@@ -1,15 +1,70 @@
 import logging
+import re
 from textwrap import dedent
+from abc import ABC, abstractmethod
+from typing import Optional
 
 import pytest
 
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.collect_experiences_agent import CollectedData
 from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtractionLLM
+from app.agent.experience import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
+
+NON_EMPTY_STRING_REGEX = re.compile(r"^\s*\S.*$")
+
+
+class Matcher(ABC):
+    @abstractmethod
+    def matches(self, value: any) -> tuple[bool, str | None]:
+        """
+        Check if the value matches the matcher.
+        :param value: The value to check.
+        :return: A tuple containing a boolean indicating if the value matches and a string with the reason why it does not match.
+        """
+        pass
+
+
+class AnyOf(Matcher):
+    def __init__(self, *args: any):
+        self.options = args
+
+    def matches(self, value: any) -> tuple[bool, str | None]:
+        for option in self.options:
+            if isinstance(option, re.Pattern) and isinstance(value, str) and option.match(value):
+                return True, None
+            elif isinstance(option, Matcher):
+                match, _ = option.matches(value)
+                if match:
+                    return True, None
+            elif option == value:
+                return True, None
+
+        return False, f"Value '{value}' does not match any of the options: [{', '.join(map(str, self.options))}]"
+
+
+class ContainsString(Matcher):
+    def __init__(self, string: str, case_sensitive: bool = False):
+        self.string = string
+        self.case_sensitive = case_sensitive
+
+    def matches(self, value: any) -> tuple[bool, str | None]:
+        if not isinstance(value, str):
+            return False, f"Value '{value}' is not a string"
+        if self.case_sensitive:
+            if self.string in value:
+                return True, None
+        else:
+            if self.string.lower() in value.lower():
+                return True, None
+        return False, f"Value '{value}' does not contain '{self.string}'"
+
+    def __str__(self):
+        return f"ContainsString('{self.string}', case_sensitive={self.case_sensitive})"
 
 
 class _TestCaseDataExtraction(CompassTestCase):
@@ -37,7 +92,23 @@ class _TestCaseDataExtraction(CompassTestCase):
 
     # The THEN (expected)
     expected_last_referenced_experience_index: int
+    """
+    The index of the last referenced experience.
+    -1 means no experience was referenced.
+    """
+
     expected_collected_data_count: int
+    """
+    The expected number of collected data.
+    This is used to check if the data extraction LLM added new experiences or not.
+    """
+
+    expected_collected_data: Optional[list[dict]] = None
+    """
+    The expected collected data.
+    Optionally assert how the llm should update the collected data.
+    If not provided, the test will not assert on the collected data.
+    """
 
 
 test_cases_data_extraction = [
@@ -67,7 +138,20 @@ test_cases_data_extraction = [
         collected_data_so_far=[
         ],
         expected_last_referenced_experience_index=0,
-        expected_collected_data_count=1
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": ContainsString("selling shoes"),
+             "location": AnyOf(None, ContainsString("local market")),
+             "company": AnyOf(None, ContainsString("local market")),
+             "paid_work": AnyOf(True, False),
+             "start_date": AnyOf('', None),
+             "end_date": AnyOf('', None),
+             "work_type":
+                 AnyOf(*WorkType.__members__.keys())
+             },
+        ]
     ),
     # Add two experiences at once
     _TestCaseDataExtraction(
@@ -84,7 +168,21 @@ test_cases_data_extraction = [
         collected_data_so_far=[
         ],
         expected_last_referenced_experience_index=0,
-        expected_collected_data_count=1
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": ContainsString("Software Architect"),
+             "location": ContainsString("Berlin"),
+             "company": ContainsString("ProUbis GmbH"),
+             "paid_work": True,
+             "start_date": '2010',
+             "end_date": '2018',
+             "work_type":
+                 AnyOf(None, WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name)
+             }
+        ]
+
     ),
 
     # Do not add twice
@@ -103,8 +201,21 @@ test_cases_data_extraction = [
                           end_date=None,
                           paid_work=None, work_type='SELF_EMPLOYMENT')
         ],
-        expected_last_referenced_experience_index=0,
-        expected_collected_data_count=1
+        expected_last_referenced_experience_index=-1,
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": ContainsString("selling shoes"),
+             "location": AnyOf(None, ContainsString("local market")),
+             "company": AnyOf(None, ContainsString("local market")),
+             "paid_work": AnyOf('', None, "True", "False", True, False),
+             "start_date": AnyOf('', None),
+             "end_date": AnyOf('', None),
+             "work_type":
+                 AnyOf(WorkType.SELF_EMPLOYMENT.name)
+             },
+        ]
     ),
     # Update an experience
     _TestCaseDataExtraction(
@@ -123,7 +234,19 @@ test_cases_data_extraction = [
                           paid_work=None, work_type='SELF_EMPLOYMENT')
         ],
         expected_last_referenced_experience_index=0,
-        expected_collected_data_count=1
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": "Selling Shoes",
+             "location": None,
+             "company": "Local Market",
+             "paid_work": AnyOf(None, True),
+             "start_date": ContainsString("2019"),
+             "end_date": AnyOf('', None),
+             "work_type": 'SELF_EMPLOYMENT'
+             },
+        ]
     ),
 
     # Delete an experience
@@ -143,6 +266,7 @@ test_cases_data_extraction = [
         ],
         expected_last_referenced_experience_index=-1,  # The experience should be deleted
         expected_collected_data_count=0
+
     ),
     # Delete an experience from two similar experiences
     _TestCaseDataExtraction(
@@ -169,7 +293,20 @@ test_cases_data_extraction = [
                                CollectedData(index=1, defined_at_turn_number=9, experience_title='Volunteering', company=None, location=None, start_date='',
                                              end_date='', paid_work=False, work_type='UNSEEN_UNPAID')],
         expected_last_referenced_experience_index=-1,  # The experience should be deleted
-        expected_collected_data_count=1
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 3,
+             "experience_title": ContainsString("Volunteer Peer mentor, Educator and a mentor manager"),
+             "location": ContainsString("Mombasa"),
+             "company": ContainsString("Mombasa Youth Empowerment Network, the Kenya Red Cross Society, and the Mombasa County Government"),
+             "paid_work": False,
+             "start_date": '2016',
+             "end_date": '2022',
+             "work_type":
+                 AnyOf(None, 'None')
+             },
+        ]
     ),
     # Complex Test cases based on failing e2e tests of the collect experiences agent
     _TestCaseDataExtraction(
@@ -246,20 +383,34 @@ test_cases_data_extraction = [
         turns=[
             (
                 "(silence)",
-                "Let's start by exploring your work experiences.  Have you ever worked for a company or someone else's business for money?"
+                "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"
             ),
             (
-                "Nope, never.  I've only done freelance stuff.",
+                "Nope, never. I've only done freelance stuff.",
                 "Okay, so you've only done freelance work. Can you tell me about the first time you started doing freelance work?"
             )
         ],
-        user_input="June 2020.  Started teaching graphic design online.  Still doing it.",
+        user_input="June 2020. Started teaching graphic design online. Still doing it.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelance Work', company=None, location=None, start_date=None, end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT'),
         ],
         expected_last_referenced_experience_index=0,
-        expected_collected_data_count=1
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": ContainsString("teaching graphic design"),
+             "location": None,
+             "company": None,
+             "paid_work": True,
+             "start_date": '2020/06',
+             "end_date": ContainsString('present'),
+             "work_type":
+                 AnyOf(WorkType.SELF_EMPLOYMENT.name)
+             },
+        ]
+
     ),
     _TestCaseDataExtraction(
         name="no_more_info_is_not_delete(experiences_of_all_kinds_all_at_once)",
@@ -335,6 +486,15 @@ async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytes
             failures.append(
                 f"Expected {test_case.expected_collected_data_count} collected data, but got {len(collected_data)}"
             )
+        if test_case.expected_collected_data is not None:
+            for i, expected_data in enumerate(test_case.expected_collected_data):
+                if i >= len(collected_data):
+                    failures.append(
+                        f"Expected {len(test_case.expected_collected_data)} collected data, but got {len(collected_data)}"
+                    )
+                    break
+                _failures = check_data_matches_expected(actual_collected_data=collected_data[i], expected_data=expected_data)
+                failures.extend(_failures)
 
         if len(failures) > 0:
             pytest.fail(
@@ -356,3 +516,32 @@ def _add_turn_to_context(user_input: str, agent_output: str, context: Conversati
     )
     context.history.turns.append(turn)
     context.all_history.turns.append(turn)
+
+
+def check_data_matches_expected(
+        actual_collected_data: CollectedData, expected_data: dict[str, any]
+) -> list[str]:
+    data_dict = actual_collected_data.model_dump()
+    failures = []
+
+    for key, expected_value in expected_data.items():
+        if key not in data_dict:
+            failures.append(f"Field '{key}' is not in CollectedData")
+            continue
+
+        actual_value = data_dict[key]
+        if isinstance(expected_value, Matcher):
+            result, failure = expected_value.matches(actual_value)
+            if not result:
+                failures.append(f"Field '{key}' with {failure}")
+        elif isinstance(expected_value, re.Pattern):
+            if not isinstance(actual_value, str) or not expected_value.match(actual_value):
+                failures.append(
+                    f"Field '{key}' with value '{actual_value}' does not match regex '{expected_value.pattern}'"
+                )
+        elif actual_value != expected_value:
+            failures.append(
+                f"Field '{key}' value '{actual_value}' does not match expected '{expected_value}'"
+            )
+
+    return failures
