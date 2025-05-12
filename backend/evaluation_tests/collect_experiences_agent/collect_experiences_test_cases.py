@@ -181,8 +181,9 @@ test_cases = [
         expected_experiences_count_max=7,
         expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (2, 2),
                              WorkType.SELF_EMPLOYMENT: (2, 2),
-                             WorkType.UNSEEN_UNPAID: (1, 1),
-                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (2, 2)},
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (1, 1),
+                             WorkType.UNSEEN_UNPAID: (2, 2)
+                             },
         country_of_user=Country.UNSPECIFIED
     ),
     CollectExperiencesAgentTestCase(
