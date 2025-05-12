@@ -155,8 +155,9 @@ test_cases = [
         country_of_user=Country.UNSPECIFIED,
         expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
                              WorkType.SELF_EMPLOYMENT: (0, 0),
-                             WorkType.UNSEEN_UNPAID: (0, 0),
-                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (0, 0)
+                             },
     ),
     CollectExperiencesAgentTestCase(
         name='experiences_of_all_kinds',
@@ -208,8 +209,8 @@ test_cases = [
         expected_experiences_count_max=7,
         expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (2, 2),
                              WorkType.SELF_EMPLOYMENT: (2, 2),
-                             WorkType.UNSEEN_UNPAID: (1, 1),
-                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (2, 2)},
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (1, 1),
+                             WorkType.UNSEEN_UNPAID: (2, 2)},
         country_of_user=Country.UNSPECIFIED
     ),
     CollectExperiencesAgentTestCase(
@@ -226,8 +227,8 @@ test_cases = [
         expected_experiences_count_max=3,
         expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
                              WorkType.SELF_EMPLOYMENT: (1, 1),
-                             WorkType.UNSEEN_UNPAID: (2, 2),
-                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (2, 2)},
         country_of_user=Country.SOUTH_AFRICA
     ),
     CollectExperiencesAgentTestCase(
@@ -245,8 +246,8 @@ test_cases = [
         expected_experiences_count_max=3,
         expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
                              WorkType.SELF_EMPLOYMENT: (1, 1),
-                             WorkType.UNSEEN_UNPAID: (2, 2),
-                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (2, 2)},
         country_of_user=Country.SOUTH_AFRICA
     ),
     CollectExperiencesAgentTestCase(
@@ -262,8 +263,8 @@ test_cases = [
         expected_experiences_count_max=3,
         expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
                              WorkType.SELF_EMPLOYMENT: (0, 0),
-                             WorkType.UNSEEN_UNPAID: (2, 3),
-                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (1, 3)},
         country_of_user=Country.KENYA
     ),
     CollectExperiencesAgentTestCase(
@@ -281,8 +282,8 @@ test_cases = [
         expected_experiences_count_max=3,
         expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
                              WorkType.SELF_EMPLOYMENT: (1, 1),
-                             WorkType.UNSEEN_UNPAID: (0, 0),
-                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (0, 0)},
         country_of_user=Country.FRANCE
     ),
     CollectExperiencesAgentTestCase(
@@ -298,8 +299,8 @@ test_cases = [
         expected_experiences_count_max=3,
         expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
                              WorkType.SELF_EMPLOYMENT: (1, 1),
-                             WorkType.UNSEEN_UNPAID: (0, 0),
-                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (0, 0)},
         country_of_user=Country.FRANCE
     ),
     CollectExperiencesAgentTestCase(
@@ -314,8 +315,8 @@ test_cases = [
         expected_experiences_count_max=1,
         expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
                              WorkType.SELF_EMPLOYMENT: (0, 0),
-                             WorkType.UNSEEN_UNPAID: (0, 0),
-                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (0, 0)},
         country_of_user=Country.KENYA
     ),
     CollectExperiencesAgentTestCase(
@@ -334,8 +335,8 @@ test_cases = [
         expected_experiences_count_max=1,
         expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
                              WorkType.SELF_EMPLOYMENT: (0, 0),
-                             WorkType.UNSEEN_UNPAID: (0, 0),
-                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (0, 0)},
         country_of_user=Country.KENYA
     ),
     CollectExperiencesAgentTestCase(
@@ -352,8 +353,8 @@ test_cases = [
         expected_experiences_count_max=1,
         expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
                              WorkType.SELF_EMPLOYMENT: (0, 0),
-                             WorkType.UNSEEN_UNPAID: (1, 1),
-                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0)},
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (1, 1)},
         country_of_user=Country.UNSPECIFIED
     ),
 ]
