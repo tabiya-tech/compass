@@ -11,7 +11,7 @@ import ChatBubble, {
 import { render, screen } from "src/_test_utilities/test-utils";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
-import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
+import { ChatMessageType } from "src/chat/Chat.types";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import ReactionButtons from "src/chat/reaction/components/reactionButtons/ReactionButtons";
 
@@ -42,15 +42,11 @@ describe("render tests", () => {
       sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
       sent_at: givenDate,
-      type: ChatMessageType.BASIC_CHAT,
+      type: ChatMessageType.USER_MESSAGE,
       reaction: null
     };
-    const givenMessage: IChatMessage = {
-      ...messageData,
-      component: <CompassChatMessage chatMessage={messageData} />
-    };
     // WHEN the user chat message is rendered
-    render(<CompassChatMessage chatMessage={givenMessage} />);
+    render(<CompassChatMessage {...messageData} />);
 
     // THEN expect the message container to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CONTAINER)).toBeInTheDocument();
@@ -71,8 +67,8 @@ describe("render tests", () => {
       expect.objectContaining({
         type: ReactionButtons,
         props: {
-          messageId: givenMessage.message_id,
-          currentReaction: givenMessage.reaction
+          messageId: messageData.message_id,
+          currentReaction: messageData.reaction
         }
       })
     ]))
@@ -80,8 +76,8 @@ describe("render tests", () => {
     expect(ChatBubble).toHaveBeenNthCalledWith(
       1,
       {
-        message: givenMessage.message,
-        sender: givenMessage.sender,
+        message: messageData.message,
+        sender: messageData.sender,
       },
       {}
     );

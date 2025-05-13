@@ -1,8 +1,8 @@
 import React from "react";
-import { IChatMessage } from "src/chat/Chat.types";
 import { MessageContainer } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
 import ConversationConclusionFooter from "src/chat/chatMessage/conversationConclusionChatMessage/conversationConclusionFooter/ConversationConclusionFooter";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
+import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 
 const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
 
@@ -10,19 +10,21 @@ export const DATA_TEST_ID = {
   CONVERSATION_CONCLUSION_CHAT_MESSAGE_CONTAINER: `conversation_conclusion_chat-message-container-${uniqueId}`,
 };
 
-interface ConversationConclusionChatMessageProps {
-  chatMessage: Omit<IChatMessage, "component">;
+export interface ConversationConclusionChatMessageProps {
+  sender: ConversationMessageSender;
+  message: string;
 }
 
 const ConversationConclusionChatMessage: React.FC<ConversationConclusionChatMessageProps> = ({
-  chatMessage,
+  sender,
+  message,
 }) => {
   return (
     <MessageContainer
-      origin={chatMessage.sender}
+      origin={sender}
       data-testid={DATA_TEST_ID.CONVERSATION_CONCLUSION_CHAT_MESSAGE_CONTAINER}
     >
-      <ChatBubble message={chatMessage.message} sender={chatMessage.sender}>
+      <ChatBubble message={message} sender={sender}>
         <ConversationConclusionFooter />
       </ChatBubble>
     </MessageContainer>

@@ -1,23 +1,23 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import ChatList from "./ChatList";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
+import { ChatMessageProps, ChatMessageType, IChatMessage } from "src/chat/Chat.types";
 import { nanoid } from "nanoid";
-import CompassChatMessage from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
-import UserChatMessage from "src/chat/chatMessage/userChatMessage/UserChatMessage";
-import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
-import ConversationConclusionChatMessage from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
-import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
+import CompassChatMessage, { CompassChatMessageProps } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import UserChatMessage, { UserChatMessageProps } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import TypingChatMessage, { TypingChatMessageProps } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
+import ConversationConclusionChatMessage, { ConversationConclusionChatMessageProps } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import ChatBubble, { ChatBubbleProps } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 
 // Helper function to create a message with its component
 const createMessage = (
   message: string,
   sender: ConversationMessageSender,
-  type: ChatMessageType = ChatMessageType.BASIC_CHAT,
+  type: ChatMessageType = ChatMessageType.USER_MESSAGE,
   reaction: any = null
-): IChatMessage => {
+): IChatMessage<ChatMessageProps> => {
   const messageData = {
     message_id: nanoid(),
     sender,
@@ -27,25 +27,28 @@ const createMessage = (
     reaction,
   };
 
-  let component;
+  let component: (props: ChatMessageProps) => ReactElement<ChatMessageProps>;
   switch (type) {
     case ChatMessageType.TYPING:
-      component = <TypingChatMessage waitBeforeThinking={15000} />;
+      component = (props: ChatMessageProps) => <TypingChatMessage {...(props as TypingChatMessageProps)} />;
       break;
     case ChatMessageType.CONVERSATION_CONCLUSION:
-      component = <ConversationConclusionChatMessage chatMessage={messageData} />;
+      component = (props: ChatMessageProps) => <ConversationConclusionChatMessage {...(props as ConversationConclusionChatMessageProps)} />;
       break;
     case ChatMessageType.ERROR:
-      component = <ChatBubble message={messageData.message} sender={messageData.sender} />;
+      component = (props: ChatMessageProps) => <ChatBubble {...(props as ChatBubbleProps)} />;
       break;
     default:
       component = sender === ConversationMessageSender.USER ? 
-        <UserChatMessage chatMessage={messageData} /> : 
-        <CompassChatMessage chatMessage={messageData} />;
+        (props: ChatMessageProps) => <UserChatMessage {...(props as UserChatMessageProps)} /> : 
+        (props: ChatMessageProps) => <CompassChatMessage {...(props as CompassChatMessageProps)} />;
   }
 
   return {
-    ...messageData,
+    type,
+    message_id: messageData.message_id,
+    sender: messageData.sender,
+    payload: messageData,
     component,
   };
 };
