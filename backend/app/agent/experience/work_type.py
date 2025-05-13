@@ -46,16 +46,16 @@ class WorkType(Enum):
     @staticmethod
     def work_type_long(work_type: WorkType | None) -> str:
         if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-            return "Waged work or paid work as an employee."
+            return "Waged work or paid work as an employee. Working for someone else, for a company or an organization, in exchange for a salary or wage."
         elif work_type == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
             return "Unpaid Trainee Work."
         elif work_type == WorkType.SELF_EMPLOYMENT:
             return "Self-employment, micro entrepreneurship, contract based work, freelancing, running own business, paid work but not work as an employee."
         elif work_type == WorkType.UNSEEN_UNPAID:
             return dedent("""\
-            Represents all unseen economy, including:
-                - Unpaid domestic services for household and family members.
-                - Unpaid caregiving services for household and family members.
+            Represents all unpaid work, including:
+                - Unpaid domestic services for own household or family members.
+                - Unpaid caregiving for own household or family members.
                 - Unpaid direct volunteering for other households.
                 - Unpaid community- and organization-based volunteering.
             excluding:
