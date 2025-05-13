@@ -9,7 +9,7 @@ import {
 import { render, screen } from "src/_test_utilities/test-utils";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
-import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
+import { ChatMessageType } from "src/chat/Chat.types";
 
 jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
   const originalModule = jest.requireActual("src/chat/chatMessage/components/chatBubble/ChatBubble");
@@ -51,15 +51,11 @@ describe("render tests", () => {
       type: ChatMessageType.CONVERSATION_CONCLUSION,
       reaction: null
     };
-    const givenMessage: IChatMessage = {
-      ...messageData,
-      component: <ConversationConclusionChatMessage chatMessage={messageData} />
-    };
 
     // WHEN the conversation conclusion chat message is rendered
     render(
       <ConversationConclusionChatMessage
-        chatMessage={givenMessage}
+        {...messageData}
       />
     );
 
@@ -86,15 +82,11 @@ describe("render tests", () => {
       type: ChatMessageType.CONVERSATION_CONCLUSION,
       reaction: null
     };
-    const givenMessage: IChatMessage = {
-      ...messageData,
-      component: <ConversationConclusionChatMessage chatMessage={messageData} />
-    };
 
     // WHEN the conversation conclusion chat message is rendered
     render(
       <ConversationConclusionChatMessage
-        chatMessage={givenMessage}
+        {...messageData}
       />
     );
 
@@ -113,15 +105,11 @@ describe("render tests", () => {
       type: ChatMessageType.CONVERSATION_CONCLUSION,
       reaction: null
     };
-    const givenMessage: IChatMessage = {
-      ...messageData,
-      component: <ConversationConclusionChatMessage chatMessage={messageData} />
-    };
 
     // WHEN the conversation conclusion chat message is rendered
     render(
         <ConversationConclusionChatMessage
-          chatMessage={givenMessage}
+          {...messageData}
         />
     );
 

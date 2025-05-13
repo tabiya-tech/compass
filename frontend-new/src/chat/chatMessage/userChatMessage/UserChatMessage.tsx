@@ -1,6 +1,5 @@
 import React from "react";
 import { Box, styled } from "@mui/material";
-import { IChatMessage } from "src/chat/Chat.types";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
@@ -20,13 +19,15 @@ export const MessageContainer = styled(Box)<{ origin: ConversationMessageSender 
   width: "100%",
 }));
 
-type BasicChatMessageProps = {
-  chatMessage: Omit<IChatMessage, "component">;
-};
+export interface UserChatMessageProps {
+  sender: ConversationMessageSender;
+  message: string;
+  sent_at: string;
+}
 
-const UserChatMessage: React.FC<BasicChatMessageProps> = ({ chatMessage }) => {
+const UserChatMessage: React.FC<UserChatMessageProps> = ({ sender, message, sent_at }) => {
   return (
-    <MessageContainer origin={chatMessage.sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
+    <MessageContainer origin={sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
       <Box
         sx={{
           maxWidth: "80%",
@@ -35,9 +36,9 @@ const UserChatMessage: React.FC<BasicChatMessageProps> = ({ chatMessage }) => {
           flexDirection: "column",
         }}
       >
-        <ChatBubble message={chatMessage.message} sender={chatMessage.sender} />
-        <ChatMessageFooterLayout sender={chatMessage.sender}>
-          <Timestamp sentAt={chatMessage.sent_at} />
+        <ChatBubble message={message} sender={sender} />
+        <ChatMessageFooterLayout sender={sender}>
+          <Timestamp sentAt={sent_at} />
         </ChatMessageFooterLayout>
       </Box>
     </MessageContainer>

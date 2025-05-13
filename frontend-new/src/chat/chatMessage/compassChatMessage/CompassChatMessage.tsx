@@ -1,7 +1,6 @@
 import React from "react";
 import { Box, styled } from "@mui/material";
-import { IChatMessage } from "src/chat/Chat.types";
-import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
+import { ConversationMessageSender, MessageReaction } from "src/chat/ChatService/ChatService.types";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
@@ -21,28 +20,32 @@ export const MessageContainer = styled(Box)<{ origin: ConversationMessageSender 
   width: "100%",
 }));
 
-type CompassChatMessageProps = {
-  chatMessage: Omit<IChatMessage, "component">;
-};
+export interface CompassChatMessageProps {
+    message_id: string;
+    message: string;
+    sent_at: string; // ISO formatted datetime string
+    reaction: MessageReaction | null;
+    sender: ConversationMessageSender;
+}
 
-const CompassChatMessage: React.FC<CompassChatMessageProps> = ({ chatMessage }) => {
+const CompassChatMessage: React.FC<CompassChatMessageProps> = ({ message_id, message, sent_at, reaction, sender }) => {
   return (
-    <MessageContainer origin={chatMessage.sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
+    <MessageContainer origin={sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
       <Box sx={{
         width: "fit-content",
         minWidth: "30%",
         maxWidth: "80%",
         display: "flex",
         flexDirection: "column",
-        alignItems: chatMessage.sender === ConversationMessageSender.COMPASS ? "flex-start" : "flex-end"
+        alignItems: sender === ConversationMessageSender.COMPASS ? "flex-start" : "flex-end"
       }}>
         <Box sx={{ width: "100%" }}>
-          <ChatBubble message={chatMessage.message} sender={chatMessage.sender} />
-          <ChatMessageFooterLayout sender={chatMessage.sender}>
-            <Timestamp sentAt={chatMessage.sent_at} />
+          <ChatBubble message={message} sender={sender} />
+          <ChatMessageFooterLayout sender={sender}>
+            <Timestamp sentAt={sent_at} />
             <ReactionButtons
-              messageId={chatMessage.message_id}
-              currentReaction={chatMessage.reaction}
+              messageId={message_id}
+              currentReaction={reaction}
             />
           </ChatMessageFooterLayout>
         </Box>

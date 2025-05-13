@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { IChatMessage } from "src/chat/Chat.types";
+import { IChatMessage, ChatMessageProps } from "src/chat/Chat.types";
 import { Box, List, ListItem, useTheme } from "@mui/material";
 import { styled } from "@mui/system";
 import { AnimatePresence, motion } from "framer-motion";
@@ -10,7 +10,7 @@ export const DATA_TEST_ID = {
 };
 
 export type ChatListProps = {
-  messages: IChatMessage[];
+  messages: IChatMessage<ChatMessageProps>[];
 };
 
 const ChatListContainer = styled(Box)(({ theme }) => ({
@@ -84,7 +84,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages }) => {
               transition={{ duration: 0.3 }}
               sx={{ width: "100%", paddingY: theme.tabiyaSpacing.xs, paddingX: 0 }}
             >
-              {message.component}
+              {message.component(message.payload)}
             </ListItem>
           ))}
         </AnimatePresence>
