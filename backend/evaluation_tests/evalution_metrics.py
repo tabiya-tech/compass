@@ -146,20 +146,41 @@ def aggregate_metrics(*, log_file: str, label_filter: Optional[str] = None,
 
 
 def main(*, label: Optional[str] = None, log_file: str, summary_file: str, do_plot: bool):
+    # Generate the summary
     summary = aggregate_metrics(log_file=log_file, label_filter=label, summary_file=summary_file)
     print(summary.head())
-    if do_plot:
-        # Plot the data
-        import matplotlib.pyplot as plt
-        # Plot the data
-        plt.figure(figsize=(14, 10))
-        for label, group in summary.groupby("label"):
-            plt.barh(group["test_name"], group["pass_percentage"], label=label)
 
-        plt.ylabel("Test Name")
+    if do_plot:
+        import matplotlib.pyplot as plt
+        import numpy as np
+        # Get unique test names and labels
+        test_names = summary["test_name"].unique()
+        labels = summary["label"].unique()
+
+        # Set figure size dynamically based on number of tests
+        plt.figure(figsize=(14, max(10, len(test_names) * 0.4)))
+
+        # Set bar width and calculate positions
+        bar_height = 0.8 / len(labels)  # Adjust based on the number of labels
+        index = np.arange(len(test_names))
+
+        # Plot each label as a separate bar group
+        for i, label in enumerate(labels):
+            # Filter the data for the current label
+            group = summary[summary["label"] == label].set_index("test_name").reindex(test_names).reset_index()
+
+            # Calculate the y-positions for this label's bars
+            y_positions = index + (i - (len(labels) - 1) / 2) * bar_height
+
+            # Plot the bars
+            plt.barh(y_positions, group["pass_percentage"], height=bar_height, label=label)
+
+        # Set the y-ticks to the middle of each group
+        plt.yticks(index, test_names)
         plt.xlabel("Outcome (%)")
+        plt.ylabel("Test Name")
         plt.title("Test Outcomes by Label")
-        plt.legend(title="Label")
+        plt.legend(title="Label", bbox_to_anchor=(1.05, 1), loc="upper left")
         plt.tight_layout()
         plt.show()
 
