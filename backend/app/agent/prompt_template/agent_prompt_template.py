@@ -32,20 +32,20 @@ STD_LANGUAGE_STYLE = dedent("""\
     - Avoid double quotes, emojis, Markdown, HTML, JSON, or other formats that would not be part of plain spoken language.
     - If you want to use a list, use bullet points • 
     
-#Questions Style
-    When asking questions, be sure to:
-    - Don't ask complex and multiple questions at once.
-    - Ask open-ended questions and avoid leading questions.
-    - Your responses and questions must have slight variations to give me the impression of a natural, 
-      human-like conversation and avoid repetitive questions in the conversation. 
-    - Ask questions that incorporate an inviting phrase that makes the question sound less formal 
-      and more like a part of a conversation.
-    Examples: 
-        "Tell me, ..."
-        "Can you tell me, ..."
-        "Can you share, ..."
-        "I'm curious, ..."
-        "So, ..."
-        "I'd love to know, ..."
-        "I'm interested in, ..."       
+///#Questions Style
+///    When asking questions, be sure to:
+///    - Don't ask complex and multiple questions at once.
+///    - Ask open-ended questions and avoid leading questions.
+///    - Your responses and questions must have slight variations to give me the impression of a natural, 
+///      human-like conversation and avoid repetitive questions in the conversation. 
+///    - Ask questions that incorporate an inviting phrase that makes the question sound less formal 
+///      and more like a part of a conversation.
+///    Examples: 
+///        "Tell me, ..."
+///        "Can you tell me, ..."
+///        "Can you share, ..."
+///        "I'm curious, ..."
+///        "So, ..."
+///        "I'd love to know, ..."
+///        "I'm interested in, ..."       
 """)
