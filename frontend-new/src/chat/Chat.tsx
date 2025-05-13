@@ -1,7 +1,7 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/chatList/ChatList";
-import { IChatMessage } from "./Chat.types";
+import { ChatMessageProps, IChatMessage } from "./Chat.types";
 import {
   generateCompassMessage,
   generateConversationConclusionMessage,
@@ -34,6 +34,7 @@ import { ChatProvider } from "src/chat/ChatContext";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 import ChatProgressBar from "./chatProgressbar/ChatProgressBar";
 import { CurrentPhase, defaultCurrentPhase } from "./chatProgressbar/types";
+import { CompassChatMessageProps } from "./chatMessage/compassChatMessage/CompassChatMessage";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -63,7 +64,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [messages, setMessages] = useState<IChatMessage[]>([]);
+  const [messages, setMessages] = useState<IChatMessage<ChatMessageProps>[]>([]);
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
   const [exploredExperiences, setExploredExperiences] = useState<number>(0);
   const [conversationConductedAt, setConversationConductedAt] = useState<string | null>(null);
@@ -92,7 +93,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
    * --- Utility functions ---
    */
 
-  const addMessage = (message: IChatMessage) => {
+  const addMessage = (message: IChatMessage<ChatMessageProps>) => {
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 
@@ -104,18 +105,18 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const addOrRemoveTypingMessage = (userIsTyping: boolean) => {
     if (userIsTyping) {
       // Only add typing message if it doesn't already exist
-      setMessages((prevMessages) => {
+      setMessages((prevMessages: IChatMessage<ChatMessageProps>[]) => {
         // check if the last message is a typing message
         const hasTypingMessage = prevMessages[prevMessages.length - 1]?.type === ChatMessageType.TYPING;
 
         if (!hasTypingMessage) {
-          return [...prevMessages, generateTypingMessage()];
+          return [...prevMessages, generateTypingMessage() as IChatMessage<ChatMessageProps>];
         }
         return prevMessages;
       });
     } else {
       // filter out the typing message
-      setMessages((prevMessages) => prevMessages.filter((message) => message.type !== ChatMessageType.TYPING));
+      setMessages((prevMessages: IChatMessage<ChatMessageProps>[]) => prevMessages.filter((message) => message.type !== ChatMessageType.TYPING));
     }
   };
 
@@ -123,11 +124,17 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     // If there are no messages, we can't calculate the time
     if (messages.length === 0) return null;
 
-    // Get timestamp from the first message in the conversation
-    const firstMessageTimestamp = messages[0].sent_at;
-    if (!firstMessageTimestamp) return null;
+    // Get timestamp from the first compass message in the conversation
+    const firstCompassMessage = (messages.find((message) => message.type === ChatMessageType.COMPASS_MESSAGE) as IChatMessage<CompassChatMessageProps>)
+    // If there is no compass message, we can't calculate the time
+    if (!firstCompassMessage) return null;
 
-    const conversationStartTime = new Date(firstMessageTimestamp).getTime();
+    // Get the timestamp from the compass message
+    const firstCompassMessageTimestamp = firstCompassMessage.payload.sent_at;
+    // If there is no timestamp, we can't calculate the time
+    if (!firstCompassMessageTimestamp) return null;
+
+    const conversationStartTime = new Date(firstCompassMessageTimestamp).getTime();
     const targetTime = conversationStartTime + FEEDBACK_NOTIFICATION_DELAY;
     const currentTime = Date.now();
     return Math.max(0, targetTime - currentTime);
@@ -174,7 +181,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       setAiIsTyping(true);
       if (userMessage) {
         // optimistically add the user's message for a more responsive feel
-        const message = generateUserMessage(userMessage, new Date().toISOString());
+        const message = generateUserMessage(userMessage, new Date().toISOString()) as IChatMessage<ChatMessageProps>;
         addMessage(message);
       }
 
@@ -190,9 +197,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
         response.messages.forEach((messageItem) => {
           const message = response.conversation_completed && messageItem === response.messages[response.messages.length - 1]
-            ? generateConversationConclusionMessage(messageItem.message_id, messageItem.message, messageItem.sent_at)
+            ? generateConversationConclusionMessage(messageItem.message_id, messageItem.message)
             : generateCompassMessage(messageItem.message_id, messageItem.message, messageItem.sent_at, messageItem.reaction);
-          addMessage(message);
+          addMessage(message as IChatMessage<ChatMessageProps>);
         });
 
         setConversationCompleted(response.conversation_completed);
@@ -204,7 +211,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         });
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error));
-        addMessage(generatePleaseRepeatMessage());
+        addMessage(generatePleaseRepeatMessage() as IChatMessage<ChatMessageProps>);
       } finally {
         setAiIsTyping(false);
       }
@@ -229,7 +236,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           if (sessionId) {
             // Clear the messages if a new session is issued
             //  and add a typing message as the previous one will be removed
-            setMessages([generateTypingMessage()]);
+            setMessages([generateTypingMessage() as IChatMessage<ChatMessageProps>]);
             // AND clear the current phase
             setCurrentPhase(defaultCurrentPhase)
           } else {
@@ -247,13 +254,13 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           setMessages(
             history.messages.map((message: ConversationMessage) => {
               if (message.sender === ConversationMessageSender.USER) {
-                return generateUserMessage(message.message, message.sent_at);
+                return generateUserMessage(message.message, message.sent_at) as IChatMessage<ChatMessageProps>;
               }
               // If this is the last message and conversation is completed, make it a conclusion message
               if (history.conversation_completed && message === history.messages[history.messages.length - 1]) {
-                return generateConversationConclusionMessage(message.message_id, message.message, message.sent_at);
+                return generateConversationConclusionMessage(message.message_id, message.message) as IChatMessage<ChatMessageProps>;
               }
-              return generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction);
+              return generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction) as IChatMessage<ChatMessageProps>;
             }),
           );
 
@@ -311,7 +318,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.NEW_CONVERSATION_STARTED, { variant: "success" });
     } else {
       // Add a message to the chat saying that something went wrong
-      setMessages([generateSomethingWentWrongMessage()]);
+      setMessages([generateSomethingWentWrongMessage() as IChatMessage<ChatMessageProps>]);
       // Set the conversation as completed to prevent the user from sending any messages
       setConversationCompleted(true);
       // Notify the user that the chat failed to start
@@ -332,7 +339,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     initializeChat(currentUserId, activeSessionId).then((successful: boolean) => {
       if (!successful) {
         // Add a message to the chat saying that something went wrong
-        setMessages([generateSomethingWentWrongMessage()]);
+        setMessages([generateSomethingWentWrongMessage() as IChatMessage<ChatMessageProps>]);
         // Set the conversation as completed to prevent the user from sending any messages
         setConversationCompleted(true);
         // Notify the user that the chat failed to start
