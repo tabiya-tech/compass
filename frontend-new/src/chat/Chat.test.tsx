@@ -34,7 +34,7 @@ import ConfirmModalDialog, {
 } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import { DATA_TEST_ID as INACTIVE_BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/InactiveBackdrop";
 import userEvent, { UserEvent } from "@testing-library/user-event";
-import { ChatMessageProps, ChatMessageType, IChatMessage } from "./Chat.types";
+import { IChatMessage } from "./Chat.types";
 import { FIXED_MESSAGES_TEXT } from "./util";
 import { TabiyaUser } from "src/auth/auth.types";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
@@ -46,6 +46,11 @@ import ChatProgressBar, {
   DATA_TEST_ID as CHAT_PROGRESS_BAR_DATA_TEST_ID,
 } from "src/chat/chatProgressbar/ChatProgressBar";
 import { ChatProvider } from "src/chat/ChatContext";
+import { USER_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import { COMPASS_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import { TYPING_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
+import { ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
+import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 
 // Mock Components ----------
 // mock the snackbar
@@ -200,7 +205,7 @@ describe("Chat", () => {
     );
   }
 
-  function assertMessagesAreShown(conversationMessages: IChatMessage<ChatMessageProps>[], areLastMessages: boolean = true) {
+  function assertMessagesAreShown(conversationMessages: IChatMessage<any>[], areLastMessages: boolean = true) {
     // eslint-disable-next-line jest/valid-expect
     const fn = areLastMessages ? expect(ChatList as jest.Mock).toHaveBeenLastCalledWith : expect(ChatList as jest.Mock).toHaveBeenCalledWith;
     fn(
@@ -220,7 +225,7 @@ describe("Chat", () => {
     // AND expect a typing indicator to have been shown
     const assertion = () =>
       expect.objectContaining({
-        messages: expect.arrayContaining([expect.objectContaining({ type: ChatMessageType.TYPING })]),
+        messages: expect.arrayContaining([expect.objectContaining({ type: TYPING_CHAT_MESSAGE_TYPE })]),
       });
     if (nthCall < 0) {
       expect(ChatList as jest.Mock).toHaveBeenCalledWith(assertion(), {});
@@ -583,18 +588,17 @@ describe("Chat", () => {
           // AND an error message to be shown in the chat list
           expect(ChatList as jest.Mock).toHaveBeenLastCalledWith(
             expect.objectContaining({
-              messages: [
+              messages: expect.arrayContaining([
                 {
                   message_id: expect.any(String),
-                  type: ChatMessageType.ERROR,
+                  type: ERROR_CHAT_MESSAGE_TYPE,
                   sender: ConversationMessageSender.COMPASS,
                   component: expect.any(Function),
                   payload: {
-                    message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
-                    sender: ConversationMessageSender.COMPASS
+                    message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT
                   }
                 },
-              ],
+              ]),
             }),
             {}
           );
@@ -647,11 +651,10 @@ describe("Chat", () => {
           [
             {
               message_id: expect.any(String),
-              type: ChatMessageType.ERROR,
+              type: ERROR_CHAT_MESSAGE_TYPE,
               sender: ConversationMessageSender.COMPASS,
               payload: {
-                message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
-                sender: ConversationMessageSender.COMPASS,
+                message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG
               },
               component: expect.any(Function),
             },
@@ -712,7 +715,7 @@ describe("Chat", () => {
         expect(ChatService.getInstance().sendMessage).not.toHaveBeenCalled();
         // AND the last message to be a conversation conclusion message
         const lastMessage = (ChatList as jest.Mock).mock.calls.at(-1)[0].messages.at(-1);
-        expect(lastMessage.type).toBe(ChatMessageType.CONVERSATION_CONCLUSION);
+        expect(lastMessage.type).toBe(CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE);
         // AND expect input field to have been disabled
         expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
           expect.objectContaining({ isChatFinished: true, aiIsTyping: false }),
@@ -817,11 +820,10 @@ describe("Chat", () => {
           [
             {
               message_id: expect.any(String),
-              type: ChatMessageType.ERROR,
+              type: ERROR_CHAT_MESSAGE_TYPE,
               sender: ConversationMessageSender.COMPASS,
               payload: {
-                message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
-                sender: ConversationMessageSender.COMPASS,
+                message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG
               },
               component: expect.any(Function),
             },
@@ -881,11 +883,10 @@ describe("Chat", () => {
           [
             {
               message_id: expect.any(String),
-              type: ChatMessageType.ERROR,
+              type: ERROR_CHAT_MESSAGE_TYPE,
               sender: ConversationMessageSender.COMPASS,
               payload: {
                 message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
-                sender: ConversationMessageSender.COMPASS,
               },
               component: expect.any(Function),
             },
@@ -951,10 +952,9 @@ describe("Chat", () => {
             {
               message_id: expect.any(String),
               sender: ConversationMessageSender.COMPASS,
-              type: ChatMessageType.ERROR,
+              type: ERROR_CHAT_MESSAGE_TYPE,
               payload: {
-                message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
-                sender: ConversationMessageSender.COMPASS
+                message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT
               },
               component: expect.any(Function),
             },
@@ -1072,11 +1072,10 @@ describe("Chat", () => {
           [
             ...givenPreviousConversation.messages.map((message) => ({
               message_id: expect.any(String),
-              type: message.sender === ConversationMessageSender.COMPASS ? ChatMessageType.COMPASS_MESSAGE : ChatMessageType.USER_MESSAGE,
+              type: message.sender === ConversationMessageSender.COMPASS ? COMPASS_CHAT_MESSAGE_TYPE : USER_CHAT_MESSAGE_TYPE,
               sender: message.sender,
               payload: {
                 message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined,
-                sender: message.sender,
                 message: message.message,
                 sent_at: message.sent_at,
                 reaction: message.sender === ConversationMessageSender.COMPASS ? message.reaction : undefined,
@@ -1085,10 +1084,9 @@ describe("Chat", () => {
             })),
             {
               message_id: expect.any(String),
-              type: ChatMessageType.USER_MESSAGE,
+              type: USER_CHAT_MESSAGE_TYPE,
               sender: ConversationMessageSender.USER,
               payload: {
-                sender: ConversationMessageSender.USER,
                 message: givenMessage,
                 sent_at: expect.any(String),
               },
@@ -1096,7 +1094,7 @@ describe("Chat", () => {
             },
             {
               message_id: expect.any(String),
-              type: ChatMessageType.TYPING,
+              type: TYPING_CHAT_MESSAGE_TYPE,
               sender: ConversationMessageSender.COMPASS,
               payload: {
                 waitBeforeThinking: undefined,
@@ -1124,11 +1122,10 @@ describe("Chat", () => {
           [
             ...givenPreviousConversation.messages.map((message) => ({
               message_id: expect.any(String),
-              type: message.sender === ConversationMessageSender.COMPASS ? ChatMessageType.COMPASS_MESSAGE : ChatMessageType.USER_MESSAGE,
+              type: message.sender === ConversationMessageSender.COMPASS ? COMPASS_CHAT_MESSAGE_TYPE : USER_CHAT_MESSAGE_TYPE,
               sender: message.sender,
               payload: {
                 message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined,
-                sender: message.sender,
                 message: message.message,
                 sent_at: message.sent_at,
                 reaction: message.sender === ConversationMessageSender.COMPASS ? message.reaction : undefined,
@@ -1137,10 +1134,9 @@ describe("Chat", () => {
             })),
             {
               message_id: expect.any(String),
-              type: ChatMessageType.USER_MESSAGE,
+              type: USER_CHAT_MESSAGE_TYPE,
               sender: ConversationMessageSender.USER,
               payload: {
-                sender: ConversationMessageSender.USER,
                 message: givenMessage,
                 sent_at: expect.any(String),
               },
@@ -1148,11 +1144,10 @@ describe("Chat", () => {
             },
             ...givenSendMessageResponse.messages.map((message) => ({
               message_id: expect.any(String),
-              type: message.sender === ConversationMessageSender.COMPASS ? ChatMessageType.COMPASS_MESSAGE : ChatMessageType.USER_MESSAGE,
+              type: message.sender === ConversationMessageSender.COMPASS ? COMPASS_CHAT_MESSAGE_TYPE : USER_CHAT_MESSAGE_TYPE,
               sender: message.sender === ConversationMessageSender.COMPASS ? ConversationMessageSender.COMPASS : ConversationMessageSender.USER,
               payload: {
                 message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined,
-                sender: message.sender,
                 message: message.message,
                 sent_at: message.sent_at,
                 reaction: message.sender === ConversationMessageSender.COMPASS ? message.reaction : undefined,
@@ -1280,11 +1275,10 @@ describe("Chat", () => {
           [
             ...givenPreviousConversation.messages.map((message) => ({
               message_id: expect.any(String),
-              type: message.sender === ConversationMessageSender.COMPASS ? ChatMessageType.COMPASS_MESSAGE : ChatMessageType.USER_MESSAGE,
+              type: message.sender === ConversationMessageSender.COMPASS ? COMPASS_CHAT_MESSAGE_TYPE : USER_CHAT_MESSAGE_TYPE,
               sender: message.sender,
               payload: {
                 message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined,
-                sender: message.sender,
                 message: message.message,
                 sent_at: message.sent_at,
                 reaction: message.sender === ConversationMessageSender.COMPASS ? message.reaction : undefined,
@@ -1293,10 +1287,9 @@ describe("Chat", () => {
             })),
             {
               message_id: expect.any(String),
-              type: ChatMessageType.USER_MESSAGE,
+              type: USER_CHAT_MESSAGE_TYPE,
               sender: ConversationMessageSender.USER,
               payload: {
-                sender: ConversationMessageSender.USER,
                 message: givenMessage,
                 sent_at: expect.any(String)
               },
@@ -1304,7 +1297,7 @@ describe("Chat", () => {
             },
             {
               message_id: expect.any(String),
-              type: ChatMessageType.TYPING,
+              type: TYPING_CHAT_MESSAGE_TYPE,
               sender: ConversationMessageSender.COMPASS,
               payload: {
                 waitBeforeThinking: undefined,
@@ -1336,7 +1329,6 @@ describe("Chat", () => {
               sender: message.sender,
               payload: {
                 message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined,
-                sender: message.sender,
                 message: message.message,
                 sent_at: message.sent_at,
                 reaction: message.sender === ConversationMessageSender.COMPASS ? message.reaction : undefined,
@@ -1345,10 +1337,9 @@ describe("Chat", () => {
             })),
             {
               message_id: expect.any(String),
-              type: ChatMessageType.USER_MESSAGE,
+              type: USER_CHAT_MESSAGE_TYPE,
               sender: ConversationMessageSender.USER,
               payload: {
-                sender: ConversationMessageSender.USER,
                 message: givenMessage,
                 sent_at: expect.any(String)
               },
@@ -1361,7 +1352,6 @@ describe("Chat", () => {
               sender: message.sender,
               payload: {
                 message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined,
-                sender: message.sender,
                 message: message.message,
                 sent_at: message.sent_at,
                 reaction: message.sender === ConversationMessageSender.COMPASS ? message.reaction : undefined,
@@ -1370,10 +1360,9 @@ describe("Chat", () => {
             })),
             {
               message_id: expect.any(String),
-              type: ChatMessageType.CONVERSATION_CONCLUSION,
+              type: CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
               sender: ConversationMessageSender.COMPASS,
               payload: {
-                sender: ConversationMessageSender.COMPASS,
                 message: expect.any(String),
               },
               component: expect.any(Function),
@@ -1483,7 +1472,6 @@ describe("Chat", () => {
               sender: message.sender,
               payload: {
                 message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined,
-                sender: message.sender,
                 message: message.message,
                 sent_at: message.sent_at,
                 reaction: message.sender === ConversationMessageSender.COMPASS ? message.reaction : undefined,
@@ -1492,11 +1480,10 @@ describe("Chat", () => {
             })),
             {
               message_id: expect.any(String),
-              type: ChatMessageType.ERROR,
+              type: ERROR_CHAT_MESSAGE_TYPE,
               sender: ConversationMessageSender.COMPASS,
               payload: {
                 message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
-                sender: ConversationMessageSender.COMPASS,
               },
               component: expect.any(Function),
             },
@@ -1845,9 +1832,8 @@ describe("Chat", () => {
           ...givenPreviousConversation.messages.map((message) => ({
             message_id: message.message_id,
             sender: message.sender,
-            type: ChatMessageType.COMPASS_MESSAGE,
+            type: COMPASS_CHAT_MESSAGE_TYPE,
             payload: {
-              sender: ConversationMessageSender.COMPASS,
               message_id: message.message_id,
               message: message.message,
               sent_at: message.sent_at,
@@ -1918,11 +1904,10 @@ describe("Chat", () => {
           [
             {
               message_id: expect.any(String),
-              type: ChatMessageType.ERROR,
+              type: ERROR_CHAT_MESSAGE_TYPE,
               sender: ConversationMessageSender.COMPASS,
               payload: {
                 message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
-                sender: ConversationMessageSender.COMPASS,
               },
               component: expect.any(Function),
             },

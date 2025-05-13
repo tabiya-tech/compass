@@ -19,15 +19,16 @@ export const MessageContainer = styled(Box)<{ origin: ConversationMessageSender 
   width: "100%",
 }));
 
+export const USER_CHAT_MESSAGE_TYPE = `user-message-${uniqueId}`;
+
 export interface UserChatMessageProps {
-  sender: ConversationMessageSender;
   message: string;
   sent_at: string;
 }
 
-const UserChatMessage: React.FC<UserChatMessageProps> = ({ sender, message, sent_at }) => {
+const UserChatMessage: React.FC<UserChatMessageProps> = ({ message, sent_at }) => {
   return (
-    <MessageContainer origin={sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
+    <MessageContainer origin={ConversationMessageSender.USER} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
       <Box
         sx={{
           maxWidth: "80%",
@@ -36,8 +37,8 @@ const UserChatMessage: React.FC<UserChatMessageProps> = ({ sender, message, sent
           flexDirection: "column",
         }}
       >
-        <ChatBubble message={message} sender={sender} />
-        <ChatMessageFooterLayout sender={sender}>
+        <ChatBubble message={message} sender={ConversationMessageSender.USER} />
+        <ChatMessageFooterLayout sender={ConversationMessageSender.USER}>
           <Timestamp sentAt={sent_at} />
         </ChatMessageFooterLayout>
       </Box>

@@ -2,9 +2,9 @@
 
 exports[`render tests should render the User Chat message with a timestamp 1`] = `
 <div
-  class="MuiBox-root css-1c8zvho"
+  class="MuiBox-root css-1oo776r"
   data-testid="chat-message-container-41e9f8a5-be6f-406a-9958-13e9bcc853a9"
-  origin="COMPASS"
+  origin="USER"
 >
   <div
     class="MuiBox-root css-1321dhz"

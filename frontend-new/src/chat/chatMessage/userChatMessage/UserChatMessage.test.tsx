@@ -1,7 +1,7 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import UserChatMessage, { DATA_TEST_ID } from "./UserChatMessage";
+import UserChatMessage, { DATA_TEST_ID, USER_CHAT_MESSAGE_TYPE } from "./UserChatMessage";
 import ChatMessageFooter, {
   DATA_TEST_ID as CHAT_MESSAGE_FOOTER_DATA_TEST_ID,
 } from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
@@ -11,7 +11,6 @@ import ChatBubble, {
 import { render, screen } from "src/_test_utilities/test-utils";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
-import { ChatMessageType } from "src/chat/Chat.types";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 
 jest.mock("src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout", () => {
@@ -59,7 +58,7 @@ describe("render tests", () => {
       sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
       sent_at: givenDate,
-      type: ChatMessageType.USER_MESSAGE,
+      type: USER_CHAT_MESSAGE_TYPE,
       reaction: null,
     };
     // WHEN the user chat message is rendered
@@ -82,7 +81,7 @@ describe("render tests", () => {
       1,
       {
         message: messageData.message,
-        sender: messageData.sender,
+        sender: ConversationMessageSender.USER,
       },
       {}
     );

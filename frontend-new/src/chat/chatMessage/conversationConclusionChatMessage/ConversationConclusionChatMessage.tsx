@@ -10,21 +10,21 @@ export const DATA_TEST_ID = {
   CONVERSATION_CONCLUSION_CHAT_MESSAGE_CONTAINER: `conversation_conclusion_chat-message-container-${uniqueId}`,
 };
 
+export const CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE = `conversation-conclusion-message-${uniqueId}`;
+
 export interface ConversationConclusionChatMessageProps {
-  sender: ConversationMessageSender;
   message: string;
 }
 
 const ConversationConclusionChatMessage: React.FC<ConversationConclusionChatMessageProps> = ({
-  sender,
   message,
 }) => {
   return (
     <MessageContainer
-      origin={sender}
+      origin={ConversationMessageSender.COMPASS}
       data-testid={DATA_TEST_ID.CONVERSATION_CONCLUSION_CHAT_MESSAGE_CONTAINER}
     >
-      <ChatBubble message={message} sender={sender}>
+      <ChatBubble message={message} sender={ConversationMessageSender.COMPASS}>
         <ConversationConclusionFooter />
       </ChatBubble>
     </MessageContainer>
