@@ -1,15 +1,13 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import ConversationConclusionChatMessage, { DATA_TEST_ID } from "./ConversationConclusionChatMessage";
+import ConversationConclusionChatMessage, { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE, DATA_TEST_ID } from "./ConversationConclusionChatMessage";
 import ConversationConclusionFooter from "src/chat/chatMessage/conversationConclusionChatMessage/conversationConclusionFooter/ConversationConclusionFooter";
 import {
   DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID,
 } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { render, screen } from "src/_test_utilities/test-utils";
-import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
-import { ChatMessageType } from "src/chat/Chat.types";
 
 jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
   const originalModule = jest.requireActual("src/chat/chatMessage/components/chatBubble/ChatBubble");
@@ -45,10 +43,9 @@ describe("render tests", () => {
     const givenDate = new Date().toISOString();
     const messageData = {
       message_id: nanoid(),
-      sender: ConversationMessageSender.COMPASS,
       message: "Thanks for having a conversation with me.",
       sent_at: givenDate,
-      type: ChatMessageType.CONVERSATION_CONCLUSION,
+      type: CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
       reaction: null
     };
 
@@ -76,10 +73,9 @@ describe("render tests", () => {
     const givenDate = new Date().toISOString();
     const messageData = {
       message_id: nanoid(),
-      sender: ConversationMessageSender.COMPASS,
       message: "Thanks for having a conversation with me.",
       sent_at: givenDate,
-      type: ChatMessageType.CONVERSATION_CONCLUSION,
+      type: CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
       reaction: null
     };
 
@@ -99,10 +95,9 @@ describe("render tests", () => {
     const givenDate = new Date().toISOString();
     const messageData = {
       message_id: nanoid(),
-      sender: ConversationMessageSender.COMPASS,
       message: "Thanks for having a conversation with me.",
       sent_at: givenDate,
-      type: ChatMessageType.CONVERSATION_CONCLUSION,
+      type: CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
       reaction: null
     };
 

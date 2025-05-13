@@ -1,13 +1,13 @@
 import { nanoid } from "nanoid";
-import { ChatMessageType, IChatMessage } from "src/chat/Chat.types";
+import { IChatMessage } from "src/chat/Chat.types";
 import { ConversationMessageSender, MessageReaction } from "./ChatService/ChatService.types";
 import { CurrentPhase } from "src/chat/chatProgressbar/types";
 import { InvalidConversationPhasePercentage } from "./errors";
-import UserChatMessage, { UserChatMessageProps } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
-import CompassChatMessage, { CompassChatMessageProps } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
-import ConversationConclusionChatMessage, { ConversationConclusionChatMessageProps } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
-import TypingChatMessage, { TypingChatMessageProps } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
-import ChatBubble, { ChatBubbleProps } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
+import UserChatMessage, { UserChatMessageProps, USER_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import CompassChatMessage, { CompassChatMessageProps, COMPASS_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import ConversationConclusionChatMessage, { ConversationConclusionChatMessageProps, CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import TypingChatMessage, { TypingChatMessageProps, TYPING_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
+import ErrorChatMessage, { ErrorChatMessageProps, ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
 
 export const FIXED_MESSAGES_TEXT = {
   AI_IS_TYPING: "Typing...",
@@ -20,12 +20,11 @@ export const FIXED_MESSAGES_TEXT = {
 
 export const generateUserMessage = (message: string, sent_at: string, message_id?: string): IChatMessage<UserChatMessageProps> => {
   const payload: UserChatMessageProps = {
-    sender: ConversationMessageSender.USER,
     message: message,
     sent_at: sent_at,
   };
   return {
-    type: ChatMessageType.USER_MESSAGE,
+    type: USER_CHAT_MESSAGE_TYPE,
     message_id: message_id ? message_id : nanoid(),
     sender: ConversationMessageSender.USER,
     payload: payload,
@@ -41,13 +40,12 @@ export const generateCompassMessage = (
 ): IChatMessage<CompassChatMessageProps> => {
   const payload: CompassChatMessageProps = {
     message_id: message_id,
-    sender: ConversationMessageSender.COMPASS,
     message: message,
     sent_at: sent_at,
     reaction: reaction,
   };
   return {
-    type: ChatMessageType.COMPASS_MESSAGE,
+    type: COMPASS_CHAT_MESSAGE_TYPE,
     message_id: message_id,
     sender: ConversationMessageSender.COMPASS,
     payload: payload,
@@ -55,17 +53,16 @@ export const generateCompassMessage = (
   };
 };
 
-export const generateErrorMessage = (message: string): IChatMessage<ChatBubbleProps> => {
-  const payload: ChatBubbleProps = {
+export const generateErrorMessage = (message: string): IChatMessage<ErrorChatMessageProps> => {
+  const payload: ErrorChatMessageProps = {
     message: message,
-    sender: ConversationMessageSender.COMPASS,
   };
   return {
-    type: ChatMessageType.ERROR,
+    type: ERROR_CHAT_MESSAGE_TYPE,
     message_id: nanoid(),
     sender: ConversationMessageSender.COMPASS,
     payload: payload,
-    component: (prop: ChatBubbleProps) => <ChatBubble {...prop} />,
+    component: (prop: ErrorChatMessageProps) => <ErrorChatMessage {...prop} />,
   };
 };
 
@@ -74,7 +71,7 @@ export const generateTypingMessage = (waitBeforeThinking?: number): IChatMessage
     waitBeforeThinking: waitBeforeThinking,
   };
   return {
-    type: ChatMessageType.TYPING,
+    type: TYPING_CHAT_MESSAGE_TYPE,
     message_id: nanoid(),
     sender: ConversationMessageSender.COMPASS,
     payload: payload,
@@ -88,10 +85,9 @@ export const generateConversationConclusionMessage = (
 ): IChatMessage<ConversationConclusionChatMessageProps> => {
   const payload: ConversationConclusionChatMessageProps = {
     message: message,
-    sender: ConversationMessageSender.COMPASS,
   };
   return {
-    type: ChatMessageType.CONVERSATION_CONCLUSION,
+    type: CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
     message_id: message_id,
     sender: ConversationMessageSender.COMPASS,
     payload: payload,

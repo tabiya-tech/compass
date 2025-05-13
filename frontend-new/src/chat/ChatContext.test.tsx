@@ -6,9 +6,9 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { ChatProvider, useChatContext } from "./ChatContext";
 import { FeedbackStatus } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { ChatMessageType, ChatMessageProps } from "src/chat/Chat.types";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import CompassChatMessage, { CompassChatMessageProps } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import { COMPASS_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 
 // Mock PersistentStorageService
 jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
@@ -45,7 +45,7 @@ describe("ChatContext", () => {
       message: "Test message",
       sender: ConversationMessageSender.COMPASS,
       sent_at: FIXED_TIMESTAMP,
-      type: ChatMessageType.COMPASS_MESSAGE,
+      type: COMPASS_CHAT_MESSAGE_TYPE,
       reaction: null
     };
 
@@ -54,11 +54,11 @@ describe("ChatContext", () => {
         <button onClick={() => handleOpenExperiencesDrawer()}>Open Drawer</button>
         <button onClick={() => removeMessage("test-message")}>Remove Message</button>
         <button onClick={() => addMessage({
-          type: ChatMessageType.COMPASS_MESSAGE,
+          type: COMPASS_CHAT_MESSAGE_TYPE,
           message_id: messageData.message_id,
           sender: messageData.sender,
           payload: messageData,
-          component: (props: ChatMessageProps) => <CompassChatMessage {...(props as CompassChatMessageProps)} />
+          component: (props) => <CompassChatMessage {...(props as CompassChatMessageProps)} />
         })}>Add Message</button>
         <button onClick={() => setFeedbackStatus(FeedbackStatus.SUBMITTED)}>Set Feedback</button>
         <button onClick={() => setIsAccountConverted(true)}>Convert Account</button>
@@ -119,7 +119,7 @@ describe("ChatContext", () => {
       sender: ConversationMessageSender.COMPASS,
       message: "Test message",
       sent_at: FIXED_TIMESTAMP,
-      type: ChatMessageType.COMPASS_MESSAGE,
+      type: COMPASS_CHAT_MESSAGE_TYPE,
       reaction: null
     };
 

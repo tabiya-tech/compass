@@ -2,22 +2,25 @@ import React, { ReactElement } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import ChatList from "./ChatList";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import { ChatMessageProps, ChatMessageType, IChatMessage } from "src/chat/Chat.types";
+import { IChatMessage } from "src/chat/Chat.types";
 import { nanoid } from "nanoid";
-import CompassChatMessage, { CompassChatMessageProps } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
-import UserChatMessage, { UserChatMessageProps } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
-import TypingChatMessage, { TypingChatMessageProps } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
-import ConversationConclusionChatMessage, { ConversationConclusionChatMessageProps } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
-import ChatBubble, { ChatBubbleProps } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
+import CompassChatMessage, { CompassChatMessageProps, COMPASS_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import UserChatMessage, { UserChatMessageProps, USER_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import TypingChatMessage, { TypingChatMessageProps, TYPING_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
+import ConversationConclusionChatMessage, { ConversationConclusionChatMessageProps, CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import ErrorChatMessage, {
+  ERROR_CHAT_MESSAGE_TYPE,
+  ErrorChatMessageProps,
+} from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 
 // Helper function to create a message with its component
 const createMessage = (
   message: string,
   sender: ConversationMessageSender,
-  type: ChatMessageType = ChatMessageType.USER_MESSAGE,
+  type: string = USER_CHAT_MESSAGE_TYPE,
   reaction: any = null
-): IChatMessage<ChatMessageProps> => {
+): IChatMessage<any> => {
   const messageData = {
     message_id: nanoid(),
     sender,
@@ -27,25 +30,21 @@ const createMessage = (
     reaction,
   };
 
-  let component: (props: ChatMessageProps) => ReactElement<ChatMessageProps>;
-  switch (type) {
-    case ChatMessageType.TYPING:
-      component = (props: ChatMessageProps) => <TypingChatMessage {...(props as TypingChatMessageProps)} />;
-      break;
-    case ChatMessageType.CONVERSATION_CONCLUSION:
-      component = (props: ChatMessageProps) => <ConversationConclusionChatMessage {...(props as ConversationConclusionChatMessageProps)} />;
-      break;
-    case ChatMessageType.ERROR:
-      component = (props: ChatMessageProps) => <ChatBubble {...(props as ChatBubbleProps)} />;
-      break;
-    default:
-      component = sender === ConversationMessageSender.USER ? 
-        (props: ChatMessageProps) => <UserChatMessage {...(props as UserChatMessageProps)} /> : 
-        (props: ChatMessageProps) => <CompassChatMessage {...(props as CompassChatMessageProps)} />;
+  let component: (props: any) => ReactElement<any>;
+  if (type === TYPING_CHAT_MESSAGE_TYPE) {
+    component = (props) => <TypingChatMessage {...(props as TypingChatMessageProps)} />;
+  } else if (type === CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE) {
+    component = (props) => <ConversationConclusionChatMessage {...(props as ConversationConclusionChatMessageProps)} />;
+  } else if (type === ERROR_CHAT_MESSAGE_TYPE) {
+    component = (props) => <ErrorChatMessage {...(props as ErrorChatMessageProps)} />;
+  } else {
+    component = sender === ConversationMessageSender.USER ? 
+      (props) => <UserChatMessage {...(props as UserChatMessageProps)} /> :
+      (props) => <CompassChatMessage {...(props as CompassChatMessageProps)} />;
   }
 
   return {
-    type,
+    type: messageData.type,
     message_id: messageData.message_id,
     sender: messageData.sender,
     payload: messageData,
@@ -77,8 +76,8 @@ type Story = StoryObj<typeof ChatList>;
 export const Shown: Story = {
   args: {
     messages: [
-      createMessage("Hello, how can I help you?", ConversationMessageSender.COMPASS),
-      createMessage("I need help with something", ConversationMessageSender.USER),
+      createMessage("Hello, how can I help you?", ConversationMessageSender.COMPASS, COMPASS_CHAT_MESSAGE_TYPE),
+      createMessage("I need help with something", ConversationMessageSender.USER, USER_CHAT_MESSAGE_TYPE),
     ],
   },
 };
@@ -92,8 +91,8 @@ export const Empty: Story = {
 export const Typing: Story = {
   args: {
     messages: [
-      createMessage("Hello, how can I help you?", ConversationMessageSender.USER),
-      createMessage("", ConversationMessageSender.COMPASS, ChatMessageType.TYPING),
+      createMessage("Hello, how can I help you?", ConversationMessageSender.USER, USER_CHAT_MESSAGE_TYPE),
+      createMessage("", ConversationMessageSender.COMPASS, TYPING_CHAT_MESSAGE_TYPE),
     ],
   },
 };
@@ -101,7 +100,7 @@ export const Typing: Story = {
 export const TypingWhenEmpty: Story = {
   args: {
     messages: [
-      createMessage("", ConversationMessageSender.COMPASS, ChatMessageType.TYPING),
+      createMessage("", ConversationMessageSender.COMPASS, TYPING_CHAT_MESSAGE_TYPE),
     ],
   },
 };
@@ -109,7 +108,7 @@ export const TypingWhenEmpty: Story = {
 export const SingleMessage: Story = {
   args: {
     messages: [
-      createMessage("Hello, I'm Compass", ConversationMessageSender.COMPASS)
+      createMessage("Hello, I'm Compass", ConversationMessageSender.COMPASS, COMPASS_CHAT_MESSAGE_TYPE)
     ],
   },
 };
@@ -117,10 +116,10 @@ export const SingleMessage: Story = {
 export const MultipleMessages: Story = {
   args: {
     messages: [
-      createMessage("Hello", ConversationMessageSender.USER),
-      createMessage("Hi, I'm Compass", ConversationMessageSender.COMPASS),
-      createMessage("Thank you for using compass", ConversationMessageSender.COMPASS, ChatMessageType.CONVERSATION_CONCLUSION),
-      createMessage("Typing...", ConversationMessageSender.COMPASS, ChatMessageType.TYPING),
+      createMessage("Hello", ConversationMessageSender.USER, USER_CHAT_MESSAGE_TYPE),
+      createMessage("Hi, I'm Compass", ConversationMessageSender.COMPASS, COMPASS_CHAT_MESSAGE_TYPE),
+      createMessage("Thank you for using compass", ConversationMessageSender.COMPASS, CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE),
+      createMessage("Typing...", ConversationMessageSender.COMPASS, TYPING_CHAT_MESSAGE_TYPE),
     ],
   },
 };
@@ -130,7 +129,8 @@ export const LongConversation: Story = {
     messages: Array.from({ length: 100 }, (_, i) => 
       createMessage(
         `Message ${i}`,
-        i % 2 === 0 ? ConversationMessageSender.COMPASS : ConversationMessageSender.USER
+        i % 2 === 0 ? ConversationMessageSender.COMPASS : ConversationMessageSender.USER,
+        i % 2 === 0 ? COMPASS_CHAT_MESSAGE_TYPE : USER_CHAT_MESSAGE_TYPE
       )
     ),
   },

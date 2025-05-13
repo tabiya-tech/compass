@@ -1,6 +1,5 @@
 import "src/_test_utilities/consoleMock";
 import { nanoid } from "nanoid";
-import { ChatMessageType } from "src/chat/Chat.types";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import {
   FIXED_MESSAGES_TEXT,
@@ -14,6 +13,10 @@ import {
 import { ReactionKind } from "./reaction/reaction.types";
 import { ConversationPhase } from "./chatProgressbar/types";
 import { InvalidConversationPhasePercentage } from "./errors";
+import { USER_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import { COMPASS_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import { TYPING_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
+import { ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
 // Mock nanoid to return a fixed value for testing
 jest.mock("nanoid", () => ({
   nanoid: jest.fn().mockReturnValue("foo-nanoid"),
@@ -41,9 +44,8 @@ describe("Chat Utils", () => {
       expect(result).toEqual({
         message_id: "foo-nanoid",
         sender: ConversationMessageSender.USER,
-        type: ChatMessageType.USER_MESSAGE,
+        type: USER_CHAT_MESSAGE_TYPE,
         payload: {
-          sender: ConversationMessageSender.USER,
           message: givenMessage,
           sent_at: givenSentAt,
         },
@@ -74,9 +76,8 @@ describe("Chat Utils", () => {
       expect(result).toEqual({
         message_id: givenMessageId,
         sender: ConversationMessageSender.USER,
-        type: ChatMessageType.USER_MESSAGE,
+        type: USER_CHAT_MESSAGE_TYPE,
         payload: {
-          sender: ConversationMessageSender.USER,
           message: givenMessage,
           sent_at: givenSentAt,
         },
@@ -112,10 +113,9 @@ describe("Chat Utils", () => {
       expect(result).toEqual({
         message_id: givenMessageId,
         sender: ConversationMessageSender.COMPASS,
-        type: ChatMessageType.COMPASS_MESSAGE,
+        type: COMPASS_CHAT_MESSAGE_TYPE,
         payload: {
           message_id: givenMessageId,
-          sender: ConversationMessageSender.COMPASS,
           message: givenMessage,
           sent_at: givenSentAt,
           reaction: givenReaction,
@@ -143,10 +143,9 @@ describe("Chat Utils", () => {
       expect(result).toEqual({
         message_id: givenMessageId,
         sender: ConversationMessageSender.COMPASS,
-        type: ChatMessageType.COMPASS_MESSAGE,
+        type: COMPASS_CHAT_MESSAGE_TYPE,
         payload: {
           message_id: givenMessageId,
-          sender: ConversationMessageSender.COMPASS,
           message: givenMessage,
           sent_at: givenSentAt,
           reaction: null,
@@ -173,7 +172,7 @@ describe("Chat Utils", () => {
       expect(result).toEqual({
         message_id: "foo-nanoid",
         sender: ConversationMessageSender.COMPASS,
-        type: ChatMessageType.TYPING,
+        type: TYPING_CHAT_MESSAGE_TYPE,
         payload: {
           waitBeforeThinking: undefined,
         },
@@ -201,10 +200,9 @@ describe("Chat Utils", () => {
       expect(result).toEqual({
         message_id: "foo-nanoid",
         sender: ConversationMessageSender.COMPASS,
-        type: ChatMessageType.ERROR,
+        type: ERROR_CHAT_MESSAGE_TYPE,
         payload: {
           message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
-          sender: ConversationMessageSender.COMPASS,
         },
         component: expect.any(Function)
       });
@@ -230,10 +228,9 @@ describe("Chat Utils", () => {
       expect(result).toEqual({
         message_id: "foo-nanoid",
         sender: ConversationMessageSender.COMPASS,
-        type: ChatMessageType.ERROR,
+        type: ERROR_CHAT_MESSAGE_TYPE,
         payload: {
           message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
-          sender: ConversationMessageSender.COMPASS,
         },
         component: expect.any(Function)
       });
