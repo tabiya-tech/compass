@@ -12,7 +12,20 @@ mark the test as `evaluation_test` in the test function definition.
 ```python
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
-def test_foo_evaluation():
+async def test_foo_evaluation():
+    ...
+```
+
+### Repeating tests
+The evaluation tests should be run multiple times as the results can vary a lot due to the LLM nature of the agents. To repeat a test, use the
+`@pytest.mark.repeat` annotation from the `pytest-repeat` plugin.
+
+For example, to run a test 10 times:
+
+```python
+@pytest.mark.asyncio
+@pytest.mark.repeat(5) # Repeat the test 5 times
+async def test_foo_evaluation():
     ...
 ```
 
@@ -27,6 +40,9 @@ python evaluation_metrics.py
 ```
 
 This command creates a comprehensive summary (`test_summary.csv`) that aggregates results, grouped by both test name and label. It supports both parameterized and non-parameterized tests.
+
+Run `python evaluation_tests/evalution_metrics.py --help` to see the available options.
+
 
 The `evaluation_test` annotation accepts a version label, for example:
 

@@ -37,6 +37,8 @@ datasets = "^2.19.2"
 google-cloud = "^0.34.0"
 firebase-admin = "6.5.0"
 pymongo_inmemory = "^0.4.2"
+pytest-repeat = "^0.9.4"
+matplotlib="^3.9.0"
 
 [build-system]
 requires = ["poetry-core"]
