@@ -175,7 +175,9 @@ class CollectExperiencesAgent(Agent):
             exploring_type = self._state.unexplored_types[0] if len(self._state.unexplored_types) > 0 else None
             self._state.explored_types.append(explored_type)
             self.logger.info(
-                "Explored work type: %s, remaining types: %s | Discovered experiences so far: %s",
+                "Explored work type: %s"
+                "\n  - remaining types: %s"
+                "\n  - discovered experiences so far: %s",
                 explored_type,
                 self._state.unexplored_types,
                 self._state.collected_data
