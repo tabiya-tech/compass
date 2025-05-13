@@ -1,7 +1,7 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import CompassChatMessage, { DATA_TEST_ID } from "./CompassChatMessage";
+import CompassChatMessage, { COMPASS_CHAT_MESSAGE_TYPE, DATA_TEST_ID } from "./CompassChatMessage";
 import ChatMessageFooterLayout, {
   DATA_TEST_ID as CHAT_MESSAGE_FOOTER_DATA_TEST_ID,
 } from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
@@ -11,7 +11,6 @@ import ChatBubble, {
 import { render, screen } from "src/_test_utilities/test-utils";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { nanoid } from "nanoid";
-import { ChatMessageType } from "src/chat/Chat.types";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import ReactionButtons from "src/chat/reaction/components/reactionButtons/ReactionButtons";
 
@@ -39,10 +38,9 @@ describe("render tests", () => {
     const givenDate = new Date(2024, 6, 25).toISOString();
     const messageData = {
       message_id: nanoid(),
-      sender: ConversationMessageSender.COMPASS,
       message: "Hello, I'm Compass",
       sent_at: givenDate,
-      type: ChatMessageType.USER_MESSAGE,
+      type: COMPASS_CHAT_MESSAGE_TYPE,
       reaction: null
     };
     // WHEN the user chat message is rendered
@@ -77,7 +75,7 @@ describe("render tests", () => {
       1,
       {
         message: messageData.message,
-        sender: messageData.sender,
+        sender: ConversationMessageSender.COMPASS,
       },
       {}
     );

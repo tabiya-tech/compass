@@ -6,8 +6,13 @@ import { render, screen } from "src/_test_utilities/test-utils";
 import { ChatProvider } from "src/chat/ChatContext";
 import ChatList, { DATA_TEST_ID } from "./ChatList";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import { ChatMessageProps, ChatMessageType, IChatMessage } from "src/chat/Chat.types";
+import { IChatMessage } from "src/chat/Chat.types";
 import { nanoid } from "nanoid";
+import { USER_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import { COMPASS_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import { TYPING_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
+import { ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
+import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import CompassChatMessage, {
   DATA_TEST_ID as COMPASS_CHAT_MESSAGE_DATA_TEST_ID,
   CompassChatMessageProps,
@@ -103,7 +108,6 @@ describe("ChatList", () => {
     
     // AND user message data
     const userMessageData: UserChatMessageProps = {
-      sender: ConversationMessageSender.USER,
       message: "Hello",
       sent_at: givenDate,
     };
@@ -111,7 +115,6 @@ describe("ChatList", () => {
     // AND compass message data with reaction
     const compassMessageData: CompassChatMessageProps = {
       message_id: nanoid(),
-      sender: ConversationMessageSender.COMPASS,
       message: "Hi, I'm Compass",
       sent_at: givenDate,
       reaction: {
@@ -126,7 +129,6 @@ describe("ChatList", () => {
       message: "Let's explore your experiences!",
       sent_at: givenDate,
       reaction: null,
-      sender: ConversationMessageSender.COMPASS,
     };
 
     // AND typing message data
@@ -137,7 +139,6 @@ describe("ChatList", () => {
     // AND conclusion message data
     const conclusionMessageData: ConversationConclusionChatMessageProps = {
       message: "Thank you for using compass",
-      sender: ConversationMessageSender.COMPASS,
     };
 
     // AND error message data
@@ -147,48 +148,48 @@ describe("ChatList", () => {
     };
 
     // AND create full messages with components
-    const givenMessages: IChatMessage<ChatMessageProps>[] = [
+    const givenMessages: IChatMessage<any>[] = [
       {
-        type: ChatMessageType.USER_MESSAGE,
+        type: USER_CHAT_MESSAGE_TYPE,
         message_id: nanoid(),
         sender: ConversationMessageSender.USER,
         payload: userMessageData,
-        component: (props: ChatMessageProps) => <UserChatMessage {...(props as UserChatMessageProps)} />,
+        component: (props) => <UserChatMessage {...(props as UserChatMessageProps)} />,
       },
       {
-        type: ChatMessageType.COMPASS_MESSAGE,
+        type: COMPASS_CHAT_MESSAGE_TYPE,
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         payload: compassMessageData,
-        component: (props: ChatMessageProps) => <CompassChatMessage {...(props as CompassChatMessageProps)} />,
+        component: (props) => <CompassChatMessage {...(props as CompassChatMessageProps)} />,
       },
       {
-        type: ChatMessageType.COMPASS_MESSAGE,
+        type: COMPASS_CHAT_MESSAGE_TYPE,
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         payload: compassMessageData2,
-        component: (props: ChatMessageProps) => <CompassChatMessage {...(props as CompassChatMessageProps)} />,
+        component: (props) => <CompassChatMessage {...(props as CompassChatMessageProps)} />,
       },
       {
-        type: ChatMessageType.TYPING,
+        type: TYPING_CHAT_MESSAGE_TYPE,
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         payload: typingMessageData,
-        component: (props: ChatMessageProps) => <TypingChatMessage {...(props as TypingChatMessageProps)} />,
+        component: (props) => <TypingChatMessage {...(props as TypingChatMessageProps)} />,
       },
       {
-        type: ChatMessageType.CONVERSATION_CONCLUSION,
+        type: CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         payload: conclusionMessageData,
-        component: (props: ChatMessageProps) => <ConversationConclusionChatMessage {...(props as ConversationConclusionChatMessageProps)} />,
+        component: (props) => <ConversationConclusionChatMessage {...(props as ConversationConclusionChatMessageProps)} />,
       },
       {
-        type: ChatMessageType.ERROR,
+        type: ERROR_CHAT_MESSAGE_TYPE,
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         payload: errorMessageData,
-        component: (props: ChatMessageProps) => <ChatBubble {...(props as ChatBubbleProps)} />,
+        component: (props) => <ChatBubble {...(props as ChatBubbleProps)} />,
       },
     ];
 
@@ -217,7 +218,6 @@ describe("ChatList", () => {
     expect(UserChatMessage).toHaveBeenNthCalledWith(
       1,
       {
-        sender: ConversationMessageSender.USER,
         message: "Hello",
         sent_at: givenDate,
       },
@@ -281,7 +281,7 @@ describe("ChatList", () => {
       sender: ConversationMessageSender.USER,
       message: "Hello",
       sent_at: givenDate,
-      type: ChatMessageType.USER_MESSAGE,
+      type: USER_CHAT_MESSAGE_TYPE,
       reaction: null
     }
     const givenCompassMessageData = {
@@ -289,23 +289,23 @@ describe("ChatList", () => {
       sender: ConversationMessageSender.COMPASS,
       message: "Hi",
       sent_at: new Date().toISOString(),
-      type: ChatMessageType.USER_MESSAGE,
+      type: USER_CHAT_MESSAGE_TYPE,
       reaction: null,
     }
-    const givenMessages: IChatMessage<ChatMessageProps>[] = [
+    const givenMessages: IChatMessage<any>[] = [
       {
-        type: ChatMessageType.USER_MESSAGE,
+        type: USER_CHAT_MESSAGE_TYPE,
         message_id: nanoid(),
         sender: ConversationMessageSender.USER,
         payload: givenUserMessageData,
-        component: (props: ChatMessageProps) => <UserChatMessage {...(props as UserChatMessageProps)} />,
+        component: (props) => <UserChatMessage {...(props as UserChatMessageProps)} />,
       },
       {
-        type: ChatMessageType.COMPASS_MESSAGE,
+        type: USER_CHAT_MESSAGE_TYPE,
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         payload: givenCompassMessageData,
-        component: (props: ChatMessageProps) => <CompassChatMessage {...(props as CompassChatMessageProps)} />,
+        component: (props) => <CompassChatMessage {...(props as CompassChatMessageProps)} />,
       }
     ];
 

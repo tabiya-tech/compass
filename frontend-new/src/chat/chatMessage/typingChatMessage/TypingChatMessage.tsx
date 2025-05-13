@@ -18,6 +18,8 @@ export const UI_TEXT = {
 
 export const WAIT_BEFORE_THINKING = 15000;
 
+export const TYPING_CHAT_MESSAGE_TYPE = `typing-message-${uniqueId}`;
+
 export interface TypingChatMessageProps {
   waitBeforeThinking?: number;
 }

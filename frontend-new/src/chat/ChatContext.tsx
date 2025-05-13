@@ -1,12 +1,12 @@
 import React, { createContext, useContext, ReactNode, useState, useMemo } from 'react';
 import { FeedbackStatus } from 'src/feedback/overallFeedback/feedbackForm/FeedbackForm';
 import { PersistentStorageService } from 'src/app/PersistentStorageService/PersistentStorageService';
-import { IChatMessage, ChatMessageProps } from "src/chat/Chat.types";
+import { IChatMessage } from "src/chat/Chat.types";
 
 interface ChatContextType {
   handleOpenExperiencesDrawer: () => void;
   removeMessage: (messageId: string) => void;
-  addMessage: (message: IChatMessage<ChatMessageProps>) => void;
+  addMessage: (message: IChatMessage<any>) => void;
   feedbackStatus: FeedbackStatus;
   setFeedbackStatus: (status: FeedbackStatus) => void;
   isAccountConverted: boolean;
@@ -19,7 +19,7 @@ interface ChatProviderProps {
   children: ReactNode;
   handleOpenExperiencesDrawer: () => void;
   removeMessage: (messageId: string) => void;
-  addMessage: (message: IChatMessage<ChatMessageProps>) => void;
+  addMessage: (message: IChatMessage<any>) => void;
 }
 
 export const ChatProvider: React.FC<ChatProviderProps> = ({ children, handleOpenExperiencesDrawer, removeMessage, addMessage }) => {
