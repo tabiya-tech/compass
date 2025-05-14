@@ -4,6 +4,10 @@ import PasswordInput from "./PasswordInput";
 export default {
   title: "Components/PasswordInput",
   component: PasswordInput,
+  tags: ["autodocs"],
+  argTypes: {
+    onChange: { action: "changed" },
+  },
 } as Meta;
 
 type Story = StoryObj<typeof PasswordInput>;

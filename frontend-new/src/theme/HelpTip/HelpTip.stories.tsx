@@ -1,7 +1,8 @@
 import { Meta, StoryObj } from "@storybook/react";
 import HelpTip from "./HelpTip";
+import InfoIcon from "@mui/icons-material/Info";
 
-const meta: Meta = {
+const meta: Meta<typeof HelpTip> = {
   title: "components/HelpTip",
   component: HelpTip,
   tags: ["autodocs"],
@@ -13,6 +14,7 @@ const meta: Meta = {
         <p>@constructor</p>
       </div>
     ),
+    icon: <InfoIcon />,
   },
 };
 
