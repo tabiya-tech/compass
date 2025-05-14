@@ -5,6 +5,7 @@ import { getBackendUrl } from "src/envService";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { Language, SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
+import { nanoid } from "nanoid";
 
 const CONVERSATION_HISTORY_URL = getBackendUrl() + "/conversations/:session_id/messages";
 const NEW_SESSION_URL = getBackendUrl() + "/users/preferences/new-session";
@@ -22,7 +23,7 @@ const meta: Meta<typeof Chat> = {
         method: "GET",
         status: 201,
         response: {
-          user_id: "1",
+          user_id: nanoid(),
           language: Language.en,
           sessions: [1],
           user_feedback_answered_questions: {},
@@ -38,7 +39,7 @@ const meta: Meta<typeof Chat> = {
         response: {
           messages: [
             {
-              message_id: "1",
+              message_id: nanoid(),
               message: "I understand you're asking about that. Let me help you with that.",
               sender: "COMPASS",
               sent_at: getTimestamp(3),
@@ -49,10 +50,10 @@ const meta: Meta<typeof Chat> = {
           conversation_conducted_at: getTimestamp(3),
           experiences_explored: 0,
           current_phase: {
-            phase: ConversationPhase.INTRO,
-            percentage: 10,
-            current: 1,
-            total: 10,
+            phase: ConversationPhase.COLLECT_EXPERIENCES,
+            percentage: 50,
+            current: 2,
+            total: 4,
           }
         },
       },
@@ -72,6 +73,23 @@ const meta: Meta<typeof Chat> = {
             total: 10,
           }
         },
+      },
+      {
+        url: getBackendUrl() + "/conversations/:session_id/messages/:message_id/reactions",
+        method: "PUT",
+        status: 201,
+        response: {
+          id: nanoid(),
+          message_id: nanoid(),
+          session_id: 123,
+          created_at: new Date().toISOString()
+        },
+      },
+      {
+        url: getBackendUrl() + "/conversations/:session_id/messages/:message_id/reactions",
+        method: "DELETE",
+        status: 204,
+        response: () => {},
       },
     ],
   },
