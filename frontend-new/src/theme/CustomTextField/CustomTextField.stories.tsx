@@ -5,7 +5,9 @@ const meta: Meta<typeof CustomTextField> = {
   title: "Components/CustomTextField",
   component: CustomTextField,
   tags: ["autodocs"],
-  argTypes: {},
+  argTypes: {
+    onChange: { action: "changed" },
+  },
 };
 
 export default meta;
@@ -16,8 +18,6 @@ export const Shown: Story = {
   args: {
     label: "Name:",
     placeholder: "Enter your name here",
-    value: "",
-    onChange: () => {},
   },
 };
 
