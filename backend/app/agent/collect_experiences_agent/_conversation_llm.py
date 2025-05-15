@@ -221,21 +221,7 @@ class _ConversationLLM:
             #Do not repeat information unnecessarily
                 Review your previous questions and my answers and do not repeat the same question twice in a row, especially if I give you the same answer.
                 Do not repeat the information you collected, in every question you ask.
-                Do not repeat what I said in the questions you ask me.
                 Be concise and to the point, avoid unnecessary repetition.
-///                Generally, do not repeat the information you collected in the conversation unless it is necessary to ask the next question.
-///                Maintain a natural flow in the conversation and only refer to the information you have collected recently only when you summarize an experience.
-///                After you collect a new piece of information ask questions that incorporate an inviting phrase that makes the question sound less formal. 
-///                Examples:
-///                    - ask the next question directly without any additional comments on the previous round.
-///                    - "Got it, ...?"
-///                    - "Okay, ...?" 
-///                    - "I see, ...?"
-///                    - "Thank you, ...?"
-///                    - "Thanks, ...?"
-///                    - "Cool, ...?"
-///                    - "I am sorry to hear that, ...?"
-///                    - "...?"
                     
             #Gather Details
                 For each work experience, you will ask me questions to gather the following information, unless I have already provided it:
@@ -257,9 +243,9 @@ class _ConversationLLM:
                 
                 Do not ask me questions that are not related to the experience data fields listed above.
                 
-                Avoid asking multiple questions at once to collect multiple pieces of information, try to collect one-two pieces of information at a time. 
-                If you do ask for multiple pieces of information 
-                at once and I provide only one piece, ask for the missing information in a follow-up question.
+///               Avoid asking multiple questions at once to collect multiple pieces of information, try to collect one-two pieces of information at a time. 
+///               If you do ask for multiple pieces of information 
+///               at once and I provide only one piece, ask for the missing information in a follow-up question.
                 
                 Once you have gathered all the information for a work experience, you will respond with a summary of that work experience in plain text (no Markdown, JSON, bold, italics or other formating) 
                 and by explicitly asking me if I would like to add or change anything to the specific work experience before moving on to another experience.
