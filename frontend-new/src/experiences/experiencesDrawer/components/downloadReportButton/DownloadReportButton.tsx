@@ -1,8 +1,9 @@
 import React from "react";
-import { Box, CircularProgress, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, CircularProgress, Typography, useTheme } from "@mui/material";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import InfoIcon from "@mui/icons-material/Info";
 import HelpTip from "src/theme/HelpTip/HelpTip";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const uniqueId = "f5553dac-adb7-440f-9549-c3567b22dc76";
 export const DATA_TEST_ID = {
@@ -24,36 +25,26 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({ disabled, i
 
   return (
     <Box data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER}>
-      <IconButton
-        sx={{
-          margin: 0,
-          color: theme.palette.tabiyaBlue.main,
-          borderRadius: (theme) => theme.tabiyaRounding.sm,
-        }}
+      <PrimaryButton
         title="Download CV"
         disabled={disabled || isLoading}
+        disableWhenOffline
+        startIcon={
+          isLoading ? (
+            <CircularProgress
+              sx={{ color: theme.palette.tabiyaBlue.main, marginRight: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}
+              size={theme.spacing(3)}
+              data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_PROGRESS_ICON}
+            />
+          ) : (
+            <FileDownloadIcon sx={{ lineHeight: 0 }} data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_ICON} />
+          )
+        }
         onClick={notifyOnDownloadPdf}
         data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON}
       >
-        {isLoading ? (
-          <CircularProgress
-            sx={{ color: theme.palette.tabiyaBlue.main, marginRight: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}
-            size={theme.spacing(3)}
-            data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_PROGRESS_ICON}
-          />
-        ) : (
-          <FileDownloadIcon sx={{ lineHeight: 0 }} data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_ICON} />
-        )}
-        <Typography
-          variant="caption"
-          sx={{
-            color: theme.palette.tabiyaBlue.main,
-            opacity: disabled ? 0.5 : 1,
-          }}
-        >
-          {isLoading ? "Downloading" : "Download CV"}
-        </Typography>
-      </IconButton>
+        <Typography variant="caption">{isLoading ? "Downloading" : "Download CV"}</Typography>
+      </PrimaryButton>
       {disabled && (
         <HelpTip icon={<InfoIcon />} data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_HELP_TIP}>
           You cannot download the report until you finish exploring at least one experience.
