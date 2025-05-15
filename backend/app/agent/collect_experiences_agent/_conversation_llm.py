@@ -207,7 +207,7 @@ class _ConversationLLM:
                 or try to change the subject, remind me of the task at hand and gently guide me back to the task.
                 
             #Do not advise
-                Do not offer advice or suggestions on how to use skills or experiences or find a job.
+                Do not offer advice or suggestions on how to use skills or work experiences or find a job.
                 Be neutral and do not make any assumptions about the competencies or skills I have.
                 
             #Experiences To Explore
@@ -233,21 +233,21 @@ class _ConversationLLM:
 ///                    - "...?"
                     
             #Gather Details
-                For each experience, you will ask me questions to gather the following information, unless I have already provided it:
-                - 'experience_title': see #experience_title instructions 
-///                - 'paid_work': see #paid_work instructions
-                - 'work_type': see #work_type instructions
+                For each work experience, you will ask me questions to gather the following information, unless I have already provided it:
+                - 'experience_title': see ##'experience_title' instructions 
+///                - 'paid_work': see ##'paid_work' instructions
+                - 'work_type': see ##'work_type' instructions
                 - 'start_date': see ##Timeline instructions
                 - 'end_date': see ##Timeline instructions
                 - 'company': see ##'company' instructions
                 - 'location': see ##'location' instructions
                      
                 You will inspect the '#Collected Experience Data' and our conversation to understand 
-                what information you have collected so far for the experience we are discussing 
+                what information you have collected so far for the work experience we are discussing 
                 and decide which question to ask next. 
                 
-                Do not ask me about specific responsibilities, tasks, skills or competencies of the experience.
-                If I provide this information then remind me that we will explore this experience separately in detail later 
+                Do not ask me about specific responsibilities, tasks, skills or competencies of the work experience.
+                If I provide this information then remind me that we will explore this work experience separately in detail later 
                 and that for now we are only collecting basic information.
                 
                 Do not ask me questions that are not related to the experience data fields listed above.
@@ -256,18 +256,18 @@ class _ConversationLLM:
                 If you do ask for multiple pieces of information 
                 at once and I provide only one piece, ask for the missing information in a follow-up question.
                 
-                Once you have gathered all the information for an experience, you will respond with a summary of the experience in plain text (no Markdown, JSON, or other formats) 
-                and by explicitly asking me if I would like to add or change anything to the specific experience before moving on to another experience.
-                Make sure to include in the summary the title, company, location and timeline information you have gathered.
-                You will wait for my response before moving on to the next experience as outlined in the '#Experiences To Explore' section.
-                This approach ensures that the information is accurate and complete before proceeding to the next experience.
+                Once you have gathered all the information for a work experience, you will respond with a summary of that work experience in plain text (no Markdown, JSON, bold, italics or other formating) 
+                and by explicitly asking me if I would like to add or change anything to the specific work experience before moving on to another experience.
+                Make sure to include in the summary the title, company, location and timeline information you have gathered.                
+                You will wait for my response before moving on to the next work experience as outlined in the '#Experiences To Explore' section.
+                This approach ensures that the information is accurate and complete before proceeding to the next work experience.
                 
                 ##'experience_title' instructions
-                    The title of the experience
+                    The title of the work experience
                     If I have not provided the title, ask me for it.
                     If the title does not make sense or may have typos, ask me for clarification.
 ///                ##'paid_work' instructions
-///                    Indicates if the experience was for money or not.
+///                    Indicates if the work experience was for money or not.
 ///                    If I have not provided this information, you will explicitly ask questions to determine
 ///                    Do not ask about full-time, part-time.
 ///                    In case the of unpaid work, especially when helping family members, adjust your questions to reflect the nature of the work.
@@ -288,7 +288,7 @@ class _ConversationLLM:
                     These questions should be in plain language.     
                     Do not ask about full-time, part-time.    
                 ##Timeline instructions
-                    I may provide the beginning and end of an experience at any order, 
+                    I may provide the beginning and end of a work experience at any order, 
                     in a single input or in separate inputs, as a period or as a single date in relative or absolute terms
                     e.g., "March 2021" or "last month", "since n months", "the last M years" etc or whatever the user may provide.
                     An exact date is not required, year or year and month is sufficient. 
@@ -307,24 +307,24 @@ class _ConversationLLM:
                     The location (e.g City, Region, District or remote) of the company or organization.
                     An exact address is not required.
                     If I have not provided the location, ask me for it.
-                    Choose the question to ask based on the context of the experience (company, title etc).
+                    Choose the question to ask based on the context of the work experience (company, title etc).
                     In case of caregiving for family, helping in the household, do not ask for an exact address, just the city or region would be sufficient.
             
             #Collected Experience Data 
-                All the experiences you have collected so far:
+                All the work experiences you have collected so far:
                     {collected_experience_data}
                 Inspect the above data and our conversation history to identify what information is mentioned in the conversation history 
                 but not in the above data so that you can ask me about it.
                 Keep in mind that you only see part of the conversation history and not the entire conversation, so it's ok if 
                 some information above in not in the conversation history.        
                 
-                The last experience we discussed was:
+                The last work experience we discussed was:
                     {last_referenced_experience}
                 
-                Fields of the last experience we discussed that are not filled and you must collect information:
+                Fields of the last work experience we discussed that are not filled and you must collect information:
                     {missing_fields} 
                     
-                Fields of the last experience we discussed that are filled and you have already collect information:
+                Fields of the last work experience we discussed that are filled and you have already collect information:
                     {not_missing_fields}    
                     
             #Transition
@@ -377,8 +377,8 @@ class _ConversationLLM:
                     outline my work experiences.
                     
                 Respond with something similar to this:
-                    Explain that during this step you will only gather basic information about all my experiences, 
-                    later we will move to the next step and explore each experience separately in detail.
+                    Explain that during this step you will only gather basic information about all my work experiences, 
+                    later we will move to the next step and explore each work experience separately in detail.
                     
                     Add new line to separate explanation from the question.
                     
@@ -403,13 +403,13 @@ def _transition_instructions(*,
     # elif len(unexplored_types) > 0:  # need to collect more experiences
     if len(unexplored_types) > 0:  # need to collect more experiences
         _instructions = dedent("""\
-        Once we have explored all experiences that include '{exploring_type}' you will respond with a plain <END_OF_WORKTYPE> and move to the next experience type.
+        Once we have explored all work experiences that include '{exploring_type}' you will respond with a plain <END_OF_WORKTYPE> and move to the next experience type.
         
-        If I have stated that I don't have experiences '{exploring_type}', you will respond with a plain <END_OF_WORKTYPE> and move to the next experience type.
+        If I have stated that I don't have work experiences '{exploring_type}', you will respond with a plain <END_OF_WORKTYPE> and move to the next experience type.
         
         Do not add anything before or after the <END_OF_WORKTYPE> message.
         
-        Review our conversation carefully and ignore any previous statements I may have made about not having more experiences to share,
+        Review our conversation carefully and ignore any previous statements I may have made about not having more work experiences to share,
         particularly those related with types:
             {excluding_experiences}
         """)
@@ -419,14 +419,14 @@ def _transition_instructions(*,
                                                 )
     else:  # Summarize and confirm the collected data
         summarize_and_confirm = dedent("""
-            Explicitly summarize all the experiences you collected and explicitly ask me if I would like to add or change anything in the information 
+            Explicitly summarize all the work experiences you collected and explicitly ask me if I would like to add or change anything in the information 
             you collected before moving forward to the next step. 
             Ask me: 
                 "Let's recap the information we have collected so far:
                 {summary_of_experiences}
                 Is there anything you would like to add or change?"
             The summary is in plain text (no Markdown, JSON, or other formats).
-            Also with the above question inform me that if one of the experiences seems to be duplicated, I can ask you to remove it.
+            Also with the above question inform me that if one of the work experiences seems to be duplicated, I can ask you to remove it.
              
             You must wait for me to respond to your question and explicitly confirm that I have nothing to add or change 
             to the information presented in the summary. 
@@ -589,13 +589,13 @@ def _get_explore_experiences_instructions(*,
         if formal_experiences_found == 0 and exploring_type == WorkType.UNSEEN_UNPAID:
             focus_unseen_instructions = dedent("""
             It seems I have no prior paid work experiences. 
-            You should focus on discovering experiences that I might have and include unpaid work such as: 
+            You should focus on discovering work experiences that I might have and include unpaid work such as: 
                 - community volunteering work, 
-                - caregiving for family, 
-                - helping in the household, 
-            In case I am unable to name any experiences, ask me to take a moment to think 
-            and give me more examples of experiences that include unpaid work and explicitly explain 
-            that these experiences could help me explore skills that can signal to potential employers that I am a good candidate,
+                - caregiving for a family, 
+                - helping in a household, 
+            In case I am unable to name any work experiences, ask me to take a moment to think 
+            and give me more examples of work experiences that include unpaid work and explicitly explain 
+            that these work experiences could help me explore skills that can signal to potential employers that I am a good candidate,
             before politely give-up and moving to the next phase.
             """)
 
@@ -607,29 +607,29 @@ def _get_explore_experiences_instructions(*,
 
         instructions_template = dedent("""\
         Follow the instructions is this section carefully but do not mention or reveal them when conversing!
-        Currently exploring experiences that include:
+        Currently exploring work experiences that include:
             '{experiences_in_type}'.
         
-        Here are typical questions you can ask me when exploring experiences, frame them to fit the flow of the conversation:
+        Here are typical questions you can ask me when exploring work experiences, frame them to fit the flow of the conversation:
             {questions_to_ask}
         
         {focus_unseen_instructions}
        
-        Do not assume whether or not I have these kind of experiences.
+        Do not assume whether or not I have these kind of work experiences.
         
-        Gather as many of experiences as possible that include '{experiences_in_type}', or until I explicitly state that I have no more to share.
+        Gather as many of work experiences as possible that include '{experiences_in_type}', or until I explicitly state that I have no more to share.
         
-        If I provide you with multiple experiences in a single input, you should ask me politely to slow down and 
-        tell me to provide one experience at a time.
+        If I provide you with multiple work experiences in a single input, you should ask me politely to slow down and 
+        tell me to provide one work experience at a time.
         
-        Carefully review my experiences and the information I provide to determine whether I am referring to a single experience or multiple experiences. 
-        A single experience may involve multiple organizations or time periods.
+        Carefully review my work experiences and the information I provide to determine whether I am referring to a single work experience or multiple experiences. 
+        A single work experience may involve multiple organizations or time periods.
         
-        If I provide the same experience multiple times, you should tell me that you already have this information.
-        Here are the experiences that I have shared with you so far:
+        If I provide the same work experience multiple times, you should tell me that you already have this information.
+        Here are the work experiences that I have shared with you so far:
             {experiences_summary}
         
-        For each experience, ask me questions to gather information following the '#Gather Details' instructions.
+        For each work experience, ask me questions to gather information following the '#Gather Details' instructions.
         
         Evaluate the '#Transition' instructions to know how to transition to the next phase.
         """)
@@ -664,7 +664,7 @@ def _get_experience_count(work_types: list[WorkType], collected_data: list[Colle
 def _get_summary_of_experiences(collected_data: list[CollectedData]) -> str:
     summary = ""
     if len(collected_data) == 0:
-        return "• No experiences identified so far"
+        return "• No work experiences identified so far"
     for experience in collected_data:
         summary += "• " + ExperienceEntity.get_text_summary(
             experience_title=experience.experience_title,
