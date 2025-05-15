@@ -132,7 +132,7 @@ async def app_setup_and_teardown(current_test_case: EvaluationTestCase) -> Async
         # Ensure sentry is disabled for the tests
         'BACKEND_ENABLE_SENTRY': 'False',
         'EMBEDDINGS_SERVICE_NAME': os.getenv('EMBEDDINGS_SERVICE_NAME'),
-        'EMBEDDINGS_MODEL_NAME':  os.getenv('EMBEDDINGS_MODEL_NAME'),
+        'EMBEDDINGS_MODEL_NAME': os.getenv('EMBEDDINGS_MODEL_NAME'),
     })
     _app_server_module_name = 'app.server'
     try:
@@ -186,6 +186,7 @@ async def test_main_app_chat(
         record_metrics = False  # change this value to run with or without metrics
         evaluation_result = ConversationEvaluationRecord(simulated_user_prompt=current_test_case.simulated_user_prompt,
                                                          test_case=current_test_case.name)
+        failures = []
         try:
             evaluation_result.add_conversation_records(
                 await conversation_generator.generate(
@@ -200,10 +201,12 @@ async def test_main_app_chat(
                 output = await create_evaluator(evaluation.type).evaluate(evaluation_result)
                 evaluation_result.add_evaluation_result(output)
                 logger.info(f'Evaluation for {evaluation.type.name}: {output.score} {output.reasoning}')
-                assert output.score >= evaluation.expected, f"{evaluation.type.name} expected " \
-                                                            f"{evaluation.expected} actual {output.score}"
+                if output.score < evaluation.expected:
+                    failures.append(f"{evaluation.type.name} expected "
+                                    f"{evaluation.expected} actual {output.score}")
         except Exception as e:
             logger.exception(f"Error in test case {current_test_case.name}: {e}", exc_info=True)
+            failures.append(f"Error in test case {current_test_case.name}: {e}")
         finally:
             output_folder = common_folder_path + 'e2e_test_' + current_test_case.name
             evaluation_result.save_data(folder=output_folder, base_file_name='evaluation_record')
@@ -211,3 +214,9 @@ async def test_main_app_chat(
             context = ConversationContext.model_validate(
                 client.get("/poc/conversation_context", params={'session_id': session_id}).json())
             save_conversation(context, title=current_test_case.name, folder_path=output_folder)
+
+            if failures:
+                failures = "\n  - ".join(failures)
+                pytest.fail(f"Test case {current_test_case.name} failed with errors: {failures}")
+            else:
+                logger.info(f"Test case {current_test_case.name} passed")
