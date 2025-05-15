@@ -209,7 +209,12 @@ class _ConversationLLM:
             #Do not advise
                 Do not offer advice or suggestions on how to use skills or work experiences or find a job.
                 Be neutral and do not make any assumptions about the competencies or skills I have.
-                
+            
+            #Distinguish between Caregiving for own or other families
+                When the work experience is about caregiving for own or other family, or helping in the household in the neighborhood, etc and does not
+                refer to a company or organization, you should ask me questions to align with the nature of the work.
+                You should not mention company or organization in this case and the start and end dates should be aligned with the nature of the work.
+               
             #Experiences To Explore
                 {exploring_type_instructions}
                 
@@ -275,8 +280,8 @@ class _ConversationLLM:
                 ##'work_type' instructions
                     It can have one of the following values:
                         {work_type_definitions}
-                    Ask questions to infer the 'work_type' field.
-                    If the work_type is classified as 'None' ask further questions to clarify the work type.
+                    Infer the 'work_type' from the information I provided in our conversation.
+                    If it is not possible to infer it, it is ambiguous or it was classified as 'None', ask further questions to clarify the work type.
                     Here are some example questions you can ask depending on the work type you want to verify, adjust as you see fit:
                         - FORMAL_SECTOR_WAGED_EMPLOYMENT: "Did you work as a paid employee?"
                         - FORMAL_SECTOR_UNPAID_TRAINEE_WORK: "Did you work as an unpaid trainee?"
@@ -291,7 +296,8 @@ class _ConversationLLM:
                     I may provide the beginning and end of a work experience at any order, 
                     in a single input or in separate inputs, as a period or as a single date in relative or absolute terms
                     e.g., "March 2021" or "last month", "since n months", "the last M years" etc or whatever the user may provide.
-                    An exact date is not required, year or year and month is sufficient. 
+                    An exact date is not required, year or year and month is sufficient.
+                    In case the of caregiving for family, helping in the household, use common sense and adjust your questions to reflect the nature of the work.
                     ###Date Consistency instructions
                         Check the start_date and end_date dates and ensure they are not inconsistent:
                         - they do not refer to the future
@@ -299,17 +305,19 @@ class _ConversationLLM:
                         - end_date is after the start_date
                         If they are inconsistent point it out and ask me for clarifications.
                 ##'company' instructions
-                    What the company does and its name.
-                    If I have not provided the company name or what it does, ask me for it. 
-                     In case the of caregiving for family, helping in the household, adjust your questions to reflect the nature of the work
-                     as there is not a company in this case but the family or household.
+                    The receiver of work. Can be an organization, a company, a household or a family etc.
+                    If I have not provided the receiver, or what it does, ask me for it.
+                    If the receiver of the work is a person, a household, or a family, then use the receiver type and don't ask for a name.
+                    /// In case the of caregiving for family, helping in the household, use common sense and adjust your questions to reflect the nature of the work,
+                    /// as there is not a company in this case but the family or household.
+                    Do not ask for any personal information such as the name of a person, of a family or a household.
                 ##'location' instructions
                     The location (e.g City, Region, District or remote) of the company or organization.
                     An exact address is not required.
                     If I have not provided the location, ask me for it.
                     Choose the question to ask based on the context of the work experience (company, title etc).
                     In case of caregiving for family, helping in the household, do not ask for an exact address, just the city or region would be sufficient.
-            
+                    Do not ask for any personal information such as the address of a person,of a family, or a household.
             #Collected Experience Data 
                 All the work experiences you have collected so far:
                     {collected_experience_data}
@@ -563,13 +571,13 @@ def _get_excluding_experiences(work_type: WorkType) -> str:
 def _ask_experience_type_question(work_type: WorkType) -> str:
     question_to_ask: str
     if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-        question_to_ask = "Have I worked for a company or a someone else's business for money."
+        question_to_ask = "Have I been employed in a company or someone else's business for money."
     elif work_type == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
         question_to_ask = "Have I worked as an unpaid trainee for a company or organization."
     elif work_type == WorkType.SELF_EMPLOYMENT:
-        question_to_ask = "Have I run my own business, did freelance or contract work."
+        question_to_ask = "Have I run my own business, done freelance or contract work."
     elif work_type == WorkType.UNSEEN_UNPAID:
-        question_to_ask = "Have Id done unpaid work such as community volunteering, caregiving my own family, helping in the household."
+        question_to_ask = "Have I done unpaid work such as community volunteering, caregiving my own or another family, helping in a household."
     else:
         raise ValueError("The exploring type is not supported")
     return question_to_ask
