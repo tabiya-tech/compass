@@ -41,7 +41,7 @@ class _ConversationLLM:
         async def _callback(attempt: int, max_retries: int) -> tuple[ConversationLLMAgentOutput, float, BaseException | None]:
             # Call the LLM to get the next message for the user
             # Add some temperature and top_p variation to prompt the LLM to return different results on each retry.
-            # Exponentially increase the temperature and top_p to avoid the LLM to return the same result every time.
+            # Exponentially increase the temperature and top_p to avoid the LLM returning the same result every time.
             temperature_config = get_config_variation(start_temperature=0.25, end_temperature=0.5,
                                                       start_top_p=0.8, end_top_p=1,
                                                       attempt=attempt, max_retries=max_retries)
@@ -80,7 +80,7 @@ class _ConversationLLM:
                                 logger: logging.Logger) -> tuple[ConversationLLMAgentOutput, float, BaseException | None]:
         """
         Converses with the user and asks probing questions to collect experiences.
-        :param first_time_visit: If this is the first time the user visits the agent during the conversation
+        :param first_time_visit: If this is the first time the user is visiting the agent.
         :param user_input: The user input.
         :param country_of_user: The country of the user.
         :param context: The conversation context.
@@ -389,13 +389,13 @@ def _transition_instructions(*,
                              exploring_type: WorkType,
                              unexplored_types: list[WorkType],
                              ):
-    # if not all_fields_collected:  # need to fill missing fields
+    # if not all_fields_collected: # need to fill missing fields
     #    return dedent("""\
     #        To transition to the next phase you must ask questions to fill the missing fields for the experiences that I shared with you.
     #        Inspect the '#Collected Experience Data' to see which fields are missing and continue asking questions
     #        to fill the missing fields based on the '#Gather Details' instructions.
     #        """)
-    # elif len(unexplored_types) > 0:  # need to collect more experiences
+    # elif len(unexplored_types) > 0: # need to collect more experiences
     if len(unexplored_types) > 0:  # need to collect more experiences
         _instructions = dedent("""\
         Once we have explored all work experiences that include '{exploring_type}' you will respond with a plain <END_OF_WORKTYPE> and move to the next experience type.
@@ -539,13 +539,13 @@ def _get_excluding_experiences(work_type: WorkType) -> str:
     excluding_experience_types: list[WorkType] = []
     if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
         excluding_experience_types = [WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK, WorkType.SELF_EMPLOYMENT, WorkType.UNSEEN_UNPAID]
-        #  return "unpaid trainee work, self-employment, or unpaid work such as community volunteering work etc"
+        #  return "unpaid trainee work, self-employment, or unpaid work such as community volunteering work etc."
     elif work_type == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
         excluding_experience_types = [WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT, WorkType.SELF_EMPLOYMENT, WorkType.UNSEEN_UNPAID]
-        #  return "waged employment, self-employment, or unpaid work such as community volunteering work etc"
+        #  return "waged employment, self-employment, or unpaid work such as community volunteering work etc."
     elif work_type == WorkType.SELF_EMPLOYMENT:
         excluding_experience_types = [WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT, WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK, WorkType.UNSEEN_UNPAID]
-        #  return "waged employment, unpaid trainee work, or unpaid work such as community volunteering work etc"
+        #  return "waged employment, unpaid trainee work, or unpaid work such as community volunteering work etc."
     elif work_type == WorkType.UNSEEN_UNPAID:
         excluding_experience_types = [WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT, WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK, WorkType.SELF_EMPLOYMENT]
         #  return "waged employment, unpaid trainee work, or self-employment"
