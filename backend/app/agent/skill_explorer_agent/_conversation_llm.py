@@ -11,12 +11,14 @@ from app.conversation_memory.conversation_formatter import ConversationHistoryFo
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.countries import Country
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import MODERATE_TEMPERATURE_GENERATION_CONFIG, LLMConfig, LLMResponse
+from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation
+from common_libs.retry import Retry
 
 _FINAL_MESSAGE = "Thank you for sharing these details! I have all the information I need."
 
 
 class _ConversationLLM:
+
     @staticmethod
     async def execute(*,
                       experiences_explored: list[str],
@@ -28,6 +30,45 @@ class _ConversationLLM:
                       experience_title,
                       work_type: WorkType,
                       logger: logging.Logger) -> AgentOutput:
+
+        async def _callback(attempt: int, max_retries: int) -> tuple[AgentOutput, float, BaseException | None]:
+            # Call the LLM to get the next message for the user.
+            # Add some temperature and top_p variation to prompt the LLM to return different results on each retry.
+            # Exponentially increase the temperature and top_p to avoid the LLM to return the same result every time.
+            temperature_config = get_config_variation(start_temperature=0.25, end_temperature=0.5,
+                                                      start_top_p=0.8, end_top_p=1,
+                                                      attempt=attempt, max_retries=max_retries)
+            logger.debug("Calling _ConversationLLM with temperature: %s, top_p: %s",
+                         temperature_config["temperature"],
+                         temperature_config["top_p"])
+            return await _ConversationLLM._internal_execute(
+                temperature_config=temperature_config,
+                experiences_explored=experiences_explored,
+                first_time_for_experience=first_time_for_experience,
+                question_asked_until_now=question_asked_until_now,
+                user_input=user_input,
+                country_of_user=country_of_user,
+                context=context,
+                experience_title=experience_title,
+                work_type=work_type,
+                logger=logger
+            )
+
+        result, _result_penalty, _error = await Retry[AgentOutput].call_with_penalty(callback=_callback)
+        return result
+
+    @staticmethod
+    async def _internal_execute(*,
+                                temperature_config: dict,
+                                experiences_explored: list[str],
+                                first_time_for_experience: bool,
+                                question_asked_until_now: list[str],
+                                user_input: AgentInput,
+                                country_of_user: Country,
+                                context: ConversationContext,
+                                experience_title,
+                                work_type: WorkType,
+                                logger: logging.Logger) -> tuple[AgentOutput, float, BaseException | None]:
         """
         The main conversation logic for the skill explorer agent.
         """
@@ -55,18 +96,16 @@ class _ConversationLLM:
 
             llm = GeminiGenerativeLLM(
                 config=LLMConfig(
-                    generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG
+                    generation_config=temperature_config
                 ))
             llm_response = await llm.generate_content(
                 llm_input=_ConversationLLM.create_first_time_generative_prompt(
                     country_of_user=country_of_user,
                     experiences_explored=experiences_explored,
                     experience_title=experience_title,
-                    work_type=work_type)
-            )
-
+                    work_type=work_type
+                ))
         else:
-
             llm = GeminiGenerativeLLM(
                 system_instructions=_ConversationLLM._create_conversation_system_instructions(
                     question_asked_until_now=question_asked_until_now,
@@ -74,20 +113,28 @@ class _ConversationLLM:
                     experience_title=experience_title,
                     work_type=work_type),
                 config=LLMConfig(
-                    generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG
+                    generation_config=temperature_config
                 ))
-
             llm_response = await llm.generate_content(
                 llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
                     model_response_instructions=None,
                     context=context, user_input=msg),
             )
+
         llm_end_time = time.time()
         llm_stats = LLMStats(prompt_token_count=llm_response.prompt_token_count,
                              response_token_count=llm_response.response_token_count,
                              response_time_in_sec=round(llm_end_time - llm_start_time, 2))
         finished = False
         llm_response.text = llm_response.text.strip()
+        if llm_response.text == "":
+            return AgentOutput(
+                message_for_user="Sorry, I didn't understand that. Can you please rephrase?",
+                finished=False,
+                agent_type=AgentType.EXPLORE_SKILLS_AGENT,
+                agent_response_time_in_sec=round(llm_end_time - llm_start_time, 2),
+                llm_stats=[llm_stats]), 100, ValueError("LLM response is empty")
+
         if llm_response.text == "<END_OF_CONVERSATION>":
             llm_response.text = _FINAL_MESSAGE
             finished = True
@@ -101,7 +148,7 @@ class _ConversationLLM:
             finished=finished,
             agent_type=AgentType.EXPLORE_SKILLS_AGENT,
             agent_response_time_in_sec=round(llm_end_time - llm_start_time, 2),
-            llm_stats=[llm_stats])
+            llm_stats=[llm_stats]), 0, None
 
     @staticmethod
     def _create_conversation_system_instructions(*,
@@ -228,7 +275,7 @@ class _ConversationLLM:
                 
                 Add new line to separate the above from the following question.
                 
-                Ask me to describe a typical day at work.
+                Ask me to describe a typical day as {experience_title}.
             
         {language_style}
         """)
