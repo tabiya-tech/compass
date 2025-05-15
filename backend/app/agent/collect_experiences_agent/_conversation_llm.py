@@ -13,7 +13,8 @@ from app.conversation_memory.conversation_formatter import ConversationHistoryFo
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.countries import Country
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import MODERATE_TEMPERATURE_GENERATION_CONFIG, LLMConfig, LLMResponse
+from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation
+from common_libs.retry import Retry
 
 _NO_EXPERIENCE_COLLECTED = "No experience data has been collected yet"
 _FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step."
@@ -24,6 +25,7 @@ class ConversationLLMAgentOutput(AgentOutput):
 
 
 class _ConversationLLM:
+
     @staticmethod
     async def execute(*,
                       first_time_visit: bool,
@@ -36,6 +38,46 @@ class _ConversationLLM:
                       explored_types: list[WorkType],
                       last_referenced_experience_index: int,
                       logger: logging.Logger) -> ConversationLLMAgentOutput:
+        async def _callback(attempt: int, max_retries: int) -> tuple[ConversationLLMAgentOutput, float, BaseException | None]:
+            # Call the LLM to get the next message for the user
+            # Add some temperature and top_p variation to prompt the LLM to return different results on each retry.
+            # Exponentially increase the temperature and top_p to avoid the LLM to return the same result every time.
+            temperature_config = get_config_variation(start_temperature=0.25, end_temperature=0.5,
+                                                      start_top_p=0.8, end_top_p=1,
+                                                      attempt=attempt, max_retries=max_retries)
+            logger.debug("Calling _ConversationLLM with temperature: %s, top_p: %s",
+                         temperature_config["temperature"],
+                         temperature_config["top_p"])
+            return await _ConversationLLM._internal_execute(
+                temperature_config=temperature_config,
+                first_time_visit=first_time_visit,
+                user_input=user_input,
+                country_of_user=country_of_user,
+                context=context,
+                collected_data=collected_data,
+                exploring_type=exploring_type,
+                unexplored_types=unexplored_types,
+                explored_types=explored_types,
+                last_referenced_experience_index=last_referenced_experience_index,
+                logger=logger
+            )
+
+        result, _result_penalty, _error = await Retry[ConversationLLMAgentOutput].call_with_penalty(callback=_callback)
+        return result
+
+    @staticmethod
+    async def _internal_execute(*,
+                                temperature_config: dict,
+                                first_time_visit: bool,
+                                user_input: AgentInput,
+                                country_of_user: Country,
+                                context: ConversationContext,
+                                collected_data: list[CollectedData],
+                                exploring_type: WorkType,
+                                unexplored_types: list[WorkType],
+                                explored_types: list[WorkType],
+                                last_referenced_experience_index: int,
+                                logger: logging.Logger) -> tuple[ConversationLLMAgentOutput, float, BaseException | None]:
         """
         Converses with the user and asks probing questions to collect experiences.
         :param first_time_visit: If this is the first time the user visits the agent during the conversation
@@ -66,11 +108,10 @@ class _ConversationLLM:
         if first_time_visit:
             # If this is the first time the user visits the agent, the agent should get to the point
             # and not introduce itself or ask how the user is doing.
-
             llm = GeminiGenerativeLLM(
                 system_instructions=None,
                 config=LLMConfig(
-                    generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG
+                    generation_config=temperature_config
                 ))
             llm_response = await llm.generate_content(
                 llm_input=_ConversationLLM._get_first_time_generative_prompt(
@@ -87,9 +128,8 @@ class _ConversationLLM:
                                                                               last_referenced_experience_index=last_referenced_experience_index,
                                                                               ),
                 config=LLMConfig(
-                    generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG
+                    generation_config=temperature_config
                 ))
-
             llm_response = await llm.generate_content(
                 llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
                     model_response_instructions=None,
@@ -97,35 +137,44 @@ class _ConversationLLM:
                     user_input=msg),
             )
 
-            llm_response.text = llm_response.text.strip()
-
-            # Test if the response is the same as the previous two
-            if llm_response.text.find("<END_OF_WORKTYPE>") != -1:
-                # We finished a work type (and it is not the last one) we need to move to the next one
-                if llm_response.text != "<END_OF_WORKTYPE>":
-                    logger.warning("The response contains '<END_OF_WORKTYPE>' and additional text: %s", llm_response.text)
-                exploring_type_finished = True
-                finished = False
-                llm_response.text = "Let's move on to other work experiences."
-
-            if llm_response.text.find("<END_OF_CONVERSATION>") != -1:
-                if llm_response.text != "<END_OF_CONVERSATION>":
-                    logger.warning("The response contains '<END_OF_CONVERSATION>' and additional text: %s", llm_response.text)
-                llm_response.text = _FINAL_MESSAGE
-                exploring_type_finished = False
-                finished = True
-
         llm_end_time = time.time()
         llm_stats = LLMStats(prompt_token_count=llm_response.prompt_token_count,
                              response_token_count=llm_response.response_token_count,
                              response_time_in_sec=round(llm_end_time - llm_start_time, 2))
+
+        llm_response.text = llm_response.text.strip()
+        if llm_response.text == "":
+            return ConversationLLMAgentOutput(
+                message_for_user="Sorry, I didn't understand that. Can you please rephrase?",
+                exploring_type_finished=False,
+                finished=False,
+                agent_type=AgentType.COLLECT_EXPERIENCES_AGENT,
+                agent_response_time_in_sec=round(llm_end_time - llm_start_time, 2),
+                llm_stats=[llm_stats]), 100, ValueError("Conversation LLM response is empty")
+
+        # Test if the response is the same as the previous two
+        if llm_response.text.find("<END_OF_WORKTYPE>") != -1:
+            # We finished a work type (and it is not the last one) we need to move to the next one
+            if llm_response.text != "<END_OF_WORKTYPE>":
+                logger.warning("The response contains '<END_OF_WORKTYPE>' and additional text: %s", llm_response.text)
+            exploring_type_finished = True
+            finished = False
+            llm_response.text = "Let's move on to other work experiences."
+
+        if llm_response.text.find("<END_OF_CONVERSATION>") != -1:
+            if llm_response.text != "<END_OF_CONVERSATION>":
+                logger.warning("The response contains '<END_OF_CONVERSATION>' and additional text: %s", llm_response.text)
+            llm_response.text = _FINAL_MESSAGE
+            exploring_type_finished = False
+            finished = True
+
         return ConversationLLMAgentOutput(
             message_for_user=llm_response.text,
             exploring_type_finished=exploring_type_finished,
             finished=finished,
             agent_type=AgentType.COLLECT_EXPERIENCES_AGENT,
             agent_response_time_in_sec=round(llm_end_time - llm_start_time, 2),
-            llm_stats=[llm_stats])
+            llm_stats=[llm_stats]), 0, None
 
     @staticmethod
     def _get_system_instructions(*,
@@ -582,9 +631,9 @@ def _get_explore_experiences_instructions(*,
                                                 questions_to_ask=questions_to_ask,
                                                 focus_unseen_instructions=focus_unseen_instructions,
                                                 experiences_in_type=experiences_in_type,
-                                               # excluding_experiences=excluding_experiences,
-                                               # already_explored_types=already_explored_types,
-                                               # not_explored_types=not_explored_types,
+                                                # excluding_experiences=excluding_experiences,
+                                                # already_explored_types=already_explored_types,
+                                                # not_explored_types=not_explored_types,
                                                 experiences_summary=experiences_summary)
 
     else:
