@@ -355,7 +355,8 @@ class _ConversationLLM:
                                                     exploring_type=exploring_type,
                                                     unexplored_types=unexplored_types,
                                                 ),
-                                                last_referenced_experience=_get_last_referenced_experience(collected_data, last_referenced_experience_index)
+                                                last_referenced_experience=_get_last_referenced_experience(collected_data, last_referenced_experience_index),
+                                                example_summary=_get_example_summary(),
                                                 )
 
     @staticmethod
@@ -653,6 +654,16 @@ def _get_experience_count(work_types: list[WorkType], collected_data: list[Colle
         if WorkType.from_string_key(data.work_type) in work_types:
             count += 1
     return count
+
+
+def _get_example_summary() -> str:
+    return "• " + ExperienceEntity.get_text_summary(
+        experience_title="Crew Member",
+        location="London",
+        work_type=WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name,
+        start_date="2020",
+        end_date="2021",
+        company="Acme Ltd") + "\n"
 
 
 def _get_summary_of_experiences(collected_data: list[CollectedData]) -> str:
