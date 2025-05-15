@@ -11,6 +11,7 @@ from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_
 from app.agent.experience import WorkType
 from app.agent.skill_explorer_agent._conversation_llm import _ConversationLLM, _FINAL_MESSAGE
 from common_libs.test_utilities import get_random_session_id
+from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
@@ -36,8 +37,40 @@ class _TestCaseConversation(CompassTestCase):
     The country of the user.
     """
 
+    experience_title: str
+    """
+    The title of the experience that is being explored.
+    """
+
+    work_type:WorkType
+    """
+    The work type of the experience that is being explored.
+    """
+
 
 test_cases = [
+    _TestCaseConversation(
+        country_of_user=Country.KENYA,
+        name="young_mother",
+        summary="I told you that I am a young mother and take care of my child.",
+        turns=[("Yes, I still do.",
+                "Thanks, so you've been taking care of your child since August 2022, since you became a mother."
+                "Is there anything you'd like to add or change about this experience?"),
+               ("No, that's all correct.",
+                'Cool, can you tell me about any other experiences where you helped out friends or family members without getting paid?'),
+               ("No, that's the only one.",
+                dedent("""\
+                                    Let's recap the information we have collected so far:
+                                    • Taking care of child (Volunteer/Unpaid), 2022/08 - Present, Home, Nairobi
+                                    Is there anything you would like to add or change?  If you think any of the experiences are the same, you can ask me to delete one.
+                                     """)),
+               ("That's all correct.",
+               "Thank you for sharing your experiences. Let's move on to the next step.")
+               ],
+        experiences_explored=[],
+        experience_title="Taking care of child",
+        work_type=WorkType.UNSEEN_UNPAID
+    ),
     _TestCaseConversation(
         country_of_user=Country.SOUTH_AFRICA,
         name="first_experience_to_explore",
@@ -59,11 +92,13 @@ test_cases = [
                                     • Community Volunteering (Volunteer/Unpaid)
                                     • Helping Brother with Car (Volunteer/Unpaid), 2022/08 - Present, Brother, Garage
                                     Is there anything you would like to add or change?  If you think any of the experiences are the same, you can ask me to delete one.
-                                     """))
-            , ("That's all correct.",
+                                     """)),
+               ("That's all correct.",
                "Thank you for sharing your experiences. Let's move on to the next step.")
                ],
-        experiences_explored=[]
+        experiences_explored=[],
+        experience_title="Selling Kotas",
+        work_type=WorkType.SELF_EMPLOYMENT
     ),
     _TestCaseConversation(
         country_of_user=Country.SOUTH_AFRICA,
@@ -89,7 +124,9 @@ test_cases = [
                                      """)),
                ("Das ist alles korrekt.",
                 "Vielen Dank, dass du deine Erfahrungen geteilt hast. Lassen Sie uns zum nächsten Schritt übergehen.")],
-        experiences_explored=[]
+        experiences_explored=[],
+        experience_title="Verkauf von Kotas",
+        work_type=WorkType.SELF_EMPLOYMENT
     ),
     _TestCaseConversation(
         country_of_user=Country.SOUTH_AFRICA,
@@ -121,7 +158,9 @@ test_cases = [
              '• take payments for bills\n\n')
 
         ],
-        experiences_explored=["Selling Kotas (Self-Employed), 2023/08 - Present, Joburg"]
+        experiences_explored=["Selling Kotas (Self-Employed), 2023/08 - Present, Joburg"],
+        experience_title="Community Volunteering",
+        work_type=WorkType.UNSEEN_UNPAID
     )]
 
 
@@ -129,36 +168,49 @@ test_cases = [
 @pytest.mark.evaluation_test
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
-async def test_skills_explorer_agent_first_message(test_case):
-    # The conversation manager for this test
-    conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
-    conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=get_random_session_id()))
-    context = await conversation_manager.get_conversation_context()
-    # GIVEN the previous conversation context
-    for turn in test_case.turns:
-        _add_turn_to_context(turn[0], turn[1], context)
-    # AND the context summary
-    context.summary = test_case.summary
-    # WHEN the conversation LLM is executed
-    llm = _ConversationLLM()
-    out = await llm.execute(
-        country_of_user=test_case.country_of_user,
-        experiences_explored=test_case.experiences_explored,
-        first_time_for_experience=True,
-        user_input=AgentInput(message="", is_artificial=True),
-        context=context,
-        experience_title="Baker",
-        work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
-        logger=logging.getLogger()
-    )
-    logging.getLogger().info(out)
+async def test_skills_explorer_agent_first_message(test_case, caplog: pytest.LogCaptureFixture):
+    logger = logging.getLogger()
 
-    # THEN expect that the conversation has not ended
-    assert out.message_for_user != _FINAL_MESSAGE
-    # AND the model is asking question about the currently explored experience
-    assert out.message_for_user.lower().find("baker") != -1
-    # And there are not <br> tags in the output
-    assert out.message_for_user.find("<br>") == -1
+    # WHEN the tool is executed with the given experience and country
+    # Set the capl-og at the level in question - 1 to ensure that the root logger is set to the correct level.
+    # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
+    # the log messages to the root logger. For this reason, we add additional guards.
+    with caplog.at_level(logging.INFO):
+        # Guards to ensure that the loggers are correctly set up,
+        guard_caplog(logger=logger, caplog=caplog)
+
+        conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
+        conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=get_random_session_id()))
+        context = await conversation_manager.get_conversation_context()
+        # GIVEN the previous conversation context
+        for turn in test_case.turns:
+            _add_turn_to_context(turn[0], turn[1], context)
+        # AND the context summary
+        context.summary = test_case.summary
+        # WHEN the conversation LLM is executed
+        llm = _ConversationLLM()
+        out = await llm.execute(
+            country_of_user=test_case.country_of_user,
+            experiences_explored=test_case.experiences_explored,
+            first_time_for_experience=True,
+            question_asked_until_now=[],
+            user_input=AgentInput(message="", is_artificial=True),
+            context=context,
+            experience_title=test_case.experience_title,
+            work_type=test_case.work_type,
+            logger=logger
+        )
+        logger.info(out)
+
+        # THEN expect that the conversation has not ended
+        assert out.message_for_user != _FINAL_MESSAGE
+        # AND the model is asking the first question
+        assert out.message_for_user.lower().find("typical day") != -1
+        # And there are not <br> tags in the output
+        assert out.message_for_user.find("<br>") == -1
+
+        # AND no error or warning messages in the logs
+        assert_log_error_warnings(caplog=caplog, expect_errors_in_logs=False, expect_warnings_in_logs=False)
 
 
 def _add_turn_to_context(user_input: str, agent_output: str, context: ConversationContext):
