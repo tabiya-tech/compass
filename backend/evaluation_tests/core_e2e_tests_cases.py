@@ -31,6 +31,17 @@ france_prompt = system_instruction_prompt + dedent("""
 
 test_cases = [
     EvaluationTestCase(
+        country_of_user=Country.KENYA,
+        conversation_rounds=100,
+        name='young_monther_unseen_user_e2e',
+        simulated_user_prompt=dedent("""
+            You're a young monther. You have been raising your child since it was born three years and mostly taking care of your family at home.
+            Never had a paying working experience of any kind, never as an employee, never did any internship, never run
+            did any internship, never run your own business, never volunteered, never did any freelance work.
+            """) + kenya_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+    ),
+    EvaluationTestCase(
         country_of_user=Country.UNSPECIFIED,
         conversation_rounds=100,
         name='minimal_user_e2e',

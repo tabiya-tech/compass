@@ -182,10 +182,9 @@ class _ConversationLLM:
             You must ask me questions that help me reflect on my experience and describe it in detail.
             
             (a) Questions you must ask me to gather the details of my experience:
-                - Can you describe a typical day at your work?
-                - What else do you do at work?
-                - Can you describe the typical tasks you do at work?
-                - What are the most important things you need to do at work?
+                - Can you describe a typical day as {experience_title}?
+                - What else do you do as {experience_title}?
+                - What are the most important things you need to do as {experience_title}?
                 - How do you decide what task to do first each day?
 
             (b) Questions you must ask me to identify what is not part of my experience:
