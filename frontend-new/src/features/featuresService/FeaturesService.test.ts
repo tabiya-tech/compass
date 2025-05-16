@@ -2,14 +2,14 @@
 import "src/_test_utilities/consoleMock";
 
 import * as EnvServiceModule from "src/envService";
-import { OptionalFeaturesService } from "./optionalFeaturesService";
+import { FeaturesService } from "./FeaturesService";
 
 describe("OptionalFeaturesService", () => {
   let getFeaturesMock = jest.spyOn(EnvServiceModule, "getFeatures");
 
   beforeEach(() => {
     getFeaturesMock.mockReset();
-    OptionalFeaturesService.getInstance().clearState();
+    FeaturesService.getInstance().clearState();
   });
 
   describe("getConfig", () => {
@@ -19,7 +19,7 @@ describe("OptionalFeaturesService", () => {
       getFeaturesMock.mockReturnValue("");
 
       // WHEN getConfig is called
-      const actualConfig = OptionalFeaturesService.getInstance().getConfig(givenFeatureId);
+      const actualConfig = FeaturesService.getInstance().getConfig(givenFeatureId);
 
       // THEN expect it to return enabled: false and empty config object.
       expect(actualConfig).toStrictEqual({
@@ -34,7 +34,7 @@ describe("OptionalFeaturesService", () => {
       getFeaturesMock.mockReturnValue(JSON.stringify({ foo: { enabled: true, config: {} } }));
 
       // WHEN getConfig is called
-      const actualConfig = OptionalFeaturesService.getInstance().getConfig(givenFeatureId);
+      const actualConfig = FeaturesService.getInstance().getConfig(givenFeatureId);
 
       // THEN expect it to return enabled: false and empty config object.
       expect(actualConfig).toStrictEqual({
@@ -49,7 +49,7 @@ describe("OptionalFeaturesService", () => {
       getFeaturesMock.mockReturnValue("invalid");
 
       // WHEN getConfig is called
-      const actualConfig = OptionalFeaturesService.getInstance().getConfig(givenFeatureId);
+      const actualConfig = FeaturesService.getInstance().getConfig(givenFeatureId);
 
       // THEN expect it to return enabled: false and empty config object.
       expect(actualConfig).toStrictEqual({
@@ -76,7 +76,7 @@ describe("OptionalFeaturesService", () => {
       getFeaturesMock.mockReturnValue(JSON.stringify({ [givenFeatureId]: givenConfigDict }));
 
       // WHEN getConfig is called
-      const actualConfig = OptionalFeaturesService.getInstance().getConfig(givenFeatureId);
+      const actualConfig = FeaturesService.getInstance().getConfig(givenFeatureId);
 
       // THEN expect it to return the actual config
       expect(actualConfig).toStrictEqual(givenConfigDict);
@@ -88,7 +88,7 @@ describe("OptionalFeaturesService", () => {
       const givenConfigDict = { enabled: true, config: { foo: "bar" } };
       getFeaturesMock.mockReturnValue(JSON.stringify({ [givenFeatureId]: givenConfigDict }));
 
-      const service = OptionalFeaturesService.getInstance();
+      const service = FeaturesService.getInstance();
 
       // WHEN getConfig is called twice
       const config1 = service.getConfig(givenFeatureId);
@@ -107,10 +107,10 @@ describe("OptionalFeaturesService", () => {
       // GIVEN the features string is set and valid
       const givenEnabledState = true;
 
-      const getConfig = jest.spyOn(OptionalFeaturesService.getInstance(), "getConfig");
+      const getConfig = jest.spyOn(FeaturesService.getInstance(), "getConfig");
 
       getConfig.mockReturnValue({ enabled: givenEnabledState, config: {} });
-      const service = OptionalFeaturesService.getInstance();
+      const service = FeaturesService.getInstance();
 
       // WHEN isFeatureEnabled is called
       const actualEnabledState = service.isFeatureEnabled("bar");
