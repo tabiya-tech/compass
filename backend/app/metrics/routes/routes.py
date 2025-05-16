@@ -31,8 +31,9 @@ logger = logging.getLogger(__name__)
 # DemographicsEvent: Estimate: 20 (user_id) + 3 (age) + 10 (gender) + 20 (education) + 50 (employment) + overhead ≈ 100–200 bytes
 # UserLocationEvent: Estimate: 20 + 16 (coords) + overhead ≈ 60–100 bytes
 # DeviceSpecificationEvent: Estimate: 20 (user_id) + 20 (device) + 20 (os) + 20 (browser) + 20 (screen) + overhead ≈ 100–200 bytes
+# UIInteractionEvent: Estimate: 20 (user_id) + 50 (actions * 5) + 20 (element_id) + 20 (timestamp) + overhead ≈ 50–150 bytes
 # single event size ≈ 100–200 bytes, 1KB ≈ 5–10 events
-MAX_PAYLOAD_SIZE = 1024
+MAX_PAYLOAD_SIZE = 2048 # 2KB
 
 
 class _MetricRequest(BaseModel):
