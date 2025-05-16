@@ -29,7 +29,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       color={"primary"}
       style={style}
       sx={{
-        borderRadius: (theme) => theme.tabiyaRounding.xl,
+        borderRadius: (theme) => theme.fixedSpacing(theme.tabiyaRounding.xl),
         paddingY: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.xs),
         paddingX: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.md),
         ...sx,
