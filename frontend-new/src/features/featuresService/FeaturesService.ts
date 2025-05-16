@@ -8,21 +8,21 @@ type Config = {
 };
 
 /**
- * Singleton class to manage optional features.
+ * Singleton class to manage features.
  */
-export class OptionalFeaturesService {
-  private static instance: OptionalFeaturesService;
+export class FeaturesService {
+  private static instance: FeaturesService;
   private readonly _state: Map<string, Config>;
 
   private constructor() {
     this._state = new Map<string, Config>();
   }
 
-  public static getInstance(): OptionalFeaturesService {
-    if (!OptionalFeaturesService.instance) {
-      OptionalFeaturesService.instance = new OptionalFeaturesService();
+  public static getInstance(): FeaturesService {
+    if (!FeaturesService.instance) {
+      FeaturesService.instance = new FeaturesService();
     }
-    return OptionalFeaturesService.instance;
+    return FeaturesService.instance;
   }
 
   /**

@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SkillsRankingResult tests render tests should render component successfully 1`] = `
+<div
+  class="MuiBox-root css-1c8zvho"
+  data-testid="skills-ranking-result-container-3fb55364-3b63-48db-b1ef-818a4daa5862"
+  origin="COMPASS"
+>
+  <div
+    class="MuiBox-root css-u9ttk8"
+    data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+    origin="COMPASS"
+  >
+    <p
+      class="MuiTypography-root MuiTypography-body1 css-13zm2uq-MuiTypography-root"
+      data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
+    >
+      Here's what we found
+    </p>
+    <div
+      class="MuiBox-root css-0"
+      data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+    >
+      <div
+        class="MuiBox-root css-0"
+      >
+        <p
+          class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+          data-testid="skills-ranking-result-text-3fb55364-3b63-48db-b1ef-818a4daa5862"
+        >
+          Based on how important your skills are versus other job seekers, you currently rank in the 
+          <b>
+            foobar
+          </b>
+           percentile. Do note that this can always change as you continue learning!
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;

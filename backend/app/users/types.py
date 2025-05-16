@@ -1,16 +1,30 @@
 from dataclasses import field
 from datetime import datetime
-from typing import Mapping, Any, Union, TypeAlias
+from typing import Mapping, Any, TypeAlias
 
 from pydantic import BaseModel, Field
 
 from app.conversations.feedback.services.types import AnsweredQuestions
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 
+PossibleExperimentValues: TypeAlias = str | bool | int | float | None
+"""
+An experiment can either be a group of PossibleExperimentValues namespaced by a single string (max depth: 1)
+eg: {
+"feature_foo_experiments": {
+        "experiment_1": "foo",
+        "experiment_2": False,
+        "experiment_3": 1
+    }
+}
 
-# Type alias for experiment configurations
-ExperimentConfig: TypeAlias = Union[str, dict[str, Any]]
-Experiments: TypeAlias = dict[str, ExperimentConfig]
+or an experiment can be a flat dictionary of PossibleExperimentValues
+{
+"experiment": "foo"
+}
+
+"""
+Experiments: TypeAlias = dict[str, dict[str, PossibleExperimentValues] | PossibleExperimentValues]
 UserExperiments: TypeAlias = dict[str, Experiments]
 
 
@@ -118,7 +132,7 @@ class UserPreferences(BaseModel):
     """
 
     @staticmethod
-    def from_document(doc: Mapping[str, any]) -> "UserPreferences":
+    def from_document(doc: Mapping[str, Any]) -> "UserPreferences":
         """
         Create a new UserPreferences object from a dictionary
 

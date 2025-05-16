@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SkillsRankingVoteItem tests render tests should render component successfully 1`] = `
+<div
+  class="MuiBox-root css-7pf6at"
+  data-testid="skills-ranking-vote-item-5271610c-0000-4000-8000-000000000000"
+>
+  <div
+    class="MuiBox-root css-1s0iju1"
+  >
+    <div
+      class="MuiBox-root css-7csspk"
+      data-testid="skills-ranking-vote-item-top-label-5271610c-0000-4000-8000-000000000000"
+    >
+      <p
+        class="MuiTypography-root MuiTypography-body1 css-18d7qa1-MuiTypography-root"
+      >
+        foo
+      </p>
+    </div>
+    <button
+      aria-label="foo"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-m3kom-MuiButtonBase-root-MuiIconButton-root"
+      data-testid="skills-ranking-vote-item-radio-5271610c-0000-4000-8000-000000000000"
+      tabindex="0"
+      type="button"
+    >
+      <span
+        style="display: block; width: 24px; height: 24px; border-radius: 50%; background: transparent; border: 2px solid rgb(0, 178, 101);"
+      />
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <div
+      class="MuiBox-root css-a3klcv"
+      data-testid="skills-ranking-vote-item-bottom-label-5271610c-0000-4000-8000-000000000000"
+    >
+      <p
+        class="MuiTypography-root MuiTypography-body1 css-18d7qa1-MuiTypography-root"
+      >
+        foo
+      </p>
+    </div>
+  </div>
+  <hr
+    class="MuiDivider-root MuiDivider-fullWidth css-19f4636-MuiDivider-root"
+    data-testid="skills-ranking-vote-item-divider-5271610c-0000-4000-8000-000000000000"
+  />
+</div>
+`;

@@ -1,0 +1,148 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SkillsRankingVote tests render tests should render component successfully 1`] = `
+<div
+  class="MuiBox-root css-1c8zvho"
+  data-testid="skills-ranking-vote-container-cb5e9e43-c288-4597-b6f4-a268623c9e61"
+  origin="COMPASS"
+>
+  <div
+    class="MuiBox-root css-u9ttk8"
+    data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+    origin="COMPASS"
+  >
+    <p
+      class="MuiTypography-root MuiTypography-body1 css-13zm2uq-MuiTypography-root"
+      data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
+    >
+      Please rate your skills
+    </p>
+    <div
+      class="MuiBox-root css-0"
+      data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+    >
+      <div
+        class="MuiBox-root css-1821gv5"
+      >
+        <p
+          class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+          data-testid="skills-ranking-vote-text-cb5e9e43-c288-4597-b6f4-a268623c9e61"
+        >
+          Before I tell you, how do your current skillset ranks compared to other job seekers?
+        </p>
+        <div
+          class="MuiBox-root css-1a23d07"
+        >
+          <div
+            data-testid="skills-ranking-vote-item"
+          >
+            <div
+              data-testid="skills-ranking-vote-item-radio"
+            />
+            <div
+              data-testid="skills-ranking-vote-item-divider"
+            />
+          </div>
+          <div
+            data-testid="skills-ranking-vote-item"
+          >
+            <div
+              data-testid="skills-ranking-vote-item-radio"
+            />
+            <div
+              data-testid="skills-ranking-vote-item-divider"
+            />
+          </div>
+          <div
+            data-testid="skills-ranking-vote-item"
+          >
+            <div
+              data-testid="skills-ranking-vote-item-radio"
+            />
+            <div
+              data-testid="skills-ranking-vote-item-divider"
+            />
+          </div>
+          <div
+            data-testid="skills-ranking-vote-item"
+          >
+            <div
+              data-testid="skills-ranking-vote-item-radio"
+            />
+            <div
+              data-testid="skills-ranking-vote-item-divider"
+            />
+          </div>
+          <div
+            data-testid="skills-ranking-vote-item"
+          >
+            <div
+              data-testid="skills-ranking-vote-item-radio"
+            />
+            <div
+              data-testid="skills-ranking-vote-item-divider"
+            />
+          </div>
+          <div
+            data-testid="skills-ranking-vote-item"
+          >
+            <div
+              data-testid="skills-ranking-vote-item-radio"
+            />
+            <div
+              data-testid="skills-ranking-vote-item-divider"
+            />
+          </div>
+          <div
+            data-testid="skills-ranking-vote-item"
+          >
+            <div
+              data-testid="skills-ranking-vote-item-radio"
+            />
+            <div
+              data-testid="skills-ranking-vote-item-divider"
+            />
+          </div>
+          <div
+            data-testid="skills-ranking-vote-item"
+          >
+            <div
+              data-testid="skills-ranking-vote-item-radio"
+            />
+            <div
+              data-testid="skills-ranking-vote-item-divider"
+            />
+          </div>
+          <div
+            data-testid="skills-ranking-vote-item"
+          >
+            <div
+              data-testid="skills-ranking-vote-item-radio"
+            />
+            <div
+              data-testid="skills-ranking-vote-item-divider"
+            />
+          </div>
+          <div
+            data-testid="skills-ranking-vote-item"
+          >
+            <div
+              data-testid="skills-ranking-vote-item-radio"
+            />
+            <div
+              data-testid="skills-ranking-vote-item-divider"
+            />
+          </div>
+          <div
+            data-testid="skills-ranking-vote-item"
+          >
+            <div
+              data-testid="skills-ranking-vote-item-radio"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

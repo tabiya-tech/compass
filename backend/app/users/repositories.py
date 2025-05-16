@@ -6,7 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.server_dependencies.database_collections import Collections
 from common_libs.time_utilities import datetime_to_mongo_date, get_now
-from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest, Experiments, ExperimentConfig, UserExperiments
+from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest, Experiments, UserExperiments, PossibleExperimentValues
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ class IUserPreferenceRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: ExperimentConfig) -> None:
+    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: dict[str, PossibleExperimentValues]) -> None:
         """
         Set an experiment configuration for a given experiment ID in the user preferences
         :param user_id: str - The user_id to set the experiment for
@@ -133,7 +133,7 @@ class UserPreferenceRepository(IUserPreferenceRepository):
             logger.exception(e)
             raise UserPreferenceRepositoryError("Failed to get user experiments") from e
 
-    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: ExperimentConfig) -> None:
+    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: dict[str, PossibleExperimentValues]) -> None:
         try:
             # Use $set with dot notation to update a specific field in the experiments dictionary
             await self.collection.update_one(
