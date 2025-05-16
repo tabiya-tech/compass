@@ -9,8 +9,8 @@ export type AnsweredQuestions = {
 }
 
 // we dont constrain the keys to the experiment ids, since the frontend doesnt
-// nessarily know all the experiment ids. some might be backend only.
-export type UserPreferencesExperiments = Partial<Record<string, string>>
+// necessarily know all the experiment ids. some might be backend only.
+export type UserPreferencesExperiments = Partial<Record<string, string | Record<string, any>>>
 
 export type UserPreference = {
   user_id: string;

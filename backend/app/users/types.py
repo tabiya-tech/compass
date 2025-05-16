@@ -1,11 +1,17 @@
 from dataclasses import field
 from datetime import datetime
-from typing import Mapping
+from typing import Mapping, Any, Union, TypeAlias
 
 from pydantic import BaseModel, Field
 
 from app.conversations.feedback.services.types import AnsweredQuestions
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
+
+
+# Type alias for experiment configurations
+ExperimentConfig: TypeAlias = Union[str, dict[str, Any]]
+Experiments: TypeAlias = dict[str, ExperimentConfig]
+UserExperiments: TypeAlias = dict[str, Experiments]
 
 
 class UpdateUserLanguageRequest(BaseModel):
@@ -37,9 +43,19 @@ class UserPreferencesRepositoryUpdateRequest(BaseModel):
     invitation_code - The invitation code of the user
     """
 
-    experiments: dict[str, str] = Field(default_factory=dict)
+    experiments: Experiments = Field(default_factory=dict)
     """
-    experiments - a key value pair of all the experiment ids(labels) the user is a part and with the a/b test class they've been assigned
+    experiments - A dictionary mapping experiment namespaces to their configuration
+    Each experiment can have either a simple string value or a nested configuration.
+    Example:
+    {
+        "simple_experiment": "group1",
+        "complex_experiment": {
+            "shown": true,
+            "branch": 3,
+            "default": {"rank": 0}
+        }
+    }
     """
 
     class Config:
@@ -61,9 +77,19 @@ class UserPreferencesUpdateRequest(BaseModel):
     """
     time - The time the user accepted the terms and conditions
     """
-    experiments: dict[str, str] = Field(default_factory=dict)
+    experiments: Experiments = Field(default_factory=dict)
     """
-    experiments - A key value pair of all the experiment ids(labels) the user is a part and with the a/b test class they've been assigned
+    experiments - A dictionary mapping experiment namespaces to their configuration
+    Each experiment can have either a simple string value or a nested configuration.
+    Example:
+    {
+        "simple_experiment": "group1",
+        "complex_experiment": {
+            "shown": true,
+            "branch": 3,
+            "default": {"rank": 0}
+        }
+    }
     """
 
     class Config:
@@ -76,7 +102,20 @@ class UserPreferences(BaseModel):
     accepted_tc: datetime | None = None
     sessions: list[int] = Field(default_factory=list)  # not required
     sensitive_personal_data_requirement: SensitivePersonalDataRequirement
-    experiments: dict[str, str] = Field(default_factory=dict)
+    experiments: Experiments = Field(default_factory=dict)
+    """
+    experiments - A dictionary mapping experiment namespaces to their configuration
+    Each experiment can have either a simple string value or a nested configuration.
+    Example:
+    {
+        "simple_experiment": "group1",
+        "complex_experiment": {
+            "shown": true,
+            "branch": 3,
+            "default": {"rank": 0}
+        }
+    }
+    """
 
     @staticmethod
     def from_document(doc: Mapping[str, any]) -> "UserPreferences":
