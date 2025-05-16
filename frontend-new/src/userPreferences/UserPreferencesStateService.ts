@@ -69,6 +69,10 @@ export default class UserPreferencesStateService {
       return false;
     }
 
+    if (!answered_questions[activeSessionId]) {
+      return false;
+    }
+
     return answered_questions[activeSessionId].some(
       (question) => question !== QUESTION_KEYS.CUSTOMER_SATISFACTION
     );
