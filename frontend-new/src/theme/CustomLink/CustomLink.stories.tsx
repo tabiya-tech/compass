@@ -5,17 +5,22 @@ const meta: Meta<typeof CustomLink> = {
   title: "Components/CustomLink",
   component: CustomLink,
   tags: ["autodocs"],
-  argTypes: {},
+  argTypes: {
+    onClick: { action: "clicked" },
+  },
+  args: {
+    href: "https://example.com",
+    target: "_blank",
+  },
 };
 
 export default meta;
 
 type Story = StoryObj<typeof CustomLink>;
 
-export const Default: Story = {
+export const Shown: Story = {
   args: {
     children: ["Hello"],
-    href: "#",
   },
 };
 
@@ -23,6 +28,5 @@ export const Disabled: Story = {
   args: {
     children: ["Hello"],
     disabled: true,
-    href: "#",
   },
 };

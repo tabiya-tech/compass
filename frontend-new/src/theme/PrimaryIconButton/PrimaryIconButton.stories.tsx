@@ -8,7 +8,9 @@ const meta: Meta<typeof PrimaryIconButton> = {
   title: "Components/PrimaryIconButton",
   component: PrimaryIconButton,
   tags: ["autodocs"],
-  argTypes: {},
+  argTypes: {
+    onClick: { action: "clicked" },
+  },
 };
 
 export default meta;
