@@ -188,7 +188,10 @@ class TestGetExperimentsByUserId:
         repository = await get_user_preference_repository
 
         # AND a user preference with experiments
-        given_experiments = {"exp1": "group1", "exp2": "group2"}
+        given_experiments = {
+            "exp1": {"shown": True, "branch": 1},
+            "exp2": {"enabled": False, "variant": "A"}
+        }
         given_user_preference = UserPreferences(
             language="en",
             sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_AVAILABLE,
@@ -240,12 +243,12 @@ class TestSetExperimentByUserId:
 
         # WHEN setting an experiment
         given_experiment_id = "exp1"
-        given_experiment_class = "group1"
-        await repository.set_experiment_by_user_id(given_user_id, given_experiment_id, given_experiment_class)
+        given_experiment_config = {"shown": True, "branch": 1}
+        await repository.set_experiment_by_user_id(given_user_id, given_experiment_id, given_experiment_config)
 
         # THEN the experiment should be in the database
         actual_experiments = await repository.get_experiments_by_user_id(given_user_id)
-        assert actual_experiments == {given_experiment_id: given_experiment_class}
+        assert actual_experiments == {given_experiment_id: given_experiment_config}
 
     async def test_set_experiment_by_user_id_update_existing(self, get_user_preference_repository: Awaitable[UserPreferenceRepository]):
         # GIVEN a user id
@@ -255,7 +258,7 @@ class TestSetExperimentByUserId:
         repository = await get_user_preference_repository
 
         # AND a user preference with an existing experiment
-        given_experiments = {"exp1": "group1"}
+        given_experiments = {"exp1": {"shown": True, "branch": 1}}
         given_user_preference = UserPreferences(
             language="en",
             sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_AVAILABLE,
@@ -267,12 +270,12 @@ class TestSetExperimentByUserId:
 
         # WHEN updating the experiment
         given_experiment_id = "exp1"
-        given_experiment_class = "group2"
-        await repository.set_experiment_by_user_id(given_user_id, given_experiment_id, given_experiment_class)
+        given_experiment_config = {"shown": False, "branch": 2}
+        await repository.set_experiment_by_user_id(given_user_id, given_experiment_id, given_experiment_config)
 
         # THEN the experiment should be updated in the database
         actual_experiments = await repository.get_experiments_by_user_id(given_user_id)
-        assert actual_experiments == {given_experiment_id: given_experiment_class}
+        assert actual_experiments == {given_experiment_id: given_experiment_config}
 
     async def test_set_experiment_by_user_id_multiple_experiments(self, get_user_preference_repository: Awaitable[UserPreferenceRepository]):
         # GIVEN a user id
@@ -282,7 +285,7 @@ class TestSetExperimentByUserId:
         repository = await get_user_preference_repository
 
         # AND a user preference with an existing experiment
-        given_experiments = {"exp1": "group1"}
+        given_experiments = {"exp1": {"shown": True, "branch": 1}}
         given_user_preference = UserPreferences(
             language="en",
             sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_AVAILABLE,
@@ -294,12 +297,12 @@ class TestSetExperimentByUserId:
 
         # WHEN adding another experiment
         given_experiment_id = "exp2"
-        given_experiment_class = "group2"
-        await repository.set_experiment_by_user_id(given_user_id, given_experiment_id, given_experiment_class)
+        given_experiment_config = {"enabled": False, "variant": "A"}
+        await repository.set_experiment_by_user_id(given_user_id, given_experiment_id, given_experiment_config)
 
         # THEN both experiments should be in the database
         actual_experiments = await repository.get_experiments_by_user_id(given_user_id)
-        assert actual_experiments == {**given_experiments, given_experiment_id: given_experiment_class}
+        assert actual_experiments == {**given_experiments, given_experiment_id: given_experiment_config}
 
     async def test_set_experiment_by_user_id_database_error(self, get_user_preference_repository: Awaitable[UserPreferenceRepository], mocker):
         # GIVEN a user id
@@ -307,7 +310,7 @@ class TestSetExperimentByUserId:
 
         # AND a user preference with no experiments
         given_experiment_id = "exp1"
-        given_experiment_class = "group1"
+        given_experiment_config = {"shown": True, "branch": 1}
 
         # AND a user preference repository
         repository = await get_user_preference_repository
@@ -318,7 +321,7 @@ class TestSetExperimentByUserId:
         # WHEN setting an experiment
         # THEN a UserPreferenceRepositoryError should be thrown
         with pytest.raises(UserPreferenceRepositoryError):
-            await repository.set_experiment_by_user_id(given_user_id, given_experiment_id, given_experiment_class)
+            await repository.set_experiment_by_user_id(given_user_id, given_experiment_id, given_experiment_config)
 
 
 @pytest.mark.asyncio
@@ -341,9 +344,10 @@ class TestGetExperimentsByUserIds:
 
         # AND user preferences with different experiments for each user
         given_experiments = [
-            {"exp1": "group1", "exp2": "group2"},
-            {"exp3": "group3"},
-            {"exp4": "group4", "exp5": "group5"}
+            {"exp1": {"shown": True, "branch": 1}, "exp2": {"enabled": False, "variant": "A"}},
+            {"exp3": {"shown": False, "branch": 2}},
+            {"exp4": {"enabled": True, "variant": "B"}, "exp5": {"shown": True, "branch": 3}},
+            {"exp6": "foo-flat-experiment"}
         ]
 
         # AND the user preferences are inserted
@@ -382,7 +386,11 @@ class TestGetExperimentsByUserIds:
         repository = await get_user_preference_repository
 
         # AND a user preference with experiments
-        given_experiments = {"exp1": "group1", "exp2": "group2"}
+        given_experiments = {
+            "exp1": {"shown": True, "branch": 1},
+            "exp2": {"enabled": False, "variant": "A"},
+            "exp3": "foo-flat-experiment"
+        }
         given_user_preference = UserPreferences(
             language="en",
             sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_AVAILABLE,

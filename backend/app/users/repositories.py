@@ -1,11 +1,12 @@
 import logging
 from abc import ABC, abstractmethod
+from typing import Any, Union
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.server_dependencies.database_collections import Collections
 from common_libs.time_utilities import datetime_to_mongo_date, get_now
-from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
+from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest, Experiments, ExperimentConfig, UserExperiments
 
 logger = logging.getLogger(__name__)
 
@@ -34,32 +35,32 @@ class IUserPreferenceRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_experiments_by_user_id(self, user_id: str) -> dict[str, str]:
+    async def get_experiments_by_user_id(self, user_id: str) -> Experiments:
         """
         Get the experiments for a user by user_id
         :param user_id: str - The user_id to get experiments for
-        :return: dict[str, str] - A dictionary mapping experiment IDs to their corresponding groups
+        :return: Experiments - A dictionary mapping experiment namespaces to their configuration
         """
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_experiments_by_user_ids(self, user_ids: list[str]) -> dict[str, dict[str, str]]:
+    async def get_experiments_by_user_ids(self, user_ids: list[str]) -> UserExperiments:
         """
-        Get the experiments for a user by user_id
-        :param user_ids: str - The user_ids to get experiments for
-        :return: dict[str, dict[str, str]] - A dictionary mapping user IDs to their corresponding experiments
-                example {"user_id": {"experiment_id": "experiment_class"}}
+        Get the experiments for multiple users by user_ids
+        :param user_ids: list[str] - The user_ids to get experiments for
+        :return: UserExperiments - A dictionary mapping user IDs to their corresponding experiments
+                example {"user_id": {"experiment_namespace": "value" | {"config": "value"}}}
                 returns an empty dict if no experiments are found for a user_id {"user_id": {}}
         """
         raise NotImplementedError()
 
     @abstractmethod
-    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_class: str) -> None:
+    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: ExperimentConfig) -> None:
         """
-        Set an experiment class for a given experiment ID in the user preferences
+        Set an experiment configuration for a given experiment ID in the user preferences
         :param user_id: str - The user_id to set the experiment for
         :param experiment_id: str - The ID of the experiment
-        :param experiment_class: str - The class/group of the experiment
+        :param experiment_config: ExperimentConfig - The configuration for the experiment (can be a simple string or a nested config)
         :return: None
         """
         raise NotImplementedError()
@@ -106,11 +107,11 @@ class UserPreferenceRepository(IUserPreferenceRepository):
             logger.exception(e)
             raise UserPreferenceRepositoryError("Failed to get user preferences") from e
 
-    async def get_experiments_by_user_id(self, user_id: str) -> dict[str, str]:
+    async def get_experiments_by_user_id(self, user_id: str) -> Experiments:
         experiments = await self.get_experiments_by_user_ids([user_id])
         return experiments.get(user_id, {})
 
-    async def get_experiments_by_user_ids(self, user_ids: list[str]) -> dict[str, dict[str, str]]:
+    async def get_experiments_by_user_ids(self, user_ids: list[str]) -> UserExperiments:
         try:
             # Convert list to set to remove duplicates
             unique_user_ids = set(user_ids)
@@ -120,7 +121,7 @@ class UserPreferenceRepository(IUserPreferenceRepository):
             if not docs:
                 return {}
 
-            experiments: dict[str, dict[str, str]] = {}
+            experiments: UserExperiments = {}
             for doc in docs:
                 if "experiments" not in doc:
                     doc["experiments"] = {}
@@ -132,12 +133,12 @@ class UserPreferenceRepository(IUserPreferenceRepository):
             logger.exception(e)
             raise UserPreferenceRepositoryError("Failed to get user experiments") from e
 
-    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_class: str) -> None:
+    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: ExperimentConfig) -> None:
         try:
             # Use $set with dot notation to update a specific field in the experiments dictionary
             await self.collection.update_one(
                 {"user_id": {"$eq": user_id}},
-                {"$set": {f"experiments.{experiment_id}": experiment_class}}
+                {"$set": {f"experiments.{experiment_id}": experiment_config}}
             )
         except Exception as e:
             logger.exception(e)
