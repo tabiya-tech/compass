@@ -34,7 +34,7 @@ class _ConversationLLM:
         async def _callback(attempt: int, max_retries: int) -> tuple[AgentOutput, float, BaseException | None]:
             # Call the LLM to get the next message for the user.
             # Add some temperature and top_p variation to prompt the LLM to return different results on each retry.
-            # Exponentially increase the temperature and top_p to avoid the LLM to return the same result every time.
+            # Exponentially increase the temperature and top_p to avoid the LLM returning the same result every time.
             temperature_config = get_config_variation(start_temperature=0.25, end_temperature=0.5,
                                                       start_top_p=0.8, end_top_p=1,
                                                       attempt=attempt, max_retries=max_retries)
@@ -85,15 +85,14 @@ class _ConversationLLM:
         llm_input: LLMInput | str
         system_instructions: list[str] | str | None = None
         if first_time_for_experience:
-            # If it is the first time for the experience, generate just a response.
-            # Do not pass the conversation history, or the user message as it will only confuse the model and
-            # possible lead to a response about the previous experiences
-            # Different, approaches have been tried to generate a response for the first time experience
-            # and if the user message is passed then it confuses the model it generates a response about the previous experiences
-            # To work around  an artificial message needs to be generated like "I am ready to share my experience as a ...", but
-            # It just complicates things.
-            # The experiences explored seems to mitigate the issue of the model generating a response about the previous experiences,
-            # but now they are not needed, we are still keeping them for now as they may become useful in the future.
+            # If this is the first experience, generate only a response without passing the conversation history
+            # or user message. Including these can confuse the model, potentially leading to responses about previous experiences.
+            #
+            # Various approaches have been tested, including using artificial prompts like "I am ready to share my experience as a ...",
+            # but this added unnecessary complexity.
+            #
+            # While earlier mitigations helped reduce this issue, they are no longer required, though we are keeping them for now
+            # in case they prove useful in the future.
 
             llm = GeminiGenerativeLLM(
                 config=LLMConfig(
