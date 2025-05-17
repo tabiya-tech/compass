@@ -117,7 +117,7 @@ class PickTopSkillsTool:
                                                 threshold=threshold
                                                 )
 
-        result, _result_penalty, _error = await Retry[PickTopSkillsToolOutput].call_with_penalty(callback=_callback)
+        result, _result_penalty, _error = await Retry[PickTopSkillsToolOutput].call_with_penalty(callback=_callback, logger=self._logger)
         return result
 
     async def _internal_execute(

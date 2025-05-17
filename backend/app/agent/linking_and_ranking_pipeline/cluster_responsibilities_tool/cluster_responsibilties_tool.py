@@ -130,7 +130,7 @@ class ClusterResponsibilitiesTool:
                                temperature_config["top_p"])
             return await self._internal_execute(llm=llm, responsibilities=_responsibilities, number_of_clusters=number_of_clusters)
 
-        result, _result_penalty, _error = await Retry[ClusterResponsibilitiesResponse].call_with_penalty(callback=_callback)
+        result, _result_penalty, _error = await Retry[ClusterResponsibilitiesResponse].call_with_penalty(callback=_callback, logger=self._logger)
         return result
 
     async def _internal_execute(

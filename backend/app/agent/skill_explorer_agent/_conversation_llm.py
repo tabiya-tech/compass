@@ -54,7 +54,7 @@ class _ConversationLLM:
                 logger=logger
             )
 
-        result, _result_penalty, _error = await Retry[AgentOutput].call_with_penalty(callback=_callback)
+        result, _result_penalty, _error = await Retry[AgentOutput].call_with_penalty(callback=_callback, logger=logger)
         return result
 
     @staticmethod

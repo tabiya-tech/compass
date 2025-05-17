@@ -232,7 +232,7 @@ class BasicLLM(LLM):
                              self._resource_name, exc_info=True)
                 raise e
 
-        return await Retry[str].call_with_exponential_backoff(_generate_content)
+        return await Retry[str].call_with_exponential_backoff(callback=_generate_content,logger=logger)
 
     @abstractmethod
     async def internal_generate_content(self, llm_input: LLMInput | str) -> LLMResponse:

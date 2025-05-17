@@ -173,7 +173,7 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
                                              responsibilities=responsibilities,
                                              entities_to_classify=entities_to_classify)
 
-        result, _result_penalty, _error = await Retry[RelevantEntityClassifierOutput].call_with_penalty(callback=_callback)
+        result, _result_penalty, _error = await Retry[RelevantEntityClassifierOutput].call_with_penalty(callback=_callback, logger=self._logger)
         return result
 
     async def _process_batch(
