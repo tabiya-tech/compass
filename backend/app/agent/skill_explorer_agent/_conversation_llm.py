@@ -11,7 +11,7 @@ from app.conversation_memory.conversation_formatter import ConversationHistoryFo
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.countries import Country
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation
+from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
 from common_libs.retry import Retry
 
 _FINAL_MESSAGE = "Thank you for sharing these details! I have all the information I need."
@@ -82,7 +82,8 @@ class _ConversationLLM:
         llm_start_time = time.time()
 
         llm_response: LLMResponse
-
+        llm_input: LLMInput | str
+        system_instructions: list[str] | str | None = None
         if first_time_for_experience:
             # If it is the first time for the experience, generate just a response.
             # Do not pass the conversation history, or the user message as it will only confuse the model and
@@ -98,28 +99,28 @@ class _ConversationLLM:
                 config=LLMConfig(
                     generation_config=temperature_config
                 ))
-            llm_response = await llm.generate_content(
-                llm_input=_ConversationLLM.create_first_time_generative_prompt(
-                    country_of_user=country_of_user,
-                    experiences_explored=experiences_explored,
-                    experience_title=experience_title,
-                    work_type=work_type
-                ))
+            llm_input = _ConversationLLM.create_first_time_generative_prompt(
+                country_of_user=country_of_user,
+                experiences_explored=experiences_explored,
+                experience_title=experience_title,
+                work_type=work_type
+            )
+            llm_response = await llm.generate_content(llm_input=llm_input)
         else:
+            system_instructions = _ConversationLLM._create_conversation_system_instructions(
+                question_asked_until_now=question_asked_until_now,
+                country_of_user=country_of_user,
+                experience_title=experience_title,
+                work_type=work_type)
             llm = GeminiGenerativeLLM(
-                system_instructions=_ConversationLLM._create_conversation_system_instructions(
-                    question_asked_until_now=question_asked_until_now,
-                    country_of_user=country_of_user,
-                    experience_title=experience_title,
-                    work_type=work_type),
+                system_instructions=system_instructions,
                 config=LLMConfig(
                     generation_config=temperature_config
                 ))
-            llm_response = await llm.generate_content(
-                llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
-                    model_response_instructions=None,
-                    context=context, user_input=msg),
-            )
+            llm_input = ConversationHistoryFormatter.format_for_agent_generative_prompt(
+                model_response_instructions=None,
+                context=context, user_input=msg)
+            llm_response = await llm.generate_content(llm_input=llm_input)
 
         llm_end_time = time.time()
         llm_stats = LLMStats(prompt_token_count=llm_response.prompt_token_count,
@@ -128,6 +129,12 @@ class _ConversationLLM:
         finished = False
         llm_response.text = llm_response.text.strip()
         if llm_response.text == "":
+            logger.warning("LLM response is empty. "
+                           "\n  - System instructions: %s"
+                           "\n  - LLM input: %s",
+                           "\n".join(system_instructions),
+                           llm_input)
+
             return AgentOutput(
                 message_for_user="Sorry, I didn't understand that. Can you please rephrase?",
                 finished=False,

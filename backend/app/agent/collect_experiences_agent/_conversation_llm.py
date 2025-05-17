@@ -13,7 +13,7 @@ from app.conversation_memory.conversation_formatter import ConversationHistoryFo
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.countries import Country
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation
+from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
 from common_libs.retry import Retry
 
 _NO_EXPERIENCE_COLLECTED = "No experience data has been collected yet"
@@ -105,37 +105,38 @@ class _ConversationLLM:
         exploring_type_finished = False
         finished = False
         llm_response: LLMResponse
+        llm_input: LLMInput | str
+        system_instructions: list[str] | str | None = None
         if first_time_visit:
-            # If this is the first time the user visits the agent, the agent should get to the point
+            # If this is the first time the user has visited the agent, the agent should get to the point
             # and not introduce itself or ask how the user is doing.
             llm = GeminiGenerativeLLM(
                 system_instructions=None,
                 config=LLMConfig(
                     generation_config=temperature_config
                 ))
-            llm_response = await llm.generate_content(
-                llm_input=_ConversationLLM._get_first_time_generative_prompt(
-                    country_of_user=country_of_user,
-                    exploring_type=exploring_type),
-            )
+            llm_input = _ConversationLLM._get_first_time_generative_prompt(
+                country_of_user=country_of_user,
+                exploring_type=exploring_type)
+            llm_response = await llm.generate_content(llm_input=llm_input)
         else:
+            system_instructions = _ConversationLLM._get_system_instructions(country_of_user=country_of_user,
+                                                                            collected_data=collected_data,
+                                                                            exploring_type=exploring_type,
+                                                                            unexplored_types=unexplored_types,
+                                                                            explored_types=explored_types,
+                                                                            last_referenced_experience_index=last_referenced_experience_index,
+                                                                            )
             llm = GeminiGenerativeLLM(
-                system_instructions=_ConversationLLM._get_system_instructions(country_of_user=country_of_user,
-                                                                              collected_data=collected_data,
-                                                                              exploring_type=exploring_type,
-                                                                              unexplored_types=unexplored_types,
-                                                                              explored_types=explored_types,
-                                                                              last_referenced_experience_index=last_referenced_experience_index,
-                                                                              ),
+                system_instructions=system_instructions,
                 config=LLMConfig(
                     generation_config=temperature_config
                 ))
-            llm_response = await llm.generate_content(
-                llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
-                    model_response_instructions=None,
-                    context=context,
-                    user_input=msg),
-            )
+            llm_input = ConversationHistoryFormatter.format_for_agent_generative_prompt(
+                model_response_instructions=None,
+                context=context,
+                user_input=msg)
+            llm_response = await llm.generate_content(llm_input=llm_input)
 
         llm_end_time = time.time()
         llm_stats = LLMStats(prompt_token_count=llm_response.prompt_token_count,
@@ -144,6 +145,11 @@ class _ConversationLLM:
 
         llm_response.text = llm_response.text.strip()
         if llm_response.text == "":
+            logger.warning("LLM response is empty. "
+                           "\n  - System instructions: %s"
+                           "\n  - LLM input: %s",
+                           "\n".join(system_instructions),
+                           llm_input)
             return ConversationLLMAgentOutput(
                 message_for_user="Sorry, I didn't understand that. Can you please rephrase?",
                 exploring_type_finished=False,
