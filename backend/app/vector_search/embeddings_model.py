@@ -78,7 +78,7 @@ class GoogleEmbeddingService(EmbeddingService):
                 inputs: list[TextEmbeddingInput] = [TextEmbeddingInput(query, self._TASK) for query in text_list[i:i + batch_size]]
                 return self._run_batch(inputs)
 
-            batch_embeddings: list[TextEmbedding] = await Retry[list[TextEmbedding]].call_with_exponential_backoff(_callback)
+            batch_embeddings: list[TextEmbedding] = await Retry[list[TextEmbedding]].call_with_exponential_backoff(callback=_callback,logger=self.logger)
             embeddings.extend(batch_embeddings)
         return [embedding.values for embedding in embeddings]
 

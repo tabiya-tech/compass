@@ -6,8 +6,6 @@ from typing import TypeVar, Generic, Callable, Awaitable, Tuple, Optional
 from google.api_core.exceptions import ServerError, TooManyRequests, ResourceExhausted
 from pydantic import BaseModel
 
-logger = logging.getLogger(__name__)
-
 # Retry logic with exponential backoff and jitter #
 T = TypeVar('T')
 
@@ -67,8 +65,11 @@ class Retry(Generic[T]):
     """
 
     @staticmethod
-    async def call_with_exponential_backoff(callback: AsyncCallback[T],
-                                            retry_config: RetryConfigWithExponentialBackOff = DEFAULT_RETRY_CONFIG_WITH_EXP_BACKOFF) -> T:
+    async def call_with_exponential_backoff(*,
+                                            callback: AsyncCallback[T],
+                                            retry_config: RetryConfigWithExponentialBackOff = DEFAULT_RETRY_CONFIG_WITH_EXP_BACKOFF,
+                                            logger: logging.Logger
+                                            ) -> T:
         """ Call `callback()` with exponential backoff and jitter."""
         wait_time = retry_config.initial_wait
         for attempt in range(retry_config.max_retries):
@@ -100,6 +101,7 @@ class Retry(Generic[T]):
             *,
             callback: AsyncCallbackWithPenalty[T],
             max_retries: int = 3,
+            logger: logging.Logger
     ) -> tuple[T, float, Optional[BaseException]]:
 
         attempts: list[tuple[int, T, float, Optional[BaseException]]] = []
