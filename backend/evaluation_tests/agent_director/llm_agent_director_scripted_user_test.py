@@ -108,7 +108,8 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test
+@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.repeat(3)
 async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
                                           setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
                                               [LogCaptureFixture, ScriptedUserEvaluationTestCase],
@@ -142,7 +143,8 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test
+@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.repeat(3)
 async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
                                             setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
                                                 [LogCaptureFixture, ScriptedUserEvaluationTestCase],
@@ -161,7 +163,7 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
 
     given_test_case = ScriptedUserEvaluationTestCase(
         name='user_typical_conversation',
-        simulated_user_prompt="Scripted user: Just says yes",
+        simulated_user_prompt="Scripted user: Some typical conversation",
         scripted_user=[
             "Hi, can you please explain the process?",
             "Ok, Let's start",  # End of WelcomeAgent, Start of SkillsAgent
