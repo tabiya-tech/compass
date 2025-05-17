@@ -34,6 +34,7 @@ async def test_skills_explorer_agent_simulated_user(max_iterations: int, test_ca
     output_folder = os.path.join(os.getcwd(), 'test_output/skills_explorer_agent/simulated_user/', test_case.name)
 
     # The conversation manager for this test
+    given_experience = test_case.given_experience.model_copy(deep=True)  # model_copy is needed to avoid modifying the original experience between repeats
     conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=session_id))
     execute_evaluated_agent = SkillsExplorerAgentExecutor(conversation_manager=conversation_manager,
@@ -41,7 +42,7 @@ async def test_skills_explorer_agent_simulated_user(max_iterations: int, test_ca
                                                               session_id=session_id,
                                                               country_of_user=test_case.country_of_user,
                                                           ),
-                                                          experience=test_case.given_experience)
+                                                          experience=given_experience)
 
     # Run the conversation test
     config = ConversationTestConfig(
@@ -75,8 +76,8 @@ async def test_skills_explorer_agent_simulated_user(max_iterations: int, test_ca
         # Check if the actual discovered experiences match the expected ones
         # assert if the test_case.expected_responsibilities is a subset of the actual responsibilities
         if not set(test_case.expected_responsibilities).issubset(
-                set(test_case.given_experience.responsibilities.responsibilities)):
-            assert sorted(test_case.given_experience.responsibilities.responsibilities) == sorted(test_case.expected_responsibilities)
+                set(given_experience.responsibilities.responsibilities)):
+            assert sorted(given_experience.responsibilities.responsibilities) == sorted(test_case.expected_responsibilities)
 
         # Finally, check that no errors and no warning were logged
         assert_log_error_warnings(caplog=caplog, expect_errors_in_logs=False, expect_warnings_in_logs=False)
