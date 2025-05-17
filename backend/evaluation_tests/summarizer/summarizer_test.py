@@ -17,7 +17,8 @@ async def _evaluate_with_llm(prompt: str) -> str:
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test
+@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.repeat(3)
 async def test_summarizer_without_existing_summary(fake_conversation_context: FakeConversationContext,
                                                    common_folder_path: str):
     """ Tests the summarizer with a current conversation and without an existing summary. """
@@ -69,7 +70,8 @@ async def test_summarizer_without_existing_summary(fake_conversation_context: Fa
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test
+@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.repeat(3)
 async def test_summarizer_with_existing_summary(fake_conversation_context: FakeConversationContext,
                                                 common_folder_path: str):
     """ Tests the summarizer with a current conversation and an existing summary. """
@@ -102,7 +104,6 @@ async def test_summarizer_with_existing_summary(fake_conversation_context: FakeC
 
         assert "TRUE" in await _evaluate_with_llm(
             f"""Respond only with TRUE if the _SUMMARY_:"{new_summary}"  mentions that the user has a good English writing and speaking skills. Otherwise respond with FALSE."""), f"output: {new_summary}"
-
 
     finally:
         folder = common_folder_path + 'summarizer_with_existing_summary'
