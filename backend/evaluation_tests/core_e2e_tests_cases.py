@@ -53,7 +53,6 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
     ),
     EvaluationTestCase(
-        skip_force="force",
         country_of_user=Country.SOUTH_AFRICA,
         conversation_rounds=100,
         name='genZ_student_e2e',
