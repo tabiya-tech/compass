@@ -10,10 +10,10 @@ from typing import Optional
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
+from _common import StoreType, create_store, get_db_connection
 from app.application_state import ApplicationStateStore, ApplicationState
 from app.users.repositories import UserPreferenceRepository
 from app.users.sessions import SessionsService
-from _common import StoreType, create_store, get_db_connection
 from common_libs.logging.log_utilities import setup_logging_config
 from scripts.export_conversation.constants import SCRIPT_DIR, DEFAULT_EXPORTS_DIR
 
@@ -76,6 +76,9 @@ def _update_state_session_id(state: ApplicationState, new_session_id: int) -> Ap
 
     if hasattr(state, 'skills_explorer_agent_state') and state.skills_explorer_agent_state:
         state.skills_explorer_agent_state.session_id = new_session_id
+
+    if hasattr(state, 'welcome_agent_state') and state.skills_explorer_agent_state:
+        state.welcome_agent_state.session_id = new_session_id
 
     return state
 
