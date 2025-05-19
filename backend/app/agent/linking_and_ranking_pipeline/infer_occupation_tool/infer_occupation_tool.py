@@ -4,13 +4,12 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from app.agent.agent_types import LLMStats
 from app.agent.experience.work_type import WorkType
 from app.countries import Country
-from app.agent.agent_types import LLMStats
-from ._contextualization_llm import _ContextualizationLLM
-
 from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.esco_search_service import OccupationSkillSearchService
+from ._contextualization_llm import _ContextualizationLLM
 from ._relevant_occupations_classifier_llm import _RelevantOccupationsClassifierLLM
 
 
@@ -57,7 +56,6 @@ class InferOccupationTool:
         #    and infer the contextual title.
         contextualization_llm = _ContextualizationLLM(
             country_of_interest=country_of_interest,
-            number_of_titles=number_of_titles,
             logger=self._logger)
         contextualization_response = await contextualization_llm.execute(
             experience_title=experience_title,
