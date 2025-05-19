@@ -29,7 +29,7 @@ def get_penalty(level: int) -> float:
 
     :param level:  The severity level of the error (0, 1, 2, ...).
     :return: The penalty associated with the given severity level.
-    :raises ValueError: If the level is negative.
+    :raises ValueError: If the level is negative or greater than max(64).
     """
     if level < 0:
         raise ValueError("Severity level must be non-negative.")
