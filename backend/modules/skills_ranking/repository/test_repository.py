@@ -4,7 +4,7 @@ import pytest
 
 from app.app_config import ApplicationConfig
 from modules.skills_ranking.repository.repository import SkillsRankingRepository
-from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState, SkillRankingExperimentGroups
+from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhase, SkillRankingExperimentGroups
 
 
 @pytest.fixture(scope="function")
@@ -15,23 +15,22 @@ async def get_skills_ranking_repository(in_memory_application_database) -> Skill
 
 def get_skills_ranking_state(
         session_id: int = 1,
-        current_state: SkillsRankingCurrentState = SkillsRankingCurrentState.INITIAL,
+        phase: SkillsRankingPhase = SkillsRankingPhase.INITIAL,
         experiment_groups: SkillRankingExperimentGroups = SkillRankingExperimentGroups(
             compare_against="against_other_job_seekers",
             button_order="skip_button_first",
-            delayed_results="delayed_results"
+            delayed_results=False
         ),
         ranking: str | None = None,
         self_ranking: str | None = None
 ) -> SkillsRankingState:
     return SkillsRankingState(
         session_id=session_id,
-        current_state=current_state,
+        phase=phase,
         experiment_groups=experiment_groups,
         ranking=ranking,
         self_ranking=self_ranking
     )
-
 
 
 def _assert_skills_ranking_state_fields_match(given_state: SkillsRankingState, actual_stored_state: dict) -> None:
@@ -39,9 +38,9 @@ def _assert_skills_ranking_state_fields_match(given_state: SkillsRankingState, a
     actual_stored_state.pop("_id", None)
 
     for field, value in given_state.model_dump().items():
-        if field == "current_state":
+        if field == "phase":
             # Special case for current_state which is an Enum
-            assert actual_stored_state[field] == value.value
+            assert actual_stored_state[field] == value
         else:
             assert actual_stored_state[field] == value
 
@@ -81,7 +80,7 @@ class TestSkillsRankingRepository:
         # THEN the state is returned
         assert state is not None
         assert state.session_id == given_state.session_id
-        assert state.current_state == given_state.current_state
+        assert state.phase == given_state.phase
 
     @pytest.mark.asyncio
     async def test_create_success(
@@ -118,18 +117,95 @@ class TestSkillsRankingRepository:
         given_state = get_skills_ranking_state()
         await repository.create(given_state)
 
-        # AND a new state to update with
-        new_state = get_skills_ranking_state(
-            current_state=SkillsRankingCurrentState.SELF_EVALUATING,
-            ranking="new ranking"
-        )
+        # AND new values to update with
+        new_phase = SkillsRankingPhase.SELF_EVALUATING
+        new_ranking = "new ranking"
 
-        # WHEN updating the state
-        await repository.update(new_state)
+        # WHEN updating the state with only phase and ranking
+        await repository.update(
+            session_id=given_state.session_id,
+            phase=new_phase,
+            ranking=new_ranking
+        )
 
         # THEN the state is updated in the database
         assert await repository._collection.count_documents({}) == 1
 
         # AND the state data matches what we expect
         actual_stored_state = await repository._collection.find_one({})
-        _assert_skills_ranking_state_fields_match(new_state, actual_stored_state)
+        expected_state = get_skills_ranking_state(
+            phase=new_phase,
+            ranking=new_ranking
+        )
+        _assert_skills_ranking_state_fields_match(expected_state, actual_stored_state)
+
+    @pytest.mark.asyncio
+    async def test_update_only_ranking(
+            self,
+            get_skills_ranking_repository: Awaitable[SkillsRankingRepository],
+            setup_application_config: ApplicationConfig
+    ):
+        # GIVEN a repository
+        repository = await get_skills_ranking_repository
+
+        # AND an existing state
+        given_state = get_skills_ranking_state()
+        await repository.create(given_state)
+
+        # WHEN updating only the ranking
+        new_ranking = "new ranking"
+        await repository.update(
+            session_id=given_state.session_id,
+            ranking=new_ranking
+        )
+
+        # THEN the state is updated in the database
+        assert await repository._collection.count_documents({}) == 1
+
+        # AND only the ranking is changed
+        actual_stored_state = await repository._collection.find_one({})
+        expected_state = get_skills_ranking_state(
+            ranking=new_ranking
+        )
+        _assert_skills_ranking_state_fields_match(expected_state, actual_stored_state)
+
+    @pytest.mark.asyncio
+    async def test_update_initial_phase_requires_experiment_groups(
+            self,
+            get_skills_ranking_repository: Awaitable[SkillsRankingRepository],
+            setup_application_config: ApplicationConfig
+    ):
+        # GIVEN a repository
+        repository = await get_skills_ranking_repository
+
+        # AND an existing state
+        given_state = get_skills_ranking_state()
+        await repository.create(given_state)
+
+        # WHEN updating to initial phase without experiment groups
+        with pytest.raises(ValueError, match="Experiment groups are required for the initial phase"):
+            await repository.update(
+                session_id=given_state.session_id,
+                phase=SkillsRankingPhase.INITIAL
+            )
+
+    @pytest.mark.asyncio
+    async def test_update_non_initial_phase_rejects_experiment_groups(
+            self,
+            get_skills_ranking_repository: Awaitable[SkillsRankingRepository],
+            setup_application_config: ApplicationConfig
+    ):
+        # GIVEN a repository
+        repository = await get_skills_ranking_repository
+
+        # AND an existing state
+        given_state = get_skills_ranking_state()
+        await repository.create(given_state)
+
+        # WHEN updating to non-initial phase with experiment groups
+        with pytest.raises(ValueError, match="Experiment groups are not allowed for non-initial phases"):
+            await repository.update(
+                session_id=given_state.session_id,
+                phase=SkillsRankingPhase.SELF_EVALUATING,
+                experiment_groups=given_state.experiment_groups
+            )

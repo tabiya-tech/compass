@@ -1,6 +1,6 @@
 from dataclasses import field
 from datetime import datetime
-from typing import Mapping, Any, Union, TypeAlias
+from typing import Mapping, Any, TypeAlias
 
 from pydantic import BaseModel, Field
 
@@ -9,7 +9,7 @@ from app.users.sensitive_personal_data.types import SensitivePersonalDataRequire
 
 
 # Type alias for experiment configurations
-ExperimentConfig: TypeAlias = Union[str, dict[str, Any]]
+ExperimentConfig: TypeAlias = dict[str, str | bool | int | float | None]
 Experiments: TypeAlias = dict[str, ExperimentConfig]
 UserExperiments: TypeAlias = dict[str, Experiments]
 
@@ -118,7 +118,7 @@ class UserPreferences(BaseModel):
     """
 
     @staticmethod
-    def from_document(doc: Mapping[str, any]) -> "UserPreferences":
+    def from_document(doc: Mapping[str, Any]) -> "UserPreferences":
         """
         Create a new UserPreferences object from a dictionary
 

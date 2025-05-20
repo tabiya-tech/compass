@@ -1,21 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Mapping, Any, Optional
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo import ReturnDocument
 
 from modules.skills_ranking.repository.collections import Collections
-from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState
-
-
-def _to_db_doc(state: SkillsRankingState) -> dict:
-    # use the Mode JSON to serialize Enums into strings for better MongoDB compatibility.
-    state_dict = state.model_dump(mode="json")
-    return state_dict
-
-
-def _from_db_doc(doc: Mapping[str, Any]) -> SkillsRankingState:
-    return SkillsRankingState(**doc)
+from modules.skills_ranking.service.types import SkillRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState
 
 
 class ISkillsRankingRepository(ABC):
@@ -36,9 +25,17 @@ class ISkillsRankingRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def update(self, state: SkillsRankingState) -> SkillsRankingState:
+    async def update(self, *, session_id: int, experiment_groups: SkillRankingExperimentGroups | None = None, phase: SkillsRankingPhase | None = None, ranking: str | None = None,
+                     self_ranking: str | None = None) -> SkillsRankingState:
         """
-        Updates an existing state
+        Updates an existing skills ranking state with the provided fields.
+        
+        :param session_id: The ID of the session to update (required)
+        :param experiment_groups: Optional experiment group configuration to update
+        :param phase: Optional phase to update the state to
+        :param ranking: Optional ranking string to update
+        :param self_ranking: Optional self-ranking string to update
+        :return: The updated SkillsRankingState
         """
         raise NotImplementedError()
 
@@ -57,20 +54,35 @@ class SkillsRankingRepository(ISkillsRankingRepository):
         if _doc is None:
             return None
 
-        return _from_db_doc(_doc)
+        return SkillsRankingState(**_doc)
 
     async def create(self, state: SkillsRankingState) -> SkillsRankingState:
-        _doc = _to_db_doc(state)
+        _doc = state.model_dump()
         await self._collection.insert_one(_doc)
         return state
 
-    async def update(self, state: SkillsRankingState):
-        _doc = _to_db_doc(state)
-        _doc.pop("session_id")
+    # partial of skills ranking state
+    async def update(self, *, session_id: int, experiment_groups: SkillRankingExperimentGroups | None = None, phase: SkillsRankingPhase | None = None, ranking: str | None = None,
+                     self_ranking: str | None = None) -> SkillsRankingState:
+        # some business logic
+        if phase is SkillsRankingPhase.INITIAL and experiment_groups is None:
+            raise ValueError("Experiment groups are required for the initial phase")
+        if phase is not SkillsRankingPhase.INITIAL and experiment_groups is not None:
+            raise ValueError("Experiment groups are not allowed for non-initial phases")
+
+        update_fields = {}
+        if experiment_groups is not None:
+            update_fields["experiment_groups"] = experiment_groups.model_dump()
+        if phase is not None:
+            update_fields["phase"] = phase.value
+        if ranking is not None:
+            update_fields["ranking"] = ranking
+        if self_ranking is not None:
+            update_fields["self_ranking"] = self_ranking
 
         updated_doc = await self._collection.find_one_and_update(
-            {"session_id": state.session_id},
-            {"$set": _doc},
+            {"session_id": session_id},
+            {"$set": update_fields},
             return_document=ReturnDocument.AFTER
         )
         return SkillsRankingState(**updated_doc)

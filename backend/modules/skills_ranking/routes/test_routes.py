@@ -15,14 +15,14 @@ from app.users.sensitive_personal_data.types import SensitivePersonalDataRequire
 from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
 from common_libs.test_utilities.mock_auth import MockAuth
 from modules.skills_ranking.constants import FEATURE_ID
-from modules.skills_ranking.errors import InvalidNewPhaseError, ExperimentGroupsNotFound, SkillsRankingStateNotFound
+from modules.skills_ranking.errors import SkillsRankingStateNotFound
 from modules.skills_ranking.repository.get_skills_ranking_repository import get_skills_ranking_repository
 from modules.skills_ranking.repository.repository import ISkillsRankingRepository
 from modules.skills_ranking.routes.routes import get_skills_ranking_router
 from modules.skills_ranking.routes.types import GetRankingResponse
 from modules.skills_ranking.service.get_skills_ranking_service import get_skills_ranking_service
 from modules.skills_ranking.service.service import ISkillsRankingService
-from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState, SkillRankingExperimentGroups
+from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhase, SkillRankingExperimentGroups
 
 
 def get_mock_user_preferences(session_id: int, experiments: dict[str, str] = None):
@@ -40,19 +40,22 @@ def get_mock_user_preferences(session_id: int, experiments: dict[str, str] = Non
 
 def get_skills_ranking_state(
         session_id: int = 1,
-        current_state: SkillsRankingCurrentState = SkillsRankingCurrentState.INITIAL,
-        experiment_groups: SkillRankingExperimentGroups = SkillRankingExperimentGroups(),
+        phase: SkillsRankingPhase = SkillsRankingPhase.INITIAL,
+        experiment_groups: SkillRankingExperimentGroups = SkillRankingExperimentGroups(
+            compare_against="against_other_job_seekers",
+            button_order="skip_button_first",
+            delayed_results=False
+        ),
         ranking: str | None = None,
         self_ranking: str | None = None
 ) -> SkillsRankingState:
     return SkillsRankingState(
         session_id=session_id,
-        current_state=current_state,
+        phase=phase,
         experiment_groups=experiment_groups,
         ranking=ranking,
         self_ranking=self_ranking
     )
-
 
 TestClientWithMocks = tuple[
     TestClient, ISkillsRankingService, ISkillsRankingRepository, IUserPreferenceRepository, UserInfo | None]
@@ -107,7 +110,8 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
         async def create(self, state: SkillsRankingState) -> SkillsRankingState:
             raise NotImplementedError()
 
-        async def update(self, state: SkillsRankingState) -> SkillsRankingState:
+        async def update(self, *, session_id: int, experiment_groups: SkillRankingExperimentGroups | None = None, phase: SkillsRankingPhase | None = None, ranking: str | None = None,
+                         self_ranking: str | None = None) -> SkillsRankingState:
             raise NotImplementedError()
 
     mocked_skills_ranking_repository = MockedSkillsRankingRepository()
@@ -162,284 +166,144 @@ class TestSkillsRankingRoutes:
             mocked_skills_ranking_repository.get_by_session_id = AsyncMock(return_value=given_state)
 
             # WHEN a GET request is made
-            response = client.get(f"/conversations/{given_state.session_id}/skills-ranking")
+            response = client.get(f"/conversations/{given_state.session_id}/skills-ranking/state")
 
             # THEN the response is OK
             assert response.status_code == HTTPStatus.OK
             # AND the response contains the state
             assert response.json() == {
                 "session_id": given_state.session_id,
-                "current_state": given_state.current_state.value,
+                "phase": given_state.phase.value,
                 "experiment_groups": given_state.experiment_groups.model_dump(),
                 "ranking": given_state.ranking,
                 "self_ranking": given_state.self_ranking
             }
 
         @pytest.mark.asyncio
-        async def test_get_skills_ranking_state_initializes_experiments(
-                self,
-                client_with_mocks: TestClientWithMocks,
-                setup_application_config: ApplicationConfig
-        ):
-            client, mocked_service, mocked_skills_ranking_repository, mocked_preferences, _ = client_with_mocks
-
-            # GIVEN a session id
-            session_id = 1
-
-            # AND the user has a valid session with no experiments
-            mocked_preferences.get_user_preference_by_user_id = AsyncMock(
-                return_value=get_mock_user_preferences(session_id, {}))
-
-            # AND the user preferences repository's set_experiment_by_user_id method will succeed
-            mocked_preferences.set_experiment_by_user_id = AsyncMock(return_value=None)
-
-            # AND the repository's get_by_session_id method will return None (no existing state)
-            mocked_skills_ranking_repository.get_by_session_id = AsyncMock(return_value=None)
-
-            # AND the service's upsert_state method will return a new state
-            expected_state = get_skills_ranking_state(session_id=session_id)
-            mocked_service.upsert_state = AsyncMock(return_value=expected_state)
-
-            # WHEN a GET request is made
-            response = client.get(f"/conversations/{session_id}/skills-ranking")
-
-            # THEN the response is OK
-            assert response.status_code == HTTPStatus.OK
-
-            # AND the service was called with a new state containing initialized experiments
-            mocked_service.upsert_state.assert_called_once()
-            actual_state = mocked_service.upsert_state.call_args[0][0]
-            assert actual_state.session_id == session_id
-            assert actual_state.current_state == SkillsRankingCurrentState.INITIAL
-            assert isinstance(actual_state.experiment_groups, SkillRankingExperimentGroups)
-
-            # AND the response contains the initialized state
-            assert response.json() == {
-                "session_id": expected_state.session_id,
-                "current_state": expected_state.current_state.value,
-                "experiment_groups": expected_state.experiment_groups.model_dump(),
-                "ranking": expected_state.ranking,
-                "self_ranking": expected_state.self_ranking
-            }
-
-        @pytest.mark.asyncio
-        async def test_get_skills_ranking_state_unauthorized(
-                self,
-                client_with_mocks: TestClientWithMocks,
-                setup_application_config: ApplicationConfig
-        ):
-            client, _, _, mocked_preferences, _ = client_with_mocks
-
-            # GIVEN a session id
-            session_id = 1
-
-            # AND the user does not have access to the session
-            mocked_preferences.get_user_preference_by_user_id = AsyncMock(
-                return_value=get_mock_user_preferences(999))  # different session id
-
-            # WHEN a GET request is made
-            response = client.get(f"/conversations/{session_id}/skills-ranking")
-
-            # THEN the response is forbidden
-            assert response.status_code == HTTPStatus.FORBIDDEN
-
-        @pytest.mark.asyncio
-        async def test_get_skills_ranking_state_user_preferences_repository_get_experiments_by_user_id_error(
-                self,
-                client_with_mocks: TestClientWithMocks,
-                setup_application_config: ApplicationConfig
-        ):
-            client, _, _, mocked_preferences, _ = client_with_mocks
-
-            # GIVEN a session id
-            session_id = 1
-
-            # AND the user has a valid session
-            mocked_preferences.get_user_preference_by_user_id = AsyncMock(side_effect=Exception("test error"))
-
-            # WHEN a GET request is made
-            response = client.get(f"/conversations/{session_id}/skills-ranking")
-
-            # THEN the response is internal server error
-            assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
-
-        @pytest.mark.asyncio
-        async def test_get_skills_ranking_state_user_preferences_repository_set_experiment_by_user_id_error(
-                self,
-                client_with_mocks: TestClientWithMocks,
-                setup_application_config: ApplicationConfig
-        ):
-            client, _, _, mocked_preferences, _ = client_with_mocks
-
-            # GIVEN a session id
-            session_id = 1
-
-            # AND the user has a valid session
-            mocked_preferences.get_user_preference_by_user_id = AsyncMock(
-                return_value=get_mock_user_preferences(session_id))
-
-            # AND the user preferences repository's set_experiment_by_user_id method will raise an error
-            mocked_preferences.set_experiment_by_user_id = AsyncMock(side_effect=Exception("test error"))
-
-            # WHEN a GET request is made
-            response = client.get(f"/conversations/{session_id}/skills-ranking")
-
-            # THEN the response is internal server error
-            assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
-
-        @pytest.mark.asyncio
-        async def test_get_skills_ranking_state_skills_ranking_repository_error(
+        async def test_get_skills_ranking_state_not_found(
                 self,
                 client_with_mocks: TestClientWithMocks,
                 setup_application_config: ApplicationConfig
         ):
             client, _, mocked_skills_ranking_repository, mocked_preferences, _ = client_with_mocks
-
             # GIVEN a session id
             session_id = 1
-
             # AND the user has a valid session
             mocked_preferences.get_user_preference_by_user_id = AsyncMock(
-                return_value=get_mock_user_preferences(session_id))
-
-            # AND the repository's get_by_session_id method will raise an error
-            mocked_skills_ranking_repository.get_by_session_id = AsyncMock(side_effect=Exception("test error"))
+                return_value=get_mock_user_preferences(session_id, {}))
+            # AND the repository's get_by_session_id method will return None (no state)
+            mocked_skills_ranking_repository.get_by_session_id = AsyncMock(return_value=None)
 
             # WHEN a GET request is made
-            response = client.get(f"/conversations/{session_id}/skills-ranking")
+            response = client.get(f"/conversations/{session_id}/skills-ranking/state")
 
-            # THEN the response is internal server error
-            assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+            # THEN the response is OK with null
+            assert response.status_code == HTTPStatus.OK
+            assert response.json() is None
 
     class TestUpsertSkillsRankingState:
         @pytest.mark.asyncio
-        async def test_upsert_skills_ranking_state_create_success(
+        async def test_upsert_skills_ranking_state_create_success_initial(
                 self,
                 client_with_mocks: TestClientWithMocks,
                 setup_application_config: ApplicationConfig
         ):
-            client, mocked_service, _, mocked_preferences, _ = client_with_mocks
-
-            # GIVEN a session id
-            given_session_id = 1
-            given_current_state = SkillsRankingCurrentState.SELF_EVALUATING
-            given_self_ranking = "test ranking"
-
-            # AND the user has a valid session with experiments
-            experiment_groups = SkillRankingExperimentGroups()
-            mocked_preferences.get_user_preference_by_user_id = AsyncMock(
-                return_value=get_mock_user_preferences(given_session_id, {FEATURE_ID: experiment_groups.model_dump()}))
-
-            # AND the service's upsert_state method will return the new state
-            given_state = get_skills_ranking_state(
-                session_id=given_session_id,
-                current_state=SkillsRankingCurrentState.SELF_EVALUATING,
-                experiment_groups=experiment_groups,
-                ranking="test ranking",
-                self_ranking="test self ranking"
-            )
-            mocked_service.upsert_state = AsyncMock(return_value=given_state)
-
-            # WHEN a PATCH request is made
-            response = client.patch(
-                f"/conversations/{given_session_id}/skills-ranking",
-                json={
-                    "current_state": given_current_state.value,
-                    "self_ranking": given_self_ranking
-                }
-            )
-
-            # THEN the response is accepted
-            assert response.status_code == HTTPStatus.ACCEPTED
-
-            # AND the service was called with the correct state
-            mocked_service.upsert_state.assert_called_once()
-            actual_state = mocked_service.upsert_state.call_args[0][0]
-            assert actual_state.session_id == given_session_id
-            assert actual_state.current_state == given_current_state
-            assert actual_state.ranking is None
-            assert actual_state.self_ranking == given_self_ranking
-            assert actual_state.experiment_groups == experiment_groups
-
-            # AND the response contains the updated state
-            assert response.json() == {
-                "session_id": given_state.session_id,
-                "current_state": given_state.current_state.value,
-                "experiment_groups": given_state.experiment_groups.model_dump(),
-                "ranking": given_state.ranking,
-                "self_ranking": given_state.self_ranking
-            }
-
-        @pytest.mark.asyncio
-        async def test_upsert_skills_ranking_state_invalid_transition(
-                self,
-                client_with_mocks: TestClientWithMocks,
-                setup_application_config: ApplicationConfig
-        ):
-            client, mocked_service, _, mocked_preferences, _ = client_with_mocks
-
-            # GIVEN a session id
+            client, mocked_service, mocked_skills_ranking_repository, mocked_preferences, _ = client_with_mocks
             session_id = 1
-
-            # AND the user has a valid session with experiments
-            experiment_groups = SkillRankingExperimentGroups()
-            mocked_preferences.get_user_preference_by_user_id = AsyncMock(
-                return_value=get_mock_user_preferences(session_id, {FEATURE_ID: experiment_groups.model_dump()}))
-
-            # AND the service's upsert_state method raises an InvalidNewPhaseError
-            mocked_service.upsert_state = AsyncMock(side_effect=InvalidNewPhaseError(
-                current_phase=SkillsRankingCurrentState.INITIAL,
-                expected_phases=[SkillsRankingCurrentState.SELF_EVALUATING]
-            ))
-
-            # WHEN a PATCH request is made with an invalid state transition
-            response = client.patch(
-                f"/conversations/{session_id}/skills-ranking",
-                json={
-                    "current_state": SkillsRankingCurrentState.EVALUATED.value,
-                    "self_ranking": "test ranking"
-                }
-            )
-
-            # THEN the response is bad request
-            assert response.status_code == HTTPStatus.BAD_REQUEST
-            assert response.json() == {"detail": {
-                "message": "Invalid new phase error",
-                "current_phase": SkillsRankingCurrentState.INITIAL.value,
-                "expected_phases": [SkillsRankingCurrentState.SELF_EVALUATING.value]
-            }}
-
-        @pytest.mark.asyncio
-        async def test_upsert_skills_ranking_state_experiment_groups_not_found(
-                self,
-                client_with_mocks: TestClientWithMocks,
-                setup_application_config: ApplicationConfig
-        ):
-            client, _, _, mocked_preferences, user_info = client_with_mocks
-
-            # GIVEN a session id
-            session_id = 1
-
-            # AND the user has a valid session but no experiment groups
+            # GIVEN no existing state
+            mocked_skills_ranking_repository.get_by_session_id = AsyncMock(return_value=None)
+            # AND the user has a valid session with no experiments
             mocked_preferences.get_user_preference_by_user_id = AsyncMock(
                 return_value=get_mock_user_preferences(session_id, {}))
+            # AND preferences set_experiment_by_user_id will succeed
+            mocked_preferences.set_experiment_by_user_id = AsyncMock(return_value=None)
+            # AND the service upsert_state will succeed
+            created_state = get_skills_ranking_state(session_id=session_id)
+            mocked_service.upsert_state = AsyncMock(return_value=created_state)
 
-            # WHEN a PATCH request is made
-            response = client.patch(
-                f"/conversations/{session_id}/skills-ranking",
-                json={
-                    "current_state": SkillsRankingCurrentState.EVALUATED.value,
-                    "self_ranking": "test ranking"
-                }
-            )
+            # WHEN a POST request is made with INITIAL phase
+            response = client.post(f"/conversations/{session_id}/skills-ranking/state", json={
+                "phase": "INITIAL",
+                "self_ranking": None
+            })
 
-            # THEN the response is bad request
+            # THEN the response is ACCEPTED
+            assert response.status_code == HTTPStatus.ACCEPTED
+            # AND the service upsert_state is called
+            mocked_service.upsert_state.assert_called_once()
+            # AND preferences set_experiment_by_user_id is called
+            mocked_preferences.set_experiment_by_user_id.assert_called_once()
+            # AND the response contains the created state
+            assert response.json()["session_id"] == session_id
+            assert response.json()["phase"] == "INITIAL"
+
+        @pytest.mark.asyncio
+        async def test_upsert_skills_ranking_state_create_error_non_initial(
+                self,
+                client_with_mocks: TestClientWithMocks,
+                setup_application_config: ApplicationConfig
+        ):
+            client, mocked_service, mocked_skills_ranking_repository, mocked_preferences, _ = client_with_mocks
+            session_id = 1
+            # GIVEN no existing state
+            mocked_skills_ranking_repository.get_by_session_id = AsyncMock(return_value=None)
+            # AND the user has a valid session
+            mocked_preferences.get_user_preference_by_user_id = AsyncMock(
+                return_value=get_mock_user_preferences(session_id, {}))
+            # AND preferences set_experiment_by_user_id should not be called
+            mocked_preferences.set_experiment_by_user_id = AsyncMock()
+            # AND the service upsert_state should not be called
+            mocked_service.upsert_state = AsyncMock()
+
+            # WHEN a POST request is made with non-INITIAL phase
+            response = client.post(f"/conversations/{session_id}/skills-ranking/state", json={
+                "phase": "SELF_EVALUATING",
+                "self_ranking": None
+            })
+
+            # THEN the response is BAD_REQUEST
             assert response.status_code == HTTPStatus.BAD_REQUEST
-            assert response.json() == {"detail": {
-            "message": "Experiment groups not found",
-            "user_id": user_info.user_id,
-            "session_id": session_id
-        }}
+            assert response.json()["detail"] == "Skills ranking state not found"
+            # AND preferences set_experiment_by_user_id is not called
+            mocked_preferences.set_experiment_by_user_id.assert_not_called()
+            # AND the service upsert_state is not called
+            mocked_service.upsert_state.assert_not_called()
+
+        @pytest.mark.asyncio
+        async def test_upsert_skills_ranking_state_upsert_existing(
+                self,
+                client_with_mocks: TestClientWithMocks,
+                setup_application_config: ApplicationConfig
+        ):
+            client, mocked_service, mocked_skills_ranking_repository, mocked_preferences, _ = client_with_mocks
+            session_id = 1
+            # GIVEN an existing state
+            existing_state = get_skills_ranking_state(session_id=session_id, phase=SkillsRankingPhase.INITIAL)
+            mocked_skills_ranking_repository.get_by_session_id = AsyncMock(return_value=existing_state)
+            # AND the user has a valid session
+            mocked_preferences.get_user_preference_by_user_id = AsyncMock(
+                return_value=get_mock_user_preferences(session_id, {FEATURE_ID: existing_state.experiment_groups.model_dump()}))
+            # AND preferences set_experiment_by_user_id should not be called
+            mocked_preferences.set_experiment_by_user_id = AsyncMock()
+            # AND the service upsert_state will succeed
+            updated_state = get_skills_ranking_state(session_id=session_id, phase=SkillsRankingPhase.SELF_EVALUATING)
+            mocked_service.upsert_state = AsyncMock(return_value=updated_state)
+
+            # WHEN a POST request is made to update
+            response = client.post(f"/conversations/{session_id}/skills-ranking/state", json={
+                "phase": "SELF_EVALUATING",
+                "self_ranking": "foo"
+            })
+
+            # THEN the response is ACCEPTED
+            assert response.status_code == HTTPStatus.ACCEPTED
+            # AND the service upsert_state is called
+            mocked_service.upsert_state.assert_called_once()
+            # AND preferences set_experiment_by_user_id is not called
+            mocked_preferences.set_experiment_by_user_id.assert_not_called()
+            # AND the response contains the updated state
+            assert response.json()["session_id"] == session_id
+            assert response.json()["phase"] == "SELF_EVALUATING"
 
     class TestGetRanking:
         @pytest.mark.asyncio

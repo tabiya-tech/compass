@@ -6,7 +6,7 @@ from app.app_config import ApplicationConfig
 from modules.skills_ranking.errors import InvalidNewPhaseError, SkillsRankingStateNotFound
 from modules.skills_ranking.repository.repository import ISkillsRankingRepository
 from modules.skills_ranking.service.service import SkillsRankingService
-from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState, SkillRankingExperimentGroups
+from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhase, SkillRankingExperimentGroups
 
 
 @pytest.fixture(scope="function")
@@ -18,7 +18,8 @@ def _mock_skills_ranking_repository() -> ISkillsRankingRepository:
         async def create(self, state: SkillsRankingState) -> SkillsRankingState:
             raise NotImplementedError()
 
-        async def update(self, state: SkillsRankingState) -> SkillsRankingState:
+        async def update(self, *, session_id: int, experiment_groups: SkillRankingExperimentGroups | None = None, phase: SkillsRankingPhase | None = None, ranking: str | None = None,
+                     self_ranking: str | None = None) -> SkillsRankingState:
             raise NotImplementedError()
 
     return MockSkillsRankingRepository()
@@ -26,23 +27,22 @@ def _mock_skills_ranking_repository() -> ISkillsRankingRepository:
 
 def get_skills_ranking_state(
         session_id: int = 1,
-        current_state: SkillsRankingCurrentState = SkillsRankingCurrentState.INITIAL,
+        phase: SkillsRankingPhase = SkillsRankingPhase.INITIAL,
         experiment_groups: SkillRankingExperimentGroups = SkillRankingExperimentGroups(
             compare_against="against_other_job_seekers",
             button_order="skip_button_first",
-            delayed_results="delayed_results"
+            delayed_results=False
         ),
         ranking: str | None = None,
         self_ranking: str | None = None
 ) -> SkillsRankingState:
     return SkillsRankingState(
         session_id=session_id,
-        current_state=current_state,
+        phase=phase,
         experiment_groups=experiment_groups,
         ranking=ranking,
         self_ranking=self_ranking
     )
-
 
 
 class TestSkillsRankingService:
@@ -83,11 +83,11 @@ class TestSkillsRankingService:
             setup_application_config: ApplicationConfig
     ):
         # GIVEN an existing state
-        existing_state = get_skills_ranking_state(current_state=SkillsRankingCurrentState.INITIAL)
+        existing_state = get_skills_ranking_state()
 
         # AND a new state to update with
         new_state = get_skills_ranking_state(
-            current_state=SkillsRankingCurrentState.SELF_EVALUATING,
+            phase=SkillsRankingPhase.SELF_EVALUATING,
             ranking="new ranking"
         )
 
@@ -103,8 +103,14 @@ class TestSkillsRankingService:
         # THEN the repository get_by_session_id method is called with the state
         _mock_skills_ranking_repository.get_by_session_id.assert_called_once_with(new_state.session_id)
 
-        # AND then the repository update method is called with the state
-        _mock_skills_ranking_repository.update.assert_called_once_with(new_state)
+        # AND then the repository update method is called with only the changed fields
+        _mock_skills_ranking_repository.update.assert_called_once_with(
+            experiment_groups=existing_state.experiment_groups,
+            session_id=new_state.session_id,
+            phase=new_state.phase,
+            ranking=new_state.ranking,
+            self_ranking=new_state.self_ranking
+        )
 
         # AND the repository create method is not called
         _mock_skills_ranking_repository.create.assert_not_called()
@@ -119,11 +125,11 @@ class TestSkillsRankingService:
             setup_application_config: ApplicationConfig
     ):
         # GIVEN an existing state
-        existing_state = get_skills_ranking_state(current_state=SkillsRankingCurrentState.INITIAL)
+        existing_state = get_skills_ranking_state(phase=SkillsRankingPhase.INITIAL)
 
         # AND a new state with an invalid transition
         new_state = get_skills_ranking_state(
-            current_state=SkillsRankingCurrentState.EVALUATED,
+            phase=SkillsRankingPhase.EVALUATED,
             ranking="new ranking"
         )
 

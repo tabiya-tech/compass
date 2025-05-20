@@ -1,13 +1,13 @@
 import logging
 from http import HTTPStatus
 from typing import Annotated
-import random
 
 from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends, Path
 
 from app.constants.errors import HTTPErrorResponse
 from app.context_vars import user_id_ctx_var, session_id_ctx_var
+from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
 from app.users.auth import Authentication, UserInfo
 from app.users.get_user_preferences_repository import get_user_preferences_repository
@@ -16,11 +16,11 @@ from modules.skills_ranking.constants import FEATURE_ID
 from modules.skills_ranking.errors import InvalidNewPhaseError
 from modules.skills_ranking.repository.get_skills_ranking_repository import get_skills_ranking_repository
 from modules.skills_ranking.repository.repository import ISkillsRankingRepository
-from modules.skills_ranking.routes.types import SkillsRankingResponse, UpsertSkillsRankingRequest, GetRankingResponse
+from modules.skills_ranking.routes.types import UpsertSkillsRankingRequest, GetRankingResponse
 from modules.skills_ranking.service.get_skills_ranking_service import get_skills_ranking_service
 from modules.skills_ranking.service.service import ISkillsRankingService
-from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingCurrentState, SkillRankingExperimentGroups
-from modules.skills_ranking.errors import ExperimentGroupsNotFound, SkillsRankingStateNotFound
+from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhase, SkillRankingExperimentGroups
+from modules.skills_ranking.errors import SkillsRankingStateNotFound
 logger = logging.getLogger(__name__)
 
 
@@ -31,13 +31,13 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
 
     router = APIRouter(prefix="/conversations/{session_id}/skills-ranking", tags=["skills-ranking", "conversations"])
 
-    @router.get("")
-    async def _get_skills_ranking(
+    @router.get("/state")
+    async def _get_skills_ranking_state(
             session_id: Annotated[int, Path(description="The conversation identifier", examples=[1])],
             user_preferences_repository: IUserPreferenceRepository = Depends(get_user_preferences_repository),
             skills_ranking_repository: ISkillsRankingRepository = Depends(get_skills_ranking_repository),
             skills_ranking_service: ISkillsRankingService = Depends(get_skills_ranking_service),
-            user_info: UserInfo = Depends(auth.get_user_info())) -> SkillsRankingResponse:
+            user_info: UserInfo = Depends(auth.get_user_info())) -> SkillsRankingState | None:
         try:
             # set the context variables
             user_id_ctx_var.set(user_info.user_id)
@@ -51,31 +51,19 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
             # get the state
             state = await skills_ranking_repository.get_by_session_id(session_id=session_id)
             if state is None:
-                # if no state is found, create a new one
-                new_state = SkillsRankingState(
-                    session_id=session_id,
-                    experiment_groups=SkillRankingExperimentGroups(),
-                    current_state=SkillsRankingCurrentState.INITIAL
-                )
-                # write the experiment groups to the user preferences
-                await user_preferences_repository.set_experiment_by_user_id(
-                    user_id=user_info.user_id,
-                    experiment_id=FEATURE_ID,
-                    experiment_config=new_state.experiment_groups.model_dump()
-                )
+                # return None if no state exists
+                return None
 
-                state = await skills_ranking_service.upsert_state(new_state)
-
-            return SkillsRankingResponse.from_state(state)
+            return state
         except UnauthorizedSessionAccessError:
             logger.warning(f"Unauthorized access to session_id: {session_id} by user_id: {user_info.user_id}")
-            raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Unauthorized access to session.")
+            raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=NO_PERMISSION_FOR_SESSION)
         except Exception as e:
             logger.exception(e)
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")
 
-    @router.patch(
-        path="",
+    @router.post(
+        path="/state",
         responses={
             HTTPStatus.BAD_REQUEST: {"model": HTTPErrorResponse},
             HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
@@ -85,10 +73,11 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
         name="upsert skills ranking state",
         description="create or update the skills ranking state for a specific session",
         status_code=HTTPStatus.ACCEPTED)
-    async def _upsert_skills_ranking(
+    async def _upsert_skills_ranking_state(
             session_id: Annotated[int, Path(description="The conversation identifier", examples=[1])],
             request: UpsertSkillsRankingRequest,
             user_preferences_repository: IUserPreferenceRepository = Depends(get_user_preferences_repository),
+            skills_ranking_repository: ISkillsRankingRepository = Depends(get_skills_ranking_repository),
             skills_ranking_service: ISkillsRankingService = Depends(get_skills_ranking_service),
             user_info: UserInfo = Depends(auth.get_user_info())) -> SkillsRankingState:
         try:
@@ -101,22 +90,46 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
             if preferences is None or session_id not in preferences.sessions:
                 raise UnauthorizedSessionAccessError(user_info.user_id, session_id)
 
+            # get experiment group from preferences (may be None)
             experiment_group = preferences.experiments.get(FEATURE_ID, None)
-            # if the user is in the experiment, add it to the skills ranking experiments
-            if experiment_group is None:
-                raise ExperimentGroupsNotFound(user_info.user_id, session_id)
-            experiment_groups = SkillRankingExperimentGroups(**experiment_group)
+            experiment_groups = SkillRankingExperimentGroups(**experiment_group) if experiment_group else None
 
-            # upsert the state
-            state = SkillsRankingState(
-                session_id=session_id,
-                experiment_groups=experiment_groups,
-                current_state=request.current_state,
-                self_ranking=request.self_ranking,
-            )
+            # check if state exists
+            existing_state = await skills_ranking_repository.get_by_session_id(session_id=session_id)
 
-            new_state = await skills_ranking_service.upsert_state(state)
-            return new_state
+            if existing_state is None:
+                # if INITIAL create a new state, else throw a state not found error
+                if request.phase != SkillsRankingPhase.INITIAL:
+                    raise SkillsRankingStateNotFound(session_id=session_id)
+                # If experiment groups are not in preferences, create a new state with random experiment groups
+                if experiment_groups is None:
+                    experiment_groups = SkillRankingExperimentGroups()
+                    await user_preferences_repository.set_experiment_by_user_id(
+                        user_id=user_info.user_id,
+                        experiment_id=FEATURE_ID,
+                        experiment_config=experiment_groups.model_dump()
+                    )
+                # create the state
+                state = SkillsRankingState(
+                    session_id=session_id,
+                    experiment_groups=experiment_groups,
+                    phase=request.phase,
+                    self_ranking=request.self_ranking,
+                    ranking=None
+                )
+                new_state = await skills_ranking_service.upsert_state(state)
+                return new_state
+            else:
+                # upsert/update as normal
+                state = SkillsRankingState(
+                    session_id=session_id,
+                    experiment_groups=existing_state.experiment_groups,
+                    phase=request.phase,
+                    self_ranking=request.self_ranking,
+                    ranking=existing_state.ranking
+                )
+                new_state = await skills_ranking_service.upsert_state(state)
+                return new_state
 
         except InvalidNewPhaseError as e:
             logger.error("Invalid new phase error occurred.")
@@ -128,16 +141,12 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
         except UnauthorizedSessionAccessError:
             logger.warning(f"Unauthorized access to session_id: {session_id} by user_id: {user_info.user_id}")
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Unauthorized access to session.")
-        except ExperimentGroupsNotFound as e:
-            logger.warning(f"Experiment groups not found for user_id: {user_info.user_id} and session_id: {session_id}")
-            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=dict(
-                message="Experiment groups not found",
-                user_id=user_info.user_id,
-                session_id=session_id
-            ))
+        except SkillsRankingStateNotFound as e:
+            logger.warning(f"Skills ranking state not found: {e}")
+            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Skills ranking state not found")
         except Exception as e:
             logger.exception(e)
-            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Opps! Something went wrong.")
+            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")
 
     @router.get(
         path="/ranking",

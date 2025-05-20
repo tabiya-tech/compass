@@ -2,10 +2,10 @@ from enum import Enum
 import random
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, field_serializer
 
 
-class SkillsRankingCurrentState(Enum):
+class SkillsRankingPhase(Enum):
     INITIAL = "INITIAL"
     SKIPPED = "SKIPPED"
     CANCELLED = "CANCELLED"
@@ -15,7 +15,6 @@ class SkillsRankingCurrentState(Enum):
 
 CompareAgainst = Literal["against_other_job_seekers", "against_job_market"]
 ButtonOrder = Literal["skip_button_first", "view_button_first"]
-DelayedResults = Literal["delayed_results", "immediate_results"]
 
 
 class SkillRankingExperimentGroups(BaseModel):
@@ -31,7 +30,7 @@ class SkillRankingExperimentGroups(BaseModel):
     """
     the order of the buttons
     """
-    delayed_results: DelayedResults = Field(default=random.choice(["delayed_results", "immediate_results"])) # nosec B311 # random is fine here, we are not using it for security
+    delayed_results: bool = Field(default=random.choice([True, False])) # nosec B311 # random is fine here, we are not using it for security
     """
     whether the results are delayed
     """
@@ -52,9 +51,9 @@ class SkillsRankingState(BaseModel):
     the groups the user is assigned for each experiment branch under the skills ranking experiment
     """
 
-    current_state: SkillsRankingCurrentState
+    phase: SkillsRankingPhase
     """
-    The phase of the skills ranking process.
+    The current phase of the skills ranking process.
     """
 
     ranking: str | None = None
@@ -66,3 +65,13 @@ class SkillsRankingState(BaseModel):
     """
     The self ranking of the skills got during a conversation.
     """
+
+    @field_validator("phase", mode='before')
+    def deserialize_phase(cls, value: str | SkillsRankingPhase) -> SkillsRankingPhase:
+        if isinstance(value, str):
+            return SkillsRankingPhase[value]
+        return value
+
+    @field_serializer("phase")
+    def serialize_sent_at(self, phase: SkillsRankingPhase) -> str:
+        return phase.value
