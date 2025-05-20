@@ -5,15 +5,17 @@ from pydantic import BaseModel
 from app.agent.agent import Agent
 from app.agent.agent_director.abstract_agent_director import AbstractAgentDirector, ConversationPhase
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
-from app.agent.farewell_agent import FarewellAgent
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirector
+from app.agent.farewell_agent import FarewellAgent
 from app.agent.llm_caller import LLMCaller
+from app.agent.penalty import get_penalty
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.vector_search.vector_search_dependencies import SearchServices
-from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, DEFAULT_GENERATION_CONFIG
 from common_libs.llm.generative_models import GeminiGenerativeLLM
+from common_libs.llm.models_utils import LLMConfig, get_config_variation, JSON_GENERATION_CONFIG
+from common_libs.retry import Retry
 
 DEFAULT_AGENT = "DefaultAgent"
 HISTORY_LENGTH = 5
@@ -106,7 +108,6 @@ class LLMAgentDirector(AbstractAgentDirector):
             ConversationPhase.CHECKOUT: [farewell_agent_tasks, default_agent_tasks]
         }
         # initialize the router model
-        self._model = GeminiGenerativeLLM(config=LLMConfig(generation_config=DEFAULT_GENERATION_CONFIG | JSON_GENERATION_CONFIG))
         self._llm_caller: LLMCaller[RouterModelResponse] = LLMCaller[RouterModelResponse](
             model_response_type=RouterModelResponse)
 
@@ -181,41 +182,26 @@ class LLMAgentDirector(AbstractAgentDirector):
         )
         return instructions
 
-    @staticmethod
-    def _get_default_agent_type_for_phase(phase: ConversationPhase) -> AgentType:
-        """
-        Get the default agent type for the given phase.
-        :param phase: The conversation phase
-        :return: The default agent type for the given phase
-        """
-        if phase == ConversationPhase.INTRO:
-            return AgentType.WELCOME_AGENT
-        if phase == ConversationPhase.COUNSELING:
-            return AgentType.EXPLORE_EXPERIENCES_AGENT
-        if phase == ConversationPhase.CHECKOUT:
-            return AgentType.FAREWELL_AGENT
-        if phase == ConversationPhase.ENDED:
-            return AgentType.FAREWELL_AGENT
-        raise ValueError(f"Unknown phase: {phase}")
+    async def _get_suitable_agent_type_handler(self,
+                                               llm: GeminiGenerativeLLM,
+                                               user_input: AgentInput,
+                                               phase: ConversationPhase,
+                                               context: ConversationContext) \
+            -> tuple[AgentType, float, BaseException | None]:
 
-    async def _get_suitable_agent_type(self, user_input: AgentInput, phase: ConversationPhase,
-                                       context: ConversationContext) -> AgentType:
-        """
-        Get the agent type most suitable to handle the user input
-        based on the user input and the current conversation phase.
-        :param user_input: The user input
-        :return: The agent type that is most suitable for handling the user input
-        :raises ValueError: If the conversation has ended
-        """
+        # Penalty levels, the higher the level, the more severe the penalty.
+        no_llm_response_penalty_level = 1
+        invalid_agent_type_returned_penalty_level = 0
 
         if phase == ConversationPhase.ENDED:
             raise ValueError("Conversation has ended, no more agents to run")
 
-        # Currently, in the intro phase, only the welcome agent is active
+        # Currently, in the intro phase, only the welcome agent is active.
+        # Zero penalty for the welcome agent, and no error.
         if phase == ConversationPhase.INTRO:
-            return AgentType.WELCOME_AGENT
+            return AgentType.WELCOME_AGENT, 0, None
 
-        # In the consulting phase, the agent type is determined by the user's intent
+        # In the consulting phase, the agent type is determined by the user's intent.
         if phase == ConversationPhase.COUNSELING:
             # Get the recent conversation history
             recent_conversation_history: str = ""
@@ -228,31 +214,88 @@ class LLMAgentDirector(AbstractAgentDirector):
                                                         conversation_history=recent_conversation_history,
                                                         phase=phase)
             self._logger.debug("Router input: %s", model_input)
-            try:
-                # TODO: return the LLM stats and aggregate them in the agent director state
-                router_model_response, _llm_stats_list = await self._llm_caller.call_llm(
-                    llm=self._model,
-                    llm_input=model_input,
-                    logger=self._logger
-                )
-                self._logger.debug("Router Model Response: %s", router_model_response)
+            # TODO: return the LLM stats and aggregate them in the agent director state
+            router_model_response, _llm_stats_list = await self._llm_caller.call_llm(
+                llm=llm,
+                llm_input=model_input,
+                logger=self._logger
+            )
+            self._logger.info("Router Model Response: %s", router_model_response)
 
-                selected_agent_type: str = DEFAULT_AGENT
-                if router_model_response is not None:
-                    selected_agent_type = router_model_response.agent_type.strip()
+            _default = AgentType.EXPLORE_EXPERIENCES_AGENT
+            if router_model_response is None:
+                self._logger.warning("Router model did not return a response, falling back to the default agent %s",
+                                     _default.name)
 
-                if selected_agent_type == DEFAULT_AGENT:
-                    self._logger.debug("Could not find the right agent, falling back to the experiences explorer")
-                    return self._get_default_agent_type_for_phase(phase)
-                return AgentType(selected_agent_type)
-            except Exception as e:  # pylint: disable=broad-except
-                self._logger.error("Error getting the suitable agent: %s", e)
-                # If the model fails to respond, return the default agent for the counseling phase
-                return self._get_default_agent_type_for_phase(phase)
+                _result_penalty = get_penalty(no_llm_response_penalty_level)
+                _raised_error = Exception("Router model did not return a response")
 
-        # In the checkout phase, only the farewell agent is active
-        if phase == ConversationPhase.CHECKOUT:
-            return AgentType.FAREWELL_AGENT
+                # If the model fails to respond, return the default agent for the counselling phase, with a penalty.
+                return _default, _result_penalty, _raised_error
+
+            selected_agent_type = router_model_response.agent_type.strip()
+            if selected_agent_type == DEFAULT_AGENT:
+                self._logger.debug("Model chose the default agent %s", _default.name)
+
+                # If the model chooses the default agent, return the default agent for the counselling phase.
+                # In this case we are not returning a penalty, or an error because the user can freely send any message
+                # to the model, and the model will choose the default agent, We don't want to trigger a retry for that
+                # because it is costly, and it can happen frequently.
+                return _default, 0, None
+
+            _all_agents_values = [_agent.value for _agent in AgentType]
+            if selected_agent_type not in _all_agents_values:
+                self._logger.warning("Model chose an unknown agent type: %s falling back to the default",
+                                     selected_agent_type, _default)
+
+                _result_penalty = get_penalty(invalid_agent_type_returned_penalty_level)
+                _raised_error = Exception("Router model returned an invalid agent type %s" % selected_agent_type)
+
+                # If the model returns an invalid agent type, return the default agent for the counselling phase, with a penalty.
+                return _default, _result_penalty, _raised_error
+
+            return AgentType(selected_agent_type), 0, None
+
+        # Otherwise, send the Farewell agent to the LLM, no penalty and no error.
+        return AgentType.FAREWELL_AGENT, 0, None
+
+    async def _get_suitable_agent_type(self,
+                                       user_input: AgentInput,
+                                       phase: ConversationPhase,
+                                       context: ConversationContext) -> AgentType:
+        """
+        Get the agent type most suitable to handle the user input
+        based on the user input, and the current conversation phase.
+
+        :param user_input: The user input
+        :return: The agent type that is most suitable for handling the user input, penalty and error
+        :raises ValueError: If the conversation has ended.
+        """
+
+        async def _callback(attempt: int, max_retries: int) -> tuple[AgentType, float, BaseException | None]:
+            # Call the LLM to get the suitable agent type.
+
+            # Add some temperature and `top_p` variation to prompt the LLM to return different results on each retry.
+            # Exponentially increase the temperature and `top_p` to avoid the LLM to return the same result every time.
+            temperature_config = get_config_variation(start_temperature=0.0, end_temperature=1,
+                                                      start_top_p=0.9, end_top_p=1,
+                                                      attempt=attempt, max_retries=max_retries)
+
+            llm = GeminiGenerativeLLM(config=LLMConfig(generation_config=temperature_config | JSON_GENERATION_CONFIG))
+            self._logger.debug("Calling LLM with temperature: %s, top_p: %s",
+                               temperature_config["temperature"],
+                               temperature_config["top_p"])
+
+            return await  self._get_suitable_agent_type_handler(
+                llm=llm,
+                user_input=user_input,
+                phase=phase,
+                context=context)
+
+        result, _result_penalty, _error = await Retry[AgentType].call_with_penalty(callback=_callback,
+                                                                                   logger=self._logger)
+
+        return result
 
     def _get_new_phase(self, agent_output: AgentOutput) -> ConversationPhase:
         """
