@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, field_serializer, field_validator
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentType
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.agent.collect_experiences_agent._conversation_llm import _ConversationLLM, ConversationLLMAgentOutput
+from app.agent.collect_experiences_agent._conversation_llm import _ConversationLLM, ConversationLLMAgentOutput, _get_experience_type
 from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtractionLLM
 from app.agent.collect_experiences_agent._types import CollectedData
 from app.agent.experience.experience_entity import ExperienceEntity
@@ -183,9 +183,13 @@ class CollectExperiencesAgent(Agent):
                 self._state.collected_data
             )
             transition_message: str
+            if exploring_type is not None:
+                transition_message = f"{user_input.message}\nAsk me about experiences that include: {_get_experience_type(exploring_type)}"
+            else:
+                transition_message = f"{user_input.message}\nLet's recap, and give me a chance to correct any mistakes."
             conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
                                                                    context=context,
-                                                                   user_input=AgentInput(message=user_input.message, is_artificial=True),
+                                                                   user_input=AgentInput(message=transition_message, is_artificial=True),
                                                                    country_of_user=self._state.country_of_user,
                                                                    collected_data=collected_data,
                                                                    last_referenced_experience_index=last_referenced_experience_index,

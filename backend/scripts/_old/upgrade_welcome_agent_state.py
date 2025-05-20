@@ -63,7 +63,7 @@ async def migrate(*, mongo_uri: str, database_name: str, hot_run: bool = False):
                 continue
 
         # Log summary
-        logger.info(f"Migration {'completed ' if hot_run else ''}simulated!")
+        logger.info(f"Migration {'completed!' if hot_run else 'simulated!'}")
         logger.info(f"Total states found: {total_states}")
         logger.info(f"States processed: {processed_states}")
         logger.info(f"Errors: {errored}")

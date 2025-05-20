@@ -58,7 +58,7 @@ async def test_collect_experiences_agent_simulated_user(test_case: CollectExperi
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.DEBUG):
-        # Guards to ensure that the loggers are correctly setup,
+        # Guards to ensure that the loggers are correctly set up,
         guard_caplog(logger=execute_evaluated_agent._agent._logger, caplog=caplog)
 
         # Run the main test
@@ -70,42 +70,12 @@ async def test_collect_experiences_agent_simulated_user(test_case: CollectExperi
         context = await conversation_manager.get_conversation_context()
         assert context.history.turns[-1].output.finished
 
-        failures = []
-
-        # Check if the actual discovered experiences match the expected ones
-        failures.append(
-            f"Expected at least {test_case.expected_experiences_count_min} experiences, but got {len(execute_evaluated_agent.get_experiences())}"
-        ) if len(execute_evaluated_agent.get_experiences()) < test_case.expected_experiences_count_min else None
-        failures.append(
-            f"Expected at most {test_case.expected_experiences_count_max} experiences, but got {len(execute_evaluated_agent.get_experiences())}"
-        ) if len(execute_evaluated_agent.get_experiences()) > test_case.expected_experiences_count_max else None
-
-        # assert that the experiences are in the expected work types test_case.expected_minimum_work_types
-        # build a dictionary with the work types and their counts
-        actual_work_types_count = {}
-        for experience in execute_evaluated_agent.get_experiences():
-            work_type = experience.work_type
-            if work_type in actual_work_types_count:
-                actual_work_types_count[work_type] += 1
-            else:
-                actual_work_types_count[work_type] = 1
-
-        # check that the actual work types are in the expected work types
-        for expected_work_type, expected_min_max_count in test_case.expected_work_types.items():
-            expected_minimum_count = expected_min_max_count[0]
-            expected_maximum_count = expected_min_max_count[1]
-            actual_work_type_count = actual_work_types_count.get(expected_work_type, 0)
-            failures.append(
-                f"Expected at least {expected_minimum_count} experiences of type {expected_work_type}, but got {actual_work_type_count}"
-            ) if actual_work_type_count < expected_minimum_count else None
-            failures.append(
-                f"Expected at most {expected_maximum_count} experiences of type {expected_work_type}, but got {actual_work_type_count}"
-            ) if actual_work_type_count > expected_maximum_count else None
+        # check that that experiences discovered meet the expectations
+        failures = await test_case.check_expectations(execute_evaluated_agent.get_experiences())
         if len(failures) > 0:
             pytest.fail(
                 '\n'.join(failures)
             )
-
         # We run the evaluation assertions at the end
         # as it fails often due to the unpredictability of the LLM responses
         assert_expected_evaluation_results(evaluation_result=evaluation_result, test_case=test_case)
