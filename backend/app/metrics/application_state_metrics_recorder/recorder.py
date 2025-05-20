@@ -131,11 +131,12 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
 
         # Record experience exploration changes
         # Record experience explored changes
-        if previous_state.experiences_explored_count != current_state.experiences_explored_count:
+        if previous_state.experiences_explored_by_work_type != current_state.experiences_explored_by_work_type:
             events.append(ExperienceExploredEvent(
                 user_id=user_id,
                 session_id=session_id,
-                experience_count=current_state.experiences_explored_count
+                experience_count=current_state.experiences_explored_count,
+                experiences_by_work_type=current_state.experiences_explored_by_work_type
             ))
 
         # Record conversation phase changes

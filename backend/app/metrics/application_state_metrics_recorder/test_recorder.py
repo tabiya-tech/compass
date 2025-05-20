@@ -1,15 +1,15 @@
 import random
+from datetime import datetime, timezone
+from typing import cast
+from unittest.mock import AsyncMock
 
 import pytest
-from unittest.mock import AsyncMock
-from typing import cast
-from datetime import datetime, timezone
 
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
+from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.collect_experiences_agent import CollectedData
 from app.agent.experience import ExperienceEntity, WorkType
 from app.agent.explore_experiences_agent_director import ConversationPhase as CounselingPhase, ExperienceState
-from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.app_config import ApplicationConfig
 from app.application_state import ApplicationState, IApplicationStateManager
@@ -57,6 +57,37 @@ def mock_application_state_manager() -> IApplicationStateManager:
     manager = MockedApplicationStateManager()
     return manager
 
+
+def _get_mock_application_states_of_interest(
+        conversation_phase: _ConversationPhaseLiteral = "NOT_STARTED",
+        counseling_phase: _CounselingPhaseLiteral = "NOT_STARTED",
+        compass_message_count=1,
+        user_message_count=1,
+        experiences_explored_count=0,
+        experiences_discovered_count=0,
+        experiences_by_work_type: dict | None = None,
+        experiences_explored_by_work_type: dict | None = None):
+    """
+    Get the mock application states of interest,
+    It already assigns default values to help you not change many places on new fields added.
+    """
+
+    if not experiences_by_work_type:
+        experiences_by_work_type = {}
+
+    if not experiences_explored_by_work_type:
+        experiences_explored_by_work_type = {}
+
+    return ApplicationStatesOfInterest(
+        conversation_phase=conversation_phase,
+        counseling_phase=counseling_phase,
+        compass_message_count=compass_message_count,
+        user_message_count=user_message_count,
+        experiences_explored_count=experiences_explored_count,
+        experiences_discovered_count=experiences_discovered_count,
+        experiences_by_work_type=experiences_by_work_type,
+        experiences_explored_by_work_type=experiences_explored_by_work_type
+    )
 
 class TestRecorderFlow:
     @pytest.mark.asyncio
@@ -297,7 +328,7 @@ class TestRecordMetricEventsFunction:
         user_id = get_random_user_id()
 
         # AND an empty previous state
-        given_previous_state = ApplicationStatesOfInterest(
+        given_previous_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=1,
@@ -307,7 +338,7 @@ class TestRecordMetricEventsFunction:
             experiences_by_work_type={}
         )
         # AND a current state with a message turn
-        given_current_state = ApplicationStatesOfInterest(
+        given_current_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=given_previous_state.compass_message_count + random.randint(1, 10),  # nosec B311 # random is used for testing purposes
@@ -346,7 +377,7 @@ class TestRecordMetricEventsFunction:
         user_id = get_random_user_id()
 
         # AND a previous state with 1 user message and 1 compass message
-        given_previous_state = ApplicationStatesOfInterest(
+        given_previous_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=1,
@@ -356,7 +387,7 @@ class TestRecordMetricEventsFunction:
             experiences_by_work_type={}
         )
         # AND a current state with 2 user messages and 2 compass messages
-        given_current_state = ApplicationStatesOfInterest(
+        given_current_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=3,
@@ -395,7 +426,7 @@ class TestRecordMetricEventsFunction:
         user_id = get_random_user_id()
 
         # AND a previous state with 1 user message and 1 compass message
-        given_previous_state = ApplicationStatesOfInterest(
+        given_previous_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=1,
@@ -405,7 +436,7 @@ class TestRecordMetricEventsFunction:
             experiences_by_work_type={}
         )
         # AND a current state with 1 user message and 1 compass message
-        given_current_state = ApplicationStatesOfInterest(
+        given_current_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=1,  # no change
@@ -440,7 +471,7 @@ class TestRecordMetricEventsFunction:
         user_id = get_random_user_id()
 
         # AND an empty previous state
-        given_previous_state = ApplicationStatesOfInterest(
+        given_previous_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
@@ -450,7 +481,7 @@ class TestRecordMetricEventsFunction:
             experiences_by_work_type={}
         )
         # AND a current state with a conversation phase
-        given_current_state = ApplicationStatesOfInterest(
+        given_current_state = _get_mock_application_states_of_interest(
             conversation_phase=cast(_ConversationPhaseLiteral, given_conversation_phase),
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
@@ -491,7 +522,7 @@ class TestRecordMetricEventsFunction:
         user_id = get_random_user_id()
 
         # AND an empty previous state
-        given_previous_state = ApplicationStatesOfInterest(
+        given_previous_state = _get_mock_application_states_of_interest(
             conversation_phase="COUNSELING",  # we should start out as counseling to isolate the counseling phase change
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
@@ -501,7 +532,7 @@ class TestRecordMetricEventsFunction:
             experiences_by_work_type={}
         )
         # AND a current state with a conversation phase
-        given_current_state = ApplicationStatesOfInterest(
+        given_current_state = _get_mock_application_states_of_interest(
             conversation_phase="COUNSELING",
             counseling_phase=cast(_CounselingPhaseLiteral, given_counseling_phase),
             compass_message_count=0,
@@ -541,24 +572,24 @@ class TestRecordMetricEventsFunction:
         user_id = get_random_user_id()
 
         # AND an empty previous state
-        given_previous_state = ApplicationStatesOfInterest(
+        given_previous_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
             user_message_count=0,
             experiences_explored_count=0,
             experiences_discovered_count=0,
-            experiences_by_work_type={}
+            experiences_explored_by_work_type={}
         )
         # AND a current state with an explored experience
-        given_current_state = ApplicationStatesOfInterest(
+        given_current_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
             user_message_count=0,
             experiences_explored_count=1,
             experiences_discovered_count=0,
-            experiences_by_work_type={}
+            experiences_explored_by_work_type={"foo": 1}
         )
 
         # WHEN the record_metric_events function is called with a previous state, current state, session_id and user_id
@@ -591,7 +622,7 @@ class TestRecordMetricEventsFunction:
         user_id = get_random_user_id()
 
         # AND a previous state with an explored experience
-        given_previous_state = ApplicationStatesOfInterest(
+        given_previous_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
@@ -601,7 +632,7 @@ class TestRecordMetricEventsFunction:
             experiences_by_work_type={}
         )
         # AND a current state with the same explored experience
-        given_current_state = ApplicationStatesOfInterest(
+        given_current_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
@@ -635,7 +666,7 @@ class TestRecordMetricEventsFunction:
         user_id = get_random_user_id()
 
         # AND an empty previous state
-        given_previous_state = ApplicationStatesOfInterest(
+        given_previous_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
@@ -645,7 +676,7 @@ class TestRecordMetricEventsFunction:
             experiences_by_work_type={}
         )
         # AND a current state with an explored experience
-        given_current_state = ApplicationStatesOfInterest(
+        given_current_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="DIVE_IN",  # we only count the discovered experiences when we are in the DIVE_IN phase
             compass_message_count=0,
@@ -684,7 +715,7 @@ class TestRecordMetricEventsFunction:
         user_id = get_random_user_id()
 
         # AND a previous state with an experience discovered
-        given_previous_state = ApplicationStatesOfInterest(
+        given_previous_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
@@ -694,7 +725,7 @@ class TestRecordMetricEventsFunction:
             experiences_by_work_type={}
         )
         # AND a current state with the same experience discovered
-        given_current_state = ApplicationStatesOfInterest(
+        given_current_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
@@ -728,7 +759,7 @@ class TestRecordMetricEventsFunction:
         user_id = get_random_user_id()
 
         # AND a previous state with experiences discovered for one work type
-        given_previous_state = ApplicationStatesOfInterest(
+        given_previous_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
@@ -741,7 +772,7 @@ class TestRecordMetricEventsFunction:
             }
         )
         # AND a current state with a new experience discovered for the work type
-        given_current_state = ApplicationStatesOfInterest(
+        given_current_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
             compass_message_count=0,
@@ -767,6 +798,58 @@ class TestRecordMetricEventsFunction:
         events = mock_metrics_service.bulk_record_events.call_args[0][0]
         assert len(events) == 1
         assert isinstance(events[0], ExperienceDiscoveredEvent)
+        assert events[0].experience_count == 4
+        # AND the experience discovered event should have the updated counts
+        assert events[0].experiences_by_work_type == {
+            "WORK_TYPE_1": 1,
+            "WORK_TYPE_2": 3
+        }
+
+    @pytest.mark.asyncio
+    async def test_record_experience_explored_event_with_new_experience_for_work_type(
+            self,
+            mock_metrics_service: IMetricsService,
+            mock_application_state_manager: IApplicationStateManager,
+            setup_application_config: ApplicationConfig
+    ):
+        # GIVEN a metrics service that successfully records events
+        mock_metrics_service.bulk_record_events = AsyncMock()
+        # AND a session_id
+        session_id = get_random_session_id()
+        # AND a user_id
+        user_id = get_random_user_id()
+
+        # AND a previous state with experiences discovered for one work type
+        given_previous_state = _get_mock_application_states_of_interest(
+            experiences_explored_count=3,
+            experiences_explored_by_work_type={
+                "WORK_TYPE_1": 1,
+                "WORK_TYPE_2": 2
+            }
+        )
+
+        # AND a current state with a new experience discovered for the work type
+        given_current_state = _get_mock_application_states_of_interest(
+            experiences_explored_count=4,
+            experiences_explored_by_work_type={
+                "WORK_TYPE_1": 1,
+                "WORK_TYPE_2": 3,
+            }
+        )
+
+        # WHEN the record_metric_events function is called with a previous state, current state, session_id and user_id
+        recorder = ApplicationStateMetricsRecorder(
+            application_state_manager=mock_application_state_manager,
+            metrics_service=mock_metrics_service
+        )
+
+        await recorder.record_metric_events(given_previous_state, given_current_state, session_id, user_id)
+
+        # THEN the metrics service should be called with the updated counts
+        mock_metrics_service.bulk_record_events.assert_called_once()
+        events = mock_metrics_service.bulk_record_events.call_args[0][0]
+        assert len(events) == 1
+        assert isinstance(events[0], ExperienceExploredEvent)
         assert events[0].experience_count == 4
         # AND the experience discovered event should have the updated counts
         assert events[0].experiences_by_work_type == {

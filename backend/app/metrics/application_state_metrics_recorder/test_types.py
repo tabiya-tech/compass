@@ -277,21 +277,27 @@ class TestExperienceExploration:
     def test_experiences_explored_count_one(self):
         # GIVEN a state with one processed experience
         state = get_empty_state()
-        experience = ExperienceEntity(
+        given_experience = ExperienceEntity(
             uuid=str(uuid.uuid4()),
             experience_title="Test Experience",
+            work_type=WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
         )
         experience_state = ExperienceState(
             dive_in_phase=DiveInPhase.PROCESSED,
-            experience=experience
+            experience=given_experience
         )
-        state.explore_experiences_director_state.experiences_state = {experience.uuid: experience_state}
+        state.explore_experiences_director_state.experiences_state = {given_experience.uuid: experience_state}
         
         # WHEN creating an ApplicationStatesOfInterest from the state
         result = ApplicationStatesOfInterest.from_state(state)
         
         # THEN the experiences explored count should be 1
         assert result.experiences_explored_count == 1
+
+        # AND the experiences by work type should not be empty
+        assert result.experiences_explored_by_work_type == {
+            given_experience.work_type.name: 1
+        }
 
     def test_experiences_explored_count_with_unprocessed(self):
         # GIVEN a state with one processed experience and one unprocessed experience
@@ -301,10 +307,17 @@ class TestExperienceExploration:
         processed_experience = ExperienceEntity(
             uuid=str(uuid.uuid4()),
             experience_title="Processed Experience",
+            work_type=WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
         )
+
+        processed_experience_with_none_work_type = ExperienceEntity(
+            uuid=str(uuid.uuid4()),
+            experience_title="Processed Experience",
+        )
+
         processed_experience_state = ExperienceState(
             dive_in_phase=DiveInPhase.PROCESSED,
-            experience=processed_experience
+            experience=processed_experience,
         )
         
         # Unprocessed experience
@@ -314,19 +327,31 @@ class TestExperienceExploration:
         )
         unprocessed_experience_state = ExperienceState(
             dive_in_phase=DiveInPhase.NOT_STARTED,
-            experience=unprocessed_experience
+            experience=unprocessed_experience,
+        )
+
+        processed_experience_with_none_work_type_state = ExperienceState(
+            dive_in_phase=DiveInPhase.PROCESSED,
+            experience=processed_experience_with_none_work_type,
         )
         
         state.explore_experiences_director_state.experiences_state = {
             processed_experience.uuid: processed_experience_state,
-            unprocessed_experience.uuid: unprocessed_experience_state
+            unprocessed_experience.uuid: unprocessed_experience_state,
+            processed_experience_with_none_work_type.uuid: processed_experience_with_none_work_type_state
         }
         
         # WHEN creating an ApplicationStatesOfInterest from the state
         result = ApplicationStatesOfInterest.from_state(state)
         
         # THEN the experiences explored count should be 1 (only the processed one)
-        assert result.experiences_explored_count == 1
+        assert result.experiences_explored_count == 2
+
+        # AND the experiences by work type should not be empty and should contain only the processed experience
+        assert result.experiences_explored_by_work_type == {
+            processed_experience.work_type.name: 1,
+            "None": 1
+        }
 
 
 class TestExperienceDiscovery:

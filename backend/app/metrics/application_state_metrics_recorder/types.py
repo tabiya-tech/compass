@@ -1,7 +1,7 @@
 from typing import Literal
+from typing import cast
 
 from pydantic import BaseModel
-from typing import cast
 
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.experience import WorkType
@@ -22,6 +22,7 @@ class ApplicationStatesOfInterest(BaseModel):
     experiences_explored_count: int
     experiences_discovered_count: int
     experiences_by_work_type: dict[str, int]
+    experiences_explored_by_work_type: dict[str, int]
 
     @classmethod
     def from_state(cls, state: ApplicationState) -> "ApplicationStatesOfInterest":
@@ -33,7 +34,8 @@ class ApplicationStatesOfInterest(BaseModel):
             user_message_count=_get_user_message_count(state),
             experiences_explored_count=_get_experiences_explored_count(state),
             experiences_discovered_count=_get_experiences_discovered_count(state),
-            experiences_by_work_type=_get_experience_by_work_type(state)
+            experiences_by_work_type=_get_experience_by_work_type(state),
+            experiences_explored_by_work_type=_get_experience_explored_by_work_type(state),
         )
 
 
@@ -103,3 +105,31 @@ def _get_experience_by_work_type(state: ApplicationState) -> dict[str, int]:
             experiences_discovered[data.work_type] = experiences_discovered.get(data.work_type, 0) + 1
 
     return experiences_discovered
+
+
+def _get_experience_explored_by_work_type(state: ApplicationState) -> dict[str, int]:
+    """
+    Get the current number of experiences explored by work type
+
+    :returns: the current number of experiences explored grouped by work type.
+    `
+        {
+            "{{ work type }}: "{{ number of explored experience for this work type }}"
+        }
+    `
+    """
+
+    experiences_explored = {}
+    for exp in state.explore_experiences_director_state.experiences_state.values():
+        # if it is not yet finished exploration phase, skip it.
+        if exp.dive_in_phase != DiveInPhase.PROCESSED:
+            continue
+
+        # if the work type is not in the enum, we count it as None.
+        if exp.experience.work_type is None:
+            experiences_explored["None"] = experiences_explored.get("None", 0) + 1
+        else:
+            experiences_explored[exp.experience.work_type.name] = experiences_explored.get(
+                exp.experience.work_type.name, 0) + 1
+
+    return experiences_explored
