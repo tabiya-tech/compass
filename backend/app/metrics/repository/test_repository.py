@@ -76,7 +76,12 @@ def get_experience_explored_event(*, experience_count: int):
     return ExperienceExploredEvent(
         user_id=get_random_user_id(),
         session_id=get_random_session_id(),
-        experience_count=experience_count
+        experience_count=experience_count,
+        experiences_by_work_type={
+            get_random_printable_string(10):
+                random.randint(1, 100)  # nosec B311 # random is used for testing purposes
+        }
+
     )
 
 

@@ -215,13 +215,25 @@ class ExperienceExploredEvent(AbstractConversationEvent):
     experience_count - the number of experiences explored by a user
     """
 
-    def __init__(self, *, user_id: str, session_id: int, experience_count: int, relevant_experiments: dict[str, str] = None):
+    experiences_by_work_type: dict[str, int]
+    """
+    experiences_by_work_type - a dictionary mapping {work types : the number of experiences explored for each type }
+    """
+
+    def __init__(self,
+                 *,
+                 user_id: str,
+                 session_id: int,
+                 experience_count: int,
+                 experiences_by_work_type: dict[str, int],
+                 relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
             session_id=session_id,
             event_type=EventType.EXPERIENCE_EXPLORED,
             experience_count=experience_count,
-            relevant_experiments=relevant_experiments or {}
+            experiences_by_work_type=experiences_by_work_type,
+            relevant_experiments=relevant_experiments or {},
         )
 
     class Config:

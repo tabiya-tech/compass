@@ -26,7 +26,8 @@ from app.metrics.types import (
     ExperienceExploredEvent,
     UIInteractionEvent,
 )
-from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_application_config
+from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_application_config, \
+    get_random_printable_string
 
 
 def assert_basic_event_fields_are_set(event: AbstractCompassMetricEvent, expected_event_type: EventType,
@@ -273,9 +274,12 @@ class TestExperienceExploredEvent:
         given_session_id = get_random_session_id()
         given_user_id = get_random_user_id()
         given_experience_count = random.randint(1, 10)  # nosec B311 # random is used for testing purposes
+        given_experiences_by_work_type = {
+            get_random_printable_string(10): random.randint(1, 100)}  # nosec B311 # random is used for testing purposes
         # WHEN creating an instance of the event
         actual_event = ExperienceExploredEvent(session_id=given_session_id, user_id=given_user_id,
-                                               experience_count=given_experience_count)
+                                               experience_count=given_experience_count,
+                                               experiences_by_work_type=given_experiences_by_work_type)
 
         # THEN the basic event fields should be set correctly
         assert_basic_event_fields_are_set(actual_event, EventType.EXPERIENCE_EXPLORED, setup_application_config,
