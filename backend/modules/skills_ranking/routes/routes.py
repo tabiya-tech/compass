@@ -12,14 +12,13 @@ from app.errors.errors import UnauthorizedSessionAccessError
 from app.users.auth import Authentication, UserInfo
 from app.users.get_user_preferences_repository import get_user_preferences_repository
 from app.users.repositories import IUserPreferenceRepository
-from modules.skills_ranking.constants import FEATURE_ID
-from modules.skills_ranking.errors import InvalidNewPhaseError
+from modules.skills_ranking.errors import InvalidNewPhaseError, InvalidSkillsRankingInitializationRequest
 from modules.skills_ranking.repository.get_skills_ranking_repository import get_skills_ranking_repository
 from modules.skills_ranking.repository.repository import ISkillsRankingRepository
 from modules.skills_ranking.routes.types import UpsertSkillsRankingRequest, GetRankingResponse
 from modules.skills_ranking.service.get_skills_ranking_service import get_skills_ranking_service
 from modules.skills_ranking.service.service import ISkillsRankingService
-from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhase, SkillRankingExperimentGroups
+from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhase
 from modules.skills_ranking.errors import SkillsRankingStateNotFound
 logger = logging.getLogger(__name__)
 
@@ -90,10 +89,6 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
             if preferences is None or session_id not in preferences.sessions:
                 raise UnauthorizedSessionAccessError(user_info.user_id, session_id)
 
-            # get experiment group from preferences (may be None)
-            experiment_group = preferences.experiments.get(FEATURE_ID, None)
-            experiment_groups = SkillRankingExperimentGroups(**experiment_group) if experiment_group else None
-
             # check if state exists
             existing_state = await skills_ranking_repository.get_by_session_id(session_id=session_id)
 
@@ -101,34 +96,23 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
                 # if INITIAL create a new state, else throw a state not found error
                 if request.phase != SkillsRankingPhase.INITIAL:
                     raise SkillsRankingStateNotFound(session_id=session_id)
-                # If experiment groups are not in preferences, create a new state with random experiment groups
-                if experiment_groups is None:
-                    experiment_groups = SkillRankingExperimentGroups()
-                    await user_preferences_repository.set_experiment_by_user_id(
-                        user_id=user_info.user_id,
-                        experiment_id=FEATURE_ID,
-                        experiment_config=experiment_groups.model_dump()
-                    )
+
                 # create the state
-                state = SkillsRankingState(
+                new_state = await skills_ranking_service.upsert_state(
                     session_id=session_id,
-                    experiment_groups=experiment_groups,
+                    user_id=user_info.user_id,
                     phase=request.phase,
-                    self_ranking=request.self_ranking,
-                    ranking=None
                 )
-                new_state = await skills_ranking_service.upsert_state(state)
                 return new_state
             else:
                 # upsert/update as normal
-                state = SkillsRankingState(
+                new_state = await skills_ranking_service.upsert_state(
                     session_id=session_id,
-                    experiment_groups=existing_state.experiment_groups,
                     phase=request.phase,
+                    experiment_groups=existing_state.experiment_groups,
                     self_ranking=request.self_ranking,
                     ranking=existing_state.ranking
                 )
-                new_state = await skills_ranking_service.upsert_state(state)
                 return new_state
 
         except InvalidNewPhaseError as e:
@@ -144,6 +128,9 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
         except SkillsRankingStateNotFound as e:
             logger.warning(f"Skills ranking state not found: {e}")
             raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Skills ranking state not found")
+        except InvalidSkillsRankingInitializationRequest as e:
+            logger.warning(f"Invalid skill ranking initialization request: {e}")
+            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Invalid skill ranking initialization request")
         except Exception as e:
             logger.exception(e)
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")

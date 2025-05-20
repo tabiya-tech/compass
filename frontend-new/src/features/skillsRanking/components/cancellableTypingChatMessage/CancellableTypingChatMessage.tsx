@@ -29,7 +29,7 @@ export interface CancellableTypingChatMessageProps {
   message?: string;
   thinkingMessage?: string;
   waitBeforeThinking?: number;
-  onCancel: () => void;
+  onCancel: () => Promise<void>;
 }
 
 const dotAnimation = keyframes`

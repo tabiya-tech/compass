@@ -6,9 +6,9 @@ import SkillsRankingPrompt, {
   DATA_TEST_ID,
   PROMPT_TEXTS,
 } from "src/features/skillsRanking/components/skillsRankingPrompt/SkillsRankingPrompt";
-import { CompareAgainstGroup, ButtonOrderGroup, DelayedResultsGroup } from "src/features/skillsRanking/types";
+import { CompareAgainstGroup, ButtonOrderGroup } from "src/features/skillsRanking/types";
 import { DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
-import { SkillsRankingCurrentState, SkillsRankingState } from "src/features/skillsRanking/types";
+import { SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import userEvent from "@testing-library/user-event";
 
 describe("SkillsRankingPrompt tests", () => {
@@ -16,11 +16,11 @@ describe("SkillsRankingPrompt tests", () => {
     test("should render component successfully", () => {
       // GIVEN a skills ranking state
       const givenSkillsRankingState: SkillsRankingState = {
-        current_state: SkillsRankingCurrentState.INITIAL,
+        phase: SkillsRankingPhase.INITIAL,
         experiment_groups: {
           compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
           button_order: ButtonOrderGroup.VIEW_BUTTON_FIRST,
-          delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+          delayed_results: false,
         },
         session_id: 1234,
         ranking: "",
@@ -61,11 +61,11 @@ describe("SkillsRankingPrompt tests", () => {
     ])("should render correct prompt text for %s", (experimentGroup, expectedText) => {
       // GIVEN a skills ranking state
       const givenSkillsRankingState: SkillsRankingState = {
-        current_state: SkillsRankingCurrentState.INITIAL,
+        phase: SkillsRankingPhase.INITIAL,
         experiment_groups: {
           compare_against: experimentGroup,
           button_order: ButtonOrderGroup.VIEW_BUTTON_FIRST,
-          delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+          delayed_results: false,
         },
         session_id: 1234,
         ranking: "",
@@ -94,11 +94,11 @@ describe("SkillsRankingPrompt tests", () => {
     test("should render buttons in correct order based on experiment group", () => {
       // GIVEN a skills ranking state with skip button first
       const givenSkillsRankingState: SkillsRankingState = {
-        current_state: SkillsRankingCurrentState.INITIAL,
+        phase: SkillsRankingPhase.INITIAL,
         experiment_groups: {
           compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
           button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
-          delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+          delayed_results: false,
         },
         session_id: 1234,
         ranking: "",
@@ -126,11 +126,11 @@ describe("SkillsRankingPrompt tests", () => {
     test("should call onView when the view button is clicked", async () => {
       // GIVEN a skills ranking state
       const givenSkillsRankingState: SkillsRankingState = {
-        current_state: SkillsRankingCurrentState.INITIAL,
+        phase: SkillsRankingPhase.INITIAL,
         experiment_groups: {
           compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
           button_order: ButtonOrderGroup.VIEW_BUTTON_FIRST,
-          delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+          delayed_results: false,
         },
         session_id: 1234,
         ranking: "",
@@ -163,11 +163,11 @@ describe("SkillsRankingPrompt tests", () => {
     test("should call onSkip when the skip button is clicked", async () => {
       // GIVEN a skills ranking state
       const givenSkillsRankingState: SkillsRankingState = {
-        current_state: SkillsRankingCurrentState.INITIAL,
+        phase: SkillsRankingPhase.INITIAL,
         experiment_groups: {
           compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
           button_order: ButtonOrderGroup.VIEW_BUTTON_FIRST,
-          delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+          delayed_results: false,
         },
         session_id: 1234,
         ranking: "",
@@ -200,11 +200,11 @@ describe("SkillsRankingPrompt tests", () => {
     test("should be disabled when not in initial state", () => {
       // GIVEN a skills ranking state that is not in initial state
       const givenSkillsRankingState: SkillsRankingState = {
-        current_state: SkillsRankingCurrentState.EVALUATED,
+        phase: SkillsRankingPhase.EVALUATED,
         experiment_groups: {
           compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
           button_order: ButtonOrderGroup.VIEW_BUTTON_FIRST,
-          delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+          delayed_results: false,
         },
         session_id: 1234,
         ranking: "",

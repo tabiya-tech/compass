@@ -7,10 +7,24 @@ from pydantic import BaseModel, Field
 from app.conversations.feedback.services.types import AnsweredQuestions
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 
+PossibleExperimentValues: TypeAlias = str | bool | int | float | None
+"""
+An experiment can either be a group of PossibleExperimentValues namespaced by a single string (max depth: 1)
+eg: {
+"feature_foo_experiments": {
+        "experiment_1": "foo",
+        "experiment_2": False,
+        "experiment_3": 1
+    }
+}
 
-# Type alias for experiment configurations
-ExperimentConfig: TypeAlias = dict[str, str | bool | int | float | None]
-Experiments: TypeAlias = dict[str, ExperimentConfig]
+or an experiment can be a flat dictionary of PossibleExperimentValues
+{
+"experiment": "foo"
+}
+
+"""
+Experiments: TypeAlias = dict[str, dict[str, PossibleExperimentValues] | PossibleExperimentValues]
 UserExperiments: TypeAlias = dict[str, Experiments]
 
 

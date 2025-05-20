@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 import SkillsRankingPrompt from "src/features/skillsRanking/components/skillsRankingPrompt/SkillsRankingPrompt";
-import { ButtonOrderGroup, CompareAgainstGroup, DelayedResultsGroup } from "src/features/skillsRanking/types";
-import { SkillsRankingCurrentState } from "src/features/skillsRanking/types";
+import { ButtonOrderGroup, CompareAgainstGroup } from "src/features/skillsRanking/types";
+import { SkillsRankingPhase } from "src/features/skillsRanking/types";
 
 const meta: Meta<typeof SkillsRankingPrompt> = {
   title: "Features/SkillsRanking/SkillsRankingPrompt",
@@ -13,15 +13,15 @@ const meta: Meta<typeof SkillsRankingPrompt> = {
   },
   args: {
     message: "Please rate your skills",
-    onView: () => {},
-    onSkip: () => {},
+    onView: async () => {},
+    onSkip: async () => {},
     disabled: false,
     skillsRankingState: {
-      current_state: SkillsRankingCurrentState.INITIAL,
+      phase: SkillsRankingPhase.INITIAL,
       experiment_groups: {
         compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
         button_order: ButtonOrderGroup.VIEW_BUTTON_FIRST,
-        delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+        delayed_results: false,
       },
       session_id: 1234,
       ranking: "",
@@ -41,11 +41,11 @@ export const Shown: Story = {
 export const JobMarketComparison: Story = {
   args: {
     skillsRankingState: {
-      current_state: SkillsRankingCurrentState.INITIAL,
+      phase: SkillsRankingPhase.INITIAL,
       experiment_groups: {
         compare_against: CompareAgainstGroup.AGAINST_JOB_MARKET,
         button_order: ButtonOrderGroup.VIEW_BUTTON_FIRST,
-        delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+          delayed_results: false,
       },
       session_id: 1234,
       ranking: "",
@@ -57,11 +57,11 @@ export const JobMarketComparison: Story = {
 export const SkipButtonFirst: Story = {
   args: {
     skillsRankingState: {
-      current_state: SkillsRankingCurrentState.INITIAL,
+      phase: SkillsRankingPhase.INITIAL,
       experiment_groups: {
         compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
         button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
-        delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+        delayed_results: false,
       },
       session_id: 1234,
       ranking: "",
@@ -79,11 +79,11 @@ export const Disabled: Story = {
 export const EvaluatedState: Story = {
   args: {
     skillsRankingState: {
-      current_state: SkillsRankingCurrentState.EVALUATED,
+      phase: SkillsRankingPhase.EVALUATED,
       experiment_groups: {
         compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
         button_order: ButtonOrderGroup.VIEW_BUTTON_FIRST,
-        delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+        delayed_results: false,
       },
       session_id: 1234,
       ranking: "",

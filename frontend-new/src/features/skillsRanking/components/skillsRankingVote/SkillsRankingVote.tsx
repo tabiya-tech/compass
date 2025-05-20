@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, forwardRef } from "react";
 import { Box, Typography, useTheme, styled } from "@mui/material";
 import { 
-  SkillsRankingCurrentState, 
+  SkillsRankingPhase,
   SkillsRankingState,
   CompareAgainstGroup
 } from "src/features/skillsRanking/types";
@@ -25,7 +25,7 @@ export const DATA_TEST_ID = {
 
 export interface SkillsRankingVoteProps {
   message: string;
-  onRankSelect: (rank: string) => void;
+  onRankSelect: (rank: string) => Promise<void>;
   disabled?: boolean;
   skillsRankingState: SkillsRankingState;
 }
@@ -70,7 +70,7 @@ export const SkillsRankingVote = forwardRef<HTMLDivElement, SkillsRankingVotePro
 
   useEffect(() => {
     setQuestionText(QUESTION_TEXTS[skillsRankingState.experiment_groups.compare_against]);
-    if (skillsRankingState.current_state === SkillsRankingCurrentState.SELF_EVALUATING) {
+    if (skillsRankingState.phase === SkillsRankingPhase.SELF_EVALUATING) {
       setSelectedIndex(null);
       setIsRankSelected(false);
     } else {
@@ -81,10 +81,10 @@ export const SkillsRankingVote = forwardRef<HTMLDivElement, SkillsRankingVotePro
         setSelectedIndex(null);
       }
     }
-  }, [skillsRankingState.current_state, skillsRankingState.experiment_groups.compare_against, skillsRankingState.self_ranking]);
+  }, [skillsRankingState.phase, skillsRankingState.experiment_groups.compare_against, skillsRankingState.self_ranking]);
 
   // Disable buttons if we're not in the self-evaluating state
-  const isDisabled = disabled || skillsRankingState.current_state !== SkillsRankingCurrentState.SELF_EVALUATING || isRankSelected;
+  const isDisabled = disabled || skillsRankingState.phase !== SkillsRankingPhase.SELF_EVALUATING || isRankSelected;
 
   const handleRankSelect = (rank: string) => {
     setSelectedIndex(OPTIONS.findIndex(option => option.value === rank));

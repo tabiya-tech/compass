@@ -1,26 +1,22 @@
 import { Meta, StoryObj } from "@storybook/react";
 import SkillsRankingResult from "src/features/skillsRanking/components/skillsRankingResult/SkillsRankingResult";
-import { CompareAgainstGroup, ButtonOrderGroup, DelayedResultsGroup } from "src/features/skillsRanking/types";
+import { CompareAgainstGroup, ButtonOrderGroup } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { SkillsRankingCurrentState } from "src/features/skillsRanking/types";
+import { SkillsRankingPhase } from "src/features/skillsRanking/types";
 
 const meta: Meta<typeof SkillsRankingResult> = {
   title: "Features/SkillsRanking/SkillsRankingResult",
   component: SkillsRankingResult,
   tags: ["autodocs"],
-  argTypes: {
-    onError: { action: "onError" },
-  },
   args: {
     message: "Here's what we found",
-    onError: () => {},
     skillsRankingState: {
-      current_state: SkillsRankingCurrentState.EVALUATED,
+      phase: SkillsRankingPhase.EVALUATED,
       experiment_groups: {
         compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
         button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
-        delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+        delayed_results: false,
       },
       session_id: 1234,
       ranking: "80%",
@@ -35,9 +31,9 @@ const meta: Meta<typeof SkillsRankingResult> = {
         experiment_groups: {
           compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
           button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
-          delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+          delayed_results: false,
         },
-        current_state: SkillsRankingCurrentState.EVALUATED,
+        phase: SkillsRankingPhase.EVALUATED,
         ranking: "80%",
         self_ranking: null,
       });
@@ -57,11 +53,11 @@ export const Shown: Story = {
 export const JobMarketComparison: Story = {
   args: {
     skillsRankingState: {
-      current_state: SkillsRankingCurrentState.EVALUATED,
+      phase: SkillsRankingPhase.EVALUATED,
       experiment_groups: {
         compare_against: CompareAgainstGroup.AGAINST_JOB_MARKET,
         button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
-        delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+        delayed_results: false,
       },
       session_id: 1234,
       ranking: "80%",
@@ -73,11 +69,11 @@ export const JobMarketComparison: Story = {
 export const Loading: Story = {
   args: {
     skillsRankingState: {
-      current_state: SkillsRankingCurrentState.SELF_EVALUATING,
+      phase: SkillsRankingPhase.SELF_EVALUATING,
       experiment_groups: {
         compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
         button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
-        delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+        delayed_results: false,
       },
       session_id: 1234,
       ranking: "",
@@ -94,9 +90,9 @@ export const Loading: Story = {
           experiment_groups: {
             compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
             button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
-            delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+            delayed_results: false,
           },
-          current_state: SkillsRankingCurrentState.EVALUATED,
+          phase: SkillsRankingPhase.EVALUATED,
           ranking: "80%",
           self_ranking: null,
         };

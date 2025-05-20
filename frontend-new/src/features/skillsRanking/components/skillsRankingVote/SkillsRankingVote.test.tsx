@@ -7,8 +7,8 @@ import SkillsRankingVote, {
   QUESTION_TEXTS,
   OPTIONS
 } from "src/features/skillsRanking/components/skillsRankingVote/SkillsRankingVote";
-import { CompareAgainstGroup, DelayedResultsGroup, ButtonOrderGroup } from "src/features/skillsRanking/types";
-import { SkillsRankingCurrentState, SkillsRankingState } from "src/features/skillsRanking/types";
+import { CompareAgainstGroup, ButtonOrderGroup } from "src/features/skillsRanking/types";
+import { SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import { DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import userEvent from "@testing-library/user-event";
 
@@ -31,10 +31,10 @@ describe("SkillsRankingVote tests", () => {
     test("should render component successfully", () => {
       // GIVEN a skills ranking state
       const givenSkillsRankingState: SkillsRankingState = {
-        current_state: SkillsRankingCurrentState.SELF_EVALUATING,
+        phase: SkillsRankingPhase.SELF_EVALUATING,
         experiment_groups: {
           compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
-          delayed_results: DelayedResultsGroup.IMMEDIATE_RESULTS,
+          delayed_results: false,
           button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
         },
         session_id: 1,
@@ -74,11 +74,11 @@ describe("SkillsRankingVote tests", () => {
     ])("should render correct question text for %s", (experimentGroup, expectedText) => {
       // GIVEN a skills ranking state
       const givenSkillsRankingState: SkillsRankingState = {
-        current_state: SkillsRankingCurrentState.SELF_EVALUATING,
+        phase: SkillsRankingPhase.SELF_EVALUATING,
         experiment_groups: {
           compare_against: experimentGroup,
           button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
-          delayed_results: DelayedResultsGroup.IMMEDIATE_RESULTS,
+          delayed_results: false,
         },
         session_id: 1,
         ranking: "",
@@ -108,11 +108,11 @@ describe("SkillsRankingVote tests", () => {
     test("should call onRankSelect when a rank icon is clicked", async () => {
       // GIVEN a skills ranking state
       const givenSkillsRankingState: SkillsRankingState = {
-        current_state: SkillsRankingCurrentState.SELF_EVALUATING,
+        phase: SkillsRankingPhase.SELF_EVALUATING,
         experiment_groups: {
           compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
           button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
-          delayed_results: DelayedResultsGroup.IMMEDIATE_RESULTS,
+          delayed_results: false,
         },
         session_id: 1,
         ranking: "",

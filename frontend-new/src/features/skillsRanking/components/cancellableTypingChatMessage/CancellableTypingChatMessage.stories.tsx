@@ -15,36 +15,40 @@ export default meta;
 
 type Story = StoryObj<typeof CancellableTypingChatMessage>;
 
+const asyncAction = (name: string) => async () => {
+  action(name)();
+};
+
 export const Shown: Story = {
   args: {
-    onCancel: action("cancel clicked"),
+    onCancel: asyncAction("cancel clicked"),
   },
 };
 
 export const ShownWithQuickTyping: Story = {
   args: {
-    onCancel: action("cancel clicked"),
+    onCancel: asyncAction("cancel clicked"),
     waitBeforeThinking: 1000,
   },
 };
 
 export const ShownWithTyping: Story = {
   args: {
-    onCancel: action("cancel clicked"),
+    onCancel: asyncAction("cancel clicked"),
     waitBeforeThinking: 15000,
   },
 };
 
 export const ShownWhenThinking: Story = {
   args: {
-    onCancel: action("cancel clicked"),
+    onCancel: asyncAction("cancel clicked"),
     waitBeforeThinking: 0,
   },
 };
 
 export const WithCustomMessages: Story = {
   args: {
-    onCancel: action("cancel clicked"),
+    onCancel: asyncAction("cancel clicked"),
     message: "Processing your request",
     thinkingMessage: "Analyzing the data",
     waitBeforeThinking: 2000,

@@ -8,18 +8,13 @@ export enum ButtonOrderGroup {
   VIEW_BUTTON_FIRST = "view_button_first"
 }
 
-export enum DelayedResultsGroup {
-  DELAYED_RESULTS = "delayed_results",
-  IMMEDIATE_RESULTS = "immediate_results"
-}
-
 export interface SkillRankingExperimentGroups {
   compare_against: CompareAgainstGroup;
   button_order: ButtonOrderGroup;
-  delayed_results: DelayedResultsGroup;
+  delayed_results: boolean;
 }
 
-export enum SkillsRankingCurrentState {
+export enum SkillsRankingPhase {
   INITIAL = "INITIAL",
   SKIPPED = "SKIPPED",
   CANCELLED = "CANCELLED",
@@ -30,7 +25,7 @@ export enum SkillsRankingCurrentState {
 export interface SkillsRankingState {
   session_id: number;
   experiment_groups: SkillRankingExperimentGroups;
-  current_state: SkillsRankingCurrentState;
+  phase: SkillsRankingPhase;
   ranking: string | null;
   self_ranking: string | null;
 }
@@ -40,9 +35,9 @@ export const skillsRankingStateDefault: SkillsRankingState = {
   experiment_groups: {
     compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
     button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
-    delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+    delayed_results: false,
   },
-  current_state: SkillsRankingCurrentState.INITIAL,
+  phase: SkillsRankingPhase.INITIAL,
   ranking: null,
   self_ranking: null,
 }

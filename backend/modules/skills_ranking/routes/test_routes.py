@@ -208,7 +208,7 @@ class TestSkillsRankingRoutes:
                 client_with_mocks: TestClientWithMocks,
                 setup_application_config: ApplicationConfig
         ):
-            client, mocked_service, mocked_skills_ranking_repository, mocked_preferences, _ = client_with_mocks
+            client, mocked_service, mocked_skills_ranking_repository, mocked_preferences, mocked_user = client_with_mocks
             session_id = 1
             # GIVEN no existing state
             mocked_skills_ranking_repository.get_by_session_id = AsyncMock(return_value=None)
@@ -229,10 +229,12 @@ class TestSkillsRankingRoutes:
 
             # THEN the response is ACCEPTED
             assert response.status_code == HTTPStatus.ACCEPTED
-            # AND the service upsert_state is called
-            mocked_service.upsert_state.assert_called_once()
-            # AND preferences set_experiment_by_user_id is called
-            mocked_preferences.set_experiment_by_user_id.assert_called_once()
+            # AND the service upsert_state is called with the correct arguments
+            mocked_service.upsert_state.assert_called_once_with(
+                session_id=session_id,
+                user_id=mocked_user.user_id,
+                phase=SkillsRankingPhase.INITIAL,
+            )
             # AND the response contains the created state
             assert response.json()["session_id"] == session_id
             assert response.json()["phase"] == "INITIAL"
@@ -297,13 +299,23 @@ class TestSkillsRankingRoutes:
 
             # THEN the response is ACCEPTED
             assert response.status_code == HTTPStatus.ACCEPTED
-            # AND the service upsert_state is called
-            mocked_service.upsert_state.assert_called_once()
+            # AND the service upsert_state is called with the correct arguments
+            mocked_service.upsert_state.assert_called_once_with(
+                session_id=session_id,
+                phase=SkillsRankingPhase.SELF_EVALUATING,
+                experiment_groups=existing_state.experiment_groups,
+                self_ranking="foo",
+                ranking=existing_state.ranking
+            )
             # AND preferences set_experiment_by_user_id is not called
             mocked_preferences.set_experiment_by_user_id.assert_not_called()
             # AND the response contains the updated state
             assert response.json()["session_id"] == session_id
             assert response.json()["phase"] == "SELF_EVALUATING"
+
+        @pytest.mark.todo
+        async def test_upsert_initial_state_with_experiment_groups(self):
+            pass
 
     class TestGetRanking:
         @pytest.mark.asyncio

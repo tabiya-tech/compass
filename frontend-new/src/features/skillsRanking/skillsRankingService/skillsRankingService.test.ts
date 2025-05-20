@@ -1,10 +1,10 @@
 import "src/_test_utilities/consoleMock";
 import { SkillsRankingService } from "./skillsRankingService";
-import { DelayedResultsGroup, SkillsRankingCurrentState } from "../types";
+import { SkillsRankingPhase, CompareAgainstGroup, ButtonOrderGroup } from "../types";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { getBackendUrl } from "src/envService";
 import { FeaturesService } from "src/features/featuresService/FeaturesService";
-import { CompareAgainstGroup, ButtonOrderGroup } from "src/features/skillsRanking/types";
+
 jest.mock("src/envService", () => ({
   getFeatures: jest.fn(),
   getBackendUrl: jest.fn(),
@@ -49,9 +49,9 @@ describe("SkillsRankingService", () => {
         experiment_groups: {
           compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
           button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
-          delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+          delayed_results: false,
         },
-        current_state: SkillsRankingCurrentState.INITIAL,
+        phase: SkillsRankingPhase.INITIAL,
         ranking: "80%",
         self_ranking: null,
       };
@@ -66,7 +66,7 @@ describe("SkillsRankingService", () => {
       expect(result).toEqual(expectedResponse);
       // AND the fetch should be called with the correct parameters
       expect(fetchSpy).toHaveBeenCalledWith(
-        `${mockBackendUrl}/conversations/${sessionId}/skills-ranking`,
+        `${mockBackendUrl}/conversations/${sessionId}/skills-ranking/state`,
         expect.objectContaining({
           method: "GET",
           headers: expect.objectContaining({
@@ -83,6 +83,35 @@ describe("SkillsRankingService", () => {
       // AND no errors or warnings should be logged
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should return null when no state exists", async () => {
+      // GIVEN a session id
+      const sessionId = 123;
+
+      // AND the server responds with an empty object
+      const fetchSpy = setupAPIServiceSpy(200, null, "application/json;charset=UTF-8");
+
+      // WHEN getting the skills ranking state
+      const result = await service.getSkillsRankingState(sessionId);
+
+      // THEN it should return null
+      expect(result).toBeNull();
+      // AND the fetch should be called with the correct parameters
+      expect(fetchSpy).toHaveBeenCalledWith(
+        `${mockBackendUrl}/conversations/${sessionId}/skills-ranking/state`,
+        expect.objectContaining({
+          method: "GET",
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+          }),
+          expectedStatusCode: 200,
+          serviceName: "SkillsRankingService",
+          serviceFunction: "getSkillsRankingState",
+          failureMessage: `Failed to get skills ranking state for session ${sessionId}`,
+          expectedContentType: "application/json",
+        })
+      );
     });
 
     test("should handle fetch errors", async () => {
@@ -106,16 +135,16 @@ describe("SkillsRankingService", () => {
     test("should update and return the skills ranking state", async () => {
       // GIVEN a session id, new state and ranking
       const sessionId = 123;
-      const newState = SkillsRankingCurrentState.EVALUATED;
+      const newState = SkillsRankingPhase.EVALUATED;
       const selfRanking = "70%";
       const expectedResponse = {
         session_id: sessionId,
         experiment_groups: {
           compare_against: CompareAgainstGroup.AGAINST_OTHER_JOB_SEEKERS,
           button_order: ButtonOrderGroup.SKIP_BUTTON_FIRST,
-          delayed_results: DelayedResultsGroup.DELAYED_RESULTS,
+          delayed_results: false,
         },
-        current_state: newState,
+        phase: newState,
         ranking: "80%",
         self_ranking: selfRanking,
       };
@@ -128,15 +157,19 @@ describe("SkillsRankingService", () => {
       
       // AND the fetch should be called with the correct parameters
       expect(fetchSpy).toHaveBeenCalledWith(
-        `${mockBackendUrl}/conversations/${sessionId}/skills-ranking`,
+        `${mockBackendUrl}/conversations/${sessionId}/skills-ranking/state`,
         expect.objectContaining({
-          method: "PATCH",
+          method: "POST",
           headers: expect.objectContaining({
             "Content-Type": "application/json",
           }),
           expectedStatusCode: 202,
           serviceName: "SkillsRankingService",
           serviceFunction: "updateSkillsRankingState",
+          body: JSON.stringify({
+            phase: newState,
+            self_ranking: selfRanking
+          }),
         })
       );
 
@@ -151,7 +184,7 @@ describe("SkillsRankingService", () => {
     test("should handle fetch errors", async () => {
       // GIVEN a session id, new state and ranking
       const sessionId = 123;
-      const newState = SkillsRankingCurrentState.EVALUATED;
+      const newState = SkillsRankingPhase.EVALUATED;
       const selfRanking = "70%";
 
       // AND fetch rejects with an error

@@ -3,7 +3,9 @@ from unittest.mock import AsyncMock
 import pytest
 
 from app.app_config import ApplicationConfig
-from modules.skills_ranking.errors import InvalidNewPhaseError, SkillsRankingStateNotFound
+from app.users.repositories import IUserPreferenceRepository
+from app.users.types import UserPreferences, PossibleExperimentValues
+from modules.skills_ranking.errors import InvalidNewPhaseError
 from modules.skills_ranking.repository.repository import ISkillsRankingRepository
 from modules.skills_ranking.service.service import SkillsRankingService
 from modules.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhase, SkillRankingExperimentGroups
@@ -18,11 +20,40 @@ def _mock_skills_ranking_repository() -> ISkillsRankingRepository:
         async def create(self, state: SkillsRankingState) -> SkillsRankingState:
             raise NotImplementedError()
 
-        async def update(self, *, session_id: int, experiment_groups: SkillRankingExperimentGroups | None = None, phase: SkillsRankingPhase | None = None, ranking: str | None = None,
-                     self_ranking: str | None = None) -> SkillsRankingState:
+        async def update(self, *, session_id: int, experiment_groups: SkillRankingExperimentGroups | None = None, phase: SkillsRankingPhase | None = None,
+                         ranking: str | None = None,
+                         self_ranking: str | None = None) -> SkillsRankingState:
             raise NotImplementedError()
 
     return MockSkillsRankingRepository()
+
+
+@pytest.fixture(scope="function")
+def _mock_user_preference_repository() -> IUserPreferenceRepository:
+    class MockUserPreferenceRepository(IUserPreferenceRepository):
+        async def get_by_session_id(self, session_id: int) -> UserPreferences | None:
+            raise NotImplementedError()
+
+        async def update_user_preference(self, *, session_id: int, user_id: str | None = None,
+                                         experiment_groups: SkillRankingExperimentGroups | None = None) -> UserPreferences:
+            raise NotImplementedError()
+
+        async def get_user_preference_by_user_id(self, user_id: str) -> UserPreferences | None:
+            raise NotImplementedError()
+
+        async def get_experiments_by_user_ids(self, user_ids: list[str]) -> list[UserPreferences]:
+            raise NotImplementedError()
+
+        async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: dict[str, PossibleExperimentValues]) -> None:
+            raise NotImplementedError()
+
+        async def get_experiments_by_user_id(self, user_id: str) -> SkillRankingExperimentGroups | None:
+            raise NotImplementedError()
+
+        async def insert_user_preference(self, user_id: str, user_preference: UserPreferences) -> UserPreferences:
+            raise NotImplementedError()
+
+    return MockUserPreferenceRepository()
 
 
 def get_skills_ranking_state(
@@ -50,6 +81,7 @@ class TestSkillsRankingService:
     async def test_upsert_state_create(
             self,
             _mock_skills_ranking_repository: ISkillsRankingRepository,
+            _mock_user_preference_repository: IUserPreferenceRepository,
             setup_application_config: ApplicationConfig
     ):
         # GIVEN a state to create
@@ -60,15 +92,21 @@ class TestSkillsRankingService:
         _mock_skills_ranking_repository.create = AsyncMock(return_value=given_state)
         _mock_skills_ranking_repository.update = AsyncMock()
 
+        # AND the set_experiment_by_user_id method will successfully set the experiment groups
+        _mock_user_preference_repository.set_experiment_by_user_id = AsyncMock()
+
         # WHEN upserting the state
-        service = SkillsRankingService(_mock_skills_ranking_repository)
-        result = await service.upsert_state(given_state)
+        service = SkillsRankingService(_mock_skills_ranking_repository, _mock_user_preference_repository)
+        result = await service.upsert_state(
+            session_id=given_state.session_id,
+            phase=given_state.phase,
+        )
 
         # THEN the repository get_by_session_id method is called with the state
         _mock_skills_ranking_repository.get_by_session_id.assert_called_once_with(given_state.session_id)
 
         # AND then the repository create method is called with the state
-        _mock_skills_ranking_repository.create.assert_called_once_with(given_state)
+        _mock_skills_ranking_repository.create.assert_called_once()
 
         # AND the repository update method is not called
         _mock_skills_ranking_repository.update.assert_not_called()
@@ -80,6 +118,7 @@ class TestSkillsRankingService:
     async def test_upsert_state_update_valid_transition(
             self,
             _mock_skills_ranking_repository: ISkillsRankingRepository,
+            _mock_user_preference_repository: IUserPreferenceRepository,
             setup_application_config: ApplicationConfig
     ):
         # GIVEN an existing state
@@ -96,18 +135,27 @@ class TestSkillsRankingService:
         _mock_skills_ranking_repository.create = AsyncMock()
         _mock_skills_ranking_repository.update = AsyncMock(return_value=new_state)
 
+        # AND the set_experiment_by_user_id method will successfully set the experiment groups
+        _mock_user_preference_repository.set_experiment_by_user_id = AsyncMock()
+
         # WHEN upserting the state
-        service = SkillsRankingService(_mock_skills_ranking_repository)
-        result = await service.upsert_state(new_state)
+        service = SkillsRankingService(_mock_skills_ranking_repository, _mock_user_preference_repository)
+        result = await service.upsert_state(
+            session_id=new_state.session_id,
+            phase=new_state.phase,
+            experiment_groups=new_state.experiment_groups,
+            ranking=new_state.ranking,
+            self_ranking=new_state.self_ranking
+        )
 
         # THEN the repository get_by_session_id method is called with the state
         _mock_skills_ranking_repository.get_by_session_id.assert_called_once_with(new_state.session_id)
 
         # AND then the repository update method is called with only the changed fields
         _mock_skills_ranking_repository.update.assert_called_once_with(
-            experiment_groups=existing_state.experiment_groups,
             session_id=new_state.session_id,
             phase=new_state.phase,
+            experiment_groups=new_state.experiment_groups,
             ranking=new_state.ranking,
             self_ranking=new_state.self_ranking
         )
@@ -122,6 +170,7 @@ class TestSkillsRankingService:
     async def test_upsert_state_update_invalid_transition(
             self,
             _mock_skills_ranking_repository: ISkillsRankingRepository,
+            _mock_user_preference_repository: IUserPreferenceRepository,
             setup_application_config: ApplicationConfig
     ):
         # GIVEN an existing state
@@ -138,12 +187,21 @@ class TestSkillsRankingService:
         _mock_skills_ranking_repository.create = AsyncMock()
         _mock_skills_ranking_repository.update = AsyncMock()
 
+        # AND the set_experiment_by_user_id method will successfully set the experiment groups
+        _mock_user_preference_repository.set_experiment_by_user_id = AsyncMock()
+
         # WHEN upserting the state
-        service = SkillsRankingService(_mock_skills_ranking_repository)
+        service = SkillsRankingService(_mock_skills_ranking_repository, _mock_user_preference_repository)
 
         # THEN an InvalidNewPhaseError is raised
         with pytest.raises(InvalidNewPhaseError):
-            await service.upsert_state(new_state)
+            await service.upsert_state(
+                session_id=new_state.session_id,
+                phase=new_state.phase,
+                experiment_groups=new_state.experiment_groups,
+                ranking=new_state.ranking,
+                self_ranking=new_state.self_ranking
+            )
 
         # AND the repository is not called to update
         _mock_skills_ranking_repository.update.assert_not_called()

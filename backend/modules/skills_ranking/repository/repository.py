@@ -64,11 +64,6 @@ class SkillsRankingRepository(ISkillsRankingRepository):
     # partial of skills ranking state
     async def update(self, *, session_id: int, experiment_groups: SkillRankingExperimentGroups | None = None, phase: SkillsRankingPhase | None = None, ranking: str | None = None,
                      self_ranking: str | None = None) -> SkillsRankingState:
-        # some business logic
-        if phase is SkillsRankingPhase.INITIAL and experiment_groups is None:
-            raise ValueError("Experiment groups are required for the initial phase")
-        if phase is not SkillsRankingPhase.INITIAL and experiment_groups is not None:
-            raise ValueError("Experiment groups are not allowed for non-initial phases")
 
         update_fields = {}
         if experiment_groups is not None:

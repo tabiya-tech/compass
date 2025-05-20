@@ -2,7 +2,7 @@ import { getBackendUrl } from "src/envService";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
 import {
-  SkillsRankingCurrentState,
+  SkillsRankingPhase,
   SkillsRankingState,
   SkillRankingExperimentGroups,
   SkillsRankingResult,
@@ -64,7 +64,7 @@ export class SkillsRankingService {
       throw new Error("Experiment groups must have a valid button_order value");
     }
 
-    if (!experimentGroups.delayed_results || (experimentGroups.delayed_results !== "delayed_results" && experimentGroups.delayed_results !== "immediate_results")) {
+    if (typeof experimentGroups.delayed_results !== "boolean") {
       throw new Error("Experiment groups must have a valid delayed_results value");
     }
   }
@@ -73,10 +73,10 @@ export class SkillsRankingService {
    * Get the ranking state for a given session.
    *
    * @param sessionId - The ID of the session to get the ranking state for.
-   * @returns {Promise<SkillsRankingState>} The ranking state for the session.
+   * @returns {Promise<SkillsRankingState | null>} The ranking state for the session, or null if none exists.
    */
-  async getSkillsRankingState(sessionId: number): Promise<SkillsRankingState> {
-    const url = `${this.skillsRankingEndpointUrl}/${sessionId}/skills-ranking`;
+  async getSkillsRankingState(sessionId: number): Promise<SkillsRankingState | null> {
+    const url = `${this.skillsRankingEndpointUrl}/${sessionId}/skills-ranking/state`;
     
     const response = await customFetch(url, {
       method: "GET",
@@ -91,9 +91,10 @@ export class SkillsRankingService {
     });
 
     const data = await response.json();
-
+    if (data === null) {
+      return null;
+    }
     this._validateExperimentGroups(data.experiment_groups);
-
     return {
       session_id: data.session_id,
       experiment_groups: {
@@ -101,7 +102,7 @@ export class SkillsRankingService {
         button_order: data.experiment_groups.button_order,
         delayed_results: data.experiment_groups.delayed_results,
       },
-      current_state: data.current_state,
+      phase: data.phase,
       ranking: data.ranking,
       self_ranking: data.self_ranking,
     };
@@ -111,19 +112,19 @@ export class SkillsRankingService {
    * Update the ranking state for a given session.
    *
    * @param sessionId - The ID of the session to update the ranking state for.
-   * @param currentState - The new current state.
+   * @param phase - The new current phase.
    * @param self_ranking - The new ranking.
    * @returns {Promise<SkillsRankingState>} The updated ranking state for the session.
    */
   async updateSkillsRankingState(
     sessionId: number,
-    currentState: SkillsRankingCurrentState,
-    self_ranking?: string // TODO: test optional
+    phase: SkillsRankingPhase,
+    self_ranking?: string
   ): Promise<SkillsRankingState> {
-    const url = `${this.skillsRankingEndpointUrl}/${sessionId}/skills-ranking`;
+    const url = `${this.skillsRankingEndpointUrl}/${sessionId}/skills-ranking/state`;
     
     const response = await customFetch(url, {
-      method: "PATCH",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
@@ -132,7 +133,7 @@ export class SkillsRankingService {
       serviceFunction: "updateSkillsRankingState",
       failureMessage: `Failed to update skills ranking state for session ${sessionId}`,
       body: JSON.stringify({
-        current_state: currentState,
+        phase: phase,
         self_ranking: self_ranking
       }),
       expectedContentType: "application/json",
@@ -149,7 +150,7 @@ export class SkillsRankingService {
         button_order: data.experiment_groups.button_order,
         delayed_results: data.experiment_groups.delayed_results,
       },
-      current_state: data.current_state,
+      phase: data.phase,
       ranking: data.ranking,
       self_ranking: data.self_ranking,
     };
@@ -159,9 +160,10 @@ export class SkillsRankingService {
    * Get the ranking for a given session.
    *
    * @param sessionId - The ID of the session to get the ranking for.
+   * @param signal - Optional AbortSignal to cancel the request.
    * @returns {Promise<string>} The ranking class for the session.
    */
-  async getRanking(sessionId: number): Promise<SkillsRankingResult> {
+  async getRanking(sessionId: number, signal?: AbortSignal): Promise<SkillsRankingResult> {
     const url = `${this.skillsRankingEndpointUrl}/${sessionId}/skills-ranking/ranking`;
     
     const response = await customFetch(url, {
@@ -174,6 +176,7 @@ export class SkillsRankingService {
       serviceFunction: "getRanking",
       failureMessage: `Failed to get ranking for session ${sessionId}`,
       expectedContentType: "application/json",
+      signal,
     });
 
     const data = await response.json();

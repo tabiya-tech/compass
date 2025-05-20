@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import {
-  SkillsRankingCurrentState,
+  SkillsRankingPhase,
   SkillsRankingState,
   CompareAgainstGroup,
   ButtonOrderGroup,
@@ -24,8 +24,8 @@ export const SKILLS_RANKING_PROMPT_MESSAGE_TYPE = `skills-ranking-prompt-message
 
 export interface SkillsRankingPromptProps {
   message: string,
-  onView: () => void;
-  onSkip: () => void;
+  onView: () => Promise<void>;
+  onSkip: () => Promise<void>;
   disabled?: boolean;
   skillsRankingState: SkillsRankingState;
 }
@@ -57,17 +57,17 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({
   useEffect(() => {
       setPromptText(PROMPT_TEXTS[skillsRankingState.experiment_groups.compare_against as keyof typeof PROMPT_TEXTS]);
       setButtonPosition(skillsRankingState.experiment_groups.button_order);
-      if (skillsRankingState.current_state === SkillsRankingCurrentState.INITIAL) {
+      if (skillsRankingState.phase === SkillsRankingPhase.INITIAL) {
         setSelectionMade(undefined);
-      } else if (skillsRankingState.current_state === SkillsRankingCurrentState.SKIPPED) {
+      } else if (skillsRankingState.phase === SkillsRankingPhase.SKIPPED) {
         setSelectionMade(SkillsRankingPromptAction.SKIP);
       } else {
         setSelectionMade(SkillsRankingPromptAction.VIEW);
       }
-  }, [skillsRankingState.current_state, skillsRankingState.experiment_groups]);
+  }, [skillsRankingState.phase, skillsRankingState.experiment_groups]);
 
 
-  const isDisabled = disabled || skillsRankingState.current_state !== SkillsRankingCurrentState.INITIAL || selectionMade !== undefined;
+  const isDisabled = disabled || skillsRankingState.phase !== SkillsRankingPhase.INITIAL || selectionMade !== undefined;
 
   const handleButtonClick = (action: SkillsRankingPromptAction) => {
     if (isDisabled) return;

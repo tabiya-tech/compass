@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
+from urllib import request
 
-from modules.skills_ranking.errors import InvalidNewPhaseError, SkillsRankingStateNotFound
+from app.users.repositories import IUserPreferenceRepository
+from modules.skills_ranking.constants import FEATURE_ID
+from modules.skills_ranking.errors import InvalidNewPhaseError, SkillsRankingStateNotFound, InvalidSkillsRankingInitializationRequest
 from modules.skills_ranking.repository.repository import ISkillsRankingRepository
 from modules.skills_ranking.service.types import SkillsRankingState, SkillRankingExperimentGroups, SkillsRankingPhase
 from modules.skills_ranking.utils import get_possible_next_states
@@ -12,12 +15,21 @@ class ISkillsRankingService(ABC):
     """
 
     @abstractmethod
-    async def upsert_state(self, state: SkillsRankingState) -> SkillsRankingState:
+    async def upsert_state(self, session_id: int,
+                           user_id: str | None = None,
+                           phase: SkillsRankingPhase | None = None,
+                           experiment_groups: SkillRankingExperimentGroups | None = None,
+                           ranking: str | None = None,
+                           self_ranking: str | None = None) -> SkillsRankingState:
         """
         Upsert the skills ranking state.
 
-        :param new_state: The new skills ranking state to upsert.
-        :type new_state: SkillsRankingState
+        :param session_id:
+        :param user_id:
+        :param self_ranking:
+        :param ranking:
+        :param experiment_groups:
+        :param phase:
         :return: The upserted SkillsRankingState.
         :raises InvalidNewPhaseError: If the new phase is not a valid transition from the current phase.
         """
@@ -43,31 +55,62 @@ class SkillsRankingService(ISkillsRankingService):
     SkillsRankingService implementation.
     """
 
-    def __init__(self, repository: ISkillsRankingRepository):
+    def __init__(self, repository: ISkillsRankingRepository, user_preferences_repository: IUserPreferenceRepository):
         self._repository = repository
+        self._user_preferences_repository = user_preferences_repository
 
-    async def upsert_state(self, new_state: SkillsRankingState) -> SkillsRankingState:
-        existing_state = await self._repository.get_by_session_id(new_state.session_id)
+    async def upsert_state(
+        self,
+        session_id: int,
+        user_id: str | None = None,
+        phase: SkillsRankingPhase | None = None,
+        experiment_groups: SkillRankingExperimentGroups | None = None,
+        ranking: str | None = None,
+        self_ranking: str | None = None
+    ) -> SkillsRankingState:
+        existing_state = await self._repository.get_by_session_id(session_id)
 
         # see if the state already exists, if not create it
         if existing_state is None:
+            if phase != SkillsRankingPhase.INITIAL:
+                raise SkillsRankingStateNotFound(session_id=session_id)
+            if experiment_groups is not None:
+                raise InvalidSkillsRankingInitializationRequest(session_id=session_id)
+
+            new_experiment_groups = SkillRankingExperimentGroups()
+
+            await self._user_preferences_repository.set_experiment_by_user_id(
+                user_id=user_id,
+                experiment_id=FEATURE_ID,
+                experiment_config=new_experiment_groups.model_dump()
+            )
+
+            new_state = SkillsRankingState(
+                session_id=session_id,
+                phase=phase,
+                experiment_groups=new_experiment_groups,
+                ranking=ranking,
+                self_ranking=self_ranking
+            )
             saved_state = await self._repository.create(new_state)
             return saved_state
 
-        # validate the new state against the existing state
-        possible_next_states = get_possible_next_states(existing_state.phase)
-        if new_state.phase not in possible_next_states:
-            raise InvalidNewPhaseError(
-                current_phase=existing_state.phase,
-                expected_phases=possible_next_states)
+        # For updates, validate the new phase if provided
+        if phase is not None:
+            possible_next_states = get_possible_next_states(existing_state.phase)
+            if phase not in possible_next_states:
+                raise InvalidNewPhaseError(
+                    current_phase=existing_state.phase,
+                    expected_phases=possible_next_states
+                )
 
         # update the existing state using named arguments
         saved_state = await self._repository.update(
-            session_id=new_state.session_id,
-            experiment_groups=new_state.experiment_groups,
-            phase=new_state.phase,
-            ranking=new_state.ranking,
-            self_ranking=new_state.self_ranking
+            session_id=session_id,
+            phase=phase,
+            experiment_groups=experiment_groups,
+            ranking=ranking,
+            self_ranking=self_ranking
         )
         return saved_state
 

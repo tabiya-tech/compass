@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  SkillsRankingCurrentState,
-  SkillsRankingState,
-  skillsRankingStateDefault,
-} from "src/features/skillsRanking/types";
+import { SkillsRankingPhase, SkillsRankingState, skillsRankingStateDefault } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { IChatMessage } from "src/chat/Chat.types";
@@ -21,7 +17,10 @@ import SkillsRankingResult, {
 } from "src/features/skillsRanking/components/skillsRankingResult/SkillsRankingResult";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { SkillsRankingError } from "./errors";
-import CancellableTypingChatMessage, { CANCELABLE_TYPING_CHAT_MESSAGE_TYPE, CancellableTypingChatMessageProps } from "./components/cancellableTypingChatMessage/CancellableTypingChatMessage";
+import CancellableTypingChatMessage, {
+  CANCELABLE_TYPING_CHAT_MESSAGE_TYPE,
+  CancellableTypingChatMessageProps,
+} from "./components/cancellableTypingChatMessage/CancellableTypingChatMessage";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { generateTypingMessage } from "src/chat/util";
 import { TypingChatMessageProps } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
@@ -42,9 +41,11 @@ const SkillsRankingMessageIds = {
 export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => void, removeMessage: (messageId: string) => void) => {
   const pendingTimeouts = useRef<{ [key: string]: NodeJS.Timeout }>({});
   const [currentSkillsRankingState, setCurrentSkillsRankingState] = useState<SkillsRankingState>(skillsRankingStateDefault);
+  const [ranking, setRanking] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const onFinishRef = useRef<(() => void) | null>(null);
-  const lastHandledState = useRef<SkillsRankingCurrentState | null>(null);
-  // we could use the original messages array from the chat context, but this didnt seem like a good enough reason to expose that to all the children
+  const lastHandledState = useRef<SkillsRankingPhase | null>(null);
   const shownMessages = useRef<Set<string>>(new Set());
   const { enqueueSnackbar } = useSnackbar();
 
@@ -68,7 +69,31 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
     component: (props: T) => <Component {...props} />,
   }), []);
 
-  const handleStateTransition = useCallback(async (newState: SkillsRankingCurrentState, rank?: string) => {
+  const fetchRanking = useCallback(async (signal: AbortSignal) => {
+    setIsLoading(true);
+    try {
+      const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
+      if (sessionId === null) {
+        throw new Error("No active session found");
+      }
+      const skillsRankingService = SkillsRankingService.getInstance();
+      const result = await skillsRankingService.getRanking(sessionId, signal);
+      setRanking(result.ranking);
+      return result.ranking;
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Ranking fetch was aborted');
+        return null;
+      }
+      const errorMessage = error instanceof Error ? error.message : "Failed to fetch ranking";
+      handleError(error instanceof Error ? error : new Error(errorMessage));
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [handleError]);
+
+  const handleStateTransition = useCallback(async (newState: SkillsRankingPhase, rank?: string) => {
     const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
     if (!sessionId) return;
     
@@ -87,45 +112,38 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
   }, [handleError]);
 
   const handleStateMessages = useCallback((state: SkillsRankingState, onFinish: () => void) => {
-    if (lastHandledState.current === state.current_state) return;
-    lastHandledState.current = state.current_state;
+    if (lastHandledState.current === state.phase) return;
+    lastHandledState.current = state.phase;
 
     const showTypingAndThen = (callback: () => void) => {
       let typingMsg: IChatMessage<TypingChatMessageProps> | null = null;
 
-      // for skipped or cancelled states, we don't want to show the typing message since we're going to call onFinish
-      // and it will handle showing the appropriate typing message
-      // and for evaluated state, the cancelable typing message will be shown before we even transition state so we dont need to show a typing message here
-      if (state.current_state !== SkillsRankingCurrentState.SKIPPED && state.current_state !== SkillsRankingCurrentState.CANCELLED && state.current_state !== SkillsRankingCurrentState.EVALUATED) {
+      if (state.phase !== SkillsRankingPhase.SKIPPED && state.phase !== SkillsRankingPhase.CANCELLED && state.phase !== SkillsRankingPhase.EVALUATED) {
         typingMsg = generateTypingMessage();
         addMessage(typingMsg);
       }
 
-      // if there is a typing message, we want to wait for the timeout to show the components
-      // otherwise, we want to call the callback immediately
-      const timeoutId = setTimeout(() => {
+      pendingTimeouts.current['showMessage'] = setTimeout(() => {
         if (typingMsg) {
           removeMessage(typingMsg.message_id);
         }
         callback();
       }, typingMsg ? TYPING_TIMEOUT : 0);
-      
-      pendingTimeouts.current['showMessage'] = timeoutId;
     };
 
     const handleState = () => {
-      switch (state.current_state) {
-        case SkillsRankingCurrentState.INITIAL:
+      switch (state.phase) {
+        case SkillsRankingPhase.INITIAL:
           if (!shownMessages.current.has(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE])) {
             addMessage(createMessage(SKILLS_RANKING_PROMPT_MESSAGE_TYPE, {
               message: "Please rate your skills",
               onView: async () => {
-                const newState = await handleStateTransition(SkillsRankingCurrentState.SELF_EVALUATING);
+                const newState = await handleStateTransition(SkillsRankingPhase.SELF_EVALUATING);
                 if (newState) handleStateMessages(newState, onFinish);
               },
               onSkip: async () => {
                 removeMessage(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE]);
-                const newState = await handleStateTransition(SkillsRankingCurrentState.SKIPPED);
+                const newState = await handleStateTransition(SkillsRankingPhase.SKIPPED);
                 if (newState) handleStateMessages(newState, onFinish);
               },
               disabled: false,
@@ -135,17 +153,17 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
           }
           break;
 
-        case SkillsRankingCurrentState.SELF_EVALUATING:
+        case SkillsRankingPhase.SELF_EVALUATING:
           if (!shownMessages.current.has(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE])) {
             addMessage(createMessage(SKILLS_RANKING_PROMPT_MESSAGE_TYPE, {
               message: "Please rate your skills",
               onView: async () => {
-                const newState = await handleStateTransition(SkillsRankingCurrentState.SELF_EVALUATING);
+                const newState = await handleStateTransition(SkillsRankingPhase.SELF_EVALUATING);
                 if (newState) handleStateMessages(newState, onFinish);
               },
               onSkip: async () => {
                 removeMessage(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE]);
-                const newState = await handleStateTransition(SkillsRankingCurrentState.SKIPPED);
+                const newState = await handleStateTransition(SkillsRankingPhase.SKIPPED);
                 if (newState) handleStateMessages(newState, onFinish);
               },
               disabled: true,
@@ -163,21 +181,27 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
                   message: "Calculating your skills ranking",
                   onCancel: async () => {
                     clearAllPendingTimeouts();
+                    if (abortControllerRef.current) {
+                      abortControllerRef.current.abort();
+                      abortControllerRef.current = null;
+                    }
                     removeMessage(SkillsRankingMessageIds[CANCELABLE_TYPING_CHAT_MESSAGE_TYPE]);
-                    const newState = await handleStateTransition(SkillsRankingCurrentState.CANCELLED);
+                    const newState = await handleStateTransition(SkillsRankingPhase.CANCELLED);
                     if (newState) handleStateMessages(newState, onFinish);
                   },
                 }, CancellableTypingChatMessage);
                 addMessage(cancelableTypingMsg);
 
+                // Start fetching ranking
+                abortControllerRef.current = new AbortController();
+                const fetchedRank = await fetchRanking(abortControllerRef.current.signal);
+
                 // Wait for typing timeout before transitioning state
-                const timeoutId = setTimeout(async () => {
+                pendingTimeouts.current['rankSelect'] = setTimeout(async () => {
                   removeMessage(cancelableTypingMsg.message_id);
-                  const newState = await handleStateTransition(SkillsRankingCurrentState.EVALUATED, rank);
+                  const newState = await handleStateTransition(SkillsRankingPhase.EVALUATED, fetchedRank ?? rank);
                   if (newState) handleStateMessages(newState, onFinish);
                 }, CANCELABLE_TYPING_TIMEOUT);
-                
-                pendingTimeouts.current['rankSelect'] = timeoutId;
               },
               skillsRankingState: state,
             }, SkillsRankingVote));
@@ -185,17 +209,17 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
           }
           break;
 
-        case SkillsRankingCurrentState.EVALUATED:
+        case SkillsRankingPhase.EVALUATED:
           if (!shownMessages.current.has(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE])) {
             addMessage(createMessage(SKILLS_RANKING_PROMPT_MESSAGE_TYPE, {
               message: "Please rate your skills",
               onView: async () => {
-                const newState = await handleStateTransition(SkillsRankingCurrentState.SELF_EVALUATING);
+                const newState = await handleStateTransition(SkillsRankingPhase.SELF_EVALUATING);
                 if (newState) handleStateMessages(newState, onFinish);
               },
               onSkip: async () => {
                 removeMessage(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE]);
-                const newState = await handleStateTransition(SkillsRankingCurrentState.SKIPPED);
+                const newState = await handleStateTransition(SkillsRankingPhase.SKIPPED);
                 if (newState) handleStateMessages(newState, onFinish);
               },
               disabled: true,
@@ -208,19 +232,20 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
             addMessage(createMessage(SKILLS_RANKING_VOTE_MESSAGE_TYPE, {
               message: "Please rate your skills",
               onRankSelect: async (rank: string) => {
-                const newState = await handleStateTransition(SkillsRankingCurrentState.EVALUATED, rank);
+                const newState = await handleStateTransition(SkillsRankingPhase.EVALUATED, rank);
                 if (newState) handleStateMessages(newState, onFinish);
               },
               skillsRankingState: state,
             }, SkillsRankingVote));
             shownMessages.current.add(SkillsRankingMessageIds[SKILLS_RANKING_VOTE_MESSAGE_TYPE]);
           }
+          console.log('state:', state);
           
           if (!shownMessages.current.has(SkillsRankingMessageIds[SKILLS_RANKING_RESULT_MESSAGE_TYPE])) {
             addMessage(createMessage(SKILLS_RANKING_RESULT_MESSAGE_TYPE, {
               message: "Here's what we found",
-              onError: handleError,
               skillsRankingState: state,
+              isLoading,
             }, SkillsRankingResult));
             shownMessages.current.add(SkillsRankingMessageIds[SKILLS_RANKING_RESULT_MESSAGE_TYPE]);
           }
@@ -232,11 +257,8 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
           pendingTimeouts.current['finish'] = finishTimeoutId;
           break;
 
-        case SkillsRankingCurrentState.SKIPPED:
-        case SkillsRankingCurrentState.CANCELLED:
-          // removeMessage(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE]);
-          // removeMessage(SkillsRankingMessageIds[SKILLS_RANKING_VOTE_MESSAGE_TYPE]);
-          // removeMessage(SkillsRankingMessageIds[SKILLS_RANKING_RESULT_MESSAGE_TYPE]);
+        case SkillsRankingPhase.SKIPPED:
+        case SkillsRankingPhase.CANCELLED:
           console.debug("SKIPPED or CANCELLED, calling onFinish");
           onFinish();
           break;
@@ -244,7 +266,7 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
     };
 
     showTypingAndThen(handleState);
-  }, [addMessage, removeMessage, createMessage, handleStateTransition, handleError, clearAllPendingTimeouts]);
+  }, [addMessage, removeMessage, createMessage, handleStateTransition, clearAllPendingTimeouts, fetchRanking, isLoading]);
 
   const showSkillsRanking = useCallback(async (onFinish: () => void) => {
     clearAllPendingTimeouts();
@@ -253,7 +275,12 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
       const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
       if (!sessionId) throw new Error("No active session found");
       
-      const state = await SkillsRankingService.getInstance().getSkillsRankingState(sessionId);
+      let state = await SkillsRankingService.getInstance().getSkillsRankingState(sessionId);
+      // If no state exists, create one with INITIAL phase
+      state ??= await SkillsRankingService.getInstance().updateSkillsRankingState(
+        sessionId,
+        SkillsRankingPhase.INITIAL,
+      );
       setCurrentSkillsRankingState(state);
       onFinishRef.current = onFinish;
       handleStateMessages(state, onFinish);
@@ -268,7 +295,7 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
       handleStateMessages(currentSkillsRankingState, onFinishRef.current);
       onFinishRef.current = null;
     }
-  }, [currentSkillsRankingState.current_state, handleStateMessages, currentSkillsRankingState]);
+  }, [ranking, isLoading, currentSkillsRankingState.phase, handleStateMessages, currentSkillsRankingState]);
 
   return { showSkillsRanking };
 }; 
