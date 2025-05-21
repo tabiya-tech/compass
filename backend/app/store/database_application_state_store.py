@@ -44,28 +44,40 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
                 self._collect_experience_state_collection.find_one({"session_id": {"$eq": session_id}}, {'_id': False}),
                 self._skills_explorer_agent_state_collection.find_one({"session_id": {"$eq": session_id}}, {'_id': False})
             )
-
-            if not all(results):
-                # If any of the states are None, return None
-                # but log which ones are None
-                collection_names = [
-                    Collections.AGENT_DIRECTOR_STATE,
-                    Collections.WELCOME_AGENT_STATE,
-                    Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE,
-                    Collections.CONVERSATION_MEMORY_MANAGER_STATE,
-                    Collections.COLLECT_EXPERIENCE_STATE,
-                    Collections.SKILLS_EXPLORER_AGENT_STATE
-                ]
-                # log the ones that are none
-                _log_missing = []
-                for i, result in enumerate(results):
-                    if result is None:
-                        _log_missing.append(collection_names[i])
-
-                self._logger.error("Missing application state for session ID %s: %s. A new session will be created.", session_id, _log_missing)
-
+            if all(_state_part is None for _state_part in results):
+                # If all the states are None, return None
+                self._logger.info("No application state found for session ID %s", session_id)
                 return None
 
+            collection_names = [
+                Collections.AGENT_DIRECTOR_STATE,
+                Collections.WELCOME_AGENT_STATE,
+                Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE,
+                Collections.CONVERSATION_MEMORY_MANAGER_STATE,
+                Collections.COLLECT_EXPERIENCE_STATE,
+                Collections.SKILLS_EXPLORER_AGENT_STATE
+            ]
+
+            if len(collection_names) != len(results):
+                self._logger.error(
+                    "Mismatch between collection names and results for session ID %s. "
+                    "Expected %d results, got %d.",
+                    session_id,
+                    len(collection_names),
+                    len(results)
+                )
+                return None
+
+            missing_parts = [name for name, result in zip(collection_names, results) if result is None]
+            if missing_parts:
+                self._logger.error(
+                    "Missing application state part(s) for session ID %s. Missing part(s): %s",
+                    session_id,
+                    missing_parts
+                )
+                return None
+
+            # Successfully retrieved all states
             (agent_director_state,
              welcome_agent_state,
              explore_experiences_director_state,
@@ -115,7 +127,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             )
 
         except Exception as e:  # pylint: disable=broad-except
-            # Log the error and raise an exception, so that the caller can handle it
+            # Log the error and raise an exception so that the caller can handle it
             self._logger.error("Failed to save application state for session ID %s: %s", state.agent_director_state.session_id, e, exc_info=True)
             raise
 
@@ -136,7 +148,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             )
 
         except Exception as e:  # pylint: disable=broad-except
-            # Log the error and raise an exception, so that the caller can handle it
+            # Log the error and raise an exception so that the caller can handle it
             self._logger.error("Failed to delete application state for session ID %s: %s", session_id, e, exc_info=True)
             raise
 
@@ -146,7 +158,7 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
         Returns an async generator of ApplicationState objects.
         """
         try:
-            # Create cursor for streaming conversation memory manager documents
+            # Create a cursor for streaming conversation memory manager documents
             cursor = self._conversation_memory_manager_state_collection.find(
                 {}, {'_id': False, 'session_id': True}
             )
