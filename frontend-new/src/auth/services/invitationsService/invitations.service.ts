@@ -1,8 +1,7 @@
-import { getRestAPIErrorFactory, RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
-import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { getBackendUrl } from "src/envService";
 import { Invitation } from "./invitations.types";
+import { customFetch } from "src/utils/customFetch/customFetch";
 
 export default class InvitationsService {
   private static instance: InvitationsService;
@@ -37,39 +36,14 @@ export default class InvitationsService {
     const serviceFunction = "checkInvitationCodeStatus";
     const method = "GET";
     const endpointUrl = `${this.invitationStatusEndpointUrl}/check-status?invitation_code=${code}`;
-    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, endpointUrl);
-    try {
-      const response = await fetch(endpointUrl, {
+      const response = await customFetch(endpointUrl, {
         method: method,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: serviceName,
+        serviceFunction: serviceFunction,
+        failureMessage: `Failed to check status for invitation code ${code}`,
+        authRequired: false
       });
-
-      // check if the server responded with the expected status code
-      if (response.status !== StatusCodes.OK) {
-        // Server responded with a status code that indicates that the resource was not the expected one
-        // The responseBody should be an ErrorResponse but that is not guaranteed e.g. if a gateway in the middle returns a 502,
-        // or if the server is not conforming to the error response schema
-        const responseBody = await response.text();
-        throw errorFactory(
-          response.status,
-          ErrorConstants.ErrorCodes.API_ERROR,
-          "Failed to check status for invitation code",
-          responseBody
-        );
-      }
-
-      // check if the response is in the expected format
-      const responseContentType = response.headers.get("Content-Type");
-      if (!responseContentType?.includes("application/json")) {
-        throw errorFactory(
-          response.status,
-          ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER,
-          "Response Content-Type should be 'application/json'",
-          `Content-Type header was ${responseContentType}`
-        );
-      }
 
       const responseBody = await response.text();
       let data: Invitation;
@@ -77,19 +51,6 @@ export default class InvitationsService {
       data = JSON.parse(responseBody);
 
       return data;
-    } catch (e: unknown) {
-      if (e instanceof RestAPIError) {
-        // if we threw a service error above, we should simply rethrow that
-        throw e;
-      } else {
-        throw errorFactory(
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          ErrorConstants.ErrorCodes.FAILED_TO_FETCH,
-          "Failed to check status for invitation code",
-          (e as Error).message
-        );
-      }
-    }
   }
 }
 

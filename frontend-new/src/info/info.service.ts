@@ -1,6 +1,7 @@
 import infoURL from "./info.constants";
 
 import { VersionItem, Versions } from "./info.types";
+import { customFetch } from "src/utils/customFetch/customFetch";
 
 export default class InfoService {
   private static instance: InfoService;
@@ -16,8 +17,21 @@ export default class InfoService {
   }
 
   public async loadInfoFromUrl(url: string): Promise<VersionItem> {
+    const serviceName = "InfoService";
+    const serviceFunction = "loadInfoFromUrl";
+    const method = "GET";
+    const failureMessage = `Failed to load info from ${url}`;
     try {
-      return await fetch(url).then(async (response) => {
+      return await customFetch(url, {
+        method: method,
+        headers: { "content-type": "application/json" },
+        expectedStatusCode: 200,
+        serviceName: serviceName,
+        serviceFunction: serviceFunction,
+        failureMessage: failureMessage,
+        expectedContentType: "application/json",
+        authRequired: false,
+      }).then(async (response) => {
         const data: VersionItem = await response.json();
         if (data === null) {
           throw new Error("No data");

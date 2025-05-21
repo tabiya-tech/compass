@@ -1,7 +1,7 @@
 import "src/_test_utilities/consoleMock";
 import { renderHook } from "@testing-library/react-hooks";
 import { useFieldsConfig } from "./useFieldsConfig";
-import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
+import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import {
   EnumFieldDefinition,
   FieldDefinition,
@@ -9,6 +9,7 @@ import {
   MultipleSelectFieldDefinition,
   StringFieldDefinition,
 } from "./types";
+import * as CustomFetchModule from "src/utils/customFetch/customFetch";
 
 // Mock the utils functions
 jest.mock("./utils", () => ({
@@ -60,7 +61,7 @@ stringFieldName:
   required: true
   label: String Field
 `;
-      fetchSpy = setupFetchSpy(200, givenMultipleSelectFieldWithRequiredFields, "");
+      fetchSpy = setupAPIServiceSpy(200, givenMultipleSelectFieldWithRequiredFields, "");
 
       // WHEN the hook is mounted
       const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
@@ -97,7 +98,13 @@ stringFieldName:
           label: "String Field",
         }),
       ];
-      expect(fetchSpy).toHaveBeenCalledWith("/data/config/fields.yaml");
+      expect(fetchSpy).toHaveBeenCalledWith("/data/config/fields.yaml", {
+        authRequired: false,
+        expectedStatusCode: [200, 204],
+        failureMessage: "Failed to fetch fields configuration from /data/config/fields.yaml",
+        serviceFunction: "useFieldsConfig",
+        serviceName: "SensitiveDataService",
+      });
       expect(result.current.fields).toEqual(expect.arrayContaining(expectedFieldDefinitions));
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBe(null);
@@ -105,7 +112,8 @@ stringFieldName:
 
     test("should handle config loading errors", async () => {
       // GIVEN a failed fetch response
-      fetchSpy = setupFetchSpy(500, undefined, "");
+      const givenError = new Error("Failed to load fields configuration");
+      jest.spyOn(CustomFetchModule, "customFetch").mockRejectedValueOnce(givenError);
 
       // WHEN the hook is mounted
       const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
@@ -125,7 +133,8 @@ stringFieldName:
 
     test("should clean up on unmount", async () => {
       // GIVEN a pending fetch that never resolves
-      fetchSpy = setupFetchSpy(200, new Promise(() => {}), "");
+      fetchSpy = setupAPIServiceSpy(200, new Promise(() => {
+      }), "");
 
       // WHEN the hook is mounted and then unmounted
       const { unmount } = renderHook(() => useFieldsConfig());
@@ -147,7 +156,7 @@ stringFieldName:
         required: true
         label: Unknown Field
       `;
-      fetchSpy = setupFetchSpy(200, givenUnknownFieldType, "");
+      fetchSpy = setupAPIServiceSpy(200, givenUnknownFieldType, "");
 
       // WHEN the hook is mounted
       const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
@@ -179,7 +188,7 @@ stringFieldName:
         required: true
         label: String Field 2
       `;
-      fetchSpy = setupFetchSpy(200, givenDuplicateDataKey, "");
+      fetchSpy = setupAPIServiceSpy(200, givenDuplicateDataKey, "");
 
       // WHEN the hook is mounted
       const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
@@ -199,9 +208,8 @@ stringFieldName:
 
     test("should throw an error when an unexpected error occurs", async () => {
       // GIVEN a fetch that throws an unexpected non-Error object
-      fetchSpy = jest.spyOn(window, "fetch").mockImplementation(() => {
-        throw Object.create({ message: "Something went wrong" });
-      });
+      const givenError = new Error("Something went wrong");
+      jest.spyOn(CustomFetchModule, "customFetch").mockRejectedValueOnce(givenError);
 
       // WHEN the hook is mounted
       const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
@@ -216,7 +224,7 @@ stringFieldName:
       expect(result.current.fields).toEqual([]);
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toContain("Unknown error loading configuration");
+      expect(result.current.error?.message).toBe(givenError.message);
     });
   });
 });

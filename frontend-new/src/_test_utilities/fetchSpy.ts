@@ -18,7 +18,7 @@ export function setupFetchSpy(
 export function setupAPIServiceSpy(
   expectedStatus: number,
   expectedResponseBody: string | object | undefined,
-  contentType: "" | "application/json;charset=UTF-8"
+  contentType: string
 ): jest.SpyInstance {
   const responseBody =
     typeof expectedResponseBody === "string" ? expectedResponseBody : JSON.stringify(expectedResponseBody);
@@ -27,8 +27,11 @@ export function setupAPIServiceSpy(
     headers: { "Content-Type": contentType },
   });
 
-  jest.spyOn(window, "fetch").mockResolvedValue(expectedResponse);
-  return jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch");
+  // Mock the customFetch function to return the expected response
+  // Return a clone of the expected response to avoid issues with the original response being consumed
+  // Like multiple API calls in the same test.
+  return jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch")
+    .mockImplementation(async () => expectedResponse.clone())
 }
 
 export function expectCorrectFetchRequest(fetchSpy: jest.SpyInstance, expectedUrl: string, expectedConfig: ExtendedRequestInit) {

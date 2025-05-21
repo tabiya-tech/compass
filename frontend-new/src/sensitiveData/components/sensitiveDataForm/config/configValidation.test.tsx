@@ -2,7 +2,7 @@ import "src/_test_utilities/consoleMock";
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { useFieldsConfig } from './useFieldsConfig';
-import { setupFetchSpy } from 'src/_test_utilities/fetchSpy';
+import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { ConfigurationError } from "src/error/commonErrors";
 
 // Mock component to test the hook
@@ -35,7 +35,7 @@ stringFieldName:
 `;
     
     // WHEN the config is fetched
-    setupFetchSpy(200, validConfig, "");
+    setupAPIServiceSpy(200, validConfig, "");
 
     // THEN the component should render successfully
     render(<TestComponent />);
@@ -61,7 +61,7 @@ field2:
 `;
 
     // WHEN the config is fetched
-    setupFetchSpy(200, invalidConfig, "");
+    setupAPIServiceSpy(200, invalidConfig, "");
 
     // THEN the component should show an error about duplicate keys
     render(<TestComponent />);
@@ -88,7 +88,7 @@ enumField:
 `;
 
     // WHEN the config is fetched
-    setupFetchSpy(200, invalidConfig, "");
+    setupAPIServiceSpy(200, invalidConfig, "");
 
     // THEN the component should show an error about validation not being allowed for ENUM
     render(<TestComponent />);
@@ -110,7 +110,7 @@ stringField:
 `;
 
     // WHEN the config is fetched
-    setupFetchSpy(200, invalidConfig, "");
+    setupAPIServiceSpy(200, invalidConfig, "");
 
     // THEN the component should show an error about missing required fields
     render(<TestComponent />);
@@ -134,7 +134,7 @@ enumField:
 `;
 
     // WHEN the config is fetched
-    setupFetchSpy(200, invalidConfig, "");
+    setupAPIServiceSpy(200, invalidConfig, "");
 
     // THEN the component should show an error about missing values
     render(<TestComponent />);

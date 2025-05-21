@@ -1,4 +1,5 @@
 import { Experience, Skill, WorkType } from "src/experiences/experienceService/experiences.types";
+import { customFetch } from "src/utils/customFetch/customFetch";
 
 // Get a list of all unique skills in alphabetical order
 export const getUniqueSkills = (experiences: Experience[]): Skill[] => {
@@ -48,7 +49,14 @@ export const groupExperiencesByWorkType = (experiences: Experience[]) => {
 
 // Convert local image to base64
 export const getBase64Image = async (url: string) => {
-  const response = await fetch(url);
+  const response = await customFetch(url, {
+    expectedStatusCode: [200, 204],
+    serviceName: "SkillsReportService",
+    serviceFunction: "getBase64Image",
+    failureMessage: `Failed to fetch image: ${url}`,
+    authRequired: false,
+  });
+
   const blob = await response.blob();
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();

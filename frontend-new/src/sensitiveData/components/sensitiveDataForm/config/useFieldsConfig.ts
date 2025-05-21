@@ -8,6 +8,7 @@ import {
 } from "./types";
 import { parse } from "yaml";
 import { ConfigurationError } from "src/error/commonErrors";
+import { customFetch } from "src/utils/customFetch/customFetch";
 
 export const CONFIG_PATH = "/data/config/fields.yaml";
 
@@ -23,10 +24,13 @@ export const useFieldsConfig = () => {
   useEffect(() => {
     const fetchConfig = async () => {
       // Load from the public directory
-      const response = await fetch(CONFIG_PATH);
-      if (!response.ok) {
-        throw new Error(`Failed to load fields configuration: ${response.status} ${response.statusText}`);
-      }
+      const response = await customFetch(CONFIG_PATH, {
+        expectedStatusCode: [200, 204],
+        serviceName: "SensitiveDataService",
+        serviceFunction: "useFieldsConfig",
+        failureMessage: `Failed to fetch fields configuration from ${CONFIG_PATH}`,
+        authRequired: false,
+      });
 
       const yamlText = await response.text();
       const parsedDefinitions: FieldDefinition[] = parseYamlConfig(yamlText);
