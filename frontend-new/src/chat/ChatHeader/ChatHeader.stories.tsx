@@ -60,3 +60,23 @@ export const ShownWithFeedbackNotification: Story = {
     timeUntilNotification: 0,
   },
 };
+
+export const AnonymousUserLogoutConfirmation: Story = {
+  decorators: [
+    (Story) => {
+      authenticationStateService.getInstance().getUser = () => ({
+        id: "123",
+        name: "",
+        email: "",
+      });
+      return Story();
+    },
+  ],
+  args: {
+    exploredExperiencesNotification: false,
+    experiencesExplored: 0,
+    conversationCompleted: false,
+    progressPercentage: 0,
+    timeUntilNotification: null,
+  },
+};

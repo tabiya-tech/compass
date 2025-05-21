@@ -27,7 +27,7 @@ exports[`ConfirmModalDialog should render component correctly 1`] = `
       role="dialog"
     >
       <h2
-        class="MuiTypography-root MuiTypography-h2 MuiDialogTitle-root css-f196o7-MuiTypography-root-MuiDialogTitle-root"
+        class="MuiTypography-root MuiTypography-h2 MuiDialogTitle-root css-16mgy1n-MuiTypography-root-MuiDialogTitle-root"
         data-testid="confirm-modal-title-edc0ac15-67a7-4c1f-9934-94fa65757046"
         id="confirm-modal-title"
       >
@@ -36,6 +36,28 @@ exports[`ConfirmModalDialog should render component correctly 1`] = `
         >
           Sample Title?
         </span>
+        <button
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
+          data-testid="confirm-modal-close-edc0ac15-67a7-4c1f-9934-94fa65757046"
+          tabindex="0"
+          title="close confirm modal"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="CloseIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
       </h2>
       <div
         class="MuiDialogContent-root css-8jfn0p-MuiDialogContent-root"

@@ -4,6 +4,8 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTh
 import { Theme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
+import CloseIcon from "@mui/icons-material/Close";
+import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 
 export interface ConfirmModalDialogProps {
   title: string;
@@ -14,6 +16,7 @@ export interface ConfirmModalDialogProps {
   onDismiss: () => void;
   cancelButtonText: string;
   confirmButtonText: string;
+  showCloseIcon?: boolean;
 }
 
 const uniqueId = "edc0ac15-67a7-4c1f-9934-94fa65757046";
@@ -24,6 +27,7 @@ export const DATA_TEST_ID = {
   CONFIRM_MODAL_CONTENT: `confirm-modal-content-${uniqueId}`,
   CONFIRM_MODAL_CANCEL: `confirm-modal-cancel-${uniqueId}`,
   CONFIRM_MODAL_CONFIRM: `confirm-modal-confirm-${uniqueId}`,
+  CONFIRM_MODAL_CLOSE: `confirm-modal-close-${uniqueId}`,
 };
 
 const ConfirmModalDialog: React.FC<ConfirmModalDialogProps> = (props) => {
@@ -46,10 +50,29 @@ const ConfirmModalDialog: React.FC<ConfirmModalDialogProps> = (props) => {
         },
       }}
     >
-      <DialogTitle id="confirm-modal-title" data-testid={DATA_TEST_ID.CONFIRM_MODAL_TITLE} sx={{ padding: 0 }}>
+      <DialogTitle
+        id="confirm-modal-title"
+        data-testid={DATA_TEST_ID.CONFIRM_MODAL_TITLE}
+        sx={{
+          padding: 0,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Typography variant="h6" component="span">
           {props.title}
         </Typography>
+        {props.showCloseIcon && (
+          <PrimaryIconButton
+            title="close confirm modal"
+            onClick={props.onDismiss}
+            data-testid={DATA_TEST_ID.CONFIRM_MODAL_CLOSE}
+            sx={{ color: theme.palette.common.black }}
+          >
+            <CloseIcon />
+          </PrimaryIconButton>
+        )}
       </DialogTitle>
       <DialogContent data-testid={DATA_TEST_ID.CONFIRM_MODAL_CONTENT} sx={{ padding: 0 }}>
         {props.content}
