@@ -4,6 +4,7 @@ import "src/_test_utilities/consoleMock";
 import SkillReportPDF, { DATA_TEST_ID } from "src/experiences/report/reportPdf/SkillReportPDF";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
+import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 
 describe("Report", () => {
   test("should render Report correctly", () => {
@@ -19,6 +20,9 @@ describe("Report", () => {
         conversationConductedAt="2021-06-01T00:00:00Z"
       />
     );
+
+    // AND GET: Image will return a base64 image
+    const mockedCustomerFetch = setupAPIServiceSpy(200, new Blob(['mock file content']), "image/png")
 
     // WHEN the component is rendered
     render(givenReport);
@@ -42,5 +46,13 @@ describe("Report", () => {
     expect(experiencesContainer.children.length).toBe(experiences.length);
     // AND to match the snapshot
     expect(reportContainer).toMatchSnapshot();
+
+    // AND the fetch should be called with authRequired:false.
+    expect(mockedCustomerFetch).toHaveBeenCalledWith(
+      expect.any(String), // Image Path,
+      expect.objectContaining({
+        authRequired: false, // With no Authentication.
+      })
+    )
   });
 });
