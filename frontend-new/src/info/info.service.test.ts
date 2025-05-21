@@ -1,8 +1,10 @@
-import InfoService from "src/info/info.service";
+import InfoService from "./info.service";
 import infoURL from "./info.constants";
 
 import { VersionItem } from "./info.types";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
+import * as CustomFetchModule from "src/utils/customFetch/customFetch";
 
 describe("InfoService", () => {
   describe("Test the loadInfoFromUrl function", () => {
@@ -17,7 +19,7 @@ describe("InfoService", () => {
     function setupFetchMock(expectedBody: any): jest.Mock {
       const expectedResponse = new Response(expectedBody);
       const mockFetch = jest.fn().mockResolvedValueOnce(expectedResponse);
-      jest.spyOn(window, "fetch").mockImplementation(mockFetch);
+      jest.spyOn(CustomFetchModule, "customFetch").mockImplementation(mockFetch);
       return mockFetch;
     }
 
@@ -30,14 +32,23 @@ describe("InfoService", () => {
         buildNumber: "baz",
         sha: "goo",
       };
-      const mockFetch = setupFetchMock(JSON.stringify(expectedData));
+      const mockFetch = setupAPIServiceSpy(200, JSON.stringify(expectedData), "application/json;charset=UTF-8");
 
       // WHEN the loadInfoFromUrl function is called for that URL
       const service = InfoService.getInstance();
       const actualResult = await service.loadInfoFromUrl(someURL);
 
       // THEN it returns that data structure from the given url
-      expect(mockFetch).toHaveBeenCalledWith(someURL);
+      expect(mockFetch).toHaveBeenCalledWith(someURL, {
+        method: "GET",
+        headers: { "content-type": "application/json" },
+        expectedStatusCode: 200,
+        serviceName: "InfoService",
+        serviceFunction: "loadInfoFromUrl",
+        failureMessage: `Failed to load info from ${someURL}`,
+        expectedContentType: "application/json",
+        authRequired: false,
+      });
       expect(actualResult).toMatchObject(expectedData);
     });
 
@@ -52,7 +63,16 @@ describe("InfoService", () => {
       const actualResult = await service.loadInfoFromUrl(someURL);
 
       // THEN it returns info object with empty values
-      expect(mockFetch).toHaveBeenCalledWith(someURL);
+      expect(mockFetch).toHaveBeenCalledWith(someURL, {
+        method: "GET",
+        headers: { "content-type": "application/json" },
+        expectedStatusCode: 200,
+        serviceName: "InfoService",
+        serviceFunction: "loadInfoFromUrl",
+        failureMessage: `Failed to load info from ${someURL}`,
+        expectedContentType: "application/json",
+        authRequired: false,
+      });
       expect(actualResult).toMatchObject({ date: "", branch: "", buildNumber: "", sha: "" });
     });
 
@@ -68,7 +88,16 @@ describe("InfoService", () => {
         const actualResult = await service.loadInfoFromUrl(someURL);
 
         // THEN it returns info object with empty values
-        expect(mockFetch).toHaveBeenCalledWith(someURL);
+        expect(mockFetch).toHaveBeenCalledWith(someURL, {
+          method: "GET",
+          headers: { "content-type": "application/json" },
+          expectedStatusCode: 200,
+          serviceName: "InfoService",
+          serviceFunction: "loadInfoFromUrl",
+          failureMessage: `Failed to load info from ${someURL}`,
+          expectedContentType: "application/json",
+          authRequired: false,
+        });
         expect(actualResult).toMatchObject({ date: "", branch: "", buildNumber: "", sha: "" });
       }
     );
@@ -84,14 +113,23 @@ describe("InfoService", () => {
         { status: 500 }
       );
       const mockFetch = jest.fn().mockRejectedValueOnce(expectedResponse);
-      jest.spyOn(window, "fetch").mockImplementation(mockFetch);
+      jest.spyOn(CustomFetchModule, "customFetch").mockImplementation(mockFetch);
 
       // WHEN the loadInfoFromUrl function is called for that URL
       const service = InfoService.getInstance();
       const actualResult = await service.loadInfoFromUrl(someURL);
 
       // THEN it returns info object with empty values
-      expect(mockFetch).toHaveBeenCalledWith(someURL);
+      expect(mockFetch).toHaveBeenCalledWith(someURL, {
+        method: "GET",
+        headers: { "content-type": "application/json" },
+        expectedStatusCode: 200,
+        serviceName: "InfoService",
+        serviceFunction: "loadInfoFromUrl",
+        failureMessage: `Failed to load info from ${someURL}`,
+        expectedContentType: "application/json",
+        authRequired: false,
+      });
       expect(actualResult).toMatchObject({ date: "", branch: "", buildNumber: "", sha: "" });
     });
   });

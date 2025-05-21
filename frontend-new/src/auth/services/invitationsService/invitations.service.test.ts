@@ -2,9 +2,10 @@ import "src/_test_utilities/consoleMock";
 
 import InvitationsService from "./invitations.service";
 import { StatusCodes } from "http-status-codes";
-import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
+import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { Invitation, InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import * as CustomFetchModule from "src/utils/customFetch/customFetch";
 
 describe("InvitationsService", () => {
   // GIVEN a backend URL is returned by the envService
@@ -38,7 +39,7 @@ describe("InvitationsService", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       };
 
-      const fetchSpy = setupFetchSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
 
       // WHEN the checkInvitationCodeStatus function is called with the given code
       const service = new InvitationsService();
@@ -49,9 +50,11 @@ describe("InvitationsService", () => {
         `${givenApiServerUrl}/user-invitations/check-status?invitation_code=test-code`,
         {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          authRequired: false,
+          expectedStatusCode: 200,
+          failureMessage: "Failed to check status for invitation code test-code",
+          serviceFunction: "checkInvitationCodeStatus",
+          serviceName: "InvitationsService",
         }
       );
 
@@ -61,7 +64,8 @@ describe("InvitationsService", () => {
 
     test("on fail to fetch, should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
-      jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockRejectedValue(new Error());
+      const givenError = new Error("Failed to check status for invitation code");
+      jest.spyOn(CustomFetchModule, "customFetch").mockRejectedValue(givenError);
 
       // WHEN calling checkInvitationCodeStatus function with some code
       const service = new InvitationsService();
@@ -70,17 +74,21 @@ describe("InvitationsService", () => {
       const checkInvitationCodeCallback = async () => await service.checkInvitationCodeStatus("test-code");
 
       // AND expect the service to throw the error that the fetchWithAuth function throws
-      await expect(checkInvitationCodeCallback()).rejects.toThrow("Failed to check status for invitation code");
+      await expect(checkInvitationCodeCallback()).rejects.toThrow(givenError);
     });
 
     test.each([
-      ["is a malformed json", "{"],
-      ["is a string", "foo"],
+      ["is a malformed json", "{", "Expected property name or '}' in JSON at position 1"],
+      ["is a string", "foo", "Unexpected token 'o', \"foo\" is not valid JSON"],
     ])(
       "on 200, should reject with an error ERROR_CODE.INTERNAL_SERVER_ERROR if response %s",
-      async (description, givenResponse) => {
+      async (description, givenResponse, expectedError) => {
         // GIVEN the GET invitations REST API will respond with OK and some invalid response
-        setupFetchSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
+        const mockResponse = new Response(givenResponse, {
+          status: StatusCodes.OK,
+          headers: { "content-type": "application/json;charset=UTF-8" }
+        });
+        jest.spyOn(CustomFetchModule, "customFetch").mockResolvedValue(mockResponse);
 
         // WHEN the checkInvitationCodeStatus function is called with the given code
         const service = new InvitationsService();
@@ -88,7 +96,7 @@ describe("InvitationsService", () => {
         const checkInvitationCodeCallback = async () => await service.checkInvitationCodeStatus("test-code");
 
         // AND expect the service to throw the error that the fetchWithAuth function throws
-        await expect(checkInvitationCodeCallback()).rejects.toThrow("Failed to check status for invitation code");
+        await expect(checkInvitationCodeCallback()).rejects.toThrow(expectedError);
       }
     );
   });

@@ -196,8 +196,9 @@ describe("MetricsService", () => {
       };
 
       // AND an unsuccessful response from the API
-      const errorResponse = { message: "Something went wrong" };
+      const errorResponse = new Error("Something went wrong");
       const fetchSpy = setupAPIServiceSpy(StatusCodes.BAD_REQUEST, errorResponse, "application/json;charset=UTF-8");
+      fetchSpy.mockRejectedValueOnce(errorResponse)
 
       // WHEN sending a metrics event
       const service = MetricsService.getInstance();
