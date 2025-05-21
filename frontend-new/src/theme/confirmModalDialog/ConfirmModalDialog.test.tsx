@@ -22,6 +22,7 @@ describe("ConfirmModalDialog", () => {
         onCancel={() => {}}
         onConfirm={() => {}}
         onDismiss={() => {}}
+        showCloseIcon={true}
         cancelButtonText="Cancel"
         confirmButtonText="Confirm"
       />
@@ -44,6 +45,8 @@ describe("ConfirmModalDialog", () => {
     expect(screen.getByTestId(DATA_TEST_ID.CONFIRM_MODAL_CANCEL)).toBeInTheDocument();
     // AND dialog confirm button to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.CONFIRM_MODAL_CONFIRM)).toBeInTheDocument();
+    // AND dialog close button to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.CONFIRM_MODAL_CLOSE)).toBeInTheDocument();
     // AND dialog to match the snapshot
     expect(dialogContainer).toMatchSnapshot();
   });
