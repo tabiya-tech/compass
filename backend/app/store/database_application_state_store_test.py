@@ -145,7 +145,7 @@ def update_collect_experience_state(application_state: ApplicationState):
 
 
 def update_skills_explorer_agent_state(application_state: ApplicationState):
-    # Set the skills explorer agent state to a new state with a different conversation history
+    # Set the skill explorer agent state to a new state with a different conversation history
     application_state.skills_explorer_agent_state.first_time_for_experience = {
         str(uuid4()): random.choice([True, False])}  # nosec B311 # random is used for testing purposes
     application_state.skills_explorer_agent_state.experiences_explored = [str(uuid4()) for _ in range(5)]
@@ -187,7 +187,7 @@ class TestDatabaseApplicationStateStore:
     ])
     async def test_database_application_state_roundtrip(self, update_state_callback, database_application_state_store):
         # (1) Initialize state in Memory-> (2) Save state in DB -> (3) Read state from DB ->
-        # (4) Update state In Memory-> (5) Save state in DB -> (6) Read state frm DB
+        # (4) Update state In Memory-> (5) Save state in DB -> (6) Read state from DB
 
         # (1) Initial state
         # GIVEN some initial application state
@@ -199,15 +199,15 @@ class TestDatabaseApplicationStateStore:
         await database_application_state_store.save_state(given_initial_application_state)
 
         # (3) Read state from DB
-        # AND WHEN the state is be read back from the database
+        # AND WHEN the state is read back from the database
         actual_fetched_state = await database_application_state_store.get_state(given_state_id)
         # make sure we make model dump to get a snapshot of the state, as the state object is mutable
         actual_fetched_state_model_dump = actual_fetched_state.model_dump()
         # THEN the state from step (3) is the same as the initial state from step (1)
         assert given_initial_application_state_model_dump == actual_fetched_state_model_dump
 
-        # (4) Update the state from step (3) in ,emory
-        # AND WHEN the newly retrieved state is updated in memory
+        # (4) Update the state from step (3) in memory
+        # AND WHEN the newly retrieved state is updated in memory,
         # update is updating the state object in memory
         update_state_callback(application_state=actual_fetched_state)
         # make sure we make model dump to get a snapshot of the state, as the state object is mutable
@@ -261,7 +261,7 @@ class TestDatabaseApplicationStateStore:
         assert len(actual_state_ids) == len(given_states)
 
         # AND each retrieved state matches its corresponding saved state
-        # Sort both lists by session_id to ensure consistent comparison
+        # Sort both lists by session_id to ensure a consistent comparison
         given_session_ids.sort()
         actual_state_ids.sort()
 
@@ -327,4 +327,5 @@ class TestDatabaseApplicationStateStore:
             assert len(caplog.records) == 1
             assert caplog.records[0].levelname == "ERROR"
             assert caplog.records[
-                       0].message == f"Missing application state for session ID {given_session_id}: ['{collection_name}']. A new session will be created."
+                       0].message == f"Missing application state part(s) for session ID {given_session_id}. Missing part(s): ['{collection_name}']"
+
