@@ -100,15 +100,23 @@ class Retry(Generic[T]):
             *,
             callback: AsyncCallbackWithPenalty[T],
             max_retries: int = 3,
+            task_name: str | None = None,
     ) -> tuple[T, float, Optional[BaseException]]:
 
         attempts: list[tuple[int, T, float, Optional[BaseException]]] = []
+
+        # if task_name is not None, format it for logging.
+        if task_name is not None:
+            _formatted_task_name = f": {task_name}"
+        else:
+            _formatted_task_name = ""
+
 
         for attempt in range(1, max_retries + 1):
             result, penalty, error = await callback(attempt, max_retries)
 
             if error is None:
-                logger.info(f"'Retryable task' succeeded after {attempt} attempts.")
+                logger.info(f"'Retryable task{_formatted_task_name}' succeeded after {attempt} attempts.")
                 return result, penalty, error
 
             attempts.append((attempt, result, penalty, error))
@@ -118,7 +126,8 @@ class Retry(Generic[T]):
             elif error:
                 errors = [error]
             error_messages = '\n    -'.join(str(e) for e in errors)
-            logger.warning(f"'Retry task' attempt {attempt} failed with errors (penalty={penalty}):"
+            logger.warning(
+                f"'Retry task{_formatted_task_name}' attempt {attempt} failed with errors (penalty={penalty}):"
                            f"{error_messages}")
 
         # All attempts failed — pick the highest penalty fallback
@@ -130,7 +139,8 @@ class Retry(Generic[T]):
         elif best_error:
             errors = [best_error]
         error_messages = '\n    -'.join(str(e) for e in errors)
-        logger.warning(f"'Retry task' failed after {max_retries} attempts. Using fallback result {best_attempt} (penalty={best_penalty}) with errors:"
+        logger.warning(
+            f"'Retry task{_formatted_task_name}' failed after {max_retries} attempts. Using fallback result {best_attempt} (penalty={best_penalty}) with errors:"
                        f"{error_messages}")
 
         return best_result, best_penalty, best_error

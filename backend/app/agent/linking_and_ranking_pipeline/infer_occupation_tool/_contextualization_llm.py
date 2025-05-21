@@ -149,7 +149,8 @@ class _ContextualizationLLM:
             )
 
         result, _result_penalty, _error = await Retry[ContextualizationLLMResponse].call_with_penalty(
-            callback=_callback)
+            callback=_callback,
+            task_name="contextualize_job_titles")
         return result
 
     def _get_llm(self, number_of_titles: int, temperature_config: dict) -> GeminiGenerativeLLM:

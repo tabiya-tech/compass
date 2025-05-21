@@ -321,7 +321,9 @@ class LLMAgentDirector(AbstractAgentDirector):
                 phase=phase,
                 context=context)
 
-        result, _result_penalty, _error = await Retry[AgentType].call_with_penalty(callback=_callback)
+        result, _result_penalty, _error = await Retry[AgentType].call_with_penalty(
+            callback=_callback,
+            task_name=self._get_suitable_agent_type.__name__)
 
         return result
 
