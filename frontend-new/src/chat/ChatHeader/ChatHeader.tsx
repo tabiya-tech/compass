@@ -19,6 +19,8 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { SessionError } from "src/error/commonErrors";
+import TextConfirmModalDialog from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
+import { HighlightedSpan } from "src/consent/components/consentPage/Consent";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
@@ -83,6 +85,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [showConversionDialog, setShowConversionDialog] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const feedbackTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const notificationShownRef = React.useRef<boolean>(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -92,6 +95,24 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   const isAnonymous = !user?.name || !user?.email;
   const { setIsAccountConverted, handleOpenExperiencesDrawer } = useChatContext();
   const [sentryEnabled, setSentryEnabled] = useState(false);
+
+  const handleLogout = useCallback(() => {
+    if (isAnonymous) {
+      setShowLogoutConfirmation(true);
+    } else {
+      notifyOnLogout();
+    }
+  }, [isAnonymous, notifyOnLogout]);
+
+  const handleConfirmLogout = () => {
+    setShowLogoutConfirmation(false);
+    notifyOnLogout();
+  };
+
+  const handleRegister = () => {
+    setShowLogoutConfirmation(false);
+    setShowConversionDialog(true);
+  };
 
   const handleViewExperiences = () => {
     handleOpenExperiencesDrawer();
@@ -181,7 +202,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
             variant: "info",
             persist: true,
             autoHideDuration: null,
-            preventDuplicate: true
+            preventDuplicate: true,
           }
         );
         // Mark the notification as shown
@@ -252,10 +273,10 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         id: MENU_ITEM_ID.LOGOUT_BUTTON,
         text: MENU_ITEM_TEXT.LOGOUT,
         disabled: false,
-        action: notifyOnLogout,
+        action: handleLogout,
       },
     ],
-    [isAnonymous, isOnline, notifyOnLogout, startNewConversation, sentryEnabled]
+    [isAnonymous, isOnline, startNewConversation, sentryEnabled, handleLogout]
   );
 
   return (
@@ -333,6 +354,44 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         }}
       />
       <InfoDrawer isOpen={isDrawerOpen} notifyOnClose={() => setIsDrawerOpen(false)} />
+      <TextConfirmModalDialog
+        isOpen={showLogoutConfirmation}
+        onCancel={handleConfirmLogout}
+        onDismiss={() => setShowLogoutConfirmation(false)}
+        onConfirm={handleRegister}
+        title="Before you go"
+        confirmButtonText="Register"
+        cancelButtonText="Logout"
+        showCloseIcon={true}
+        textParagraphs={[
+          {
+            id: "1",
+            text: <>Are you sure you want to log out?</>,
+          },
+          {
+            id: "2",
+            text: (
+              <>
+                You're currently using an anonymous account.
+                <HighlightedSpan>
+                  {" "}
+                  If you log out, you'll lose access to your conversation history and experiences
+                </HighlightedSpan>
+                .
+              </>
+            ),
+          },
+          {
+            id: "3",
+            text: (
+              <>
+                <HighlightedSpan>Create an account to save your progress</HighlightedSpan> and continue your journey
+                later.
+              </>
+            ),
+          },
+        ]}
+      />
     </Box>
   );
 };

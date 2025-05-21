@@ -27,7 +27,7 @@ exports[`TextConfirmModalDialog should render component correctly with expected 
       role="dialog"
     >
       <h2
-        class="MuiTypography-root MuiTypography-h2 MuiDialogTitle-root css-f196o7-MuiTypography-root-MuiDialogTitle-root"
+        class="MuiTypography-root MuiTypography-h2 MuiDialogTitle-root css-16mgy1n-MuiTypography-root-MuiDialogTitle-root"
         data-testid="confirm-modal-title-edc0ac15-67a7-4c1f-9934-94fa65757046"
         id="confirm-modal-title"
       >
