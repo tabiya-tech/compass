@@ -3,7 +3,6 @@ import { Box, Typography, useTheme } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
-import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import FeedbackOutlinedIcon from "@mui/icons-material/FeedbackOutlined";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
@@ -181,7 +180,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
             variant: "info",
             persist: true,
             autoHideDuration: null,
-            preventDuplicate: true
+            preventDuplicate: true,
           }
         );
         // Mark the notification as shown
@@ -316,7 +315,11 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_USER}
           title="user info"
         >
-          <PermIdentityIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_USER} />
+          <img
+            src={`${process.env.PUBLIC_URL}/user-icon.svg`}
+            alt="User Icon"
+            data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_USER}
+          />
         </PrimaryIconButton>
       </Box>
       <ContextMenu
