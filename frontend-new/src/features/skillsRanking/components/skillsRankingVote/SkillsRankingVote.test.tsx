@@ -5,7 +5,7 @@ import { render, screen } from "src/_test_utilities/test-utils";
 import SkillsRankingVote, {
   DATA_TEST_ID,
   QUESTION_TEXTS,
-  OPTIONS
+  OPTIONS,
 } from "src/features/skillsRanking/components/skillsRankingVote/SkillsRankingVote";
 import { CompareAgainstGroup, ButtonOrderGroup } from "src/features/skillsRanking/types";
 import { SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
@@ -13,18 +13,15 @@ import { DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID } from "src/chat/chatMessage/c
 import userEvent from "@testing-library/user-event";
 
 // mock SkillsRankingVoteItem component
-jest.mock(
-  "src/features/skillsRanking/components/skillsRankingVote/components/SkillsRankingVoteItem",
-  () => ({
-    __esModule: true,
-    default: (props: any) => (
-      <div data-testid="skills-ranking-vote-item">
-        <div data-testid="skills-ranking-vote-item-radio" onClick={() => props.onSelect?.(props.index)} />
-        {!props.isLast && <div data-testid="skills-ranking-vote-item-divider" />}
-      </div>
-    ),
-  })
-);
+jest.mock("src/features/skillsRanking/components/skillsRankingVote/components/SkillsRankingVoteItem", () => ({
+  __esModule: true,
+  default: (props: any) => (
+    <div data-testid="skills-ranking-vote-item">
+      <div data-testid="skills-ranking-vote-item-radio" onClick={() => props.onSelect?.(props.index)} />
+      {!props.isLast && <div data-testid="skills-ranking-vote-item-divider" />}
+    </div>
+  ),
+}));
 
 describe("SkillsRankingVote tests", () => {
   describe("render tests", () => {
