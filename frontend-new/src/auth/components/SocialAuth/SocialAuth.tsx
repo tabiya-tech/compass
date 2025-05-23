@@ -197,7 +197,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
             <div style={{ display: "flex", alignItems: "center" }}>
               <GoogleIcon disabled={socialAuthLoading} />
             </div>
-            <Typography variant="body2">{label ?? "Sign in with Google"}</Typography>
+            <Typography variant="body2">{label ?? "Login with Google"}</Typography>
           </Button>
           {!isOnline && (
             <Typography
@@ -205,7 +205,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
               sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
               data-testid={DATA_TEST_ID.FIREBASE_FALLBACK_TEXT}
             >
-              Google sign in is not available when offline.
+              Google login is not available when offline.
             </Typography>
           )}
         </div>

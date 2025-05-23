@@ -50,8 +50,8 @@ exports[`Sensitive Data Form Form validation should enable submit button when al
       >
         Provide Your Information
       </h4>
-      <p
-        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+      <div
+        class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
         We use your data to personalize your experience and may contact you about Compass.
@@ -79,7 +79,7 @@ exports[`Sensitive Data Form Form validation should enable submit button when al
             class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
           />
         </button>
-      </p>
+      </div>
     </div>
     <div
       class="MuiBox-root css-1tcf7lu"
@@ -183,8 +183,8 @@ exports[`Sensitive Data Form Rendering fields based on configuration should hand
       >
         Provide Your Information
       </h4>
-      <p
-        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+      <div
+        class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
         We use your data to personalize your experience and may contact you about Compass.
@@ -212,7 +212,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should hand
             class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
           />
         </button>
-      </p>
+      </div>
     </div>
     <div
       class="MuiBox-root css-1tcf7lu"
@@ -297,8 +297,8 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
       >
         Provide Your Information
       </h4>
-      <p
-        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+      <div
+        class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
         We use your data to personalize your experience and may contact you about Compass.
@@ -326,7 +326,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
             class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
           />
         </button>
-      </p>
+      </div>
     </div>
     <div
       class="MuiBox-root css-1tcf7lu"
@@ -416,8 +416,8 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
       >
         Provide Your Information
       </h4>
-      <p
-        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+      <div
+        class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
         We use your data to personalize your experience and may contact you about Compass.
@@ -445,7 +445,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
             class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
           />
         </button>
-      </p>
+      </div>
     </div>
     <div
       class="MuiBox-root css-1tcf7lu"
@@ -535,8 +535,8 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
       >
         Provide Your Information
       </h4>
-      <p
-        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+      <div
+        class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
         We use your data to personalize your experience and may contact you about Compass.
@@ -564,7 +564,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
             class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
           />
         </button>
-      </p>
+      </div>
     </div>
     <div
       class="MuiBox-root css-1tcf7lu"
@@ -666,8 +666,8 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
       >
         Provide Your Information
       </h4>
-      <p
-        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+      <div
+        class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
         We use your data to personalize your experience and may contact you about Compass.
@@ -695,7 +695,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
             class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
           />
         </button>
-      </p>
+      </div>
     </div>
     <div
       class="MuiBox-root css-1tcf7lu"

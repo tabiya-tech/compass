@@ -23,7 +23,7 @@ import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/
 import * as Sentry from "@sentry/react";
 import { DATA_TEST_ID as REQUEST_INVITATION_CODE_DATA_TEST_ID } from "src/auth/components/requestInvitationCode/RequestInvitationCode";
 import * as ReactRouterDomModule from "react-router-dom";
-import * as EnvServiceModule from "src/envService"
+import * as EnvServiceModule from "src/envService";
 import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 
 //mock the SocialAuth component
@@ -383,10 +383,10 @@ describe("Testing Register component", () => {
   test("should handle application registration code", async () => {
     // GIVEN the application registration code is set
     const givenApplicationRegistrationCode = "app-reg-code";
-    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue(givenApplicationRegistrationCode)
+    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue(givenApplicationRegistrationCode);
 
     // AND no application login code
-    jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue("")
+    jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue("");
 
     // AND there is no registration code in the url
     const mockLocation = {
@@ -398,7 +398,7 @@ describe("Testing Register component", () => {
 
     // AND some user credentials.
     const givenPassword = "password";
-    const givenEmail = "email"
+    const givenEmail = "email";
 
     // AND the register function returns a token
     const registerMock = jest.fn().mockResolvedValue("foo-bar-token");
@@ -415,14 +415,17 @@ describe("Testing Register component", () => {
     expect(screen.queryByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT)).not.toBeInTheDocument();
 
     // AND the social auth should be called with the correct arguments.
-    expect((SocialAuth as unknown as jest.Mock)).toHaveBeenCalledWith({
-      disabled: false,
-      isLoading: false,
-      label: "Sign up with Google",
-      notifyOnLoading: expect.any(Function),
-      postLoginHandler: expect.any(Function),
-      registrationCode: givenApplicationRegistrationCode,
-    }, {})
+    expect(SocialAuth as unknown as jest.Mock).toHaveBeenCalledWith(
+      {
+        disabled: false,
+        isLoading: false,
+        label: "Register with Google",
+        notifyOnLoading: expect.any(Function),
+        postLoginHandler: expect.any(Function),
+        registrationCode: givenApplicationRegistrationCode,
+      },
+      {}
+    );
 
     // AND the register form should match snapshot
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_CONTAINER)).toMatchSnapshot();
@@ -433,20 +436,24 @@ describe("Testing Register component", () => {
       await calls[calls.length - 1][0].notifyOnRegister(givenEmail, givenPassword);
     });
 
-
     // THEN expect the register function to have been called with the correct arguments
     await waitFor(() => {
-      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenApplicationRegistrationCode);
+      expect(registerMock).toHaveBeenCalledWith(
+        givenEmail,
+        givenPassword,
+        givenEmail,
+        givenApplicationRegistrationCode
+      );
     });
-  })
+  });
 
   test("should prefer the url registration code over the application default registration code", async () => {
     // GIVEN a default application code
-    const givenDefaultApplicationCode = "given-application-default-registration-code"
-    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue(givenDefaultApplicationCode)
+    const givenDefaultApplicationCode = "given-application-default-registration-code";
+    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue(givenDefaultApplicationCode);
 
     // AND an invite code is in the url param
-    const givenURLParamRegistrationCode = "given-url-registration-code"
+    const givenURLParamRegistrationCode = "given-url-registration-code";
     const mockLocation = {
       pathname: "/register",
       search: `?${INVITATIONS_PARAM_NAME}=${givenURLParamRegistrationCode}`,
@@ -456,12 +463,13 @@ describe("Testing Register component", () => {
 
     // WHEN the user registers the account.
     const givenPassword = "password";
-    const givenEmail = "email"
+    const givenEmail = "email";
 
     // AND the register function returns a token
     const registerMock = jest.fn().mockResolvedValue("foo-bar-token");
-    jest.spyOn(FirebaseEmailAuthenticationService, "getInstance")
-      .mockReturnValue({ register: registerMock} as unknown as FirebaseEmailAuthenticationService);
+    jest
+      .spyOn(FirebaseEmailAuthenticationService, "getInstance")
+      .mockReturnValue({ register: registerMock } as unknown as FirebaseEmailAuthenticationService);
 
     // WHEN the component is rendered
     render(<Register />);
@@ -476,5 +484,5 @@ describe("Testing Register component", () => {
     await waitFor(() => {
       expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenURLParamRegistrationCode);
     });
-  })
+  });
 });

@@ -181,10 +181,17 @@ const Register: React.FC = () => {
         gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
         width={"100%"}
       >
-        <AuthHeader title={"Welcome to Compass!"} subtitle={<>We need some information to get started</>} />
+        <AuthHeader
+          title={"Welcome to Compass!"}
+          subtitle={
+            <Typography variant="body2" gutterBottom>
+              We need some information to get started
+            </Typography>
+          }
+        />
         {!applicationRegistrationCode && (
           <React.Fragment>
-            <Typography variant="subtitle2">Enter your registration code to sign up</Typography>
+            <Typography variant="subtitle2">Enter your registration code</Typography>
             <TextField
               fullWidth
               label="Registration code"
@@ -196,7 +203,7 @@ const Register: React.FC = () => {
             />
           </React.Fragment>
         )}
-        {!applicationRegistrationCode &&  (
+        {!applicationRegistrationCode && (
           <Divider textAlign="center" style={{ width: "100%" }}>
             <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
               and either continue with
@@ -212,7 +219,7 @@ const Register: React.FC = () => {
           postLoginHandler={handlePostLogin}
           isLoading={isLoading}
           disabled={!registrationCode && !applicationRegistrationCode}
-          label={"Sign up with Google"}
+          label={"Register with Google"}
           notifyOnLoading={notifyOnSocialLoading}
           registrationCode={registrationCode || applicationRegistrationCode}
         />

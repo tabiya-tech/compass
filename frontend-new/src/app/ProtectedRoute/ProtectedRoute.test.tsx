@@ -63,11 +63,15 @@ import AuthenticationStateService from "src/auth/services/AuthenticationState.se
 import { TabiyaUser } from "../../auth/auth.types";
 
 const getUser = (loggedIn: boolean) => {
-  const givenUser = loggedIn ? { id: "user1" } as TabiyaUser : null;
+  const givenUser = loggedIn ? ({ id: "user1" } as TabiyaUser) : null;
   jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(givenUser);
 };
 
-const getUserPreferences = (acceptedTC: Date | undefined, hasSensitiveData: boolean, sensitiveDataRequirement: SensitivePersonalDataRequirement) => {
+const getUserPreferences = (
+  acceptedTC: Date | undefined,
+  hasSensitiveData: boolean,
+  sensitiveDataRequirement: SensitivePersonalDataRequirement
+) => {
   const givenPreferences: UserPreference = {
     user_id: "user1",
     language: Language.en,
@@ -79,7 +83,7 @@ const getUserPreferences = (acceptedTC: Date | undefined, hasSensitiveData: bool
     experiments: {},
   };
   jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenPreferences);
-}
+};
 
 describe("ProtectedRoute test", () => {
   beforeEach(() => {
@@ -89,43 +93,9 @@ describe("ProtectedRoute test", () => {
     // As a precaution, we reset all method mocks to ensure that no side effects are carried over betwe
     resetAllMethodMocks(UserPreferencesStateService.getInstance());
     resetAllMethodMocks(AuthenticationStateService.getInstance());
-  })
+  });
 
   describe("login page", () => {
-    test("should redirect to the login page if the user is not logged in", () => {
-      // GIVEN the user select a page that require authentication
-      getUser(false);
-
-      // WHEN the user navigates to the page
-      const router = createMemoryRouter(
-        [
-          {
-            path: routerPaths.ROOT,
-            element: (
-              <ProtectedRoute>
-                <div>Protected page</div>
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: routerPaths.LOGIN,
-            element:
-              <ProtectedRoute>
-                <div>Login Page</div>
-              </ProtectedRoute>,
-          },
-        ],
-        {
-          initialEntries: [routerPaths.ROOT],
-        }
-      );
-      render(<RouterProvider router={router} />);
-
-      // THEN expect the user to be redirected to the login page
-      expect(screen.getByText("Login Page")).toBeInTheDocument();
-      expect(screen.queryByText("Protected page")).not.toBeInTheDocument();
-    });
-
     test("should redirect logged-in user to root page", () => {
       // GIVEN a user is logged in
       getUser(true);
@@ -149,9 +119,11 @@ describe("ProtectedRoute test", () => {
           },
           {
             path: routerPaths.ROOT,
-            element: <ProtectedRoute>
-              <div>Chat Page</div>
-            </ProtectedRoute>,
+            element: (
+              <ProtectedRoute>
+                <div>Chat Page</div>
+              </ProtectedRoute>
+            ),
           },
         ],
         {
@@ -163,41 +135,6 @@ describe("ProtectedRoute test", () => {
       // THEN expect the user to be redirected to the root page
       expect(screen.getByText("Chat Page")).toBeInTheDocument();
       expect(screen.queryByText("Login Page")).not.toBeInTheDocument();
-    });
-
-    test("should render the login page if no user is found", () => {
-      // GIVEN there is no user
-      getUser(false);
-
-
-      // WHEN the user navigates to the login page
-      const router = createMemoryRouter(
-        [
-          {
-            path: routerPaths.LOGIN,
-            element: (
-              <ProtectedRoute>
-                <div>Login Page</div>
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: routerPaths.ROOT,
-            element: (
-              <ProtectedRoute>
-                <div>Chat Page</div>
-              </ProtectedRoute>
-            ),
-          },
-        ],
-        {
-          initialEntries: [routerPaths.ROOT],
-        }
-      );
-      render(<RouterProvider router={router} />);
-
-      // THEN expect the user to stay on the login page
-      expect(screen.getByText("Login Page")).toBeInTheDocument();
     });
   });
 
@@ -287,7 +224,7 @@ describe("ProtectedRoute test", () => {
       expect(screen.getByText("Chat Page")).toBeInTheDocument();
       expect(screen.queryByText("Sensitive Data Page")).not.toBeInTheDocument();
     });
-  })
+  });
 
   describe("verify email page", () => {
     test("should render the verify email page when the user wants to access it", () => {
@@ -538,7 +475,7 @@ describe("ProtectedRoute test", () => {
       expect(screen.queryByText("Root Page")).not.toBeInTheDocument();
     });
 
-    test("should redirect to login page when trying to access settings without being logged in", () => {
+    test("should redirect to landing page when trying to access settings without being logged in", () => {
       // GIVEN the user is not logged in
       getUser(false);
       // AND no user preferences exist
@@ -556,10 +493,10 @@ describe("ProtectedRoute test", () => {
             ),
           },
           {
-            path: routerPaths.LOGIN,
+            path: routerPaths.LANDING,
             element: (
               <ProtectedRoute>
-                <div>Login Page</div>
+                <div>Landing Page</div>
               </ProtectedRoute>
             ),
           },
@@ -570,8 +507,8 @@ describe("ProtectedRoute test", () => {
       );
       render(<RouterProvider router={router} />);
 
-      // THEN expect the user to be redirected to the login page
-      expect(screen.getByText("Login Page")).toBeInTheDocument();
+      // THEN expect the user to be redirected to the landing page
+      expect(screen.getByText("Landing Page")).toBeInTheDocument();
       expect(screen.queryByText("Settings Page")).not.toBeInTheDocument();
     });
 
@@ -668,7 +605,9 @@ describe("ProtectedRoute test", () => {
           {
             path: routerPaths.LOGIN,
             element: (
-              <ProtectedRoute><div>Login</div></ProtectedRoute>
+              <ProtectedRoute>
+                <div>Login</div>
+              </ProtectedRoute>
             ),
           },
         ],
@@ -687,39 +626,41 @@ describe("ProtectedRoute test", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
-    test.each([
-      [SensitivePersonalDataRequirement.REQUIRED],
-      [SensitivePersonalDataRequirement.NOT_REQUIRED],
-    ])("should preload the sensitive data form if the user has sensitive data requirement %s", async (requirement) => {
-      // GIVEN the user has sensitive data requirement
-      getUserPreferences(new Date(), false, requirement);
-      // WHEN a component is rendered with the ProtectedRoute is rendered
-      const router = createMemoryRouter(
-        [
+    test.each([[SensitivePersonalDataRequirement.REQUIRED], [SensitivePersonalDataRequirement.NOT_REQUIRED]])(
+      "should preload the sensitive data form if the user has sensitive data requirement %s",
+      async (requirement) => {
+        // GIVEN the user has sensitive data requirement
+        getUserPreferences(new Date(), false, requirement);
+        // WHEN a component is rendered with the ProtectedRoute is rendered
+        const router = createMemoryRouter(
+          [
+            {
+              path: routerPaths.LOGIN,
+              element: (
+                <ProtectedRoute>
+                  <div>Login</div>
+                </ProtectedRoute>
+              ),
+            },
+          ],
           {
-            path: routerPaths.LOGIN,
-            element: (
-              <ProtectedRoute><div>Login</div></ProtectedRoute>
-            ),
-          },
-        ],
-        {
-          initialEntries: [routerPaths.LOGIN],
-        }
-      );
-      render(<RouterProvider router={router} />);
+            initialEntries: [routerPaths.LOGIN],
+          }
+        );
+        render(<RouterProvider router={router} />);
 
-      // AND expect the sensitive data form to be preloaded
-      // We expect the lazyWithPreload to be called twice:
-      // 1. Once for the ProtectedRoute
-      // 2. Once for the Chat Component
-      expect(lazyWithPreload).toHaveBeenCalledTimes(2);
-      expect((lazyWithPreload as jest.Mock).mock.results[0].value.preload).toHaveBeenCalled();
+        // AND expect the sensitive data form to be preloaded
+        // We expect the lazyWithPreload to be called twice:
+        // 1. Once for the ProtectedRoute
+        // 2. Once for the Chat Component
+        expect(lazyWithPreload).toHaveBeenCalledTimes(2);
+        expect((lazyWithPreload as jest.Mock).mock.results[0].value.preload).toHaveBeenCalled();
 
-      // AND expect no errors or warning to have occurred
-      expect(console.error).not.toHaveBeenCalled();
-      expect(console.warn).not.toHaveBeenCalled();
-    });
+        // AND expect no errors or warning to have occurred
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+      }
+    );
 
     test("should not preload the sensitive data form if the user has no sensitive data available", async () => {
       // GIVEN the user has no sensitive data available
@@ -730,7 +671,9 @@ describe("ProtectedRoute test", () => {
           {
             path: routerPaths.LOGIN,
             element: (
-              <ProtectedRoute><div>Login</div></ProtectedRoute>
+              <ProtectedRoute>
+                <div>Login</div>
+              </ProtectedRoute>
             ),
           },
         ],
@@ -744,6 +687,46 @@ describe("ProtectedRoute test", () => {
       // We expect the lazyWithPreload to be called once for the Chat Component
       expect(lazyWithPreload).toHaveBeenCalledTimes(1);
 
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Landing page", () => {
+    test("should redirect to the landing page if the user is not logged in", () => {
+      // GIVEN the user is not logged in
+      getUser(false);
+
+      // WHEN the user navigates to the page that requires authentication
+      const router = createMemoryRouter(
+        [
+          {
+            path: routerPaths.ROOT,
+            element: (
+              <ProtectedRoute>
+                <div>Protected page</div>
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: routerPaths.LANDING,
+            element: (
+              <ProtectedRoute>
+                <div>Landing Page</div>
+              </ProtectedRoute>
+            ),
+          },
+        ],
+        {
+          initialEntries: [routerPaths.ROOT],
+        }
+      );
+      render(<RouterProvider router={router} />);
+
+      // THEN expect the user to be redirected to the landing page
+      expect(screen.getByText("Landing Page")).toBeInTheDocument();
+      expect(screen.queryByText("Protected page")).not.toBeInTheDocument();
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();

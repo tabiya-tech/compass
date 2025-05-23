@@ -10,7 +10,7 @@ import { DATA_TEST_ID as BACKDROP_DATA_TEST_IDS } from "src/theme/Backdrop/Backd
 import { DATA_TEST_ID as CONFIRM_MODAL_DATA_TEST_IDS } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 
 import { routerPaths } from "src/app/routerPaths";
-import {  RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import * as RestAPIErrorModule from "src/error/restAPIError/RestAPIError";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -34,17 +34,12 @@ import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { UserPreferenceError } from "src/error/commonErrors";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
-
 // Mock the field components
 jest.mock("./components/StringField", () => {
   return {
     __esModule: true,
     default: jest.fn((props: any) => {
-      return (
-        <div data-testid={props.dataTestId}>
-          StringField: {props.field.name}
-        </div>
-      );
+      return <div data-testid={props.dataTestId}>StringField: {props.field.name}</div>;
     }),
   };
 });
@@ -53,11 +48,7 @@ jest.mock("./components/EnumField", () => {
   return {
     __esModule: true,
     default: jest.fn((props: any) => {
-      return (
-        <div data-testid={props.dataTestId}>
-          EnumField: {props.field.name}
-        </div>
-      );
+      return <div data-testid={props.dataTestId}>EnumField: {props.field.name}</div>;
     }),
   };
 });
@@ -66,11 +57,7 @@ jest.mock("./components/MultipleSelectField", () => {
   return {
     __esModule: true,
     default: jest.fn((props: any) => {
-      return (
-        <div data-testid={props.dataTestId}>
-          MultipleField: {props.field.name}
-        </div>
-      );
+      return <div data-testid={props.dataTestId}>MultipleField: {props.field.name}</div>;
     }),
   };
 });
@@ -158,11 +145,7 @@ const SAMPLE_MULTIPLE_FIELD: FieldDefinition = {
   values: ["option1", "option2", "option3", "option4"],
 };
 
-const SAMPLE_FIELDS = [
-  SAMPLE_STRING_FIELD,
-  SAMPLE_ENUM_FIELD,
-  SAMPLE_MULTIPLE_FIELD,
-];
+const SAMPLE_FIELDS = [SAMPLE_STRING_FIELD, SAMPLE_ENUM_FIELD, SAMPLE_MULTIPLE_FIELD];
 
 const givenUserId = getTestString(10);
 
@@ -207,8 +190,7 @@ describe("Sensitive Data Form", () => {
       .spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences")
       .mockReturnValue(SAMPLE_USER_PREFERENCES);
 
-    jest
-      .spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences")
+    jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences");
   });
 
   describe("Rendering fields based on configuration", () => {
@@ -314,9 +296,9 @@ describe("Sensitive Data Form", () => {
       expect(screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_CONTAINER)).toMatchSnapshot();
 
       // THEN the component should render without error
-        expect(console.warn).not.toHaveBeenCalled();
-        expect(console.error).not.toHaveBeenCalled();
-      });
+      expect(console.warn).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    });
 
     it("should render a MultipleField when configuration contains a multiple field", () => {
       // GIVEN a SensitiveDataForm with a configuration containing a multiple field
@@ -394,7 +376,7 @@ describe("Sensitive Data Form", () => {
       componentRender();
 
       // THEN all field components should be rendered with the correct props
-      SAMPLE_FIELDS.forEach(field => {
+      SAMPLE_FIELDS.forEach((field) => {
         const fieldTestId = `sensitive-data-form-${field.name.toLowerCase()}-input-ab02918f-d559-47ba-9662-ea6b3a3606d1`;
         expect(screen.getByTestId(fieldTestId)).toBeInTheDocument();
       });
@@ -624,7 +606,7 @@ describe("Sensitive Data Form", () => {
     it.each([
       ["string field is invalid", "StringField", false],
       ["enum field is invalid", "EnumField", false],
-      ["multiple field is invalid", "MultipleSelectField", false]
+      ["multiple field is invalid", "MultipleSelectField", false],
     ])("should disable submit button when %s", async (_, fieldType, isValid) => {
       // GIVEN a form with required fields
       componentRender();
@@ -670,7 +652,8 @@ describe("Sensitive Data Form", () => {
     it("should submit the form with sanitized data when all fields are valid", async () => {
       // GIVEN a form with valid fields
       const user = userEvent.setup();
-      const mockCreateSensitivePersonalData = jest.spyOn(sensitivePersonalDataService, "createSensitivePersonalData")
+      const mockCreateSensitivePersonalData = jest
+        .spyOn(sensitivePersonalDataService, "createSensitivePersonalData")
         .mockResolvedValue(undefined);
 
       componentRender();
@@ -705,7 +688,7 @@ describe("Sensitive Data Form", () => {
         {
           field1: "test value",
           field2: "option1",
-          field3: ["option1", "option2"]
+          field3: ["option1", "option2"],
         },
         givenUserId,
         SAMPLE_FIELDS
@@ -715,22 +698,20 @@ describe("Sensitive Data Form", () => {
       expect(mockNavigate).toHaveBeenCalledWith(routerPaths.ROOT);
 
       // AND a success message should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "Personal data saved successfully and securely.",
-        { variant: "success" }
-      );
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Personal data saved successfully and securely.", {
+        variant: "success",
+      });
     });
 
     it("should handle service errors during submission", async () => {
       // GIVEN a form with valid fields but a service that throws an error
       const user = userEvent.setup();
       const mockError = new RestAPIError("mockedService", "mockedFunction", "GET", "/", 400, "foo", "");
-      jest.spyOn(sensitivePersonalDataService, "createSensitivePersonalData")
-        .mockRejectedValue(mockError);
+      jest.spyOn(sensitivePersonalDataService, "createSensitivePersonalData").mockRejectedValue(mockError);
 
       jest.spyOn(RestAPIErrorModule, "getUserFriendlyErrorMessage").mockReturnValue("User-friendly error message");
 
-     componentRender();
+      componentRender();
 
       // WHEN all fields report valid values
       // Get the onChange callbacks from the most recent calls to each component
@@ -756,10 +737,7 @@ describe("Sensitive Data Form", () => {
       await user.click(submitButton);
 
       // THEN an error message should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "User-friendly error message",
-        { variant: "error" }
-      );
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("User-friendly error message", { variant: "error" });
     });
 
     it("should handle encrypted data too large error", async () => {
@@ -771,8 +749,7 @@ describe("Sensitive Data Form", () => {
         aes_encryption_key: getRandomString(MaximumAESEncryptedKeySize + 1),
       };
       const mockError = new EncryptedDataTooLarge(givenEncryptReturnValue);
-      jest.spyOn(sensitivePersonalDataService, "createSensitivePersonalData")
-        .mockRejectedValue(mockError);
+      jest.spyOn(sensitivePersonalDataService, "createSensitivePersonalData").mockRejectedValue(mockError);
 
       componentRender();
 
@@ -800,10 +777,9 @@ describe("Sensitive Data Form", () => {
       await user.click(submitButton);
 
       // THEN the specific error message for encrypted data too large should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        ERROR_MESSAGE.ENCRYPTED_DATA_TOO_LARGE,
-        { variant: "error" }
-      );
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(ERROR_MESSAGE.ENCRYPTED_DATA_TOO_LARGE, {
+        variant: "error",
+      });
     });
 
     it("should handle missing user preferences error", async () => {
@@ -816,10 +792,7 @@ describe("Sensitive Data Form", () => {
       expect(() => componentRender()).toThrowError(new UserPreferenceError("User preferences not found"));
 
       // THEN an error message should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        ERROR_MESSAGE.DEFAULT,
-        { variant: "error" }
-      );
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(ERROR_MESSAGE.DEFAULT, { variant: "error" });
     });
 
     it("should handle logout error when rejecting sensitive data", async () => {
@@ -850,18 +823,14 @@ describe("Sensitive Data Form", () => {
       await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CANCEL));
 
       // THEN an error message should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "Failed to log out.",
-        { variant: "error" }
-      );
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to log out.", { variant: "error" });
     });
 
     it("should handle service errors during skip operation", async () => {
       // GIVEN skip operation fails
       const user = userEvent.setup();
       const mockError = new RestAPIError("mockedService", "mockedFunction", "GET", "/", 400, "foo", "");
-      jest.spyOn(sensitivePersonalDataService, "skip")
-        .mockRejectedValue(mockError);
+      jest.spyOn(sensitivePersonalDataService, "skip").mockRejectedValue(mockError);
 
       jest.spyOn(RestAPIErrorModule, "getUserFriendlyErrorMessage").mockReturnValue("User-friendly error message");
 
@@ -876,10 +845,7 @@ describe("Sensitive Data Form", () => {
       await user.click(screen.getByTestId(CONFIRM_MODAL_DATA_TEST_IDS.CONFIRM_MODAL_CANCEL));
 
       // THEN an error message should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "User-friendly error message",
-        { variant: "error" }
-      );
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("User-friendly error message", { variant: "error" });
     });
 
     it("should handle YAML configuration parsing errors", async () => {
@@ -902,7 +868,8 @@ describe("Sensitive Data Form", () => {
     it("should handle personal info extraction errors gracefully", async () => {
       // GIVEN a form with valid fields
       const user = userEvent.setup();
-      const mockCreateSensitivePersonalData = jest.spyOn(sensitivePersonalDataService, "createSensitivePersonalData")
+      const mockCreateSensitivePersonalData = jest
+        .spyOn(sensitivePersonalDataService, "createSensitivePersonalData")
         .mockResolvedValue(undefined);
 
       // AND the form is rendered
@@ -935,7 +902,7 @@ describe("Sensitive Data Form", () => {
         {
           field1: "test value",
           field2: "option1",
-          field3: ["option1", "option2"]
+          field3: ["option1", "option2"],
         },
         givenUserId,
         SAMPLE_FIELDS
@@ -945,10 +912,9 @@ describe("Sensitive Data Form", () => {
       expect(mockNavigate).toHaveBeenCalledWith(routerPaths.ROOT);
 
       // AND a success message should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "Personal data saved successfully and securely.",
-        { variant: "success" }
-      );
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Personal data saved successfully and securely.", {
+        variant: "success",
+      });
     });
   });
 
@@ -985,16 +951,13 @@ describe("Sensitive Data Form", () => {
       // THEN the logout function should be called
       expect(mockLogout).toHaveBeenCalled();
 
-      // AND the user should be navigated to the login page
+      // AND the user should be navigated to the landing page
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith(routerPaths.LOGIN, { replace: true });
+        expect(mockNavigate).toHaveBeenCalledWith(routerPaths.LANDING, { replace: true });
       });
 
       // AND a success message should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "Successfully logged out.",
-        { variant: "success" }
-      );
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Successfully logged out.", { variant: "success" });
       // AND no console errors or warnings should be logged
       expect(console.warn).not.toHaveBeenCalled();
       expect(console.error).not.toHaveBeenCalled();
@@ -1050,10 +1013,9 @@ describe("Sensitive Data Form", () => {
       expect(mockNavigate).toHaveBeenCalledWith(routerPaths.ROOT);
 
       // AND a success message should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "Personal data collection skipped.",
-        { variant: "success" }
-      );
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Personal data collection skipped.", {
+        variant: "success",
+      });
     });
 
     test("should stay on the same page when the user cancels the skip action", async () => {
@@ -1150,8 +1112,8 @@ describe("Sensitive Data Form", () => {
         ...SAMPLE_STRING_FIELD,
         validation: {
           pattern: "^[A-Za-z]+$",
-          errorMessage: "Only letters are allowed"
-        }
+          errorMessage: "Only letters are allowed",
+        },
       };
       useFieldsConfigSpy.mockReturnValue({
         fields: [fieldWithPattern],
@@ -1210,7 +1172,7 @@ describe("Sensitive Data Form", () => {
       const nonRequiredFields = [
         { ...SAMPLE_STRING_FIELD, required: false },
         { ...SAMPLE_ENUM_FIELD, required: false },
-        { ...SAMPLE_MULTIPLE_FIELD, required: false }
+        { ...SAMPLE_MULTIPLE_FIELD, required: false },
       ];
       useFieldsConfigSpy.mockReturnValue({
         fields: nonRequiredFields,

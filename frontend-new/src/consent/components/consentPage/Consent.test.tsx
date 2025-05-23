@@ -16,7 +16,8 @@ import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { routerPaths } from "src/app/routerPaths";
 import {
   SensitivePersonalDataRequirement,
-  Language, UserPreference,
+  Language,
+  UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { DATA_TEST_ID as BACKDROP_TEST_ID } from "src/theme/Backdrop/Backdrop";
@@ -88,7 +89,7 @@ describe("Testing Consent Page", () => {
     global.GeolocationPositionError = class extends Error {
       constructor(message: string) {
         super(message);
-        this.name = 'GeolocationPositionError';
+        this.name = "GeolocationPositionError";
       }
     };
   });
@@ -141,92 +142,95 @@ describe("Testing Consent Page", () => {
       test.each([
         [routerPaths.SENSITIVE_DATA, SensitivePersonalDataRequirement.NOT_REQUIRED],
         [routerPaths.SENSITIVE_DATA, SensitivePersonalDataRequirement.REQUIRED],
-        [routerPaths.ROOT, SensitivePersonalDataRequirement.NOT_AVAILABLE]
-      ])("should successfully accept the agreements and navigate to %s when the sensitive data is %s", async (expectedRoute, givenSensitiveDataRequirement) => {
-        mockBrowserIsOnLine(true);
+        [routerPaths.ROOT, SensitivePersonalDataRequirement.NOT_AVAILABLE],
+      ])(
+        "should successfully accept the agreements and navigate to %s when the sensitive data is %s",
+        async (expectedRoute, givenSensitiveDataRequirement) => {
+          mockBrowserIsOnLine(true);
 
-        // GIVEN the user preferences state service is mocked to set the user preferences
-        const givenUserPreferences: UserPreference = {
-          user_id: "foo-id",
-          language: Language.en,
-          accepted_tc: new Date(),
-          sessions: [],
-          user_feedback_answered_questions: {},
-          has_sensitive_personal_data: false,
-          sensitive_personal_data_requirement: givenSensitiveDataRequirement,
-          experiments: {},
+          // GIVEN the user preferences state service is mocked to set the user preferences
+          const givenUserPreferences: UserPreference = {
+            user_id: "foo-id",
+            language: Language.en,
+            accepted_tc: new Date(),
+            sessions: [],
+            user_feedback_answered_questions: {},
+            has_sensitive_personal_data: false,
+            sensitive_personal_data_requirement: givenSensitiveDataRequirement,
+            experiments: {},
+          };
+          UserPreferencesStateService.getInstance().setUserPreferences(givenUserPreferences);
+
+          const updateUserPreferences = jest
+            .spyOn(UserPreferencesService.getInstance(), "updateUserPreferences")
+            .mockResolvedValue(givenUserPreferences);
+
+          // AND the authStateService is mocked to return the given user
+          const givenUser: TabiyaUser = {
+            id: "0001",
+            email: "foo@bar.baz",
+            name: "Foo Bar",
+          };
+
+          jest.spyOn(authStateService.getInstance(), "getUser").mockImplementation(() => givenUser);
+          const givenCoordinates: [number, number] = [123, 456];
+          jest.spyOn(UserLocationUtils, "getCoordinates").mockResolvedValueOnce(givenCoordinates);
+
+          jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValueOnce();
+
+          // WHEN the component is rendered
+          render(<Consent />);
+
+          // AND WHEN the user accepts Data protection Agreement
+          const dpaCheckBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER);
+          expect(dpaCheckBoxWrapper).toBeInTheDocument();
+          const dpaCheckbox = dpaCheckBoxWrapper.getElementsByTagName("input")[0] as HTMLInputElement;
+          await userEvent.click(dpaCheckbox);
+
+          // AND Terms and Conditions are accepted
+          const tcCheckBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER);
+          expect(tcCheckBoxWrapper).toBeInTheDocument();
+          const tcCheckbox = tcCheckBoxWrapper.getElementsByTagName("input")[0] as HTMLInputElement;
+          await userEvent.click(tcCheckbox);
+
+          // AND the user clicks the accept button
+          expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON)).toBeEnabled();
+          await userEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
+
+          // THEN update user preferences should be called
+          expect(updateUserPreferences).toHaveBeenCalled();
+
+          // AND no errors should be logged
+          expect(console.error).not.toHaveBeenCalled();
+          expect(console.warn).not.toHaveBeenCalled();
+
+          // AND device metrics should have been recorded
+          expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith(
+            expect.objectContaining({
+              event_type: EventType.DEVICE_SPECIFICATION,
+              user_id: givenUserPreferences.user_id,
+              browser_type: "foo", // from mock at the top of the file
+              device_type: "bar", // from mock at the top of the file
+              os_type: "baz", // from mock at the top of the file
+              browser_version: "foo-version", // from mock at the top of the file
+              timestamp: new Date().toISOString(),
+            })
+          );
+
+          // AND location metrics should have been recorded
+          expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith(
+            expect.objectContaining({
+              event_type: EventType.USER_LOCATION,
+              user_id: givenUserPreferences.user_id,
+              coordinates: givenCoordinates,
+              timestamp: new Date().toISOString(),
+            })
+          );
+
+          // AND user should be redirected to the expected route
+          expect(useNavigate()).toHaveBeenCalledWith(expectedRoute, { replace: true });
         }
-        UserPreferencesStateService.getInstance().setUserPreferences(givenUserPreferences)
-
-        const updateUserPreferences = jest
-          .spyOn(UserPreferencesService.getInstance(), "updateUserPreferences")
-          .mockResolvedValue(givenUserPreferences);
-
-        // AND the authStateService is mocked to return the given user
-        const givenUser: TabiyaUser = {
-          id: "0001",
-          email: "foo@bar.baz",
-          name: "Foo Bar",
-        };
-
-        jest.spyOn(authStateService.getInstance(), "getUser").mockImplementation(() => givenUser);
-        const givenCoordinates: [number, number] = [123, 456];
-        jest.spyOn(UserLocationUtils, "getCoordinates").mockResolvedValueOnce(givenCoordinates);
-
-        jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValueOnce();
-
-        // WHEN the component is rendered
-        render(<Consent />);
-
-        // AND WHEN the user accepts Data protection Agreement
-        const dpaCheckBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER);
-        expect(dpaCheckBoxWrapper).toBeInTheDocument();
-        const dpaCheckbox = dpaCheckBoxWrapper.getElementsByTagName("input")[0] as HTMLInputElement;
-        await userEvent.click(dpaCheckbox);
-
-        // AND Terms and Conditions are accepted
-        const tcCheckBoxWrapper = screen.getByTestId(DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER);
-        expect(tcCheckBoxWrapper).toBeInTheDocument();
-        const tcCheckbox = tcCheckBoxWrapper.getElementsByTagName("input")[0] as HTMLInputElement;
-        await userEvent.click(tcCheckbox);
-
-        // AND the user clicks the accept button
-        expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON)).toBeEnabled();
-        await userEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
-
-        // THEN update user preferences should be called
-        expect(updateUserPreferences).toHaveBeenCalled();
-
-        // AND no errors should be logged
-        expect(console.error).not.toHaveBeenCalled();
-        expect(console.warn).not.toHaveBeenCalled();
-
-        // AND device metrics should have been recorded
-        expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith(
-          expect.objectContaining({
-            event_type: EventType.DEVICE_SPECIFICATION,
-            user_id: givenUserPreferences.user_id,
-            browser_type: "foo", // from mock at the top of the file
-            device_type: "bar", // from mock at the top of the file
-            os_type: "baz", // from mock at the top of the file
-            browser_version: "foo-version", // from mock at the top of the file
-            timestamp: new Date().toISOString(),
-          })
-        );
-
-        // AND location metrics should have been recorded
-        expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith(
-          expect.objectContaining({
-            event_type: EventType.USER_LOCATION,
-            user_id: givenUserPreferences.user_id,
-            coordinates: givenCoordinates,
-            timestamp: new Date().toISOString(),
-          })
-        );
-
-        // AND user should be redirected to the expected route
-        expect(useNavigate()).toHaveBeenCalledWith(expectedRoute, { replace: true });
-      });
+      );
 
       test("should fail to accept agreements gracefully", async () => {
         // GIVEN a user is logged in
@@ -350,9 +354,9 @@ describe("Testing Consent Page", () => {
         // AND the user clicks the accept button
         await userEvent.click(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON));
 
-        // AND the user should be navigated to the login page
+        // AND the user should be navigated to the landing page
         await waitFor(() => {
-          expect(useNavigate()).toHaveBeenCalledWith(routerPaths.LOGIN);
+          expect(useNavigate()).toHaveBeenCalledWith(routerPaths.LANDING);
         });
       });
     });
@@ -401,9 +405,9 @@ describe("Testing Consent Page", () => {
         // THEN the accept button should be disabled while the user is being logged out
         expect(screen.getByTestId(DATA_TEST_ID.ACCEPT_BUTTON)).toBeDisabled();
 
-        // AND the user should be navigated to the login page
+        // AND the user should be navigated to the landing page
         await waitFor(() => {
-          expect(useNavigate()).toHaveBeenCalledWith(routerPaths.LOGIN, { replace: true });
+          expect(useNavigate()).toHaveBeenCalledWith(routerPaths.LANDING, { replace: true });
         });
 
         // AND snack bar should display a success message

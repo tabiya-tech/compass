@@ -7,7 +7,7 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
 >
   <div
     aria-hidden="true"
-    class="MuiBackdrop-root css-hdzoti-MuiBackdrop-root"
+    class="MuiBackdrop-root css-1mfxwij-MuiBackdrop-root"
     data-testid="backdrop-91b57774-d50c-4350-882d-363f80ac10e8"
     style="opacity: 0; visibility: hidden;"
   >
@@ -223,8 +223,8 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
       >
         Before we begin...
       </h4>
-      <p
-        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+      <div
+        class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       />
     </div>

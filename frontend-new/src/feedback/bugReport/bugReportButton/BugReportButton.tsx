@@ -38,7 +38,7 @@ const StyledPrimaryIconButton = styled(PrimaryIconButton)(({ theme }) => ({
 const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, className }) => {
   const [bugReport, setBugReport] = useState<any>();
   const buttonRef = useRef<HTMLDivElement>(null);
-  const isMobile = useMediaQuery((theme : Theme) => theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [sentryEnabled, setSentryEnabled] = useState(false);
 
   useEffect(() => {
@@ -65,8 +65,9 @@ const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, classNam
         className={className}
         sx={{
           position: bottomAlign ? "fixed" : "auto",
-          bottom: (theme) => bottomAlign ? theme.spacing(theme.tabiyaSpacing.lg) : "auto",
-          right: (theme) => bottomAlign ? theme.spacing(theme.tabiyaSpacing.lg) : "auto",
+          bottom: (theme) => (bottomAlign ? theme.spacing(theme.tabiyaSpacing.lg) : "auto"),
+          right: (theme) => (bottomAlign ? theme.spacing(theme.tabiyaSpacing.lg) : "auto"),
+          zIndex: (theme) => Math.max(theme.zIndex.drawer, theme.zIndex.modal) + 1,
         }}
       >
         {" "}

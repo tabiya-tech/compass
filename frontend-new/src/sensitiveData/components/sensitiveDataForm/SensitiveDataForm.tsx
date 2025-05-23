@@ -1,12 +1,5 @@
 import { useCallback, useState, useEffect, Suspense } from "react";
-import {
-  Box,
-  CircularProgress,
-  Container,
-  useMediaQuery,
-  useTheme,
-  Typography,
-} from "@mui/material";
+import { Box, CircularProgress, Container, useMediaQuery, useTheme, Typography } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -21,10 +14,7 @@ import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIErro
 import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePersonalDataService/errors";
 import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 import TextConfirmModalDialog from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
-import {
-  FieldType,
-  FieldDefinition,
-} from "src/sensitiveData/components/sensitiveDataForm/config/types";
+import { FieldType, FieldDefinition } from "src/sensitiveData/components/sensitiveDataForm/config/types";
 import { useFieldsConfig } from "src/sensitiveData/components/sensitiveDataForm/config/useFieldsConfig";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import {
@@ -83,10 +73,14 @@ const createDataTestId = (fields: FieldDefinition[]): DataTestIdType => {
   };
 
   // Add dynamic field IDs
-  const fieldIds = fields.reduce((acc, field) => {
-    acc[`SENSITIVE_DATA_FORM_${field.name.toUpperCase()}_INPUT`] = `sensitive-data-form-${field.name.toLowerCase()}-input-${uniqueId}`;
-    return acc;
-  }, {} as Record<string, string>);
+  const fieldIds = fields.reduce(
+    (acc, field) => {
+      acc[`SENSITIVE_DATA_FORM_${field.name.toUpperCase()}_INPUT`] =
+        `sensitive-data-form-${field.name.toLowerCase()}-input-${uniqueId}`;
+      return acc;
+    },
+    {} as Record<string, string>
+  );
 
   return { ...baseIds, ...fieldIds };
 };
@@ -102,10 +96,8 @@ export const ERROR_MESSAGE = {
   DEFAULT:
     "The personal data could not be saved." +
     "Please try again and if the problem persists, clear your browser's cache and refresh the page.",
-  CONFIG_LOADING_ERROR:
-    "Failed to load the form configuration. Please refresh the page and try again.",
+  CONFIG_LOADING_ERROR: "Failed to load the form configuration. Please refresh the page and try again.",
 };
-
 
 function isFormValid(result: Record<string, boolean>): boolean {
   for (let value of Object.values(result)) {
@@ -151,7 +143,7 @@ const renderField = (
   field: FieldDefinition,
   handleFieldChange: (key: string, value: string | string[], isValid: boolean) => void,
   dataTestId: DataTestIdType,
-  initialData: SensitivePersonalData,
+  initialData: SensitivePersonalData
 ) => {
   const fieldTestId = dataTestId[`SENSITIVE_DATA_FORM_${field.name.toUpperCase()}_INPUT`];
 
@@ -162,7 +154,7 @@ const renderField = (
           key={field.name}
           field={field}
           dataTestId={fieldTestId}
-          initialValue={Array.isArray(initialData[field.name]) ? initialData[field.name] as string[] : []}
+          initialValue={Array.isArray(initialData[field.name]) ? (initialData[field.name] as string[]) : []}
           onChange={(values: string[], isValid: boolean) => handleFieldChange(field.name, values, isValid)}
         />
       );
@@ -172,7 +164,11 @@ const renderField = (
           key={field.name}
           field={field}
           dataTestId={fieldTestId}
-          initialValue={typeof initialData[field.name] === "string" ? initialData[field.name] as string : field.defaultValue ?? ""}
+          initialValue={
+            typeof initialData[field.name] === "string"
+              ? (initialData[field.name] as string)
+              : (field.defaultValue ?? "")
+          }
           onChange={(value: string, isValid: boolean) => handleFieldChange(field.name, value, isValid)}
         />
       );
@@ -183,7 +179,11 @@ const renderField = (
           key={field.name}
           field={field}
           dataTestId={fieldTestId}
-          initialValue={typeof initialData[field.name] === "string" ? initialData[field.name] as string : field.defaultValue ?? ""}
+          initialValue={
+            typeof initialData[field.name] === "string"
+              ? (initialData[field.name] as string)
+              : (field.defaultValue ?? "")
+          }
           onChange={(value: string, isValid: boolean) => handleFieldChange(field.name, value, isValid)}
         />
       );
@@ -216,7 +216,7 @@ const SensitiveDataForm: React.FC = () => {
   const [isSubmitButtonEnabled, setIsSubmitButtonEnabled] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   const [userPreferences] = useState<UserPreference | null>(
-    UserPreferencesStateService.getInstance().getUserPreferences(),
+    UserPreferencesStateService.getInstance().getUserPreferences()
   );
 
   // Initialize with empty data, will be updated when config is loaded
@@ -232,7 +232,7 @@ const SensitiveDataForm: React.FC = () => {
       const initialValidation: Record<string, boolean> = {};
 
       // Set initial validation state based on field requirements
-      fields.forEach(field => {
+      fields.forEach((field) => {
         // Required fields start as invalid, non-required fields start as valid
         initialValidation[field.name] = !field.required;
       });
@@ -277,7 +277,7 @@ const SensitiveDataForm: React.FC = () => {
       await sensitivePersonalDataService.createSensitivePersonalData(
         sanitize(sensitiveData, fields),
         userPreferences!.user_id,
-        fields,
+        fields
       );
 
       // Update user preferences to indicate that the user has sensitive personal data
@@ -289,21 +289,19 @@ const SensitiveDataForm: React.FC = () => {
       });
 
       // Store personal info for local use using our utility function
-      PersistentStorageService.setPersonalInfo(
-        extractPersonalInfo(sensitiveData, fields),
-      );
+      PersistentStorageService.setPersonalInfo(extractPersonalInfo(sensitiveData, fields));
 
       enqueueSnackbar("Personal data saved successfully and securely.", { variant: "success" });
       navigate(routerPaths.ROOT);
     } catch (e) {
       console.error("Failed to save personal data", e);
-      let friendlyErrorMessage = ERROR_MESSAGE.DEFAULT
+      let friendlyErrorMessage = ERROR_MESSAGE.DEFAULT;
       if (e instanceof RestAPIError) {
         friendlyErrorMessage = getUserFriendlyErrorMessage(e);
       } else if (e instanceof EncryptedDataTooLarge) {
         friendlyErrorMessage = ERROR_MESSAGE.ENCRYPTED_DATA_TOO_LARGE;
       }
-      enqueueSnackbar(friendlyErrorMessage, {variant: "error"});
+      enqueueSnackbar(friendlyErrorMessage, { variant: "error" });
 
       setIsSavingSensitiveData(false);
       setIsSubmitButtonEnabled(true);
@@ -317,7 +315,7 @@ const SensitiveDataForm: React.FC = () => {
     try {
       const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
       await authenticationService!.logout();
-      navigate(routerPaths.LOGIN, { replace: true });
+      navigate(routerPaths.LANDING, { replace: true });
       enqueueSnackbar("Successfully logged out.", { variant: "success" });
     } catch (e) {
       console.error("Failed to log out", e);
@@ -344,12 +342,11 @@ const SensitiveDataForm: React.FC = () => {
       navigate(routerPaths.ROOT);
     } catch (e) {
       console.error("Failed to skip personal data", e);
-      let friendlyErrorMessage = ERROR_MESSAGE.DEFAULT
+      let friendlyErrorMessage = ERROR_MESSAGE.DEFAULT;
       if (e instanceof RestAPIError) {
         friendlyErrorMessage = getUserFriendlyErrorMessage(e);
       }
       enqueueSnackbar(friendlyErrorMessage, { variant: "error" });
-
     } finally {
       setIsSkipping(false);
     }
@@ -372,17 +369,9 @@ const SensitiveDataForm: React.FC = () => {
   if (configError) {
     return (
       <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.SENSITIVE_DATA_CONTAINER}>
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          height="100%"
-        >
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100%">
           <Box color="error.main" mb={2}>
-            <Typography
-              data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_ERROR_MESSAGE}
-            >
+            <Typography data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_ERROR_MESSAGE}>
               {SENSITIVE_DATA_FORM_FIXED_TEXT.FAILED_TO_LOAD_CONFIG}
             </Typography>
           </Box>
@@ -422,12 +411,10 @@ const SensitiveDataForm: React.FC = () => {
                 subtitle={
                   <>
                     {SENSITIVE_DATA_FORM_FIXED_TEXT.SUBTITLE}
-                    {
-                      isPIIRequired ? " " + SENSITIVE_DATA_FORM_FIXED_TEXT.UNSKIPPABLE_SUBTITLE : " " + SENSITIVE_DATA_FORM_FIXED_TEXT.SKIPPABLE_SUBTITLE
-                    }
-                    <HelpTip icon={<PrivacyTipIcon />}>
-                      {SENSITIVE_DATA_FORM_FIXED_TEXT.HELP_TIP_TEXT}
-                    </HelpTip>
+                    {isPIIRequired
+                      ? " " + SENSITIVE_DATA_FORM_FIXED_TEXT.UNSKIPPABLE_SUBTITLE
+                      : " " + SENSITIVE_DATA_FORM_FIXED_TEXT.SKIPPABLE_SUBTITLE}
+                    <HelpTip icon={<PrivacyTipIcon />}>{SENSITIVE_DATA_FORM_FIXED_TEXT.HELP_TIP_TEXT}</HelpTip>
                   </>
                 }
               />
@@ -440,12 +427,7 @@ const SensitiveDataForm: React.FC = () => {
               >
                 <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
                   {/* Dynamically render form fields based on configuration */}
-                  {fields.map(field => renderField(
-                    field,
-                    handleFieldChange,
-                    DATA_TEST_ID,
-                    sensitiveData,
-                  ))}
+                  {fields.map((field) => renderField(field, handleFieldChange, DATA_TEST_ID, sensitiveData))}
                 </Box>
                 <Box
                   sx={{
