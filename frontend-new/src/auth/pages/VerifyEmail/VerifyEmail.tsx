@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Container } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import { routerPaths } from "src/app/routerPaths";
@@ -39,10 +39,10 @@ const VerifyEmail: React.FC = () => {
         <AuthHeader
           title={"Thank you for registering to Compass."}
           subtitle={
-            <>
+            <Typography variant="body2">
               A verification email has been sent to your email address. To continue, please verify your email address
               first.
-            </>
+            </Typography>
           }
         />
         <PrimaryButton

@@ -49,12 +49,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!user || !userPreferences) {
-    if (targetPath === routerPaths.LOGIN || targetPath === routerPaths.REGISTER) {
-      console.debug("redirecting from /login/register --> /login/register because no user");
+    if (targetPath === routerPaths.LOGIN || targetPath === routerPaths.REGISTER || targetPath === routerPaths.LANDING) {
+      console.debug("redirecting from landing/login/register --> landing/login/register because no user");
       return <>{children}</>;
     }
-    console.debug("redirecting from ? --> /login because no user");
-    return <Navigate to={routerPaths.LOGIN} />;
+    console.debug("redirecting from ? --> /landing because no user");
+    return <Navigate to={routerPaths.LANDING} />;
   }
 
   //--- by now we know we have a user and some preferences
@@ -76,7 +76,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   // Redirect from auth-related paths to root when all conditions are met
-  if (targetPath === routerPaths.LOGIN || targetPath === routerPaths.REGISTER) {
+  if (targetPath === routerPaths.LOGIN || targetPath === routerPaths.REGISTER || targetPath === routerPaths.LANDING) {
     if (isAcceptedTCValid(userPreferences) && isSensitiveDataValid(userPreferences)) {
       console.debug("redirecting from auth path --> /home because all conditions are met");
       return <Navigate to={routerPaths.ROOT} />;

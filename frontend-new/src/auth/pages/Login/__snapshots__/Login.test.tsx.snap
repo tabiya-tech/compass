@@ -121,7 +121,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
   />
   <div
     aria-hidden="true"
-    class="MuiBackdrop-root css-hdzoti-MuiBackdrop-root"
+    class="MuiBackdrop-root css-1mfxwij-MuiBackdrop-root"
     data-testid="backdrop-91b57774-d50c-4350-882d-363f80ac10e8"
     style="opacity: 0; visibility: hidden;"
   >
@@ -356,7 +356,7 @@ exports[`Testing Login component should handle application login code 1`] = `
         tabindex="0"
         type="button"
       >
-        Start a new conversation
+        Continue as Guest
         <span
           class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
         />
@@ -413,7 +413,7 @@ exports[`Testing Login component should handle application login code 1`] = `
   />
   <div
     aria-hidden="true"
-    class="MuiBackdrop-root css-hdzoti-MuiBackdrop-root"
+    class="MuiBackdrop-root css-1mfxwij-MuiBackdrop-root"
     data-testid="backdrop-91b57774-d50c-4350-882d-363f80ac10e8"
     style="opacity: 0; visibility: hidden;"
   >

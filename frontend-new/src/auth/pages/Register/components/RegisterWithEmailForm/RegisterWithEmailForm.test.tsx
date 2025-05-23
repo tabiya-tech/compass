@@ -3,7 +3,7 @@ import "src/_test_utilities/consoleMock";
 import RegisterWithEmailForm, { DATA_TEST_ID } from "./RegisterWithEmailForm";
 import React from "react";
 import { render, screen, fireEvent, act } from "src/_test_utilities/test-utils";
-import PasswordInput, { DATA_TEST_ID as PASSWORD_INPUT_DATA_TEST_ID} from "src/theme/PasswordInput/PasswordInput";
+import PasswordInput, { DATA_TEST_ID as PASSWORD_INPUT_DATA_TEST_ID } from "src/theme/PasswordInput/PasswordInput";
 
 // mock the SocialAuthService
 jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
@@ -94,7 +94,7 @@ describe("Testing Register Email Form component", () => {
       act(() => {
         (PasswordInput as jest.Mock).mock.calls[0][0].onChange({ target: { value: "Password123$" } });
         (PasswordInput as jest.Mock).mock.calls[0][0].onValidityChange(true);
-      })
+      });
 
       // AND the form is submitted
       fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
@@ -135,7 +135,7 @@ describe("Testing Register Email Form component", () => {
       act(() => {
         (PasswordInput as jest.Mock).mock.calls[0][0].onChange({ target: { value: "Password123$" } });
         (PasswordInput as jest.Mock).mock.calls[0][0].onValidityChange(true);
-      })
+      });
 
       // AND the form is submitted
       fireEvent.submit(screen.getByTestId(DATA_TEST_ID.FORM));
@@ -163,7 +163,7 @@ describe("Testing Register Email Form component", () => {
       act(() => {
         (PasswordInput as jest.Mock).mock.calls[0][0].onChange({ target: { value: "Password123$" } });
         (PasswordInput as jest.Mock).mock.calls[0][0].onValidityChange(false); // password is invalid
-      })
+      });
 
       // THEN expect notifyOnRegister to not have been called
       expect(givenNotifyOnRegister).not.toHaveBeenCalled();
@@ -187,7 +187,7 @@ describe("Testing Register Email Form component", () => {
 
       expect(PasswordInput).toHaveBeenCalledWith(
         expect.objectContaining({
-          disabled: true
+          disabled: true,
         }),
         expect.anything()
       );

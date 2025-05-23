@@ -98,7 +98,7 @@ const Consent: React.FC = () => {
           console.error("An error occurred while trying to get user's location", err);
         }
       }
-    })
+    });
   }
 
   /**
@@ -109,7 +109,7 @@ const Consent: React.FC = () => {
       const user = authStateService.getInstance().getUser();
       if (!user) {
         enqueueSnackbar("User not found", { variant: "error" });
-        navigate(routerPaths.LOGIN);
+        navigate(routerPaths.LANDING);
         return;
       }
 
@@ -165,7 +165,7 @@ const Consent: React.FC = () => {
     try {
       const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
       await authenticationService!.logout();
-      navigate(routerPaths.LOGIN, { replace: true });
+      navigate(routerPaths.LANDING, { replace: true });
       enqueueSnackbar("Successfully logged out.", { variant: "success" });
     } catch (e) {
       console.error(new AuthenticationError("Failed to log out", e));

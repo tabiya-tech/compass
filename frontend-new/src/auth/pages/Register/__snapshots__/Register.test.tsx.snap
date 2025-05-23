@@ -14,7 +14,7 @@ exports[`Testing Register component it should show register form successfully 1`
     <h6
       class="MuiTypography-root MuiTypography-subtitle2 css-ohbpz3-MuiTypography-root"
     >
-      Enter your registration code to sign up
+      Enter your registration code
     </h6>
     <div
       class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-4c32m-MuiFormControl-root-MuiTextField-root"
@@ -104,7 +104,7 @@ exports[`Testing Register component it should show register form successfully 1`
   />
   <div
     aria-hidden="true"
-    class="MuiBackdrop-root css-hdzoti-MuiBackdrop-root"
+    class="MuiBackdrop-root css-1mfxwij-MuiBackdrop-root"
     data-testid="backdrop-91b57774-d50c-4350-882d-363f80ac10e8"
     style="opacity: 0; visibility: hidden;"
   >
@@ -316,7 +316,7 @@ exports[`Testing Register component should handle application registration code 
   />
   <div
     aria-hidden="true"
-    class="MuiBackdrop-root css-hdzoti-MuiBackdrop-root"
+    class="MuiBackdrop-root css-1mfxwij-MuiBackdrop-root"
     data-testid="backdrop-91b57774-d50c-4350-882d-363f80ac10e8"
     style="opacity: 0; visibility: hidden;"
   >

@@ -28,7 +28,7 @@ import { routerPaths } from "src/app/routerPaths";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import * as EnvServiceModule from "src/envService"
+import * as EnvServiceModule from "src/envService";
 import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import * as ReactRouterDomModule from "react-router-dom";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
@@ -220,14 +220,14 @@ describe("Testing Login component", () => {
   it("should handle application login code", async () => {
     // GIVEN the application login code is set
     const givenApplicationLoginCode = "bar";
-    jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode)
+    jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
 
     // AND no application registration code
-    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue("")
+    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue("");
 
     // AND some sample application code
     const givenApplicationRegistrationCode = "foo";
-    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue(givenApplicationRegistrationCode)
+    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue(givenApplicationRegistrationCode);
 
     // AND anonymous login function will succeed
     const anonymousLoginMock = jest.fn().mockResolvedValue("mock-token");
@@ -249,13 +249,16 @@ describe("Testing Login component", () => {
     // AND LoginWithComponent should not be called
     expect(LoginWithInviteCodeForm).not.toHaveBeenCalled();
 
-    expect((SocialAuth as unknown as jest.Mock)).toHaveBeenCalledWith({
-      disabled: false,
-      isLoading: false,
-      notifyOnLoading: expect.any(Function),
-      postLoginHandler: expect.any(Function),
-      registrationCode: givenApplicationRegistrationCode,
-    }, {})
+    expect(SocialAuth as unknown as jest.Mock).toHaveBeenCalledWith(
+      {
+        disabled: false,
+        isLoading: false,
+        notifyOnLoading: expect.any(Function),
+        postLoginHandler: expect.any(Function),
+        registrationCode: givenApplicationRegistrationCode,
+      },
+      {}
+    );
 
     // AND the component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toMatchSnapshot();
@@ -265,7 +268,7 @@ describe("Testing Login component", () => {
 
     // THEN the login function should be called with the correct arguments.
     expect(anonymousLoginMock).toHaveBeenCalledWith(givenApplicationLoginCode);
-  })
+  });
 
   test("it should handle email login correctly", async () => {
     // GIVEN an email and password
@@ -436,17 +439,16 @@ describe("Testing Login component", () => {
   test("it should prefer the invitation code from url param over the application default code", async () => {
     // GIVEN an invitation code
     const givenApplicationLoginCode = "given-application-login-code";
-    jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode)
+    jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
 
     // AND an invite code is in the url param
-    const givenURLParamLoginCode = "given-url-login-code"
+    const givenURLParamLoginCode = "given-url-login-code";
     const mockLocation = {
       pathname: "/login",
       search: `?${INVITATIONS_PARAM_NAME}=${givenURLParamLoginCode}`,
     };
     // @ts-ignore
     jest.spyOn(ReactRouterDomModule, "useLocation").mockReturnValue(mockLocation);
-
 
     // AND the anonymous auth mock will succeed
     const anonymousLoginMock = jest.fn().mockResolvedValue("mock-token");
@@ -458,13 +460,13 @@ describe("Testing Login component", () => {
     render(<Login />);
 
     // AND the button clicks the start new conversation
-    await fireEvent.click(screen.getByTestId(DATA_TEST_ID.START_NEW_CONVERSATION_BUTTON))
+    await fireEvent.click(screen.getByTestId(DATA_TEST_ID.START_NEW_CONVERSATION_BUTTON));
 
     // THEN the anonymousAuthService should be called with the url invitation code
     await waitFor(() => {
       expect(anonymousLoginMock).toHaveBeenCalledWith(givenURLParamLoginCode);
     });
-  })
+  });
 
   test("should show ResendVerificationEmail component when email is not verified", async () => {
     // GIVEN an email and password

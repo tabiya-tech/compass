@@ -38,11 +38,7 @@ const AuthHeader: React.FC<Readonly<AuthHeaderProps>> = ({ title, subtitle }) =>
         {title}
       </Typography>
       {/* Only show a subtitle if needed */}
-      {subtitle && (
-        <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AUTH_HEADER_SUBTITLE}>
-          {subtitle}
-        </Typography>
-      )}
+      {subtitle && <Box data-testid={DATA_TEST_ID.AUTH_HEADER_SUBTITLE}>{subtitle}</Box>}
     </Box>
   );
 };
