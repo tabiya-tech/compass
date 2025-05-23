@@ -17,9 +17,9 @@ export const Shown: StoryObj<typeof Login> = {
 export const ShownWithApplicationLoginCodeSet: StoryObj<typeof Login> = {
   args: {},
   beforeEach: () => {
-    window.tabiyaConfig[EnvVariables.FRONTEND_LOGIN_CODE] = btoa("bar")
+    window.tabiyaConfig[EnvVariables.FRONTEND_LOGIN_CODE] = btoa("bar");
     return () => {
       delete window.tabiyaConfig[EnvVariables.FRONTEND_LOGIN_CODE];
-    }
-  }
-}
+    };
+  },
+};

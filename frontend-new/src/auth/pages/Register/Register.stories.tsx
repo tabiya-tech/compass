@@ -18,9 +18,9 @@ export const Shown: StoryObj<typeof Register> = {
 export const ShownWithApplicationRegistrationCodeSet: StoryObj<typeof Login> = {
   args: {},
   beforeEach: () => {
-    window.tabiyaConfig[EnvVariables.FRONTEND_REGISTRATION_CODE] = btoa("bar")
+    window.tabiyaConfig[EnvVariables.FRONTEND_REGISTRATION_CODE] = btoa("bar");
     return () => {
       delete window.tabiyaConfig[EnvVariables.FRONTEND_REGISTRATION_CODE];
-    }
-  }
-}
+    };
+  },
+};

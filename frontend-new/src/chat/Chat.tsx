@@ -174,7 +174,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     setIsLoggingOut(true);
     const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
     await authenticationService!.logout();
-    navigate(routerPaths.LOGIN, { replace: true });
+    navigate(routerPaths.LANDING, { replace: true });
     enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.SUCCESSFULLY_LOGGED_OUT, { variant: "success" });
     setIsLoggingOut(false);
   }, [enqueueSnackbar, navigate]);

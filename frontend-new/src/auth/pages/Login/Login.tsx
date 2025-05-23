@@ -341,9 +341,9 @@ const Login: React.FC = () => {
     if (applicationLoginCode) {
       return "Or login to your account to continue";
     } else {
-      return "or"
+      return "or";
     }
-  }, [applicationLoginCode])
+  }, [applicationLoginCode]);
 
   return (
     <Container
@@ -359,7 +359,7 @@ const Login: React.FC = () => {
         gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
         width={"100%"}
       >
-        <AuthHeader title={"Welcome to Compass!"}/>
+        <AuthHeader title={"Welcome to Compass!"} />
         <Box
           component="form"
           onSubmit={handleLoginSubmit}
@@ -377,13 +377,11 @@ const Login: React.FC = () => {
               onClick={handleStartNewConversation}
               data-testid={DATA_TEST_ID.START_NEW_CONVERSATION_BUTTON}
             >
-              Start a new conversation
+              Continue as Guest
             </PrimaryButton>
           ) : (
             <React.Fragment>
-              <Typography variant="body2">
-                Login to your account to continue
-              </Typography>
+              <Typography variant="body2">Login to your account to continue</Typography>
               <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
                 Login using
               </Typography>
