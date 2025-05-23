@@ -17,6 +17,8 @@ import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import AnonymousAccountConversionDialog, {
   DATA_TEST_ID as ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID,
 } from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
+import { DATA_TEST_ID as CONFIRM_MODAL_DATA_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
+import { DATA_TEST_ID as TEXT_CONFIRM_MODAL_DIALOG_DATA_TEST_ID } from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
 import { DATA_TEST_ID as INFO_DRAWER_DATA_TEST_ID } from "src/info/Info";
 import { ChatProvider } from "src/chat/ChatContext";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
@@ -97,7 +99,11 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 });
 
 const renderWithChatProvider = (child: React.ReactNode) => {
-  render(<ChatProvider handleOpenExperiencesDrawer={jest.fn} removeMessage={jest.fn} addMessage={jest.fn}>{child}</ChatProvider>);
+  render(
+    <ChatProvider handleOpenExperiencesDrawer={jest.fn} removeMessage={jest.fn} addMessage={jest.fn}>
+      {child}
+    </ChatProvider>
+  );
 };
 
 describe("ChatHeader", () => {
@@ -194,7 +200,11 @@ describe("ChatHeader", () => {
     const givenRemoveMessage = jest.fn();
     const givenAddMessage = jest.fn();
     const givenChatHeader = (
-      <ChatProvider handleOpenExperiencesDrawer={jest.fn} removeMessage={givenRemoveMessage} addMessage={givenAddMessage}>
+      <ChatProvider
+        handleOpenExperiencesDrawer={jest.fn}
+        removeMessage={givenRemoveMessage}
+        addMessage={givenAddMessage}
+      >
         <ChatHeader
           notifyOnLogout={givenNotifyOnLogout}
           startNewConversation={givenStartNewConversation}
@@ -393,7 +403,13 @@ describe("ChatHeader", () => {
       );
       // AND the chat header is rendered
       render(
-        <ChatProvider handleOpenExperiencesDrawer={givenNotifyOnExperiencesDrawerOpen} removeMessage={givenRemoveMessage} addMessage={givenAddMessage}>{givenChatHeader}</ChatProvider>
+        <ChatProvider
+          handleOpenExperiencesDrawer={givenNotifyOnExperiencesDrawerOpen}
+          removeMessage={givenRemoveMessage}
+          addMessage={givenAddMessage}
+        >
+          {givenChatHeader}
+        </ChatProvider>
       );
 
       // WHEN the experiences button is clicked
@@ -459,7 +475,13 @@ describe("ChatHeader", () => {
       );
       // renderWithChatProvider(givenChatHeader);
       render(
-        <ChatProvider handleOpenExperiencesDrawer={givenNotifyOnExperiencesDrawerOpen} removeMessage={givenRemoveMessage} addMessage={givenAddMessage}>{givenChatHeader}</ChatProvider>
+        <ChatProvider
+          handleOpenExperiencesDrawer={givenNotifyOnExperiencesDrawerOpen}
+          removeMessage={givenRemoveMessage}
+          addMessage={givenAddMessage}
+        >
+          {givenChatHeader}
+        </ChatProvider>
       );
 
       // WHEN the experiences button is clicked
@@ -996,6 +1018,135 @@ describe("ChatHeader", () => {
       // AND no errors or warnings to be shown
       expect(console.warn).not.toHaveBeenCalled();
       expect(console.error).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Logout button tests", () => {
+    // Common setup
+    const mockAnonymousUser = { id: "anonymous-id", name: "", email: "" };
+    const mockRegisteredUser = { id: "123", name: "Foo Bar", email: "foo@bar.baz" };
+
+    const renderChatHeader = (props = {}) => {
+      const defaultProps = {
+        notifyOnLogout: jest.fn(),
+        startNewConversation: jest.fn(),
+        experiencesExplored: 0,
+        exploredExperiencesNotification: false,
+        setExploredExperiencesNotification: jest.fn(),
+        conversationCompleted: false,
+        progressPercentage: 0,
+        timeUntilNotification: null,
+        ...props,
+      };
+
+      return renderWithChatProvider(<ChatHeader {...defaultProps} />);
+    };
+
+    test("should show confirmation dialog for anonymous users when logging out", async () => {
+      // GIVEN an anonymous user
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(mockAnonymousUser);
+
+      // WHEN the chat header is rendered
+      renderChatHeader();
+      // AND the user button is clicked
+      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+      await userEvent.click(userButton);
+      // AND the logout button is clicked
+      const logoutMenuItem = screen.getByTestId(MENU_ITEM_ID.LOGOUT_BUTTON);
+      await userEvent.click(logoutMenuItem);
+
+      // THEN expect the confirmation dialog to be shown
+      expect(screen.getByTestId(TEXT_CONFIRM_MODAL_DIALOG_DATA_TEST_ID.TEXT_CONFIRM_MODAL_CONTENT)).toBeInTheDocument();
+    });
+
+    test("should directly logout registered users without confirmation", async () => {
+      // GIVEN a registered user
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(mockRegisteredUser);
+      const notifyOnLogout = jest.fn();
+
+      // WHEN the chat header is rendered
+      renderChatHeader({ notifyOnLogout });
+      // AND the user button is clicked
+      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+      await userEvent.click(userButton);
+      // AND the logout button is clicked
+      const logoutMenuItem = screen.getByTestId(MENU_ITEM_ID.LOGOUT_BUTTON);
+      await userEvent.click(logoutMenuItem);
+
+      // THEN expect logout to be called
+      expect(notifyOnLogout).toHaveBeenCalled();
+      // AND the dialog to not be shown
+      expect(
+        screen.queryByTestId(TEXT_CONFIRM_MODAL_DIALOG_DATA_TEST_ID.TEXT_CONFIRM_MODAL_CONTENT)
+      ).not.toBeInTheDocument();
+    });
+
+    test("should proceed with logout when user confirms from dialog", async () => {
+      // GIVEN an anonymous user
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(mockAnonymousUser);
+      const notifyOnLogout = jest.fn();
+
+      // WHEN the chat header is rendered
+      renderChatHeader({ notifyOnLogout });
+      // AND the user button is clicked
+      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+      await userEvent.click(userButton);
+      // AND the logout button is clicked
+      const logoutMenuItem = screen.getByTestId(MENU_ITEM_ID.LOGOUT_BUTTON);
+      await userEvent.click(logoutMenuItem);
+      // AND the user confirms logout
+      const logoutButton = screen.getByTestId(CONFIRM_MODAL_DATA_TEST_ID.CONFIRM_MODAL_CANCEL);
+      await userEvent.click(logoutButton);
+
+      // THEN expect logout to be called
+      expect(notifyOnLogout).toHaveBeenCalled();
+    });
+
+    test("should show registration dialog when user chooses to register from logout confirmation", async () => {
+      // GIVEN an anonymous user
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(mockAnonymousUser);
+
+      // WHEN the chat header is rendered
+      renderChatHeader();
+      // AND the user button is clicked
+      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+      await userEvent.click(userButton);
+      // AND the logout button is clicked
+      const logoutMenuItem = screen.getByTestId(MENU_ITEM_ID.LOGOUT_BUTTON);
+      await userEvent.click(logoutMenuItem);
+      // AND the user chooses to register
+      const registerButton = screen.getByTestId(CONFIRM_MODAL_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM);
+      await userEvent.click(registerButton);
+
+      // THEN expect the registration dialog to be shown
+      expect(screen.getByTestId(ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID.DIALOG)).toBeInTheDocument();
+    });
+
+    test("should close logout confirmation dialog when close icon is clicked", async () => {
+      // GIVEN an anonymous user
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(mockAnonymousUser);
+
+      // WHEN the chat header is rendered
+      renderChatHeader();
+      // AND the user button is clicked
+      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
+      await userEvent.click(userButton);
+      // AND the logout button is clicked
+      const logoutMenuItem = screen.getByTestId(MENU_ITEM_ID.LOGOUT_BUTTON);
+      await userEvent.click(logoutMenuItem);
+
+      // THEN expect the logout confirmation dialog to be opened
+      const logoutConfirmationDialog = screen.getByTestId(CONFIRM_MODAL_DATA_TEST_ID.CONFIRM_MODAL);
+      expect(logoutConfirmationDialog).toBeInTheDocument();
+
+      // WHEN the close icon is clicked
+      const closeIcon = screen.getByTestId(CONFIRM_MODAL_DATA_TEST_ID.CONFIRM_MODAL_CLOSE);
+      await userEvent.click(closeIcon);
+
+      // THEN expect the dialog to be closed
+      await waitFor(() => {
+        expect(logoutConfirmationDialog).not.toBeInTheDocument();
+      });
     });
   });
 });

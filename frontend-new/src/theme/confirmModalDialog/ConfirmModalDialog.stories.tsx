@@ -11,6 +11,7 @@ const meta: Meta<typeof ConfirmModalDialog> = {
   argTypes: {
     onConfirm: { action: "onConfirm" },
     onCancel: { action: "onCancel" },
+    onDismiss: { action: "onDismiss" },
   },
 };
 
@@ -32,6 +33,24 @@ export const Shown: Story = {
     isOpen: true,
     cancelButtonText: "Cancel",
     confirmButtonText: "Confirm",
+  },
+};
+
+export const ShownWithCloseIcon: Story = {
+  args: {
+    title: "Sample Title",
+    content: (
+      <>
+        This is a sample body text for the ConfirmModal component.
+        <br />
+        <br />
+        Please confirm your action.
+      </>
+    ),
+    isOpen: true,
+    cancelButtonText: "Cancel",
+    confirmButtonText: "Confirm",
+    showCloseIcon: true,
   },
 };
 
