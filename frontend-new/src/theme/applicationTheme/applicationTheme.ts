@@ -63,6 +63,7 @@ export const TabiyaBasicColors = {
   LightBlue: "#265EA7",
   Yellow: "#EEFF41",
   Green: "#00FF91",
+  LightGreen: "#E4F8E2",
   DarkGreen: "#1E7166",
   Gray: "#F3F1EE",
   GrayDark: "#41403D",

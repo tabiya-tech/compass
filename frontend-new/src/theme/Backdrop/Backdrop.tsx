@@ -23,7 +23,7 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
     <OriginalBackdrop
       sx={{
         backgroundColor: props.transparent ? "transparent" : undefined,
-        zIndex: theme.zIndex.drawer + 1,
+        zIndex: Math.max(theme.zIndex.drawer, theme.zIndex.modal) + 1,
         color: theme.palette.info.contrastText,
       }}
       data-testid={DATA_TEST_ID.BACKDROP_CONTAINER}

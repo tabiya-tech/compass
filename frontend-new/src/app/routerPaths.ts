@@ -1,5 +1,6 @@
 export const routerPaths = {
   ROOT: "/",
+  LANDING: "/landing",
   SETTINGS: "/settings",
   REGISTER: "/register",
   LOGIN: "/login",

@@ -5,6 +5,7 @@ import ErrorPage from "src/error/errorPage/ErrorPage";
 import Register from "src/auth/pages/Register/Register";
 import VerifyEmail from "src/auth/pages/VerifyEmail/VerifyEmail";
 import Consent from "src/consent/components/consentPage/Consent";
+import Landing from "src/auth/pages/Landing/Landing";
 
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
 import { routerPaths } from "src/app/routerPaths";
@@ -37,6 +38,7 @@ export const SNACKBAR_KEYS = {
 
 const ProtectedRouteKeys = {
   ROOT: "ROOT",
+  LANDING: "LANDING",
   SETTINGS: "SETTINGS",
   REGISTER: "REGISTER",
   LOGIN: "LOGIN",
@@ -68,14 +70,16 @@ const App = () => {
       }
 
       // if the token is expired, refresh it.
-      if(authenticationServiceInstance.isTokenValid(token).failureCause === TokenValidationFailureCause.TOKEN_EXPIRED) {
+      if (
+        authenticationServiceInstance.isTokenValid(token).failureCause === TokenValidationFailureCause.TOKEN_EXPIRED
+      ) {
         console.debug("Token is expired getting new token for user...");
-        await authenticationServiceInstance.refreshToken()
-        token = authenticationStateService.getToken()
+        await authenticationServiceInstance.refreshToken();
+        token = authenticationStateService.getToken();
       }
 
       // the token may be null if something went wrong during the refresh.
-      if(!token) {
+      if (!token) {
         console.warn("Token could not be refreshed. User is not logged in");
         return;
       }
@@ -151,12 +155,12 @@ const App = () => {
 
       const token = authenticationStateService.getToken();
       // If no token from authenticationStateService, we don't need to update it again.
-      if(token) {
+      if (token) {
         authenticationStateService.setToken(token);
       }
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       const currentAuthenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
@@ -168,7 +172,7 @@ const App = () => {
         // since we're not sure if the user has logged in or not.
         currentAuthenticationService?.cleanup();
         // Remove the visibility change event listener
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
       } catch (error) {
         console.error(new AuthenticationError("Error cleaning up auth", error));
       }
@@ -183,6 +187,14 @@ const App = () => {
       element: (
         <ProtectedRoute key={ProtectedRouteKeys.ROOT}>
           <LazyLoadedChat />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: routerPaths.LANDING,
+      element: (
+        <ProtectedRoute key={ProtectedRouteKeys.LANDING}>
+          <Landing />
         </ProtectedRoute>
       ),
     },
