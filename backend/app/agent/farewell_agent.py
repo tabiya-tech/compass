@@ -1,6 +1,5 @@
 from textwrap import dedent
 
-from app.agent.simple_llm_agent.llm_response import ModelResponse
 from app.agent.simple_llm_agent.simple_llm_agent import SimpleLLMAgent
 from app.agent.agent_types import AgentType, AgentInput, AgentOutput
 from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions, \
@@ -18,18 +17,15 @@ class FarewellAgent(SimpleLLMAgent):
 
     def __init__(self):
         # Define the response part of the prompt with some example responses
-        response_part = get_json_response_instructions([
-            ModelResponse(message="Here are your skills ...", finished=True,
-                          reasoning="You are at the checkout, "
-                                    "therefore I will set the finished flag to true, "
-                                    "and I will provide you with a summary of your skills.")
-        ])
+        response_part = get_json_response_instructions()
 
         finish_instructions = get_conversation_finish_instructions(dedent("""Once you have completed your task"""))
 
         system_instructions_template = dedent("""\
-            Your task is to summarize my experiences and skills discovered 
-            in the skill exploration session between me and others agents and say goodbye.
+            Your task is to thank me for participating in the skill exploration session, and say goodbye.
+            Be friendly and farewell me with a positive and supportive message that captures the bigger picture of my working experiences from our conversation
+                        
+            Do not summarize my skills
             Do not ask any questions.
             Do not make things up.
             Do not explore skills further. 
@@ -37,9 +33,9 @@ class FarewellAgent(SimpleLLMAgent):
             Do not answer any of my questions.
             Do not format or style your response.
             There aren't any follow-up steps.
-            If i ask questions you are unsure, you will answer each time with a concise but different variation of:
-            "Sorry, I don't know how to help you with that."
-            Ensure the total response, including the goodbye, does not exceed 100 words.          
+            If I ask questions you are unsure, you will answer each time with a concise but different variation of:
+                "Sorry, I don't know how to help you with that."
+            Ensure the total response does not exceed 100 words.          
             
             {response_part}
             
