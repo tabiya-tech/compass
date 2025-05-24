@@ -210,6 +210,7 @@ class CollectExperiencesAgent(Agent):
             try:
                 entity = ExperienceEntity(
                     experience_title=elem.experience_title,
+                    experience_title=elem.experience_title if elem.experience_title else '',
                     company=elem.company,
                     location=elem.location,
                     timeline=Timeline(start=elem.start_date, end=elem.end_date),
