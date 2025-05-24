@@ -11,7 +11,7 @@ from evaluation_tests.conversation_libs.evaluators.prompt_generator import Promp
 
 class LlmEvaluatorOutput(BaseModel):
     """
-    Class used to parse the json returned from the llm evaluator.
+    Class used to parse the JSON returned from the llm evaluator.
     """
     score: int
     reason: str
@@ -27,7 +27,7 @@ class CriteriaEvaluator(BaseEvaluator):
         self.criteria = criteria
         # Use GeminiGenerativeLLM as the LLM for evaluation
         # as we are not interested in conducting a conversation, with an in-memory state (history).
-        self.llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name="gemini-2.0-flash-001"))
+        self.llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name="gemini-2.5-pro-preview-05-06"))
 
     async def evaluate(self, actual: ConversationEvaluationRecord) -> EvaluationResult:
         prompt = PromptGenerator.generate_prompt(conversation=actual.generate_conversation(),
