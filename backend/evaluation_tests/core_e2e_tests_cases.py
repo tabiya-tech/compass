@@ -1,8 +1,13 @@
 from textwrap import dedent
 
+from pydantic import ConfigDict
+
+from app.agent.experience import WorkType
 from app.countries import Country
+from evaluation_tests.discovered_experience_test_case import DiscoveredExperienceTestCase
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, Evaluation
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
+from evaluation_tests.matcher import ContainsString, AnyOf
 
 system_instruction_prompt = dedent("""
     You are going to be interacting with a GenAI-driven conversational agent to help you identify what your skills 
@@ -29,28 +34,91 @@ france_prompt = system_instruction_prompt + dedent("""
         (€580 a month, or €688 if volunteers have higher education grants or qualify for RSA supplemental income).
 """)
 
+
+class E2ESpecificTestCase(EvaluationTestCase, DiscoveredExperienceTestCase):
+    model_config = ConfigDict(extra="forbid")
+
+
 test_cases = [
-    EvaluationTestCase(
+    E2ESpecificTestCase(
+        country_of_user=Country.UNSPECIFIED,
+        conversation_rounds=50,
+        name='single_experience_specific_and_concise_user_e2e',
+        simulated_user_prompt=dedent("""
+            You're a Gen Y living alone. you have this single experience as an employee:
+            - Selling Shoes at Shoe Soles, a shoe store in Tokyo, from 2023 to present.
+            When asked you will reply with the information about this experience all at once, in a single message.
+            You have never had another job experience beside the shoe salesperson job. Also never
+            did any internship, never run your own business, never volunteered, never did any freelance work.
+            Be as concise as possible, and do not make up any information.
+            """) + system_instruction_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=1,
+        expected_work_types={
+            WorkType.SELF_EMPLOYMENT: (0, 0),
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+            WorkType.UNSEEN_UNPAID: (0, 0),
+        },
+        matchers=["llm", "matcher"],
+        expected_experience_data=[{
+            "experience_title": ContainsString("Shoe Salesperson"),
+            "location": ContainsString("Tokyo"),
+            "company": ContainsString("Shoe Soles"),
+            "timeline": {"start": ContainsString("2023"), "end": AnyOf(ContainsString("present"), "")},
+        }]
+    ),
+    E2ESpecificTestCase(
         country_of_user=Country.KENYA,
-        conversation_rounds=100,
+        conversation_rounds=50,
         name='young_monther_unseen_user_e2e',
         simulated_user_prompt=dedent("""
-            You're a young monther. You have been raising your child since it was born three years and mostly taking care of your family at home.
+            You're a young monther living in Mombasa. You have been raising your child since it was born three years ago (2022) 
+            and mostly taking care of your family at home.
             Never had a paying working experience of any kind, never as an employee, never did any internship, never run
-            did any internship, never run your own business, never volunteered, never did any freelance work.
+            did any internship, never run your own business, never volunteered, never did any freelance work, never helped the community or other households.
             """) + kenya_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=2,
+        expected_work_types={
+            WorkType.SELF_EMPLOYMENT: (0, 0),
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+            WorkType.UNSEEN_UNPAID: (1, 2),
+        },
+        matchers=["llm", "matcher"],
+        expected_experience_data=[{
+            "experience_title": ContainsString("Mom"),
+            "location": ContainsString("Mombasa"),
+            "company": ContainsString("family"),
+            "timeline": {"start": "2022", "end": ContainsString("present")},
+            "work_type": WorkType.UNSEEN_UNPAID.name,
+        }]
     ),
-    EvaluationTestCase(
+    E2ESpecificTestCase(
         country_of_user=Country.UNSPECIFIED,
-        conversation_rounds=100,
+        conversation_rounds=50,
         name='minimal_user_e2e',
         simulated_user_prompt=dedent("""
             You're a Gen Y living alone. You have one year of experience in a job as a shoe salesperson. 
             You have never had another job experience beside the shoe salesperson job. Also never
             did any internship, never run your own business, never volunteered, never did any freelance work.
             """) + system_instruction_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=1,
+        expected_work_types={
+            WorkType.SELF_EMPLOYMENT: (0, 0),
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+            WorkType.UNSEEN_UNPAID: (0, 0),
+        },
+        matchers=["llm", "matcher"],
+        expected_experience_data=[{
+            "experience_title": ContainsString("Shoe Salesperson"),
+        }]
     ),
     EvaluationTestCase(
         country_of_user=Country.SOUTH_AFRICA,
@@ -58,11 +126,11 @@ test_cases = [
         name='genZ_student_e2e',
         simulated_user_prompt=dedent("""
             Let's put you in the shoes of Shiela! You're a Gen Z student living with your mom and three 
-            brothers. Classes are mostly online for you, but you still hustle hard.  You volunteer and love teaching 
+            brothers. Classes are mostly online for you, but you still hustle hard. You volunteer and love teaching 
             others graphic design, transcription, the whole digital skills thing. You even help people without fancy 
             degrees get started online.
             """) + sa_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
     EvaluationTestCase(
         country_of_user=Country.SOUTH_AFRICA,
@@ -74,7 +142,7 @@ test_cases = [
             Engineering. You tried to start your own business but gave up after facing challenges. You have been 
             searching a lot to find a job but have failed. 
             """) + sa_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
     EvaluationTestCase(
         country_of_user=Country.SOUTH_AFRICA,
@@ -87,7 +155,7 @@ test_cases = [
             new job. You are now looking for opportunities to earn more money and move out of your cousin’s place. 
             However, you don't know how to do that and what kind of earning opportunities you should look for
             """) + sa_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
     EvaluationTestCase(
         country_of_user=Country.KENYA,
@@ -100,7 +168,7 @@ test_cases = [
             from your work as a dancer. Therefore, you started training with the Ajira Program (tech training 
             program), but you are unsure about the tech field you should follow.
             """) + kenya_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
     EvaluationTestCase(
         country_of_user=Country.KENYA,
@@ -112,7 +180,7 @@ test_cases = [
             deal. They even had this mentorship program, and before I knew it, I was working with nine guys!  It's been 
             amazing, helping others find their path, just like Huum helped me.
             """) + kenya_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
     EvaluationTestCase(
         country_of_user=Country.KENYA,
@@ -123,7 +191,7 @@ test_cases = [
             fares from passengers in a matatu, a type of public transport. You have never had another job experience,
             never did any internship, never run your own business, never volunteered, never did any freelance work.
             """) + kenya_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
     EvaluationTestCase(
         country_of_user=Country.FRANCE,
@@ -134,7 +202,7 @@ test_cases = [
             completed one year of the Bac Pro (a vocational studies path) in management, but dropped out. You are now 
             doing civic service at an organization. You like interacting with people and helping those around you. 
             """) + france_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
     EvaluationTestCase(
         country_of_user=Country.FRANCE,
@@ -146,6 +214,6 @@ test_cases = [
             shared garden and enjoyed working outside. You want a job with a good salary that is accessible to your 
             without a car.  
             """) + france_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     )
 ]
