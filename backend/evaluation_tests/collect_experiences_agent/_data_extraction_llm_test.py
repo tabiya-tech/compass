@@ -140,7 +140,115 @@ test_cases_data_extraction = [
         ]
 
     ),
-
+    _TestCaseDataExtraction(
+        name="associate_with_previous_experience",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Alright, cool. Have you ever run your own business, or done any freelance or contract work?"),
+            ("Yes, I freelanced since June 2020",
+             "Nice one! What kind of freelancing work have you been doing?"),
+        ],
+        user_input="Graphic design teacher working online",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None, location=None, start_date='2020/06',
+                          end_date=None,
+                          paid_work=True, work_type='SELF_EMPLOYMENT')
+        ],
+        expected_last_referenced_experience_index=0,
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": ContainsString("Graphic design teacher"),
+             "location": AnyOf(ContainsString("online"), ContainsString("remote")),
+             "company": None,
+             "paid_work": AnyOf("True", True),
+             "start_date": ContainsString("2020/06"),
+             "end_date": None,
+             "work_type":
+                 AnyOf(WorkType.SELF_EMPLOYMENT.name)
+             },
+        ]
+    ),
+    _TestCaseDataExtraction(
+        name="associate_with_previous_experience_long_conversation",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Alright, cool. Have you ever run your own business, or done any freelance or contract work?"),
+            ("Yes, I freelanced since June 2020",
+             "Nice one! What kind of freelancing work have you been doing?"),
+            ("before i answer, this can you tell me what you mean by freelance?",
+             "Yes, freelance work is when you work for yourself or for different clients without being employed by a single company. "),
+            ("Sure, so it's like being self-employed?",
+             "Exactly! Freelancers often take on short-term projects or contracts for various clients."),
+        ],
+        user_input="OK, so it was Graphic design teacher and i was working online",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None, location=None, start_date='2020/06',
+                          end_date=None,
+                          paid_work=True, work_type='SELF_EMPLOYMENT')
+        ],
+        expected_last_referenced_experience_index=0,
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": ContainsString("Graphic design teacher"),
+             "location": AnyOf(ContainsString("online"), ContainsString("remote")),
+             "company": None,
+             "paid_work": AnyOf("True", True),
+             "start_date": ContainsString("2020/06"),
+             "end_date": None,
+             "work_type":
+                 AnyOf(WorkType.SELF_EMPLOYMENT.name)
+             },
+        ]
+    ),
+    _TestCaseDataExtraction(
+        name="associate_with_previous_experience_long_conversation_texts",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Alright, cool. Have you ever run your own business, or done any freelance or contract work?"),
+            ("Yes, I freelanced since June 2020, this was one of the most important experiences in my life."
+             "And it i will never forget it because it was the first time i started working and it was a great experience."
+             "It made me feel like i was doing something important and it was a great way to learn new skills. "
+             "I remember i was so excited to start working and i was really nervous too. "
+             "I was worried that i wouldn't be good enough or that i would mess up. "
+             "But it turned out to be a great experience and i learned a lot. "
+             "I was really proud of myself for taking that step and starting to work.",
+             "Nice one! What kind of freelancing work have you been doing?"),
+            ("before i answer, this can you tell me what you mean by freelance?",
+             "Yes, freelance work is when you work for yourself or for different clients without being employed by a single company. "),
+            ("Sure, so it's like being self-employed?",
+             "Exactly! Freelancers often take on short-term projects or contracts for various clients."),
+        ],
+        user_input="During the experience I mentioned, I worked as a graphic design teacher remotely."
+                   "I really enjoyed it and would love to do it again. "
+                   "Especially because it was fulfilling and I learned a lot.",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None, location=None, start_date='2020/06',
+                          end_date=None,
+                          paid_work=True, work_type='SELF_EMPLOYMENT')
+        ],
+        expected_last_referenced_experience_index=0,
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": ContainsString("Graphic design teacher"),
+             "location": AnyOf(ContainsString("online"), ContainsString("remote")),
+             "company": None,
+             "paid_work": AnyOf("True", True),
+             "start_date": ContainsString("2020/06"),
+             "end_date": None,
+             "work_type":
+                 AnyOf(WorkType.SELF_EMPLOYMENT.name)
+             },
+        ]
+    ),
     # Do not add twice
     _TestCaseDataExtraction(
         name="do_not_add_twice",
