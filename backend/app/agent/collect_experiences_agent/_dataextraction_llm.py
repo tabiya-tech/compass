@@ -45,6 +45,7 @@ class _CollectedDataWithReasoning(CollectedData):
     dates_mentioned: Optional[str] = ""
     dates_calculations: Optional[str] = ""
     work_type_classification_reasoning: Optional[str] = ""
+    data_operation_reasoning: Optional[str] = ""
     data_operation: Optional[str] = ""
 
     class Config:
@@ -55,6 +56,7 @@ class _CollectedDataWithReasoning(CollectedData):
 
 
 class _CollectedExperience(BaseModel):
+    associations: Optional[str] = ""
     experience_references: Optional[str] = ""
     experience_index: int = -1
     ignored_experiences: Optional[str] = None
@@ -120,12 +122,23 @@ class _DataExtractionLLM:
 
         _data = response_data.collected_experience_data
         logging.debug("Response data from LLM: %s", response_data.model_dump_json(indent=2))
+        self.logger.info("Reasoning:"
+                         "\n  - associations: %s"
+                         "\n  - ignored_experiences: %s"
+                         "\n  - experience_references: %s"
+                         "\n  - data_extraction_references: %s"
+                         "\n  - data_operation_reasoning: %s",
+                         response_data.associations,
+                         response_data.ignored_experiences,
+                         response_data.experience_references,
+                         _data.data_extraction_references,
+                         _data.data_operation_reasoning)
 
         data_operation = _DataOperation.from_string_key(_data.data_operation)
 
         if data_operation is None:
             # This may happen if the LLM fails to return a valid data operation string
-            self.logger.error("Invalid data operation:%s", _data.data_operation)
+            self.logger.error("Invalid data operation: %s", _data.data_operation)
 
             return -1, llm_stats
 
@@ -139,7 +152,7 @@ class _DataExtractionLLM:
 
         if data_operation == _DataOperation.ADD:
             # add the new experience to the collected experience data
-            self.logger.info("Adding new experience with index:%s", len(collected_experience_data_so_far))
+            self.logger.info("Adding new experience with index: %s", len(collected_experience_data_so_far))
             # The latest user input will be added after the last turn in the conversation history
             next_turn_index = context.history.turns[-1].index + 1
 
@@ -172,13 +185,13 @@ class _DataExtractionLLM:
                     collected_experience_data_so_far.append(new_item)
                     experience_index = len(collected_experience_data_so_far) - 1
                     self.logger.info("Experience data added with index:%s\n"
-                                     "  - data:%s", experience_index, new_item.model_dump())
+                                     "  - data: %s", experience_index, new_item.model_dump())
         elif data_operation == _DataOperation.UPDATE:
             # update the experience in the collected experience data
             if 0 <= _data.index < len(collected_experience_data_so_far):
                 to_update = collected_experience_data_so_far[_data.index]
                 before_update = to_update.model_dump()
-                self.logger.info("Updating experience with index:%s", _data.index)
+                self.logger.info("Updating experience with index: %s", _data.index)
                 # once a value is set, it should not be set to None again
                 if _data.experience_title is not None:
                     to_update.experience_title = _data.experience_title
@@ -350,6 +363,13 @@ class _DataExtractionLLM:
                         Do not insist on the user providing this information if they do not provide it.
                 #JSON Output instructions
                     Your response must always be a JSON object with the following schema:
+                    - associations: Generate a linear chain of associations in the form of ...-> ...->... that start from the User's Last Input 
+                                    and follow the relevant entries they refer to in the Conversation History until they terminate to the Previously Extracted Experience Data, if relevant. 
+                                    ///Skip unrelated or tangential turns to preserve a coherent causal chain of associations.
+                                    ///You are filtering for semantic lineage rather than strictly temporal proximity.
+                                    Once you reach the Previously Extracted Experience Data, you will not follow the associations anymore.
+                                    e.g. "user('...') -> model('...') -> ... -> user('...') -> model('...') -> Previously Extracted Experience Data(...)"
+                                    Each step in the sequence should be a summarized version of the actual user or model turn.
                     - ignored_experiences: A detailed, step-by-step explanation in prose of the experiences referenced by the user that will not be added to the 
                                            'collected_experience_data' and why. These are experiences that will be ignored.
                                            Follow the instructions in '#New Experience handling', '#Update Experience handling' and '#Delete Experience handling' to determine which experience you will be ignoring.
@@ -361,6 +381,7 @@ class _DataExtractionLLM:
                                 Follow the instructions in '#New Experience handling', '#Update Experience handling' and '#Delete Experience handling' 
                                 to determine which experience you will be working with.
                                 Include the index of the experience from the <Previously Extracted Experience Data>.
+                                Use the 'associations' to guide you in your explanation.
                                 Formatted as a json string 
                     - experience_index: The index of the <Previously Extracted Experience Data> list if the 
                                 experience is updated or deleted, or the next index in the list if it is a new experience. 
@@ -388,6 +409,7 @@ class _DataExtractionLLM:
                                     - location_references:
                                     - paid_work_references:
                                     }}
+                                - data_operation_reasoning: A detailed, step-by-step explanation in prose of what data operation should be performed. 
                                 - data_operation: The operation that should be performed to the experience data, choose one of the following values:
                                     'ADD', 'UPDATE', 'DELETE', 'NOOP'. The value 'NOOP' means that no operation should be performed.
                                 - index: For an experience that exists in the <Previously Extracted Experience Data>, the index of that experience. 
