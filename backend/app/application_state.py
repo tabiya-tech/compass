@@ -63,6 +63,8 @@ class ApplicationState(BaseModel):
         :param session_id:
         :param country_of_user: The country of the user
         """
+        if country_of_user is None:
+            country_of_user = Country.UNSPECIFIED
         return cls(
             session_id=session_id,
             agent_director_state=AgentDirectorState(session_id=session_id),
