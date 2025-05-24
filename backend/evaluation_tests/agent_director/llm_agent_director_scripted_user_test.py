@@ -56,6 +56,7 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
     search_services = await setup_search_services
     agent_director = LLMAgentDirector(conversation_manager, search_services)
     agent_director.set_state(AgentDirectorState(session_id=session_id))
+    agent_director.get_welcome_agent().set_state(WelcomeAgentState(session_id=session_id))
     explore_experiences_agent = agent_director.get_explore_experiences_agent()
     explore_experiences_agent.set_state(ExploreExperiencesAgentDirectorState(session_id=session_id))
     explore_experiences_agent.get_collect_experiences_agent().set_state(CollectExperiencesAgentState(session_id=session_id))
