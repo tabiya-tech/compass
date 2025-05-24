@@ -12,7 +12,7 @@ from evaluation_tests.conversation_libs.conversation_test_function import Evalua
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord
 from evaluation_tests.conversation_libs.evaluators.evaluator_builder import create_evaluator
 from evaluation_tests.conversation_libs.fake_conversation_context import save_conversation
-from evaluation_tests.core_e2e_tests_cases import test_cases
+from evaluation_tests.core_e2e_tests_cases import test_cases, E2ESpecificTestCase
 from evaluation_tests.e2e_chat_executor import E2EChatExecutor
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
@@ -29,8 +29,7 @@ def current_test_case(request) -> EvaluationTestCase:
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_main_app_chat(
         max_iterations: int,
-        current_test_case: EvaluationTestCase,
-        common_folder_path: str
+        current_test_case: EvaluationTestCase | E2ESpecificTestCase,
         common_folder_path: str,
         setup_search_services: Awaitable[SearchServices]
 ):
@@ -58,6 +57,53 @@ async def test_main_app_chat(
                 execute_evaluated_agent=lambda agent_input: chat_executor.send_message(agent_input=agent_input),
                 is_finished=lambda agent_output: chat_executor.conversation_is_complete(agent_output=agent_output),
             ))
+        actual_experiences_explored = chat_executor.get_experiences_explored()
+        if isinstance(current_test_case, E2ESpecificTestCase):
+            # Check if the actual discovered experiences match the expected ones
+            _failures = await current_test_case.check_expectations(actual_experiences_explored)
+            if _failures:
+                failures.extend(_failures)
+            else:
+                logger.info(f"Test case {current_test_case.name} passed the experiences expectations check.")
+
+        # Assert that at least one experience has been explored,
+        if not chat_executor.get_experiences_explored():
+            failures.append("No experiences were explored during the conversation.")
+        else:
+            logger.info(f"Experiences successfully explored: {len(actual_experiences_explored)}")
+
+        # Assert that all experiences discovered have been explored
+        actual_experiences_discovered = chat_executor.get_experiences_discovered()
+        if not actual_experiences_discovered:
+            failures.append("No experiences were discovered during the conversation.")
+        else:
+            logger.info(f"Experiences successfully discovered: {len(actual_experiences_discovered)}")
+
+        # Assert that the discovered experiences match the explored ones
+        uuids_discovered = {exp.uuid for exp in actual_experiences_discovered}
+        uuids_explored = {exp.uuid for exp in actual_experiences_explored}
+        diff = uuids_discovered.symmetric_difference(uuids_explored)
+        if diff:
+            failures.append(f"Discovered experiences {uuids_discovered} do not match explored experiences {uuids_explored}."
+                            f" - Difference: {diff}")
+        else:
+            logger.info("Discovered experiences match explored experiences.")
+
+        # Assert that all experiences explored have at least 5 skills explored
+        cfg = ExperiencePipelineConfig()
+        expected_top_skills_count = cfg.number_of_clusters * cfg.number_of_top_skills_to_pick_per_cluster
+        _passed_top_skills_count = True
+        for experience in actual_experiences_explored:
+            if not experience.top_skills:
+                _passed_top_skills_count = False
+                failures.append(f"Experience {experience.experience_title} has no skills explored.")
+            elif len(experience.top_skills) < expected_top_skills_count:
+                _passed_top_skills_count = False
+                failures.append(f"Experience {experience.experience_title} "
+                                f"has less than {expected_top_skills_count} skills explored: {len(experience.top_skills)}")
+
+        if _passed_top_skills_count:
+            logger.info(f"All experiences explored have at least {expected_top_skills_count} skills explored.")
 
         for evaluation in tqdm(current_test_case.evaluations, desc='Evaluating'):
             output = await create_evaluator(evaluation.type).evaluate(evaluation_result)
