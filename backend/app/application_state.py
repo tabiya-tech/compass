@@ -56,20 +56,21 @@ class ApplicationState(BaseModel):
                          )
 
     @classmethod
-    def new_state(cls, session_id: int) -> "ApplicationState":
+    def new_state(cls, session_id: int, country_of_user: Country = None) -> "ApplicationState":
         """
         Create a new application state for the given session ID.
         All the states are initialized with the session ID and their default values.
         :param session_id:
+        :param country_of_user: The country of the user
         """
         return cls(
             session_id=session_id,
             agent_director_state=AgentDirectorState(session_id=session_id),
             welcome_agent_state=WelcomeAgentState(session_id=session_id),
-            explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id),
+            explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id, country_of_user=country_of_user),
             conversation_memory_manager_state=ConversationMemoryManagerState(session_id=session_id),
-            collect_experience_state=CollectExperiencesAgentState(session_id=session_id),
-            skills_explorer_agent_state=SkillsExplorerAgentState(session_id=session_id)
+            collect_experience_state=CollectExperiencesAgentState(session_id=session_id, country_of_user=country_of_user),
+            skills_explorer_agent_state=SkillsExplorerAgentState(session_id=session_id, country_of_user=country_of_user)
         )
 
 
@@ -111,7 +112,7 @@ class IApplicationStateManager(ABC):
     """
     Interface for the application state manager
 
-    Allows to mock the class in tests
+    Helps in mocking the class in tests
     """
 
     @abstractmethod
@@ -163,15 +164,10 @@ class ApplicationStateManager(IApplicationStateManager):
         if state is None:
             # When creating a new state, use the default country of the user
             # Eventually, we may want to use the country of the user from the user's profile, but for now, we just use the default.
-            # The default country, is typically be deployment-specific
-            state = ApplicationState(
+            # The default country is typically deployment-specific
+            state = ApplicationState.new_state(
                 session_id=session_id,
-                agent_director_state=AgentDirectorState(session_id=session_id),
-                welcome_agent_state=WelcomeAgentState(session_id=session_id),
-                explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id, country_of_user=self._default_country_of_user),
-                conversation_memory_manager_state=ConversationMemoryManagerState(session_id=session_id),
-                collect_experience_state=CollectExperiencesAgentState(session_id=session_id, country_of_user=self._default_country_of_user),
-                skills_explorer_agent_state=SkillsExplorerAgentState(session_id=session_id, country_of_user=self._default_country_of_user)
+                country_of_user=self._default_country_of_user
             )
             logging.info("Creating a new application state for session ID %s", session_id)
             await self._store.save_state(state)
