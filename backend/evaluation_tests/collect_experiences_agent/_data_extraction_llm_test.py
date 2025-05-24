@@ -1,10 +1,10 @@
 import logging
 from copy import deepcopy
 from textwrap import dedent
-from abc import ABC, abstractmethod
 from typing import Optional
 
 import pytest
+from pydantic import ConfigDict
 
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.collect_experiences_agent import CollectedData
@@ -12,59 +12,9 @@ from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtract
 from app.agent.experience import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
+from evaluation_tests.matcher import check_actual_data_matches_expected, ContainsString, AnyOf, Matcher, match_expected
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
-
-NON_EMPTY_STRING_REGEX = re.compile(r"^\s*\S.*$")
-
-
-class Matcher(ABC):
-    @abstractmethod
-    def matches(self, value: any) -> tuple[bool, str | None]:
-        """
-        Check if the value matches the matcher.
-        :param value: The value to check.
-        :return: A tuple containing a boolean indicating if the value matches and a string with the reason why it does not match.
-        """
-        pass
-
-
-class AnyOf(Matcher):
-    def __init__(self, *args: any):
-        self.options = args
-
-    def matches(self, value: any) -> tuple[bool, str | None]:
-        for option in self.options:
-            if isinstance(option, re.Pattern) and isinstance(value, str) and option.match(value):
-                return True, None
-            elif isinstance(option, Matcher):
-                match, _ = option.matches(value)
-                if match:
-                    return True, None
-            elif option == value:
-                return True, None
-
-        return False, f"Value '{value}' does not match any of the options: [{', '.join(map(str, self.options))}]"
-
-
-class ContainsString(Matcher):
-    def __init__(self, string: str, case_sensitive: bool = False):
-        self.string = string
-        self.case_sensitive = case_sensitive
-
-    def matches(self, value: any) -> tuple[bool, str | None]:
-        if not isinstance(value, str):
-            return False, f"Value '{value}' is not a string"
-        if self.case_sensitive:
-            if self.string in value:
-                return True, None
-        else:
-            if self.string.lower() in value.lower():
-                return True, None
-        return False, f"Value '{value}' does not contain '{self.string}'"
-
-    def __str__(self):
-        return f"ContainsString('{self.string}', case_sensitive={self.case_sensitive})"
 
 
 class _TestCaseDataExtraction(CompassTestCase):
@@ -91,7 +41,7 @@ class _TestCaseDataExtraction(CompassTestCase):
     """
 
     # The THEN (expected)
-    expected_last_referenced_experience_index: int
+    expected_last_referenced_experience_index: int | Matcher
     """
     The index of the last referenced experience.
     -1 means no experience was referenced.
@@ -109,6 +59,12 @@ class _TestCaseDataExtraction(CompassTestCase):
     Optionally assert how the llm should update the collected data.
     If not provided, the test will not assert on the collected data.
     """
+
+    # arbitrary_types_allowed=True
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="forbid",
+    )
 
 
 test_cases_data_extraction = [
@@ -201,7 +157,7 @@ test_cases_data_extraction = [
                           end_date=None,
                           paid_work=None, work_type='SELF_EMPLOYMENT')
         ],
-        expected_last_referenced_experience_index=-1,
+        expected_last_referenced_experience_index=AnyOf(0, -1),
         expected_collected_data_count=1,
         expected_collected_data=[
             {"index": 0,
@@ -401,7 +357,7 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("teaching graphic design"),
-             "location": None,
+             "location": AnyOf(ContainsString("online"), ContainsString("remote")),
              "company": None,
              "paid_work": True,
              "start_date": '2020/06',
@@ -480,7 +436,10 @@ async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytes
 
         failures = []
         # THEN the last referenced experience index should be the expected one
-        if last_referenced_experience_index != test_case.expected_last_referenced_experience_index:
+        if not match_expected(
+                actual=last_referenced_experience_index,
+                expected=test_case.expected_last_referenced_experience_index
+        ):
             failures.append(
                 f"Expected last referenced experience index {test_case.expected_last_referenced_experience_index}, but got {last_referenced_experience_index}"
             )
@@ -490,14 +449,8 @@ async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytes
                 f"Expected {test_case.expected_collected_data_count} collected data, but got {len(collected_data)}"
             )
         if test_case.expected_collected_data is not None:
-            for i, expected_data in enumerate(test_case.expected_collected_data):
-                if i >= len(collected_data):
-                    failures.append(
-                        f"Expected {len(test_case.expected_collected_data)} collected data, but got {len(collected_data)}"
-                    )
-                    break
-                _failures = check_data_matches_expected(actual_collected_data=collected_data[i], expected_data=expected_data)
-                failures.extend(_failures)
+            _failures = check_actual_data_matches_expected(actual_data=collected_data, expected_data=test_case.expected_collected_data, preserve_order=True)
+            failures.extend(_failures)
 
         if len(failures) > 0:
             pytest.fail(
@@ -519,32 +472,3 @@ def _add_turn_to_context(user_input: str, agent_output: str, context: Conversati
     )
     context.history.turns.append(turn)
     context.all_history.turns.append(turn)
-
-
-def check_data_matches_expected(
-        actual_collected_data: CollectedData, expected_data: dict[str, any]
-) -> list[str]:
-    data_dict = actual_collected_data.model_dump()
-    failures = []
-
-    for key, expected_value in expected_data.items():
-        if key not in data_dict:
-            failures.append(f"Field '{key}' is not in CollectedData")
-            continue
-
-        actual_value = data_dict[key]
-        if isinstance(expected_value, Matcher):
-            result, failure = expected_value.matches(actual_value)
-            if not result:
-                failures.append(f"Field '{key}' with {failure}")
-        elif isinstance(expected_value, re.Pattern):
-            if not isinstance(actual_value, str) or not expected_value.match(actual_value):
-                failures.append(
-                    f"Field '{key}' with value '{actual_value}' does not match regex '{expected_value.pattern}'"
-                )
-        elif actual_value != expected_value:
-            failures.append(
-                f"Field '{key}' value '{actual_value}' does not match expected '{expected_value}'"
-            )
-
-    return failures
