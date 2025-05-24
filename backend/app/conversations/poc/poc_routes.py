@@ -159,6 +159,7 @@ def add_poc_route_endpoints(poc_router: APIRouter, auth: Authentication):
             state = await application_state_manager.get_state(session_id)
 
             agent_director.set_state(state.agent_director_state)
+            agent_director.get_welcome_agent().set_state(state.welcome_agent_state)
             agent_director.get_explore_experiences_agent().set_state(state.explore_experiences_director_state)
             agent_director.get_explore_experiences_agent().get_collect_experiences_agent().set_state(
                 state.collect_experience_state)
