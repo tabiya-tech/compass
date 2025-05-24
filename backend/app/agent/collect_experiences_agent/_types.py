@@ -1,20 +1,20 @@
+import uuid
 from typing import Optional
 
-from pydantic import BaseModel
-
-from app.agent.experience.work_type import WorkType
+from pydantic import BaseModel, Field
 
 
 class CollectedData(BaseModel):
     """
     A model for the collected data of the CollectExperiencesAgent.
-    The data collected during the conversation and store in the agents state.
+    The data is collected during the conversation and stored in the agent's state.
 
-    The values are to interpreted as follows:
+    The values are interpreted as follows:
     - None: The value was not provided because it was not explicitly asked.
     - "": The user was asked for the value, but the user did not provide it.
-    - "value": The user provided the value.
+    - Some value: The user provided the value.
     """
+    uuid: str = Field(default_factory=lambda: str(uuid.uuid4()))
     index: int
     defined_at_turn_number: Optional[int] = -1
     """
