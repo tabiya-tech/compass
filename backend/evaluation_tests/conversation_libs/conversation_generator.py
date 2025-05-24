@@ -1,18 +1,42 @@
 import logging
-from typing import Callable
+from typing import Awaitable, Protocol
 
 from tqdm import tqdm
 
-from app.agent.agent_types import AgentInput
+from app.agent.agent_types import AgentInput, AgentOutput
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationRecord, Actor
 
 logger = logging.getLogger()
 
 
+class AgentCallable(Protocol):
+    """
+    An interface for the callback function that is called to get output from the evaluated agent.
+    """
+    def __call__(self, *, agent_input: AgentInput) -> Awaitable[AgentOutput]:
+        ...
+
+
+class SimulatedUserCallable(Protocol):
+    """
+    An interface for the callback function that is called to get output from the simulated user.
+    """
+    def __call__(self, *, turn_number: int, message_for_user: str) -> Awaitable[str]:
+        ...
+
+
+class FinishedCallable(Protocol):
+    """
+    An interface for the callback function that is called to check if the conversation is finished.
+    """
+    def __call__(self, *, agent_output: AgentOutput) -> bool:
+        ...
+
+
 async def generate(*, max_iterations: int,
-                   execute_evaluated_agent: Callable,
-                   execute_simulated_user: Callable,
-                   is_finished: Callable
+                   execute_evaluated_agent: AgentCallable,  # Callable[[AgentInput], Awaitable[AgentOutput]],
+                   execute_simulated_user: SimulatedUserCallable,  # Callable[[int, str], Awaitable[str]],
+                   is_finished: FinishedCallable,  # Callable[[AgentInput], bool]
                    ) -> list[ConversationRecord]:
     """
     Generates a complete conversation between a simulated_user and the actor.
