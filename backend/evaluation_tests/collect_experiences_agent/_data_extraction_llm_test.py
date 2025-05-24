@@ -1,5 +1,5 @@
 import logging
-import re
+from copy import deepcopy
 from textwrap import dedent
 from abc import ABC, abstractmethod
 from typing import Optional
@@ -467,7 +467,9 @@ async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytes
         # AND the user input
         user_input = AgentInput(message=test_case.user_input)
         # AND the collected data so far
-        collected_data: list[CollectedData] = test_case.collected_data_so_far
+        # Make a deep copy of the collected data to avoid modifying the original test case,
+        # since it is passed to the data extraction agent, which mutates it.
+        collected_data: list[CollectedData] = deepcopy(test_case.collected_data_so_far)
 
         # WHEN the data extraction LLM is executed
         data_extraction_llm = _DataExtractionLLM(logger)
