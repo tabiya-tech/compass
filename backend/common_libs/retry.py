@@ -110,7 +110,7 @@ class Retry(Generic[T]):
             result, penalty, error = await callback(attempt, max_retries)
 
             if error is None:
-                logger.info(f"'Retryable task' succeeded after {attempt} attempts.")
+                logger.debug(f"'Retryable task' succeeded after {attempt} attempts.")
                 return result, penalty, error
 
             attempts.append((attempt, result, penalty, error))
