@@ -209,7 +209,7 @@ class CollectExperiencesAgent(Agent):
             self.logger.debug("Experience data collected: %s", elem)
             try:
                 entity = ExperienceEntity(
-                    experience_title=elem.experience_title,
+                    uuid=elem.uuid if elem.uuid else None,
                     experience_title=elem.experience_title if elem.experience_title else '',
                     company=elem.company,
                     location=elem.location,
