@@ -4,7 +4,10 @@ import "src/_test_utilities/consoleMock";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Language, SensitivePersonalDataRequirement, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { nanoid } from "nanoid";
-import { QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+
+import {
+  CUSTOMER_SATISFACTION_QUESTION_KEY
+} from "src/feedback/overallFeedback/overallFeedbackForm/components/formContent/questionComponents/customerSatisfactionRating/constants";
 
 function getMockUserPreference(): UserPreference {
   const random = Math.floor(Math.random() * 1000000);
@@ -260,7 +263,7 @@ describe("UserPreferencesStateService", () => {
         // GIVEN user preferences with customer satisfaction rating for the active session are set
         const givenPreferences: UserPreference = getMockUserPreference();
         givenPreferences.user_feedback_answered_questions = {
-          [givenPreferences.sessions[0]]: [QUESTION_KEYS.CUSTOMER_SATISFACTION]
+          [givenPreferences.sessions[0]]: [CUSTOMER_SATISFACTION_QUESTION_KEY]
         };
         service.setUserPreferences(givenPreferences);
 
