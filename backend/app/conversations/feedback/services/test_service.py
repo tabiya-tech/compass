@@ -20,7 +20,8 @@ from app.conversations.feedback.services.errors import (
 from app.conversations.feedback.services.service import UserFeedbackService
 from app.conversations.feedback.services.service import questions_cache
 from app.conversations.feedback.services.types import Feedback, FeedbackItem, Version, Answer, NewFeedbackSpec, \
-    NewFeedbackItemSpec, NewFeedbackVersionSpec, SimplifiedAnswer
+    NewFeedbackItemSpec, NewFeedbackVersionSpec, SimplifiedAnswer, QuestionsConfig, YesNoQuestion, RatingQuestion, \
+    CheckboxQuestion
 from app.metrics.constants import EventType
 from app.metrics.services.service import IMetricsService
 from app.metrics.types import FeedbackProvidedEvent, FeedbackRatingValueEvent, AbstractCompassMetricEvent
@@ -524,3 +525,85 @@ class TestMetricsRecording:
         assert actual_events[2].value == 1
         assert actual_events[3].feedback_type == "CES"
         assert actual_events[3].value == 0
+
+
+@pytest.mark.asyncio
+async def test_get_questions_config_success(_mock_feedback_repository: IUserFeedbackRepository,
+                                          _mock_metrics_service: IMetricsService):
+    # GIVEN a service instance
+    service = UserFeedbackService(
+        user_feedback_repository=_mock_feedback_repository,
+        metrics_service=_mock_metrics_service
+    )
+
+    # WHEN getting the questions configuration
+    config = await service.get_questions_config()
+
+    # THEN the configuration should be properly loaded and converted to Pydantic models
+    assert isinstance(config, dict)
+    for question_id, question in config.items():
+        assert question_id in actual_questions_json
+        raw_question = actual_questions_json[question_id]
+        
+        # Check base fields
+        assert question.question_text == raw_question["question_text"]
+        assert question.description == raw_question["description"]
+        assert question.comment_placeholder == raw_question["comment_placeholder"]
+        assert question.type == raw_question["type"]
+
+        # Check type-specific fields
+        if isinstance(question, YesNoQuestion):
+            assert question.show_comments_on == raw_question["show_comments_on"]
+        elif isinstance(question, RatingQuestion):
+            assert question.max_rating == raw_question.get("max_rating")
+            assert question.display_rating == raw_question.get("display_rating")
+            assert question.low_rating_label == raw_question.get("low_rating_label")
+            assert question.high_rating_label == raw_question.get("high_rating_label")
+        elif isinstance(question, CheckboxQuestion):
+            assert question.options == raw_question["options"]
+            assert question.low_rating_label == raw_question.get("low_rating_label")
+            assert question.high_rating_label == raw_question.get("high_rating_label")
+
+
+@pytest.mark.asyncio
+async def test_get_questions_config_invalid_type(_mock_feedback_repository: IUserFeedbackRepository,
+                                               _mock_metrics_service: IMetricsService):
+    # GIVEN a service instance
+    service = UserFeedbackService(
+        user_feedback_repository=_mock_feedback_repository,
+        metrics_service=_mock_metrics_service
+    )
+
+    # AND a question with an invalid type
+    invalid_question = {
+        "question_text": "Test question",
+        "description": "Test description",
+        "comment_placeholder": "Test placeholder",
+        "type": "invalid_type"
+    }
+
+    # WHEN loading questions with an invalid type
+    with patch('app.conversations.feedback.services.service.load_questions',
+               return_value={"test_question": invalid_question}):
+        # THEN a QuestionsFileError should be raised
+        with pytest.raises(QuestionsFileError) as exc_info:
+            await service.get_questions_config()
+        assert "Invalid question type" in str(exc_info.value)
+
+
+@pytest.mark.asyncio
+async def test_get_questions_config_empty(_mock_feedback_repository: IUserFeedbackRepository,
+                                        _mock_metrics_service: IMetricsService):
+    # GIVEN a service instance
+    service = UserFeedbackService(
+        user_feedback_repository=_mock_feedback_repository,
+        metrics_service=_mock_metrics_service
+    )
+
+    # AND no questions data available
+    with patch('app.conversations.feedback.services.service.load_questions',
+               return_value=None):
+        # THEN a QuestionsFileError should be raised
+        with pytest.raises(QuestionsFileError) as exc_info:
+            await service.get_questions_config()
+        assert "No questions data available" in str(exc_info.value)
