@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, useTheme } from "@mui/material";
-import { BaseQuestion, Option } from "src/feedback/overallFeedback/feedbackForm/feedbackForm.types";
+import { BaseQuestion, QuestionOption } from "src/feedback/overallFeedback/feedbackForm/feedbackForm.types";
 import QuestionText from "src/feedback/overallFeedback/feedbackForm/components/questionText/QuestionText";
 import CommentTextField from "src/feedback/overallFeedback/feedbackForm/components/commentTextField/CommentTextField";
 import { focusAndScrollToField } from "src/feedback/overallFeedback/feedbackForm/util";
 
 export interface CheckboxQuestionProps extends BaseQuestion {
+  questionId: string;
   selectedOptions: string[];
   notifyChange: (selectedOptions: string[], comments?: string) => void;
-  options: Option[];
+  options: QuestionOption[];
   comments?: string;
 }
 
@@ -22,12 +23,12 @@ export const DATA_TEST_ID = {
 };
 
 const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
-  questionText,
+  question_text,
   selectedOptions,
   notifyChange,
   options,
   comments,
-  placeholder,
+  comment_placeholder,
 }) => {
   const theme = useTheme();
   const [checkedOptions, setCheckedOptions] = useState<string[]>(selectedOptions);
@@ -69,7 +70,7 @@ const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
       data-testid={DATA_TEST_ID.FORM_CONTROL}
     >
       <FormLabel component="legend" data-testid={DATA_TEST_ID.FORM_LABEL}>
-        <QuestionText questionText={questionText} />
+        <QuestionText questionText={question_text} />
       </FormLabel>
       <FormGroup
         sx={{
@@ -96,7 +97,7 @@ const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
       </FormGroup>
       {checkedOptions.length > 0 && (
         <CommentTextField
-          placeholder={placeholder}
+          placeholder={comment_placeholder ?? undefined}
           value={commentText}
           ref={commentTextFieldRef}
           onChange={handleCommentChange}

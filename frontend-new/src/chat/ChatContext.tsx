@@ -30,7 +30,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, handleOpen
     handleOpenExperiencesDrawer,
     removeMessage,
     addMessage,
-    feedbackStatus,
+    feedbackStatus, //TODO: move to feedback context
     setFeedbackStatus,
     isAccountConverted,
     setIsAccountConverted: (converted: boolean) => {

@@ -15,15 +15,16 @@ describe("CustomRating", () => {
   // mock question
   const mockQuestion: CustomRatingProps = {
     type: QuestionType.Rating,
-    questionText: "How would you rate the overall experience?",
+    question_text: "How would you rate the overall experience?",
     questionId: "overall_experience",
-    placeholder: "Please provide your feedback here",
+    comment_placeholder: "Please provide your feedback here",
     ratingValue: 6,
     displayRating: true,
     lowRatingLabel: "Very Difficult",
     highRatingLabel: "Very Easy",
     notifyChange: jest.fn(),
     maxRating: 5,
+    description: "Test description"
   };
 
   test("should render component successfully", () => {

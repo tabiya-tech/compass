@@ -33,14 +33,14 @@ const CustomRating: React.FC<CustomRatingProps> = ({
   questionId,
   ratingValue,
   notifyChange,
-  questionText,
+  question_text,
   lowRatingLabel,
   highRatingLabel,
   comments,
   displayRating = true,
   disabled,
   maxRating,
-  placeholder,
+  comment_placeholder,
 }) => {
   const theme = useTheme();
   const [commentText, setCommentText] = useState(comments ?? "");
@@ -68,7 +68,7 @@ const CustomRating: React.FC<CustomRatingProps> = ({
       data-testid={DATA_TEST_ID.CUSTOM_RATING_CONTAINER}
     >
       <Box display="flex" flexDirection="column" gap={theme.tabiyaSpacing.sm}>
-        <QuestionText questionText={questionText} />
+        <QuestionText questionText={question_text} />
         {displayRating && (
           <Box display="flex" flexDirection="column" width="fit-content">
             <Rating
@@ -117,9 +117,9 @@ const CustomRating: React.FC<CustomRatingProps> = ({
           </Box>
         )}
       </Box>
-      {placeholder && (
+      {comment_placeholder && (
         <CommentTextField
-          placeholder={placeholder}
+          placeholder={comment_placeholder}
           value={commentText}
           ref={commentTextFieldRef}
           onChange={handleCommentChange}

@@ -23,13 +23,13 @@ export const DATA_TEST_ID = {
 };
 
 const YesNoQuestion: React.FC<YesNoQuestionProps> = ({
-  questionText,
+  question_text,
   questionId,
   ratingValue,
   notifyChange,
   comments,
   showCommentsOn,
-  placeholder,
+  comment_placeholder,
 }) => {
   // function to determine if comments should be shown
   const shouldShowComments = useCallback(
@@ -75,7 +75,7 @@ const YesNoQuestion: React.FC<YesNoQuestionProps> = ({
       data-testid={DATA_TEST_ID.FORM_CONTROL}
     >
       <FormLabel component="legend" data-testid={DATA_TEST_ID.FORM_LABEL}>
-        <QuestionText questionText={questionText} />
+        <QuestionText questionText={question_text} />
       </FormLabel>
       <RadioGroup
         aria-label={questionId}
@@ -105,7 +105,7 @@ const YesNoQuestion: React.FC<YesNoQuestionProps> = ({
       </RadioGroup>
       {showComments && (
         <CommentTextField
-          placeholder={placeholder}
+          placeholder={comment_placeholder ?? undefined}
           value={commentText}
           ref={commentTextFieldRef}
           onChange={handleCommentChange}

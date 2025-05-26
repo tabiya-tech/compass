@@ -14,7 +14,9 @@ describe("CheckboxQuestion", () => {
   const mockQuestion: CheckboxQuestionProps = {
     type: QuestionType.Checkbox,
     questionId: "skills_experience",
-    questionText: "What are your skills and experiences?",
+    question_text: "What are your skills and experiences?",
+    description: "Test description",
+    comment_placeholder: "Please provide comments",
     selectedOptions: ["javascript", "react"],
     notifyChange: jest.fn(),
     options: [

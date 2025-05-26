@@ -132,6 +132,7 @@ exports[`YesNoQuestion should render component successfully 1`] = `
         class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
         data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
         id=":r1:"
+        placeholder="Test placeholder"
         rows="3"
         style="height: 0px; overflow: hidden;"
       />

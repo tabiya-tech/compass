@@ -9,12 +9,8 @@ export enum YesNoEnum {
   No = "no",
 }
 
-export interface QuestionOption {
-  key: string;
-  value: string;
-}
-
 export interface BaseQuestion {
+  questionId: string;
   question_text: string;
   description: string;
   comment_placeholder: string | null;
@@ -23,7 +19,7 @@ export interface BaseQuestion {
 
 export interface YesNoQuestion extends BaseQuestion {
   type: QuestionType.YesNo;
-  show_comments_on: "yes" | "no";
+  show_comments_on: YesNoEnum;
 }
 
 export interface RatingQuestion extends BaseQuestion {
@@ -41,12 +37,16 @@ export interface CheckboxQuestion extends BaseQuestion {
   high_rating_label?: string;
 }
 
-export type Question = YesNoQuestion | RatingQuestion | CheckboxQuestion;
+export interface QuestionOption {
+  key: string;
+  value: string;
+}
 
 export interface DetailedQuestion {
   type: QuestionType;
   questionId: string;
   questionText: string;
+  description: string;
   showCommentsOn?: YesNoEnum;
   placeholder?: string | null;
   options?: QuestionOption[];
@@ -56,6 +56,13 @@ export interface DetailedQuestion {
   displayRating?: boolean;
 }
 
+export type Question = YesNoQuestion | RatingQuestion | CheckboxQuestion;
+
+/*
+* Represents the configuration for all questions in the feedback form.
+* Each key is a question identifier, and the value is the question object.
+* one of the types: YesNoQuestion, RatingQuestion, or CheckboxQuestion.
+* */
 export interface QuestionsConfig {
   [key: string]: Question;
 }

@@ -14,11 +14,13 @@ describe("YesNoQuestion", () => {
   // mock question
   const mockQuestion: YesNoQuestionProps = {
     type: QuestionType.YesNo,
-    questionText: "Do you like the product?",
+    question_text: "Do you like the product?",
     questionId: "like_product",
     ratingValue: true,
     showCommentsOn: YesNoEnum.Yes,
     notifyChange: jest.fn(),
+    description: "Test description",
+    comment_placeholder: "Test placeholder"
   };
 
   test("should render component successfully", () => {

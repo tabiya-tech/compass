@@ -20,18 +20,20 @@ type Story = StoryObj<typeof YesNoQuestion>;
 
 export const ShowCommentsWhenYesSelected: Story = {
   args: {
-    questionText: "Is this a question?",
+    question_text: "Is this a question?",
     questionId: "is_question",
     showCommentsOn: YesNoEnum.Yes,
-    placeholder: "Please provide comments",
+    comment_placeholder: "Please provide comments",
+    description: "Test description"
   },
 };
 
 export const ShowCommentsWhenNoSelected: Story = {
   args: {
-    questionText: "Is this not a question?",
+    question_text: "Is this not a question?",
     questionId: "is_not_question",
     showCommentsOn: YesNoEnum.No,
-    placeholder: "Please provide comments",
+    comment_placeholder: "Please provide comments",
+    description: "Test description"
   },
 };

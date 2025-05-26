@@ -9,9 +9,9 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import CustomRating from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
-import questions from "src/feedback/overallFeedback/feedbackForm/questions-en.json";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { useFeedback } from "src/feedback/overallFeedback/context/FeedbackContext";
 
 interface CustomerSatisfactionRatingProps {
   notifyOnCustomerSatisfactionRatingSubmitted: () => void;
@@ -24,18 +24,26 @@ export const DATA_TEST_ID = {
 };
 
 export const UI_TEXT = {
-  CUSTOMER_SATISFACTION_QUESTION_TEXT: "Finally, we'd love to hear your thoughts on your experience so far! " + questions[QUESTION_KEYS.CUSTOMER_SATISFACTION].question_text,
   RATING_LABEL_LOW: "Unsatisfied",
   RATING_LABEL_HIGH: "Satisfied",
 };
+
 const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
-                                                                                 notifyOnCustomerSatisfactionRatingSubmitted,
-                                                                               }) => {
+  notifyOnCustomerSatisfactionRatingSubmitted,
+}) => {
   const { enqueueSnackbar } = useSnackbar();
   const isOnline = useContext(IsOnlineContext);
+  const { questionsConfig } = useFeedback();
 
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [isSubmittingRating, setIsSubmittingRating] = useState<boolean>(false);
+
+  if (!questionsConfig) {
+    return null;
+  }
+
+  const question = questionsConfig[QUESTION_KEYS.CUSTOMER_SATISFACTION];
+  const questionText = "Finally, we'd love to hear your thoughts on your experience so far! " + question.question_text;
 
   const handleInputChange = async (questionId: string, value: SimplifiedAnswer) => {
     const formattedData: FeedbackItem = {
@@ -71,7 +79,8 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       <CustomRating
         type={QuestionType.Rating}
         questionId={QUESTION_KEYS.CUSTOMER_SATISFACTION}
-        questionText={UI_TEXT.CUSTOMER_SATISFACTION_QUESTION_TEXT}
+        question_text={questionText}
+        description={question.description}
         ratingValue={selectedRating}
         notifyChange={(value, comments) =>
           handleInputChange(QUESTION_KEYS.CUSTOMER_SATISFACTION, { rating_numeric: value, comment: comments })
@@ -80,6 +89,7 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
         highRatingLabel={UI_TEXT.RATING_LABEL_HIGH}
         maxRating={5}
         disabled={!isOnline || isSubmittingRating}
+        comment_placeholder={question.comment_placeholder}
       />
     </div>
   );

@@ -19,8 +19,7 @@ type Story = StoryObj<typeof CheckboxQuestion>;
 
 export const Shown: Story = {
   args: {
-    questionId: "accuracy_relevance",
-    questionText: "How accurate and relevant was the information provided?",
+    question_text: "How accurate and relevant was the information provided?",
     options: [
       { key: "accurate", value: "Accurate" },
       { key: "relevant", value: "Relevant" },
@@ -28,6 +27,6 @@ export const Shown: Story = {
       { key: "easyToUnderstand", value: "Easy to understand" },
     ],
     selectedOptions: [],
-    placeholder: "Please provide comments",
+    comment_placeholder: "Please provide comments",
   },
 };

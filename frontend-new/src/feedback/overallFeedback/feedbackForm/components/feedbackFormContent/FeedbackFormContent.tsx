@@ -5,13 +5,19 @@ import MobileStepper from "@mui/material/MobileStepper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import feedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
-import StepsComponent from "src/feedback/overallFeedback/feedbackForm/components/stepsComponent/StepsComponent";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
 import { useSwipeable } from "react-swipeable";
 import { AnimatePresence, motion } from "framer-motion";
+import PerceivedBiasQuestion from "./questionComponents/PerceivedBiasQuestion";
+import WorkExperienceAccuracyQuestion from "./questionComponents/WorkExperienceAccuracyQuestion";
+import ClarityOfSkillsQuestion from "./questionComponents/ClarityOfSkillsQuestion";
+import IncorrectSkillsQuestion from "./questionComponents/IncorrectSkillsQuestion";
+import MissingSkillsQuestion from "./questionComponents/MissingSkillsQuestion";
+import InteractionEaseQuestion from "./questionComponents/InteractionEaseQuestion";
+import RecommendationQuestion from "./questionComponents/RecommendationQuestion";
+import AdditionalFeedbackQuestion from "./questionComponents/AdditionalFeedbackQuestion";
 
 export const SLIDE_DURATION = 0.3;
 
@@ -41,7 +47,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
   // if the previous step is less than the active step, the swipe is to the right
   const [prevStep, setPrevStep] = useState(activeStep);
 
-  const maxSteps = feedbackFormContentSteps.length;
+  const maxSteps = 3; // Total number of question groups
 
   const handleNext = () => {
     if (activeStep === maxSteps - 1) {
@@ -120,6 +126,63 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
     }),
   };
 
+  const renderQuestionGroup = () => {
+    switch (activeStep) {
+      case 0:
+        return (
+          <>
+            <Typography
+              fontWeight="bold"
+              gutterBottom
+              color={theme.palette.text.secondary}
+              sx={{ fontSize: theme.typography.h6.fontSize }}
+              data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE}
+            >
+              Bias & Experience Accuracy
+            </Typography>
+            <PerceivedBiasQuestion feedbackItems={answers} onChange={handleAnswerChange} />
+            <WorkExperienceAccuracyQuestion feedbackItems={answers} onChange={handleAnswerChange} />
+          </>
+        );
+      case 1:
+        return (
+          <>
+            <Typography
+              fontWeight="bold"
+              gutterBottom
+              color={theme.palette.text.secondary}
+              sx={{ fontSize: theme.typography.h6.fontSize }}
+              data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE}
+            >
+              Skill Accuracy
+            </Typography>
+            <ClarityOfSkillsQuestion feedbackItems={answers} onChange={handleAnswerChange} />
+            <IncorrectSkillsQuestion feedbackItems={answers} onChange={handleAnswerChange} />
+            <MissingSkillsQuestion feedbackItems={answers} onChange={handleAnswerChange} />
+          </>
+        );
+      case 2:
+        return (
+          <>
+            <Typography
+              fontWeight="bold"
+              gutterBottom
+              color={theme.palette.text.secondary}
+              sx={{ fontSize: theme.typography.h6.fontSize }}
+              data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE}
+            >
+              Final feedback
+            </Typography>
+            <InteractionEaseQuestion feedbackItems={answers} onChange={handleAnswerChange} />
+            <RecommendationQuestion feedbackItems={answers} onChange={handleAnswerChange} />
+            <AdditionalFeedbackQuestion feedbackItems={answers} onChange={handleAnswerChange} />
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <Box
       display="flex"
@@ -158,15 +221,6 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
               bottom: 0,
             }}
           >
-            <Typography
-              fontWeight="bold"
-              gutterBottom
-              color={theme.palette.text.secondary}
-              sx={{ fontSize: theme.typography.h6.fontSize }}
-              data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_TITLE}
-            >
-              {feedbackFormContentSteps[activeStep].label}
-            </Typography>
             <Box
               sx={{
                 overflowY: "auto",
@@ -177,11 +231,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
               }}
               data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_QUESTIONS}
             >
-              <StepsComponent
-                questions={feedbackFormContentSteps[activeStep].questions}
-                feedbackItems={answers}
-                onChange={handleAnswerChange}
-              />
+              {renderQuestionGroup()}
             </Box>
           </motion.div>
         </AnimatePresence>

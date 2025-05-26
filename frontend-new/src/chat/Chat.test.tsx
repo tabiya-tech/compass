@@ -185,6 +185,15 @@ jest.mock("src/chat/ChatContext", () => {
   }
 })
 
+//  mock the feedback context
+jest.mock("src/feedback/overallFeedback/context/FeedbackContext", () => {
+  const actual = jest.requireActual("src/feedback/overallFeedback/context/FeedbackContext");
+  return {
+    ...actual,
+    FeedbackProvider: jest.fn().mockImplementation(({ children }) => <div>{children}</div>)
+  }
+})
+
 describe("Chat", () => {
   // ExperienceService methods to be mocked
   const mockGetExperiences = jest.fn();
