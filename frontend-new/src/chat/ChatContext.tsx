@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode, useState, useMemo } from 'react';
-import { FeedbackStatus } from 'src/feedback/overallFeedback/feedbackForm/FeedbackForm';
+import { FeedbackStatus } from 'src/feedback/overallFeedback/overallFeedbackForm/OverallFeedbackForm';
 import { PersistentStorageService } from 'src/app/PersistentStorageService/PersistentStorageService';
 import { IChatMessage } from "src/chat/Chat.types";
 
@@ -30,7 +30,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, handleOpen
     handleOpenExperiencesDrawer,
     removeMessage,
     addMessage,
-    feedbackStatus,
+    feedbackStatus, //TODO: move to feedback context
     setFeedbackStatus,
     isAccountConverted,
     setIsAccountConverted: (converted: boolean) => {

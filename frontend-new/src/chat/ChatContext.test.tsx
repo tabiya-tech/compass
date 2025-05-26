@@ -4,7 +4,7 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ChatProvider, useChatContext } from "./ChatContext";
-import { FeedbackStatus } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
+import { FeedbackStatus } from "src/feedback/overallFeedback/overallFeedbackForm/OverallFeedbackForm";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import CompassChatMessage, { CompassChatMessageProps } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";

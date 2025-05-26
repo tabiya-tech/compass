@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ClarityOfSkillsQuestion should render correctly with empty feedbackItems 1`] = `
+<div>
+  <div
+    class="MuiBox-root css-0"
+    data-testid="clarity-of-skills-f52f579d-4cb6-4674-825d-37612e821e65"
+  >
+    <div
+      data-testid="question-renderer-3bf900a2-f9fa-4b28-8c20-8bc21570635c"
+    />
+  </div>
+</div>
+`;
+
+exports[`ClarityOfSkillsQuestion should render correctly with existing feedbackItems 1`] = `
+<div>
+  <div
+    class="MuiBox-root css-0"
+    data-testid="clarity-of-skills-f52f579d-4cb6-4674-825d-37612e821e65"
+  >
+    <div
+      data-testid="question-renderer-3bf900a2-f9fa-4b28-8c20-8bc21570635c"
+    />
+  </div>
+</div>
+`;

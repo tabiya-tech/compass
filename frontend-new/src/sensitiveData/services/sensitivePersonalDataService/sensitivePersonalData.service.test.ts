@@ -14,7 +14,7 @@ import { EncryptedDataTooLarge } from "./errors";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { FieldDefinition, FieldType } from "src/sensitiveData/components/sensitiveDataForm/config/types";
 
-// Define gender values as constants to match the mockConfig
+// Define gender values as constants.ts to match the mockConfig
 const Gender = {
   MALE: "MALE",
   FEMALE: "FEMALE",
