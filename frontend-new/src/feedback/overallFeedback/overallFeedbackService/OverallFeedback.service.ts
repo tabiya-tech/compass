@@ -10,6 +10,7 @@ import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import InfoService from "src/info/info.service";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { getRestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
+import { QuestionsConfig } from "src/feedback/overallFeedback/overallFeedbackForm/overallFeedbackForm.types";
 
 export default class OverallFeedbackService {
   readonly apiServerUrl: string;
@@ -85,5 +86,41 @@ export default class OverallFeedbackService {
     }
 
     return feedbackResponse;
+  }
+
+  /**
+   * Retrieves the questions configuration from the backend.
+   * @param sessionId The session ID for the conversation to retrieve questions for.
+   * @returns {Promise<QuestionsConfig>} The questions configuration.
+   */
+  public async getQuestionsConfig(sessionId: number): Promise<QuestionsConfig> {
+    const serviceName = "OverallFeedbackService";
+    const serviceFunction = "getQuestionsConfig";
+    const method = "GET";
+    const questionsURL = `${this.apiServerUrl}/conversations/${sessionId}/feedback/questions`;
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, questionsURL);
+
+    const response = await customFetch(questionsURL, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      expectedStatusCode: StatusCodes.OK,
+      serviceName,
+      serviceFunction,
+      failureMessage: "Failed to retrieve questions configuration",
+      expectedContentType: "application/json",
+    });
+
+    try {
+      return JSON.parse(await response.text());
+    } catch (e: any) {
+      throw errorFactory(
+        response.status,
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+        "Response did not contain valid JSON",
+        {}
+      );
+    }
   }
 }

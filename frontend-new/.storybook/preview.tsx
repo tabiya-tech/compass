@@ -22,6 +22,7 @@ import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
 import { initSentry } from "../src/sentryInit";
 import { ChatProvider } from "../src/chat/ChatContext";
+import { FeedbackProvider } from "../src/feedback/overallFeedback/feedbackContext/FeedbackContext";
 
 const preview: Preview = {
   parameters: {
@@ -119,9 +120,11 @@ export const decorators = [
           <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
             <SnackbarProvider>
               <div style={{ height: "100vh" }}>
-                <ChatProvider handleOpenExperiencesDrawer={() => {}}>
-                  <Story />
-                </ChatProvider>
+                <FeedbackProvider>
+                  <ChatProvider handleOpenExperiencesDrawer={() => {}} addMessage={()=> {}} removeMessage={() => {}}>
+                    <Story />
+                  </ChatProvider>
+                </FeedbackProvider>
               </div>
             </SnackbarProvider>
           </ThemeProvider>
