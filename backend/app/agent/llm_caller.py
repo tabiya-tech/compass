@@ -10,8 +10,16 @@ from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMInput
 from common_libs.text_formatters.extract_json import extract_json, ExtractJSONError
 
-# Number of retries to get a JSON object from the model
+# retries to call the LLM, if it fails to respond or with a valid JSON object.
 _MAX_ATTEMPTS = 3
+
+# Maximum values for generation parameters
+_MAX_FREQUENCY_PENALTY = 1.0
+_MAX_TEMPERATURE = 1.0
+
+# Increment step for adjusting generation parameters
+_PENALTY_INCREMENT = 0.1
+
 
 RESPONSE_T = TypeVar('RESPONSE_T', bound=BaseModel)
 
@@ -37,25 +45,51 @@ class LLMCaller(Generic[RESPONSE_T]):
         The method retries multiple times if the LLM fails to respond with a JSON object that is of the expected type.
         It never raises an exception, but it logs errors and captures the statistics of the LLM calls.
         If all attempts fail, it returns None and the statistics of the LLM calls.
+
         :param llm: The LLM to call
         :param llm_input: The input to the LLM
-        :param logger: The logger to log messages
-        :return: The model response and the statistics of the LLM calls
+        :param logger: The logger to log messages.
+
+        :return: The model response and the statistics of the LLM calls.
         """
+
         llm_stats_list: list[LLMStats] = []
         success = False
         attempt_count = 0
         model_response: RESPONSE_T | None = None
-        # This is a hack as we do not have access to the model config any more
+
+        # This is a hack as we do not have access to the model config any more.
         generation_config: GenerationConfig = llm._model._generation_config._raw_generation_config
         original_frequency_penalty = generation_config.frequency_penalty
         original_temperature = generation_config.temperature  # usually for json we use 0.0
+
         while not success and attempt_count < _MAX_ATTEMPTS:
             attempt_count += 1
             llm_start_time = time.time()
-            llm_response = await llm.generate_content(
-                llm_input=llm_input
-            )
+
+            if attempt_count > 1:
+                logger.info(f"Retrying to call LLM. attempt: {attempt_count}")
+
+            try:
+                # Call the LLM to generate content.
+                llm_response = await llm.generate_content(
+                    llm_input=llm_input
+                )
+            except Exception as e:
+                # If for some reason, the LLM fails to call, we log the error and continue to the next attempt.
+                # Examples of such errors are ResponseValidationError, or NetworkError.
+
+                log_message = f"Attempt {attempt_count} failed to call the LLM caused by: {e}"
+                llm_stats = LLMStats(
+                    error=log_message,
+                    prompt_token_count=0,
+                    response_token_count=0,  # No response token
+                    response_time_in_sec=round(time.time() - llm_start_time, 2)
+                )
+                logger.exception(e)
+                llm_stats_list.append(llm_stats)
+                continue  # Continue to the next attempt if the LLM call failed.
+
             llm_end_time = time.time()
             llm_stats = LLMStats(prompt_token_count=llm_response.prompt_token_count,
                                  response_token_count=llm_response.response_token_count,
@@ -81,12 +115,13 @@ class LLMCaller(Generic[RESPONSE_T]):
                         # Therefore, there is no guarantee that the result is a valid JSON.
                         # However, we must perform this process to get unstuck from the repetition trap as experiments have
                         # shown that just rerunning the model will not solve the problem on its own, but changing the parameters will.
-                        generation_config.frequency_penalty += 0.1
-                        if generation_config.frequency_penalty > 1.0:
-                            generation_config.frequency_penalty = 1.0
-                        generation_config.temperature += 0.1
-                        if generation_config.temperature > 1.0:
-                            generation_config.temperature = 1.0
+                        generation_config.frequency_penalty += _PENALTY_INCREMENT
+                        if generation_config.frequency_penalty > _MAX_FREQUENCY_PENALTY:
+                            generation_config.frequency_penalty = _MAX_FREQUENCY_PENALTY
+
+                        generation_config.temperature += _PENALTY_INCREMENT
+                        if generation_config.temperature > _MAX_TEMPERATURE:
+                            generation_config.temperature = _MAX_TEMPERATURE
 
                         logger.warning("The model reached the maximum number of tokens %s.\n"
                                        "To escape the repetition trap, we increased the frequency_penalty to %s\n"
@@ -94,12 +129,6 @@ class LLMCaller(Generic[RESPONSE_T]):
                                        generation_config.max_output_tokens,
                                        generation_config.frequency_penalty,
                                        generation_config.temperature)
-
-            # Any other exception should be caught and logged
-            except Exception as e:  # pylint: disable=broad-except
-                logger.error("An error occurred while requesting a response from the model: %s",
-                             e, exc_info=True)
-                llm_stats.error = str(e)
             finally:
                 llm_stats_list.append(llm_stats)
 
