@@ -226,7 +226,7 @@ const Register: React.FC = () => {
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Already have an account? <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>Login</CustomLink>
         </Typography>
-        <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />
+        {!applicationRegistrationCode && <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />}
       </Box>
       <BugReportButton bottomAlign={true} />
       <Backdrop isShown={isLoading} message="Registering you..." />

@@ -445,7 +445,7 @@ const Login: React.FC = () => {
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Don't have an account? <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>Register</CustomLink>
         </Typography>
-        <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />
+        {!applicationLoginCode && <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />}
       </Box>
       <BugReportButton bottomAlign={true} />
       <Backdrop isShown={isLoading} message={"Logging you in..."} />
