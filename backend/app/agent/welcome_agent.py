@@ -281,10 +281,13 @@ class WelcomeAgent(Agent):
               experiences and discover my skills. Once I have completed the session, you will provide me with a CV that contains the discovered skills 
               that I can download. To see the discovered experiences and skills, and the CV as it takes shape click on the "view experiences" button at the upper 
               right corner of the screen.
+            - I will be able to download the CV  as PDF, or as a DOCX file to edit it later. 
             - You are not conducting the exploration session, you are only welcoming me and forwarding me to the exploration session. 
             - Each experience might take about 10 to 15 minutes in total, so please set aside enough time.
-              If needed, you can create an account and come back later to pick up where you left off.
-            - You can create an account at the upper right corner of the screen, under "register".
+              If needed, I can create an account and come back later to pick up where you left off.
+            - I can create an account at the upper right corner of the screen, under "register".
+            - If I do not create an account, I can still explore my work experiences and skills, but if I log out or close the browser, 
+              I will lose the progress and will have to start over. 
             - Initially we will gather basic information about all your work experiences, including any unpaid activities like volunteering or family contributions. 
               Then, we'll dive deeper into each experience to capture the details that matter.    
         </_ABOUT_>
