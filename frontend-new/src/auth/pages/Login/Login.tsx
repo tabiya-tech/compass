@@ -341,9 +341,9 @@ const Login: React.FC = () => {
     if (applicationLoginCode) {
       return "Or login to your account to continue";
     } else {
-      return "or"
+      return "or";
     }
-  }, [applicationLoginCode])
+  }, [applicationLoginCode]);
 
   return (
     <Container
@@ -359,7 +359,7 @@ const Login: React.FC = () => {
         gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
         width={"100%"}
       >
-        <AuthHeader title={"Welcome to Compass!"}/>
+        <AuthHeader title={"Welcome to Compass!"} />
         <Box
           component="form"
           onSubmit={handleLoginSubmit}
@@ -381,9 +381,7 @@ const Login: React.FC = () => {
             </PrimaryButton>
           ) : (
             <React.Fragment>
-              <Typography variant="body2">
-                Login to your account to continue
-              </Typography>
+              <Typography variant="body2">Login to your account to continue</Typography>
               <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
                 Login using
               </Typography>
@@ -447,7 +445,7 @@ const Login: React.FC = () => {
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Don't have an account? <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>Register</CustomLink>
         </Typography>
-        <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />
+        {!applicationLoginCode && <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />}
       </Box>
       <BugReportButton bottomAlign={true} />
       <Backdrop isShown={isLoading} message={"Logging you in..."} />

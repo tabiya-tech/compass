@@ -196,7 +196,7 @@ const Register: React.FC = () => {
             />
           </React.Fragment>
         )}
-        {!applicationRegistrationCode &&  (
+        {!applicationRegistrationCode && (
           <Divider textAlign="center" style={{ width: "100%" }}>
             <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
               and either continue with
@@ -219,7 +219,7 @@ const Register: React.FC = () => {
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Already have an account? <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>Login</CustomLink>
         </Typography>
-        <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />
+        {!applicationRegistrationCode && <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />}
       </Box>
       <BugReportButton bottomAlign={true} />
       <Backdrop isShown={isLoading} message="Registering you..." />

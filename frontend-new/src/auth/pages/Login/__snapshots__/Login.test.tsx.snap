@@ -404,9 +404,6 @@ exports[`Testing Login component should handle application login code 1`] = `
         Register
       </a>
     </span>
-    <span
-      data-testid="request-invitation-code-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
-    />
   </div>
   <span
     data-testid="bug-report-button-container-31d2b110-8308-4035-90a6-519e89e7f6fa"
