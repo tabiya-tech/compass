@@ -32,6 +32,7 @@ def extract_json(text: str, model: Type[T]) -> T:
     if not match:
         raise NoJSONFound(f"No JSON object found in the text: {text}")
 
+    # This will not `IndexError` if no match, as we check for it above.
     extracted_text = match.group(0)
 
     # First, try to get the JSON using fix_busted_json
