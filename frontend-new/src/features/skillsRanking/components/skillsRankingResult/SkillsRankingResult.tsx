@@ -57,10 +57,6 @@ const SkillsRankingResult: React.FC<Readonly<SkillsRankingResultProps>> = ({
     setDelayedResults(skillsRankingState.experiment_groups.delayed_results);
   }, [skillsRankingState.experiment_groups]);
 
-  console.log('compareAgainstGroup:', compareAgainstGroup);
-  console.log('delayedResults:', delayedResults);
-  console.log('skillsRankingState:', skillsRankingState);
-
   return (
     <MessageContainer origin={ConversationMessageSender.COMPASS} data-testid={DATA_TEST_ID.SKILLS_RANKING_RESULT_CONTAINER}>
       <ChatBubble message={delayedResults ? DELAYED_RESULT_MESSAGE : message} sender={ConversationMessageSender.COMPASS}>

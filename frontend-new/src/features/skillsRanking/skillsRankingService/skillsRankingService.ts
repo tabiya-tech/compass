@@ -63,10 +63,6 @@ export class SkillsRankingService {
     if (!experimentGroups.button_order || (experimentGroups.button_order !== "skip_button_first" && experimentGroups.button_order !== "view_button_first")) {
       throw new Error("Experiment groups must have a valid button_order value");
     }
-
-    if (typeof experimentGroups.delayed_results !== "boolean") {
-      throw new Error("Experiment groups must have a valid delayed_results value");
-    }
   }
 
   /**

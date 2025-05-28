@@ -77,7 +77,7 @@ const SkillsRankingVote = forwardRef<HTMLDivElement, SkillsRankingVoteProps>(
     ]);
 
     // Disable buttons if we're not in the self-evaluating state
-    const isDisabled = disabled || skillsRankingState.phase !== SkillsRankingPhase.SELF_EVALUATING || isRankSelected;
+    const isDisabled = disabled || isRankSelected;
 
     const handleRankSelect = (rank: string) => {
       setSelectedIndex(OPTIONS.findIndex((option) => option.value === rank));
