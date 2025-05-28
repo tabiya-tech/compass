@@ -294,7 +294,13 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({ showInactiveSessionAlert =
           if (isConclusion) {
             const lastMessage = history.messages[history.messages.length - 1];
             const showConclusionMessage = () => {
-              addMessageToChat(generateConversationConclusionMessage(lastMessage.message_id, lastMessage.message));
+              const conclusionMessage = generateConversationConclusionMessage(lastMessage.message_id, lastMessage.message);
+              const typingMessage = generateTypingMessage();
+              addMessageToChat(typingMessage);
+              setTimeout(() => {
+                removeMessageFromChat(typingMessage.message_id);
+                addMessageToChat(conclusionMessage);
+              }, TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT);
             }
   
             if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
@@ -333,7 +339,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({ showInactiveSessionAlert =
         setAiIsTyping(false);
       }
     },
-    [sendMessage, showSkillsRanking, addMessageToChat],
+    [sendMessage, showSkillsRanking, addMessageToChat, removeMessageFromChat],
   );
 
   // Resets the text field for the next message
