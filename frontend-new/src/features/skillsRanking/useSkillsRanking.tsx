@@ -3,118 +3,49 @@ import { SkillsRankingPhase, SkillsRankingState, skillsRankingStateDefault } fro
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { IChatMessage } from "src/chat/Chat.types";
-import SkillsRankingPrompt, {
-  SKILLS_RANKING_PROMPT_MESSAGE_TYPE,
-  SkillsRankingPromptProps,
-} from "src/features/skillsRanking/components/skillsRankingPrompt/SkillsRankingPrompt";
-import SkillsRankingVote, {
-  SKILLS_RANKING_VOTE_MESSAGE_TYPE,
-  SkillsRankingVoteProps,
-} from "src/features/skillsRanking/components/skillsRankingVote/SkillsRankingVote";
-import SkillsRankingResult, {
-  SKILLS_RANKING_RESULT_MESSAGE_TYPE,
-  SkillsRankingResultProps,
-} from "src/features/skillsRanking/components/skillsRankingResult/SkillsRankingResult";
-import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import { SkillsRankingError } from "./errors";
-import CancellableTypingChatMessage, {
-  CANCELABLE_TYPING_CHAT_MESSAGE_TYPE,
-  CancellableTypingChatMessageProps,
-} from "./components/cancellableTypingChatMessage/CancellableTypingChatMessage";
-import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import SkillsRankingPrompt, { SKILLS_RANKING_PROMPT_MESSAGE_TYPE } from "./components/skillsRankingPrompt/SkillsRankingPrompt";
+import SkillsRankingVote, { SKILLS_RANKING_VOTE_MESSAGE_TYPE } from "./components/skillsRankingVote/SkillsRankingVote";
+import SkillsRankingResult, { SKILLS_RANKING_RESULT_MESSAGE_TYPE } from "./components/skillsRankingResult/SkillsRankingResult";
+import CancellableTypingChatMessage, { CANCELABLE_TYPING_CHAT_MESSAGE_TYPE } from "./components/cancellableTypingChatMessage/CancellableTypingChatMessage";
 import { generateTypingMessage } from "src/chat/util";
 import { TypingChatMessageProps } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
-
-type SkillsRankingMessageProps = SkillsRankingPromptProps | SkillsRankingVoteProps | SkillsRankingResultProps | CancellableTypingChatMessageProps;
-
-const TYPING_TIMEOUT = 5000; // 5 seconds
-const CANCELABLE_TYPING_TIMEOUT = 10000; // 10 seconds
-const DELAY_AFTER_RESULTS = 3000; // 3 seconds
-
-const SkillsRankingMessageIds = {
-  [SKILLS_RANKING_PROMPT_MESSAGE_TYPE]: "skills-ranking-prompt-message",
-  [SKILLS_RANKING_VOTE_MESSAGE_TYPE]: "skills-ranking-vote-message",
-  [SKILLS_RANKING_RESULT_MESSAGE_TYPE]: "skills-ranking-result-message",
-  [CANCELABLE_TYPING_CHAT_MESSAGE_TYPE]: "skills-ranking-cancellable-typing-message",
-} as const;
+import { createMessage } from "src/features/skillsRanking/utils/createMessage";
+import { useSkillsRankingState } from "./utils/useSkillsRankingState";
+import { useGetRankingResult } from "./utils/useGetRankingResult";
+import { SessionError } from "src/error/commonErrors";
+import { SkillsRankingError } from "src/features/skillsRanking/errors";
+import { CANCELABLE_TYPING_TIMEOUT, DELAY_AFTER_RESULTS, SkillsRankingMessageIds, TYPING_TIMEOUT } from "./constants";
 
 export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => void, removeMessage: (messageId: string) => void) => {
-  const pendingTimeouts = useRef<{ [key: string]: NodeJS.Timeout }>({});
+  const currentTimeout = useRef<NodeJS.Timeout | null>(null);
   const [currentSkillsRankingState, setCurrentSkillsRankingState] = useState<SkillsRankingState>(skillsRankingStateDefault);
-  const [ranking, setRanking] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
   const onFinishRef = useRef<(() => void) | null>(null);
-  const lastHandledState = useRef<SkillsRankingPhase | null>(null);
-  const shownMessages = useRef<Set<string>>(new Set());
-  const { enqueueSnackbar } = useSnackbar();
+  const shownMessages = useRef<Set<string>>(new Set()); 
 
-  const handleError = useCallback((error: Error) => {
-    console.error(new SkillsRankingError("Error in skills ranking flow:", error));
-    enqueueSnackbar("An error occurred while calculating your skills ranking. Please try again later.", {
-      variant: "error",
-    });
-  }, [enqueueSnackbar]);
+  const { handleStateTransition, lastHandledState } = useSkillsRankingState();
+  const { fetchRanking, isLoading, ranking } = useGetRankingResult();
 
-  const clearAllPendingTimeouts = useCallback(() => {
-    Object.values(pendingTimeouts.current).forEach(timeout => clearTimeout(timeout));
-    pendingTimeouts.current = {};
+  const clearCurrentTimeout = useCallback(() => {
+    if (currentTimeout.current) {
+      clearTimeout(currentTimeout.current);
+      currentTimeout.current = null;
+    }
   }, []);
 
-  const createMessage = useCallback(<T extends SkillsRankingMessageProps>(type: string, props: T, Component: React.ComponentType<T>): IChatMessage<T> => ({
-    message_id: SkillsRankingMessageIds[type as keyof typeof SkillsRankingMessageIds],
-    type,
-    payload: props,
-    sender: ConversationMessageSender.COMPASS,
-    component: (props: T) => <Component {...props} />,
-  }), []);
-
-  const fetchRanking = useCallback(async (signal: AbortSignal) => {
-    setIsLoading(true);
-    try {
-      const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
-      if (sessionId === null) {
-        throw new Error("No active session found");
-      }
-      const skillsRankingService = SkillsRankingService.getInstance();
-      const result = await skillsRankingService.getRanking(sessionId, signal);
-      setRanking(result.ranking);
-      return result.ranking;
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.log('Ranking fetch was aborted');
-        return null;
-      }
-      const errorMessage = error instanceof Error ? error.message : "Failed to fetch ranking";
-      handleError(error instanceof Error ? error : new Error(errorMessage));
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [handleError]);
-
-  const handleStateTransition = useCallback(async (newState: SkillsRankingPhase, rank?: string) => {
-    const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
-    if (!sessionId) return;
-    
-    try {
-      const state = await SkillsRankingService.getInstance().updateSkillsRankingState(
-        sessionId,
-        newState,
-        rank
-      );
-      setCurrentSkillsRankingState(state);
-      return state;
-    } catch (error) {
-      handleError(error as Error);
-      return null;
-    }
-  }, [handleError]);
-
-  const handleStateMessages = useCallback((state: SkillsRankingState, onFinish: () => void) => {
+  const handleSkillsRankingMessageFlow = useCallback((state: SkillsRankingState) => {
     if (lastHandledState.current === state.phase) return;
     lastHandledState.current = state.phase;
+    let abortController: AbortController | null = null;
 
+    /*
+    * shows a typing message for a certain amount of time, then calls the callback function.
+    * this is used to simulate typing in the chat before showing the next message.
+    *
+    * since the flow is called after every state change, wrapping the message creation in a typing message
+    * allows us to show a typing indicator before showing the next message.
+    *
+    * unless the phase is SKIPPED, CANCELLED or EVALUATED, in which case we don't show the typing message. (they have their own internal way of showing typing)
+    * */
     const showTypingAndThen = (callback: () => void) => {
       let typingMsg: IChatMessage<TypingChatMessageProps> | null = null;
 
@@ -123,7 +54,8 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
         addMessage(typingMsg);
       }
 
-      pendingTimeouts.current['showMessage'] = setTimeout(() => {
+      clearCurrentTimeout();
+      currentTimeout.current = setTimeout(() => {
         if (typingMsg) {
           removeMessage(typingMsg.message_id);
         }
@@ -131,171 +63,203 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
       }, typingMsg ? TYPING_TIMEOUT : 0);
     };
 
-    const handleState = () => {
+    /* * ----------------
+    * reusable message creation functions
+    * These functions create the messages that will be shown in the chat based on the current state of the skills ranking flow.
+    * */
+    const createPromptMessage = (state: SkillsRankingState, disabled: boolean) => {
+      return createMessage(SKILLS_RANKING_PROMPT_MESSAGE_TYPE, {
+        message: "Please rate your skills",
+        onView: async () => {
+          const newState = await handleStateTransition(SkillsRankingPhase.SELF_EVALUATING);
+          if (newState) {
+            setCurrentSkillsRankingState(newState);
+            handleSkillsRankingMessageFlow(newState);
+          }
+        },
+        onSkip: async () => {
+          removeMessage(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE]);
+          const newState = await handleStateTransition(SkillsRankingPhase.SKIPPED);
+          if (newState) {
+            setCurrentSkillsRankingState(newState);
+            handleSkillsRankingMessageFlow(newState);
+          }
+        },
+        disabled,
+        skillsRankingState: state,
+      }, SkillsRankingPrompt);
+    };
+
+    /*
+    * We're interested in knowing if the user cancels the typing message while the ranking is being fetched.
+    * This function will cancel the current timeout, abort the fetch request if it exists, and then send a new state with the CANCELLED phase.
+    * */
+    const createCancellableTypingMessage = (state: SkillsRankingState) => {
+      return createMessage(CANCELABLE_TYPING_CHAT_MESSAGE_TYPE, {
+        message: "Calculating your skills ranking",
+        onCancel: async () => {
+          clearCurrentTimeout();
+          if (abortController) {
+            abortController.abort();
+            abortController = null;
+          }
+          removeMessage(SkillsRankingMessageIds[CANCELABLE_TYPING_CHAT_MESSAGE_TYPE]);
+          const newState = await handleStateTransition(SkillsRankingPhase.CANCELLED);
+          if (newState) {
+            setCurrentSkillsRankingState(newState);
+            handleSkillsRankingMessageFlow(newState);
+          }
+        },
+      }, CancellableTypingChatMessage);
+    };
+
+    /*
+    * When a vote is selected, we show a typing message first, then fetch the ranking.
+    * we add an artifical delay and give the user the option to cancel the typing message.
+    * */
+    const createVoteMessage = (state: SkillsRankingState, disabled: boolean) => {
+      return createMessage(SKILLS_RANKING_VOTE_MESSAGE_TYPE, {
+        message: "Please rate your skills",
+        onRankSelect: async (rank: string) => {
+          // Show typing message first
+          const cancelableTypingMsg = createCancellableTypingMessage(state);
+          addMessage(cancelableTypingMsg);
+
+          // Start fetching ranking
+          abortController = new AbortController();
+          await fetchRanking(abortController.signal);
+
+          // Wait for typing timeout before transitioning state
+          clearCurrentTimeout();
+          currentTimeout.current = setTimeout(async () => {
+            removeMessage(cancelableTypingMsg.message_id);
+            const newState = await handleStateTransition(SkillsRankingPhase.EVALUATED, rank);
+            if (newState) {
+              setCurrentSkillsRankingState(newState);
+              handleSkillsRankingMessageFlow(newState);
+            }
+          }, CANCELABLE_TYPING_TIMEOUT);
+        },
+        disabled,
+        skillsRankingState: state,
+      }, SkillsRankingVote);
+    };
+
+    const createResultMessage = (state: SkillsRankingState) => {
+      return createMessage(SKILLS_RANKING_RESULT_MESSAGE_TYPE, {
+        message: "Here's what we found",
+        skillsRankingState: state,
+        isLoading,
+      }, SkillsRankingResult);
+    };
+
+    /* * ----------------
+    * Responsible for adding the appropriate messages to the chat based on the current phase of the skills ranking flow.
+    * There are two possible ways to reach this point:
+    *   1. we are loading the state in an intermediate step (for example during a reload) and we need to reconstruct the appropriate messages
+    *     for each previous phase as well as the current one
+    *   2. we are in the middle of the flow and we need to add the messages for the current phase (move from one phase to another)
+    * so this function is called every time the state changes, and it will add the appropriate messages to the chat if they arent already shown.
+    * */
+    const addSkillsRankingMessagesToChat = () => {
       switch (state.phase) {
         case SkillsRankingPhase.INITIAL:
           if (!shownMessages.current.has(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE])) {
-            addMessage(createMessage(SKILLS_RANKING_PROMPT_MESSAGE_TYPE, {
-              message: "Please rate your skills",
-              onView: async () => {
-                const newState = await handleStateTransition(SkillsRankingPhase.SELF_EVALUATING);
-                if (newState) handleStateMessages(newState, onFinish);
-              },
-              onSkip: async () => {
-                removeMessage(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE]);
-                const newState = await handleStateTransition(SkillsRankingPhase.SKIPPED);
-                if (newState) handleStateMessages(newState, onFinish);
-              },
-              disabled: false,
-              skillsRankingState: state,
-            }, SkillsRankingPrompt));
+            addMessage(createPromptMessage(state, false));
             shownMessages.current.add(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE]);
           }
           break;
 
         case SkillsRankingPhase.SELF_EVALUATING:
           if (!shownMessages.current.has(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE])) {
-            addMessage(createMessage(SKILLS_RANKING_PROMPT_MESSAGE_TYPE, {
-              message: "Please rate your skills",
-              onView: async () => {
-                const newState = await handleStateTransition(SkillsRankingPhase.SELF_EVALUATING);
-                if (newState) handleStateMessages(newState, onFinish);
-              },
-              onSkip: async () => {
-                removeMessage(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE]);
-                const newState = await handleStateTransition(SkillsRankingPhase.SKIPPED);
-                if (newState) handleStateMessages(newState, onFinish);
-              },
-              disabled: true,
-              skillsRankingState: state,
-            }, SkillsRankingPrompt));
+            addMessage(createPromptMessage(state, true));
             shownMessages.current.add(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE]);
           }
           
           if (!shownMessages.current.has(SkillsRankingMessageIds[SKILLS_RANKING_VOTE_MESSAGE_TYPE])) {
-            addMessage(createMessage(SKILLS_RANKING_VOTE_MESSAGE_TYPE, {
-              message: "Please rate your skills",
-              onRankSelect: async (rank: string) => {
-                // Show typing message first
-                const cancelableTypingMsg = createMessage(CANCELABLE_TYPING_CHAT_MESSAGE_TYPE, {
-                  message: "Calculating your skills ranking",
-                  onCancel: async () => {
-                    clearAllPendingTimeouts();
-                    if (abortControllerRef.current) {
-                      abortControllerRef.current.abort();
-                      abortControllerRef.current = null;
-                    }
-                    removeMessage(SkillsRankingMessageIds[CANCELABLE_TYPING_CHAT_MESSAGE_TYPE]);
-                    const newState = await handleStateTransition(SkillsRankingPhase.CANCELLED);
-                    if (newState) handleStateMessages(newState, onFinish);
-                  },
-                }, CancellableTypingChatMessage);
-                addMessage(cancelableTypingMsg);
-
-                // Start fetching ranking
-                abortControllerRef.current = new AbortController();
-                await fetchRanking(abortControllerRef.current.signal);
-
-                // Wait for typing timeout before transitioning state
-                pendingTimeouts.current['rankSelect'] = setTimeout(async () => {
-                  removeMessage(cancelableTypingMsg.message_id);
-                  const newState = await handleStateTransition(SkillsRankingPhase.EVALUATED, rank);
-                  if (newState) handleStateMessages(newState, onFinish);
-                }, CANCELABLE_TYPING_TIMEOUT);
-              },
-              skillsRankingState: state,
-            }, SkillsRankingVote));
+            addMessage(createVoteMessage(state, false));
             shownMessages.current.add(SkillsRankingMessageIds[SKILLS_RANKING_VOTE_MESSAGE_TYPE]);
           }
           break;
-
         case SkillsRankingPhase.EVALUATED:
           if (!shownMessages.current.has(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE])) {
-            addMessage(createMessage(SKILLS_RANKING_PROMPT_MESSAGE_TYPE, {
-              message: "Please rate your skills",
-              onView: async () => {
-                const newState = await handleStateTransition(SkillsRankingPhase.SELF_EVALUATING);
-                if (newState) handleStateMessages(newState, onFinish);
-              },
-              onSkip: async () => {
-                removeMessage(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE]);
-                const newState = await handleStateTransition(SkillsRankingPhase.SKIPPED);
-                if (newState) handleStateMessages(newState, onFinish);
-              },
-              disabled: true,
-              skillsRankingState: state,
-            }, SkillsRankingPrompt));
+            addMessage(createPromptMessage(state, true));
             shownMessages.current.add(SkillsRankingMessageIds[SKILLS_RANKING_PROMPT_MESSAGE_TYPE]);
           }
-          
           if (!shownMessages.current.has(SkillsRankingMessageIds[SKILLS_RANKING_VOTE_MESSAGE_TYPE])) {
-            addMessage(createMessage(SKILLS_RANKING_VOTE_MESSAGE_TYPE, {
-              message: "Please rate your skills",
-              onRankSelect: async (rank: string) => {
-                const newState = await handleStateTransition(SkillsRankingPhase.EVALUATED, rank);
-                if (newState) handleStateMessages(newState, onFinish);
-              },
-              skillsRankingState: state,
-            }, SkillsRankingVote));
+            addMessage(createVoteMessage(state, true));
             shownMessages.current.add(SkillsRankingMessageIds[SKILLS_RANKING_VOTE_MESSAGE_TYPE]);
           }
-          console.log('state:', state);
-          
           if (!shownMessages.current.has(SkillsRankingMessageIds[SKILLS_RANKING_RESULT_MESSAGE_TYPE])) {
-            addMessage(createMessage(SKILLS_RANKING_RESULT_MESSAGE_TYPE, {
-              message: "Here's what we found",
-              skillsRankingState: state,
-              isLoading,
-            }, SkillsRankingResult));
+            addMessage(createResultMessage(state));
             shownMessages.current.add(SkillsRankingMessageIds[SKILLS_RANKING_RESULT_MESSAGE_TYPE]);
           }
-          
-          const finishTimeoutId = setTimeout(() => {
-            onFinish();
+                    
+          clearCurrentTimeout();
+          currentTimeout.current = setTimeout(() => {
+            //  we expect onFinish to be set by the caller
+            onFinishRef.current!();
           }, DELAY_AFTER_RESULTS);
-          
-          pendingTimeouts.current['finish'] = finishTimeoutId;
-          break;
 
+          break;
         case SkillsRankingPhase.SKIPPED:
         case SkillsRankingPhase.CANCELLED:
           console.debug("SKIPPED or CANCELLED, calling onFinish");
-          onFinish();
+          //  we expect onFinish to be set by the caller
+          onFinishRef.current!();
           break;
       }
     };
 
-    showTypingAndThen(handleState);
-  }, [addMessage, removeMessage, createMessage, handleStateTransition, clearAllPendingTimeouts, fetchRanking, isLoading]);
+    showTypingAndThen(addSkillsRankingMessagesToChat);
+  }, [addMessage, removeMessage, handleStateTransition, clearCurrentTimeout, fetchRanking, isLoading, lastHandledState]);
 
+  /*
+  * This is the entry point for showing the skills ranking flow.
+  * The main responsibilities of the is function are:
+  *   1. to get the skills ranking state of this session from the backend
+  *   2. to trigger an initialization of the skills ranking state if it doesn't exist yet (send an update request with an INITIAL phase)
+  *   3. to set the onFinish callback that will be called when the flow is done to a ref so that we can access it later
+  * from the handleSkillsRankingMessageFlow function.
+  * */
   const showSkillsRanking = useCallback(async (onFinish: () => void) => {
-    clearAllPendingTimeouts();
+    clearCurrentTimeout();
     shownMessages.current.clear(); // Reset shown messages when starting a new flow
     try {
       const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
-      if (!sessionId) throw new Error("No active session found");
+      if (!sessionId) throw new SessionError("No active session found");
       
       let state = await SkillsRankingService.getInstance().getSkillsRankingState(sessionId);
       // If no state exists, create one with INITIAL phase
-      state ??= await SkillsRankingService.getInstance().updateSkillsRankingState(
-        sessionId,
-        SkillsRankingPhase.INITIAL,
-      );
+      if (!state) {
+        const newState = await handleStateTransition(SkillsRankingPhase.INITIAL);
+        if (!newState) {
+          return;
+        }
+        state = newState;
+      }
       setCurrentSkillsRankingState(state);
+      // set onFinish callback to be called when the flow is done
       onFinishRef.current = onFinish;
-      handleStateMessages(state, onFinish);
+      handleSkillsRankingMessageFlow(state);
     } catch (error) {
-      console.error("Error in skills ranking flow:", error);
-      onFinish();
+      // we dont use the handleError here since we dont want to show a snackbar if initializing the skills ranking flow fails
+      // we simply want to move on and call the onFinish callback
+      console.error(new SkillsRankingError("Error in skills ranking flow:", error));
+      //  we expect onFinish to be set by the caller
+      onFinishRef.current!();
     }
-  }, [clearAllPendingTimeouts, handleStateMessages]);
+  }, [clearCurrentTimeout, handleSkillsRankingMessageFlow, handleStateTransition]);
 
+
+  /*
+  * Once the onFinish callback is set by the entry point function, we use this useEffect to trigger the skills ranking message flow.
+  * */
   useEffect(() => {
     if (onFinishRef.current) {
-      handleStateMessages(currentSkillsRankingState, onFinishRef.current);
-      onFinishRef.current = null;
+      handleSkillsRankingMessageFlow(currentSkillsRankingState);
     }
-  }, [ranking, isLoading, currentSkillsRankingState.phase, handleStateMessages, currentSkillsRankingState]);
+  }, [ranking, isLoading, currentSkillsRankingState.phase, handleSkillsRankingMessageFlow, currentSkillsRankingState]);
 
   return { showSkillsRanking };
 }; 

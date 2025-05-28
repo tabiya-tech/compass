@@ -66,8 +66,7 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({
       }
   }, [skillsRankingState.phase, skillsRankingState.experiment_groups]);
 
-
-  const isDisabled = disabled || skillsRankingState.phase !== SkillsRankingPhase.INITIAL || selectionMade !== undefined;
+  const isDisabled = disabled || selectionMade !== undefined;
 
   const handleButtonClick = (action: SkillsRankingPromptAction) => {
     if (isDisabled) return;
