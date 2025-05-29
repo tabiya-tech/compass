@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import os
+from typing import cast
 
 from dotenv import load_dotenv
 
@@ -27,6 +28,7 @@ from app.app_config import ApplicationConfig, set_application_config, get_applic
 from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
 from modules.loader import FeatureLoader
+from starlette.datastructures import State
 
 
 def setup_logging():
@@ -212,6 +214,10 @@ async def lifespan(_app: FastAPI):
     # so that plugins will be loaded after the application is initialized.
     await feature_loader.init(application_db)
 
+    logger.info("Application started successfully.")
+    # noinspection PyUnresolvedReferences
+    _app.state.startup_complete.set()  # signal startup complete
+
     yield
 
     # Tear down features before shutting down the application
@@ -226,6 +232,10 @@ async def lifespan(_app: FastAPI):
     application_db.client.close()
     userdata_db.client.close()
     metrics_db.client.close()
+
+    logger.info("Shutting down completed.")
+    # noinspection PyUnresolvedReferences
+    _app.state.shutdown_complete.set()  # signal shutdown complete
 
 
 # Retrieve the backend URL from the environment variables
@@ -243,6 +253,9 @@ app = FastAPI(
         }],
     lifespan=lifespan
 )
+app.state = cast(State, app.state)
+app.state.startup_complete = asyncio.Event()
+app.state.shutdown_complete = asyncio.Event()
 
 ############################################
 # Setup the CORS policy
