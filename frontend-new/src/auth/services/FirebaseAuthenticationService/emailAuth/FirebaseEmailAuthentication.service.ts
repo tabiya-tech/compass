@@ -182,9 +182,8 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
       // call the parent class method once the token is successfully refreshed
       await super.onSuccessfulRefresh(newToken);
     } catch (error) {
-      console.error(new TokenError("Error refreshing token:", error));
-      // if token refresh fails, log the user out
-      await this.logout();
+      console.error(new TokenError("error refreshing token", error));
+      // if token refresh fails, log the error and do nothing
     }
   }
 
