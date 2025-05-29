@@ -1,8 +1,5 @@
 import { firebaseAuth } from "src/auth/firebaseConfig";
 import { TabiyaUser, Token } from "src/auth/auth.types";
-import { jwtDecode } from "jwt-decode";
-import firebase from "firebase/compat/app";
-import Unsubscribe = firebase.Unsubscribe;
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 
 export interface FirebaseToken extends Token {
@@ -53,14 +50,10 @@ export enum FirebaseTokenValidationFailureCause {
  */
 class StdFirebaseAuthenticationService {
   private readonly FIREBASE_DB_NAME = "firebaseLocalStorageDb";
-  private readonly REFRESH_TOKEN_EXPIRATION_PERCENTAGE = 0.9; // Refresh token after 90% of the token expiration time has elapsed
-  private refreshTimeout: NodeJS.Timeout | null = null;
-  private readonly unsubscribeAuthListener: Unsubscribe;
 
   private static instance: StdFirebaseAuthenticationService;
 
   private constructor() {
-    this.unsubscribeAuthListener = () => this.setupAuthListener();
   }
 
   static getInstance(): StdFirebaseAuthenticationService {
@@ -72,7 +65,7 @@ class StdFirebaseAuthenticationService {
 
   /**
    * Logs out the user from the Firebase authentication service.
-   * It signs out the user, deletes the Firebase IndexedDB, clears the refresh timeout,
+   * It signs out the user, deletes the Firebase IndexedDB
    * and clears user data from the authentication state and user preferences state services.
    *
    * @returns {Promise<void>} A promise that resolves when the logout process is complete.
@@ -83,93 +76,7 @@ class StdFirebaseAuthenticationService {
     } catch (error) {
       console.warn("An error occurred while logging out from firebase. Cleaning firebase DB explicitly.", error);
       await this.deleteFirebaseDB();
-    } finally {
-      console.debug("Clearing refresh timeout");
-      this.clearRefreshTimeout();
-      this.unsubscribeAuthListener();
     }
-  }
-
-  /**
-   * Refreshes the user's token if a current user exists.
-   * It retrieves the current user's token, updates the authentication state with the new token,
-   * and schedules the next token refresh.
-   *
-   * @returns {Promise<string>} A promise that resolves with the new token when the token refresh process is complete.
-   * @throws {Error} If an error occurs during the token refresh process.
-   */
-  public async refreshToken(): Promise<string> {
-    console.debug("Attempting to refresh token");
-    const oldToken = AuthenticationStateService.getInstance().getToken();
-    console.debug("Old token", "..." + oldToken?.slice(-20));
-
-    // We need to use a one-time auth state listener because firebaseAuth.currentUser
-    // might not be available immediately on page load
-    return new Promise<string>((resolve, reject) => {
-      // Create a one-time listener that will be removed after the first auth state change
-      const unsubscribeFunction = firebaseAuth.onAuthStateChanged(async (currentUser) => {
-        if (currentUser) {
-          try {
-            const newToken = await currentUser.getIdToken(true);
-            console.debug("New token obtained", "..." + newToken.slice(-20));
-            this.scheduleTokenRefresh(newToken);
-            AuthenticationStateService.getInstance().setToken(newToken);
-            
-            resolve(newToken);
-          } catch (error) {
-            console.error("Error refreshing token:", error);
-            reject(error as Error);
-          }
-        } else {
-          console.debug("No current user to refresh token");
-          reject(new Error("No current user to refresh token"));
-        }
-
-        unsubscribeFunction();
-      });
-    });
-  }
-
-  /**
-   * Schedules the next token refresh based on the token's expiration time.
-   * It decodes the token to retrieve the expiration time, calculates the refresh time
-   * (10% before expiration), and sets a timeout to trigger the token refresh.
-   *
-   * @param {string} token - The user's token.
-   */
-  private scheduleTokenRefresh(token: string) {
-    console.debug("Scheduling next token refresh");
-    this.clearRefreshTimeout();
-
-    const decodedToken: FirebaseToken = jwtDecode(token);
-    const expirationTime = decodedToken.exp * 1000;
-    const currentTime = Date.now();
-    const refreshTime = (expirationTime - currentTime) * this.REFRESH_TOKEN_EXPIRATION_PERCENTAGE;
-
-    console.debug(`Next refresh scheduled in ${refreshTime / 1000} seconds`);
-
-    this.refreshTimeout = setTimeout(async () => {
-      await this.refreshToken();
-    }, refreshTime);
-  }
-
-  /**
-   * Sets up the Firebase authentication listener.
-   * It listens for changes in the user's authentication state and schedules token refreshes
-   * when the user is authenticated.
-   *
-   * @returns {() => void} A function to unsubscribe from the authentication listener.
-   * @throws {Error} If an error occurs during the setup of the authentication listener.
-   */
-  private setupAuthListener(): Unsubscribe {
-    console.debug("Setting up auth listener");
-    return firebaseAuth.onAuthStateChanged((user) => {
-      if (user) {
-        user.getIdToken(true).then((token) => {
-          this.scheduleTokenRefresh(token);
-        });
-      }
-    });
   }
 
   /**
@@ -212,25 +119,53 @@ class StdFirebaseAuthenticationService {
   }
 
   /**
-   * Clears the refresh timeout if it exists.
+   * Refreshes the user's token if a current user exists.
+   * It retrieves the current user's token, updates the authentication state with the new token,
+   * and schedules the next token refresh.
+   *
+   * @returns {Promise<string>} A promise that resolves with the new token when the token refresh process is complete.
+   * @throws {Error} If an error occurs during the token refresh process.
    */
-  private clearRefreshTimeout() {
-    console.debug("Clearing refresh timeout");
-    if (this.refreshTimeout) {
-      clearTimeout(this.refreshTimeout);
-      this.refreshTimeout = null;
-    }
+  public async refreshToken(): Promise<string> {
+    console.debug("Attempting to refresh token");
+    const oldToken = AuthenticationStateService.getInstance().getToken();
+    console.debug("Old token", "..." + oldToken?.slice(-20));
+
+    // We need to use a one-time auth state listener because firebaseAuth.currentUser
+    // might not be available immediately on page load. Its not perfectly documented that this will be triggered on
+    // subscribing to onAuthStateChanged, but it seems to be the case. And this is the recommended way to handle auth state changes in Firebase.
+    return new Promise<string>((resolve, reject) => {
+      // Create a one-time listener that will be removed after the first auth state change
+      const unsubscribeFunction = firebaseAuth.onAuthStateChanged(async (currentUser) => {
+        if (currentUser) {
+          try {
+            const newToken = await currentUser.getIdToken(true);
+            console.debug("New token obtained", "..." + newToken.slice(-20));
+            AuthenticationStateService.getInstance().setToken(newToken);
+
+            resolve(newToken);
+          } catch (error) {
+            console.error("Error refreshing token:", error);
+            reject(error as Error);
+          }
+        } else {
+          console.debug("No current user to refresh token");
+          reject(new Error("No current user to refresh token"));
+        }
+
+        unsubscribeFunction();
+      });
+    });
   }
 
   /**
    * Cleans up the Firebase authentication service.
-   * It unsubscribes from the authentication listener and clears the refresh timeout.
-   * @throws {Error} If the unsubscribe function from the authentication listener fails.
+   * Presently does nothing, but will be used in the future to clean up resources like refresh listeners,
+   * @throws {Error} If the cleanup fails
    */
   public cleanup() {
     console.debug("Cleaning up FirebaseAuthService");
-    this.unsubscribeAuthListener();
-    this.clearRefreshTimeout();
+
   }
 
   public getUserFromDecodedToken(decodedToken: FirebaseToken): TabiyaUser {
