@@ -51,7 +51,10 @@ def pytest_runtest_makereport(item):
         return
 
     # Determine if the test is repeated using the pytest-repeat plugin
-    is_repeated = "__pytest_repeat_step_number" in getattr(item, "callspec", {}).params
+    is_repeated = False
+    call_spec = getattr(item, "callspec", None)
+    if call_spec is not None:
+        is_repeated = "__pytest_repeat_step_number" in call_spec.params
     test_name = item.name
 
     # Trim repeat suffix if the test is repeated
