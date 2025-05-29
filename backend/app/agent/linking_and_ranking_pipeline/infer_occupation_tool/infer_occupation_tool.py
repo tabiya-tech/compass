@@ -65,7 +65,7 @@ class InferOccupationTool:
             number_of_titles=number_of_titles
         )
         # 2. Search for the top_p occupations matching the title
-        #  create a set to remove duplicates and convert to lowercase as the esco titles in the db are lowercase and
+        #  creates a set to remove duplicates and convert to lowercase as the esco titles in the db are lowercase, and
         #  using a different case yields imprecise results
         titles: set[str] = {experience_title.strip().lower()}.union(
             {title.strip().lower() for title in contextualization_response.contextual_titles})
