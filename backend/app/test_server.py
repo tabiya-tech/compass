@@ -1,9 +1,10 @@
-from typing import Awaitable
+from typing import Awaitable, cast
 
 import pytest
 import pytest_mock
 from httpx import ASGITransport, AsyncClient
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from starlette.datastructures import State
 
 from common_libs.test_utilities.setup_env_vars import setup_env_vars, teardown_env_vars
 
@@ -67,6 +68,10 @@ class TestServer:
                 Test the version endpoint
                 :return:
                 """
+                # GIVEN the FastAPI application is running
+                app.state = cast(State, app.state)
+                await app.state.startup_complete.wait()
+                print("Application startup complete, running tests...")
                 # WHEN a GET request is made to the version endpoint
                 response = await c.get("/version")
                 # THEN it should return with OK
