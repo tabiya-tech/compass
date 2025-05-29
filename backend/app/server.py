@@ -28,6 +28,7 @@ from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
 from modules.loader import FeatureLoader
 
+
 def setup_logging():
     # The configuration is loaded (once) when python imports the module.
     # If the LOG_CONFIG_FILE environment variable is not set, then fallback to the production logging configuration
@@ -70,10 +71,10 @@ logger = logging.getLogger(__name__)
 # Setup Sentry
 setup_sentry()
 
-# Setup CORS policy
+# Set up the CORS policy.
 # Keep the backend, frontend urls and the environment as separate env variables as a failsafe measure,
 # as we want to be certain that both the backend, frontend urls are set correctly,
-# especially in non dev or local environments.
+# especially in non-dev or local environments.
 
 if not os.getenv("FRONTEND_URL"):
     raise ValueError("Mandatory FRONTEND_URL env variable is not set! Please set it to the frontend URL as it is "
@@ -163,7 +164,6 @@ set_application_config(application_config)
 set_sentry_contexts()
 
 
-
 ############################################
 # Initialize Feature Loader
 ############################################
@@ -199,7 +199,7 @@ async def lifespan(_app: FastAPI):
                                 embeddings_model_name=app_cfg.embeddings_model_name),
     )
 
-    # We are initializing the feature loader here,
+    # We are initializing the feature loader here
     # so that plugins will be loaded after the application is initialized.
     await feature_loader.init(application_db)
 
@@ -219,8 +219,8 @@ async def lifespan(_app: FastAPI):
     metrics_db.client.close()
 
 
-# Retrieve the backend URL from the environment variables,
-# and set the server URL to the backend URL, so that Swagger UI can correctly call the backend paths
+# Retrieve the backend URL from the environment variables
+# and set the server URL to the backend URL so that Swagger UI can correctly call the backend paths
 app = FastAPI(
     # redirect_slashes is set False to prevent FastAPI from redirecting when a trailing slash is added.
     title="Compass API",
