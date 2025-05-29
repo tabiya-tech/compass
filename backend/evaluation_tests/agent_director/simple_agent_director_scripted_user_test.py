@@ -13,10 +13,13 @@ from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.agent_types import AgentType
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
+from app.agent.welcome_agent import WelcomeAgent, WelcomeAgentState
+from app.agent.welcome_agent import WelcomeAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
     ConversationMemoryManagerState
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from app.vector_search.vector_search_dependencies import SearchServices
+from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.agent_director.agent_director_executors import AgentDirectorExecutor, \
     AgentDirectorGetConversationContextExecutor, AgentDirectorIsFinished
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
@@ -53,8 +56,12 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
     # The Search Services for this test
     search_services = await setup_search_services
 
-    agent_director = SimpleAgentDirector(conversation_manager, search_services)
+    agent_director = SimpleAgentDirector(
+        conversation_manager=conversation_manager,
+        search_services=search_services,
+    )
     agent_director.set_state(AgentDirectorState(session_id=session_id))
+    agent_director.get_welcome_agent().set_state(WelcomeAgentState(session_id=session_id))
     explore_experiences_agent = agent_director.get_explore_experiences_agent()
     explore_experiences_agent.set_state(ExploreExperiencesAgentDirectorState(session_id=session_id))
     explore_experiences_agent.get_collect_experiences_agent().set_state(CollectExperiencesAgentState(session_id=session_id))
@@ -69,7 +76,7 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
         # Run the conversation test
         config = ConversationTestConfig(
             # Ignoring max_iterations, The agent is expected to complete the conversation at the last input from the user
-            max_iterations=len(test_case.scripted_user) + 1,
+            max_iterations=len(test_case.scripted_user),
             test_case=test_case,
             output_folder=output_folder,
             execute_evaluated_agent=execute_evaluated_agent,
@@ -82,31 +89,22 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
         # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
         # the log messages to the root logger. For this reason, we add additional guards.
         with caplog.at_level(logging.DEBUG):
-            # Guards to ensure that the loggers are correctly setup,
-            # otherwise the tests cannot be trusted that they correctly assert the absence of errors and warnings.
-            guard_warning_msg = logging.getLevelName(logging.WARNING) + str(session_id)  # some random string
-            execute_evaluated_agent._agent._logger.warning(guard_warning_msg)
-            assert guard_warning_msg in caplog.text
-            guard_error_msg = logging.getLevelName(logging.ERROR) + str(session_id)  # some random string
-            execute_evaluated_agent._agent._logger.warning(guard_error_msg)
-            assert guard_error_msg in caplog.text
-            caplog.records.clear()
+            guard_caplog(logger=execute_evaluated_agent._agent._logger, caplog=caplog)
 
             # Run the main test
             await conversation_test_function(
                 config=config
             )
-
-            # Check that no errors and no warning were logged
-            for record in caplog.records:
-                assert record.levelname != 'ERROR'
-                assert record.levelname != 'WARNING'
+            assert_log_error_warnings(caplog=caplog,
+                                      expect_errors_in_logs=False,
+                                      expect_warnings_in_logs=True)
 
     return conversation_manager, agent_director_exec
 
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
+@pytest.mark.repeat(1)
 async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
                                           setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
                                               [LogCaptureFixture, ScriptedUserEvaluationTestCase],
@@ -125,7 +123,8 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
             "yes",
             "yes",
             "yes",
-            "yes"
+            "yes",
+            "nothing to add",  # this is not passed to the evaluated agent, see the internal logic of how the conversation is simulated
         ],
         evaluations=[]
     )
@@ -165,10 +164,8 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
             "Ok, Let's start",  # END of Welcome
             "ok",  # Acknowledge forwarding to the next agent
             "I worked as a backer",  # <--- Job 1
-            "pastry and bread making",  # <--- skills
-            "no, I dont have more to say about this",
-            "Let's finish the conversation",  # END of Skill Explore
-            "What now?"  # END of Farewell
+            "Master Baker",  # <--- Title or occupation
+            "nothing to add",  # this is not passed to the evaluated agent, see the internal logic of how the conversation is simulated
         ],
         evaluations=[]
     )
@@ -178,7 +175,7 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
 
     # Check if the welcome agent completed their task
     context = await conversation_manager.get_conversation_context()
-    # Assert that the conversation is finished and we are still at the skills explorer
+    # Assert that the conversation is finished and we are still at the Skills Explorer
     expected_agent_states: list[AgentState] = [
         AgentState(0, AgentType.WELCOME_AGENT, False),  # Wellcome Agent say hi
         AgentState(1, AgentType.WELCOME_AGENT, False),
@@ -186,9 +183,6 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
         AgentState(3, AgentType.COLLECT_EXPERIENCES_AGENT, False),
         AgentState(4, AgentType.COLLECT_EXPERIENCES_AGENT, False),
         AgentState(5, AgentType.COLLECT_EXPERIENCES_AGENT, False),
-        AgentState(6, AgentType.EXPLORE_SKILLS_AGENT, False),
-        AgentState(7, AgentType.EXPLORE_SKILLS_AGENT, True),  # Skill Agent completes task
-        AgentState(8, AgentType.FAREWELL_AGENT, True)  # Farewell Agent completes task
     ]
     for i, expected_state in enumerate(expected_agent_states):
         turn = context.all_history.turns[i]

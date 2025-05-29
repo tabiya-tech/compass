@@ -35,6 +35,16 @@ class SimpleAgentDirector(AbstractAgentDirector):
             raise ValueError("The agent is not an instance of ExploreExperiencesAgentDirector")
         return agent
 
+    def get_welcome_agent(self) -> WelcomeAgent:
+        """
+        Get the welcome agent.
+        :return: The welcome agent
+        """
+        agent = self._agents[ConversationPhase.INTRO]
+        if not isinstance(agent, WelcomeAgent):
+            raise ValueError("The agent is not an instance of WelcomeAgent")
+        return agent
+
     def _get_current_agent(self) -> Agent | None:
         """
         Get the current agent for a specific state.
