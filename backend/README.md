@@ -168,6 +168,7 @@ The backend uses the following environment variables:
 - `BACKEND_SENTRY_DSN`: (optional) The Sentry Data Source Name used to track backend errors.
 - `TARGET_ENVIRONMENT`: (optional) The target environment where the backend is running. When set to `dev` or `local`, CORS will be set to allow all origins.
 - `BACKEND_FEATURES`: (optional) A JSON like dictionary with the features enabled status and configurations specific to each feature.
+- `BACKEND_EXPERIENCE_PIPELINE_CONFIG`: (optional) The configuration for the experience pipeline as a JSON like dictionary. See `class ExperiencePipelineConfig`.
   > Note: The `FRONTEND_URL` should be set irrespective of the `TARGET_ENVIRONMENT` value.
 
 
@@ -199,6 +200,7 @@ BACKEND_ENABLE_METRICS=False|True
 BACKEND_ENABLE_SENTRY=False|True
 BACKEND_SENTRY_DSN=<BACKEND_SENTRY_DSN>
 BACKEND_FEATURES=<BACKEND_FEATURES>
+BACKEND_EXPERIENCE_PIPELINE_CONFIG=<BACKEND_EXPERIENCE_PIPELINE_CONFIG>
 ```
 
 > ATTENTION: The .env file should be kept secure and not shared with others as it contains sensitive information.
@@ -286,6 +288,7 @@ TARGET_ENVIRONMENT_TYPE=local
 BACKEND_ENABLE_SENTRY=False
 BACKEND_SENTRY_DSN=<BACKEND_SENTRY_DSN>
 BACKEND_FEATURES='{}'
+BACKEND_EXPERIENCE_PIPELINE_CONFIG='{}'
 ```
 
 Run the image using the following command:

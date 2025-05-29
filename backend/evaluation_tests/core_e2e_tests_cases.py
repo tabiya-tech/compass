@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from pydantic import ConfigDict
+from pydantic import ConfigDict, BaseModel
 
 from app.agent.experience import WorkType
 from app.countries import Country
@@ -35,7 +35,25 @@ france_prompt = system_instruction_prompt + dedent("""
 """)
 
 
-class E2ESpecificTestCase(EvaluationTestCase, DiscoveredExperienceTestCase):
+class ExperiencePipelineConfigCase(BaseModel):
+    given_number_of_clusters: int = 5
+    """
+    The number of clusters to use for the experience pipeline.
+    """
+    given_number_of_top_skills_to_pick_per_cluster: int = 1
+    """
+    The number of top skills to pick per cluster in the experience pipeline.
+    """
+
+
+class E2ETestCase(EvaluationTestCase, ExperiencePipelineConfigCase):
+    """
+    A base class for end-to-end test cases that includes the evaluation test case and the experience pipeline config.
+    """
+    model_config = ConfigDict(extra="forbid")
+
+
+class E2ESpecificTestCase(E2ETestCase, DiscoveredExperienceTestCase):
     model_config = ConfigDict(extra="forbid")
 
 
@@ -158,7 +176,7 @@ test_cases = [
             "experience_title": ContainsString("Shoe Salesperson"),
         }]
     ),
-    EvaluationTestCase(
+    E2ETestCase(
         country_of_user=Country.SOUTH_AFRICA,
         conversation_rounds=100,
         name='genZ_student_e2e',
@@ -170,7 +188,7 @@ test_cases = [
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
-    EvaluationTestCase(
+    E2ETestCase(
         country_of_user=Country.SOUTH_AFRICA,
         conversation_rounds=100,
         name='mechanical_engineer_e2e',
@@ -182,7 +200,7 @@ test_cases = [
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
-    EvaluationTestCase(
+    E2ETestCase(
         country_of_user=Country.SOUTH_AFRICA,
         conversation_rounds=100,
         name='minimum_wage_worker_e2e',
@@ -195,7 +213,7 @@ test_cases = [
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
-    EvaluationTestCase(
+    E2ETestCase(
         country_of_user=Country.KENYA,
         conversation_rounds=100,
         name='dancer_e2e',
@@ -208,7 +226,7 @@ test_cases = [
             """) + kenya_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
-    EvaluationTestCase(
+    E2ETestCase(
         country_of_user=Country.KENYA,
         conversation_rounds=100,
         name='creative_writer_e2e',
@@ -220,7 +238,7 @@ test_cases = [
             """) + kenya_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
-    EvaluationTestCase(
+    E2ETestCase(
         country_of_user=Country.KENYA,
         conversation_rounds=100,
         name='matatu_conductor_e2e',
@@ -231,7 +249,7 @@ test_cases = [
             """) + kenya_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
-    EvaluationTestCase(
+    E2ETestCase(
         country_of_user=Country.FRANCE,
         conversation_rounds=100,
         name='management_dropout_e2e',
@@ -242,7 +260,7 @@ test_cases = [
             """) + france_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
-    EvaluationTestCase(
+    E2ETestCase(
         country_of_user=Country.FRANCE,
         conversation_rounds=100,
         name='garden_worker_e2e',

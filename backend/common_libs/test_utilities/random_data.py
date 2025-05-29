@@ -71,5 +71,6 @@ def get_random_application_config() -> ApplicationConfig:
         taxonomy_model_id=get_random_printable_string(10),
         embeddings_service_name=get_random_printable_string(10),
         embeddings_model_name=get_random_printable_string(10),
-        features={}
+        features={},
+        experience_pipeline_config={}
     )

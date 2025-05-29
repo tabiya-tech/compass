@@ -8,17 +8,17 @@ from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
 from app.vector_search.vector_search_dependencies import SearchServices
 from common_libs.test_utilities import get_random_session_id
 from evaluation_tests.conversation_libs import conversation_generator
-from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, LLMSimulatedUser
+from evaluation_tests.conversation_libs.conversation_test_function import LLMSimulatedUser
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord
 from evaluation_tests.conversation_libs.evaluators.evaluator_builder import create_evaluator
 from evaluation_tests.conversation_libs.fake_conversation_context import save_conversation
-from evaluation_tests.core_e2e_tests_cases import test_cases, E2ESpecificTestCase
+from evaluation_tests.core_e2e_tests_cases import test_cases, E2ESpecificTestCase, E2ETestCase
 from evaluation_tests.e2e_chat_executor import E2EChatExecutor
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
 
 @pytest.fixture(scope="function")
-def current_test_case(request) -> EvaluationTestCase:
+def current_test_case(request) -> E2ETestCase:
     return request.param
 
 
@@ -29,7 +29,7 @@ def current_test_case(request) -> EvaluationTestCase:
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_main_app_chat(
         max_iterations: int,
-        current_test_case: EvaluationTestCase | E2ESpecificTestCase,
+        current_test_case: E2ETestCase | E2ESpecificTestCase,
         common_folder_path: str,
         setup_search_services: Awaitable[SearchServices]
 ):
@@ -41,9 +41,14 @@ async def test_main_app_chat(
     logger.info(f"Running test case {current_test_case.name}")
     session_id = get_random_session_id()
     search_services = await setup_search_services
+    experience_pipeline_config = ExperiencePipelineConfig.model_validate(
+        {"number_of_clusters": current_test_case.given_number_of_clusters,
+         "number_of_top_skills_to_pick_per_cluster": current_test_case.given_number_of_top_skills_to_pick_per_cluster})
+    logger.info(f"Experience pipeline config: {experience_pipeline_config}")
     chat_executor = E2EChatExecutor(session_id=session_id,
                                     default_country_of_user=current_test_case.country_of_user,
-                                    search_services=search_services)
+                                    search_services=search_services,
+                                    experience_pipeline_config=experience_pipeline_config)
 
     evaluation_result = ConversationEvaluationRecord(simulated_user_prompt=current_test_case.simulated_user_prompt,
                                                      test_case=current_test_case.name)

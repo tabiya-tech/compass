@@ -4,6 +4,7 @@ from app.agent.agent_director.abstract_agent_director import AbstractAgentDirect
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirector
 from app.agent.farewell_agent import FarewellAgent
+from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
@@ -16,9 +17,10 @@ class LLMAgentDirector(AbstractAgentDirector):
     the user input to the appropriate agent.
     """
 
-    def __init__(self,
+    def __init__(self, *,
                  conversation_manager: ConversationMemoryManager,
                  search_services: SearchServices,
+                 experience_pipeline_config: ExperiencePipelineConfig
                  ):
         super().__init__(conversation_manager)
         # initialize the agents
@@ -27,6 +29,7 @@ class LLMAgentDirector(AbstractAgentDirector):
             AgentType.EXPLORE_EXPERIENCES_AGENT: ExploreExperiencesAgentDirector(
                 conversation_manager=conversation_manager,
                 search_services=search_services,
+                experience_pipeline_config=experience_pipeline_config
             ),
             AgentType.FAREWELL_AGENT: FarewellAgent()
         }

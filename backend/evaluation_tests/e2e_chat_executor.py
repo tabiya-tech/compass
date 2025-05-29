@@ -2,6 +2,7 @@ from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.experience import ExperienceEntity
+from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
 from app.application_state import ApplicationState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
@@ -11,13 +12,19 @@ from app.vector_search.vector_search_dependencies import SearchServices
 
 
 class E2EChatExecutor:
-    def __init__(self, *, session_id: int, default_country_of_user: Country,
-                 search_services: SearchServices):
+    def __init__(self, *,
+                 session_id: int,
+                 default_country_of_user: Country,
+                 search_services: SearchServices,
+                 experience_pipeline_config: ExperiencePipelineConfig
+                 ):
         self._state = ApplicationState.new_state(session_id=session_id, country_of_user=default_country_of_user)
         self._conversation_memory_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
         self._conversation_memory_manager.set_state(self._state.conversation_memory_manager_state)
 
-        self._agent_director = LLMAgentDirector(self._conversation_memory_manager, search_services)
+        self._agent_director = LLMAgentDirector(conversation_manager=self._conversation_memory_manager,
+                                                experience_pipeline_config=experience_pipeline_config,
+                                                search_services=search_services)
         self._agent_director.set_state(self._state.agent_director_state)
         self._agent_director.get_welcome_agent().set_state(self._state.welcome_agent_state)
         self._agent_director.get_explore_experiences_agent().set_state(self._state.explore_experiences_director_state)
