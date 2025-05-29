@@ -76,7 +76,8 @@ def main():
         cloudrun_cpu_limit=cloudrun_cpu_limit,
         api_gateway_timeout=api_gateway_timeout,
 
-        features=getenv("BACKEND_FEATURES", False, False)
+        features=getenv("BACKEND_FEATURES", False, False),
+        experience_pipeline_config=getenv("BACKEND_EXPERIENCE_PIPELINE_CONFIG", False, False),
     )
 
     # version of the artifacts to deploy

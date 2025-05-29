@@ -1,9 +1,10 @@
 import asyncio
 import json
 import logging
+from logging import Logger
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.agent.agent_types import LLMStats
 from app.agent.experience.work_type import WorkType
@@ -13,6 +14,7 @@ from .pick_top_skills_tool import PickTopSkillsTool
 from .skill_linking_tool import SkillLinkingTool
 from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
+from ...app_config import ApplicationConfig, get_application_config
 from ...countries import Country
 
 
@@ -86,8 +88,24 @@ class ExperiencePipelineConfig(BaseModel):
     to the skills associated with the occupations found."
     """
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(
+        extra="forbid"
+    )
+
+    @staticmethod
+    def from_application_config(*,
+                                application_config: ApplicationConfig,
+                                logger: Logger) -> "ExperiencePipelineConfig":
+        if application_config is None or application_config.experience_pipeline_config is None:
+            logger.warning("No experience pipeline config found in the application config. Using default config.")
+            return ExperiencePipelineConfig()
+
+        # merge the application config with the default config
+        try:
+            return ExperiencePipelineConfig.model_validate(application_config.experience_pipeline_config)
+        except Exception as e:
+            logger.error("Falling back to the default experience pipeline config due to an error: %s", e)
+            return ExperiencePipelineConfig()
 
 
 class ClusterPipelineResult(BaseModel):

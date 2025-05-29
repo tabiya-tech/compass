@@ -322,6 +322,7 @@ class ExploreExperiencesAgentDirector(Agent):
     def __init__(self, *,
                  conversation_manager: ConversationMemoryManager,
                  search_services: SearchServices,
+                 experience_pipeline_config: ExperiencePipelineConfig
                  ):
         super().__init__(agent_type=AgentType.EXPLORE_EXPERIENCES_AGENT,
                          is_responsible_for_conversation_history=True)
@@ -330,6 +331,7 @@ class ExploreExperiencesAgentDirector(Agent):
         self._state: ExploreExperiencesAgentDirectorState | None = None
         self._collect_experiences_agent = CollectExperiencesAgent()
         self._exploring_skills_agent = SkillsExplorerAgent()
+        self._experience_pipeline_config = experience_pipeline_config
 
     def get_collect_experiences_agent(self) -> CollectExperiencesAgent:
         return self._collect_experiences_agent
@@ -343,7 +345,7 @@ class ExploreExperiencesAgentDirector(Agent):
                              ) -> AgentOutput:
         start = time.time()
         pipeline = ExperiencePipeline(
-            config=ExperiencePipelineConfig(),
+            config=self._experience_pipeline_config,
             search_services=self._search_services
         )
         pipline_result = await pipeline.execute(

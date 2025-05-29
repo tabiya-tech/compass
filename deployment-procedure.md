@@ -467,6 +467,14 @@ FRONTEND_FEATURES='{}'
 #    }
 # }
 BACKEND_FEATURES='{}'
+
+# JSON like Configuration for the experience pipeline
+# {
+#   "number_of_clusters": 5, 
+#   "number_of_top_skills_to_pick_per_cluster": 1
+#   ...
+# }
+BACKEND_EXPERIENCE_PIPELINE_CONFIG='{}'
 ```  
 
 - **For the final `.env` file structure**, refer to the [env.template](/iac/templates/env.template).

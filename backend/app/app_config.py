@@ -1,9 +1,12 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 from app.countries import Country
 from app.version.types import Version
 
 from modules.types import FeatureSetupConfig
+
 
 class ApplicationConfig(BaseModel):
     """
@@ -48,7 +51,17 @@ class ApplicationConfig(BaseModel):
     The name of the embeddings model to use.
     """
 
-    features: dict[str, FeatureSetupConfig]
+    features: Optional[dict[str, FeatureSetupConfig]] = {}
+    """
+    The backend features configuration.
+    This is a dictionary that can contain various feature and their configurations.
+    """
+
+    experience_pipeline_config: Optional[dict[str, str | int | bool]] = {}
+    """
+    The configuration for the experience pipeline.
+    This is a dictionary that can contain various settings for the pipeline.
+    """
 
 
 _application_config: ApplicationConfig | None = None

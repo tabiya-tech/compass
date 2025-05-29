@@ -13,7 +13,7 @@ from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.agent_types import AgentType
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
-from app.agent.welcome_agent import WelcomeAgent, WelcomeAgentState
+from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
 from app.agent.welcome_agent import WelcomeAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
     ConversationMemoryManagerState
@@ -59,6 +59,7 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
     agent_director = SimpleAgentDirector(
         conversation_manager=conversation_manager,
         search_services=search_services,
+        experience_pipeline_config=ExperiencePipelineConfig()  # Not used in this test, can be None
     )
     agent_director.set_state(AgentDirectorState(session_id=session_id))
     agent_director.get_welcome_agent().set_state(WelcomeAgentState(session_id=session_id))

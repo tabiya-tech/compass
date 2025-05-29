@@ -154,6 +154,19 @@ if _backend_features_config:
 else:
     logger.info("No BACKEND_FEATURES environment variable set, using empty configuration.")
 
+# The experience_pipeline_config environment variable is optional.
+# If it is not provided, it will be set to an empty dictionary.
+_experience_pipeline_config = os.getenv("BACKEND_EXPERIENCE_PIPELINE_CONFIG", "{}")
+experience_pipeline_config = {}
+if _experience_pipeline_config:
+    try:
+        experience_pipeline_config = json.loads(_experience_pipeline_config)
+        logger.info(f"Loaded experience pipeline configuration: {experience_pipeline_config}")
+    except json.JSONDecodeError as e:
+        logger.warning(f"Falling back to empty experience pipeline configuration due to error: {e}")
+else:
+    logger.info("No EXPERIENCE_PIPELINE_CONFIG environment variable set, using empty configuration.")
+
 # set global application configuration
 application_config = ApplicationConfig(
     environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
@@ -164,6 +177,7 @@ application_config = ApplicationConfig(
     embeddings_service_name=os.getenv("EMBEDDINGS_SERVICE_NAME"),
     embeddings_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"),
     features=backend_features_config,
+    experience_pipeline_config=experience_pipeline_config
 )
 
 set_application_config(application_config)

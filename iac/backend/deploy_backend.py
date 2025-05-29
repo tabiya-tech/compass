@@ -48,6 +48,7 @@ class BackendServiceConfig:
     cloudrun_cpu_limit: str
     api_gateway_timeout: str
     features: Optional[str]
+    experience_pipeline_config: Optional[str]
 
 
 """
@@ -324,6 +325,9 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_FEATURES",
                             value=backend_service_cfg.features),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_EXPERIENCE_PIPELINE_CONFIG",
+                            value=backend_service_cfg.experience_pipeline_config),
                         # Add more environment variables here
                     ],
                 )

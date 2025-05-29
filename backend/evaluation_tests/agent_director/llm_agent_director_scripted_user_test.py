@@ -6,6 +6,7 @@ from typing import Coroutine, Callable, Awaitable
 import pytest
 from _pytest.logging import LogCaptureFixture
 
+from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
 from app.vector_search.vector_search_dependencies import SearchServices
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.agent_types import AgentType
@@ -38,7 +39,9 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
     conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=session_id))
     # The Search Services for this test
     search_services = await setup_search_services
-    agent_director = LLMAgentDirector(conversation_manager, search_services)
+    agent_director = LLMAgentDirector(conversation_manager=conversation_manager,
+                                      search_services=search_services,
+                                      experience_pipeline_config=ExperiencePipelineConfig())
     agent_director.set_state(AgentDirectorState(session_id=session_id))
     agent_director.get_welcome_agent().set_state(WelcomeAgentState(session_id=session_id))
     explore_experiences_agent = agent_director.get_explore_experiences_agent()
@@ -49,7 +52,6 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
         print(f"Running test case {test_case.name}")
 
         output_folder = os.path.join(os.getcwd(), 'test_output/llm_agent_director/scripted', test_case.name)
-
         execute_evaluated_agent = AgentDirectorExecutor(agent_director=agent_director)
 
         # Run the conversation test
