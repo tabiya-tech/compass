@@ -139,9 +139,18 @@ if not os.getenv("EMBEDDINGS_SERVICE_NAME"):
 if not os.getenv("EMBEDDINGS_MODEL_NAME"):
     raise ValueError("Mandatory EMBEDDINGS_MODEL_NAME environment variable is not set")
 
-# backend features environment variable is optional
-# if not provided it will be set to an empty dictionary
-backend_features_config = os.getenv("BACKEND_FEATURES", "{}")
+# Backend features environment variable is optional.
+# If it is not provided, it will be set to an empty dictionary.
+_backend_features_config = os.getenv("BACKEND_FEATURES", "{}")
+backend_features_config = {}
+if _backend_features_config:
+    try:
+        backend_features_config = json.loads(_backend_features_config)
+        logger.info(f"Loaded backend features configuration: {backend_features_config}")
+    except json.JSONDecodeError as e:
+        logger.warning(f"Falling back to empty backend features configuration due to error: {e}")
+else:
+    logger.info("No BACKEND_FEATURES environment variable set, using empty configuration.")
 
 # set global application configuration
 application_config = ApplicationConfig(
@@ -152,7 +161,7 @@ application_config = ApplicationConfig(
     taxonomy_model_id=os.getenv('TAXONOMY_MODEL_ID'),
     embeddings_service_name=os.getenv("EMBEDDINGS_SERVICE_NAME"),
     embeddings_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"),
-    features=json.loads(backend_features_config) if backend_features_config else {}
+    features=backend_features_config,
 )
 
 set_application_config(application_config)
