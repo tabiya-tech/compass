@@ -136,8 +136,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
       await super.onSuccessfulRefresh(newToken);
     } catch (error) {
       console.error(new TokenError("error refreshing token", error));
-      // if token refresh fails, log the user out
-      await this.logout();
+      // if token refresh fails, log the error and do nothing
     }
   }
 

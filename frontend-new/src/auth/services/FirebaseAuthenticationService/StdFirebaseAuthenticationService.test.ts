@@ -148,39 +148,6 @@ describe("StdFirebaseAuthenticationService", () => {
     });
   });
 
-  describe("scheduleTokenRefresh", () => {
-    test("should schedule token refresh correctly", () => {
-      const mockTimeout = jest.spyOn(window, "setTimeout");
-      // GIVEN a valid token with expiration
-      const mockToken = "test-token";
-      const mockDecodedToken: FirebaseToken = {
-        exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour from now
-        name: "Test User",
-        aud: "test-audience",
-        auth_time: 123456789,
-        user_id: "test-user",
-        sub: "test-sub",
-        email: "test@example.com",
-        email_verified: true,
-        firebase: {
-          identities: {
-            email: ["test@example.com"],
-          },
-          sign_in_provider: "password",
-        },
-        iss: "https://securetoken.google.com/test",
-        iat: 123456789,
-      };
-      (jwtDecode as jest.Mock).mockReturnValue(mockDecodedToken);
-
-      // WHEN scheduling token refresh
-      service["scheduleTokenRefresh"](mockToken);
-
-      // THEN a timeout should be set
-      expect(mockTimeout).toHaveBeenCalled();
-    });
-  });
-
   describe("getUserFromDecodedToken", () => {
     test("should correctly map token to user with name", () => {
       // GIVEN a decoded token with name

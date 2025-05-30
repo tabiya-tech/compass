@@ -1,4 +1,4 @@
-import { sleep } from "./utils";
+import { sleep, getNextBackoff, calculateTimeToTokenExpiry } from "./utils";
 
 describe("sleep", () => {
   beforeEach(() => {
@@ -52,5 +52,67 @@ describe("sleep", () => {
     await Promise.resolve(); // Flush microtask queue again
     // AND check if the promise has resolved.
     expect(resolved).toBe(true);
+  });
+});
+
+describe("getNextBackoff", () => {
+  it.each([
+    [1000, 1, 0],
+    [1000, 2, 1000],
+    [1000, 3, 2000],
+    [1000, 4, 4000],
+    [500, 2, 500],
+    [500, 3, 1000],
+  ])("should calculate correct backoff for initial_backoff_ms=%i and attempt=%i", (initialBackoff, attempt, expected) => {
+    // GIVEN initial backoff and attempt values
+    // WHEN we calculate the next backoff
+    const result = getNextBackoff(initialBackoff, attempt);
+    // THEN it should return the expected value
+    expect(result).toBe(expected);
+  });
+});
+
+describe("calculateTimeToTokenExpiry", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it("should return correct time remaining for future expiry", () => {
+    // GIVEN a future expiry time (1 hour from now)
+    const currentTime = Math.floor(Date.now() / 1000);
+    const futureExpiry = currentTime + 3600; // 1 hour in the future
+
+    // WHEN we calculate time to expiry
+    const result = calculateTimeToTokenExpiry(futureExpiry);
+
+    // THEN it should return approximately 3600 seconds
+    expect(result).toBeCloseTo(3600, -1); // Allow for small timing differences
+  });
+
+  it("should return negative value for expired token", () => {
+    // GIVEN a past expiry time (1 hour ago)
+    const currentTime = Math.floor(Date.now() / 1000);
+    const pastExpiry = currentTime - 3600; // 1 hour in the past
+
+    // WHEN we calculate time to expiry
+    const result = calculateTimeToTokenExpiry(pastExpiry);
+
+    // THEN it should return a negative value
+    expect(result).toBeLessThan(0);
+  });
+
+  it("should return 0 for token expiring now", () => {
+    // GIVEN current time as expiry
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    // WHEN we calculate time to expiry
+    const result = calculateTimeToTokenExpiry(currentTime);
+
+    // THEN it should return approximately 0
+    expect(result).toBeCloseTo(0, -1); // Allow for small timing differences
   });
 });
