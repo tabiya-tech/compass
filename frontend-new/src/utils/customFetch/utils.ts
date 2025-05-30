@@ -12,3 +12,13 @@ export const getNextBackoff = (initial_backoff_ms: number, attempt: number): num
   if (attempt <= 1) return 0;
   return initial_backoff_ms * 2 ** (attempt - 2);
 };
+/**
+ * Calculates the time remaining until a token expires.
+ * @return {number} The time remaining in seconds until the token expires.
+ * if token is already expired, can return negative value.
+ * */
+export const calculateTimeToTokenExpiry = (exp: number): number => {
+  // exp is in unix timestamp format (seconds since epoch)
+  const currentTime = Math.floor(Date.now() / 1000); // current time in seconds
+  return exp - currentTime; // time to expiry in seconds
+}
