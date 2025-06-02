@@ -1,5 +1,4 @@
-from typing import List, Literal, Any
-
+from typing import List, Literal
 from pydantic import Field
 from pydantic.main import BaseModel
 
@@ -28,10 +27,6 @@ class OccupationEntity(BaseEntity):
     """
     code: str
 
-    # TODO: remove it as it is not needed https://tabiya-tech.atlassian.net/browse/COM-476
-    def __init__(self, **data: Any):
-        super().__init__(**data)
-
     def __str__(self):
         return self.preferredLabel
 
@@ -41,10 +36,6 @@ class SkillEntity(BaseEntity):
     Represents a skill entity.
     """
     skillType: Literal['skill/competence', 'knowledge', 'language', 'attitude', '']
-
-    # TODO: remove it as it is not needed https://tabiya-tech.atlassian.net/browse/COM-476
-    def __init__(self, **data: Any):
-        super().__init__(**data)
 
     def __str__(self):
         return self.preferredLabel
@@ -59,10 +50,6 @@ class AssociatedSkillEntity(SkillEntity):
     relationType: Literal['essential', 'optional', '']
 
     signallingValueLabel: Literal['', 'low', 'medium', 'high'] = ''  # default to empty string if not provided
-
-    # TODO: remove it as it is not needed https://tabiya-tech.atlassian.net/browse/COM-476
-    def __init__(self, **data: Any):
-        super().__init__(**data)
 
     def __str__(self):
         return self.preferredLabel
