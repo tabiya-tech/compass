@@ -40,9 +40,10 @@ class SkillLinkingTool:
 
     async def execute(self, *,
                       job_titles: list[str],
-                      esco_occupations: List[OccupationSkillEntity],
+                      occupation_skills_entities: List[OccupationSkillEntity],
                       responsibilities: list[str],
-                      only_essential: bool = True,
+                      only_essential_skills: bool = True,
+                      only_high_signal_skills: bool = False,
                       ignore_occupations: bool = False,
                       top_k: int,
                       top_p: int) -> SkillsLinkingToolOutput:
@@ -51,10 +52,10 @@ class SkillLinkingTool:
         # 1. Generate the embeddings for the responsibilities (responsibilities_data.responsibilities)
         # 2. For each responsibility (embedding),
         # 2.1 Find the top_p most similar skills that are
-            if esco_occupations is empty or ignore_occupations is True
+            if occupations is empty or ignore_occupations is True
                 within all the skills in the database
-            elseif esco_occupations is not empty
-                within the list of skills of the esco_occupations
+            elseif occupations is not empty
+                within the list of skills associated with the occupations
         # 2.2 Discard the skills that are not relevant by using the relevance classifier
         # 2.3 Count the number of occurrences of each skill and update the ranking
         # 3. Return the top_k the highest ranked relevant skills
@@ -62,15 +63,17 @@ class SkillLinkingTool:
         # Prepare the data
         skill_stats: dict[str, _SkillStat] = {}  # The uuid is the key
 
-        # Get the uuids of the skills of the esco_occupations
+        # Get the uuids of the skills associated with the occupations
         esco_skills_uuids = []
         if not ignore_occupations:
-            for occupation in esco_occupations:
-                # Add the uuids of the skills of the occupation
-                # if only_essential is True, only add the essential skills
-                for associated_skill in occupation.associated_skills:
-                    if not only_essential or (associated_skill.relationType == "essential"):
-                        esco_skills_uuids.append(associated_skill.UUID)
+            for occupation_skills_entity in occupation_skills_entities:
+                # Add the uuids of the skills associated with this occupation
+                is_icatus = occupation_skills_entity.occupation.code.startswith("I")
+                for skill in occupation_skills_entity.associated_skills:
+                    if is_icatus and (not only_high_signal_skills or skill.signallingValueLabel == "high"):
+                        esco_skills_uuids.append(skill.UUID)
+                    elif not is_icatus and (not only_essential_skills or skill.relationType == "essential"):
+                        esco_skills_uuids.append(skill.UUID)
             # remove duplicates
             esco_skills_uuids = list(set(esco_skills_uuids))
             if len(esco_skills_uuids) == 0:
@@ -83,7 +86,7 @@ class SkillLinkingTool:
         embeddings_service = await get_embeddings_service()
         responsibilities_embeddings = await embeddings_service.embed_batch(responsibilities)
         # 2. For each responsibility (embedding),
-        # Find the top_p most similar skills that are within the list of skills of the esco_occupations and get the top_k most relevant skills
+        # Find the top_p most similar skills that are within the list of skills associated with the occupations and get the top_k most relevant skills
         # Parallelize the process to speed up the execution
         tasks: list[Coroutine[Any, Any, tuple[list[SkillEntity], list[LLMStats]]]] = []
         for responsibility_text, responsibility_embedding in zip(responsibilities, responsibilities_embeddings):

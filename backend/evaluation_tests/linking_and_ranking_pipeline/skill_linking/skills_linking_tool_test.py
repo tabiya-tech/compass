@@ -96,12 +96,12 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_sea
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.INFO):
-        # Guards to ensure that the loggers are correctly setup,
+        # Guards to ensure that the loggers are correctly set up.
         guard_caplog(logger=skill_linking_tool._logger, caplog=caplog)
 
         response = await skill_linking_tool.execute(
             job_titles=given_job_titles,
-            esco_occupations=given_occupations_with_skills,
+            occupation_skills_entities=given_occupations_with_skills,
             responsibilities=test_case.given_responsibilities,
             top_k=5,
             top_p=5)

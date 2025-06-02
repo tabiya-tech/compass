@@ -257,6 +257,7 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
                             "altLabels": {"$first": "$skills.altLabels"},
                             "skillType": {"$first": "$skills.skillType"},
                             "relationType": {"$first": "$relationType"},
+                            "signallingValueLabel": {"$first": "$signallingValueLabel"},
                             }
                  }
             ]).to_list(length=None)
@@ -269,6 +270,7 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
             altLabels=skill.get("altLabels", []),
             skillType=skill.get("skillType", ""),
             relationType=skill.get("relationType", ""),
+            signallingValueLabel=skill.get("signallingValueLabel", ""),
             score=0.0
         ) for skill in skills]
 
