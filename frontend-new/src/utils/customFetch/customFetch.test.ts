@@ -32,6 +32,12 @@ jest.mock("src/auth/services/Authentication.service.factory", () => ({
   },
 }));
 
+const VALID_TOKEN_RESPONSE = {
+  decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid token by default
+  isValid: true,
+  failureCause: null,
+}
+
 describe("Api Service tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -44,6 +50,12 @@ describe("Api Service tests", () => {
     const givenToken = "someAuthToken";
 
     jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValueOnce(givenToken);
+
+    // AND the token is valid.
+    const mockAuthService = {
+      isTokenValid: jest.fn().mockReturnValue(VALID_TOKEN_RESPONSE),
+    };
+    (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
 
     // AND the server responds with a StatusCodes.OK status code
     setupFetchSpy(StatusCodes.OK, "fetch response", "application/json;charset=UTF-8");
@@ -179,10 +191,7 @@ describe("Api Service tests", () => {
 
     // AND the auth service factory is mocked to return a service that validates tokens
     const mockAuthService = {
-      isTokenValid: jest.fn().mockReturnValue({
-        decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid token by default
-        failureCause: null,
-      }),
+      isTokenValid: jest.fn().mockReturnValue(VALID_TOKEN_RESPONSE),
     };
     (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
 
@@ -231,10 +240,7 @@ describe("Api Service tests", () => {
 
     // AND the auth service factory is mocked to return a service that validates tokens
     const mockAuthService = {
-      isTokenValid: jest.fn().mockReturnValue({
-        decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid token by default
-        failureCause: null,
-      }),
+      isTokenValid: jest.fn().mockReturnValue(VALID_TOKEN_RESPONSE),
     };
     (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
 
@@ -467,10 +473,12 @@ describe("Api Service tests", () => {
       const mockAuthService = {
         isTokenValid: jest.fn()
           .mockReturnValueOnce({
+            isValid: true,
             decodedToken: { exp: Math.floor(Date.now() / 1000) + tokenExpirySeconds }, // token about to expire
             failureCause: null
           })
           .mockReturnValueOnce({
+            isValid: true,
             decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // new token valid for an hour
             failureCause: null
           }),
@@ -523,6 +531,7 @@ describe("Api Service tests", () => {
       // AND the auth service factory is mocked to return a service that validates tokens
       const mockAuthService = {
         isTokenValid: jest.fn().mockReturnValue({
+          isValid: true,
           decodedToken: { exp: Math.floor(Date.now() / 1000) + tokenExpirySeconds }, // token not about to expire
           failureCause: null
         }),
@@ -584,14 +593,17 @@ describe("Api Service tests", () => {
       const mockAuthService = {
         isTokenValid: jest.fn()
           .mockReturnValueOnce({
+            isValid: true,
             decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid
             failureCause: null
           })
           .mockReturnValueOnce({
+            isValid: false,
             decodedToken: { exp: Math.floor(Date.now() / 1000) - 1 }, // expired
             failureCause: TokenValidationFailureCause.TOKEN_EXPIRED
           })
           .mockReturnValueOnce({
+            isValid: true,
             decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid
             failureCause: null
           }),
