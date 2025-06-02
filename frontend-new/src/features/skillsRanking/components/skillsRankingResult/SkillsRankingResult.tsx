@@ -41,7 +41,7 @@ export const IMMEDIATE_RESULT_MESSAGES = {
   ),
 };
 
-export const DELAYED_RESULT_MESSAGE = "Your skills ranking is taking longer than expected to calculate. We will share the results with you via SMS within 24 hours."
+export const DELAYED_RESULT_MESSAGE = "Your skills ranking is taking longer than expected to calculate. We will share the results with you via SMS with you during the survey/debrief. Thank you for your patience!";
 
 const SkillsRankingResult: React.FC<Readonly<SkillsRankingResultProps>> = ({ 
   message, 

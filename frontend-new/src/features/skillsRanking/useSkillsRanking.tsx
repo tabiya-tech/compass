@@ -69,7 +69,7 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
     * */
     const createPromptMessage = (state: SkillsRankingState, disabled: boolean) => {
       return createMessage(SKILLS_RANKING_PROMPT_MESSAGE_TYPE, {
-        message: "Please rate your skills",
+        message: "Now that we've discovered your skills, we would like to ask you a few questions about them...",
         onView: async () => {
           const newState = await handleStateTransition(SkillsRankingPhase.SELF_EVALUATING);
           if (newState) {
@@ -119,7 +119,7 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
     * */
     const createVoteMessage = (state: SkillsRankingState, disabled: boolean) => {
       return createMessage(SKILLS_RANKING_VOTE_MESSAGE_TYPE, {
-        message: "Please rate your skills",
+        message: "This question is designed to gauge your self-perception of your skills. Please select the rank that best represents your current skill level.",
         onRankSelect: async (rank: string) => {
           // Show typing message first
           const cancelableTypingMsg = createCancellableTypingMessage(state);
