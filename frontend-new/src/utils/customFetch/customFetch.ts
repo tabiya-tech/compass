@@ -114,20 +114,34 @@ const checkToken = async (token: string | null, attempt: number, serviceName: st
     );
     throw new AuthenticationError("No authentication service available for authentication");
   }
-  const { decodedToken, failureCause } = authService.isTokenValid(token)
+  const { isValid, failureCause, decodedToken } = authService.isTokenValid(token)
 
-  if (!decodedToken) {
-    console.warn(
-        `customFetch: Token is invalid for ${serviceName}.${serviceFunction} on attempt ${attempt}. Failure cause: ${failureCause}`
-    );
-    throw new AuthenticationError(`Token is invalid: ${failureCause}`);
+  // If the token is valid, we are certain that the decodedToken is not null.
+  // That is why we are using the non-null assertion operator (!).
+  if (isValid && calculateTimeToTokenExpiry(decodedToken!.exp) < MIN_TOKEN_VALIDITY_SECONDS) {
+    console.debug("customFetch: Token is valid but about to expire, refreshing token for", serviceName, serviceFunction);
+    throw new TokenError(TokenValidationFailureCause.TOKEN_EXPIRED)
   }
 
-  // if the token is valid, but expired, or about to be expired try to refresh it.
-  if (failureCause === TokenValidationFailureCause.TOKEN_EXPIRED || calculateTimeToTokenExpiry(decodedToken.exp) < MIN_TOKEN_VALIDITY_SECONDS) {
+  // if the token is invalid, and the reason is that it is expired try to refresh it.
+  if (failureCause === TokenValidationFailureCause.TOKEN_EXPIRED) {
+    console.debug(
+      `customFetch: Token is expired for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
+    );
     // throw a specific error if the token is expired so that the caller can handle it specifically.
     throw new TokenError(TokenValidationFailureCause.TOKEN_EXPIRED)
   }
+
+  // if the token is valid, return without throwing an error.
+  if(isValid) {
+    return
+  }
+
+  // Otherwise, if the token is invalid for any other reason, throw an error.
+  console.warn(
+    `customFetch: Token is invalid for ${serviceName}.${serviceFunction} on attempt ${attempt}. Failure cause: ${failureCause}`
+  );
+  throw new AuthenticationError(`Token is invalid: ${failureCause}`);
 }
 
 export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = defaultInit): Promise<Response> => {
