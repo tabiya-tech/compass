@@ -58,6 +58,8 @@ class AssociatedSkillEntity(SkillEntity):
     """
     relationType: Literal['essential', 'optional', '']
 
+    signallingValueLabel: Literal['', 'low', 'medium', 'high'] = ''  # default to empty string if not provided
+
     # TODO: remove it as it is not needed https://tabiya-tech.atlassian.net/browse/COM-476
     def __init__(self, **data: Any):
         super().__init__(**data)

@@ -79,6 +79,14 @@ class ExperiencePipelineConfig(BaseModel):
     """
     Default is True
     If True, only the essential skills will be considered when linking the responsibilities to the skills.
+    This applies to the skills associated with esco occupations.
+    """
+
+    only_high_signal_skills: bool = True
+    """
+    Default is True
+    If True, only skills with "high" signaling values will be considered when linking the responsibilities to the skills.
+    This applies to the skills associated with icatus occupations.
     """
 
     ignore_occupations: bool = False
@@ -294,9 +302,9 @@ class ExperiencePipeline:
         # 2.2 Link responsibilities to the associated skills
         top_skills_response = await self._skills_linking_tool.execute(
             job_titles=inferred_occupations_response.contextual_titles,
-            esco_occupations=inferred_occupations_response.esco_occupations,
+            occupation_skills_entities=inferred_occupations_response.esco_occupations,
             responsibilities=responsibilities,
-            only_essential=config.only_essential_skills,
+            only_essential_skills=config.only_essential_skills,
             ignore_occupations=config.ignore_occupations,
             top_k=config.number_of_top_skills_candidates_per_cluster,
             top_p=config.number_of_skill_candidates_per_responsibility
