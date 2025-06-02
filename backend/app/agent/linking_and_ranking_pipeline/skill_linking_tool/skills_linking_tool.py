@@ -105,7 +105,7 @@ class SkillLinkingTool:
         for most_relevant_skills, llm_stats in most_relevant_skills_of_each_responsibility:
             all_llm_stats.extend(llm_stats)
 
-            # 2.3 Count the number of occurrences of each skill and update the ranking
+            # 2.3 Count the number of occurrences for each skill and update the ranking
             for skill in most_relevant_skills:
                 if skill.UUID in skill_stats:
                     skill_stats[skill.UUID].count += 1
@@ -116,7 +116,7 @@ class SkillLinkingTool:
         # 3. Return the top_k the highest ranked relevant skills
         # 3.1 Get the skills relevant to all the responsibilities
         # sorted_skills_freq = sorted(skill_stats.values(), key=lambda x: x.count, reverse=True)
-        # 3.2 Order the based on their score
+        # 3.2 Order the skills based on their score
         top_skills = [skill_stat for skill_stat in skill_stats.values()]
         if len(skill_stats) >= top_k:
             # Return the top_k most relevant skills
@@ -135,10 +135,10 @@ class SkillLinkingTool:
 
     async def _responsibility_to_skills(self, *, responsibility_text: str, responsibility_embedding: list[float], esco_skills_uuids: list[str],
                                         job_titles: list[str], top_k: int, top_p: int) -> tuple[list[SkillEntity], list[LLMStats]]:
-        # 2.1 Find the top_p most similar skills that are within the list of skills of the esco_occupations
+        # 2.1 Find the top_p most similar skills that are within the list of skills associated with the occupations
         filter_spec = FilterSpec(UUID=esco_skills_uuids) if len(esco_skills_uuids) > 0 else None
         similar_skills = await self._skill_search_service.search(query=responsibility_embedding, filter_spec=filter_spec, k=top_p)
-        # 2.2  Discard the skills that are not relevant by using the relevance classifier and return the top_k most relevant skills for the responsibility
+        # 2.2 Discard the skills that are not relevant by using the relevance classifier and return the top_k most relevant skills for the responsibility
         relevant_skills_output = await self._relevant_skills_tool.execute(
             job_titles=job_titles,
             responsibilities=[responsibility_text],

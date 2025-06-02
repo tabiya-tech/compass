@@ -39,7 +39,7 @@ T = TypeVar('T')
 class AbstractEscoSearchService(SimilaritySearchService[T]):
     """
     A service class to perform similarity searches on esco entities using a MongoDB database.
-    The db, embedding model used and a config with the collection name, index name, and other parameters is provided
+    The db, embedding model used and a config with the collection name, index name, and other parameters are provided
     during initialization.
 
     Subclasses must implement the to_entity method to convert the document returned by the vector search
@@ -82,7 +82,7 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
         Perform a similarity search on the vector store. It uses the default similarity search set during vector
         generation.
 
-        :param query: The text query, or it's vector representation to search for.
+        :param query: The text query, or a vector representation to search for.
         :param filter_spec: A filter to apply to the search.
         :param k: The number of results to return.
         :return: A list of T objects.
