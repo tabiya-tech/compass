@@ -1,6 +1,5 @@
 import logging
-from collections.abc import Awaitable
-from typing import Optional
+from typing import Optional, Awaitable
 
 import pytest
 
@@ -106,7 +105,7 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_sea
             top_k=5,
             top_p=5)
         # Then the expected skills are returned
-        # get the preferred labels fo the found skills
+        # get the preferred labels for the found skills
         actual_skills_labels = sorted([skill.preferredLabel.lower() for skill in response.top_skills])
         # assert the expected skills are in the actual skills
         # Find missing skills
@@ -116,7 +115,7 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_sea
         logging.getLogger().info(f"Found skills: {actual_skills_labels}")
         if missing_skills:
             logging.getLogger().info(f"Missing skills: {missing_skills}")
-            # do the assertion in a way that the test fails and the diff can be shown in the IDE
+            # do the assertion in a way that the test fails, and the diff can be shown in the IDE
             assert actual_skills_labels == sorted(test_case.expected_skills)
 
         # AND the logs should not contain any errors

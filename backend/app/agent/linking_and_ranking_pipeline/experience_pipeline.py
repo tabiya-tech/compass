@@ -14,7 +14,7 @@ from .pick_top_skills_tool import PickTopSkillsTool
 from .skill_linking_tool import SkillLinkingTool
 from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
-from ...app_config import ApplicationConfig, get_application_config
+from ...app_config import ApplicationConfig
 from ...countries import Country
 
 
@@ -326,7 +326,7 @@ class ExperiencePipeline:
                               json.dumps(top_skills_labels, ensure_ascii=False)
                               )
         # 2.3 Rank the skills to get the top skill of the cluster
-        # For now, just return the unranked skills
+        # For now, return the unranked skills
         return ClusterPipelineResult(
             responsibilities_cluster_name=responsibilities_cluster_name,
             responsibilities=responsibilities,
