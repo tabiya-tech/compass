@@ -4,6 +4,7 @@ import { SkillsRankingPhase, CompareAgainstGroup, ButtonOrderGroup } from "../ty
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { getBackendUrl } from "src/envService";
 import { FeaturesService } from "src/features/featuresService/FeaturesService";
+import { RestAPIError } from "../../../error/restAPIError/RestAPIError";
 
 jest.mock("src/envService", () => ({
   getFeatures: jest.fn(),
@@ -188,7 +189,8 @@ describe("SkillsRankingService", () => {
       const selfRanking = "70%";
 
       // AND fetch rejects with an error
-      jest.spyOn(window, "fetch").mockRejectedValue(new Error("Server Error"));
+      const customFetch = setupAPIServiceSpy(500, "Server Error", "application/json;charset=UTF-8");
+      customFetch.mockRejectedValue(new RestAPIError("givenService", "givenServiceFunction", "geivenMethod", `/given/api/url`, 500, "SERVER_ERROR", "Failed to update skills ranking state"));
 
       // WHEN updating the skills ranking state
       // THEN it should throw an error
