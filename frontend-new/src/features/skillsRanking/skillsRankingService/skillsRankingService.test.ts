@@ -187,8 +187,9 @@ describe("SkillsRankingService", () => {
       const newState = SkillsRankingPhase.EVALUATED;
       const selfRanking = "70%";
 
-      // AND fetch rejects with an error
-      jest.spyOn(window, "fetch").mockRejectedValue(new Error("Server Error"));
+      // GIVEN fetch rejects with some unknown error
+      const givenFetchError = new Error("Failed to update user preferences");
+      jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockRejectedValue(givenFetchError);
 
       // WHEN updating the skills ranking state
       // THEN it should throw an error

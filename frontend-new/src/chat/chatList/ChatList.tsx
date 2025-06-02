@@ -35,7 +35,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages }) => {
       // we are making scrollIntoView optionally called,
       // because in jest (jsdom) scrollIntoView is not a function
       // as jest jsdom doesn't have any view.
-      messagesEndRef.current.scrollIntoView?.({ behavior: "smooth" });
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   }, [messages]);
 
@@ -50,8 +50,10 @@ const ChatList: React.FC<ChatListProps> = ({ messages }) => {
    * @mdndocs dsad
    */
   function resizeChatMessage() {
-    // Scroll to the bottom of the chat message
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      // Scroll to the bottom of the chat message
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
   }
 
   useEffect(() => {
