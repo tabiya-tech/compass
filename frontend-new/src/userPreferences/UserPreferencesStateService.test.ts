@@ -4,6 +4,7 @@ import "src/_test_utilities/consoleMock";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Language, SensitivePersonalDataRequirement, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { nanoid } from "nanoid";
+import { QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 
 function getMockUserPreference(): UserPreference {
   const random = Math.floor(Math.random() * 1000000);
@@ -52,7 +53,7 @@ describe("UserPreferencesStateService", () => {
       service.clearUserPreferences();
     });
     describe("getUserPreferences", () => {
-      it("should return null when no user preferences are set", () => {
+      test("should return null when no user preferences are set", () => {
         // GIVEN the user preferences is newly instantiated
         service = new (UserPreferencesStateService as any)();
 
@@ -62,7 +63,7 @@ describe("UserPreferencesStateService", () => {
         // THEN expect the user preferences to be null
         expect(actualUserPreferences).toBeNull();
       });
-      it("should get a deep clone of the preferences", () => {
+      test("should get a deep clone of the preferences", () => {
         // GIVEN some user preferences that are set
         const originalPreferences: UserPreference = getMockUserPreference();
         service.setUserPreferences(originalPreferences);
@@ -74,7 +75,7 @@ describe("UserPreferencesStateService", () => {
 
         // AND mutating the retrieved user preferences
         const givenMutatedUserId = `${actualUserPreferences?.user_id}_mutated`;
-        // @ts-ignore actualUserPreferences is not null, it is checked above
+        // @ts-ignore actualUserPreferences is not null, test is checked above
         actualUserPreferences.user_id = givenMutatedUserId;
         // guard
         expect(actualUserPreferences?.user_id).toEqual(givenMutatedUserId);
@@ -84,7 +85,7 @@ describe("UserPreferencesStateService", () => {
         expect(actualUserPreferencesSecond).not.toEqual(actualUserPreferences);
         expect(actualUserPreferencesSecond).toEqual(originalPreferences);
       });
-      it("should return null when an error occurs while cloning the object", () => {
+      test("should return null when an error occurs while cloning the object", () => {
         // GIVEN some user preferences that are set
         const originalPreferences: UserPreference = getMockUserPreference();
         service.setUserPreferences(originalPreferences);
@@ -106,7 +107,7 @@ describe("UserPreferencesStateService", () => {
     });
 
     describe("setUserPreferences", () => {
-      it("should set a deep clone of the preferences", () => {
+      test("should set a deep clone of the preferences", () => {
         // GIVEN some user preferences
         const givenPreferences: UserPreference = getMockUserPreference();
         const givenOriginalUserId = givenPreferences.user_id;
@@ -125,7 +126,7 @@ describe("UserPreferencesStateService", () => {
         expect(actualUserPreferences).not.toEqual(givenPreferences);
         expect(actualUserPreferences?.user_id).toEqual(givenOriginalUserId);
       });
-      it("throws an error when the preferences cannot be cloned", () => {
+      test("throws an error when the preferences cannot be cloned", () => {
         // GIVEN some user preferences
         const givenPreferences: UserPreference = getMockUserPreference();
 
@@ -140,7 +141,7 @@ describe("UserPreferencesStateService", () => {
       });
     });
     describe("get/setUserPreferences", () => {
-      it("should set and get user preferences correctly", () => {
+      test("should set and get user preferences correctly", () => {
         // GIVEN user preferences
         const givenPreferences: UserPreference = getMockUserPreference();
 
@@ -151,7 +152,7 @@ describe("UserPreferencesStateService", () => {
         // THEN the given preferences to be returned
         expect(actualUserPreferences).toEqual(givenPreferences);
       });
-      it("should set and get null correctly", () => {
+      test("should set and get null correctly", () => {
         // WHEN setUserPreferences and getUserPreferences are called for null
         // @ts-ignore
         service.setUserPreferences(null);
@@ -162,7 +163,7 @@ describe("UserPreferencesStateService", () => {
       });
     });
     describe("clearUserPreferences", () => {
-      it("should return null user preferences are cleared", () => {
+      test("should return null user preferences are cleared", () => {
         // GIVEN  user preferences are set
         service = UserPreferencesStateService.getInstance();
         service.setUserPreferences(getMockUserPreference());
@@ -178,7 +179,7 @@ describe("UserPreferencesStateService", () => {
       });
     });
     describe("getActiveSessionId", () => {
-      it("should return the active session id when sessions are available", () => {
+      test("should return the active session id when sessions are available", () => {
         // GIVEN user preferences with sessions are set
         const givenPreferences: UserPreference = getMockUserPreference();
         service.setUserPreferences(givenPreferences);
@@ -190,7 +191,7 @@ describe("UserPreferencesStateService", () => {
         expect(actualSessionId).toBe(givenPreferences.sessions[0]);
       });
 
-      it("should return null when no sessions are available", () => {
+      test("should return null when no sessions are available", () => {
         // GIVEN user preferences with no sessions are set
         const givenPreferences: UserPreference = getMockUserPreference();
         givenPreferences.sessions = [];
@@ -203,7 +204,7 @@ describe("UserPreferencesStateService", () => {
         // THEN expected null
         expect(actualSessionId).toBeNull();
       });
-      it("should return null when no user preferences are set", () => {
+      test("should return null when no user preferences are set", () => {
         // GIVEN no user preferences are set
         service.clearUserPreferences();
 
@@ -216,7 +217,7 @@ describe("UserPreferencesStateService", () => {
     });
 
     describe("user_feedback_answered_questions methods", () => {
-      it("activeSessionHasOverallFeedback should return true if the active session has feedbackitems", () => {
+      test("activeSessionHasOverallFeedback should return true if the active session has feedbackitems", () => {
         // GIVEN user preferences with feedback for the active session are set
         const givenPreferences: UserPreference = getMockUserPreference();
         //guard
@@ -229,7 +230,7 @@ describe("UserPreferencesStateService", () => {
         // THEN expected true
         expect(actualHasFeedback).toBe(true);
       });
-      it("activeSessionHasOverallFeedback should return false if the active session does not have feedback", () => {
+      test("activeSessionHasOverallFeedback should return false if the active session does not have feedback", () => {
         // GIVEN user preferences with no feedback for the active session are set
         const givenPreferences: UserPreference = getMockUserPreference();
         givenPreferences.user_feedback_answered_questions = {};
@@ -241,7 +242,7 @@ describe("UserPreferencesStateService", () => {
         // THEN expected false
         expect(actualHasFeedback).toBe(false);
       });
-      it("activeSessionHasOverallFeedback should return false if there is no active session", () => {
+      test("activeSessionHasOverallFeedback should return false if there is no active session", () => {
         // GIVEN user preferences with no sessions are set
         const givenPreferences: UserPreference = getMockUserPreference();
         givenPreferences.sessions = [];
@@ -253,6 +254,63 @@ describe("UserPreferencesStateService", () => {
 
         // THEN expected false
         expect(actualHasFeedback).toBe(false);
+      });
+
+      test("activeSessionHasCustomerSatisfactionRating should return true if the active session has customer satisfaction rating", () => {
+        // GIVEN user preferences with customer satisfaction rating for the active session are set
+        const givenPreferences: UserPreference = getMockUserPreference();
+        givenPreferences.user_feedback_answered_questions = {
+          [givenPreferences.sessions[0]]: [QUESTION_KEYS.CUSTOMER_SATISFACTION]
+        };
+        service.setUserPreferences(givenPreferences);
+
+        // WHEN activeSessionHasCustomerSatisfactionRating is called
+        const actualHasRating = service.activeSessionHasCustomerSatisfactionRating();
+
+        // THEN expected true
+        expect(actualHasRating).toBe(true);
+      });
+
+      test("activeSessionHasCustomerSatisfactionRating should return false if the active session does not have customer satisfaction rating", () => {
+        // GIVEN user preferences with no customer satisfaction rating for the active session are set
+        const givenPreferences: UserPreference = getMockUserPreference();
+        givenPreferences.user_feedback_answered_questions = {
+          [givenPreferences.sessions[0]]: ["question1", "question2"]
+        };
+        service.setUserPreferences(givenPreferences);
+
+        // WHEN activeSessionHasCustomerSatisfactionRating is called
+        const actualHasRating = service.activeSessionHasCustomerSatisfactionRating();
+
+        // THEN expected false
+        expect(actualHasRating).toBe(false);
+      });
+
+      test("activeSessionHasCustomerSatisfactionRating should return false if there is no active session", () => {
+        // GIVEN user preferences with no sessions are set
+        const givenPreferences: UserPreference = getMockUserPreference();
+        givenPreferences.sessions = [];
+        givenPreferences.user_feedback_answered_questions = {};
+        service.setUserPreferences(givenPreferences);
+
+        // WHEN activeSessionHasCustomerSatisfactionRating is called
+        const actualHasRating = service.activeSessionHasCustomerSatisfactionRating();
+
+        // THEN expected false
+        expect(actualHasRating).toBe(false);
+      });
+
+      test("activeSessionHasCustomerSatisfactionRating should return false if answered questions is empty", () => {
+        // GIVEN user preferences with empty answered questions are set
+        const givenPreferences: UserPreference = getMockUserPreference();
+        givenPreferences.user_feedback_answered_questions = {};
+        service.setUserPreferences(givenPreferences);
+
+        // WHEN activeSessionHasCustomerSatisfactionRating is called
+        const actualHasRating = service.activeSessionHasCustomerSatisfactionRating();
+
+        // THEN expected false
+        expect(actualHasRating).toBe(false);
       });
     });
   });
