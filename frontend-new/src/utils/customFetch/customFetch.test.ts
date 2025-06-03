@@ -26,8 +26,8 @@ jest.mock("src/auth/services/Authentication.service.factory", () => ({
       refreshToken: jest.fn(),
       isTokenValid: jest.fn().mockReturnValue({
         decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid token by default
-        failureCause: null
-      })
+        failureCause: null,
+      }),
     }),
   },
 }));
@@ -36,7 +36,7 @@ const VALID_TOKEN_RESPONSE = {
   decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid token by default
   isValid: true,
   failureCause: null,
-}
+};
 
 describe("Api Service tests", () => {
   beforeEach(() => {
@@ -158,7 +158,7 @@ describe("Api Service tests", () => {
     const givenApiUrl = "givenAPIUrl";
     jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValueOnce(null);
 
-    const globalFetchSpy = jest.spyOn(global, "fetch")
+    const globalFetchSpy = jest.spyOn(global, "fetch");
 
     // AND given init request.
     const givenFailureMessage = "fetchWithAuth failed";
@@ -169,7 +169,7 @@ describe("Api Service tests", () => {
       serviceFunction: "givenServiceFunction",
       expectedStatusCode: [StatusCodes.OK],
       expectedContentType: "application/json",
-    }
+    };
 
     // WHEN fetchWithAuth is called with an apiUrl
     await expect(customFetch(givenApiUrl, request)).rejects.toThrow(`RestAPIError: ${givenFailureMessage}`);
@@ -349,9 +349,11 @@ describe("Api Service tests", () => {
       const givenFailureMessage = "fetchWithAuth failed";
 
       // AND the server always responds with the given status code
-      const mockFetch = jest.spyOn(global, "fetch").mockResolvedValue(
-        new Response("Error", { status: statusCode, headers: { "Content-Type": "application/json;charset=UTF-8" } })
-      );
+      const mockFetch = jest
+        .spyOn(global, "fetch")
+        .mockResolvedValue(
+          new Response("Error", { status: statusCode, headers: { "Content-Type": "application/json;charset=UTF-8" } })
+        );
 
       const sleepSpy = jest.spyOn(UtilsModule, "sleep").mockImplementation(() => Promise.resolve());
 
@@ -378,7 +380,104 @@ describe("Api Service tests", () => {
       expect(sleepSpy).toHaveBeenNthCalledWith(3, 4000); // Second retry backoff
       expect(sleepSpy).toHaveBeenNthCalledWith(4, 8000); // Third retry backoff
     });
+
+    test.each([StatusCodes.NO_CONTENT, StatusCodes.NOT_FOUND, StatusCodes.INTERNAL_SERVER_ERROR])(
+      "should retry when the given status code %s is provided as part retriable status codes",
+      async (statusCode) => {
+        // GIVEN an API URL and a valid auth token in sessionStorage.
+        const givenApiUrl = "givenAPIUrl";
+        const givenServiceName = "Some service";
+        const givenServiceFunction = "Some function";
+        const givenMethod = "GET";
+        const givenFailureMessage = "fetchWithAuth failed";
+        const givenExpectedStatusCode = StatusCodes.OK;
+
+        // AND the server will fail for the first three attempts and succeed on the fourth.
+        const failureResponse = new Response("Error", {
+          status: statusCode,
+          headers: { "Content-Type": "application/json;charset=UTF-8" },
+        });
+        const successResponse = new Response("Success", {
+          status: givenExpectedStatusCode,
+          headers: { "Content-Type": "application/json;charset=UTF-8" },
+        });
+
+        const mockFetch = jest
+          .spyOn(global, "fetch")
+          .mockResolvedValueOnce(failureResponse) // First attempt fails
+          .mockResolvedValueOnce(failureResponse) // Second attempt fails
+          .mockResolvedValueOnce(failureResponse) // Third attempt fails
+          .mockResolvedValueOnce(successResponse); // Fourth attempt succeeds
+
+        const sleepSpy = jest.spyOn(UtilsModule, "sleep").mockImplementation(() => Promise.resolve());
+
+        // WHEN fetchWithAuth is called with an apiUrl and an init configuration.
+        const fetchPromise = customFetch(givenApiUrl, {
+          expectedStatusCode: givenExpectedStatusCode,
+          serviceName: givenServiceName,
+          serviceFunction: givenServiceFunction,
+          method: givenMethod,
+          failureMessage: givenFailureMessage,
+          retriableStatusCodes: [statusCode],
+          authRequired: false,
+        });
+
+        // THEN promise will resolve at the end.
+        await expect(fetchPromise).resolves.toBe(successResponse); // The final response should be the success response
+
+        // AND the fetch should be called MAX_ATTEMPTS times
+        expect(mockFetch).toHaveBeenCalledTimes(MAX_ATTEMPTS);
+
+        // AND the sleepSpy should be called for each retry
+        expect(sleepSpy).toHaveBeenCalledTimes(MAX_ATTEMPTS - 1); // No sleep before the first attempt
+
+        expect(sleepSpy).toHaveBeenNthCalledWith(1, 1000); // Initial backoff
+        expect(sleepSpy).toHaveBeenNthCalledWith(2, 2000); // First retry backoff
+        expect(sleepSpy).toHaveBeenNthCalledWith(3, 4000); // Second retry backoff
+      }
+    );
   });
+
+  test("should retry on fail to fetch if the caller has requested it", async () => {
+    // GIVEN an API URL and a valid auth token in sessionStorage
+    const givenApiUrl = "givenAPIUrl";
+    const givenServiceName = "Some service";
+    const givenServiceFunction = "Some function";
+    const givenMethod = "GET";
+    const givenFailureMessage = "fetchWithAuth failed";
+
+    // AND the server responds with the given status code
+    const windowFetch = setupFetchSpy(500, {}, "");
+    windowFetch
+      .mockRejectedValue(new TypeError("failed to fetch"));
+
+    jest.spyOn(UtilsModule, "sleep").mockImplementation(() => Promise.resolve());
+
+    // WHEN fetchWithAuth is called with an apiUrl and an init configuration.
+    const fetchPromise = customFetch(givenApiUrl, {
+      expectedStatusCode: StatusCodes.OK,
+      serviceName: givenServiceName,
+      serviceFunction: givenServiceFunction,
+      method: givenMethod,
+      failureMessage: givenFailureMessage,
+      authRequired: false,
+      retryOnFailedToFetch: true
+    });
+
+    // THEN the function will reject
+    await expect(fetchPromise).rejects.toThrow(`RestAPIError: ${givenFailureMessage}`);
+
+    // AND the fetch should be called MAX_ATTEMPTS times
+    expect(windowFetch).toHaveBeenCalledTimes(MAX_ATTEMPTS);
+
+    // AND the sleepSpy should be called for each retry
+    expect(UtilsModule.sleep).toHaveBeenCalledTimes(MAX_ATTEMPTS); // No sleep before the first attempt
+
+    expect(UtilsModule.sleep).toHaveBeenNthCalledWith(1, 1000); // Initial backoff
+    expect(UtilsModule.sleep).toHaveBeenNthCalledWith(2, 2000); // First retry backoff
+    expect(UtilsModule.sleep).toHaveBeenNthCalledWith(3, 4000); // Second retry backoff
+    expect(UtilsModule.sleep).toHaveBeenNthCalledWith(4, 8000); // Third retry backoff
+  })
 
   test("should fail if fetch fails to go through", async () => {
     // GIVEN an API URL and a valid auth token in sessionStorage
@@ -402,6 +501,7 @@ describe("Api Service tests", () => {
       method: givenMethod,
       failureMessage: givenFailureMessage,
       authRequired: false,
+      retryOnFailedToFetch: true,
     });
 
     // THEN the function will reject
@@ -421,8 +521,8 @@ describe("Api Service tests", () => {
       // AND the token validation service returns an invalid token response
       const givenInvalidTokenResponse = {
         decodedToken: null,
-        failureCause: "INVALID_TOKEN"
-      }
+        failureCause: "INVALID_TOKEN",
+      };
 
       // AND the auth token is set
       jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValueOnce(givenToken);
@@ -430,7 +530,7 @@ describe("Api Service tests", () => {
       // AND the auth service factory is mocked to return a service that validates tokens
       const mockAuthService = {
         isTokenValid: jest.fn().mockReturnValue(givenInvalidTokenResponse),
-        refreshToken: jest.fn()
+        refreshToken: jest.fn(),
       };
       (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
 
@@ -438,14 +538,16 @@ describe("Api Service tests", () => {
       const mockFetch = jest.spyOn(global, "fetch");
 
       // WHEN fetchWithAuth is called
-      await expect(customFetch(givenApiUrl, {
-        expectedStatusCode: StatusCodes.OK,
-        serviceName: givenServiceName,
-        serviceFunction: givenServiceFunction,
-        method: givenMethod,
-        failureMessage: givenFailureMessage,
-        authRequired: true,
-      })).rejects.toThrow();
+      await expect(
+        customFetch(givenApiUrl, {
+          expectedStatusCode: StatusCodes.OK,
+          serviceName: givenServiceName,
+          serviceFunction: givenServiceFunction,
+          method: givenMethod,
+          failureMessage: givenFailureMessage,
+          authRequired: true,
+        })
+      ).rejects.toThrow();
 
       // THEN isTokenValid should be called with the token
       expect(mockAuthService.isTokenValid).toHaveBeenCalledWith(givenToken);
@@ -453,121 +555,128 @@ describe("Api Service tests", () => {
       expect(mockFetch).not.toHaveBeenCalled();
     });
 
-    test.each([MIN_TOKEN_VALIDITY_SECONDS - 1, MIN_TOKEN_VALIDITY_SECONDS - 10])("should refresh token if it's about to expire", async (tokenExpirySeconds) => {
-      // GIVEN an API URL and a token that's about to expire
-      const givenApiUrl = "givenAPIUrl";
-      const givenToken = "expiringToken";
-      const givenNewToken = "newToken";
-      const givenServiceName = "Some service";
-      const givenServiceFunction = "Some function";
-      const givenMethod = "GET";
-      const givenFailureMessage = "fetchWithAuth failed";
+    test.each([MIN_TOKEN_VALIDITY_SECONDS - 1, MIN_TOKEN_VALIDITY_SECONDS - 10])(
+      "should refresh token if it's about to expire",
+      async (tokenExpirySeconds) => {
+        // GIVEN an API URL and a token that's about to expire
+        const givenApiUrl = "givenAPIUrl";
+        const givenToken = "expiringToken";
+        const givenNewToken = "newToken";
+        const givenServiceName = "Some service";
+        const givenServiceFunction = "Some function";
+        const givenMethod = "GET";
+        const givenFailureMessage = "fetchWithAuth failed";
 
-      // AND the auth token is initially set
-      jest
-        .spyOn(AuthenticationStateService.getInstance(), "getToken")
-        .mockReturnValueOnce(givenToken)
-        .mockReturnValueOnce(givenNewToken);
+        // AND the auth token is initially set
+        jest
+          .spyOn(AuthenticationStateService.getInstance(), "getToken")
+          .mockReturnValueOnce(givenToken)
+          .mockReturnValueOnce(givenNewToken);
 
-      // AND the auth service factory is mocked to return a service that validates tokens
-      const mockAuthService = {
-        isTokenValid: jest.fn()
-          .mockReturnValueOnce({
-            isValid: true,
-            decodedToken: { exp: Math.floor(Date.now() / 1000) + tokenExpirySeconds }, // token about to expire
-            failureCause: null
+        // AND the auth service factory is mocked to return a service that validates tokens
+        const mockAuthService = {
+          isTokenValid: jest
+            .fn()
+            .mockReturnValueOnce({
+              isValid: true,
+              decodedToken: { exp: Math.floor(Date.now() / 1000) + tokenExpirySeconds }, // token about to expire
+              failureCause: null,
+            })
+            .mockReturnValueOnce({
+              isValid: true,
+              decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // new token valid for an hour
+              failureCause: null,
+            }),
+          refreshToken: jest.fn().mockResolvedValue(undefined),
+        };
+        (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
+
+        // AND the server responds with a StatusCodes.OK status code
+        const mockFetch = setupFetchSpy(StatusCodes.OK, "Success", "application/json;charset=UTF-8");
+
+        // WHEN fetchWithAuth is called
+        const response = await customFetch(givenApiUrl, {
+          expectedStatusCode: StatusCodes.OK,
+          serviceName: givenServiceName,
+          serviceFunction: givenServiceFunction,
+          method: givenMethod,
+          failureMessage: givenFailureMessage,
+          authRequired: true,
+        });
+
+        // THEN the token should be refreshed
+        expect(mockAuthService.refreshToken).toHaveBeenCalled();
+        // AND the request should be made with the new token
+        expect(mockFetch).toHaveBeenCalledWith(
+          givenApiUrl,
+          expect.objectContaining({
+            headers: expect.objectContaining({
+              map: expect.objectContaining({
+                authorization: `Bearer ${givenNewToken}`,
+              }),
+            }),
           })
-          .mockReturnValueOnce({
+        );
+        // AND the response should be successful
+        expect(response.status).toBe(StatusCodes.OK);
+      }
+    );
+
+    test.each([MIN_TOKEN_VALIDITY_SECONDS + 1, MIN_TOKEN_VALIDITY_SECONDS + 10])(
+      "should not refresh token if it's not about to expire",
+      async (tokenExpirySeconds) => {
+        // GIVEN an API URL and a token that's not about to expire
+        const givenApiUrl = "givenAPIUrl";
+        const givenToken = "validToken";
+        const givenServiceName = "Some service";
+        const givenServiceFunction = "Some function";
+        const givenMethod = "GET";
+        const givenFailureMessage = "fetchWithAuth failed";
+
+        // AND the auth token is set
+        jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValueOnce(givenToken);
+
+        // AND the auth service factory is mocked to return a service that validates tokens
+        const mockAuthService = {
+          isTokenValid: jest.fn().mockReturnValue({
             isValid: true,
-            decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // new token valid for an hour
-            failureCause: null
+            decodedToken: { exp: Math.floor(Date.now() / 1000) + tokenExpirySeconds }, // token not about to expire
+            failureCause: null,
           }),
-        refreshToken: jest.fn().mockResolvedValue(undefined)
-      };
-      (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
+          refreshToken: jest.fn(),
+        };
+        (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
 
-      // AND the server responds with a StatusCodes.OK status code
-      const mockFetch = setupFetchSpy(StatusCodes.OK, "Success", "application/json;charset=UTF-8");
+        // AND the server responds with a StatusCodes.OK status code
+        const mockFetch = setupFetchSpy(StatusCodes.OK, "Success", "application/json;charset=UTF-8");
 
-      // WHEN fetchWithAuth is called
-      const response = await customFetch(givenApiUrl, {
-        expectedStatusCode: StatusCodes.OK,
-        serviceName: givenServiceName,
-        serviceFunction: givenServiceFunction,
-        method: givenMethod,
-        failureMessage: givenFailureMessage,
-        authRequired: true,
-      });
+        // WHEN fetchWithAuth is called
+        const response = await customFetch(givenApiUrl, {
+          expectedStatusCode: StatusCodes.OK,
+          serviceName: givenServiceName,
+          serviceFunction: givenServiceFunction,
+          method: givenMethod,
+          failureMessage: givenFailureMessage,
+          authRequired: true,
+        });
 
-      // THEN the token should be refreshed
-      expect(mockAuthService.refreshToken).toHaveBeenCalled();
-      // AND the request should be made with the new token
-      expect(mockFetch).toHaveBeenCalledWith(
-        givenApiUrl,
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            map: expect.objectContaining({
-              authorization: `Bearer ${givenNewToken}`,
+        // THEN the token should not be refreshed
+        expect(mockAuthService.refreshToken).not.toHaveBeenCalled();
+        // AND the request should be made with the original token
+        expect(mockFetch).toHaveBeenCalledWith(
+          givenApiUrl,
+          expect.objectContaining({
+            headers: expect.objectContaining({
+              map: expect.objectContaining({
+                authorization: `Bearer ${givenToken}`,
+              }),
             }),
-          }),
-        })
-      );
-      // AND the response should be successful
-      expect(response.status).toBe(StatusCodes.OK);
-    });
-
-    test.each([MIN_TOKEN_VALIDITY_SECONDS + 1, MIN_TOKEN_VALIDITY_SECONDS + 10])("should not refresh token if it's not about to expire", async (tokenExpirySeconds) => {
-      // GIVEN an API URL and a token that's not about to expire
-      const givenApiUrl = "givenAPIUrl";
-      const givenToken = "validToken";
-      const givenServiceName = "Some service";
-      const givenServiceFunction = "Some function";
-      const givenMethod = "GET";
-      const givenFailureMessage = "fetchWithAuth failed";
-
-      // AND the auth token is set
-      jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValueOnce(givenToken);
-
-      // AND the auth service factory is mocked to return a service that validates tokens
-      const mockAuthService = {
-        isTokenValid: jest.fn().mockReturnValue({
-          isValid: true,
-          decodedToken: { exp: Math.floor(Date.now() / 1000) + tokenExpirySeconds }, // token not about to expire
-          failureCause: null
-        }),
-        refreshToken: jest.fn()
-      };
-      (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
-
-      // AND the server responds with a StatusCodes.OK status code
-      const mockFetch = setupFetchSpy(StatusCodes.OK, "Success", "application/json;charset=UTF-8");
-
-      // WHEN fetchWithAuth is called
-      const response = await customFetch(givenApiUrl, {
-        expectedStatusCode: StatusCodes.OK,
-        serviceName: givenServiceName,
-        serviceFunction: givenServiceFunction,
-        method: givenMethod,
-        failureMessage: givenFailureMessage,
-        authRequired: true,
-      });
-
-      // THEN the token should not be refreshed
-      expect(mockAuthService.refreshToken).not.toHaveBeenCalled();
-      // AND the request should be made with the original token
-      expect(mockFetch).toHaveBeenCalledWith(
-        givenApiUrl,
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            map: expect.objectContaining({
-              authorization: `Bearer ${givenToken}`,
-            }),
-          }),
-        })
-      );
-      // AND the response should be successful
-      expect(response.status).toBe(StatusCodes.OK);
-    });
+          })
+        );
+        // AND the response should be successful
+        expect(response.status).toBe(StatusCodes.OK);
+      }
+    );
 
     test("should refresh token when receiving 401 with expired token", async () => {
       // GIVEN an API URL and an expired token
@@ -591,23 +700,24 @@ describe("Api Service tests", () => {
       //  expired token on second call (the token has expired since initial call was made)
       //  and valid token on third call (the token has been refreshed)
       const mockAuthService = {
-        isTokenValid: jest.fn()
+        isTokenValid: jest
+          .fn()
           .mockReturnValueOnce({
             isValid: true,
             decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid
-            failureCause: null
+            failureCause: null,
           })
           .mockReturnValueOnce({
             isValid: false,
             decodedToken: { exp: Math.floor(Date.now() / 1000) - 1 }, // expired
-            failureCause: TokenValidationFailureCause.TOKEN_EXPIRED
+            failureCause: TokenValidationFailureCause.TOKEN_EXPIRED,
           })
           .mockReturnValueOnce({
             isValid: true,
             decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid
-            failureCause: null
+            failureCause: null,
           }),
-        refreshToken: jest.fn().mockResolvedValue(undefined)
+        refreshToken: jest.fn().mockResolvedValue(undefined),
       };
       (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
 
@@ -662,9 +772,9 @@ describe("Api Service tests", () => {
       const mockAuthService = {
         isTokenValid: jest.fn().mockReturnValue({
           decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid
-          failureCause: null
+          failureCause: null,
         }),
-        refreshToken: jest.fn()
+        refreshToken: jest.fn(),
       };
       (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
 
