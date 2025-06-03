@@ -5,7 +5,7 @@ from app.application_state import ApplicationStateStore
 from app.store.database_application_state_store import DatabaseApplicationStateStore
 from app.store.json_application_state_store import JSONApplicationStateStore
 from app.store.markdown_conversation_state_store import MarkdownConversationStateStore
-from app.store.txt_application_state_store import TxtApplicationStateStore
+from app.store.txt_conversation_state_store import TxtConversationStateStore
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 StoreType = Literal["JSON", "DB", "MD", "TXT"]
@@ -50,7 +50,7 @@ def create_store(
 
         # Ensure directory exists
         os.makedirs(folder_path, exist_ok=True)
-        return TxtApplicationStateStore(folder_path)
+        return TxtConversationStateStore(folder_path)
     else:
         raise ValueError(f"Unsupported store type: {store_type}")
 
