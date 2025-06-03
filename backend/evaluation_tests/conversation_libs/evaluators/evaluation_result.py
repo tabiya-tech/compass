@@ -44,7 +44,7 @@ class EvaluationResult(BaseModel):
     """
     The result of the evaluation.
     """
-    type: EvaluationType
+    evaluator_name: str
     score: int
     reasoning: str
 
@@ -118,7 +118,7 @@ class EvaluationRecord(BaseModel):
         """
         evaluations_str = ""
         for evaluation in self.evaluations:
-            evaluations_str += f"**{evaluation.type}**: {evaluation.score}  \n**Reasoning**:{evaluation.reasoning}\n\n"
+            evaluations_str += f"**{evaluation.evaluator_name}**: {evaluation.score}  \n**Reasoning**:{evaluation.reasoning}\n\n"
         return evaluations_str
 
     def _get_formatted_conversation(self) -> str:

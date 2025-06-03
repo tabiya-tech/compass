@@ -40,7 +40,7 @@ class ExperiencePipelineConfigCase(BaseModel):
     """
     The number of clusters to use for the experience pipeline.
     """
-    given_number_of_top_skills_to_pick_per_cluster: int = 1
+    given_number_of_top_skills_to_pick_per_cluster: int = 2
     """
     The number of top skills to pick per cluster in the experience pipeline.
     """
@@ -156,7 +156,27 @@ test_cases = [
     E2ESpecificTestCase(
         country_of_user=Country.UNSPECIFIED,
         conversation_rounds=50,
-        name='minimal_user_e2e',
+        name='minimal_user_unseen_e2e',
+        simulated_user_prompt=dedent("""
+            You're a Gen Y living alone. You have absolutely no working  experience at all. 
+            You have never had any job experience, never worked for money, never did any internship, never run your own business, never did any freelance work.
+            The only experience you have is taking care of your sick grandfather at home. That is all, you have no other experience, never volunteered, 
+            never helped the community or other households.
+            """) + system_instruction_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=1,
+        expected_work_types={
+            WorkType.SELF_EMPLOYMENT: (0, 0),
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+            WorkType.UNSEEN_UNPAID: (1, 1),
+        }
+    ),
+    E2ESpecificTestCase(
+        country_of_user=Country.UNSPECIFIED,
+        conversation_rounds=50,
+        name='minimal_user_employee_e2e',
         simulated_user_prompt=dedent("""
             You're a Gen Y living alone. You have one year of experience in a job as a shoe salesperson. 
             You have never had another job experience beside the shoe salesperson job. Also never

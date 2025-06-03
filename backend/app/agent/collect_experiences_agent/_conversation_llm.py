@@ -681,7 +681,7 @@ def _get_experience_count(work_types: list[WorkType], collected_data: list[Colle
 
 
 def _get_example_summary() -> str:
-    return "• " + ExperienceEntity.get_text_summary(
+    return "• " + ExperienceEntity.get_structured_summary(
         experience_title="Crew Member",
         location="London",
         work_type=WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name,
@@ -695,7 +695,7 @@ def _get_summary_of_experiences(collected_data: list[CollectedData]) -> str:
     if len(collected_data) == 0:
         return "• No work experiences identified so far"
     for experience in collected_data:
-        summary += "• " + ExperienceEntity.get_text_summary(
+        summary += "• " + ExperienceEntity.get_structured_summary(
             experience_title=experience.experience_title,
             location=experience.location,
             work_type=experience.work_type,
