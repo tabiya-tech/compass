@@ -12,7 +12,7 @@ def _format_message(message: str):
     return message.replace("\n", "\n\t\t")
 
 
-class TxtApplicationStateStore(ApplicationStateStore):
+class TxtConversationStateStore(ApplicationStateStore):
     """
     A store that saves conversation states to text files.
     Conversations are stored in files grouped by the date the conversation was conducted as {date}.txt.
