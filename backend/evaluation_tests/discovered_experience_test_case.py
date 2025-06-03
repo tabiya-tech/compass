@@ -1,7 +1,6 @@
 import logging
 from typing import Literal, Optional
 
-import pytest
 from pydantic import BaseModel, ConfigDict
 
 from app.agent.experience import WorkType, ExperienceEntity
@@ -92,9 +91,7 @@ class DiscoveredExperienceTestCase(BaseModel):
                     f"which is within the expected range ({expected_minimum_count}, {expected_maximum_count})"
                 )
         if len(actual_work_types_count) > 0:
-            pytest.fail(
-                f"Unexpected work types found: {', '.join(str(k) for k in actual_work_types_count.keys())}"
-            )
+            failures.append(f"Unexpected work types found: {', '.join(str(k) for k in actual_work_types_count.keys())}")
         else:
             logging.info(
                 f"No unexpected work types found"

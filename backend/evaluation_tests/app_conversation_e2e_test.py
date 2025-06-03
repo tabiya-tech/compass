@@ -14,6 +14,7 @@ from evaluation_tests.conversation_libs.evaluators.evaluator_builder import crea
 from evaluation_tests.conversation_libs.fake_conversation_context import save_conversation
 from evaluation_tests.core_e2e_tests_cases import test_cases, E2ESpecificTestCase, E2ETestCase
 from evaluation_tests.e2e_chat_executor import E2EChatExecutor
+from evaluation_tests.experience_summarizer.experience_summarizer_evaluator import ExperienceSummarizerEvaluator
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
 
@@ -94,11 +95,17 @@ async def test_main_app_chat(
         else:
             logger.info("Discovered experiences match explored experiences.")
 
-        # Assert that all experiences explored have at least 5 skills explored
-        cfg = ExperiencePipelineConfig()
-        expected_top_skills_count = cfg.number_of_clusters * cfg.number_of_top_skills_to_pick_per_cluster
+        # Assert that all experiences explored have at least the expected number of top skills explored
+        expected_top_skills_count = current_test_case.given_number_of_clusters * current_test_case.given_number_of_top_skills_to_pick_per_cluster
         _passed_top_skills_count = True
+        # AND that all experiences explored have a summary
+        # AND that all experiences explored pass the ExperienceSummarizerEvaluator
+        _passed_has_summary = True
+        experience_summarizer_evaluator = ExperienceSummarizerEvaluator(current_test_case.country_of_user)
         for experience in actual_experiences_explored:
+            if not experience.summary:
+                _passed_has_summary = False
+                failures.append(f"Experience {experience.experience_title} has no summary.")
             if not experience.top_skills:
                 _passed_top_skills_count = False
                 failures.append(f"Experience {experience.experience_title} has no skills explored.")
@@ -106,6 +113,23 @@ async def test_main_app_chat(
                 _passed_top_skills_count = False
                 failures.append(f"Experience {experience.experience_title} "
                                 f"has less than {expected_top_skills_count} skills explored: {len(experience.top_skills)}")
+            eval_result = await experience_summarizer_evaluator.evaluate(
+                experience_title=experience.experience_title,
+                company=experience.company,
+                work_type=experience.work_type,
+                responsibilities=experience.responsibilities.responsibilities,
+                top_skills=experience.top_skills,
+                questions_and_answers=experience.questions_and_answers,
+                llm_summary=experience.summary
+            )
+            evaluation_result.add_evaluation_result(eval_result)
+            logger.info(f'Evaluation for {eval_result.evaluator_name}: {eval_result.score} {eval_result.reasoning}')
+            if not eval_result.meets_requirements:
+                failures.append(f"Experience {experience.experience_title} failed the summarization evaluation: "
+                                f"{eval_result.reasoning}")
+
+        if _passed_has_summary:
+            logger.info(f"All experiences explored have a summary.")
 
         if _passed_top_skills_count:
             logger.info(f"All experiences explored have at least {expected_top_skills_count} skills explored.")
@@ -113,9 +137,9 @@ async def test_main_app_chat(
         for evaluation in tqdm(current_test_case.evaluations, desc='Evaluating'):
             output = await create_evaluator(evaluation.type).evaluate(evaluation_result)
             evaluation_result.add_evaluation_result(output)
-            logger.info(f'Evaluation for {evaluation.type.name}: {output.score} {output.reasoning}')
+            logger.info(f'Evaluation for {output.evaluator_name}: {output.score} {output.reasoning}')
             if output.score < evaluation.expected:
-                failures.append(f"{evaluation.type.name} expected "
+                failures.append(f"{output.evaluator_name} expected "
                                 f"{evaluation.expected} actual {output.score}")
     except Exception as e:
         logger.exception(f"Error in test case {current_test_case.name}: {e}", exc_info=True)

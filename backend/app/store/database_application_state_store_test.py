@@ -60,6 +60,7 @@ def generate_random_experience(index: int) -> ExperienceEntity:
         timeline=Timeline(start=f"2020-01-{index}", end=f"2022-02-{index}"),
         work_type=random.choice(list(WorkType)),  # nosec B311 # random is used for testing purposes
         responsibilities=ResponsibilitiesData(responsibilities=[f"Responsibility {index}"]),
+        questions_and_answers=[(f"Question {index}", f"Answer {index}")],
         top_skills=[
             SkillEntity(
                 id=f"Skill {index}",
@@ -328,4 +329,3 @@ class TestDatabaseApplicationStateStore:
             assert caplog.records[0].levelname == "ERROR"
             assert caplog.records[
                        0].message == f"Missing application state part(s) for session ID {given_session_id}. Missing part(s): ['{collection_name}']"
-

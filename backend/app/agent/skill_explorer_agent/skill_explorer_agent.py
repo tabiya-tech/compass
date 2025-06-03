@@ -52,6 +52,16 @@ class SkillsExplorerAgentState(BaseModel):
     or history window size.
     """
 
+    answers_provided: list[str] = Field(default_factory=list)
+    """
+    Tracks answers provided by the user during the conversation.
+    
+    This is useful for generating a more accurate summary of the user's experience, which can be used
+    for the CV generation or other purposes.
+    
+    The array is on par with the question_asked_until_now array, meaning that the i-th answer corresponds to the i-th question.
+    """
+
     class Config:
         extra = "forbid"
 
@@ -131,7 +141,7 @@ class SkillsExplorerAgent(Agent):
             # This is to avoid the agent failing to respond to an empty input
             user_input.message = "(silence)"
         else:
-            # Extract the responsibilities data from the last user's input
+            # Extract the responsibilities from the last user's input
             responsibilities_extraction_tool = _ResponsibilitiesExtractionTool(self.logger)
             responsibilities_output, responsibilities_llm_stats = \
                 await responsibilities_extraction_tool.execute(user_input=user_input,
@@ -140,6 +150,10 @@ class SkillsExplorerAgent(Agent):
                               responsibilities_output)
             # Merge the extracted responsibilities data into the experience entity
             SkillsExplorerAgent._merge_responsibilities_data(self.experience_entity, responsibilities_output)
+
+            # Update the state with the answers provided by the user
+            # This input was the user's response to a previous question asked by the agent
+            self.state.answers_provided.append(user_input.message.strip())
 
         # Converses with the user to get details about the experience
 
@@ -165,7 +179,7 @@ class SkillsExplorerAgent(Agent):
             start_date = getattr(timeline, 'start', None) if timeline else None
             end_date = getattr(timeline, 'end', None) if timeline else None
 
-            summary = ExperienceEntity.get_text_summary(
+            structured_summary = ExperienceEntity.get_structured_summary(
                 experience_title=title,
                 work_type=work_type,
                 company=company,
@@ -173,7 +187,10 @@ class SkillsExplorerAgent(Agent):
                 start_date=start_date,
                 end_date=end_date
             )
-            self.state.experiences_explored.append(summary)
+            self.state.experiences_explored.append(structured_summary)
+
+            # set the questions and answers
+            self.experience_entity.questions_and_answers = list(zip(self.state.question_asked_until_now, self.state.answers_provided))
 
         conversation_llm_output.llm_stats = responsibilities_llm_stats + conversation_llm_output.llm_stats
         return conversation_llm_output

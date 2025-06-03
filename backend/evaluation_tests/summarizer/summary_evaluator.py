@@ -25,5 +25,5 @@ class SummaryCriteriaEvaluator(BaseEvaluator):
                                                          criteria=self.criteria)
         result = await self.llm.generate_content(prompt)
         parsed_result = extract_json.extract_json(result.text, LlmEvaluatorOutput)
-        return EvaluationResult(type=self.criteria, score=parsed_result.score,
+        return EvaluationResult(evaluator_name=self.criteria.value, score=parsed_result.score,
                                 reasoning=parsed_result.reason)

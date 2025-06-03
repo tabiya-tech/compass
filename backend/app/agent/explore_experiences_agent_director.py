@@ -4,6 +4,7 @@ from typing import Optional, Mapping, Any
 
 from pydantic import BaseModel, field_serializer, field_validator, Field
 
+from app.agent.experience._experience_summarizer import ExperienceSummarizer
 from app.agent.linking_and_ranking_pipeline import ExperiencePipeline, ExperiencePipelineConfig
 from app.agent.skill_explorer_agent import SkillsExplorerAgent
 from app.countries import Country
@@ -368,14 +369,26 @@ class ExploreExperiencesAgentDirector(Agent):
             for skill in current_experience.top_skills:
                 skills_summary += f"• {skill.preferredLabel}\n"
 
-        end = time.time()
+        # construct a summary of the experience
+        current_experience.summary = await ExperienceSummarizer().execute(
+            country_of_user=country_of_user,
+            experience_title=current_experience.experience_title,
+            company=current_experience.company,
+            work_type=current_experience.work_type,
+            responsibilities=current_experience.responsibilities.responsibilities,
+            top_skills=current_experience.top_skills,
+            questions_and_answers=current_experience.questions_and_answers
+        )
+
         agent_output: AgentOutput = AgentOutput(
-            message_for_user=f"After reviewing the information you provided about your experience as '{current_experience.experience_title}', "
-                             f"I identified the following top {len(current_experience.top_skills)} skills:"
+            message_for_user=f"Based on the information provided about your experience as '{current_experience.experience_title}', "
+                             f"here’s a brief overview:\n\n"
+                             f"{current_experience.summary}\n\n"
+                             f"Top {len(current_experience.top_skills)} skills demonstrated:"
                              f"{skills_summary}",
             finished=False,
             agent_type=self._agent_type,
-            agent_response_time_in_sec=round(end - start, 2),
+            agent_response_time_in_sec=round(time.time() - start, 2),
             llm_stats=pipline_result.llm_stats
         )
         return agent_output
