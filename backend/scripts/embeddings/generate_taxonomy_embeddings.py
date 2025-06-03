@@ -279,6 +279,10 @@ async def _copy_model_info(*, hot_run: bool, embeddings_service: EmbeddingServic
         model_name=embeddings_service.model_name,
     )
 
+    # Add the origin UUID to the model Info
+    # UUID and UUIDHistory are already present in the from_model_info.
+    from_model_info["originUUID"] = from_model_info["UUIDHistory"][-1]
+
     # Add the time the embeddings were generated
     from_model_info["generatedAt"] = datetime_to_mongo_date(get_now())
 
