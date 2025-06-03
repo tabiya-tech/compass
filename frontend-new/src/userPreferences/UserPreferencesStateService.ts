@@ -80,11 +80,20 @@ export default class UserPreferencesStateService {
   
   public activeSessionHasCustomerSatisfactionRating(): boolean {
     const activeSessionId = this.getActiveSessionId();
+
     if (activeSessionId === null) {
       return false;
     }
+
+    // userPreferences.user_feedback_answered_questions is an object with session ids as keys,
+    // and it is never undefined, but it can be an empty object: {}.
+    // For Postel's Law: assert that the object is defined.
     const answered_questions = this.userPreferences!.user_feedback_answered_questions
-    if (Object.keys(answered_questions).length === 0) {
+    if (!answered_questions || Object.keys(answered_questions).length === 0) {
+      return false;
+    }
+
+    if (!answered_questions[activeSessionId]) {
       return false;
     }
 
