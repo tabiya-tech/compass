@@ -46,6 +46,12 @@ export type ExtendedRequestInit = RequestInit & {
   failureMessage: string;
   expectedContentType?: string;
   authRequired?: boolean;
+
+  // If the customFetch should retry the request on the provided status codes.
+  retriableStatusCodes?: number[];
+
+  // If the customFetch should retry the request on didn't fetch errors.
+  retryOnFailedToFetch?: boolean;
 };
 
 export const defaultInit: ExtendedRequestInit = {
@@ -57,51 +63,61 @@ export const defaultInit: ExtendedRequestInit = {
 };
 
 /*
-  * Refresh the token using the authentication service.
-  * */
-const refreshToken = async (attempt: number, serviceName: string, serviceFunction: string, failureMessage: string, errorFactory: RestAPIErrorFactory): Promise<string> => {
+ * Refresh the token using the authentication service.
+ * */
+const refreshToken = async (
+  attempt: number,
+  serviceName: string,
+  serviceFunction: string,
+  failureMessage: string,
+  errorFactory: RestAPIErrorFactory
+): Promise<string> => {
   // import the Authentication service factory dynamically to avoid circular dependencies.
   // If the response status is 401 Unauthorized, try to refresh the token.
   const authServiceFactory = await import("src/auth/services/Authentication.service.factory");
   const authService = authServiceFactory.default.getCurrentAuthenticationService();
   if (!authService) {
     console.warn(
-        `customFetch: No authentication service available for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
+      `customFetch: No authentication service available for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
     );
     throw new AuthenticationError("No authentication service available for authentication");
   }
   try {
     await authService.refreshToken();
     console.debug(
-        `customFetch: Token refreshed successfully for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
+      `customFetch: Token refreshed successfully for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
     );
-    const newToken = AuthenticationStateService.getInstance().getToken()
+    const newToken = AuthenticationStateService.getInstance().getToken();
     if (!newToken) {
       console.warn(
-          `customFetch: No token available after refreshing for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
+        `customFetch: No token available after refreshing for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
       );
       throw new AuthenticationError("No token available after refreshing");
     }
     return newToken;
   } catch (e: any) {
     console.warn(
-        `customFetch: Failed to refresh token for ${serviceName}.${serviceFunction} on attempt ${attempt}.`,
-        e
+      `customFetch: Failed to refresh token for ${serviceName}.${serviceFunction} on attempt ${attempt}.`,
+      e
     );
     throw errorFactory(0, ErrorConstants.ErrorCodes.API_ERROR, failureMessage, e);
   }
-}
+};
 
 /*
-* Check if the token is valid before making the request.
-* If the token is otherwise valid, but expired or about to be expired, try to refresh it.
-* if the token is invalid, throw an error.
-* */
-const checkToken = async (token: string | null, attempt: number, serviceName: string, serviceFunction: string, errorFactory: RestAPIErrorFactory) => {
+ * Check if the token is valid before making the request.
+ * If the token is otherwise valid, but expired or about to be expired, try to refresh it.
+ * if the token is invalid, throw an error.
+ * */
+const checkToken = async (
+  token: string | null,
+  attempt: number,
+  serviceName: string,
+  serviceFunction: string,
+  errorFactory: RestAPIErrorFactory
+) => {
   if (!token) {
-    console.warn(
-        `customFetch: No token available for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
-    );
+    console.warn(`customFetch: No token available for ${serviceName}.${serviceFunction} on attempt ${attempt}.`);
     throw errorFactory(0, ErrorConstants.ErrorCodes.API_ERROR, "No token available for authentication", null);
   }
   // import the Authentication service factory dynamically to avoid circular dependencies.
@@ -110,31 +126,33 @@ const checkToken = async (token: string | null, attempt: number, serviceName: st
   const authService = authServiceFactory.default.getCurrentAuthenticationService();
   if (!authService) {
     console.warn(
-        `customFetch: No authentication service available for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
+      `customFetch: No authentication service available for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
     );
     throw new AuthenticationError("No authentication service available for authentication");
   }
-  const { isValid, failureCause, decodedToken } = authService.isTokenValid(token)
+  const { isValid, failureCause, decodedToken } = authService.isTokenValid(token);
 
   // If the token is valid, we are certain that the decodedToken is not null.
   // That is why we are using the non-null assertion operator (!).
   if (isValid && calculateTimeToTokenExpiry(decodedToken!.exp) < MIN_TOKEN_VALIDITY_SECONDS) {
-    console.debug("customFetch: Token is valid but about to expire, refreshing token for", serviceName, serviceFunction);
-    throw new TokenError(TokenValidationFailureCause.TOKEN_EXPIRED)
+    console.debug(
+      "customFetch: Token is valid but about to expire, refreshing token for",
+      serviceName,
+      serviceFunction
+    );
+    throw new TokenError(TokenValidationFailureCause.TOKEN_EXPIRED);
   }
 
   // if the token is invalid, and the reason is that it is expired try to refresh it.
   if (failureCause === TokenValidationFailureCause.TOKEN_EXPIRED) {
-    console.debug(
-      `customFetch: Token is expired for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
-    );
+    console.debug(`customFetch: Token is expired for ${serviceName}.${serviceFunction} on attempt ${attempt}.`);
     // throw a specific error if the token is expired so that the caller can handle it specifically.
-    throw new TokenError(TokenValidationFailureCause.TOKEN_EXPIRED)
+    throw new TokenError(TokenValidationFailureCause.TOKEN_EXPIRED);
   }
 
   // if the token is valid, return without throwing an error.
-  if(isValid) {
-    return
+  if (isValid) {
+    return;
   }
 
   // Otherwise, if the token is invalid for any other reason, throw an error.
@@ -142,10 +160,19 @@ const checkToken = async (token: string | null, attempt: number, serviceName: st
     `customFetch: Token is invalid for ${serviceName}.${serviceFunction} on attempt ${attempt}. Failure cause: ${failureCause}`
   );
   throw new AuthenticationError(`Token is invalid: ${failureCause}`);
-}
+};
 
 export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = defaultInit): Promise<Response> => {
-  const { serviceName, serviceFunction, failureMessage, authRequired = true, expectedStatusCode, ...options } = init;
+  const {
+    serviceName,
+    serviceFunction,
+    failureMessage,
+    authRequired = true,
+    expectedStatusCode,
+    retriableStatusCodes = [],
+    retryOnFailedToFetch = false,
+    ...options
+  } = init;
 
   // check if the expected status code is an array or a single value
   const expectedStatusCodes = Array.isArray(expectedStatusCode) ? expectedStatusCode : [expectedStatusCode];
@@ -158,7 +185,7 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
   let failedDueToRetryableStatusCode = 1;
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        let token = authRequired ? AuthenticationStateService.getInstance().getToken() : null;
+    let token = authRequired ? AuthenticationStateService.getInstance().getToken() : null;
 
     // GUARD: If auth is required then check the token validity.
     // invalid token will throw an error. a valid token will be used to make the request.
@@ -191,11 +218,29 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
 
       response = await fetch(apiUrl, enhancedInit);
     } catch (e: any) {
+      // If the caller, has set the retryOnFailedToFetch to true, and the fetch fails due to a network error,
+      // We should sleep for some time and retry the request.
+      if(retryOnFailedToFetch) {
+        console.warn(
+          `customFetch: Failed to fetch ${serviceName}.${serviceFunction} on attempt ${attempt}. Error:`,
+          e
+        );
+
+        const backOffMs = getNextBackoff(INITIAL_BACKOFF_MS, attempt+1);
+        console.debug("sleeping for", backOffMs, "ms before retrying", serviceName, serviceFunction, "attempt", attempt);
+        await sleep(backOffMs);
+
+        continue; // Retry the request
+      }
+
       // If the fetch fails (e.g. network error), throw an error.
       // We do not know if the operation was successful or not, and if the server was able to process the request or not.
       // Let the caller decide what to do with this error.
       throw errorFactory(0, ErrorConstants.ErrorCodes.FAILED_TO_FETCH, failureMessage, e);
     }
+
+    // Combine the default retriable status codes with the ones provided by the caller.
+    const combinedRetriableStatusCodes = [...RETRY_STATUS_CODES, ...retriableStatusCodes];
 
     // If the expectedStatusCodes includes the response status.
     // Validate the content type if the expectedContentType is provided.
@@ -228,8 +273,8 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
           // if checking token fails for any other reason, do nothing and let the error be thrown.
         }
       }
-    } else if (RETRY_STATUS_CODES.includes(response.status)) {
-      // The response status is in the list of retryable status codes,
+    } else if (combinedRetriableStatusCodes.includes(response.status)) {
+      // The response status is in the list of combined retryable status codes,
       // If it is not the first attempt, before fetching, sleep for some time that exponentially increases
       // Based on the attempt number.
       failedDueToRetryableStatusCode++;
