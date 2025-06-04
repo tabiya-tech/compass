@@ -197,7 +197,8 @@ class ConversationService(IConversationService):
                 start_date=experience_details.timeline.start,
                 end_date=experience_details.timeline.end,
                 work_type=experience_details.work_type,
-                top_skills=top_skills
+                top_skills=top_skills,
+                summary=experience_details.summary
             ))
 
         return experiences

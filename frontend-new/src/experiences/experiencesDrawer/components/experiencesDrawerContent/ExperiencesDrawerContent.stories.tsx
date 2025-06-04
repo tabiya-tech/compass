@@ -49,3 +49,12 @@ export const ShownWithNoDate = {
     },
   },
 };
+
+export const ShownWithNoSummary = {
+  args: {
+    experience: {
+      ...generateRandomExperiences(1)[0],
+      summary: "",
+    },
+  },
+};

@@ -26,6 +26,9 @@ export const mockExperiences: Experience[] = [
         altLabels: ["Interpersonal Communication", "Public Speaking"],
       },
     ],
+    summary:
+      "Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that " +
+      "improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.",
   },
   {
     UUID: "c3c8b43d-73dd-4c6d-9e71-010492e86d5e",
@@ -49,6 +52,9 @@ export const mockExperiences: Experience[] = [
         altLabels: ["Interpersonal Communication", "Public Speaking"],
       },
     ],
+    summary:
+      "Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that " +
+      "improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.",
   },
 ];
 
@@ -157,6 +163,7 @@ const generateRandomExperience = (workType?: WorkType): Experience => {
     start_date: startDate,
     end_date: endDate,
     experience_title: jobTitles[Math.floor(Math.random() * jobTitles.length)],
+    summary: faker.lorem.paragraphs(3, "\n"),
     company: companyNames[Math.floor(Math.random() * companyNames.length)],
     location: locations[Math.floor(Math.random() * locations.length)],
     work_type: randomWorkType,

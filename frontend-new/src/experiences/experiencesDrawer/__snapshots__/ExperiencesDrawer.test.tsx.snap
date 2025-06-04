@@ -233,6 +233,12 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                      (New York, NY)
                   </i>
                 </p>
+                <p
+                  class="MuiTypography-root MuiTypography-body2 css-1ndnk23-MuiTypography-root"
+                  data-testid="experiences-drawer-content-summary-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                >
+                  Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
+                </p>
                 <div
                   class="MuiBox-root css-70qvj9"
                 >
@@ -352,6 +358,12 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                   <i>
                      (New York, NY)
                   </i>
+                </p>
+                <p
+                  class="MuiTypography-root MuiTypography-body2 css-1ndnk23-MuiTypography-root"
+                  data-testid="experiences-drawer-content-summary-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                >
+                  Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
                 </p>
                 <div
                   class="MuiBox-root css-70qvj9"

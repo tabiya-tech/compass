@@ -30,6 +30,8 @@ describe("ExperiencesReportContent", () => {
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_COMPANY)).toBeInTheDocument();
     // AND the location to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_LOCATION)).toBeInTheDocument();
+    // AND the report content experience summary to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_SUMMARY)).toBeInTheDocument();
     // AND to match the snapshot
     expect(reportContentContainer).toMatchSnapshot();
   });

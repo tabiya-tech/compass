@@ -4,7 +4,7 @@ import { capitalizeFirstLetter } from "src/experiences/report/reportPdf/componen
 import { ReportContent } from "src/experiences/report/reportContent";
 import { COLORS } from "src/experiences/report/util";
 
-export const generateExperience = (experience: Experience) : Paragraph[] => {
+export const generateExperience = (experience: Experience): Paragraph[] => {
   const titleParagraph = new Paragraph({
     children: [
       new TextRun({
@@ -62,6 +62,24 @@ export const generateExperience = (experience: Experience) : Paragraph[] => {
     },
   });
 
+  // display summary if it exists
+  const summaryParagraph = experience.summary
+    ? [
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: experience.summary,
+              color: COLORS.textBlack,
+              size: 22,
+            }),
+          ],
+          spacing: {
+            after: 100,
+          },
+        }),
+      ]
+    : [];
+
   const skillsParagraph = new Paragraph({
     children: [
       new TextRun({
@@ -92,5 +110,5 @@ export const generateExperience = (experience: Experience) : Paragraph[] => {
       })
   );
 
-  return [titleParagraph, dateParagraph, skillsParagraph, ...skillsList];
+  return [titleParagraph, dateParagraph, ...summaryParagraph, skillsParagraph, ...skillsList];
 };

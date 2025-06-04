@@ -31,6 +31,8 @@ describe("ReportDrawerContent", () => {
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_SKILLS)).toBeInTheDocument();
     // AND the report drawer skills container to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_SKILLS_CONTAINER)).toBeInTheDocument();
+    // AND the report drawer content experience summary to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_SUMMARY)).toBeInTheDocument();
     // AND the report drawer chips to be in the document
     const chips = screen.getAllByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_CHIP);
     chips.forEach((chip) => expect(chip).toBeInTheDocument());

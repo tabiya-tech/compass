@@ -60,6 +60,9 @@ class Experience(BaseModel):
     top_skills: List[Skill] = Field(default_factory=list)
     """The top skills of the experience"""
 
+    summary: Optional[str] = None
+    """A summary of the experience"""
+
     @field_serializer("work_type")
     def serialize_group(self, work_type: WorkType, _info):
         # If work_type is None, return None to avoid serialization error
