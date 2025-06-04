@@ -146,3 +146,23 @@ export const ShownWithNoLocation = () => {
     </PrimaryButton>
   );
 };
+
+export const ShownWithNoSummary = () => {
+  return (
+    <PrimaryButton
+      onClick={() =>
+        reportDownloadProvider.download({
+          ...mockedData,
+          experiences: [
+            {
+              ...generateRandomExperiences(1)[0],
+              summary: "",
+            },
+          ],
+        })
+      }
+    >
+      Download Report Docx
+    </PrimaryButton>
+  );
+};

@@ -13,6 +13,7 @@ export const DATA_TEST_ID = {
   EXPERIENCES_DRAWER_CONTENT_OCCUPATION: `experiences-drawer-content-occupation-${uniqueId}`,
   EXPERIENCES_DRAWER_CONTENT_SKILLS: `experiences-drawer-content-skills-${uniqueId}`,
   EXPERIENCES_DRAWER_SKILLS_CONTAINER: `experiences-drawer-skills-container-${uniqueId}`,
+  EXPERIENCES_DRAWER_CONTENT_SUMMARY: `experiences-drawer-content-summary-${uniqueId}`,
   EXPERIENCES_DRAWER_CHIP: `experiences-drawer-chip-${uniqueId}`,
   EXPERIENCES_DRAWER_POPOVER: `experiences-drawer-popover-${uniqueId}`,
 };
@@ -72,6 +73,11 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => 
         {/* display the location if it exists */}
         {experience.location && <i>{` (${experience.location})`}</i>}
       </Typography>
+      {experience.summary && (
+        <Typography variant="body2" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_SUMMARY}>
+          {experience.summary}
+        </Typography>
+      )}
       <Box display="flex" alignItems="center">
         <Typography
           variant="body1"

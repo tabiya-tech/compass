@@ -194,6 +194,14 @@ exports[`Report should render Report correctly 1`] = `
                     (New York, NY)
                   </text>
                 </view>
+                <text
+                  data-testid="experiences-content-report-summary-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+                  style="font-size: 11px; padding-bottom: 6px; word-break: break-word;"
+                  x="0"
+                  y="0"
+                >
+                  Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
+                </text>
                 <view>
                   <text
                     style="font-size: 11px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"
@@ -296,6 +304,14 @@ exports[`Report should render Report correctly 1`] = `
                     (New York, NY)
                   </text>
                 </view>
+                <text
+                  data-testid="experiences-content-report-summary-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+                  style="font-size: 11px; padding-bottom: 6px; word-break: break-word;"
+                  x="0"
+                  y="0"
+                >
+                  Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
+                </text>
                 <view>
                   <text
                     style="font-size: 11px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"

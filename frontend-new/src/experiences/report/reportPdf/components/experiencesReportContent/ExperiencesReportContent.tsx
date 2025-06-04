@@ -18,6 +18,7 @@ export const DATA_TEST_ID = {
   EXPERIENCES_CONTENT_REPORT_EXPERIENCE_INFO: `experiences-content-report-experience-info-${uniqueId}`,
   EXPERIENCES_CONTENT_REPORT_COMPANY: `experiences-content-report-company-${uniqueId}`,
   EXPERIENCES_CONTENT_REPORT_LOCATION: `experiences-content-report-location-${uniqueId}`,
+  EXPERIENCES_CONTENT_REPORT_SUMMARY: `experiences-content-report-summary-${uniqueId}`,
 };
 
 export const capitalizeFirstLetter = (string: string): string => {
@@ -54,6 +55,11 @@ const ExperiencesReportContent: React.FC<ExperienceProps> = ({ experience }) => 
             {experience.location && `(${experience.location})`}
           </Text>
         </View>
+        {experience.summary && (
+          <Text x={0} y={0} style={styles.summary} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_SUMMARY}>
+            {experience.summary}
+          </Text>
+        )}
         <View>
           <Text x={0} y={0} style={styles.skillsTitle}>
             {ReportContent.TOP_SKILLS_TITLE}

@@ -89,3 +89,14 @@ export const ShownWithUncategorizedExperiences = {
     conversationCompleted: true,
   },
 };
+
+const ShownWithNoSummary_experiences = generateRandomExperiences(1);
+ShownWithNoSummary_experiences.forEach((experience) => {
+  experience.summary = "";
+});
+export const ShownWithNoSummary = {
+  args: {
+    isOpen: true,
+    experiences: ShownWithNoSummary_experiences,
+  },
+};

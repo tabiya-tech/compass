@@ -124,6 +124,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     ...fontStyles.bold,
   },
+  summary: {
+    fontSize: 11,
+    paddingBottom: 6,
+    wordBreak: "break-word",
+  },
   experienceInfo: {
     display: "flex",
     flexDirection: "row",
