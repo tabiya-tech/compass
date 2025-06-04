@@ -18,7 +18,9 @@ def _get_zone_name(domain_name: str) -> str:
     _hashed_domain_name = hash_string(domain_name)
     _prefix = "zone-"
     # ensure that the zone name is less than 63 characters and the has is completely included
-    return f"{_prefix}{_domain_name[:63 - len(_prefix) - len(_hashed_domain_name)]}-{_hashed_domain_name}"
+    # We are removing the length of the connector, a dash (-) and the length of the prefix.
+    _connector_length = 1  # the length of the dash (-) connector
+    return f"{_prefix}{_domain_name[:63 - len(_prefix) - len(_hashed_domain_name) - _connector_length]}-{_hashed_domain_name}"
 
 
 def _create_dns(*, basic_config: ProjectBaseConfig, domain_name: pulumi.Output[str]) -> gcp.dns.ManagedZone:
