@@ -78,10 +78,17 @@ class SkillsExplorerAgentState(BaseModel):
     @staticmethod
     def from_document(_doc: Mapping[str, Any]) -> "SkillsExplorerAgentState":
         return SkillsExplorerAgentState(session_id=_doc["session_id"],
-                                        # For backward compatibility with old documents that don't have the country_of_user field, set it to UNSPECIFIED
+                                        # For backward compatibility with old documents that don't have the country_of_user field,
+                                        # set it to UNSPECIFIED
                                         country_of_user=_doc.get("country_of_user", Country.UNSPECIFIED),
                                         first_time_for_experience=_doc["first_time_for_experience"],
-                                        experiences_explored=_doc["experiences_explored"])
+                                        experiences_explored=_doc["experiences_explored"],
+                                        # For backward compatibility with old documents that don't have the question_asked_until_now field,
+                                        # set it to an empty list
+                                        question_asked_until_now=_doc.get("question_asked_until_now", []),
+                                        # For backward compatibility with old documents that don't have the answers_provided field,
+                                        # set it to an empty list
+                                        answers_provided=_doc.get("answers_provided", []))
 
 
 class SkillsExplorerAgent(Agent):
@@ -190,6 +197,10 @@ class SkillsExplorerAgent(Agent):
             self.state.experiences_explored.append(structured_summary)
 
             # set the questions and answers
+            if len(self.state.question_asked_until_now) != len(self.state.answers_provided):
+                self.logger.warning("The number of questions asked (%d) does not match the number of answers provided (%d).",
+                                    len(self.state.question_asked_until_now), len(self.state.answers_provided))
+                # If they don't match, we will just zip them, but this may lead to loss of information
             self.experience_entity.questions_and_answers = list(zip(self.state.question_asked_until_now, self.state.answers_provided))
 
         conversation_llm_output.llm_stats = responsibilities_llm_stats + conversation_llm_output.llm_stats

@@ -16,10 +16,11 @@ from app.agent.explore_experiences_agent_director import ConversationPhase as Ex
     ExperienceState, DiveInPhase
 from app.application_state import ApplicationState
 from app.conversation_memory.conversation_memory_types import ConversationHistory, ConversationTurn
+from app.countries import Country
 from app.server_dependencies.database_collections import Collections
 from app.store.database_application_state_store import DatabaseApplicationStateStore
 from app.users.generate_session_id import generate_new_session_id
-from app.vector_search.esco_entities import SkillEntity
+from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity, OccupationEntity, AssociatedSkillEntity
 from common_libs.test_utilities.guard_caplog import guard_caplog
 from conftest import random_db_name
 
@@ -43,6 +44,8 @@ def database_application_state_store(in_memory_db) -> DatabaseApplicationStateSt
 
 def update_welcome_agent_state(application_state: ApplicationState):
     application_state.welcome_agent_state.is_first_encounter = random.choice([True, False])  # nosec B311 # random is used for testing purposes
+    application_state.welcome_agent_state.country_of_user = random.choice(list(Country)) # nosec B311 # random is used for testing purposes
+    application_state.welcome_agent_state.user_started_discovery = random.choice([True, False])  # nosec B311 # random is used for testing purposes
 
 
 def update_agent_director_state(application_state: ApplicationState):
@@ -61,6 +64,35 @@ def generate_random_experience(index: int) -> ExperienceEntity:
         work_type=random.choice(list(WorkType)),  # nosec B311 # random is used for testing purposes
         responsibilities=ResponsibilitiesData(responsibilities=[f"Responsibility {index}"]),
         questions_and_answers=[(f"Question {index}", f"Answer {index}")],
+        summary=f"Summary for experience {index}",
+        esco_occupations=[
+            OccupationSkillEntity(
+                occupation=OccupationEntity(
+                    id=f"Occupation {index}",
+                    UUID=str(uuid4()),
+                    modelId=str(ObjectId()),
+                    preferredLabel=f"preferred label {index}",
+                    altLabels=[f"label {index}", f"label {index + 1}"],
+                    description=f"Occupation description {index}",
+                    score=0.5,
+                    code=f"ESCO-{index}"
+                ),
+                associated_skills=[
+                    AssociatedSkillEntity(
+                        id=f"Skill {index}",
+                        UUID=str(uuid4()),
+                        modelId=str(ObjectId()),
+                        preferredLabel=f"preferred label {index}",
+                        altLabels=[f"label {index}", f"label {index + 1}"],
+                        description=f"Skill description {index} ",
+                        score=0.5,
+                        skillType=random.choice(['skill/competence', 'knowledge', 'language', 'attitude', '']),  # nosec B311 # random is used for testing purposes
+                        relationType=random.choice(['essential', 'optional', '']),  # nosec B311 # random is used for testing purposes
+                        signallingValueLabel=random.choice(['high', 'medium', 'low', ''])  # nosec B311 # random is used for testing purposes
+                    )
+                ]
+            )
+        ],
         top_skills=[
             SkillEntity(
                 id=f"Skill {index}",
@@ -127,6 +159,8 @@ def update_conversation_memory_manager_state(application_state: ApplicationState
 def generate_collected_data(index) -> CollectedData:
     return CollectedData(
         index=index,
+        uuid=str(uuid4()),
+        defined_at_turn_number=index,
         experience_title=f"Experience {index}",
         company="Company",
         location="Location",
@@ -150,6 +184,9 @@ def update_skills_explorer_agent_state(application_state: ApplicationState):
     application_state.skills_explorer_agent_state.first_time_for_experience = {
         str(uuid4()): random.choice([True, False])}  # nosec B311 # random is used for testing purposes
     application_state.skills_explorer_agent_state.experiences_explored = [str(uuid4()) for _ in range(5)]
+    application_state.skills_explorer_agent_state.country_of_user=random.choice(list(Country))  # nosec B311 # random is used for testing purposes
+    application_state.skills_explorer_agent_state.question_asked_until_now = ["Question 1", "Question 2", "Question 3"]
+    application_state.skills_explorer_agent_state.answers_provided= ["Answer 1", "Answer 2", "Answer 3"]
 
 
 def get_test_application_state(given_session_id: int) -> ApplicationState:
