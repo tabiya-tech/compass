@@ -58,7 +58,8 @@ class WelcomeAgentState(BaseModel):
     def from_document(_doc: Mapping[str, Any]) -> "WelcomeAgentState":
         return WelcomeAgentState(session_id=_doc["session_id"],
                                  is_first_encounter=_doc["is_first_encounter"],
-                                 user_started_discovery=_doc["user_started_discovery"])
+                                 user_started_discovery=_doc["user_started_discovery"],
+                                 country_of_user=_doc.get("country_of_user", Country.UNSPECIFIED))
 
 
 class WelcomeAgentLLMResponse(BaseModel):
