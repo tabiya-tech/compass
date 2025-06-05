@@ -19,6 +19,7 @@ def main():
 
     # Get the config values
     gcp_region = getconfig("region", "gcp")
+    protected_from_deletion: bool = getconfig("protected_from_deletion").lower() == "true"
 
     environment_type: EnvironmentTypes = EnvironmentTypes(getconfig("environment_type"))
     # check that it is one of the allowed values
@@ -34,6 +35,7 @@ def main():
     root_project_id = getstackref(realm_reference, "root_project_id")
     docker_repository = getstackref(realm_reference, "docker_repository")
     base_domain_name = getstackref(realm_reference, "base_domain_name")
+    protected_from_deletion_tag = getstackref(realm_reference, "protected_from_deletion_tag")
 
     # if the environment is prod, use the compass upper folder, otherwise use the compass lower folder
     if environment_type == EnvironmentTypes.PROD:
@@ -67,7 +69,9 @@ def main():
         region=gcp_region,
         folder_id=folder_id,
         billing_account=billing_account,
-        environment_name=environment_name
+        environment_name=environment_name,
+        protected_from_deletion=protected_from_deletion,
+        protected_from_deletion_tag=protected_from_deletion_tag
     )
 
 
