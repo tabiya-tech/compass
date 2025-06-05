@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WorkExperienceAccuracyQuestion should render correctly with empty feedbackItems 1`] = `
+<div>
+  <div
+    class="MuiBox-root css-0"
+    data-testid="work-experience-accuracy-b8cad548-471b-4ec1-8a6f-bbe9028f87b9"
+  >
+    <div
+      data-testid="question-renderer-3bf900a2-f9fa-4b28-8c20-8bc21570635c"
+    />
+  </div>
+</div>
+`;
+
+exports[`WorkExperienceAccuracyQuestion should render correctly with existing feedbackItems 1`] = `
+<div>
+  <div
+    class="MuiBox-root css-0"
+    data-testid="work-experience-accuracy-b8cad548-471b-4ec1-8a6f-bbe9028f87b9"
+  >
+    <div
+      data-testid="question-renderer-3bf900a2-f9fa-4b28-8c20-8bc21570635c"
+    />
+  </div>
+</div>
+`;

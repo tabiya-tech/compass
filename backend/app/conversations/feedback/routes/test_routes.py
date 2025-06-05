@@ -12,11 +12,11 @@ import pytest_mock
 from fastapi import FastAPI, APIRouter
 from fastapi.testclient import TestClient
 
-from app.conversations.feedback.services.errors import InvalidQuestionError, InvalidOptionError
+from app.conversations.feedback.services.errors import InvalidQuestionError, InvalidOptionError, QuestionsFileError
 from app.conversations.feedback.services.service import IUserFeedbackService
 from app.conversations.feedback.services.types import NewFeedbackSpec, NewFeedbackVersionSpec, NewFeedbackItemSpec, \
     Feedback, \
-    Version, FeedbackItem, Answer
+    Version, FeedbackItem, Answer, QuestionsConfig
 from app.users.auth import UserInfo
 from app.users.get_user_preferences_repository import get_user_preferences_repository
 from app.users.repositories import IUserPreferenceRepository
@@ -82,6 +82,9 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
             raise NotImplementedError()
 
         async def get_answered_questions(self, user_id: str) -> list[int]:
+            raise NotImplementedError()
+
+        async def get_questions_config(self) -> QuestionsConfig:
             raise NotImplementedError()
 
     mocked_feedback_service = MockedFeedbackService()
@@ -351,3 +354,55 @@ class TestFeedbackRoutes:
         assert "payload" in response.json()["detail"].lower()
         # AND the service's upsert_user_feedback method was not called
         _upsert_spy.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_get_questions_config_success(self, authenticated_client_with_mocks: TestClientWithMocks):
+        client, mocked_service, _, _ = authenticated_client_with_mocks
+        # GIVEN a session ID for which the questions configuration is requested
+        given_session_id = 123
+
+        # GIVEN a valid questions configuration
+        given_config: QuestionsConfig = {
+            "test_question": {
+                "question_text": "Test question",
+                "description": "Test description",
+                "comment_placeholder": "Test placeholder",
+                "type": "yes_no",
+                "show_comments_on": "yes"
+            }
+        }
+        mocked_service.get_questions_config = AsyncMock(return_value=given_config)
+
+        # WHEN getting the questions configuration
+        response = client.get(f"/conversations/{given_session_id}/feedback/questions",)
+
+        # THEN the response should be OK
+        assert response.status_code == HTTPStatus.OK
+
+        # AND the response should contain the questions configuration
+        actual_config = response.json()
+        assert actual_config == given_config
+
+        # AND the service's get_questions_config method was called
+        mocked_service.get_questions_config.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_get_questions_config_error(self, authenticated_client_with_mocks: TestClientWithMocks):
+        client, mocked_service, _, _ = authenticated_client_with_mocks
+        # GIVEN a session ID for which the questions configuration is requested
+        given_session_id = 123
+
+        # GIVEN the service raises a QuestionsFileError
+        mocked_service.get_questions_config = AsyncMock(side_effect=QuestionsFileError("Test error"))
+
+        # WHEN getting the questions configuration
+        response = client.get(f"/conversations/{given_session_id}/feedback/questions",)
+
+        # THEN the response should be INTERNAL_SERVER_ERROR
+        assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+
+        # AND the response should contain the error message
+        assert response.json()["detail"] == "Failed to load questions configuration"
+
+        # AND the service's get_questions_config method was called
+        mocked_service.get_questions_config.assert_called_once()

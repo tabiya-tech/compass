@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormContent should render component successfully 1`] = `
+<div
+  class="MuiBox-root css-llfxzc"
+  data-testid="feedback-form-content-07d1ed9d-6ced-4a24-912a-9b89199df67f"
+>
+  <div
+    class="MuiBox-root css-136j4hj"
+  >
+    <div
+      animate="center"
+      custom="-1"
+      exit="exit"
+      initial="enter"
+      style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px;"
+      transition="[object Object]"
+      variants="[object Object]"
+    >
+      <div
+        class="MuiBox-root css-16qyt99"
+        data-testid="feedback-form-content-questions-07d1ed9d-6ced-4a24-912a-9b89199df67f"
+      >
+        <p
+          class="MuiTypography-root MuiTypography-body1 MuiTypography-gutterBottom css-1s8fdmd-MuiTypography-root"
+          data-testid="feedback-form-content-title-07d1ed9d-6ced-4a24-912a-9b89199df67f"
+        >
+          Bias & Experience Accuracy
+        </p>
+        <div
+          data-testid="perceived-bias-f60211ff-b133-41e5-9457-bb55d8d6b350"
+        />
+        <div
+          data-testid="work-experience-accuracy-b8cad548-471b-4ec1-8a6f-bbe9028f87b9"
+        />
+      </div>
+    </div>
+  </div>
+  <hr
+    class="MuiDivider-root MuiDivider-fullWidth css-4rn412-MuiDivider-root"
+    color="primary"
+    data-testid="feedback-form-content-divider-07d1ed9d-6ced-4a24-912a-9b89199df67f"
+  />
+  <div
+    class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiMobileStepper-root MuiMobileStepper-positionStatic css-ufcsdh-MuiPaper-root-MuiMobileStepper-root"
+  >
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-187exs5-MuiButtonBase-root-MuiButton-root"
+      data-testid="feedback-form-back-button-07d1ed9d-6ced-4a24-912a-9b89199df67f"
+      disabled=""
+      tabindex="-1"
+      type="button"
+    >
+      Previous
+    </button>
+    <div
+      class="MuiMobileStepper-dots css-1384nzf-MuiMobileStepper-dots"
+    >
+      <div
+        class="MuiMobileStepper-dot MuiMobileStepper-dotActive css-15nuweu-MuiMobileStepper-dot"
+      />
+      <div
+        class="MuiMobileStepper-dot css-114p2tk-MuiMobileStepper-dot"
+      />
+      <div
+        class="MuiMobileStepper-dot css-114p2tk-MuiMobileStepper-dot"
+      />
+    </div>
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+      data-testid="feedback-form-next-button-07d1ed9d-6ced-4a24-912a-9b89199df67f"
+      style="width: 100px;"
+      tabindex="0"
+      type="button"
+    >
+      Next
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+  </div>
+</div>
+`;
