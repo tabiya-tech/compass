@@ -5,14 +5,15 @@ import asyncio
 import json
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, cast
+from typing import Any, Dict
 from pathlib import Path
 
 from app.conversations.feedback.repository import IUserFeedbackRepository
 from app.app_config import get_application_config
 from app.metrics.services.service import IMetricsService
 from app.metrics.types import FeedbackProvidedEvent, FeedbackRatingValueEvent, FeedbackTypeLiteral
-from .types import Feedback, NewFeedbackSpec, FeedbackItem, Version, AnsweredQuestions
+from .types import Feedback, NewFeedbackSpec, FeedbackItem, Version, AnsweredQuestions, QuestionsConfig, Question, YesNoQuestion, RatingQuestion, \
+    CheckboxQuestion
 from .errors import (
     InvalidQuestionError,
     QuestionsFileError
@@ -91,6 +92,11 @@ def calculate_ces_value(answer: int) -> int:
 
 
 async def load_questions() -> Dict[str, Any]:
+    """
+    Load questions from the JSON file.
+    :return: Dictionary containing questions data
+    :raises QuestionsFileError: If there's an error loading the questions file
+    """
     global questions_cache
     if not questions_cache:
         questions_file = Path(__file__).parent / "questions-en.json"
@@ -134,6 +140,16 @@ class IUserFeedbackService(ABC):
         """
         raise NotImplementedError()
 
+    @abstractmethod
+    async def get_questions_config(self) -> QuestionsConfig:
+        """
+        Get the questions configuration for the feedback form.
+
+        :return: The questions configuration
+        :raises QuestionsFileError: If there's an error loading the questions file
+        """
+        raise NotImplementedError()
+
 
 class UserFeedbackService(IUserFeedbackService):
     """
@@ -144,6 +160,32 @@ class UserFeedbackService(IUserFeedbackService):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._user_feedback_repository: IUserFeedbackRepository = user_feedback_repository
         self._metrics_service: IMetricsService = metrics_service
+
+    async def get_questions_config(self) -> QuestionsConfig:
+        """
+        Get the questions configuration for the feedback form.
+
+        :return: The questions configuration
+        :raises QuestionsFileError: If there's an error loading the questions file
+        """
+        questions_data = await load_questions()
+        if not questions_data:
+            raise QuestionsFileError("No questions data available")
+
+        # Convert the raw questions data to the proper Pydantic models
+        config: QuestionsConfig = {}
+        for question_id, question_data in questions_data.items():
+            question_type = question_data.get("type")
+            if question_type == "yes_no":
+                config[question_id] = YesNoQuestion(**question_data)
+            elif question_type == "rating":
+                config[question_id] = RatingQuestion(**question_data)
+            elif question_type == "checkbox":
+                config[question_id] = CheckboxQuestion(**question_data)
+            else:
+                raise QuestionsFileError(f"Invalid question type '{question_type}' for question '{question_id}'")
+
+        return config
 
     async def upsert_user_feedback(self, user_id: str, session_id: int, feedback_spec: NewFeedbackSpec) -> Feedback:
         questions_data = await load_questions()
@@ -225,7 +267,7 @@ class UserFeedbackService(IUserFeedbackService):
                     logger.error(f"Rating value {item.answer.rating_numeric} for question {item.question_id} is out of range (1-5)")
                     continue
                 feedback_type: FeedbackTypeLiteral
-                match item.question_id:
+                match item.question_id: # TODO: check unreachable
                     case "recommendation":
                         feedback_type = "NPS"
                         value = calculate_nps_value(item.answer.rating_numeric)

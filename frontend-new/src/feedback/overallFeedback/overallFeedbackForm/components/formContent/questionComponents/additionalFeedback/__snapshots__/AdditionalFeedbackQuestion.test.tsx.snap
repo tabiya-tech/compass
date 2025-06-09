@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AdditionalFeedbackQuestion should render correctly with empty feedbackItems 1`] = `
+<div>
+  <div
+    class="MuiBox-root css-0"
+    data-testid="additional-feedback-5d5def55-b805-4ef6-84cd-e0388d0e7cca"
+  >
+    <div
+      data-testid="question-renderer-3bf900a2-f9fa-4b28-8c20-8bc21570635c"
+    />
+  </div>
+</div>
+`;
+
+exports[`AdditionalFeedbackQuestion should render correctly with existing feedbackItems 1`] = `
+<div>
+  <div
+    class="MuiBox-root css-0"
+    data-testid="additional-feedback-5d5def55-b805-4ef6-84cd-e0388d0e7cca"
+  >
+    <div
+      data-testid="question-renderer-3bf900a2-f9fa-4b28-8c20-8bc21570635c"
+    />
+  </div>
+</div>
+`;
