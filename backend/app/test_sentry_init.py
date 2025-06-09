@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, call
 
 from app.app_config import ApplicationConfig
 from app.sentry_init import init_sentry, set_sentry_contexts
@@ -9,11 +9,11 @@ from app.context_vars import session_id_ctx_var, user_id_ctx_var
 @pytest.fixture
 def mock_sentry():
     with patch('sentry_sdk.init') as mock_init, \
-            patch('sentry_sdk.set_user') as mock_set_user, \
+            patch('sentry_sdk.set_tag') as mock_set_tag, \
             patch('sentry_sdk.set_context') as mock_set_context:
         yield {
             'init': mock_init,
-            'set_user': mock_set_user,
+            'set_tag': mock_set_tag,
             'set_context': mock_set_context
         }
 
@@ -96,12 +96,12 @@ def test_before_send_hook(mock_sentry):
     hint = MagicMock()
     before_send(event, hint)
 
-    # THEN sentry.set_user is called with the correct context vars
-    mock_sentry['set_user'].assert_called_once()
-    mock_sentry['set_user'].assert_called_with({
-        "session_id": session_id_ctx_var.get(),
-        "user_id": user_id_ctx_var.get()
-    })
+    # THEN sentry.set_tag is called with the correct context vars
+    mock_sentry['set_tag'].assert_has_calls([
+        call("session_id", session_id_ctx_var.get()),
+        call("user_id", user_id_ctx_var.get())
+    ])
+    assert mock_sentry['set_tag'].call_count == 2
 
 
 def test_set_sentry_contexts(mock_sentry , setup_application_config: ApplicationConfig):
