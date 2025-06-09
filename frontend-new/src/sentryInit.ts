@@ -4,6 +4,8 @@ import React from "react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
 import { serializeError } from "./error/errorSerializer";
 import InfoService from "./info/info.service";
+import AuthenticationStateService from "./auth/services/AuthenticationState.service";
+import UserPreferencesStateService from "./userPreferences/UserPreferencesStateService";
 
 export interface SentryConfig {
   // See https://docs.sentry.io/platforms/javascript/configuration/options/
@@ -127,6 +129,11 @@ export function initSentry() {
           ...event.extra,
           errorDetails: serialized,
         };
+        event.tags = {
+          ...event.tags,
+          user_id: AuthenticationStateService.getInstance().getUser()?.id,
+          session_id: UserPreferencesStateService.getInstance().getActiveSessionId()
+        }
       }
       return event;
     },

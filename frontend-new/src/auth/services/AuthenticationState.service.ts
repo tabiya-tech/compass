@@ -1,6 +1,5 @@
 import { TabiyaUser } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import * as Sentry from "@sentry/react";
 
 /**
  * AuthenticationStateService manages the authentication state of the application.
@@ -65,14 +64,6 @@ export default class AuthenticationStateService {
    */
   public setUser(user: TabiyaUser | null): TabiyaUser | null {
     this.user = user;
-    // Set the session context for Sentry so that we can track the user id in errors
-    try {
-      Sentry.setUser({
-        user_id: user?.id ?? "UNKNOWN",
-      });
-    } catch (err) {
-      console.error("Error setting Sentry user context", err);
-    }
     return this.user;
   }
 
