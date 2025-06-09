@@ -139,7 +139,7 @@ class _ConversationLLM:
             filtered_history = [turn for turn in context.history.turns if turn.output.agent_type == AgentType.COLLECT_EXPERIENCES_AGENT]
             filtered_context = ConversationContext(all_history=ConversationHistory(turns=filtered_history),
                                                    history=ConversationHistory(turns=filtered_history),
-                                                   summary= context.summary)
+                                                   summary=context.summary)
             # Filter all turns that are not from this agent
             llm_input = ConversationHistoryFormatter.format_for_agent_generative_prompt(
                 model_response_instructions=None,
@@ -264,7 +264,7 @@ class _ConversationLLM:
                 and that for now we are only collecting basic information.
                 
                 Do not ask me questions that are not related to the experience data fields listed above.
-                
+///                
 ///               Avoid asking multiple questions at once to collect multiple pieces of information, try to collect one-two pieces of information at a time. 
 ///               If you do ask for multiple pieces of information 
 ///               at once and I provide only one piece, ask for the missing information in a follow-up question.
@@ -274,7 +274,6 @@ class _ConversationLLM:
                 Make sure to include in the summary the title, company, location and timeline information you have gathered and is '#Collected Experience Data'
                 and not information from the conversation history.   
                 You will wait for my response before moving on to the next work experience as outlined in the '#Experiences To Explore' section.
-                This approach ensures that the information is accurate and complete before proceeding to the next work experience.
                 
                 ##'experience_title' instructions
                     The title of the work experience
@@ -327,7 +326,7 @@ class _ConversationLLM:
                     If I have not provided the location, ask me for it.
                     Choose the question to ask based on the context of the work experience (company, title etc).
                     In case of caregiving for family, helping in the household, do not ask for an exact address, just the city or region would be sufficient.
-                    Do not ask for any personal information such as the address of a person,of a family, or a household.
+                    Do not ask for any personal information such as the address of a person, of a family, or a household.
             #Collected Experience Data 
                 All the work experiences you have collected so far:
                     {collected_experience_data}
@@ -501,9 +500,9 @@ def _get_missing_fields(collected_data: list[CollectedData], index: int) -> str:
     missing_fields = []
     if experience_data.experience_title is None:
         missing_fields.append("experience_title")
-    #if experience_data.paid_work is None:
+    # if experience_data.paid_work is None:
     #    missing_fields.append("paid_work")
-    #if experience_data.work_type is None:
+    # if experience_data.work_type is None:
     #    missing_fields.append("work_type")
     if experience_data.start_date is None:
         missing_fields.append("start_date")
@@ -527,9 +526,9 @@ def _get_not_missing_fields(collected_data: list[CollectedData], index: int) -> 
     not_missing_fields = []
     if experience_data.experience_title is not None:
         not_missing_fields.append("experience_title")
-    #if experience_data.paid_work is not None:
+    # if experience_data.paid_work is not None:
     #    not_missing_fields.append("paid_work")
-    #if WorkType.from_string_key(experience_data.work_type) is not None:
+    # if WorkType.from_string_key(experience_data.work_type) is not None:
     #    not_missing_fields.append("work_type")
     if experience_data.start_date is not None:
         not_missing_fields.append("start_date")
