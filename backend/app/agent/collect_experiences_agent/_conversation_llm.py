@@ -364,11 +364,7 @@ class _ConversationLLM:
                                                 exploring_type_instructions=_get_explore_experiences_instructions(
                                                     collected_data=collected_data,
                                                     exploring_type=exploring_type,
-                                                    unexplored_types=unexplored_types,
-                                                    explored_types=explored_types,
-                                                    formal_experiences_found=_get_experience_count(
-                                                        [WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT, WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
-                                                         WorkType.SELF_EMPLOYMENT], collected_data)
+                                                    explored_types=explored_types
                                                 ),
                                                 collected_experience_data=_get_collected_experience_data(collected_data),
                                                 missing_fields=_get_missing_fields(collected_data, last_referenced_experience_index),
@@ -600,27 +596,10 @@ def _ask_experience_type_question(work_type: WorkType) -> str:
 def _get_explore_experiences_instructions(*,
                                           collected_data: list[CollectedData],
                                           exploring_type: WorkType,
-                                          unexplored_types: list[WorkType],
                                           explored_types: list[WorkType],
-                                          formal_experiences_found: int,
                                           ) -> str:
     if exploring_type is not None:
         questions_to_ask: str = _ask_experience_type_question(exploring_type)
-
-        focus_unseen_instructions = ""
-        if formal_experiences_found == 0 and exploring_type == WorkType.UNSEEN_UNPAID:
-            focus_unseen_instructions = dedent("""
-            It seems I have no prior paid work experiences. 
-            You should focus on discovering work experiences that I might have and include unpaid work such as: 
-                - community volunteering work, 
-                - caregiving for a family, 
-                - helping in a household, 
-            In case I am unable to name any work experiences, ask me to take a moment to think 
-            and give me more examples of work experiences that include unpaid work and explicitly explain 
-            that these work experiences could help me explore skills that can signal to potential employers that I am a good candidate,
-            before politely give-up and moving to the next phase.
-            """)
-
         experiences_in_type = _get_experience_type(exploring_type)
         # excluding_experiences = _get_excluding_experiences(exploring_type)
         # already_explored_types = _get_experience_types(explored_types)
@@ -635,8 +614,8 @@ def _get_explore_experiences_instructions(*,
         Here are typical questions you can ask me when exploring work experiences, frame them to fit the flow of the conversation:
             {questions_to_ask}
         
-        {focus_unseen_instructions}
-       
+        ///{focus_unseen_instructions}
+        ///
         Do not assume whether or not I have these kind of work experiences.
         
         Gather as many of work experiences as possible that include '{experiences_in_type}', or until I explicitly state that I have no more to share.
@@ -657,7 +636,6 @@ def _get_explore_experiences_instructions(*,
         """)
         return replace_placeholders_with_indent(instructions_template,
                                                 questions_to_ask=questions_to_ask,
-                                                focus_unseen_instructions=focus_unseen_instructions,
                                                 experiences_in_type=experiences_in_type,
                                                 # excluding_experiences=excluding_experiences,
                                                 # already_explored_types=already_explored_types,
@@ -673,14 +651,6 @@ def _get_explore_experiences_instructions(*,
             
             '#Transition' instructions will guide you on how to transition to the next phase.
             """), explored_types=_get_experience_types(explored_types))
-
-
-def _get_experience_count(work_types: list[WorkType], collected_data: list[CollectedData]) -> int:
-    count = 0
-    for data in collected_data:
-        if WorkType.from_string_key(data.work_type) in work_types:
-            count += 1
-    return count
 
 
 def _get_example_summary() -> str:
