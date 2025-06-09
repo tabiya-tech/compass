@@ -216,23 +216,27 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                 class="MuiBox-root css-yj95vr"
                 data-testid="experiences-drawer-content-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
               >
-                <p
-                  class="MuiTypography-root MuiTypography-body1 css-vvbmpr-MuiTypography-root"
-                  data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                <div
+                  class="MuiBox-root css-1kkt86i"
                 >
-                  Project Manager
-                </p>
-                <p
-                  class="MuiTypography-root MuiTypography-body2 css-1ndnk23-MuiTypography-root"
-                  data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-                >
-                  2022 — Present
-                  , 
-                  Business Inc
-                  <i>
-                     (New York, NY)
-                  </i>
-                </p>
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-vvbmpr-MuiTypography-root"
+                    data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                  >
+                    Project Manager
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-1s89n9g-MuiTypography-root"
+                    data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                  >
+                    2022 — Present
+                    , 
+                    Business Inc
+                    <i>
+                       (New York, NY)
+                    </i>
+                  </span>
+                </div>
                 <p
                   class="MuiTypography-root MuiTypography-body2 css-1ndnk23-MuiTypography-root"
                   data-testid="experiences-drawer-content-summary-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
@@ -342,23 +346,27 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                 class="MuiBox-root css-yj95vr"
                 data-testid="experiences-drawer-content-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
               >
-                <p
-                  class="MuiTypography-root MuiTypography-body1 css-vvbmpr-MuiTypography-root"
-                  data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                <div
+                  class="MuiBox-root css-1kkt86i"
                 >
-                  Project Manager
-                </p>
-                <p
-                  class="MuiTypography-root MuiTypography-body2 css-1ndnk23-MuiTypography-root"
-                  data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-                >
-                  2022 — Present
-                  , 
-                  Business Inc
-                  <i>
-                     (New York, NY)
-                  </i>
-                </p>
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-vvbmpr-MuiTypography-root"
+                    data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                  >
+                    Project Manager
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-1s89n9g-MuiTypography-root"
+                    data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                  >
+                    2022 — Present
+                    , 
+                    Business Inc
+                    <i>
+                       (New York, NY)
+                    </i>
+                  </span>
+                </div>
                 <p
                   class="MuiTypography-root MuiTypography-body2 css-1ndnk23-MuiTypography-root"
                   data-testid="experiences-drawer-content-summary-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
