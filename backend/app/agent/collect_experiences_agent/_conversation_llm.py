@@ -436,6 +436,10 @@ def _transition_instructions(*,
                                                 # excluding_experiences=_get_excluding_experiences(exploring_type)
                                                 )
     else:  # Summarize and confirm the collected data
+
+        duplicate_hint = ""
+        if len(collected_data) > 1:
+            duplicate_hint = "Also, with the above question inform me that if one of the work experiences seems to be duplicated, I can ask you to remove it.\n"
         summarize_and_confirm = dedent("""
             Explicitly summarize all the work experiences you collected and explicitly ask me if I would like to add or change anything in the information 
             you collected before moving forward to the next step. 
@@ -444,8 +448,7 @@ def _transition_instructions(*,
                 {summary_of_experiences}
                 Is there anything you would like to add or change?"
             The summary is in plain text (no Markdown, JSON, or other formats).
-            Also with the above question inform me that if one of the work experiences seems to be duplicated, I can ask you to remove it.
-             
+            {duplicate_hint}             
             You must wait for me to respond to your question and explicitly confirm that I have nothing to add or change 
             to the information presented in the summary. 
             
@@ -460,7 +463,9 @@ def _transition_instructions(*,
             
             You must perform the summarization and confirmation step before ending the conversation.
             """)
-        return replace_placeholders_with_indent(summarize_and_confirm, summary_of_experiences=_get_summary_of_experiences(collected_data))
+        return replace_placeholders_with_indent(summarize_and_confirm,
+                                                summary_of_experiences=_get_summary_of_experiences(collected_data),
+                                                duplicate_hint=duplicate_hint)
 
 
 def _get_collected_experience_data(collected_data: list[CollectedData]) -> str:
