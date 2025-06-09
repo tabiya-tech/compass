@@ -53,26 +53,32 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => 
     <Box
       display="flex"
       flexDirection="column"
-      gap={isSmallMobile ? 4 : theme.tabiyaSpacing.md}
+      gap={isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.sm) : theme.tabiyaSpacing.md}
       data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_CONTAINER}
     >
-      <Typography variant="body1" fontWeight="bold" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_OCCUPATION}>
-        {experience.experience_title ? experience.experience_title : <i>Untitled!</i>}
-      </Typography>
-      <Typography variant="body2" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_DATE}>
-        {/* display the start and end dates */}
-        {experience.end_date && experience.start_date
-          ? `${experience.start_date} — ${experience.end_date}`
-          : experience.start_date || experience.end_date}
+      <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
+        <Typography variant="body1" fontWeight="bold" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_OCCUPATION}>
+          {experience.experience_title ? experience.experience_title : <i>Untitled!</i>}
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{ color: theme.palette.text.secondary }}
+          data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_DATE}
+        >
+          {/* display the start and end dates */}
+          {experience.end_date && experience.start_date
+            ? `${experience.start_date} — ${experience.end_date}`
+            : experience.start_date || experience.end_date}
 
-        {(experience.start_date || experience.end_date) && experience.company && ", "}
+          {(experience.start_date || experience.end_date) && experience.company && ", "}
 
-        {/* display the company if it exists */}
-        {experience.company && experience.company}
+          {/* display the company if it exists */}
+          {experience.company && experience.company}
 
-        {/* display the location if it exists */}
-        {experience.location && <i>{` (${experience.location})`}</i>}
-      </Typography>
+          {/* display the location if it exists */}
+          {experience.location && <i>{` (${experience.location})`}</i>}
+        </Typography>
+      </Box>
       {experience.summary && (
         <Typography variant="body2" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_SUMMARY}>
           {experience.summary}
