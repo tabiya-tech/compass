@@ -12,7 +12,7 @@ from app.agent.penalty import get_penalty
 from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER, STD_LANGUAGE_STYLE
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
-from app.conversation_memory.conversation_memory_types import ConversationContext
+from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory
 from app.countries import Country
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
@@ -136,11 +136,14 @@ class _ConversationLLM:
                 ))
             # Drop the first message from the conversation history, which is the welcome message from the welcome agent.
             # This message is treated as an instruction and causes the conversation to go off track.
-            context_copy = context.model_copy(deep=True)  # make a deep copy of the context to avoid modifying the original context
-            context_copy.history.turns.pop(0)
+            filtered_history = [turn for turn in context.history.turns if turn.output.agent_type == AgentType.COLLECT_EXPERIENCES_AGENT]
+            filtered_context = ConversationContext(all_history=ConversationHistory(turns=filtered_history),
+                                                   history=ConversationHistory(turns=filtered_history),
+                                                   summary= context.summary)
+            # Filter all turns that are not from this agent
             llm_input = ConversationHistoryFormatter.format_for_agent_generative_prompt(
                 model_response_instructions=None,
-                context=context_copy,
+                context=filtered_context,
                 user_input=msg)
             llm_response = await llm.generate_content(llm_input=llm_input)
 
