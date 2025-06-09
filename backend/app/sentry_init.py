@@ -41,8 +41,6 @@ def set_sentry_contexts():
 
 def attach_ticket_info(event: Event, hint: Hint) -> Event | None:
     # Set default user context with values from context vars
-    sentry_sdk.set_user({
-        "session_id": session_id_ctx_var.get(),
-        "user_id": user_id_ctx_var.get()
-    })
+    sentry_sdk.set_tag("session_id", session_id_ctx_var.get())
+    sentry_sdk.set_tag("user_id", user_id_ctx_var.get())
     return event

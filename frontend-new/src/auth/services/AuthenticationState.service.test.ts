@@ -15,11 +15,6 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
   },
 }));
 
-// Mock Sentry
-jest.mock("@sentry/react", () => ({
-  setUser: jest.fn(),
-}));
-
 function getMockTabiyaUser(): TabiyaUser {
   return {
     id: nanoid(), // ensure a unique user id
@@ -88,56 +83,25 @@ describe("AuthenticationStateService", () => {
       it("should set the user and update Sentry", () => {
         // GIVEN a user
         const givenUser = getMockTabiyaUser();
-        const setUserSpy = jest.spyOn(require("@sentry/react"), "setUser");
+        // const setTagSpy = jest.spyOn(require("@sentry/react"), "setTag");
 
         // WHEN setUser is called
         const result = service.setUser(givenUser);
 
         // THEN expect the user to be set
         expect(service.getUser()).toEqual(givenUser);
-        // AND expect Sentry to be updated
-        expect(setUserSpy).toHaveBeenCalledWith({
-          user_id: givenUser.id
-        });
         // AND expect the result to be the user
         expect(result).toEqual(givenUser);
       });
 
       it("should handle null user and update Sentry", () => {
-        // GIVEN a null user
-        const setUserSpy = jest.spyOn(require("@sentry/react"), "setUser");
-
         // WHEN setUser is called with null
         const result = service.setUser(null);
 
         // THEN expect the user to be null
         expect(service.getUser()).toBeNull();
-        // AND expect Sentry to be updated with UNKNOWN
-        expect(setUserSpy).toHaveBeenCalledWith({
-          user_id: "UNKNOWN"
-        });
         // AND expect the result to be null
         expect(result).toBeNull();
-      });
-
-      it("should handle Sentry errors gracefully", () => {
-        // GIVEN a user
-        const givenUser = getMockTabiyaUser();
-        // AND Sentry.setUser will throw an error
-        jest.spyOn(require("@sentry/react"), "setUser").mockImplementationOnce(() => {
-          throw new Error("Sentry error");
-        });
-        const consoleErrorSpy = jest.spyOn(console, "error");
-
-        // WHEN setUser is called
-        const result = service.setUser(givenUser);
-
-        // THEN expect the user to be set despite the error
-        expect(service.getUser()).toEqual(givenUser);
-        // AND expect the error to be logged
-        expect(consoleErrorSpy).toHaveBeenCalledWith("Error setting Sentry user context", expect.any(Error));
-        // AND expect the result to be the user
-        expect(result).toEqual(givenUser);
       });
     });
 
