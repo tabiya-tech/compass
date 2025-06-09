@@ -240,7 +240,7 @@ class _ConversationLLM:
                 
             #Do not repeat information unnecessarily
                 Review your previous questions and my answers and do not repeat the same question twice in a row, especially if I give you the same answer.
-                ///Do not repeat the information you collected, in every question you ask.
+                Do not repeat the information you collected, in every question you ask.
                 Avoid restating previously collected details in each new question.
                 Keep the conversation natural and avoid redundancy.
                 Be concise and to the point, avoid unnecessary repetition.
@@ -547,7 +547,7 @@ def _get_experience_type(work_type: WorkType | None) -> str:
     elif work_type == WorkType.SELF_EMPLOYMENT:
         return "running my own business, doing freelance or contract work"
     elif work_type == WorkType.UNSEEN_UNPAID:
-        return "unpaid work for the community volunteering work, caregiving for family, helping in the household, or helping out friends"
+        return "unpaid work such as community volunteering, caregiving for own or another family, helping in a household"
     elif work_type is None:
         return "no work experience"
     else:
@@ -611,14 +611,14 @@ def _get_explore_experiences_instructions(*,
         Currently we are exploring work experiences that include:
             '{experiences_in_type}'.
         
-        Here are typical questions you can ask me when exploring work experiences, frame them to fit the flow of the conversation:
+        Here is a typical question to ask me when exploring work experiences of the above type:
             {questions_to_ask}
         
         ///{focus_unseen_instructions}
         ///
         Do not assume whether or not I have these kind of work experiences.
         
-        Gather as many of work experiences as possible that include '{experiences_in_type}', or until I explicitly state that I have no more to share.
+        Gather as many work experiences as possible that include '{experiences_in_type}', or until I explicitly state that I have no more to share.
         
         If I provide you with multiple work experiences in a single input, you should ask me politely to slow down and 
         tell me to provide one work experience at a time.
