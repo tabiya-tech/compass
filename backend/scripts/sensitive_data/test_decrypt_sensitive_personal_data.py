@@ -3,10 +3,11 @@ This script tests the decryption of sensitive personal data using RSA and AES.
 """
 
 import os
-import base64
 import json
-import datetime
+import shutil
 import pytest
+import base64
+import datetime
 
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
@@ -80,8 +81,10 @@ async def test_round_trip_with_size(_rsa_keys, in_memory_userdata_database):
     given_key_id = get_random_printable_string(10)
     # AND the input json
     given_input_path = _get_file_path("given.json")
-    # AND the output json path
-    given_output_path = _get_file_path("output.json")
+
+    # AND the output folder path
+    given_output_folder = os.path.join(os.path.dirname(__file__), "test_output")
+    os.makedirs(given_output_folder, exist_ok=True)
 
     # AND the RSA keys (public and private keys)
     private_key, public_key = _rsa_keys
@@ -114,26 +117,113 @@ async def test_round_trip_with_size(_rsa_keys, in_memory_userdata_database):
     given_password = get_random_printable_string(10).encode()
 
     # WHEN the sensitive data is decrypted and saved into the output file.
+    given_identifiable_fields = ["first_name", "last_name", "contact_email"]
     await decrypt_sensitive_data_from_database(
         private_key_pem=private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.BestAvailableEncryption(given_password)
         ),
-        output_path=given_output_path,
+        output_folder_path=given_output_folder,
         private_key_password=given_password,
-        repository=repository
+        repository=repository,
+        identifiable_fields=given_identifiable_fields
     )
+    import csv
+    # THEN the identifiable JSON data should be saved in the output folder
+    with open(os.path.join(given_output_folder, "identifiable.json")) as file:
+        actual_saved_identifiable_data_json = json.load(file)
+    # AND the identifiable JSON data should fulfill the expectations
+    assert_identifiable_data(actual_saved_identifiable_data_json, given_data)
 
-    # THEN the two files should match
-    with open(given_input_path) as file:
-        original_data = json.load(file)
+    # AND the identifiable CSV data should be saved in the output folder
+    with open(os.path.join(given_output_folder, "identifiable.csv")) as file:
+        actual_saved_identifiable_data_csv = csv.DictReader(file)
+        actual_saved_identifiable_data_csv = [row for row in actual_saved_identifiable_data_csv]
+    # AND the identifiable CSV data should fulfill the expectations
+    assert_identifiable_data(actual_saved_identifiable_data_csv, given_data)
 
-    with open(given_output_path) as file:
-        decrypted_data = json.load(file)
+    # AND the Pseudonymized JSON data should be saved in the output folder
+    with open(os.path.join(given_output_folder, "pseudonymized.json")) as file:
+        actual_saved_pseudonymized_data_json = json.load(file)
+    # AND the pseudonymized JSON data should fulfill the expectations
+    assert_pseudonymized_data(actual_saved_pseudonymized_data_json, given_data, given_identifiable_fields)
 
-    assert original_data == decrypted_data
+    # AND the Pseudonymized CSV data should be saved in the output folder
+    with open(os.path.join(given_output_folder, "pseudonymized.csv")) as file:
+        actual_saved_pseudonymized_data_csv = csv.DictReader(file)
+        actual_saved_pseudonymized_data_csv = [row for row in actual_saved_pseudonymized_data_csv]
+    # AND the pseudonymized CSV data should fulfill the expectations
+    assert_pseudonymized_data(actual_saved_pseudonymized_data_csv, given_data, given_identifiable_fields)
+
+    # AND the anonymized JSON data should be saved in the output folder
+    with open(os.path.join(given_output_folder, "anonymized.json")) as file:
+        actual_saved_anonymized_data_json = json.load(file)
+    # AND the anonymized json should fulfill the expectations
+    assert_anonymized_data(actual_saved_anonymized_data_json, given_data, given_identifiable_fields)
+
+    # AND the anonymized CSV data should be saved in the output folder
+    with open(os.path.join(given_output_folder, "anonymized.csv")) as file:
+        actual_saved_anonymized_data_csv = csv.DictReader(file)
+        actual_saved_anonymized_data_csv = [row for row in actual_saved_anonymized_data_csv]
+    # AND the anonymized csv data should fulfill the expectations
+    assert_anonymized_data(actual_saved_anonymized_data_csv, given_data, given_identifiable_fields)
 
     # clean up
     # remove the output file
-    os.remove(given_output_path)
+    shutil.rmtree(given_output_folder)
+
+
+def assert_identifiable_data(
+        identifiable_data: list[dict],
+        given_data: list[dict]):
+    # AND the identifiable data contains the same number of entries as the given data
+    assert len(identifiable_data) == len(given_data)
+    for i, data in enumerate(identifiable_data):
+        # AND the all the data is present
+        for field in given_data[i]:
+            if field not in ["user_id", "created_at"]:
+                assert field in identifiable_data[i]
+                assert data[field] == given_data[i][field]
+
+
+def assert_pseudonymized_data(
+        pseudonymized_data: list[dict],
+        given_data: list[dict],
+        identifiable_fields: list[str]
+):
+    # AND the pseudonymized data contains the same number of entries as the given data
+    assert len(pseudonymized_data) == len(given_data)
+    # AND the user ID is part of the identifiable fields
+    _identifiable_fields = identifiable_fields.copy()  # make a copy to avoid modifying the original list
+    for i, data in enumerate(pseudonymized_data):
+        # AND the user ID is present and is not equal to the original user ID
+        assert data["user_id"] is not None
+        assert data["user_id"] != given_data[i]["user_id"]
+        # AND the identifiable data is not present
+        for field in _identifiable_fields:
+            assert field not in pseudonymized_data[i]
+        # AND the pseudonymized data contains the non-identifiable fields
+        for field in given_data[i]:
+            if field not in _identifiable_fields:
+                assert field in pseudonymized_data[i]
+
+
+def assert_anonymized_data(
+        anonymized_data: list[dict],
+        given_data: list[dict],
+        identifiable_fields: list[str]
+):
+    # AND the anonymized data contains the same number of entries as the given data
+    assert len(anonymized_data) == len(given_data)
+    # AND the user ID is part of the identifiable fields
+    _identifiable_fields = identifiable_fields.copy()  # make a copy to avoid modifying the original list
+    _identifiable_fields.append("user_id")
+    for i, data in enumerate(anonymized_data):
+        # AND the identifiable data is not present
+        for field in _identifiable_fields:
+            assert field not in anonymized_data[i]
+        # AND the anonymized data contains the non-identifiable fields
+        for field in given_data[i]:
+            if field not in _identifiable_fields:
+                assert field in anonymized_data[i]
