@@ -38,7 +38,7 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
 
     # Mock the reaction service
     class MockedReactionService(IReactionService):
-        async def add(self, reaction: Reaction, user_id: str) -> Reaction:
+        async def add(self, reaction: Reaction, user_id: str, client_id: str | None) -> Reaction:
             return Reaction(
                 id="mock_doc_id",
                 session_id=reaction.session_id,

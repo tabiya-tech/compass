@@ -11,7 +11,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import Field
 
 from app.constants.errors import HTTPErrorResponse
-from app.context_vars import session_id_ctx_var, user_id_ctx_var
+from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var
 from app.conversations.feedback.services.errors import InvalidOptionError, InvalidQuestionError, QuestionsFileError
 from app.conversations.feedback.services.service import IUserFeedbackService, UserFeedbackService, NewFeedbackSpec
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
@@ -116,6 +116,9 @@ def add_user_feedback_routes(users_router: APIRouter, auth: Authentication):
             preferences = await user_preferences_repository.get_user_preference_by_user_id(user_info.user_id)
             if preferences is None or session_id not in preferences.sessions:
                 raise UnauthorizedSessionAccessError(user_info.user_id, session_id)
+
+            # Set the client_id context variable
+            client_id_ctx_var.set(preferences.client_id)
 
             feedback = await user_feedback_service.upsert_user_feedback(user_info.user_id, session_id, feedback_request)
             return FeedbackResponse.from_feedback(feedback)

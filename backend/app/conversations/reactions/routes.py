@@ -12,7 +12,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.metrics.services.get_metrics_service import get_metrics_service
 from app.metrics.services.service import IMetricsService
-from app.context_vars import session_id_ctx_var, user_id_ctx_var
+from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
@@ -170,7 +170,7 @@ def add_reaction_routes(conversation_router: APIRouter, auth: Authentication):
                 raise UnauthorizedSessionAccessError(user_info.user_id, session_id)
 
             reaction = reaction_request.to_reaction(message_id=message_id, session_id=session_id)
-            added_reaction = await reaction_service.add(reaction, user_info.user_id)
+            added_reaction = await reaction_service.add(reaction, user_info.user_id, preferences.client_id)
             return _ReactionResponse.from_reaction(added_reaction)
         except ReactingToUserMessageError as e:
             warning_msg = str(e)
@@ -219,6 +219,9 @@ def add_reaction_routes(conversation_router: APIRouter, auth: Authentication):
             preferences = await user_preferences_repository.get_user_preference_by_user_id(user_info.user_id)
             if preferences is None or session_id not in preferences.sessions:
                 raise UnauthorizedSessionAccessError(user_info.user_id, session_id)
+
+            # Set the client_id context variable
+            client_id_ctx_var.set(preferences.client_id)
 
             await service.delete(session_id, message_id)
         except UnauthorizedSessionAccessError as e:

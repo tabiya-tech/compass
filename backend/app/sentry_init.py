@@ -4,7 +4,7 @@ from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 
 from app.app_config import get_application_config
-from app.context_vars import session_id_ctx_var, user_id_ctx_var
+from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var
 import logging
 
 logger = logging.getLogger(__name__)
@@ -41,6 +41,11 @@ def set_sentry_contexts():
 
 def attach_ticket_info(event: Event, hint: Hint) -> Event | None:
     # Set default user context with values from context vars
-    sentry_sdk.set_tag("session_id", session_id_ctx_var.get())
-    sentry_sdk.set_tag("user_id", user_id_ctx_var.get())
+    event['tags'] = {
+        **event.get('tags', {}),
+        "session_id": session_id_ctx_var.get(),
+        "user_id": user_id_ctx_var.get(),
+        "client_id": client_id_ctx_var.get()
+    }
+
     return event

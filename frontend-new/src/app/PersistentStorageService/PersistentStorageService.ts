@@ -17,6 +17,8 @@ export const ACCOUNT_CONVERTED_KEY = `account_converted_${PERSISTENT_STORAGE_VER
 
 export const FEEDBACK_NOTIFICATION_KEY = `feedback_notification_${PERSISTENT_STORAGE_VERSION}`;
 
+export const CLIENT_ID_KEY = `client_id_${PERSISTENT_STORAGE_VERSION}`;
+
 /**
  * This class is used to store the tokens in the session storage.
  *   eg: refresh token
@@ -213,5 +215,21 @@ export class PersistentStorageService {
    */
   static clear(): void {
     this.storage.clear();
+  }
+
+  /**
+   * Returns Client Device UUID.
+   * @returns string - The client Device UUID.
+   */
+  static getClientId(): string | null {
+    return this.storage.getItem(CLIENT_ID_KEY)
+  }
+
+  /**
+   * Sets the client Device UUID.
+   * @param clientId - The client Device UUID.
+   */
+  static setClientID(clientId: string): void {
+    this.storage.setItem(CLIENT_ID_KEY, clientId);
   }
 }

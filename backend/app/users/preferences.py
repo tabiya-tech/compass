@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.constants.errors import ErrorService, HTTPErrorResponse
+from app.context_vars import user_id_ctx_var
 from app.conversations.feedback.repository import UserFeedbackRepository
 from app.conversations.feedback.services.service import UserFeedbackService, IUserFeedbackService
 from app.invitations.repository import UserInvitationRepository
@@ -124,13 +125,15 @@ async def _create_user_preferences(
         newly_created = await repository.insert_user_preference(preferences.user_id, UserPreferences(
             language=preferences.language,
             invitation_code=preferences.invitation_code,
+            client_id=preferences.client_id,
             sensitive_personal_data_requirement=invitation.sensitive_personal_data_requirement,
             sessions=sessions
         ))
 
         # Record user account creation metric
         await metrics_service.record_event(UserAccountCreatedEvent(
-            user_id=preferences.user_id
+            user_id=preferences.user_id,
+            client_id=preferences.client_id,
         ))
 
         return UsersPreferencesResponse(
@@ -218,6 +221,7 @@ async def _update_user_preferences(
         updated_user_preferences, sessions_with_feedback, has_sensitive_personal_data = await asyncio.gather(
             repository.update_user_preference(preferences.user_id, UserPreferencesRepositoryUpdateRequest(
                 language=preferences.language,
+                client_id=preferences.client_id,
                 accepted_tc=preferences.accepted_tc,
                 experiments=preferences.experiments
             )),
@@ -288,6 +292,9 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                 get_sensitive_personal_data_service),
             user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
             ) -> UsersPreferencesResponse:
+        # set the user id context variable.
+        user_id_ctx_var.set(user_id)
+
         return await _get_user_preferences(
             user_preference_repository,
             user_feedback_service,
@@ -336,6 +343,9 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                 get_sensitive_personal_data_service),
             user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
     ) -> UsersPreferencesResponse:
+        # set the user id context variable.
+        user_id_ctx_var.set(user_info.user_id)
+
         return await _update_user_preferences(
             user_preference_repository,
             user_feedback_service,
@@ -366,6 +376,9 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
         :param user_info: UserInfo - The logged-in user information
         :return: UserPreferences - The updated user preferences
         """
+        # set the user id context variable.
+        user_id_ctx_var.set(user_id)
+
         return await _get_new_session(user_preference_repository,
                                       user_feedback_service,
                                       sensitive_personal_data_service,

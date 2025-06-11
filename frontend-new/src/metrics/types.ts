@@ -73,3 +73,8 @@ export type MetricsEventUnion =
   | UserLocationEvent
   | NetworkInformationEvent
   | UIInteractionEvent;
+
+
+export type SavableMetricsEventUnion = MetricsEventUnion & {
+  client_id: string; // The client ID to associate with the event
+}

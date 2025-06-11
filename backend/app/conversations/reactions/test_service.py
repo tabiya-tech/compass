@@ -3,6 +3,7 @@ Tests for the reaction service
 """
 from datetime import datetime, timezone, timedelta
 from unittest.mock import AsyncMock, Mock
+from uuid import uuid4
 
 import pytest
 
@@ -15,6 +16,7 @@ from app.conversation_memory.conversation_memory_types import ConversationMemory
 from app.conversations.reactions.repository import IReactionRepository
 from app.conversations.reactions.service import ReactionService, ReactingToUserMessageError
 from app.conversations.reactions.types import ReactionKind, DislikeReason, Reaction
+from app.metrics.common import hash_metric_value
 from app.metrics.services.service import IMetricsService
 from app.metrics.types import MessageReactionCreatedEvent
 from common_libs.test_utilities import get_random_user_id
@@ -176,6 +178,9 @@ class TestAdd:
         # AND a user id
         given_user_id = get_random_user_id()
 
+        # AND a given client id
+        given_client_id = uuid4().__str__()
+
         # AND the message with the given message_id is a COMPASS message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
             return_value=ApplicationState.new_state(self._given_session_id))
@@ -199,7 +204,7 @@ class TestAdd:
                                   metrics_service=_mock_metrics_service)
 
         # THEN the reaction should be added successfully and return the repository's reaction
-        result = await service.add(given_reaction, given_user_id)
+        result = await service.add(given_reaction, given_user_id, given_client_id)
         assert result == mock_returned_reaction  # Assert we get the repository's reaction back
         assert result != given_reaction  # Double check we're not just getting our input back
 
@@ -209,6 +214,7 @@ class TestAdd:
         assert isinstance(recorded_event, MessageReactionCreatedEvent)
         assert recorded_event.message_id == given_reaction.message_id
         assert recorded_event.kind == given_reaction.kind.name
+        assert recorded_event.anonymized_client_id == hash_metric_value(given_client_id)
         assert recorded_event.reasons == [reason.name for reason in given_reaction.reasons]
 
     @pytest.mark.asyncio
@@ -226,6 +232,9 @@ class TestAdd:
         )
         # AND a user id
         given_user_id = get_random_user_id()
+
+        # AND a given client id
+        given_client_id = None
 
         # AND the message with the given message_id is a COMPASS message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
@@ -252,7 +261,7 @@ class TestAdd:
                                   metrics_service=_mock_metrics_service)
 
         # THEN the reaction should be added successfully and return the repository's reaction
-        result = await service.add(given_reaction, given_user_id)
+        result = await service.add(given_reaction, given_user_id, given_client_id)
         assert result == mock_returned_reaction  # Assert we get the repository's reaction back
         assert result != given_reaction  # Double check we're not just getting our input back
 
@@ -262,6 +271,7 @@ class TestAdd:
         assert isinstance(recorded_event, MessageReactionCreatedEvent)
         assert recorded_event.message_id == given_reaction.message_id
         assert recorded_event.kind == given_reaction.kind.name
+        assert recorded_event.anonymized_client_id == None
         assert recorded_event.reasons == [reason.name for reason in given_reaction.reasons]
 
     @pytest.mark.asyncio
@@ -278,6 +288,9 @@ class TestAdd:
         # AND a user id
         given_user_id = get_random_user_id()
 
+        # AND a given client id
+        given_client_id = None
+
         # AND the message with the given message_id is a USER message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
             return_value=ApplicationState.new_state(self._given_session_id))
@@ -293,7 +306,7 @@ class TestAdd:
                                       conversation_memory_manager=_mock_conversation_memory_manager,
                                       application_state_manager=_mock_application_state_manager,
                                       metrics_service=_mock_metrics_service)
-            await service.add(given_reaction, given_user_id)
+            await service.add(given_reaction, given_user_id, given_client_id)
 
         # THEN the metrics service should not have been called
         _mock_metrics_service.record_event.assert_not_called()
@@ -316,6 +329,9 @@ class TestAdd:
         # AND a user id
         given_user_id = get_random_user_id()
 
+        # AND a given client id
+        given_client_id = uuid4().__str__()
+
         # AND the message with the given message_id is a COMPASS message in the conversation context
         _mock_application_state_manager.get_state = AsyncMock(
             return_value=ApplicationState.new_state(self._given_session_id))
@@ -331,7 +347,7 @@ class TestAdd:
                                       conversation_memory_manager=_mock_conversation_memory_manager,
                                       application_state_manager=_mock_application_state_manager,
                                       metrics_service=_mock_metrics_service)
-            await service.add(given_reaction, given_user_id)
+            await service.add(given_reaction, given_user_id, given_client_id)
 
         # THEN the error should be raised
         assert error_info.value == given_error
@@ -357,6 +373,9 @@ class TestAdd:
         # AND a user id
         given_user_id = get_random_user_id()
 
+        # AND a given client id
+        given_client_id = None
+
         # AND the metrics service will record the event successfully
         _mock_metrics_service.record_event = AsyncMock()
 
@@ -366,7 +385,7 @@ class TestAdd:
                                       conversation_memory_manager=_mock_conversation_memory_manager,
                                       application_state_manager=_mock_application_state_manager,
                                       metrics_service=_mock_metrics_service)
-            await service.add(given_reaction, given_user_id)
+            await service.add(given_reaction, given_user_id, given_client_id)
 
         # THEN the error should be raised
         assert error_info.value == given_error

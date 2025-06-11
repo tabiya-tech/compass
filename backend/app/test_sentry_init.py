@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock, call
 
 from app.app_config import ApplicationConfig
 from app.sentry_init import init_sentry, set_sentry_contexts
-from app.context_vars import session_id_ctx_var, user_id_ctx_var
+from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var
 
 
 @pytest.fixture
@@ -92,16 +92,15 @@ def test_before_send_hook(mock_sentry):
     before_send = mock_sentry['init'].call_args[1]['before_send']
 
     # AND the before_send hook is called with an event and hint
-    event = MagicMock()
+    event = {}
     hint = MagicMock()
-    before_send(event, hint)
+    event = before_send(event, hint)
 
-    # THEN sentry.set_tag is called with the correct context vars
-    mock_sentry['set_tag'].assert_has_calls([
-        call("session_id", session_id_ctx_var.get()),
-        call("user_id", user_id_ctx_var.get())
-    ])
-    assert mock_sentry['set_tag'].call_count == 2
+    event_tags = event.get('tags', {})
+
+    assert event_tags.get("session_id") == session_id_ctx_var.get()
+    assert event_tags.get("user_id") == user_id_ctx_var.get()
+    assert event_tags.get("client_id") == client_id_ctx_var.get()
 
 
 def test_set_sentry_contexts(mock_sentry , setup_application_config: ApplicationConfig):
