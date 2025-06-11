@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from datetime import datetime, timezone
@@ -53,6 +55,7 @@ class TestInsertUserPreference:
         # AND a user preference
         given_user_preference = UserPreferences(
             language="en",
+            client_id=uuid.uuid4().__str__(),
             sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_AVAILABLE
         )
 
@@ -65,12 +68,14 @@ class TestInsertUserPreference:
         # THEN the user preferences should be returned
         assert actual_user_preferences is not None
         assert actual_user_preferences.language == given_user_preference.language
+        assert actual_user_preferences.client_id == given_user_preference.client_id
         assert actual_user_preferences.sensitive_personal_data_requirement == given_user_preference.sensitive_personal_data_requirement
 
         # AND the user preferences should be in the database
         actual_user_preferences = await repository.get_user_preference_by_user_id(given_user_id)
         assert actual_user_preferences is not None
         assert actual_user_preferences.language == given_user_preference.language
+        assert actual_user_preferences.client_id == given_user_preference.client_id
         assert actual_user_preferences.sensitive_personal_data_requirement == given_user_preference.sensitive_personal_data_requirement
 
     async def test_insert_user_preference_database_error(self, get_user_preference_repository: Awaitable[UserPreferenceRepository], mocker):
@@ -104,6 +109,7 @@ class TestUpdateUserPreference:
         # AND a user preference
         given_user_preference = UserPreferences(
             language="en",
+            client_id=uuid.uuid4().__str__(),
             sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_AVAILABLE
         )
 
@@ -126,12 +132,14 @@ class TestUpdateUserPreference:
         # THEN the user preferences should be returned
         assert actual_user_preferences is not None
         assert actual_user_preferences.language == given_update.language
+        assert actual_user_preferences.client_id == given_user_preference.client_id # not update field should not be updated
         assert truncate_microseconds(mongo_date_to_datetime(actual_user_preferences.accepted_tc)) == truncate_microseconds(test_datetime)
 
         # AND the user preferences should be in the database
         actual_user_preferences = await repository.get_user_preference_by_user_id(given_user_id)
         assert actual_user_preferences is not None
         assert actual_user_preferences.language == given_update.language
+        assert actual_user_preferences.client_id == given_user_preference.client_id # not update field should not be updated
         assert truncate_microseconds(mongo_date_to_datetime(actual_user_preferences.accepted_tc)) == truncate_microseconds(test_datetime)
 
     async def test_update_user_preference_database_error(self, get_user_preference_repository: Awaitable[UserPreferenceRepository], mocker):

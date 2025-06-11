@@ -17,6 +17,7 @@ jest.mock("@sentry/react", () => ({
   captureConsoleIntegration: jest.fn(),
   reactRouterV6BrowserTracingIntegration: jest.fn(),
   setUser: jest.fn(),
+  setTag: jest.fn(),
   setContext: jest.fn(),
 }));
 

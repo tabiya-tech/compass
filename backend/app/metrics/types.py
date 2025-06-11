@@ -1,9 +1,9 @@
-import hashlib
 from datetime import datetime, timezone
 from typing import Literal, final
 
 from pydantic import BaseModel, Field, model_validator
 
+from .common import hash_metric_value
 from app.app_config import get_application_config
 from app.conversations.reactions.types import ReactionKind, DislikeReason
 from app.metrics.constants import EventType
@@ -74,6 +74,10 @@ class AbstractUserAccountEvent(AbstractCompassMetricEvent):
     will be empty for frontend events until the service populates the field with values from user preferences
     """
 
+    anonymized_client_id: str | None = None
+    """
+    The anonymized client ID (device ID) of the user, used for tracking purposes.
+    """
 
     # using a model_validator instead of an __init__ to obfuscate user_id without needing to pass extra fields to the parent constructor
     # because the __init__ method of the parent class would be called before the __init__ method of the child class
@@ -81,9 +85,19 @@ class AbstractUserAccountEvent(AbstractCompassMetricEvent):
     @model_validator(mode="before")
     def validator(cls, values):
         if 'user_id' in values:
-            values['anonymized_user_id'] = hashlib.md5(values['user_id'].encode(), usedforsecurity=False).hexdigest()
+            values['anonymized_user_id'] = hash_metric_value(values['user_id'])
         if 'relevant_experiments' in values and values['relevant_experiments'] is None:
             values['relevant_experiments'] = {}
+
+        # anonymize client_id if it exists, otherwise set it to None.
+        if 'client_id' in values:
+            if values['client_id'] is not None:
+                values['anonymized_client_id'] = hash_metric_value(values['client_id'])
+            else:
+                values['anonymized_client_id'] = None
+
+            del values['client_id'] # remove the client_id field as it is not needed in the event
+
         return values
 
     class Config:
@@ -95,9 +109,10 @@ class UserAccountCreatedEvent(AbstractUserAccountEvent):
     """
     A metric event representing a user account creation.
     """
-    def __init__(self, *, user_id: str, relevant_experiments: dict[str, str] = None):
+    def __init__(self, *, user_id: str, client_id: str | None = None, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             event_type=EventType.USER_ACCOUNT_CREATED,
             relevant_experiments=relevant_experiments or {}
         )
@@ -134,8 +149,7 @@ class AbstractConversationEvent(AbstractUserAccountEvent):
     @model_validator(mode="before")
     def obfuscate_session_id(cls, values):
         if 'session_id' in values:
-            values['anonymized_session_id'] = hashlib.md5(str(values['session_id']).encode(),
-                                                          usedforsecurity=False).hexdigest()
+            values['anonymized_session_id'] = hash_metric_value(str(values['session_id']))
         return values
 
     class Config:
@@ -162,9 +176,10 @@ class ConversationPhaseEvent(AbstractConversationEvent):
     phase - the phase of the conversation
     """
 
-    def __init__(self, *, user_id: str, session_id: int, phase: ConversationPhaseLiteral, relevant_experiments: dict[str, str] = None):
+    def __init__(self, *, user_id: str, session_id: int, phase: ConversationPhaseLiteral, client_id: str | None = None, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             session_id=session_id,
             event_type=EventType.CONVERSATION_PHASE,
             phase=phase,
@@ -188,12 +203,13 @@ class ExperienceDiscoveredEvent(AbstractConversationEvent):
     experiences_by_work_type - a dictionary mapping {work types : the number of experiences discovered for each type }
     """
 
-    def __init__(self, *, user_id: str, session_id: int, experience_count: int, experiences_by_work_type: dict[str, int], relevant_experiments: dict[str, str] = None, timestamp: str | None = None):
+    def __init__(self, *, user_id: str, session_id: int, experience_count: int, experiences_by_work_type: dict[str, int], client_id: str | None = None, relevant_experiments: dict[str, str] = None, timestamp: str | None = None):
         # construct a dict with a timestamp field only if the timestamp is provided
         # we do this to avoid having to pass None to the super constructor
         timestamp_argument = dict(timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)) if timestamp else {}
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             session_id=session_id,
             event_type=EventType.EXPERIENCE_DISCOVERED,
             experience_count=experience_count,
@@ -226,9 +242,11 @@ class ExperienceExploredEvent(AbstractConversationEvent):
                  session_id: int,
                  experience_count: int,
                  experiences_by_work_type: dict[str, int],
+                 client_id: str | None = None,
                  relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             session_id=session_id,
             event_type=EventType.EXPERIENCE_EXPLORED,
             experience_count=experience_count,
@@ -248,9 +266,10 @@ class FeedbackProvidedEvent(AbstractConversationEvent):
     A metric event representing the provision of feedback by a user
     """
 
-    def __init__(self, *, user_id: str, session_id: int, relevant_experiments: dict[str, str] = None):
+    def __init__(self, *, user_id: str, session_id: int, client_id: str | None = None, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             session_id=session_id,
             event_type=EventType.FEEDBACK_PROVIDED,
             relevant_experiments=relevant_experiments or {}
@@ -278,9 +297,10 @@ class FeedbackRatingValueEvent(AbstractConversationEvent):
         - For CES, the value is 0 or 1, with 1 being the of respondents who select the highest 2 options on a 1–5 ease scale and 0 being the rest.
     """
 
-    def __init__(self, *, user_id: str, session_id: int, feedback_type: FeedbackTypeLiteral, value: int, relevant_experiments: dict[str, str] = None):
+    def __init__(self, *, user_id: str, session_id: int, feedback_type: FeedbackTypeLiteral, value: int, client_id: str | None = None, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             session_id=session_id,
             event_type=EventType.FEEDBACK_RATING_VALUE,
             feedback_type=feedback_type,
@@ -299,9 +319,10 @@ class ConversationTurnEvent(AbstractConversationEvent):
     compass_message_count: int
     user_message_count: int
 
-    def __init__(self, *, user_id: str, session_id: int, compass_message_count: int, user_message_count: int, relevant_experiments: dict[str, str] = None):
+    def __init__(self, *, user_id: str, session_id: int, compass_message_count: int, user_message_count: int, client_id: str | None = None, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             session_id=session_id,
             event_type=EventType.CONVERSATION_TURN,
             compass_message_count=compass_message_count,
@@ -334,9 +355,10 @@ class MessageReactionCreatedEvent(AbstractConversationEvent):
     """
 
     def __init__(self, *, user_id: str, session_id: int, message_id: str, kind: ReactionKind,
-                 reasons: list[DislikeReason], relevant_experiments: dict[str, str] = None):
+                 reasons: list[DislikeReason], client_id: str | None = None, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             session_id=session_id,
             event_type=EventType.MESSAGE_REACTION_CREATED,
             message_id=message_id,
@@ -365,9 +387,10 @@ class CVDownloadedEvent(AbstractConversationEvent):
     format - the format of the CV
     """
 
-    def __init__(self, *, user_id: str, session_id: int, cv_format: CVFormatLiteral, timestamp: str, relevant_experiments: dict[str, str] = None):
+    def __init__(self, *, user_id: str, session_id: int, cv_format: CVFormatLiteral, timestamp: str, client_id: str | None = None, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             session_id=session_id,
             event_type=EventType.CV_DOWNLOADED,
             cv_format=cv_format,
@@ -400,9 +423,10 @@ class DemographicsEvent(AbstractUserAccountEvent):
     employment_status - the employment status of the user
     """
 
-    def __init__(self, *, user_id: str, age: int, gender: str, education: str, employment_status: str, relevant_experiments: dict[str, str] = None):
+    def __init__(self, *, user_id: str, age: int, gender: str, education: str, employment_status: str, client_id: str | None = None, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             event_type=EventType.DEMOGRAPHICS,
             age=age,
             gender=gender,
@@ -424,9 +448,10 @@ class UserLocationEvent(AbstractUserAccountEvent):
     coordinates - the coordinates of the user
     """
 
-    def __init__(self, *, user_id: str, coordinates: tuple[float, float], timestamp: str, relevant_experiments: dict[str, str] = None):
+    def __init__(self, *, user_id: str, coordinates: tuple[float, float], timestamp: str, client_id: str | None = None, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             event_type=EventType.USER_LOCATION,
             coordinates=coordinates,
             timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc),
@@ -463,9 +488,10 @@ class DeviceSpecificationEvent(AbstractUserAccountEvent):
     """
 
     def __init__(self, *, user_id: str, device_type: str, os_type: str, browser_type: str, timestamp: str,
-                 browser_version: str, user_agent: str, relevant_experiments: dict[str, str] = None):
+                 browser_version: str, user_agent: str, client_id: str | None = None, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             event_type=EventType.DEVICE_SPECIFICATION,
             device_type=device_type,
             os_type=os_type,
@@ -493,9 +519,10 @@ class UIInteractionEvent(AbstractUserAccountEvent):
     action: any arbitrary actions on an element. Could be ["clicked", "seen"] or ["seen_twice"] or ["swiped"]
     """
 
-    def __init__(self, *, user_id: str, element_id: str, actions: list[str], timestamp: str, relevant_experiments: dict[str, str] = None):
+    def __init__(self, *, user_id: str, element_id: str, actions: list[str], timestamp: str, client_id: str | None = None, relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             event_type=EventType.UI_INTERACTION,
             element_id=element_id,
             actions=actions,
@@ -516,9 +543,10 @@ class NetworkInformationEvent(AbstractUserAccountEvent):
     effective_connection_type - the network classification of the user's connection: 2g, 3g, 4g, 5g...
     """
 
-    def __init__(self, *, user_id: str, effective_connection_type: str, relevant_experiments: dict[str, str] = None):
+    def __init__(self, *, user_id: str, effective_connection_type: str, client_id: str | None = None,  relevant_experiments: dict[str, str] = None):
         super().__init__(
             user_id=user_id,
+            client_id=client_id,
             event_type=EventType.NETWORK_INFORMATION,
             effective_connection_type=effective_connection_type,
             relevant_experiments=relevant_experiments or {}

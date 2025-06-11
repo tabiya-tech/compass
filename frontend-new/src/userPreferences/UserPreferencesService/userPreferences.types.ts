@@ -15,6 +15,7 @@ export type UserPreferencesExperiments = Partial<Record<string, string | Record<
 export type UserPreference = {
   user_id: string;
   language: Language;
+  client_id?: string;
   accepted_tc?: Date;
   sessions: number[];
   user_feedback_answered_questions: AnsweredQuestions;
@@ -35,6 +36,7 @@ export type UpdateUserPreferencesSpec = {
   user_id: string;
   language?: Language;
   accepted_tc?: Date;
+  client_id?: string;
   experiments?: UserPreferencesExperiments
 };
 

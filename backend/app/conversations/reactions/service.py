@@ -24,10 +24,11 @@ class IReactionService(ABC):
     """Interface for managing reactions to messages."""
 
     @abstractmethod
-    async def add(self, reaction: Reaction, user_id: str) -> Reaction:
+    async def add(self, reaction: Reaction, user_id: str, client_id: str | None) -> Reaction:
         """
         Creates or updates a reaction to a message.
 
+        :param client_id: The Device client id of the user who made the reaction.
         :param reaction: The reaction to store
         :param user_id: The id of the user who created the reaction
         :return: The stored reaction
@@ -61,10 +62,11 @@ class ReactionService(IReactionService):
         self._metrics_service = metrics_service
         self._logger = logging.getLogger(ReactionService.__name__)
 
-    async def add(self, reaction: Reaction, user_id: str) -> Reaction:
+    async def add(self, reaction: Reaction, user_id: str, client_id: str | None) -> Reaction:
         """
         Creates or updates a reaction to a message.
 
+        :param client_id: The client id for the device of the user who made the reaction.
         :param user_id: The user id who made the reaction
         :param reaction: The reaction to store
         :return: The stored reaction
@@ -84,6 +86,7 @@ class ReactionService(IReactionService):
         await self._metrics_service.record_event(
             MessageReactionCreatedEvent(
                 user_id=user_id,
+                client_id=client_id,
                 session_id=reaction.session_id,
                 message_id=reaction.message_id,
                 kind=reaction.kind,

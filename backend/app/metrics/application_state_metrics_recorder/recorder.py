@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import cast
 
 from app.application_state import ApplicationState, IApplicationStateManager
+from app.context_vars import client_id_ctx_var
 from app.metrics.application_state_metrics_recorder.types import ApplicationStatesOfInterest
 from app.metrics.services.service import IMetricsService
 from app.metrics.types import ConversationPhaseEvent, ConversationTurnEvent, \
@@ -109,12 +110,14 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
         """
         Record metric events based on the changes between the previous and current state.
         """
+        client_id = client_id_ctx_var.get()
         events: list[AbstractCompassMetricEvent] = []
 
         # Record count changes
         if current_state.user_message_count != previous_state.user_message_count or current_state.compass_message_count != previous_state.compass_message_count:
             events.append(ConversationTurnEvent(
                 user_id=user_id,
+                client_id=client_id,
                 session_id=session_id,
                 user_message_count=current_state.user_message_count,
                 compass_message_count=current_state.compass_message_count
@@ -124,6 +127,7 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
         if previous_state.experiences_by_work_type != current_state.experiences_by_work_type:
             events.append(ExperienceDiscoveredEvent(
                 user_id=user_id,
+                client_id=client_id,
                 session_id=session_id,
                 experience_count=current_state.experiences_discovered_count,
                 experiences_by_work_type=current_state.experiences_by_work_type
@@ -134,6 +138,7 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
         if previous_state.experiences_explored_by_work_type != current_state.experiences_explored_by_work_type:
             events.append(ExperienceExploredEvent(
                 user_id=user_id,
+                client_id=client_id,
                 session_id=session_id,
                 experience_count=current_state.experiences_explored_count,
                 experiences_by_work_type=current_state.experiences_explored_by_work_type
@@ -143,6 +148,7 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
         if previous_state.conversation_phase != current_state.conversation_phase:
             events.append(ConversationPhaseEvent(
                 user_id=user_id,
+                client_id=client_id,
                 session_id=session_id,
                 phase=cast(ConversationPhaseLiteral, current_state.conversation_phase)
             ))
@@ -153,6 +159,7 @@ class ApplicationStateMetricsRecorder(IApplicationStateMetricsRecorder):
                 current_state.counseling_phase != "ENDED"):
             events.append(ConversationPhaseEvent(
                 user_id=user_id,
+                client_id=client_id,
                 session_id=session_id,
                 phase=cast(ConversationPhaseLiteral, current_state.counseling_phase)
             ))

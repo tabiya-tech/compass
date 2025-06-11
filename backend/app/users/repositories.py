@@ -1,6 +1,5 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Union
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 

@@ -6,6 +6,7 @@ import { serializeError } from "./error/errorSerializer";
 import InfoService from "./info/info.service";
 import AuthenticationStateService from "./auth/services/AuthenticationState.service";
 import UserPreferencesStateService from "./userPreferences/UserPreferencesStateService";
+import UserPreferencesService from "./userPreferences/UserPreferencesService/userPreferences.service";
 
 export interface SentryConfig {
   // See https://docs.sentry.io/platforms/javascript/configuration/options/
@@ -144,8 +145,12 @@ export function initSentry() {
       // Set the frontend version in Sentry
       Sentry.setContext("Frontend Version", frontend);
     });
+
+  // Set the tag for the client ID in Sentry, It is not per event, but per session.
+  Sentry.setTag("client_id", UserPreferencesService.getInstance().getClientID())
+
   // Log any errors and warning that occurred while loading Sentry
-  // Do this at the end, so that if sentry is initialized, the errors are sent to Sentry
+  // Do this at the end, so that if entry is initialized, the errors are sent to Sentry
   warnings.forEach((w) => console.warn(`Warning loading Sentry: ${w}`));
   errors.forEach((e) => console.error(`Error loading Sentry: ${e.message}`, e));
 }
