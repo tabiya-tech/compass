@@ -1,8 +1,9 @@
 import { getBackendUrl, getMetricsEnabled } from "src/envService";
-import { MetricsEventUnion } from "src/metrics/types";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
 import { MetricsError } from "src/error/commonErrors";
+import { MetricsEventUnion, SavableMetricsEventUnion } from "src/metrics/types";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 
 export const METRICS_FLUSH_INTERVAL_MS = 15000; // 15 seconds
 
@@ -10,7 +11,7 @@ export default class MetricsService {
   readonly apiServerUrl: string;
   private static instance: MetricsService | null;
   private readonly _metricsEnabled: boolean;
-  private _eventBuffer: MetricsEventUnion[] = [];
+  private _eventBuffer: SavableMetricsEventUnion[] = [];
   private _flushInterval: NodeJS.Timeout | null = null;
 
   private constructor() {
@@ -74,9 +75,16 @@ export default class MetricsService {
       return;
     }
 
+    const userPreferencesService = UserPreferencesService.getInstance();
+
+    const savableEvent: SavableMetricsEventUnion = {
+      ...event,
+      client_id: userPreferencesService.getClientID()
+    }
+
     try {
       console.debug("Adding metrics event to buffer:", event.event_type);
-      this._eventBuffer.push(event);
+      this._eventBuffer.push(savableEvent);
     } catch (err) {
       console.error(new MetricsError("Failed to add metrics event to buffer", err));
     }

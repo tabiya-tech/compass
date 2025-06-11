@@ -4,6 +4,8 @@ import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { getBackendUrl } from "src/envService";
 import { customFetch } from "src/utils/customFetch/customFetch";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { v4 as UUIDV4 } from "uuid";
 
 export default class UserPreferencesService {
   private static instance: UserPreferencesService;
@@ -61,6 +63,7 @@ export default class UserPreferencesService {
       userPreferencesResponse = {
         user_id: userId,
         language: jsonPayload.language,
+        client_id: jsonPayload.client_id,
         sessions: jsonPayload.sessions,
         sensitive_personal_data_requirement: jsonPayload.sensitive_personal_data_requirement,
         has_sensitive_personal_data: jsonPayload.has_sensitive_personal_data,
@@ -96,7 +99,10 @@ export default class UserPreferencesService {
       method,
       this.userPreferencesEndpointUrl
     );
-    const requestBody = JSON.stringify(user_preferences);
+    const requestBody = JSON.stringify({
+      ...user_preferences,
+      client_id: this.getClientID(),
+    });
     const response = await customFetch(this.userPreferencesEndpointUrl, {
       method: method,
       headers: {
@@ -169,7 +175,13 @@ export default class UserPreferencesService {
       expectedContentType: "application/json",
     });
 
-    return await this.parseJsonResponse(response, userId, errorFactory);
+    const userPreferences = await this.parseJsonResponse(response, userId, errorFactory);
+
+    if(!userPreferences.client_id) {
+      await this.updateUserPreferences({ user_id: userId, client_id: this.getClientID() })
+    }
+
+    return userPreferences;
   }
 
   /**
@@ -196,5 +208,21 @@ export default class UserPreferencesService {
     });
 
     return await this.parseJsonResponse(response, userId, errorFactory);
+  }
+
+  /**
+   * Gets the client ID. If it doesn't exist, it will be created.
+   *
+   * @returns {string} The client ID.
+   */
+  public getClientID(): string {
+    let clientId = PersistentStorageService.getClientId();
+
+    if(!clientId) {
+      clientId = UUIDV4()
+      PersistentStorageService.setClientID(clientId);
+    }
+
+    return clientId;
   }
 }

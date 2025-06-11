@@ -3,11 +3,19 @@ import "src/_test_utilities/envServiceMock";
 
 import { waitFor } from "src/_test_utilities/test-utils";
 import MetricsService, { METRICS_FLUSH_INTERVAL_MS } from "src/metrics/metricsService";
-import { CVDownloadedEvent, EventType, MetricsEventUnion } from "src/metrics/types";
+import { CVDownloadedEvent, EventType, MetricsEventUnion, SavableMetricsEventUnion } from "src/metrics/types";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { CVFormat } from "src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown";
 import { StatusCodes } from "http-status-codes";
 import * as CustomFetchModule from "src/utils/customFetch/customFetch";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+
+const addClientId = (event: MetricsEventUnion, clientId: string): SavableMetricsEventUnion => {
+  return {
+    ...event,
+    client_id: clientId,
+  }
+}
 
 describe("MetricsService", () => {
   let givenApiServerUrl: string = "/path/to/api";
@@ -55,6 +63,10 @@ describe("MetricsService", () => {
         timestamp: new Date().toISOString(),
       };
 
+      // AND given a client id
+      const givenClientId = "test-client-id";
+      jest.spyOn(PersistentStorageService, "getClientId").mockReturnValue(givenClientId);
+
       // AND a successful response from the API
       const fetchSpy = setupAPIServiceSpy(StatusCodes.ACCEPTED, undefined, ""); // Backend returns 202 ACCEPTED
 
@@ -82,7 +94,7 @@ describe("MetricsService", () => {
           serviceFunction: "flushEvents",
           failureMessage: "Failed to send metrics events",
           expectedStatusCode: StatusCodes.ACCEPTED,
-          body: JSON.stringify([givenEvent1, givenEvent2]),
+          body: JSON.stringify([addClientId(givenEvent1, givenClientId), addClientId(givenEvent2, givenClientId)]),
         });
       });
     });
@@ -131,6 +143,10 @@ describe("MetricsService", () => {
       // AND a successful response from the API
       const fetchSpy = setupAPIServiceSpy(StatusCodes.ACCEPTED, undefined, "");
 
+      // AND given a client id
+      const givenClientId = "test-client-id";
+      jest.spyOn(PersistentStorageService, "getClientId").mockReturnValue(givenClientId);
+
       // WHEN sending the events
       const service = MetricsService.getInstance();
       givenEvents.forEach(event => service.sendMetricsEvent(event));
@@ -151,7 +167,7 @@ describe("MetricsService", () => {
           serviceFunction: "flushEvents",
           failureMessage: "Failed to send metrics events",
           expectedStatusCode: StatusCodes.ACCEPTED,
-          body: JSON.stringify(givenEvents),
+          body: JSON.stringify(givenEvents.map(event => addClientId(event, givenClientId))),
         });
       });
     });
@@ -194,6 +210,10 @@ describe("MetricsService", () => {
         user_id: "456",
         timestamp: new Date().toISOString(),
       };
+
+      // AND given a client id
+      const givenClientId = "test-client-id";
+      jest.spyOn(PersistentStorageService, "getClientId").mockReturnValue(givenClientId);
 
       // AND an unsuccessful response from the API
       const errorResponse = new Error("Something went wrong");
@@ -244,7 +264,7 @@ describe("MetricsService", () => {
         serviceFunction: "flushEvents",
         failureMessage: "Failed to send metrics events",
         expectedStatusCode: StatusCodes.ACCEPTED,
-        body: JSON.stringify([newEvent]),
+        body: JSON.stringify([addClientId(newEvent, givenClientId)]),
       });
     });
 
