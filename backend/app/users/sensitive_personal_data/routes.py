@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.constants.errors import HTTPErrorResponse
+from app.context_vars import user_id_ctx_var
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo
 from app.users.repositories import UserPreferenceRepository
@@ -73,6 +74,9 @@ def add_user_sensitive_personal_data_routes(users_router: APIRouter, auth: Authe
             service: ISensitivePersonalDataService = Depends(get_sensitive_personal_data_service),
             user_info: UserInfo = Depends(auth.get_user_info())
     ):
+        # set the user id context variable.
+        user_id_ctx_var.set(user_id)
+
         if user_info.user_id != user_id:
             warning_msg = f"User {user_info.user_id} is not allowed to handle sensitive personal data for another user {user_id}"
             logger.warning(warning_msg)
