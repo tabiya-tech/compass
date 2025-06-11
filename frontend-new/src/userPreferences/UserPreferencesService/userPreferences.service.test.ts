@@ -12,6 +12,7 @@ import {
   UpdateUserPreferencesSpec,
   UserPreference,
 } from "./userPreferences.types";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 describe("UserPreferencesService", () => {
   // GIVEN a backend URL is returned by the envService
@@ -47,11 +48,16 @@ describe("UserPreferencesService", () => {
   describe("getUserPreferences", () => {
     test("getUserPreferences should fetch at the correct URL, with GET and the correct headers and payload successfully", async () => {
       // GIVEN the GET models REST API will respond with OK and some models
+
+      // AND a client id is set in the persistent storage
+      const givenClientId = "client-1234";
+
       const givenResponseBody: UserPreference = {
         user_id: "1",
         language: Language.en,
         accepted_tc: new Date(),
         sessions: [1234],
+        client_id: givenClientId,
         user_feedback_answered_questions: {},
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
@@ -233,12 +239,17 @@ describe("UserPreferencesService", () => {
         invitation_code: "1234",
       };
 
+      // AND a given client id
+      const givenClientId = "client-1234";
+      jest.spyOn(PersistentStorageService, "getClientId").mockReturnValue(givenClientId);
+
       // WHEN the createUserPreferences function is called with the given arguments
       const mockResponseFormBackend: UserPreference = {
         user_id: givenUserPreferences.user_id,
         language: givenUserPreferences.language,
         sessions: [],
         user_feedback_answered_questions: {},
+        client_id: givenClientId,
         accepted_tc: undefined,
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
@@ -255,7 +266,10 @@ describe("UserPreferencesService", () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(givenUserPreferences),
+        body: JSON.stringify({
+          ...givenUserPreferences,
+          client_id: givenClientId,
+        }),
         expectedStatusCode: 201,
         failureMessage: `Failed to create new user preferences for user with id ${givenUserPreferences.user_id}`,
         serviceFunction: "createUserPreferences",
@@ -268,6 +282,7 @@ describe("UserPreferencesService", () => {
         user_id: givenUserPreferences.user_id,
         language: givenUserPreferences.language,
         sessions: [],
+        client_id: givenClientId,
         user_feedback_answered_questions: {},
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,

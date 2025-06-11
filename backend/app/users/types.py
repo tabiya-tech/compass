@@ -43,6 +43,11 @@ class UserPreferencesRepositoryUpdateRequest(BaseModel):
     invitation_code - The invitation code of the user
     """
 
+    client_id: str | None = None
+    """
+    UUID - The client ID (UUID) assigned to the device client (Browser).
+    """
+
     experiments: Experiments = Field(default_factory=dict)
     """
     experiments - A dictionary mapping experiment namespaces to their configuration
@@ -77,6 +82,12 @@ class UserPreferencesUpdateRequest(BaseModel):
     """
     time - The time the user accepted the terms and conditions
     """
+
+    client_id: str | None = None
+    """
+    UUID - The client ID (UUID) assigned to the device client (Browser).
+    """
+
     experiments: Experiments = Field(default_factory=dict)
     """
     experiments - A dictionary mapping experiment namespaces to their configuration
@@ -100,6 +111,7 @@ class UserPreferences(BaseModel):
     language: str | None = None
     invitation_code: str | None = None
     accepted_tc: datetime | None = None
+    client_id: str | None = None
     sessions: list[int] = Field(default_factory=list)  # not required
     sensitive_personal_data_requirement: SensitivePersonalDataRequirement
     experiments: Experiments = Field(default_factory=dict)
@@ -130,6 +142,7 @@ class UserPreferences(BaseModel):
             language=doc.get("language"),
             accepted_tc=doc.get("accepted_tc"),
             invitation_code=doc.get("invitation_code"),
+            client_id=doc.get("client_id"),
             sessions=doc.get("sessions"),
             sensitive_personal_data_requirement=doc.get(
                 "sensitive_personal_data_requirement",
@@ -180,6 +193,11 @@ class CreateUserPreferencesRequest(BaseModel):
     Invitation code
     """
 
+    client_id: str
+    """
+    UUID - The client ID (UUID) assigned to the device client (Browser).
+    """
+
     class Config:
         extra = "forbid"
 
@@ -198,6 +216,11 @@ class UpdateUserPreferencesRequest(BaseModel):
     accepted_tc: datetime | None = None
     """
     Accepted terms and conditions date
+    """
+
+    client_id: str | None = None
+    """
+    UUID - The client ID (UUID) assigned to the device client (Browser).
     """
 
     class Config:
