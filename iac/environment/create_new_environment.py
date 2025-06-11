@@ -6,7 +6,7 @@ import pulumi
 import pulumi_gcp as gcp
 import pulumiverse_time as time
 
-from lib.std_pulumi import enable_services, get_resource_name, int_to_base36
+from lib.std_pulumi import enable_services, get_resource_name, int_to_base36, get_pulumi_stack_outputs
 
 from dns import REQUIRED_SERVICES as DNS_SERVICES
 from auth import REQUIRED_SERVICES as AUTH_SERVICES
@@ -42,13 +42,29 @@ if any(api in SERVICES_TO_ENABLE for api in _INITIAL_APIS):
     raise ValueError("The initial APIs must not be included in the services to enable")
 
 
+def _ensure_immutable_config(*, key: str, value: pulumi.Output[str]):
+    past_outputs = get_pulumi_stack_outputs(stack_name=pulumi.get_stack(), module="environment")
+    locked_key = f"{key}_locked_at"
+    previous_value = past_outputs.get(locked_key)
+
+    def _validate_locked_value(_value: str):
+        if previous_value is not None and previous_value.value != _value:
+            raise ValueError(f"Cannot change the value of {key} from {previous_value} to {_value}")
+
+    value.apply(_validate_locked_value)
+
+    pulumi.export(locked_key, value)
+
+
 def create_new_environment(*,
                            region: str,
                            realm_name: str,
                            folder_id: pulumi.Output[str],
                            billing_account: pulumi.Output[str],
-                           environment_name: str
-                           ):
+                           environment_name: str,
+                           protected_from_deletion: bool,
+                           protected_from_deletion_tag: pulumi.Output[str]):
+
     # This is the project for the environment.
     # all the required services are enabled on this micro-task project.
     # The project should be created in either the Lower Environments folder or the Prod Folder
@@ -62,14 +78,26 @@ def create_new_environment(*,
                               keepers={
                                   "version": "1"  # Changing this will regenerate the random integer
                               })
-    project_id = random_id.result.apply(lambda _id: f"{project_name}-{int_to_base36(_id)}"[:30])  # convert the random integer to base36 approx 12 characters
+    # convert the random integer to base36 approx 12 characters
+    project_id = random_id.result.apply(lambda _id: f"{project_name}-{int_to_base36(_id)}"[:30])
+
+    # Ensure that the environment name is immutable. This is to prevent, re-creating of the project.
+    _ensure_immutable_config(key="project_id", value=project_id)
+
     project = gcp.organizations.Project(
-        # we are using the get_resource_name function to generate a unique name for the project
+        # we are using the get_resource_name function to generate a unique name for the project.
         resource_name=get_resource_name(resource="project"),
         name=project_name,
         project_id=project_id,
         folder_id=folder_id,
-        billing_account=billing_account
+        billing_account=billing_account,
+        opts=pulumi.ResourceOptions(
+            # Protect the project if it is configured to be protected from deletion.
+            protect=protected_from_deletion,
+            # If someone manually un-protects the upper project, the GCP `Delete Project` command method will not
+            # be called  for this resource. We don't want to delete this project in GCP no matter what.
+            retain_on_delete=protected_from_deletion
+        )
     )
 
     # By default, resources use package-wide configuration
@@ -166,6 +194,20 @@ def create_new_environment(*,
         service_names=SERVICES_TO_ENABLE,
         dependencies=initial_apis + [sleep_for_a_while]
     )
+
+    # add the project tag as a separate resource, because changing tags list in project triggers a recreation
+    # of the new project, which we don't want for now because of legacy created projects.
+    if protected_from_deletion:
+        gcp.tags.TagBinding(
+            get_resource_name(resource="project-protected", resource_type="tag-binding"),
+            parent=project.number.apply(lambda number: f"//cloudresourcemanager.googleapis.com/projects/{number}"),
+            tag_value=protected_from_deletion_tag,
+            opts=pulumi.ResourceOptions(
+                provider=environment_gcp_provider,
+                depends_on=initial_apis,
+                # Delete the existing resource before creating new binding
+                # to avoid conflicts with the existing bindings on the key.
+                delete_before_replace=True))
 
     pulumi.export("project_id", project.id.apply(lambda _id: _id.replace("projects/", "")))
     pulumi.export("project_number", project.number)
