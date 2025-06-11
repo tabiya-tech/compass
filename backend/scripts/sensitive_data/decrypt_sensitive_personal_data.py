@@ -1,31 +1,25 @@
 #!/usr/bin/env python3
-import pathlib
-import sys
-import os
-
-from dotenv import load_dotenv
-from motor.motor_asyncio import AsyncIOMotorClient
-
-# Get the absolute path of the project root
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-
-# Add the project root to the Python path, so that this script can import the necessary modules no matter where it is run from
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
 
 """
 script to decrypt the sensitive personal data
 """
 
+import sys
+import os
+import hashlib
 import base64
 import argparse
 import asyncio
 import json
 import logging
 
+from textwrap import dedent
+from dotenv import load_dotenv
 from datetime import datetime, timezone
-from pydantic import BaseModel, field_validator, field_serializer
 from typing import Optional, Final, Union
+from motor.motor_asyncio import AsyncIOMotorClient
+from common_libs.logging.log_utilities import setup_logging_config
+from pydantic import BaseModel, field_validator, field_serializer
 
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
@@ -35,14 +29,24 @@ from cryptography.hazmat.primitives.asymmetric import padding as asymmetric_padd
 from app.users.sensitive_personal_data.types import SensitivePersonalData
 from app.users.sensitive_personal_data.repository import SensitivePersonalDataRepository
 
+# load environment variables from .env file
 load_dotenv()
 
-# Set up logging to use the module's file name
-logger = logging.getLogger(os.path.basename(__file__))
+# setup logging
+setup_logging_config(os.path.join("logging.cfg.yaml"))
+logger = logging.getLogger(__name__)
 
 IV_SIZE: Final[int] = 12  # The initialization vector size in bytes
 TAG_LENGTH: Final[int] = 16  # 16 bytes, which is 128 bits
 AES_KEY_LENGTH: Final[int] = 32  # 32 bytes, which is 256 bits
+
+#####################################################
+#              TYPES
+####################################################
+
+# the field content values can either be a string, or a list of strings
+# @see: frontend-new/src/sensitiveData/types.ts#FieldContentValue.
+FieldContentValue = Union[str, list[str]]
 
 
 class DecryptedPersonalDataModel(BaseModel):
@@ -66,6 +70,15 @@ class DecryptedPersonalDataModel(BaseModel):
 
     class Config:
         extra = "allow"  # allow extra fields as the actual data fields may vary
+
+
+def _anonymize_user_id(user_id: str) -> str:
+    """
+    Anonymizes the user ID by hashing it with MD5.
+
+    :return: The anonymized user ID as a hexadecimal string.
+    """
+    return hashlib.md5(user_id.encode(), usedforsecurity=False).hexdigest()
 
 
 def _extract_rsa_private_crypto_key(pem_key: bytes, password: Optional[bytes]) -> RSAPrivateKey:
@@ -114,7 +127,8 @@ def _aes_decrypt_message(iv: bytes, aes_decryption_key: bytes, aes_encrypted_byt
     return decrypted_message
 
 
-async def _decrypt_sensitive_personal_data(_private_key: RSAPrivateKey, encrypted_personal_data: SensitivePersonalData) -> DecryptedPersonalDataModel:
+async def _decrypt_sensitive_personal_data(_private_key: RSAPrivateKey,
+                                           encrypted_personal_data: SensitivePersonalData) -> DecryptedPersonalDataModel:
     """
     Decrypts the sensitive personal data using the provided private key.
 
@@ -166,20 +180,68 @@ async def _decrypt_sensitive_personal_data(_private_key: RSAPrivateKey, encrypte
         )
 
 
+async def _anonymise_decrypted_data(decrypted_data: list[DecryptedPersonalDataModel],
+                                    identifiable_fields: list[str]) \
+        -> tuple[
+            list[dict[str, FieldContentValue]],
+            list[dict[str, FieldContentValue]],
+            list[dict[str, FieldContentValue]]
+        ]:
+    """
+    Anonymizes the decrypted data by removing identifiable fields and anonymizing the user ID.
+
+    :param decrypted_data: The decrypted sensitive personal data
+    :param identifiable_fields: The fields to be removed from the plain data for security reasons.
+
+    :return: (plain_data, pseudonymized_data, public_data)
+    """
+
+    plain_data = []
+    pseudonymized_data = []
+    public_data = []
+
+    for datum in decrypted_data:
+        # 1. in the plain data we keep all fields including the identifiable fields and the user id.
+        plain_data.append(datum.model_dump(mode="json"))
+
+        # Anonymize the user_id for pseudonymized and public data
+        datum.user_id = _anonymize_user_id(datum.user_id)
+
+        # Create a pseudonymized version of the data
+        anonymized_datum = datum.model_copy()
+
+        # 2. by removing the identifiable fields.
+        for field in identifiable_fields:
+            if hasattr(anonymized_datum, field):
+                delattr(anonymized_datum, field)
+
+        pseudonymized_data.append(anonymized_datum.model_dump(mode="json"))
+
+        # 3. in the public data we remove the user_id
+        if hasattr(anonymized_datum, "user_id"):
+            delattr(anonymized_datum, "user_id")
+
+        public_data.append(anonymized_datum.model_dump(mode="json"))
+
+    return plain_data, pseudonymized_data, public_data
+
+
 async def decrypt_sensitive_data_from_database(*,
                                                private_key_pem: bytes,
                                                private_key_password: Optional[bytes],
-                                               output_path: str,
-                                               repository: SensitivePersonalDataRepository
-                                               ):
+                                               output_folder_path: str,
+                                               repository: SensitivePersonalDataRepository,
+                                               identifiable_fields: list[str]) -> list[DecryptedPersonalDataModel]:
     """
     Main function to decrypt the sensitive personal data.
 
+    :param identifiable_fields: sensitive fields that can be used to identify a user, and should be omitted from the public version.
     :param repository:  The repository to get the sensitive personal data from
-    :param output_path: The path to the output file (JSON format)
+    :param output_folder_path: The path to the output folder
     :param private_key_password: the password of the private key
-    :param private_key_pem: The RSA private key in PEM format
-    :return: None
+    :param private_key_pem: The RSA private key in PEM format.
+
+    :return: List[DecryptedPersonalDataModel] — The decrypted sensitive personal data.
     """
 
     # Load the private key
@@ -195,11 +257,29 @@ async def decrypt_sensitive_data_from_database(*,
         decrypted_datum = await _decrypt_sensitive_personal_data(private_key, personal_data)
         decrypted_data.append(decrypted_datum)
 
-    logger.info(f"decryption took {(asyncio.get_event_loop().time() - start_time):.2f} seconds to decrypt {len(decrypted_data)} records")
+    logger.info(
+        f"decryption took {(asyncio.get_event_loop().time() - start_time):.2f} seconds to decrypt {len(decrypted_data)} records")
 
     # writing the decrypted data to a file
-    with open(output_path, "w", encoding="UTF-8") as file:
-        file.write(json.dumps([datum.model_dump() for datum in decrypted_data], ensure_ascii=False, indent=2))
+    plain_content, pseudonymized_content, public_content = await _anonymise_decrypted_data(
+        decrypted_data=decrypted_data,
+        identifiable_fields=identifiable_fields
+    )
+
+    plain_content_file = os.path.join(output_folder_path, "plain.json")
+    pseudonymized_content_file = os.path.join(output_folder_path, "pseudonymized.json")
+    public_content_file = os.path.join(output_folder_path, "public.json")
+
+    with open(plain_content_file, "w", encoding="UTF-8") as file:
+        file.write(json.dumps(plain_content, ensure_ascii=False, indent=2))
+
+    with open(pseudonymized_content_file, "w", encoding="UTF-8") as file:
+        file.write(json.dumps(pseudonymized_content, ensure_ascii=False, indent=2))
+
+    with open(public_content_file, "w", encoding="UTF-8") as file:
+        file.write(json.dumps(public_content, ensure_ascii=False, indent=2))
+
+    return decrypted_data
 
 
 async def _main():
@@ -212,48 +292,99 @@ async def _main():
     with open(private_key_path, "rb") as f:
         _private_key_pem = f.read()
 
-    # Ensure _output_path is a JSON file path
-    _output_path = pathlib.Path(args.output_path)
-    if _output_path.suffix.lower() != ".json":
-        raise ValueError("Output path must be a JSON file with '.json' extension.")
-
     # Ensure the parent directory exists
-    output_dir = _output_path.parent
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_folder_path = args.output_folder_path
+    os.makedirs(output_folder_path, exist_ok=True)
 
     # connect to the database
     mongo_uri = os.getenv("DECRYPT_SCRIPT_USERDATA_MONGODB_URI")
     if not mongo_uri:
-        raise ValueError("The userdata MongoDB URI is not set in the environment variables (DECRYPT_SCRIPT_USERDATA_MONGODB_URI)")
+        raise ValueError(
+            "The userdata MongoDB URI is not set in the environment variables (DECRYPT_SCRIPT_USERDATA_MONGODB_URI)")
 
     database_name = os.getenv("DECRYPT_SCRIPT_USERDATA_DB_NAME")
     if not database_name:
-        raise ValueError("The userdata MongoDB database name is not set in the environment variables (DECRYPT_SCRIPT_USERDATA_DB_NAME)")
+        raise ValueError(
+            "The userdata MongoDB database name is not set in the environment variables (DECRYPT_SCRIPT_USERDATA_DB_NAME)")
 
     # Connect to MongoDB
     client = AsyncIOMotorClient(mongo_uri, tlsAllowInvalidCertificates=True)
     si = await client.server_info()
     host, port = client.address
-    logger.info(f"Connected to the database {database_name} at {host}:{port} version:{si.get('version', 'Unknown version')}")
+    logger.info(
+        f"Connected to the database {database_name} at {host}:{port} version:{si.get('version', 'Unknown version')}")
     db = client.get_database(database_name)
     repository = SensitivePersonalDataRepository(db=db)
 
-    # decrypt the data
-    await decrypt_sensitive_data_from_database(
+    # decrypt the data and save them in the plain.json
+    decrypted_data = await decrypt_sensitive_data_from_database(
         private_key_pem=_private_key_pem,
         private_key_password=_private_key_password.encode() if _private_key_password else None,
-        output_path=str(_output_path),
+        output_folder_path=output_folder_path,
+        identifiable_fields=args.identifiable_fields,
         repository=repository
     )
 
+    do_plot = args.do_plot
+    if do_plot:
+        logger.info("starting to plot distribution of the data")
+
+        from _plotting import plot
+        plot(
+            data=decrypted_data,
+            output_dir=output_folder_path,
+            string_fields=args.string_fields,
+            bin_size=args.bin_size,
+            numeric_fields=args.numeric_fields)
+
+    logger.info("Decryption and anonymization completed successfully.")
 
 if __name__ == "__main__":
     if sys.version_info < (3, 11):
         sys.exit("This script requires Python 3.11 or higher.")
 
-    parser = argparse.ArgumentParser(description="decrypt saved sensitive personal data",
+    parser = argparse.ArgumentParser(description=dedent("""
+                                        decrypt saved sensitive personal data 
+                                        This script decrypts sensitive personal data stored in a MongoDB database using a private RSA key.
+                                        Outputs the three files.
+                                        - plain.json: contains the decrypted sensitive personal data in JSON format.
+                                        - pseudonymized.json: Contains the pseudonymized sensitive personal data in JSON format.
+                                                              Meaning email and names are removed and user_id is anonymized.
+                                        - public.json: Contains the sharable sensitive personal data in JSON format. without user_id, email and names
+                                        """),
+                                     formatter_class=argparse.RawTextHelpFormatter,
                                      epilog="The following environment variables are required: DECRYPT_SCRIPT_USERDATA_MONGODB_URI, "
                                             "DECRYPT_SCRIPT_USERDATA_DB_NAME")
+
+    plotting_options = parser.add_argument_group('Plotting Options')
+    plotting_options.add_argument(
+        '--do-plot',
+        action='store_true',
+        help='Enable plotting. If set, --string-fields or --number-fields must be provided.'
+    )
+
+    plotting_options.add_argument(
+        '--string-fields',
+        nargs='*',  # Accepts zero or more string values
+        type=str,
+        default=[],
+        help='Space-separated list of string fields to be binned for plotting.'
+    )
+
+    plotting_options.add_argument(
+        '--numeric-fields',
+        nargs='*',  # Accepts zero or more numeric values
+        type=str,
+        default=[],
+        help='Space-separated list of numeric fields to be binned for plotting.'
+    )
+
+    plotting_options.add_argument(
+        '--bin-size',
+        type=int,
+        default=5,
+        help='Size of the bins for numeric fields. Default is 5.',
+    )
 
     parser.add_argument(
         '--private-key-path',
@@ -264,11 +395,21 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        '--output-path',
+        '--output-folder-path',
         type=str,
         required=True,
-        help='Path to the JSON output file (absolute or relative to the current working directory).',
+        help='Path to the output folder (absolute or relative to the current working directory).',
         default=None
+    )
+
+    parser.add_argument(
+        '--identifiable-fields',
+        type=str,
+        required=False,
+        help='Space-separated list of fields to keep in the decrypted data. \n'
+             'If not provided, all fields will be kept in the pseudonymized and public data.',
+        default=[],
+        nargs='+',
     )
 
     parser.add_argument(
@@ -278,5 +419,20 @@ if __name__ == "__main__":
         help='The private key password',
         default=None
     )
+
+    args = parser.parse_args()
+
+    if args.do_plot and not (args.string_fields or args.numeric):
+        parser.error("--do-plot requires either --string-fields or --numeric-fields to be provided.")
+
+
+    if (args.string_fields or args.numeric or args.bin_size) and not args.do_plot:
+        parser.error("--string-fields, --numeric-fields, and --bin-size can only be used with --do-plot.")
+
+    if args.bin_size and args.bin_size <= 0:
+        parser.error("--bin-size must be a positive integer.")
+
+    if args.bin_size and not len(args.numeric_fields):
+        parser.error("--bin-size can only be used with --numeric-fields.")
 
     asyncio.run(_main())

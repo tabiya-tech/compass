@@ -3,10 +3,11 @@ This script tests the decryption of sensitive personal data using RSA and AES.
 """
 
 import os
-import base64
 import json
-import datetime
+import shutil
 import pytest
+import base64
+import datetime
 
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
@@ -80,8 +81,10 @@ async def test_round_trip_with_size(_rsa_keys, in_memory_userdata_database):
     given_key_id = get_random_printable_string(10)
     # AND the input json
     given_input_path = _get_file_path("given.json")
-    # AND the output json path
-    given_output_path = _get_file_path("output.json")
+
+    # AND the output folder path
+    given_output_folder = os.path.join(os.path.dirname(__file__), "test_output")
+    os.makedirs(given_output_folder, exist_ok=True)
 
     # AND the RSA keys (public and private keys)
     private_key, public_key = _rsa_keys
@@ -120,20 +123,21 @@ async def test_round_trip_with_size(_rsa_keys, in_memory_userdata_database):
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.BestAvailableEncryption(given_password)
         ),
-        output_path=given_output_path,
+        output_folder_path=given_output_folder,
         private_key_password=given_password,
-        repository=repository
+        repository=repository,
+        identifiable_fields=[]
     )
 
     # THEN the two files should match
     with open(given_input_path) as file:
         original_data = json.load(file)
 
-    with open(given_output_path) as file:
+    with open(os.path.join(given_output_folder, "plain.json")) as file:
         decrypted_data = json.load(file)
 
     assert original_data == decrypted_data
 
     # clean up
     # remove the output file
-    os.remove(given_output_path)
+    shutil.rmtree(given_output_folder)
