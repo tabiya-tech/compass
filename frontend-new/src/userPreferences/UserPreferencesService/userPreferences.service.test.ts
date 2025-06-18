@@ -3,6 +3,7 @@ import "src/_test_utilities/consoleMock";
 import UserPreferencesService from "./userPreferences.service";
 import { StatusCodes } from "http-status-codes";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { getRandomString } from "src/_test_utilities/specialCharacters";
 import { setupAPIServiceSpy, expectCorrectFetchRequest } from "src/_test_utilities/fetchSpy";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import {
@@ -13,6 +14,20 @@ import {
   UserPreference,
 } from "./userPreferences.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+
+function getTestUserPreferences(): UserPreference {
+  return {
+    user_id: "1",
+    language: Language.en,
+    accepted_tc: new Date(),
+    sessions: [1234],
+    client_id: getRandomString(10),
+    user_feedback_answered_questions: {},
+    has_sensitive_personal_data: false,
+    sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+    experiments: {},
+  }
+}
 
 describe("UserPreferencesService", () => {
   // GIVEN a backend URL is returned by the envService
@@ -48,21 +63,10 @@ describe("UserPreferencesService", () => {
   describe("getUserPreferences", () => {
     test("getUserPreferences should fetch at the correct URL, with GET and the correct headers and payload successfully", async () => {
       // GIVEN the GET models REST API will respond with OK and some models
+      const givenResponseBody = getTestUserPreferences();
 
-      // AND a client id is set in the persistent storage
-      const givenClientId = "client-1234";
-
-      const givenResponseBody: UserPreference = {
-        user_id: "1",
-        language: Language.en,
-        accepted_tc: new Date(),
-        sessions: [1234],
-        client_id: givenClientId,
-        user_feedback_answered_questions: {},
-        has_sensitive_personal_data: false,
-        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
-        experiments: {},
-      };
+      // AND the client id is the same as the one on the local client device
+      jest.spyOn(PersistentStorageService, "getClientId").mockReturnValue(givenResponseBody.client_id as string);
 
       const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
 
@@ -89,6 +93,67 @@ describe("UserPreferencesService", () => {
       // AND expect it to return the user preferences
       expect(actualUserPreferences).toEqual(givenResponseBody);
     });
+
+
+    test("getUserPreferences should update the client id in the user preferences if it does not exist for legacy users", async () => {
+      const updateUserPreferencesSpy = jest.spyOn(UserPreferencesService.getInstance(), "updateUserPreferences");
+
+      // GIVEN the GET models REST API will respond with OK and some models
+      const givenResponseBody: UserPreference = getTestUserPreferences();
+      // With no client id
+      givenResponseBody.client_id = undefined;
+
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
+
+      // AND PersistentStorageService.getClientId returns a client id
+      const givenClientId = "client-1234";
+      jest.spyOn(PersistentStorageService, "getClientId").mockReturnValue(givenClientId);
+
+      // WHEN the getUserPreferences function is called with the given arguments
+      const service = UserPreferencesService.getInstance();
+      await service.getUserPreferences(givenResponseBody.user_id);
+
+      // THEN expect it to make a GET request with correct headers and payload
+      expect(fetchSpy).toHaveBeenCalled()
+
+      // AND updateUserPreferencesSpy should be called with the correct arguments
+      expect(updateUserPreferencesSpy).toHaveBeenCalledWith({
+        user_id: givenResponseBody.user_id,
+        client_id: givenClientId,
+      });
+    })
+
+    test("getUserPreferences should update the client id if it mismatches with the one on the local client device", async () => {
+      const updateUserPreferencesSpy = jest.spyOn(UserPreferencesService.getInstance(), "updateUserPreferences");
+
+      // GIVEN the GET models REST API will respond with OK and some models
+      const givenResponseBody: UserPreference = getTestUserPreferences();
+      // With no client id
+      givenResponseBody.client_id = getRandomString(10);
+
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
+
+      // AND PersistentStorageService.getClientId returns a client id
+      const givenClientId = "client-1234";
+
+      // GUARD givenClientId != givenResponseBody.client_id
+      expect(givenClientId).not.toEqual(givenResponseBody.client_id);
+
+      jest.spyOn(PersistentStorageService, "getClientId").mockReturnValue(givenClientId);
+
+      // WHEN the getUserPreferences function is called with the given arguments
+      const service = UserPreferencesService.getInstance();
+      await service.getUserPreferences(givenResponseBody.user_id);
+
+      // THEN expect it to make a GET request with correct headers and payload
+      expect(fetchSpy).toHaveBeenCalled()
+
+      // AND updateUserPreferencesSpy should be called with the correct arguments
+      expect(updateUserPreferencesSpy).toHaveBeenCalledWith({
+        user_id: givenResponseBody.user_id,
+        client_id: givenClientId,
+      });
+    })
 
     test("on fail to fetch, getUserPreferences should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
