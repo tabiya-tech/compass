@@ -177,8 +177,14 @@ export default class UserPreferencesService {
 
     const userPreferences = await this.parseJsonResponse(response, userId, errorFactory);
 
-    if(!userPreferences.client_id) {
-      await this.updateUserPreferences({ user_id: userId, client_id: this.getClientID() })
+    const clientId = this.getClientID();
+
+    // If the user preferences do not have a client_id, we will set it to the current client ID.
+    // Or if the client_id has changed.
+    // This can happen if the user is opening the app on a different device or browser.
+    // We will update the user preferences with the current client ID.
+    if(!userPreferences.client_id || userPreferences.client_id !== clientId) {
+      await this.updateUserPreferences({ user_id: userId, client_id: clientId })
     }
 
     return userPreferences;
