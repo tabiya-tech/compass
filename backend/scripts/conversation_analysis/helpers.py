@@ -5,7 +5,7 @@ from typing import Optional, Any, List, Dict
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.server_dependencies.database_collections import Collections
-from scripts.export_interesting_conversations.utils import _load_deployments_from_file, _load_demographics_from_file
+from scripts.conversation_analysis.utils import _load_deployments_from_file, _load_demographics_from_file
 
 # Load deployments from a JSON file
 deployments = _load_deployments_from_file()
@@ -22,6 +22,28 @@ def _get_compass_version(date_input: Optional[Any]) -> Optional[str]:
         if date_input >= deployment_date:
             return f"{i}: {deployment_label}"
     return None
+
+
+def _assign_group(row: dict) -> str:
+    if row.get("user_never_started_conversation", False):
+        return "Group 5"  # No Engagement
+    elif row.get("current_phase") == "ENDED":
+        return "Group 4"  # Successful Engagement
+    elif any([
+        row.get("is_explored_gt1_but_not_complete", False),
+        row.get("is_explored_1_but_not_completed", False),
+    ]):
+        return "Group 3"  # High Engagement: explored one or more experiences
+    elif row.get("is_discovered_but_no_explored", False):
+        return "Group 2"  # Moderate Engagement: discovered, but explored none
+    elif any([
+        row.get("is_never_left_intro", False),
+        row.get("is_counseling_but_no_messages", False),
+        row.get("is_counseling_but_no_discovered", False)
+    ]):
+        return "Group 1"  # Low Engagement: didn't progress beyond early steps
+    else:
+        return "Unknown"  # Session does not match any known behavioral pattern
 
 
 def _get_demographics_for_user(user_id: str) -> dict:
@@ -52,17 +74,16 @@ def _compute_session_flags(session_data: dict) -> dict:
         "is_never_left_intro": (
                 not session_data.get("user_never_started_conversation", False)
                 and session_data.get("current_phase") == "INTRO"
-                and not session_data.get("has_multiple_sessions", False)
         ),
         "is_counseling_but_no_messages": (
                 not session_data.get("user_never_started_conversation", False)
                 and session_data.get("counseling_messages", 0) == 1
-                and session_data.get("current_phase") == "COUNSELING"
+                and session_data.get("current_phase") not in ["ENDED", "INTRO"]
         ),
         "is_counseling_but_no_discovered": (
                 not session_data.get("user_never_started_conversation", False)
                 and session_data.get("discovered_experiences", 0) == 0
-                and session_data.get("current_phase") == "COUNSELING"
+                and session_data.get("current_phase") not in ["ENDED", "INTRO"]
         ),
         "is_discovered_but_no_explored": (
                 session_data.get("discovered_experiences", 0) > 0

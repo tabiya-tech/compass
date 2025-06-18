@@ -6,7 +6,7 @@ from datetime import datetime
 import pandas as pd
 from motor.motor_asyncio import AsyncIOMotorDatabase, AsyncIOMotorClient
 
-from scripts.export_interesting_conversations.constants import SCRIPT_DIR, DEMOGRAPHICS_FILE_NAME, DEPLOYMENTS_FILE_NAME
+from scripts.conversation_analysis.constants import SCRIPT_DIR, DEMOGRAPHICS_FILE_NAME, DEPLOYMENTS_FILE_NAME
 
 # Load the demographics file
 DEMOGRAPHIC_FILE = os.path.join(SCRIPT_DIR, DEMOGRAPHICS_FILE_NAME)

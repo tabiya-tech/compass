@@ -15,8 +15,9 @@ from pydantic_settings import BaseSettings
 from app.server_dependencies.database_collections import Collections
 from common_libs.logging.log_utilities import setup_logging_config
 from constants import SCRIPT_DIR, DEFAULT_EXPORTS_DIR
-from scripts.export_interesting_conversations.helpers import _get_compass_version, _compute_session_flags, _get_session_data, _get_demographics_for_user
-from scripts.export_interesting_conversations.utils import _valid_datetime, _get_db_connection
+from scripts.conversation_analysis.helpers import _get_compass_version, _compute_session_flags, _get_session_data, _get_demographics_for_user, \
+    _assign_group
+from scripts.conversation_analysis.utils import _valid_datetime, _get_db_connection
 
 # Load environment and logging
 load_dotenv()
@@ -177,7 +178,7 @@ async def _get_sessions_with_no_app_state(
                 "has_multiple_sessions": users_with_multiple_sessions.get(user_id, False),
                 "compass_version": _get_compass_version(user_created_at),
                 **_get_demographics_for_user(user_id),
-                "conversation_link": ""
+                "conversation_link": "",
             }
             # we expect that the session flags will always be false for these sessions
             flags = _compute_session_flags(session_dict)
@@ -252,6 +253,7 @@ async def main():
         results = await analyze_sessions(application_db, userdata_db, args.start_datetime, args.end_datetime)
 
         df = pd.DataFrame(results)
+        df["group"] = df.apply(_assign_group, axis=1)
 
         os.makedirs(args.output_dir, exist_ok=True)
         output_path = os.path.join(args.output_dir, f"session_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv")
