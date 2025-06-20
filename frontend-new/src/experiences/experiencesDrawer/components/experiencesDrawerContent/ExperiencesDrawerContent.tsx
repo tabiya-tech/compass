@@ -66,11 +66,11 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => 
           data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_DATE}
         >
           {/* display the start and end dates */}
-          {experience.end_date && experience.start_date
-            ? `${experience.start_date} — ${experience.end_date}`
-            : experience.start_date || experience.end_date}
+          {experience.timeline.end && experience.timeline.start
+            ? `${experience.timeline.start} — ${experience.timeline.end}`
+            : experience.timeline.start || experience.timeline.end}
 
-          {(experience.start_date || experience.end_date) && experience.company && ", "}
+          {(experience.timeline.start || experience.timeline.end) && experience.company && ", "}
 
           {/* display the company if it exists */}
           {experience.company && experience.company}

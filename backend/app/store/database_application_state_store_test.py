@@ -124,7 +124,15 @@ def update_explore_experiences_director_state(application_state: ApplicationStat
     application_state.explore_experiences_director_state.current_experience_uuid = str(uuid4())
     application_state.explore_experiences_director_state.conversation_phase = random.choice(
         list(ExploreExperiencesConversationPhase))  # nosec B311 # random is used for testing purposes
-    application_state.explore_experiences_director_state.experiences_state = generate_experience_states(5)
+    experience_states = generate_experience_states(5)
+    application_state.explore_experiences_director_state.experiences_state = experience_states
+    # Set explored_experiences as subset where dive_in_phase == PROCESSED
+    processed_experiences = [
+        state.experience
+        for state in experience_states.values()
+        if state.dive_in_phase == DiveInPhase.PROCESSED
+    ]
+    application_state.explore_experiences_director_state.explored_experiences = processed_experiences
 
 
 def generate_history(index) -> ConversationHistory:

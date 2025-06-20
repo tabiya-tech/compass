@@ -1530,8 +1530,10 @@ describe("Chat", () => {
       const givenExperiences = [
         {
           UUID: "1",
-          start_date: "2024-01-01",
-          end_date: "2024-01-01",
+          timeline: {
+            start: "2024-01-01",
+            end: "2024-01-01",
+          },
           experience_title: "Experience 1",
           company: "Company 1",
           location: "Location 1",
