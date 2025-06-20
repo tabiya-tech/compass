@@ -332,6 +332,27 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
       throw castToFirebaseError(error, firebaseErrorFactory);
     }
   }
+
+  /**
+   * Send a password reset email to the user.
+   * @param {string} email - The user's email address
+   * @returns {Promise<void>}
+   * @throws {FirebaseError} If sending the reset email fails
+   */
+  async resetPassword(email: string): Promise<void> {
+
+    const firebaseErrorFactory = getFirebaseErrorFactory(
+      "EmailAuthService",
+      "resetPassword",
+    );
+
+    try {
+      await firebaseAuth.sendPasswordResetEmail(email);
+    } catch (error) {
+      throw castToFirebaseError(error, firebaseErrorFactory);
+    }
+  }
+
 }
 
 export default FirebaseEmailAuthenticationService;

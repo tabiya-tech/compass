@@ -18,6 +18,9 @@ import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.consta
 import ResendVerificationEmail, {
   DATA_TEST_ID as RESEND_DATA_TEST_ID,
 } from "src/auth/components/resendVerificationEmail/ResendVerificationEmail";
+import {
+  DATA_TEST_ID as PASSWORD_RESET_DATA_TEST_ID,
+} from "src/auth/components/passwordReset/PasswordReset";
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { useNavigate } from "react-router-dom";
 import MetricsService from "src/metrics/metricsService";
@@ -163,6 +166,17 @@ jest.mock("src/auth/components/resendVerificationEmail/ResendVerificationEmail",
   };
 });
 
+jest.mock("src/auth/components/passwordReset/PasswordReset", () => {
+  const actual = jest.requireActual("src/auth/components/passwordReset/PasswordReset");
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => {
+      return <span data-testid={actual.DATA_TEST_ID.CONTAINER}></span>;
+    }),
+  };
+});
+
 describe("Testing Login component", () => {
   const mockLogin = jest.fn();
   const mockLogout = jest.fn();
@@ -203,7 +217,9 @@ describe("Testing Login component", () => {
     // AND expect the bug report button to be rendered
     expect(screen.getByTestId(BUG_REPORT_DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER)).toBeInTheDocument();
     // AND the request registration code link should be displayed
-    expect(screen.getByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).toBeInTheDocument();
+    expect(screen.getByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).toBeInTheDocument()
+    // AND the password reset link should be shown
+    expect(screen.getByTestId(PASSWORD_RESET_DATA_TEST_ID.CONTAINER)).toBeInTheDocument();
 
     // THEN the email login form should be displayed
     expect(LoginWithEmailForm).toHaveBeenCalled();

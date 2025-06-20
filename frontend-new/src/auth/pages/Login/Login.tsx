@@ -11,11 +11,13 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
-import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import FirebaseEmailAuthService
+  from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
-import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
+import FirebaseInvitationCodeAuthenticationService
+  from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import { AuthenticationError } from "src/error/commonErrors";
 import ResendVerificationEmail from "src/auth/components/resendVerificationEmail/ResendVerificationEmail";
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
@@ -24,9 +26,10 @@ import CustomLink from "src/theme/CustomLink/CustomLink";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
 import MetricsService from "src/metrics/metricsService";
 import { DeviceSpecificationEvent, EventType, UserLocationEvent } from "src/metrics/types";
-import { browserName, deviceType, osName, browserVersion } from "react-device-detect";
+import { browserName, browserVersion, deviceType, osName } from "react-device-detect";
 import { getCoordinates } from "src/metrics/utils/getUserLocation";
 import { getApplicationLoginCode, getApplicationRegistrationCode } from "src/envService";
+import PasswordReset from "src/auth/components/passwordReset/PasswordReset";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -92,7 +95,7 @@ const Login: React.FC = () => {
         // Show resend verification option if the error is due to unverified email
         if (error.errorCode === FirebaseErrorCodes.EMAIL_NOT_VERIFIED) {
           setShowResendVerification(true);
-        } else {
+        }  else {
           setShowResendVerification(false);
         }
       } else {
@@ -409,9 +412,16 @@ const Login: React.FC = () => {
             notifyOnPasswordChanged={handlePasswordChanged}
             isDisabled={isLoading}
           />
-          {showResendVerification && (
+          {
+            showResendVerification && (
             <ResendVerificationEmail email={lastAttemptedEmail} password={lastAttemptedPassword} />
           )}
+          {
+            /*dont show both the resend verification email and forgot password at the same time*/
+            !showResendVerification && (
+              <PasswordReset />
+            )
+          }
           <PrimaryButton
             fullWidth
             variant="contained"
