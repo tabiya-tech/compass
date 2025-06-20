@@ -6,14 +6,14 @@ from unittest.mock import AsyncMock
 import pytest
 import pytest_mock
 
-from app.agent.experience import WorkType
+from app.agent.experience import WorkType, Timeline
+from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.conversations.reactions.routes import get_user_preferences_repository
 from app.conversations.types import ConversationResponse, ConversationMessage, ConversationInput, \
-    ConversationMessageSender, ConversationPhaseResponse, CurrentConversationPhaseResponse
+    ConversationMessageSender, ConversationPhaseResponse, CurrentConversationPhaseResponse, Skill, Experience
 from app.conversations.constants import MAX_MESSAGE_LENGTH
 from app.conversations.routes import get_conversation_service, add_conversation_routes
 from app.conversations.service import IConversationService, ConversationAlreadyConcludedError
-from app.types import Experience, Skill
 from app.users.auth import UserInfo
 
 from fastapi.testclient import TestClient
@@ -534,12 +534,11 @@ class TestConversationsRoutes:
         # AND a ConversationService that will return a list of experiences
         expected_response = [
             Experience(
-                UUID="foo_uuid",
+                uuid="foo_uuid",
                 experience_title="Foo Bar",
                 company="Foo Company",
                 location="Foo Location",
-                start_date="2020-01-01",
-                end_date="2021-01-01",
+                timeline=Timeline(start="2020-01-01", end="2021-01-01"),
                 work_type=WorkType.SELF_EMPLOYMENT,
                 top_skills=[
                     Skill(
@@ -548,7 +547,9 @@ class TestConversationsRoutes:
                         description="Foo bar baz",
                         altLabels=["foo_label_1", "bar_label_2"]
                     )
-                ]
+                ],
+                exploration_phase=DiveInPhase.PROCESSED,
+                summary="Foo summary"
             )
         ]
         mocked_service.get_experiences_by_session_id = AsyncMock(return_value=expected_response)
@@ -561,7 +562,7 @@ class TestConversationsRoutes:
         assert response.status_code == HTTPStatus.OK
 
         # AND the response matches the expected response
-        assert response.json() == [exp.model_dump() for exp in expected_response]
+        assert response.json() == [exp.model_dump(by_alias=True, mode="json") for exp in expected_response]
 
         # AND the user preferences repository was called with the correct user_id
         preferences_spy.assert_called_once_with(mocked_user.user_id)

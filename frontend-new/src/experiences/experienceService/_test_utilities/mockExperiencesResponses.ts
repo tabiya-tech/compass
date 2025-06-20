@@ -6,8 +6,10 @@ import { format } from "date-fns";
 export const mockExperiences: Experience[] = [
   {
     UUID: "c3c8b43d-73dd-4c6d-9e71-010492e86d5e",
-    start_date: "2022",
-    end_date: "Present",
+    timeline: {
+      start: "2022",
+      end: "Present",
+    },
     experience_title: "Project Manager",
     company: "Business Inc",
     location: "New York, NY",
@@ -32,8 +34,10 @@ export const mockExperiences: Experience[] = [
   },
   {
     UUID: "c3c8b43d-73dd-4c6d-9e71-010492e86d5e",
-    start_date: "2022",
-    end_date: "Present",
+    timeline: {
+      start: "2022",
+      end: "Present",
+    },
     experience_title: "Project Manager",
     company: "Business Inc",
     location: "New York, NY",
@@ -160,8 +164,10 @@ const generateRandomExperience = (workType?: WorkType): Experience => {
 
   return {
     UUID: uuidv4(),
-    start_date: startDate,
-    end_date: endDate,
+    timeline: {
+      start: startDate,
+      end: endDate,
+    },
     experience_title: jobTitles[Math.floor(Math.random() * jobTitles.length)],
     summary: faker.lorem.paragraphs(3, "\n"),
     company: companyNames[Math.floor(Math.random() * companyNames.length)],

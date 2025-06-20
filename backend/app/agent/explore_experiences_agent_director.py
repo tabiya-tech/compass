@@ -91,6 +91,12 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
     The state of the experiences of the user that are being explored, keyed by experience.uuid
     """
 
+    explored_experiences: list[ExperienceEntity] = Field(default_factory=list)
+    """
+    Experiences that have been explored so far. 
+    This is also used as a copy of what users are able to see and edit in the UI.
+    """
+
     current_experience_uuid: Optional[str] = None
     """
     The key in the experiences dict of the current experience under discussion
@@ -136,6 +142,9 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
             country_of_user=_doc.get("country_of_user", Country.UNSPECIFIED),
             experiences_state=_doc["experiences_state"],
             current_experience_uuid=_doc["current_experience_uuid"],
+
+            # For backward compatibility with old documents that don't have the explored_experiences field, the default is an empty array.
+            explored_experiences=_doc.get("explored_experiences", []),
             conversation_phase=_doc["conversation_phase"])
 
 
@@ -245,6 +254,10 @@ class ExploreExperiencesAgentDirector(Agent):
                 ), agent_output)
                 # get the context again after updating the history
                 context = await self._conversation_manager.get_conversation_context()
+
+            if current_experience.dive_in_phase == DiveInPhase.PROCESSED:
+                # Add the experience to the list of explored experiences
+                state.explored_experiences.append(current_experience.experience)
 
             # If the agent has finished exploring the skills, then if there are no more experiences to process,
             # then we are done

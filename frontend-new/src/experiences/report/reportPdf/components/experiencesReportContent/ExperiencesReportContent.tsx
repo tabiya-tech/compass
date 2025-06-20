@@ -39,11 +39,11 @@ const ExperiencesReportContent: React.FC<ExperienceProps> = ({ experience }) => 
         </Text>
         <View style={styles.experienceInfo} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_INFO}>
           <Text x={0} y={0} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_DATE}>
-            {experience.end_date && experience.start_date
-              ? `${experience.start_date} — ${experience.end_date}`
-              : experience.start_date || experience.end_date}
+            {experience.timeline.end && experience.timeline.start
+              ? `${experience.timeline.start} — ${experience.timeline.end}`
+              : experience.timeline.start || experience.timeline.end}
           </Text>
-          {(experience.start_date || experience.end_date) && experience.company && (
+          {(experience.timeline.start || experience.timeline.end) && experience.company && (
             <Text x={0} y={0}>
               ,{" "}
             </Text>

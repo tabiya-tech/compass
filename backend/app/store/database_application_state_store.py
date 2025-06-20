@@ -4,6 +4,8 @@ from typing import AsyncIterator
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from ._utils import has_explored_experiences, filter_explored_experiences
+
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
@@ -85,13 +87,19 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
              collect_experience_state,
              skills_explorer_agent_state) = results
 
-            return ApplicationState(session_id=session_id,
+            state = ApplicationState(session_id=session_id,
                                     agent_director_state=AgentDirectorState.from_document(agent_director_state),
                                     welcome_agent_state=WelcomeAgentState.from_document(welcome_agent_state),
                                     explore_experiences_director_state=ExploreExperiencesAgentDirectorState.from_document(explore_experiences_director_state),
                                     conversation_memory_manager_state=ConversationMemoryManagerState.from_document(conversation_memory_manager_state),
                                     collect_experience_state=CollectExperiencesAgentState.from_document(collect_experience_state),
                                     skills_explorer_agent_state=SkillsExplorerAgentState.from_document(skills_explorer_agent_state))
+
+            # Upgrade the state if necessary
+            state = await self._upgrade_state(state)
+
+            return state
+
         except Exception as e:  # pylint: disable=broad-except
             self._logger.error("Failed to get application state for session ID %s: %s", session_id, e, exc_info=True)
             return None
@@ -173,3 +181,31 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
         except Exception as e:
             self._logger.error("Failed to stream application states: %s", e, exc_info=True)
             raise
+
+    async def _upgrade_state(self, state: ApplicationState) -> ApplicationState:
+        """
+        Upgrade the state to the latest version if necessary.
+        Saves it andy returns the upgraded state.
+
+        This method should not raise an exception but log it and return the state as is.
+        As we didn't upgrade the state, it will be returned as is.
+        """
+
+        try:
+            _changes = False
+
+            # The field `state.explore_experiences_director_state.explored_experiences` was added in a later version
+            # if it is empty, and we have explored experiences, we populate it
+            # with the experiences that have been processed
+            if len(state.explore_experiences_director_state.explored_experiences) == 0 and has_explored_experiences(state):
+                state.explore_experiences_director_state.explored_experiences = filter_explored_experiences(state)
+                _changes = True
+
+            if _changes:
+                await self.save_state(state)
+
+            # Currently, no upgrades are needed, but this method can be extended in the future
+            return state
+        except Exception as e:  # pylint: disable=broad-except
+            self._logger.error("Failed to upgrade application state: %s", e, exc_info=True)
+            return state

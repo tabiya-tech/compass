@@ -8,15 +8,13 @@ from datetime import datetime, timezone
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentInput
-from app.agent.experience import ExperienceEntity
 from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.conversation_memory.conversation_memory_manager import IConversationMemoryManager
 from app.conversations.reactions.repository import IReactionRepository
-from app.conversations.types import ConversationResponse
+from app.conversations.types import ConversationResponse, Skill, Experience
 from app.conversations.utils import get_messages_from_conversation_manager, filter_conversation_history, \
     get_total_explored_experiences, get_current_conversation_phase_response
 from app.sensitive_filter import sensitive_filter
-from app.types import Experience, Skill
 from app.metrics.application_state_metrics_recorder.recorder import IApplicationStateMetricsRecorder
 
 
@@ -161,44 +159,25 @@ class ConversationService(IConversationService):
     async def get_experiences_by_session_id(self, user_id: str, session_id: int) -> list[Experience]:
         # Get the experiences from the application state
         state = await self._application_state_metrics_recorder.get_state(session_id)
+        director_state = state.explore_experiences_director_state
 
+        # experiences to return to the user.
         experiences: list[Experience] = []
 
-        for uuid in state.explore_experiences_director_state.experiences_state:
-            """
-            UUID is the key for the experiences_state dictionary in the explore_experiences_director_state.
-            """
-            experience_details: ExperienceEntity = state.explore_experiences_director_state.experiences_state[
-                uuid].experience
-            """
-            experience_details is the value for the UUID key in the experiences_state dictionary.
-            """
-            top_skills = []
-            """
-            Top skills for the experience.
-            """
+        # Cache for UUIDs of explored experiences so that they don't be duplicated
+        explored_uuids: set[str] = set()
 
-            for skill in experience_details.top_skills:
-                """
-                Construct the Skill object for each skill in the top_skills list.
-                """
-                top_skills.append(Skill(
-                    UUID=skill.UUID,
-                    preferredLabel=skill.preferredLabel,
-                    description=skill.description,
-                    altLabels=skill.altLabels
-                ))
+        # 1. First, get the explored experiences from the `director_state`
+        for experience_details in director_state.explored_experiences:
+            explored_uuids.add(experience_details.uuid)
+            experiences.append(Experience.from_experience_entity(experience_details, DiveInPhase.PROCESSED))
 
-            experiences.append(Experience(
-                UUID=experience_details.uuid,
-                experience_title=experience_details.experience_title,
-                company=experience_details.company,
-                location=experience_details.location,
-                start_date=experience_details.timeline.start,
-                end_date=experience_details.timeline.end,
-                work_type=experience_details.work_type,
-                top_skills=top_skills,
-                summary=experience_details.summary
-            ))
+        # 2. Then, get the experiences that are in the `experiences_state` but not yet explored.
+        #    Append them to the experiences to return to the user.
+        for uuid, exp_state in director_state.experiences_state.items():
+            if uuid in explored_uuids:
+                continue  # Skip ones we already added
+
+            experiences.append(Experience.from_experience_entity(exp_state.experience, exp_state.dive_in_phase))
 
         return experiences

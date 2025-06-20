@@ -31,11 +31,14 @@ class OccupationEntity(BaseEntity):
         return self.preferredLabel
 
 
+SkillTypeLiteral = Literal['skill/competence', 'knowledge', 'language', 'attitude', '']
+
+
 class SkillEntity(BaseEntity):
     """
     Represents a skill entity.
     """
-    skillType: Literal['skill/competence', 'knowledge', 'language', 'attitude', '']
+    skillType: SkillTypeLiteral
 
     def __str__(self):
         return self.preferredLabel

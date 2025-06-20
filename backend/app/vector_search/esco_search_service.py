@@ -1,12 +1,12 @@
 from abc import abstractmethod
-from typing import TypeVar, List
+from typing import TypeVar, List, cast
 
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel
 
 from app.vector_search.embeddings_model import EmbeddingService
-from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity, AssociatedSkillEntity
+from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity, AssociatedSkillEntity, SkillTypeLiteral
 from app.vector_search.esco_entities import SkillEntity
 from app.vector_search.similarity_search_service import SimilaritySearchService, FilterSpec
 from common_libs.environment_settings.constants import EmbeddingConfig
@@ -189,7 +189,7 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
             preferredLabel=doc.get("preferredLabel", ""),
             description=doc.get("description", ""),
             altLabels=doc.get("altLabels", []),
-            skillType=doc.get("skillType", ""),
+            skillType=cast(SkillTypeLiteral, doc.get("skillType", "")),
             score=doc.get("score", 0.0),
         )
 
@@ -235,32 +235,32 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
 
         skills = await self.database.get_collection(
             self.embedding_config.occupation_to_skill_collection_name).aggregate([
-                {"$match": {"modelId": self._model_id, "requiringOccupationId": ObjectId(occupation.id)}},
-                {
-                    "$lookup": {
-                        "from": self.embedding_config.skill_collection_name,
-                        "localField": "requiredSkillId",
-                        "foreignField": "skillId",
-                        "as": "skills",
-                        "pipeline": [
-                            {"$match": {"modelId": self._model_id}}
-                        ]
-                    }
-                },
-                {"$unwind": "$skills"},
-                {"$group": {"_id": "$skills.skillId",
-                            "modelId": {"$first": "$modelId"},
-                            "skillId": {"$first": "$skills.skillId"},
-                            "UUID": {"$first": "$skills.UUID"},
-                            "preferredLabel": {"$first": "$skills.preferredLabel"},
-                            "description": {"$first": "$skills.description"},
-                            "altLabels": {"$first": "$skills.altLabels"},
-                            "skillType": {"$first": "$skills.skillType"},
-                            "relationType": {"$first": "$relationType"},
-                            "signallingValueLabel": {"$first": "$signallingValueLabel"},
-                            }
-                 }
-            ]).to_list(length=None)
+            {"$match": {"modelId": self._model_id, "requiringOccupationId": ObjectId(occupation.id)}},
+            {
+                "$lookup": {
+                    "from": self.embedding_config.skill_collection_name,
+                    "localField": "requiredSkillId",
+                    "foreignField": "skillId",
+                    "as": "skills",
+                    "pipeline": [
+                        {"$match": {"modelId": self._model_id}}
+                    ]
+                }
+            },
+            {"$unwind": "$skills"},
+            {"$group": {"_id": "$skills.skillId",
+                        "modelId": {"$first": "$modelId"},
+                        "skillId": {"$first": "$skills.skillId"},
+                        "UUID": {"$first": "$skills.UUID"},
+                        "preferredLabel": {"$first": "$skills.preferredLabel"},
+                        "description": {"$first": "$skills.description"},
+                        "altLabels": {"$first": "$skills.altLabels"},
+                        "skillType": {"$first": "$skills.skillType"},
+                        "relationType": {"$first": "$relationType"},
+                        "signallingValueLabel": {"$first": "$signallingValueLabel"},
+                        }
+             }
+        ]).to_list(length=None)
         return [AssociatedSkillEntity(
             id=str(skill.get("skillId", "")),
             modelId=str(skill.get("modelId", "")),
