@@ -12,10 +12,14 @@ export interface Skill {
   altLabels: string[];
 }
 
+export interface Timeline {
+  start: string;
+  end: string;
+}
+
 export interface Experience {
   UUID: string;
-  start_date: string;
-  end_date: string;
+  timeline: Timeline;
   experience_title: string;
   company: string;
   location: string;

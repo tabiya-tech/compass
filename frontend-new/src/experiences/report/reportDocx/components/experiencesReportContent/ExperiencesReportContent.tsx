@@ -25,14 +25,14 @@ export const generateExperience = (experience: Experience): Paragraph[] => {
       // display the start and end dates
       new TextRun({
         text:
-          experience.end_date && experience.start_date
-            ? `${experience.start_date} — ${experience.end_date}`
-            : experience.start_date || experience.end_date,
+          experience.timeline.end && experience.timeline.start
+            ? `${experience.timeline.start} — ${experience.timeline.end}`
+            : experience.timeline.start || experience.timeline.end,
         color: COLORS.textBlack,
         size: 20,
       }),
 
-      ...((experience.start_date || experience.end_date) && experience.company ? [new TextRun({ text: ", " })] : []),
+      ...((experience.timeline.start || experience.timeline.end) && experience.company ? [new TextRun({ text: ", " })] : []),
 
       // display the company if it exists
       ...(experience.company

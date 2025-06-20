@@ -18,7 +18,7 @@ from app.conversations.feedback.routes.routes import add_user_feedback_routes
 from app.conversations.reactions.repository import ReactionRepository
 from app.conversations.reactions.routes import add_reaction_routes, get_user_preferences_repository
 from app.conversations.service import ConversationAlreadyConcludedError, IConversationService, ConversationService
-from app.conversations.types import ConversationResponse, ConversationInput
+from app.conversations.types import ConversationResponse, ConversationInput, Experience
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
 from app.metrics.application_state_metrics_recorder.recorder import ApplicationStateMetricsRecorder
@@ -28,7 +28,6 @@ from app.server_dependencies.agent_director_dependencies import get_agent_direct
 from app.server_dependencies.application_state_dependencies import get_application_state_manager
 from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.server_dependencies.db_dependencies import CompassDBProvider
-from app.types import Experience
 from app.users.auth import Authentication, UserInfo
 
 
