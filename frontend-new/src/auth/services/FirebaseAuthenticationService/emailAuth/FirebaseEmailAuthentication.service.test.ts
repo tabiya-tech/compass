@@ -24,6 +24,7 @@ jest.mock("firebase/compat/app", () => {
       signInAnonymously: jest.fn(),
       signOut: jest.fn(),
       onAuthStateChanged: jest.fn(),
+      sendPasswordResetEmail: jest.fn(),
       get currentUser() {
         return jest.fn();
       },
@@ -570,6 +571,71 @@ describe("AuthService class tests", () => {
         "signInWithEmailAndPassword",
         FirebaseErrorCodes.INTERNAL_ERROR,
         "Internal error"
+      ));
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("resetPassword", () => {
+    test("should send password reset email successfully", async () => {
+      // GIVEN a user email and the Firebase method resolves
+      const givenEmail = "foo@bar.baz";
+      jest.spyOn(firebase.auth(), "sendPasswordResetEmail").mockResolvedValueOnce();
+
+      // WHEN resetting the password
+      await authService.resetPassword(givenEmail);
+
+      // THEN it should call Firebase's method with correct email
+      expect(firebase.auth().sendPasswordResetEmail).toHaveBeenCalledWith(givenEmail);
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw a FirebaseError if sendPasswordResetEmail fails", async () => {
+      // GIVEN a user email and Firebase rejects with a known error
+      const givenEmail = "foo@bar.baz";
+      const firebaseError = {
+        code: "auth/invalid-email",
+        message: "Invalid email format",
+      };
+      jest.spyOn(firebase.auth(), "sendPasswordResetEmail").mockRejectedValueOnce(firebaseError);
+
+      // WHEN resetting the password
+      const resetPromise = authService.resetPassword(givenEmail);
+
+      // THEN it should throw a FirebaseError
+      await expect(resetPromise).rejects.toThrow(new FirebaseError(
+        "EmailAuthService",
+        "resetPassword",
+        FirebaseErrorCodes.INVALID_EMAIL,
+        "Invalid email format"
+      ));
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw a generic FirebaseError if an unknown error occurs", async () => {
+      // GIVEN a user email and Firebase throws a generic error
+      const givenEmail = "foo@bar.baz";
+      const unknownError = new Error("Something unexpected");
+      jest.spyOn(firebase.auth(), "sendPasswordResetEmail").mockRejectedValueOnce(unknownError);
+
+      // WHEN resetting the password
+      const resetPromise = authService.resetPassword(givenEmail);
+
+      // THEN it should throw a FirebaseError with INTERNAL_ERROR
+      await expect(resetPromise).rejects.toThrow(new FirebaseError(
+        "EmailAuthService",
+        "resetPassword",
+        FirebaseErrorCodes.INTERNAL_ERROR,
+        "An unknown error occurred"
       ));
 
       // AND no errors or warnings should be logged
