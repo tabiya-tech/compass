@@ -60,7 +60,7 @@ async def _get_skills_to_export(*,
         for experience in explore_experiences_state.experiences_state.values():
             for skill in experience.experience.top_skills:
                 _uuids = skills_uuids_by_model_id.get(skill.modelId, [])
-                _uuids.append(skill.UUID)
+                _uuids.append(skill.uuid)
                 skills_uuids_by_model_id[skill.modelId] = _uuids
 
 
@@ -94,9 +94,9 @@ async def _get_skills_to_export(*,
 
         for experience in explore_experiences_state.experiences_state.values():
             for skill in experience.experience.top_skills:
-                skill_doc = skills_map.get(skill.UUID)
+                skill_doc = skills_map.get(skill.uuid)
                 if skill_doc is None:
-                    logger.warning("No skill found for UUID: %s", skill.UUID)
+                    logger.warning("No skill found for UUID: %s", skill.uuid)
                     continue
 
                 exportable_skills.append(dict(
@@ -104,9 +104,9 @@ async def _get_skills_to_export(*,
                     conversation_id=conversation_state.session_id,
                     conversation_phase=conversation_state.current_phase.name,
                     experience_id=experience.experience.uuid,
-                    uuid=skill.UUID,
-                    uuid_history=skill_doc.get("UUIDHistory", [skill.UUID]),
-                    origin_uuid=skill_doc.get("originUUID", skill.UUID),
+                    uuid=skill.uuid,
+                    uuid_history=skill_doc.get("UUIDHistory", [skill.uuid]),
+                    origin_uuid=skill_doc.get("originUUID", skill.uuid),
                     preferred_label=skill.preferredLabel,
                     alt_labels=skill.altLabels,
                     description=skill.description,
