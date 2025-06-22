@@ -63,10 +63,22 @@ def _parse_session_data(
         if (t.get("output", {}).get("agent_type") == "COLLECT_EXPERIENCES_AGENT")
         and not t.get("input", {}).get("is_artificial", True)
         and t.get("input", {}).get("message") != "(silence)"
-    ) - 1)
+    ))
+
+    collect_data = session.get("collect_experiences", {}).get("collected_data", {})
+    discovered_experiences = (
+        len([
+            exp for exp in collect_data
+            if isinstance(exp, dict) and any([
+                exp.get("company") not in [None, "null", ""],
+                exp.get("location") not in [None, "null", ""],
+                exp.get("start_date") not in [None, "null", ""],
+                exp.get("end_date") not in [None, "null", ""]
+            ])
+        ]) if isinstance(collect_data, list) else 0
+    )
 
     explore_data = session.get("explore_experiences", {}).get("experiences_state", {})
-    discovered_experiences = len(explore_data) if isinstance(explore_data, dict) else 0
     explored_experiences = sum(
         1 for exp in explore_data.values()
         if isinstance(exp, dict) and exp.get("dive_in_phase") == "PROCESSED"

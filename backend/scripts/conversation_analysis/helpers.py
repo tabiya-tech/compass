@@ -77,24 +77,27 @@ def _compute_session_flags(session_data: dict) -> dict:
         ),
         "is_counseling_but_no_messages": (
                 not session_data.get("user_never_started_conversation", False)
-                and session_data.get("counseling_messages", 0) == 1
+                and int(session_data.get("counseling_messages") or 0) == 0
                 and session_data.get("current_phase") not in ["ENDED", "INTRO"]
         ),
         "is_counseling_but_no_discovered": (
                 not session_data.get("user_never_started_conversation", False)
-                and session_data.get("discovered_experiences", 0) == 0
+                and int(session_data.get("counseling_messages") or 0) > 0
+                and int(session_data.get("discovered_experiences") or 0) == 0
                 and session_data.get("current_phase") not in ["ENDED", "INTRO"]
         ),
         "is_discovered_but_no_explored": (
-                session_data.get("discovered_experiences", 0) > 0
-                and session_data.get("explored_experiences", 0) == 0
+                not session_data.get("user_never_started_conversation", False)
+                and int(session_data.get("counseling_messages") or 0) > 1
+                and int(session_data.get("discovered_experiences") or 0) > 0
+                and int(session_data.get("explored_experiences") or 0) == 0
         ),
         "is_explored_1_but_not_completed": (
-                session_data.get("explored_experiences", 0) == 1
+                int(session_data.get("explored_experiences") or 0) == 1
                 and session_data.get("current_phase") != "ENDED"
         ),
         "is_explored_gt1_but_not_complete": (
-                session_data.get("explored_experiences", 0) > 1
+                int(session_data.get("explored_experiences") or 0) > 1
                 and session_data.get("current_phase") != "ENDED"
         ),
     }
@@ -115,8 +118,15 @@ async def _get_session_data(application_db: AsyncIOMotorDatabase, session_ids: L
             "foreignField": "session_id",
             "as": "explore_experiences"
         }},
+        {"$lookup": {
+            "from": Collections.COLLECT_EXPERIENCE_STATE,
+            "localField": "session_id",
+            "foreignField": "session_id",
+            "as": "collect_experiences"
+        }},
         {"$addFields": {
             "conversation_memory": {"$arrayElemAt": ["$conversation_memory", 0]},
-            "explore_experiences": {"$arrayElemAt": ["$explore_experiences", 0]}
+            "explore_experiences": {"$arrayElemAt": ["$explore_experiences", 0]},
+            "collect_experiences": {"$arrayElemAt": ["$collect_experiences", 0]}
         }}
     ]).to_list(length=None)
