@@ -3,7 +3,7 @@ import { getRestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
-import { Experience } from "src/experiences/experienceService/experiences.types";
+import { Experience, UpdateExperienceRequest } from "src/experiences/experienceService/experiences.types";
 
 export default class ExperienceService {
   readonly experiencesEndpointUrl: string;
@@ -54,5 +54,46 @@ export default class ExperienceService {
     }
 
     return experiencesResponse;
+  }
+
+  async updateExperience(
+    sessionId: number,
+    experienceId: string,
+    updatedFields: UpdateExperienceRequest
+  ): Promise<Experience> {
+    const serviceName = "ExperienceService";
+    const serviceFunction = "updateExperience";
+    const method = "PATCH";
+    const experienceURL = `${this.apiServeUrl}/conversations/${sessionId}/experiences/${experienceId}`;
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, experienceURL);
+
+    const response = await customFetch(experienceURL, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedFields),
+      expectedStatusCode: StatusCodes.OK,
+      serviceName,
+      serviceFunction,
+      failureMessage: `Failed to update experience with UUID ${experienceId}`,
+      expectedContentType: "application/json",
+    });
+
+    let updatedExperience: Experience;
+    try {
+      updatedExperience = JSON.parse(await response.text());
+    } catch (error: unknown) {
+      throw errorFactory(
+        response.status,
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+        "Response did not contain valid JSON",
+        {
+          error: error,
+        }
+      );
+    }
+
+    return updatedExperience;
   }
 }

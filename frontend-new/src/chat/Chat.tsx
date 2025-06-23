@@ -147,26 +147,30 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   /**
    * --- Service handlers ---
    */
-
-    // Opens the experiences drawer
     // Goes to the experience service to get the experiences
+  const fetchExperiences = useCallback(async () => {
+    if (!activeSessionId) {
+      // If there is no session id, we can't get the experiences
+      throw new ChatError("Session id is not available");
+    }
+    setIsLoading(true);
+    try {
+      const experienceService = new ExperienceService();
+      const data = await experienceService.getExperiences(activeSessionId);
+      setExperiences(data);
+    } catch (error) {
+      console.error(new ChatError("Failed to retrieve experiences", error));
+      enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [enqueueSnackbar, activeSessionId]);
+
+  // Opens the experiences drawer and get experiences if needed
   const handleOpenExperiencesDrawer = useCallback(async () => {
-      setIsDrawerOpen(true);
-      setIsLoading(true);
-      if (!activeSessionId) {
-        // If there is no session id, we can't get the experiences
-        throw new ChatError("Session id is not available");
-      }
-      try {
-        const experienceService = new ExperienceService();
-        const data = await experienceService.getExperiences(activeSessionId);
-        setExperiences(data);
-        setIsLoading(false);
-      } catch (error) {
-        console.error(new ChatError("Failed to retrieve experiences", error));
-        enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
-      }
-    }, [enqueueSnackbar, activeSessionId]);
+    setIsDrawerOpen(true);
+    await fetchExperiences();
+  }, [fetchExperiences]);
 
   // Goes to the authentication service to log the user out
   // Navigates to the login page
@@ -468,6 +472,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             isLoading={isLoading}
             experiences={experiences}
             conversationConductedAt={conversationConductedAt}
+            onExperiencesUpdated={fetchExperiences}
           />
           {newConversationDialog && (
             <ConfirmModalDialog

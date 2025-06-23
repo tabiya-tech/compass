@@ -4,6 +4,9 @@ import { Experience } from "src/experiences/experienceService/experiences.types"
 import { Theme } from "@mui/material/styles";
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import InfoIcon from "@mui/icons-material/Info";
+import EditIcon from "@mui/icons-material/Edit";
+import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
+
 const uniqueId = "34a59a9e-e7f6-4a10-8b72-0fd401c727de";
 
 export const DATA_TEST_ID = {
@@ -16,17 +19,19 @@ export const DATA_TEST_ID = {
   EXPERIENCES_DRAWER_CONTENT_SUMMARY: `experiences-drawer-content-summary-${uniqueId}`,
   EXPERIENCES_DRAWER_CHIP: `experiences-drawer-chip-${uniqueId}`,
   EXPERIENCES_DRAWER_POPOVER: `experiences-drawer-popover-${uniqueId}`,
+  EXPERIENCES_DRAWER_EDIT_BUTTON: `experiences-drawer-edit-button-${uniqueId}`,
 };
 
 interface ExperienceProps {
   experience: Experience;
+  onEdit: (experience: Experience) => void;
 }
 
-const capitalizeFirstLetter = (string: string): string => {
+export const capitalizeFirstLetter = (string: string): string => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => {
+const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdit }) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [skillDescription, setSkillDescription] = React.useState<string>("");
@@ -37,6 +42,10 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => 
     if (experience.top_skills.length === 0) return [];
     return experience.top_skills.map((skill) => skill);
   }, [experience.top_skills]);
+
+  const handleEditClick = () => {
+    onEdit(experience);
+  };
 
   const handleChipClick = (event: React.MouseEvent<HTMLElement>, description: string) => {
     setAnchorEl(event.currentTarget);
@@ -57,9 +66,23 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => 
       data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_CONTAINER}
     >
       <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
-        <Typography variant="body1" fontWeight="bold" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_OCCUPATION}>
-          {experience.experience_title ? experience.experience_title : <i>Untitled!</i>}
-        </Typography>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography
+            variant="body1"
+            fontWeight="bold"
+            data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_OCCUPATION}
+          >
+            {experience.experience_title ? experience.experience_title : <i>Untitled!</i>}
+          </Typography>
+          <PrimaryIconButton
+            onClick={handleEditClick}
+            sx={{ color: theme.palette.common.black }}
+            title="Edit"
+            data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON}
+          >
+            <EditIcon />
+          </PrimaryIconButton>
+        </Box>
         <Typography
           variant="caption"
           sx={{ color: theme.palette.text.secondary }}
@@ -109,7 +132,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience }) => 
             <Chip
               key={skill.UUID}
               label={capitalizeFirstLetter(skill.preferredLabel)}
-              sx={{ color: theme.palette.text.secondary }}
+              sx={{ color: theme.palette.text.secondary, backgroundColor: theme.palette.grey[100] }}
               onClick={(event) => handleChipClick(event, skill.description)}
               data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CHIP}
             />

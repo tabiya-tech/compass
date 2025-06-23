@@ -54,6 +54,11 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
             <Typography variant="caption" color="secondary">
               {item.text}
             </Typography>
+            {item.description && (
+              <Typography variant="caption" display="flex" whiteSpace="normal">
+                {item.description}
+              </Typography>
+            )}
           </ListItemText>
         </MenuItem>
       ))}
