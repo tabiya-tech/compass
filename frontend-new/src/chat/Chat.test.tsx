@@ -1574,6 +1574,7 @@ describe("Chat", () => {
             isOpen: true,
             conversationConductedAt: null,
             notifyOnClose: expect.any(Function),
+            onExperiencesUpdated: expect.any(Function),
           },
           {}
         );

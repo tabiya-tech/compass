@@ -1,0 +1,669 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
+<div
+  class="MuiBox-root css-11gwlou"
+  data-testid="experience-edit-form-container-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+>
+  <div
+    class="MuiBox-root css-1q095yz"
+  >
+    <h5
+      class="MuiTypography-root MuiTypography-h5 css-vmt1ul-MuiTypography-root"
+    >
+      Edit Experience
+    </h5>
+    <div
+      class="MuiBox-root css-1rf73am"
+    >
+      <button
+        class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-187exs5-MuiButtonBase-root-MuiButton-root"
+        data-testid="experience-edit-form-cancel-button-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+        tabindex="0"
+        type="button"
+      >
+        <span
+          class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+        >
+          Cancel
+        </span>
+        <span
+          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </button>
+      <button
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+        data-testid="experience-edit-form-save-button-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+        disabled=""
+        tabindex="-1"
+        type="button"
+      >
+        <span
+          class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+        >
+          Save
+        </span>
+      </button>
+    </div>
+  </div>
+  <div
+    class="MuiBox-root css-1pnvk0s"
+  >
+    <div
+      class="MuiBox-root css-171onha"
+      data-testid="experience-edit-form-work-type-title-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+    >
+      <button
+        aria-label="help"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
+        data-mui-internal-clone-element="true"
+        data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+        tabindex="0"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+          data-testid="InfoIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"
+          />
+        </svg>
+        <span
+          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </button>
+      <h6
+        class="MuiTypography-root MuiTypography-subtitle1 css-15jwqi5-MuiTypography-root"
+      >
+        Salary Work
+      </h6>
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-clgdd0-MuiSvgIcon-root"
+        data-testid="experience-edit-form-work-type-dropdown-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="m7 10 5 5 5-5z"
+        />
+      </svg>
+    </div>
+    <div
+      class="MuiBox-root css-70qvj9"
+    >
+      <p
+        class="MuiTypography-root MuiTypography-body1 css-11iibhc-MuiTypography-root"
+      >
+        <b>
+          Experience info
+        </b>
+      </p>
+      <button
+        aria-label="help"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
+        data-mui-internal-clone-element="true"
+        data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+        tabindex="0"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+          data-testid="InfoIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"
+          />
+        </svg>
+        <span
+          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </button>
+    </div>
+    <div
+      class="MuiBox-root css-yd8sa2"
+    >
+      <div
+        class="MuiBox-root css-1lxwves"
+      >
+        <div
+          class="MuiFormControl-root MuiTextField-root css-1k77k21-MuiFormControl-root-MuiTextField-root"
+          data-testid="experience-edit-form-experience-title-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+        >
+          <div
+            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary Mui-focused MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+          >
+            <input
+              aria-invalid="false"
+              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+              id=":r2:"
+              placeholder="Experience title"
+              type="text"
+              value="Project Manager"
+            />
+            <fieldset
+              aria-hidden="true"
+              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+            >
+              <legend
+                class="css-ihdtdm"
+              >
+                <span
+                  class="notranslate"
+                >
+                  ​
+                </span>
+              </legend>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+      <div
+        class="MuiBox-root css-1msuw7t"
+      >
+        <div
+          class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
+          data-testid="experience-edit-form-start-date-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+        >
+          <div
+            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+          >
+            <input
+              aria-invalid="false"
+              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+              id=":r3:"
+              placeholder="Start date"
+              type="text"
+              value="2022"
+            />
+            <fieldset
+              aria-hidden="true"
+              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+            >
+              <legend
+                class="css-ihdtdm"
+              >
+                <span
+                  class="notranslate"
+                >
+                  ​
+                </span>
+              </legend>
+            </fieldset>
+          </div>
+        </div>
+        <div
+          class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
+          data-testid="experience-edit-form-end-date-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+        >
+          <div
+            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+          >
+            <input
+              aria-invalid="false"
+              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+              id=":r4:"
+              placeholder="End date"
+              type="text"
+              value="Present"
+            />
+            <fieldset
+              aria-hidden="true"
+              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+            >
+              <legend
+                class="css-ihdtdm"
+              >
+                <span
+                  class="notranslate"
+                >
+                  ​
+                </span>
+              </legend>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+      <div
+        class="MuiBox-root css-1msuw7t"
+      >
+        <div
+          class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
+          data-testid="experience-edit-form-company-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+        >
+          <div
+            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+          >
+            <input
+              aria-invalid="false"
+              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+              id=":r5:"
+              placeholder="Company"
+              type="text"
+              value="Business Inc"
+            />
+            <fieldset
+              aria-hidden="true"
+              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+            >
+              <legend
+                class="css-ihdtdm"
+              >
+                <span
+                  class="notranslate"
+                >
+                  ​
+                </span>
+              </legend>
+            </fieldset>
+          </div>
+        </div>
+        <div
+          class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
+          data-testid="experience-edit-form-location-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+        >
+          <div
+            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+          >
+            <input
+              aria-invalid="false"
+              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+              id=":r6:"
+              placeholder="Location"
+              type="text"
+              value="New York, NY"
+            />
+            <fieldset
+              aria-hidden="true"
+              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+            >
+              <legend
+                class="css-ihdtdm"
+              >
+                <span
+                  class="notranslate"
+                >
+                  ​
+                </span>
+              </legend>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+      <div
+        class="MuiFormControl-root MuiTextField-root css-9vw252-MuiFormControl-root-MuiTextField-root"
+        data-testid="experience-edit-form-summary-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+      >
+        <div
+          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-multiline css-1fv69vb-MuiInputBase-root-MuiOutlinedInput-root"
+        >
+          <textarea
+            aria-invalid="false"
+            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+            id=":r7:"
+            placeholder="Experience summary"
+            style="height: 0px; overflow: hidden;"
+          >
+            Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
+          </textarea>
+          <textarea
+            aria-hidden="true"
+            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+            readonly=""
+            style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
+            tabindex="-1"
+          />
+          <fieldset
+            aria-hidden="true"
+            class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+          >
+            <legend
+              class="css-ihdtdm"
+            >
+              <span
+                class="notranslate"
+              >
+                ​
+              </span>
+            </legend>
+          </fieldset>
+        </div>
+      </div>
+      <div
+        class="MuiBox-root css-70qvj9"
+      >
+        <p
+          class="MuiTypography-root MuiTypography-body1 css-11iibhc-MuiTypography-root"
+        >
+          <b>
+            Top Skills
+          </b>
+        </p>
+        <button
+          aria-label="help"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
+          data-mui-internal-clone-element="true"
+          data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+          tabindex="0"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="InfoIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+      <div
+        class="MuiBox-root css-zefc5s"
+        data-testid="experience-edit-form-skills-container-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+      >
+        <div
+          class="MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-filledDefault css-ondr1i-MuiChip-root"
+          data-testid="experience-edit-form-skill-chip-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+        >
+          <span
+            class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+          >
+            <div
+              class="MuiBox-root css-70qvj9"
+            >
+              <span
+                style="text-decoration: none;"
+              >
+                Management
+              </span>
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-13b6f3w-MuiSvgIcon-root"
+                data-testid="experience-edit-form-skill-chip-dropdown-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="m7 10 5 5 5-5z"
+                />
+              </svg>
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-7fr91u-MuiSvgIcon-root"
+                data-testid="experience-edit-form-skill-chip-delete-icon-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"
+                />
+              </svg>
+            </div>
+          </span>
+        </div>
+        <div
+          class="MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-filledDefault css-ondr1i-MuiChip-root"
+          data-testid="experience-edit-form-skill-chip-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+        >
+          <span
+            class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+          >
+            <div
+              class="MuiBox-root css-70qvj9"
+            >
+              <span
+                style="text-decoration: none;"
+              >
+                Communication
+              </span>
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-13b6f3w-MuiSvgIcon-root"
+                data-testid="experience-edit-form-skill-chip-dropdown-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="m7 10 5 5 5-5z"
+                />
+              </svg>
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-7fr91u-MuiSvgIcon-root"
+                data-testid="experience-edit-form-skill-chip-delete-icon-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"
+                />
+              </svg>
+            </div>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
+  >
+    ;
+  </div>
+  <div
+    data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
+  >
+    <div
+      data-testid="SELF_EMPLOYMENT"
+    >
+      Self-Employment
+    </div>
+    <div
+      data-testid="FORMAL_SECTOR_WAGED_EMPLOYMENT"
+    >
+      Salary Work
+    </div>
+    <div
+      data-testid="FORMAL_SECTOR_UNPAID_TRAINEE_WORK"
+    >
+      Trainee Work
+    </div>
+    <div
+      data-testid="UNSEEN_UNPAID"
+    >
+      Unpaid Work
+    </div>
+    <div
+      data-testid="uncategorized"
+    >
+      Uncategorized
+    </div>
+    ;
+  </div>
+  <div
+    aria-hidden="true"
+    class="MuiBackdrop-root css-1mfxwij-MuiBackdrop-root"
+    data-testid="backdrop-91b57774-d50c-4350-882d-363f80ac10e8"
+    style="opacity: 0; visibility: hidden;"
+  >
+    <div
+      data-testid="sloth-5f51c2ff-74cd-4a23-98b4-0c1f5404d5ee"
+      style="position: relative; margin: 0px; padding: 0px;"
+    >
+      <div
+        class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-14c64kg-MuiPaper-root"
+      >
+        <div
+          class="MuiGrid-root MuiGrid-container css-15vmx7d-MuiGrid-root"
+        >
+          <div
+            class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+          >
+            <h6
+              class="MuiTypography-root MuiTypography-h6 css-odley9-MuiTypography-root"
+              data-testid="message-91b57774-d50c-4350-882d-363f80ac10e8"
+            >
+              Updating experience...
+            </h6>
+          </div>
+          <div
+            class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+            style="line-height: 0;"
+          >
+            <span
+              class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1tmrh9l-MuiCircularProgress-root"
+              data-testid="progress-91b57774-d50c-4350-882d-363f80ac10e8"
+              role="progressbar"
+              style="width: 32px; height: 32px;"
+            >
+              <svg
+                class="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
+                viewBox="22 22 44 44"
+              >
+                <circle
+                  class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-176wh8e-MuiCircularProgress-circle"
+                  cx="44"
+                  cy="44"
+                  fill="none"
+                  r="20.2"
+                  stroke-width="3.6"
+                />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="MuiContainer-root MuiContainer-maxWidthLg css-t4utv2-MuiContainer-root"
+      >
+        <svg
+          overflow="visible"
+          style="z-index: 1301; position: absolute; left: 0px;"
+          viewBox="0 0 128 176"
+          width="64px"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          
+  
+          <g
+            id="sloth-arm"
+            style="fill:rgb(166, 178, 45);fill-opacity:1"
+          >
+            
+    
+            <path
+              d="m 14.514759,154.02465 c -0.223222,7.54279 1.889033,14.31023 6.003671,20.12666"
+              id="path11933"
+              style="stroke:#002147;stroke-width:3.43002;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+            />
+            
+    
+            <path
+              d="m 18.102994,156.94 c 0.876984,6.63374 3.47077,12.36155 7.569543,17.07907"
+              id="path11935"
+              style="stroke:#002147;stroke-width:3.43002;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+            />
+            
+    
+            <path
+              d="m 22.590384,155.6948 c -0.02644,6.78986 4.860219,11.28627 8.356559,15.96141"
+              id="path11937"
+              style="stroke:#002147;stroke-width:3.43002;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+            />
+            
+    
+            <path
+              d="m 16.155526,92.631962 c -2.397382,14.608358 -5.018547,40.414198 -2.309374,58.794228 1.345636,10.71389 13.390445,3.26402 10.026414,-4.80477 -0.185829,-10.97318 3.22198,-26.38245 9.483242,-35.8906"
+              id="path10943"
+              style="display:inline;stroke:#002147;stroke-width:4.0018;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+            />
+            
+  
+          </g>
+          
+  
+          <g
+            id="sloth-body"
+            style="fill:rgb(166, 178, 45);fill-opacity:1"
+          >
+            
+    
+            <path
+              d="M 90.43732,62.124738 C 80.765159,72.143232 61.675685,73.505359 58.059543,66.476431 56.322681,63.10038 57.085072,48.491863 55.800698,45.613442 51.842764,36.743284 42.253159,33.966119 32.313919,33.185915 30.379026,33.034031 30.27136,32.592447 26.491469,33.096325 l -2.825741,0.376686 C 9.9437551,35.302218 0.26032252,46.069416 2.2065025,59.935389 3.0716644,80.339077 10.912511,102.04229 28.700604,113.58067 c 13.577672,9.16985 30.624678,11.41364 46.669719,10.83986 18.268794,-0.877 37.706797,-9.99707 44.895357,-27.827253 5.42971,-13.34508 6.81554,-28.317784 4.94335,-42.535971 -0.6407,-6.66636 -6.04889,-6.606256 -7.19109,0.300158 -0.57049,3.449516 -4.15524,10.764389 -6.01114,3.299577      "
+              id="path356"
+              style="stroke:#002147;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+            />
+            
+  
+          </g>
+          
+  
+          <g
+            id="sloth-face"
+            style="fill:#EEFF41;fill-opacity:1"
+          >
+            
+    
+            <path
+              d="m 14.097135,45.06275 c 6.594093,-3.092353 13.024301,4.64989 19.788171,1.505066 5.845188,-3.519947 15.063887,-2.847274 15.553048,5.557662 1.504572,8.883565 -2.696937,20.630621 -12.677006,22.055619 -9.206273,2.426258 -21.888604,0.05935 -25.533835,-9.789371 C 9.7964043,58.277976 8.9129239,49.606375 14.097135,45.06275 Z"
+              id="path1068"
+              style="stroke:#002147;stroke-width:4.24961;stroke-dasharray:none;stroke-opacity:1"
+            />
+            
+    
+            <path
+              d="M 25.150328,53.598222 C 19.5057,53.230017 15.33792,56.597843 12.015927,60.78691"
+              id="path1076"
+              style="stroke:#002147;stroke-width:4.24961;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+            />
+            
+    
+            <path
+              d="m 35.397394,53.690084 c 5.301525,0.26916 9.127221,3.370397 12.03295,7.622747"
+              id="path1078"
+              style="stroke:#002147;stroke-width:4.24961;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+            />
+            
+    
+            <path
+              d="m 23.623698,61.785599 c 4.082759,1.95693 8.532002,2.209343 12.661822,0.186749"
+              id="path1260"
+              style="stroke:#002147;stroke-width:4.24961;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+            />
+            
+  
+          </g>
+          
+  
+          <path
+            d="m 90.118843,62.518213 c 0,0 6.483175,-9.799709 7.212019,-16.207953 1.536074,-13.505678 1.472686,-33.390562 -1.085642,-36.8551862 -1.8363,-2.4867984 2.553319,-7.0642704 5.62356,-7.2690653 4.47491,-0.2984939 6.86184,7.7656371 7.13595,12.7506545 0.65157,11.849278 -0.35635,22.14692 0.7275,32.644203 0.45452,4.402105 2.77413,12.15515 2.77413,12.15515"
+            id="sloth-leg"
+            style="fill:rgb(166, 178, 45);fill-opacity:1;stroke:#002147;stroke-width:4;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+          />
+          
+  
+          <path
+            d="m 50.395651,79.193064 c 0,0 13.690628,-15.002471 14.631855,-34.293484 0.435414,-8.924059 2.308685,-21.46904 -0.196491,-30.411566 -0.935496,-3.339364 -8.661263,-2.000533 -8.853989,-5.4631001 -0.203842,-3.662289 5.01835,-6.392621 8.665606,-6.781779 4.579867,-0.488665 10.670019,1.635917 12.433262,6.028249 5.078151,12.6499451 4.629924,21.9263741 5.069182,33.0697121 0.395593,10.035614 6.26e-4,20.251473 -2.206773,30.0493 -1.23259,5.471008 -2.969712,11.280552 -6.082137,15.686572 -6.830033,9.66876 -9.363708,10.642509 -9.363708,10.642509"
+            id="sloth-top-arm"
+            style="fill:rgb(166, 178, 45);fill-opacity:1;stroke:#002147;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+          />
+          
+  
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+`;

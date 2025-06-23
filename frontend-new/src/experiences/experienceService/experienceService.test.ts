@@ -96,4 +96,101 @@ describe("ExperienceService", () => {
       }
     );
   });
+
+  describe("updateExperience", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test("should fetch the correct URL, with PATCH and the correct headers and payload successfully", async () => {
+      // GIVEN an experience with only updated fields
+      const experienceId = mockExperiences[0].UUID;
+      const updatedFields = {
+        experience_title: "foo Title",
+        company: "bar Company",
+      };
+      const updatedExperience = { ...mockExperiences[0], ...updatedFields };
+
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, updatedExperience, "application/json;charset=UTF-8");
+
+      // WHEN the updateExperience function is called with the updated fields
+      const givenSessionId = 1234;
+      const service = new ExperienceService();
+      const result = await service.updateExperience(givenSessionId, experienceId, updatedFields);
+
+      // THEN expect to make a PATCH request with the updated fields
+      expectCorrectFetchRequest(
+        fetchSpy,
+        `${givenApiServerUrl}/conversations/${givenSessionId}/experiences/${experienceId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedFields),
+          expectedStatusCode: StatusCodes.OK,
+          serviceName: "ExperienceService",
+          serviceFunction: "updateExperience",
+          failureMessage: `Failed to update experience with UUID ${experienceId}`,
+          expectedContentType: "application/json",
+        }
+      );
+      // AND to return the complete updated experience
+      expect(result).toEqual(updatedExperience);
+    });
+
+    test("on fail to fetch, should reject with the expected service error", async () => {
+      // GIVEN fetch rejects with some unknown error
+      const givenFetchError = new Error("some error");
+      jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockImplementationOnce(() => {
+        return new Promise(() => {
+          throw givenFetchError;
+        });
+      });
+
+      // WHEN the updateExperience function is called
+      const givenSessionId = 1234;
+      const experienceId = mockExperiences[0].UUID;
+      const updatedFields = { experience_title: "Updated Title" };
+      const service = new ExperienceService();
+
+      // THEN expect it to reject with the expected error
+      await expect(service.updateExperience(givenSessionId, experienceId, updatedFields)).rejects.toThrow(
+        givenFetchError
+      );
+    });
+
+    test.each([
+      ["is a malformed json", "#"],
+      ["is a string", "foo"],
+    ])(
+      "on 200, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
+      async (_description, giveResponse) => {
+        // GIVEN fetch resolves with a response that has invalid JSON
+        setupAPIServiceSpy(StatusCodes.OK, giveResponse, "application/json;charset=UTF-8");
+        // AND the updated fields
+        const givenSessionId = 1234;
+        const experienceId = mockExperiences[0].UUID;
+        const updatedFields = { experience_title: "foo Title" };
+
+        // WHEN the updateExperience function is called
+        const service = new ExperienceService();
+        const actualExperience = service.updateExperience(givenSessionId, experienceId, updatedFields);
+
+        // THEN expect it to reject with the error response
+        const expectedError = {
+          ...new RestAPIError(
+            ExperienceService.name,
+            "updateExperience",
+            "PATCH",
+            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences/${experienceId}`,
+            StatusCodes.OK,
+            ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+            "",
+            ""
+          ),
+          cause: expect.anything(),
+        };
+        await expect(actualExperience).rejects.toMatchObject(expectedError);
+      }
+    );
+  });
 });

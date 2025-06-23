@@ -2,11 +2,13 @@
 import "src/_test_utilities/consoleMock";
 
 import ExperiencesDrawer, { DATA_TEST_ID } from "src/experiences/experiencesDrawer/ExperiencesDrawer";
-import { fireEvent } from "@testing-library/react";
-import { render, screen } from "src/_test_utilities/test-utils";
+import userEvent from "@testing-library/user-event";
+import { render, screen, within, fireEvent } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTENT_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
+import { DATA_TEST_ID as CONFIRM_MODAL_DIALOG_DATA_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
+import { DATA_TEST_ID as EXPERIENCE_EDIT_FORM_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/experienceEditForm/ExperienceEditForm";
 
 // mock custom text field
 jest.mock("src/theme/CustomTextField/CustomTextField", () => {
@@ -22,7 +24,28 @@ jest.mock("src/experiences/experiencesDrawer/components/downloadReportDropdown/D
   });
 });
 
+// mock the Confirm Modal Dialog
+jest.mock("src/theme/confirmModalDialog/ConfirmModalDialog", () => {
+  const actual = jest.requireActual("src/theme/confirmModalDialog/ConfirmModalDialog");
+  const mockConfirmModalDialog = jest.fn().mockImplementation(({ onConfirm, onCancel, onDismiss, isOpen }) => (
+    <div data-testid={actual.DATA_TEST_ID.CONFIRM_MODAL}>
+      <button data-testid={actual.DATA_TEST_ID.CONFIRM_MODAL_CANCEL} onClick={onCancel} />
+      <button data-testid={actual.DATA_TEST_ID.CONFIRM_MODAL_CONFIRM} onClick={onConfirm} />
+      <button data-testid={actual.DATA_TEST_ID.CONFIRM_MODAL_CLOSE} onClick={onDismiss} />
+    </div>
+  ));
+  return {
+    __esModule: true,
+    default: mockConfirmModalDialog,
+    DATA_TEST_ID: actual.DATA_TEST_ID,
+  };
+});
+
 describe("ExperiencesDrawer", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test("should render ExperiencesDrawer correctly", () => {
     // GIVEN the ExperiencesDrawer component
     const givenExperiencesDrawer = (
@@ -32,6 +55,7 @@ describe("ExperiencesDrawer", () => {
         experiences={mockExperiences}
         notifyOnClose={jest.fn()}
         conversationConductedAt="2021-06-01T00:00:00Z"
+        onExperiencesUpdated={jest.fn()}
       />
     );
 
@@ -70,6 +94,7 @@ describe("ExperiencesDrawer", () => {
         experiences={mockExperiences}
         notifyOnClose={notifyOnClose}
         conversationConductedAt="2021-06-01T00:00:00Z"
+        onExperiencesUpdated={jest.fn()}
       />
     );
     // AND the component is rendered
@@ -92,6 +117,7 @@ describe("ExperiencesDrawer", () => {
         experiences={[]}
         notifyOnClose={jest.fn()}
         conversationConductedAt="2021-06-01T00:00:00Z"
+        onExperiencesUpdated={jest.fn()}
       />
     );
     // AND the component is rendered
@@ -113,6 +139,7 @@ describe("ExperiencesDrawer", () => {
         experiences={[]}
         notifyOnClose={jest.fn()}
         conversationConductedAt="2021-06-01T00:00:00Z"
+        onExperiencesUpdated={jest.fn()}
       />
     );
     // AND the component is rendered
@@ -132,6 +159,7 @@ describe("ExperiencesDrawer", () => {
         experiences={mockExperiences}
         notifyOnClose={jest.fn()}
         conversationConductedAt="2021-06-01T00:00:00Z"
+        onExperiencesUpdated={jest.fn()}
       />
     );
     // AND the component is rendered
@@ -160,5 +188,202 @@ describe("ExperiencesDrawer", () => {
     fireEvent.change(addressField, { target: { value: "123 Main St" } });
     // THEN expect the address field to have the correct value
     expect(addressField).toHaveValue("123 Main St");
+  });
+
+  describe("ExperienceEditForm", () => {
+    test("should render ExperienceEditForm when edit button is clicked", async () => {
+      // GIVEN the ExperiencesDrawer component
+      const givenExperiencesDrawer = (
+        <ExperiencesDrawer
+          isOpen={true}
+          isLoading={false}
+          experiences={mockExperiences}
+          notifyOnClose={jest.fn()}
+          conversationConductedAt="2021-06-01T00:00:00Z"
+          onExperiencesUpdated={jest.fn()}
+        />
+      );
+      // AND the component is rendered
+      render(givenExperiencesDrawer);
+
+      // WHEN the edit button is clicked for a specific experience
+      const editButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)[0];
+      await userEvent.click(editButton);
+
+      // THEN expect the ExperienceEditForm to be in the document
+      const experienceEditForm = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CONTAINER);
+      expect(experienceEditForm).toBeInTheDocument();
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should show confirmation dialog when unsaved changes exist and cancel button is clicked", async () => {
+      // GIVEN the ExperiencesDrawer component
+      const givenExperiencesDrawer = (
+        <ExperiencesDrawer
+          isOpen={true}
+          isLoading={false}
+          experiences={mockExperiences}
+          notifyOnClose={jest.fn()}
+          conversationConductedAt="2021-06-01T00:00:00Z"
+          onExperiencesUpdated={jest.fn()}
+        />
+      );
+      // AND the component is rendered
+      render(givenExperiencesDrawer);
+
+      // WHEN the edit button is clicked for a specific experience
+      const editButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)[0];
+      await userEvent.click(editButton);
+
+      // THEN expect the ExperienceEditForm to be visible
+      const experienceEditForm = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CONTAINER);
+      expect(experienceEditForm).toBeInTheDocument();
+
+      // WHEN some changes are made in the form
+      const locationField = within(screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_LOCATION)).getByRole(
+        "textbox"
+      );
+      await userEvent.type(locationField, "foo location");
+      // AND the cancel button is clicked
+      const cancelButton = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CANCEL_BUTTON);
+      await userEvent.click(cancelButton);
+
+      // THEN expect a confirmation dialog to be shown
+      expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should keep ExperienceEditForm open when Keep Editing button in the dialog is clicked", async () => {
+      // GIVEN the ExperiencesDrawer component
+      const givenExperiencesDrawer = (
+        <ExperiencesDrawer
+          isOpen={true}
+          isLoading={false}
+          experiences={mockExperiences}
+          notifyOnClose={jest.fn()}
+          conversationConductedAt="2021-06-01T00:00:00Z"
+          onExperiencesUpdated={jest.fn()}
+        />
+      );
+      // AND the component is rendered
+      render(givenExperiencesDrawer);
+
+      // WHEN the edit button is clicked for a specific experience
+      const editButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)[0];
+      await userEvent.click(editButton);
+
+      // THEN expect the ExperienceEditForm to be visible
+      expect(screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CONTAINER)).toBeInTheDocument();
+
+      // WHEN some changes are made in the form
+      const locationField = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_LOCATION);
+      const locationInput = within(locationField).getByRole("textbox");
+      await userEvent.type(locationInput, "foo location");
+      // AND the cancel button is clicked
+      const cancelButton = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CANCEL_BUTTON);
+      await userEvent.click(cancelButton);
+
+      // THEN expect a confirmation dialog to be shown
+      const confirmDialog = await screen.findByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL);
+      expect(confirmDialog).toBeInTheDocument();
+
+      // WHEN keep editing button in the confirmation dialog is clicked
+      const keepEditButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM);
+      await userEvent.click(keepEditButton);
+
+      // THEN expect the ExperienceEditForm to still be visible
+      expect(screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CONTAINER)).toBeInTheDocument();
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should close ExperienceEditForm when close button in the dialog is clicked", async () => {
+      // GIVEN the ExperiencesDrawer component
+      const givenExperiencesDrawer = (
+        <ExperiencesDrawer
+          isOpen={true}
+          isLoading={false}
+          experiences={mockExperiences}
+          notifyOnClose={jest.fn()}
+          conversationConductedAt="2021-06-01T00:00:00Z"
+          onExperiencesUpdated={jest.fn()}
+        />
+      );
+      // AND the component is rendered
+      render(givenExperiencesDrawer);
+
+      // WHEN the edit button is clicked for a specific experience
+      const editButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)[0];
+      await userEvent.click(editButton);
+      // AND some changes are made in the form
+      const companyField = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_COMPANY);
+      const companyInput = within(companyField).getByRole("textbox");
+      await userEvent.type(companyInput, "foo company");
+      // AND the ESC key is pressed to close the form
+      await userEvent.keyboard("{Escape}");
+
+      // THEN expect a confirmation dialog to be shown
+      expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
+
+      // WHEN the cancel button in the confirmation dialog is clicked
+      const cancelButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CANCEL);
+      await userEvent.click(cancelButton);
+
+      // THEN expect the ExperienceEditForm to be closed
+      expect(screen.queryByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CONTAINER)).not.toBeInTheDocument();
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should keep ExperienceEditForm open when close icon in dialog is clicked", async () => {
+      // GIVEN the ExperiencesDrawer component
+      const givenExperiencesDrawer = (
+        <ExperiencesDrawer
+          isOpen={true}
+          isLoading={false}
+          experiences={mockExperiences}
+          notifyOnClose={jest.fn()}
+          conversationConductedAt="2021-06-01T00:00:00Z"
+          onExperiencesUpdated={jest.fn()}
+        />
+      );
+      // AND the component is rendered
+      render(givenExperiencesDrawer);
+
+      // WHEN the edit button is clicked for a specific experience
+      const editButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)[0];
+      await userEvent.click(editButton);
+
+      // THEN expect the ExperienceEditForm to be visible
+      expect(screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CONTAINER)).toBeInTheDocument();
+
+      // WHEN some changes are made in the form
+      const locationField = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_LOCATION);
+      const locationInput = within(locationField).getByRole("textbox");
+      await userEvent.type(locationInput, "foo location");
+      // AND the cancel button is clicked
+      const cancelButton = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CANCEL_BUTTON);
+      await userEvent.click(cancelButton);
+
+      // THEN expect a confirmation dialog to be shown
+      const confirmDialog = await screen.findByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL);
+      expect(confirmDialog).toBeInTheDocument();
+
+      // WHEN close icon in the confirmation dialog is clicked
+      const closeIcon = screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CLOSE);
+      await userEvent.click(closeIcon);
+
+      // THEN expect the ExperienceEditForm to still be visible
+      expect(screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CONTAINER)).toBeInTheDocument();
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
   });
 });
