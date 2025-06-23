@@ -8,11 +8,14 @@ import ExperiencesDrawerContent, {
 import { render, screen } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 describe("ReportDrawerContent", () => {
   test("should render ExperiencesDrawerContent correctly", () => {
     // GIVEN the ExperiencesDrawerContent component
-    const givenReportDrawerContent = <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} />;
+    const givenReportDrawerContent = (
+      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} onEdit={jest.fn()} />
+    );
 
     // WHEN the component is rendered
     render(givenReportDrawerContent);
@@ -33,6 +36,8 @@ describe("ReportDrawerContent", () => {
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_SKILLS_CONTAINER)).toBeInTheDocument();
     // AND the report drawer content experience summary to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_SUMMARY)).toBeInTheDocument();
+    // AND the report drawer edit button to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)).toBeInTheDocument();
     // AND the report drawer chips to be in the document
     const chips = screen.getAllByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_CHIP);
     chips.forEach((chip) => expect(chip).toBeInTheDocument());
@@ -62,7 +67,7 @@ describe("ReportDrawerContent", () => {
   test("it should show No skills yet when there are no skills", () => {
     // GIVEN the ExperiencesDrawerContent component
     const givenReportDrawerContent = (
-      <ExperiencesDrawerContent experience={{ ...mockExperiences[0], top_skills: [] }} />
+      <ExperiencesDrawerContent experience={{ ...mockExperiences[0], top_skills: [] }} onEdit={jest.fn()} />
     );
 
     // WHEN the component is rendered
@@ -74,7 +79,9 @@ describe("ReportDrawerContent", () => {
 
   test("should show skill description when chip is clicked", () => {
     // GIVEN the ExperiencesDrawerContent component
-    const givenReportDrawerContent = <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} />;
+    const givenReportDrawerContent = (
+      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} onEdit={jest.fn()} />
+    );
     // AND the component is rendered
     render(givenReportDrawerContent);
 
@@ -94,7 +101,9 @@ describe("ReportDrawerContent", () => {
 
   test("should close popover when clicked outside", async () => {
     // GIVEN the ExperiencesDrawerContent component
-    const givenReportDrawerContent = <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} />;
+    const givenReportDrawerContent = (
+      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} onEdit={jest.fn()} />
+    );
     // AND the component is rendered
     render(givenReportDrawerContent);
     // AND the chip is clicked
@@ -113,5 +122,25 @@ describe("ReportDrawerContent", () => {
     });
     // AND expect the skill description to not be in the document
     expect(screen.queryByText(mockExperiences[0].top_skills[0].description)).not.toBeInTheDocument();
+  });
+
+  test("should call onEdit when edit button is clicked", async () => {
+    // GIVEN the ExperiencesDrawerContent component
+    const onEditMock = jest.fn();
+    const givenReportDrawerContent = (
+      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} onEdit={onEditMock} />
+    );
+
+    // WHEN the component is rendered
+    render(givenReportDrawerContent);
+    // AND the edit button is clicked
+    const editButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON);
+    await userEvent.click(editButton);
+
+    // THEN expect onEdit to have been called with the correct experience
+    expect(onEditMock).toHaveBeenCalledWith(mockExperiences[0]);
+    // AND expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
   });
 });

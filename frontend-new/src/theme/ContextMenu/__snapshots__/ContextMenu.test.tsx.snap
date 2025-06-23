@@ -47,9 +47,13 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
           data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-text"
         >
           <span
-            class="MuiTypography-root MuiTypography-caption css-1061lhe-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-10hburv-MuiTypography-root"
           >
-            foo
+            <span
+              class="MuiTypography-root MuiTypography-caption css-1061lhe-MuiTypography-root"
+            >
+              foo
+            </span>
           </span>
         </div>
         <span
@@ -67,9 +71,13 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
           data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-text"
         >
           <span
-            class="MuiTypography-root MuiTypography-caption css-1061lhe-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-10hburv-MuiTypography-root"
           >
-            bar
+            <span
+              class="MuiTypography-root MuiTypography-caption css-1061lhe-MuiTypography-root"
+            >
+              bar
+            </span>
           </span>
         </div>
         <span
@@ -99,9 +107,13 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
           data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-text"
         >
           <span
-            class="MuiTypography-root MuiTypography-caption css-1061lhe-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-10hburv-MuiTypography-root"
           >
-            baz
+            <span
+              class="MuiTypography-root MuiTypography-caption css-1061lhe-MuiTypography-root"
+            >
+              baz
+            </span>
           </span>
         </div>
       </li>

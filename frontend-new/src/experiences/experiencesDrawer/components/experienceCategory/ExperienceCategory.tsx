@@ -11,9 +11,16 @@ interface ExperienceCategoryProps {
   title: string;
   experiences: Experience[];
   tooltipText?: string;
+  onEditExperience: (experience: Experience) => void;
 }
 
-const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({ icon, title, experiences, tooltipText }) => {
+const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
+  icon,
+  title,
+  experiences,
+  tooltipText,
+  onEditExperience,
+}) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
@@ -30,7 +37,7 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({ icon, title, ex
       </Box>
       <Box display="flex" flexDirection="column" gap={isSmallMobile ? 8 : 4}>
         {experiences.map((experience, index) => (
-          <ExperiencesDrawerContent key={index} experience={experience} />
+          <ExperiencesDrawerContent key={index} experience={experience} onEdit={onEditExperience} />
         ))}
       </Box>
     </Box>

@@ -27,3 +27,18 @@ export interface Experience {
   top_skills: Skill[];
   summary: string | null;
 }
+
+export interface SkillUpdate {
+  UUID: string;
+  preferredLabel: string;
+}
+
+export interface UpdateExperienceRequest {
+  experience_title?: string;
+  timeline?: Timeline;
+  company?: string;
+  location?: string;
+  work_type?: WorkType | null;
+  summary?: string | null;
+  top_skills?: SkillUpdate[];
+}

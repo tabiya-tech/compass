@@ -45,9 +45,9 @@ export const ShownWithNoDate = {
     experience: {
       ...generateRandomExperiences(1)[0],
       timeline: {
-          start: "",
-          end: "",
-      }
+        start: "",
+        end: "",
+      },
     },
   },
 };
