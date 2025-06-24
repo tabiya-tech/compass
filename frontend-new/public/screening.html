@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="icon" href="/favicon.svg" />
+
+  <title>Compass | Screening</title>
+
+  <!-- Pre-connect for faster font loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, interactive-widget=resizes-content" />
+  <link rel="apple-touch-icon" href="/compass.svg" />
+
+  <!--
+    Google Fonts: Inter and IBM Plex Mono
+     We are loading the fonts with the media="print" attribute and changing it to "all" when the font is loaded.
+     We do this to avoid blocking the rendering of the page while the font is being loaded.
+     If javascript is disabled, the font will still load, but the page will be blocked until it is loaded.
+  -->
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"
+        media="print" onload="this.media='all'">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,500;0,600;0,700;1,300&display=swap"
+    rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,500;0,600;0,700;1,300&display=swap"
+      rel="stylesheet">
+  </noscript>
+
+  <script defer src="/data/env.js"></script>
+
+  <style>
+      /* Colors */
+      :root {
+          --dark-blue: #002147;
+          --primary: #00FF91;
+      }
+
+      * {
+          font-size: 16px;
+      }
+
+      .container {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+      }
+
+      .content .title {
+          font-family: 'IBM Plex Mono', monospace;
+          font-weight: bold;
+          color: var(--dark-blue);
+          font-size: 1.75rem;
+          text-align: center;
+      }
+
+      .btn {
+          padding: 10px 25px;
+          cursor: pointer;
+          border: none;
+          font-family: 'Inter', sans-serif;
+          text-align: center;
+          border-radius: 4px;
+          transition: all 0.2s ease-in-out;
+      }
+
+      .btn-primary {
+          background-color: var(--primary);
+          color: var(--dark-blue);
+      }
+
+      .btn-primary:hover {
+          background-color: #00E07D;
+      }
+
+      .btn-secondary {
+          background-color: #E0E0E0;
+          color: var(--dark-blue);
+      }
+
+      .btn-secondary:hover {
+          background-color: #C0C0C0;
+      }
+
+      .buttons {
+          display: flex;
+          justify-content: center;
+          padding-top: 4rem;
+          gap: 40px;
+      }
+
+      .logo-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding-bottom: 2rem;
+      }
+
+      .error-message {
+          font-family: 'Inter', sans-serif;
+          color: red;
+      }
+  </style>
+</head>
+<body>
+<div>
+  <div class="container">
+    <div class="content">
+      <div class="logo-container">
+        <img src="/logo.svg" alt="Compass Logo" width="200" height="100" />
+      </div>
+      <section id="initial-question" style="display: none;">
+        <div class="title">Do you have one hour to spend?</div>
+        <div class="buttons">
+          <button class="btn btn-primary" id="yes-btn">Yes</button>
+          <button class="btn btn-secondary" id="no-btn">No</button>
+        </div>
+      </section>
+
+      <section id="user-is-busy-section" style="display: none;">
+        <div class="title">Return whenever you are ready, thanks. I am waiting</div>
+        <div>
+          <div class="buttons">
+            <button class="btn btn-primary" id="return-home">I have got time</button>
+          </div>
+        </div>
+      </section>
+      <section id="invalid-query-params" style="display: none;">
+        <div>
+          <div class="error-message">Invalid query parameters. Please provide email and externalUserId in the URL.</div>
+        </div>
+      </section>
+      <section id="wait-a-moment" style="display: none;">
+        <div>
+          <div class="title">Wait a moment......</div>
+        </div>
+      </section>
+      <section id="server-error-message" style="display: none;">
+        <div>
+          <div class="error-message" id="server-error-message-content">Unknown error occurred. Please try again later.</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+  <script>
+    // #############################################################
+    // #                    CONSTANTS
+    // #############################################################
+    const IDS = {
+      SECTIONS: {
+        INITIAL_QUESTION: "initial-question",
+        USER_IS_BUSY_SECTION: "user-is-busy-section",
+        INVALID_QUERY_PARAMS: "invalid-query-params",
+        SERVER_ERROR_MESSAGE: "server-error-message",
+        WAIT_A_MOMENT: "wait-a-moment",
+      },
+      YES_BTN: "yes-btn",
+      NO_BTN: "no-btn",
+      RETURN_HOME_BTN: "return-home",
+    };
+
+    const ENV_KEYS = {
+      CLIENT_ID: "client_id_0.0.1",
+      TOKEN: "token_0.0.1",
+      LOGIN_METHOD: "login_method_0.0.1",
+    };
+
+    const LOGIN_METHODS = {
+      FIREBASE_EMAIL: "FIREBASE_EMAIL",
+    };
+
+    // #############################################################
+    // #                    UTILITY - FUNCTIONS
+    // #############################################################
+    const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+    const getNextBackoff = (initial_backoff_ms, attempt) => {
+      if (attempt <= 1) return 0;
+      return initial_backoff_ms * 2 ** (attempt - 2);
+    };
+
+    const INITIAL_BACKOFF_MS = 1000;
+    const MAX_ATTEMPTS = 4;
+    const RETRY_STATUS_CODES = [
+      429, // Too Many Requests
+      502, // Bad Gateway
+      503, // Service Unavailable
+    ];
+
+    async function fetchWithRetry(url, init) {
+      let response;
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        console.debug("customFetch: Attempt", attempt, "for URL:", url, ", at ", new Date().toISOString());
+
+        response = await fetch(url, init);
+
+        // if the request is successful, return the response
+        // without retrying
+        if (response.ok)
+          return response;
+
+        // if the response status is in retry status codes,
+        // wait for some time and retry
+        if (RETRY_STATUS_CODES.includes(response.status)) {
+          const backOffMs = getNextBackoff(INITIAL_BACKOFF_MS, attempt + 1);
+          await sleep(backOffMs);
+          continue;
+        }
+
+        // otherwise, it is not for a retry to return the actual response
+        return response;
+      }
+
+      console.warn(
+        `customFetch: Reached max attempts (${MAX_ATTEMPTS}) without success.`,
+      );
+
+      return response
+    }
+
+    /**
+     * Retrieves URL parameters for email and externalUserId.
+     *
+     * @returns {{ email: string, externalUserId: string }}
+     */
+    function getUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+
+      const email = urlParams.get("email");
+      const externalUserId = urlParams.get("externalUserId");
+
+      return { email, externalUserId };
+    }
+
+    /**
+     * Loads the configuration script from the given source URL.
+     */
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = src;
+        script.onload = () => resolve(script);
+        script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+        document.head.appendChild(script);
+      });
+    }
+
+    /**
+     * Hides all sections.
+     */
+    function hideAllSections() {
+      document.getElementById(IDS.SECTIONS.INITIAL_QUESTION).style.display = "none";
+      document.getElementById(IDS.SECTIONS.USER_IS_BUSY_SECTION).style.display = "none";
+      document.getElementById(IDS.SECTIONS.INVALID_QUERY_PARAMS).style.display = "none";
+      document.getElementById(IDS.SECTIONS.SERVER_ERROR_MESSAGE).style.display = "none";
+      document.getElementById(IDS.SECTIONS.WAIT_A_MOMENT).style.display = "none";
+    }
+
+    /**
+     * Shows the specified section by its ID.
+     *
+     * @param {string} sectionId - The ID of the section to show.
+     */
+    function showSection(sectionId) {
+      hideAllSections();
+      document.getElementById(sectionId).style.display = "block";
+    }
+
+    function getClientID() {
+      let clientId = localStorage.getItem(ENV_KEYS.CLIENT_ID);
+      if (!clientId) {
+        clientId = window.crypto.randomUUID();
+        localStorage.setItem(ENV_KEYS.CLIENT_ID, clientId);
+      }
+
+      return clientId;
+    }
+
+    /**
+     * Handles the case when the user is busy and cannot participate.
+     *
+     * It shows the 'no-response' section.
+     */
+    function handleUserIsBusy() {
+      showSection(IDS.SECTIONS.USER_IS_BUSY_SECTION);
+    }
+
+    /**
+     * Handle the user is ready to start to chat with compass.
+     * @returns {Promise<void>}
+     */
+    async function handleYesClick(context) {
+      console.debug("Using Context", context);
+      try {
+        showSection(IDS.SECTIONS.WAIT_A_MOMENT);
+
+        const response = await fetchWithRetry(context.configs.RCT_BACKEND_API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": context.configs.RCT_BACKEND_API_KEY,
+          },
+          body: JSON.stringify(context.request),
+        });
+
+        console.log("done with fetch, response status:", response.status);
+
+        const data = await response.json();
+        if (!response.ok) {
+          console.error("Error:", response);
+
+          showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+          document.getElementById("server-error-message-content").innerHTML = data.message;
+          return;
+        }
+
+        if (data.group === "not_using_compass") {
+          window.location.href = context.configs.CONTROL_GROUP_REDIRECT_LINK;
+        } else if (data.group === "using_compass") {
+          const credentials = data.credentials;
+
+          firebase.initializeApp({
+            apiKey: context.configs.RCT_FIREBASE_API_KEY,
+            authDomain: atob(window.tabiyaConfig.FIREBASE_AUTH_DOMAIN),
+          });
+
+          const userCredential = await firebase.auth().signInWithEmailAndPassword(context.request.email, atob(credentials.password));
+          const token = await userCredential.user.getIdToken();
+
+          // Set the client ID and token in localStorage
+          localStorage.setItem(ENV_KEYS.TOKEN, token);
+          localStorage.setItem(ENV_KEYS.LOGIN_METHOD, LOGIN_METHODS.FIREBASE_EMAIL);
+
+          window.location.href = "/#/";
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        // Handle error as needed
+        showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+      }
+    }
+
+    function handleReturnHome() {
+      // show the initial question section again
+      showSection(IDS.SECTIONS.INITIAL_QUESTION);
+    }
+
+    function setupEventListeners(context) {
+      document.getElementById("yes-btn").addEventListener("click", handleYesClick.bind(null, context));
+      document.getElementById("no-btn").addEventListener("click", handleUserIsBusy);
+      document.getElementById("return-home").addEventListener("click", handleReturnHome);
+    }
+
+    function handleAlreadyLoggedIn() {
+      const token = localStorage.getItem(ENV_KEYS.TOKEN);
+      const loginMethod = localStorage.getItem(ENV_KEYS.LOGIN_METHOD);
+
+      if (token && loginMethod) {
+        console.debug("User is already logged in with method:", loginMethod);
+        // Redirect to the main application or perform any other action
+        window.location.href = "/#/"; // Adjust the redirect as needed
+      } else {
+        console.debug("No user is logged in, proceeding with screening.");
+      }
+    }
+
+    function handleAppLoaded() {
+      console.debug("Application loaded successfully");
+
+      const screeningConfig = window.screeningConfig;
+
+      const RCT_BACKEND_API_URL = atob(screeningConfig.RCT_BACKEND_API_URL);
+      const RCT_BACKEND_API_KEY = atob(screeningConfig.RCT_BACKEND_API_KEY);
+      const RCT_FIREBASE_API_KEY = atob(screeningConfig.RCT_FIREBASE_API_KEY);
+      const CONTROL_GROUP_REDIRECT_LINK = atob(screeningConfig.CONTROL_GROUP_REDIRECT_LINK);
+
+      const { email, externalUserId } = getUrlParams();
+
+      const context = {
+        configs: {
+          RCT_BACKEND_API_URL,
+          RCT_BACKEND_API_KEY,
+          RCT_FIREBASE_API_KEY,
+          CONTROL_GROUP_REDIRECT_LINK,
+        },
+        request: {
+          email,
+          externalUserId,
+          clientId: getClientID(),
+        },
+      };
+
+      // Setup event listeners after configs are loaded
+      setupEventListeners(context);
+    }
+
+    // #############################################################
+    // #                    MAIN Entry Point
+    // #############################################################
+    document.addEventListener("DOMContentLoaded", function() {
+      // First check if the user is already logged in, and log them in if so.
+      handleAlreadyLoggedIn();
+
+      // Get URL parameters
+      const { email, externalUserId } = getUrlParams();
+
+      if (!email || !externalUserId) {
+        console.error("Email and externalUserId are required in the URL parameters.");
+        showSection(IDS.SECTIONS.INVALID_QUERY_PARAMS);
+        return;
+      } else {
+        showSection(IDS.SECTIONS.INITIAL_QUESTION);
+      }
+
+      const frontendFeatures = JSON.parse(atob(window.tabiyaConfig.FRONTEND_FEATURES));
+      const screeningConfigPath = frontendFeatures.screening.config.config_buckets_url;
+
+      loadScript(screeningConfigPath).then(handleAppLoaded);
+    });
+  </script>
+</div>
+</body>
+</html>
