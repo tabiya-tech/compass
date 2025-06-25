@@ -11,7 +11,7 @@ from app.agent.agent_types import AgentInput
 from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.conversation_memory.conversation_memory_manager import IConversationMemoryManager
 from app.conversations.reactions.repository import IReactionRepository
-from app.conversations.types import ConversationResponse, Skill, Experience
+from app.conversations.types import ConversationResponse
 from app.conversations.utils import get_messages_from_conversation_manager, filter_conversation_history, \
     get_total_explored_experiences, get_current_conversation_phase_response
 from app.sensitive_filter import sensitive_filter
@@ -57,17 +57,6 @@ class IConversationService(ABC):
         :param user_id: str - the id of the requesting user
         :param session_id: int - id for the conversation session
         :return: ConversationResponse - an object containing a list of messages and some metadata about the current conversation
-        :raises Exception: if any error occurs
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
-    async def get_experiences_by_session_id(self, user_id: str, session_id: int) -> list[Experience]:
-        """
-        Get all the experiences that have been discovered for this session so far
-        :param user_id: str - the id of the requesting user
-        :param session_id: int - id for the conversation session
-        :return: list[Experience] - an array containing a list of experience objects
         :raises Exception: if any error occurs
         """
         raise NotImplementedError()
@@ -155,29 +144,3 @@ class ConversationService(IConversationService):
             experiences_explored=experiences_explored,
             current_phase=get_current_conversation_phase_response(state, self._logger)
         )
-
-    async def get_experiences_by_session_id(self, user_id: str, session_id: int) -> list[Experience]:
-        # Get the experiences from the application state
-        state = await self._application_state_metrics_recorder.get_state(session_id)
-        director_state = state.explore_experiences_director_state
-
-        # experiences to return to the user.
-        experiences: list[Experience] = []
-
-        # Cache for UUIDs of explored experiences so that they don't be duplicated
-        explored_uuids: set[str] = set()
-
-        # 1. First, get the explored experiences from the `director_state`
-        for experience_details in director_state.explored_experiences:
-            explored_uuids.add(experience_details.uuid)
-            experiences.append(Experience.from_experience_entity(experience_details, DiveInPhase.PROCESSED))
-
-        # 2. Then, get the experiences that are in the `experiences_state` but not yet explored.
-        #    Append them to the experiences to return to the user.
-        for uuid, exp_state in director_state.experiences_state.items():
-            if uuid in explored_uuids:
-                continue  # Skip ones we already added
-
-            experiences.append(Experience.from_experience_entity(exp_state.experience, exp_state.dive_in_phase))
-
-        return experiences
