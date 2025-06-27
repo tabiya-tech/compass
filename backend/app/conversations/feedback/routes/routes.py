@@ -14,6 +14,7 @@ from app.constants.errors import HTTPErrorResponse
 from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var
 from app.conversations.feedback.services.errors import InvalidOptionError, InvalidQuestionError, QuestionsFileError
 from app.conversations.feedback.services.service import IUserFeedbackService, UserFeedbackService, NewFeedbackSpec
+from app.conversations.feedback.services.types import QuestionsConfig
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
 from app.metrics.services.get_metrics_service import get_metrics_service
@@ -71,6 +72,32 @@ def add_user_feedback_routes(users_router: APIRouter, auth: Authentication):
     :param auth: Authentication: The authentication instance to use for the routes.
     """
     router = APIRouter(prefix="/feedback", tags=["users-feedback"])
+
+    @router.get("/questions",
+                status_code=HTTPStatus.OK,
+                response_model=QuestionsConfig,
+                responses={
+                    HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse}
+                },
+                name="get questions configuration",
+                description="Get the questions configuration for the feedback form"
+                )
+    async def _get_questions_config(
+            user_feedback_service: IUserFeedbackService = Depends(_get_user_feedback_service)
+    ) -> QuestionsConfig:
+        """
+        Get the questions configuration for the feedback form.
+
+        :param user_feedback_service: Service for managing user feedback
+        :return: The questions configuration
+        :raises HTTPException: If there's an error loading the questions
+        """
+        try:
+            questions_data = await user_feedback_service.get_questions_config()
+            return questions_data
+        except QuestionsFileError as e:
+            logger.exception(e)
+            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Failed to load questions configuration")
 
     @router.patch("",
                   status_code=HTTPStatus.OK,

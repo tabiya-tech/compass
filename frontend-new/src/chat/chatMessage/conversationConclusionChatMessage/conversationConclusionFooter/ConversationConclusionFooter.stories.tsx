@@ -2,7 +2,7 @@ import React, { ReactNode, useMemo } from "react";
 import { Meta, StoryObj } from "@storybook/react";
 import ConversationConclusionFooter from "./ConversationConclusionFooter";
 import { ChatProvider, useChatContext } from "src/chat/ChatContext";
-import { FeedbackItem, QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -12,7 +12,14 @@ import {
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { getBackendUrl } from "src/envService";
-import { FeedbackStatus } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
+import { FeedbackStatus } from "src/feedback/overallFeedback/overallFeedbackForm/OverallFeedbackForm";
+
+import {
+  CUSTOMER_SATISFACTION_QUESTION_KEY
+} from "src/feedback/overallFeedback/overallFeedbackForm/components/formContent/questionComponents/customerSatisfactionRating/constants";
+import {
+  ADDITIONAL_FEEDBACK_QUESTION_ID
+} from "src/feedback/overallFeedback/overallFeedbackForm/components/formContent/questionComponents/additionalFeedback/constants";
 
 // Mock feedback data
 const mockFeedbackInProgress: FeedbackItem[] = [
@@ -62,10 +69,10 @@ const StorybookWrapper = ({
 
   const answeredQuestions = [];
   if (hasSubmittedFeedback) {
-    answeredQuestions.push(QUESTION_KEYS.OVERALL_SATISFACTION);
+    answeredQuestions.push(ADDITIONAL_FEEDBACK_QUESTION_ID);
   }
   if (hasSubmittedCustomerSatisfactionRating) {
-    answeredQuestions.push(QUESTION_KEYS.CUSTOMER_SATISFACTION);
+    answeredQuestions.push(CUSTOMER_SATISFACTION_QUESTION_KEY);
   }
 
   // Mock the session feedback on window

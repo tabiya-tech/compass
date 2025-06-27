@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import ConversationConclusionChatMessage from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { ChatProvider, useChatContext } from "src/chat/ChatContext";
-import { FeedbackStatus } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
+import { FeedbackStatus } from "src/feedback/overallFeedback/overallFeedbackForm/OverallFeedbackForm";
 import { useEffect } from "react";
 
 const withChatContext = (feedbackStatus: FeedbackStatus) => (Story: any) => {
