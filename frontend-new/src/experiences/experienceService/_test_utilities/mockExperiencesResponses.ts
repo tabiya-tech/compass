@@ -1,4 +1,4 @@
-import { Experience, Skill, WorkType } from "src/experiences/experienceService/experiences.types";
+import { DiveInPhase, Experience, Skill, WorkType } from "src/experiences/experienceService/experiences.types";
 import { faker } from "@faker-js/faker";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
@@ -31,6 +31,7 @@ export const mockExperiences: Experience[] = [
     summary:
       "Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that " +
       "improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.",
+    exploration_phase: DiveInPhase.EXPLORING_SKILLS,
   },
   {
     UUID: "c3c8b43d-73dd-4c6d-9e71-010492e86d5e",
@@ -59,6 +60,7 @@ export const mockExperiences: Experience[] = [
     summary:
       "Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that " +
       "improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.",
+    exploration_phase: DiveInPhase.EXPLORING_SKILLS,
   },
 ];
 
@@ -180,6 +182,7 @@ const generateRandomExperience = (workType?: WorkType): Experience => {
       generateRandomSkill(usedLabels),
       generateRandomSkill(usedLabels),
     ],
+    exploration_phase: DiveInPhase.EXPLORING_SKILLS,
   };
 };
 

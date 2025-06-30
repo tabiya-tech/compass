@@ -235,28 +235,6 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                       >
                         Project Manager
                       </p>
-                      <button
-                        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
-                        data-testid="experiences-drawer-edit-button-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-                        tabindex="0"
-                        title="Edit"
-                        type="button"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
-                          data-testid="EditIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"
-                          />
-                        </svg>
-                        <span
-                          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                        />
-                      </button>
                     </div>
                     <span
                       class="MuiTypography-root MuiTypography-caption css-1s89n9g-MuiTypography-root"
@@ -391,28 +369,6 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                       >
                         Project Manager
                       </p>
-                      <button
-                        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
-                        data-testid="experiences-drawer-edit-button-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-                        tabindex="0"
-                        title="Edit"
-                        type="button"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
-                          data-testid="EditIcon"
-                          focusable="false"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"
-                          />
-                        </svg>
-                        <span
-                          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                        />
-                      </button>
                     </div>
                     <span
                       class="MuiTypography-root MuiTypography-caption css-1s89n9g-MuiTypography-root"

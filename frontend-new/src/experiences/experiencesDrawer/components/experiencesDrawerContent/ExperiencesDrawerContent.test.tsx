@@ -9,6 +9,7 @@ import { render, screen } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 
 describe("ReportDrawerContent", () => {
   test("should render ExperiencesDrawerContent correctly", () => {
@@ -36,8 +37,6 @@ describe("ReportDrawerContent", () => {
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_SKILLS_CONTAINER)).toBeInTheDocument();
     // AND the report drawer content experience summary to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_SUMMARY)).toBeInTheDocument();
-    // AND the report drawer edit button to be in the document
-    expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)).toBeInTheDocument();
     // AND the report drawer chips to be in the document
     const chips = screen.getAllByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_CHIP);
     chips.forEach((chip) => expect(chip).toBeInTheDocument());
@@ -63,6 +62,49 @@ describe("ReportDrawerContent", () => {
     // AND to match the snapshot
     expect(loadingContainer).toMatchSnapshot();
   });
+
+  test("should render edit button if experience exploration phase is PROCESSED", () => {
+    // GIVEN the ExperiencesDrawerContent component with a PROCESSED experience
+    const givenReportDrawerContent = (
+      <ExperiencesDrawerContent
+        experience={{ ...mockExperiences[0], exploration_phase: DiveInPhase.PROCESSED }}
+        onEdit={jest.fn()}
+      />
+    );
+
+    // WHEN the component is rendered
+    render(givenReportDrawerContent);
+
+    // THEN expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+    // AND the edit button to be in the document
+    const editButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON);
+    expect(editButton).toBeInTheDocument();
+  });
+
+  test.each([
+    DiveInPhase.NOT_STARTED,
+    DiveInPhase.EXPLORING_SKILLS,
+    DiveInPhase.LINKING_RANKING,
+  ])("should not render edit button if experience exploration phase is %s", (phase) => {
+    // GIVEN the ExperiencesDrawerContent component with a non-PROCESSED experience
+    const givenReportDrawerContent = (
+      <ExperiencesDrawerContent
+        experience={{ ...mockExperiences[0], exploration_phase: phase }}
+        onEdit={jest.fn()}
+      />
+    );
+
+    // WHEN the component is rendered
+    render(givenReportDrawerContent);
+
+    // THEN expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+    // AND the edit button to not be in the document
+    expect(screen.queryByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)).not.toBeInTheDocument();
+  })
 
   test("it should show No skills yet when there are no skills", () => {
     // GIVEN the ExperiencesDrawerContent component
@@ -127,8 +169,12 @@ describe("ReportDrawerContent", () => {
   test("should call onEdit when edit button is clicked", async () => {
     // GIVEN the ExperiencesDrawerContent component
     const onEditMock = jest.fn();
+    // GIVEN some experiences that have been explored
+    const givenExploredExperiences = mockExperiences[0]
+    givenExploredExperiences.exploration_phase = DiveInPhase.PROCESSED;
+    // AND the ExperiencesDrawer component
     const givenReportDrawerContent = (
-      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} onEdit={onEditMock} />
+      <ExperiencesDrawerContent experience={givenExploredExperiences} onEdit={onEditMock} />
     );
 
     // WHEN the component is rendered
