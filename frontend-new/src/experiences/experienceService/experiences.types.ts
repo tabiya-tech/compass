@@ -17,6 +17,13 @@ export interface Timeline {
   end: string;
 }
 
+export enum DiveInPhase {
+  NOT_STARTED = "NOT_STARTED",
+  EXPLORING_SKILLS = "EXPLORING_SKILLS",
+  LINKING_RANKING = "LINKING_RANKING",
+  PROCESSED= "PROCESSED",
+}
+
 export interface Experience {
   UUID: string;
   timeline: Timeline;
@@ -26,6 +33,7 @@ export interface Experience {
   work_type: WorkType | null;
   top_skills: Skill[];
   summary: string | null;
+  exploration_phase: DiveInPhase;
 }
 
 export interface SkillUpdate {

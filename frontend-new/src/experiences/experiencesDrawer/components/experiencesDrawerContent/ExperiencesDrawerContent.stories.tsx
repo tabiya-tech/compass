@@ -3,6 +3,7 @@ import ExperiencesDrawerContent, {
   LoadingExperienceDrawerContent,
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import { generateRandomExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
+import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 
 const meta: Meta<typeof ExperiencesDrawerContent> = {
   title: "Experiences/ExperiencesDrawerContent",
@@ -57,6 +58,15 @@ export const ShownWithNoSummary = {
     experience: {
       ...generateRandomExperiences(1)[0],
       summary: "",
+    },
+  },
+};
+
+export const ShownWhenEditable = {
+  args: {
+    experience: {
+      ...generateRandomExperiences(1)[0],
+      exploration_phase: DiveInPhase.PROCESSED,
     },
   },
 };

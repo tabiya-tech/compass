@@ -3,12 +3,19 @@ import "src/_test_utilities/consoleMock";
 
 import ExperiencesDrawer, { DATA_TEST_ID } from "src/experiences/experiencesDrawer/ExperiencesDrawer";
 import userEvent from "@testing-library/user-event";
-import { render, screen, within, fireEvent } from "src/_test_utilities/test-utils";
+import { fireEvent, render, screen, within } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
-import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
-import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTENT_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
+import {
+  DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID,
+} from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
+import {
+  DATA_TEST_ID as EXPERIENCES_DRAWER_CONTENT_TEST_ID,
+} from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import { DATA_TEST_ID as CONFIRM_MODAL_DIALOG_DATA_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
-import { DATA_TEST_ID as EXPERIENCE_EDIT_FORM_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/experienceEditForm/ExperienceEditForm";
+import {
+  DATA_TEST_ID as EXPERIENCE_EDIT_FORM_DATA_TEST_ID,
+} from "src/experiences/experiencesDrawer/components/experienceEditForm/ExperienceEditForm";
+import { DiveInPhase } from "../experienceService/experiences.types";
 
 // mock custom text field
 jest.mock("src/theme/CustomTextField/CustomTextField", () => {
@@ -192,12 +199,17 @@ describe("ExperiencesDrawer", () => {
 
   describe("ExperienceEditForm", () => {
     test("should render ExperienceEditForm when edit button is clicked", async () => {
-      // GIVEN the ExperiencesDrawer component
+      // GIVEN some experiences that have been explored
+      const givenExploredExperiences = mockExperiences.map(experience => ({
+        ...experience,
+        exploration_phase: DiveInPhase.PROCESSED
+      }))
+      // AND the ExperiencesDrawer component
       const givenExperiencesDrawer = (
         <ExperiencesDrawer
           isOpen={true}
           isLoading={false}
-          experiences={mockExperiences}
+          experiences={givenExploredExperiences}
           notifyOnClose={jest.fn()}
           conversationConductedAt="2021-06-01T00:00:00Z"
           onExperiencesUpdated={jest.fn()}
@@ -219,12 +231,17 @@ describe("ExperiencesDrawer", () => {
     });
 
     test("should show confirmation dialog when unsaved changes exist and cancel button is clicked", async () => {
-      // GIVEN the ExperiencesDrawer component
+      // GIVEN some experiences that have been explored
+      const givenExploredExperiences = mockExperiences.map(experience => ({
+        ...experience,
+        exploration_phase: DiveInPhase.PROCESSED
+      }))
+      // AND the ExperiencesDrawer component
       const givenExperiencesDrawer = (
         <ExperiencesDrawer
           isOpen={true}
           isLoading={false}
-          experiences={mockExperiences}
+          experiences={givenExploredExperiences}
           notifyOnClose={jest.fn()}
           conversationConductedAt="2021-06-01T00:00:00Z"
           onExperiencesUpdated={jest.fn()}
@@ -258,12 +275,17 @@ describe("ExperiencesDrawer", () => {
     });
 
     test("should keep ExperienceEditForm open when Keep Editing button in the dialog is clicked", async () => {
-      // GIVEN the ExperiencesDrawer component
+      // GIVEN some experiences that have been explored
+      const givenExploredExperiences = mockExperiences.map(experience => ({
+        ...experience,
+        exploration_phase: DiveInPhase.PROCESSED
+      }))
+      // AND the ExperiencesDrawer component
       const givenExperiencesDrawer = (
         <ExperiencesDrawer
           isOpen={true}
           isLoading={false}
-          experiences={mockExperiences}
+          experiences={givenExploredExperiences}
           notifyOnClose={jest.fn()}
           conversationConductedAt="2021-06-01T00:00:00Z"
           onExperiencesUpdated={jest.fn()}
@@ -303,12 +325,17 @@ describe("ExperiencesDrawer", () => {
     });
 
     test("should close ExperienceEditForm when close button in the dialog is clicked", async () => {
-      // GIVEN the ExperiencesDrawer component
+      // GIVEN some experiences that have been explored
+      const givenExploredExperiences = mockExperiences.map(experience => ({
+        ...experience,
+        exploration_phase: DiveInPhase.PROCESSED
+      }))
+      // AND the ExperiencesDrawer component
       const givenExperiencesDrawer = (
         <ExperiencesDrawer
           isOpen={true}
           isLoading={false}
-          experiences={mockExperiences}
+          experiences={givenExploredExperiences}
           notifyOnClose={jest.fn()}
           conversationConductedAt="2021-06-01T00:00:00Z"
           onExperiencesUpdated={jest.fn()}
@@ -342,12 +369,17 @@ describe("ExperiencesDrawer", () => {
     });
 
     test("should keep ExperienceEditForm open when close icon in dialog is clicked", async () => {
-      // GIVEN the ExperiencesDrawer component
+      // GIVEN some experiences that have been explored
+      const givenExploredExperiences = mockExperiences.map(experience => ({
+        ...experience,
+        exploration_phase: DiveInPhase.PROCESSED
+      }))
+      // AND the ExperiencesDrawer component
       const givenExperiencesDrawer = (
         <ExperiencesDrawer
           isOpen={true}
           isLoading={false}
-          experiences={mockExperiences}
+          experiences={givenExploredExperiences}
           notifyOnClose={jest.fn()}
           conversationConductedAt="2021-06-01T00:00:00Z"
           onExperiencesUpdated={jest.fn()}

@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Box, Chip, Grid, Popover, Skeleton, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { Experience } from "src/experiences/experienceService/experiences.types";
+import { DiveInPhase, Experience } from "src/experiences/experienceService/experiences.types";
 import { Theme } from "@mui/material/styles";
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import InfoIcon from "@mui/icons-material/Info";
@@ -74,14 +74,16 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
           >
             {experience.experience_title ? experience.experience_title : <i>Untitled!</i>}
           </Typography>
-          <PrimaryIconButton
-            onClick={handleEditClick}
-            sx={{ color: theme.palette.common.black }}
-            title="Edit"
-            data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON}
-          >
-            <EditIcon />
-          </PrimaryIconButton>
+          {experience.exploration_phase === DiveInPhase.PROCESSED && (
+            <PrimaryIconButton
+              onClick={handleEditClick}
+              sx={{ color: theme.palette.common.black }}
+              title="Edit"
+              data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON}
+            >
+              <EditIcon />
+            </PrimaryIconButton>
+          )}
         </Box>
         <Typography
           variant="caption"
