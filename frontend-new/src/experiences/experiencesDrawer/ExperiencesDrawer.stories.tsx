@@ -1,6 +1,7 @@
 import { Meta } from "@storybook/react";
 import ExperiencesDrawer from "src/experiences/experiencesDrawer/ExperiencesDrawer";
 import { generateRandomExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
+import { DiveInPhase } from "../experienceService/experiences.types";
 
 const meta: Meta<typeof ExperiencesDrawer> = {
   title: "Experiences/ExperiencesDrawer",
@@ -94,9 +95,22 @@ const ShownWithNoSummary_experiences = generateRandomExperiences(1);
 ShownWithNoSummary_experiences.forEach((experience) => {
   experience.summary = "";
 });
+
 export const ShownWithNoSummary = {
   args: {
     isOpen: true,
     experiences: ShownWithNoSummary_experiences,
+  },
+};
+
+const ShownWhenAllExperiencesExplored_experiences = generateRandomExperiences(3);
+ShownWhenAllExperiencesExplored_experiences.forEach(experience =>  {
+  experience.exploration_phase = DiveInPhase.PROCESSED;
+})
+
+export const ShownWhenAllExperiencesExplored = {
+  args: {
+    isOpen: true,
+    experiences: ShownWhenAllExperiencesExplored_experiences,
   },
 };
