@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Chip, styled, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import {
@@ -6,6 +6,11 @@ import {
   Timeline,
   WorkType,
   UpdateExperienceRequest,
+  EXPERIENCE_TITLE_MAX_LENGTH,
+  COMPANY_MAX_LENGTH,
+  LOCATION_MAX_LENGTH,
+  SUMMARY_MAX_LENGTH,
+  TIMELINE_MAX_LENGTH,
 } from "src/experiences/experienceService/experiences.types";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import UndoIcon from "@mui/icons-material/Undo";
@@ -22,6 +27,7 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import ExperienceService from "src/experiences/experienceService/experienceService";
+import { debounce } from "src/utils/debounce";
 
 const uniqueId = "0ddc6b92-eca6-472b-8e5f-fdce9abfec3b";
 
@@ -30,11 +36,15 @@ export const DATA_TEST_ID = {
   FORM_SAVE_BUTTON: `experience-edit-form-save-button-${uniqueId}`,
   FORM_CANCEL_BUTTON: `experience-edit-form-cancel-button-${uniqueId}`,
   FORM_EXPERIENCE_TITLE: `experience-edit-form-experience-title-${uniqueId}`,
+  FORM_EXPERIENCE_TITLE_ERROR: `experience-edit-form-experience-title-error-${uniqueId}`,
   FORM_START_DATE: `experience-edit-form-start-date-${uniqueId}`,
   FORM_END_DATE: `experience-edit-form-end-date-${uniqueId}`,
   FORM_COMPANY: `experience-edit-form-company-${uniqueId}`,
+  FORM_COMPANY_ERROR: `experience-edit-form-company-error-${uniqueId}`,
   FORM_LOCATION: `experience-edit-form-location-${uniqueId}`,
+  FORM_LOCATION_ERROR: `experience-edit-form-location-error-${uniqueId}`,
   FORM_SUMMARY: `experience-edit-form-summary-${uniqueId}`,
+  FORM_SUMMARY_ERROR: `experience-edit-form-summary-error-${uniqueId}`,
   FORM_SKILLS_CONTAINER: `experience-edit-form-skills-container-${uniqueId}`,
   FORM_WORK_TYPE: `experience-edit-form-work-type-title-${uniqueId}`,
   FORM_WORK_TYPE_DROPDOWN: `experience-edit-form-work-type-dropdown-${uniqueId}`,
@@ -101,6 +111,32 @@ const workTypeDescription = (workType: WorkType | null) => {
   }
 };
 
+// Debounce delay for error checking (ms)
+export const DEBOUNCE_ERROR_DELAY_MS = 20;
+
+const checkInitialFieldErrors = (experience: Experience) => {
+  const errors: { [key: string]: string } = {};
+  if (experience.experience_title && experience.experience_title.length > EXPERIENCE_TITLE_MAX_LENGTH) {
+    errors.experience_title = `Maximum ${EXPERIENCE_TITLE_MAX_LENGTH} characters allowed.`;
+  }
+  if (experience.company && experience.company.length > COMPANY_MAX_LENGTH) {
+    errors.company = `Maximum ${COMPANY_MAX_LENGTH} characters allowed.`;
+  }
+  if (experience.location && experience.location.length > LOCATION_MAX_LENGTH) {
+    errors.location = `Maximum ${LOCATION_MAX_LENGTH} characters allowed.`;
+  }
+  if (experience.summary && experience.summary.length > SUMMARY_MAX_LENGTH) {
+    errors.summary = `Maximum ${SUMMARY_MAX_LENGTH} characters allowed.`;
+  }
+  if (experience.timeline.start && experience.timeline.start.length > TIMELINE_MAX_LENGTH) {
+    errors.timeline_start = `Maximum ${TIMELINE_MAX_LENGTH} characters allowed.`;
+  }
+  if (experience.timeline.end && experience.timeline.end.length > TIMELINE_MAX_LENGTH) {
+    errors.timeline_end = `Maximum ${TIMELINE_MAX_LENGTH} characters allowed.`;
+  }
+  return errors;
+};
+
 const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   experience,
   notifyOnSave,
@@ -117,27 +153,59 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   const [markedForDeletion, setMarkedForDeletion] = useState<Set<string>>(new Set());
   const [workTypeMenuAnchorEl, setWorkTypeMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+
+  // Debounced error updater (stable ref)
+  const debouncedUpdateFieldError = useRef(
+    debounce((field: string, value: string, maxLength: number) => {
+      setFieldErrors((prev) => {
+        if (value.length > maxLength) {
+          return { ...prev, [field]: `Maximum ${maxLength} characters allowed.` };
+        } else {
+          const { [field]: _, ...rest } = prev;
+          return rest;
+        }
+      });
+    }, DEBOUNCE_ERROR_DELAY_MS)
+  ).current;
+
+  useEffect(() => {
+    // Cleanup on unmount
+    return () => {
+      debouncedUpdateFieldError.cancel();
+    };
+  }, [debouncedUpdateFieldError]);
+
+  // Set initial errors on mount and when experience prop changes
+  useEffect(() => {
+    setFieldErrors(checkInitialFieldErrors(experience));
+  }, [experience]);
 
   const displayExperience = useMemo(() => ({ ...experience, ...editedExperience }), [experience, editedExperience]);
 
-  // Check if there are any changes that need to be saved
   const hasChanges = useMemo(
     () => Object.keys(editedExperience).length > 0 || markedForDeletion.size > 0,
     [editedExperience, markedForDeletion]
   );
 
+  const anyFieldTooLong = Object.keys(fieldErrors).length > 0;
+
   useEffect(() => {
     notifyOnUnsavedChange?.(hasChanges);
   }, [hasChanges, notifyOnUnsavedChange]);
 
-  const handleInputChange = (field: keyof Experience) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEditedExperience((prev) => ({
-      ...prev,
-      [field]: event.target.value,
-    }));
-
-    notifyOnUnsavedChange?.(true);
-  };
+  const handleInputChange =
+    (field: keyof Experience, maxLength?: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      let value = event.target.value;
+      setEditedExperience((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+      if (maxLength !== undefined) {
+        debouncedUpdateFieldError(field, value, maxLength);
+      }
+      notifyOnUnsavedChange?.(true);
+    };
 
   const handleTimelineChange = (field: keyof Timeline) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setEditedExperience((prev) => ({
@@ -147,7 +215,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
         [field]: event.target.value,
       },
     }));
-
+    debouncedUpdateFieldError(`timeline_${field}`, event.target.value, TIMELINE_MAX_LENGTH);
     notifyOnUnsavedChange?.(true);
   };
 
@@ -164,10 +232,8 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   const handleSkillSelect = (newPreferredLabel: string) => {
     if (selectedSkillId) {
       setEditedExperience((prev) => {
-        // Get the current skills, either from previous edit or original experience
         const currentSkills = prev.top_skills || [...experience.top_skills];
 
-        // Create a new array with updated skills
         const updatedSkills = currentSkills.map((skill) => {
           if (skill.UUID === selectedSkillId) {
             return {
@@ -223,12 +289,10 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
 
       const sessionId = userPreferences.sessions[0];
 
-      // Extract only defined fields from editedExperience (excluding top_skills)
       const updatedFields: UpdateExperienceRequest = Object.fromEntries(
         Object.entries(editedExperience).filter(([key, value]) => value !== undefined && key !== "top_skills")
       ) as UpdateExperienceRequest;
 
-      // Handle skills filtering separately
       if (markedForDeletion.size > 0 || (editedExperience.top_skills && editedExperience.top_skills.length > 0)) {
         const baseSkills = editedExperience.top_skills || experience.top_skills;
         updatedFields.top_skills = baseSkills
@@ -306,7 +370,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
           </SecondaryButton>
           <PrimaryButton
             onClick={handleSave}
-            disabled={!hasChanges || isExperienceTitleEmpty}
+            disabled={!hasChanges || isExperienceTitleEmpty || anyFieldTooLong}
             disableWhenOffline
             data-testid={DATA_TEST_ID.FORM_SAVE_BUTTON}
           >
@@ -353,7 +417,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             <StyledTextField
               placeholder="Experience title"
               value={displayExperience.experience_title}
-              onChange={handleInputChange("experience_title")}
+              onChange={handleInputChange("experience_title", EXPERIENCE_TITLE_MAX_LENGTH)}
               autoFocus
               data-testid={DATA_TEST_ID.FORM_EXPERIENCE_TITLE}
               sx={{
@@ -362,7 +426,17 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                   fontSize: theme.typography.body1.fontSize,
                 },
               }}
+              error={!!fieldErrors.experience_title}
             />
+            {fieldErrors.experience_title && (
+              <Typography
+                variant="caption"
+                sx={{ color: theme.palette.error.main, width: "100%" }}
+                data-testid={DATA_TEST_ID.FORM_EXPERIENCE_TITLE_ERROR}
+              >
+                {fieldErrors.experience_title}
+              </Typography>
+            )}
             {isExperienceTitleEmpty && (
               <Typography variant="caption" color={theme.palette.error.main}>
                 * Experience title is required
@@ -370,42 +444,102 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             )}
           </Box>
           <Box display="flex" justifyContent="space-between" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-            <StyledTextField
-              placeholder="Start date"
-              value={displayExperience.timeline.start}
-              onChange={handleTimelineChange("start")}
-              data-testid={DATA_TEST_ID.FORM_START_DATE}
-            />
-            <StyledTextField
-              placeholder="End date"
-              value={displayExperience.timeline.end}
-              onChange={handleTimelineChange("end")}
-              data-testid={DATA_TEST_ID.FORM_END_DATE}
-            />
+            <Box flexGrow={1}>
+              <StyledTextField
+                placeholder="Start date"
+                value={displayExperience.timeline.start}
+                onChange={handleTimelineChange("start")}
+                data-testid={DATA_TEST_ID.FORM_START_DATE}
+                error={!!fieldErrors.timeline_start}
+              />
+              {fieldErrors.timeline_start && (
+                <Typography
+                  variant="caption"
+                  sx={{ color: theme.palette.error.main, width: "100%", textAlign: "end" }}
+                  data-testid={DATA_TEST_ID.FORM_COMPANY_ERROR}
+                >
+                  {fieldErrors.timeline_start}
+                </Typography>
+              )}
+            </Box>
+            <Box flexGrow={1}>
+              <StyledTextField
+                placeholder="End date"
+                value={displayExperience.timeline.end}
+                onChange={handleTimelineChange("end")}
+                data-testid={DATA_TEST_ID.FORM_END_DATE}
+                error={!!fieldErrors.timeline_end}
+              />
+              {fieldErrors.timeline_end && (
+                <Typography
+                  variant="caption"
+                  sx={{ color: theme.palette.error.main, width: "100%", textAlign: "end" }}
+                  data-testid={DATA_TEST_ID.FORM_COMPANY_ERROR}
+                >
+                  {fieldErrors.timeline_end}
+                </Typography>
+              )}
+            </Box>
           </Box>
           <Box display="flex" justifyContent="space-between" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-            <StyledTextField
-              placeholder="Company"
-              value={displayExperience.company}
-              onChange={handleInputChange("company")}
-              data-testid={DATA_TEST_ID.FORM_COMPANY}
-            />
-            <StyledTextField
-              placeholder="Location"
-              value={displayExperience.location}
-              onChange={handleInputChange("location")}
-              data-testid={DATA_TEST_ID.FORM_LOCATION}
-            />
+            <Box width="100%">
+              <StyledTextField
+                placeholder="Company"
+                value={displayExperience.company}
+                onChange={handleInputChange("company", COMPANY_MAX_LENGTH)}
+                data-testid={DATA_TEST_ID.FORM_COMPANY}
+                error={!!fieldErrors.company}
+              />
+              {fieldErrors.company && (
+                <Typography
+                  variant="caption"
+                  sx={{ color: theme.palette.error.main, width: "100%", textAlign: "end" }}
+                  data-testid={DATA_TEST_ID.FORM_COMPANY_ERROR}
+                >
+                  {fieldErrors.company}
+                </Typography>
+              )}
+            </Box>
+            <Box width="100%">
+              <StyledTextField
+                placeholder="Location"
+                value={displayExperience.location}
+                onChange={handleInputChange("location", LOCATION_MAX_LENGTH)}
+                data-testid={DATA_TEST_ID.FORM_LOCATION}
+                error={!!fieldErrors.location}
+              />
+              {fieldErrors.location && (
+                <Typography
+                  variant="caption"
+                  sx={{ color: theme.palette.error.main, width: "100%", textAlign: "end" }}
+                  data-testid={DATA_TEST_ID.FORM_LOCATION_ERROR}
+                >
+                  {fieldErrors.location}
+                </Typography>
+              )}
+            </Box>
           </Box>
-          <StyledTextField
-            placeholder="Experience summary"
-            value={displayExperience.summary ?? ""}
-            onChange={handleInputChange("summary")}
-            multiline
-            minRows={4}
-            sx={{ paddingY: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}
-            data-testid={DATA_TEST_ID.FORM_SUMMARY}
-          />
+          <Box width="100%">
+            <StyledTextField
+              placeholder="Experience summary"
+              value={displayExperience.summary ?? ""}
+              onChange={handleInputChange("summary", SUMMARY_MAX_LENGTH)}
+              multiline
+              minRows={4}
+              sx={{ paddingY: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}
+              data-testid={DATA_TEST_ID.FORM_SUMMARY}
+              error={!!fieldErrors.summary}
+            />
+            {fieldErrors.summary && (
+              <Typography
+                variant="caption"
+                sx={{ color: theme.palette.error.main, width: "100%", textAlign: "end" }}
+                data-testid={DATA_TEST_ID.FORM_SUMMARY_ERROR}
+              >
+                {fieldErrors.summary}
+              </Typography>
+            )}
+          </Box>
           <Box display="flex" alignItems="center">
             <Typography variant="body1" sx={{ wordBreak: "break-all" }}>
               <b>Top Skills</b>
