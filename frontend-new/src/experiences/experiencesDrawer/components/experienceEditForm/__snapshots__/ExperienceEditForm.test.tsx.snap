@@ -169,65 +169,73 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
         class="MuiBox-root css-1msuw7t"
       >
         <div
-          class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
-          data-testid="experience-edit-form-start-date-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+          class="MuiBox-root css-i9gxme"
         >
           <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+            class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
+            data-testid="experience-edit-form-start-date-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           >
-            <input
-              aria-invalid="false"
-              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-              id=":r3:"
-              placeholder="Start date"
-              type="text"
-              value="2022"
-            />
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+            <div
+              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
             >
-              <legend
-                class="css-ihdtdm"
+              <input
+                aria-invalid="false"
+                class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+                id=":r3:"
+                placeholder="Start date"
+                type="text"
+                value="2022"
+              />
+              <fieldset
+                aria-hidden="true"
+                class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
               >
-                <span
-                  class="notranslate"
+                <legend
+                  class="css-ihdtdm"
                 >
-                  ​
-                </span>
-              </legend>
-            </fieldset>
+                  <span
+                    class="notranslate"
+                  >
+                    ​
+                  </span>
+                </legend>
+              </fieldset>
+            </div>
           </div>
         </div>
         <div
-          class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
-          data-testid="experience-edit-form-end-date-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+          class="MuiBox-root css-i9gxme"
         >
           <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+            class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
+            data-testid="experience-edit-form-end-date-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           >
-            <input
-              aria-invalid="false"
-              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-              id=":r4:"
-              placeholder="End date"
-              type="text"
-              value="Present"
-            />
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+            <div
+              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
             >
-              <legend
-                class="css-ihdtdm"
+              <input
+                aria-invalid="false"
+                class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+                id=":r4:"
+                placeholder="End date"
+                type="text"
+                value="Present"
+              />
+              <fieldset
+                aria-hidden="true"
+                class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
               >
-                <span
-                  class="notranslate"
+                <legend
+                  class="css-ihdtdm"
                 >
-                  ​
-                </span>
-              </legend>
-            </fieldset>
+                  <span
+                    class="notranslate"
+                  >
+                    ​
+                  </span>
+                </legend>
+              </fieldset>
+            </div>
           </div>
         </div>
       </div>
@@ -235,105 +243,117 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
         class="MuiBox-root css-1msuw7t"
       >
         <div
-          class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
-          data-testid="experience-edit-form-company-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+          class="MuiBox-root css-8atqhb"
         >
           <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+            class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
+            data-testid="experience-edit-form-company-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           >
-            <input
-              aria-invalid="false"
-              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-              id=":r5:"
-              placeholder="Company"
-              type="text"
-              value="Business Inc"
-            />
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+            <div
+              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
             >
-              <legend
-                class="css-ihdtdm"
+              <input
+                aria-invalid="false"
+                class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+                id=":r5:"
+                placeholder="Company"
+                type="text"
+                value="Business Inc"
+              />
+              <fieldset
+                aria-hidden="true"
+                class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
               >
-                <span
-                  class="notranslate"
+                <legend
+                  class="css-ihdtdm"
                 >
-                  ​
-                </span>
-              </legend>
-            </fieldset>
+                  <span
+                    class="notranslate"
+                  >
+                    ​
+                  </span>
+                </legend>
+              </fieldset>
+            </div>
           </div>
         </div>
         <div
-          class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
-          data-testid="experience-edit-form-location-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+          class="MuiBox-root css-8atqhb"
         >
           <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+            class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
+            data-testid="experience-edit-form-location-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           >
-            <input
-              aria-invalid="false"
-              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-              id=":r6:"
-              placeholder="Location"
-              type="text"
-              value="New York, NY"
-            />
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+            <div
+              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
             >
-              <legend
-                class="css-ihdtdm"
+              <input
+                aria-invalid="false"
+                class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+                id=":r6:"
+                placeholder="Location"
+                type="text"
+                value="New York, NY"
+              />
+              <fieldset
+                aria-hidden="true"
+                class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
               >
-                <span
-                  class="notranslate"
+                <legend
+                  class="css-ihdtdm"
                 >
-                  ​
-                </span>
-              </legend>
-            </fieldset>
+                  <span
+                    class="notranslate"
+                  >
+                    ​
+                  </span>
+                </legend>
+              </fieldset>
+            </div>
           </div>
         </div>
       </div>
       <div
-        class="MuiFormControl-root MuiTextField-root css-9vw252-MuiFormControl-root-MuiTextField-root"
-        data-testid="experience-edit-form-summary-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+        class="MuiBox-root css-8atqhb"
       >
         <div
-          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-multiline css-1fv69vb-MuiInputBase-root-MuiOutlinedInput-root"
+          class="MuiFormControl-root MuiTextField-root css-9vw252-MuiFormControl-root-MuiTextField-root"
+          data-testid="experience-edit-form-summary-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
         >
-          <textarea
-            aria-invalid="false"
-            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-            id=":r7:"
-            placeholder="Experience summary"
-            style="height: 0px; overflow: hidden;"
+          <div
+            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-multiline css-1fv69vb-MuiInputBase-root-MuiOutlinedInput-root"
           >
-            Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
-          </textarea>
-          <textarea
-            aria-hidden="true"
-            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-            readonly=""
-            style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
-            tabindex="-1"
-          />
-          <fieldset
-            aria-hidden="true"
-            class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-          >
-            <legend
-              class="css-ihdtdm"
+            <textarea
+              aria-invalid="false"
+              class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+              id=":r7:"
+              placeholder="Experience summary"
+              style="height: 0px; overflow: hidden;"
             >
-              <span
-                class="notranslate"
+              Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
+            </textarea>
+            <textarea
+              aria-hidden="true"
+              class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+              readonly=""
+              style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
+              tabindex="-1"
+            />
+            <fieldset
+              aria-hidden="true"
+              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+            >
+              <legend
+                class="css-ihdtdm"
               >
-                ​
-              </span>
-            </legend>
-          </fieldset>
+                <span
+                  class="notranslate"
+                >
+                  ​
+                </span>
+              </legend>
+            </fieldset>
+          </div>
         </div>
       </div>
       <div

@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import AsyncMock
 
 from app.conversations.experience.service import ExperienceService, ExperienceNotFoundError
-from app.conversations.experience.types import UpdateExperienceRequest, SkillUpdate
+from app.conversations.experience.types import UpdateExperienceRequest, SkillUpdate, TimelineUpdate
 from app.agent.experience import ExperienceEntity, WorkType, Timeline
 from app.agent.explore_experiences_agent_director import DiveInPhase, ExperienceState, ExploreExperiencesAgentDirectorState
 from app.countries import Country
@@ -162,7 +162,7 @@ class TestUpdateExperience:
                 id="title_only"
             ),
             pytest.param(
-                UpdateExperienceRequest(timeline=Timeline(start="2022", end="2023")),
+                UpdateExperienceRequest(timeline=TimelineUpdate(start="2022", end="2023")),
                 {"timeline": Timeline(start="2022", end="2023")},
                 id="timeline_only"
             ),

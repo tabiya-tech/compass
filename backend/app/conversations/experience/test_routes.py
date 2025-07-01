@@ -10,7 +10,7 @@ from app.agent.experience import WorkType, Timeline
 from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.conversations.experience.routes import get_experience_service
 from app.conversations.experience.service import IExperienceService
-from app.conversations.experience.types import Skill, ExperienceResponse
+from app.conversations.experience.types import Skill, ExperienceResponse, EXPERIENCE_TITLE_MAX_LENGTH, COMPANY_MAX_LENGTH, LOCATION_MAX_LENGTH, SUMMARY_MAX_LENGTH, SKILL_LABEL_MAX_LENGTH
 from app.conversations.routes import add_experience_routes
 from app.users.auth import UserInfo
 
@@ -380,3 +380,36 @@ class TestExperienceRoutes:
         response = client.patch(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}", json=given_update_payload)
         # THEN the response is INTERNAL_SERVER_ERROR
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+
+    @pytest.mark.asyncio
+    async def test_update_experience_field_too_long(self, authenticated_client_with_mocks: TestClientWithMocks):
+        client, mocked_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
+        given_session_id = 123
+        given_experience_uuid = "exp-uuid"
+        # AND the user owns the session
+        mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=get_mock_user_preferences(given_session_id))
+        # GIVEN a payload with fields that exceed max length
+        too_long_title = "x" * (EXPERIENCE_TITLE_MAX_LENGTH + 1)
+        too_long_company = "y" * (COMPANY_MAX_LENGTH + 1)
+        too_long_location = "z" * (LOCATION_MAX_LENGTH + 1)
+        too_long_summary = "s" * (SUMMARY_MAX_LENGTH + 1)
+        too_long_skill_label = "l" * (SKILL_LABEL_MAX_LENGTH + 1)
+        given_update_payload = {
+            "experience_title": too_long_title,
+            "company": too_long_company,
+            "location": too_long_location,
+            "summary": too_long_summary,
+            "top_skills": [{"UUID": "skill-uuid-1", "preferredLabel": too_long_skill_label}]
+        }
+        # WHEN the PATCH request is made
+        response = client.patch(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}", json=given_update_payload)
+        # THEN the response is 422 Unprocessable Entity
+        assert response.status_code == 422
+        # AND the error message mentions the correct fields
+        error_json = response.json()
+        error_fields = [err["loc"][-1] for err in error_json.get("detail", [])]
+        assert "experience_title" in error_fields
+        assert "company" in error_fields
+        assert "location" in error_fields
+        assert "summary" in error_fields
+        assert "preferredLabel" in error_fields
