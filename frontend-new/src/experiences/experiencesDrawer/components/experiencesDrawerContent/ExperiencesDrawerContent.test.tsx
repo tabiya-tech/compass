@@ -12,20 +12,23 @@ import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
+import { DATA_TEST_ID as CONTEXT_MENU_DATA_TEST_ID } from "src/theme/ContextMenu/ContextMenu";
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
   const actual = jest.requireActual("src/theme/ContextMenu/ContextMenu");
   return {
     __esModule: true,
-    default: jest.fn(({ items }: { items: MenuItemConfig[] }) => (
+    default: jest.fn(({ items, notifyOnClose }: { items: MenuItemConfig[]; notifyOnClose: () => void }) => (
       <div data-testid={actual.DATA_TEST_ID.MENU}>
         {items.map((item) => (
           <div key={item.id} data-testid={item.id} onClick={item.action}>
             {item.text}
           </div>
         ))}
-        ;
+        <button data-testid="close-menu-button" onClick={notifyOnClose}>
+          Close
+        </button>
       </div>
     )),
     DATA_TEST_ID: actual.DATA_TEST_ID,
@@ -36,7 +39,7 @@ describe("ReportDrawerContent", () => {
   test("should render ExperiencesDrawerContent correctly", () => {
     // GIVEN the ExperiencesDrawerContent component
     const givenReportDrawerContent = (
-      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} onEdit={jest.fn()} />
+      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} onEdit={jest.fn()} onDelete={jest.fn()} />
     );
 
     // WHEN the component is rendered
@@ -90,6 +93,7 @@ describe("ReportDrawerContent", () => {
       <ExperiencesDrawerContent
         experience={{ ...mockExperiences[0], exploration_phase: DiveInPhase.PROCESSED }}
         onEdit={jest.fn()}
+        onDelete={jest.fn()}
       />
     );
 
@@ -103,32 +107,37 @@ describe("ReportDrawerContent", () => {
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)).toBeInTheDocument();
   });
 
-  test.each([
-    DiveInPhase.NOT_STARTED,
-    DiveInPhase.EXPLORING_SKILLS,
-    DiveInPhase.LINKING_RANKING,
-  ])("should not render context menu button if experience exploration phase is %s", (phase) => {
-    // GIVEN the ExperiencesDrawerContent component with a non-PROCESSED experience
-    const givenReportDrawerContent = (
-      <ExperiencesDrawerContent
-        experience={{ ...mockExperiences[0], exploration_phase: phase }}
-        onEdit={jest.fn()}
-      />
-    );
+  test.each([DiveInPhase.NOT_STARTED, DiveInPhase.EXPLORING_SKILLS, DiveInPhase.LINKING_RANKING])(
+    "should not render context menu button if experience exploration phase is %s",
+    (phase) => {
+      // GIVEN the ExperiencesDrawerContent component with a non-PROCESSED experience
+      const givenReportDrawerContent = (
+        <ExperiencesDrawerContent
+          experience={{ ...mockExperiences[0], exploration_phase: phase }}
+          onEdit={jest.fn()}
+          onDelete={jest.fn()}
+        />
+      );
 
-    // WHEN the component is rendered
-    render(givenReportDrawerContent);
+      // WHEN the component is rendered
+      render(givenReportDrawerContent);
 
-    // THEN expect no errors or warning to have occurred
-    expect(console.error).not.toHaveBeenCalled();
-    expect(console.warn).not.toHaveBeenCalled();
-    // AND the report drawer more button to be in the document
-    expect(screen.queryByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)).not.toBeInTheDocument();  })
+      // THEN expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+      // AND the report drawer more button to be in the document
+      expect(screen.queryByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)).not.toBeInTheDocument();
+    }
+  );
 
   test("it should show No skills yet when there are no skills", () => {
     // GIVEN the ExperiencesDrawerContent component
     const givenReportDrawerContent = (
-      <ExperiencesDrawerContent experience={{ ...mockExperiences[0], top_skills: [] }} onEdit={jest.fn()} />
+      <ExperiencesDrawerContent
+        experience={{ ...mockExperiences[0], top_skills: [] }}
+        onEdit={jest.fn()}
+        onDelete={jest.fn()}
+      />
     );
 
     // WHEN the component is rendered
@@ -141,7 +150,7 @@ describe("ReportDrawerContent", () => {
   test("should show skill description when chip is clicked", () => {
     // GIVEN the ExperiencesDrawerContent component
     const givenReportDrawerContent = (
-      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} onEdit={jest.fn()} />
+      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} onEdit={jest.fn()} onDelete={jest.fn()} />
     );
     // AND the component is rendered
     render(givenReportDrawerContent);
@@ -163,7 +172,7 @@ describe("ReportDrawerContent", () => {
   test("should close popover when clicked outside", async () => {
     // GIVEN the ExperiencesDrawerContent component
     const givenReportDrawerContent = (
-      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} onEdit={jest.fn()} />
+      <ExperiencesDrawerContent experience={{ ...mockExperiences[0] }} onEdit={jest.fn()} onDelete={jest.fn()} />
     );
     // AND the component is rendered
     render(givenReportDrawerContent);
@@ -189,11 +198,11 @@ describe("ReportDrawerContent", () => {
     // GIVEN the ExperiencesDrawerContent component
     const onEditMock = jest.fn();
     // GIVEN some experiences that have been explored
-    const givenExploredExperiences = mockExperiences[0]
+    const givenExploredExperiences = mockExperiences[0];
     givenExploredExperiences.exploration_phase = DiveInPhase.PROCESSED;
     // AND the ExperiencesDrawer component
     const givenReportDrawerContent = (
-      <ExperiencesDrawerContent experience={givenExploredExperiences} onEdit={onEditMock} />
+      <ExperiencesDrawerContent experience={givenExploredExperiences} onEdit={onEditMock} onDelete={jest.fn()} />
     );
 
     // WHEN the component is rendered
@@ -208,6 +217,60 @@ describe("ReportDrawerContent", () => {
     // THEN expect onEdit to have been called with the correct experience
     expect(onEditMock).toHaveBeenCalledWith(mockExperiences[0]);
     // AND expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+  });
+
+  test("should call onDelete when delete button is clicked", async () => {
+    // GIVEN the ExperiencesDrawerContent component
+    const onDeleteMock = jest.fn();
+    // GIVEN some experiences that have been explored
+    const givenExploredExperiences = mockExperiences[0];
+    givenExploredExperiences.exploration_phase = DiveInPhase.PROCESSED;
+    // AND the ExperiencesDrawer component
+    const givenReportDrawerContent = (
+      <ExperiencesDrawerContent experience={givenExploredExperiences} onEdit={jest.fn()} onDelete={onDeleteMock} />
+    );
+
+    // WHEN the component is rendered
+    render(givenReportDrawerContent);
+    // AND the more button is clicked to open the context menu
+    const moreButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON);
+    await userEvent.click(moreButton);
+    // AND the delete button is clicked
+    const deleteButton = screen.getByTestId(MENU_ITEM_ID.DELETE);
+    await userEvent.click(deleteButton);
+
+    // THEN expect onDelete to have been called with the correct experience
+    expect(onDeleteMock).toHaveBeenCalledWith(mockExperiences[0]);
+    // AND expect no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+  });
+
+  test("should close context menu when clicked outside", async () => {
+    // GIVEN the ExperiencesDrawerContent component
+    const givenExploredExperiences = { ...mockExperiences[0], exploration_phase: DiveInPhase.PROCESSED };
+    const givenReportDrawerContent = (
+      <ExperiencesDrawerContent experience={givenExploredExperiences} onEdit={jest.fn()} onDelete={jest.fn()} />
+    );
+    // AND the component is rendered
+    render(givenReportDrawerContent);
+
+    // WHEN the more button is clicked to open the context menu
+    const moreButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON);
+    await userEvent.click(moreButton);
+
+    // THEN expect the context menu to be visible
+    expect(screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU)).toBeInTheDocument();
+
+    // WHEN the close button in the context menu is clicked
+    const closeButton = screen.getByTestId("close-menu-button");
+    await userEvent.click(closeButton);
+
+    // THEN the more button should be able to be clicked again
+    await userEvent.click(moreButton);
+    // AND no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
   });

@@ -332,6 +332,11 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     >
                       Edit experience
                     </div>
+                    <div
+                      data-testid="experiences-drawer-menu-item-delete-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                    >
+                      Delete experience
+                    </div>
                     ;
                   </div>
                 </div>
@@ -475,6 +480,11 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                       data-testid="experiences-drawer-menu-item-edit-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                     >
                       Edit experience
+                    </div>
+                    <div
+                      data-testid="experiences-drawer-menu-item-delete-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                    >
+                      Delete experience
                     </div>
                     ;
                   </div>

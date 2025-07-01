@@ -5,9 +5,7 @@ import ExperiencesDrawer, { DATA_TEST_ID } from "src/experiences/experiencesDraw
 import userEvent from "@testing-library/user-event";
 import { fireEvent, render, screen, within } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
-import {
-  DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID,
-} from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
+import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import {
   DATA_TEST_ID as EXPERIENCES_DRAWER_CONTENT_TEST_ID,
   MENU_ITEM_ID,
@@ -15,7 +13,11 @@ import {
 import { DATA_TEST_ID as CONFIRM_MODAL_DIALOG_DATA_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import { DATA_TEST_ID as EXPERIENCE_EDIT_FORM_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/experienceEditForm/ExperienceEditForm";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
-import { DiveInPhase } from "../experienceService/experiences.types";
+import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
+import ExperienceService from "src/experiences/experienceService/experienceService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
 // mock custom text field
 jest.mock("src/theme/CustomTextField/CustomTextField", () => {
@@ -34,13 +36,15 @@ jest.mock("src/experiences/experiencesDrawer/components/downloadReportDropdown/D
 // mock the Confirm Modal Dialog
 jest.mock("src/theme/confirmModalDialog/ConfirmModalDialog", () => {
   const actual = jest.requireActual("src/theme/confirmModalDialog/ConfirmModalDialog");
-  const mockConfirmModalDialog = jest.fn().mockImplementation(({ onConfirm, onCancel, onDismiss, isOpen }) => (
-    <div data-testid={actual.DATA_TEST_ID.CONFIRM_MODAL}>
-      <button data-testid={actual.DATA_TEST_ID.CONFIRM_MODAL_CANCEL} onClick={onCancel} />
-      <button data-testid={actual.DATA_TEST_ID.CONFIRM_MODAL_CONFIRM} onClick={onConfirm} />
-      <button data-testid={actual.DATA_TEST_ID.CONFIRM_MODAL_CLOSE} onClick={onDismiss} />
-    </div>
-  ));
+  const mockConfirmModalDialog = jest
+    .fn()
+    .mockImplementation(({ onConfirm, onCancel, onDismiss, _isOpen, "data-testid": customTestId }) => (
+      <div data-testid={customTestId || actual.DATA_TEST_ID.CONFIRM_MODAL}>
+        <button data-testid={actual.DATA_TEST_ID.CONFIRM_MODAL_CANCEL} onClick={onCancel} />
+        <button data-testid={actual.DATA_TEST_ID.CONFIRM_MODAL_CONFIRM} onClick={onConfirm} />
+        <button data-testid={actual.DATA_TEST_ID.CONFIRM_MODAL_CLOSE} onClick={onDismiss} />
+      </div>
+    ));
   return {
     __esModule: true,
     default: mockConfirmModalDialog,
@@ -64,6 +68,19 @@ jest.mock("src/theme/ContextMenu/ContextMenu", () => {
       </div>
     )),
     DATA_TEST_ID: actual.DATA_TEST_ID,
+  };
+});
+
+// mock the snack bar provider
+jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
+  const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
+  return {
+    ...actual,
+    __esModule: true,
+    useSnackbar: jest.fn().mockReturnValue({
+      enqueueSnackbar: jest.fn(),
+      closeSnackbar: jest.fn(),
+    }),
   };
 });
 
@@ -219,10 +236,10 @@ describe("ExperiencesDrawer", () => {
   describe("ExperienceEditForm", () => {
     test("should render ExperienceEditForm when edit button is clicked", async () => {
       // GIVEN some experiences that have been explored
-      const givenExploredExperiences = mockExperiences.map(experience => ({
+      const givenExploredExperiences = mockExperiences.map((experience) => ({
         ...experience,
-        exploration_phase: DiveInPhase.PROCESSED
-      }))
+        exploration_phase: DiveInPhase.PROCESSED,
+      }));
       // AND the ExperiencesDrawer component
       const givenExperiencesDrawer = (
         <ExperiencesDrawer
@@ -254,10 +271,10 @@ describe("ExperiencesDrawer", () => {
 
     test("should show confirmation dialog when unsaved changes exist and cancel button is clicked", async () => {
       // GIVEN some experiences that have been explored
-      const givenExploredExperiences = mockExperiences.map(experience => ({
+      const givenExploredExperiences = mockExperiences.map((experience) => ({
         ...experience,
-        exploration_phase: DiveInPhase.PROCESSED
-      }))
+        exploration_phase: DiveInPhase.PROCESSED,
+      }));
       // AND the ExperiencesDrawer component
       const givenExperiencesDrawer = (
         <ExperiencesDrawer
@@ -293,18 +310,21 @@ describe("ExperiencesDrawer", () => {
       await userEvent.click(cancelButton);
 
       // THEN expect a confirmation dialog to be shown
-      expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
+      expect(screen.getByTestId(DATA_TEST_ID.UNSAVED_CHANGES_DIALOG)).toBeInTheDocument();
       // AND no errors or warnings to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
     });
 
-    test("should keep ExperienceEditForm open when Keep Editing button in the dialog is clicked", async () => {
+    test.each([
+      { element: "Keep Editing button", testId: CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM },
+      { element: "close icon", testId: CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CLOSE },
+    ])("should keep ExperienceEditForm open when $element in dialog is clicked", async ({ testId }) => {
       // GIVEN some experiences that have been explored
-      const givenExploredExperiences = mockExperiences.map(experience => ({
+      const givenExploredExperiences = mockExperiences.map((experience) => ({
         ...experience,
-        exploration_phase: DiveInPhase.PROCESSED
-      }))
+        exploration_phase: DiveInPhase.PROCESSED,
+      }));
       // AND the ExperiencesDrawer component
       const givenExperiencesDrawer = (
         <ExperiencesDrawer
@@ -319,7 +339,6 @@ describe("ExperiencesDrawer", () => {
       // AND the component is rendered
       render(givenExperiencesDrawer);
 
-      // WHEN the edit button is clicked for a specific experience
       // WHEN the more button is clicked for a specific experience
       const moreButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)[0];
       await userEvent.click(moreButton);
@@ -339,12 +358,12 @@ describe("ExperiencesDrawer", () => {
       await userEvent.click(cancelButton);
 
       // THEN expect a confirmation dialog to be shown
-      const confirmDialog = await screen.findByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL);
+      const confirmDialog = await screen.findByTestId(DATA_TEST_ID.UNSAVED_CHANGES_DIALOG);
       expect(confirmDialog).toBeInTheDocument();
 
-      // WHEN keep editing button in the confirmation dialog is clicked
-      const keepEditButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM);
-      await userEvent.click(keepEditButton);
+      // WHEN the specified element in the confirmation dialog is clicked
+      const element = screen.getAllByTestId(testId)[0];
+      await userEvent.click(element);
 
       // THEN expect the ExperienceEditForm to still be visible
       expect(screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CONTAINER)).toBeInTheDocument();
@@ -355,10 +374,10 @@ describe("ExperiencesDrawer", () => {
 
     test("should close ExperienceEditForm when close button in the dialog is clicked", async () => {
       // GIVEN some experiences that have been explored
-      const givenExploredExperiences = mockExperiences.map(experience => ({
+      const givenExploredExperiences = mockExperiences.map((experience) => ({
         ...experience,
-        exploration_phase: DiveInPhase.PROCESSED
-      }))
+        exploration_phase: DiveInPhase.PROCESSED,
+      }));
       // AND the ExperiencesDrawer component
       const givenExperiencesDrawer = (
         <ExperiencesDrawer
@@ -387,10 +406,11 @@ describe("ExperiencesDrawer", () => {
       await userEvent.keyboard("{Escape}");
 
       // THEN expect a confirmation dialog to be shown
-      expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL)).toBeInTheDocument();
+      const confirmDialog = await screen.findByTestId(DATA_TEST_ID.UNSAVED_CHANGES_DIALOG);
+      expect(confirmDialog).toBeInTheDocument();
 
       // WHEN the cancel button in the confirmation dialog is clicked
-      const cancelButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CANCEL);
+      const cancelButton = screen.getAllByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CANCEL)[0];
       await userEvent.click(cancelButton);
 
       // THEN expect the ExperienceEditForm to be closed
@@ -400,13 +420,20 @@ describe("ExperiencesDrawer", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
-    test("should keep ExperienceEditForm open when close icon in dialog is clicked", async () => {
+    test("should call onExperiencesUpdated when save button is clicked", async () => {
+      const updateExperienceMock = jest.spyOn(ExperienceService.prototype, "updateExperience");
       // GIVEN some experiences that have been explored
-      const givenExploredExperiences = mockExperiences.map(experience => ({
+      const givenExploredExperiences = mockExperiences.map((experience) => ({
         ...experience,
-        exploration_phase: DiveInPhase.PROCESSED
-      }))
+        exploration_phase: DiveInPhase.PROCESSED,
+      }));
+      // AND a session ID that is set in user preferences
+      const givenSessionId = 234;
+      UserPreferencesStateService.getInstance().setUserPreferences({
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
       // AND the ExperiencesDrawer component
+      const onExperiencesUpdated = jest.fn();
       const givenExperiencesDrawer = (
         <ExperiencesDrawer
           isOpen={true}
@@ -414,9 +441,16 @@ describe("ExperiencesDrawer", () => {
           experiences={givenExploredExperiences}
           notifyOnClose={jest.fn()}
           conversationConductedAt="2021-06-01T00:00:00Z"
-          onExperiencesUpdated={jest.fn()}
+          onExperiencesUpdated={onExperiencesUpdated}
         />
       );
+      // AND a mocked service that resolves with the updated experience
+      const updatedExperience = {
+        ...givenExploredExperiences[0],
+        company: "foo company",
+      };
+      jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValueOnce(updatedExperience);
+
       // AND the component is rendered
       render(givenExperiencesDrawer);
 
@@ -426,31 +460,180 @@ describe("ExperiencesDrawer", () => {
       // WHEN the edit button is clicked
       const editButton = screen.getAllByTestId(MENU_ITEM_ID.EDIT)[0];
       await userEvent.click(editButton);
+      // AND some changes are made in the form
+      const companyField = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_COMPANY);
+      const companyInput = within(companyField).getByRole("textbox");
+      await userEvent.clear(companyInput);
+      await userEvent.type(companyInput, "foo company");
+      // AND the save button is clicked
+      const saveButton = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_SAVE_BUTTON);
+      await userEvent.click(saveButton);
 
-      // THEN expect the ExperienceEditForm to be visible
-      expect(screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CONTAINER)).toBeInTheDocument();
+      // THEN expect the service to have been called with the correct parameters
+      expect(updateExperienceMock).toHaveBeenCalledWith(
+        givenSessionId,
+        givenExploredExperiences[0].UUID,
+        expect.objectContaining({
+          company: "foo company",
+        })
+      );
+      // AND expect onExperiencesUpdated to have been called with the updated experience
+      expect(onExperiencesUpdated).toHaveBeenCalled();
+    });
+  });
 
-      // WHEN some changes are made in the form
-      const locationField = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_LOCATION);
-      const locationInput = within(locationField).getByRole("textbox");
-      await userEvent.type(locationInput, "foo location");
-      // AND the cancel button is clicked
-      const cancelButton = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CANCEL_BUTTON);
-      await userEvent.click(cancelButton);
+  describe("Delete Experience", () => {
+    test("should delete experience successfully when delete button is clicked", async () => {
+      // GIVEN some experiences that have been explored
+      const givenExploredExperiences = mockExperiences.map((experience) => ({
+        ...experience,
+        exploration_phase: DiveInPhase.PROCESSED,
+      }));
+      // AND a session ID that is set in user preferences
+      const givenSessionId = 234;
+      UserPreferencesStateService.getInstance().setUserPreferences({
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
+      const onExperiencesUpdated = jest.fn();
+      // AND the component is rendered
+      render(
+        <ExperiencesDrawer
+          isOpen={true}
+          isLoading={false}
+          experiences={givenExploredExperiences}
+          notifyOnClose={jest.fn()}
+          conversationConductedAt="2022-06-01T00:00:00Z"
+          onExperiencesUpdated={onExperiencesUpdated}
+        />
+      );
+      // AND a mocked service that resolves
+      const deleteSpy = jest.spyOn(ExperienceService.getInstance(), "deleteExperience").mockResolvedValueOnce();
+
+      // WHEN the more button is clicked for a specific experience
+      const moreButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)[0];
+      await userEvent.click(moreButton);
+      // AND the delete button is clicked
+      const deleteButton = screen.getAllByTestId(MENU_ITEM_ID.DELETE)[0];
+      await userEvent.click(deleteButton);
 
       // THEN expect a confirmation dialog to be shown
-      const confirmDialog = await screen.findByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL);
+      const confirmDialog = await screen.findByTestId(DATA_TEST_ID.DELETE_EXPERIENCE_DIALOG);
       expect(confirmDialog).toBeInTheDocument();
 
-      // WHEN close icon in the confirmation dialog is clicked
-      const closeIcon = screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CLOSE);
-      await userEvent.click(closeIcon);
+      // WHEN the confirmation button is clicked
+      const confirmButton = screen.getAllByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM)[1];
+      await userEvent.click(confirmButton);
 
-      // THEN expect the ExperienceEditForm to still be visible
-      expect(screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_CONTAINER)).toBeInTheDocument();
+      // THEN expect the service to be called
+      expect(deleteSpy).toHaveBeenCalledWith(givenSessionId, mockExperiences[0].UUID);
+      expect(onExperiencesUpdated).toHaveBeenCalled();
+      // AND the snackbar to be displayed
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Experience deleted successfully!", {
+        variant: "success",
+      });
       // AND no errors or warnings to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test.each([
+      { element: "cancel button", testId: CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CANCEL },
+      { element: "close icon", testId: CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CLOSE },
+    ])("should not delete experience when $element in confirmation dialog is clicked", async ({ testId }) => {
+      const deleteExperienceMock = jest.spyOn(ExperienceService.prototype, "deleteExperience").mockResolvedValueOnce();
+
+      // GIVEN some experiences that have been explored
+      const givenExploredExperiences = mockExperiences.map((experience) => ({
+        ...experience,
+        exploration_phase: DiveInPhase.PROCESSED,
+      }));
+      // AND a session ID that is set in user preferences
+      const givenSessionId = 234;
+      UserPreferencesStateService.getInstance().setUserPreferences({
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
+      const onExperiencesUpdated = jest.fn();
+      // AND the component is rendered
+      render(
+        <ExperiencesDrawer
+          isOpen={true}
+          isLoading={false}
+          experiences={givenExploredExperiences}
+          notifyOnClose={jest.fn()}
+          conversationConductedAt="2022-06-01T00:00:00Z"
+          onExperiencesUpdated={onExperiencesUpdated}
+        />
+      );
+
+      // WHEN the more button is clicked for a specific experience
+      const moreButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)[0];
+      await userEvent.click(moreButton);
+      // AND the delete button is clicked
+      const deleteButton = screen.getAllByTestId(MENU_ITEM_ID.DELETE)[0];
+      await userEvent.click(deleteButton);
+
+      // THEN expect a confirmation dialog to be shown
+      const confirmDialog = await screen.findByTestId(DATA_TEST_ID.DELETE_EXPERIENCE_DIALOG);
+      expect(confirmDialog).toBeInTheDocument();
+
+      // WHEN the specified element in the confirmation dialog is clicked
+      const element = screen.getAllByTestId(testId)[1];
+      await userEvent.click(element);
+
+      // THEN expect the service to not be called
+      expect(deleteExperienceMock).not.toHaveBeenCalled();
+      expect(onExperiencesUpdated).not.toHaveBeenCalled();
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should handle error when deleteExperience fails", async () => {
+      // GIVEN some experiences that have been explored
+      const givenExploredExperiences = mockExperiences.map((experience) => ({
+        ...experience,
+        exploration_phase: DiveInPhase.PROCESSED,
+      }));
+      // AND a session ID that is set in user preferences
+      const givenSessionId = 234;
+      UserPreferencesStateService.getInstance().setUserPreferences({
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
+      const onExperiencesUpdated = jest.fn();
+      // AND the component is rendered
+      render(
+        <ExperiencesDrawer
+          isOpen={true}
+          isLoading={false}
+          experiences={givenExploredExperiences}
+          notifyOnClose={jest.fn()}
+          conversationConductedAt="2022-06-01T00:00:00Z"
+          onExperiencesUpdated={onExperiencesUpdated}
+        />
+      );
+      // AND a mocked service that rejects
+      jest.spyOn(ExperienceService.prototype, "deleteExperience").mockRejectedValueOnce(new Error("Delete failed"));
+
+      // WHEN the more button is clicked for a specific experience
+      const moreButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)[0];
+      await userEvent.click(moreButton);
+      // AND the delete button is clicked
+      const deleteButton = screen.getAllByTestId(MENU_ITEM_ID.DELETE)[0];
+      await userEvent.click(deleteButton);
+
+      // THEN expect a confirmation dialog to be shown
+      const confirmDialog = await screen.findByTestId(DATA_TEST_ID.DELETE_EXPERIENCE_DIALOG);
+      expect(confirmDialog).toBeInTheDocument();
+
+      // WHEN the confirmation button is clicked
+      const confirmButton = screen.getAllByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM)[1];
+      await userEvent.click(confirmButton);
+
+      // THEN expect error snackbar to be displayed
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        "An unexpected error occurred. Please try again later.",
+        { variant: "error" }
+      );
     });
   });
 });

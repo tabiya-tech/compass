@@ -17,6 +17,7 @@ export interface ConfirmModalDialogProps {
   cancelButtonText: string;
   confirmButtonText: string;
   showCloseIcon?: boolean;
+  "data-testid"?: string;
 }
 
 const uniqueId = "edc0ac15-67a7-4c1f-9934-94fa65757046";
@@ -33,13 +34,14 @@ export const DATA_TEST_ID = {
 const ConfirmModalDialog: React.FC<ConfirmModalDialogProps> = (props) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+  const customTestId = props["data-testid"] || DATA_TEST_ID.CONFIRM_MODAL;
 
   return (
     <Dialog
       open={props.isOpen}
       onClose={props.onDismiss}
       aria-labelledby="confirm-modal"
-      data-testid={DATA_TEST_ID.CONFIRM_MODAL}
+      data-testid={customTestId}
       PaperProps={{
         sx: {
           display: "flex",

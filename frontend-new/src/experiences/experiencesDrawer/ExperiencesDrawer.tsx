@@ -19,6 +19,11 @@ import ExperienceCategory from "src/experiences/experiencesDrawer/components/exp
 import ExperienceEditForm from "src/experiences/experiencesDrawer/components/experienceEditForm/ExperienceEditForm";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import ExperienceService from "src/experiences/experienceService/experienceService";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { Backdrop } from "src/theme/Backdrop/Backdrop";
+import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
 
 const LazyLoadedDownloadDropdown = lazyWithPreload(
   () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown")
@@ -45,6 +50,8 @@ export const DATA_TEST_ID = {
   EXPERIENCES_DRAWER_CONTAINER: `experiences-drawer-container-${uniqueId}`,
   EXPERIENCES_DRAWER_CONTENT_LOADER: `experiences-drawer-content-loader-${uniqueId}`,
   EXPERIENCES_DIVIDER: `experiences-divider-${uniqueId}`,
+  UNSAVED_CHANGES_DIALOG: `unsaved-changes-dialog-${uniqueId}`,
+  DELETE_EXPERIENCE_DIALOG: `delete-experience-dialog-${uniqueId}`,
 };
 
 const useLocalStorage = (key: string, initialValue: Record<string, string>) => {
@@ -77,6 +84,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   onExperiencesUpdated,
 }) => {
   const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [personalInfo, setPersonalInfo] = useLocalStorage("personalInfo", {
@@ -89,6 +97,9 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
+  const [experienceToDelete, setExperienceToDelete] = useState<Experience | null>(null);
+  const [isDeletingExperience, setIsDeletingExperience] = React.useState(false);
 
   useEffect(() => {
     setHasTopSkills(experiences.some((experience) => experience.top_skills && experience.top_skills.length > 0));
@@ -128,6 +139,56 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   const handleExperienceSaved = async () => {
     await onExperiencesUpdated();
     setEditingExperience(null);
+  };
+
+  const handleDeleteExperience = async (experience: Experience) => {
+    setExperienceToDelete(experience);
+    setShowDeleteConfirmDialog(true);
+  };
+
+  const confirmDeleteExperience = async () => {
+    if (!experienceToDelete) return;
+
+    // Close the confirmation dialog immediately when confirming deletion
+    setShowDeleteConfirmDialog(false);
+    setIsDeletingExperience(true);
+
+    try {
+      // Get services instances.
+      const userPreferencesStateService = UserPreferencesStateService.getInstance();
+      const experienceService = ExperienceService.getInstance();
+
+      // Get current user preferences
+      const userPreferences = userPreferencesStateService.getUserPreferences();
+      if (!userPreferences?.sessions.length) {
+        throw new Error("User has no sessions");
+      }
+
+      const sessionId = userPreferencesStateService.getActiveSessionId();
+      if (!sessionId) {
+        throw new Error("No active session found");
+      }
+
+      // Delete the experience
+      await experienceService.deleteExperience(sessionId, experienceToDelete.UUID);
+
+      // Refresh the experiences
+      await onExperiencesUpdated();
+
+      enqueueSnackbar("Experience deleted successfully!", { variant: "success" });
+    } catch (error) {
+      let errorMessage = "Failed to delete experience.";
+
+      if (error instanceof RestAPIError) {
+        errorMessage = getUserFriendlyErrorMessage(error);
+      }
+
+      console.error(errorMessage, error);
+      enqueueSnackbar(errorMessage, { variant: "error" });
+    } finally {
+      setIsDeletingExperience(false);
+      setExperienceToDelete(null);
+    }
   };
 
   // Experiences with top skills
@@ -252,24 +313,28 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                       title={ReportContent.SELF_EMPLOYMENT_TITLE}
                       experiences={groupedExperiences.selfEmploymentExperiences}
                       onEditExperience={handleEditExperience}
+                      onDeleteExperience={handleDeleteExperience}
                     />
                     <ExperienceCategory
                       icon={<WorkIcon />}
                       title={ReportContent.SALARY_WORK_TITLE}
                       experiences={groupedExperiences.salaryWorkExperiences}
                       onEditExperience={handleEditExperience}
+                      onDeleteExperience={handleDeleteExperience}
                     />
                     <ExperienceCategory
                       icon={<VolunteerActivismIcon />}
                       title={ReportContent.UNPAID_WORK_TITLE}
                       experiences={groupedExperiences.unpaidWorkExperiences}
                       onEditExperience={handleEditExperience}
+                      onDeleteExperience={handleDeleteExperience}
                     />
                     <ExperienceCategory
                       icon={<SchoolIcon />}
                       title={ReportContent.TRAINEE_WORK_TITLE}
                       experiences={groupedExperiences.traineeWorkExperiences}
                       onEditExperience={handleEditExperience}
+                      onDeleteExperience={handleDeleteExperience}
                     />
                     <ExperienceCategory
                       icon={<QuizIcon />}
@@ -277,6 +342,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                       experiences={groupedExperiences.uncategorizedExperiences}
                       tooltipText="Based on the conversation, these experiences couldn't be automatically categorized."
                       onEditExperience={handleEditExperience}
+                      onDeleteExperience={handleDeleteExperience}
                     />
                   </Box>
                 )}
@@ -295,7 +361,21 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         cancelButtonText="Close"
         confirmButtonText="Keep Editing"
         showCloseIcon={true}
+        data-testid={DATA_TEST_ID.UNSAVED_CHANGES_DIALOG}
       />
+      <ConfirmModalDialog
+        isOpen={showDeleteConfirmDialog}
+        title="Delete Experience"
+        content={<>Are you sure you want to delete this experience? This action cannot be undone.</>}
+        onConfirm={confirmDeleteExperience}
+        onDismiss={() => setShowDeleteConfirmDialog(false)}
+        onCancel={() => setShowDeleteConfirmDialog(false)}
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        showCloseIcon
+        data-testid={DATA_TEST_ID.DELETE_EXPERIENCE_DIALOG}
+      />
+      <Backdrop isShown={isDeletingExperience} message="Deleting experience..." />
     </>
   );
 };

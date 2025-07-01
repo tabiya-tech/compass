@@ -21,7 +21,7 @@ export enum DiveInPhase {
   NOT_STARTED = "NOT_STARTED",
   EXPLORING_SKILLS = "EXPLORING_SKILLS",
   LINKING_RANKING = "LINKING_RANKING",
-  PROCESSED= "PROCESSED",
+  PROCESSED = "PROCESSED",
 }
 
 export interface Experience {

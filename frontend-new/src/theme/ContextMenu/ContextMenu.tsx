@@ -52,7 +52,7 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
             </ListItemIcon>
           )}
           <ListItemText data-testid={DATA_TEST_ID.MENU_ITEM_TEXT}>
-            <Typography variant="caption" color="secondary">
+            <Typography variant="caption" color={item.textColor ?? "secondary"}>
               {item.text}
             </Typography>
             {item.description && (

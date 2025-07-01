@@ -43,6 +43,16 @@ class IExperienceService(ABC):
         """
         raise NotImplementedError()
 
+    @abstractmethod
+    async def delete_experience(self, user_id: str, session_id: int, experience_uuid: str) -> None:
+        """
+        Delete an experience for a given session.
+        :param user_id: str - the id of the requesting user
+        :param session_id: int - id for the conversation session
+        :param experience_uuid: str - the uuid of the experience to delete
+        :raises ExperienceNotFoundError: if the experience is not found
+        """
+        raise NotImplementedError()
 
 
 class ExperienceService(IExperienceService):
@@ -126,3 +136,24 @@ class ExperienceService(IExperienceService):
             experiences.append(ExperienceResponse.from_experience_entity(exp_state.experience, exp_state.dive_in_phase))
 
         return experiences
+
+    async def delete_experience(self, user_id: str, session_id: int, experience_uuid: str) -> None:
+        # Get the experience from the application state
+        state = await self._application_state_metrics_recorder.get_state(session_id)
+        director_state = state.explore_experiences_director_state
+
+        # find the experience to delete
+        experience_to_delete = None
+
+        for exp in director_state.explored_experiences:
+            if exp.uuid == experience_uuid:
+                experience_to_delete = exp
+                break
+
+        if not experience_to_delete:
+            raise ExperienceNotFoundError(experience_uuid)
+
+        # Remove the experience from explored experiences
+        director_state.explored_experiences.remove(experience_to_delete)
+
+        await self._application_state_metrics_recorder.save_state(state, user_id)

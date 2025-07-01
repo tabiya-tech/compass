@@ -1,3 +1,6 @@
+// mute the console
+import "src/_test_utilities/consoleMock";
+
 import ExperienceService from "src/experiences/experienceService/experienceService";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { expectCorrectFetchRequest, setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
@@ -192,5 +195,63 @@ describe("ExperienceService", () => {
         await expect(actualExperience).rejects.toMatchObject(expectedError);
       }
     );
+  });
+
+  describe("deleteExperience", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test("should  delete the experience successfully", async () => {
+      // GIVEN an experience to delete
+      const experienceId = mockExperiences[0].UUID;
+      // AND the session id for the experience
+      const givenSessionId = 1234;
+      // AND the API will return a successful response
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.NO_CONTENT, undefined, "a");
+
+      // WHEN the deleteExperience function is called
+      const service = new ExperienceService();
+      await service.deleteExperience(givenSessionId, experienceId);
+
+      // THEN expect to make a DELETE request with the correct URL
+      expectCorrectFetchRequest(
+        fetchSpy,
+        `${givenApiServerUrl}/conversations/${givenSessionId}/experiences/${experienceId}`,
+        {
+          method: "DELETE",
+          expectedStatusCode: StatusCodes.NO_CONTENT,
+          serviceName: "ExperienceService",
+          serviceFunction: "deleteExperience",
+          failureMessage: `Failed to delete experience with UUID ${experienceId}`,
+        }
+      );
+      // AND expect no errors or warnings to be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw the same error thrown by the customFetch method", async () => {
+      // GIVEN an experience to delete
+      const experienceId = mockExperiences[0].UUID;
+      // AND the session id for the experience
+      const givenSessionId = 1234;
+      // AND the API will return an error response
+      const givenFetchError = new Error("some error");
+      jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockImplementationOnce(() => {
+        return new Promise(() => {
+          throw givenFetchError;
+        });
+      });
+
+      // WHEN the deleteExperience function is called
+      const service = new ExperienceService();
+
+      // THEN expect the correct error to be thrown
+      await expect(service.deleteExperience(givenSessionId, experienceId)).rejects.toThrow(givenFetchError);
+      // AND expect no errors or warnings to be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
   });
 });
