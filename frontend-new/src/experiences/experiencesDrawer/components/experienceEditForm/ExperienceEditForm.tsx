@@ -22,12 +22,12 @@ import InfoIcon from "@mui/icons-material/Info";
 import { capitalizeFirstLetter } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import { ReportContent } from "src/experiences/report/reportContent";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import ExperienceService from "src/experiences/experienceService/experienceService";
 import { debounce } from "src/utils/debounce";
+import { getWorkTypeDescription, getWorkTypeIcon, getWorkTypeTitle } from "src/experiences/experiencesDrawer/util";
 
 const uniqueId = "0ddc6b92-eca6-472b-8e5f-fdce9abfec3b";
 
@@ -77,40 +77,9 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
   width: "100%",
   backgroundColor: theme.palette.grey[100],
-  borderRadius: theme.fixedSpacing(theme.tabiyaRounding.md),
+  borderRadius: theme.fixedSpacing(theme.tabiyaRounding.sm),
   padding: theme.fixedSpacing(theme.tabiyaSpacing.xs),
 }));
-
-const workTypeTitle = (workType: WorkType | null) => {
-  switch (workType) {
-    case WorkType.SELF_EMPLOYMENT:
-      return ReportContent.SELF_EMPLOYMENT_TITLE;
-    case WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-      return ReportContent.SALARY_WORK_TITLE;
-    case WorkType.UNSEEN_UNPAID:
-      return ReportContent.UNPAID_WORK_TITLE;
-    case WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
-      return ReportContent.TRAINEE_WORK_TITLE;
-    default:
-      return ReportContent.UNCATEGORIZED_TITLE;
-  }
-};
-
-const workTypeDescription = (workType: WorkType | null) => {
-  switch (workType) {
-    case WorkType.SELF_EMPLOYMENT:
-      return "You work for yourself and run your own business";
-    case WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-      return "You have a regular paid job with an employer";
-    case WorkType.UNSEEN_UNPAID:
-      return "You work without pay to learn or gain experience";
-    case WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
-      return "You help out without pay, like volunteering or community service";
-    default:
-      return "Work that doesn't fit into the other categories";
-  }
-};
-
 // Debounce delay for error checking (ms)
 export const DEBOUNCE_ERROR_DELAY_MS = 20;
 
@@ -136,7 +105,6 @@ const checkInitialFieldErrors = (experience: Experience) => {
   }
   return errors;
 };
-
 const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   experience,
   notifyOnSave,
@@ -151,8 +119,8 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
   const [markedForDeletion, setMarkedForDeletion] = useState<Set<string>>(new Set());
-  const [workTypeMenuAnchorEl, setWorkTypeMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [workTypeMenuAnchorEl, setWorkTypeMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
 
   // Debounced error updater (stable ref)
@@ -317,8 +285,8 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
     }
   };
 
-  const handleWorkTypeMenuClick = (event: React.MouseEvent<SVGSVGElement>) => {
-    setWorkTypeMenuAnchorEl(event.currentTarget as unknown as HTMLElement);
+  const handleWorkTypeMenuClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    setWorkTypeMenuAnchorEl(event.currentTarget);
   };
 
   const handleWorkTypeMenuClose = () => {
@@ -330,15 +298,20 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
       ...prev,
       work_type: workType,
     }));
+
+    notifyOnUnsavedChange?.(true);
     handleWorkTypeMenuClose();
   };
 
   const getWorkTypeMenuItems = (): MenuItemConfig[] => {
-    const workTypes = [...Object.values(WorkType), null];
+    // Only include 'Uncategorized' if the current work_type is null
+    const workTypes =
+      displayExperience.work_type === null ? [...Object.values(WorkType), null] : [...Object.values(WorkType)];
     return workTypes.map((workType) => ({
       id: workType ?? "uncategorized",
-      text: workTypeTitle(workType),
-      description: workTypeDescription(workType),
+      text: getWorkTypeTitle(workType),
+      description: getWorkTypeDescription(workType),
+      icon: getWorkTypeIcon(workType),
       disabled: false,
       action: () => handleWorkTypeSelect(workType),
     }));
@@ -384,35 +357,42 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
         gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
         paddingX={isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : theme.tabiyaSpacing.xl}
       >
-        <Box
-          display="flex"
-          alignItems="center"
-          gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
-          data-testid={DATA_TEST_ID.FORM_WORK_TYPE}
-        >
-          <HelpTip icon={<InfoIcon />}>Choose the work category that best reflects what you've done</HelpTip>
-          <Typography variant="subtitle1" fontWeight="bold" color={theme.palette.text.secondary}>
-            {workTypeTitle(displayExperience.work_type)}
-          </Typography>
-          <ArrowDropDownIcon
-            sx={{
-              fontSize: "30px",
-              cursor: "pointer",
-              color: theme.palette.text.secondary,
-            }}
-            onClick={handleWorkTypeMenuClick}
-            data-testid={DATA_TEST_ID.FORM_WORK_TYPE_DROPDOWN}
-          />
-        </Box>
         <Box display="flex" alignItems="center">
           <Typography variant="body1" sx={{ wordBreak: "break-all" }}>
             <b>Experience info</b>
           </Typography>
           <HelpTip icon={<InfoIcon />}>
-            Click a field to update the title, dates, company, location, or summary of your experience.
+            Click a field to update the work type, title, dates, company, location, or summary of your experience.
           </HelpTip>
         </Box>
         <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
+          <Box
+            display="flex"
+            justifyItems="start"
+            onClick={handleWorkTypeMenuClick}
+            sx={{
+              backgroundColor: theme.palette.grey[100],
+              borderRadius: theme.fixedSpacing(theme.tabiyaRounding.sm),
+              padding: theme.fixedSpacing(theme.tabiyaSpacing.xs),
+              paddingX: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+              cursor: "pointer",
+              width: "fit-content",
+            }}
+            data-testid={DATA_TEST_ID.FORM_WORK_TYPE}
+          >
+            <Box display="flex" alignItems="center" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
+              {React.cloneElement(getWorkTypeIcon(displayExperience.work_type), {
+                sx: { color: theme.palette.text.secondary },
+              })}
+              <Typography variant="body1" fontWeight="bold" color={theme.palette.text.secondary}>
+                {getWorkTypeTitle(displayExperience.work_type)}
+              </Typography>
+            </Box>
+            <ArrowDropDownIcon
+              sx={{ color: theme.palette.text.secondary }}
+              data-testid={DATA_TEST_ID.FORM_WORK_TYPE_DROPDOWN}
+            />
+          </Box>
           <Box display="flex" flexDirection="column" alignItems="flex-start">
             <StyledTextField
               placeholder="Experience title"

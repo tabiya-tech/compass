@@ -50,50 +50,6 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
     class="MuiBox-root css-1pnvk0s"
   >
     <div
-      class="MuiBox-root css-171onha"
-      data-testid="experience-edit-form-work-type-title-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
-    >
-      <button
-        aria-label="help"
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
-        data-mui-internal-clone-element="true"
-        data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
-        tabindex="0"
-        type="button"
-      >
-        <svg
-          aria-hidden="true"
-          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
-          data-testid="InfoIcon"
-          focusable="false"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"
-          />
-        </svg>
-        <span
-          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-        />
-      </button>
-      <h6
-        class="MuiTypography-root MuiTypography-subtitle1 css-15jwqi5-MuiTypography-root"
-      >
-        Salary Work
-      </h6>
-      <svg
-        aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-clgdd0-MuiSvgIcon-root"
-        data-testid="experience-edit-form-work-type-dropdown-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
-        focusable="false"
-        viewBox="0 0 24 24"
-      >
-        <path
-          d="m7 10 5 5 5-5z"
-        />
-      </svg>
-    </div>
-    <div
       class="MuiBox-root css-70qvj9"
     >
       <p
@@ -131,10 +87,46 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
       class="MuiBox-root css-yd8sa2"
     >
       <div
+        class="MuiBox-root css-6b1g0m"
+        data-testid="experience-edit-form-work-type-title-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+      >
+        <div
+          class="MuiBox-root css-axw7ok"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1de4ipc-MuiSvgIcon-root"
+            data-testid="WorkIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2m-6 0h-4V4h4z"
+            />
+          </svg>
+          <p
+            class="MuiTypography-root MuiTypography-body1 css-ckgs5j-MuiTypography-root"
+          >
+            Salary Work
+          </p>
+        </div>
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1de4ipc-MuiSvgIcon-root"
+          data-testid="experience-edit-form-work-type-dropdown-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="m7 10 5 5 5-5z"
+          />
+        </svg>
+      </div>
+      <div
         class="MuiBox-root css-1lxwves"
       >
         <div
-          class="MuiFormControl-root MuiTextField-root css-1k77k21-MuiFormControl-root-MuiTextField-root"
+          class="MuiFormControl-root MuiTextField-root css-15f8b5y-MuiFormControl-root-MuiTextField-root"
           data-testid="experience-edit-form-experience-title-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
         >
           <div
@@ -143,7 +135,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
             <input
               aria-invalid="false"
               class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-              id=":r2:"
+              id=":r1:"
               placeholder="Experience title"
               type="text"
               value="Project Manager"
@@ -172,7 +164,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
           class="MuiBox-root css-i9gxme"
         >
           <div
-            class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
+            class="MuiFormControl-root MuiTextField-root css-1qpvupq-MuiFormControl-root-MuiTextField-root"
             data-testid="experience-edit-form-start-date-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           >
             <div
@@ -181,7 +173,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
               <input
                 aria-invalid="false"
                 class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-                id=":r3:"
+                id=":r2:"
                 placeholder="Start date"
                 type="text"
                 value="2022"
@@ -207,7 +199,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
           class="MuiBox-root css-i9gxme"
         >
           <div
-            class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
+            class="MuiFormControl-root MuiTextField-root css-1qpvupq-MuiFormControl-root-MuiTextField-root"
             data-testid="experience-edit-form-end-date-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           >
             <div
@@ -216,7 +208,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
               <input
                 aria-invalid="false"
                 class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-                id=":r4:"
+                id=":r3:"
                 placeholder="End date"
                 type="text"
                 value="Present"
@@ -246,7 +238,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
           class="MuiBox-root css-8atqhb"
         >
           <div
-            class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
+            class="MuiFormControl-root MuiTextField-root css-1qpvupq-MuiFormControl-root-MuiTextField-root"
             data-testid="experience-edit-form-company-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           >
             <div
@@ -255,7 +247,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
               <input
                 aria-invalid="false"
                 class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-                id=":r5:"
+                id=":r4:"
                 placeholder="Company"
                 type="text"
                 value="Business Inc"
@@ -281,7 +273,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
           class="MuiBox-root css-8atqhb"
         >
           <div
-            class="MuiFormControl-root MuiTextField-root css-xgztkw-MuiFormControl-root-MuiTextField-root"
+            class="MuiFormControl-root MuiTextField-root css-1qpvupq-MuiFormControl-root-MuiTextField-root"
             data-testid="experience-edit-form-location-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           >
             <div
@@ -290,7 +282,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
               <input
                 aria-invalid="false"
                 class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-                id=":r6:"
+                id=":r5:"
                 placeholder="Location"
                 type="text"
                 value="New York, NY"
@@ -317,7 +309,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
         class="MuiBox-root css-8atqhb"
       >
         <div
-          class="MuiFormControl-root MuiTextField-root css-9vw252-MuiFormControl-root-MuiTextField-root"
+          class="MuiFormControl-root MuiTextField-root css-1nsg36l-MuiFormControl-root-MuiTextField-root"
           data-testid="experience-edit-form-summary-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
         >
           <div
@@ -326,7 +318,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
             <textarea
               aria-invalid="false"
               class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-              id=":r7:"
+              id=":r6:"
               placeholder="Experience summary"
               style="height: 0px; overflow: hidden;"
             >
@@ -504,11 +496,6 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
       data-testid="UNSEEN_UNPAID"
     >
       Unpaid Work
-    </div>
-    <div
-      data-testid="uncategorized"
-    >
-      Uncategorized
     </div>
     ;
   </div>
