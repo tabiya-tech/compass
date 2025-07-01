@@ -50,3 +50,10 @@ export interface UpdateExperienceRequest {
   summary?: string | null;
   top_skills?: SkillUpdate[];
 }
+
+// Field length limits (keep in sync with backend)
+export const EXPERIENCE_TITLE_MAX_LENGTH = 100;
+export const COMPANY_MAX_LENGTH = 100;
+export const LOCATION_MAX_LENGTH = 100;
+export const SUMMARY_MAX_LENGTH = 1000;
+export const TIMELINE_MAX_LENGTH = 30;

@@ -24,6 +24,6 @@ def update_experience_entity(experience_entity, update_data, all_skills):
                 experience_entity.top_skills = new_top_skills
         elif field == "work_type":
             # the value of the work type is a string (the enum name)
-            experience_entity.work_type = WorkType[value] if value else None
+            experience_entity.work_type = WorkType.from_string_key(value)
         else:
             setattr(experience_entity, field, value)
