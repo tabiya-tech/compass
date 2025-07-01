@@ -4,12 +4,33 @@ import "src/_test_utilities/consoleMock";
 import ExperiencesDrawerContent, {
   DATA_TEST_ID,
   LoadingExperienceDrawerContent,
+  MENU_ITEM_ID,
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
+import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
+
+// mock the ContextMenu
+jest.mock("src/theme/ContextMenu/ContextMenu", () => {
+  const actual = jest.requireActual("src/theme/ContextMenu/ContextMenu");
+  return {
+    __esModule: true,
+    default: jest.fn(({ items }: { items: MenuItemConfig[] }) => (
+      <div data-testid={actual.DATA_TEST_ID.MENU}>
+        {items.map((item) => (
+          <div key={item.id} data-testid={item.id} onClick={item.action}>
+            {item.text}
+          </div>
+        ))}
+        ;
+      </div>
+    )),
+    DATA_TEST_ID: actual.DATA_TEST_ID,
+  };
+});
 
 describe("ReportDrawerContent", () => {
   test("should render ExperiencesDrawerContent correctly", () => {
@@ -78,16 +99,15 @@ describe("ReportDrawerContent", () => {
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
-    // AND the edit button to be in the document
-    const editButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON);
-    expect(editButton).toBeInTheDocument();
+    // AND the report drawer more button to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)).toBeInTheDocument();
   });
 
   test.each([
     DiveInPhase.NOT_STARTED,
     DiveInPhase.EXPLORING_SKILLS,
     DiveInPhase.LINKING_RANKING,
-  ])("should not render edit button if experience exploration phase is %s", (phase) => {
+  ])("should not render context menu button if experience exploration phase is %s", (phase) => {
     // GIVEN the ExperiencesDrawerContent component with a non-PROCESSED experience
     const givenReportDrawerContent = (
       <ExperiencesDrawerContent
@@ -102,9 +122,8 @@ describe("ReportDrawerContent", () => {
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
-    // AND the edit button to not be in the document
-    expect(screen.queryByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)).not.toBeInTheDocument();
-  })
+    // AND the report drawer more button to be in the document
+    expect(screen.queryByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)).not.toBeInTheDocument();  })
 
   test("it should show No skills yet when there are no skills", () => {
     // GIVEN the ExperiencesDrawerContent component
@@ -179,8 +198,11 @@ describe("ReportDrawerContent", () => {
 
     // WHEN the component is rendered
     render(givenReportDrawerContent);
+    // AND the more button is clicked to open the context menu
+    const moreButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON);
+    await userEvent.click(moreButton);
     // AND the edit button is clicked
-    const editButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON);
+    const editButton = screen.getByTestId(MENU_ITEM_ID.EDIT);
     await userEvent.click(editButton);
 
     // THEN expect onEdit to have been called with the correct experience

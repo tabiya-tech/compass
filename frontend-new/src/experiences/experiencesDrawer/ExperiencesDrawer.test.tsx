@@ -10,11 +10,11 @@ import {
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import {
   DATA_TEST_ID as EXPERIENCES_DRAWER_CONTENT_TEST_ID,
+  MENU_ITEM_ID,
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import { DATA_TEST_ID as CONFIRM_MODAL_DIALOG_DATA_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
-import {
-  DATA_TEST_ID as EXPERIENCE_EDIT_FORM_DATA_TEST_ID,
-} from "src/experiences/experiencesDrawer/components/experienceEditForm/ExperienceEditForm";
+import { DATA_TEST_ID as EXPERIENCE_EDIT_FORM_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/experienceEditForm/ExperienceEditForm";
+import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { DiveInPhase } from "../experienceService/experiences.types";
 
 // mock custom text field
@@ -44,6 +44,25 @@ jest.mock("src/theme/confirmModalDialog/ConfirmModalDialog", () => {
   return {
     __esModule: true,
     default: mockConfirmModalDialog,
+    DATA_TEST_ID: actual.DATA_TEST_ID,
+  };
+});
+
+// mock the ContextMenu
+jest.mock("src/theme/ContextMenu/ContextMenu", () => {
+  const actual = jest.requireActual("src/theme/ContextMenu/ContextMenu");
+  return {
+    __esModule: true,
+    default: jest.fn(({ items }: { items: MenuItemConfig[] }) => (
+      <div data-testid={actual.DATA_TEST_ID.MENU}>
+        {items.map((item) => (
+          <div key={item.id} data-testid={item.id} onClick={item.action}>
+            {item.text}
+          </div>
+        ))}
+        ;
+      </div>
+    )),
     DATA_TEST_ID: actual.DATA_TEST_ID,
   };
 });
@@ -218,8 +237,11 @@ describe("ExperiencesDrawer", () => {
       // AND the component is rendered
       render(givenExperiencesDrawer);
 
-      // WHEN the edit button is clicked for a specific experience
-      const editButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)[0];
+      // WHEN the more button is clicked for a specific experience
+      const moreButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)[0];
+      await userEvent.click(moreButton);
+      // WHEN the edit button is clicked
+      const editButton = screen.getAllByTestId(MENU_ITEM_ID.EDIT)[0];
       await userEvent.click(editButton);
 
       // THEN expect the ExperienceEditForm to be in the document
@@ -250,8 +272,11 @@ describe("ExperiencesDrawer", () => {
       // AND the component is rendered
       render(givenExperiencesDrawer);
 
-      // WHEN the edit button is clicked for a specific experience
-      const editButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)[0];
+      // WHEN the more button is clicked for a specific experience
+      const moreButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)[0];
+      await userEvent.click(moreButton);
+      // WHEN the edit button is clicked
+      const editButton = screen.getAllByTestId(MENU_ITEM_ID.EDIT)[0];
       await userEvent.click(editButton);
 
       // THEN expect the ExperienceEditForm to be visible
@@ -295,7 +320,11 @@ describe("ExperiencesDrawer", () => {
       render(givenExperiencesDrawer);
 
       // WHEN the edit button is clicked for a specific experience
-      const editButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)[0];
+      // WHEN the more button is clicked for a specific experience
+      const moreButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)[0];
+      await userEvent.click(moreButton);
+      // WHEN the edit button is clicked
+      const editButton = screen.getAllByTestId(MENU_ITEM_ID.EDIT)[0];
       await userEvent.click(editButton);
 
       // THEN expect the ExperienceEditForm to be visible
@@ -344,8 +373,11 @@ describe("ExperiencesDrawer", () => {
       // AND the component is rendered
       render(givenExperiencesDrawer);
 
-      // WHEN the edit button is clicked for a specific experience
-      const editButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)[0];
+      // WHEN the more button is clicked for a specific experience
+      const moreButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)[0];
+      await userEvent.click(moreButton);
+      // WHEN the edit button is clicked
+      const editButton = screen.getAllByTestId(MENU_ITEM_ID.EDIT)[0];
       await userEvent.click(editButton);
       // AND some changes are made in the form
       const companyField = screen.getByTestId(EXPERIENCE_EDIT_FORM_DATA_TEST_ID.FORM_COMPANY);
@@ -388,8 +420,11 @@ describe("ExperiencesDrawer", () => {
       // AND the component is rendered
       render(givenExperiencesDrawer);
 
-      // WHEN the edit button is clicked for a specific experience
-      const editButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON)[0];
+      // WHEN the more button is clicked for a specific experience
+      const moreButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)[0];
+      await userEvent.click(moreButton);
+      // WHEN the edit button is clicked
+      const editButton = screen.getAllByTestId(MENU_ITEM_ID.EDIT)[0];
       await userEvent.click(editButton);
 
       // THEN expect the ExperienceEditForm to be visible

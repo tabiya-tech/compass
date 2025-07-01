@@ -5,7 +5,10 @@ import { Theme } from "@mui/material/styles";
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import InfoIcon from "@mui/icons-material/Info";
 import EditIcon from "@mui/icons-material/Edit";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
+import ContextMenu from "src/theme/ContextMenu/ContextMenu";
+import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 
 const uniqueId = "34a59a9e-e7f6-4a10-8b72-0fd401c727de";
 
@@ -19,7 +22,15 @@ export const DATA_TEST_ID = {
   EXPERIENCES_DRAWER_CONTENT_SUMMARY: `experiences-drawer-content-summary-${uniqueId}`,
   EXPERIENCES_DRAWER_CHIP: `experiences-drawer-chip-${uniqueId}`,
   EXPERIENCES_DRAWER_POPOVER: `experiences-drawer-popover-${uniqueId}`,
-  EXPERIENCES_DRAWER_EDIT_BUTTON: `experiences-drawer-edit-button-${uniqueId}`,
+  EXPERIENCES_DRAWER_MORE_BUTTON: `experiences-drawer-more-button-${uniqueId}`,
+};
+
+export const MENU_ITEM_ID = {
+  EDIT: `experiences-drawer-menu-item-edit-${uniqueId}`,
+};
+
+export const MENU_ITEM_TEXT = {
+  EDIT: "Edit experience",
 };
 
 interface ExperienceProps {
@@ -37,6 +48,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
   const [skillDescription, setSkillDescription] = React.useState<string>("");
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [isOpen, setIsOpen] = React.useState(false);
+  const [moreMenuAnchorEl, setMoreMenuAnchorEl] = React.useState<HTMLElement | null>(null);
 
   const formattedSkills = useMemo(() => {
     if (experience.top_skills.length === 0) return [];
@@ -45,6 +57,23 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
 
   const handleEditClick = () => {
     onEdit(experience);
+    setMoreMenuAnchorEl(null);
+  };
+
+  const handleMoreClick = (event: React.MouseEvent<HTMLElement>) => {
+    setMoreMenuAnchorEl(event.currentTarget);
+  };
+
+  const getMoreMenuItems = (): MenuItemConfig[] => {
+    return [
+      {
+        id: MENU_ITEM_ID.EDIT,
+        text: MENU_ITEM_TEXT.EDIT,
+        icon: <EditIcon />,
+        disabled: false,
+        action: handleEditClick,
+      },
+    ];
   };
 
   const handleChipClick = (event: React.MouseEvent<HTMLElement>, description: string) => {
@@ -76,12 +105,12 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
           </Typography>
           {experience.exploration_phase === DiveInPhase.PROCESSED && (
             <PrimaryIconButton
-              onClick={handleEditClick}
+              onClick={handleMoreClick}
               sx={{ color: theme.palette.common.black }}
-              title="Edit"
-              data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_EDIT_BUTTON}
+              title="More options"
+              data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON}
             >
-              <EditIcon />
+              <MoreVertIcon />
             </PrimaryIconButton>
           )}
         </Box>
@@ -157,6 +186,12 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
       >
         <Typography sx={{ maxWidth: 500, padding: isSmallMobile ? 4 : 2 }}>{skillDescription}</Typography>
       </Popover>
+      <ContextMenu
+        anchorEl={moreMenuAnchorEl}
+        open={Boolean(moreMenuAnchorEl)}
+        notifyOnClose={() => setMoreMenuAnchorEl(null)}
+        items={getMoreMenuItems()}
+      />
     </Box>
   );
 };
