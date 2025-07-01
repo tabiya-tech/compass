@@ -324,6 +324,16 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                       />
                     </div>
                   </div>
+                  <div
+                    data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
+                  >
+                    <div
+                      data-testid="experiences-drawer-menu-item-edit-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                    >
+                      Edit experience
+                    </div>
+                    ;
+                  </div>
                 </div>
               </div>
             </div>
@@ -457,6 +467,16 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                         class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
                       />
                     </div>
+                  </div>
+                  <div
+                    data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
+                  >
+                    <div
+                      data-testid="experiences-drawer-menu-item-edit-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+                    >
+                      Edit experience
+                    </div>
+                    ;
                   </div>
                 </div>
               </div>

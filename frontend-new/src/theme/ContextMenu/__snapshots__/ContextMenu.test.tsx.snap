@@ -37,7 +37,7 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
         >
           <span
             aria-hidden="true"
-            class="material-icons notranslate MuiIcon-root MuiIcon-colorPrimary MuiIcon-fontSizeMedium css-shoean-MuiIcon-root"
+            class="material-icons notranslate MuiIcon-root MuiIcon-fontSizeMedium css-ae0ms7-MuiIcon-root"
           >
             <div />
           </span>
@@ -97,7 +97,7 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
         >
           <span
             aria-hidden="true"
-            class="material-icons notranslate MuiIcon-root MuiIcon-colorPrimary MuiIcon-fontSizeMedium css-shoean-MuiIcon-root"
+            class="material-icons notranslate MuiIcon-root MuiIcon-fontSizeMedium css-ae0ms7-MuiIcon-root"
           >
             <div />
           </span>

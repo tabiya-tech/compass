@@ -1,4 +1,4 @@
-import { Icon, ListItemIcon, ListItemText, Menu, MenuItem, Typography } from "@mui/material";
+import { Icon, ListItemIcon, ListItemText, Menu, MenuItem, Typography, useTheme } from "@mui/material";
 import { MenuItemConfig } from "./menuItemConfig.types";
 
 export interface ContextMenuProps {
@@ -17,6 +17,7 @@ export const DATA_TEST_ID = {
 };
 
 function ContextMenu(props: Readonly<ContextMenuProps>) {
+  const theme = useTheme();
   const handleItemClick = (item: MenuItemConfig) => {
     props.notifyOnClose();
     item.action();
@@ -47,7 +48,7 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
         >
           {item.icon && (
             <ListItemIcon data-testid={DATA_TEST_ID.MENU_ITEM_ICON}>
-              <Icon color="primary">{item.icon}</Icon>
+              <Icon sx={{ color: theme.palette.text.secondary }}>{item.icon}</Icon>
             </ListItemIcon>
           )}
           <ListItemText data-testid={DATA_TEST_ID.MENU_ITEM_TEXT}>
