@@ -7,4 +7,5 @@ export type MenuItemConfig = {
   icon?: ReactNode;
   disabled: boolean;
   action: () => void;
+  textColor?: string;
 };

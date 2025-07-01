@@ -55,6 +55,9 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
         async def update_experience(self, user_id: str, session_id: int, experience_uuid: str, update_payload):
             raise NotImplementedError
 
+        async def delete_experience(self, user_id: str, session_id: int, experience_uuid: str):
+            raise NotImplementedError
+
     _instance_experience_service = MockExperienceService()
 
     def _mocked_experience_service() -> IExperienceService:
@@ -413,3 +416,85 @@ class TestExperienceRoutes:
         assert "location" in error_fields
         assert "summary" in error_fields
         assert "preferredLabel" in error_fields
+
+   ### ----- delete experience tests -----
+    @pytest.mark.asyncio
+    async def test_delete_experience_successful(self, authenticated_client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
+        # GIVEN a valid session id and experience uuid
+        given_session_id = 123
+        given_experience_uuid = "exp-uuid"
+        # AND the user owns the session
+        mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=get_mock_user_preferences(given_session_id))
+        preferences_spy = mocker.spy(mocked_preferences_repository, "get_user_preference_by_user_id")
+        # AND the service confirms deletion
+        mocked_service.delete_experience = AsyncMock(return_value=None)
+        service_spy = mocker.spy(mocked_service, "delete_experience")
+
+        # WHEN the DELETE request is made
+        response = client.delete(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}")
+
+        # THEN the response is NO CONTENT
+        assert response.status_code == HTTPStatus.NO_CONTENT
+        # AND the user preferences repository was called with the correct user_id
+        preferences_spy.assert_called_once_with(mocked_user.user_id)
+        # AND the conversation service was called with the correct arguments
+        service_spy.assert_called_once_with(
+            mocked_user.user_id,
+            given_session_id,
+            given_experience_uuid
+        )
+
+    @pytest.mark.asyncio
+    async def test_delete_experience_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks):
+        client, _, mocked_preferences_repository, _ = authenticated_client_with_mocks
+        # GIVEN a valid session id and experience uuid
+        given_session_id = 123
+        given_experience_uuid = "exp-uuid"
+        # AND the user does NOT own the session
+        mock_user_preferences = get_mock_user_preferences(given_session_id)
+        mock_user_preferences.sessions = [999]  # not the session
+        mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=mock_user_preferences)
+
+        # WHEN the DELETE request is made
+        response = client.delete(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}")
+
+        # THEN the response is FORBIDDEN
+        assert response.status_code == HTTPStatus.FORBIDDEN
+
+    @pytest.mark.asyncio
+    async def test_delete_experience_not_found(self, authenticated_client_with_mocks: TestClientWithMocks):
+        client, mocked_service, mocked_preferences_repository, _ = authenticated_client_with_mocks
+        # GIVEN a valid session id and experience uuid
+        given_session_id = 123
+        given_experience_uuid = "exp-uuid"
+        # AND the user owns the session
+        mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=get_mock_user_preferences(given_session_id))
+        # AND the service raises ExperienceNotFoundError
+        from app.conversations.experience.service import ExperienceNotFoundError
+        mocked_service.delete_experience = AsyncMock(side_effect=ExperienceNotFoundError(given_experience_uuid))
+
+        # WHEN the DELETE request is made
+        response = client.delete(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}")
+
+        # THEN the response is NOT_FOUND
+        assert response.status_code == HTTPStatus.NOT_FOUND
+        # AND the error message contains the experience uuid
+        assert response.json() == {"detail": f"Experience with uuid {given_experience_uuid} not found"}
+
+    @pytest.mark.asyncio
+    async def test_delete_experience_internal_server_error(self, authenticated_client_with_mocks: TestClientWithMocks):
+        client, mocked_service, mocked_preferences_repository, _ = authenticated_client_with_mocks
+        # GIVEN a valid session id and experience uuid
+        given_session_id = 123
+        given_experience_uuid = "exp-uuid"
+        # AND the user owns the session
+        mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=get_mock_user_preferences(given_session_id))
+        # AND the service raises a generic error
+        mocked_service.delete_experience = AsyncMock(side_effect=Exception("Unexpected error"))
+
+        # WHEN the DELETE request is made
+        response = client.delete(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}")
+
+        # THEN the response is INTERNAL_SERVER_ERROR
+        assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR

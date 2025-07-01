@@ -12,6 +12,7 @@ interface ExperienceCategoryProps {
   experiences: Experience[];
   tooltipText?: string;
   onEditExperience: (experience: Experience) => void;
+  onDeleteExperience: (experience: Experience) => void;
 }
 
 const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
@@ -20,6 +21,7 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
   experiences,
   tooltipText,
   onEditExperience,
+  onDeleteExperience,
 }) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -37,7 +39,7 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
       </Box>
       <Box display="flex" flexDirection="column" gap={isSmallMobile ? 8 : 4}>
         {experiences.map((experience, index) => (
-          <ExperiencesDrawerContent key={index} experience={experience} onEdit={onEditExperience} />
+          <ExperiencesDrawerContent key={index} experience={experience} onEdit={onEditExperience} onDelete={onDeleteExperience}/>
         ))}
       </Box>
     </Box>

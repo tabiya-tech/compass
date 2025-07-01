@@ -9,6 +9,16 @@ export default class ExperienceService {
   readonly experiencesEndpointUrl: string;
   readonly apiServeUrl: string;
 
+  private static instance: ExperienceService;
+
+  public static getInstance(): ExperienceService {
+    if (!ExperienceService.instance) {
+      ExperienceService.instance = new ExperienceService();
+    }
+
+    return ExperienceService.instance;
+  }
+
   constructor() {
     this.apiServeUrl = getBackendUrl();
     this.experiencesEndpointUrl = `${this.apiServeUrl}/conversations`;
@@ -95,5 +105,20 @@ export default class ExperienceService {
     }
 
     return updatedExperience;
+  }
+
+  async deleteExperience(sessionId: number, experienceId: string): Promise<void> {
+    const serviceName = "ExperienceService";
+    const serviceFunction = "deleteExperience";
+    const method = "DELETE";
+    const experienceURL = `${this.apiServeUrl}/conversations/${sessionId}/experiences/${experienceId}`;
+
+    await customFetch(experienceURL, {
+      method: method,
+      expectedStatusCode: StatusCodes.NO_CONTENT,
+      serviceName: serviceName,
+      serviceFunction: serviceFunction,
+      failureMessage: `Failed to delete experience with UUID ${experienceId}`,
+    });
   }
 }
