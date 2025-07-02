@@ -2,8 +2,9 @@ import { Meta } from "@storybook/react";
 import ExperiencesDrawerContent, {
   LoadingExperienceDrawerContent,
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
-import { generateRandomExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
+import { generateRandomExperiences, mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
+import { action } from "@storybook/addon-actions";
 
 const meta: Meta<typeof ExperiencesDrawerContent> = {
   title: "Experiences/ExperiencesDrawerContent",
@@ -67,6 +68,37 @@ export const ShownWhenEditable = {
     experience: {
       ...generateRandomExperiences(1)[0],
       exploration_phase: DiveInPhase.PROCESSED,
+    },
+  },
+};
+
+export const WithRestoreToOriginal = {
+  args: {
+    experience: { ...mockExperiences[0], exploration_phase: DiveInPhase.PROCESSED },
+    onEdit: action("onEdit"),
+    onDelete: action("onDelete"),
+    onRestoreToOriginal: action("onRestoreToOriginal"),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Experience with restore to original functionality enabled. Click the more menu (⋮) to see the 'Restore to original' option.",
+      },
+    },
+  },
+};
+
+export const RestoreVariant = {
+  args: {
+    experience: { ...mockExperiences[0], exploration_phase: DiveInPhase.PROCESSED },
+    onRestore: action("onRestore"),
+    variant: "RESTORE",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Experience in restore variant mode. Shows a restore icon instead of the context menu.",
+      },
     },
   },
 };

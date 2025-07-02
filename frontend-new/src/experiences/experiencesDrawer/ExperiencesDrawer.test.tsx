@@ -18,6 +18,8 @@ import ExperienceService from "src/experiences/experienceService/experienceServi
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { ExperienceError } from "../../error/commonErrors";
+import { resetAllMethodMocks } from "../../_test_utilities/resetAllMethodMocks";
 
 // mock custom text field
 jest.mock("src/theme/CustomTextField/CustomTextField", () => {
@@ -86,7 +88,8 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 
 describe("ExperiencesDrawer", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.clearAllMocks()
+    resetAllMethodMocks(UserPreferencesStateService.getInstance());
   });
 
   test("should render ExperiencesDrawer correctly", () => {
@@ -634,6 +637,128 @@ describe("ExperiencesDrawer", () => {
         "An unexpected error occurred. Please try again later.",
         { variant: "error" }
       );
+    });
+  });
+
+  describe("Restore to Original", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    })
+    test("should restore experience to original successfully when restore to original button is clicked", async () => {
+      // GIVEN some experiences that have been explored
+      const givenExploredExperiences = mockExperiences.map((experience) => ({
+        ...experience,
+        exploration_phase: DiveInPhase.PROCESSED,
+      }));
+      // AND a session ID that is set in user preferences
+      const givenSessionId = 234;
+      UserPreferencesStateService.getInstance().setUserPreferences({
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
+      const onExperiencesUpdated = jest.fn();
+      // AND mocked services that resolve
+      const getOriginalExperienceSpy = jest.spyOn(ExperienceService.getInstance(), "getOriginalExperience").mockResolvedValueOnce(givenExploredExperiences[0]);
+      const updateExperienceSpy = jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValueOnce(givenExploredExperiences[0]);
+      // AND the component is rendered
+      render(
+        <ExperiencesDrawer
+          isOpen={true}
+          isLoading={false}
+          experiences={givenExploredExperiences}
+          notifyOnClose={jest.fn()}
+          conversationConductedAt="2022-06-01T00:00:00Z"
+          onExperiencesUpdated={onExperiencesUpdated}
+        />
+      );
+      // WHEN the more button is clicked for a specific experience
+      const moreButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)[0];
+      await userEvent.click(moreButton);
+      // AND the restore to original button is clicked
+      const restoreToOriginalButton = screen.getAllByTestId(MENU_ITEM_ID.RESTORE_TO_ORIGINAL)[0];
+      await userEvent.click(restoreToOriginalButton);
+      // THEN expect a confirmation dialog to be shown
+      const confirmDialog = await screen.findByTestId(DATA_TEST_ID.RESTORE_TO_ORIGINAL_CONFIRM_DIALOG);
+      expect(confirmDialog).toBeInTheDocument();
+      // WHEN the confirmation button is clicked
+      const confirmButton = within(confirmDialog).getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM);
+      await userEvent.click(confirmButton);
+      // THEN expect the services to be called with the correct parameters
+      expect(getOriginalExperienceSpy).toHaveBeenCalledWith(givenSessionId, mockExperiences[0].UUID);
+      expect(updateExperienceSpy).toHaveBeenCalledWith(
+        givenSessionId,
+        mockExperiences[0].UUID,
+        expect.objectContaining({
+          experience_title: mockExperiences[0].experience_title,
+          timeline: mockExperiences[0].timeline,
+          company: mockExperiences[0].company,
+          location: mockExperiences[0].location,
+          work_type: mockExperiences[0].work_type,
+          summary: mockExperiences[0].summary,
+          top_skills: expect.arrayContaining([
+            expect.objectContaining({
+              UUID: mockExperiences[0].top_skills[0].UUID,
+              preferredLabel: mockExperiences[0].top_skills[0].preferredLabel,
+            }),
+          ]),
+        })
+      );
+      expect(onExperiencesUpdated).toHaveBeenCalled();
+      // AND the snackbar to be displayed
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Experience restored to original successfully!", {
+        variant: "success",
+      });
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should handle error when restore to original fails", async () => {
+      // GIVEN some experiences that have been explored
+      const givenExploredExperiences = mockExperiences.map((experience) => ({
+        ...experience,
+        exploration_phase: DiveInPhase.PROCESSED,
+      }));
+      // AND a session ID that is set in user preferences
+      const givenSessionId = 234;
+      UserPreferencesStateService.getInstance().setUserPreferences({
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
+      const onExperiencesUpdated = jest.fn();
+      // AND a mocked service that rejects
+      const givenError = new Error("API Error")
+      jest.spyOn(ExperienceService.getInstance(), "getOriginalExperience").mockRejectedValueOnce(givenError);
+      // AND the component is rendered
+      render(
+        <ExperiencesDrawer
+          isOpen={true}
+          isLoading={false}
+          experiences={givenExploredExperiences}
+          notifyOnClose={jest.fn()}
+          conversationConductedAt="2022-06-01T00:00:00Z"
+          onExperiencesUpdated={onExperiencesUpdated}
+        />
+      );
+      // WHEN the more button is clicked for a specific experience
+      const moreButton = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)[0];
+      await userEvent.click(moreButton);
+      // AND the restore to original button is clicked
+      const restoreToOriginalButton = screen.getAllByTestId(MENU_ITEM_ID.RESTORE_TO_ORIGINAL)[0];
+      await userEvent.click(restoreToOriginalButton);
+      // THEN expect a confirmation dialog to be shown
+      const confirmDialog = await screen.findByTestId(DATA_TEST_ID.RESTORE_TO_ORIGINAL_CONFIRM_DIALOG);
+      expect(confirmDialog).toBeInTheDocument();
+      // WHEN the confirmation button is clicked
+      const confirmButton = within(confirmDialog).getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM);
+      await userEvent.click(confirmButton);
+      // THEN expect the snackbar to be displayed with error message
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to restore experience to original.", {
+        variant: "error",
+      });
+      // AND expect onExperiencesUpdated to not have been called
+      expect(onExperiencesUpdated).not.toHaveBeenCalled();
+      // AND no errors or warnings to have occurred
+      expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to restore experience to original:", givenError));
+      expect(console.warn).not.toHaveBeenCalled();
     });
   });
 });

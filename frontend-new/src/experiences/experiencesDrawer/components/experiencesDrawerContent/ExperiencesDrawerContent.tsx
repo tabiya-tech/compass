@@ -11,6 +11,8 @@ import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
+import { ExperienceCategoryVariant } from "src/experiences/experiencesDrawer/components/experienceCategory/ExperienceCategory";
+import RestoreIcon from "@mui/icons-material/Restore";
 
 const uniqueId = "34a59a9e-e7f6-4a10-8b72-0fd401c727de";
 
@@ -30,24 +32,28 @@ export const DATA_TEST_ID = {
 export const MENU_ITEM_ID = {
   EDIT: `experiences-drawer-menu-item-edit-${uniqueId}`,
   DELETE: `experiences-drawer-menu-item-delete-${uniqueId}`,
+  RESTORE_TO_ORIGINAL: `experiences-drawer-menu-item-restore-to-original-${uniqueId}`,
 };
 
 export const MENU_ITEM_TEXT = {
   EDIT: "Edit experience",
   DELETE: "Delete experience",
+  RESTORE_TO_ORIGINAL: "Restore to original",
 };
 
 interface ExperienceProps {
   experience: Experience;
-  onEdit: (experience: Experience) => void;
-  onDelete: (experience: Experience) => void;
+  onEdit?: (experience: Experience) => void;
+  onDelete?: (experience: Experience) => void;
+  onRestoreToOriginal?: (experience: Experience) => void;
+  variant?: ExperienceCategoryVariant;
 }
 
 export const capitalizeFirstLetter = (string: string): string => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdit, onDelete }) => {
+const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdit, onDelete, onRestoreToOriginal, variant = ExperienceCategoryVariant.DEFAULT }) => {
   const theme = useTheme();
   const isOnline = useContext(IsOnlineContext);
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -62,7 +68,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
   }, [experience.top_skills]);
 
   const handleEditClick = () => {
-    onEdit(experience);
+    onEdit && onEdit(experience);
     setMoreMenuAnchorEl(null);
   };
 
@@ -71,7 +77,12 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
   };
 
   const handleDeleteClick = () => {
-    onDelete(experience);
+    onDelete && onDelete(experience);
+    setMoreMenuAnchorEl(null);
+  };
+
+  const handleRestoreToOriginalClick = () => {
+    onRestoreToOriginal && onRestoreToOriginal(experience);
     setMoreMenuAnchorEl(null);
   };
 
@@ -83,6 +94,13 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
         icon: <EditIcon />,
         disabled: false,
         action: handleEditClick,
+      },
+      {
+        id: MENU_ITEM_ID.RESTORE_TO_ORIGINAL,
+        text: MENU_ITEM_TEXT.RESTORE_TO_ORIGINAL,
+        icon: <RestoreIcon />,
+        disabled: !isOnline,
+        action: handleRestoreToOriginalClick,
       },
       {
         id: MENU_ITEM_ID.DELETE,

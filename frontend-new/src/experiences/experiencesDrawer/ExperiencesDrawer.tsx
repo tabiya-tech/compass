@@ -24,6 +24,7 @@ import ExperienceService from "src/experiences/experienceService/experienceServi
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { ExperienceError } from "src/error/commonErrors";
 
 const LazyLoadedDownloadDropdown = lazyWithPreload(
   () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown")
@@ -52,6 +53,7 @@ export const DATA_TEST_ID = {
   EXPERIENCES_DIVIDER: `experiences-divider-${uniqueId}`,
   UNSAVED_CHANGES_DIALOG: `unsaved-changes-dialog-${uniqueId}`,
   DELETE_EXPERIENCE_DIALOG: `delete-experience-dialog-${uniqueId}`,
+  RESTORE_TO_ORIGINAL_CONFIRM_DIALOG: `restore-to-original-confirm-dialog-${uniqueId}`,
 };
 
 const useLocalStorage = (key: string, initialValue: Record<string, string>) => {
@@ -100,6 +102,9 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
   const [experienceToDelete, setExperienceToDelete] = useState<Experience | null>(null);
   const [isDeletingExperience, setIsDeletingExperience] = React.useState(false);
+  const [isRestoringExperience, setIsRestoringExperience] = useState(false);
+  const [showRestoreToOriginalConfirmDialog, setShowRestoreToOriginalConfirmDialog] = React.useState(false);
+  const [experienceToRestoreToOriginal, setExperienceToRestoreToOriginal] = React.useState<Experience | null>(null);
 
   useEffect(() => {
     setHasTopSkills(experiences.some((experience) => experience.top_skills && experience.top_skills.length > 0));
@@ -158,12 +163,6 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       const userPreferencesStateService = UserPreferencesStateService.getInstance();
       const experienceService = ExperienceService.getInstance();
 
-      // Get current user preferences
-      const userPreferences = userPreferencesStateService.getUserPreferences();
-      if (!userPreferences?.sessions.length) {
-        throw new Error("User has no sessions");
-      }
-
       const sessionId = userPreferencesStateService.getActiveSessionId();
       if (!sessionId) {
         throw new Error("No active session found");
@@ -189,6 +188,60 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       setIsDeletingExperience(false);
       setExperienceToDelete(null);
     }
+  };
+
+  const handleRequestRestoreToOriginalExperience = (experience: Experience) => {
+    setExperienceToRestoreToOriginal(experience);
+    setShowRestoreToOriginalConfirmDialog(true);
+  };
+
+  const confirmRestoreToOriginalExperience = async () => {
+    if (!experienceToRestoreToOriginal) return;
+    setShowRestoreToOriginalConfirmDialog(false);
+
+    setIsRestoringExperience(true);
+    const userPreferencesStateService = UserPreferencesStateService.getInstance();
+    const experienceService = ExperienceService.getInstance();
+    const sessionId = userPreferencesStateService.getActiveSessionId()
+
+    if (!sessionId) {
+      enqueueSnackbar("User has no sessions", { variant: "error" });
+      setIsRestoringExperience(false);
+      return;
+    }
+
+    try {
+      // Get the original experience
+      const originalExperience = await experienceService.getOriginalExperience(sessionId, experienceToRestoreToOriginal.UUID);
+
+      // Update the current experience with all original fields
+      await experienceService.updateExperience(sessionId, experienceToRestoreToOriginal.UUID, {
+        experience_title: originalExperience.experience_title,
+        timeline: originalExperience.timeline,
+        company: originalExperience.company,
+        location: originalExperience.location,
+        work_type: originalExperience.work_type,
+        summary: originalExperience.summary,
+        top_skills: originalExperience.top_skills.map(skill => ({
+          UUID: skill.UUID,
+          preferredLabel: skill.preferredLabel
+        }))
+      });
+
+      enqueueSnackbar("Experience restored to original successfully!", { variant: "success" });
+      await onExperiencesUpdated();
+    } catch (error) {
+      console.error(new ExperienceError("Failed to restore experience to original:", error));
+      enqueueSnackbar("Failed to restore experience to original.", { variant: "error" });
+    } finally {
+      setIsRestoringExperience(false);
+      setExperienceToRestoreToOriginal(null);
+    }
+  };
+
+  const cancelRestoreToOriginalExperience = () => {
+    setShowRestoreToOriginalConfirmDialog(false);
+    setExperienceToRestoreToOriginal(null);
   };
 
   // Experiences with top skills
@@ -314,6 +367,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                       experiences={groupedExperiences.selfEmploymentExperiences}
                       onEditExperience={handleEditExperience}
                       onDeleteExperience={handleDeleteExperience}
+                      onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
                     />
                     <ExperienceCategory
                       icon={<WorkIcon />}
@@ -321,6 +375,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                       experiences={groupedExperiences.salaryWorkExperiences}
                       onEditExperience={handleEditExperience}
                       onDeleteExperience={handleDeleteExperience}
+                      onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
                     />
                     <ExperienceCategory
                       icon={<VolunteerActivismIcon />}
@@ -328,6 +383,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                       experiences={groupedExperiences.unpaidWorkExperiences}
                       onEditExperience={handleEditExperience}
                       onDeleteExperience={handleDeleteExperience}
+                      onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
                     />
                     <ExperienceCategory
                       icon={<SchoolIcon />}
@@ -335,6 +391,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                       experiences={groupedExperiences.traineeWorkExperiences}
                       onEditExperience={handleEditExperience}
                       onDeleteExperience={handleDeleteExperience}
+                      onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
                     />
                     <ExperienceCategory
                       icon={<QuizIcon />}
@@ -343,6 +400,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                       tooltipText="Based on the conversation, these experiences couldn't be automatically categorized."
                       onEditExperience={handleEditExperience}
                       onDeleteExperience={handleDeleteExperience}
+                      onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
                     />
                   </Box>
                 )}
@@ -375,7 +433,20 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         showCloseIcon
         data-testid={DATA_TEST_ID.DELETE_EXPERIENCE_DIALOG}
       />
+      <ConfirmModalDialog
+        isOpen={showRestoreToOriginalConfirmDialog}
+        title="Restore to Original Experience"
+        content={<>Are you sure you want to restore this experience to its original version? This will overwrite any changes you've made.</>}
+        onConfirm={confirmRestoreToOriginalExperience}
+        onDismiss={cancelRestoreToOriginalExperience}
+        onCancel={cancelRestoreToOriginalExperience}
+        confirmButtonText="Restore"
+        cancelButtonText="Cancel"
+        showCloseIcon
+        data-testid={DATA_TEST_ID.RESTORE_TO_ORIGINAL_CONFIRM_DIALOG}
+      />
       <Backdrop isShown={isDeletingExperience} message="Deleting experience..." />
+      <Backdrop isShown={isRestoringExperience} message="Restoring experience..." />
     </>
   );
 };

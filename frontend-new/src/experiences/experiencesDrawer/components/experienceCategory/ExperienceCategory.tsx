@@ -6,13 +6,19 @@ import ExperiencesDrawerContent from "src/experiences/experiencesDrawer/componen
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import InfoIcon from "@mui/icons-material/Info";
 
+export enum ExperienceCategoryVariant {
+  DEFAULT = "DEFAULT"
+}
+
 interface ExperienceCategoryProps {
   icon: React.ReactNode;
   title: string;
   experiences: Experience[];
   tooltipText?: string;
-  onEditExperience: (experience: Experience) => void;
-  onDeleteExperience: (experience: Experience) => void;
+  onEditExperience?: (experience: Experience) => void;
+  onDeleteExperience?: (experience: Experience) => void;
+  onRestoreToOriginalExperience?: (experience: Experience) => void;
+  variant?: ExperienceCategoryVariant;
 }
 
 const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
@@ -22,6 +28,8 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
   tooltipText,
   onEditExperience,
   onDeleteExperience,
+  onRestoreToOriginalExperience,
+  variant = ExperienceCategoryVariant.DEFAULT,
 }) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -39,7 +47,14 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
       </Box>
       <Box display="flex" flexDirection="column" gap={isSmallMobile ? 8 : 4}>
         {experiences.map((experience, index) => (
-          <ExperiencesDrawerContent key={index} experience={experience} onEdit={onEditExperience} onDelete={onDeleteExperience}/>
+          <ExperiencesDrawerContent
+            key={index}
+            experience={experience}
+            onEdit={variant === ExperienceCategoryVariant.DEFAULT ? onEditExperience : undefined}
+            onDelete={variant === ExperienceCategoryVariant.DEFAULT ? onDeleteExperience : undefined}
+            onRestoreToOriginal={variant === ExperienceCategoryVariant.DEFAULT ? onRestoreToOriginalExperience : undefined}
+            variant={variant}
+          />
         ))}
       </Box>
     </Box>

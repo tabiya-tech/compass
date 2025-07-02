@@ -5,6 +5,7 @@ import ExperiencesDrawerContent, {
   DATA_TEST_ID,
   LoadingExperienceDrawerContent,
   MENU_ITEM_ID,
+  MENU_ITEM_TEXT,
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
@@ -13,6 +14,8 @@ import userEvent from "@testing-library/user-event";
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { DATA_TEST_ID as CONTEXT_MENU_DATA_TEST_ID } from "src/theme/ContextMenu/ContextMenu";
+import { resetAllMethodMocks } from "../../../../_test_utilities/resetAllMethodMocks";
+import ExperienceService from "../../../experienceService/experienceService";
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
@@ -36,6 +39,10 @@ jest.mock("src/theme/ContextMenu/ContextMenu", () => {
 });
 
 describe("ReportDrawerContent", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    resetAllMethodMocks(ExperienceService.getInstance());
+  });
   test("should render ExperiencesDrawerContent correctly", () => {
     // GIVEN the ExperiencesDrawerContent component
     const givenReportDrawerContent = (
@@ -273,5 +280,57 @@ describe("ReportDrawerContent", () => {
     // AND no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
+  });
+
+  describe("Restore to Original functionality", () => {
+    test("should show restore to original menu item in context menu", () => {
+      // GIVEN an experience with restore to original handler
+      const mockOnRestoreToOriginal = jest.fn();
+      const experience = { ...mockExperiences[0], exploration_phase: DiveInPhase.PROCESSED };
+      
+      // WHEN the component is rendered
+      render(
+        <ExperiencesDrawerContent
+          experience={experience}
+          onEdit={jest.fn()}
+          onDelete={jest.fn()}
+          onRestoreToOriginal={mockOnRestoreToOriginal}
+        />
+      );
+
+      // AND the more menu button is clicked
+      const moreButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON);
+      fireEvent.click(moreButton);
+
+      // THEN the restore to original menu item should be visible
+      expect(screen.getByText(MENU_ITEM_TEXT.RESTORE_TO_ORIGINAL)).toBeInTheDocument();
+    });
+
+    test("should call onRestoreToOriginal when restore to original menu item is clicked", () => {
+      // GIVEN an experience with restore to original handler
+      const mockOnRestoreToOriginal = jest.fn();
+      const experience = { ...mockExperiences[0], exploration_phase: DiveInPhase.PROCESSED };
+      
+      // WHEN the component is rendered
+      render(
+        <ExperiencesDrawerContent
+          experience={experience}
+          onEdit={jest.fn()}
+          onDelete={jest.fn()}
+          onRestoreToOriginal={mockOnRestoreToOriginal}
+        />
+      );
+
+      // AND the more menu button is clicked
+      const moreButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON);
+      fireEvent.click(moreButton);
+
+      // AND the restore to original menu item is clicked
+      const restoreToOriginalMenuItem = screen.getByText(MENU_ITEM_TEXT.RESTORE_TO_ORIGINAL);
+      fireEvent.click(restoreToOriginalMenuItem);
+
+      // THEN the onRestoreToOriginal handler should be called with the experience
+      expect(mockOnRestoreToOriginal).toHaveBeenCalledWith(experience);
+    });
   });
 });
