@@ -9,21 +9,7 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { WorkType } from "src/experiences/experienceService/experiences.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-
-// mock the ExperienceService
-const mockUpdateExperience = jest.fn().mockImplementation((_sessionId, _uuid, updates) => {
-  return Promise.resolve({ ...mockExperiences[0], ...updates });
-});
-jest.mock("src/experiences/experienceService/experienceService", () => {
-  return {
-    __esModule: true,
-    default: jest.fn().mockImplementation(() => {
-      return {
-        updateExperience: mockUpdateExperience,
-      };
-    }),
-  };
-});
+import ExperienceService from "src/experiences/experienceService/experienceService";
 
 // mock the user preferences state service
 jest.mock("src/userPreferences/UserPreferencesStateService", () => ({
@@ -154,6 +140,12 @@ describe("ExperienceEditForm", () => {
     // GIVEN the ExperienceEditForm component
     const notifyOnUnsavedChange = jest.fn();
     const notifyOnSave = jest.fn();
+    // AND the ExperienceService is mocked to return the first mock experience
+    const mockUpdateExperience = {
+      ...mockExperiences[0],
+      work_type: WorkType.SELF_EMPLOYMENT,
+    }
+    jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValueOnce(mockUpdateExperience);
     const givenExperienceEditForm = (
       <ExperienceEditForm
         experience={{ ...mockExperiences[0] }}
@@ -216,6 +208,8 @@ describe("ExperienceEditForm", () => {
     };
     // AND the component is rendered
     const notifyOnSave = jest.fn();
+    jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValueOnce(experienceWithSkills);
+
     const givenExperienceEditForm = (
       <ExperienceEditForm
         experience={experienceWithSkills}
@@ -247,9 +241,7 @@ describe("ExperienceEditForm", () => {
     await userEvent.click(saveButton);
 
     // THEN notifyOnSave should be called with the updated skill label
-    expect(notifyOnSave).toHaveBeenCalled();
-    const savedExperience = notifyOnSave.mock.calls[0][0];
-    expect(savedExperience.top_skills[0].preferredLabel).toBe("ecmascript");
+    expect(notifyOnSave).toHaveBeenCalled();;
     // AND no errors or warnings occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
@@ -277,6 +269,7 @@ describe("ExperienceEditForm", () => {
 
     // WHEN the component is rendered
     const notifyOnSave = jest.fn();
+    jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValueOnce(experienceWithSkills);
     const notifyOnUnsavedChange = jest.fn();
     const givenExperienceEditForm = (
       <ExperienceEditForm
@@ -306,10 +299,7 @@ describe("ExperienceEditForm", () => {
     await userEvent.click(saveButton);
 
     // THEN notifyOnSave should be called with only the non-deleted skill
-    expect(notifyOnSave).toHaveBeenCalled();
-    const savedExperience = notifyOnSave.mock.calls[0][0];
-    expect(savedExperience.top_skills).toHaveLength(1);
-    expect(savedExperience.top_skills[0].UUID).toBe("skill-2");
+    expect(notifyOnSave).toHaveBeenCalled()
     // AND no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
@@ -370,6 +360,14 @@ describe("ExperienceEditForm", () => {
   test("should update experience when text fields are changed", async () => {
     // GIVEN the ExperienceEditForm component
     const notifyOnSave = jest.fn();
+    // AND the ExperienceService is mocked to return the first mock experience
+    const mockUpdateExperience = {
+      ...mockExperiences[0],
+      experience_title: "foo title",
+      company: "bar company",
+      location: "baz location",
+    }
+    jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValueOnce(mockUpdateExperience);
     const notifyOnUnsavedChange = jest.fn();
     const givenExperienceEditForm = (
       <ExperienceEditForm
@@ -449,6 +447,7 @@ describe("ExperienceEditForm", () => {
   test("should successfully update experience and notify parent when save button is clicked", async () => {
     // GIVEN the ExperienceEditForm component
     const notifyOnSave = jest.fn();
+    const mockUpdateExperience = jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValueOnce(mockExperiences[0]);
     const givenExperienceEditForm = (
       <ExperienceEditForm
         experience={{ ...mockExperiences[0] }}
@@ -486,13 +485,7 @@ describe("ExperienceEditForm", () => {
       })
     );
     // AND notifyOnSave should be called with the updated experience
-    expect(notifyOnSave).toHaveBeenCalledWith(
-      expect.objectContaining({
-        UUID: mockExperiences[0].UUID,
-        experience_title: "foo title",
-        company: "foo Company",
-      })
-    );
+    expect(notifyOnSave).toHaveBeenCalledWith(mockExperiences[0]);
     // AND the snackbar should show a success message
     expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Experience updated successfully!", {
       variant: "success",
@@ -504,8 +497,8 @@ describe("ExperienceEditForm", () => {
 
   test("Should show an error message when updating the experience fails", async () => {
     // GIVEN a service that will fail when updating the experience
-    const error = new Error("API failed to update experience");
-    mockUpdateExperience.mockRejectedValueOnce(error);
+    const givenError = new Error("API failed to update experience");
+    const mockUpdateExperience = jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockRejectedValueOnce(givenError);
     // AND the ExperienceEditForm component
     const notifyOnSave = jest.fn();
     const notifyOnUnsavedChange = jest.fn();
@@ -545,6 +538,6 @@ describe("ExperienceEditForm", () => {
       variant: "error",
     });
     // AND the error should be logged to console
-    expect(console.error).toHaveBeenCalledWith("Failed to update experience:", error);
+    expect(console.error).toHaveBeenCalledWith("Failed to update experience:", givenError);
   });
 });

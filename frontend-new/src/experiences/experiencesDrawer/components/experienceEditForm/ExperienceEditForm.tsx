@@ -271,7 +271,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
           }));
       }
 
-      const experienceService = new ExperienceService();
+      const experienceService = ExperienceService.getInstance();
       const result = await experienceService.updateExperience(sessionId, experience.UUID, updatedFields);
 
       notifyOnUnsavedChange?.(false);
