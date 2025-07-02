@@ -91,7 +91,7 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
     The state of the experiences of the user that are being explored, keyed by experience.uuid
     """
 
-    explored_experiences: list[ExperienceEntity] = Field(default_factory=list)
+    explored_experiences: list[ExperienceEntity] | None = Field(default_factory=list)
     """
     Experiences that have been explored so far. 
     This is also used as a copy of what users are able to see and edit in the UI.
@@ -143,8 +143,9 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
             experiences_state=_doc["experiences_state"],
             current_experience_uuid=_doc["current_experience_uuid"],
 
-            # For backward compatibility with old documents that don't have the explored_experiences field, the default is an empty array.
-            explored_experiences=_doc.get("explored_experiences", []),
+            # For backward compatibility with old documents that don't have the explored_experiences field,
+            # The default value is None, which means that the state is legacy and should be upgraded
+            explored_experiences=_doc.get("explored_experiences", None),
             conversation_phase=_doc["conversation_phase"])
 
 
