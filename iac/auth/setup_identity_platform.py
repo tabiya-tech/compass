@@ -12,7 +12,7 @@ libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, libs_dir)
 
 from lib import get_resource_name, ProjectBaseConfig, get_project_base_config
-from identity_platform import IdentityPlatform, NotificationConfigArgs, SendEmailArgs, DNSInfoArgs, VerifyEmailTemplateArgs
+from identity_platform import IdentityPlatform, NotificationConfigArgs, SendEmailArgs, DNSInfoArgs, EmailTemplateArgs
 
 
 def _setup_google_signin(*,
@@ -180,12 +180,16 @@ def _setup_identity_platform(
                     custom_domain=frontend_domain,
                     use_custom_domain=True,
                 ),
-                verify_email_template=VerifyEmailTemplateArgs(
+                verify_email_template=EmailTemplateArgs(
                     sender_local_part="noreply",
                     sender_display_name="Compass",
                     subject="Please verify your email address",
                 ),
-
+                reset_password_template=EmailTemplateArgs(
+                    sender_local_part="noreply",
+                    sender_display_name="Compass",
+                    subject="Reset your password",
+                )
             )
         ),
         config=gcp.identityplatform.ConfigArgs(
@@ -209,6 +213,10 @@ def _setup_identity_platform(
                                     depends_on=dependencies,
                                     delete_before_replace=True)
     )
+
+    # If you have made changes to the idp_config, during preview,
+    # you might see changes to the `identity_platform_client_api_key`, but no actual changes occurred.
+    # This is because the manually created Custom IDP Config cannot track only output fields.
 
     # Get the api key from the client config
     api_key_value = idp_config.client.apply(lambda c: c.get("api_key"))
