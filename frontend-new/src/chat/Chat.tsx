@@ -100,7 +100,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({ showInactiveSessionAlert =
     setMessages((prevMessages) => prevMessages.filter(msg => msg.message_id !== messageId));
   }, []);
 
-  const { showSkillsRanking } = useSkillsRanking(addMessageToChat, removeMessageFromChat);
+  const { showSkillsRanking } = useSkillsRanking(addMessageToChat, removeMessageFromChat, SkillsRankingService.getInstance());
 
   /**
    * --- Utility functions ---

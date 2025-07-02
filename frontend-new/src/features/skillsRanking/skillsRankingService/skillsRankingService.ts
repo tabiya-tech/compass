@@ -17,7 +17,7 @@ export class SkillsRankingService {
   readonly skillsRankingEndpointUrl: string;
   readonly apiServerUrl: string;
 
-  private constructor() {
+  public constructor() {
     this.apiServerUrl = getBackendUrl();
     this.skillsRankingEndpointUrl = `${this.apiServerUrl}/conversations`;
   }

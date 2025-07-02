@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
-import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
+import { type SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
-export const useGetRankingResult = () => {
+export const useGetRankingResult = (skillsRankingService: SkillsRankingService) => {
   const [isLoading, setIsLoading] = useState(false);
   const [ranking, setRanking] = useState<string>("");
   const { enqueueSnackbar } = useSnackbar();
@@ -23,7 +23,6 @@ export const useGetRankingResult = () => {
       if (sessionId === null) {
         throw new Error("No active session found");
       }
-      const skillsRankingService = SkillsRankingService.getInstance();
       const result = await skillsRankingService.getRanking(sessionId, signal);
       setRanking(result.ranking);
       return result.ranking;
@@ -37,7 +36,7 @@ export const useGetRankingResult = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [handleError]);
+  }, [handleError, skillsRankingService]);
 
   return {
     fetchRanking: getRankingResult,

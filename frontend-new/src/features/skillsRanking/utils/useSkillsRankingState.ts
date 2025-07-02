@@ -1,11 +1,11 @@
 import { useCallback, useRef } from "react";
 import { SkillsRankingPhase } from "src/features/skillsRanking/types";
-import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
+import { type SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
-export const useSkillsRankingState = () => {
+export const useSkillsRankingState = (skillsRankingService: SkillsRankingService) => {
   const { enqueueSnackbar } = useSnackbar();
   const lastHandledState = useRef<SkillsRankingPhase | null>(null);
 
@@ -21,7 +21,7 @@ export const useSkillsRankingState = () => {
     if (!sessionId) return null;
     
     try {
-      return await SkillsRankingService.getInstance().updateSkillsRankingState(
+      return await skillsRankingService.updateSkillsRankingState(
         sessionId,
         newState,
         rank
@@ -30,7 +30,7 @@ export const useSkillsRankingState = () => {
       handleError(error as Error);
       return null;
     }
-  }, [handleError]);
+  }, [handleError, skillsRankingService]);
 
   return {
     handleStateTransition,
