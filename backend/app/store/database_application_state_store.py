@@ -197,7 +197,8 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             # The field `state.explore_experiences_director_state.explored_experiences` was added in a later version
             # if it is empty, and we have explored experiences, we populate it
             # with the experiences that have been processed
-            if len(state.explore_experiences_director_state.explored_experiences) == 0 and has_explored_experiences(state):
+            if state.explore_experiences_director_state.explored_experiences is None and has_explored_experiences(state):
+                self._logger.info("upgrading state: populating explored_experiences field")
                 state.explore_experiences_director_state.explored_experiences = filter_explored_experiences(state)
                 _changes = True
 
