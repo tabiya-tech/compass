@@ -155,7 +155,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     }
     setIsLoading(true);
     try {
-      const experienceService = new ExperienceService();
+      const experienceService = ExperienceService.getInstance();
       const data = await experienceService.getExperiences(activeSessionId);
       setExperiences(data);
     } catch (error) {

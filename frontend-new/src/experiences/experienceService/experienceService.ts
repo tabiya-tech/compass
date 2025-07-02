@@ -11,21 +11,24 @@ export default class ExperienceService {
 
   private static instance: ExperienceService;
 
+  /**
+   * Get the singleton instance of ExperienceService.
+   * @returns {ExperienceService} The singleton instance.
+   */
   public static getInstance(): ExperienceService {
     if (!ExperienceService.instance) {
       ExperienceService.instance = new ExperienceService();
     }
-
     return ExperienceService.instance;
   }
 
-  constructor() {
+  private constructor() {
     this.apiServeUrl = getBackendUrl();
     this.experiencesEndpointUrl = `${this.apiServeUrl}/conversations`;
   }
 
-  async getExperiences(sessionId: number): Promise<Experience[]> {
-    const constructedExperiencesUrl = `${this.experiencesEndpointUrl}/${sessionId}/experiences`;
+  async getExperiences(sessionId: number, original: boolean = false): Promise<Experience[]> {
+    const constructedExperiencesUrl = `${this.experiencesEndpointUrl}/${sessionId}/experiences?original=${original}`;
     const errorFactory = getRestAPIErrorFactory(
       "ExperienceService",
       "getExperiences",
@@ -87,6 +90,45 @@ export default class ExperienceService {
       serviceName,
       serviceFunction,
       failureMessage: `Failed to update experience with UUID ${experienceId}`,
+      expectedContentType: "application/json",
+    });
+
+    let updatedExperience: Experience;
+    try {
+      updatedExperience = JSON.parse(await response.text());
+    } catch (error: unknown) {
+      throw errorFactory(
+        response.status,
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+        "Response did not contain valid JSON",
+        {
+          error: error,
+        }
+      );
+    }
+
+    return updatedExperience;
+  }
+
+  async getOriginalExperience(
+    sessionId: number,
+    experienceId: string
+  ): Promise<Experience> {
+    const serviceName = "ExperienceService";
+    const serviceFunction = "getOriginalExperience";
+    const method = "GET";
+    const experienceURL = `${this.apiServeUrl}/conversations/${sessionId}/experiences/${experienceId}/original`;
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, experienceURL);
+
+    const response = await customFetch(experienceURL, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      expectedStatusCode: StatusCodes.OK,
+      serviceName,
+      serviceFunction,
+      failureMessage: `Failed to retrieve experience with UUID ${experienceId}`,
       expectedContentType: "application/json",
     });
 
