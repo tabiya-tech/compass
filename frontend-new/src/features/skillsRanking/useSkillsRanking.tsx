@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SkillsRankingPhase, SkillsRankingState, skillsRankingStateDefault } from "src/features/skillsRanking/types";
-import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
+import { type SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { IChatMessage } from "src/chat/Chat.types";
 import SkillsRankingPrompt, { SKILLS_RANKING_PROMPT_MESSAGE_TYPE } from "./components/skillsRankingPrompt/SkillsRankingPrompt";
@@ -16,14 +16,14 @@ import { SessionError } from "src/error/commonErrors";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import { CANCELABLE_TYPING_TIMEOUT, DELAY_AFTER_RESULTS, SkillsRankingMessageIds, TYPING_TIMEOUT } from "./constants";
 
-export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => void, removeMessage: (messageId: string) => void) => {
+export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => void, removeMessage: (messageId: string) => void, skillsRankingService: SkillsRankingService) => {
   const currentTimeout = useRef<NodeJS.Timeout | null>(null);
   const [currentSkillsRankingState, setCurrentSkillsRankingState] = useState<SkillsRankingState>(skillsRankingStateDefault);
   const onFinishRef = useRef<(() => void) | null>(null);
   const shownMessages = useRef<Set<string>>(new Set()); 
 
-  const { handleStateTransition, lastHandledState } = useSkillsRankingState();
-  const { fetchRanking, isLoading, ranking } = useGetRankingResult();
+  const { handleStateTransition, lastHandledState } = useSkillsRankingState(skillsRankingService);
+  const { fetchRanking, isLoading, ranking } = useGetRankingResult(skillsRankingService);
 
   const clearCurrentTimeout = useCallback(() => {
     if (currentTimeout.current) {
@@ -147,7 +147,7 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
 
     const createResultMessage = (state: SkillsRankingState) => {
       return createMessage(SKILLS_RANKING_RESULT_MESSAGE_TYPE, {
-        message: "Here's what we found",
+        message: `Here's what we found:`,
         skillsRankingState: state,
         isLoading,
       }, SkillsRankingResult);
@@ -224,12 +224,15 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
   * */
   const showSkillsRanking = useCallback(async (onFinish: () => void) => {
     clearCurrentTimeout();
+
     shownMessages.current.clear(); // Reset shown messages when starting a new flow
+    onFinishRef.current = onFinish;
+
     try {
       const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
       if (!sessionId) throw new SessionError("No active session found");
       
-      let state = await SkillsRankingService.getInstance().getSkillsRankingState(sessionId);
+      let state = await skillsRankingService.getSkillsRankingState(sessionId);
       // If no state exists, create one with INITIAL phase
       if (!state) {
         const newState = await handleStateTransition(SkillsRankingPhase.INITIAL);
@@ -247,9 +250,9 @@ export const useSkillsRanking = (addMessage: (message: IChatMessage<any>) => voi
       // we simply want to move on and call the onFinish callback
       console.error(new SkillsRankingError("Error in skills ranking flow:", error));
       //  we expect onFinish to be set by the caller
-      onFinishRef.current!();
+      onFinishRef.current();
     }
-  }, [clearCurrentTimeout, handleSkillsRankingMessageFlow, handleStateTransition]);
+  }, [clearCurrentTimeout, handleSkillsRankingMessageFlow, handleStateTransition, skillsRankingService]);
 
 
   /*

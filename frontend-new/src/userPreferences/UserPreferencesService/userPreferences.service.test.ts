@@ -14,20 +14,8 @@ import {
   UserPreference,
 } from "./userPreferences.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { getTestUserPreferences } from "src/_test_utilities/userPreferences";
 
-function getTestUserPreferences(): UserPreference {
-  return {
-    user_id: "1",
-    language: Language.en,
-    accepted_tc: new Date(),
-    sessions: [1234],
-    client_id: getRandomString(10),
-    user_feedback_answered_questions: {},
-    has_sensitive_personal_data: false,
-    sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
-    experiments: {},
-  }
-}
 
 describe("UserPreferencesService", () => {
   // GIVEN a backend URL is returned by the envService
