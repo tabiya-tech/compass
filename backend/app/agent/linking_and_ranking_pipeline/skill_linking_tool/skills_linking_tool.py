@@ -72,7 +72,7 @@ class SkillLinkingTool:
                 for skill in occupation_skills_entity.associated_skills:
                     if is_icatus and (not only_high_signal_skills or skill.signallingValueLabel == "high"):
                         esco_skills_uuids.append(skill.UUID)
-                    elif not is_icatus and (not only_essential_skills or skill.relationType == "essential"):
+                    elif not is_icatus and (not only_essential_skills or skill.relationType == "essential") or not associated_skill.relationType:
                         esco_skills_uuids.append(skill.UUID)
             # remove duplicates
             esco_skills_uuids = list(set(esco_skills_uuids))
