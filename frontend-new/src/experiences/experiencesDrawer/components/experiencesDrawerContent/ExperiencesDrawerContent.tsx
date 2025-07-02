@@ -146,7 +146,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
           {(experience.timeline.start || experience.timeline.end) && experience.company && ", "}
 
           {/* display the company if it exists */}
-          {experience.company && experience.company}
+          {experience?.company}
 
           {/* display the location if it exists */}
           {experience.location && <i>{` (${experience.location})`}</i>}
