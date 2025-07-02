@@ -40,10 +40,15 @@ class DNSInfoArgs:
 
 
 @dataclass(frozen=True)
-class VerifyEmailTemplateArgs:
+class EmailTemplateArgs:
+    """
+    The email template args for Identity platform config.
+    @see: https://cloud.google.com/identity-platform/docs/reference/rest/v2/Config#emailtemplate
+    """
+
     sender_local_part: Optional[pulumi.Input[str]] = None
-    subject: Optional[pulumi.Input[str]] = None
     sender_display_name: Optional[pulumi.Input[str]] = None
+    subject: Optional[pulumi.Input[str]] = None
     reply_to: Optional[pulumi.Input[str]] = None
 
     def to_dict(self):
@@ -59,13 +64,15 @@ class VerifyEmailTemplateArgs:
 class SendEmailArgs:
     callback_uri: Optional[pulumi.Input[str]] = None
     dns_info: Optional[pulumi.Input[DNSInfoArgs]] = None
-    verify_email_template: Optional[pulumi.Input[VerifyEmailTemplateArgs]] = None
+    verify_email_template: Optional[pulumi.Input[EmailTemplateArgs]] = None
+    reset_password_template: Optional[pulumi.Input[EmailTemplateArgs]] = None
 
     def to_dict(self):
         return {
             "callback_uri": self.callback_uri,
             "dns_info": self.dns_info.to_dict() if hasattr(self.dns_info, "to_dict") else self.dns_info,
             "verify_email_template": self.verify_email_template.to_dict() if hasattr(self.verify_email_template, "to_dict") else self.verify_email_template,
+            "reset_password_template": self.reset_password_template.to_dict() if hasattr(self.reset_password_template, "to_dict") else self.reset_password_template,
         }
 
 
