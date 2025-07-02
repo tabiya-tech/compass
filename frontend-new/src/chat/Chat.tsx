@@ -37,6 +37,7 @@ import { CompassChatMessageProps } from "./chatMessage/compassChatMessage/Compas
 import {
   CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE
 } from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import { FeedbackProvider } from "src/feedback/overallFeedback/feedbackContext/FeedbackContext";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -412,88 +413,89 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       {isLoggingOut ? (
         <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
       ) : (
-        <ChatProvider
-          handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}
-          removeMessage={removeMessage}
-          addMessage={addMessage}
-        >
-          <Box
-            width="100%"
-            height="100%"
-            display="flex"
-            flexDirection="column"
-            position="relative"
-            data-testid={DATA_TEST_ID.CHAT_CONTAINER}
-            // The "is-initialized" attribute helps make the component testable.
-            // When the component mounts, an initialization function runs, changing the state and causing a rerender.
-            // Tests need to wait for the component to "settle" after mounting, but they don't know when that happens.
-            // To check if the component is settled, tests can wait for the "is-initialized" attribute to be true:
-            //   await waitFor(() => {
-            //     expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toHaveAttribute("is-initialized", "true");
-            //   });
-            // This technique can solve the "Warning: An update to Chat inside a test was not wrapped in act(...)" warning.
-            is-initialized={`${initialized}`}
+        <FeedbackProvider>
+          <ChatProvider
+            handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}
+            removeMessage={removeMessage}
+            addMessage={addMessage}
           >
-            <Box padding={theme.spacing(theme.tabiyaSpacing.lg)}>
-              <ChatHeader
-                notifyOnLogout={handleLogout}
-                startNewConversation={() => setNewConversationDialog(true)}
-                experiencesExplored={exploredExperiences}
-                exploredExperiencesNotification={exploredExperiencesNotification}
-                setExploredExperiencesNotification={setExploredExperiencesNotification}
-                conversationCompleted={conversationCompleted}
-                timeUntilNotification={timeUntilFeedbackNotification}
-                progressPercentage={currentPhase.percentage}
+            <Box
+              width="100%"
+              height="100%"
+              display="flex"
+              flexDirection="column"
+              position="relative"
+              data-testid={DATA_TEST_ID.CHAT_CONTAINER}
+              // The "is-initialized" attribute helps make the component testable.
+              // When the component mounts, an initialization function runs, changing the state and causing a rerender.
+              // Tests need to wait for the component to "settle" after mounting, but they don't know when that happens.
+              // To check if the component is settled, tests can wait for the "is-initialized" attribute to be true:
+              //   await waitFor(() => {
+              //     expect(screen.getByTestId(DATA_TEST_ID.CHAT_CONTAINER)).toHaveAttribute("is-initialized", "true");
+              //   });
+              // This technique can solve the "Warning: An update to Chat inside a test was not wrapped in act(...)" warning.
+              is-initialized={`${initialized}`}
+            >
+              <Box padding={theme.spacing(theme.tabiyaSpacing.lg)}>
+                <ChatHeader
+                  notifyOnLogout={handleLogout}
+                  startNewConversation={() => setNewConversationDialog(true)}
+                  experiencesExplored={exploredExperiences}
+                  exploredExperiencesNotification={exploredExperiencesNotification}
+                  setExploredExperiencesNotification={setExploredExperiencesNotification}
+                  conversationCompleted={conversationCompleted}
+                  timeUntilNotification={timeUntilFeedbackNotification}
+                  progressPercentage={currentPhase.percentage}
+                />
+              </Box>
+              <Box paddingBottom={theme.spacing(theme.tabiyaSpacing.lg)} paddingX={theme.spacing(theme.tabiyaSpacing.md)}>
+                <ChatProgressBar
+                  percentage={currentPhase.percentage}
+                  phase={currentPhase.phase}
+                  current={currentPhase.current}
+                  total={currentPhase.total}
+                />
+              </Box>
+              <Box sx={{ flex: 1, overflowY: "auto", paddingX: theme.spacing(theme.tabiyaSpacing.lg) }}>
+                <ChatList messages={messages} />
+              </Box>
+              {showBackdrop && <InactiveBackdrop isShown={showBackdrop} />}
+              <Box sx={{ flexShrink: 0, padding: theme.tabiyaSpacing.lg, paddingTop: theme.tabiyaSpacing.xs }}>
+                <ChatMessageField
+                  handleSend={handleSend}
+                  aiIsTyping={aiIsTyping}
+                  isChatFinished={conversationCompleted}
+                />
+              </Box>
+            </Box>
+            <ExperiencesDrawer
+              isOpen={isDrawerOpen}
+              notifyOnClose={handleDrawerClose}
+              isLoading={isLoading}
+              experiences={experiences}
+              conversationConductedAt={conversationConductedAt}
+            onExperiencesUpdated={fetchExperiences}/>
+            {newConversationDialog && (
+              <ConfirmModalDialog
+                isOpen={newConversationDialog}
+                title="Start New Conversation?"
+                content={
+                  <>
+                    Once you start a new conversation, all messages from the current conversation will be lost forever.
+                    <br />
+                    <br />
+                    Are you sure you want to start a new conversation?
+                  </>
+                }
+                onCancel={() => setNewConversationDialog(false)}
+                onConfirm={handleConfirmNewConversation}
+                onDismiss={() => setNewConversationDialog(false)}
+                cancelButtonText="Cancel"
+                confirmButtonText="Yes, I'm sure"
               />
-            </Box>
-            <Box paddingBottom={theme.spacing(theme.tabiyaSpacing.lg)} paddingX={theme.spacing(theme.tabiyaSpacing.md)}>
-              <ChatProgressBar
-                percentage={currentPhase.percentage}
-                phase={currentPhase.phase}
-                current={currentPhase.current}
-                total={currentPhase.total}
-              />
-            </Box>
-            <Box sx={{ flex: 1, overflowY: "auto", paddingX: theme.spacing(theme.tabiyaSpacing.lg) }}>
-              <ChatList messages={messages} />
-            </Box>
-            {showBackdrop && <InactiveBackdrop isShown={showBackdrop} />}
-            <Box sx={{ flexShrink: 0, padding: theme.tabiyaSpacing.lg, paddingTop: theme.tabiyaSpacing.xs }}>
-              <ChatMessageField
-                handleSend={handleSend}
-                aiIsTyping={aiIsTyping}
-                isChatFinished={conversationCompleted}
-              />
-            </Box>
-          </Box>
-          <ExperiencesDrawer
-            isOpen={isDrawerOpen}
-            notifyOnClose={handleDrawerClose}
-            isLoading={isLoading}
-            experiences={experiences}
-            conversationConductedAt={conversationConductedAt}
-            onExperiencesUpdated={fetchExperiences}
-          />
-          {newConversationDialog && (
-            <ConfirmModalDialog
-              isOpen={newConversationDialog}
-              title="Start New Conversation?"
-              content={
-                <>
-                  Once you start a new conversation, all messages from the current conversation will be lost forever.
-                  <br />
-                  <br />
-                  Are you sure you want to start a new conversation?
-                </>
-              }
-              onCancel={() => setNewConversationDialog(false)}
-              onConfirm={handleConfirmNewConversation}
-              onDismiss={() => setNewConversationDialog(false)}
-              cancelButtonText="Cancel"
-              confirmButtonText="Yes, I'm sure"
-            />
-          )}
-        </ChatProvider>
+            )}
+          </ChatProvider>
+        </FeedbackProvider>
       )}
     </Suspense>
   );
