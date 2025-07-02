@@ -343,4 +343,90 @@ describe("ExperienceService", () => {
       }
     );
   });
+
+  describe("restoreDeletedExperience", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test("should restore a deleted experience successfully", async () => {
+      // GIVEN an experience to restore
+      const experienceId = mockExperiences[0].UUID;
+      // AND the session id for the experience
+      const givenSessionId = 1234;
+      // AND the API will return a successful response
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, mockExperiences[0], "application/json;charset=UTF-8");
+
+      // WHEN the restoreDeletedExperience function is called
+      const service = ExperienceService.getInstance();
+      await service.restoreDeletedExperience(givenSessionId, experienceId);
+
+      // THEN expect to make a POST request with the correct URL
+      expectCorrectFetchRequest(
+        fetchSpy,
+        `${givenApiServerUrl}/conversations/${givenSessionId}/experiences/${experienceId}/restore`,
+        {
+          method: "POST",
+          expectedStatusCode: StatusCodes.OK,
+          serviceName: "ExperienceService",
+          serviceFunction: "restoreExperience",
+          failureMessage: `Failed to restore experience with UUID ${experienceId}`,
+        }
+      );
+    });
+
+    test("should throw the same error thrown by the customFetch method", async () => {
+      // GIVEN an experience to restore
+      const experienceId = mockExperiences[0].UUID;
+      // AND the session id for the experience
+      const givenSessionId = 1234;
+      // AND the API will return an error response
+      const givenFetchError = new Error("some error");
+      jest.spyOn(require("src/utils/customFetch/customFetch"), "customFetch").mockImplementationOnce(() => {
+        return new Promise(() => {
+          throw givenFetchError;
+        });
+      });
+
+      // WHEN the restoreDeletedExperience function is called
+      const service = ExperienceService.getInstance();
+
+      // THEN expect the correct error to be thrown
+      await expect(service.restoreDeletedExperience(givenSessionId, experienceId)).rejects.toThrow(givenFetchError);
+    });
+
+    test.each([
+      ["is a malformed json", "#"],
+      ["is a string", "foo"],
+    ])(
+      "on 200, should reject with an error ERROR_CODE.INVALID_RESPONSE_BODY if response %s",
+      async (_description, giveResponse) => {
+        // GIVEN fetch resolves with a response that has invalid JSON
+        setupAPIServiceSpy(StatusCodes.OK, giveResponse, "application/json;charset=UTF-8");
+        // AND the updated fields
+        const givenSessionId = 1234;
+        const experienceId = mockExperiences[0].UUID;
+
+        // WHEN the restoreDeletedExperience function is called
+        const service = ExperienceService.getInstance();
+        const actualExperience = service.restoreDeletedExperience(givenSessionId, experienceId);
+
+        // THEN expect it to reject with the error response
+        const expectedError = {
+          ...new RestAPIError(
+            ExperienceService.name,
+            "restoreDeletedExperience",
+            "POST",
+            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences/${experienceId}/restore`,
+            StatusCodes.OK,
+            ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+            "",
+            ""
+          ),
+          cause: expect.anything(),
+        };
+        await expect(actualExperience).rejects.toMatchObject(expectedError);
+      }
+    );
+  });
 });
