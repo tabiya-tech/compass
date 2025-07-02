@@ -74,6 +74,18 @@ class IExperienceService(ABC):
         """
         raise NotImplementedError()
 
+    @abstractmethod
+    async def restore_deleted_experience(self, user_id: str, session_id: int, experience_uuid: str) -> ExperienceResponse:
+        """
+        Restore a deleted experience for a given session.
+        :param user_id: str - the id of the requesting user
+        :param session_id: int - id for the conversation session
+        :param experience_uuid: str - the uuid of the experience to restore
+        :return: ExperienceResponse - the restored experience object
+        :raises ExperienceNotFoundError: if the experience is not found
+        """
+        raise NotImplementedError()
+
 
 class ExperienceService(IExperienceService):
     def __init__(self, *,
@@ -201,3 +213,24 @@ class ExperienceService(IExperienceService):
             original_experiences.append(ExperienceResponse.from_experience_entity(exp_state.experience, exp_state.dive_in_phase))
 
         return original_experiences
+
+    async def restore_deleted_experience(self, user_id: str, session_id: int, experience_uuid: str) -> ExperienceResponse:
+        state = await self._application_state_metrics_recorder.get_state(session_id)
+        director_state = state.explore_experiences_director_state
+
+        # Find the experience in the explored experiences
+        for exp in director_state.explored_experiences:
+            if exp.uuid == experience_uuid:
+                # If found, skip restoring as it is already in the explored list
+                raise ExperienceNotFoundError(experience_uuid)
+        # If not found, check in the experiences state
+        recovered_experience = director_state.experiences_state.get(experience_uuid, None)
+        if not recovered_experience:
+            raise ExperienceNotFoundError(experience_uuid)
+        # Restore the experience by adding it back to the explored experiences
+        director_state.explored_experiences.append(recovered_experience.experience)
+        # save the updated state
+        await self._application_state_metrics_recorder.save_state(state, user_id)
+        # Return the restored experience
+        return ExperienceResponse.from_experience_entity(recovered_experience.experience, recovered_experience.dive_in_phase)
+

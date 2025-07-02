@@ -207,4 +207,43 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
 
     # Include the experience router directly with the conversation router
     # The conversation router already has the prefix /conversations/{session_id}
+
+    @experience_router.post(path="/{experience_uuid}/restore", response_model=ExperienceResponse,
+                             responses={HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
+                                        HTTPStatus.NOT_FOUND: {"model": HTTPErrorResponse},
+                                        HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse}},
+                             description="""Endpoint for restoring deleted experiences.""")
+    async def _restore_experience(session_id: Annotated[
+        int, Path(description="The session id for the conversation history.", examples=[123])],
+                                   experience_uuid: Annotated[str, Path(description="The uuid of the experience to restore.")],
+                                   user_info: UserInfo = Depends(authentication.get_user_info()),
+                                   user_preferences_repository=Depends(get_user_preferences_repository),
+                                   service: IExperienceService = Depends(get_experience_service)) -> ExperienceResponse:
+        """
+        Endpoint for restoring deleted experiences.
+        """
+        user_id = user_info.user_id
+
+        session_id_ctx_var.set(session_id)
+        user_id_ctx_var.set(user_info.user_id)
+
+        try:
+            # check that the user making the request has the session_id in their user preferences
+            current_user_preferences = await user_preferences_repository.get_user_preference_by_user_id(user_id)
+            if current_user_preferences is None or session_id not in current_user_preferences.sessions:
+                raise UnauthorizedSessionAccessError(user_id, session_id)
+
+            return await service.restore_deleted_experience(user_id, session_id, experience_uuid)
+        except UnauthorizedSessionAccessError as e:
+            warning_msg = str(e)
+            logger.warning(warning_msg)
+            raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=NO_PERMISSION_FOR_SESSION)
+        except ExperienceNotFoundError as e:
+            warning_msg = str(e)
+            logger.warning(warning_msg)
+            raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=warning_msg)
+        except Exception as e:
+            logger.exception(e)
+            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=UNEXPECTED_FAILURE_MESSAGE)
+
     conversation_router.include_router(experience_router)
