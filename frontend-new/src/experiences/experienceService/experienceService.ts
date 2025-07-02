@@ -163,4 +163,36 @@ export default class ExperienceService {
       failureMessage: `Failed to delete experience with UUID ${experienceId}`,
     });
   }
+
+  async restoreDeletedExperience(sessionId: number, experienceId: string): Promise<Experience> {
+    const url = `${this.experiencesEndpointUrl}/${sessionId}/experiences/${experienceId}/restore`;
+    const errorFactory = getRestAPIErrorFactory(
+      "ExperienceService",
+      "restoreDeletedExperience",
+      "POST",
+      url
+    );
+    const response =await customFetch(url, {
+        method: "POST",
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: "ExperienceService",
+        serviceFunction: "restoreExperience",
+        failureMessage: `Failed to restore experience with UUID ${experienceId}`,
+      });
+
+    let restoredExperience: Experience;
+    try {
+      restoredExperience = JSON.parse(await response.text());
+    } catch (error: unknown) {
+      throw errorFactory(
+        response.status,
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+        "Response did not contain valid JSON",
+        {
+          error: error,
+        }
+      );
+    }
+    return restoredExperience;
+  }
 }
