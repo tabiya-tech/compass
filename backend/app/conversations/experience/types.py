@@ -38,6 +38,9 @@ class ExperienceResponse(BaseExperienceEntity):
     Response model for an experience.
     Inherits all fields from BaseExperienceEntity and adds exploration_phase and top_skills.
     """
+    # using a serialization alias to have consistency across the API for using uppercase UUIDs
+    # ideally this would change throughout the codebase to use uppercase UUIDs, but that would require migrating
+    # existing data.
     uuid: Annotated[str, Field(serialization_alias="UUID", description="Unique identifier for the experience.")]
     exploration_phase: Annotated[str, Field(
         description=f"The current sub-phase of the experience exploration. Allowed values: {[e.name for e in DiveInPhase]}",

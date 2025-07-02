@@ -74,7 +74,6 @@ class TestGetExperiencesBySessionId:
     @pytest.mark.asyncio
     async def test_success(self, mock_metrics_recorder):
         # GIVEN a user and session with an experience
-        user_id = get_random_user_id()
         session_id = get_random_session_id()
         exp_uuid = get_random_printable_string(8)
         skill = _make_skill_entity("skill1", "Skill One")
@@ -83,7 +82,7 @@ class TestGetExperiencesBySessionId:
         service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
 
         # WHEN get_experiences_by_session_id is called
-        result = await service.get_experiences_by_session_id(user_id, session_id)
+        result = await service.get_experiences_by_session_id(session_id)
 
         # THEN it returns the expected experience
         assert len(result) == 1
@@ -96,7 +95,6 @@ class TestGetExperiencesBySessionId:
     @pytest.mark.asyncio
     async def test_empty(self, mock_metrics_recorder):
         # GIVEN a user and session with no experiences
-        user_id = get_random_user_id()
         session_id = get_random_session_id()
         director_state = ExploreExperiencesAgentDirectorState(
             session_id=session_id,
@@ -110,7 +108,7 @@ class TestGetExperiencesBySessionId:
         service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
 
         # WHEN get_experiences_by_session_id is called
-        result = await service.get_experiences_by_session_id(user_id, session_id)
+        result = await service.get_experiences_by_session_id(session_id)
 
         # THEN it returns an empty list
         assert result == []
@@ -118,7 +116,6 @@ class TestGetExperiencesBySessionId:
     @pytest.mark.asyncio
     async def test_recorder_throws_error(self, mock_metrics_recorder):
         # GIVEN the metrics recorder will throw an error
-        user_id = get_random_user_id()
         session_id = get_random_session_id()
         given_error = Exception("Something went wrong")
         mock_metrics_recorder.get_state = AsyncMock(side_effect=given_error)
@@ -127,7 +124,7 @@ class TestGetExperiencesBySessionId:
         # WHEN get_experiences_by_session_id is called
         # THEN the error is propagated
         with pytest.raises(Exception) as error_info:
-            await service.get_experiences_by_session_id(user_id, session_id)
+            await service.get_experiences_by_session_id(session_id)
         assert error_info.value == given_error
 
 
@@ -305,6 +302,7 @@ class TestUpdateExperience:
             await service.update_experience(user_id, session_id, exp_uuid, update_payload)
         assert error_info.value == given_error
 
+
 class TestDeleteExperience:
     @pytest.mark.asyncio
     async def test_success(self, mock_metrics_recorder):
@@ -362,4 +360,127 @@ class TestDeleteExperience:
         # THEN the error is propagated
         with pytest.raises(Exception) as error_info:
             await service.delete_experience(user_id, session_id, exp_uuid)
+        assert error_info.value == given_error
+
+
+class TestGetOriginalExperienceByUuid:
+    @pytest.mark.asyncio
+    async def test_success(self, mock_metrics_recorder):
+        # GIVEN a user and session with an experience
+        session_id = get_random_session_id()
+        exp_uuid = get_random_printable_string(8)
+        skill = _make_skill_entity("skill1", "Skill One")
+        app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience", [skill])
+        mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
+        service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
+
+        # WHEN get_original_experience_by_uuid is called
+        result = await service.get_original_experience_by_uuid(session_id, exp_uuid)
+
+        # THEN it returns the expected experience
+        assert result.uuid == exp_uuid
+        assert result.experience_title == "Test Experience"
+        assert result.top_skills[0].UUID == "skill1"
+
+    @pytest.mark.asyncio
+    async def test_not_found(self, mock_metrics_recorder):
+        # GIVEN a user and session with NO matching experience
+        session_id = get_random_session_id()
+        exp_uuid = get_random_printable_string(8)
+        app_state = _make_state_with_experience(session_id, "other_uuid", "Other Experience")
+        mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
+        service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
+
+        # WHEN get_original_experience_by_uuid is called with a non-existent uuid
+        # THEN it raises ExperienceNotFoundError
+        with pytest.raises(ExperienceNotFoundError):
+            await service.get_original_experience_by_uuid(session_id, exp_uuid)
+
+    @pytest.mark.asyncio
+    async def test_recorder_get_state_throws_error(self, mock_metrics_recorder):
+        # GIVEN the metrics recorder will throw an error on get_state
+        session_id = get_random_session_id()
+        exp_uuid = get_random_printable_string(8)
+        given_error = Exception("Something went wrong")
+        mock_metrics_recorder.get_state = AsyncMock(side_effect=given_error)
+        service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
+
+        # WHEN get_original_experience_by_uuid is called
+        # THEN the error is propagated
+        with pytest.raises(Exception) as error_info:
+            await service.get_original_experience_by_uuid(session_id, exp_uuid)
+        assert error_info.value == given_error
+
+
+class TestGetAllOriginalExperiences:
+    @pytest.mark.asyncio
+    async def test_get_original_experiences(self, mock_metrics_recorder):
+        # GIVEN a user and session with multiple experiences
+        session_id = get_random_session_id()
+        exp_uuid1 = get_random_printable_string(8)
+        exp_uuid2 = get_random_printable_string(8)
+        skill1 = _make_skill_entity("skill1", "Skill One")
+        skill2 = _make_skill_entity("skill2", "Skill Two")
+        app_state = ApplicationState.new_state(session_id)
+        app_state.explore_experiences_director_state = ExploreExperiencesAgentDirectorState(
+            session_id=session_id,
+            experiences_state={
+                exp_uuid1: ExperienceState(dive_in_phase=DiveInPhase.PROCESSED, experience=_make_experience_entity(exp_uuid1, "Experience One", [skill1])),
+                exp_uuid2: ExperienceState(dive_in_phase=DiveInPhase.PROCESSED, experience=_make_experience_entity(exp_uuid2, "Experience Two", [skill2])),
+            },
+            explored_experiences=[
+                _make_experience_entity(exp_uuid1, "Experience One", [skill1]),
+                _make_experience_entity(exp_uuid2, "Experience Two", [skill2])
+            ],
+            current_experience_uuid=None,
+            country_of_user=Country.UNSPECIFIED
+        )
+        mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
+        service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
+
+        # WHEN get_original_experiences is called
+        result = await service.get_original_experiences(session_id)
+
+        # THEN it returns all experiences
+        assert len(result) == 2
+        assert result[0].uuid == exp_uuid1
+        assert result[0].experience_title == "Experience One"
+        assert result[0].top_skills[0].UUID == "skill1"
+        assert result[1].uuid == exp_uuid2
+        assert result[1].experience_title == "Experience Two"
+        assert result[1].top_skills[0].UUID == "skill2"
+
+    @pytest.mark.asyncio
+    async def test_get_original_experiences_empty(self, mock_metrics_recorder):
+        # GIVEN a user and session with no experiences
+        session_id = get_random_session_id()
+        app_state = ApplicationState.new_state(session_id)
+        app_state.explore_experiences_director_state = ExploreExperiencesAgentDirectorState(
+            session_id=session_id,
+            experiences_state={},
+            explored_experiences=[],
+            current_experience_uuid=None,
+            country_of_user=Country.UNSPECIFIED
+        )
+        mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
+        service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
+
+        # WHEN get_original_experiences is called
+        result = await service.get_original_experiences(session_id)
+
+        # THEN it returns an empty list
+        assert result == []
+
+    @pytest.mark.asyncio
+    async def test_get_original_experiences_recorder_throws_error(self, mock_metrics_recorder):
+        # GIVEN the metrics recorder will throw an error
+        session_id = get_random_session_id()
+        given_error = Exception("Something went wrong")
+        mock_metrics_recorder.get_state = AsyncMock(side_effect=given_error)
+        service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
+
+        # WHEN get_original_experiences is called
+        # THEN the error is propagated
+        with pytest.raises(Exception) as error_info:
+            await service.get_original_experiences(session_id)
         assert error_info.value == given_error

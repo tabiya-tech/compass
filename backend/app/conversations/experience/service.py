@@ -19,10 +19,9 @@ class ExperienceNotFoundError(Exception):
 
 class IExperienceService(ABC):
     @abstractmethod
-    async def get_experiences_by_session_id(self, user_id: str, session_id: int) -> list[ExperienceResponse]:
+    async def get_experiences_by_session_id(self, session_id: int) -> list[ExperienceResponse]:
         """
         Get all the experiences that have been discovered for this session so far
-        :param user_id: str - the id of the requesting user
         :param session_id: int - id for the conversation session
         :return: list[Experience] - an array containing a list of experience objects
         :raises Exception: if any error occurs
@@ -51,6 +50,27 @@ class IExperienceService(ABC):
         :param session_id: int - id for the conversation session
         :param experience_uuid: str - the uuid of the experience to delete
         :raises ExperienceNotFoundError: if the experience is not found
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_original_experience_by_uuid(self, session_id: int, experience_uuid: str) -> ExperienceResponse:
+        """
+        Get the original experience by UUID
+        :param session_id: int - id for the conversation session
+        :param experience_uuid: str - the uuid of the experience to retrieve
+        :return: ExperienceResponse - the original experience object
+        :raises ExperienceNotFoundError: if the experience is not found
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_original_experiences(self, session_id: int) -> list[ExperienceResponse]:
+        """
+        Get all original experiences for a given session.
+        :param session_id: int - id for the conversation session
+        :return: list[ExperienceResponse] - a list of original experience objects
+        :raises Exception: if any error occurs
         """
         raise NotImplementedError()
 
@@ -115,7 +135,7 @@ class ExperienceService(IExperienceService):
             exploration_phase=DiveInPhase.PROCESSED.name
         )
 
-    async def get_experiences_by_session_id(self, user_id: str, session_id: int) -> list[ExperienceResponse]:
+    async def get_experiences_by_session_id(self, session_id: int) -> list[ExperienceResponse]:
         # Get the experiences from the application state
         state = await self._application_state_metrics_recorder.get_state(session_id)
         director_state = state.explore_experiences_director_state
@@ -157,3 +177,27 @@ class ExperienceService(IExperienceService):
         director_state.explored_experiences.remove(experience_to_delete)
 
         await self._application_state_metrics_recorder.save_state(state, user_id)
+
+    async def get_original_experience_by_uuid(self, session_id: int, experience_uuid: str) -> ExperienceResponse:
+        state = await self._application_state_metrics_recorder.get_state(session_id)
+        director_state = state.explore_experiences_director_state
+
+        # Find the experience in the explored experiences
+        for exp_uuid, exp_state in director_state.experiences_state.items():
+            if exp_uuid == experience_uuid:
+                return ExperienceResponse.from_experience_entity(exp_state.experience, exp_state.dive_in_phase)
+
+        # If not found, raise an error
+        raise ExperienceNotFoundError(experience_uuid)
+
+    async def get_original_experiences(self, session_id: int) -> list[ExperienceResponse]:
+        state = await self._application_state_metrics_recorder.get_state(session_id)
+        director_state = state.explore_experiences_director_state
+
+        # Collect all original experiences
+        original_experiences: list[ExperienceResponse] = []
+
+        for exp_uuid, exp_state in director_state.experiences_state.items():
+            original_experiences.append(ExperienceResponse.from_experience_entity(exp_state.experience, exp_state.dive_in_phase))
+
+        return original_experiences
