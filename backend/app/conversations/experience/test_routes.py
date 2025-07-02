@@ -66,6 +66,9 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
         async def get_original_experiences(self, session_id: int):
             raise NotImplementedError
 
+        async def restore_deleted_experience(self, user_id: str, session_id: int, experience_uuid: str) -> ExperienceResponse:
+            raise NotImplementedError
+
     _instance_experience_service = MockExperienceService()
 
     def _mocked_experience_service() -> IExperienceService:
@@ -682,3 +685,84 @@ class TestExperienceRoutes:
             assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
             # AND the user preferences repository was called with the correct user_id
             get_user_preferences_spy.assert_called_once_with(mocked_user.user_id)
+
+    class RestoreDeletedExperience:
+        """
+        Tests for the Restore Deleted Experience Route
+        """
+
+        @pytest.mark.asyncio
+        async def test_restore_deleted_experience_successful(self, authenticated_client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+            client, mocked_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
+            # GIVEN a valid session id and experience uuid
+            given_session_id = get_random_session_id()
+            given_experience_uuid = "exp-uuid"
+            # AND the user owns the session
+            mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=get_mock_user_preferences(given_session_id))
+            preferences_spy = mocker.spy(mocked_preferences_repository, "get_user_preference_by_user_id")
+            # AND the service confirms restoration
+            mocked_service.restore_deleted_experience = AsyncMock(return_value=None)
+            service_spy = mocker.spy(mocked_service, "restore_deleted_experience")
+            # WHEN the POST request is made to restore the deleted experience
+            response = client.post(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/restore")
+            # THEN the response is NO CONTENT
+            assert response.status_code == HTTPStatus.NO_CONTENT
+            # AND the user preferences repository was called with the correct user_id
+            preferences_spy.assert_called_once_with(mocked_user.user_id)
+            # AND the experience service was called with the correct arguments
+            service_spy.assert_called_once_with(
+                mocked_user.user_id,
+                given_session_id,
+                given_experience_uuid
+            )
+
+        @pytest.mark.asyncio
+        async def test_restore_deleted_experience_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks):
+            client, _, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
+            # GIVEN a valid session id and experience uuid
+            given_session_id = get_random_session_id()
+            given_experience_uuid = "exp-uuid"
+            # AND the user does NOT own the session
+            mock_user_preferences = get_mock_user_preferences(given_session_id)
+            mock_user_preferences.sessions = [given_session_id - 1]  # not the session"""
+            mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=mock_user_preferences)
+            # WHEN the POST request is made to restore the deleted experience
+            response = client.post(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/restore")
+            # THEN the response is FORBIDDEN
+            assert response.status_code == HTTPStatus.FORBIDDEN
+            # AND the user preferences repository was called with the correct user_id
+            mocked_preferences_repository.get_user_preference_by_user_id.assert_called_once_with(mocked_user.user_id)
+
+        @pytest.mark.asyncio
+        async def test_restore_deleted_experience_not_found(self, authenticated_client_with_mocks: TestClientWithMocks):
+            client, mocked_service, mocked_preferences_repository, _ = authenticated_client_with_mocks
+            # GIVEN a valid session id and experience uuid
+            given_session_id = get_random_session_id()
+            given_experience_uuid = "exp-uuid"
+            # AND the user owns the session
+            mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=get_mock_user_preferences(given_session_id))
+            # AND the service raises ExperienceNotFoundError
+            from app.conversations.experience.service import ExperienceNotFoundError
+            mocked_service.restore_deleted_experience = AsyncMock(side_effect=ExperienceNotFoundError(given_experience_uuid))
+            # WHEN the POST request is made to restore the deleted experience
+            response = client.post(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/restore")
+            # THEN the response is NOT_FOUND
+            assert response.status_code == HTTPStatus.NOT_FOUND
+            # AND the error message contains the experience uuid
+            assert response.json() == {"detail": f"Experience with uuid {given_experience_uuid} not found"}
+
+        @pytest.mark.asyncio
+        async def test_restore_deleted_experience_internal_server_error(self, authenticated_client_with_mocks: TestClientWithMocks):
+            client, mocked_service, mocked_preferences_repository, _ = authenticated_client_with_mocks
+            # GIVEN a valid session id and experience uuid
+            given_session_id = get_random_session_id()
+            given_experience_uuid = "exp-uuid"
+            # AND the user owns the session
+            mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=get_mock_user_preferences(given_session_id))
+            # AND the service raises a generic error
+            mocked_service.restore_deleted_experience = AsyncMock(side_effect=Exception("Unexpected error"))
+            # WHEN the POST request is made to restore the deleted experience
+            response = client.post(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/restore")
+            # THEN the response is INTERNAL_SERVER_ERROR
+            assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+

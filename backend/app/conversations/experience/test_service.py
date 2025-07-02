@@ -484,3 +484,103 @@ class TestGetAllOriginalExperiences:
         with pytest.raises(Exception) as error_info:
             await service.get_original_experiences(session_id)
         assert error_info.value == given_error
+
+
+class TestRestoreDeletedExperience:
+    @pytest.mark.asyncio
+    async def test_restore_deleted_experience(self, mock_metrics_recorder):
+        # GIVEN a user and session with an experience that was deleted
+        user_id = get_random_user_id()
+        session_id = get_random_session_id()
+        exp_uuid = get_random_printable_string(8)
+        app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience")
+        app_state.explore_experiences_director_state.explored_experiences = [] # Simulate deleted experience
+        mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
+        mock_metrics_recorder.save_state = AsyncMock()
+        service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
+
+        # WHEN restore_deleted_experience is called
+        await service.restore_deleted_experience(user_id, session_id, exp_uuid)
+
+        # THEN the experience is restored to the explored experiences
+        restored_experience = app_state.explore_experiences_director_state.experiences_state[exp_uuid].experience
+        assert restored_experience.uuid == exp_uuid
+        assert restored_experience.experience_title == "Test Experience"
+
+        # AND save_state was called to persist changes
+        mock_metrics_recorder.save_state.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_restore_not_deleted_experience(self, mock_metrics_recorder):
+        # GIVEN a user and session with an experience that was not deleted
+        user_id = get_random_user_id()
+        session_id = get_random_session_id()
+        exp_uuid = get_random_printable_string(8)
+        app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience") # app state will have the experience in explored experiences
+        mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
+        mock_metrics_recorder.save_state = AsyncMock()
+        service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
+
+        # WHEN restore_deleted_experience is called
+        # THEN it raises ExperienceNotFoundError
+        with pytest.raises(ExperienceNotFoundError):
+            await service.restore_deleted_experience(user_id, session_id, exp_uuid)
+
+        # AND save_state was not called
+        mock_metrics_recorder.save_state.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_restore_not_found(self, mock_metrics_recorder):
+        # GIVEN a user and session with NO matching experience in deleted state
+        user_id = get_random_user_id()
+        session_id = get_random_session_id()
+        exp_uuid = get_random_printable_string(8)
+        app_state = _make_state_with_experience(session_id, "other_uuid", "Other Experience")
+        mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
+        mock_metrics_recorder.save_state = AsyncMock()
+        service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
+
+        # WHEN restore_deleted_experience is called with a non-existent uuid
+        # THEN it raises ExperienceNotFoundError
+        with pytest.raises(ExperienceNotFoundError):
+            await service.restore_deleted_experience(user_id, session_id, exp_uuid)
+
+        # AND save_state was not called
+        mock_metrics_recorder.save_state.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_recorder_get_state_throws_error(self, mock_metrics_recorder):
+        # GIVEN the metrics recorder will throw an error on get_state
+        user_id = get_random_user_id()
+        session_id = get_random_session_id()
+        exp_uuid = get_random_printable_string(8)
+        given_error = Exception("Something went wrong")
+        mock_metrics_recorder.get_state = AsyncMock(side_effect=given_error)
+        service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
+        # WHEN restore_deleted_experience is called
+        # THEN the error is propagated
+        with pytest.raises(Exception) as error_info:
+            await service.restore_deleted_experience(user_id, session_id, exp_uuid)
+        assert error_info.value == given_error
+
+    @pytest.mark.asyncio
+    async def test_recorder_save_state_throws_error(self, mock_metrics_recorder):
+        # GIVEN a user and session with an experience that was not deleted
+        user_id = get_random_user_id()
+        session_id = get_random_session_id()
+        exp_uuid = get_random_printable_string(8)
+        app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience")
+        app_state.explore_experiences_director_state.explored_experiences = []  # Simulate deleted experience
+        mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
+        mock_metrics_recorder.save_state = AsyncMock()
+
+        # AND save state will throw an error
+        given_error = Exception("Something went wrong saving")
+        mock_metrics_recorder.save_state = AsyncMock(side_effect=given_error)
+        service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
+
+        # WHEN restore_deleted_experience is called
+        # THEN the error is propagated
+        with pytest.raises(Exception) as error_info:
+            await service.restore_deleted_experience(user_id, session_id, exp_uuid)
+        assert error_info.value == given_error
