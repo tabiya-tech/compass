@@ -44,6 +44,7 @@ class IExperienceService(ABC):
         raise NotImplementedError()
 
 
+
 class ExperienceService(IExperienceService):
     def __init__(self, *,
                  application_state_metrics_recorder: IApplicationStateMetricsRecorder):
@@ -112,19 +113,15 @@ class ExperienceService(IExperienceService):
         # experiences to return to the user.
         experiences: list[ExperienceResponse] = []
 
-        # Cache for UUIDs of explored experiences so that they don't be duplicated
-        explored_uuids: set[str] = set()
-
         # 1. First, get the explored experiences from the `director_state`
         for experience_details in director_state.explored_experiences:
-            explored_uuids.add(experience_details.uuid)
             experiences.append(ExperienceResponse.from_experience_entity(experience_details, DiveInPhase.PROCESSED))
 
         # 2. Then, get the experiences that are in the `experiences_state` but not yet explored.
         #    Append them to the experiences to return to the user.
         for uuid, exp_state in director_state.experiences_state.items():
-            if uuid in explored_uuids:
-                continue  # Skip ones we already added
+            if exp_state.dive_in_phase == DiveInPhase.PROCESSED:
+                continue  # Skip ones we already explored
 
             experiences.append(ExperienceResponse.from_experience_entity(exp_state.experience, exp_state.dive_in_phase))
 
