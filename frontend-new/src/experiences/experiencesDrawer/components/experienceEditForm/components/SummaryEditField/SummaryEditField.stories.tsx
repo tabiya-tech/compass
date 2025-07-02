@@ -1,25 +1,14 @@
-import { Meta } from "@storybook/react/*";
-import ExperienceEditForm from "./ExperienceEditForm";
-import { generateRandomExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
-import {
-  EXPERIENCE_TITLE_MAX_LENGTH,
-  COMPANY_MAX_LENGTH,
-  LOCATION_MAX_LENGTH,
-  SUMMARY_MAX_LENGTH,
-  TIMELINE_MAX_LENGTH,
-} from "src/experiences/experienceService/experiences.types";
+import type { Meta, StoryObj } from "@storybook/react";
+import { action } from "@storybook/addon-actions";
+
+import SummaryEditField from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import ExperienceService from "src/experiences/experienceService/experienceService";
 
-const meta: Meta<typeof ExperienceEditForm> = {
-  title: "Experiences/ExperienceEditForm",
-  component: ExperienceEditForm,
+const meta: Meta<typeof SummaryEditField> = {
+  title: "Experiences/ExperienceEditForm/SummaryEditField",
+  component: SummaryEditField,
   tags: ["autodocs"],
-  argTypes: {
-    notifyOnSave: { action: "saved" },
-    notifyOnCancel: { action: "cancel" },
-    notifyOnUnsavedChange: { action: "unsavedChangesChanged" },
-  },
   decorators: [
     (Story) => {
       // Mock AuthenticationStateService
@@ -47,32 +36,49 @@ const meta: Meta<typeof ExperienceEditForm> = {
       // @ts-ignore
       ExperienceService.getInstance().updateExperience = mockExperienceService.updateExperience;
 
-      return <Story/>
-    }]
+      return (<div style={{ width: "40%", padding: "20px" }}>
+        <Story />
+      </div>);
+    },
+  ],
 };
 
 export default meta;
-
-type Story = Meta<typeof ExperienceEditForm>;
+type Story = StoryObj<typeof SummaryEditField>;
 
 export const Shown: Story = {
   args: {
-    experience: generateRandomExperiences(2)[0],
+    summary: "This is a summary of the experience.",
+    notifyOnChange: action("notifyOnChange"),
   },
 };
 
-export const FieldOverflowError: Story = {
+export const ShownWithLongText: Story = {
   args: {
-    experience: {
-      ...generateRandomExperiences(1)[0],
-      experience_title: "x".repeat(EXPERIENCE_TITLE_MAX_LENGTH + 5),
-      company: "y".repeat(COMPANY_MAX_LENGTH + 5),
-      location: "z".repeat(LOCATION_MAX_LENGTH + 5),
-      summary: "s".repeat(SUMMARY_MAX_LENGTH + 5),
-      timeline: {
-        start: "s".repeat(TIMELINE_MAX_LENGTH + 5),
-        end: "e".repeat(TIMELINE_MAX_LENGTH + 5),
-      },
-    },
+    summary: "This is a summary of the experience. ".repeat(15),
+    notifyOnChange: action("notifyOnChange"),
   },
 };
+
+
+export const Empty: Story = {
+  args: {
+    summary: "",
+    notifyOnChange: action("notifyOnChange"),
+  },
+};
+
+export const Error: Story = {
+  args: {
+    summary: "This is a summary of the experience.",
+    notifyOnChange: action("notifyOnChange"),
+    error: "An error has occurred",
+  },
+}
+
+export const Disabled: Story = {
+  args: {
+    summary: "This is a summary of the experience.",
+    notifyOnChange: action("notifyOnChange"),
+  },
+}

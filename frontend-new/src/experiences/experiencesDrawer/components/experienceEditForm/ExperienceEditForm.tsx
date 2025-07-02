@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Box, Chip, styled, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { Box, Chip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import {
   Experience,
@@ -28,6 +28,9 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import ExperienceService from "src/experiences/experienceService/experienceService";
 import { debounce } from "src/utils/debounce";
 import { getWorkTypeDescription, getWorkTypeIcon, getWorkTypeTitle } from "src/experiences/experiencesDrawer/util";
+import InlineEditField from "src/theme/InlineEditField/InlineEditField";
+import SummaryEditField from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
+import { ExperienceError } from "src/error/commonErrors";
 
 const uniqueId = "0ddc6b92-eca6-472b-8e5f-fdce9abfec3b";
 
@@ -43,7 +46,6 @@ export const DATA_TEST_ID = {
   FORM_COMPANY_ERROR: `experience-edit-form-company-error-${uniqueId}`,
   FORM_LOCATION: `experience-edit-form-location-${uniqueId}`,
   FORM_LOCATION_ERROR: `experience-edit-form-location-error-${uniqueId}`,
-  FORM_SUMMARY: `experience-edit-form-summary-${uniqueId}`,
   FORM_SUMMARY_ERROR: `experience-edit-form-summary-error-${uniqueId}`,
   FORM_SKILLS_CONTAINER: `experience-edit-form-skills-container-${uniqueId}`,
   FORM_WORK_TYPE: `experience-edit-form-work-type-title-${uniqueId}`,
@@ -61,25 +63,6 @@ interface ExperienceEditFormProps {
   notifyOnUnsavedChange?: (hasChanges: boolean) => void;
 }
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": {
-      border: "none",
-    },
-    padding: 0,
-  },
-  "& .MuiInputBase-input": {
-    padding: 0,
-    paddingLeft: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-    fontSize: theme.typography.body2.fontSize,
-    color: theme.palette.text.secondary,
-    background: "transparent !important",
-  },
-  width: "100%",
-  backgroundColor: theme.palette.grey[100],
-  borderRadius: theme.fixedSpacing(theme.tabiyaRounding.sm),
-  padding: theme.fixedSpacing(theme.tabiyaSpacing.xs),
-}));
 // Debounce delay for error checking (ms)
 export const DEBOUNCE_ERROR_DELAY_MS = 20;
 
@@ -163,7 +146,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   }, [hasChanges, notifyOnUnsavedChange]);
 
   const handleInputChange =
-    (field: keyof Experience, maxLength?: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    useCallback((event:React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, field: keyof Experience, maxLength?: number)=> {
       let value = event.target.value;
       setEditedExperience((prev) => ({
         ...prev,
@@ -173,9 +156,9 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
         debouncedUpdateFieldError(field, value, maxLength);
       }
       notifyOnUnsavedChange?.(true);
-    };
+    }, [debouncedUpdateFieldError, notifyOnUnsavedChange]);
 
-  const handleTimelineChange = (field: keyof Timeline) => (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTimelineChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, field: keyof Timeline) => {
     setEditedExperience((prev) => ({
       ...prev,
       timeline: {
@@ -249,14 +232,11 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
 
   const handleSave = async () => {
     setIsSubmitting(true);
+    const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
+    if (!sessionId) {
+      throw new Error("User has no sessions");
+    }
     try {
-      const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
-      if (!userPreferences?.sessions.length) {
-        throw new Error("User has no sessions");
-      }
-
-      const sessionId = userPreferences.sessions[0];
-
       const updatedFields: UpdateExperienceRequest = Object.fromEntries(
         Object.entries(editedExperience).filter(([key, value]) => value !== undefined && key !== "top_skills")
       ) as UpdateExperienceRequest;
@@ -278,7 +258,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
       notifyOnSave(result);
       enqueueSnackbar("Experience updated successfully!", { variant: "success" });
     } catch (error) {
-      console.error("Failed to update experience:", error);
+      console.error(new ExperienceError("Failed to update experience:", error));
       enqueueSnackbar("Failed to update experience. Please try again later.", { variant: "error" });
     } finally {
       setIsSubmitting(false);
@@ -394,10 +374,10 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             />
           </Box>
           <Box display="flex" flexDirection="column" alignItems="flex-start">
-            <StyledTextField
+            <InlineEditField
               placeholder="Experience title"
               value={displayExperience.experience_title}
-              onChange={handleInputChange("experience_title", EXPERIENCE_TITLE_MAX_LENGTH)}
+              onChange={(event) => handleInputChange(event, "experience_title", EXPERIENCE_TITLE_MAX_LENGTH)}
               autoFocus
               data-testid={DATA_TEST_ID.FORM_EXPERIENCE_TITLE}
               sx={{
@@ -425,10 +405,10 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
           </Box>
           <Box display="flex" justifyContent="space-between" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
             <Box flexGrow={1}>
-              <StyledTextField
+              <InlineEditField
                 placeholder="Start date"
                 value={displayExperience.timeline.start}
-                onChange={handleTimelineChange("start")}
+                onChange={(event) => handleTimelineChange(event, "start")}
                 data-testid={DATA_TEST_ID.FORM_START_DATE}
                 error={!!fieldErrors.timeline_start}
               />
@@ -443,10 +423,10 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
               )}
             </Box>
             <Box flexGrow={1}>
-              <StyledTextField
+              <InlineEditField
                 placeholder="End date"
                 value={displayExperience.timeline.end}
-                onChange={handleTimelineChange("end")}
+                onChange={(event) => handleTimelineChange(event,"end")}
                 data-testid={DATA_TEST_ID.FORM_END_DATE}
                 error={!!fieldErrors.timeline_end}
               />
@@ -463,10 +443,10 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
           </Box>
           <Box display="flex" justifyContent="space-between" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
             <Box width="100%">
-              <StyledTextField
+              <InlineEditField
                 placeholder="Company"
                 value={displayExperience.company}
-                onChange={handleInputChange("company", COMPANY_MAX_LENGTH)}
+                onChange={(event) => handleInputChange(event,"company", COMPANY_MAX_LENGTH)}
                 data-testid={DATA_TEST_ID.FORM_COMPANY}
                 error={!!fieldErrors.company}
               />
@@ -481,10 +461,10 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
               )}
             </Box>
             <Box width="100%">
-              <StyledTextField
+              <InlineEditField
                 placeholder="Location"
                 value={displayExperience.location}
-                onChange={handleInputChange("location", LOCATION_MAX_LENGTH)}
+                onChange={(event) => handleInputChange(event, "location", LOCATION_MAX_LENGTH)}
                 data-testid={DATA_TEST_ID.FORM_LOCATION}
                 error={!!fieldErrors.location}
               />
@@ -499,27 +479,12 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
               )}
             </Box>
           </Box>
-          <Box width="100%">
-            <StyledTextField
-              placeholder="Experience summary"
-              value={displayExperience.summary ?? ""}
-              onChange={handleInputChange("summary", SUMMARY_MAX_LENGTH)}
-              multiline
-              minRows={4}
-              sx={{ paddingY: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}
-              data-testid={DATA_TEST_ID.FORM_SUMMARY}
-              error={!!fieldErrors.summary}
-            />
-            {fieldErrors.summary && (
-              <Typography
-                variant="caption"
-                sx={{ color: theme.palette.error.main, width: "100%", textAlign: "end" }}
-                data-testid={DATA_TEST_ID.FORM_SUMMARY_ERROR}
-              >
-                {fieldErrors.summary}
-              </Typography>
-            )}
-          </Box>
+          <SummaryEditField
+            notifyOnChange={(event) => handleInputChange(event,"summary", SUMMARY_MAX_LENGTH)}
+            summary={displayExperience.summary ?? ""}
+            error={fieldErrors.summary}
+            experience_uuid={displayExperience.UUID}
+          />
           <Box display="flex" alignItems="center">
             <Typography variant="body1" sx={{ wordBreak: "break-all" }}>
               <b>Top Skills</b>

@@ -1,7 +1,9 @@
 import { Meta } from "@storybook/react";
 import ExperiencesDrawer from "src/experiences/experiencesDrawer/ExperiencesDrawer";
 import { generateRandomExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
-import { DiveInPhase } from "../experienceService/experiences.types";
+import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import ExperienceService from "src/experiences/experienceService/experienceService";
 
 const meta: Meta<typeof ExperiencesDrawer> = {
   title: "Experiences/ExperiencesDrawer",
@@ -10,6 +12,35 @@ const meta: Meta<typeof ExperiencesDrawer> = {
   argTypes: {
     notifyOnClose: { action: "notifyOnClose" },
   },
+  decorators: [
+    (Story) => {
+      // Mock AuthenticationStateService
+      const mockUserPreferencesStateService = UserPreferencesStateService.getInstance();
+      mockUserPreferencesStateService.getActiveSessionId = () => 1234;
+
+      const mockExperienceService = {
+        getOriginalExperience: () => ({
+          uuid: "1234",
+          summary: "This is the original summary of the experience.".repeat(15),
+        }),
+        updateExperience: (sessionId: number, experience_uuid: string, data: {summary: string}) => {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              resolve({
+                ...data,
+                uuid: experience_uuid,
+              });
+            }, 1000);
+          });
+        },
+      };
+      // @ts-ignore
+      ExperienceService.getInstance().getOriginalExperience = mockExperienceService.getOriginalExperience;
+      // @ts-ignore
+      ExperienceService.getInstance().updateExperience = mockExperienceService.updateExperience;
+
+      return <Story/>
+    }]
 };
 
 export default meta;

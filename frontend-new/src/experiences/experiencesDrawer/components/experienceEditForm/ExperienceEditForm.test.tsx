@@ -9,14 +9,14 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { WorkType } from "src/experiences/experienceService/experiences.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { DATA_TEST_ID as SUMMARY_EDIT_FIELD_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
+import { ExperienceError } from "src/error/commonErrors";
 import ExperienceService from "src/experiences/experienceService/experienceService";
 
 // mock the user preferences state service
 jest.mock("src/userPreferences/UserPreferencesStateService", () => ({
   getInstance: jest.fn().mockReturnValue({
-    getUserPreferences: jest.fn().mockReturnValue({
-      sessions: [1234],
-    }),
+    getActiveSessionId: jest.fn().mockReturnValue(1234),
   }),
 }));
 
@@ -49,6 +49,22 @@ jest.mock("src/theme/ContextMenu/ContextMenu", () => {
       </div>
     )),
     DATA_TEST_ID: actual.DATA_TEST_ID,
+  };
+});
+
+// mock the summary edit field
+jest.mock("./components/SummaryEditField/SummaryEditField", () => {
+  const actual = jest.requireActual("./components/SummaryEditField/SummaryEditField");
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn(({ value, onChange }) => (
+      <textarea
+        data-testid={actual.DATA_TEST_ID.FORM_SUMMARY}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    )),
   };
 });
 
@@ -90,8 +106,8 @@ describe("ExperienceEditForm", () => {
     expect(screen.getByTestId(DATA_TEST_ID.FORM_COMPANY)).toBeInTheDocument();
     // AND the location textfield to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.FORM_LOCATION)).toBeInTheDocument();
-    // AND the summary textfield to be in the document
-    expect(screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY)).toBeInTheDocument();
+    // AND the summary edit field to be in the document
+    expect(screen.getByTestId(SUMMARY_EDIT_FIELD_DATA_TEST_ID.FORM_SUMMARY)).toBeInTheDocument();
     // AND the top skills textfield to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.FORM_SKILLS_CONTAINER)).toBeInTheDocument();
     // AND the top skills chips to be in the document
@@ -538,6 +554,6 @@ describe("ExperienceEditForm", () => {
       variant: "error",
     });
     // AND the error should be logged to console
-    expect(console.error).toHaveBeenCalledWith("Failed to update experience:", givenError);
+    expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to update experience:", givenError));
   });
 });

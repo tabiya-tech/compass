@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render tests should render correctly 1`] = `
+<input
+  aria-invalid="false"
+  class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+  id=":r0:"
+  placeholder="foo bar"
+  type="text"
+  value=""
+/>
+`;
