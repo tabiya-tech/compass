@@ -24,6 +24,8 @@ import ExperienceService from "src/experiences/experienceService/experienceServi
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
+import CustomLink from "src/theme/CustomLink/CustomLink";
+import RestoreExperiencesDrawer from "src/experiences/experiencesDrawer/components/restoreExperiencesDrawer/RestoreExperiencesDrawer";
 import { ExperienceError } from "src/error/commonErrors";
 
 const LazyLoadedDownloadDropdown = lazyWithPreload(
@@ -54,6 +56,11 @@ export const DATA_TEST_ID = {
   UNSAVED_CHANGES_DIALOG: `unsaved-changes-dialog-${uniqueId}`,
   DELETE_EXPERIENCE_DIALOG: `delete-experience-dialog-${uniqueId}`,
   RESTORE_TO_ORIGINAL_CONFIRM_DIALOG: `restore-to-original-confirm-dialog-${uniqueId}`,
+  RESTORE_DELETED_EXPERIENCES_LINK: `restore-deleted-experiences-link-${uniqueId}`,
+  RESTORE_EXPERIENCES_TITLE: `restore-experiences-title-${uniqueId}`,
+  RESTORE_EXPERIENCES_GO_BACK_BUTTON: `restore-experiences-go-back-button-${uniqueId}`,
+  RESTORE_EXPERIENCES_EMPTY_MESSAGE: `restore-experiences-empty-message-${uniqueId}`,
+  PERSONAL_INFORMATION_TITLE: `personal-information-title-${uniqueId}`,
 };
 
 const useLocalStorage = (key: string, initialValue: Record<string, string>) => {
@@ -102,6 +109,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
   const [experienceToDelete, setExperienceToDelete] = useState<Experience | null>(null);
   const [isDeletingExperience, setIsDeletingExperience] = React.useState(false);
+  const [showRestoreDrawer, setShowRestoreDrawer] = useState(false);
   const [isRestoringExperience, setIsRestoringExperience] = useState(false);
   const [showRestoreToOriginalConfirmDialog, setShowRestoreToOriginalConfirmDialog] = React.useState(false);
   const [experienceToRestoreToOriginal, setExperienceToRestoreToOriginal] = React.useState<Experience | null>(null);
@@ -244,6 +252,34 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     setExperienceToRestoreToOriginal(null);
   };
 
+  const handleRestoreExperience = async (experience: Experience) => {
+    setIsRestoringExperience(true);
+    const userPreferencesStateService = UserPreferencesStateService.getInstance();
+    const experienceService = ExperienceService.getInstance();
+    const userPreferences = userPreferencesStateService.getUserPreferences();
+    if (!userPreferences?.sessions.length) {
+      enqueueSnackbar("User has no sessions", { variant: "error" });
+      setIsRestoringExperience(false);
+      return;
+    }
+    const sessionId = userPreferencesStateService.getActiveSessionId();
+    if (!sessionId) {
+      enqueueSnackbar("No active session found", { variant: "error" });
+      setIsRestoringExperience(false);
+      return;
+    }
+    try {
+      await experienceService.restoreDeletedExperience(sessionId, experience.UUID);
+      enqueueSnackbar("Experience restored successfully!", { variant: "success" });
+      await onExperiencesUpdated();
+    } catch (error) {
+      console.error(new ExperienceError("Failed to restore experience:", error));
+      enqueueSnackbar("Failed to restore experience.", { variant: "error" });
+    } finally {
+      setIsRestoringExperience(false);
+    }
+  };
+
   // Experiences with top skills
   const experiencesWithTopSkills = useMemo(
     () => experiences.filter((experience) => experience.top_skills && experience.top_skills.length > 0),
@@ -255,6 +291,168 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
 
   const tooltipText =
     "The fields are prefilled with information you may have provided earlier and are stored securely on your device. Fill in missing details to personalize your CV.";
+
+  const renderDrawerContent = () => {
+    if (showRestoreDrawer) {
+      return (<RestoreExperiencesDrawer
+        isOpen={showRestoreDrawer}
+        onClose={() => setShowRestoreDrawer(false)}
+        onRestore={handleRestoreExperience}
+        sessionId={UserPreferencesStateService.getInstance().getActiveSessionId() || 0}
+        onExperiencesRestored={onExperiencesUpdated}
+        currentExperiences={experiences}
+      />)
+    }
+    else if (editingExperience) {
+      return (
+        <Slide direction="left" in={true} appear={true}>
+          <Box>
+            <ExperienceEditForm
+              experience={editingExperience}
+              notifyOnSave={handleExperienceSaved}
+              notifyOnCancel={handleClose}
+              notifyOnUnsavedChange={setHasUnsavedChanges}
+            />
+          </Box>
+        </Slide>
+      );
+    } else {
+      // Main drawer content
+      return (
+        <Box
+          display="flex"
+          flexDirection="column"
+          padding={isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : theme.tabiyaSpacing.xl}
+          gap={theme.fixedSpacing(isSmallMobile ? theme.tabiyaSpacing.lg : theme.tabiyaSpacing.xl)}
+          sx={{ minHeight: "100%" }}
+        >
+          <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
+            <ExperiencesDrawerHeader notifyOnClose={handleClose} title={"Experiences and Skills"} />
+            <Box display="flex" flexDirection="column" alignItems="end" justifyContent="flex-end">
+              <Suspense
+                fallback={
+                  <Skeleton variant="rectangular" height={40} width={theme.spacing(20)} sx={{ borderRadius: 1 }} />
+                }
+              >
+                <LazyLoadedDownloadDropdown
+                  name={personalInfo.fullName}
+                  email={personalInfo.contactEmail}
+                  phone={personalInfo.phoneNumber}
+                  address={personalInfo.address}
+                  experiences={experiencesWithTopSkills}
+                  conversationConductedAt={conversationConductedAt}
+                  disabled={!hasTopSkills}
+                />
+              </Suspense>
+            </Box>
+          </Box>
+          <Box display="flex" flexDirection="column" gap={2}>
+            <CustomAccordion title="Personal Information" tooltipText={tooltipText}>
+              <Typography variant="h6" data-testid={DATA_TEST_ID.PERSONAL_INFORMATION_TITLE} sx={{ display: 'none' }}>Personal Information</Typography>
+              <CustomTextField
+                label="Name:"
+                placeholder="Enter your name here"
+                value={personalInfo.fullName}
+                onChange={handleInputChange("fullName")}
+              />
+              <CustomTextField
+                label="Email:"
+                placeholder="Enter your email here"
+                value={personalInfo.contactEmail}
+                onChange={handleInputChange("contactEmail")}
+              />
+              <CustomTextField
+                label="Phone:"
+                placeholder="Enter your phone number here"
+                value={personalInfo.phoneNumber}
+                onChange={handleInputChange("phoneNumber")}
+              />
+              <CustomTextField
+                label="Address:"
+                placeholder="Enter your address here"
+                value={personalInfo.address}
+                onChange={handleInputChange("address")}
+              />
+            </CustomAccordion>
+            <Divider
+              color="primary"
+              sx={{ height: "0.2rem", marginY: isSmallMobile ? 8 : 2, marginRight: 1 }}
+              data-testid={DATA_TEST_ID.EXPERIENCES_DIVIDER}
+            />
+            <Box display="flex" flexDirection="column" gap={isSmallMobile ? 10 : 6}>
+              {/* LOADING STATE */}
+              {isLoading && (
+                <Box data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_LOADER}>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <LoadingExperienceDrawerContent key={index} />
+                  ))}
+                </Box>
+              )}
+
+              {/* EMPTY STATE */}
+              {experiences.length === 0 && !isLoading && (
+                <Box sx={{ fontSize: theme.typography.body1.fontSize, fontWeight: "bold" }}>
+                  <Typography variant="h1" textAlign={"center"}>
+                    🤷‍♀️
+                  </Typography>
+                  <Typography>We haven't yet discovered any experiences so far, Let's continue chatting.</Typography>
+                </Box>
+              )}
+
+              {/* EXPERIENCES */}
+              {!isLoading && (
+                <Box display="flex" flexDirection="column" gap={isSmallMobile ? 10 : 6}>
+                  <ExperienceCategory
+                    icon={<StoreIcon />}
+                    title={ReportContent.SELF_EMPLOYMENT_TITLE}
+                    experiences={groupedExperiences.selfEmploymentExperiences}
+                    onEditExperience={handleEditExperience}
+                    onDeleteExperience={handleDeleteExperience}
+                  onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}/>
+                  <ExperienceCategory
+                    icon={<WorkIcon />}
+                    title={ReportContent.SALARY_WORK_TITLE}
+                    experiences={groupedExperiences.salaryWorkExperiences}
+                    onEditExperience={handleEditExperience}
+                    onDeleteExperience={handleDeleteExperience}
+                  onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}/>
+                  <ExperienceCategory
+                    icon={<VolunteerActivismIcon />}
+                    title={ReportContent.UNPAID_WORK_TITLE}
+                    experiences={groupedExperiences.unpaidWorkExperiences}
+                    onEditExperience={handleEditExperience}
+                    onDeleteExperience={handleDeleteExperience}
+                  onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}/>
+                  <ExperienceCategory
+                    icon={<SchoolIcon />}
+                    title={ReportContent.TRAINEE_WORK_TITLE}
+                    experiences={groupedExperiences.traineeWorkExperiences}
+                    onEditExperience={handleEditExperience}
+                    onDeleteExperience={handleDeleteExperience}
+                  onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}/>
+                  <ExperienceCategory
+                    icon={<QuizIcon />}
+                    title={ReportContent.UNCATEGORIZED_TITLE}
+                    experiences={groupedExperiences.uncategorizedExperiences}
+                    tooltipText="Based on the conversation, these experiences couldn't be automatically categorized."
+                    onEditExperience={handleEditExperience}
+                    onDeleteExperience={handleDeleteExperience}
+                    onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
+                  />
+                </Box>
+              )}
+            </Box>
+          </Box>
+          <Box sx={{ marginTop: "auto", padding: isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : 0, alignSelf: "center" }}>
+            <CustomLink onClick={() => setShowRestoreDrawer(true)} disableWhenOffline={true} data-testid={DATA_TEST_ID.RESTORE_DELETED_EXPERIENCES_LINK}>
+              Restore deleted experiences
+            </CustomLink>
+          </Box>
+        </Box>
+      );
+    }
+  };
+
   return (
     <>
       <Drawer
@@ -268,146 +466,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         }}
         data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTAINER}
       >
-        {editingExperience ? (
-          <Slide direction="left" in={true} appear={true}>
-            <Box>
-              <ExperienceEditForm
-                experience={editingExperience}
-                notifyOnSave={handleExperienceSaved}
-                notifyOnCancel={handleClose}
-                notifyOnUnsavedChange={setHasUnsavedChanges}
-              />
-            </Box>
-          </Slide>
-        ) : (
-          <Box
-            display="flex"
-            flexDirection="column"
-            padding={isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : theme.tabiyaSpacing.xl}
-            gap={theme.fixedSpacing(isSmallMobile ? theme.tabiyaSpacing.lg : theme.tabiyaSpacing.xl)}
-          >
-            <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-              <ExperiencesDrawerHeader notifyOnClose={handleClose} />
-              <Box display="flex" flexDirection="column" alignItems="end" justifyContent="flex-end">
-                <Suspense
-                  fallback={
-                    <Skeleton variant="rectangular" height={40} width={theme.spacing(20)} sx={{ borderRadius: 1 }} />
-                  }
-                >
-                  <LazyLoadedDownloadDropdown
-                    name={personalInfo.fullName}
-                    email={personalInfo.contactEmail}
-                    phone={personalInfo.phoneNumber}
-                    address={personalInfo.address}
-                    experiences={experiencesWithTopSkills}
-                    conversationConductedAt={conversationConductedAt}
-                    disabled={!hasTopSkills}
-                  />
-                </Suspense>
-              </Box>
-            </Box>
-            <Box display="flex" flexDirection="column" gap={2}>
-              <CustomAccordion title="Personal Information" tooltipText={tooltipText}>
-                <CustomTextField
-                  label="Name:"
-                  placeholder="Enter your name here"
-                  value={personalInfo.fullName}
-                  onChange={handleInputChange("fullName")}
-                />
-                <CustomTextField
-                  label="Email:"
-                  placeholder="Enter your email here"
-                  value={personalInfo.contactEmail}
-                  onChange={handleInputChange("contactEmail")}
-                />
-                <CustomTextField
-                  label="Phone:"
-                  placeholder="Enter your phone number here"
-                  value={personalInfo.phoneNumber}
-                  onChange={handleInputChange("phoneNumber")}
-                />
-                <CustomTextField
-                  label="Address:"
-                  placeholder="Enter your address here"
-                  value={personalInfo.address}
-                  onChange={handleInputChange("address")}
-                />
-              </CustomAccordion>
-              <Divider
-                color="primary"
-                sx={{ height: "0.2rem", marginY: isSmallMobile ? 8 : 2, marginRight: 1 }}
-                data-testid={DATA_TEST_ID.EXPERIENCES_DIVIDER}
-              />
-              <Box display="flex" flexDirection="column" gap={isSmallMobile ? 10 : 6}>
-                {/* LOADING STATE */}
-                {isLoading && (
-                  <Box data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_LOADER}>
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <LoadingExperienceDrawerContent key={index} />
-                    ))}
-                  </Box>
-                )}
-
-                {/* EMPTY STATE */}
-                {experiences.length === 0 && !isLoading && (
-                  <Box sx={{ fontSize: theme.typography.body1.fontSize, fontWeight: "bold" }}>
-                    <Typography variant="h1" textAlign={"center"}>
-                      🤷‍♀️
-                    </Typography>
-                    <Typography>We haven't yet discovered any experiences so far, Let's continue chatting.</Typography>
-                  </Box>
-                )}
-
-                {/* EXPERIENCES */}
-                {!isLoading && (
-                  <Box display="flex" flexDirection="column" gap={isSmallMobile ? 10 : 6}>
-                    <ExperienceCategory
-                      icon={<StoreIcon />}
-                      title={ReportContent.SELF_EMPLOYMENT_TITLE}
-                      experiences={groupedExperiences.selfEmploymentExperiences}
-                      onEditExperience={handleEditExperience}
-                      onDeleteExperience={handleDeleteExperience}
-                      onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
-                    />
-                    <ExperienceCategory
-                      icon={<WorkIcon />}
-                      title={ReportContent.SALARY_WORK_TITLE}
-                      experiences={groupedExperiences.salaryWorkExperiences}
-                      onEditExperience={handleEditExperience}
-                      onDeleteExperience={handleDeleteExperience}
-                      onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
-                    />
-                    <ExperienceCategory
-                      icon={<VolunteerActivismIcon />}
-                      title={ReportContent.UNPAID_WORK_TITLE}
-                      experiences={groupedExperiences.unpaidWorkExperiences}
-                      onEditExperience={handleEditExperience}
-                      onDeleteExperience={handleDeleteExperience}
-                      onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
-                    />
-                    <ExperienceCategory
-                      icon={<SchoolIcon />}
-                      title={ReportContent.TRAINEE_WORK_TITLE}
-                      experiences={groupedExperiences.traineeWorkExperiences}
-                      onEditExperience={handleEditExperience}
-                      onDeleteExperience={handleDeleteExperience}
-                      onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
-                    />
-                    <ExperienceCategory
-                      icon={<QuizIcon />}
-                      title={ReportContent.UNCATEGORIZED_TITLE}
-                      experiences={groupedExperiences.uncategorizedExperiences}
-                      tooltipText="Based on the conversation, these experiences couldn't be automatically categorized."
-                      onEditExperience={handleEditExperience}
-                      onDeleteExperience={handleDeleteExperience}
-                      onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
-                    />
-                  </Box>
-                )}
-              </Box>
-            </Box>
-          </Box>
-        )}
+        {renderDrawerContent()}
       </Drawer>
       <ConfirmModalDialog
         title="Unsaved Changes"

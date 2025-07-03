@@ -7,7 +7,8 @@ import HelpTip from "src/theme/HelpTip/HelpTip";
 import InfoIcon from "@mui/icons-material/Info";
 
 export enum ExperienceCategoryVariant {
-  DEFAULT = "DEFAULT"
+  DEFAULT = "DEFAULT",
+  RESTORE = "RESTORE",
 }
 
 interface ExperienceCategoryProps {
@@ -17,6 +18,7 @@ interface ExperienceCategoryProps {
   tooltipText?: string;
   onEditExperience?: (experience: Experience) => void;
   onDeleteExperience?: (experience: Experience) => void;
+  onRestoreExperience?: (experience: Experience) => void;
   onRestoreToOriginalExperience?: (experience: Experience) => void;
   variant?: ExperienceCategoryVariant;
 }
@@ -30,6 +32,7 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
   onDeleteExperience,
   onRestoreToOriginalExperience,
   variant = ExperienceCategoryVariant.DEFAULT,
+  onRestoreExperience,
 }) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -53,6 +56,7 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
             onEdit={variant === ExperienceCategoryVariant.DEFAULT ? onEditExperience : undefined}
             onDelete={variant === ExperienceCategoryVariant.DEFAULT ? onDeleteExperience : undefined}
             onRestoreToOriginal={variant === ExperienceCategoryVariant.DEFAULT ? onRestoreToOriginalExperience : undefined}
+            onRestore={variant === ExperienceCategoryVariant.RESTORE ? onRestoreExperience : undefined}
             variant={variant}
           />
         ))}

@@ -184,4 +184,4 @@ describe("ExperienceCategory", () => {
     // THEN expect no more buttons to be rendered
     expect(screen.queryByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)).not.toBeInTheDocument();
   });
-}); 
+});

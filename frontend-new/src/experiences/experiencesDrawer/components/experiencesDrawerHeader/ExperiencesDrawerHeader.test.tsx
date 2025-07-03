@@ -9,7 +9,8 @@ import ExperiencesDrawerHeader, {
 describe("ExperiencesDrawerHeader", () => {
   test("should render ExperiencesDrawerHeader correctly", () => {
     // GIVEN the ExperiencesDrawerHeader component
-    const givenExperiencesDrawerHeader = <ExperiencesDrawerHeader notifyOnClose={jest.fn()} />;
+    const givenTitle = "FOo Bar";
+    const givenExperiencesDrawerHeader = <ExperiencesDrawerHeader notifyOnClose={jest.fn()} title={givenTitle}/>;
 
     // WHEN the component is rendered
     render(givenExperiencesDrawerHeader);
@@ -21,7 +22,7 @@ describe("ExperiencesDrawerHeader", () => {
     const experiencesDrawerHeaderContainer = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_CONTAINER);
     expect(experiencesDrawerHeaderContainer).toBeInTheDocument();
     // AND the experiences drawer header text to be in the document
-    expect(screen.getByText("Experiences and Skills")).toBeInTheDocument();
+    expect(screen.getByText(givenTitle)).toBeInTheDocument();
     // AND the experiences drawer header button to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_BUTTON)).toBeInTheDocument();
     // AND the experiences drawer header icon to be in the document
@@ -34,7 +35,8 @@ describe("ExperiencesDrawerHeader", () => {
     // GIVEN the notifyOnClose
     const givenNotifyOnClose = jest.fn();
     // AND the ExperiencesDrawerHeader component is rendered
-    render(<ExperiencesDrawerHeader notifyOnClose={givenNotifyOnClose} />);
+    const givenTitle = "Foo Bar";
+    render(<ExperiencesDrawerHeader notifyOnClose={givenNotifyOnClose} title={givenTitle}/>);
 
     // WHEN the close button is clicked
     const closeButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_BUTTON);

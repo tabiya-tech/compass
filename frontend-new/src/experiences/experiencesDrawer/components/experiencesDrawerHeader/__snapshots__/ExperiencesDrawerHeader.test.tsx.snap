@@ -8,7 +8,7 @@ exports[`ExperiencesDrawerHeader should render ExperiencesDrawerHeader correctly
   <h5
     class="MuiTypography-root MuiTypography-h5 css-vmt1ul-MuiTypography-root"
   >
-    Experiences and Skills
+    FOo Bar
   </h5>
   <button
     class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-xu2vll-MuiButtonBase-root-MuiIconButton-root"

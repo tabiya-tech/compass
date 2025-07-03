@@ -14,8 +14,8 @@ import userEvent from "@testing-library/user-event";
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { DATA_TEST_ID as CONTEXT_MENU_DATA_TEST_ID } from "src/theme/ContextMenu/ContextMenu";
-import { resetAllMethodMocks } from "../../../../_test_utilities/resetAllMethodMocks";
-import ExperienceService from "../../../experienceService/experienceService";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import ExperienceService from "src/experiences/experienceService/experienceService";
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {

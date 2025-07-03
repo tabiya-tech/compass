@@ -145,3 +145,21 @@ export const ShownWhenAllExperiencesExplored = {
     experiences: ShownWhenAllExperiencesExplored_experiences,
   },
 };
+
+export const ShownWithRestoreDrawerOpen = {
+  args: {
+    isOpen: true,
+    experiences: generateRandomExperiences(2),
+  },
+  parameters: {
+    msw: {
+      handlers: [
+        {
+          method: "get",
+          url: "/api/experiences",
+          response: generateRandomExperiences(4), // 2 current, 2 deleted
+        },
+      ],
+    },
+  },
+};
