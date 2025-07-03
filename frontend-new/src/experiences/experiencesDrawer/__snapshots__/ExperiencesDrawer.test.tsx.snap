@@ -20,7 +20,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
     tabindex="-1"
   >
     <div
-      class="MuiBox-root css-4wfrhm"
+      class="MuiBox-root css-192ypfk"
     >
       <div
         class="MuiBox-root css-1821gv5"
@@ -152,6 +152,12 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     class="MuiAccordionDetails-root css-1w3q3li-MuiAccordionDetails-root"
                     data-testid="custom-accordion-details-34d24bf6-1b9b-40f1-93b3-baf68ab03da4"
                   >
+                    <h6
+                      class="MuiTypography-root MuiTypography-h6 css-1ldba0-MuiTypography-root"
+                      data-testid="personal-information-title-df5ab5c0-a109-4b6d-ba3f-a46975e5511b"
+                    >
+                      Personal Information
+                    </h6>
                     <input
                       aria-label="Name:"
                       data-testid="mock-CustomTextField"
@@ -220,7 +226,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                 class="MuiBox-root css-c4dei4"
               >
                 <div
-                  class="MuiBox-root css-yj95vr"
+                  class="MuiBox-root css-yd8sa2"
                   data-testid="experiences-drawer-content-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                 >
                   <div
@@ -235,6 +241,9 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                       >
                         Project Manager
                       </p>
+                      <div
+                        class="MuiBox-root css-192qrng"
+                      />
                     </div>
                     <span
                       class="MuiTypography-root MuiTypography-caption css-1s89n9g-MuiTypography-root"
@@ -374,7 +383,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                 class="MuiBox-root css-c4dei4"
               >
                 <div
-                  class="MuiBox-root css-yj95vr"
+                  class="MuiBox-root css-yd8sa2"
                   data-testid="experiences-drawer-content-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                 >
                   <div
@@ -387,8 +396,11 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                         class="MuiTypography-root MuiTypography-body1 css-vvbmpr-MuiTypography-root"
                         data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                       >
-                        Project Manager
+                        Software Engineer
                       </p>
+                      <div
+                        class="MuiBox-root css-192qrng"
+                      />
                     </div>
                     <span
                       class="MuiTypography-root MuiTypography-caption css-1s89n9g-MuiTypography-root"
@@ -456,22 +468,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                       <span
                         class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
                       >
-                        Management
-                      </span>
-                      <span
-                        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                      />
-                    </div>
-                    <div
-                      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1n9e303-MuiButtonBase-root-MuiChip-root"
-                      data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
-                      role="button"
-                      tabindex="0"
-                    >
-                      <span
-                        class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
-                      >
-                        Communication
+                        Python Programming
                       </span>
                       <span
                         class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
@@ -503,6 +500,17 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
             </div>
           </div>
         </div>
+      </div>
+      <div
+        class="MuiBox-root css-1cm8ap5"
+      >
+        <a
+          aria-disabled="false"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+          data-testid="restore-deleted-experiences-link-df5ab5c0-a109-4b6d-ba3f-a46975e5511b"
+        >
+          Restore deleted experiences
+        </a>
       </div>
     </div>
   </div>

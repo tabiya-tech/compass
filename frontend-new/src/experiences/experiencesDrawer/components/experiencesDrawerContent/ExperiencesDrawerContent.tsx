@@ -27,6 +27,8 @@ export const DATA_TEST_ID = {
   EXPERIENCES_DRAWER_CHIP: `experiences-drawer-chip-${uniqueId}`,
   EXPERIENCES_DRAWER_POPOVER: `experiences-drawer-popover-${uniqueId}`,
   EXPERIENCES_DRAWER_MORE_BUTTON: `experiences-drawer-more-button-${uniqueId}`,
+  EXPERIENCES_DRAWER_RESTORE_TO_ORIGINAL_BUTTON: `experiences-drawer-restore-to-original-button-${uniqueId}`,
+  RESTORE_EXPERIENCE_BUTTON: `restore-experience-button-${uniqueId}`,
 };
 
 export const MENU_ITEM_ID = {
@@ -46,6 +48,7 @@ interface ExperienceProps {
   onEdit?: (experience: Experience) => void;
   onDelete?: (experience: Experience) => void;
   onRestoreToOriginal?: (experience: Experience) => void;
+  onRestore?: (experience: Experience) => void;
   variant?: ExperienceCategoryVariant;
 }
 
@@ -53,7 +56,7 @@ export const capitalizeFirstLetter = (string: string): string => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdit, onDelete, onRestoreToOriginal, variant = ExperienceCategoryVariant.DEFAULT }) => {
+const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdit, onDelete, onRestoreToOriginal, onRestore, variant = ExperienceCategoryVariant.DEFAULT }) => {
   const theme = useTheme();
   const isOnline = useContext(IsOnlineContext);
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -77,7 +80,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
   };
 
   const handleDeleteClick = () => {
-    onDelete && onDelete(experience);
+    onDelete && onDelete && onDelete(experience);
     setMoreMenuAnchorEl(null);
   };
 
@@ -128,7 +131,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
     <Box
       display="flex"
       flexDirection="column"
-      gap={isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.sm) : theme.tabiyaSpacing.md}
+      gap={isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.sm) : theme.fixedSpacing(theme.tabiyaSpacing.md)}
       data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_CONTAINER}
     >
       <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
@@ -140,16 +143,28 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
           >
             {experience.experience_title ? experience.experience_title : <i>Untitled!</i>}
           </Typography>
-          {experience.exploration_phase === DiveInPhase.PROCESSED && (
-            <PrimaryIconButton
-              onClick={handleMoreClick}
-              sx={{ color: theme.palette.common.black }}
-              title="More options"
-              data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON}
-            >
-              <MoreVertIcon />
-            </PrimaryIconButton>
-          )}
+          <Box display="flex" alignItems="center" justifyContent="flex-end">
+            {variant === ExperienceCategoryVariant.RESTORE ? (
+                <PrimaryIconButton
+                  onClick={() => onRestore && onRestore(experience)}
+                  sx={{ color: theme.palette.common.black }}
+                  disabled={!isOnline}
+                  title="Restore"
+                  data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_BUTTON}
+                >
+                  <RestoreIcon />
+                </PrimaryIconButton>
+            ) : experience.exploration_phase === DiveInPhase.PROCESSED && (
+              <PrimaryIconButton
+                onClick={handleMoreClick}
+                sx={{ color: theme.palette.common.black }}
+                title="More options"
+                data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON}
+              >
+                <MoreVertIcon />
+              </PrimaryIconButton>
+            )}
+          </Box>
         </Box>
         <Typography
           variant="caption"

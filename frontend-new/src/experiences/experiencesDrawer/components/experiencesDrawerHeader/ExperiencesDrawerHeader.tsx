@@ -4,6 +4,7 @@ import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import CloseIcon from "@mui/icons-material/Close";
 
 export interface ExperiencesDrawerHeaderProps {
+  title: string;
   notifyOnClose: () => void;
 }
 
@@ -26,7 +27,7 @@ const ExperiencesDrawerHeader: React.FC<ExperiencesDrawerHeaderProps> = (props) 
       gap={theme.tabiyaSpacing.lg}
       data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_CONTAINER}
     >
-      <Typography variant="h5">Experiences and Skills</Typography>
+      <Typography variant="h5">{props.title}</Typography>
       <PrimaryIconButton
         sx={{
           color: theme.palette.common.black,

@@ -18,8 +18,9 @@ import ExperienceService from "src/experiences/experienceService/experienceServi
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { ExperienceError } from "../../error/commonErrors";
-import { resetAllMethodMocks } from "../../_test_utilities/resetAllMethodMocks";
+import { ExperienceError } from "src/error/commonErrors";
+import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import { waitFor } from "@testing-library/react";
 
 // mock custom text field
 jest.mock("src/theme/CustomTextField/CustomTextField", () => {
@@ -759,6 +760,69 @@ describe("ExperiencesDrawer", () => {
       // AND no errors or warnings to have occurred
       expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to restore experience to original:", givenError));
       expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Restore Deleted Experiences Drawer integration", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test("should open restore drawer when link is clicked and close when Go Back is clicked", async () => {
+      // GIVEN the ExperiencesDrawer component
+      const onExperiencesUpdated = jest.fn();
+      // AND a mocked service that resolves
+      jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce(mockExperiences)
+      render(
+        <ExperiencesDrawer
+          isOpen={true}
+          isLoading={false}
+          experiences={mockExperiences}
+          notifyOnClose={jest.fn()}
+          conversationConductedAt="2022-06-01T00:00:00Z"
+          onExperiencesUpdated={onExperiencesUpdated}
+        />
+      );
+      // WHEN the restore link is clicked
+      const restoreLink = screen.getByTestId(DATA_TEST_ID.RESTORE_DELETED_EXPERIENCES_LINK);
+      await userEvent.click(restoreLink);
+      // THEN the restore drawer is shown
+      expect(screen.getByTestId(DATA_TEST_ID.RESTORE_EXPERIENCES_TITLE)).toBeInTheDocument();
+      // WHEN Go Back is clicked
+      const goBackButton = await screen.findByTestId(DATA_TEST_ID.RESTORE_EXPERIENCES_GO_BACK_BUTTON);
+      await userEvent.click(goBackButton);
+      // THEN the main drawer content is shown again
+      await waitFor(async () => {
+        expect(screen.getByTestId(DATA_TEST_ID.PERSONAL_INFORMATION_TITLE)).toBeInTheDocument();
+      });
+    });
+
+    test("should restore a deleted experience and close the restore drawer", async () => {
+      // GIVEN a session ID that is set in user preferences
+      const givenSessionId = 234;
+      UserPreferencesStateService.getInstance().setUserPreferences({
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
+      const onExperiencesUpdated = jest.fn();
+      // AND a mocked service that resolves
+      const currentExperiences = [mockExperiences[0]];
+      const deletedExperiences = [mockExperiences[1]];
+      jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce([...currentExperiences, ...deletedExperiences]);
+      render(
+        <ExperiencesDrawer
+          isOpen={true}
+          isLoading={false}
+          experiences={currentExperiences}
+          notifyOnClose={jest.fn()}
+          conversationConductedAt="2022-06-01T00:00:00Z"
+          onExperiencesUpdated={onExperiencesUpdated}
+        />
+      );
+      // WHEN the restore link is clicked
+      const restoreLink = screen.getByTestId(DATA_TEST_ID.RESTORE_DELETED_EXPERIENCES_LINK);
+      await userEvent.click(restoreLink);
+      // THEN the restore drawer is shown
+      expect(screen.getByTestId(DATA_TEST_ID.RESTORE_EXPERIENCES_TITLE)).toBeInTheDocument();
     });
   });
 });

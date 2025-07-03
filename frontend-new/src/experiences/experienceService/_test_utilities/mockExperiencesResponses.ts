@@ -34,27 +34,21 @@ export const mockExperiences: Experience[] = [
     exploration_phase: DiveInPhase.EXPLORING_SKILLS,
   },
   {
-    UUID: "c3c8b43d-73dd-4c6d-9e71-010492e86d5e",
+    UUID: "607c19f8-60e2-4c70-ac5a-6ce95426423c",
     timeline: {
       start: "2022",
       end: "Present",
     },
-    experience_title: "Project Manager",
+    experience_title: "Software Engineer",
     company: "Business Inc",
     location: "New York, NY",
     work_type: WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
     top_skills: [
       {
-        UUID: "2512652c-49ba-4751-b654-8fc525ce98ca",
-        preferredLabel: "Management",
-        description: "The process of dealing with or controlling things or people",
-        altLabels: ["Leadership", "Administration"],
-      },
-      {
-        UUID: "815f3660-4c7f-43ba-859d-cf50dd527fe0",
-        preferredLabel: "Communication",
-        description: "The imparting or exchanging of information or news",
-        altLabels: ["Interpersonal Communication", "Public Speaking"],
+        UUID: "65a46171-a72e-42f7-bf8b-a685b795d1ab",
+        preferredLabel: "Python Programming",
+        description: "The ability to write code in Python",
+        altLabels: ["Python Development", "Software Development"],
       },
     ],
     summary:

@@ -268,7 +268,7 @@ exports[`Report should render Report correctly 1`] = `
                   x="0"
                   y="0"
                 >
-                  Project Manager
+                  Software Engineer
                 </text>
                 <view
                   data-testid="experiences-content-report-experience-info-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
@@ -330,15 +330,7 @@ exports[`Report should render Report correctly 1`] = `
                       y="0"
                     >
                       • 
-                      Management
-                    </text>
-                    <text
-                      style="font-size: 10px; color: rgb(33, 31, 29);"
-                      x="0"
-                      y="0"
-                    >
-                      • 
-                      Communication
+                      Python Programming
                     </text>
                   </view>
                 </view>
@@ -401,6 +393,24 @@ exports[`Report should render Report correctly 1`] = `
             y="0"
           >
             The process of dealing with or controlling things or people
+          </text>
+        </view>
+        <view
+          style="display: flex; flex-direction: column; gap: 4px;"
+        >
+          <text
+            style="font-size: 11px; font-family: Inter; font-weight: bold;"
+            x="0"
+            y="0"
+          >
+            Python Programming
+          </text>
+          <text
+            style="font-size: 10px; padding-bottom: 12px;"
+            x="0"
+            y="0"
+          >
+            The ability to write code in Python
           </text>
         </view>
       </view>

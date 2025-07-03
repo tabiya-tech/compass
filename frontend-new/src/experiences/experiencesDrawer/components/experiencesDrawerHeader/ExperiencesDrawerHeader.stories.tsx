@@ -11,5 +11,7 @@ const meta: Meta<typeof ExperiencesDrawerHeader> = {
 export default meta;
 
 export const Shown = {
-  args: {},
+  args: {
+    title: "Experiences and Skills"
+  },
 };
