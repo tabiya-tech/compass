@@ -32,7 +32,7 @@ const meta: Meta<typeof SummaryEditField> = {
         },
       };
       // @ts-ignore
-      ExperienceService.getInstance().getOriginalExperience = mockExperienceService.getOriginalExperience;
+      ExperienceService.getInstance().getUneditedExperience = mockExperienceService.getOriginalExperience;
       // @ts-ignore
       ExperienceService.getInstance().updateExperience = mockExperienceService.updateExperience;
 

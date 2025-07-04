@@ -35,7 +35,7 @@ const meta: Meta<typeof ExperiencesDrawer> = {
         },
       };
       // @ts-ignore
-      ExperienceService.getInstance().getOriginalExperience = mockExperienceService.getOriginalExperience;
+      ExperienceService.getInstance().getUneditedExperience = mockExperienceService.getOriginalExperience;
       // @ts-ignore
       ExperienceService.getInstance().updateExperience = mockExperienceService.updateExperience;
 

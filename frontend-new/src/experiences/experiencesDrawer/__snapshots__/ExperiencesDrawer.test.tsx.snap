@@ -344,7 +344,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     <div
                       data-testid="experiences-drawer-menu-item-restore-to-original-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                     >
-                      Restore to original
+                      Restore experience
                     </div>
                     <div
                       data-testid="experiences-drawer-menu-item-delete-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
@@ -486,7 +486,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     <div
                       data-testid="experiences-drawer-menu-item-restore-to-original-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                     >
-                      Restore to original
+                      Restore experience
                     </div>
                     <div
                       data-testid="experiences-drawer-menu-item-delete-34a59a9e-e7f6-4a10-8b72-0fd401c727de"

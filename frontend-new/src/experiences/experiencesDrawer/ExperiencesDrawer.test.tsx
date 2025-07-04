@@ -641,11 +641,11 @@ describe("ExperiencesDrawer", () => {
     });
   });
 
-  describe("Restore to Original", () => {
+  describe("Restore to Unedited", () => {
     beforeEach(() => {
       jest.clearAllMocks();
     })
-    test("should restore experience to original successfully when restore to original button is clicked", async () => {
+    test("should restore experience to unedited successfully when restore to unedited button is clicked", async () => {
       // GIVEN some experiences that have been explored
       const givenExploredExperiences = mockExperiences.map((experience) => ({
         ...experience,
@@ -658,7 +658,7 @@ describe("ExperiencesDrawer", () => {
       } as unknown as UserPreference);
       const onExperiencesUpdated = jest.fn();
       // AND mocked services that resolve
-      const getOriginalExperienceSpy = jest.spyOn(ExperienceService.getInstance(), "getOriginalExperience").mockResolvedValueOnce(givenExploredExperiences[0]);
+      const getUneditedExperienceSpy = jest.spyOn(ExperienceService.getInstance(), "getUneditedExperience").mockResolvedValueOnce(givenExploredExperiences[0]);
       const updateExperienceSpy = jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValueOnce(givenExploredExperiences[0]);
       // AND the component is rendered
       render(
@@ -684,7 +684,7 @@ describe("ExperiencesDrawer", () => {
       const confirmButton = within(confirmDialog).getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM);
       await userEvent.click(confirmButton);
       // THEN expect the services to be called with the correct parameters
-      expect(getOriginalExperienceSpy).toHaveBeenCalledWith(givenSessionId, mockExperiences[0].UUID);
+      expect(getUneditedExperienceSpy).toHaveBeenCalledWith(givenSessionId, mockExperiences[0].UUID);
       expect(updateExperienceSpy).toHaveBeenCalledWith(
         givenSessionId,
         mockExperiences[0].UUID,
@@ -705,7 +705,7 @@ describe("ExperiencesDrawer", () => {
       );
       expect(onExperiencesUpdated).toHaveBeenCalled();
       // AND the snackbar to be displayed
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Experience restored to original successfully!", {
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Experience restored successfully!", {
         variant: "success",
       });
       // AND no errors or warnings to have occurred
@@ -713,7 +713,7 @@ describe("ExperiencesDrawer", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
-    test("should handle error when restore to original fails", async () => {
+    test("should handle error when restore to unedited fails", async () => {
       // GIVEN some experiences that have been explored
       const givenExploredExperiences = mockExperiences.map((experience) => ({
         ...experience,
@@ -727,7 +727,7 @@ describe("ExperiencesDrawer", () => {
       const onExperiencesUpdated = jest.fn();
       // AND a mocked service that rejects
       const givenError = new Error("API Error")
-      jest.spyOn(ExperienceService.getInstance(), "getOriginalExperience").mockRejectedValueOnce(givenError);
+      jest.spyOn(ExperienceService.getInstance(), "getUneditedExperience").mockRejectedValueOnce(givenError);
       // AND the component is rendered
       render(
         <ExperiencesDrawer
@@ -752,13 +752,13 @@ describe("ExperiencesDrawer", () => {
       const confirmButton = within(confirmDialog).getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM);
       await userEvent.click(confirmButton);
       // THEN expect the snackbar to be displayed with error message
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to restore experience to original.", {
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to restore experience.", {
         variant: "error",
       });
       // AND expect onExperiencesUpdated to not have been called
       expect(onExperiencesUpdated).not.toHaveBeenCalled();
       // AND no errors or warnings to have occurred
-      expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to restore experience to original:", givenError));
+      expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to restore experience:", givenError));
       expect(console.warn).not.toHaveBeenCalled();
     });
   });

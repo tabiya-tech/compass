@@ -60,10 +60,10 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
         async def delete_experience(self, user_id: str, session_id: int, experience_uuid: str):
             raise NotImplementedError
 
-        async def get_original_experience_by_uuid(self, session_id: int, experience_uuid: str):
+        async def get_unedited_experience_by_uuid(self, session_id: int, experience_uuid: str):
             raise NotImplementedError
 
-        async def get_original_experiences(self, session_id: int):
+        async def get_unedited_experiences(self, session_id: int):
             raise NotImplementedError
 
         async def restore_deleted_experience(self, user_id: str, session_id: int, experience_uuid: str) -> ExperienceResponse:
@@ -153,11 +153,11 @@ class TestExperienceRoutes:
         """
 
         @pytest.mark.asyncio
-        @pytest.mark.parametrize("original",
+        @pytest.mark.parametrize("unedited",
                                  [True, False],
-                                 ids=["original", "processed"])
+                                 ids=["unedited", "processed"])
         async def test_get_experiences_successful(self, authenticated_client_with_mocks: TestClientWithMocks,
-                                                  mocker: pytest_mock.MockerFixture, original: bool):
+                                                  mocker: pytest_mock.MockerFixture, unedited: bool):
             client, mocked_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
             # GIVEN a valid session id
             given_session_id = get_random_session_id()
@@ -189,15 +189,15 @@ class TestExperienceRoutes:
                 )
             ]
 
-            if original:
-                mocked_service.get_original_experiences = AsyncMock(return_value=expected_response)
-                service_spy = mocker.spy(mocked_service, "get_original_experiences")
+            if unedited:
+                mocked_service.get_unedited_experiences = AsyncMock(return_value=expected_response)
+                service_spy = mocker.spy(mocked_service, "get_unedited_experiences")
             else:
                 mocked_service.get_experiences_by_session_id = AsyncMock(return_value=expected_response)
                 service_spy = mocker.spy(mocked_service, "get_experiences_by_session_id")
 
             # WHEN a GET request where the session_id is in the Path
-            response = client.get(f"/conversations/{given_session_id}/experiences?original={original}")
+            response = client.get(f"/conversations/{given_session_id}/experiences?unedited={unedited}")
 
             # THEN the response is OK
             assert response.status_code == HTTPStatus.OK
@@ -214,25 +214,25 @@ class TestExperienceRoutes:
             )
 
         @pytest.mark.asyncio
-        @pytest.mark.parametrize("original",
+        @pytest.mark.parametrize("unedited",
                                  [True, False],
-                                 ids=["original", "processed"])
-        async def test_get_experiences_unauthorized(self, unauthenticated_client_with_mocks: TestClientWithMocks, original: bool):
+                                 ids=["unedited", "processed"])
+        async def test_get_experiences_unauthorized(self, unauthenticated_client_with_mocks: TestClientWithMocks, unedited: bool):
             client, _, _, _ = unauthenticated_client_with_mocks
             # GIVEN a session id
             given_session_id = get_random_session_id()
 
             # WHEN a GET request is made without authentication
-            response = client.get(f"/conversations/{given_session_id}/experiences?original={original}")
+            response = client.get(f"/conversations/{given_session_id}/experiences?unedited={unedited}")
 
             # THEN the response is UNAUTHORIZED
             assert response.status_code == HTTPStatus.UNAUTHORIZED
 
         @pytest.mark.asyncio
-        @pytest.mark.parametrize("original",
+        @pytest.mark.parametrize("unedited",
                                  [True, False],
-                                 ids=["original", "processed"])
-        async def test_get_experiences_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks, original: bool):
+                                 ids=["unedited", "processed"])
+        async def test_get_experiences_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks, unedited: bool):
             client, _, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
             # GIVEN a valid session id
             given_session_id = get_random_session_id()
@@ -244,7 +244,7 @@ class TestExperienceRoutes:
                 return_value=mock_user_preferences)
 
             # WHEN a GET request where the session_id is in the Path
-            response = client.get(f"/conversations/{given_session_id}/experiences?original={original}")
+            response = client.get(f"/conversations/{given_session_id}/experiences?unedited={unedited}")
 
             # THEN the response is FORBIDDEN
             assert response.status_code == HTTPStatus.FORBIDDEN
@@ -267,7 +267,7 @@ class TestExperienceRoutes:
             get_experiences_spy.side_effect = Exception("Unexpected error")
 
             # WHEN a GET request where the session_id is in the Path
-            response = client.get(f"/conversations/{given_session_id}/experiences/?original=False")
+            response = client.get(f"/conversations/{given_session_id}/experiences/?unedited=False")
 
             # THEN the response is INTERNAL_SERVER_ERROR
             assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
@@ -278,7 +278,7 @@ class TestExperienceRoutes:
             )
 
         @pytest.mark.asyncio
-        async def test_get_original_experiences_service_internal_server_error(self,
+        async def test_get_unedited_experiences_service_internal_server_error(self,
                                                                               authenticated_client_with_mocks: TestClientWithMocks,
                                                                               mocker: pytest_mock.MockerFixture):
             client, mocked_service, mocked_preferences_repository, _ = authenticated_client_with_mocks
@@ -288,27 +288,27 @@ class TestExperienceRoutes:
             # AND an ExperienceService that will raise an unexpected error
             mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(
                 return_value=get_mock_user_preferences(given_session_id))
-            get_original_experiences_spy = mocker.spy(mocked_service, "get_original_experiences")
-            get_original_experiences_spy.side_effect = Exception("Unexpected error")
+            get_unedited_experiences_spy = mocker.spy(mocked_service, "get_unedited_experiences")
+            get_unedited_experiences_spy.side_effect = Exception("Unexpected error")
 
             # WHEN a GET request where the session_id is in the Path
-            response = client.get(f"/conversations/{given_session_id}/experiences/?original=True")
+            response = client.get(f"/conversations/{given_session_id}/experiences/?unedited=True")
 
             # THEN the response is INTERNAL_SERVER_ERROR
             assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
             # AND the experiences service was called with the correct arguments
-            get_original_experiences_spy.assert_called_once_with(
+            get_unedited_experiences_spy.assert_called_once_with(
                 given_session_id
             )
 
         @pytest.mark.asyncio
-        @pytest.mark.parametrize("original",
+        @pytest.mark.parametrize("unedited",
                                  [True, False],
-                                 ids=["original", "processed"])
+                                 ids=["unedited", "processed"])
         async def test_get_experiences_user_preferences_internal_server_error(self,
                                                                               authenticated_client_with_mocks: TestClientWithMocks,
-                                                                              mocker: pytest_mock.MockerFixture, original: bool):
+                                                                              mocker: pytest_mock.MockerFixture, unedited: bool):
             client, _, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
             # GIVEN a valid session id
             given_session_id = get_random_session_id()
@@ -318,7 +318,7 @@ class TestExperienceRoutes:
             get_user_preferences_spy.side_effect = Exception("Unexpected error")
 
             # WHEN a GET request where the session_id is in the Path
-            response = client.get(f"/conversations/{given_session_id}/experiences?original={original}")
+            response = client.get(f"/conversations/{given_session_id}/experiences?unedited={unedited}")
 
             # THEN the response is INTERNAL_SERVER_ERROR
             assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
@@ -557,13 +557,13 @@ class TestExperienceRoutes:
             # THEN the response is INTERNAL_SERVER_ERROR
             assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
-    class TestGetOriginalExperience:
+    class TestGetUneditedExperience:
         """
-        Tests for the Get Original Experience by uuid Route
+        Tests for the Get Unedited Experience by uuid Route
         """
 
         @pytest.mark.asyncio
-        async def test_get_original_experience_successful(self, authenticated_client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        async def test_get_unedited_experience_successful(self, authenticated_client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
             client, mocked_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
             # GIVEN a valid session id and experience uuid
             given_session_id = get_random_session_id()
@@ -571,22 +571,22 @@ class TestExperienceRoutes:
             # AND the user owns the session
             mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=get_mock_user_preferences(given_session_id))
             preferences_spy = mocker.spy(mocked_preferences_repository, "get_user_preference_by_user_id")
-            # AND the service returns the original experience
+            # AND the service returns the unedited experience
             expected_response = ExperienceResponse(
                 uuid=given_experience_uuid,
-                experience_title="Original Title",
-                company="Original Company",
-                location="Original Location",
+                experience_title="Unedited Title",
+                company="Unedited Company",
+                location="Unedited Location",
                 timeline=Timeline(start="2020", end="2021"),
                 work_type=WorkType.SELF_EMPLOYMENT,
                 top_skills=[],
-                summary="Original summary",
+                summary="Unedited summary",
                 exploration_phase=DiveInPhase.PROCESSED.name
             )
-            mocked_service.get_original_experience_by_uuid = AsyncMock(return_value=expected_response)
-            service_spy = mocker.spy(mocked_service, "get_original_experience_by_uuid")
+            mocked_service.get_unedited_experience_by_uuid = AsyncMock(return_value=expected_response)
+            service_spy = mocker.spy(mocked_service, "get_unedited_experience_by_uuid")
             # WHEN the GET request is made
-            response = client.get(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/original")
+            response = client.get(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/unedited")
             # THEN the response is OK
             assert response.status_code == HTTPStatus.OK
             # AND the response matches the expected experience
@@ -600,7 +600,7 @@ class TestExperienceRoutes:
             )
 
         @pytest.mark.asyncio
-        async def test_get_original_experience_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks):
+        async def test_get_unedited_experience_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks):
             client, _, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
             # GIVEN a valid session id and experience uuid
             given_session_id = get_random_session_id()
@@ -610,14 +610,14 @@ class TestExperienceRoutes:
             mock_user_preferences.sessions = [given_session_id - 1]
             mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=mock_user_preferences)
             # WHEN the GET request is made
-            response = client.get(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/original")
+            response = client.get(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/unedited")
             # THEN the response is FORBIDDEN
             assert response.status_code == HTTPStatus.FORBIDDEN
             # AND the user preferences repository was called with the correct user_id
             mocked_preferences_repository.get_user_preference_by_user_id.assert_called_once_with(mocked_user.user_id)
 
         @pytest.mark.asyncio
-        async def test_get_original_experience_not_found(self, authenticated_client_with_mocks: TestClientWithMocks):
+        async def test_get_unedited_experience_not_found(self, authenticated_client_with_mocks: TestClientWithMocks):
             client, mocked_service, mocked_preferences_repository, _ = authenticated_client_with_mocks
             # GIVEN a valid session id and experience uuid
             given_session_id = get_random_session_id()
@@ -626,30 +626,30 @@ class TestExperienceRoutes:
             mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=get_mock_user_preferences(given_session_id))
             # AND the service raises ExperienceNotFoundError
             from app.conversations.experience.service import ExperienceNotFoundError
-            mocked_service.get_original_experience_by_uuid = AsyncMock(side_effect=ExperienceNotFoundError(given_experience_uuid))
+            mocked_service.get_unedited_experience_by_uuid = AsyncMock(side_effect=ExperienceNotFoundError(given_experience_uuid))
             # WHEN the GET request is made
-            response = client.get(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/original")
+            response = client.get(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/unedited")
             # THEN the response is NOT_FOUND
             assert response.status_code == HTTPStatus.NOT_FOUND
             # AND the service was called with the correct arguments
-            mocked_service.get_original_experience_by_uuid.assert_called_once_with(
+            mocked_service.get_unedited_experience_by_uuid.assert_called_once_with(
                 given_session_id,
                 given_experience_uuid
             )
 
         @pytest.mark.asyncio
-        async def test_get_original_experience_unauthorized(self, unauthenticated_client_with_mocks: TestClientWithMocks):
+        async def test_get_unedited_experience_unauthorized(self, unauthenticated_client_with_mocks: TestClientWithMocks):
             client, _, _, _ = unauthenticated_client_with_mocks
             # GIVEN a valid session id and experience uuid
             given_session_id = get_random_session_id()
             given_experience_uuid = "exp-uuid"
             # WHEN the GET request is made without authentication
-            response = client.get(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/original")
+            response = client.get(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/unedited")
             # THEN the response is UNAUTHORIZED
             assert response.status_code == HTTPStatus.UNAUTHORIZED
 
         @pytest.mark.asyncio
-        async def test_get_original_experience_service_internal_server_error(self, authenticated_client_with_mocks: TestClientWithMocks,
+        async def test_get_unedited_experience_service_internal_server_error(self, authenticated_client_with_mocks: TestClientWithMocks,
                                                                              mocker: pytest_mock.MockerFixture):
             client, mocked_service, mocked_preferences_repository, _ = authenticated_client_with_mocks
             # GIVEN a valid session id and experience uuid
@@ -658,19 +658,19 @@ class TestExperienceRoutes:
             # AND the user owns the session
             mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=get_mock_user_preferences(given_session_id))
             # AND the service raises an unexpected error
-            mocked_service.get_original_experience_by_uuid = AsyncMock(side_effect=Exception("Unexpected error"))
+            mocked_service.get_unedited_experience_by_uuid = AsyncMock(side_effect=Exception("Unexpected error"))
             # WHEN the GET request is made
-            response = client.get(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/original")
+            response = client.get(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/unedited")
             # THEN the response is INTERNAL_SERVER_ERROR
             assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
             # AND the service was called with the correct arguments
-            mocked_service.get_original_experience_by_uuid.assert_called_once_with(
+            mocked_service.get_unedited_experience_by_uuid.assert_called_once_with(
                 given_session_id,
                 given_experience_uuid
             )
 
         @pytest.mark.asyncio
-        async def test_get_original_experience_user_preferences_internal_server_error(self, authenticated_client_with_mocks: TestClientWithMocks,
+        async def test_get_unedited_experience_user_preferences_internal_server_error(self, authenticated_client_with_mocks: TestClientWithMocks,
                                                                                       mocker: pytest_mock.MockerFixture):
             client, _, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
             # GIVEN a valid session id and experience uuid
@@ -680,7 +680,7 @@ class TestExperienceRoutes:
             get_user_preferences_spy = mocker.spy(mocked_preferences_repository, "get_user_preference_by_user_id")
             get_user_preferences_spy.side_effect = Exception("Unexpected error")
             # WHEN the GET request is made
-            response = client.get(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/original")
+            response = client.get(f"/conversations/{given_session_id}/experiences/{given_experience_uuid}/unedited")
             # THEN the response is INTERNAL_SERVER_ERROR
             assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
             # AND the user preferences repository was called with the correct user_id

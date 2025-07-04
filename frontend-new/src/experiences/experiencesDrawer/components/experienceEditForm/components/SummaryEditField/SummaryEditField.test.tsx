@@ -85,11 +85,11 @@ describe("SummaryEditField", () => {
     expect(textarea).toHaveValue("New summary");
   });
 
-  test("should restore summary to original when restore is clicked (success path)", async () => {
+  test("should restore summary to unedited when restore is clicked (success path)", async () => {
     jest.useFakeTimers()
-    // GIVEN original summary from service
-    const originalSummary = "Original summary from service.";
-    jest.spyOn(ExperienceService.getInstance(), "getOriginalExperience").mockResolvedValue({ summary: originalSummary } as Experience);
+    // GIVEN unedited summary from service
+    const uneditedSummary = "Unedited summary from service.";
+    jest.spyOn(ExperienceService.getInstance(), "getUneditedExperience").mockResolvedValue({ summary: uneditedSummary } as Experience);
     render(<SummaryEditField {...defaultProps} />);
     // WHEN restore is clicked
     const restoreBtn = screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY_RESTORE);
@@ -97,13 +97,13 @@ describe("SummaryEditField", () => {
     // THEN summary is updated
     await waitFor(() => {
       const summaryContainer = screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY);
-      expect(within(summaryContainer).getByRole("textbox")).toHaveValue(originalSummary);
+      expect(within(summaryContainer).getByRole("textbox")).toHaveValue(uneditedSummary);
     });
     // AND success message is shown
-    expect(screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY_HELPER)).toHaveTextContent("Summary restored to original version.");
-    // AND notifyOnChange is called with original summary
+    expect(screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY_HELPER)).toHaveTextContent("Summary restored.");
+    // AND notifyOnChange is called with unedited summary
     expect(mockNotifyOnChange).toHaveBeenCalledWith(
-      expect.objectContaining({ target: { value: originalSummary } }),
+      expect.objectContaining({ target: { value: uneditedSummary } }),
       "summary",
       SUMMARY_MAX_LENGTH
     );
@@ -119,14 +119,14 @@ describe("SummaryEditField", () => {
   test("should show error snackbar and log error if restore fails", async () => {
     // GIVEN service throws error
     const givenError = new Error("some error");
-    jest.spyOn(ExperienceService.getInstance(), "getOriginalExperience").mockRejectedValueOnce(givenError);
+    jest.spyOn(ExperienceService.getInstance(), "getUneditedExperience").mockRejectedValueOnce(givenError);
     render(<SummaryEditField {...defaultProps} />);
     // WHEN restore is clicked
     const restoreBtn = screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY_RESTORE);
     userEvent.click(restoreBtn);
     // THEN error is logged and snackbar is shown
     await waitFor(() => {
-      expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to restore original summary:", givenError));
+      expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to restore summary:", givenError));
     });
     expect(mockEnqueueSnackbar).toHaveBeenCalledWith(
       "Failed to restore summary. Please try again later.",
@@ -139,7 +139,7 @@ describe("SummaryEditField", () => {
   test("should disable restore button while restoring", async () => {
     // GIVEN slow service
     let resolvePromise: any;
-    jest.spyOn(ExperienceService.getInstance(), "getOriginalExperience").mockReturnValueOnce(
+    jest.spyOn(ExperienceService.getInstance(), "getUneditedExperience").mockReturnValueOnce(
       new Promise((res) => { resolvePromise = res; })
     );
     jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValue({ summary: "restored" } as Experience);

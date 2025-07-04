@@ -31,7 +31,7 @@ describe("ExperienceService", () => {
       jest.clearAllMocks();
     });
 
-    test.each([["original experiences", true], ['processed experiences', false]])("should fetch the correct URL with GET and the correct headers and payload successfully for %s", async (_description, original) => {
+    test.each([["unedited experiences", true], ['processed experiences', false]])("should fetch the correct URL with GET and the correct headers and payload successfully for %s", async (_description, unedited) => {
       // GIVEN the experiences to return
       const givenMockExperiences = { mockExperiences };
       const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenMockExperiences, "application/json;charset=UTF-8");
@@ -39,10 +39,10 @@ describe("ExperienceService", () => {
       // WHEN the getExperiences function is called with a session id
       const givenSessionId = 1234;
       const service = ExperienceService.getInstance();
-      const experiencesResponse = await service.getExperiences(givenSessionId, original);
+      const experiencesResponse = await service.getExperiences(givenSessionId, unedited);
 
       // THEN expect to make a GET request with the correct headers and payload
-      expectCorrectFetchRequest(fetchSpy, `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?original=${original}`, {
+      expectCorrectFetchRequest(fetchSpy, `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?unedited=${unedited}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         expectedStatusCode: StatusCodes.OK,
@@ -92,7 +92,7 @@ describe("ExperienceService", () => {
             ExperienceService.name,
             "getExperiences",
             "GET",
-            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?original=false`,
+            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?unedited=false`,
             StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
@@ -260,7 +260,7 @@ describe("ExperienceService", () => {
     });
   });
 
-  describe("getOriginalExperience", () => {
+  describe("getUneditedExperience", () => {
     beforeEach(() => {
       jest.clearAllMocks();
     });
@@ -273,15 +273,15 @@ describe("ExperienceService", () => {
       // WHEN the getExperiences function is called with a session id
       const givenSessionId = 1234;
       const service = ExperienceService.getInstance();
-      const experiencesResponse = await service.getOriginalExperience(givenSessionId, givenMockExperience.UUID);
+      const experiencesResponse = await service.getUneditedExperience(givenSessionId, givenMockExperience.UUID);
 
       // THEN expect to make a GET request with the correct headers and payload
-      expectCorrectFetchRequest(fetchSpy, `${givenApiServerUrl}/conversations/${givenSessionId}/experiences/${givenMockExperience.UUID}/original`, {
+      expectCorrectFetchRequest(fetchSpy, `${givenApiServerUrl}/conversations/${givenSessionId}/experiences/${givenMockExperience.UUID}/unedited`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         expectedStatusCode: StatusCodes.OK,
         serviceName: "ExperienceService",
-        serviceFunction: "getOriginalExperience",
+        serviceFunction: "getUneditedExperience",
         failureMessage: "Failed to retrieve experience with UUID " + givenMockExperience.UUID,
         expectedContentType: "application/json",
       });
@@ -304,7 +304,7 @@ describe("ExperienceService", () => {
       const service = ExperienceService.getInstance();
 
       // THEN expect it to reject with the expected error
-      await expect(service.getOriginalExperience(givenSessionId, experienceId)).rejects.toThrow(
+      await expect(service.getUneditedExperience(givenSessionId, experienceId)).rejects.toThrow(
         givenFetchError
       );
     });
@@ -323,15 +323,15 @@ describe("ExperienceService", () => {
 
         // WHEN the updateExperience function is called
         const service = ExperienceService.getInstance();
-        const actualExperience = service.getOriginalExperience(givenSessionId, experienceId);
+        const actualExperience = service.getUneditedExperience(givenSessionId, experienceId);
 
         // THEN expect it to reject with the error response
         const expectedError = {
           ...new RestAPIError(
             ExperienceService.name,
-            "getOriginalExperience",
+            "getUneditedExperience",
             "GET",
-            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences/${experienceId}/original`,
+            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences/${experienceId}/unedited`,
             StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",

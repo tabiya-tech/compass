@@ -220,27 +220,27 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
 
     try {
       // Get the original experience
-      const originalExperience = await experienceService.getOriginalExperience(sessionId, experienceToRestoreToOriginal.UUID);
+      const uneditedExperience = await experienceService.getUneditedExperience(sessionId, experienceToRestoreToOriginal.UUID);
 
       // Update the current experience with all original fields
       await experienceService.updateExperience(sessionId, experienceToRestoreToOriginal.UUID, {
-        experience_title: originalExperience.experience_title,
-        timeline: originalExperience.timeline,
-        company: originalExperience.company,
-        location: originalExperience.location,
-        work_type: originalExperience.work_type,
-        summary: originalExperience.summary,
-        top_skills: originalExperience.top_skills.map(skill => ({
+        experience_title: uneditedExperience.experience_title,
+        timeline: uneditedExperience.timeline,
+        company: uneditedExperience.company,
+        location: uneditedExperience.location,
+        work_type: uneditedExperience.work_type,
+        summary: uneditedExperience.summary,
+        top_skills: uneditedExperience.top_skills.map(skill => ({
           UUID: skill.UUID,
           preferredLabel: skill.preferredLabel
         }))
       });
 
-      enqueueSnackbar("Experience restored to original successfully!", { variant: "success" });
+      enqueueSnackbar("Experience restored successfully!", { variant: "success" });
       await onExperiencesUpdated();
     } catch (error) {
-      console.error(new ExperienceError("Failed to restore experience to original:", error));
-      enqueueSnackbar("Failed to restore experience to original.", { variant: "error" });
+      console.error(new ExperienceError("Failed to restore experience:", error));
+      enqueueSnackbar("Failed to restore experience.", { variant: "error" });
     } finally {
       setIsRestoringExperience(false);
       setExperienceToRestoreToOriginal(null);
@@ -494,8 +494,8 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       />
       <ConfirmModalDialog
         isOpen={showRestoreToOriginalConfirmDialog}
-        title="Restore to Original Experience"
-        content={<>Are you sure you want to restore this experience to its original version? This will overwrite any changes you've made.</>}
+        title="Restore Experience"
+        content={<>Are you sure you want to restore this experience to its unedited version? This will overwrite any changes you've made.</>}
         onConfirm={confirmRestoreToOriginalExperience}
         onDismiss={cancelRestoreToOriginalExperience}
         onCancel={cancelRestoreToOriginalExperience}

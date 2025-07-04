@@ -27,8 +27,8 @@ export default class ExperienceService {
     this.experiencesEndpointUrl = `${this.apiServeUrl}/conversations`;
   }
 
-  async getExperiences(sessionId: number, original: boolean = false): Promise<Experience[]> {
-    const constructedExperiencesUrl = `${this.experiencesEndpointUrl}/${sessionId}/experiences?original=${original}`;
+  async getExperiences(sessionId: number, unedited: boolean = false): Promise<Experience[]> {
+    const constructedExperiencesUrl = `${this.experiencesEndpointUrl}/${sessionId}/experiences?unedited=${unedited}`;
     const errorFactory = getRestAPIErrorFactory(
       "ExperienceService",
       "getExperiences",
@@ -110,14 +110,14 @@ export default class ExperienceService {
     return updatedExperience;
   }
 
-  async getOriginalExperience(
+  async getUneditedExperience(
     sessionId: number,
     experienceId: string
   ): Promise<Experience> {
     const serviceName = "ExperienceService";
-    const serviceFunction = "getOriginalExperience";
+    const serviceFunction = "getUneditedExperience";
     const method = "GET";
-    const experienceURL = `${this.apiServeUrl}/conversations/${sessionId}/experiences/${experienceId}/original`;
+    const experienceURL = `${this.apiServeUrl}/conversations/${sessionId}/experiences/${experienceId}/unedited`;
     const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, experienceURL);
 
     const response = await customFetch(experienceURL, {
