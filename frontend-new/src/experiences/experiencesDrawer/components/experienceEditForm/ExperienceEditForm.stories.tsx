@@ -43,7 +43,7 @@ const meta: Meta<typeof ExperienceEditForm> = {
         },
       };
       // @ts-ignore
-      ExperienceService.getInstance().getOriginalExperience = mockExperienceService.getOriginalExperience;
+      ExperienceService.getInstance().getUneditedExperience = mockExperienceService.getOriginalExperience;
       // @ts-ignore
       ExperienceService.getInstance().updateExperience = mockExperienceService.updateExperience;
 

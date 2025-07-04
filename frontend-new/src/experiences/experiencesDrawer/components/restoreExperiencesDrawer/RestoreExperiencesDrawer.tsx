@@ -57,7 +57,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
       }
     };
     fetchDeletedExperiences().then();
-  }, [isOpen, sessionId, currentExperiences]);
+  }, [isOpen, sessionId, currentExperiences, enqueueSnackbar]);
 
   const handleRestore = async (experience: Experience) => {
     await onRestore(experience);

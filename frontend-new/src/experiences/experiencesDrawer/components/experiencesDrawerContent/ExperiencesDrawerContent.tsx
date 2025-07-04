@@ -40,7 +40,7 @@ export const MENU_ITEM_ID = {
 export const MENU_ITEM_TEXT = {
   EDIT: "Edit experience",
   DELETE: "Delete experience",
-  RESTORE_TO_ORIGINAL: "Restore to original",
+  RESTORE_TO_ORIGINAL: "Restore experience"
 };
 
 interface ExperienceProps {
