@@ -19,25 +19,26 @@ class ExperienceNotFoundError(Exception):
 
 class IExperienceService(ABC):
     @abstractmethod
-    async def get_experiences_by_session_id(self, session_id: int) -> list[ExperienceEntity]:
+    async def get_experiences_by_session_id(self, session_id: int) -> list[tuple[ExperienceEntity, DiveInPhase]]:
         """
         Get all the experiences that have been discovered for this session so far
+
         :param session_id: int - id for the conversation session
-        :return: list[Experience] - an array containing a list of experience objects
+        :return: List[Tuple[ExperienceEntity, DiveInPhase]] - an array containing tuples of (ExperienceEntity, DiveInPhase)
         :raises Exception: if any error occurs
         """
         raise NotImplementedError()
 
     @abstractmethod
     async def update_experience(self, user_id: str, session_id: int, experience_uuid: str,
-                                update_payload: UpdateExperienceRequest) -> ExperienceEntity:
+                                update_payload: UpdateExperienceRequest) -> tuple[ExperienceEntity, DiveInPhase]:
         """
         Update an experience for a given session.
         :param user_id: str - the id of the requesting user
         :param session_id: int - id for the conversation session
         :param experience_uuid: str - the uuid of the experience to update
         :param update_payload: UpdateExperienceRequest - the payload with the fields to update
-        :return: Experience - the updated experience object
+        :return Tuple[ExperienceEntity, DiveInPhase]: - a tuple containing the updated experience object and its dive-in phase
         :raises Exception: if any error occurs
         """
         raise NotImplementedError()
@@ -54,34 +55,34 @@ class IExperienceService(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_unedited_experience_by_uuid(self, session_id: int, experience_uuid: str) -> ExperienceEntity:
+    async def get_unedited_experience_by_uuid(self, session_id: int, experience_uuid: str) -> tuple[ExperienceEntity, DiveInPhase]:
         """
         Get the unedited experience by UUID
         :param session_id: int - id for the conversation session
         :param experience_uuid: str - the uuid of the experience to retrieve
-        :return: ExperienceEntity - the unedited experience object
+        :return: Tuple[ExperienceEntity, DiveInPhase] - a tuple containing the experience object and its dive-in phase
         :raises ExperienceNotFoundError: if the experience is not found
         """
         raise NotImplementedError()
 
     @abstractmethod
-    async def get_unedited_experiences(self, session_id: int) -> list[ExperienceEntity]:
+    async def get_unedited_experiences(self, session_id: int) -> list[tuple[ExperienceEntity, DiveInPhase]]:
         """
         Get all unedited experiences for a given session.
         :param session_id: int - id for the conversation session
-        :return: list[ExperienceEntity] - a list of unedited experience objects
+        :return: List[Tuple[ExperienceEntity, DiveInPhase]] - a list of tuples containing the experience objects and their dive-in phases
         :raises Exception: if any error occurs
         """
         raise NotImplementedError()
 
     @abstractmethod
-    async def restore_deleted_experience(self, user_id: str, session_id: int, experience_uuid: str) -> ExperienceEntity:
+    async def restore_deleted_experience(self, user_id: str, session_id: int, experience_uuid: str) -> tuple[ExperienceEntity, DiveInPhase]:
         """
         Restore a deleted experience for a given session.
         :param user_id: str - the id of the requesting user
         :param session_id: int - id for the conversation session
         :param experience_uuid: str - the uuid of the experience to restore
-        :return: ExperienceEntity - the restored experience object
+        :return: Tuple[ExperienceEntity, DiveInPhase] - a tuple containing the restored experience object and its dive-in phase
         :raises ExperienceNotFoundError: if the experience is not found
         """
         raise NotImplementedError()
@@ -94,7 +95,7 @@ class ExperienceService(IExperienceService):
         self._application_state_metrics_recorder = application_state_metrics_recorder
 
     async def update_experience(self, user_id: str, session_id: int, experience_uuid: str,
-                                update_payload: UpdateExperienceRequest) -> ExperienceEntity:
+                                update_payload: UpdateExperienceRequest) -> tuple[ExperienceEntity, DiveInPhase]:
         state = await self._application_state_metrics_recorder.get_state(session_id)
         director_state = state.explore_experiences_director_state
 
@@ -143,19 +144,19 @@ class ExperienceService(IExperienceService):
             work_type=experience_to_update.work_type,
             top_skills=top_skills,
             summary=experience_to_update.summary,
-        )
+        ), DiveInPhase(director_state.experiences_state[experience_uuid].dive_in_phase)
 
-    async def get_experiences_by_session_id(self, session_id: int) -> list[ExperienceEntity]:
+    async def get_experiences_by_session_id(self, session_id: int) -> list[tuple[ExperienceEntity, DiveInPhase]]:
         # Get the experiences from the application state
         state = await self._application_state_metrics_recorder.get_state(session_id)
         director_state = state.explore_experiences_director_state
 
         # experiences to return to the user.
-        experiences: list[ExperienceEntity] = []
+        experiences: list[tuple[ExperienceEntity, DiveInPhase]] = []
 
         # 1. First, get the explored experiences from the `director_state`
         for experience_details in director_state.explored_experiences:
-            experiences.append(experience_details)
+            experiences.append((experience_details, DiveInPhase.PROCESSED))
 
         # 2. Then, get the experiences that are in the `experiences_state` but not yet explored.
         #    Append them to the experiences to return to the user.
@@ -163,7 +164,7 @@ class ExperienceService(IExperienceService):
             if exp_state.dive_in_phase == DiveInPhase.PROCESSED:
                 continue  # Skip ones we already explored
 
-            experiences.append(exp_state.experience)
+            experiences.append((exp_state.experience, exp_state.dive_in_phase))
 
         return experiences
 
@@ -188,31 +189,31 @@ class ExperienceService(IExperienceService):
 
         await self._application_state_metrics_recorder.save_state(state, user_id)
 
-    async def get_unedited_experience_by_uuid(self, session_id: int, experience_uuid: str) -> ExperienceEntity:
+    async def get_unedited_experience_by_uuid(self, session_id: int, experience_uuid: str) -> tuple[ExperienceEntity, DiveInPhase]:
         state = await self._application_state_metrics_recorder.get_state(session_id)
         director_state = state.explore_experiences_director_state
 
         # Find the experience in the explored experiences
         for exp_uuid, exp_state in director_state.experiences_state.items():
             if exp_uuid == experience_uuid:
-                return exp_state.experience
+                return exp_state.experience, exp_state.dive_in_phase
 
         # If not found, raise an error
         raise ExperienceNotFoundError(experience_uuid)
 
-    async def get_unedited_experiences(self, session_id: int) -> list[ExperienceEntity]:
+    async def get_unedited_experiences(self, session_id: int) -> list[tuple[ExperienceEntity, DiveInPhase]]:
         state = await self._application_state_metrics_recorder.get_state(session_id)
         director_state = state.explore_experiences_director_state
 
         # Collect all unedited experiences
-        unedited_experiences: list[ExperienceEntity] = []
+        unedited_experiences: list[tuple[ExperienceEntity, DiveInPhase]] = []
 
         for exp_uuid, exp_state in director_state.experiences_state.items():
-            unedited_experiences.append(exp_state.experience)
+            unedited_experiences.append((exp_state.experience, exp_state.dive_in_phase))
 
         return unedited_experiences
 
-    async def restore_deleted_experience(self, user_id: str, session_id: int, experience_uuid: str) -> ExperienceEntity:
+    async def restore_deleted_experience(self, user_id: str, session_id: int, experience_uuid: str) -> tuple[ExperienceEntity, DiveInPhase]:
         state = await self._application_state_metrics_recorder.get_state(session_id)
         director_state = state.explore_experiences_director_state
 
@@ -230,5 +231,5 @@ class ExperienceService(IExperienceService):
         # save the updated state
         await self._application_state_metrics_recorder.save_state(state, user_id)
         # Return the restored experience
-        return recovered_experience.experience
+        return recovered_experience.experience, recovered_experience.dive_in_phase
 
