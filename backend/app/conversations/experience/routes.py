@@ -4,7 +4,6 @@ from typing import List, Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
-from app.agent.experience import ExperienceEntity
 from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
@@ -81,8 +80,8 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
 
             return [ExperienceResponse.from_experience_entity(
                 experience_entity=experience_entity,
-                dive_in_phase=DiveInPhase.PROCESSED
-            ) for experience_entity in experience_entity_list]
+                dive_in_phase=dive_in_phase
+            ) for experience_entity, dive_in_phase in experience_entity_list]
 
         except UnauthorizedSessionAccessError as e:
             warning_msg = str(e)
@@ -118,8 +117,8 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
             if current_user_preferences is None or session_id not in current_user_preferences.sessions:
                 raise UnauthorizedSessionAccessError(user_id, session_id)
 
-            experience_entity = await service.update_experience(user_id, session_id, experience_uuid, body)
-            return ExperienceResponse.from_experience_entity(experience_entity, DiveInPhase.PROCESSED)
+            experience_entity, dive_in_phase = await service.update_experience(user_id, session_id, experience_uuid, body)
+            return ExperienceResponse.from_experience_entity(experience_entity, dive_in_phase)
         except UnauthorizedSessionAccessError as e:
             warning_msg = str(e)
             logger.warning(warning_msg)
@@ -157,10 +156,10 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
             if current_user_preferences is None or session_id not in current_user_preferences.sessions:
                 raise UnauthorizedSessionAccessError(user_id, session_id)
 
-            experience_entity = await service.get_unedited_experience_by_uuid(session_id, experience_uuid)
+            experience_entity, dive_in_phase = await service.get_unedited_experience_by_uuid(session_id, experience_uuid)
             return ExperienceResponse.from_experience_entity(
                 experience_entity=experience_entity,
-                dive_in_phase=DiveInPhase.PROCESSED
+                dive_in_phase=dive_in_phase
             )
         except UnauthorizedSessionAccessError as e:
             warning_msg = str(e)
@@ -245,10 +244,10 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
             if current_user_preferences is None or session_id not in current_user_preferences.sessions:
                 raise UnauthorizedSessionAccessError(user_id, session_id)
 
-            experience_entity = await service.restore_deleted_experience(user_id, session_id, experience_uuid)
+            experience_entity, dive_in_phase = await service.restore_deleted_experience(user_id, session_id, experience_uuid)
             return ExperienceResponse.from_experience_entity(
                 experience_entity=experience_entity,
-                dive_in_phase=DiveInPhase.PROCESSED
+                dive_in_phase=dive_in_phase
             )
         except UnauthorizedSessionAccessError as e:
             warning_msg = str(e)

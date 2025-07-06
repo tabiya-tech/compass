@@ -168,7 +168,7 @@ class TestExperienceRoutes:
             preferences_spy = mocker.spy(mocked_preferences_repository, "get_user_preference_by_user_id")
 
             # AND an ExperienceService that will return a list of experiences
-            expected_response = [
+            expected_response = [(
                 ExperienceResponse(
                     uuid="foo_uuid",
                     experience_title="Foo Bar",
@@ -186,7 +186,8 @@ class TestExperienceRoutes:
                     ],
                     exploration_phase=DiveInPhase.PROCESSED.name,
                     summary="Foo summary"
-                )
+                ),
+                DiveInPhase.PROCESSED)
             ]
 
             if unedited:
@@ -203,7 +204,9 @@ class TestExperienceRoutes:
             assert response.status_code == HTTPStatus.OK
 
             # AND the response matches the expected response
-            assert response.json() == [exp.model_dump(by_alias=True, mode="json") for exp in expected_response]
+            assert response.json() == [
+                exp.model_dump(by_alias=True) for exp, _ in expected_response
+            ]
 
             # AND the user preferences repository was called with the correct user_id
             preferences_spy.assert_called_once_with(mocked_user.user_id)
@@ -342,7 +345,7 @@ class TestExperienceRoutes:
             mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=get_mock_user_preferences(given_session_id))
             preferences_spy = mocker.spy(mocked_preferences_repository, "get_user_preference_by_user_id")
             # AND the service returns the updated experience
-            expected_response = ExperienceResponse(
+            expected_response = (ExperienceResponse(
                 uuid=given_experience_uuid,
                 experience_title="new title",
                 company="company",
@@ -352,7 +355,7 @@ class TestExperienceRoutes:
                 top_skills=[],
                 summary="summary",
                 exploration_phase="PROCESSED"
-            )
+            ), DiveInPhase.PROCESSED)
             mocked_service.update_experience = AsyncMock(return_value=expected_response)
             service_spy = mocker.spy(mocked_service, "update_experience")
             # WHEN the PATCH request is made
@@ -360,7 +363,7 @@ class TestExperienceRoutes:
             # THEN the response is OK
             assert response.status_code == HTTPStatus.OK
             # AND the response matches the expected experience
-            assert response.json() == expected_response.model_dump(by_alias=True)
+            assert response.json() == expected_response[0].model_dump(by_alias=True)
             # AND the user preferences repository was called with the correct user_id
             preferences_spy.assert_called_once_with(mocked_user.user_id)
             # AND the experience service was called with the correct arguments
@@ -572,7 +575,7 @@ class TestExperienceRoutes:
             mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(return_value=get_mock_user_preferences(given_session_id))
             preferences_spy = mocker.spy(mocked_preferences_repository, "get_user_preference_by_user_id")
             # AND the service returns the unedited experience
-            expected_response = ExperienceResponse(
+            expected_response = (ExperienceResponse(
                 uuid=given_experience_uuid,
                 experience_title="Unedited Title",
                 company="Unedited Company",
@@ -582,7 +585,7 @@ class TestExperienceRoutes:
                 top_skills=[],
                 summary="Unedited summary",
                 exploration_phase=DiveInPhase.PROCESSED.name
-            )
+            ), DiveInPhase.PROCESSED)
             mocked_service.get_unedited_experience_by_uuid = AsyncMock(return_value=expected_response)
             service_spy = mocker.spy(mocked_service, "get_unedited_experience_by_uuid")
             # WHEN the GET request is made
@@ -590,7 +593,7 @@ class TestExperienceRoutes:
             # THEN the response is OK
             assert response.status_code == HTTPStatus.OK
             # AND the response matches the expected experience
-            assert response.json() == expected_response.model_dump(by_alias=True)
+            assert response.json() == expected_response[0].model_dump(by_alias=True)
             # AND the user preferences repository was called with the correct user_id
             preferences_spy.assert_called_once_with(mocked_user.user_id)
             # AND the experience service was called with the correct arguments

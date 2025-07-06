@@ -86,10 +86,12 @@ class TestGetExperiencesBySessionId:
 
         # THEN it returns the expected experience
         assert len(result) == 1
-        exp = result[0]
+        exp, dive_in_phase = result[0]
         assert exp.uuid == exp_uuid
         assert exp.experience_title == "Test Experience"
         assert exp.top_skills[0].UUID == "skill1"
+
+        assert dive_in_phase == DiveInPhase.PROCESSED
 
     @pytest.mark.asyncio
     async def test_empty(self, mock_metrics_recorder):
@@ -142,11 +144,12 @@ class TestUpdateExperience:
         update_payload = UpdateExperienceRequest(experience_title="Updated Title")
 
         # WHEN update_experience is called
-        result = await service.update_experience(user_id, session_id, exp_uuid, update_payload)
+        exp, dive_in_phase = await service.update_experience(user_id, session_id, exp_uuid, update_payload)
 
         # THEN the experience is updated and returned
-        assert result.uuid == exp_uuid
-        assert result.experience_title == "Updated Title"
+        assert exp.uuid == exp_uuid
+        assert exp.experience_title == "Updated Title"
+        assert  dive_in_phase == DiveInPhase.PROCESSED
         mock_metrics_recorder.save_state.assert_called_once()
 
     @pytest.mark.parametrize(
@@ -225,14 +228,14 @@ class TestUpdateExperience:
         service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
 
         # WHEN update_experience is called
-        result = await service.update_experience(user_id, session_id, exp_uuid, update_payload)
+        exp, dive_in_phase = await service.update_experience(user_id, session_id, exp_uuid, update_payload)
 
         # THEN the experience is updated and saved
         mock_metrics_recorder.save_state.assert_called_once()
 
         # AND the updated fields are correct
         for field, expected in expected_changes.items():
-            actual = getattr(result, field)
+            actual = getattr(exp, field)
             if field == 'top_skills':
                 actual_simple = [{'UUID': s.UUID, 'preferredLabel': s.preferredLabel} for s in actual]
                 assert actual_simple == expected
@@ -241,13 +244,16 @@ class TestUpdateExperience:
 
         # AND some non-updated fields are unchanged
         if 'experience_title' not in expected_changes:
-            assert result.experience_title == initial_experience.experience_title
+            assert exp.experience_title == initial_experience.experience_title
         if 'company' not in expected_changes:
-            assert result.company == initial_experience.company
+            assert exp.company == initial_experience.company
         if 'top_skills' not in expected_changes:
             unedited_skills = [{'UUID': s.UUID, 'preferredLabel': s.preferredLabel} for s in initial_experience.top_skills]
-            result_skills = [{'UUID': s.UUID, 'preferredLabel': s.preferredLabel} for s in result.top_skills]
+            result_skills = [{'UUID': s.UUID, 'preferredLabel': s.preferredLabel} for s in exp.top_skills]
             assert result_skills == unedited_skills
+
+        # AND the dive_in_phase is still PROCESSED
+        assert dive_in_phase == DiveInPhase.PROCESSED
 
     @pytest.mark.asyncio
     async def test_not_found(self, mock_metrics_recorder):
@@ -374,12 +380,13 @@ class TestGetUneditedExperienceByUuid:
         service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
 
         # WHEN get_unedited_experience_by_uuid is called
-        result = await service.get_unedited_experience_by_uuid(session_id, exp_uuid)
+        exp, dive_in_phase = await service.get_unedited_experience_by_uuid(session_id, exp_uuid)
 
         # THEN it returns the expected experience
-        assert result.uuid == exp_uuid
-        assert result.experience_title == "Test Experience"
-        assert result.top_skills[0].UUID == "skill1"
+        assert exp.uuid == exp_uuid
+        assert exp.experience_title == "Test Experience"
+        assert exp.top_skills[0].UUID == "skill1"
+        assert dive_in_phase == DiveInPhase.PROCESSED
 
     @pytest.mark.asyncio
     async def test_not_found(self, mock_metrics_recorder):
@@ -442,12 +449,14 @@ class TestGetAllUneditedExperiences:
 
         # THEN it returns all experiences
         assert len(result) == 2
-        assert result[0].uuid == exp_uuid1
-        assert result[0].experience_title == "Experience One"
-        assert result[0].top_skills[0].UUID == "skill1"
-        assert result[1].uuid == exp_uuid2
-        assert result[1].experience_title == "Experience Two"
-        assert result[1].top_skills[0].UUID == "skill2"
+        assert result[0][0].uuid == exp_uuid1
+        assert result[0][0].experience_title == "Experience One"
+        assert result[0][0].top_skills[0].UUID == "skill1"
+        assert result[0][1] == DiveInPhase.PROCESSED
+        assert result[1][0].uuid == exp_uuid2
+        assert result[1][0].experience_title == "Experience Two"
+        assert result[1][0].top_skills[0].UUID == "skill2"
+        assert result[1][1] == DiveInPhase.PROCESSED
 
     @pytest.mark.asyncio
     async def test_get_unedited_experiences_empty(self, mock_metrics_recorder):
