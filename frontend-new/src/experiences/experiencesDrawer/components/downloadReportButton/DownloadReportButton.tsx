@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, CircularProgress, Typography, useTheme } from "@mui/material";
+import { Box, CircularProgress, useTheme } from "@mui/material";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import InfoIcon from "@mui/icons-material/Info";
 import HelpTip from "src/theme/HelpTip/HelpTip";
@@ -43,7 +43,7 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({ disabled, i
         onClick={notifyOnDownloadPdf}
         data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON}
       >
-        <Typography variant="caption">{isLoading ? "Downloading" : "Download CV"}</Typography>
+        {isLoading ? "Downloading" : "Download CV"}
       </PrimaryButton>
       {disabled && (
         <HelpTip icon={<InfoIcon />} data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_HELP_TIP}>

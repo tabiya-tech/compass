@@ -160,7 +160,7 @@ describe("ExperienceEditForm", () => {
     const mockUpdateExperience = {
       ...mockExperiences[0],
       work_type: WorkType.SELF_EMPLOYMENT,
-    }
+    };
     jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValueOnce(mockUpdateExperience);
     const givenExperienceEditForm = (
       <ExperienceEditForm
@@ -257,7 +257,7 @@ describe("ExperienceEditForm", () => {
     await userEvent.click(saveButton);
 
     // THEN notifyOnSave should be called with the updated skill label
-    expect(notifyOnSave).toHaveBeenCalled();;
+    expect(notifyOnSave).toHaveBeenCalled();
     // AND no errors or warnings occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
@@ -315,7 +315,7 @@ describe("ExperienceEditForm", () => {
     await userEvent.click(saveButton);
 
     // THEN notifyOnSave should be called with only the non-deleted skill
-    expect(notifyOnSave).toHaveBeenCalled()
+    expect(notifyOnSave).toHaveBeenCalled();
     // AND no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
@@ -382,7 +382,7 @@ describe("ExperienceEditForm", () => {
       experience_title: "foo title",
       company: "bar company",
       location: "baz location",
-    }
+    };
     jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValueOnce(mockUpdateExperience);
     const notifyOnUnsavedChange = jest.fn();
     const givenExperienceEditForm = (
@@ -463,7 +463,9 @@ describe("ExperienceEditForm", () => {
   test("should successfully update experience and notify parent when save button is clicked", async () => {
     // GIVEN the ExperienceEditForm component
     const notifyOnSave = jest.fn();
-    const mockUpdateExperience = jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValueOnce(mockExperiences[0]);
+    const mockUpdateExperience = jest
+      .spyOn(ExperienceService.getInstance(), "updateExperience")
+      .mockResolvedValueOnce(mockExperiences[0]);
     const givenExperienceEditForm = (
       <ExperienceEditForm
         experience={{ ...mockExperiences[0] }}
@@ -514,7 +516,9 @@ describe("ExperienceEditForm", () => {
   test("Should show an error message when updating the experience fails", async () => {
     // GIVEN a service that will fail when updating the experience
     const givenError = new Error("API failed to update experience");
-    const mockUpdateExperience = jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockRejectedValueOnce(givenError);
+    const mockUpdateExperience = jest
+      .spyOn(ExperienceService.getInstance(), "updateExperience")
+      .mockRejectedValueOnce(givenError);
     // AND the ExperienceEditForm component
     const notifyOnSave = jest.fn();
     const notifyOnUnsavedChange = jest.fn();

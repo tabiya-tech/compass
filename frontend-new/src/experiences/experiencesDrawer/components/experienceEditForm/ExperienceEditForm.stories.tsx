@@ -31,7 +31,7 @@ const meta: Meta<typeof ExperienceEditForm> = {
           uuid: "1234",
           summary: "This is the original summary of the experience.".repeat(15),
         }),
-        updateExperience: (sessionId: number, experience_uuid: string, data: {summary: string}) => {
+        updateExperience: (sessionId: number, experience_uuid: string, data: { summary: string }) => {
           return new Promise((resolve) => {
             setTimeout(() => {
               resolve({
@@ -47,8 +47,9 @@ const meta: Meta<typeof ExperienceEditForm> = {
       // @ts-ignore
       ExperienceService.getInstance().updateExperience = mockExperienceService.updateExperience;
 
-      return <Story/>
-    }]
+      return <Story />;
+    },
+  ],
 };
 
 export default meta;
