@@ -36,3 +36,7 @@ To add a new feature create a `FeatureImpl` class that implements the ABC class 
       }
     }
     ```
+
+2. **Add the config to the supported features file:**  
+   
+   For the GCP API Gateway to include the current feature APIs (paths), you need to specify them in the file [`/scripts/export_api_gateway_config/supported_features.json`](/backend/scripts/export_api_gateway_config/supported_features.json). This file is used to generate the OpenAPI spec and the API Gateway configuration. The format is the same as above.

@@ -1,8 +1,27 @@
 #!/usr/bin/env python3
+import json
 import os
 
 import yaml
 from fastapi.openapi.utils import get_openapi
+
+
+def _get_supported_features() -> str:
+    """
+    Reads the supported features from the JSON file located at ./supported_features.json.
+    And returns a string of JSON dictionary of supported features.
+    """
+    current_dir = os.path.dirname(__file__)
+    features_file = os.path.join(current_dir, 'supported_features.json')
+    if not os.path.exists(features_file):
+        raise FileNotFoundError(f"Supported features file not found: {features_file}")
+
+    # Validate the file is a valid JSON file
+    with open(features_file, 'r') as f:
+        features = json.load(f)
+
+    # Return the features as a JSON string
+    return json.dumps(features)
 
 
 def export():
@@ -10,8 +29,12 @@ def export():
     # Since the app won't actually be running, we only need to set the environment variables typically used for testing.
     # This is necessary because the app is initialized at the module level and doesn't currently support passing a configuration.
     # If these values are not set, the app won't start and will throw an error due to missing required environment variables.
+
+    # For optional features, we need to support all of them for the api_gateway_config export.
+    # Otherwise, the GCP API gateway will not be able to access the API if it is enabled for some environments.
+    supported_features = _get_supported_features()
     from common_libs.test_utilities.setup_env_vars import env_context
-    with env_context():
+    with env_context(env_vars={"BACKEND_FEATURES": supported_features}):
         from app.server import app
         # Generate the OpenAPI 3.1 schema
         openapi3 = get_openapi(
