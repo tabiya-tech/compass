@@ -7,7 +7,11 @@ import { mockExperiences } from "src/experiences/experienceService/_test_utiliti
 import { fireEvent } from "@testing-library/react";
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
-import { DATA_TEST_ID as EXPERIENCES_DRAWER_CONTENT_TEST_ID, MENU_ITEM_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
+import {
+  DATA_TEST_ID as EXPERIENCES_DRAWER_CONTENT_TEST_ID,
+  MENU_ITEM_ID,
+} from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
+import userEvent from "@testing-library/user-event";
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
@@ -17,7 +21,7 @@ jest.mock("src/theme/ContextMenu/ContextMenu", () => {
     default: jest.fn(({ items, notifyOnClose }: { items: MenuItemConfig[]; notifyOnClose: () => void }) => (
       <div data-testid={actual.DATA_TEST_ID.MENU}>
         {items.map((item) => (
-          <div key={item.id} data-testid={item.id} onClick={item.action}>
+          <div key={item.id} data-testid={item.id} data-disabled={item.disabled} onClick={item.action}>
             {item.text}
           </div>
         ))}
@@ -55,7 +59,9 @@ describe("ExperienceCategory", () => {
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
     // AND no experience content to be rendered
-    expect(screen.queryByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_CONTENT_CONTAINER)).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_CONTENT_CONTAINER)
+    ).not.toBeInTheDocument();
   });
 
   test("should render experiences when provided", () => {
@@ -65,18 +71,15 @@ describe("ExperienceCategory", () => {
       exploration_phase: DiveInPhase.PROCESSED,
     }));
     // AND the ExperienceCategory component
-    const givenExperienceCategory = (
-      <ExperienceCategory
-        {...defaultProps}
-        experiences={givenExperiences}
-      />
-    );
+    const givenExperienceCategory = <ExperienceCategory {...defaultProps} experiences={givenExperiences} />;
 
     // WHEN the component is rendered
     render(givenExperienceCategory);
 
     // THEN expect the experiences to be rendered
-    const experienceContainers = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_CONTENT_CONTAINER);
+    const experienceContainers = screen.getAllByTestId(
+      EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_CONTENT_CONTAINER
+    );
     expect(experienceContainers).toHaveLength(givenExperiences.length);
     // AND no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -90,12 +93,7 @@ describe("ExperienceCategory", () => {
       exploration_phase: DiveInPhase.PROCESSED,
     }));
     // AND the ExperienceCategory component
-    const givenExperienceCategory = (
-      <ExperienceCategory
-        {...defaultProps}
-        experiences={givenExperiences}
-      />
-    );
+    const givenExperienceCategory = <ExperienceCategory {...defaultProps} experiences={givenExperiences} />;
 
     // WHEN the component is rendered
     render(givenExperienceCategory);
@@ -117,12 +115,7 @@ describe("ExperienceCategory", () => {
       exploration_phase: DiveInPhase.PROCESSED,
     }));
     // AND the ExperienceCategory component
-    const givenExperienceCategory = (
-      <ExperienceCategory
-        {...defaultProps}
-        experiences={givenExperiences}
-      />
-    );
+    const givenExperienceCategory = <ExperienceCategory {...defaultProps} experiences={givenExperiences} />;
 
     // WHEN the component is rendered
     render(givenExperienceCategory);
@@ -144,12 +137,7 @@ describe("ExperienceCategory", () => {
       exploration_phase: DiveInPhase.PROCESSED,
     }));
     // AND the ExperienceCategory component
-    const givenExperienceCategory = (
-      <ExperienceCategory
-        {...defaultProps}
-        experiences={givenExperiences}
-      />
-    );
+    const givenExperienceCategory = <ExperienceCategory {...defaultProps} experiences={givenExperiences} />;
 
     // WHEN the component is rendered
     render(givenExperienceCategory);
@@ -164,24 +152,31 @@ describe("ExperienceCategory", () => {
     expect(defaultProps.onRestoreToOriginalExperience).toHaveBeenCalledWith(givenExperiences[0]);
   });
 
-  test("should not show context menu for non-processed experiences", () => {
+  test("should show context menu items disable for non-processed experiences", async () => {
     // GIVEN some experiences that have not been processed
     const givenExperiences = mockExperiences.map((experience) => ({
       ...experience,
       exploration_phase: DiveInPhase.NOT_STARTED,
     }));
     // AND the ExperienceCategory component
-    const givenExperienceCategory = (
-      <ExperienceCategory
-        {...defaultProps}
-        experiences={givenExperiences}
-      />
-    );
+    const givenExperienceCategory = <ExperienceCategory {...defaultProps} experiences={givenExperiences} />;
 
     // WHEN the component is rendered
     render(givenExperienceCategory);
 
-    // THEN expect no more buttons to be rendered
-    expect(screen.queryByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)).not.toBeInTheDocument();
+    // THEN expect the more button to be present for each experience
+    const moreButtons = screen.getAllByTestId(EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON);
+    expect(moreButtons).toHaveLength(givenExperiences.length);
+    // AND the menu items to be disabled
+    const moreButton = moreButtons[0];
+    await userEvent.click(moreButton);
+    const editButton = screen.getAllByTestId(MENU_ITEM_ID.EDIT)[0];
+    expect(editButton).toHaveAttribute("data-disabled", "true");
+
+    const deleteButton = screen.getAllByTestId(MENU_ITEM_ID.DELETE)[0];
+    expect(deleteButton).toHaveAttribute("data-disabled", "true");
+
+    const restoreToOriginalButton = screen.getAllByTestId(MENU_ITEM_ID.RESTORE_TO_ORIGINAL)[0];
+    expect(restoreToOriginalButton).toHaveAttribute("data-disabled", "true");
   });
 });

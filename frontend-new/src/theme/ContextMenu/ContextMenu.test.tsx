@@ -1,7 +1,7 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import { fireEvent, render, waitFor, screen, within } from "@testing-library/react";
+import { fireEvent, render, waitFor, screen, within } from "src/_test_utilities/test-utils";
 import ContextMenu, { ContextMenuProps, DATA_TEST_ID } from "./ContextMenu";
 import React from "react";
 import { MenuItemConfig } from "./menuItemConfig.types";
@@ -78,6 +78,32 @@ describe("ContextMenu", () => {
 
       // AND to match the snapshot
       expect(actualMenu).toMatchSnapshot();
+    });
+
+    test("should render context menu with a header message", () => {
+      // GIVEN a header message
+      const givenHeaderMessage = "This is a header message";
+      // AND the menu items
+      const givenItems: MenuItemConfig[] = [
+        {
+          id: "1",
+          text: "foo",
+          icon: <div />,
+          disabled: false,
+          action: jest.fn(),
+        },
+      ];
+      // WHEN the component is rendered with the given header message and items
+      render(<ContextMenu {...stdGivenProps} headerMessage={givenHeaderMessage} items={givenItems} />);
+
+      // THEN expect the header message to be rendered
+      const actualHeaderMessage = screen.getByTestId(DATA_TEST_ID.MENU_HEADER_MESSAGE);
+      expect(actualHeaderMessage).toBeInTheDocument();
+      expect(actualHeaderMessage.textContent).toEqual(givenHeaderMessage);
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+
     });
 
     test("renders correctly the menu closed", () => {

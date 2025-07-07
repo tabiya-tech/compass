@@ -19,7 +19,30 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
       </p>
       <div
         class="MuiBox-root css-192qrng"
-      />
+      >
+        <button
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
+          data-testid="experiences-drawer-more-button-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
+          tabindex="0"
+          title="More options"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="MoreVertIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
     </div>
     <span
       class="MuiTypography-root MuiTypography-caption css-1s89n9g-MuiTypography-root"
@@ -113,16 +136,24 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
   >
     <div
+      data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-header-message"
+    >
+      These actions are only available for explored experiences.
+    </div>
+    <div
+      data-disabled="true"
       data-testid="experiences-drawer-menu-item-edit-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
     >
       Edit
     </div>
     <div
+      data-disabled="true"
       data-testid="experiences-drawer-menu-item-restore-to-original-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
     >
       Restore
     </div>
     <div
+      data-disabled="true"
       data-testid="experiences-drawer-menu-item-delete-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
     >
       Delete
