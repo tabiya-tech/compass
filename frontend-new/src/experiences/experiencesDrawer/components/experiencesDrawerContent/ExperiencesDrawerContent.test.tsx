@@ -22,18 +22,29 @@ jest.mock("src/theme/ContextMenu/ContextMenu", () => {
   const actual = jest.requireActual("src/theme/ContextMenu/ContextMenu");
   return {
     __esModule: true,
-    default: jest.fn(({ items, notifyOnClose }: { items: MenuItemConfig[]; notifyOnClose: () => void }) => (
-      <div data-testid={actual.DATA_TEST_ID.MENU}>
-        {items.map((item) => (
-          <div key={item.id} data-testid={item.id} onClick={item.action}>
-            {item.text}
-          </div>
-        ))}
-        <button data-testid="close-menu-button" onClick={notifyOnClose}>
-          Close
-        </button>
-      </div>
-    )),
+    default: jest.fn(
+      ({
+        items,
+        notifyOnClose,
+        headerMessage,
+      }: {
+        items: MenuItemConfig[];
+        notifyOnClose: () => void;
+        headerMessage?: string;
+      }) => (
+        <div data-testid={actual.DATA_TEST_ID.MENU}>
+          {headerMessage && <div data-testid={actual.DATA_TEST_ID.MENU_HEADER_MESSAGE}>{headerMessage}</div>}
+          {items.map((item) => (
+            <div key={item.id} data-testid={item.id} data-disabled={item.disabled} onClick={item.action}>
+              {item.text}
+            </div>
+          ))}
+          <button data-testid="close-menu-button" onClick={notifyOnClose}>
+            Close
+          </button>
+        </div>
+      )
+    ),
     DATA_TEST_ID: actual.DATA_TEST_ID,
   };
 });
@@ -115,8 +126,8 @@ describe("ReportDrawerContent", () => {
   });
 
   test.each([DiveInPhase.NOT_STARTED, DiveInPhase.EXPLORING_SKILLS, DiveInPhase.LINKING_RANKING])(
-    "should not render context menu button if experience exploration phase is %s",
-    (phase) => {
+    "should display context menu with disabled actions when experience exploration phase is %s",
+    async (phase) => {
       // GIVEN the ExperiencesDrawerContent component with a non-PROCESSED experience
       const givenReportDrawerContent = (
         <ExperiencesDrawerContent
@@ -129,13 +140,63 @@ describe("ReportDrawerContent", () => {
       // WHEN the component is rendered
       render(givenReportDrawerContent);
 
-      // THEN expect no errors or warning to have occurred
-      expect(console.error).not.toHaveBeenCalled();
-      expect(console.warn).not.toHaveBeenCalled();
-      // AND the report drawer more button to be in the document
-      expect(screen.queryByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON)).not.toBeInTheDocument();
+      // AND the more button is clicked
+      const moreButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON);
+      await userEvent.click(moreButton);
+
+      // THEN expect the context menu to be displayed
+      const contextMenu = screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
+      expect(contextMenu).toBeInTheDocument();
+
+      // AND there should be a header message
+      expect(screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU_HEADER_MESSAGE)).toBeInTheDocument();
+
+      // AND all menu items should be disabled
+      const editButton = screen.getByTestId(MENU_ITEM_ID.EDIT);
+      expect(editButton).toHaveAttribute("data-disabled", "true");
+
+      const deleteButton = screen.getByTestId(MENU_ITEM_ID.DELETE);
+      expect(deleteButton).toHaveAttribute("data-disabled", "true");
+
+      const restoreToOriginalButton = screen.getByTestId(MENU_ITEM_ID.RESTORE_TO_ORIGINAL);
+      expect(restoreToOriginalButton).toHaveAttribute("data-disabled", "true");
     }
   );
+
+  test("should display context menu with enabled actions when experience is processed", async () => {
+    // GIVEN the ExperiencesDrawerContent component with a PROCESSED experience
+    const givenReportDrawerContent = (
+      <ExperiencesDrawerContent
+        experience={{ ...mockExperiences[0], exploration_phase: DiveInPhase.PROCESSED }}
+        onEdit={jest.fn()}
+        onDelete={jest.fn()}
+      />
+    );
+
+    // WHEN the component is rendered
+    render(givenReportDrawerContent);
+
+    // AND the more button is clicked
+    const moreButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON);
+    await userEvent.click(moreButton);
+
+    // THEN the context menu should be displayed
+    const contextMenu = screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
+    expect(contextMenu).toBeInTheDocument();
+
+    // AND there should not be a header message
+    expect(screen.queryByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU_HEADER_MESSAGE)).not.toBeInTheDocument();
+
+    // AND all menu items should be enabled
+    const editButton = screen.getByTestId(MENU_ITEM_ID.EDIT);
+    expect(editButton).toHaveAttribute("data-disabled", "false");
+
+    const deleteButton = screen.getByTestId(MENU_ITEM_ID.DELETE);
+    expect(deleteButton).toHaveAttribute("data-disabled", "false");
+
+    const restoreToOriginalButton = screen.getByTestId(MENU_ITEM_ID.RESTORE_TO_ORIGINAL);
+    expect(restoreToOriginalButton).toHaveAttribute("data-disabled", "false");
+  });
 
   test("it should show No skills yet when there are no skills", () => {
     // GIVEN the ExperiencesDrawerContent component
@@ -287,7 +348,7 @@ describe("ReportDrawerContent", () => {
       // GIVEN an experience with restore to original handler
       const mockOnRestoreToOriginal = jest.fn();
       const experience = { ...mockExperiences[0], exploration_phase: DiveInPhase.PROCESSED };
-      
+
       // WHEN the component is rendered
       render(
         <ExperiencesDrawerContent
@@ -310,7 +371,7 @@ describe("ReportDrawerContent", () => {
       // GIVEN an experience with restore to original handler
       const mockOnRestoreToOriginal = jest.fn();
       const experience = { ...mockExperiences[0], exploration_phase: DiveInPhase.PROCESSED };
-      
+
       // WHEN the component is rendered
       render(
         <ExperiencesDrawerContent

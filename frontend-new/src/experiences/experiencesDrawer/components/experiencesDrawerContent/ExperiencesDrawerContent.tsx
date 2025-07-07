@@ -41,7 +41,7 @@ export const MENU_ITEM_ID = {
 export const MENU_ITEM_TEXT = {
   EDIT: "Edit",
   DELETE: "Delete",
-  RESTORE_TO_ORIGINAL: "Restore"
+  RESTORE_TO_ORIGINAL: "Restore",
 };
 
 interface ExperienceProps {
@@ -57,7 +57,14 @@ export const capitalizeFirstLetter = (string: string): string => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdit, onDelete, onRestoreToOriginal, onRestore, variant = ExperienceCategoryVariant.DEFAULT }) => {
+const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({
+  experience,
+  onEdit,
+  onDelete,
+  onRestoreToOriginal,
+  onRestore,
+  variant = ExperienceCategoryVariant.DEFAULT,
+}) => {
   const theme = useTheme();
   const isOnline = useContext(IsOnlineContext);
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -90,27 +97,36 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
     setMoreMenuAnchorEl(null);
   };
 
+  const isExplored = experience.exploration_phase === DiveInPhase.PROCESSED;
+
+  const getContextMenuHeaderMessage = () => {
+    if (!isExplored) {
+      return "These actions are only available for explored experiences.";
+    }
+    return undefined;
+  };
+
   const getMoreMenuItems = (): MenuItemConfig[] => {
     return [
       {
         id: MENU_ITEM_ID.EDIT,
         text: MENU_ITEM_TEXT.EDIT,
         icon: <EditIcon />,
-        disabled: false,
+        disabled: !isExplored,
         action: handleEditClick,
       },
       {
         id: MENU_ITEM_ID.RESTORE_TO_ORIGINAL,
         text: MENU_ITEM_TEXT.RESTORE_TO_ORIGINAL,
         icon: <RestoreIcon />,
-        disabled: !isOnline,
+        disabled: !isOnline || !isExplored,
         action: handleRestoreToOriginalClick,
       },
       {
         id: MENU_ITEM_ID.DELETE,
         text: MENU_ITEM_TEXT.DELETE,
         icon: <DeleteIcon sx={{ color: theme.palette.error.main }} />,
-        disabled: !isOnline,
+        disabled: !isOnline || !isExplored,
         action: handleDeleteClick,
         textColor: theme.palette.error.main,
       },
@@ -148,14 +164,15 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
             {variant === ExperienceCategoryVariant.RESTORE ? (
               <PrimaryButton
                 onClick={() => onRestore && onRestore(experience)}
+
                 disabled={!isOnline}
                 title="Restore"
                 data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_BUTTON}
-                startIcon={ <RestoreIcon />}
-              >
+              startIcon={ <RestoreIcon />}
+                >
                 Restore
               </PrimaryButton>
-            ) : experience.exploration_phase === DiveInPhase.PROCESSED && (
+            ) : (
               <PrimaryIconButton
                 onClick={handleMoreClick}
                 sx={{ color: theme.palette.common.black }}
@@ -244,6 +261,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
         open={Boolean(moreMenuAnchorEl)}
         notifyOnClose={() => setMoreMenuAnchorEl(null)}
         items={getMoreMenuItems()}
+        headerMessage={getContextMenuHeaderMessage()}
       />
     </Box>
   );

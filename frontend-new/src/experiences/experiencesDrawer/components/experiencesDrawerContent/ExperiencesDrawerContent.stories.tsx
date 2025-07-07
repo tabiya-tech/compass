@@ -2,7 +2,10 @@ import { Meta } from "@storybook/react";
 import ExperiencesDrawerContent, {
   LoadingExperienceDrawerContent,
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
-import { generateRandomExperiences, mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
+import {
+  generateRandomExperiences,
+  mockExperiences,
+} from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import { action } from "@storybook/addon-actions";
 
@@ -82,7 +85,8 @@ export const WithRestoreToOriginal = {
   parameters: {
     docs: {
       description: {
-        story: "Experience with restore to original functionality enabled. Click the more menu (⋮) to see the 'Restore to original' option.",
+        story:
+          "Experience with restore to original functionality enabled. Click the more menu (⋮) to see the 'Restore to original' option.",
       },
     },
   },
