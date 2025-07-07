@@ -13,6 +13,7 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { ExperienceCategoryVariant } from "src/experiences/experiencesDrawer/components/experienceCategory/ExperienceCategory";
 import RestoreIcon from "@mui/icons-material/Restore";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const uniqueId = "34a59a9e-e7f6-4a10-8b72-0fd401c727de";
 
@@ -145,15 +146,15 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
           </Typography>
           <Box display="flex" alignItems="center" justifyContent="flex-end">
             {variant === ExperienceCategoryVariant.RESTORE ? (
-                <PrimaryIconButton
-                  onClick={() => onRestore && onRestore(experience)}
-                  sx={{ color: theme.palette.common.black }}
-                  disabled={!isOnline}
-                  title="Restore"
-                  data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_BUTTON}
-                >
-                  <RestoreIcon />
-                </PrimaryIconButton>
+              <PrimaryButton
+                onClick={() => onRestore && onRestore(experience)}
+                disabled={!isOnline}
+                title="Restore"
+                data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_BUTTON}
+                startIcon={ <RestoreIcon />}
+              >
+                Restore
+              </PrimaryButton>
             ) : experience.exploration_phase === DiveInPhase.PROCESSED && (
               <PrimaryIconButton
                 onClick={handleMoreClick}
