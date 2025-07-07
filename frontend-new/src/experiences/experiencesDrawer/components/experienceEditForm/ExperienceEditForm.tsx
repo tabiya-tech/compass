@@ -145,8 +145,8 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
     notifyOnUnsavedChange?.(hasChanges);
   }, [hasChanges, notifyOnUnsavedChange]);
 
-  const handleInputChange =
-    useCallback((event:React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, field: keyof Experience, maxLength?: number)=> {
+  const handleInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, field: keyof Experience, maxLength?: number) => {
       let value = event.target.value;
       setEditedExperience((prev) => ({
         ...prev,
@@ -156,9 +156,14 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
         debouncedUpdateFieldError(field, value, maxLength);
       }
       notifyOnUnsavedChange?.(true);
-    }, [debouncedUpdateFieldError, notifyOnUnsavedChange]);
+    },
+    [debouncedUpdateFieldError, notifyOnUnsavedChange]
+  );
 
-  const handleTimelineChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, field: keyof Timeline) => {
+  const handleTimelineChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    field: keyof Timeline
+  ) => {
     setEditedExperience((prev) => ({
       ...prev,
       timeline: {
@@ -319,7 +324,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
         <Typography variant="h5">Edit Experience</Typography>
         <Box display="flex" justifyContent="flex-end" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
           <SecondaryButton onClick={notifyOnCancel} data-testid={DATA_TEST_ID.FORM_CANCEL_BUTTON}>
-            <Typography variant="caption">Cancel</Typography>
+            Cancel
           </SecondaryButton>
           <PrimaryButton
             onClick={handleSave}
@@ -327,7 +332,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             disableWhenOffline
             data-testid={DATA_TEST_ID.FORM_SAVE_BUTTON}
           >
-            <Typography variant="caption">Save</Typography>
+            Save
           </PrimaryButton>
         </Box>
       </Box>
@@ -426,7 +431,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
               <InlineEditField
                 placeholder="End date"
                 value={displayExperience.timeline.end}
-                onChange={(event) => handleTimelineChange(event,"end")}
+                onChange={(event) => handleTimelineChange(event, "end")}
                 data-testid={DATA_TEST_ID.FORM_END_DATE}
                 error={!!fieldErrors.timeline_end}
               />
@@ -446,7 +451,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
               <InlineEditField
                 placeholder="Company"
                 value={displayExperience.company}
-                onChange={(event) => handleInputChange(event,"company", COMPANY_MAX_LENGTH)}
+                onChange={(event) => handleInputChange(event, "company", COMPANY_MAX_LENGTH)}
                 data-testid={DATA_TEST_ID.FORM_COMPANY}
                 error={!!fieldErrors.company}
               />
@@ -480,7 +485,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             </Box>
           </Box>
           <SummaryEditField
-            notifyOnChange={(event) => handleInputChange(event,"summary", SUMMARY_MAX_LENGTH)}
+            notifyOnChange={(event) => handleInputChange(event, "summary", SUMMARY_MAX_LENGTH)}
             summary={displayExperience.summary ?? ""}
             error={fieldErrors.summary}
             experience_uuid={displayExperience.UUID}

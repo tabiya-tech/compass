@@ -22,11 +22,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
         tabindex="0"
         type="button"
       >
-        <span
-          class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
-        >
-          Cancel
-        </span>
+        Cancel
         <span
           class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
         />
@@ -38,11 +34,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
         tabindex="-1"
         type="button"
       >
-        <span
-          class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
-        >
-          Save
-        </span>
+        Save
       </button>
     </div>
   </div>
