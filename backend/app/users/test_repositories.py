@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from typing import Awaitable
 
 from app.users.repositories import UserPreferenceRepository, UserPreferenceRepositoryError
-from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
+from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest, PossibleExperimentValues
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 from common_libs.test_utilities import get_random_printable_string
 from common_libs.time_utilities import get_now, truncate_microseconds, mongo_date_to_datetime, datetime_to_mongo_date
@@ -233,7 +233,24 @@ class TestGetExperimentsByUserId:
 
 @pytest.mark.asyncio
 class TestSetExperimentByUserId:
-    async def test_set_experiment_by_user_id_new_experiment(self, get_user_preference_repository: Awaitable[UserPreferenceRepository]):
+    @pytest.mark.parametrize("given_experiment_config", [
+        {"shown": True, "branch": 1},
+        {"parent": {"child": "value"}},
+        "foo-flat-experiment",
+        True,
+        42,
+        3.14,
+        None
+    ], ids=[
+        "dict_config",
+        "nested_dict_config",
+        "flat_string",
+        "boolean",
+        "integer",
+        "float",
+        "none"
+    ])
+    async def test_set_experiment_by_user_id_new_experiment(self, get_user_preference_repository: Awaitable[UserPreferenceRepository], given_experiment_config: PossibleExperimentValues):
         # GIVEN a user id
         given_user_id = get_random_printable_string(10)
 
@@ -251,7 +268,6 @@ class TestSetExperimentByUserId:
 
         # WHEN setting an experiment
         given_experiment_id = "exp1"
-        given_experiment_config = {"shown": True, "branch": 1}
         await repository.set_experiment_by_user_id(given_user_id, given_experiment_id, given_experiment_config)
 
         # THEN the experiment should be in the database
