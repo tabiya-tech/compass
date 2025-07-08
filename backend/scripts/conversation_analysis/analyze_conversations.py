@@ -287,7 +287,7 @@ def _parse_args():
         epilog="""
 Required files:
   --demographics-file  Path to the CSV file containing user demographics data
-  --deployments-file   Path to the JSON file containing deployment history
+  --versions-file   Path to the JSON file containing version history
 
 Environment Variables:
   ANALYZE_CONVERSATIONS_APPLICATION_MONGODB_URI     MongoDB connection URI for application database
@@ -305,10 +305,10 @@ Environment Variables:
         help="Path to the demographics CSV file"
     )
     required.add_argument(
-        "--deployments-file",
+        "--versions-file",
         type=str,
         required=True,
-        help="Path to the deployments JSON file"
+        help="Path to the versions JSON file"
     )
 
     optional = parser.add_argument_group('optional arguments')
@@ -345,7 +345,7 @@ async def main():
     # Initialize file paths
     initialize_files(
         demographics_file=args.demographics_file,
-        deployments_file=args.deployments_file
+        versions_file=args.versions_file
     )
 
     # Initialize database connections

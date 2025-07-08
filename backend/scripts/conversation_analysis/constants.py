@@ -7,6 +7,4 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_EXPORTS_DIR = os.path.join(SCRIPT_DIR, "exports")
 
 # Constants
-DEPLOYMENTS_FILE_NAME = "deployments.json"
-DEMOGRAPHICS_FILE_NAME = "pseudonymized.csv"
 BATCH_SIZE = 100

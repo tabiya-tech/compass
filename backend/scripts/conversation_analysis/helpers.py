@@ -5,10 +5,10 @@ from typing import Optional, Any, List, Dict
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.server_dependencies.database_collections import Collections
-from scripts.conversation_analysis.utils import _load_deployments_from_file, _load_demographics_from_file
+from scripts.conversation_analysis.utils import _load_versions_from_file, _load_demographics_from_file
 
 # Global variables to cache loaded data
-_deployments = None
+_versions = None
 _demographics = None
 
 
@@ -16,17 +16,17 @@ def _get_compass_version(date_input: Optional[Any]) -> Optional[str]:
     """
     Get the compass version based on the deployment date.
     """
-    global _deployments
+    global _versions
     
     if not isinstance(date_input, datetime):
         return None
 
-    # Load deployments if not already loaded
-    if _deployments is None:
-        _deployments = _load_deployments_from_file()
+    # Load versions if not already loaded
+    if _versions is None:
+        _versions = _load_versions_from_file()
 
-    for i in range(len(_deployments) - 1, -1, -1):
-        deployment_date, deployment_label = _deployments[i]
+    for i in range(len(_versions) - 1, -1, -1):
+        deployment_date, deployment_label = _versions[i]
         if date_input >= deployment_date:
             return f"{i}: {deployment_label}"
     return None
