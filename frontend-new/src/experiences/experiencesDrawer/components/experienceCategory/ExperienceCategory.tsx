@@ -6,11 +6,6 @@ import ExperiencesDrawerContent from "src/experiences/experiencesDrawer/componen
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import InfoIcon from "@mui/icons-material/Info";
 
-export enum ExperienceCategoryVariant {
-  DEFAULT = "DEFAULT",
-  RESTORE = "RESTORE",
-}
-
 interface ExperienceCategoryProps {
   icon: React.ReactNode;
   title: string;
@@ -18,9 +13,7 @@ interface ExperienceCategoryProps {
   tooltipText?: string;
   onEditExperience?: (experience: Experience) => void;
   onDeleteExperience?: (experience: Experience) => void;
-  onRestoreExperience?: (experience: Experience) => void;
   onRestoreToOriginalExperience?: (experience: Experience) => void;
-  variant?: ExperienceCategoryVariant;
 }
 
 const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
@@ -31,8 +24,6 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
   onEditExperience,
   onDeleteExperience,
   onRestoreToOriginalExperience,
-  variant = ExperienceCategoryVariant.DEFAULT,
-  onRestoreExperience,
 }) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -44,7 +35,7 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
       <Box display="flex" alignItems="center" gap={isSmallMobile ? 2 : 1}>
         {React.cloneElement(icon as React.ReactElement, { sx: { color: theme.palette.text.secondary } })}
         <Typography variant="subtitle1" fontWeight="bold" color={theme.palette.text.secondary}>
-          {title || <i>Untitled!</i>}
+          {title ?? <i>Untitled!</i>}
         </Typography>
         {tooltipText && <HelpTip icon={<InfoIcon />}>{tooltipText}</HelpTip>}
       </Box>
@@ -53,11 +44,9 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
           <ExperiencesDrawerContent
             key={index}
             experience={experience}
-            onEdit={variant === ExperienceCategoryVariant.DEFAULT ? onEditExperience : undefined}
-            onDelete={variant === ExperienceCategoryVariant.DEFAULT ? onDeleteExperience : undefined}
-            onRestoreToOriginal={variant === ExperienceCategoryVariant.DEFAULT ? onRestoreToOriginalExperience : undefined}
-            onRestore={variant === ExperienceCategoryVariant.RESTORE ? onRestoreExperience : undefined}
-            variant={variant}
+            onEdit={onEditExperience}
+            onDelete={onDeleteExperience}
+            onRestoreToOriginal={onRestoreToOriginalExperience}
           />
         ))}
       </Box>

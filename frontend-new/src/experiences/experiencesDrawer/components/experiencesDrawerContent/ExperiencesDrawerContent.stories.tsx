@@ -91,18 +91,3 @@ export const WithRestoreToOriginal = {
     },
   },
 };
-
-export const RestoreVariant = {
-  args: {
-    experience: { ...mockExperiences[0], exploration_phase: DiveInPhase.PROCESSED },
-    onRestore: action("onRestore"),
-    variant: "RESTORE",
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Experience in restore variant mode. Shows a restore icon instead of the context menu.",
-      },
-    },
-  },
-};
