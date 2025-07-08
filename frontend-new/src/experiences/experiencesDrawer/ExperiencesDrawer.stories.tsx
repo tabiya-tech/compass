@@ -23,7 +23,8 @@ const meta: Meta<typeof ExperiencesDrawer> = {
           uuid: "1234",
           summary: "This is the original summary of the experience.".repeat(15),
         }),
-        updateExperience: (sessionId: number, experience_uuid: string, data: {summary: string}) => {
+        getExperiences: () => generateRandomExperiences(3),
+        updateExperience: (sessionId: number, experience_uuid: string, data: { summary: string }) => {
           return new Promise((resolve) => {
             setTimeout(() => {
               resolve({
@@ -38,9 +39,12 @@ const meta: Meta<typeof ExperiencesDrawer> = {
       ExperienceService.getInstance().getUneditedExperience = mockExperienceService.getOriginalExperience;
       // @ts-ignore
       ExperienceService.getInstance().updateExperience = mockExperienceService.updateExperience;
+      // @ts-ignore
+      ExperienceService.getInstance().getExperiences = mockExperienceService.getExperiences;
 
-      return <Story/>
-    }]
+      return <Story />;
+    },
+  ],
 };
 
 export default meta;
@@ -135,9 +139,9 @@ export const ShownWithNoSummary = {
 };
 
 const ShownWhenAllExperiencesExplored_experiences = generateRandomExperiences(3);
-ShownWhenAllExperiencesExplored_experiences.forEach(experience =>  {
+ShownWhenAllExperiencesExplored_experiences.forEach((experience) => {
   experience.exploration_phase = DiveInPhase.PROCESSED;
-})
+});
 
 export const ShownWhenAllExperiencesExplored = {
   args: {
@@ -146,20 +150,13 @@ export const ShownWhenAllExperiencesExplored = {
   },
 };
 
-export const ShownWithRestoreDrawerOpen = {
+const shownWithUnExploredExperiences_experiences = generateRandomExperiences(3);
+shownWithUnExploredExperiences_experiences.forEach((experience) => {
+  experience.exploration_phase = DiveInPhase.EXPLORING_SKILLS;
+});
+export const ShownWithUnExploredExperiences = {
   args: {
     isOpen: true,
-    experiences: generateRandomExperiences(2),
-  },
-  parameters: {
-    msw: {
-      handlers: [
-        {
-          method: "get",
-          url: "/api/experiences",
-          response: generateRandomExperiences(4), // 2 current, 2 deleted
-        },
-      ],
-    },
+    experiences: shownWithUnExploredExperiences_experiences,
   },
 };

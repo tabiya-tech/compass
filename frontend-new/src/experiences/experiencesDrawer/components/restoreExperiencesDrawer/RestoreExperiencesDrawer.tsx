@@ -1,21 +1,30 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Box, Slide, Typography, Divider } from "@mui/material";
+import { Box, Slide, Typography, Divider, useTheme, useMediaQuery } from "@mui/material";
 import { Experience } from "src/experiences/experienceService/experiences.types";
-import ExperienceCategory, { ExperienceCategoryVariant } from "src/experiences/experiencesDrawer/components/experienceCategory/ExperienceCategory";
 import ExperienceService from "src/experiences/experienceService/experienceService";
-import { groupExperiencesByWorkType } from "src/experiences/report/util";
-import { ReportContent } from "src/experiences/report/reportContent";
 import ExperiencesDrawerHeader from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import { LoadingExperienceDrawerContent } from "../experiencesDrawerContent/ExperiencesDrawerContent";
-import { DATA_TEST_ID } from "src/experiences/experiencesDrawer/ExperiencesDrawer";
-import StoreIcon from "@mui/icons-material/Store";
-import WorkIcon from "@mui/icons-material/Work";
-import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
-import SchoolIcon from "@mui/icons-material/School";
-import QuizIcon from "@mui/icons-material/Quiz";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { ExperienceError } from "src/error/commonErrors";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { Theme } from "@mui/material/styles";
+import { TabiyaIconStyles } from "src/theme/applicationTheme/applicationTheme";
+import { getWorkTypeIcon, getWorkTypeTitle } from "src/experiences/experiencesDrawer/util";
+import RestoreIcon from "@mui/icons-material/Restore";
+
+const uniqueId = "086216b2-a180-4a13-ac3c-cfd23f46153f";
+
+export const DATA_TEST_ID = {
+  RESTORE_EXPERIENCES: `restore-experiences-drawer-${uniqueId}`,
+  RESTORE_EXPERIENCES_EMPTY_MESSAGE: `restore-experiences-empty-message-${uniqueId}`,
+  RESTORE_EXPERIENCES_GO_BACK_BUTTON: `restore-experiences-go-back-button-${uniqueId}`,
+  RESTORE_EXPERIENCE_LOADER: `restore-experiences-loader-${uniqueId}`,
+  RESTORE_EXPERIENCE_CONTAINER: `restore-experiences-container-${uniqueId}`,
+  RESTORE_EXPERIENCE_TITLE: `restore-experience-title-${uniqueId}`,
+  RESTORE_EXPERIENCE_WORK_TYPE: `restore-experience-work-type-${uniqueId}`,
+  RESTORE_EXPERIENCE_BUTTON: `restore-experience-button-${uniqueId}`,
+  RESTORE_EXPERIENCE_DATE: `restore-experience-date-${uniqueId}`,
+};
 
 interface RestoreExperiencesDrawerProps {
   isOpen: boolean;
@@ -34,6 +43,8 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
   onExperiencesRestored,
   currentExperiences,
 }) => {
+  const theme = useTheme();
+  const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [deletedExperiences, setDeletedExperiences] = useState<Experience[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
@@ -44,8 +55,8 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
       setIsLoading(true);
       try {
         const originalExperiences = await ExperienceService.getInstance().getExperiences(sessionId, true);
-        const currentIds = new Set(currentExperiences.map(e => e.UUID));
-        const deleted = originalExperiences.filter(e => !currentIds.has(e.UUID));
+        const currentIds = new Set(currentExperiences.map((e) => e.UUID));
+        const deleted = originalExperiences.filter((e) => !currentIds.has(e.UUID));
         setDeletedExperiences(deleted);
       } catch (error) {
         console.error(new ExperienceError("Failed to fetch deleted experiences", error));
@@ -65,71 +76,129 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
     onClose();
   };
 
-  const groupedExperiences = useMemo(() => groupExperiencesByWorkType(deletedExperiences), [deletedExperiences]);
+  // Sort all experiences by title
+  const sortedExperiences = useMemo(
+    () => deletedExperiences.sort((a, b) => (a.experience_title || "").localeCompare(b.experience_title || "")),
+    [deletedExperiences]
+  );
 
   const renderContent = () => {
     if (isLoading) {
-      return (<Box data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_LOADER}>
-        {Array.from({ length: 5 }).map((_, index) => (
-          <LoadingExperienceDrawerContent key={index} />
-        ))}
-      </Box>);
+      return (
+        <Box data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_LOADER}>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <LoadingExperienceDrawerContent key={index} />
+          ))}
+        </Box>
+      );
     } else if (deletedExperiences.length === 0) {
-      return <Box sx={{ fontSize: (theme) => theme.typography.body1.fontSize, fontWeight: "bold", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.lg) }}>
-        <Typography variant="h1" textAlign={"center"}>
-          🤷‍♀️
-        </Typography>
-        <Typography data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES_EMPTY_MESSAGE}>No deleted experiences found.</Typography>
-        <PrimaryButton onClick={onClose} data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES_GO_BACK_BUTTON}>Go Back</PrimaryButton>
-      </Box>
+      return (
+        <Box
+          sx={{
+            fontSize: (theme) => theme.typography.body1.fontSize,
+            fontWeight: "bold",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            gap: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.lg),
+          }}
+        >
+          <Typography variant="h1" textAlign={"center"}>
+            🤷‍♀️
+          </Typography>
+          <Typography data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES_EMPTY_MESSAGE}>
+            No deleted experiences found.
+          </Typography>
+          <PrimaryButton onClick={onClose} data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES_GO_BACK_BUTTON}>
+            Go Back
+          </PrimaryButton>
+        </Box>
+      );
     } else {
       return (
-        <Box display="flex" flexDirection="column" gap={4}>
-          <ExperienceCategory
-            icon={<StoreIcon />}
-            title={ReportContent.SELF_EMPLOYMENT_TITLE}
-            experiences={groupedExperiences.selfEmploymentExperiences}
-            onRestoreExperience={handleRestore}
-            variant={ExperienceCategoryVariant.RESTORE}
-          />
-          <ExperienceCategory
-            icon={<WorkIcon />}
-            title={ReportContent.SALARY_WORK_TITLE}
-            experiences={groupedExperiences.salaryWorkExperiences}
-            onRestoreExperience={handleRestore}
-            variant={ExperienceCategoryVariant.RESTORE}
-          />
-          <ExperienceCategory
-            icon={<VolunteerActivismIcon />}
-            title={ReportContent.UNPAID_WORK_TITLE}
-            experiences={groupedExperiences.unpaidWorkExperiences}
-            onRestoreExperience={handleRestore}
-            variant={ExperienceCategoryVariant.RESTORE}
-          />
-          <ExperienceCategory
-            icon={<SchoolIcon />}
-            title={ReportContent.TRAINEE_WORK_TITLE}
-            experiences={groupedExperiences.traineeWorkExperiences}
-            onRestoreExperience={handleRestore}
-            variant={ExperienceCategoryVariant.RESTORE}
-          />
-          <ExperienceCategory
-            icon={<QuizIcon />}
-            title={ReportContent.UNCATEGORIZED_TITLE}
-            experiences={groupedExperiences.uncategorizedExperiences}
-            onRestoreExperience={handleRestore}
-            variant={ExperienceCategoryVariant.RESTORE}
-          />
-        </Box>
+        <>
+          {sortedExperiences.map((experience) => (
+            <Box
+              key={experience.UUID}
+              display="flex"
+              flexDirection="column"
+              gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
+              data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_CONTAINER}
+            >
+              <Box display="flex" alignItems="start" justifyContent="space-between">
+                <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight="bold"
+                    color={theme.palette.text.secondary}
+                    data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_TITLE}
+                  >
+                    {experience.experience_title ?? <i>Untitled!</i>}
+                  </Typography>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
+                    data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_WORK_TYPE}
+                  >
+                    {getWorkTypeIcon(experience.work_type, {
+                      sx: { color: theme.palette.text.secondary, fontSize: TabiyaIconStyles.fontSizeSmall },
+                    })}
+                    <Typography variant="body1" fontWeight="bold" color={theme.palette.text.secondary}>
+                      {getWorkTypeTitle(experience.work_type)}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Box display="flex" alignItems="center" justifyContent="flex-end">
+                  <PrimaryButton
+                    onClick={() => handleRestore(experience)}
+                    disableWhenOffline
+                    title="Restore"
+                    data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_BUTTON}
+                    startIcon={<RestoreIcon />}
+                  >
+                    Restore
+                  </PrimaryButton>
+                </Box>
+              </Box>
+              <Typography
+                variant="caption"
+                sx={{ color: theme.palette.text.secondary }}
+                data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_DATE}
+              >
+                {/* display the start and end dates */}
+                {experience.timeline.end && experience.timeline.start
+                  ? `${experience.timeline.start} — ${experience.timeline.end}`
+                  : experience.timeline.start || experience.timeline.end}
+
+                {(experience.timeline.start || experience.timeline.end) && experience.company && ", "}
+
+                {/* display the company if it exists */}
+                {experience?.company}
+
+                {/* display the location if it exists */}
+                {experience.location && <i>{` (${experience.location})`}</i>}
+              </Typography>
+            </Box>
+          ))}
+        </>
       );
     }
   };
 
   return (
     <Slide direction="left" in={true} appear={true}>
-      <Box p={4} display="flex" flexDirection="column" gap={4} height={"100%"}>
+      <Box
+        p={4}
+        display="flex"
+        flexDirection="column"
+        gap={theme.fixedSpacing(isSmallMobile ? theme.tabiyaSpacing.lg : theme.tabiyaSpacing.xl)}
+        height={"100%"}
+        data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES}
+      >
         <ExperiencesDrawerHeader notifyOnClose={onClose} title={"Restore Experiences"} />
-        <Typography variant="h5" data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES_TITLE} sx={{ display: 'none' }}>Restore Experiences</Typography>
         <Divider />
         {renderContent()}
       </Box>

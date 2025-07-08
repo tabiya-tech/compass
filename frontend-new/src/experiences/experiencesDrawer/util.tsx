@@ -1,6 +1,7 @@
 import React from "react";
 import { WorkType } from "src/experiences/experienceService/experiences.types";
 import { ReportContent } from "src/experiences/report/reportContent";
+import type { SvgIconProps } from "@mui/material/SvgIcon";
 import StoreIcon from "@mui/icons-material/Store";
 import WorkIcon from "@mui/icons-material/Work";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
@@ -45,17 +46,17 @@ export const getWorkTypeDescription = (workType: WorkType | null) => {
   }
 };
 
-export const getWorkTypeIcon = (workType: WorkType | null) => {
+export const getWorkTypeIcon = (workType: WorkType | null, iconProps?: SvgIconProps): JSX.Element => {
   switch (workType) {
     case WorkType.SELF_EMPLOYMENT:
-      return <StoreIcon />;
+      return <StoreIcon {...iconProps} />;
     case WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-      return <WorkIcon />;
+      return <WorkIcon {...iconProps} />;
     case WorkType.UNSEEN_UNPAID:
-      return <VolunteerActivismIcon />;
+      return <VolunteerActivismIcon {...iconProps} />;
     case WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
-      return <SchoolIcon />;
+      return <SchoolIcon {...iconProps} />;
     default:
-      return <QuizIcon />;
+      return <QuizIcon {...iconProps} />;
   }
 };

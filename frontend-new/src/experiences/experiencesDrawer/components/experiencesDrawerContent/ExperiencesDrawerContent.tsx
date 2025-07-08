@@ -11,9 +11,7 @@ import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
-import { ExperienceCategoryVariant } from "src/experiences/experiencesDrawer/components/experienceCategory/ExperienceCategory";
 import RestoreIcon from "@mui/icons-material/Restore";
-import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const uniqueId = "34a59a9e-e7f6-4a10-8b72-0fd401c727de";
 
@@ -49,22 +47,13 @@ interface ExperienceProps {
   onEdit?: (experience: Experience) => void;
   onDelete?: (experience: Experience) => void;
   onRestoreToOriginal?: (experience: Experience) => void;
-  onRestore?: (experience: Experience) => void;
-  variant?: ExperienceCategoryVariant;
 }
 
 export const capitalizeFirstLetter = (string: string): string => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({
-  experience,
-  onEdit,
-  onDelete,
-  onRestoreToOriginal,
-  onRestore,
-  variant = ExperienceCategoryVariant.DEFAULT,
-}) => {
+const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdit, onDelete, onRestoreToOriginal }) => {
   const theme = useTheme();
   const isOnline = useContext(IsOnlineContext);
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -161,27 +150,14 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({
             {experience.experience_title ? experience.experience_title : <i>Untitled!</i>}
           </Typography>
           <Box display="flex" alignItems="center" justifyContent="flex-end">
-            {variant === ExperienceCategoryVariant.RESTORE ? (
-              <PrimaryButton
-                onClick={() => onRestore && onRestore(experience)}
-
-                disabled={!isOnline}
-                title="Restore"
-                data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_BUTTON}
-              startIcon={ <RestoreIcon />}
-                >
-                Restore
-              </PrimaryButton>
-            ) : (
-              <PrimaryIconButton
-                onClick={handleMoreClick}
-                sx={{ color: theme.palette.common.black }}
-                title="More options"
-                data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON}
-              >
-                <MoreVertIcon />
-              </PrimaryIconButton>
-            )}
+            <PrimaryIconButton
+              onClick={handleMoreClick}
+              sx={{ color: theme.palette.common.black }}
+              title="More options"
+              data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON}
+            >
+              <MoreVertIcon />
+            </PrimaryIconButton>
           </Box>
         </Box>
         <Typography

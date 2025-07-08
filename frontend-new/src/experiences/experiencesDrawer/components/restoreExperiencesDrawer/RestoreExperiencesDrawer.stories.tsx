@@ -1,11 +1,17 @@
 import { Meta } from "@storybook/react";
 import RestoreExperiencesDrawer from "src/experiences/experiencesDrawer/components/restoreExperiencesDrawer/RestoreExperiencesDrawer";
-import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
+import {
+  generateRandomExperiences,
+  mockExperiences,
+} from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import ExperienceService from "src/experiences/experienceService/experienceService";
 
 const currentExperiences = [mockExperiences[0]];
-const deletedExperiences = [mockExperiences[1], mockExperiences[2]].map(e => ({ ...e, exploration_phase: DiveInPhase.PROCESSED }));
+const deletedExperiences = [mockExperiences[1]].map((e) => ({
+  ...e,
+  exploration_phase: DiveInPhase.PROCESSED,
+}));
 
 const meta: Meta<typeof RestoreExperiencesDrawer> = {
   title: "Experiences/RestoreExperiencesDrawer",
@@ -15,6 +21,11 @@ const meta: Meta<typeof RestoreExperiencesDrawer> = {
     onClose: { action: "onClose" },
     onRestore: { action: "onRestore" },
     onExperiencesRestored: { action: "onExperiencesRestored" },
+  },
+  args: {
+    isOpen: true,
+    sessionId: 123,
+    currentExperiences,
   },
 };
 
@@ -26,27 +37,20 @@ const ServiceMockWrapper: React.FC<{ children: React.ReactNode; mock: () => Prom
 };
 
 export const Default = {
-  args: {
-    isOpen: true,
-    sessionId: 123,
-    currentExperiences,
-  },
+  args: {},
   decorators: [
     (Story: React.FC) => {
-      return (<ServiceMockWrapper mock={() => Promise.resolve([...currentExperiences, ...deletedExperiences])}>
+      return (
+        <ServiceMockWrapper mock={() => Promise.resolve([...currentExperiences, ...deletedExperiences])}>
           <Story />
         </ServiceMockWrapper>
       );
-    }
+    },
   ],
 };
 
 export const Empty = {
-  args: {
-    isOpen: true,
-    sessionId: 123,
-    currentExperiences,
-  },
+  args: {},
   decorators: [
     (Story: React.FC) => (
       <ServiceMockWrapper mock={() => Promise.resolve(currentExperiences)}>
@@ -57,11 +61,7 @@ export const Empty = {
 };
 
 export const Loading = {
-  args: {
-    isOpen: true,
-    sessionId: 123,
-    currentExperiences,
-  },
+  args: {},
   decorators: [
     (Story: React.FC) => (
       <ServiceMockWrapper mock={() => new Promise(() => {})}>
@@ -69,4 +69,15 @@ export const Loading = {
       </ServiceMockWrapper>
     ),
   ],
-}; 
+};
+
+export const ShownWithMultipleDeletedExperiences = {
+  args: {},
+  decorators: [
+    (Story: React.FC) => (
+      <ServiceMockWrapper mock={() => Promise.resolve(generateRandomExperiences(10))}>
+        <Story />
+      </ServiceMockWrapper>
+    ),
+  ],
+};

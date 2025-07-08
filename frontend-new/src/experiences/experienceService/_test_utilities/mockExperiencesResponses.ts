@@ -176,7 +176,7 @@ const generateRandomExperience = (workType?: WorkType): Experience => {
       generateRandomSkill(usedLabels),
       generateRandomSkill(usedLabels),
     ],
-    exploration_phase: DiveInPhase.EXPLORING_SKILLS,
+    exploration_phase: Math.random() < 0.5 ? DiveInPhase.EXPLORING_SKILLS : DiveInPhase.PROCESSED,
   };
 };
 

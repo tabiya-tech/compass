@@ -12,6 +12,7 @@ import {
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import { DATA_TEST_ID as CONFIRM_MODAL_DIALOG_DATA_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import { DATA_TEST_ID as EXPERIENCE_EDIT_FORM_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/experienceEditForm/ExperienceEditForm";
+import { DATA_TEST_ID as RESTORE_EXPERIENCES_DRAWER_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/restoreExperiencesDrawer/RestoreExperiencesDrawer";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import ExperienceService from "src/experiences/experienceService/experienceService";
@@ -89,7 +90,7 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 
 describe("ExperiencesDrawer", () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.clearAllMocks();
     resetAllMethodMocks(UserPreferencesStateService.getInstance());
   });
 
@@ -644,7 +645,7 @@ describe("ExperiencesDrawer", () => {
   describe("Restore to Unedited", () => {
     beforeEach(() => {
       jest.clearAllMocks();
-    })
+    });
     test("should restore experience to unedited successfully when restore to unedited button is clicked", async () => {
       // GIVEN some experiences that have been explored
       const givenExploredExperiences = mockExperiences.map((experience) => ({
@@ -658,8 +659,12 @@ describe("ExperiencesDrawer", () => {
       } as unknown as UserPreference);
       const onExperiencesUpdated = jest.fn();
       // AND mocked services that resolve
-      const getUneditedExperienceSpy = jest.spyOn(ExperienceService.getInstance(), "getUneditedExperience").mockResolvedValueOnce(givenExploredExperiences[0]);
-      const updateExperienceSpy = jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValueOnce(givenExploredExperiences[0]);
+      const getUneditedExperienceSpy = jest
+        .spyOn(ExperienceService.getInstance(), "getUneditedExperience")
+        .mockResolvedValueOnce(givenExploredExperiences[0]);
+      const updateExperienceSpy = jest
+        .spyOn(ExperienceService.getInstance(), "updateExperience")
+        .mockResolvedValueOnce(givenExploredExperiences[0]);
       // AND the component is rendered
       render(
         <ExperiencesDrawer
@@ -726,7 +731,7 @@ describe("ExperiencesDrawer", () => {
       } as unknown as UserPreference);
       const onExperiencesUpdated = jest.fn();
       // AND a mocked service that rejects
-      const givenError = new Error("API Error")
+      const givenError = new Error("API Error");
       jest.spyOn(ExperienceService.getInstance(), "getUneditedExperience").mockRejectedValueOnce(givenError);
       // AND the component is rendered
       render(
@@ -772,7 +777,7 @@ describe("ExperiencesDrawer", () => {
       // GIVEN the ExperiencesDrawer component
       const onExperiencesUpdated = jest.fn();
       // AND a mocked service that resolves
-      jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce(mockExperiences)
+      jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce(mockExperiences);
       render(
         <ExperiencesDrawer
           isOpen={true}
@@ -787,9 +792,11 @@ describe("ExperiencesDrawer", () => {
       const restoreLink = screen.getByTestId(DATA_TEST_ID.RESTORE_DELETED_EXPERIENCES_LINK);
       await userEvent.click(restoreLink);
       // THEN the restore drawer is shown
-      expect(screen.getByTestId(DATA_TEST_ID.RESTORE_EXPERIENCES_TITLE)).toBeInTheDocument();
+      expect(screen.getByTestId(RESTORE_EXPERIENCES_DRAWER_DATA_TEST_ID.RESTORE_EXPERIENCES)).toBeInTheDocument();
       // WHEN Go Back is clicked
-      const goBackButton = await screen.findByTestId(DATA_TEST_ID.RESTORE_EXPERIENCES_GO_BACK_BUTTON);
+      const goBackButton = await screen.findByTestId(
+        RESTORE_EXPERIENCES_DRAWER_DATA_TEST_ID.RESTORE_EXPERIENCES_GO_BACK_BUTTON
+      );
       await userEvent.click(goBackButton);
       // THEN the main drawer content is shown again
       await waitFor(async () => {
@@ -807,7 +814,9 @@ describe("ExperiencesDrawer", () => {
       // AND a mocked service that resolves
       const currentExperiences = [mockExperiences[0]];
       const deletedExperiences = [mockExperiences[1]];
-      jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce([...currentExperiences, ...deletedExperiences]);
+      jest
+        .spyOn(ExperienceService.getInstance(), "getExperiences")
+        .mockResolvedValueOnce([...currentExperiences, ...deletedExperiences]);
       render(
         <ExperiencesDrawer
           isOpen={true}
@@ -822,7 +831,7 @@ describe("ExperiencesDrawer", () => {
       const restoreLink = screen.getByTestId(DATA_TEST_ID.RESTORE_DELETED_EXPERIENCES_LINK);
       await userEvent.click(restoreLink);
       // THEN the restore drawer is shown
-      expect(screen.getByTestId(DATA_TEST_ID.RESTORE_EXPERIENCES_TITLE)).toBeInTheDocument();
+      expect(screen.getByTestId(RESTORE_EXPERIENCES_DRAWER_DATA_TEST_ID.RESTORE_EXPERIENCES)).toBeInTheDocument();
     });
   });
 });
