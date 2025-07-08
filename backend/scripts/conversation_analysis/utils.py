@@ -6,11 +6,9 @@ from datetime import datetime
 import pandas as pd
 from motor.motor_asyncio import AsyncIOMotorDatabase, AsyncIOMotorClient
 
-from scripts.conversation_analysis.constants import SCRIPT_DIR, DEMOGRAPHICS_FILE_NAME, DEPLOYMENTS_FILE_NAME
-
 # Global variables to store file paths
 DEMOGRAPHIC_FILE = None
-DEPLOYMENTS_FILE = None
+VERSIONS_FILE = None
 demographic_df = None
 
 
@@ -26,17 +24,17 @@ def _get_db_connection(mongodb_uri: str, database_name: str) -> AsyncIOMotorData
     return client.get_database(database_name)
 
 
-def initialize_files(demographics_file: str, deployments_file: str) -> None:
+def initialize_files(demographics_file: str, versions_file: str) -> None:
     """
-    Initialize the file paths for demographics and deployments files.
+    Initialize the file paths for demographics and versions files.
 
     :param demographics_file: Path to demographics CSV file
-    :param deployments_file: Path to deployments JSON file
+    :param versions_file: Path to versions JSON file
     """
-    global DEMOGRAPHIC_FILE, DEPLOYMENTS_FILE, demographic_df
+    global DEMOGRAPHIC_FILE, VERSIONS_FILE, demographic_df
     
     DEMOGRAPHIC_FILE = demographics_file
-    DEPLOYMENTS_FILE = deployments_file
+    VERSIONS_FILE = versions_file
     
     # Load demographics file
     if not os.path.exists(DEMOGRAPHIC_FILE):
@@ -62,28 +60,28 @@ def _load_demographics_from_file() -> dict:
     return demographic_map
 
 
-def _load_deployments_from_file() -> list[tuple[datetime, str]]:
+def _load_versions_from_file() -> list[tuple[datetime, str]]:
     """
-    Load deployments from a JSON file.
+    Load versions from a JSON file.
     :return: List of tuples containing deployment date and label.
     """
-    if DEPLOYMENTS_FILE is None:
-        raise RuntimeError("Deployments file not initialized. Call initialize_files() first.")
+    if VERSIONS_FILE is None:
+        raise RuntimeError("Versions file not initialized. Call initialize_files() first.")
 
-    # Load deployments file
-    print(f"Loading deployments from {DEPLOYMENTS_FILE}...")
-    if not os.path.exists(DEPLOYMENTS_FILE):
-        raise FileNotFoundError(f"Deployments file not found at {DEPLOYMENTS_FILE}")
+    # Load versions file
+    print(f"Loading versions from {VERSIONS_FILE}...")
+    if not os.path.exists(VERSIONS_FILE):
+        raise FileNotFoundError(f"Versions file not found at {VERSIONS_FILE}")
 
-    with open(DEPLOYMENTS_FILE, "r") as f:
-        raw_deployments = json.load(f)
-    deployments = [
-        (datetime.fromisoformat(raw_deployments[i]), raw_deployments[i + 1])
-        for i in range(0, len(raw_deployments), 2)
+    with open(VERSIONS_FILE, "r") as f:
+        raw_versions = json.load(f)
+    versions = [
+        (datetime.fromisoformat(raw_versions[i]), raw_versions[i + 1])
+        for i in range(0, len(raw_versions), 2)
     ]
-    deployments.sort(key=lambda x: x[0])
-    if not deployments:
-        raise ValueError("No deployments found in deployments.json")
+    versions.sort(key=lambda x: x[0])
+    if not versions:
+        raise ValueError("No versions found in versions.json")
     else:
-        print(f"Found {len(deployments)} deployments in deployments.json.")
-        return deployments
+        print(f"Found {len(versions)} versions in versions.json.")
+        return versions
