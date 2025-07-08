@@ -3,7 +3,7 @@ import { Box, Divider, Drawer, Skeleton, Typography, useMediaQuery, useTheme, Sl
 import { Theme } from "@mui/material/styles";
 import ExperiencesDrawerHeader from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import { LoadingExperienceDrawerContent } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
-import { Experience } from "src/experiences/experienceService/experiences.types";
+import { Experience, DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import { StoredPersonalInfo } from "src/sensitiveData/types";
 import CustomTextField from "src/theme/CustomTextField/CustomTextField";
 import CustomAccordion from "src/theme/CustomAccordion/CustomAccordion";
@@ -280,9 +280,9 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     }
   };
 
-  // Experiences with top skills
-  const experiencesWithTopSkills = useMemo(
-    () => experiences.filter((experience) => experience.top_skills && experience.top_skills.length > 0),
+  // Experiences that have been processed
+  const exploredExperiences = useMemo(
+    () => experiences.filter((experience) => experience.exploration_phase === DiveInPhase.PROCESSED),
     [experiences]
   );
 
@@ -340,7 +340,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                   email={personalInfo.contactEmail}
                   phone={personalInfo.phoneNumber}
                   address={personalInfo.address}
-                  experiences={experiencesWithTopSkills}
+                  experiences={exploredExperiences}
                   conversationConductedAt={conversationConductedAt}
                   disabled={!hasTopSkills}
                 />

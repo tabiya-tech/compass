@@ -21,7 +21,7 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/experiences/experiencesDrawer/ExperiencesDrawer";
-import { Experience } from "src/experiences/experienceService/experiences.types";
+import { DiveInPhase, Experience } from "src/experiences/experienceService/experiences.types";
 import ExperienceService from "src/experiences/experienceService/experienceService";
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
@@ -34,9 +34,7 @@ import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableCompo
 import ChatProgressBar from "./chatProgressbar/ChatProgressBar";
 import { CurrentPhase, defaultCurrentPhase } from "./chatProgressbar/types";
 import { CompassChatMessageProps } from "./chatMessage/compassChatMessage/CompassChatMessage";
-import {
-  CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE
-} from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -80,7 +78,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [newConversationDialog, setNewConversationDialog] = React.useState<boolean>(false);
   const [exploredExperiencesNotification, setExploredExperiencesNotification] = useState<boolean>(false);
   const [activeSessionId, setActiveSessionId] = useState<number | null>(
-    UserPreferencesStateService.getInstance().getActiveSessionId(),
+    UserPreferencesStateService.getInstance().getActiveSessionId()
   );
   const [currentUserId] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
 
@@ -91,6 +89,12 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
   const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
 
+  // Experiences that have been processed
+  const exploredExperiencesCount = useMemo(
+    () => (experiences ?? []).filter((experience) => experience.exploration_phase === DiveInPhase.PROCESSED),
+    [experiences]
+  );
+
   /**
    * --- Utility functions ---
    */
@@ -100,7 +104,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   };
 
   const removeMessage = (messageId: string) => {
-    setMessages((prevMessages) => prevMessages.filter(msg => msg.message_id !== messageId));
+    setMessages((prevMessages) => prevMessages.filter((msg) => msg.message_id !== messageId));
   };
 
   // Depending on the typing state, add or remove the typing message from the messages list
@@ -119,17 +123,18 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       });
     } else {
       // filter out the typing message
-      setMessages((prevMessages) =>
-        prevMessages.filter((message) => !message.type.startsWith('typing-message-')));
+      setMessages((prevMessages) => prevMessages.filter((message) => !message.type.startsWith("typing-message-")));
     }
   };
 
-  const timeUntilFeedbackNotification : number | null = useMemo(() => {
+  const timeUntilFeedbackNotification: number | null = useMemo(() => {
     // If there are no messages, we can't calculate the time
     if (messages.length === 0) return null;
 
     // Get timestamp from the first compass message in the conversation
-    const firstCompassMessage = (messages.find((message) => message.type.startsWith('compass-message-')) as IChatMessage<CompassChatMessageProps>)
+    const firstCompassMessage = messages.find((message) =>
+      message.type.startsWith("compass-message-")
+    ) as IChatMessage<CompassChatMessageProps>;
     // If there is no compass message, we can't calculate the time
     if (!firstCompassMessage) return null;
 
@@ -147,7 +152,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   /**
    * --- Service handlers ---
    */
-    // Goes to the experience service to get the experiences
+  // Goes to the experience service to get the experiences
   const fetchExperiences = useCallback(async () => {
     if (!activeSessionId) {
       // If there is no session id, we can't get the experiences
@@ -201,12 +206,19 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
         if (response.experiences_explored > exploredExperiences) {
           setExploredExperiencesNotification(true);
+          await fetchExperiences();
         }
 
         response.messages.forEach((messageItem) => {
-          const message = response.conversation_completed && messageItem === response.messages[response.messages.length - 1]
-            ? generateConversationConclusionMessage(messageItem.message_id, messageItem.message)
-            : generateCompassMessage(messageItem.message_id, messageItem.message, messageItem.sent_at, messageItem.reaction);
+          const message =
+            response.conversation_completed && messageItem === response.messages[response.messages.length - 1]
+              ? generateConversationConclusionMessage(messageItem.message_id, messageItem.message)
+              : generateCompassMessage(
+                  messageItem.message_id,
+                  messageItem.message,
+                  messageItem.sent_at,
+                  messageItem.reaction
+                );
           addMessage(message);
         });
 
@@ -214,7 +226,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setConversationConductedAt(response.conversation_conducted_at);
 
         // Set the current conversation phase
-        setCurrentPhase(_previousCurrentPhase => {
+        setCurrentPhase((_previousCurrentPhase) => {
           return parseConversationPhase(response.current_phase, _previousCurrentPhase);
         });
       } catch (error) {
@@ -224,7 +236,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setAiIsTyping(false);
       }
     },
-    [exploredExperiences],
+    [exploredExperiences, fetchExperiences]
   );
 
   const initializeChat = useCallback(
@@ -246,7 +258,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
             //  and add a typing message as the previous one will be removed
             setMessages([generateTypingMessage()]);
             // AND clear the current phase
-            setCurrentPhase(defaultCurrentPhase)
+            setCurrentPhase(defaultCurrentPhase);
           } else {
             console.debug("Failed to issue new session");
             return false;
@@ -269,7 +281,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
                 return generateConversationConclusionMessage(message.message_id, message.message);
               }
               return generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction);
-            }),
+            })
           );
 
           setConversationCompleted(history.conversation_completed);
@@ -290,9 +302,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setActiveSessionId(sessionId);
 
         // Set the current conversation phase
-        setCurrentPhase(_previousCurrentPhase => {
+        setCurrentPhase((_previousCurrentPhase) => {
           return parseConversationPhase(history.current_phase, _previousCurrentPhase);
-        })
+        });
         return true;
       } catch (e) {
         console.error(new ChatError("Failed to initialize chat", e));
@@ -301,15 +313,18 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setAiIsTyping(false);
       }
     },
-    [sendMessage],
+    [sendMessage]
   );
 
   // Resets the text field for the next message
   // Optimistically adds the user's message to the messages list
   // Calls the sendMessage function to send the message
-  const handleSend = useCallback(async (userMessage: string) => {
-    await sendMessage(userMessage, activeSessionId!);
-  }, [sendMessage, activeSessionId]);
+  const handleSend = useCallback(
+    async (userMessage: string) => {
+      await sendMessage(userMessage, activeSessionId!);
+    },
+    [sendMessage, activeSessionId]
+  );
 
   /**
    * --- Callbacks for child components ---
@@ -395,7 +410,9 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   useEffect(() => {
     if (exploredExperiencesNotification) {
       console.debug("Preloading DownloadReportDropdown");
-      const LazyDownloadReportDropdown = lazyWithPreload(() => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown"));
+      const LazyDownloadReportDropdown = lazyWithPreload(
+        () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown")
+      );
       LazyDownloadReportDropdown.preload().then(() => {
         console.debug("DownloadReportDropdown preloaded");
       });
@@ -406,6 +423,13 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   useEffect(() => {
     addOrRemoveTypingMessage(aiIsTyping);
   }, [aiIsTyping]);
+
+  // Fetch experiences when the active session id changes
+  useEffect(() => {
+    if (activeSessionId) {
+      fetchExperiences();
+    }
+  }, [activeSessionId, fetchExperiences]);
 
   return (
     <Suspense fallback={<Backdrop isShown={true} transparent={true} />}>
@@ -438,7 +462,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               <ChatHeader
                 notifyOnLogout={handleLogout}
                 startNewConversation={() => setNewConversationDialog(true)}
-                experiencesExplored={exploredExperiences}
+                experiencesExplored={exploredExperiencesCount.length}
                 exploredExperiencesNotification={exploredExperiencesNotification}
                 setExploredExperiencesNotification={setExploredExperiencesNotification}
                 conversationCompleted={conversationCompleted}
