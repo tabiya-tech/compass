@@ -27,7 +27,7 @@ from app.conversations.poc import add_poc_routes
 from app.app_config import ApplicationConfig, set_application_config, get_application_config
 from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
-from modules.loader import FeatureLoader
+from features.loader import FeatureLoader
 from starlette.datastructures import State
 
 

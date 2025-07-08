@@ -68,3 +68,12 @@ paths:
           description: OAS file
           schema:
             type: string
+  /features/**:
+    get:
+      summary: Features endpoint
+      operationId: features
+      responses:
+        '200':
+          description: Features list
+          schema:
+            type: string
