@@ -311,7 +311,10 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           title="view experiences"
           disabled={!isOnline}
         >
-          <AnimatedBadge badgeContent={experiencesExplored} invisible={!exploredExperiencesNotification}>
+          <AnimatedBadge
+            badgeContent={experiencesExplored}
+            invisible={!exploredExperiencesNotification || experiencesExplored === 0}
+          >
             <BadgeOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_EXPERIENCES} />
           </AnimatedBadge>
         </PrimaryIconButton>

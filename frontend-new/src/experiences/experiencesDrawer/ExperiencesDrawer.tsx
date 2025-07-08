@@ -3,7 +3,7 @@ import { Box, Divider, Drawer, Skeleton, Typography, useMediaQuery, useTheme, Sl
 import { Theme } from "@mui/material/styles";
 import ExperiencesDrawerHeader from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import { LoadingExperienceDrawerContent } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
-import { Experience } from "src/experiences/experienceService/experiences.types";
+import { Experience, DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import { StoredPersonalInfo } from "src/sensitiveData/types";
 import CustomTextField from "src/theme/CustomTextField/CustomTextField";
 import CustomAccordion from "src/theme/CustomAccordion/CustomAccordion";
@@ -210,7 +210,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     setIsRestoringExperience(true);
     const userPreferencesStateService = UserPreferencesStateService.getInstance();
     const experienceService = ExperienceService.getInstance();
-    const sessionId = userPreferencesStateService.getActiveSessionId()
+    const sessionId = userPreferencesStateService.getActiveSessionId();
 
     if (!sessionId) {
       enqueueSnackbar("User has no sessions", { variant: "error" });
@@ -220,7 +220,10 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
 
     try {
       // Get the original experience
-      const uneditedExperience = await experienceService.getUneditedExperience(sessionId, experienceToRestoreToOriginal.UUID);
+      const uneditedExperience = await experienceService.getUneditedExperience(
+        sessionId,
+        experienceToRestoreToOriginal.UUID
+      );
 
       // Update the current experience with all original fields
       await experienceService.updateExperience(sessionId, experienceToRestoreToOriginal.UUID, {
@@ -230,10 +233,10 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         location: uneditedExperience.location,
         work_type: uneditedExperience.work_type,
         summary: uneditedExperience.summary,
-        top_skills: uneditedExperience.top_skills.map(skill => ({
+        top_skills: uneditedExperience.top_skills.map((skill) => ({
           UUID: skill.UUID,
-          preferredLabel: skill.preferredLabel
-        }))
+          preferredLabel: skill.preferredLabel,
+        })),
       });
 
       enqueueSnackbar("Experience restored successfully!", { variant: "success" });
@@ -280,9 +283,9 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     }
   };
 
-  // Experiences with top skills
-  const experiencesWithTopSkills = useMemo(
-    () => experiences.filter((experience) => experience.top_skills && experience.top_skills.length > 0),
+  // Experiences that have been processed
+  const exploredExperiences = useMemo(
+    () => experiences.filter((experience) => experience.exploration_phase === DiveInPhase.PROCESSED),
     [experiences]
   );
 
@@ -294,16 +297,17 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
 
   const renderDrawerContent = () => {
     if (showRestoreDrawer) {
-      return (<RestoreExperiencesDrawer
-        isOpen={showRestoreDrawer}
-        onClose={() => setShowRestoreDrawer(false)}
-        onRestore={handleRestoreExperience}
-        sessionId={UserPreferencesStateService.getInstance().getActiveSessionId() || 0}
-        onExperiencesRestored={onExperiencesUpdated}
-        currentExperiences={experiences}
-      />)
-    }
-    else if (editingExperience) {
+      return (
+        <RestoreExperiencesDrawer
+          isOpen={showRestoreDrawer}
+          onClose={() => setShowRestoreDrawer(false)}
+          onRestore={handleRestoreExperience}
+          sessionId={UserPreferencesStateService.getInstance().getActiveSessionId() || 0}
+          onExperiencesRestored={onExperiencesUpdated}
+          currentExperiences={experiences}
+        />
+      );
+    } else if (editingExperience) {
       return (
         <Slide direction="left" in={true} appear={true}>
           <Box>
@@ -339,7 +343,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                   email={personalInfo.contactEmail}
                   phone={personalInfo.phoneNumber}
                   address={personalInfo.address}
-                  experiences={experiencesWithTopSkills}
+                  experiences={exploredExperiences}
                   conversationConductedAt={conversationConductedAt}
                   disabled={!hasTopSkills}
                 />
@@ -348,7 +352,9 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
           </Box>
           <Box display="flex" flexDirection="column" gap={2}>
             <CustomAccordion title="Personal Information" tooltipText={tooltipText}>
-              <Typography variant="h6" data-testid={DATA_TEST_ID.PERSONAL_INFORMATION_TITLE} sx={{ display: 'none' }}>Personal Information</Typography>
+              <Typography variant="h6" data-testid={DATA_TEST_ID.PERSONAL_INFORMATION_TITLE} sx={{ display: "none" }}>
+                Personal Information
+              </Typography>
               <CustomTextField
                 label="Name:"
                 placeholder="Enter your name here"
@@ -408,28 +414,32 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                     experiences={groupedExperiences.selfEmploymentExperiences}
                     onEditExperience={handleEditExperience}
                     onDeleteExperience={handleDeleteExperience}
-                  onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}/>
+                    onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
+                  />
                   <ExperienceCategory
                     icon={<WorkIcon />}
                     title={ReportContent.SALARY_WORK_TITLE}
                     experiences={groupedExperiences.salaryWorkExperiences}
                     onEditExperience={handleEditExperience}
                     onDeleteExperience={handleDeleteExperience}
-                  onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}/>
+                    onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
+                  />
                   <ExperienceCategory
                     icon={<VolunteerActivismIcon />}
                     title={ReportContent.UNPAID_WORK_TITLE}
                     experiences={groupedExperiences.unpaidWorkExperiences}
                     onEditExperience={handleEditExperience}
                     onDeleteExperience={handleDeleteExperience}
-                  onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}/>
+                    onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
+                  />
                   <ExperienceCategory
                     icon={<SchoolIcon />}
                     title={ReportContent.TRAINEE_WORK_TITLE}
                     experiences={groupedExperiences.traineeWorkExperiences}
                     onEditExperience={handleEditExperience}
                     onDeleteExperience={handleDeleteExperience}
-                  onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}/>
+                    onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
+                  />
                   <ExperienceCategory
                     icon={<QuizIcon />}
                     title={ReportContent.UNCATEGORIZED_TITLE}
@@ -443,8 +453,18 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
               )}
             </Box>
           </Box>
-          <Box sx={{ marginTop: "auto", padding: isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : 0, alignSelf: "center" }}>
-            <CustomLink onClick={() => setShowRestoreDrawer(true)} disableWhenOffline={true} data-testid={DATA_TEST_ID.RESTORE_DELETED_EXPERIENCES_LINK}>
+          <Box
+            sx={{
+              marginTop: "auto",
+              padding: isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : 0,
+              alignSelf: "center",
+            }}
+          >
+            <CustomLink
+              onClick={() => setShowRestoreDrawer(true)}
+              disableWhenOffline={true}
+              data-testid={DATA_TEST_ID.RESTORE_DELETED_EXPERIENCES_LINK}
+            >
               Restore deleted experiences
             </CustomLink>
           </Box>
@@ -495,7 +515,12 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       <ConfirmModalDialog
         isOpen={showRestoreToOriginalConfirmDialog}
         title="Restore Experience"
-        content={<>Are you sure you want to restore this experience to its unedited version? This will overwrite any changes you've made.</>}
+        content={
+          <>
+            Are you sure you want to restore this experience to its unedited version? This will overwrite any changes
+            you've made.
+          </>
+        }
         onConfirm={confirmRestoreToOriginalExperience}
         onDismiss={cancelRestoreToOriginalExperience}
         onCancel={cancelRestoreToOriginalExperience}
