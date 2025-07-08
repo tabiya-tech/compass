@@ -1,17 +1,24 @@
 from dataclasses import field
 from datetime import datetime
-from typing import Mapping, Any, Union, TypeAlias
+from typing import Mapping, Any, TypeAlias, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator, json
 
 from app.conversations.feedback.services.types import AnsweredQuestions
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 
+PossibleExperimentValues: TypeAlias = Union[str, int, float, bool, None, dict[str, Any], list[Any]]
+Experiments: TypeAlias = dict[str, Any]
+"""
+Experiments - A dictionary mapping experiment namespaces to their configuration
 
-# Type alias for experiment configurations
-ExperimentConfig: TypeAlias = Union[str, dict[str, Any]]
-Experiments: TypeAlias = dict[str, ExperimentConfig]
+Can carry a json-like structure, where each experiment can have either a simple string value or a nested configuration.
+"""
+
 UserExperiments: TypeAlias = dict[str, Experiments]
+"""
+UserExperiments - A dictionary mapping user IDs to their corresponding experiments
+"""
 
 
 class UpdateUserLanguageRequest(BaseModel):
@@ -103,6 +110,16 @@ class UserPreferencesUpdateRequest(BaseModel):
     }
     """
 
+    @model_validator(mode="before")
+    def validate_experiments_is_json(cls, values):
+        experiments = values.get("experiments")
+        if experiments is not None:
+            try:
+                json.dumps(experiments)
+            except (TypeError, ValueError) as e:
+                raise ValueError(f"Invalid experiments structure: {e}")
+        return values
+
     class Config:
         extra = "forbid"
 
@@ -130,7 +147,7 @@ class UserPreferences(BaseModel):
     """
 
     @staticmethod
-    def from_document(doc: Mapping[str, any]) -> "UserPreferences":
+    def from_document(doc: Mapping[str, Any]) -> "UserPreferences":
         """
         Create a new UserPreferences object from a dictionary
 
