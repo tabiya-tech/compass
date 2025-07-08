@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, model_validator, json
 from app.conversations.feedback.services.types import AnsweredQuestions
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 
-PossibleExperimentValues: TypeAlias = Union[str, int, float, bool, None, dict[str, Any], list[Any]]
+PossibleExperimentValues: TypeAlias = Any
 Experiments: TypeAlias = dict[str, Any]
 """
 Experiments - A dictionary mapping experiment namespaces to their configuration
