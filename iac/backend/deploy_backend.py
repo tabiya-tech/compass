@@ -195,15 +195,32 @@ def _get_fully_qualified_image_name(
         docker_repository: pulumi.Output[gcp.artifactregistry.Repository],
         tag: str
 ) -> pulumi.Output[str]:
-    def _get_name(repository_info):
+
+    def _get_self_link(repository_info):
+        # Get the latest docker image with this tag.
+        # Given the actual tag may be assigned to another image, we need to get the latest image with this tag.
+        # The `self_link` is the fully qualified image name. with the sha.
+        # ref: https://www.pulumi.com/registry/packages/gcp/api-docs/artifactregistry/getdockerimage/#self_link_python
         repository_project_id = repository_info.get("project")
         repository_location = repository_info.get("location")
         repository_name = repository_info.get("name")
-        name = f"{repository_location}-docker.pkg.dev/{repository_project_id}/{repository_name}/backend:{tag}"
-        pulumi.info("using image name: " + name)
-        return name
 
-    return docker_repository.apply(_get_name)
+        image = gcp.artifactregistry.get_docker_image(
+            image_name=f"backend:{tag}",
+            location=repository_location,
+            # The last part of the repository name to fetch from.
+            # see: https://www.pulumi.com/registry/packages/gcp/api-docs/artifactregistry/getdockerimage/#repository_id_python
+            # we are using the repository.get("name") to get the repository name because it is the one that returns the last part.
+            # Using repository.get("id") would return the full name of the repository.
+            repository_id=repository_name,
+            project=repository_project_id
+        )
+
+        pulumi.info("Deploying image with the link: "+ image.self_link)
+
+        return image.self_link
+
+    return docker_repository.apply(_get_self_link)
 
 
 # Deploy cloud run service
