@@ -4,7 +4,7 @@ from typing import AsyncIterator
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from ._utils import has_explored_experiences, filter_explored_experiences
+from ._utils import filter_explored_experiences
 
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
@@ -88,12 +88,12 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
              skills_explorer_agent_state) = results
 
             state = ApplicationState(session_id=session_id,
-                                    agent_director_state=AgentDirectorState.from_document(agent_director_state),
-                                    welcome_agent_state=WelcomeAgentState.from_document(welcome_agent_state),
-                                    explore_experiences_director_state=ExploreExperiencesAgentDirectorState.from_document(explore_experiences_director_state),
-                                    conversation_memory_manager_state=ConversationMemoryManagerState.from_document(conversation_memory_manager_state),
-                                    collect_experience_state=CollectExperiencesAgentState.from_document(collect_experience_state),
-                                    skills_explorer_agent_state=SkillsExplorerAgentState.from_document(skills_explorer_agent_state))
+                                     agent_director_state=AgentDirectorState.from_document(agent_director_state),
+                                     welcome_agent_state=WelcomeAgentState.from_document(welcome_agent_state),
+                                     explore_experiences_director_state=ExploreExperiencesAgentDirectorState.from_document(explore_experiences_director_state),
+                                     conversation_memory_manager_state=ConversationMemoryManagerState.from_document(conversation_memory_manager_state),
+                                     collect_experience_state=CollectExperiencesAgentState.from_document(collect_experience_state),
+                                     skills_explorer_agent_state=SkillsExplorerAgentState.from_document(skills_explorer_agent_state))
 
             # Upgrade the state if necessary
             state = await self._upgrade_state(state)
@@ -197,11 +197,12 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             # The field `state.explore_experiences_director_state.explored_experiences` was added in a later version
             # if it is empty, and we have explored experiences, we populate it
             # with the experiences that have been processed
-            if state.explore_experiences_director_state.explored_experiences is None and has_explored_experiences(state):
+            if state.explore_experiences_director_state.explored_experiences is None:
                 self._logger.info("upgrading state: populating explored_experiences field")
                 state.explore_experiences_director_state.explored_experiences = filter_explored_experiences(state)
                 _changes = True
 
+            # after the upgrade, we save the state
             if _changes:
                 await self.save_state(state)
 
