@@ -97,23 +97,16 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
                 if request.phase != "INITIAL":
                     raise SkillsRankingStateNotFound(session_id=session_id)
 
-                # create the state
-                new_state = await skills_ranking_service.upsert_state(
-                    session_id=session_id,
-                    user_id=user_info.user_id,
-                    phase=request.phase,
-                )
-                return new_state
-            else:
-                # upsert/update as normal
-                new_state = await skills_ranking_service.upsert_state(
-                    session_id=session_id,
-                    phase=request.phase,
-                    cancelled_after=request.cancelled_after,
-                    perceived_rank_percentile=request.perceived_rank_percentile,
-                    retyped_rank_percentile=request.retyped_rank_percentile,
-                )
-                return new_state
+
+            new_state = await skills_ranking_service.upsert_state(
+                session_id=session_id,
+                phase=request.phase,
+                cancelled_after=request.cancelled_after,
+                perceived_rank_percentile=request.perceived_rank_percentile,
+                retyped_rank_percentile=request.retyped_rank_percentile,
+            )
+
+            return new_state
 
         except InvalidNewPhaseError as e:
             logger.error("Invalid new phase error occurred.")

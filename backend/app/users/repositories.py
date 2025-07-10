@@ -54,7 +54,7 @@ class IUserPreferenceRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: dict[str, PossibleExperimentValues] | PossibleExperimentValues) -> None:
+    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: PossibleExperimentValues) -> None:
         """
         Set an experiment configuration for a given experiment ID in the user preferences
         :param user_id: str - The user_id to set the experiment for
@@ -132,7 +132,7 @@ class UserPreferenceRepository(IUserPreferenceRepository):
             logger.exception(e)
             raise UserPreferenceRepositoryError("Failed to get user experiments") from e
 
-    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: dict[str, PossibleExperimentValues] | PossibleExperimentValues) -> None:
+    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: PossibleExperimentValues) -> None:
         try:
             # Use $set with dot notation to update a specific field in the experiments dictionary
             await self.collection.update_one(

@@ -4,7 +4,7 @@ from typing import Any
 from app.users.auth import Authentication
 from features.skills_ranking.repository.collections import Collections
 from features.skills_ranking.routes.routes import get_skills_ranking_router
-from features.types import IFeature
+from modules.types import IFeature
 
 
 class Feature(IFeature):

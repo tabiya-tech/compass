@@ -1,13 +1,13 @@
 from dataclasses import field
 from datetime import datetime
-from typing import Mapping, Any, TypeAlias, Union
+from typing import Mapping, Any, TypeAlias
 
 from pydantic import BaseModel, Field, model_validator, json
 
 from app.conversations.feedback.services.types import AnsweredQuestions
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 
-PossibleExperimentValues: TypeAlias = str | bool | int | float | None
+PossibleExperimentValues: TypeAlias = Any
 Experiments: TypeAlias = dict[str, Any]
 """
 Experiments - A dictionary mapping experiment namespaces to their configuration

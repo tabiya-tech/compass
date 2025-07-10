@@ -14,22 +14,29 @@ SkillsRankingPhase = Literal[
     "CANCELLED",
     "COMPLETED"]
 
-CompareAgainst = Literal["against_other_job_seekers", "against_job_market"]
-ButtonOrder = Literal["skip_button_first", "view_button_first"]
-
 
 class SkillRankingExperimentGroup(Enum):
     """
     Skills Ranking Experiment Groups assigned to the user. Each group has its own branch in the skills ranking flow
-        Group 1: The expected flow for group 1 is that the user will go through a time based effort task to get the ranking results
-                and gets to actually see the ranking results (unlike groups 2 and 4). The group 1 users will also be asked to retype the
-                results of the ranking task before completing the skills ranking process.
-        Group 2: The expected flow for group 2 is that the user will go through a high effort task (not necessarily time based) to get the ranking results
-                this group (along with group 4) will not get to see the ranking results, and will not be asked to retype the results of the ranking task before
-                completing the skills ranking process.
-        Group 3: Same basic flow as group 1
-        Group 4: Same basic flow as group 2
+
+    Differences between the groups:
+
+    Group 1:
+        - time based effort task
+        - see ranking results.
+        - confirm they've seen the ranking results
+    Group 2:
+        - work based effort task
+        - not see ranking results.
+    Group 3:
+            - work based effort task
+            - see ranking results.
+            - confirm they've seen the ranking results
+        Group 4:
+            - time based effort task
+            - not see ranking results.
     """
+
     GROUP_1 = "Group 1: High Difference/Greater"
     GROUP_2 = "Group 2: High Difference/Smaller"
     GROUP_3 = "Group 3: Underconfidence/Yes"
@@ -41,14 +48,17 @@ class SkillsRankingScore(BaseModel):
     """
     The rank of the user as compared to the job market.
     """
+
     comparison_rank: float
     """
     The rank of the user as compared to other job seekers.
     """
+
     comparison_label: str
     """
     The label of the comparison rank, LOWEST, SECOND_LOWEST, MIDDLE, SECOND_HIGHEST, HIGHEST.
     """
+
     calculated_at: datetime
     """
     The time the score was calculated, in ISO format, in UTC.

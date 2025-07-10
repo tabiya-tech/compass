@@ -129,7 +129,9 @@ class SkillsRankingRepository(ISkillsRankingRepository):
                      completed_at: datetime | None = None
                      ) -> SkillsRankingState:
 
+        # REVIEW: Have a type UpdateSkillsRankingRequest() and do model_dump(exclude_none=True, exclude_unset=True) to get the fields to update
         update_fields = {}
+
         if phase is not None:
             update_fields["phase"] = phase
         if cancelled_after is not None:

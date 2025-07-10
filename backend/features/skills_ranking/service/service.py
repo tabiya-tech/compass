@@ -3,8 +3,8 @@ from typing import Tuple
 
 from app.users.repositories import IUserPreferenceRepository
 from common_libs.time_utilities import get_now
-from features.skills_ranking.constants import FEATURE_ID
-from features.skills_ranking.errors import InvalidNewPhaseError, SkillsRankingStateNotFound, InvalidSkillsRankingInitializationRequest
+from features.skills_ranking.constants import FEATURE_ID, SKILLS_RANKING_EXPERIMENT_ID
+from features.skills_ranking.errors import InvalidNewPhaseError, SkillsRankingStateNotFound
 from features.skills_ranking.repository.repository import ISkillsRankingRepository
 from features.skills_ranking.service.calculate_skills_ranking import calculate_belief_difference, get_experiment_group, calculate_skills_to_job_matching_rank, \
     calculate_skills_to_job_seekers_rank, get_ranking_comparison_label
@@ -65,6 +65,9 @@ class SkillsRankingService(ISkillsRankingService):
     ) -> SkillsRankingState:
         existing_state = await self._repository.get_by_session_id(session_id)
 
+        # check if the existing state is None and if the phase is not INITIAL
+        # throw the erro r that skill ranking state is not found.
+
         # see if the state already exists, if not create it
         if existing_state is None:
             if phase != "INITIAL":
@@ -74,7 +77,7 @@ class SkillsRankingService(ISkillsRankingService):
 
             await self._user_preferences_repository.set_experiment_by_user_id(
                 user_id=user_id,
-                experiment_id=FEATURE_ID,
+                experiment_id=SKILLS_RANKING_EXPERIMENT_ID, # REVIEW: discuss if using UUIDs in the database is idea especially if someone else might read it.
                 experiment_config=experiment_group.name
             )
 
@@ -98,6 +101,8 @@ class SkillsRankingService(ISkillsRankingService):
                 )
 
         # update the existing state using named arguments
+        # REVIEW: cancelled_after, perceived_rank_percentile, retyped_rank_percentile are passed with phases
+
         saved_state = await self._repository.update(
             session_id=session_id,
             phase=phase,

@@ -1,8 +1,11 @@
 from features.skills_ranking.service.types import SkillsRankingPhase
+from features.skills_ranking.utils import get_possible_next_states
 
 
 class SkillsRankingStateNotFound(Exception):
-    """Skills Ranking State Not Found in the store"""
+    """
+    Skill Ranking State Not Found in the store
+    """
 
     def __init__(self, session_id: int):
         self.session_id = session_id
@@ -19,7 +22,9 @@ class InvalidNewPhaseError(Exception):
 
 
 class InvalidSkillsRankingInitializationRequest(Exception):
-    """Invalid Skills Ranking Initialization Request"""
+    """
+    Invalid Skills Ranking Initialization Request
+    """
 
     def __init__(self, session_id: int):
         self.session_id = session_id

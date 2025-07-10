@@ -240,7 +240,9 @@ class TestSetExperimentByUserId:
         True,
         42,
         3.14,
-        None
+        None,
+        ["item1", "item2"],
+        { "p": ["item1", "item2", { "nested_item": "value"}]}
     ], ids=[
         "dict_config",
         "nested_dict_config",
@@ -248,7 +250,9 @@ class TestSetExperimentByUserId:
         "boolean",
         "integer",
         "float",
-        "none"
+        "none",
+        "flat_array",
+        "object_with_array"
     ])
     async def test_set_experiment_by_user_id_new_experiment(self, get_user_preference_repository: Awaitable[UserPreferenceRepository], given_experiment_config: PossibleExperimentValues):
         # GIVEN a user id
