@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from app.countries import Country
 from app.version.types import Version
 
-from modules.types import FeatureSetupConfig
+from features.types import FeatureSetupConfig
 
 
 class ApplicationConfig(BaseModel):
