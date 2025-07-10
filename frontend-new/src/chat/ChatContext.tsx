@@ -11,6 +11,7 @@ interface ChatContextType {
   setFeedbackStatus: (status: FeedbackStatus) => void;
   isAccountConverted: boolean;
   setIsAccountConverted: (converted: boolean) => void;
+  handleUploadCV?: () => void;
 }
 
 export const ChatContext = createContext<ChatContextType | null>(null);
@@ -20,9 +21,16 @@ interface ChatProviderProps {
   handleOpenExperiencesDrawer: () => void;
   removeMessage: (messageId: string) => void;
   addMessage: (message: IChatMessage<any>) => void;
+  handleUploadCV?: () => void;
 }
 
-export const ChatProvider: React.FC<ChatProviderProps> = ({ children, handleOpenExperiencesDrawer, removeMessage, addMessage }) => {
+export const ChatProvider: React.FC<ChatProviderProps> = ({
+  children,
+  handleOpenExperiencesDrawer,
+  removeMessage,
+  addMessage,
+  handleUploadCV
+}) => {
   const [feedbackStatus, setFeedbackStatus] = useState<FeedbackStatus>(FeedbackStatus.NOT_STARTED);
   const [isAccountConverted, setIsAccountConverted] = useState<boolean>(PersistentStorageService.getAccountConverted());
 
@@ -37,7 +45,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, handleOpen
       PersistentStorageService.setAccountConverted(converted);
       setIsAccountConverted(converted);
     },
-  }), [feedbackStatus, handleOpenExperiencesDrawer, isAccountConverted, removeMessage, addMessage]);
+    handleUploadCV,
+  }), [feedbackStatus, handleOpenExperiencesDrawer, isAccountConverted, removeMessage, addMessage, handleUploadCV]);
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 };
@@ -48,4 +57,4 @@ export const useChatContext = () => {
     throw new Error('useChatContext must be used within a ChatProvider');
   }
   return context;
-}; 
+};

@@ -36,13 +36,15 @@ export const generateCompassMessage = (
   message_id: string,
   message: string,
   sent_at: string,
-  reaction: MessageReaction | null
+  reaction: MessageReaction | null,
+  isFirstMessage: boolean = false
 ): IChatMessage<CompassChatMessageProps> => {
   const payload: CompassChatMessageProps = {
     message_id: message_id,
     message: message,
     sent_at: sent_at,
     reaction: reaction,
+    isFirstMessage
   };
   return {
     type: COMPASS_CHAT_MESSAGE_TYPE,

@@ -229,6 +229,8 @@ class WelcomeAgent(Agent):
                 
                 If you have any questions, feel free to ask.
                 
+                You can upload your CV if you have one.
+                
                 Ready to get started?
                 """)
 

@@ -209,6 +209,10 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           await fetchExperiences();
         }
 
+        // Check if this is the first Compass message
+        const compassMessagesCount = messages.filter(msg => msg.sender === ConversationMessageSender.COMPASS).length;
+        const isFirstCompassMessage = compassMessagesCount === 0;
+
         response.messages.forEach((messageItem) => {
           const message =
             response.conversation_completed && messageItem === response.messages[response.messages.length - 1]
@@ -217,7 +221,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
                   messageItem.message_id,
                   messageItem.message,
                   messageItem.sent_at,
-                  messageItem.reaction
+                  messageItem.reaction,
+                  isFirstCompassMessage
                 );
           addMessage(message);
         });
@@ -236,7 +241,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setAiIsTyping(false);
       }
     },
-    [exploredExperiences, fetchExperiences]
+    [exploredExperiences, fetchExperiences, messages]
   );
 
   const initializeChat = useCallback(
@@ -271,16 +276,28 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
         // Set the messages from the chat history
         if (history.messages.length) {
+          const compassMessages = history.messages.filter(msg => msg.sender === ConversationMessageSender.COMPASS);
+
           setMessages(
-            history.messages.map((message: ConversationMessage) => {
+            history.messages.map((message: ConversationMessage, index) => {
               if (message.sender === ConversationMessageSender.USER) {
                 return generateUserMessage(message.message, message.sent_at);
               }
+
+              // Check if this is the first COMPASS message
+              const isFirstCompassMessage = message === compassMessages[0];
+
               // If this is the last message and conversation is completed, make it a conclusion message
               if (history.conversation_completed && message === history.messages[history.messages.length - 1]) {
                 return generateConversationConclusionMessage(message.message_id, message.message);
               }
-              return generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction);
+              return generateCompassMessage(
+                message.message_id,
+                message.message,
+                message.sent_at,
+                message.reaction,
+                isFirstCompassMessage
+              );
             })
           );
 
@@ -431,6 +448,24 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     }
   }, [activeSessionId, fetchExperiences]);
 
+  // Handler for uploading CV files
+  const handleUploadCV = useCallback(() => {
+    // Create a hidden file input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf,.docx,.txt';
+    fileInput.click();
+
+    fileInput.onchange = (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // Handle the file upload
+        console.log('File selected:', file);
+        // TODO: Implement file upload logic here
+      }
+    };
+  }, []);
+
   return (
     <Suspense fallback={<Backdrop isShown={true} transparent={true} />}>
       {isLoggingOut ? (
@@ -440,6 +475,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}
           removeMessage={removeMessage}
           addMessage={addMessage}
+          handleUploadCV={handleUploadCV}
         >
           <Box
             width="100%"

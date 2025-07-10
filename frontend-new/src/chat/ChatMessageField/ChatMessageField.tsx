@@ -1,7 +1,13 @@
 import React, { useEffect, useContext, useMemo, useState, MouseEvent, KeyboardEvent, useCallback } from "react";
-import { IconButton, InputAdornment, TextField, styled, useTheme, Typography, Box } from "@mui/material";
+import { InputAdornment, TextField, styled, useTheme, Typography, Box } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
+import AddIcon from '@mui/icons-material/Add';
+import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
+import ContextMenu from "src/theme/ContextMenu/ContextMenu";
+import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import { useChatContext } from "../ChatContext";
 
 export interface ChatMessageFieldProps {
   handleSend: (message: string) => void;
@@ -20,6 +26,15 @@ export const DATA_TEST_ID = {
   CHAT_MESSAGE_FIELD_ICON: `chat-message-field-icon-${uniqueId}`,
   CHAT_MESSAGE_CHAR_COUNTER: `chat-message-char-counter-${uniqueId}`,
 };
+
+export const MENU_ITEM_ID = {
+  UPLOAD_CV: `upload-cv-${uniqueId}`,
+}
+
+export const MENU_ITEM_TEXT = {
+  UPLOAD_CV: "Upload a CV (PDF, DOCX, TXT)",
+}
+
 export const PLACEHOLDER_TEXTS = {
   CHAT_FINISHED: "Conversation has been completed. You can't send any more messages.",
   AI_TYPING: "AI is typing..., wait for it to finish.",
@@ -46,6 +61,7 @@ const StyledTextField = styled(TextField)(({ theme, disabled }) => ({
     "&.Mui-error fieldset": {
       borderColor: theme.palette.error.main,
     },
+    // paddingRight: theme.fixedSpacing(theme.tabiyaSpacing.xs),
   },
 
   // Change the color of the input text when disabled to make it more readable
@@ -62,6 +78,34 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const [isMobile, setIsMobile] = useState(false);
   const isOnline = useContext(IsOnlineContext);
   const [maxRows, setMaxRows] = useState(4);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const { handleUploadCV } = useChatContext();
+
+  const handleAddClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const onUploadCV = () => {
+    if(handleUploadCV) {
+      handleUploadCV();
+    }
+    handleCloseMenu();
+  };
+
+  const menuItems: MenuItemConfig[] = [
+    {
+      id: MENU_ITEM_ID.UPLOAD_CV,
+      text: MENU_ITEM_TEXT.UPLOAD_CV,
+      icon: <FileUploadIcon />,
+      action: onUploadCV,
+      disabled: false
+    }
+  ];
 
   // Use effect to determine if the screen width is mobile and if the number of rows should be adjusted
   useEffect(() => {
@@ -269,8 +313,6 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     >
       <Box
         sx={{
-          // responsive padding
-
           width: {
             xs: "100%",
             md: "60%",
@@ -294,20 +336,31 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton
-                  data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON}
-                  onClick={handleButtonClick}
-                  onKeyDown={(event) => event.stopPropagation()}
-                  disabled={sendIsDisabled()}
-                  title="send message"
-                >
-                  <SendIcon
-                    data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_ICON}
-                    sx={{
-                      color: sendIsDisabled() ? theme.palette.grey[400] : theme.palette.primary.dark,
-                    }}
-                  />
-                </IconButton>
+                <Box display="flex" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
+                  <PrimaryIconButton
+                    sx={{ color: theme.palette.common.black }}
+                    title="add attachment"
+                    onClick={handleAddClick}
+                  >
+                    <AddIcon />
+                  </PrimaryIconButton>
+                  <PrimaryIconButton
+                    data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON}
+                    onClick={handleButtonClick}
+                    onKeyDown={(event) => event.stopPropagation()}
+                    disabled={sendIsDisabled()}
+                    title="send message"
+                  >
+                    <SendIcon
+                      data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_ICON}
+                      sx={{
+                        color: sendIsDisabled() ? theme.palette.grey[400] : theme.palette.primary.dark,
+                        "&:hover": { color: theme.palette.common.black },
+                        "&:active": { color: theme.palette.common.black },
+                      }}
+                    />
+                  </PrimaryIconButton>
+                </Box>
               </InputAdornment>
             ),
             inputProps: {
@@ -327,6 +380,20 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           </Typography>
         )}
       </Box>
+      <ContextMenu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        notifyOnClose={handleCloseMenu}
+        items={menuItems}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+      />
     </Box>
   );
 };

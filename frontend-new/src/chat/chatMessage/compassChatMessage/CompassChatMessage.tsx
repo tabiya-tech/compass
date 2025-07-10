@@ -1,10 +1,13 @@
 import React from "react";
-import { Box, styled } from "@mui/material";
+import { Box, Divider, styled, useTheme } from "@mui/material";
 import { ConversationMessageSender, MessageReaction } from "src/chat/ChatService/ChatService.types";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import ReactionButtons from "src/chat/reaction/components/reactionButtons/ReactionButtons";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+import { useChatContext } from "src/chat/ChatContext";
 
 const uniqueId = "2fbaf2ef-9eab-485a-bd28-b4a164e18b06";
 
@@ -27,9 +30,13 @@ export interface CompassChatMessageProps {
     message: string;
     sent_at: string; // ISO formatted datetime string
     reaction: MessageReaction | null;
+    isFirstMessage?: boolean;
 }
 
-const CompassChatMessage: React.FC<CompassChatMessageProps> = ({ message_id, message, sent_at, reaction }) => {
+const CompassChatMessage: React.FC<CompassChatMessageProps> = ({ message_id, message, sent_at, reaction, isFirstMessage = false }) => {
+  const theme = useTheme();
+  const { handleUploadCV } = useChatContext();
+
   return (
     <MessageContainer origin={ConversationMessageSender.COMPASS} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
       <Box sx={{
@@ -41,7 +48,21 @@ const CompassChatMessage: React.FC<CompassChatMessageProps> = ({ message_id, mes
         alignItems: "flex-start"
       }}>
         <Box sx={{ width: "100%" }}>
-          <ChatBubble message={message} sender={ConversationMessageSender.COMPASS} />
+          <ChatBubble message={message} sender={ConversationMessageSender.COMPASS}>
+            {isFirstMessage && (
+              <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
+                <Divider />
+                <Box display="flex" justifyContent="flex-end">
+                  <PrimaryButton
+                    startIcon={<FileUploadIcon />}
+                    onClick={handleUploadCV}
+                  >
+                    Upload a CV
+                  </PrimaryButton>
+                </Box>
+              </Box>
+            )}
+          </ChatBubble>
           <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
             <Timestamp sentAt={sent_at} />
             <ReactionButtons
