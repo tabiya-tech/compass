@@ -2,17 +2,17 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { FIXED_MESSAGES_TEXT } from "src/chat/util";
-import FeedbackForm, {
+import OverallFeedbackForm, {
   FeedbackStatus,
   FeedbackCloseEvent,
-} from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
+} from "src/feedback/overallFeedback/overallFeedbackForm/OverallFeedbackForm";
 import { useChatContext } from "src/chat/ChatContext";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
-import CustomerSatisfactionRating from "src/feedback/overallFeedback/feedbackForm/components/customerSatisfactionRating/CustomerSatisfaction";
+import CustomerSatisfactionRating from "src/feedback/overallFeedback/overallFeedbackForm/components/formContent/questionComponents/customerSatisfactionRating/CustomerSatisfaction";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import FeedbackOutlinedIcon from "@mui/icons-material/FeedbackOutlined";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
@@ -203,7 +203,7 @@ const ConversationConclusionFooter: React.FC = () => {
           )}
         </Typography>
       </Box>
-      <FeedbackForm isOpen={isFeedbackFormOpen} notifyOnClose={handleFeedbackFormClose} />
+      <OverallFeedbackForm isOpen={isFeedbackFormOpen} notifyOnClose={handleFeedbackFormClose} />
       <AnonymousAccountConversionDialog
         isOpen={showConversionDialog}
         onClose={() => setShowConversionDialog(false)}

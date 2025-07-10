@@ -2,12 +2,74 @@
 Module containing type definitions for the feedback feature.
 """
 from datetime import datetime
+from enum import Enum
+from typing import TypeAlias, Literal
 
 from typing import TypeAlias
 from pydantic import BaseModel, Field
 
 from .errors import InvalidOptionError
 from common_libs.time_utilities import get_now
+
+
+class QuestionType(str, Enum):
+    """Type of feedback question."""
+    YES_NO = "yes_no"
+    RATING = "rating"
+    CHECKBOX = "checkbox"
+
+
+class BaseQuestion(BaseModel):
+    """Base model for all question types."""
+    question_text: str
+    """Text of the question"""
+    description: str
+    """Description of the question"""
+    comment_placeholder: str | None
+    """Placeholder text for comments"""
+    type: QuestionType
+    """Type of the question"""
+
+    class Config:
+        extra = "forbid"
+
+
+class YesNoQuestion(BaseQuestion):
+    """Model for yes/no questions."""
+    type: Literal[QuestionType.YES_NO]
+    show_comments_on: Literal["yes", "no"]
+    """Whether to show comments field on yes or no answer"""
+
+
+class RatingQuestion(BaseQuestion):
+    """Model for rating questions."""
+    type: Literal[QuestionType.RATING]
+    max_rating: int | None = None
+    """Maximum rating value"""
+    display_rating: bool | None = None
+    """Whether to display the rating"""
+    low_rating_label: str | None = None
+    """Label for low rating"""
+    high_rating_label: str | None = None
+    """Label for high rating"""
+
+
+class CheckboxQuestion(BaseQuestion):
+    """Model for checkbox questions."""
+    type: Literal[QuestionType.CHECKBOX]
+    options: dict[str, str]
+    """Available options as key-value pairs"""
+    low_rating_label: str | None = None
+    """Label for low rating"""
+    high_rating_label: str | None = None
+    """Label for high rating"""
+
+
+Question = YesNoQuestion | RatingQuestion | CheckboxQuestion
+"""Union type for all question types"""
+
+QuestionsConfig = dict[str, Question]
+"""Type alias for the questions configuration"""
 
 
 class Answer(BaseModel):

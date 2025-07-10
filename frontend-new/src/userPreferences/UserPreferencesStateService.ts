@@ -1,7 +1,8 @@
 import { SensitivePersonalDataRequirement, UserPreference, Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+
 import {
-  QUESTION_KEYS,
-} from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+  CUSTOMER_SATISFACTION_QUESTION_KEY
+} from "src/feedback/overallFeedback/overallFeedbackForm/components/formContent/questionComponents/customerSatisfactionRating/constants";
 
 export default class UserPreferencesStateService {
   private static instance: UserPreferencesStateService;
@@ -65,7 +66,7 @@ export default class UserPreferencesStateService {
     }
 
     return answered_questions[activeSessionId].some(
-      (question) => question !== QUESTION_KEYS.CUSTOMER_SATISFACTION
+      (question) => question !== CUSTOMER_SATISFACTION_QUESTION_KEY
     );
   }
   
@@ -88,7 +89,7 @@ export default class UserPreferencesStateService {
       return false;
     }
 
-    return answered_questions[activeSessionId].includes(QUESTION_KEYS.CUSTOMER_SATISFACTION)
+    return answered_questions[activeSessionId].includes(CUSTOMER_SATISFACTION_QUESTION_KEY)
   }
 
   private cloneUserPreferences(preferences: UserPreference | null): UserPreference | null {
