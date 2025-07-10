@@ -1,3 +1,4 @@
+import importlib
 from typing import Awaitable, cast
 
 import pytest
@@ -6,6 +7,7 @@ from httpx import ASGITransport, AsyncClient
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from starlette.datastructures import State
 
+from app.server_dependencies.db_dependencies import CompassDBProvider
 from common_libs.test_utilities.setup_env_vars import setup_env_vars, teardown_env_vars
 
 
@@ -32,6 +34,9 @@ class TestServer:
         It will spin up the FastAPI application with an in memory db for the applications db and test the version endpoint.
         """
 
+        # Clear the cache before starting the test
+        CompassDBProvider.clear_cache()
+
         # Mock the validate_taxonomy_model function to succeed
         # The mock must be created before the import of the app.server module
         mocker.patch('app.vector_search.validate_taxonomy_model.validate_taxonomy_model', return_value=None)
@@ -39,7 +44,11 @@ class TestServer:
         # NOTE: Import the FastAPI application and the lifespan context manager first. This is crucial because
         # logging is configured during the app.server module's initialization. Logging configuration must be set
         # before any other imports; otherwise, it will not be applied, and logs will not be captured during the test.
-        from app.server import app, lifespan
+        app_module = importlib.import_module("app.server")
+        importlib.reload(app_module)
+
+        app = app_module.app
+        lifespan = app_module.lifespan
 
         # Using an in-memory MongoDB server for testing
         _in_mem_application_db = mocker.patch('app.server_dependencies.db_dependencies._get_application_db')

@@ -277,3 +277,17 @@ class CompassDBProvider:
                         raise RuntimeError("MongoDB health check failed for Metrics database")
                     cls._logger.info("Successfully pinged Metrics MongoDB")
         return cls._metrics_mongo_db
+
+    @staticmethod
+    def clear_cache():
+        """
+        Clear the cached database instances.
+
+        This is useful for testing purposes to ensure that the database instances are re-created.
+        """
+        CompassDBProvider._application_mongo_db = None
+        CompassDBProvider._taxonomy_mongo_db = None
+        CompassDBProvider._userdata_mongo_db = None
+        CompassDBProvider._metrics_mongo_db = None
+
+        CompassDBProvider._logger.info("Cleared cached database instances")

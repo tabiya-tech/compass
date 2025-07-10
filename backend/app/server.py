@@ -27,7 +27,7 @@ from app.conversations.poc import add_poc_routes
 from app.app_config import ApplicationConfig, set_application_config, get_application_config
 from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
-from modules.loader import FeatureLoader
+from features.loader import FeatureLoader
 from starlette.datastructures import State
 
 
@@ -342,7 +342,13 @@ add_poc_routes(app, auth)
 ############################################
 # Add other features routes
 ############################################
-feature_loader.add_routes(app, auth)
+features_router = APIRouter(prefix="/features", tags=["Features"])
+
+# add custom features to the feature router
+feature_loader.add_routes(features_router, auth)
+
+# inject the feature router into the main app
+app.include_router(features_router)
 
 if __name__ == "__main__":
     import uvicorn
