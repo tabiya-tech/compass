@@ -1,0 +1,113 @@
+import { FeatureConfig } from "../featuresService/FeaturesService";
+
+export enum SkillRankingExperimentGroups {
+  GROUP_1 = "Group 1: High Difference/Greater",
+  /**
+   * Group 1: High Difference/Greater
+   * - time based effort task
+   * - see ranking results.
+   * - confirm they've seen the ranking results
+   */
+  GROUP_2 = "Group 2: High Difference/Smaller",
+  /**
+   * Group 2: High Difference/Smaller
+   * - work based effort task
+   * - not see ranking results.
+   */
+  GROUP_3 = "Group 3: Underconfidence/Yes",
+  /**
+   * Group 3: Underconfidence/Yes
+   * - work based effort task
+   * - see ranking results.
+   * - confirm they've seen the ranking results
+   */
+  GROUP_4 = "Group 4: Underconfidence/No"
+  /**
+   * Group 4: Underconfidence/No
+   * - time based effort task
+   * - not see ranking results.
+   */
+}
+
+export enum SkillsRankingPhase {
+  INITIAL = "INITIAL",
+  BRIEFING = "BRIEFING",
+  EFFORT = "EFFORT",
+  DISCLOSURE = "DISCLOSURE",
+  PERCEIVED_RANK = "PERCEIVED_RANK",
+  RETYPED_RANK = "RETYPED_RANK",
+  CANCELLED = "CANCELLED",
+  COMPLETED = "COMPLETED",
+}
+
+export interface SkillsRankingScore {
+  jobs_matching_rank: number;
+  /**
+   * The rank of the user as compared to the job market.
+   */
+  comparison_rank: number;
+  /**
+   * The rank of the user as compared to other job seekers.
+   */
+  comparison_label: string;
+  /**
+   * The label of the comparison rank, LOWEST, SECOND_LOWEST, MIDDLE, SECOND_HIGHEST, HIGHEST.
+   */
+  calculated_at: string;
+  /**
+   * The time the score was calculated, in ISO format, in UTC.
+   */
+}
+
+export interface SkillsRankingState {
+  session_id: number;
+  /**
+   * session id - the session ranking will be made on
+   */
+  experiment_group: SkillRankingExperimentGroups;
+  /**
+   * the group the user is assigned for each experiment branch
+   */
+  phase: SkillsRankingPhase;
+  /**
+   * The current phase of the skills ranking process.
+   */
+  score: SkillsRankingScore;
+  /**
+   * The score given to the user as compared to other job seekers and the job market.
+   */
+  cancelled_after?: string | null;
+  /**
+   * Represents the effort spent by the user before they cancelled the skills ranking process.
+   * Can be time in ms or a string indicating the effort type (e.g., "typed 4 characters").
+   */
+  perceived_rank_percentile?: number | null;
+  /**
+   * The percentile rank the user thinks they have (0-100)
+   */
+  retyped_rank_percentile?: number | null;
+  /**
+   * The rank the user retyped to confirm they saw it correctly (0-100)
+   */
+  started_at: string;
+  /**
+   * The time the skills ranking process started, in ISO format, in UTC.
+   */
+  completed_at?: string | null;
+  /**
+   * The time the skills ranking process completed, in ISO format, in UTC.
+   */
+}
+
+export interface SkillsRankingConfig extends FeatureConfig{
+  config: {
+    /**
+     * The amount of airtime the user will receive for completing the skills ranking process.
+     */
+    airtimeBudget: string;
+    /**
+     * The minimum time in seconds the user must spend on the skills ranking process.
+     */
+    jobPlatformUrl: string;
+  }
+}
