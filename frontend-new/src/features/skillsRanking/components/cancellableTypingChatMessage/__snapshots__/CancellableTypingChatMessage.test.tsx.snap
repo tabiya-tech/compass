@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CancellableTypingChatMessage should render the Cancellable Typing Chat message correctly with default text 1`] = `
+<div
+  class="MuiBox-root css-1c8zvho"
+  data-testid="cancellable-typing-chat-message-container-cancellable-typing-chat-message-eb14a7aa-b515-4ab9-9829-8110346d9090"
+  origin="COMPASS"
+>
+  <div
+    data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+  >
+    <div
+      class="MuiBox-root css-1b1d1q0"
+    >
+      <div
+        class="MuiBox-root css-x1sij0"
+      >
+        <p
+          class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+        >
+          Typing
+        </p>
+        <span
+          class="MuiBox-root css-sz63p1"
+        >
+          <span
+            class="MuiTypography-root MuiTypography-body1 css-18f2if6-MuiTypography-root"
+          >
+            .
+          </span>
+          <span
+            class="MuiTypography-root MuiTypography-body1 css-1dvtvwe-MuiTypography-root"
+          >
+            .
+          </span>
+          <span
+            class="MuiTypography-root MuiTypography-body1 css-4a4pgt-MuiTypography-root"
+          >
+            .
+          </span>
+        </span>
+      </div>
+      <a
+        aria-disabled="false"
+        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+        data-testid="cancellable-typing-chat-message-cancel-button-cancellable-typing-chat-message-eb14a7aa-b515-4ab9-9829-8110346d9090"
+        style="display: inline-flex; flex-direction: row; gap: calc(clamp(2px, (2dvh + -8px + 1.5dvw + -10px)/2 , 8px) * 0.25); vertical-align: bottom;"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+          data-testid="HighlightOffIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M14.59 8 12 10.59 9.41 8 8 9.41 10.59 12 8 14.59 9.41 16 12 13.41 14.59 16 16 14.59 13.41 12 16 9.41zM12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8"
+          />
+        </svg>
+        Cancel
+      </a>
+    </div>
+  </div>
+</div>
+`;
