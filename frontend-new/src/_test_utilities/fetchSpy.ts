@@ -17,7 +17,7 @@ export function setupFetchSpy(
 // spy on authenticated fetch requests
 export function setupAPIServiceSpy(
   expectedStatus: number,
-  expectedResponseBody: string | object | undefined,
+  expectedResponseBody: string | object | undefined | null,
   contentType: string
 ): jest.SpyInstance {
   const responseBody =
