@@ -18,7 +18,6 @@ iac_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/scripts directory.
 sys.path.insert(0, iac_folder)
 
-from backend.prepare_backend import download_backend_config
 from frontend.prepare_frontend import download_frontend_bundle
 
 from environment.env_types import EnvironmentTypes
@@ -86,12 +85,6 @@ def _download_artifacts_and_config(_realm_name: str, _artifacts_version: Version
         deployment_number=_deployment_number)
 
     download_frontend_bundle(
-        realm_name=_realm_name,
-        artifacts_version=_artifacts_version,
-        deployment_number=_deployment_number
-    )
-
-    download_backend_config(
         realm_name=_realm_name,
         artifacts_version=_artifacts_version,
         deployment_number=_deployment_number

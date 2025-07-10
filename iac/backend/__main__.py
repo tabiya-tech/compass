@@ -8,10 +8,8 @@ libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # so that we can import the iac/lib module when we run pulumi from withing the iac/backend directory.
 sys.path.insert(0, libs_dir)
 
-from scripts.formatters import construct_artifacts_version
 from deploy_backend import deploy_backend, BackendServiceConfig
-from lib import getconfig, getstackref, getenv, parse_realm_env_name_from_stack, load_dot_realm_env, \
-    construct_artifacts_dir, Version
+from lib import getconfig, getstackref, getenv, parse_realm_env_name_from_stack, load_dot_realm_env, Version
 
 
 def main():
@@ -86,21 +84,6 @@ def main():
         git_sha=getenv("TARGET_GIT_SHA")
     )
 
-    generic_artifact_version = construct_artifacts_version(
-        git_branch_name=deployable_version.git_branch_name,
-        git_sha=deployable_version.git_sha
-    )
-
-    # the key identifier of this deployment, used to identify the deployment.
-    run_number = getenv("DEPLOYMENT_RUN_NUMBER")
-
-    # Config artifacts directory name will be used to know where to find the backend config,
-    # for now api_gateway_config.yaml.
-    # Because the backend config are stored in the generic repository, we are using the generic_artifact_version.
-    config_dir = construct_artifacts_dir(
-        deployment_number=run_number,
-        fully_qualified_version=generic_artifact_version)
-
     # Deploy the backend
     deploy_backend(
         project=project,
@@ -109,7 +92,6 @@ def main():
         backend_service_cfg=backend_service_cfg,
         docker_repository=docker_repository,
         deployable_version=deployable_version,
-        config_dir=config_dir
     )
 
 

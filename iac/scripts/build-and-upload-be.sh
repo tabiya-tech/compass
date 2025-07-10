@@ -22,7 +22,6 @@ function save_report() {
     echo "### Backend artifacts packaging summary"
     echo "**Date**: \`$(date -u +%F' %T.%3N UTC')\`     "
     echo "**status**: ✅ Successfully uploaded       "
-    echo "**Config version**: \`$_deployable_generic_tag\`    "
     echo "**Docker version**: \`$_deployable_docker_tag\`    "
     echo "**version.json**:     "
     echo  "\`\`\`json"
@@ -80,13 +79,10 @@ function check_args() {
   The artifacts are versioned based on the current git branch/tag name and the commit sha.
 
   This script builds the backend Docker image and pushes it to the docker repository.
-  It also exports the API Gateway configuration and uploads it to the GCP Artifact repository.
 
   Requirements:
     - this script needs to run from the within the git repository.
     - the intended branch/tag has been checked out.
-    - the backend virtual environment is activated.
-    - Poetry and backend dependencies are installed.
 
   Arguments:
     region: The region where the artifacts will be uploaded.
@@ -132,10 +128,6 @@ if [ ! -d "$source_path" ]; then
   exit 1
 fi
 
-# @IMPORTANT: The filename of the api gateway config file name, must match the value used in backend/scripts/convert_to_openapi2.py:GCP_API_GATEWAY_CONFIG_FILE
-api_gateway_config_file_name="api_gateway_config.yaml"
-echo "info: setting the api gateway config file name to $api_gateway_config_file_name"
-
 git_branch_tag_name="$(get_git_branch_tag_name)"
 echo "info: setting the git branch/tag name to $git_branch_tag_name"
 
@@ -157,9 +149,6 @@ echo "info: setting the version json filename to $version_json_filename"
 
 echo "info: building and uploading backend:$docker_artifact_version artifacts to $region/$project_id from $source_path"
 
-# Export the API Gateway Configuration
-poetry run -C "$source_path"  python3 "$source_path/scripts/export_api_gateway_config/export_config.py" || exit 1
-
 # Make a backup of the version json file name and restore it when the script exits
 cp "$version_json_filename" "$version_json_filename.bak"
 
@@ -174,9 +163,6 @@ authenticate_gcloud
 
 # Build and upload the backend artifacts
 build_and_upload_be_docker_img "$region" "$project_id" "$docker_artifact_version" "$source_path"
-
-# Upload backend config
-upload_file "$region" "$project_id" "$generic_artifact_version" "$source_path/scripts/export_api_gateway_config/_tmp" "$api_gateway_config_file_name"
 
 # Report the summary
 save_report "$report_filename" "$generic_artifact_version" "$docker_artifact_version" "$version_json_filename"

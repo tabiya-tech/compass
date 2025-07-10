@@ -1,5 +1,4 @@
 import base64
-import os.path
 from dataclasses import dataclass
 from typing import Optional
 
@@ -8,9 +7,11 @@ import pulumi_gcp as gcp
 
 from pulumi import Output
 
-from backend.prepare_backend import base_configuration_dir, api_gateway_config_file_name
-from lib import ProjectBaseConfig, get_resource_name, get_project_base_config, get_file_as_string, Version
+from backend._construct_api_gateway_cfg import construct_api_gateway_cfg
+from lib import ProjectBaseConfig, get_resource_name, get_project_base_config, Version
 from scripts.formatters import construct_docker_tag
+
+api_gateway_config_file_name = "api_gateway_config.yaml"
 
 
 @dataclass(frozen=True)
@@ -65,10 +66,9 @@ class BackendServiceConfig:
 def _setup_api_gateway(*,
                        basic_config: ProjectBaseConfig,
                        cloudrun: gcp.cloudrunv2.Service,
-                       config_dir: str,
                        backend_service_cfg: BackendServiceConfig,
-                       dependencies: list[pulumi.Resource]
-                       ):
+                       dependencies: list[pulumi.Resource],
+                       artifacts_version: Version):
     apigw_service_account = gcp.serviceaccount.Account(
         resource_name=get_resource_name(resource="api-gateway", resource_type="sa"),
         account_id="api-gateway-sa",
@@ -87,19 +87,16 @@ def _setup_api_gateway(*,
 
     # The GCP API Gateway uses OpenAPI 2.0 yaml files for the configurations.
     # The yaml must be base64 encoded.
-    api_gateway_config_file_path: str = os.path.join(
-        base_configuration_dir,
-        config_dir,
-        api_gateway_config_file_name).__str__()
-
-    apigw_config_yml_string = get_file_as_string(api_gateway_config_file_path)
+    apigw_config_yml_string = cloudrun.uri.apply(
+        lambda cloudrun_url: construct_api_gateway_cfg(cloud_run_url=cloudrun_url,
+                                                       expected_version=artifacts_version))
 
     # update the yaml with the correct values
     # we are not using pulumi.Output.format because with path variables they are encapsulated in {}
     # which causes issues with pulumi.Output.format to throw because we want to keep them as {path variable}.
-    apigw_config_yaml = pulumi.Output.all(basic_config.project, cloudrun.uri).apply(
+    apigw_config_yaml = pulumi.Output.all(basic_config.project, cloudrun.uri, apigw_config_yml_string).apply(
         lambda args:
-        apigw_config_yml_string
+        args[2]
         # project ID
         .replace('__PROJECT_ID__', args[0])
 
@@ -366,7 +363,6 @@ def deploy_backend(
         backend_service_cfg: BackendServiceConfig,
         docker_repository: pulumi.Output[gcp.artifactregistry.Repository],
         deployable_version: Version,
-        config_dir: str
 ):
     """
     Deploy the backend infrastructure
@@ -402,7 +398,7 @@ def deploy_backend(
     _api_gateway = _setup_api_gateway(
         basic_config=basic_config,
         cloudrun=cloud_run,
-        config_dir=config_dir,
+        artifacts_version=deployable_version,
         backend_service_cfg=backend_service_cfg,
         dependencies=[cloud_run]
     )
