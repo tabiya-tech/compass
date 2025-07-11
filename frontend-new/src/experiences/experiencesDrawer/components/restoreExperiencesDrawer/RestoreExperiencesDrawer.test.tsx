@@ -139,12 +139,13 @@ describe("RestoreExperiencesDrawer", () => {
     });
   });
 
-  test("should sort experiences alphabetically by title", async () => {
+  test("should sort experiences alphabetically by title ignoring case", async () => {
     // GIVEN unsorted experiences with various titles
     const unsortedExperiences: Experience[] = [
       { ...mockExperiences[0], UUID: "1", experience_title: "Foo" },
       { ...mockExperiences[0], UUID: "2", experience_title: "Bar" },
       { ...mockExperiences[0], UUID: "3", experience_title: "Baz" },
+      { ...mockExperiences[0], UUID: "4", experience_title: "foo" },
     ];
     // AND a mock for getExperiences that returns these unsorted experiences
     jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce([...unsortedExperiences]);
@@ -161,10 +162,10 @@ describe("RestoreExperiencesDrawer", () => {
       />
     );
 
-    // THEN the experiences are sorted alphabetically by title
+    // THEN the experiences are sorted alphabetically by title ignoring case
     await waitFor(() => {
       const experienceTitles = screen.getAllByTestId(DATA_TEST_ID.RESTORE_EXPERIENCE_TITLE).map((el) => el.textContent);
-      expect(experienceTitles).toEqual(["Bar", "Baz", "Foo"]);
+      expect(experienceTitles).toEqual(["Bar", "Baz", "foo", "Foo"]);
     });
     // AND no errors or warnings to have occurred
     expect(console.error).not.toHaveBeenCalled();
