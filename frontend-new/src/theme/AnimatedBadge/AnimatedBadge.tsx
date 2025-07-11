@@ -13,7 +13,7 @@ interface AnimatedBadgeProps {
   invisible: boolean;
 }
 
-const pulse = keyframes`
+export const pulse = keyframes`
   0% {
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(0, 255, 145, 0.8);

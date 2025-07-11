@@ -12,7 +12,7 @@ import {
   parseConversationPhase,
 } from "./util";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { Box, useTheme } from "@mui/material";
+import { Box, Fab, useTheme } from "@mui/material";
 import ChatHeader from "./ChatHeader/ChatHeader";
 import ChatMessageField from "./ChatMessageField/ChatMessageField";
 import { useNavigate } from "react-router-dom";
@@ -35,6 +35,8 @@ import ChatProgressBar from "./chatProgressbar/ChatProgressBar";
 import { CurrentPhase, defaultCurrentPhase } from "./chatProgressbar/types";
 import { CompassChatMessageProps } from "./chatMessage/compassChatMessage/CompassChatMessage";
 import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import { pulse } from "src/theme/AnimatedBadge/AnimatedBadge";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -88,6 +90,20 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
   const [initialized, setInitialized] = useState<boolean>(false);
 
   const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
+
+  // Initialize button position at the bottom of the screen
+  const [buttonPosition, setButtonPosition] = useState(() => {
+    // Position at bottom right
+    return {
+      x: window.innerWidth - 70,
+      y: window.innerHeight - 130
+    };
+  });
+
+  const isDragging = useRef(false);
+  const wasDragged = useRef(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
+
 
   // Experiences that have been processed
   const exploredExperiencesCount = useMemo(
@@ -466,6 +482,58 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     };
   }, []);
 
+  // Handle starting the drag
+  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    isDragging.current = true;
+    wasDragged.current = false;
+    const rect = e.currentTarget.getBoundingClientRect();
+
+    // Calculate offset from the point user clicked to the button's top-left corner
+    dragOffset.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+
+    e.preventDefault();
+  }, []);
+
+  const handleButtonClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!wasDragged.current) {
+      handleUploadCV();
+    }
+    e.stopPropagation();
+  }, [handleUploadCV]);
+
+  // Handle dragging
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return;
+
+      wasDragged.current = true;
+
+      // Calculate new position based on mouse position and drag offset
+      setButtonPosition({
+        x: e.clientX - dragOffset.current.x,
+        y: e.clientY - dragOffset.current.y
+      });
+    };
+
+    // Handle the drag end
+    const handleMouseUp = () => {
+      isDragging.current = false;
+    };
+
+    // Add event listeners to a window for better drag experience
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      // Clean up listeners when component unmounts
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
   return (
     <Suspense fallback={<Backdrop isShown={true} transparent={true} />}>
       {isLoggingOut ? (
@@ -553,6 +621,32 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
               confirmButtonText="Yes, I'm sure"
             />
           )}
+          {/* Draggable Floating AttachFileIcon button */}
+          <Box
+            sx={{
+              position: "fixed",
+              top: buttonPosition.y,
+              left: buttonPosition.x,
+              zIndex: 10,
+              cursor: 'move',
+            }}
+            onMouseDown={handleMouseDown}
+          >
+            <Fab
+              color="primary"
+              aria-label="upload cv"
+              onClick={handleButtonClick}
+              sx={{
+                boxShadow: theme.shadows[3],
+                animation: `${pulse} 1.5s infinite`,
+                "&:hover": {
+                  cursor: "pointer"
+                }
+              }}
+            >
+              <AttachFileIcon />
+            </Fab>
+          </Box>
         </ChatProvider>
       )}
     </Suspense>
