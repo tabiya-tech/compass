@@ -94,7 +94,7 @@ export class FeaturesService {
   }
 
   protected getFeatureAPIPrefix(featureId: string): string {
-    return `/features/${featureId}`;
+    return `features/${featureId}`;
   }
 
   private _clearState(): void {

@@ -1,6 +1,15 @@
 import { FeatureConfig } from "../featuresService/FeaturesService";
 
-export enum SkillRankingExperimentGroups {
+export function isExperimentGroupKey(
+  value: unknown
+): value is keyof typeof SkillsRankingExperimentGroups {
+  return (
+    typeof value === "string" &&
+    value in Object.keys(SkillsRankingExperimentGroups)
+  );
+}
+
+export enum SkillsRankingExperimentGroups {
   GROUP_1 = "Group 1: High Difference/Greater",
   /**
    * Group 1: High Difference/Greater
@@ -64,7 +73,7 @@ export interface SkillsRankingState {
   /**
    * session id - the session ranking will be made on
    */
-  experiment_group: SkillRankingExperimentGroups;
+  experiment_group: SkillsRankingExperimentGroups;
   /**
    * the group the user is assigned for each experiment branch
    */

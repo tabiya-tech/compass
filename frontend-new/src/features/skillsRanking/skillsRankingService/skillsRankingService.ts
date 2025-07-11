@@ -3,11 +3,14 @@ import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
 import {
   SkillsRankingConfig,
+  SkillsRankingExperimentGroups,
   SkillsRankingPhase,
   SkillsRankingState,
+  isExperimentGroupKey
 } from "src/features/skillsRanking/types";
 import { FeaturesService } from "src/features/featuresService/FeaturesService";
 import { SKILLS_RANKING_FEATURE_ID } from "src/features/skillsRanking/constants";
+import { SkillsRankingError } from "../errors";
 
 /**
  * Service to manage the skills ranking feature.
@@ -67,9 +70,14 @@ export class SkillsRankingService extends FeaturesService{
     if (data === null) {
       return null;
     }
+    if (data.experiment_group && isExperimentGroupKey(data.experiment_group)){
+      throw new SkillsRankingError(
+        `Unknown experiment_group '${data.experiment_group}' from API`
+      );
+    }
     return {
       session_id: data.session_id,
-      experiment_group: data.experiment_group,
+      experiment_group: SkillsRankingExperimentGroups[data.experiment_group as keyof typeof SkillsRankingExperimentGroups],
       phase: data.phase,
       score: data.score,
       cancelled_after: data.cancelled_after ?? null,
@@ -90,6 +98,7 @@ export class SkillsRankingService extends FeaturesService{
    * @param retyped_rank_percentile - Optional parameter indicating the rank the user retyped to confirm they saw it correctly (0-100).
    * @returns {Promise<SkillsRankingState>} The updated ranking state for the session.
    */
+  // TODO: make named parameters with an interface
   async updateSkillsRankingState(
     sessionId: number,
     phase: SkillsRankingPhase,
@@ -119,9 +128,15 @@ export class SkillsRankingService extends FeaturesService{
 
     const data = await response.json();
 
+    if (data.experiment_group && isExperimentGroupKey(data.experiment_group)){
+      throw new SkillsRankingError(
+        `Unknown experiment_group '${data.experiment_group}' from API`
+      );
+    }
+
     return {
       session_id: data.session_id,
-      experiment_group: data.experiment_group,
+      experiment_group: SkillsRankingExperimentGroups[data.experiment_group as keyof typeof SkillsRankingExperimentGroups],
       phase: data.phase,
       score: data.score,
       cancelled_after: data.cancelled_after ?? null,
