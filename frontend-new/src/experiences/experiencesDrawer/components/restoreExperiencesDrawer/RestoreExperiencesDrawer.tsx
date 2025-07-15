@@ -54,9 +54,8 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
     const fetchDeletedExperiences = async () => {
       setIsLoading(true);
       try {
-        const originalExperiences = await ExperienceService.getInstance().getExperiences(sessionId, true);
-        const currentIds = new Set(currentExperiences.map((e) => e.UUID));
-        const deleted = originalExperiences.filter((e) => !currentIds.has(e.UUID));
+        const allExperiences = await ExperienceService.getInstance().getExperiences(sessionId, false, true);
+        const deleted = allExperiences.filter((experience) => experience.deleted === true);
         setDeletedExperiences(deleted);
       } catch (error) {
         console.error(new ExperienceError("Failed to fetch deleted experiences", error));

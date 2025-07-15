@@ -511,17 +511,17 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       />
       <ConfirmModalDialog
         isOpen={showRestoreToOriginalConfirmDialog}
-        title="Restore Experience"
+        title="Revert Experience"
         content={
           <>
-            Are you sure you want to restore this experience to its unedited version? This will overwrite any changes
+            Are you sure you want to revert this experience to its unedited version? This will overwrite any changes
             you've made.
           </>
         }
         onConfirm={confirmRestoreToOriginalExperience}
         onDismiss={cancelRestoreToOriginalExperience}
         onCancel={cancelRestoreToOriginalExperience}
-        confirmButtonText="Restore"
+        confirmButtonText="Revert"
         cancelButtonText="Cancel"
         showCloseIcon
         data-testid={DATA_TEST_ID.RESTORE_TO_ORIGINAL_CONFIRM_DIALOG}

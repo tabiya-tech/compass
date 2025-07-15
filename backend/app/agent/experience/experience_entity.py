@@ -93,6 +93,11 @@ class BaseExperienceEntity(BaseModel):
     This is a human-readable string that summarizes the experience.
     """
 
+    deleted: bool = False
+    """
+    Flag indicating if the experience has been deleted
+    """
+
     # use a field serializer to serialize the work_type
     # we use the name of the Enum instead of the value because that makes the code less brittle
     @field_serializer("work_type")
@@ -152,7 +157,8 @@ class ExperienceEntity(BaseExperienceEntity):
                  esco_occupations: Optional[List[OccupationSkillEntity]] = None,
                  questions_and_answers: Optional[List[tuple[str, str]]] = None,
                  summary: Optional[str] = None,
-                 top_skills: Optional[List[SkillEntity]] = None
+                 top_skills: Optional[List[SkillEntity]] = None,
+                 deleted: bool = False
                  ):
         super().__init__(
             uuid=uuid if uuid is not None else str(uuid4()),  # Generate a unique UUID for each instance
@@ -166,6 +172,7 @@ class ExperienceEntity(BaseExperienceEntity):
             questions_and_answers=questions_and_answers if questions_and_answers is not None else [],
             summary=summary,
             top_skills=top_skills if top_skills is not None else [],
+            deleted=deleted,
         )
 
     @staticmethod

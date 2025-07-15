@@ -323,12 +323,10 @@ class TestDeleteExperience:
         # WHEN delete_experience is called
         await service.delete_experience(user_id, session_id, exp_uuid)
 
-        # THEN the experience is removed from the explored experiences
-        explored_experiences_uuids = [
-            exp.uuid for exp in app_state.explore_experiences_director_state.explored_experiences
-        ]
-
-        assert exp_uuid not in explored_experiences_uuids
+        # THEN the experience is marked as deleted
+        for exp in app_state.explore_experiences_director_state.explored_experiences:
+            if exp.uuid == exp_uuid:
+                assert exp.deleted is True
 
         # AND the experience uuid should be still in the experience_state for future restore.
         assert exp_uuid in app_state.explore_experiences_director_state.experiences_state
@@ -502,21 +500,26 @@ class TestRestoreDeletedExperience:
         session_id = get_random_session_id()
         exp_uuid = get_random_printable_string(8)
         app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience")
-        app_state.explore_experiences_director_state.explored_experiences = [] # Simulate deleted experience
+        # Mark the experience as deleted
+        for exp in app_state.explore_experiences_director_state.explored_experiences:
+            if exp.uuid == exp_uuid:
+                exp.deleted = True
         mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
         mock_metrics_recorder.save_state = AsyncMock()
         service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
 
         # WHEN restore_deleted_experience is called
-        await service.restore_deleted_experience(user_id, session_id, exp_uuid)
+        result_exp, result_phase = await service.restore_deleted_experience(user_id, session_id, exp_uuid)
 
-        # THEN the experience is restored to the explored experiences
-        restored_experience = app_state.explore_experiences_director_state.experiences_state[exp_uuid].experience
-        assert restored_experience.uuid == exp_uuid
-        assert restored_experience.experience_title == "Test Experience"
+        # THEN the experience is marked as not deleted
+        assert not result_exp.deleted
 
         # AND save_state was called to persist changes
         mock_metrics_recorder.save_state.assert_called_once()
+
+        # AND the correct experience and phase are returned
+        assert result_exp.uuid == exp_uuid
+        assert result_phase == DiveInPhase.PROCESSED
 
     @pytest.mark.asyncio
     async def test_restore_not_deleted_experience(self, mock_metrics_recorder):

@@ -27,8 +27,12 @@ export default class ExperienceService {
     this.experiencesEndpointUrl = `${this.apiServeUrl}/conversations`;
   }
 
-  async getExperiences(sessionId: number, unedited: boolean = false): Promise<Experience[]> {
-    const constructedExperiencesUrl = `${this.experiencesEndpointUrl}/${sessionId}/experiences?unedited=${unedited}`;
+  async getExperiences(
+    sessionId: number,
+    unedited: boolean = false,
+    includeDeleted: boolean = false
+  ): Promise<Experience[]> {
+    const constructedExperiencesUrl = `${this.experiencesEndpointUrl}/${sessionId}/experiences?unedited=${unedited}&include_deleted=${includeDeleted}`;
     const errorFactory = getRestAPIErrorFactory(
       "ExperienceService",
       "getExperiences",
@@ -110,10 +114,7 @@ export default class ExperienceService {
     return updatedExperience;
   }
 
-  async getUneditedExperience(
-    sessionId: number,
-    experienceId: string
-  ): Promise<Experience> {
+  async getUneditedExperience(sessionId: number, experienceId: string): Promise<Experience> {
     const serviceName = "ExperienceService";
     const serviceFunction = "getUneditedExperience";
     const method = "GET";
@@ -166,19 +167,14 @@ export default class ExperienceService {
 
   async restoreDeletedExperience(sessionId: number, experienceId: string): Promise<Experience> {
     const url = `${this.experiencesEndpointUrl}/${sessionId}/experiences/${experienceId}/restore`;
-    const errorFactory = getRestAPIErrorFactory(
-      "ExperienceService",
-      "restoreDeletedExperience",
-      "POST",
-      url
-    );
-    const response =await customFetch(url, {
-        method: "POST",
-        expectedStatusCode: StatusCodes.OK,
-        serviceName: "ExperienceService",
-        serviceFunction: "restoreExperience",
-        failureMessage: `Failed to restore experience with UUID ${experienceId}`,
-      });
+    const errorFactory = getRestAPIErrorFactory("ExperienceService", "restoreDeletedExperience", "POST", url);
+    const response = await customFetch(url, {
+      method: "POST",
+      expectedStatusCode: StatusCodes.OK,
+      serviceName: "ExperienceService",
+      serviceFunction: "restoreExperience",
+      failureMessage: `Failed to restore experience with UUID ${experienceId}`,
+    });
 
     let restoredExperience: Experience;
     try {

@@ -50,6 +50,7 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
     async def _get_experiences(session_id: Annotated[
         int, Path(description="The session id for the conversation history.", examples=[123])],
                                unedited: Annotated[bool, Query(description="Whether to fetch unedited versions of the experiences.", examples=[True])] = False,
+                               include_deleted: Annotated[bool, Query(description="Whether to include deleted experiences.", examples=[True])] = False,
                                user_info: UserInfo = Depends(authentication.get_user_info()),
                                user_preferences_repository=Depends(get_user_preferences_repository),
                                service: ExperienceService = Depends(get_experience_service)) -> List[ExperienceResponse]:
@@ -78,10 +79,18 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
             else:
                 experience_entity_list = await service.get_experiences_by_session_id(session_id)
 
+            # Convert to a list for easier processing
+            experiences_list = list(experience_entity_list)
+
+            # Filter out deleted experiences if not requested
+            if not include_deleted:
+                experiences_list = [(entity, phase) for entity, phase in experiences_list
+                                  if not entity.deleted]
+
             return [ExperienceResponse.from_experience_entity(
                 experience_entity=experience_entity,
                 dive_in_phase=dive_in_phase
-            ) for experience_entity, dive_in_phase in experience_entity_list]
+            ) for experience_entity, dive_in_phase in experiences_list]
 
         except UnauthorizedSessionAccessError as e:
             warning_msg = str(e)
