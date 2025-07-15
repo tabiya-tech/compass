@@ -31,29 +31,39 @@ describe("ExperienceService", () => {
       jest.clearAllMocks();
     });
 
-    test.each([["unedited experiences", true], ['processed experiences', false]])("should fetch the correct URL with GET and the correct headers and payload successfully for %s", async (_description, unedited) => {
-      // GIVEN the experiences to return
-      const givenMockExperiences = { mockExperiences };
-      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenMockExperiences, "application/json;charset=UTF-8");
+    test.each([
+      ["unedited experiences", true, false],
+      ["processed experiences", false, true],
+    ])(
+      "should fetch the correct URL with GET and the correct headers and payload successfully for %s",
+      async (_description, unedited, include_deleted) => {
+        // GIVEN the experiences to return
+        const givenMockExperiences = { mockExperiences };
+        const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenMockExperiences, "application/json;charset=UTF-8");
 
-      // WHEN the getExperiences function is called with a session id
-      const givenSessionId = 1234;
-      const service = ExperienceService.getInstance();
-      const experiencesResponse = await service.getExperiences(givenSessionId, unedited);
+        // WHEN the getExperiences function is called with a session id
+        const givenSessionId = 1234;
+        const service = ExperienceService.getInstance();
+        const experiencesResponse = await service.getExperiences(givenSessionId, unedited, include_deleted);
 
-      // THEN expect to make a GET request with the correct headers and payload
-      expectCorrectFetchRequest(fetchSpy, `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?unedited=${unedited}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        expectedStatusCode: StatusCodes.OK,
-        serviceName: "ExperienceService",
-        serviceFunction: "getExperiences",
-        failureMessage: "Failed to retrieve experiences",
-        expectedContentType: "application/json",
-      });
-      // AND to return the correct experiences
-      expect(experiencesResponse).toEqual(givenMockExperiences);
-    });
+        // THEN expect to make a GET request with the correct headers and payload
+        expectCorrectFetchRequest(
+          fetchSpy,
+          `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?unedited=${unedited}&include_deleted=${include_deleted}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            expectedStatusCode: StatusCodes.OK,
+            serviceName: "ExperienceService",
+            serviceFunction: "getExperiences",
+            failureMessage: "Failed to retrieve experiences",
+            expectedContentType: "application/json",
+          }
+        );
+        // AND to return the correct experiences
+        expect(experiencesResponse).toEqual(givenMockExperiences);
+      }
+    );
 
     test("on fail to fetch, should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
@@ -92,7 +102,7 @@ describe("ExperienceService", () => {
             ExperienceService.name,
             "getExperiences",
             "GET",
-            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?unedited=false`,
+            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?unedited=false&include_deleted=false`,
             StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
@@ -276,15 +286,19 @@ describe("ExperienceService", () => {
       const experiencesResponse = await service.getUneditedExperience(givenSessionId, givenMockExperience.UUID);
 
       // THEN expect to make a GET request with the correct headers and payload
-      expectCorrectFetchRequest(fetchSpy, `${givenApiServerUrl}/conversations/${givenSessionId}/experiences/${givenMockExperience.UUID}/unedited`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        expectedStatusCode: StatusCodes.OK,
-        serviceName: "ExperienceService",
-        serviceFunction: "getUneditedExperience",
-        failureMessage: "Failed to retrieve experience with UUID " + givenMockExperience.UUID,
-        expectedContentType: "application/json",
-      });
+      expectCorrectFetchRequest(
+        fetchSpy,
+        `${givenApiServerUrl}/conversations/${givenSessionId}/experiences/${givenMockExperience.UUID}/unedited`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          expectedStatusCode: StatusCodes.OK,
+          serviceName: "ExperienceService",
+          serviceFunction: "getUneditedExperience",
+          failureMessage: "Failed to retrieve experience with UUID " + givenMockExperience.UUID,
+          expectedContentType: "application/json",
+        }
+      );
       // AND to return the correct experiences
       expect(experiencesResponse).toEqual(givenMockExperience);
     });
@@ -304,9 +318,7 @@ describe("ExperienceService", () => {
       const service = ExperienceService.getInstance();
 
       // THEN expect it to reject with the expected error
-      await expect(service.getUneditedExperience(givenSessionId, experienceId)).rejects.toThrow(
-        givenFetchError
-      );
+      await expect(service.getUneditedExperience(givenSessionId, experienceId)).rejects.toThrow(givenFetchError);
     });
 
     test.each([

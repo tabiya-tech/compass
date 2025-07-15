@@ -62,6 +62,7 @@ describe("RestoreExperiencesDrawer", () => {
     const deletedExperience: Experience = {
       ...mockExperiences[1],
       exploration_phase: DiveInPhase.PROCESSED,
+      deleted: true,
     };
     // AND a mock for getExperiences that returns both current and deleted experience
     jest
@@ -142,9 +143,9 @@ describe("RestoreExperiencesDrawer", () => {
   test("should sort experiences alphabetically by title", async () => {
     // GIVEN unsorted experiences with various titles
     const unsortedExperiences: Experience[] = [
-      { ...mockExperiences[0], UUID: "1", experience_title: "Foo" },
-      { ...mockExperiences[0], UUID: "2", experience_title: "Bar" },
-      { ...mockExperiences[0], UUID: "3", experience_title: "Baz" },
+      { ...mockExperiences[0], UUID: "1", experience_title: "Foo", deleted: true },
+      { ...mockExperiences[0], UUID: "2", experience_title: "Bar", deleted: true },
+      { ...mockExperiences[0], UUID: "3", experience_title: "Baz", deleted: true },
     ];
     // AND a mock for getExperiences that returns these unsorted experiences
     jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce([...unsortedExperiences]);
@@ -176,6 +177,7 @@ describe("RestoreExperiencesDrawer", () => {
     const deletedExperience: Experience = {
       ...mockExperiences[1],
       exploration_phase: DiveInPhase.PROCESSED,
+      deleted: true,
     };
     // AND a mock for getExperiences that returns current and deleted experience
     jest

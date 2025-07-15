@@ -34,6 +34,7 @@ export interface Experience {
   top_skills: Skill[];
   summary: string | null;
   exploration_phase: DiveInPhase;
+  deleted: boolean;
 }
 
 export interface SkillUpdate {

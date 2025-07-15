@@ -32,6 +32,7 @@ export const mockExperiences: Experience[] = [
       "Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that " +
       "improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.",
     exploration_phase: DiveInPhase.EXPLORING_SKILLS,
+    deleted: false,
   },
   {
     UUID: "607c19f8-60e2-4c70-ac5a-6ce95426423c",
@@ -55,6 +56,7 @@ export const mockExperiences: Experience[] = [
       "Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that " +
       "improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.",
     exploration_phase: DiveInPhase.EXPLORING_SKILLS,
+    deleted: false,
   },
 ];
 
@@ -177,6 +179,7 @@ const generateRandomExperience = (workType?: WorkType): Experience => {
       generateRandomSkill(usedLabels),
     ],
     exploration_phase: Math.random() < 0.5 ? DiveInPhase.EXPLORING_SKILLS : DiveInPhase.PROCESSED,
+    deleted: Math.random() < 0.5,
   };
 };
 

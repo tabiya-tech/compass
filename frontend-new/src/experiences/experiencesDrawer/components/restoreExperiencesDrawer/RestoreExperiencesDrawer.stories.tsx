@@ -11,6 +11,7 @@ const currentExperiences = [mockExperiences[0]];
 const deletedExperiences = [mockExperiences[1]].map((e) => ({
   ...e,
   exploration_phase: DiveInPhase.PROCESSED,
+  deleted: true,
 }));
 
 const meta: Meta<typeof RestoreExperiencesDrawer> = {

@@ -39,7 +39,7 @@ export const MENU_ITEM_ID = {
 export const MENU_ITEM_TEXT = {
   EDIT: "Edit",
   DELETE: "Delete",
-  RESTORE_TO_ORIGINAL: "Restore",
+  REVERT: "Revert",
 };
 
 interface ExperienceProps {
@@ -106,7 +106,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
       },
       {
         id: MENU_ITEM_ID.RESTORE_TO_ORIGINAL,
-        text: MENU_ITEM_TEXT.RESTORE_TO_ORIGINAL,
+        text: MENU_ITEM_TEXT.REVERT,
         icon: <RestoreIcon />,
         disabled: !isOnline || !isExplored,
         action: handleRestoreToOriginalClick,

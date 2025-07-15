@@ -150,7 +150,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
       data-disabled="true"
       data-testid="experiences-drawer-menu-item-restore-to-original-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
     >
-      Restore
+      Revert
     </div>
     <div
       data-disabled="true"

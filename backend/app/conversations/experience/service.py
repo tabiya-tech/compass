@@ -144,6 +144,7 @@ class ExperienceService(IExperienceService):
             work_type=experience_to_update.work_type,
             top_skills=top_skills,
             summary=experience_to_update.summary,
+            deleted=experience_to_update.deleted
         ), DiveInPhase(director_state.experiences_state[experience_uuid].dive_in_phase)
 
     async def get_experiences_by_session_id(self, session_id: int) -> list[tuple[ExperienceEntity, DiveInPhase]]:
@@ -184,8 +185,8 @@ class ExperienceService(IExperienceService):
         if not experience_to_delete:
             raise ExperienceNotFoundError(experience_uuid)
 
-        # Remove the experience from explored experiences
-        director_state.explored_experiences.remove(experience_to_delete)
+        # Soft delete by setting the deleted flag to True
+        experience_to_delete.deleted = True
 
         await self._application_state_metrics_recorder.save_state(state, user_id)
 
@@ -220,16 +221,24 @@ class ExperienceService(IExperienceService):
         # Find the experience in the explored experiences
         for exp in director_state.explored_experiences:
             if exp.uuid == experience_uuid:
-                # If found, skip restoring as it is already in the explored list
-                raise ExperienceNotFoundError(experience_uuid)
-        # If not found, check in the experiences state
+                # If found, check if it's deleted
+                if exp.deleted:
+                    # Restore it by marking as not deleted
+                    exp.deleted = False
+                    await self._application_state_metrics_recorder.save_state(state, user_id)
+                    return exp, DiveInPhase.PROCESSED
+                else:
+                    # If it's not deleted, raise an error
+                    raise ExperienceNotFoundError(f"{experience_uuid} is not deleted, cannot restore")
+
+        # If not found in explored experiences, check if it exists but hasn't been processed
         recovered_experience = director_state.experiences_state.get(experience_uuid, None)
         if not recovered_experience:
             raise ExperienceNotFoundError(experience_uuid)
-        # Restore the experience by adding it back to the explored experiences
+
+        # Add it to explored experiences (not deleted)
         director_state.explored_experiences.append(recovered_experience.experience)
-        # save the updated state
+        # Save the updated state
         await self._application_state_metrics_recorder.save_state(state, user_id)
         # Return the restored experience
         return recovered_experience.experience, recovered_experience.dive_in_phase
-

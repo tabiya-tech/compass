@@ -364,7 +364,7 @@ describe("ReportDrawerContent", () => {
       fireEvent.click(moreButton);
 
       // THEN the restore to original menu item should be visible
-      expect(screen.getByText(MENU_ITEM_TEXT.RESTORE_TO_ORIGINAL)).toBeInTheDocument();
+      expect(screen.getByText(MENU_ITEM_TEXT.REVERT)).toBeInTheDocument();
     });
 
     test("should call onRestoreToOriginal when restore to original menu item is clicked", () => {
@@ -387,7 +387,7 @@ describe("ReportDrawerContent", () => {
       fireEvent.click(moreButton);
 
       // AND the restore to original menu item is clicked
-      const restoreToOriginalMenuItem = screen.getByText(MENU_ITEM_TEXT.RESTORE_TO_ORIGINAL);
+      const restoreToOriginalMenuItem = screen.getByText(MENU_ITEM_TEXT.REVERT);
       fireEvent.click(restoreToOriginalMenuItem);
 
       // THEN the onRestoreToOriginal handler should be called with the experience

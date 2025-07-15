@@ -47,6 +47,7 @@ class ExperienceResponse(BaseExperienceEntity):
         examples=[e.name for e in DiveInPhase],
     )] = DiveInPhase.NOT_STARTED.name
     top_skills: Annotated[List[Skill], Field(description="List of skills identified as relevant to the experience.")]
+    deleted: Annotated[bool, Field(description="Indicates if the experience is deleted.")] = False
 
     class Config:
         extra = "forbid"
@@ -75,7 +76,8 @@ class ExperienceResponse(BaseExperienceEntity):
             work_type=experience_entity.work_type,
             top_skills=top_skills,
             summary=experience_entity.summary,
-            exploration_phase=dive_in_phase.name
+            exploration_phase=dive_in_phase.name,
+            deleted=experience_entity.deleted
         )
 
 
