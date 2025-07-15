@@ -90,7 +90,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
 
   const getContextMenuHeaderMessage = () => {
     if (!isExplored) {
-      return "These actions are only available for explored experiences.";
+      return "These actions will become available once you have discussed the experience in detail with Compass.";
     }
     return undefined;
   };

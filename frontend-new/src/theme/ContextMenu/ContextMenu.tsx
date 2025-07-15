@@ -45,7 +45,7 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
         <Box>
           <Box
             sx={{
-              maxWidth: 250,
+              maxWidth: 300,
               px: theme.fixedSpacing(theme.tabiyaSpacing.md),
               py: theme.fixedSpacing(theme.tabiyaSpacing.sm),
             }}
