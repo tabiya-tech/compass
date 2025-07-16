@@ -233,6 +233,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         top_skills: uneditedExperience.top_skills.map((skill) => ({
           UUID: skill.UUID,
           preferredLabel: skill.preferredLabel,
+          deleted: skill.deleted,
         })),
       });
 
@@ -286,8 +287,19 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     [experiences]
   );
 
-  // Group experiences by work type
-  const groupedExperiences = useMemo(() => groupExperiencesByWorkType(experiences), [experiences]);
+  // Group experiences by work type using experiences with filtered skills
+  const groupedExperiences = useMemo(
+    () => groupExperiencesByWorkType(experiences),
+    [experiences]
+  );
+
+  // Filter out deleted skills from explored experiences for download
+  const exploredExperiencesWithoutDeletedSkills = useMemo(() => {
+    return exploredExperiences.map((experience) => ({
+      ...experience,
+      top_skills: experience.top_skills.filter((skill) => !skill.deleted),
+    }));
+  }, [exploredExperiences]);
 
   const tooltipText =
     "The fields are prefilled with information you may have provided earlier and are stored securely on your device. Fill in missing details to personalize your CV.";
@@ -340,7 +352,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                   email={personalInfo.contactEmail}
                   phone={personalInfo.phoneNumber}
                   address={personalInfo.address}
-                  experiences={exploredExperiences}
+                  experiences={exploredExperiencesWithoutDeletedSkills}
                   conversationConductedAt={conversationConductedAt}
                   disabled={!hasTopSkills}
                 />

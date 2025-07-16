@@ -9,7 +9,7 @@ from app.agent.linking_and_ranking_pipeline import ExperiencePipeline, Experienc
 from app.agent.skill_explorer_agent import SkillsExplorerAgent
 from app.countries import Country
 from app.agent.collect_experiences_agent import CollectExperiencesAgent
-from app.agent.experience.experience_entity import ExperienceEntity
+from app.agent.experience.experience_entity import ExperienceEntity, ExploredExperienceEntity
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 
 from app.agent.agent import Agent
@@ -91,7 +91,7 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
     The state of the experiences of the user that are being explored, keyed by experience.uuid
     """
 
-    explored_experiences: list[ExperienceEntity] | None = Field(default_factory=list)
+    explored_experiences: list[ExploredExperienceEntity] | None = Field(default_factory=list)
     """
     Experiences that have been explored so far. 
     This is also used as a copy of what users are able to see and edit in the UI.
@@ -258,7 +258,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
             if current_experience.dive_in_phase == DiveInPhase.PROCESSED:
                 # Add the experience to the list of explored experiences
-                state.explored_experiences.append(current_experience.experience)
+                state.explored_experiences.append(ExploredExperienceEntity.from_experience_entity(current_experience.experience))
 
             # If the agent has finished exploring the skills, then if there are no more experiences to process,
             # then we are done

@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock
 
+from app.agent.experience.experience_entity import ExploredExperienceEntity
 from app.conversations.experience.service import ExperienceService, ExperienceNotFoundError
 from app.conversations.experience.types import UpdateExperienceRequest, SkillUpdate, TimelineUpdate
 from app.agent.experience import ExperienceEntity, WorkType, Timeline
@@ -61,7 +62,7 @@ def _make_state_with_experience(session_id: int, exp_uuid: str, exp_title: str, 
     director_state = ExploreExperiencesAgentDirectorState(
         session_id=session_id,
         experiences_state={exp_uuid: exp_state},
-        explored_experiences=[exp_entity],
+        explored_experiences=[ExploredExperienceEntity.from_experience_entity(exp_entity)],
         current_experience_uuid=None,
         country_of_user=Country.UNSPECIFIED,
     )
@@ -176,8 +177,8 @@ class TestUpdateExperience:
                 id="work_type_and_summary"
             ),
             pytest.param(
-                UpdateExperienceRequest(top_skills=[SkillUpdate(UUID="skill2", preferredLabel="Skill Two New Label")]),
-                {"top_skills": [{"UUID": "skill2", "preferredLabel": "Skill Two New Label"}]},
+                UpdateExperienceRequest(top_skills=[SkillUpdate(UUID="skill2", preferredLabel="Skill Two New Label", deleted=False)]),
+                {"top_skills": [{"UUID": "skill2", "preferredLabel": "Skill Two New Label", "deleted": False}]},
                 id="top_skills_update"
             ),
             pytest.param(
@@ -216,7 +217,7 @@ class TestUpdateExperience:
         director_state = ExploreExperiencesAgentDirectorState(
             session_id=session_id,
             experiences_state={exp_uuid: exp_state, "other_exp": other_exp_state},
-            explored_experiences=[initial_experience],  # This is the one we will update
+            explored_experiences=[ExploredExperienceEntity.from_experience_entity(initial_experience)],  # This is the one we will update
             current_experience_uuid=None,
             country_of_user=Country.UNSPECIFIED
         )
@@ -237,7 +238,7 @@ class TestUpdateExperience:
         for field, expected in expected_changes.items():
             actual = getattr(exp, field)
             if field == 'top_skills':
-                actual_simple = [{'UUID': s.UUID, 'preferredLabel': s.preferredLabel} for s in actual]
+                actual_simple = [{'UUID': s.UUID, 'preferredLabel': s.preferredLabel, 'deleted': s.deleted} for s in actual]
                 assert actual_simple == expected
             else:
                 assert actual == expected
@@ -433,8 +434,8 @@ class TestGetAllUneditedExperiences:
                 exp_uuid2: ExperienceState(dive_in_phase=DiveInPhase.PROCESSED, experience=_make_experience_entity(exp_uuid2, "Experience Two", [skill2])),
             },
             explored_experiences=[
-                _make_experience_entity(exp_uuid1, "Experience One", [skill1]),
-                _make_experience_entity(exp_uuid2, "Experience Two", [skill2])
+                ExploredExperienceEntity.from_experience_entity(_make_experience_entity(exp_uuid1, "Experience One", [skill1])),
+                ExploredExperienceEntity.from_experience_entity(_make_experience_entity(exp_uuid2, "Experience Two", [skill2]))
             ],
             current_experience_uuid=None,
             country_of_user=Country.UNSPECIFIED

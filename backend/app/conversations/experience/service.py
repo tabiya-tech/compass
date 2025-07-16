@@ -1,6 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 
+from app.agent.experience.experience_entity import ExploredExperienceEntity, DiscoveredTopSkill
 from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.conversations.experience.types import UpdateExperienceRequest, ExperienceEntity, Skill
 from app.conversations.experience.utils import update_experience_entity
@@ -95,12 +96,12 @@ class ExperienceService(IExperienceService):
         self._application_state_metrics_recorder = application_state_metrics_recorder
 
     async def update_experience(self, user_id: str, session_id: int, experience_uuid: str,
-                                update_payload: UpdateExperienceRequest) -> tuple[ExperienceEntity, DiveInPhase]:
+                                update_payload: UpdateExperienceRequest) -> tuple[ExploredExperienceEntity, DiveInPhase]:
         state = await self._application_state_metrics_recorder.get_state(session_id)
         director_state = state.explore_experiences_director_state
 
         # find the experience to update
-        experience_to_update = None
+        experience_to_update: ExploredExperienceEntity | None = None
 
         for exp in director_state.explored_experiences:
             if exp.uuid == experience_uuid:
@@ -112,13 +113,40 @@ class ExperienceService(IExperienceService):
 
         # build a map of all skills available in this experience
         all_skills: dict[str, SkillEntity] = {}
-        for skill in director_state.experiences_state.get(experience_uuid, {}).experience.top_skills:
+        for skill in experience_to_update.top_skills:
             all_skills[skill.UUID] = skill
 
         update_data = update_payload.model_dump(exclude_unset=True)
 
-        # Update the experience entity with the provided update data
-        # it mutates the experience_entity in place
+        if 'top_skills' in update_data:
+            new_top_skills = []
+            # Handle the case when top_skills is None
+            skill_updates = update_data.get('top_skills') or []
+
+            for skill_update in skill_updates:
+                skill_uuid = skill_update['UUID']
+                skill_entity = all_skills.get(skill_uuid)
+                if skill_entity is None:
+                    raise ValueError(f"Skill UUID {skill_uuid} not found in experience")
+                if 'deleted' not in skill_update:
+                    raise ValueError(f"Missing 'deleted' field in skill update for skill UUID {skill_uuid}")
+                # Update preferredLabel and deleted status
+                skill_entity = DiscoveredTopSkill(
+                    id=skill_entity.id,
+                    modelId=skill_entity.modelId,
+                    UUID=skill_entity.UUID,
+                    preferredLabel=skill_update['preferredLabel'],
+                    altLabels=skill_entity.altLabels,
+                    description=skill_entity.description,
+                    score=skill_entity.score,
+                    skillType=skill_entity.skillType,
+                    deleted=skill_update['deleted']
+                )
+                new_top_skills.append(skill_entity)
+            experience_to_update.top_skills = new_top_skills
+            del update_data['top_skills']
+
+        # Update the experience entity with the remaining update data
         update_experience_entity(experience_to_update, update_data, all_skills)
 
         await self._application_state_metrics_recorder.save_state(state, user_id)
@@ -131,11 +159,12 @@ class ExperienceService(IExperienceService):
                 description=skill.description,
                 altLabels=skill.altLabels,
                 skillType=skill.skillType,
+                deleted=skill.deleted
             )
             for skill in experience_to_update.top_skills
         ]
 
-        return ExperienceEntity(
+        return ExploredExperienceEntity(
             uuid=experience_to_update.uuid,
             experience_title=experience_to_update.experience_title,
             company=experience_to_update.company,
@@ -147,13 +176,13 @@ class ExperienceService(IExperienceService):
             deleted=experience_to_update.deleted
         ), DiveInPhase(director_state.experiences_state[experience_uuid].dive_in_phase)
 
-    async def get_experiences_by_session_id(self, session_id: int) -> list[tuple[ExperienceEntity, DiveInPhase]]:
+    async def get_experiences_by_session_id(self, session_id: int) -> list[tuple[ExperienceEntity | ExploredExperienceEntity, DiveInPhase]]:
         # Get the experiences from the application state
         state = await self._application_state_metrics_recorder.get_state(session_id)
         director_state = state.explore_experiences_director_state
 
         # experiences to return to the user.
-        experiences: list[tuple[ExperienceEntity, DiveInPhase]] = []
+        experiences: list[tuple[ExperienceEntity | ExploredExperienceEntity, DiveInPhase]] = []
 
         # 1. First, get the explored experiences from the `director_state`
         for experience_details in director_state.explored_experiences:

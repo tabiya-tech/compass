@@ -219,6 +219,7 @@ describe("ExperienceEditForm", () => {
           preferredLabel: "javascript",
           description: "A programming language",
           altLabels: ["js", "ecmascript"],
+          deleted: false,
         },
       ],
     };
@@ -273,12 +274,14 @@ describe("ExperienceEditForm", () => {
           preferredLabel: "javascript",
           description: "A programming language",
           altLabels: ["js", "ecmascript"],
+          deleted: false,
         },
         {
           UUID: "skill-2",
           preferredLabel: "react",
           description: "A library for building user interfaces",
           altLabels: ["reactjs", "reactjs.org"],
+          deleted: false,
         },
       ],
     };
@@ -331,12 +334,14 @@ describe("ExperienceEditForm", () => {
           preferredLabel: "javascript",
           description: "A programming language",
           altLabels: ["js", "ecmascript"],
+          deleted: false,
         },
         {
           UUID: "skill-2",
           preferredLabel: "react",
           description: "A library for building user interfaces",
           altLabels: ["reactjs", "reactjs.org"],
+          deleted: false,
         },
       ],
     };

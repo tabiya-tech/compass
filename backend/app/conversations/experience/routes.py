@@ -4,6 +4,7 @@ from typing import List, Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
+from app.agent.experience import ExploredExperienceEntity
 from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
@@ -49,7 +50,6 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
                                       }, description="""Endpoint for retrieving the experiences of a user.""")
     async def _get_experiences(session_id: Annotated[
         int, Path(description="The session id for the conversation history.", examples=[123])],
-                               unedited: Annotated[bool, Query(description="Whether to fetch unedited versions of the experiences.", examples=[True])] = False,
                                include_deleted: Annotated[bool, Query(description="Whether to include deleted experiences.", examples=[True])] = False,
                                user_info: UserInfo = Depends(authentication.get_user_info()),
                                user_preferences_repository=Depends(get_user_preferences_repository),
@@ -74,18 +74,14 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
             # set the client_id in the context variable.
             client_id_ctx_var.set(current_user_preferences.client_id)
 
-            if unedited:
-                experience_entity_list = await service.get_unedited_experiences(session_id)
-            else:
-                experience_entity_list = await service.get_experiences_by_session_id(session_id)
+            experience_entity_list = await service.get_experiences_by_session_id(session_id)
 
             # Convert to a list for easier processing
             experiences_list = list(experience_entity_list)
 
             # Filter out deleted experiences if not requested
             if not include_deleted:
-                experiences_list = [(entity, phase) for entity, phase in experiences_list
-                                  if not entity.deleted]
+                experiences_list = [(entity, phase) for entity, phase in experiences_list if not (isinstance(entity, ExploredExperienceEntity) and entity.deleted)]
 
             return [ExperienceResponse.from_experience_entity(
                 experience_entity=experience_entity,

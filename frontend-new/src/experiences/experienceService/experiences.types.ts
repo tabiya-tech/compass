@@ -10,6 +10,7 @@ export interface Skill {
   preferredLabel: string;
   description: string;
   altLabels: string[];
+  deleted: boolean;
 }
 
 export interface Timeline {
@@ -40,6 +41,7 @@ export interface Experience {
 export interface SkillUpdate {
   UUID: string;
   preferredLabel: string;
+  deleted: boolean;
 }
 
 export interface UpdateExperienceRequest {

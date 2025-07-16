@@ -10,7 +10,6 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Theme } from "@mui/material/styles";
 import { TabiyaIconStyles } from "src/theme/applicationTheme/applicationTheme";
 import { getWorkTypeIcon, getWorkTypeTitle } from "src/experiences/experiencesDrawer/util";
-import RestoreIcon from "@mui/icons-material/Restore";
 
 const uniqueId = "086216b2-a180-4a13-ac3c-cfd23f46153f";
 
@@ -54,8 +53,8 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
     const fetchDeletedExperiences = async () => {
       setIsLoading(true);
       try {
-        const allExperiences = await ExperienceService.getInstance().getExperiences(sessionId, false, true);
-        const deleted = allExperiences.filter((experience) => experience.deleted === true);
+        const allExperiences = await ExperienceService.getInstance().getExperiences(sessionId,  true);
+        const deleted = allExperiences.filter((experience) => experience.deleted);
         setDeletedExperiences(deleted);
       } catch (error) {
         console.error(new ExperienceError("Failed to fetch deleted experiences", error));
@@ -77,7 +76,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
 
   // Sort all experiences by title
   const sortedExperiences = useMemo(
-    () => deletedExperiences.sort((a, b) => (a.experience_title || "").localeCompare(b.experience_title || "")),
+    () => deletedExperiences.toSorted((a, b) => (a.experience_title || "").localeCompare(b.experience_title || "")),
     [deletedExperiences]
   );
 
@@ -156,7 +155,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
                     disableWhenOffline
                     title="Restore"
                     data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_BUTTON}
-                    startIcon={<RestoreIcon />}
+                    startIcon={<img src={`${process.env.PUBLIC_URL}/restore-icon.svg`} alt="Restore" />}
                   >
                     Restore
                   </PrimaryButton>
