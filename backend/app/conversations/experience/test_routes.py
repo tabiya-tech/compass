@@ -153,11 +153,8 @@ class TestExperienceRoutes:
         """
 
         @pytest.mark.asyncio
-        @pytest.mark.parametrize("unedited",
-                                 [True, False],
-                                 ids=["unedited", "processed"])
         async def test_get_experiences_successful(self, authenticated_client_with_mocks: TestClientWithMocks,
-                                                  mocker: pytest_mock.MockerFixture, unedited: bool):
+                                                  mocker: pytest_mock.MockerFixture):
             client, mocked_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
             # GIVEN a valid session id
             given_session_id = get_random_session_id()
@@ -181,7 +178,8 @@ class TestExperienceRoutes:
                             UUID="bar_uuid",
                             preferredLabel="Baz",
                             description="Foo bar baz",
-                            altLabels=["foo_label_1", "bar_label_2"]
+                            altLabels=["foo_label_1", "bar_label_2"],
+                            deleted=False
                         )
                     ],
                     exploration_phase=DiveInPhase.PROCESSED.name,
@@ -190,15 +188,11 @@ class TestExperienceRoutes:
                 DiveInPhase.PROCESSED)
             ]
 
-            if unedited:
-                mocked_service.get_unedited_experiences = AsyncMock(return_value=expected_response)
-                service_spy = mocker.spy(mocked_service, "get_unedited_experiences")
-            else:
-                mocked_service.get_experiences_by_session_id = AsyncMock(return_value=expected_response)
-                service_spy = mocker.spy(mocked_service, "get_experiences_by_session_id")
+            mocked_service.get_experiences_by_session_id = AsyncMock(return_value=expected_response)
+            service_spy = mocker.spy(mocked_service, "get_experiences_by_session_id")
 
             # WHEN a GET request where the session_id is in the Path
-            response = client.get(f"/conversations/{given_session_id}/experiences?unedited={unedited}")
+            response = client.get(f"/conversations/{given_session_id}/experiences")
 
             # THEN the response is OK
             assert response.status_code == HTTPStatus.OK
@@ -270,7 +264,7 @@ class TestExperienceRoutes:
             get_experiences_spy.side_effect = Exception("Unexpected error")
 
             # WHEN a GET request where the session_id is in the Path
-            response = client.get(f"/conversations/{given_session_id}/experiences/?unedited=False")
+            response = client.get(f"/conversations/{given_session_id}/experiences")
 
             # THEN the response is INTERNAL_SERVER_ERROR
             assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
@@ -291,17 +285,17 @@ class TestExperienceRoutes:
             # AND an ExperienceService that will raise an unexpected error
             mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(
                 return_value=get_mock_user_preferences(given_session_id))
-            get_unedited_experiences_spy = mocker.spy(mocked_service, "get_unedited_experiences")
-            get_unedited_experiences_spy.side_effect = Exception("Unexpected error")
+            get_experiences_by_session_id_spy = mocker.spy(mocked_service, "get_experiences_by_session_id")
+            get_experiences_by_session_id_spy.side_effect = Exception("Unexpected error")
 
             # WHEN a GET request where the session_id is in the Path
-            response = client.get(f"/conversations/{given_session_id}/experiences/?unedited=True")
+            response = client.get(f"/conversations/{given_session_id}/experiences")
 
             # THEN the response is INTERNAL_SERVER_ERROR
             assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
             # AND the experiences service was called with the correct arguments
-            get_unedited_experiences_spy.assert_called_once_with(
+            get_experiences_by_session_id_spy.assert_called_once_with(
                 given_session_id
             )
 

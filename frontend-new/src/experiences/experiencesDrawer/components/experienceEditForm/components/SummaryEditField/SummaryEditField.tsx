@@ -1,8 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import {
-  Experience,
-  SUMMARY_MAX_LENGTH
-} from "src/experiences/experienceService/experiences.types";
+import { Experience, SUMMARY_MAX_LENGTH } from "src/experiences/experienceService/experiences.types";
 import { Box, Stack, Typography, useTheme } from "@mui/material";
 import InlineEditField from "src/theme/InlineEditField/InlineEditField";
 import RestoreIcon from "@mui/icons-material/Restore";
@@ -16,7 +13,11 @@ import CustomLink from "src/theme/CustomLink/CustomLink";
 export interface SummaryEditFieldProps {
   summary: string;
   experience_uuid: string;
-  notifyOnChange: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, field: keyof Experience, maxLength?: number) => void;
+  notifyOnChange: (
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    field: keyof Experience,
+    maxLength?: number
+  ) => void;
   error?: string;
 }
 
@@ -38,13 +39,13 @@ const StyledCustomLink: React.FC<React.ComponentProps<typeof CustomLink>> = (pro
         flexDirection: "row",
         gap: theme.spacing(theme.tabiyaSpacing.xs),
         verticalAlign: "bottom",
-        ...props.style
+        ...props.style,
       }}
     />
   );
 };
 
-export const SUMMARY_FIELD_NAME : keyof Experience = "summary";
+export const SUMMARY_FIELD_NAME: keyof Experience = "summary";
 
 const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
   summary,
@@ -53,9 +54,8 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
   error,
 }) => {
   const theme = useTheme();
-  const isOnline = useContext(IsOnlineContext)
+  const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
-
 
   const [summaryValue, setSummaryValue] = useState(summary);
   const [isRestoring, setIsRestoring] = useState(false);
@@ -63,34 +63,38 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
   const [successText, setSuccessText] = useState<string | null>(null);
 
   const restoreToOriginalSummary = async () => {
-      setIsRestoring(true);
-      const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
-      if (!sessionId) {
-        throw new Error("User has no sessions");
-      }
+    setIsRestoring(true);
+    const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
+    if (!sessionId) {
+      throw new Error("User has no sessions");
+    }
 
-      try {
-        // get original version of summary
-        const experienceService = ExperienceService.getInstance();
-        const originalExperience = await experienceService.getUneditedExperience(sessionId, experience_uuid);
-        setSummaryValue(originalExperience.summary ?? "");
-        setSuccessText("Summary restored.")
-        notifyOnChange({ target: { value: originalExperience.summary ?? "" } } as React.ChangeEvent<HTMLTextAreaElement>, SUMMARY_FIELD_NAME, SUMMARY_MAX_LENGTH);
-        setTimeout(() => {
-          setSuccessText(null);
-        }, 3000); // Clear message after 3 seconds
-      } catch (err) {
-        console.error(new ExperienceError("Failed to restore summary:", err));
-        enqueueSnackbar("Failed to restore summary. Please try again later.", { variant: "error" });
-      } finally {
-        setIsRestoring(false);
-      }
-  }
+    try {
+      // get original version of summary
+      const experienceService = ExperienceService.getInstance();
+      const originalExperience = await experienceService.getUneditedExperience(sessionId, experience_uuid);
+      setSummaryValue(originalExperience.summary ?? "");
+      setSuccessText("Summary restored.");
+      notifyOnChange(
+        { target: { value: originalExperience.summary ?? "" } } as React.ChangeEvent<HTMLTextAreaElement>,
+        SUMMARY_FIELD_NAME,
+        SUMMARY_MAX_LENGTH
+      );
+      setTimeout(() => {
+        setSuccessText(null);
+      }, 3000); // Clear message after 3 seconds
+    } catch (err) {
+      console.error(new ExperienceError("Failed to restore summary:", err));
+      enqueueSnackbar("Failed to restore summary. Please try again later.", { variant: "error" });
+    } finally {
+      setIsRestoring(false);
+    }
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSummaryValue(event.target.value);
-      notifyOnChange(event, SUMMARY_FIELD_NAME, SUMMARY_MAX_LENGTH);
-  }
+    setSummaryValue(event.target.value);
+    notifyOnChange(event, SUMMARY_FIELD_NAME, SUMMARY_MAX_LENGTH);
+  };
   // decide when to show error messages
   useEffect(() => {
     if (error) {
@@ -99,7 +103,6 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
       setErrorText(null);
     }
   }, [error, theme.palette.error.main]);
-
 
   return (
     <Box>
@@ -127,7 +130,7 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
               data-testid={DATA_TEST_ID.FORM_SUMMARY_RESTORE}
               variant="caption"
             >
-              <RestoreIcon /> Restore
+              <RestoreIcon /> Revert
             </StyledCustomLink>
             {/* Other buttons */}
           </Stack>
@@ -161,16 +164,16 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
           />
         </Box>
       </Box>
-    {( errorText || successText) && (
-      <Typography
-        variant="caption"
-        color={errorText ? theme.palette.error.main : theme.palette.success.dark}
-        data-testid={DATA_TEST_ID.FORM_SUMMARY_HELPER}
-      >
-        {errorText ?? successText}
-      </Typography>
-    )}
-  </Box>
+      {(errorText || successText) && (
+        <Typography
+          variant="caption"
+          color={errorText ? theme.palette.error.main : theme.palette.success.dark}
+          data-testid={DATA_TEST_ID.FORM_SUMMARY_HELPER}
+        >
+          {errorText ?? successText}
+        </Typography>
+      )}
+    </Box>
   );
 };
 

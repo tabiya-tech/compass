@@ -2,11 +2,9 @@ from typing import Annotated, Optional, List
 
 from pydantic import Field, BaseModel
 
-from app.agent.experience import ExperienceEntity, Timeline, WorkType
-from app.agent.experience.experience_entity import BaseExperienceEntity
+from app.agent.experience import ExperienceEntity, Timeline, WorkType, ExploredExperienceEntity
+from app.agent.experience.experience_entity import BaseExperienceEntity, DiscoveredTopSkill
 from app.agent.explore_experiences_agent_director import DiveInPhase
-
-from app.vector_search.esco_entities import SkillEntity
 
 # Field length limits (keep in sync with frontend)
 EXPERIENCE_TITLE_MAX_LENGTH = 100
@@ -18,7 +16,7 @@ SKILL_LABEL_MAX_LENGTH = 100
 TIMELINE_MAX_LENGTH = 30
 
 
-class Skill(SkillEntity):
+class Skill(DiscoveredTopSkill):
     """
     A skill entity for the user.
     It excludes the fields that are not needed in the response.
@@ -63,10 +61,12 @@ class ExperienceResponse(BaseExperienceEntity):
                 UUID=skill_entity.UUID,
                 preferredLabel=skill_entity.preferredLabel,
                 description=skill_entity.description,
-                altLabels=skill_entity.altLabels
+                altLabels=skill_entity.altLabels,
+                deleted=skill_entity.deleted if isinstance(skill_entity, DiscoveredTopSkill) else False
             )
             for skill_entity in experience_entity.top_skills
         ]
+
         return ExperienceResponse(
             uuid=experience_entity.uuid,
             experience_title=experience_entity.experience_title,
@@ -77,7 +77,7 @@ class ExperienceResponse(BaseExperienceEntity):
             top_skills=top_skills,
             summary=experience_entity.summary,
             exploration_phase=dive_in_phase.name,
-            deleted=experience_entity.deleted
+            deleted=experience_entity.deleted if isinstance(experience_entity, ExploredExperienceEntity) else False
         )
 
 
@@ -99,6 +99,8 @@ class SkillUpdate(BaseModel):
             description="The preferred label for the skill.",
             max_length=SKILL_LABEL_MAX_LENGTH
         )]
+
+    deleted: Annotated[bool, Field(description="Whether the skill is marked as deleted.", default=False)] = False
 
     class Config:
         extra = "forbid"

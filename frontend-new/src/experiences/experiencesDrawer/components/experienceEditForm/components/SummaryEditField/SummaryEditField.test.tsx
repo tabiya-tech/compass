@@ -2,7 +2,9 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, fireEvent, waitFor, act, within } from "src/_test_utilities/test-utils";
 import userEvent from "@testing-library/user-event";
-import SummaryEditField, { DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
+import SummaryEditField, {
+  DATA_TEST_ID,
+} from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
 import ExperienceService from "src/experiences/experienceService/experienceService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { ExperienceError } from "src/error/commonErrors";

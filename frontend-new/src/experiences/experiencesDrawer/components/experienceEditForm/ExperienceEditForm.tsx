@@ -13,7 +13,6 @@ import {
   TIMELINE_MAX_LENGTH,
 } from "src/experiences/experienceService/experiences.types";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import UndoIcon from "@mui/icons-material/Undo";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
@@ -101,10 +100,10 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   const [editedExperience, setEditedExperience] = useState<Partial<Experience>>({});
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
-  const [markedForDeletion, setMarkedForDeletion] = useState<Set<string>>(new Set());
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [workTypeMenuAnchorEl, setWorkTypeMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+  const topSkillsRef = useRef<HTMLDivElement>(null);
 
   // Debounced error updater (stable ref)
   const debouncedUpdateFieldError = useRef(
@@ -134,10 +133,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
 
   const displayExperience = useMemo(() => ({ ...experience, ...editedExperience }), [experience, editedExperience]);
 
-  const hasChanges = useMemo(
-    () => Object.keys(editedExperience).length > 0 || markedForDeletion.size > 0,
-    [editedExperience, markedForDeletion]
-  );
+  const hasChanges = useMemo(() => Object.keys(editedExperience).length > 0, [editedExperience]);
 
   const anyFieldTooLong = Object.keys(fieldErrors).length > 0;
 
@@ -189,7 +185,6 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
     if (selectedSkillId) {
       setEditedExperience((prev) => {
         const currentSkills = prev.top_skills || [...experience.top_skills];
-
         const updatedSkills = currentSkills.map((skill) => {
           if (skill.UUID === selectedSkillId) {
             return {
@@ -199,34 +194,30 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
           }
           return skill;
         });
-
         return {
           ...prev,
           top_skills: updatedSkills,
         };
       });
-
       notifyOnUnsavedChange?.(true);
     }
     handleSkillMenuClose();
   };
 
+  // Toggle the 'deleted' property directly on the skill
   const toggleSkillDeletion = (skillId: string) => {
-    setMarkedForDeletion((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(skillId)) {
-        newSet.delete(skillId);
-      } else {
-        newSet.add(skillId);
-      }
-      return newSet;
+    setEditedExperience((prev) => {
+      const top_skills = (prev.top_skills ?? experience.top_skills).map((skill) =>
+        skill.UUID === skillId ? { ...skill, deleted: !skill.deleted } : skill
+      );
+      return { ...prev, top_skills };
     });
+    notifyOnUnsavedChange?.(true);
   };
 
   const getSkillMenuItems = (skillId: string): MenuItemConfig[] => {
     const skill = displayExperience.top_skills.find((s) => s.UUID === skillId);
     if (!skill) return [];
-
     return (skill.altLabels || []).map((altLabel) => ({
       id: altLabel,
       text: altLabel.charAt(0).toUpperCase() + altLabel.slice(1),
@@ -242,23 +233,16 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
       throw new Error("User has no sessions");
     }
     try {
-      const updatedFields: UpdateExperienceRequest = Object.fromEntries(
-        Object.entries(editedExperience).filter(([key, value]) => value !== undefined && key !== "top_skills")
-      ) as UpdateExperienceRequest;
-
-      if (markedForDeletion.size > 0 || (editedExperience.top_skills && editedExperience.top_skills.length > 0)) {
-        const baseSkills = editedExperience.top_skills || experience.top_skills;
-        updatedFields.top_skills = baseSkills
-          .filter((skill) => !markedForDeletion.has(skill.UUID))
-          .map((skill) => ({
-            UUID: skill.UUID,
-            preferredLabel: skill.preferredLabel,
-          }));
-      }
-
+      const updatedFields: UpdateExperienceRequest = {
+        ...editedExperience,
+        top_skills: (editedExperience.top_skills ?? experience.top_skills).map((skill) => ({
+          UUID: skill.UUID,
+          preferredLabel: skill.preferredLabel,
+          deleted: skill.deleted,
+        })),
+      };
       const experienceService = ExperienceService.getInstance();
       const result = await experienceService.updateExperience(sessionId, experience.UUID, updatedFields);
-
       notifyOnUnsavedChange?.(false);
       notifyOnSave(result);
       enqueueSnackbar("Experience updated successfully!", { variant: "success" });
@@ -499,12 +483,13 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             </HelpTip>
           </Box>
           <Box
+            ref={topSkillsRef}
             display="flex"
             flexWrap="wrap"
             gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
             data-testid={DATA_TEST_ID.FORM_SKILLS_CONTAINER}
           >
-            {displayExperience.top_skills.map((skill) => (
+            {(displayExperience.top_skills ?? []).map((skill) => (
               <Chip
                 key={skill.UUID}
                 data-testid={DATA_TEST_ID.FORM_SKILL_CHIP}
@@ -512,8 +497,8 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <span
                       style={{
-                        textDecoration: markedForDeletion.has(skill.UUID) ? "line-through" : "none",
-                        color: markedForDeletion.has(skill.UUID) ? theme.palette.text.disabled : "inherit",
+                        textDecoration: skill.deleted ? "line-through" : "none",
+                        color: skill.deleted ? theme.palette.text.disabled : "inherit",
                       }}
                     >
                       {capitalizeFirstLetter(skill.preferredLabel)}
@@ -527,13 +512,25 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                       onClick={(event) => handleSkillMenuClick(event, skill.UUID)}
                       data-testid={DATA_TEST_ID.FORM_SKILL_CHIP_DROPDOWN}
                     />
-                    {markedForDeletion.has(skill.UUID) ? (
-                      <UndoIcon
-                        fontSize="small"
-                        sx={{ color: theme.palette.text.secondary, cursor: "pointer" }}
+                    {skill.deleted ? (
+                      <Box
+                        component="span"
                         onClick={() => toggleSkillDeletion(skill.UUID)}
                         data-testid={DATA_TEST_ID.FORM_SKILL_CHIP_UNDO_ICON}
-                      />
+                        sx={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <img
+                          src={`${process.env.PUBLIC_URL}/restore-icon.svg`}
+                          alt="Restore"
+                          // xl wasn't quite big enough, we're going for ~16px
+                          style={{ width: theme.tabiyaSpacing.xl * 4, height: theme.tabiyaSpacing.xl * 4 }}
+                        />
+                      </Box>
                     ) : (
                       <DeleteIcon
                         fontSize="small"

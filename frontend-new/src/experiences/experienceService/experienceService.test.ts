@@ -32,11 +32,11 @@ describe("ExperienceService", () => {
     });
 
     test.each([
-      ["unedited experiences", true, false],
-      ["processed experiences", false, true],
+      ["experiences without deleted", false],
+      ["experiences including deleted", true],
     ])(
       "should fetch the correct URL with GET and the correct headers and payload successfully for %s",
-      async (_description, unedited, include_deleted) => {
+      async (_description, include_deleted) => {
         // GIVEN the experiences to return
         const givenMockExperiences = { mockExperiences };
         const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenMockExperiences, "application/json;charset=UTF-8");
@@ -44,12 +44,12 @@ describe("ExperienceService", () => {
         // WHEN the getExperiences function is called with a session id
         const givenSessionId = 1234;
         const service = ExperienceService.getInstance();
-        const experiencesResponse = await service.getExperiences(givenSessionId, unedited, include_deleted);
+        const experiencesResponse = await service.getExperiences(givenSessionId, include_deleted);
 
         // THEN expect to make a GET request with the correct headers and payload
         expectCorrectFetchRequest(
           fetchSpy,
-          `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?unedited=${unedited}&include_deleted=${include_deleted}`,
+          `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?include_deleted=${include_deleted}`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -102,7 +102,7 @@ describe("ExperienceService", () => {
             ExperienceService.name,
             "getExperiences",
             "GET",
-            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?unedited=false&include_deleted=false`,
+            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?include_deleted=false`,
             StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",

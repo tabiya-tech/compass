@@ -64,7 +64,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
 
   const formattedSkills = useMemo(() => {
     if (experience.top_skills.length === 0) return [];
-    return experience.top_skills.map((skill) => skill);
+    return experience.top_skills.map((skill) => skill).filter(skill => !skill.deleted)
   }, [experience.top_skills]);
 
   const handleEditClick = () => {
