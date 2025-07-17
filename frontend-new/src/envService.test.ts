@@ -18,6 +18,7 @@ import {
   getApplicationRegistrationCode,
   getMetricsEnabled,
   getFeatures,
+  getApplicationLoginCodeDisabled,
 } from "./envService";
 import { getRandomString } from "./_test_utilities/specialCharacters";
 
@@ -48,9 +49,10 @@ describe.each([
   ["SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID", getSensitivePersonalDataRSAEncryptionKeyId],
   ["TARGET_ENVIRONMENT_NAME", getTargetEnvironmentName],
   ["FRONTEND_LOGIN_CODE", getApplicationLoginCode],
+  ["FRONTEND_DISABLE_LOGIN_CODE", getApplicationLoginCodeDisabled],
   ["FRONTEND_REGISTRATION_CODE", getApplicationRegistrationCode],
   ["FRONTEND_ENABLE_METRICS", getMetricsEnabled],
-  ["FRONTEND_FEATURES", getFeatures]
+  ["FRONTEND_FEATURES", getFeatures],
 ])("Env Getters", (ENV_KEY, getterFn) => {
   describe(`${ENV_KEY} Getter (${getterFn.name}) tests`, () => {
     test(`getAPI should not fail if the ${ENV_KEY} is not set`, () => {

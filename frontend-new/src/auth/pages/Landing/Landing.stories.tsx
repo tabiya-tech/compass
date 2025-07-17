@@ -33,13 +33,13 @@ export default meta;
 
 type Story = StoryObj<typeof Landing>;
 
-export const WithApplicationInvitationCode: Story = {
+export const WithGuesLoginEnabled: Story = {
   args: {
     loginCode: "test-invitation-code",
   },
 };
 
-export const WithoutApplicationInvitationCode: Story = {
+export const WithGuestLoginDisabled: Story = {
   args: {
     loginCode: "",
   },

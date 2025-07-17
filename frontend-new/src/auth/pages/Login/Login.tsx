@@ -11,13 +11,11 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import LoginWithInviteCodeForm from "./components/LoginWithInviteCodeForm/LoginWithInviteCodeForm";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
-import FirebaseEmailAuthService
-  from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
-import FirebaseInvitationCodeAuthenticationService
-  from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
+import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import { AuthenticationError } from "src/error/commonErrors";
 import ResendVerificationEmail from "src/auth/components/resendVerificationEmail/ResendVerificationEmail";
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
@@ -28,7 +26,11 @@ import MetricsService from "src/metrics/metricsService";
 import { DeviceSpecificationEvent, EventType, UserLocationEvent } from "src/metrics/types";
 import { browserName, browserVersion, deviceType, osName } from "react-device-detect";
 import { getCoordinates } from "src/metrics/utils/getUserLocation";
-import { getApplicationLoginCode, getApplicationRegistrationCode } from "src/envService";
+import {
+  getApplicationLoginCode,
+  getApplicationRegistrationCode,
+  getApplicationLoginCodeDisabled,
+} from "src/envService";
 import PasswordReset from "src/auth/components/passwordReset/PasswordReset";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
@@ -95,7 +97,7 @@ const Login: React.FC = () => {
         // Show resend verification option if the error is due to unverified email
         if (error.errorCode === FirebaseErrorCodes.EMAIL_NOT_VERIFIED) {
           setShowResendVerification(true);
-        }  else {
+        } else {
           setShowResendVerification(false);
         }
       } else {
@@ -170,6 +172,10 @@ const Login: React.FC = () => {
 
   const applicationLoginCode = useMemo(() => {
     return getApplicationLoginCode();
+  }, []);
+
+  const loginCodeDisabled = useMemo(() => {
+    return getApplicationLoginCodeDisabled().toLowerCase() === "true";
   }, []);
 
   const applicationRegistrationCode = useMemo(() => {
@@ -290,6 +296,70 @@ const Login: React.FC = () => {
   }, [handleLoginWithInvitationCode, applicationLoginCode]);
 
   /* ------------------
+   * aggregated states for loading and disabling ui
+   */
+  // login button is disabled when login is loading, or when there is no active Form, or the fields for the active form are not filled in
+  const isLoginButtonDisabled =
+    isLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
+
+  const invitationCodeAndEmailFormDividerText = useMemo(() => {
+    if (applicationLoginCode) {
+      return "Or login to your account to continue";
+    } else {
+      return "or";
+    }
+  }, [applicationLoginCode]);
+
+  const getLoginCodeComponent = useMemo(() => {
+    if (loginCodeDisabled) {
+      return (
+        <>
+          <Typography variant="body2">Login to your account to continue</Typography>
+          <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
+            Login using
+          </Typography>
+        </>
+      );
+    } else {
+      return (
+        <>
+          {applicationLoginCode ? (
+            <PrimaryButton
+              disabled={isLoading}
+              disableWhenOffline={true}
+              onClick={handleStartNewConversation}
+              data-testid={DATA_TEST_ID.START_NEW_CONVERSATION_BUTTON}
+            >
+              Continue as Guest
+            </PrimaryButton>
+          ) : (
+            <React.Fragment>
+              <Typography variant="body2">Login to your account to continue</Typography>
+              <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
+                Login using
+              </Typography>
+              <LoginWithInviteCodeForm
+                inviteCode={inviteCode}
+                notifyOnInviteCodeChanged={handleInviteCodeChanged}
+                isDisabled={isLoading}
+              />
+            </React.Fragment>
+          )}
+          <Divider textAlign="center" style={{ width: "100%" }}>
+            <Typography
+              variant="subtitle2"
+              padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+              data-testid={DATA_TEST_ID.SUBTITLE}
+            >
+              {invitationCodeAndEmailFormDividerText}
+            </Typography>
+          </Divider>
+        </>
+      );
+    }
+  }, [applicationLoginCode, handleStartNewConversation, inviteCode, isLoading, loginCodeDisabled, theme, invitationCodeAndEmailFormDividerText]);
+
+  /* ------------------
    * side effects, like checking the invite code in the URL
    */
 
@@ -333,21 +403,6 @@ const Login: React.FC = () => {
     setShowResendVerification(false);
   }, [email, password]);
 
-  /* ------------------
-   * aggregated states for loading and disabling ui
-   */
-  // login button is disabled when login is loading, or when there is no active Form, or the fields for the active form are not filled in
-  const isLoginButtonDisabled =
-    isLoading || activeLoginForm === ActiveForm.NONE || ((!email || !password) && !inviteCode);
-
-  const invitationCodeAndEmailFormDividerText = useMemo(() => {
-    if (applicationLoginCode) {
-      return "Or login to your account to continue";
-    } else {
-      return "or";
-    }
-  }, [applicationLoginCode]);
-
   return (
     <Container
       maxWidth="xs"
@@ -373,38 +428,7 @@ const Login: React.FC = () => {
           width={"100%"}
           gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
         >
-          {applicationLoginCode ? (
-            <PrimaryButton
-              disabled={isLoading}
-              disableWhenOffline={true}
-              onClick={handleStartNewConversation}
-              data-testid={DATA_TEST_ID.START_NEW_CONVERSATION_BUTTON}
-            >
-              Continue as Guest
-            </PrimaryButton>
-          ) : (
-            <React.Fragment>
-              <Typography variant="body2">Login to your account to continue</Typography>
-              <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
-                Login using
-              </Typography>
-              <LoginWithInviteCodeForm
-                inviteCode={inviteCode}
-                notifyOnInviteCodeChanged={handleInviteCodeChanged}
-                isDisabled={isLoading}
-              />
-            </React.Fragment>
-          )}
-          <Divider textAlign="center" style={{ width: "100%" }}>
-            <Typography
-              variant="subtitle2"
-              padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
-              data-testid={DATA_TEST_ID.SUBTITLE}
-            >
-              {invitationCodeAndEmailFormDividerText}
-            </Typography>
-          </Divider>
-
+          {getLoginCodeComponent}
           <LoginWithEmailForm
             email={email}
             password={password}
@@ -412,15 +436,12 @@ const Login: React.FC = () => {
             notifyOnPasswordChanged={handlePasswordChanged}
             isDisabled={isLoading}
           />
-          {
-            showResendVerification && (
+          {showResendVerification && (
             <ResendVerificationEmail email={lastAttemptedEmail} password={lastAttemptedPassword} />
           )}
           {
             /*dont show both the resend verification email and forgot password at the same time*/
-            !showResendVerification && (
-              <PasswordReset />
-            )
+            !showResendVerification && <PasswordReset />
           }
           <PrimaryButton
             fullWidth
