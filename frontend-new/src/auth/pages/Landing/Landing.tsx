@@ -7,7 +7,7 @@ import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
-import { getApplicationLoginCode } from "src/envService";
+import { getApplicationLoginCodeDisabled, getApplicationLoginCode } from "src/envService";
 import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -38,6 +38,10 @@ const Landing: React.FC = () => {
 
   const applicationLoginCode = useMemo(() => {
     return getApplicationLoginCode();
+  }, []);
+
+  const loginCodeDisabled = useMemo(() => {
+    return getApplicationLoginCodeDisabled().toLowerCase() === "true";
   }, []);
 
   const handleError = useCallback(
@@ -200,7 +204,7 @@ const Landing: React.FC = () => {
                   Register
                 </SecondaryButton>
               </Box>
-              {applicationLoginCode && (
+              {applicationLoginCode && !loginCodeDisabled && (
                 <>
                   <Divider textAlign="center" style={{ width: "100%" }} data-testid={DATA_TEST_ID.LANDING_DIVIDER}>
                     <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>

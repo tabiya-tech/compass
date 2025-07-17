@@ -120,6 +120,9 @@ describe("Landing Page", () => {
       const givenApplicationLoginCode = "bar";
       jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
 
+      // AND the application login code is not disabled
+      jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
+
       // AND anonymous login function will succeed
       const anonymousLoginMock = jest.fn().mockResolvedValue("mock-token");
       jest.spyOn(FirebaseInvitationCodeAuthenticationService, "getInstance").mockReturnValue({
@@ -161,6 +164,8 @@ describe("Landing Page", () => {
       jest.spyOn(FirebaseInvitationCodeAuthenticationService, "getInstance").mockReturnValue({
         login: jest.fn().mockResolvedValue("mock-token"),
       } as unknown as FirebaseInvitationCodeAuthenticationService);
+      // AND the application login code is not disabled
+      jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
 
       // AND user has not accepted terms
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValueOnce({
@@ -199,10 +204,30 @@ describe("Landing Page", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
+    test("should not show guest button when application login code is disabled", () => {
+      // GIVEN the application login code is set
+      const givenApplicationLoginCode = "bar";
+      jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
+      // AND the application login code is disabled
+      jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("true");
+
+      // AND the component is rendered
+      render(<Landing />);
+
+      // THEN expect the guest button to not be in the document
+      expect(screen.queryByTestId(DATA_TEST_ID.LANDING_GUEST_BUTTON)).not.toBeInTheDocument();
+
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
     test("should handle RestAPIError when continuing as guest", async () => {
       // GIVEN the application login code is set
       const givenApplicationLoginCode = "bar";
       jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
+      // AND the application login code is not disabled
+      jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
 
       // AND the error scenario
       const error = new RestAPIError(
@@ -239,6 +264,8 @@ describe("Landing Page", () => {
       // GIVEN the application login code is set
       const givenApplicationLoginCode = "bar";
       jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
+      // AND the application login code is not disabled
+      jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
 
       // AND the error scenario
       const error = new FirebaseError(
@@ -271,6 +298,8 @@ describe("Landing Page", () => {
       // GIVEN the application login code is set
       const givenApplicationLoginCode = "bar";
       jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
+      // AND the application login code is not disabled
+      jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
       // AND user preferences service throws an error
       const mockError = new Error("Failed to get preferences");
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockImplementationOnce(() => {

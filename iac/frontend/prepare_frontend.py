@@ -112,6 +112,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     enable_metrics: str = getenv("FRONTEND_ENABLE_METRICS", False, False)
     login_code: Optional[str] = getenv("FRONTEND_LOGIN_CODE", False, False)
     registration_code: Optional[str] = getenv("FRONTEND_REGISTRATION_CODE", False, False)
+    disable_login_code: Optional[str] = getenv("FRONTEND_DISABLE_LOGIN_CODE", False, False)
 
     sensitive_personal_data_rsa_encryption_key: str = getenv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY")
     sensitive_personal_data_rsa_encryption_key_id: str = getenv("SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID")
@@ -141,6 +142,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY": base64_encode(sensitive_personal_data_rsa_encryption_key),
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID": base64_encode(sensitive_personal_data_rsa_encryption_key_id),
         "FRONTEND_LOGIN_CODE": base64_encode(login_code),
+        "FRONTEND_DISABLE_LOGIN_CODE": base64_encode(disable_login_code),
         "FRONTEND_REGISTRATION_CODE": base64_encode(registration_code),
         "FRONTEND_FEATURES": base64_encode(features),
     }

@@ -60,6 +60,7 @@ To develop this application locally, follow these steps:
      - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY`:(**Mandatory**) The RSA public key used to encrypt sensitive personal data. It is in the [PEM](https://www.rfc-editor.org/rfc/rfc7468) format.
      - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID`: (**Mandatory**) The ID of the RSA public key. This is used to identify the key used to encrypt the sensitive personal data as it may be rotated over time.
      - `FRONTEND_LOGIN_CODE`: (**Optional**) The login code for the frontend application. It is optional, if not provided user will be prompted to enter the login code.
+     - `FRONTEND_DISABLE_LOGIN_CODE`: (**Optional**) A boolean value to disable the login code prompt. If set to true, we disable the anonymous login code prompt and the user will only be able to log in using an existing account.
      - `FRONTEND_REGISTRATION_CODE`: (**Optional**) The registration code for the frontend application. It is optional, if not provided user will be prompted to enter the registration code.
      - `FRONTEND_FEATURES`: (**optional**) A JSON like dictionary with the features enabled status and configurations specific to each feature.
 

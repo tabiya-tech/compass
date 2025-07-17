@@ -17,10 +17,9 @@ const firebaseSuccessMock = [
   },
 ];
 
-
 export default meta;
 
-export const Shown: StoryObj<typeof Login> = {
+export const ShownAsEmptyField: StoryObj<typeof Login> = {
   args: {},
   parameters: {
     mockData: firebaseSuccessMock,
@@ -36,6 +35,19 @@ export const ShownWithApplicationLoginCodeSet: StoryObj<typeof Login> = {
     window.tabiyaConfig[EnvVariables.FRONTEND_LOGIN_CODE] = btoa("bar");
     return () => {
       delete window.tabiyaConfig[EnvVariables.FRONTEND_LOGIN_CODE];
+    };
+  },
+};
+
+export const ShownWithDisabledApplicationLoginCode: StoryObj<typeof Login> = {
+  args: {},
+  parameters: {
+    mockData: firebaseSuccessMock,
+  },
+  beforeEach: () => {
+    window.tabiyaConfig[EnvVariables.FRONTEND_DISABLE_LOGIN_CODE] = btoa("true");
+    return () => {
+      delete window.tabiyaConfig[EnvVariables.FRONTEND_DISABLE_LOGIN_CODE];
     };
   },
 };

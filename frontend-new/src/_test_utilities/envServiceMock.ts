@@ -4,5 +4,6 @@ jest.mock("src/envService", () => ({
   getBackendUrl: jest.fn(() => "mock-backend-url"),
   getApplicationLoginCode: jest.fn(() => ""),
   getApplicationRegistrationCode: jest.fn(() => ""),
+  getApplicationLoginCodeDisabled: jest.fn(() => "false"),
   getMetricsEnabled: jest.fn(() => "true"),
 }));
