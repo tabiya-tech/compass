@@ -1,16 +1,15 @@
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { Box, Chip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import {
   Experience,
   Timeline,
   WorkType,
-  UpdateExperienceRequest,
   EXPERIENCE_TITLE_MAX_LENGTH,
   COMPANY_MAX_LENGTH,
   LOCATION_MAX_LENGTH,
   SUMMARY_MAX_LENGTH,
-  TIMELINE_MAX_LENGTH,
+  TIMELINE_MAX_LENGTH, UpdateExperienceRequest,
 } from "src/experiences/experienceService/experiences.types";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -26,7 +25,13 @@ import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import ExperienceService from "src/experiences/experienceService/experienceService";
 import { debounce } from "src/utils/debounce";
-import { getWorkTypeDescription, getWorkTypeIcon, getWorkTypeTitle } from "src/experiences/experiencesDrawer/util";
+import {
+  getWorkTypeDescription,
+  getWorkTypeIcon,
+  getWorkTypeTitle,
+  getExperienceDiff,
+  checkInitialFieldErrors,
+} from "src/experiences/experiencesDrawer/util";
 import InlineEditField from "src/theme/InlineEditField/InlineEditField";
 import SummaryEditField from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
 import { ExperienceError } from "src/error/commonErrors";
@@ -65,28 +70,6 @@ interface ExperienceEditFormProps {
 // Debounce delay for error checking (ms)
 export const DEBOUNCE_ERROR_DELAY_MS = 20;
 
-const checkInitialFieldErrors = (experience: Experience) => {
-  const errors: { [key: string]: string } = {};
-  if (experience.experience_title && experience.experience_title.length > EXPERIENCE_TITLE_MAX_LENGTH) {
-    errors.experience_title = `Maximum ${EXPERIENCE_TITLE_MAX_LENGTH} characters allowed.`;
-  }
-  if (experience.company && experience.company.length > COMPANY_MAX_LENGTH) {
-    errors.company = `Maximum ${COMPANY_MAX_LENGTH} characters allowed.`;
-  }
-  if (experience.location && experience.location.length > LOCATION_MAX_LENGTH) {
-    errors.location = `Maximum ${LOCATION_MAX_LENGTH} characters allowed.`;
-  }
-  if (experience.summary && experience.summary.length > SUMMARY_MAX_LENGTH) {
-    errors.summary = `Maximum ${SUMMARY_MAX_LENGTH} characters allowed.`;
-  }
-  if (experience.timeline.start && experience.timeline.start.length > TIMELINE_MAX_LENGTH) {
-    errors.timeline_start = `Maximum ${TIMELINE_MAX_LENGTH} characters allowed.`;
-  }
-  if (experience.timeline.end && experience.timeline.end.length > TIMELINE_MAX_LENGTH) {
-    errors.timeline_end = `Maximum ${TIMELINE_MAX_LENGTH} characters allowed.`;
-  }
-  return errors;
-};
 const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   experience,
   notifyOnSave,
@@ -97,7 +80,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   const { enqueueSnackbar } = useSnackbar();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
-  const [editedExperience, setEditedExperience] = useState<Partial<Experience>>({});
+  const [formValues, setFormValues] = useState<Experience>({ ...experience });
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -105,19 +88,25 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
   const topSkillsRef = useRef<HTMLDivElement>(null);
 
-  // Debounced error updater (stable ref)
-  const debouncedUpdateFieldError = useRef(
-    debounce((field: string, value: string, maxLength: number) => {
-      setFieldErrors((prev) => {
-        if (value.length > maxLength) {
-          return { ...prev, [field]: `Maximum ${maxLength} characters allowed.` };
-        } else {
-          const { [field]: _, ...rest } = prev;
-          return rest;
-        }
-      });
-    }, DEBOUNCE_ERROR_DELAY_MS)
-  ).current;
+  const getFieldError = (value: string, maxLength: number): string | null => {
+    return value.length > maxLength ? `Maximum ${maxLength} characters allowed.` : null;
+  };
+
+  const updateFieldError = debounce((field: string, value: string, maxLength: number) => {
+    setFieldErrors((prevErrors) => {
+      const error = getFieldError(value, maxLength);
+
+      if (error) {
+        return { ...prevErrors, [field]: error };
+      }
+
+      // Remove error if it's resolved
+      const { [field]: _, ...rest } = prevErrors;
+      return rest;
+    });
+  }, DEBOUNCE_ERROR_DELAY_MS);
+
+  const debouncedUpdateFieldError = useRef(updateFieldError).current;
 
   useEffect(() => {
     // Cleanup on unmount
@@ -131,44 +120,43 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
     setFieldErrors(checkInitialFieldErrors(experience));
   }, [experience]);
 
-  const displayExperience = useMemo(() => ({ ...experience, ...editedExperience }), [experience, editedExperience]);
+  // Calculate if there are any changes
+  const hasUnsavedChanges = useMemo(() => getExperienceDiff(experience, formValues) !== null, [formValues, experience]);
 
-  const hasChanges = useMemo(() => Object.keys(editedExperience).length > 0, [editedExperience]);
+  // Notify parent of unsaved changes
+  useEffect(() => {
+    notifyOnUnsavedChange?.(hasUnsavedChanges);
+  }, [hasUnsavedChanges, notifyOnUnsavedChange]);
 
   const anyFieldTooLong = Object.keys(fieldErrors).length > 0;
 
-  useEffect(() => {
-    notifyOnUnsavedChange?.(hasChanges);
-  }, [hasChanges, notifyOnUnsavedChange]);
-
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, field: keyof Experience, maxLength?: number) => {
-      let value = event.target.value;
-      setEditedExperience((prev) => ({
+      const value = event.target.value;
+      setFormValues((prev) => ({
         ...prev,
         [field]: value,
       }));
+
       if (maxLength !== undefined) {
         debouncedUpdateFieldError(field, value, maxLength);
       }
-      notifyOnUnsavedChange?.(true);
     },
-    [debouncedUpdateFieldError, notifyOnUnsavedChange]
+    [debouncedUpdateFieldError]
   );
 
   const handleTimelineChange = (
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
     field: keyof Timeline
   ) => {
-    setEditedExperience((prev) => ({
+    setFormValues((prev) => ({
       ...prev,
       timeline: {
-        ...(prev.timeline || experience.timeline),
+        ...prev.timeline,
         [field]: event.target.value,
       },
     }));
     debouncedUpdateFieldError(`timeline_${field}`, event.target.value, TIMELINE_MAX_LENGTH);
-    notifyOnUnsavedChange?.(true);
   };
 
   const handleSkillMenuClick = (event: React.MouseEvent<HTMLElement | SVGSVGElement>, skillId: string) => {
@@ -183,8 +171,8 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
 
   const handleSkillSelect = (newPreferredLabel: string) => {
     if (selectedSkillId) {
-      setEditedExperience((prev) => {
-        const currentSkills = prev.top_skills || [...experience.top_skills];
+      setFormValues((prev) => {
+        const currentSkills = prev.top_skills;
         const updatedSkills = currentSkills.map((skill) => {
           if (skill.UUID === selectedSkillId) {
             return {
@@ -199,24 +187,22 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
           top_skills: updatedSkills,
         };
       });
-      notifyOnUnsavedChange?.(true);
     }
     handleSkillMenuClose();
   };
 
   // Toggle the 'deleted' property directly on the skill
   const toggleSkillDeletion = (skillId: string) => {
-    setEditedExperience((prev) => {
-      const top_skills = (prev.top_skills ?? experience.top_skills).map((skill) =>
+    setFormValues((prev) => ({
+      ...prev,
+      top_skills: prev.top_skills.map((skill) =>
         skill.UUID === skillId ? { ...skill, deleted: !skill.deleted } : skill
-      );
-      return { ...prev, top_skills };
-    });
-    notifyOnUnsavedChange?.(true);
+      ),
+    }));
   };
 
   const getSkillMenuItems = (skillId: string): MenuItemConfig[] => {
-    const skill = displayExperience.top_skills.find((s) => s.UUID === skillId);
+    const skill = formValues.top_skills.find((s) => s.UUID === skillId);
     if (!skill) return [];
     return (skill.altLabels || []).map((altLabel) => ({
       id: altLabel,
@@ -227,23 +213,31 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   };
 
   const handleSave = async () => {
-    setIsSubmitting(true);
     const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
     if (!sessionId) {
       throw new Error("User has no sessions");
     }
+
+    // Create a diff of the experience to check for changes
+    const changes = getExperienceDiff(experience, formValues);
+
+    // If no changes detected, don't submit
+    if (!changes) return;
+
+    setIsSubmitting(true);
+
     try {
-      const updatedFields: UpdateExperienceRequest = {
-        ...editedExperience,
-        top_skills: (editedExperience.top_skills ?? experience.top_skills).map((skill) => ({
+      const experienceService = ExperienceService.getInstance();
+      const updateExperienceRequest: UpdateExperienceRequest = {
+        ...changes,
+        top_skills: changes.top_skills?.map((skill) => ({
           UUID: skill.UUID,
           preferredLabel: skill.preferredLabel,
           deleted: skill.deleted,
         })),
-      };
-      const experienceService = ExperienceService.getInstance();
-      const result = await experienceService.updateExperience(sessionId, experience.UUID, updatedFields);
-      notifyOnUnsavedChange?.(false);
+      }
+      const result = await experienceService.updateExperience(sessionId, experience.UUID, updateExperienceRequest);
+
       notifyOnSave(result);
       enqueueSnackbar("Experience updated successfully!", { variant: "success" });
     } catch (error) {
@@ -263,19 +257,17 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   };
 
   const handleWorkTypeSelect = (workType: WorkType | null) => {
-    setEditedExperience((prev) => ({
+    setFormValues((prev) => ({
       ...prev,
       work_type: workType,
     }));
 
-    notifyOnUnsavedChange?.(true);
     handleWorkTypeMenuClose();
   };
 
   const getWorkTypeMenuItems = (): MenuItemConfig[] => {
     // Only include 'Uncategorized' if the current work_type is null
-    const workTypes =
-      displayExperience.work_type === null ? [...Object.values(WorkType), null] : [...Object.values(WorkType)];
+    const workTypes = formValues.work_type === null ? [...Object.values(WorkType), null] : [...Object.values(WorkType)];
     return workTypes.map((workType) => ({
       id: workType ?? "uncategorized",
       text: getWorkTypeTitle(workType),
@@ -286,7 +278,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
     }));
   };
 
-  const isExperienceTitleEmpty = displayExperience.experience_title === "";
+  const isExperienceTitleEmpty = formValues.experience_title === "";
 
   return (
     <Box
@@ -312,7 +304,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
           </SecondaryButton>
           <PrimaryButton
             onClick={handleSave}
-            disabled={!hasChanges || isExperienceTitleEmpty || anyFieldTooLong}
+            disabled={!hasUnsavedChanges || isExperienceTitleEmpty || anyFieldTooLong}
             disableWhenOffline
             data-testid={DATA_TEST_ID.FORM_SAVE_BUTTON}
           >
@@ -350,11 +342,11 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             data-testid={DATA_TEST_ID.FORM_WORK_TYPE}
           >
             <Box display="flex" alignItems="center" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-              {React.cloneElement(getWorkTypeIcon(displayExperience.work_type), {
+              {React.cloneElement(getWorkTypeIcon(formValues.work_type), {
                 sx: { color: theme.palette.text.secondary },
               })}
               <Typography variant="body1" fontWeight="bold" color={theme.palette.text.secondary}>
-                {getWorkTypeTitle(displayExperience.work_type)}
+                {getWorkTypeTitle(formValues.work_type)}
               </Typography>
             </Box>
             <ArrowDropDownIcon
@@ -365,7 +357,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
           <Box display="flex" flexDirection="column" alignItems="flex-start">
             <InlineEditField
               placeholder="Experience title"
-              value={displayExperience.experience_title}
+              value={formValues.experience_title}
               onChange={(event) => handleInputChange(event, "experience_title", EXPERIENCE_TITLE_MAX_LENGTH)}
               autoFocus
               data-testid={DATA_TEST_ID.FORM_EXPERIENCE_TITLE}
@@ -396,7 +388,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             <Box flexGrow={1}>
               <InlineEditField
                 placeholder="Start date"
-                value={displayExperience.timeline.start}
+                value={formValues.timeline.start}
                 onChange={(event) => handleTimelineChange(event, "start")}
                 data-testid={DATA_TEST_ID.FORM_START_DATE}
                 error={!!fieldErrors.timeline_start}
@@ -414,7 +406,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             <Box flexGrow={1}>
               <InlineEditField
                 placeholder="End date"
-                value={displayExperience.timeline.end}
+                value={formValues.timeline.end}
                 onChange={(event) => handleTimelineChange(event, "end")}
                 data-testid={DATA_TEST_ID.FORM_END_DATE}
                 error={!!fieldErrors.timeline_end}
@@ -434,7 +426,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             <Box width="100%">
               <InlineEditField
                 placeholder="Company"
-                value={displayExperience.company}
+                value={formValues.company}
                 onChange={(event) => handleInputChange(event, "company", COMPANY_MAX_LENGTH)}
                 data-testid={DATA_TEST_ID.FORM_COMPANY}
                 error={!!fieldErrors.company}
@@ -452,7 +444,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             <Box width="100%">
               <InlineEditField
                 placeholder="Location"
-                value={displayExperience.location}
+                value={formValues.location}
                 onChange={(event) => handleInputChange(event, "location", LOCATION_MAX_LENGTH)}
                 data-testid={DATA_TEST_ID.FORM_LOCATION}
                 error={!!fieldErrors.location}
@@ -470,9 +462,9 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
           </Box>
           <SummaryEditField
             notifyOnChange={(event) => handleInputChange(event, "summary", SUMMARY_MAX_LENGTH)}
-            summary={displayExperience.summary ?? ""}
+            summary={formValues.summary ?? ""}
             error={fieldErrors.summary}
-            experience_uuid={displayExperience.UUID}
+            experience_uuid={formValues.UUID}
           />
           <Box display="flex" alignItems="center">
             <Typography variant="body1" sx={{ wordBreak: "break-all" }}>
@@ -489,7 +481,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
             data-testid={DATA_TEST_ID.FORM_SKILLS_CONTAINER}
           >
-            {(displayExperience.top_skills ?? []).map((skill) => (
+            {(formValues.top_skills ?? []).map((skill) => (
               <Chip
                 key={skill.UUID}
                 data-testid={DATA_TEST_ID.FORM_SKILL_CHIP}

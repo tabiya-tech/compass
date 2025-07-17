@@ -1,5 +1,13 @@
 import React from "react";
-import { WorkType } from "src/experiences/experienceService/experiences.types";
+import {
+  WorkType,
+  Experience,
+  EXPERIENCE_TITLE_MAX_LENGTH,
+  COMPANY_MAX_LENGTH,
+  LOCATION_MAX_LENGTH,
+  SUMMARY_MAX_LENGTH,
+  TIMELINE_MAX_LENGTH,
+} from "src/experiences/experienceService/experiences.types";
 import { ReportContent } from "src/experiences/report/reportContent";
 import type { SvgIconProps } from "@mui/material/SvgIcon";
 import StoreIcon from "@mui/icons-material/Store";
@@ -59,4 +67,102 @@ export const getWorkTypeIcon = (workType: WorkType | null, iconProps?: SvgIconPr
     default:
       return <QuizIcon {...iconProps} />;
   }
+};
+
+/**
+ * Checks for field errors in an Experience object
+ * @param experience Experience object to check
+ * @returns Object with field names as keys and error messages as values
+ */
+export const checkInitialFieldErrors = (experience: Experience) => {
+  const errors: { [key: string]: string } = {};
+  if (experience.experience_title && experience.experience_title.length > EXPERIENCE_TITLE_MAX_LENGTH) {
+    errors.experience_title = `Maximum ${EXPERIENCE_TITLE_MAX_LENGTH} characters allowed.`;
+  }
+  if (experience.company && experience.company.length > COMPANY_MAX_LENGTH) {
+    errors.company = `Maximum ${COMPANY_MAX_LENGTH} characters allowed.`;
+  }
+  if (experience.location && experience.location.length > LOCATION_MAX_LENGTH) {
+    errors.location = `Maximum ${LOCATION_MAX_LENGTH} characters allowed.`;
+  }
+  if (experience.summary && experience.summary.length > SUMMARY_MAX_LENGTH) {
+    errors.summary = `Maximum ${SUMMARY_MAX_LENGTH} characters allowed.`;
+  }
+  if (experience.timeline.start && experience.timeline.start.length > TIMELINE_MAX_LENGTH) {
+    errors.timeline_start = `Maximum ${TIMELINE_MAX_LENGTH} characters allowed.`;
+  }
+  if (experience.timeline.end && experience.timeline.end.length > TIMELINE_MAX_LENGTH) {
+    errors.timeline_end = `Maximum ${TIMELINE_MAX_LENGTH} characters allowed.`;
+  }
+  return errors;
+};
+
+/**
+ * Gets a diff between original and current Experience objects
+ * @param original Original Experience object
+ * @param current Current Experience object
+ * @returns Partial Experience containing only changed fields, or null if no changes
+ */
+export const getExperienceDiff = (original: Experience, current: Experience): Partial<Experience> | null => {
+  const diff: Partial<Experience> = {};
+  let hasChanges = false;
+
+  // Compare basic fields
+  if (original.experience_title !== current.experience_title) {
+    diff.experience_title = current.experience_title;
+    hasChanges = true;
+  }
+
+  if (original.company !== current.company) {
+    diff.company = current.company;
+    hasChanges = true;
+  }
+
+  if (original.location !== current.location) {
+    diff.location = current.location;
+    hasChanges = true;
+  }
+
+  if (original.summary !== current.summary) {
+    diff.summary = current.summary;
+    hasChanges = true;
+  }
+
+  if (original.work_type !== current.work_type) {
+    diff.work_type = current.work_type;
+    hasChanges = true;
+  }
+
+  if (original.timeline.start !== current.timeline.start || original.timeline.end !== current.timeline.end) {
+    diff.timeline = current.timeline;
+    hasChanges = true;
+  }
+
+  // Compare skills
+  const originalSkills = original.top_skills || [];
+  const currentSkills = current.top_skills || [];
+
+  const originalSkillsMap = new Map(originalSkills.map((skill) => [skill.UUID, skill]));
+  let skillsChanged = false;
+
+  if (originalSkills.length !== currentSkills.length) {
+    skillsChanged = true;
+  }
+  currentSkills.forEach((skill) => {
+    const originalSkill = originalSkillsMap.get(skill.UUID);
+    if (
+      !originalSkill ||
+      originalSkill.preferredLabel !== skill.preferredLabel ||
+      originalSkill.deleted !== skill.deleted
+    ) {
+      skillsChanged = true;
+    }
+  });
+
+  if (skillsChanged) {
+    diff.top_skills = currentSkills;
+    hasChanges = true;
+  }
+
+  return hasChanges ? diff : null;
 };
