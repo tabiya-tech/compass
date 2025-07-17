@@ -1,9 +1,20 @@
-import { WorkType } from "src/experiences/experienceService/experiences.types";
+import {
+  WorkType,
+  Experience,
+  EXPERIENCE_TITLE_MAX_LENGTH,
+  DiveInPhase,
+  COMPANY_MAX_LENGTH,
+  LOCATION_MAX_LENGTH,
+  SUMMARY_MAX_LENGTH,
+  TIMELINE_MAX_LENGTH,
+} from "src/experiences/experienceService/experiences.types";
 import {
   WORK_TYPE_DESCRIPTIONS,
   getWorkTypeDescription,
   getWorkTypeIcon,
   getWorkTypeTitle,
+  checkInitialFieldErrors,
+  getExperienceDiff,
 } from "src/experiences/experiencesDrawer/util";
 import { ReportContent } from "src/experiences/report/reportContent";
 import StoreIcon from "@mui/icons-material/Store";
@@ -11,6 +22,7 @@ import WorkIcon from "@mui/icons-material/Work";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import SchoolIcon from "@mui/icons-material/School";
 import QuizIcon from "@mui/icons-material/Quiz";
+import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 
 describe("experiencesDrawer util", () => {
   test.each([
@@ -50,5 +62,107 @@ describe("experiencesDrawer util", () => {
     // WHEN calling getWorkTypeIcon with the work type
     // THEN it should return the correct icon
     expect(getWorkTypeIcon(workType).type).toBe(expectedIcon);
+  });
+
+  describe("checkInitialFieldErrors", () => {
+    test("should return empty object when all fields are valid", () => {
+      // GIVEN an experience with all valid fields
+      const experience: Experience = mockExperiences[0];
+
+      // WHEN checking for errors
+      const errors = checkInitialFieldErrors(experience);
+
+      // THEN it should return an empty object
+      expect(errors).toEqual({});
+    });
+
+    test("should detect errors for all fields exceeding max length", () => {
+      // GIVEN an experience with all fields exceeding max length
+      const experience: Experience = {
+        UUID: "530043b7-7af4-4207-8313-682d2c9bfae9",
+        experience_title: "a".repeat(EXPERIENCE_TITLE_MAX_LENGTH + 1),
+        company: "a".repeat(COMPANY_MAX_LENGTH + 1),
+        location: "a".repeat(LOCATION_MAX_LENGTH + 1),
+        summary: "a".repeat(SUMMARY_MAX_LENGTH + 1),
+        timeline: {
+          start: "a".repeat(TIMELINE_MAX_LENGTH + 1),
+          end: "a".repeat(TIMELINE_MAX_LENGTH + 1),
+        },
+        top_skills: [],
+        work_type: WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+        exploration_phase: DiveInPhase.PROCESSED,
+        deleted: false,
+      };
+
+      // WHEN checking for errors
+      const errors = checkInitialFieldErrors(experience);
+
+      // THEN it should return an object with all the field errors
+      expect(errors).toEqual({
+        experience_title: `Maximum ${EXPERIENCE_TITLE_MAX_LENGTH} characters allowed.`,
+        company: `Maximum ${COMPANY_MAX_LENGTH} characters allowed.`,
+        location: `Maximum ${LOCATION_MAX_LENGTH} characters allowed.`,
+        summary: `Maximum ${SUMMARY_MAX_LENGTH} characters allowed.`,
+        timeline_start: `Maximum ${TIMELINE_MAX_LENGTH} characters allowed.`,
+        timeline_end: `Maximum ${TIMELINE_MAX_LENGTH} characters allowed.`,
+      });
+    });
+  });
+
+  describe("getExperienceDiff", () => {
+    test("should return null when experiences are identical", () => {
+      // GIVEN two identical experiences
+      const original: Experience = mockExperiences[0];
+      const current: Experience = { ...original };
+
+      // WHEN creating a diff
+      const diff = getExperienceDiff(original, current);
+
+      // THEN it should return null (no changes)
+      expect(diff).toBeNull();
+    });
+
+    test("should return object with changed fields only", () => {
+      // GIVEN an original experience and a modified current experience
+      const original: Experience = mockExperiences[0];
+      const current: Experience = {
+        ...original,
+        experience_title: "Foo Title",
+        company: "Bar Company",
+        location: "Baz Location",
+        summary: "Foo Summary",
+        work_type: WorkType.SELF_EMPLOYMENT,
+        timeline: {
+          start: original.timeline.start,
+          end: "December 2023",
+        },
+        top_skills: [
+          {
+            UUID: "skill-1",
+            description: "foo",
+            preferredLabel: "javascript",
+            altLabels: ["react"],
+            deleted: false,
+          },
+        ],
+      };
+
+      // WHEN creating a diff
+      const diff = getExperienceDiff(original, current);
+
+      // THEN it should return an object with only the changed fields
+      expect(diff).toEqual({
+        experience_title: current.experience_title,
+        company: current.company,
+        location: current.location,
+        summary: current.summary,
+        work_type: WorkType.SELF_EMPLOYMENT,
+        timeline: {
+          start: current.timeline.start,
+          end: current.timeline.end,
+        },
+        top_skills: current.top_skills,
+      });
+    });
   });
 });
