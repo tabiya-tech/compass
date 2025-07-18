@@ -89,6 +89,7 @@ describe("experiencesDrawer util", () => {
           end: "a".repeat(TIMELINE_MAX_LENGTH + 1),
         },
         top_skills: [],
+        remaining_skills: [],
         work_type: WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
         exploration_phase: DiveInPhase.PROCESSED,
         deleted: false,

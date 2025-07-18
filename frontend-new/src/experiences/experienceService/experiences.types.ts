@@ -13,6 +13,13 @@ export interface Skill {
   deleted: boolean;
 }
 
+export interface RemainingSkill {
+  UUID: string;
+  preferredLabel: string;
+  description: string;
+  altLabels: string[];
+}
+
 export interface Timeline {
   start: string;
   end: string;
@@ -33,6 +40,7 @@ export interface Experience {
   location: string;
   work_type: WorkType | null;
   top_skills: Skill[];
+  remaining_skills: RemainingSkill[];
   summary: string | null;
   exploration_phase: DiveInPhase;
   deleted: boolean;

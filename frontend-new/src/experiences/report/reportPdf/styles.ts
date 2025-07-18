@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     ...fontStyles.general,
     display: "flex",
     flexDirection: "column",
-    paddingBottom: 100,
+    paddingBottom: 126,
     color: COLORS.textBlack,
   },
   title: {

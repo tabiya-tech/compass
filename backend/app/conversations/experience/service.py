@@ -113,13 +113,19 @@ class ExperienceService(IExperienceService):
 
         # build a map of all skills available in this experience
         all_skills: dict[str, SkillEntity] = {}
-        for skill in experience_to_update.top_skills:
+        original_top_skills = list(experience_to_update.top_skills)
+        for skill in original_top_skills:
             all_skills[skill.UUID] = skill
+
+        # Add remaining skills to the available skills map
+        if isinstance(experience_to_update, ExploredExperienceEntity) and experience_to_update.remaining_skills:
+            for skill in experience_to_update.remaining_skills:
+                all_skills[skill.UUID] = skill
 
         update_data = update_payload.model_dump(exclude_unset=True)
 
         if 'top_skills' in update_data:
-            new_top_skills = []
+            updated_top_skills = []
             # Handle the case when top_skills is None
             skill_updates = update_data.get('top_skills') or []
 
@@ -142,9 +148,46 @@ class ExperienceService(IExperienceService):
                     skillType=skill_entity.skillType,
                     deleted=skill_update['deleted']
                 )
-                new_top_skills.append(skill_entity)
-            experience_to_update.top_skills = new_top_skills
+                updated_top_skills.append(skill_entity)
+
+                # If this was a remaining skill, remove it from remaining_skills
+                if isinstance(experience_to_update, ExploredExperienceEntity) and experience_to_update.remaining_skills:
+                    experience_to_update.remaining_skills = [
+                        skill for skill in experience_to_update.remaining_skills if skill.UUID != skill_uuid
+                    ]
+
+            experience_to_update.top_skills = updated_top_skills
             del update_data['top_skills']
+
+            # Identify skills to move back to remaining_skills
+            updated_top_skill_uuids = {skill.UUID for skill in updated_top_skills}
+            original_top_skill_uuids = {skill.UUID for skill in original_top_skills}
+
+            skills_to_move_back_uuids = original_top_skill_uuids - updated_top_skill_uuids
+
+            if skills_to_move_back_uuids:
+                if experience_to_update.remaining_skills is None:
+                    experience_to_update.remaining_skills = []
+
+                skills_to_move_back = [skill for skill in original_top_skills if
+                                       skill.UUID in skills_to_move_back_uuids]
+
+                existing_remaining_uuids = {skill.UUID for skill in experience_to_update.remaining_skills}
+
+                for skill_to_move in skills_to_move_back:
+                    if skill_to_move.UUID not in existing_remaining_uuids:
+                        # Convert DiscoveredTopSkill back to SkillEntity before appending
+                        skill_entity_to_add = SkillEntity(
+                            id=skill_to_move.id,
+                            modelId=skill_to_move.modelId,
+                            UUID=skill_to_move.UUID,
+                            preferredLabel=skill_to_move.preferredLabel,
+                            altLabels=skill_to_move.altLabels,
+                            description=skill_to_move.description,
+                            skillType=skill_to_move.skillType,
+                            score=skill_to_move.score
+                        )
+                        experience_to_update.remaining_skills.append(skill_entity_to_add)
 
         # Update the experience entity with the remaining update data
         update_experience_entity(experience_to_update, update_data, all_skills)

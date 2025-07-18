@@ -226,6 +226,9 @@ class ExploredExperienceEntity(BaseExperienceEntity[DiscoveredTopSkill]):
     used to mark the experience as deleted.
     """
     remaining_skills: List[SkillEntity] = Field(default_factory=list)
+    """
+    List of skills that were not identified as top skills but are still relevant to the experience.
+    """
 
     @staticmethod
     def from_experience_entity(experience_entity: BaseExperienceEntity) -> 'ExploredExperienceEntity':

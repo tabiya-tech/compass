@@ -30,6 +30,7 @@ export const mockExperiences: Experience[] = [
         deleted: false,
       },
     ],
+    remaining_skills: [],
     summary:
       "Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that " +
       "improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.",
@@ -55,6 +56,7 @@ export const mockExperiences: Experience[] = [
         deleted: false,
       },
     ],
+    remaining_skills: [],
     summary:
       "Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that " +
       "improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.",
@@ -182,6 +184,7 @@ const generateRandomExperience = (workType?: WorkType): Experience => {
       generateRandomSkill(usedLabels),
       generateRandomSkill(usedLabels),
     ],
+    remaining_skills: Array.from({ length: Math.floor(Math.random() * 15) }, () => generateRandomSkill(usedLabels)),
     exploration_phase: Math.random() < 0.5 ? DiveInPhase.EXPLORING_SKILLS : DiveInPhase.PROCESSED,
     deleted: Math.random() < 0.5,
   };

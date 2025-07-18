@@ -18,6 +18,10 @@ TIMELINE_MAX_LENGTH = 30
 
 
 class RemainingSkill(SkillEntity):
+    """
+    A skill that was not identified as a top skill but is still relevant to the experience.
+    It excludes the fields that are not needed in the response.
+    """
     id: Annotated[Optional[str], Field(exclude=True)] = None
     modelId: Annotated[Optional[str], Field(exclude=True)] = None
     score: Annotated[Optional[float], Field(exclude=True)] = None

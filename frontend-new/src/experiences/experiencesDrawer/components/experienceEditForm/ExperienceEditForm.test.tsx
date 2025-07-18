@@ -565,4 +565,85 @@ describe("ExperienceEditForm", () => {
     // AND the error should be logged to console
     expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to update experience:", givenError));
   });
+
+  test("should add a new skill when selecting from the dropdown", async () => {
+    // GIVEN the ExperienceEditForm component with an experience that has remaining skills
+    const notifyOnSave = jest.fn();
+    const notifyOnUnsavedChange = jest.fn();
+    const experience = {
+      ...mockExperiences[0],
+      remaining_skills: Array.from({ length: 15 }, () => ({
+        UUID: `skill-${Math.random()}`,
+        preferredLabel: `Skill ${Math.random()}`,
+        description: "Test skill",
+        altLabels: ["alt1", "alt2"],
+      })),
+    };
+    // AND simulate adding a skill
+    (ContextMenu as jest.Mock).mockImplementation(({ items, open, notifyOnClose }) => {
+      if (open && items.length > 0) {
+        items[0].action();
+        if (notifyOnClose) notifyOnClose();
+      }
+      return (
+        <div>
+          {items.map((item: MenuItemConfig) => (
+            <div key={item.id}>{item.text}</div>
+          ))}
+        </div>
+      );
+    });
+
+    // WHEN the component is rendered
+    const givenExperienceEditForm = (
+      <ExperienceEditForm
+        experience={experience}
+        notifyOnSave={notifyOnSave}
+        notifyOnCancel={jest.fn()}
+        notifyOnUnsavedChange={notifyOnUnsavedChange}
+      />
+    );
+    render(givenExperienceEditForm);
+    // AND add skill button is clicked
+    const addSkillButton = screen.getByTestId(DATA_TEST_ID.FORM_ADD_SKILL_BUTTON);
+    expect(addSkillButton).toBeEnabled();
+    await userEvent.click(addSkillButton);
+
+    // THEN a new skill chip should be added
+    const skillChips = screen.getAllByTestId(DATA_TEST_ID.FORM_SKILL_CHIP);
+    expect(skillChips).toHaveLength(mockExperiences[0].top_skills.length + 1);
+    // AND notifyOnUnsavedChange should have been called
+    expect(notifyOnUnsavedChange).toHaveBeenCalledWith(true);
+    // AND the save button should be enabled
+    const saveButton = screen.getByTestId(DATA_TEST_ID.FORM_SAVE_BUTTON);
+    expect(saveButton).toBeEnabled();
+  });
+
+  test("should handle experience without remaining skills", async () => {
+    // GIVEN an experience without remaining skills
+    const experienceWithoutRemainingSkills = {
+      ...mockExperiences[0],
+      remaining_skills: [],
+    };
+
+    // WHEN the component is rendered
+    const notifyOnUnsavedChange = jest.fn();
+    const givenExperienceEditForm = (
+      <ExperienceEditForm
+        experience={experienceWithoutRemainingSkills}
+        notifyOnSave={jest.fn()}
+        notifyOnCancel={jest.fn()}
+        notifyOnUnsavedChange={notifyOnUnsavedChange}
+      />
+    );
+    render(givenExperienceEditForm);
+
+    // THEN the form should render without errors
+    expect(screen.getByTestId(DATA_TEST_ID.FORM_CONTAINER)).toBeInTheDocument();
+    // AND the Add Skill button should be disabled (since there are no remaining skills)
+    const addSkillButton = screen.getByTestId(DATA_TEST_ID.FORM_ADD_SKILL_BUTTON);
+    expect(addSkillButton).toHaveAttribute("aria-disabled", "true");
+    // AND no errors should have occurred
+    expect(console.error).not.toHaveBeenCalled();
+  });
 });

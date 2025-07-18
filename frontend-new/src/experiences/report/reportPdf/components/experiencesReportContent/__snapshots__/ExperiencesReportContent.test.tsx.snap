@@ -8,47 +8,49 @@ exports[`ExperiencesReportContent should render ExperiencesReportContent correct
   <view
     style="display: flex; flex-direction: column;"
   >
-    <text
-      data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-      style="font-size: 12px; font-family: Inter; font-weight: bold;"
-      x="0"
-      y="0"
-    >
-      Project Manager
-    </text>
-    <view
-      data-testid="experiences-content-report-experience-info-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-      style="display: flex; flex-direction: row; align-items: center; font-size: 10px;"
-    >
+    <view>
       <text
-        data-testid="experiences-content-report-date-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+        data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+        style="font-size: 12px; font-family: Inter; font-weight: bold;"
         x="0"
         y="0"
       >
-        2022 — Present
+        Project Manager
       </text>
-      <text
-        x="0"
-        y="0"
+      <view
+        data-testid="experiences-content-report-experience-info-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+        style="display: flex; flex-direction: row; align-items: center; font-size: 10px;"
       >
-        ,
-         
-      </text>
-      <text
-        data-testid="experiences-content-report-company-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-        x="0"
-        y="0"
-      >
-        Business Inc
-      </text>
-      <text
-        data-testid="experiences-content-report-location-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-        style="padding-left: 4px; font-family: Inter; font-style: italic;"
-        x="0"
-        y="0"
-      >
-        (New York, NY)
-      </text>
+        <text
+          data-testid="experiences-content-report-date-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+          x="0"
+          y="0"
+        >
+          2022 — Present
+        </text>
+        <text
+          x="0"
+          y="0"
+        >
+          ,
+           
+        </text>
+        <text
+          data-testid="experiences-content-report-company-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+          x="0"
+          y="0"
+        >
+          Business Inc
+        </text>
+        <text
+          data-testid="experiences-content-report-location-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+          style="padding-left: 4px; font-family: Inter; font-style: italic;"
+          x="0"
+          y="0"
+        >
+          (New York, NY)
+        </text>
+      </view>
     </view>
     <text
       data-testid="experiences-content-report-summary-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
