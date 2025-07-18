@@ -5,6 +5,7 @@ from pydantic import Field, BaseModel
 from app.agent.experience import ExperienceEntity, Timeline, WorkType, ExploredExperienceEntity
 from app.agent.experience.experience_entity import BaseExperienceEntity, DiscoveredTopSkill
 from app.agent.explore_experiences_agent_director import DiveInPhase
+from app.vector_search.esco_entities import SkillEntity
 
 # Field length limits (keep in sync with frontend)
 EXPERIENCE_TITLE_MAX_LENGTH = 100
@@ -14,6 +15,16 @@ SUMMARY_MAX_LENGTH = 1000
 UUID_MAX_LENGTH = 36
 SKILL_LABEL_MAX_LENGTH = 100
 TIMELINE_MAX_LENGTH = 30
+
+
+class RemainingSkill(SkillEntity):
+    id: Annotated[Optional[str], Field(exclude=True)] = None
+    modelId: Annotated[Optional[str], Field(exclude=True)] = None
+    score: Annotated[Optional[float], Field(exclude=True)] = None
+    skillType: Annotated[Optional[str], Field(exclude=True)] = None
+
+    class Config:
+        extra = "forbid"
 
 
 class Skill(DiscoveredTopSkill):
@@ -45,6 +56,9 @@ class ExperienceResponse(BaseExperienceEntity):
         examples=[e.name for e in DiveInPhase],
     )] = DiveInPhase.NOT_STARTED.name
     top_skills: Annotated[List[Skill], Field(description="List of skills identified as relevant to the experience.")]
+    remaining_skills: Annotated[
+        List[RemainingSkill], Field(description="List of skills that were not identified as top skills but are still relevant to the experience.")
+    ] = Field(default_factory=list)
     deleted: Annotated[bool, Field(description="Indicates if the experience is deleted.")] = False
 
     class Config:
@@ -67,6 +81,16 @@ class ExperienceResponse(BaseExperienceEntity):
             for skill_entity in experience_entity.top_skills
         ]
 
+        remaining_skills = [
+            RemainingSkill(
+                UUID=skill_entity.UUID,
+                preferredLabel=skill_entity.preferredLabel,
+                description=skill_entity.description,
+                altLabels=skill_entity.altLabels
+            )
+            for skill_entity in experience_entity.remaining_skills
+        ] if isinstance(experience_entity, ExploredExperienceEntity) else []
+
         return ExperienceResponse(
             uuid=experience_entity.uuid,
             experience_title=experience_entity.experience_title,
@@ -75,6 +99,7 @@ class ExperienceResponse(BaseExperienceEntity):
             timeline=experience_entity.timeline,
             work_type=experience_entity.work_type,
             top_skills=top_skills,
+            remaining_skills=remaining_skills,
             summary=experience_entity.summary,
             exploration_phase=dive_in_phase.name,
             deleted=experience_entity.deleted if isinstance(experience_entity, ExploredExperienceEntity) else False
@@ -105,6 +130,7 @@ class SkillUpdate(BaseModel):
     class Config:
         extra = "forbid"
 
+
 class TimelineUpdate(Timeline):
     start: Optional[str] = Field(
         default=None,
@@ -119,6 +145,7 @@ class TimelineUpdate(Timeline):
         examples=["Present", "2021", "2021-12", "2021-12-31", "Present", "A long time ago"],
         max_length=TIMELINE_MAX_LENGTH,
     )
+
 
 class UpdateExperienceRequest(BaseModel):
     """

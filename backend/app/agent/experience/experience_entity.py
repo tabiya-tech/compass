@@ -225,6 +225,7 @@ class ExploredExperienceEntity(BaseExperienceEntity[DiscoveredTopSkill]):
     """
     used to mark the experience as deleted.
     """
+    remaining_skills: List[SkillEntity] = Field(default_factory=list)
 
     @staticmethod
     def from_experience_entity(experience_entity: BaseExperienceEntity) -> 'ExploredExperienceEntity':
