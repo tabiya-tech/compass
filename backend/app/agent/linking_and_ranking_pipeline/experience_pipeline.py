@@ -130,6 +130,7 @@ class ClusterPipelineResult(BaseModel):
 
 class ExperiencePipelineResponse(BaseModel):
     top_skills: list[SkillEntity]
+    remaining_skills: list[SkillEntity] = []
     llm_stats: list[LLMStats]
     cluster_results: list[ClusterPipelineResult]
 
@@ -171,6 +172,7 @@ class ExperiencePipeline:
             self._logger.warning("No responsibilities found for experience title: '%s' and company: '%s'", experience_title, company_name)
             return ExperiencePipelineResponse(
                 top_skills=[],
+                remaining_skills=[],
                 llm_stats=llm_stats,
                 cluster_results=[]
             )
@@ -182,6 +184,7 @@ class ExperiencePipeline:
             self._logger.warning("No clusters found for experience title: '%s' and company: '%s'", experience_title, company_name)
             return ExperiencePipelineResponse(
                 top_skills=[],
+                remaining_skills=[],
                 llm_stats=llm_stats,
                 cluster_results=[]
             )
@@ -204,6 +207,7 @@ class ExperiencePipeline:
         cluster_results: list[ClusterPipelineResult] = await asyncio.gather(*tasks)
         # 3. Return the top skill of each cluster
         top_skills = []
+        remaining_skills = []
         for cluster_result in cluster_results:
             # exclude the skills that have already been picked
             skills_to_consider = ExperiencePipeline._exclude_skills_from_list(top_skills, cluster_result.skills)
@@ -250,11 +254,13 @@ class ExperiencePipeline:
                                    )
 
             top_skills.extend(picker_result.picked_skills)
+            remaining_skills.extend(picker_result.remaining_skills)
             llm_stats.extend(cluster_result.llm_stats)
             llm_stats.extend(picker_result.llm_stats)
 
         return ExperiencePipelineResponse(
             top_skills=top_skills,
+            remaining_skills=remaining_skills,
             llm_stats=llm_stats,
             cluster_results=cluster_results
         )

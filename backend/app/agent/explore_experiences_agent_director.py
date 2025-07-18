@@ -17,6 +17,7 @@ from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.agent_types import AgentType
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
+from app.vector_search.esco_entities import SkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
 
 
@@ -220,11 +221,12 @@ class ExploreExperiencesAgentDirector(Agent):
             current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
 
         if current_experience.dive_in_phase == DiveInPhase.LINKING_RANKING:
+            remaining_skills: list[SkillEntity] = []
 
             if current_experience.experience.responsibilities.responsibilities:
                 # Infer the occupations for the experience and update the experience entity
                 # , then link the skills and rank them
-                agent_output = await self._link_and_rank(
+                agent_output, remaining_skills = await self._link_and_rank(
                     country_of_user=state.country_of_user,
                     current_experience=current_experience.experience)
                 await self._conversation_manager.update_history(AgentInput(
@@ -258,7 +260,9 @@ class ExploreExperiencesAgentDirector(Agent):
 
             if current_experience.dive_in_phase == DiveInPhase.PROCESSED:
                 # Add the experience to the list of explored experiences
-                state.explored_experiences.append(ExploredExperienceEntity.from_experience_entity(current_experience.experience))
+                explored_experience = ExploredExperienceEntity.from_experience_entity(current_experience.experience)
+                explored_experience.remaining_skills = remaining_skills
+                state.explored_experiences.append(explored_experience)
 
             # If the agent has finished exploring the skills, then if there are no more experiences to process,
             # then we are done
@@ -356,8 +360,8 @@ class ExploreExperiencesAgentDirector(Agent):
 
     async def _link_and_rank(self, *,
                              country_of_user: Country,
-                             current_experience: ExperienceEntity
-                             ) -> AgentOutput:
+                             current_experience: ExperienceEntity,
+                             ) -> tuple[AgentOutput, list[SkillEntity]]:
         start = time.time()
         pipeline = ExperiencePipeline(
             config=self._experience_pipeline_config,
@@ -405,4 +409,4 @@ class ExploreExperiencesAgentDirector(Agent):
             agent_response_time_in_sec=round(time.time() - start, 2),
             llm_stats=pipline_result.llm_stats
         )
-        return agent_output
+        return agent_output, pipline_result.remaining_skills
