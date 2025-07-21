@@ -1,6 +1,8 @@
 import asyncio
-import logging
 import importlib
+import logging
+from http import HTTPStatus
+from textwrap import dedent
 from typing import List
 
 from fastapi import APIRouter
@@ -8,7 +10,6 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.app_config import ApplicationConfig
 from app.users.auth import Authentication
-
 from .types import FeatureState, FeatureStatus
 
 logger = logging.getLogger(__name__)
@@ -100,8 +101,8 @@ class FeatureLoader:
             except Exception as e:
                 logger.exception(f"Error adding routes for feature {feature_state.feature_setup.class_path}: {e}")
 
-        @features_router.get("/health")
-        def _features_health_check() -> dict[str, FeatureStatus]: return self._get_features_health()
+        # add the health endpoint to the features router
+        self._add_health_endpoint(features_router)
 
     async def tear_down(self):
         # This function should not fail
@@ -113,6 +114,44 @@ class FeatureLoader:
 
     def _get_features_health(self) -> dict[str, FeatureStatus]:
         """
-        Get the health of the features.
+        Get the health of the enabled features.
         """
         return {feature_state.feature_id: feature_state.status for feature_state in self.enabled_features}
+
+    def _add_health_endpoint(self, features_router: APIRouter):
+        @features_router.get(
+            path="/health",
+            description=dedent("""
+                                Retrieve the health status of the features enabled on the application.
+                                Each feature is identified by its UUID.
+                                
+                                Returns:
+                                    dict[str, FeatureStatus]: A dictionary where the keys are feature IDs (UUIDs)
+                                
+                                Feature Status can be:
+                                - "loaded":
+                                    The feature is loaded but not initialized. This means it has been imported and is ready to be initialized.
+                                
+                                - "up": The feature is initialized and running.
+                                    This means the feature has been successfully initialized and is operational.
+                                
+                                - "failed_to_init": The feature didn't initialize.
+                                    This means there was an error during the initialization process of the feature.
+            """),
+            responses={
+                HTTPStatus.OK: {
+                    "description": "Health status of the features",
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "9394674a-d442-469c-8d05-c586b2e5b3e3": "loaded",
+                                "b5954ae5-b303-4d62-8562-e0e141ad947c": "up",
+                                "560dfd10-87d2-4df5-9029-55983796a258": "failed_to_init"
+                            }
+                        }
+                    }
+                }
+            }
+        )
+        def _features_health_check() -> dict[str, FeatureStatus]:
+            return self._get_features_health()
