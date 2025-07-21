@@ -1,5 +1,6 @@
 import logging
 from typing import Optional, Awaitable
+import json
 
 import pytest
 
@@ -20,6 +21,37 @@ class ExperiencePipelineTestCase(CompassTestCase):
     given_work_type: WorkType
     expected_top_skills: list[str]
 
+    @classmethod
+    def from_custom_dict(cls, data: dict):
+        # Custom parsing logic
+        parsed_data = {}
+        parsed_data["name"] = data['name']
+        parsed_data["given_experience_title"] = data['given_experience_title']
+        parsed_data["given_responsibilities"] = data['given_responsibilities']
+        parsed_data["given_company_name"] = data['given_company_name']
+        parsed_data["given_country_of_interest"] = Country(data['given_country_of_interest'])
+        parsed_data["given_work_type"] = WorkType(data['given_work_type'])
+        parsed_data["expected_top_skills"] = data['expected_top_skills']
+        print(parsed_data)
+        return cls.model_validate(parsed_data)
+
+def get_test_cases_from_jsonl(jsonl_path):
+    all_test_cases = []
+    with open(jsonl_path, 'rt') as json_file:
+        for line in json_file:
+            test_case = json.loads(line)
+            all_test_cases.append(
+                ExperiencePipelineTestCase(
+                    name = test_case['name'],
+                    given_experience_title = test_case['given_experience_title'],
+                    given_responsibilities = test_case['given_responsibilities'],
+                    given_company_name = test_case['given_company_name'],
+                    given_country_of_interest = Country(test_case['given_country_of_interest']),
+                    given_work_type = WorkType(test_case['given_work_type']),
+                    expected_top_skills = test_case['expected_top_skills']
+                    )
+                )
+    return all_test_cases
 
 test_cases = [
     ExperiencePipelineTestCase(
@@ -140,14 +172,14 @@ test_cases = [
         expected_top_skills=['evaluate garment quality']
     ),
     ExperiencePipelineTestCase(
-        name="Icatus I34_4",
-        given_experience_title="I clean my shoes",
-        given_company_name="Home",
-        given_responsibilities=['Repair and restore damaged clothing and footwear to a presentable condition.'],
-        given_country_of_interest=Country.SOUTH_AFRICA,
-        given_work_type=WorkType.UNSEEN_UNPAID,
-        expected_top_skills=['manufacture wearing apparel products']
-    ),
+            name="Icatus I34_4",
+            given_experience_title="I clean my shoes",
+            given_company_name="Home",
+            given_responsibilities=['Repair and restore damaged clothing and footwear to a presentable condition.'],
+            given_country_of_interest=Country.SOUTH_AFRICA,
+            given_work_type=WorkType.UNSEEN_UNPAID,
+            expected_top_skills=['manufacture wearing apparel products']
+        ),
     ExperiencePipelineTestCase(
         name="Icatus I32_1",
         given_experience_title="I clean the windows ",
