@@ -104,9 +104,9 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({ showInactiveSessionAlert =
     setMessages((prevMessages) => [...prevMessages, message]);
   }, []);
 
-  const removeMessageFromChat = (messageId: string) => {
+  const removeMessageFromChat = useCallback((messageId: string) => {
     setMessages((prevMessages) => prevMessages.filter((msg) => msg.message_id !== messageId));
-  };
+  }, []);
 
   const { showSkillsRanking } = useSkillsRanking(addMessageToChat, removeMessageFromChat);
 
@@ -262,7 +262,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({ showInactiveSessionAlert =
         setAiIsTyping(false);
       }
     },
-    [addMessageToChat, exploredExperiences, fetchExperiences, removeMessageFromChat, showSkillsRanking]
+    [addMessageToChat, exploredExperiences, fetchExperiences, , removeMessageFromChat, showSkillsRanking]
   );
 
   const initializeChat = useCallback(

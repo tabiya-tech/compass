@@ -82,7 +82,7 @@ const ChatList: React.FC<ChatListProps> = ({ messages }) => {
               variants={messageVariants}
               disablePadding={true}
               transition={{ duration: 0.3 }}
-              sx={{ width: "100%", paddingY: theme.tabiyaSpacing.xs, paddingX: 0, border: "2px solid red" }}
+              sx={{ width: "100%", paddingY: theme.tabiyaSpacing.xs, paddingX: 0 }}
             >
               {message.component(message.payload)}
             </ListItem>

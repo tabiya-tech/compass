@@ -42,9 +42,9 @@ type CharState = {
 };
 
 const pulse = keyframes`
-  0% { border-color: transparent; }
-  50% { border-color: limegreen; }
-  100% { border-color: transparent; }
+    0% { border-color: transparent; }
+    50% { border-color: limegreen; }
+    100% { border-color: transparent; }
 `;
 
 const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
@@ -96,6 +96,18 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
   useEffect(() => {
     resetPuzzle();
   }, [resetPuzzle]);
+
+  const isCharSolved = (c: CharState) => {
+    if (c.char === " ") return true;
+    const normalized = Math.abs(c.angle % 360);
+    return normalized < tolerance || Math.abs(normalized - 360) < tolerance;
+  };
+
+  const getBorderColor = (char: CharState, selected: boolean): string => {
+    if (char.char === " ") return "transparent";
+    if (isCharSolved(char)) return theme.palette.primary.main;
+    return selected ? theme.palette.error.main : theme.palette.error.light;
+  };
 
   const rotateCurrent = (delta: number) => {
     if (disabled || currentIndex === null || characters[currentIndex].char === " ") return;
@@ -150,19 +162,6 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
     });
   };
 
-  const isCharSolved = (c: CharState) => {
-    if (c.char === " ") return true;
-    const normalized = Math.abs(c.angle % 360);
-    return normalized < tolerance || Math.abs(normalized - 360) < tolerance;
-  };
-
-  const getBorderColor = (char: CharState): string => {
-    if (char.char === " ") return "transparent";
-    if (!char.checked) return theme.palette.divider;
-    if (isCharSolved(char)) return theme.palette.primary.main;
-    return theme.palette.error.main;
-  };
-
   return (
     <Paper elevation={1} sx={{ p: 4, borderRadius: 3, maxWidth: 600, mx: "auto" }}>
       <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
@@ -173,10 +172,10 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
         <Box
           display="flex"
           gap={1.5}
+          padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
           justifyContent="center"
           flexWrap="wrap"
           sx={{
-            p: 2,
             borderRadius: 2,
             backgroundColor: "background.paper",
             border: (theme) => `1px solid ${theme.palette.divider}`,
@@ -184,7 +183,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
         >
           {characters.map((charState, index) => {
             const selected = index === currentIndex;
-            const borderColor = getBorderColor(charState);
+            const borderColor = getBorderColor(charState, selected);
             const solved = isCharSolved(charState);
 
             return (
@@ -206,7 +205,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
                   border: `2px solid ${borderColor}`,
                   backgroundColor:
                     selected && !disabled
-                      ? theme.palette.action.hover
+                      ? theme.palette.primary.main
                       : "transparent",
                   transition: "border-color 0.2s, background-color 0.2s",
                   cursor:
@@ -224,7 +223,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
                     transform: `rotate(${charState.angle}deg)`,
                     transition: "transform 150ms ease-out",
                     color: selected
-                      ? theme.palette.primary.dark
+                      ? theme.palette.common.black
                       : theme.palette.text.secondary,
                   }}
                 >
