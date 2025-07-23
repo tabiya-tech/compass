@@ -41,7 +41,7 @@ export enum SkillsRankingExperimentGroups {
 export enum SkillsRankingPhase {
   INITIAL = "INITIAL",
   BRIEFING = "BRIEFING",
-  EFFORT = "EFFORT",
+  PROOF_OF_VALUE = "PROOF_OF_VALUE",
   DISCLOSURE = "DISCLOSURE",
   PERCEIVED_RANK = "PERCEIVED_RANK",
   RETYPED_RANK = "RETYPED_RANK",
@@ -87,8 +87,26 @@ export interface SkillsRankingState {
    */
   cancelled_after?: string | null;
   /**
-   * Represents the effort spent by the user before they cancelled the skills ranking process.
-   * Can be time in ms or a string indicating the effort type (e.g., "typed 4 characters").
+   * Represents the time in ms spent by the user before they cancelled the skills ranking process.
+   */
+  succeeded_after?: string | null;
+  /**
+   * Represents the time in ms spent by the user before they finishing the skills ranking process.
+   */
+  puzzles_solved?:number,
+  /**
+   * The number of puzzles the user solved for the proof_of_value task during the skills ranking process.
+   *     This is only relevant for the effort-based proof_of_value task.
+   */
+  correct_rotations?:number,
+  /**
+   * The number of characters the user rotated correctly for the proof_of_value task during the skills ranking process.
+   *     This is only relevant for the time-based proof_of_value task.
+   */
+  clicks_count?:number,
+  /**
+   * The number of clicks the user made during the proof_of_value task. character selection, rotation [clockwise/counter-clockwise]
+   *     This is only relevant for the time-based proof_of_value task.
    */
   perceived_rank_percentile?: number | null;
   /**

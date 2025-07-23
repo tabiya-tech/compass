@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useContext, useEffect } from "react";
+import React, { useState, useMemo, useContext, useEffect, useRef } from "react";
 import { Box, Slider, useTheme } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress"
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -21,6 +22,7 @@ export const DATA_TEST_ID = {
   SKILLS_RANKING_RETYPED_RANK_CONTAINER: `skills-ranking-retyped-rank-container-${uniqueId}`,
   SKILLS_RANKING_RETYPED_RANK_SLIDER: `skills-ranking-retyped-rank-slider-${uniqueId}`,
   SKILLS_RANKING_RETYPED_RANK_SUBMIT_BUTTON: `skills-ranking-retyped-rank-submit-button-${uniqueId}`,
+  SKILLS_RANKING_RETYPED_RANK_PROGRESS_ICON: `skills-ranking-retyped-rank-progres-icon-${uniqueId}`
 };
 
 export interface SkillsRankingRetypedRankProps {
@@ -39,22 +41,24 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
   ), [])
   const theme = useTheme();
   const [value, setValue] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [startedEditing, setStartedEditing] = useState(false);
   const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
   const { enqueueSnackbar } = useSnackbar();
   const isOnline = useContext(IsOnlineContext);
   const [submitted, setSubmitted] = useState(false);
+  const hasSubmittedRef = useRef(false)
 
   const handleUpdateState = async () => {
     if (skillsRankingState.phase === SkillsRankingPhase.RETYPED_RANK) {
       if (!activeSessionId) {
         throw new SkillsRankingError("Active session ID is not available.");
       }
+      setIsSubmitting(true)
       try {
         const newSkillsRankingState = await SkillsRankingService.getInstance().updateSkillsRankingState(
           activeSessionId,
           SkillsRankingPhase.COMPLETED,
-          undefined,
           undefined,
           value
         );
@@ -65,6 +69,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           variant: "error",
         });
       } finally {
+        setIsSubmitting(false)
         setSubmitted(true);
       }
     }
@@ -87,10 +92,23 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
     }
   }, [skillsRankingState])
 
+  useEffect(() => {
+    if (
+      (skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
+        skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4) &&
+      !hasSubmittedRef.current
+    ) {
+      hasSubmittedRef.current = true;
+      handleUpdateState().then()
+    }
+  }, [skillsRankingState, onFinish, activeSessionId, value, enqueueSnackbar]);
+
   if (skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 || skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4)
   {
     return null; // Skip this component for GROUP_2 and GROUP_4
   }
+
+  console.log(skillsRankingState)
 
   return (
     <MessageContainer
@@ -120,11 +138,24 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
             ]}
             data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SLIDER}
             sx={{
+              height: 12,
+              '& .MuiSlider-track': {
+                backgroundColor: theme.palette.success.main,
+                border: 'none',
+              },
+              '& .MuiSlider-rail': {
+                backgroundColor: theme.palette.grey[200],
+                opacity: 1,
+              },
+              '& .MuiSlider-thumb': {
+                boxShadow: 'none',
+              },
               '& .MuiSlider-valueLabel': {
-                backgroundColor: theme.palette.primary.main,
+                backgroundColor: theme.palette.success.main,
                 color: theme.palette.common.black,
                 fontWeight: 'bold',
-                borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.sm)
+                borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                top: -30,
               },
             }}
           />
@@ -132,8 +163,13 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           <Box mt={theme.spacing(2)} textAlign="right">
             <PrimaryButton
               onClick={handleSubmit}
-              disabled={!startedEditing || skillsRankingState.phase !== SkillsRankingPhase.RETYPED_RANK || submitted || !isOnline}
+              disabled={isSubmitting || !startedEditing || skillsRankingState.phase !== SkillsRankingPhase.RETYPED_RANK || submitted || !isOnline}
               data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SUBMIT_BUTTON}
+              startIcon={isSubmitting && <CircularProgress
+                  sx={{ color: theme.palette.tabiyaBlue.main, marginRight: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}
+                  size={theme.spacing(3)}
+                  data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_PROGRESS_ICON}
+                />}
             >
               Submit
             </PrimaryButton>

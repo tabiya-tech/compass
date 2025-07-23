@@ -8,7 +8,7 @@ import SkillsRankingJobMarketDisclosure, { SKILLS_RANKING_JOB_MARKET_DISCLOSURE_
 import SkillsRankingPrompt, { SKILLS_RANKING_PROMPT_MESSAGE_ID, SkillsRankingPromptProps } from "../components/skillsRankingPrompt/SkillsRankingPrompt";
 import SkillsRankingRetypedRank, { SKILLS_RANKING_RETYPED_RANK_MESSAGE_ID, SkillsRankingRetypedRankProps } from "../components/skillsRankingRetypedRank/SkillsRankingRetypedRank";
 import SkillsRankingPerceivedRank, { SKILLS_RANKING_PERCEIVED_RANK_MESSAGE_ID, SkillsRankingPerceivedRankProps } from "../components/skillsRankingPerceivedRank/SkillsRankingPerceivedRank";
-import SkillsRankingEffort, { SKILLS_RANKING_EFFORT_MESSAGE_ID, SkillsRankingEffortProps } from "../components/skillsRankingEffort/SkillsRankingEffort";
+import SkillsRankingProofOfValue, { SKILLS_RANKING_EFFORT_MESSAGE_ID, SkillsRankingEffortProps } from "../components/skillsRankingEffort/SkillsRankingProofOfValue";
 import { SkillsRankingState } from "../types";
 
 export const createBriefingMessage = (
@@ -106,5 +106,5 @@ export const createEffortMessage = (
     onFinish,
   },
   sender: ConversationMessageSender.COMPASS,
-  component: (props: SkillsRankingEffortProps) => React.createElement(SkillsRankingEffort, props),
+  component: (props: SkillsRankingEffortProps) => React.createElement(SkillsRankingProofOfValue, props),
 });

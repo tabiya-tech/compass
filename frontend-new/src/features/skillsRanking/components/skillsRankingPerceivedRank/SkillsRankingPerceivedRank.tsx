@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useContext, useEffect } from "react";
 import { Box, Slider, useTheme } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -17,6 +18,7 @@ export const DATA_TEST_ID = {
   SKILLS_RANKING_PERCEIVED_RANK_CONTAINER: `skills-ranking-perceived-rank-container-${uniqueId}`,
   SKILLS_RANKING_PERCEIVED_RANK_SLIDER: `skills-ranking-perceived-rank-slider-${uniqueId}`,
   SKILLS_RANKING_PERCEIVED_RANK_SUBMIT_BUTTON: `skills-ranking-perceived-rank-submit-button-${uniqueId}`,
+  SKILLS_RANKING_PERCEIVED_RANK_PROGRESS_ICON: `skills-ranking-perceived-rank-progress-icon-${uniqueId}`
 };
 
 export interface SkillsRankingPerceivedRankProps {
@@ -36,6 +38,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
   const theme = useTheme();
   const [value, setValue] = useState(0);
   const [startedEditing, setStartedEditing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
   const { enqueueSnackbar } = useSnackbar();
   const isOnline = useContext(IsOnlineContext);
@@ -46,11 +49,11 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
       if (!activeSessionId) {
         throw new SkillsRankingError("Active session ID is not available.");
       }
+      setIsSubmitting(true)
       try {
         const newSkillsRankingState = await SkillsRankingService.getInstance().updateSkillsRankingState(
           activeSessionId,
           SkillsRankingPhase.RETYPED_RANK,
-          undefined,
           value,
         );
         onFinish(newSkillsRankingState);
@@ -60,6 +63,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
           variant: "error",
         });
       } finally {
+        setIsSubmitting(false);
         setSubmitted(true);
       }
     }
@@ -108,11 +112,24 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
             ]}
             data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SLIDER}
             sx={{
+              height: 12,
+              '& .MuiSlider-track': {
+                backgroundColor: theme.palette.success.main,
+                border: 'none',
+              },
+              '& .MuiSlider-rail': {
+                backgroundColor: theme.palette.grey[200],
+                opacity: 1,
+              },
+              '& .MuiSlider-thumb': {
+                boxShadow: 'none',
+              },
               '& .MuiSlider-valueLabel': {
-                backgroundColor: theme.palette.primary.main,
+                backgroundColor: theme.palette.success.main,
                 color: theme.palette.common.black,
                 fontWeight: 'bold',
-                borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.sm)
+                borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                top: -30,
               },
             }}
           />
@@ -120,8 +137,13 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
           <Box mt={theme.spacing(2)} textAlign="right">
             <PrimaryButton
               onClick={handleSubmit}
-              disabled={!startedEditing || skillsRankingState.phase !== SkillsRankingPhase.PERCEIVED_RANK || !isOnline || submitted}
+              disabled={isSubmitting || !startedEditing || skillsRankingState.phase !== SkillsRankingPhase.PERCEIVED_RANK || !isOnline || submitted}
               data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SUBMIT_BUTTON}
+              startIcon={isSubmitting && <CircularProgress
+                sx={{ color: theme.palette.tabiyaBlue.main, marginRight: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}
+                size={theme.spacing(3)}
+                data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_PROGRESS_ICON}
+              /> }
             >
               Submit
             </PrimaryButton>

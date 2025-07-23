@@ -23,10 +23,10 @@ const TYPING_MESSAGE_TIMEOUT = 5000
 
 const phaseToMessageFactory = {
   [SkillsRankingPhase.BRIEFING]: createBriefingMessage,
-  [SkillsRankingPhase.EFFORT]: createEffortMessage,
+  [SkillsRankingPhase.PROOF_OF_VALUE]: createEffortMessage,
   [SkillsRankingPhase.DISCLOSURE]: (state: SkillsRankingState, onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>) => {
-    const first = createJobSeekerDisclosureMessage(state, onFinish);
-    const second = createJobMarketDisclosureMessage(state, onFinish);
+    const first = createJobMarketDisclosureMessage(state, onFinish);
+    const second = createJobSeekerDisclosureMessage(state, onFinish);
     return [first, second];
   },
   [SkillsRankingPhase.PERCEIVED_RANK]: createPerceivedRankMessage,
@@ -104,7 +104,8 @@ export const useSkillsRanking = (
     if (!state) {
       removeMessage(typingMessage.message_id);
       onFinishFlow();
-      throw new SkillsRankingError("Skills ranking state is still null after initialization.");
+      console.error(new SkillsRankingError("Skills ranking state is still null after initialization."));
+      return;
     }
 
     const path = getPathToPhase(state.phase);

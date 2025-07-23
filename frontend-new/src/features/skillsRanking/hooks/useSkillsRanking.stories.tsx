@@ -7,11 +7,12 @@ import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState }
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { action } from "@storybook/addon-actions";
 import { SkillsRankingService } from "../skillsRankingService/skillsRankingService";
+import { SkillsRankingMetrics } from "../skillsRankingService/types";
 
 const PHASES = [
   SkillsRankingPhase.INITIAL,
   SkillsRankingPhase.BRIEFING,
-  SkillsRankingPhase.EFFORT,
+  SkillsRankingPhase.PROOF_OF_VALUE,
   SkillsRankingPhase.DISCLOSURE,
   SkillsRankingPhase.PERCEIVED_RANK,
   SkillsRankingPhase.RETYPED_RANK,
@@ -35,18 +36,22 @@ const setupMocks = (experimentGroup: SkillsRankingExperimentGroups) => {
   SkillsRankingService.getInstance().updateSkillsRankingState = async (
     _sessionId: number,
     phase: SkillsRankingPhase,
-    cancelled_after?: string,
     perceived_rank_percentile?: number,
-    retyped_rank_percentile?: number
+    retyped_rank_percentile?: number,
+    metrics?: SkillsRankingMetrics
   ) => {
     // Find the next phase in the flow
     currentPhaseIndex = PHASES.indexOf(phase) + 1;
     const nextPhase = PHASES[currentPhaseIndex] ?? SkillsRankingPhase.COMPLETED;
     const newState = getRandomSkillsRankingState(nextPhase, experimentGroup);
     // Optionally set the extra fields if provided
-    if (cancelled_after !== undefined) newState.cancelled_after = cancelled_after;
-    if (perceived_rank_percentile !== undefined) newState.perceived_rank_percentile = perceived_rank_percentile;
-    if (retyped_rank_percentile !== undefined) newState.retyped_rank_percentile = retyped_rank_percentile;
+    if (metrics?.cancelled_after !== undefined) newState.cancelled_after = metrics?.cancelled_after ?? null;
+    if (metrics?.succeeded_after !== undefined) newState.succeeded_after = metrics?.succeeded_after ?? null;
+    if (metrics?.puzzles_solved !== undefined) newState.puzzles_solved = metrics?.puzzles_solved ?? null;
+    if (metrics?.correct_rotations !== undefined) newState.correct_rotations = metrics?.correct_rotations ?? null;
+    if (metrics?.clicks_count !== undefined) newState.clicks_count = metrics?.clicks_count ?? null;
+    if (perceived_rank_percentile !== undefined) newState.perceived_rank_percentile = perceived_rank_percentile ?? null;
+    if (retyped_rank_percentile !== undefined) newState.retyped_rank_percentile = retyped_rank_percentile ?? null;
     return newState;
   };
 };

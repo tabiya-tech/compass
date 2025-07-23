@@ -1,5 +1,6 @@
 import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingScore, SkillsRankingState } from "../types";
 import { getRandomString } from "src/_test_utilities/specialCharacters";
+import { jobSeekerComparisonLabels } from "../components/skillsRankingDisclosure/types";
 
 export const getRandomSkillsRankingState = (phase?: SkillsRankingPhase, experimentGroup?: SkillsRankingExperimentGroups) : SkillsRankingState => {
   return {
@@ -8,6 +9,10 @@ export const getRandomSkillsRankingState = (phase?: SkillsRankingPhase, experime
     score: getRandomScore(),
     experiment_group: experimentGroup ?? getRandomExperimentGroup(),
     cancelled_after: phase === SkillsRankingPhase.CANCELLED ? getRandomString(10) : null, // Random string or null
+    succeeded_after: phase === SkillsRankingPhase.CANCELLED ? getRandomString(10) : null,
+    puzzles_solved: 0,
+    correct_rotations: 0,
+    clicks_count:0,
     perceived_rank_percentile: Math.random() < 0.5 ? Math.floor(Math.random() * 100) + 1 : null, // Random percentile or null
     retyped_rank_percentile: Math.random() < 0.5 ? Math.floor(Math.random() * 100) + 1 : null, // Random percentile or null
     started_at: new Date().toISOString(), // Current time in ISO format
@@ -36,8 +41,7 @@ export const getRandomScore = () : SkillsRankingScore => {
 }
 
 export const getRandomComparisonLabel = (): string => {
-  const labels = ["LOWEST", "SECOND_LOWEST", "MIDDLE", "SECOND_HIGHEST", "HIGHEST"];
-  return labels[Math.floor(Math.random() * labels.length)];
+  return jobSeekerComparisonLabels[Math.floor(Math.random() * jobSeekerComparisonLabels.length)];
 }
 
 export function getRandomSessionID(): number {

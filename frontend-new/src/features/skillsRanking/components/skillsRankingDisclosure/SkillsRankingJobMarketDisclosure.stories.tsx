@@ -25,7 +25,7 @@ const meta: Meta<StoryArgs> = {
   render: (args) => {
     const state = getRandomSkillsRankingState();
     state.experiment_group = args.experimentGroup;
-    state.phase = SkillsRankingPhase.EFFORT;
+    state.phase = SkillsRankingPhase.PROOF_OF_VALUE;
 
     return <SkillsRankingJobMarketDisclosure {...args} skillsRankingState={state} />;
   },

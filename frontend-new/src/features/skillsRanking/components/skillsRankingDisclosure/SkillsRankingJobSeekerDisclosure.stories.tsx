@@ -1,9 +1,10 @@
 import { Meta, StoryObj } from "@storybook/react";
-import SkillsRankingJobSeekerDisclosure from "src/features/skillsRanking/components/skillsRankingDisclosure/SkillsRankingJobSeekerDisclosure";
+import SkillsRankingJobSeekerDisclosure
+  from "src/features/skillsRanking/components/skillsRankingDisclosure/SkillsRankingJobSeekerDisclosure";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
 import UserPreferencesStateService from "../../../../userPreferences/UserPreferencesStateService";
 import { SkillsRankingService } from "../../skillsRankingService/skillsRankingService";
-import { SkillsRankingPhase, SkillsRankingState } from "../../types";
+import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState } from "../../types";
 import { Box } from "@mui/material";
 import { action } from "@storybook/addon-actions";
 
@@ -59,6 +60,24 @@ export default meta;
 
 type Story = StoryObj<typeof SkillsRankingJobSeekerDisclosure>;
 
-export const Shown: Story = {
-  args: {},
+export const ShownForDisclosureGroup: Story = {
+  args: {
+    skillsRankingState: (() => {
+      let skillsRankingState = getRandomSkillsRankingState();
+      skillsRankingState.phase = SkillsRankingPhase.DISCLOSURE;
+      skillsRankingState.experiment_group = SkillsRankingExperimentGroups.GROUP_1
+      return skillsRankingState;
+    })()
+  },
 };
+
+export const ShownForNonDisclosureGroup: Story = {
+  args:{
+    skillsRankingState: (() => {
+      let skillsRankingState = getRandomSkillsRankingState();
+      skillsRankingState.phase = SkillsRankingPhase.DISCLOSURE;
+      skillsRankingState.experiment_group = SkillsRankingExperimentGroups.GROUP_2
+      return skillsRankingState;
+    })()
+  }
+}

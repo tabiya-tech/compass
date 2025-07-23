@@ -35,15 +35,9 @@ const meta: Meta<StoryArgs> = {
     skillsRankingState: (() => {
       let skillsRankingState = getRandomSkillsRankingState();
       skillsRankingState.phase = SkillsRankingPhase.RETYPED_RANK;
+      skillsRankingState.experiment_group = SkillsRankingExperimentGroups.GROUP_1
       return skillsRankingState;
     })()
-  },
-  render: (args) => {
-    const state = getRandomSkillsRankingState();
-    state.experiment_group = args.experimentGroup;
-    state.phase = SkillsRankingPhase.EFFORT;
-
-    return <SkillsRankingRetypedRank {...args} skillsRankingState={state} />;
   },
   decorators: [
     (Story) => {
@@ -82,3 +76,14 @@ type Story = StoryObj<typeof SkillsRankingRetypedRank>;
 export const Shown: Story = {
   args: {},
 };
+
+export const ShownDisabledButWithData: Story = {
+  args: {
+    skillsRankingState: (() => {
+      let skillsRankingState = getRandomSkillsRankingState();
+      skillsRankingState.experiment_group = SkillsRankingExperimentGroups.GROUP_1
+      skillsRankingState.phase = SkillsRankingPhase.COMPLETED;
+      return skillsRankingState;
+    })()
+  }
+}

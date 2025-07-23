@@ -1,22 +1,24 @@
 import React, { useMemo, useContext, useState } from "react";
 
 import { Box, useTheme } from "@mui/material";
+import CircularProgress from '@mui/material/CircularProgress';
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import UserPreferencesStateService from "../../../../userPreferences/UserPreferencesStateService";
-import { SkillsRankingError } from "../../errors";
-import { useSnackbar } from "../../../../theme/SnackbarProvider/SnackbarProvider";
-import { IsOnlineContext } from "../../../../app/isOnlineProvider/IsOnlineProvider";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { SkillsRankingError } from "src/features/skillsRanking/errors";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 const uniqueId = "0e95404a-2044-4634-a6e8-29cc7b2d754e";
 
 export const DATA_TEST_ID = {
   SKILLS_RANKING_BRIEFING_CONTAINER: `skills-ranking-briefing-container-${uniqueId}`,
   SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON: `skills-ranking-briefing-continue-button-${uniqueId}`,
+  SKILLS_RANKING_BRIEFING_PROGRESS_ICON: `skills-ranking-briefing-progress-icon-${uniqueId}`
 };
 
 export const SKILLS_RANKING_BRIEFING_MESSAGE_ID = `skills-ranking-briefing-message-${uniqueId}`;
@@ -35,21 +37,22 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
     SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl
   ), [])
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
   const { enqueueSnackbar } = useSnackbar();
   const isOnline = useContext(IsOnlineContext);
-
-  console.log(JSON.stringify(skillsRankingState, null, 2), ": in brifing")
 
   const handleUpdateState = async () => {
     if (skillsRankingState.phase === SkillsRankingPhase.BRIEFING) {
       if (!activeSessionId) {
         throw new SkillsRankingError("Active session ID is not available.");
       }
+
+      setIsSubmitting(true)
       try {
         const newSkillsRankingState = await SkillsRankingService.getInstance().updateSkillsRankingState(
           activeSessionId,
-          SkillsRankingPhase.EFFORT
+          SkillsRankingPhase.PROOF_OF_VALUE
         );
         onFinish(newSkillsRankingState);
       } catch (error) {
@@ -59,6 +62,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
         });
       } finally {
         setSubmitted(true);
+        setIsSubmitting(false)
       }
     }
   }
@@ -68,7 +72,11 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       <ChatBubble message={`I will now calculate how many percent of jobs advertised on ${jobPlatformUrl} you have the required & most relevant skills for, and how you compare to other job seekers. This will take some time -- if you are not interested you can click 'cancel' in the next message, while I calculate. When you are ready please click continue.`}
                   sender={ConversationMessageSender.COMPASS}>
         <Box display="flex" flexDirection={"row"} justifyContent="flex-end" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-          <PrimaryButton onClick={handleUpdateState} disabled={skillsRankingState.phase !== SkillsRankingPhase.BRIEFING || !isOnline || submitted}>
+          <PrimaryButton onClick={handleUpdateState} disabled={skillsRankingState.phase !== SkillsRankingPhase.BRIEFING || !isOnline || submitted || isSubmitting} startIcon={isSubmitting && <CircularProgress
+            sx={{ color: theme.palette.tabiyaBlue.main, marginRight: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}
+            size={theme.spacing(3)}
+            data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_PROGRESS_ICON}
+          /> }>
             Continue
           </PrimaryButton>
         </Box>

@@ -1,7 +1,5 @@
 import { Meta, StoryObj } from "@storybook/react";
-import SkillsRankingEffort, {
-  SkillsRankingEffortState,
-} from "src/features/skillsRanking/components/skillsRankingEffort/SkillsRankingEffort";
+import SkillsRankingProofOfValue from "src/features/skillsRanking/components/skillsRankingEffort/SkillsRankingProofOfValue";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
 import { action } from '@storybook/addon-actions';
 import {
@@ -19,13 +17,13 @@ const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
   </Box>
 );
 
-type StoryArgs = React.ComponentProps<typeof SkillsRankingEffort> & {
+type StoryArgs = React.ComponentProps<typeof SkillsRankingProofOfValue> & {
   experimentGroup: SkillsRankingExperimentGroups;
 };
 
 const meta: Meta<StoryArgs> = {
-  title: "Features/SkillsRanking/SkillsRankingEffort",
-  component: SkillsRankingEffort,
+  title: "Features/SkillsRanking/SkillsRankingProofOfValue",
+  component: SkillsRankingProofOfValue,
   tags: ["autodocs"],
   argTypes: {
     onFinish: { action: "onFinish" },
@@ -42,9 +40,9 @@ const meta: Meta<StoryArgs> = {
   render: (args) => {
     const state = getRandomSkillsRankingState();
     state.experiment_group = args.experimentGroup;
-    state.phase = SkillsRankingPhase.EFFORT;
+    state.phase = SkillsRankingPhase.PROOF_OF_VALUE;
 
-    return <SkillsRankingEffort {...args} skillsRankingState={state} />;
+    return <SkillsRankingProofOfValue {...args} skillsRankingState={state} />;
   },
   decorators: [
     (Story) => {

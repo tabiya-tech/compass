@@ -40,6 +40,11 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobMarket
     }
   }, [skillsRankingState.score.jobs_matching_rank, skillsRankingState.experiment_group, jobPlatformUrl]);
 
+  if (skillsRankingState.experiment_group == SkillsRankingExperimentGroups.GROUP_2 || skillsRankingState.experiment_group == SkillsRankingExperimentGroups.GROUP_3)
+  {
+    return null;
+  }
+
   return (
     <MessageContainer origin={ConversationMessageSender.COMPASS} data-testid={DATA_TEST_ID.SKILLS_RANKING_JOB_MARKET_DISCLOSURE_CONTAINER}>
       <ChatBubble message={message} sender={ConversationMessageSender.COMPASS}>

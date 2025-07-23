@@ -1,17 +1,38 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Box, Typography, useTheme, Paper } from "@mui/material";
+import { Box, Typography, useTheme, Paper, keyframes } from "@mui/material";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import RotateRightIcon from "@mui/icons-material/RotateRight";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
+export interface RotateToSolvePuzzleMetricsReport {
+  puzzles_solved: number;
+  correct_rotations: number;
+  clicks_count: number;
+  time_spent_ms: number;
+}
+
 export interface RotateToSolveTaskProps {
   onSuccess: () => void;
+  onReport?: (metrics: RotateToSolvePuzzleMetricsReport) => void;
   tolerance?: number;
   stringPool?: string[];
   rotationStep?: number;
+  puzzles?: number;
+  disabled?: boolean;
 }
 
-const DEFAULT_STRINGS: string[] = ["COMPASS IS AWESOME"];
+const DEFAULT_STRINGS: string[] = [
+  "GJRLK",
+  "FQZNC",
+  "EKJGR",
+  "CJFLQ",
+  "GRKLE",
+  "KZFGC",
+  "JRNFQ",
+  "QRKLE",
+  "ZLCGF",
+  "KFQJC"
+];
 
 type CharState = {
   char: string;
@@ -20,14 +41,30 @@ type CharState = {
   checked: boolean;
 };
 
+const pulse = keyframes`
+  0% { border-color: transparent; }
+  50% { border-color: limegreen; }
+  100% { border-color: transparent; }
+`;
+
 const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
-                                                               onSuccess,
-                                                               tolerance = 45,
-                                                               stringPool = DEFAULT_STRINGS,
-                                                               rotationStep = 45,
-                                                             }) => {
+  onSuccess,
+  onReport,
+  tolerance = 45,
+  stringPool = DEFAULT_STRINGS,
+  rotationStep = 45,
+  puzzles = 1,
+  disabled = false,
+}) => {
   const [characters, setCharacters] = useState<CharState[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+  const [completedCount, setCompletedCount] = useState(0);
+  const [isCelebrating, setIsCelebrating] = useState(false);
+
+  const [clicksCount, setClicksCount] = useState(0);
+  const [correctRotations, setCorrectRotations] = useState(0);
+  const [startTime, setStartTime] = useState<number | null>(null);
+
   const theme = useTheme();
 
   const generateChallenge = useCallback(() => {
@@ -38,7 +75,9 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
       }
       let angle = 0;
       while (angle % 360 === 0) {
-        angle = rotationStep * Math.floor(Math.random() * (180 / rotationStep) - (90 / rotationStep));
+        angle =
+          rotationStep *
+          Math.floor(Math.random() * (180 / rotationStep) - 90 / rotationStep);
       }
       return {
         char,
@@ -49,27 +88,62 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
     });
   }, [stringPool, rotationStep]);
 
-  useEffect(() => {
+  const resetPuzzle = useCallback(() => {
     setCharacters(generateChallenge());
     setCurrentIndex(null);
   }, [generateChallenge]);
 
+  useEffect(() => {
+    resetPuzzle();
+  }, [resetPuzzle]);
+
   const rotateCurrent = (delta: number) => {
-    if (currentIndex === null || characters[currentIndex].char === " ") return;
+    if (disabled || currentIndex === null || characters[currentIndex].char === " ") return;
+
+    setClicksCount((c) => c + 1);
     setCharacters((prev) => {
       const updated = prev.map((c, i) =>
-        i === currentIndex ? { ...c, angle: c.angle + delta, touched: true, checked: true } : c
+        i === currentIndex
+          ? { ...c, angle: c.angle + delta, touched: true, checked: true }
+          : c
       );
 
-      const allCheckedAndCorrect = updated.every(
+      const allCorrect = updated.every(
         (c) =>
           c.char === " " ||
           (c.checked &&
-            (Math.abs(c.angle % 360) < tolerance || Math.abs((c.angle % 360) - 360) < tolerance))
+            (Math.abs(c.angle % 360) < tolerance ||
+              Math.abs((c.angle % 360) - 360) < tolerance))
       );
 
-      if (allCheckedAndCorrect) {
-        onSuccess();
+      if (allCorrect) {
+        setIsCelebrating(true);
+
+        const now = performance.now();
+        const report: RotateToSolvePuzzleMetricsReport = {
+          puzzles_solved: completedCount + 1,
+          correct_rotations: correctRotations + updated.filter((c) => c.char !== " " && isCharSolved(c)).length,
+          clicks_count: clicksCount + 1,
+          time_spent_ms: startTime ? Math.round(now - startTime) : 0,
+        };
+
+        onReport?.(report);
+
+        setTimeout(() => {
+          setIsCelebrating(false);
+          setCorrectRotations(report.correct_rotations);
+          setClicksCount(report.clicks_count);
+
+          setCompletedCount((count) => {
+            const next = count + 1;
+            if (next >= puzzles) {
+              onSuccess();
+            } else {
+              resetPuzzle();
+            }
+            return next;
+          });
+        }, 800); // pulse duration
       }
 
       return updated;
@@ -90,7 +164,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4, borderRadius: 3, maxWidth: 600, mx: "auto" }}>
+    <Paper elevation={1} sx={{ p: 4, borderRadius: 3, maxWidth: 600, mx: "auto" }}>
       <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
         <Typography variant="body1" color="text.secondary" textAlign="center">
           Rotate each character until it’s upright
@@ -111,11 +185,17 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           {characters.map((charState, index) => {
             const selected = index === currentIndex;
             const borderColor = getBorderColor(charState);
+            const solved = isCharSolved(charState);
 
             return (
               <Box
-                key={charState.char+index}
-                onClick={() => charState.char !== " " && setCurrentIndex(index)}
+                key={charState.char + index}
+                onClick={() => {
+                  if (disabled || charState.char === " ") return;
+                  if (startTime === null) setStartTime(performance.now());
+                  setCurrentIndex(index);
+                  setClicksCount((c) => c + 1);
+                }}
                 sx={{
                   width: 36,
                   height: 48,
@@ -124,9 +204,17 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
                   justifyContent: "center",
                   borderRadius: 1,
                   border: `2px solid ${borderColor}`,
-                  backgroundColor: selected ? theme.palette.action.hover : "transparent",
+                  backgroundColor:
+                    selected && !disabled
+                      ? theme.palette.action.hover
+                      : "transparent",
                   transition: "border-color 0.2s, background-color 0.2s",
-                  cursor: charState.char === " " ? "default" : "pointer",
+                  cursor:
+                    disabled || charState.char === " " ? "default" : "pointer",
+                  animation:
+                    isCelebrating && solved
+                      ? `${pulse} 0.8s ease-in-out`
+                      : "none",
                 }}
               >
                 <Typography
@@ -135,7 +223,9 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
                     fontSize: "1rem",
                     transform: `rotate(${charState.angle}deg)`,
                     transition: "transform 150ms ease-out",
-                    color: selected ? theme.palette.primary.dark : theme.palette.text.secondary,
+                    color: selected
+                      ? theme.palette.primary.dark
+                      : theme.palette.text.secondary,
                   }}
                 >
                   {charState.char}
@@ -150,6 +240,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
             size="small"
             onClick={() => rotateCurrent(-rotationStep)}
             startIcon={<RotateLeftIcon />}
+            disabled={disabled}
           >
             Counterclockwise
           </PrimaryButton>
@@ -157,6 +248,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
             size="small"
             onClick={() => rotateCurrent(rotationStep)}
             endIcon={<RotateRightIcon />}
+            disabled={disabled}
           >
             Clockwise
           </PrimaryButton>

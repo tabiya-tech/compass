@@ -11,6 +11,7 @@ import {
 import { FeaturesService } from "src/features/featuresService/FeaturesService";
 import { SKILLS_RANKING_FEATURE_ID } from "src/features/skillsRanking/constants";
 import { SkillsRankingError } from "../errors";
+import { SkillsRankingMetrics } from "./types";
 
 /**
  * Service to manage the skills ranking feature.
@@ -93,18 +94,20 @@ export class SkillsRankingService extends FeaturesService{
    *
    * @param sessionId - The ID of the session to update the ranking state for.
    * @param phase - The new current phase.
-   * @param cancelled_after - Optional parameter indicating the time when the user cancelled the ranking process.
+   *   This is only relevant for the effort-based proof_of_value task.
+   *   This is only relevant for the time-based proof_of_value task.
+   *     This is only relevant for the time-based proof_of_value task.
    * @param perceived_rank_percentile - Optional parameter indicating the user's perceived rank percentile (0-100).
    * @param retyped_rank_percentile - Optional parameter indicating the rank the user retyped to confirm they saw it correctly (0-100).
+   * @param metrics
    * @returns {Promise<SkillsRankingState>} The updated ranking state for the session.
    */
-  // TODO: make named parameters with an interface
   async updateSkillsRankingState(
     sessionId: number,
     phase: SkillsRankingPhase,
-    cancelled_after?: string,
     perceived_rank_percentile?: number,
     retyped_rank_percentile?: number,
+    metrics?: SkillsRankingMetrics
   ): Promise<SkillsRankingState> {
     const url = `${this.skillsRankingEndpointUrl}/${sessionId}/skills-ranking/state`;
     
@@ -119,9 +122,13 @@ export class SkillsRankingService extends FeaturesService{
       failureMessage: `Failed to update skills ranking state for session ${sessionId}`,
       body: JSON.stringify({
         phase: phase,
-        cancelled_after: cancelled_after ?? null,
+        cancelled_after: metrics?.cancelled_after ?? null,
         perceived_rank_percentile: perceived_rank_percentile ?? null,
         retyped_rank_percentile: retyped_rank_percentile ?? null,
+        succeeded_after: metrics?.succeeded_after ?? null,
+        puzzles_solved: metrics?.puzzles_solved ?? null,
+        correct_rotations: metrics?.correct_rotations ?? null,
+        clicks_count: metrics?.clicks_count ?? null
       }),
       expectedContentType: "application/json",
     });

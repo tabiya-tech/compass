@@ -3,7 +3,7 @@ import { SkillsRankingPhase } from "../types";
 export const skillsRankingHappyPath = [
   SkillsRankingPhase.INITIAL,
   SkillsRankingPhase.BRIEFING,
-  SkillsRankingPhase.EFFORT,
+  SkillsRankingPhase.PROOF_OF_VALUE,
   SkillsRankingPhase.DISCLOSURE,
   SkillsRankingPhase.PERCEIVED_RANK,
   SkillsRankingPhase.RETYPED_RANK,
@@ -13,6 +13,6 @@ export const skillsRankingHappyPath = [
 export const skillsRankingSadPath = [
   SkillsRankingPhase.INITIAL,
   SkillsRankingPhase.BRIEFING,
-  SkillsRankingPhase.EFFORT,
+  SkillsRankingPhase.PROOF_OF_VALUE,
   SkillsRankingPhase.CANCELLED
 ]
