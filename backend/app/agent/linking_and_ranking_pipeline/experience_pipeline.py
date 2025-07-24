@@ -9,11 +9,11 @@ from pydantic import BaseModel, ConfigDict
 from app.agent.agent_types import LLMStats
 from app.agent.experience.work_type import WorkType
 from app.agent.linking_and_ranking_pipeline.cluster_responsibilities_tool import ClusterResponsibilitiesTool
+from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity
+from app.vector_search.vector_search_dependencies import SearchServices
 from .infer_occupation_tool import InferOccupationTool
 from .pick_top_skills_tool import PickTopSkillsTool
 from .skill_linking_tool import SkillLinkingTool
-from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity
-from app.vector_search.vector_search_dependencies import SearchServices
 from ...app_config import ApplicationConfig
 from ...countries import Country
 
@@ -130,6 +130,7 @@ class ClusterPipelineResult(BaseModel):
 
 class ExperiencePipelineResponse(BaseModel):
     top_skills: list[SkillEntity]
+    remaining_skills: list[SkillEntity]
     llm_stats: list[LLMStats]
     cluster_results: list[ClusterPipelineResult]
 
@@ -171,6 +172,7 @@ class ExperiencePipeline:
             self._logger.warning("No responsibilities found for experience title: '%s' and company: '%s'", experience_title, company_name)
             return ExperiencePipelineResponse(
                 top_skills=[],
+                remaining_skills=[],
                 llm_stats=llm_stats,
                 cluster_results=[]
             )
@@ -182,6 +184,7 @@ class ExperiencePipeline:
             self._logger.warning("No clusters found for experience title: '%s' and company: '%s'", experience_title, company_name)
             return ExperiencePipelineResponse(
                 top_skills=[],
+                remaining_skills=[],
                 llm_stats=llm_stats,
                 cluster_results=[]
             )
@@ -204,6 +207,7 @@ class ExperiencePipeline:
         cluster_results: list[ClusterPipelineResult] = await asyncio.gather(*tasks)
         # 3. Return the top skill of each cluster
         top_skills = []
+        remaining_skills = []
         for cluster_result in cluster_results:
             # exclude the skills that have already been picked
             skills_to_consider = ExperiencePipeline._exclude_skills_from_list(top_skills, cluster_result.skills)
@@ -250,11 +254,16 @@ class ExperiencePipeline:
                                    )
 
             top_skills.extend(picker_result.picked_skills)
+            remaining_skills.extend(picker_result.remaining_skills)
             llm_stats.extend(cluster_result.llm_stats)
             llm_stats.extend(picker_result.llm_stats)
 
+        # For the final remaining, skills, remove the skills that are in the top skills.
+        # To avoid having the same skill in both top_skills and remaining_skills
+        final_remaining_skills = ExperiencePipeline._exclude_skills_from_list(top_skills, remaining_skills)
         return ExperiencePipelineResponse(
             top_skills=top_skills,
+            remaining_skills=final_remaining_skills,
             llm_stats=llm_stats,
             cluster_results=cluster_results
         )

@@ -50,7 +50,7 @@ class ResponsibilitiesData(BaseModel):
 SkillEntityT = TypeVar('SkillEntityT', bound=SkillEntity)
 
 
-class BaseExperienceEntity(BaseModel, Generic[SkillEntityT]):
+class ExperienceEntity(BaseModel, Generic[SkillEntityT]):
     """
     A simplified version of ExperienceEntity for a response
     """
@@ -87,8 +87,13 @@ class BaseExperienceEntity(BaseModel, Generic[SkillEntityT]):
 
     top_skills: List[SkillEntityT] = Field(default_factory=list)
     """
-    List of skills identified as relevant to the experience.
+    List of skills identified as relevant to the experience. (Taxonomy skills)
     It should not contain duplicates.
+    """
+
+    remaining_skills: List[SkillEntityT] = Field(default_factory=list)
+    """
+    The remaining skills that the LLM did not find as the top skills but are relevant to the experience
     """
 
     summary: Optional[str] = None
@@ -97,27 +102,6 @@ class BaseExperienceEntity(BaseModel, Generic[SkillEntityT]):
     This is a human-readable string that summarizes the experience.
     """
 
-    # use a field serializer to serialize the work_type
-    # we use the name of the Enum instead of the value because that makes the code less brittle
-    @field_serializer("work_type")
-    def serialize_work_type(self, work_type: WorkType, _info):
-        if work_type is not None:
-            return work_type.name
-        return None
-
-    # Deserialize the work_type from the enum name
-    @field_validator("work_type", mode='before')
-    def deserialize_work_type(cls, value: Any) -> WorkType:
-        if isinstance(value, str):
-            return WorkType[value]
-        return value
-
-
-class ExperienceEntity(BaseExperienceEntity):
-    """
-    A class to represent the entities extracted from the conversation with the user,
-    that can be used in downstream tasks.
-    """
     # contextual_title: Optional[str] = None  # TODO: replace with the cluster_results from the ExperiencePipelineResponse
     # """
     # Title of the experience that is based on the experience title
@@ -143,6 +127,21 @@ class ExperienceEntity(BaseExperienceEntity):
     Each tuple contains a question and the user's answer.
     """
 
+    # use a field serializer to serialize the work_type
+    # we use the name of the Enum instead of the value because that makes the code less brittle
+    @field_serializer("work_type")
+    def serialize_work_type(self, work_type: WorkType, _info):
+        if work_type is not None:
+            return work_type.name
+        return None
+
+    # Deserialize the work_type from the enum name
+    @field_validator("work_type", mode='before')
+    def deserialize_work_type(cls, value: Any) -> WorkType:
+        if isinstance(value, str):
+            return WorkType[value]
+        return value
+
     class Config:
         extra = "forbid"
 
@@ -158,6 +157,7 @@ class ExperienceEntity(BaseExperienceEntity):
                  questions_and_answers: Optional[List[tuple[str, str]]] = None,
                  summary: Optional[str] = None,
                  top_skills: Optional[List[SkillEntity]] = None,
+                 remaining_skills: Optional[List[SkillEntity]] = None,
                  ):
         super().__init__(
             uuid=uuid if uuid is not None else str(uuid4()),  # Generate a unique UUID for each instance
@@ -171,6 +171,7 @@ class ExperienceEntity(BaseExperienceEntity):
             questions_and_answers=questions_and_answers if questions_and_answers is not None else [],
             summary=summary,
             top_skills=top_skills if top_skills is not None else [],
+            remaining_skills=remaining_skills if remaining_skills is not None else []
         )
 
     @staticmethod
@@ -191,48 +192,3 @@ class ExperienceEntity(BaseExperienceEntity):
         work_type_part = f" ({WorkType.work_type_short(_work_type)})" if _work_type is not None else ""
         experience_title_part = experience_title if experience_title is not None else "No title provided yet"
         return experience_title_part + work_type_part + date_part + company_part + location_part + "\n"
-
-
-class DiscoveredTopSkill(SkillEntity):
-    """
-    Represents a skill that has been discovered during the exploration phase.
-    This is also the skill a user can see, edit, delete and restore later.
-    """
-
-    deleted: bool = False
-    """
-    used to mark the tops kill as deleted.
-    """
-
-    @staticmethod
-    def from_skill_entity(skill_entity: SkillEntity) -> 'DiscoveredTopSkill':
-        """
-        Converts a SkillEntity to a DiscoveredTopSkill.
-        This is useful for converting the skill entity to the one that can be used in the Explore Experiences Agent.
-        """
-        return DiscoveredTopSkill(**skill_entity.model_dump())
-
-
-class ExploredExperienceEntity(BaseExperienceEntity[DiscoveredTopSkill]):
-    """
-    A class to represent an experience that has been explored and contains discovered top skills.
-    It extends the BaseExperienceEntity with a specific type of SkillEntity for top skills.
-
-    This is also the experience that a user can see, edit, delete and restore later.
-    """
-
-    deleted: bool = False
-    """
-    used to mark the experience as deleted.
-    """
-
-    @staticmethod
-    def from_experience_entity(experience_entity: BaseExperienceEntity) -> 'ExploredExperienceEntity':
-        """
-        Converts an ExperienceEntity to an ExploredExperienceEntity.
-        This is useful for converting the experience entity to the one that can be used in the Explore Experiences Agent.
-        """
-        return ExploredExperienceEntity(
-            **experience_entity.model_dump(exclude={'top_skills'}),
-            top_skills=[DiscoveredTopSkill.from_skill_entity(skill) for skill in experience_entity.top_skills]
-        )
