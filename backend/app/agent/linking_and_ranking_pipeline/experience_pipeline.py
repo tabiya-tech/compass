@@ -9,11 +9,11 @@ from pydantic import BaseModel, ConfigDict
 from app.agent.agent_types import LLMStats
 from app.agent.experience.work_type import WorkType
 from app.agent.linking_and_ranking_pipeline.cluster_responsibilities_tool import ClusterResponsibilitiesTool
+from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity
+from app.vector_search.vector_search_dependencies import SearchServices
 from .infer_occupation_tool import InferOccupationTool
 from .pick_top_skills_tool import PickTopSkillsTool
 from .skill_linking_tool import SkillLinkingTool
-from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity
-from app.vector_search.vector_search_dependencies import SearchServices
 from ...app_config import ApplicationConfig
 from ...countries import Country
 
@@ -130,7 +130,7 @@ class ClusterPipelineResult(BaseModel):
 
 class ExperiencePipelineResponse(BaseModel):
     top_skills: list[SkillEntity]
-    remaining_skills: list[SkillEntity] = []
+    remaining_skills: list[SkillEntity]
     llm_stats: list[LLMStats]
     cluster_results: list[ClusterPipelineResult]
 

@@ -1,22 +1,21 @@
-import time
 from enum import Enum
 from typing import Optional, Mapping, Any
 
+import time
 from pydantic import BaseModel, field_serializer, field_validator, Field
-
-from app.agent.experience._experience_summarizer import ExperienceSummarizer
-from app.agent.linking_and_ranking_pipeline import ExperiencePipeline, ExperiencePipelineConfig
-from app.agent.skill_explorer_agent import SkillsExplorerAgent
-from app.countries import Country
-from app.agent.collect_experiences_agent import CollectExperiencesAgent
-from app.agent.experience.experience_entity import ExperienceEntity, ExploredExperienceEntity
-from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.agent_types import AgentType
+from app.agent.collect_experiences_agent import CollectExperiencesAgent
+from app.agent.experience._experience_summarizer import ExperienceSummarizer
+from app.agent.experience.experience_entity import ExperienceEntity
+from app.agent.linking_and_ranking_pipeline import ExperiencePipeline, ExperiencePipelineConfig
+from app.agent.skill_explorer_agent import SkillsExplorerAgent
+from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
+from app.countries import Country
 from app.vector_search.esco_entities import SkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
 
@@ -92,10 +91,15 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
     The state of the experiences of the user that are being explored, keyed by experience.uuid
     """
 
-    explored_experiences: list[ExploredExperienceEntity] | None = Field(default_factory=list)
+    explored_experiences: list[ExperienceEntity[tuple[int, SkillEntity]]] | None = Field(default_factory=list)
     """
-    Experiences that have been explored so far. 
+    Experiences that have been explored so far.
     This is also used as a copy of what users are able to see and edit in the UI.
+    """
+
+    deleted_experiences: list[ExperienceEntity[tuple[int, SkillEntity]]] = Field(default_factory=list)
+    """
+    Experiences that have been deleted by the user. The ones that should be hidden by the user.
     """
 
     current_experience_uuid: Optional[str] = None
@@ -147,6 +151,7 @@ class ExploreExperiencesAgentDirectorState(BaseModel):
             # For backward compatibility with old documents that don't have the explored_experiences field,
             # The default value is None, which means that the state is legacy and should be upgraded
             explored_experiences=_doc.get("explored_experiences", None),
+            deleted_experiences=_doc.get("deleted_experiences", []),
             conversation_phase=_doc["conversation_phase"])
 
 
@@ -221,12 +226,10 @@ class ExploreExperiencesAgentDirector(Agent):
             current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
 
         if current_experience.dive_in_phase == DiveInPhase.LINKING_RANKING:
-            remaining_skills: list[SkillEntity] = []
-
             if current_experience.experience.responsibilities.responsibilities:
                 # Infer the occupations for the experience and update the experience entity
                 # , then link the skills and rank them
-                agent_output, remaining_skills = await self._link_and_rank(
+                agent_output = await self._link_and_rank(
                     country_of_user=state.country_of_user,
                     current_experience=current_experience.experience)
                 await self._conversation_manager.update_history(AgentInput(
@@ -260,8 +263,19 @@ class ExploreExperiencesAgentDirector(Agent):
 
             if current_experience.dive_in_phase == DiveInPhase.PROCESSED:
                 # Add the experience to the list of explored experiences
-                explored_experience = ExploredExperienceEntity.from_experience_entity(current_experience.experience)
-                explored_experience.remaining_skills = remaining_skills
+                explored_experience = current_experience.experience.model_copy()
+
+                # construct the top skills with the mode of [index, SkillEntity]
+                top_skills = []
+                for index, skill in enumerate(current_experience.experience.top_skills):
+                    top_skills.append((index, skill))
+                explored_experience.top_skills = top_skills
+
+                _remaining_skills = []
+                for index, skill in enumerate(current_experience.experience.remaining_skills):
+                    _remaining_skills.append((index, skill))
+
+                explored_experience.remaining_skills = _remaining_skills
                 state.explored_experiences.append(explored_experience)
 
             # If the agent has finished exploring the skills, then if there are no more experiences to process,
@@ -361,7 +375,7 @@ class ExploreExperiencesAgentDirector(Agent):
     async def _link_and_rank(self, *,
                              country_of_user: Country,
                              current_experience: ExperienceEntity,
-                             ) -> tuple[AgentOutput, list[SkillEntity]]:
+                             ) -> AgentOutput:
         start = time.time()
         pipeline = ExperiencePipeline(
             config=self._experience_pipeline_config,
@@ -378,6 +392,7 @@ class ExploreExperiencesAgentDirector(Agent):
             responsibilities=current_experience.responsibilities.responsibilities
         )
         current_experience.top_skills = pipline_result.top_skills
+        current_experience.remaining_skills = pipline_result.remaining_skills
 
         # construct a summary of the skills
         skills_summary = "\n"
@@ -409,4 +424,4 @@ class ExploreExperiencesAgentDirector(Agent):
             agent_response_time_in_sec=round(time.time() - start, 2),
             llm_stats=pipline_result.llm_stats
         )
-        return agent_output, pipline_result.remaining_skills
+        return agent_output

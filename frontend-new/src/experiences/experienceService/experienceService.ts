@@ -27,8 +27,8 @@ export default class ExperienceService {
     this.experiencesEndpointUrl = `${this.apiServeUrl}/conversations`;
   }
 
-  async getExperiences(sessionId: number, includeDeleted: boolean = false): Promise<Experience[]> {
-    const constructedExperiencesUrl = `${this.experiencesEndpointUrl}/${sessionId}/experiences?include_deleted=${includeDeleted}`;
+  async getExperiences(sessionId: number, deleted: boolean = false): Promise<Experience[]> {
+    const constructedExperiencesUrl = `${this.experiencesEndpointUrl}/${sessionId}/experiences?deleted=${deleted}`;
     const errorFactory = getRestAPIErrorFactory(
       "ExperienceService",
       "getExperiences",

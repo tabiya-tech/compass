@@ -1,16 +1,21 @@
-import pytest
 from unittest.mock import AsyncMock
 
-from app.agent.experience.experience_entity import ExploredExperienceEntity
-from app.conversations.experience.service import ExperienceService, ExperienceNotFoundError
-from app.conversations.experience.types import UpdateExperienceRequest, SkillUpdate, TimelineUpdate
+import pytest
+
 from app.agent.experience import ExperienceEntity, WorkType, Timeline
-from app.agent.explore_experiences_agent_director import DiveInPhase, ExperienceState, ExploreExperiencesAgentDirectorState
+from app.agent.explore_experiences_agent_director import DiveInPhase, ExperienceState, \
+    ExploreExperiencesAgentDirectorState
+from app.application_state import ApplicationState
+from app.conversations.experience._types import UpdateExperienceRequest, SkillUpdate, TimelineUpdate
+from app.conversations.experience.service import ExperienceService, ExperienceNotFoundError
 from app.countries import Country
 from app.metrics.application_state_metrics_recorder.recorder import IApplicationStateMetricsRecorder
-from app.application_state import ApplicationState
 from app.vector_search.esco_entities import SkillEntity
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_printable_string
+
+
+class EditableExperienceEntity(ExperienceEntity[tuple[int, SkillEntity]]):
+    pass
 
 
 @pytest.fixture
@@ -41,6 +46,22 @@ def _make_skill_entity(uuid: str, label: str) -> SkillEntity:
     )
 
 
+def _make_editable_experience_entity(uuid: str, title: str, skills=None) -> EditableExperienceEntity:
+    return EditableExperienceEntity(
+        uuid=uuid,
+        experience_title=title,
+        company="fooCorp",
+        location="fooVille",
+        timeline=Timeline(start="2020", end="2021"),
+        work_type=WorkType.SELF_EMPLOYMENT,
+        esco_occupations=[],
+        questions_and_answers=[],
+        summary="fooSummary",
+        top_skills=skills or []
+    )
+
+
+
 def _make_experience_entity(uuid: str, title: str, skills=None) -> ExperienceEntity:
     return ExperienceEntity(
         uuid=uuid,
@@ -57,12 +78,13 @@ def _make_experience_entity(uuid: str, title: str, skills=None) -> ExperienceEnt
 
 
 def _make_state_with_experience(session_id: int, exp_uuid: str, exp_title: str, skills=None, dive_in_phase=DiveInPhase.PROCESSED):
-    exp_entity = _make_experience_entity(exp_uuid, exp_title, skills)
+    exp_entity = _make_editable_experience_entity(exp_uuid, exp_title, skills)
     exp_state = ExperienceState(dive_in_phase=dive_in_phase, experience=exp_entity)
     director_state = ExploreExperiencesAgentDirectorState(
         session_id=session_id,
         experiences_state={exp_uuid: exp_state},
-        explored_experiences=[ExploredExperienceEntity.from_experience_entity(exp_entity)],
+        explored_experiences=[exp_entity],
+        deleted_experiences=[],
         current_experience_uuid=None,
         country_of_user=Country.UNSPECIFIED,
     )
@@ -78,7 +100,7 @@ class TestGetExperiencesBySessionId:
         session_id = get_random_session_id()
         exp_uuid = get_random_printable_string(8)
         skill = _make_skill_entity("skill1", "Skill One")
-        app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience", [skill])
+        app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience", [(0, skill)])
         mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
         service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
 
@@ -90,7 +112,7 @@ class TestGetExperiencesBySessionId:
         exp, dive_in_phase = result[0]
         assert exp.uuid == exp_uuid
         assert exp.experience_title == "Test Experience"
-        assert exp.top_skills[0].UUID == "skill1"
+        assert exp.top_skills[0][1].UUID == "skill1"
 
         assert dive_in_phase == DiveInPhase.PROCESSED
 
@@ -138,7 +160,7 @@ class TestUpdateExperience:
         session_id = get_random_session_id()
         exp_uuid = get_random_printable_string(8)
         skill = _make_skill_entity("skill1", "Skill One")
-        app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience", [skill])
+        app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience", [(0, skill)])
         mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
         mock_metrics_recorder.save_state = AsyncMock()
         service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
@@ -177,8 +199,8 @@ class TestUpdateExperience:
                 id="work_type_and_summary"
             ),
             pytest.param(
-                UpdateExperienceRequest(top_skills=[SkillUpdate(UUID="skill2", preferredLabel="Skill Two New Label", deleted=False)]),
-                {"top_skills": [{"UUID": "skill2", "preferredLabel": "Skill Two New Label", "deleted": False}]},
+                UpdateExperienceRequest(top_skills=[SkillUpdate(UUID="skill2", preferredLabel="Skill Two New Label")]),
+                {"top_skills": [{"UUID": "skill2", "preferredLabel": "Skill Two New Label"}]},
                 id="top_skills_update"
             ),
             pytest.param(
@@ -207,17 +229,17 @@ class TestUpdateExperience:
         skill3 = _make_skill_entity("skill3", "Skill Three")
 
         # AND an initial experience state
-        initial_experience = _make_experience_entity(exp_uuid, "Unedited Title", skills=[skill1, skill2])
+        initial_experience = _make_editable_experience_entity(exp_uuid, "Unedited Title", skills=[(0, skill1), (1, skill2)])
         exp_state = ExperienceState(dive_in_phase=DiveInPhase.PROCESSED, experience=initial_experience)
 
         # AND another unrelated experience
-        other_experience = _make_experience_entity("other_exp", "Other Exp", skills=[skill3])
+        other_experience = _make_editable_experience_entity("other_exp", "Other Exp", skills=[(0, skill3)])
         other_exp_state = ExperienceState(dive_in_phase=DiveInPhase.PROCESSED, experience=other_experience)
 
         director_state = ExploreExperiencesAgentDirectorState(
             session_id=session_id,
             experiences_state={exp_uuid: exp_state, "other_exp": other_exp_state},
-            explored_experiences=[ExploredExperienceEntity.from_experience_entity(initial_experience)],  # This is the one we will update
+            explored_experiences=[initial_experience],  # This is the one we will update
             current_experience_uuid=None,
             country_of_user=Country.UNSPECIFIED
         )
@@ -238,8 +260,10 @@ class TestUpdateExperience:
         for field, expected in expected_changes.items():
             actual = getattr(exp, field)
             if field == 'top_skills':
-                actual_simple = [{'UUID': s.UUID, 'preferredLabel': s.preferredLabel, 'deleted': s.deleted} for s in actual]
+                actual_simple = [{'UUID': s.UUID, 'preferredLabel': s.preferredLabel} for _, s in actual]
                 assert actual_simple == expected
+            elif field == 'timeline':
+                assert actual == expected.model_dump()
             else:
                 assert actual == expected
 
@@ -249,8 +273,8 @@ class TestUpdateExperience:
         if 'company' not in expected_changes:
             assert exp.company == initial_experience.company
         if 'top_skills' not in expected_changes:
-            unedited_skills = [{'UUID': s.UUID, 'preferredLabel': s.preferredLabel} for s in initial_experience.top_skills]
-            result_skills = [{'UUID': s.UUID, 'preferredLabel': s.preferredLabel} for s in exp.top_skills]
+            unedited_skills = [{'UUID': s.UUID, 'preferredLabel': s.preferredLabel} for _, s in initial_experience.top_skills]
+            result_skills = [{'UUID': s.UUID, 'preferredLabel': s.preferredLabel} for _, s in exp.top_skills]
             assert result_skills == unedited_skills
 
         # AND the dive_in_phase is still PROCESSED
@@ -374,7 +398,7 @@ class TestGetUneditedExperienceByUuid:
         session_id = get_random_session_id()
         exp_uuid = get_random_printable_string(8)
         skill = _make_skill_entity("skill1", "Skill One")
-        app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience", [skill])
+        app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience", [(0, skill)])
         mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
         service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
 
@@ -384,7 +408,7 @@ class TestGetUneditedExperienceByUuid:
         # THEN it returns the expected experience
         assert exp.uuid == exp_uuid
         assert exp.experience_title == "Test Experience"
-        assert exp.top_skills[0].UUID == "skill1"
+        assert exp.top_skills[0][1].UUID == "skill1"
         assert dive_in_phase == DiveInPhase.PROCESSED
 
     @pytest.mark.asyncio
@@ -434,8 +458,8 @@ class TestGetAllUneditedExperiences:
                 exp_uuid2: ExperienceState(dive_in_phase=DiveInPhase.PROCESSED, experience=_make_experience_entity(exp_uuid2, "Experience Two", [skill2])),
             },
             explored_experiences=[
-                ExploredExperienceEntity.from_experience_entity(_make_experience_entity(exp_uuid1, "Experience One", [skill1])),
-                ExploredExperienceEntity.from_experience_entity(_make_experience_entity(exp_uuid2, "Experience Two", [skill2]))
+                _make_editable_experience_entity(exp_uuid1, "Experience One", [(0, skill1)]),
+                _make_editable_experience_entity(exp_uuid2, "Experience Two", [(0, skill2)])
             ],
             current_experience_uuid=None,
             country_of_user=Country.UNSPECIFIED
@@ -501,10 +525,11 @@ class TestRestoreDeletedExperience:
         session_id = get_random_session_id()
         exp_uuid = get_random_printable_string(8)
         app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience")
-        # Mark the experience as deleted
-        for exp in app_state.explore_experiences_director_state.explored_experiences:
-            if exp.uuid == exp_uuid:
-                exp.deleted = True
+
+        # Move the explored experience to the deleted experiences
+        app_state.explore_experiences_director_state.deleted_experiences = app_state.explore_experiences_director_state.explored_experiences
+        app_state.explore_experiences_director_state.explored_experiences = []
+
         mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
         mock_metrics_recorder.save_state = AsyncMock()
         service = ExperienceService(application_state_metrics_recorder=mock_metrics_recorder)
@@ -512,15 +537,17 @@ class TestRestoreDeletedExperience:
         # WHEN restore_deleted_experience is called
         result_exp, result_phase = await service.restore_deleted_experience(user_id, session_id, exp_uuid)
 
-        # THEN the experience is marked as not deleted
-        assert not result_exp.deleted
-
         # AND save_state was called to persist changes
         mock_metrics_recorder.save_state.assert_called_once()
 
         # AND the correct experience and phase are returned
         assert result_exp.uuid == exp_uuid
         assert result_phase == DiveInPhase.PROCESSED
+
+        # THEN the experience is moved back to explored experiences
+        assert len(app_state.explore_experiences_director_state.explored_experiences) == 1
+        assert len(app_state.explore_experiences_director_state.deleted_experiences) == 0
+
 
     @pytest.mark.asyncio
     async def test_restore_not_deleted_experience(self, mock_metrics_recorder):
@@ -582,7 +609,7 @@ class TestRestoreDeletedExperience:
         session_id = get_random_session_id()
         exp_uuid = get_random_printable_string(8)
         app_state = _make_state_with_experience(session_id, exp_uuid, "Test Experience")
-        app_state.explore_experiences_director_state.explored_experiences = []  # Simulate deleted experience
+        app_state.explore_experiences_director_state.deleted_experiences = app_state.explore_experiences_director_state.explored_experiences
         mock_metrics_recorder.get_state = AsyncMock(return_value=app_state)
         mock_metrics_recorder.save_state = AsyncMock()
 

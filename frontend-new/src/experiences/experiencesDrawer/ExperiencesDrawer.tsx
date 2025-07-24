@@ -1,9 +1,12 @@
-import React, { useEffect, useMemo, useState, Suspense } from "react";
-import { Box, Divider, Drawer, Skeleton, Typography, useMediaQuery, useTheme, Slide } from "@mui/material";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
+import { Box, Divider, Drawer, Skeleton, Slide, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
-import ExperiencesDrawerHeader from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
-import { LoadingExperienceDrawerContent } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
-import { Experience, DiveInPhase } from "src/experiences/experienceService/experiences.types";
+import ExperiencesDrawerHeader
+  from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
+import {
+  LoadingExperienceDrawerContent,
+} from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
+import { DiveInPhase, Experience } from "src/experiences/experienceService/experiences.types";
 import { StoredPersonalInfo } from "src/sensitiveData/types";
 import CustomTextField from "src/theme/CustomTextField/CustomTextField";
 import CustomAccordion from "src/theme/CustomAccordion/CustomAccordion";
@@ -25,7 +28,8 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
 import CustomLink from "src/theme/CustomLink/CustomLink";
-import RestoreExperiencesDrawer from "src/experiences/experiencesDrawer/components/restoreExperiencesDrawer/RestoreExperiencesDrawer";
+import RestoreExperiencesDrawer
+  from "src/experiences/experiencesDrawer/components/restoreExperiencesDrawer/RestoreExperiencesDrawer";
 import { ExperienceError } from "src/error/commonErrors";
 
 const LazyLoadedDownloadDropdown = lazyWithPreload(
@@ -233,7 +237,6 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         top_skills: uneditedExperience.top_skills.map((skill) => ({
           UUID: skill.UUID,
           preferredLabel: skill.preferredLabel,
-          deleted: skill.deleted,
         })),
       });
 
@@ -297,7 +300,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   const exploredExperiencesWithoutDeletedSkills = useMemo(() => {
     return exploredExperiences.map((experience) => ({
       ...experience,
-      top_skills: experience.top_skills.filter((skill) => !skill.deleted),
+      top_skills: experience.top_skills
     }));
   }, [exploredExperiences]);
 

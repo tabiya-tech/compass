@@ -1,3 +1,3 @@
-from .experience_entity import ExperienceEntity, ExploredExperienceEntity
-from .work_type import WorkType
+from .experience_entity import ExperienceEntity
 from .timeline import Timeline
+from .work_type import WorkType

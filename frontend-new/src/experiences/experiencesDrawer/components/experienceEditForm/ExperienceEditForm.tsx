@@ -1,18 +1,17 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo, useContext } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Box, Chip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import {
-  Experience,
-  Timeline,
-  WorkType,
-  EXPERIENCE_TITLE_MAX_LENGTH,
   COMPANY_MAX_LENGTH,
+  Experience,
+  EXPERIENCE_TITLE_MAX_LENGTH,
   LOCATION_MAX_LENGTH,
+  Skill,
   SUMMARY_MAX_LENGTH,
+  Timeline,
   TIMELINE_MAX_LENGTH,
   UpdateExperienceRequest,
-  Skill,
-  RemainingSkill,
+  WorkType,
 } from "src/experiences/experienceService/experiences.types";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,7 +20,9 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import InfoIcon from "@mui/icons-material/Info";
 import AddIcon from "@mui/icons-material/Add";
-import { capitalizeFirstLetter } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
+import {
+  capitalizeFirstLetter,
+} from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -30,14 +31,15 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import ExperienceService from "src/experiences/experienceService/experienceService";
 import { debounce } from "src/utils/debounce";
 import {
+  checkInitialFieldErrors,
+  getExperienceDiff,
   getWorkTypeDescription,
   getWorkTypeIcon,
   getWorkTypeTitle,
-  getExperienceDiff,
-  checkInitialFieldErrors,
 } from "src/experiences/experiencesDrawer/util";
 import InlineEditField from "src/theme/InlineEditField/InlineEditField";
-import SummaryEditField from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
+import SummaryEditField
+  from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
 import { ExperienceError } from "src/error/commonErrors";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
@@ -73,6 +75,15 @@ interface ExperienceEditFormProps {
   notifyOnUnsavedChange?: (hasChanges: boolean) => void;
 }
 
+// Extend the Skill type to include a 'deleted' property for soft deletion on the client.
+type DeletableSkill = Skill & {
+  deleted: boolean
+}
+
+type FormValues = Omit<Experience, "top_skills"> & {
+  top_skills: DeletableSkill[];
+}
+
 // Debounce delay for error checking (ms)
 export const DEBOUNCE_ERROR_DELAY_MS = 20;
 
@@ -87,7 +98,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   const { enqueueSnackbar } = useSnackbar();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
-  const [formValues, setFormValues] = useState<Experience>({ ...experience });
+  const [formValues, setFormValues] = useState<FormValues>({ ...experience, top_skills: experience.top_skills.map((skill) => ({ ...skill, deleted: false })) });
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -95,7 +106,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
   const topSkillsRef = useRef<HTMLDivElement>(null);
   const [addSkillMenuAnchorEl, setAddSkillMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [remainingSkills, setRemainingSkills] = useState<RemainingSkill[]>([]);
+  const [remainingSkills, setRemainingSkills] = useState<Skill[]>([]);
 
   // Initialize remaining skills
   useEffect(() => {
@@ -137,7 +148,14 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   }, [experience]);
 
   // Calculate if there are any changes
-  const hasUnsavedChanges = useMemo(() => getExperienceDiff(experience, formValues) !== null, [formValues, experience]);
+  const hasUnsavedChanges = useMemo(() => {
+    const newExperience: Experience = {
+      ...formValues,
+      top_skills: formValues.top_skills.filter((skill) => !skill.deleted)
+    }
+
+    return getExperienceDiff(experience, newExperience) !== null;
+  }, [formValues, experience]);
 
   // Notify parent of unsaved changes
   useEffect(() => {
@@ -235,7 +253,12 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
     }
 
     // Create a diff of the experience to check for changes
-    const changes = getExperienceDiff(experience, formValues);
+    const newExperience: Experience = {
+      ...formValues,
+      top_skills: formValues.top_skills.filter((skill) => !skill.deleted)
+    }
+
+    const changes = getExperienceDiff(experience, newExperience);
 
     // If no changes detected, don't submit
     if (!changes) return;
@@ -246,12 +269,12 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
       const experienceService = ExperienceService.getInstance();
       const updateExperienceRequest: UpdateExperienceRequest = {
         ...changes,
-        top_skills: formValues.top_skills.map((skill) => ({
+        top_skills: formValues.top_skills.filter(skill => !skill.deleted).map((skill) => ({
           UUID: skill.UUID,
           preferredLabel: skill.preferredLabel,
-          deleted: skill.deleted,
-        })),
+        }))
       };
+
       const result = await experienceService.updateExperience(sessionId, experience.UUID, updateExperienceRequest);
 
       notifyOnSave(result);
@@ -298,12 +321,12 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
       setRemainingSkills(remainingSkills.filter((skill) => skill.UUID !== skillId));
 
       // Convert RemainingSkill to Skill by adding the deleted property
-      const newSkill: Skill = {
+      const newSkill: DeletableSkill = {
         UUID: remainingSkill.UUID,
         preferredLabel: remainingSkill.preferredLabel,
         description: remainingSkill.description,
         altLabels: remainingSkill.altLabels,
-        deleted: false,
+        deleted: false
       };
 
       // Add the new skill to the top skills
@@ -320,7 +343,6 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   const getAddSkillMenuItems = (): MenuItemConfig[] => {
     // Get current skills to filter out
     const currentSkillLabels = (formValues.top_skills || [])
-      .filter((skill) => !skill.deleted)
       .map((skill) => skill.preferredLabel.toLowerCase());
 
     // Filter out skills that already exist

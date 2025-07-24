@@ -5,14 +5,20 @@ import ExperiencesDrawer, { DATA_TEST_ID } from "src/experiences/experiencesDraw
 import userEvent from "@testing-library/user-event";
 import { fireEvent, render, screen, within } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
-import { DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID } from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
+import {
+  DATA_TEST_ID as EXPERIENCES_DRAWER_HEADER_TEST_ID,
+} from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import {
   DATA_TEST_ID as EXPERIENCES_DRAWER_CONTENT_TEST_ID,
   MENU_ITEM_ID,
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import { DATA_TEST_ID as CONFIRM_MODAL_DIALOG_DATA_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
-import { DATA_TEST_ID as EXPERIENCE_EDIT_FORM_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/experienceEditForm/ExperienceEditForm";
-import { DATA_TEST_ID as RESTORE_EXPERIENCES_DRAWER_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/restoreExperiencesDrawer/RestoreExperiencesDrawer";
+import {
+  DATA_TEST_ID as EXPERIENCE_EDIT_FORM_DATA_TEST_ID,
+} from "src/experiences/experiencesDrawer/components/experienceEditForm/ExperienceEditForm";
+import {
+  DATA_TEST_ID as RESTORE_EXPERIENCES_DRAWER_DATA_TEST_ID,
+} from "src/experiences/experiencesDrawer/components/restoreExperiencesDrawer/RestoreExperiencesDrawer";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import ExperienceService from "src/experiences/experienceService/experienceService";
@@ -777,12 +783,12 @@ describe("ExperiencesDrawer", () => {
       // GIVEN the ExperiencesDrawer component
       const onExperiencesUpdated = jest.fn();
       // AND a mocked service that resolves
-      jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce(mockExperiences);
+      jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce([]);
       render(
         <ExperiencesDrawer
           isOpen={true}
           isLoading={false}
-          experiences={mockExperiences}
+          experiences={[]}
           notifyOnClose={jest.fn()}
           conversationConductedAt="2022-06-01T00:00:00Z"
           onExperiencesUpdated={onExperiencesUpdated}

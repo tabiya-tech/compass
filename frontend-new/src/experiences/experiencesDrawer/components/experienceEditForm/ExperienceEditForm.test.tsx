@@ -9,7 +9,9 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { WorkType } from "src/experiences/experienceService/experiences.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { DATA_TEST_ID as SUMMARY_EDIT_FIELD_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
+import {
+  DATA_TEST_ID as SUMMARY_EDIT_FIELD_DATA_TEST_ID,
+} from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
 import { ExperienceError } from "src/error/commonErrors";
 import ExperienceService from "src/experiences/experienceService/experienceService";
 
@@ -219,7 +221,6 @@ describe("ExperienceEditForm", () => {
           preferredLabel: "javascript",
           description: "A programming language",
           altLabels: ["js", "ecmascript"],
-          deleted: false,
         },
       ],
     };
@@ -274,14 +275,12 @@ describe("ExperienceEditForm", () => {
           preferredLabel: "javascript",
           description: "A programming language",
           altLabels: ["js", "ecmascript"],
-          deleted: false,
         },
         {
           UUID: "skill-2",
           preferredLabel: "react",
           description: "A library for building user interfaces",
           altLabels: ["reactjs", "reactjs.org"],
-          deleted: false,
         },
       ],
     };
@@ -334,14 +333,12 @@ describe("ExperienceEditForm", () => {
           preferredLabel: "javascript",
           description: "A programming language",
           altLabels: ["js", "ecmascript"],
-          deleted: false,
         },
         {
           UUID: "skill-2",
           preferredLabel: "react",
           description: "A library for building user interfaces",
           altLabels: ["reactjs", "reactjs.org"],
-          deleted: false,
         },
       ],
     };

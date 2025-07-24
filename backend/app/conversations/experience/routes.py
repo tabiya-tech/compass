@@ -4,31 +4,16 @@ from typing import List, Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
-from app.agent.experience import ExploredExperienceEntity
-from app.agent.explore_experiences_agent_director import DiveInPhase
-from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
 from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var
 from app.conversations.constants import UNEXPECTED_FAILURE_MESSAGE
+from app.conversations.experience._types import ExperienceResponse, UpdateExperienceRequest
+from app.conversations.experience.get_experience_service import get_experience_service
 from app.conversations.experience.service import ExperienceNotFoundError, ExperienceService, IExperienceService
-from app.conversations.experience.types import ExperienceResponse, UpdateExperienceRequest
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
-from app.metrics.application_state_metrics_recorder.recorder import ApplicationStateMetricsRecorder
-from app.metrics.services.get_metrics_service import get_metrics_service
-from app.metrics.services.service import IMetricsService
-from app.server_dependencies.application_state_dependencies import get_application_state_manager
 from app.users.auth import Authentication, UserInfo
 from app.users.get_user_preferences_repository import get_user_preferences_repository
-
-
-def get_experience_service(application_state_manager: ApplicationStateManager = Depends(
-    get_application_state_manager),
-        metrics_service: IMetricsService = Depends(
-            get_metrics_service)) -> IExperienceService:
-    return ExperienceService(application_state_metrics_recorder=ApplicationStateMetricsRecorder(
-        application_state_manager=application_state_manager,
-        metrics_service=metrics_service))
 
 
 def add_experience_routes(conversation_router: APIRouter, authentication: Authentication):
@@ -50,10 +35,12 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
                                       }, description="""Endpoint for retrieving the experiences of a user.""")
     async def _get_experiences(session_id: Annotated[
         int, Path(description="The session id for the conversation history.", examples=[123])],
-                               include_deleted: Annotated[bool, Query(description="Whether to include deleted experiences.", examples=[True])] = False,
+                               deleted: Annotated[bool, Query(description="Weather to return deleted experiences",
+                                                              examples=[True])] = False,
                                user_info: UserInfo = Depends(authentication.get_user_info()),
                                user_preferences_repository=Depends(get_user_preferences_repository),
-                               service: ExperienceService = Depends(get_experience_service)) -> List[ExperienceResponse]:
+                               service: ExperienceService = Depends(get_experience_service)
+                               ) -> List[ExperienceResponse]:
         """
         Endpoint for retrieving the experiences of a user.
         """
@@ -74,14 +61,13 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
             # set the client_id in the context variable.
             client_id_ctx_var.set(current_user_preferences.client_id)
 
-            experience_entity_list = await service.get_experiences_by_session_id(session_id)
+            if deleted:
+                experience_entity_list = await service.get_deleted_experiences_by_session_id(session_id)
+            else:
+                experience_entity_list = await service.get_experiences_by_session_id(session_id)
 
             # Convert to a list for easier processing
             experiences_list = list(experience_entity_list)
-
-            # Filter out deleted experiences if not requested
-            if not include_deleted:
-                experiences_list = [(entity, phase) for entity, phase in experiences_list if not (isinstance(entity, ExploredExperienceEntity) and entity.deleted)]
 
             return [ExperienceResponse.from_experience_entity(
                 experience_entity=experience_entity,
@@ -103,7 +89,8 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
                              description="""Endpoint for editing an experience.""")
     async def _update_experience(session_id: Annotated[
         int, Path(description="The session id for the conversation history.", examples=[123])],
-                                 experience_uuid: Annotated[str, Path(description="The uuid of the experience to edit.")],
+                                 experience_uuid: Annotated[
+                                     str, Path(description="The uuid of the experience to edit.")],
                                  body: UpdateExperienceRequest,
                                  user_info: UserInfo = Depends(authentication.get_user_info()),
                                  user_preferences_repository=Depends(get_user_preferences_repository),
@@ -122,7 +109,8 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
             if current_user_preferences is None or session_id not in current_user_preferences.sessions:
                 raise UnauthorizedSessionAccessError(user_id, session_id)
 
-            experience_entity, dive_in_phase = await service.update_experience(user_id, session_id, experience_uuid, body)
+            experience_entity, dive_in_phase = await service.update_experience(user_id, session_id, experience_uuid,
+                                                                               body)
             return ExperienceResponse.from_experience_entity(experience_entity, dive_in_phase)
         except UnauthorizedSessionAccessError as e:
             warning_msg = str(e)
@@ -143,10 +131,12 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
                            description="""Endpoint for retrieving the unedited experience by UUID.""")
     async def _get_unedited_experience(session_id: Annotated[
         int, Path(description="The session id for the conversation history.", examples=[123])],
-                                       experience_uuid: Annotated[str, Path(description="The uuid of the experience to retrieve.")],
+                                       experience_uuid: Annotated[
+                                           str, Path(description="The uuid of the experience to retrieve.")],
                                        user_info: UserInfo = Depends(authentication.get_user_info()),
                                        user_preferences_repository=Depends(get_user_preferences_repository),
-                                       service: IExperienceService = Depends(get_experience_service)) -> ExperienceResponse:
+                                       service: IExperienceService = Depends(
+                                           get_experience_service)) -> ExperienceResponse:
         """
         Endpoint for retrieving the unedited experience by UUID.
         """
@@ -161,7 +151,8 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
             if current_user_preferences is None or session_id not in current_user_preferences.sessions:
                 raise UnauthorizedSessionAccessError(user_id, session_id)
 
-            experience_entity, dive_in_phase = await service.get_unedited_experience_by_uuid(session_id, experience_uuid)
+            experience_entity, dive_in_phase = await service.get_unedited_experience_by_uuid(session_id,
+                                                                                             experience_uuid)
             return ExperienceResponse.from_experience_entity(
                 experience_entity=experience_entity,
                 dive_in_phase=dive_in_phase
@@ -225,16 +216,17 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
     # The conversation router already has the prefix /conversations/{session_id}
 
     @experience_router.post(path="/{experience_uuid}/restore", response_model=ExperienceResponse,
-                             responses={HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
-                                        HTTPStatus.NOT_FOUND: {"model": HTTPErrorResponse},
-                                        HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse}},
-                             description="""Endpoint for restoring deleted experiences.""")
+                            responses={HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
+                                       HTTPStatus.NOT_FOUND: {"model": HTTPErrorResponse},
+                                       HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse}},
+                            description="""Endpoint for restoring deleted experiences.""")
     async def _restore_experience(session_id: Annotated[
         int, Path(description="The session id for the conversation history.", examples=[123])],
-                                   experience_uuid: Annotated[str, Path(description="The uuid of the experience to restore.")],
-                                   user_info: UserInfo = Depends(authentication.get_user_info()),
-                                   user_preferences_repository=Depends(get_user_preferences_repository),
-                                   service: IExperienceService = Depends(get_experience_service)) -> ExperienceResponse:
+                                  experience_uuid: Annotated[
+                                      str, Path(description="The uuid of the experience to restore.")],
+                                  user_info: UserInfo = Depends(authentication.get_user_info()),
+                                  user_preferences_repository=Depends(get_user_preferences_repository),
+                                  service: IExperienceService = Depends(get_experience_service)) -> ExperienceResponse:
         """
         Endpoint for restoring deleted experiences.
         """
@@ -249,7 +241,8 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
             if current_user_preferences is None or session_id not in current_user_preferences.sessions:
                 raise UnauthorizedSessionAccessError(user_id, session_id)
 
-            experience_entity, dive_in_phase = await service.restore_deleted_experience(user_id, session_id, experience_uuid)
+            experience_entity, dive_in_phase = await service.restore_deleted_experience(user_id, session_id,
+                                                                                        experience_uuid)
             return ExperienceResponse.from_experience_entity(
                 experience_entity=experience_entity,
                 dive_in_phase=dive_in_phase

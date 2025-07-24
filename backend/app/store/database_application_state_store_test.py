@@ -11,13 +11,14 @@ from app.agent.agent_director.abstract_agent_director import ConversationPhase a
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMStats
 from app.agent.collect_experiences_agent import CollectedData
 from app.agent.experience import ExperienceEntity, Timeline, WorkType
-from app.agent.experience.experience_entity import ResponsibilitiesData, ExploredExperienceEntity
+from app.agent.experience.experience_entity import ResponsibilitiesData
 from app.agent.explore_experiences_agent_director import ConversationPhase as ExploreExperiencesConversationPhase, \
     ExperienceState, DiveInPhase
 from app.application_state import ApplicationState
 from app.conversation_memory.conversation_memory_types import ConversationHistory, ConversationTurn
 from app.countries import Country
 from app.server_dependencies.database_collections import Collections
+from app.store._utils import _get_editable_experience
 from app.store.database_application_state_store import DatabaseApplicationStateStore
 from app.users.generate_session_id import generate_new_session_id
 from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity, OccupationEntity, AssociatedSkillEntity
@@ -128,7 +129,7 @@ def update_explore_experiences_director_state(application_state: ApplicationStat
     application_state.explore_experiences_director_state.experiences_state = experience_states
     # Set explored_experiences as subset where dive_in_phase == PROCESSED
     processed_experiences = [
-        ExploredExperienceEntity.from_experience_entity(state.experience)
+        _get_editable_experience(state.experience)
         for state in experience_states.values()
         if state.dive_in_phase == DiveInPhase.PROCESSED
     ]

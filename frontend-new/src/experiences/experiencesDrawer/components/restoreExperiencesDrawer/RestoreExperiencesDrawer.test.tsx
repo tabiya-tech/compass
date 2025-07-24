@@ -22,7 +22,7 @@ describe("RestoreExperiencesDrawer", () => {
   });
 
   test("should render loading state when open", async () => {
-    jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockImplementation(() => new Promise(() => {}));
+    jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockImplementation(() => new Promise(() => []));
     render(
       <RestoreExperiencesDrawer
         isOpen={true}
@@ -38,7 +38,7 @@ describe("RestoreExperiencesDrawer", () => {
   });
 
   test("should render empty state when no deleted experiences", async () => {
-    jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce(currentExperiences);
+    jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce([]);
     render(
       <RestoreExperiencesDrawer
         isOpen={true}
@@ -46,7 +46,7 @@ describe("RestoreExperiencesDrawer", () => {
         onRestore={onRestore}
         sessionId={sessionId}
         onExperiencesRestored={onExperiencesRestored}
-        currentExperiences={currentExperiences}
+        currentExperiences={[]}
       />
     );
     // THEN empty state is shown
@@ -62,12 +62,11 @@ describe("RestoreExperiencesDrawer", () => {
     const deletedExperience: Experience = {
       ...mockExperiences[1],
       exploration_phase: DiveInPhase.PROCESSED,
-      deleted: true,
     };
-    // AND a mock for getExperiences that returns both current and deleted experience
-    jest
+    // AND a mock for getExperiences that returns some experiences (when asked deleted)
+   const getExperiencesMock = jest
       .spyOn(ExperienceService.getInstance(), "getExperiences")
-      .mockResolvedValueOnce([...currentExperiences, deletedExperience]);
+      .mockResolvedValueOnce([deletedExperience]);
 
     // WHEN the component is rendered
     render(
@@ -81,7 +80,9 @@ describe("RestoreExperiencesDrawer", () => {
       />
     );
 
-    // THEN expect the deleted experience to be shown
+    // THEN the getExperiences mock should have been called with sessionId and true for deleted
+    expect(getExperiencesMock).toHaveBeenCalledWith(sessionId, true);
+    // AND expect the deleted experience to be shown
     const restoreExperience = screen.getByTestId(DATA_TEST_ID.RESTORE_EXPERIENCES);
     expect(restoreExperience).toBeInTheDocument();
     // AND loading skeletons to be shown
@@ -102,7 +103,7 @@ describe("RestoreExperiencesDrawer", () => {
   });
 
   test("should call onClose when Go Back is clicked in empty state", async () => {
-    jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce(currentExperiences);
+    jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce([]);
     render(
       <RestoreExperiencesDrawer
         isOpen={true}
@@ -110,7 +111,7 @@ describe("RestoreExperiencesDrawer", () => {
         onRestore={onRestore}
         sessionId={sessionId}
         onExperiencesRestored={onExperiencesRestored}
-        currentExperiences={currentExperiences}
+        currentExperiences={[]}
       />
     );
     await waitFor(() => {
@@ -143,9 +144,9 @@ describe("RestoreExperiencesDrawer", () => {
   test("should sort experiences alphabetically by title", async () => {
     // GIVEN unsorted experiences with various titles
     const unsortedExperiences: Experience[] = [
-      { ...mockExperiences[0], UUID: "1", experience_title: "Foo", deleted: true },
-      { ...mockExperiences[0], UUID: "2", experience_title: "Bar", deleted: true },
-      { ...mockExperiences[0], UUID: "3", experience_title: "Baz", deleted: true },
+      { ...mockExperiences[0], UUID: "1", experience_title: "Foo"},
+      { ...mockExperiences[0], UUID: "2", experience_title: "Bar"},
+      { ...mockExperiences[0], UUID: "3", experience_title: "Baz"},
     ];
     // AND a mock for getExperiences that returns these unsorted experiences
     jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce([...unsortedExperiences]);
@@ -177,12 +178,11 @@ describe("RestoreExperiencesDrawer", () => {
     const deletedExperience: Experience = {
       ...mockExperiences[1],
       exploration_phase: DiveInPhase.PROCESSED,
-      deleted: true,
     };
     // AND a mock for getExperiences that returns current and deleted experience
     jest
       .spyOn(ExperienceService.getInstance(), "getExperiences")
-      .mockResolvedValueOnce([...currentExperiences, deletedExperience]);
+      .mockResolvedValueOnce([deletedExperience]);
 
     // WHEN the component is rendered
     render(
@@ -192,7 +192,7 @@ describe("RestoreExperiencesDrawer", () => {
         onRestore={onRestore}
         sessionId={sessionId}
         onExperiencesRestored={onExperiencesRestored}
-        currentExperiences={currentExperiences}
+        currentExperiences={[]}
       />
     );
     // AND the restore button is clicked
