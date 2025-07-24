@@ -11,7 +11,8 @@ from app.agent.agent_director.abstract_agent_director import ConversationPhase a
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMStats
 from app.agent.collect_experiences_agent import CollectedData
 from app.agent.experience import ExperienceEntity, Timeline, WorkType
-from app.agent.experience.experience_entity import ResponsibilitiesData, ExploredExperienceEntity
+from app.agent.experience.experience_entity import ResponsibilitiesData
+from app.agent.experience.upgrade_experience import get_editable_experience
 from app.agent.explore_experiences_agent_director import ConversationPhase as ExploreExperiencesConversationPhase, \
     ExperienceState, DiveInPhase
 from app.application_state import ApplicationState
@@ -128,7 +129,7 @@ def update_explore_experiences_director_state(application_state: ApplicationStat
     application_state.explore_experiences_director_state.experiences_state = experience_states
     # Set explored_experiences as subset where dive_in_phase == PROCESSED
     processed_experiences = [
-        ExploredExperienceEntity.from_experience_entity(state.experience)
+        get_editable_experience(state.experience)
         for state in experience_states.values()
         if state.dive_in_phase == DiveInPhase.PROCESSED
     ]
