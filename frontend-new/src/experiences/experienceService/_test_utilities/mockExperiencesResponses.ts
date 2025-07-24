@@ -20,21 +20,19 @@ export const mockExperiences: Experience[] = [
         preferredLabel: "Management",
         description: "The process of dealing with or controlling things or people",
         altLabels: ["Leadership", "Administration"],
-        deleted: false,
       },
       {
         UUID: "815f3660-4c7f-43ba-859d-cf50dd527fe0",
         preferredLabel: "Communication",
         description: "The imparting or exchanging of information or news",
         altLabels: ["Interpersonal Communication", "Public Speaking"],
-        deleted: false,
       },
     ],
+    remaining_skills: [],
     summary:
       "Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that " +
       "improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.",
     exploration_phase: DiveInPhase.EXPLORING_SKILLS,
-    deleted: false,
   },
   {
     UUID: "607c19f8-60e2-4c70-ac5a-6ce95426423c",
@@ -52,14 +50,13 @@ export const mockExperiences: Experience[] = [
         preferredLabel: "Python Programming",
         description: "The ability to write code in Python",
         altLabels: ["Python Development", "Software Development"],
-        deleted: false,
       },
     ],
+    remaining_skills: [],
     summary:
       "Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that " +
       "improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.",
     exploration_phase: DiveInPhase.EXPLORING_SKILLS,
-    deleted: false,
   },
 ];
 
@@ -142,7 +139,6 @@ const generateRandomSkill = (usedLabels: string[]): Skill => {
     preferredLabel: randomLabel,
     description: faker.hacker.phrase(),
     altLabels: [faker.hacker.verb(), faker.hacker.adjective()],
-    deleted: Math.random() < 0.5,
   };
 };
 
@@ -182,8 +178,8 @@ const generateRandomExperience = (workType?: WorkType): Experience => {
       generateRandomSkill(usedLabels),
       generateRandomSkill(usedLabels),
     ],
+    remaining_skills: Array.from({ length: Math.floor(Math.random() * 15) }, () => generateRandomSkill(usedLabels)),
     exploration_phase: Math.random() < 0.5 ? DiveInPhase.EXPLORING_SKILLS : DiveInPhase.PROCESSED,
-    deleted: Math.random() < 0.5,
   };
 };
 

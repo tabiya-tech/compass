@@ -1,20 +1,20 @@
 import {
-  WorkType,
+  COMPANY_MAX_LENGTH,
+  DiveInPhase,
   Experience,
   EXPERIENCE_TITLE_MAX_LENGTH,
-  DiveInPhase,
-  COMPANY_MAX_LENGTH,
   LOCATION_MAX_LENGTH,
   SUMMARY_MAX_LENGTH,
   TIMELINE_MAX_LENGTH,
+  WorkType,
 } from "src/experiences/experienceService/experiences.types";
 import {
-  WORK_TYPE_DESCRIPTIONS,
+  checkInitialFieldErrors,
+  getExperienceDiff,
   getWorkTypeDescription,
   getWorkTypeIcon,
   getWorkTypeTitle,
-  checkInitialFieldErrors,
-  getExperienceDiff,
+  WORK_TYPE_DESCRIPTIONS,
 } from "src/experiences/experiencesDrawer/util";
 import { ReportContent } from "src/experiences/report/reportContent";
 import StoreIcon from "@mui/icons-material/Store";
@@ -89,9 +89,9 @@ describe("experiencesDrawer util", () => {
           end: "a".repeat(TIMELINE_MAX_LENGTH + 1),
         },
         top_skills: [],
+        remaining_skills: [],
         work_type: WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
         exploration_phase: DiveInPhase.PROCESSED,
-        deleted: false,
       };
 
       // WHEN checking for errors
@@ -141,8 +141,7 @@ describe("experiencesDrawer util", () => {
             UUID: "skill-1",
             description: "foo",
             preferredLabel: "javascript",
-            altLabels: ["react"],
-            deleted: false,
+            altLabels: ["react"]
           },
         ],
       };

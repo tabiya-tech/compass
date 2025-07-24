@@ -1,15 +1,17 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Box, Chip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import {
-  Experience,
-  Timeline,
-  WorkType,
-  EXPERIENCE_TITLE_MAX_LENGTH,
   COMPANY_MAX_LENGTH,
+  Experience,
+  EXPERIENCE_TITLE_MAX_LENGTH,
   LOCATION_MAX_LENGTH,
+  Skill,
   SUMMARY_MAX_LENGTH,
-  TIMELINE_MAX_LENGTH, UpdateExperienceRequest,
+  Timeline,
+  TIMELINE_MAX_LENGTH,
+  UpdateExperienceRequest,
+  WorkType,
 } from "src/experiences/experienceService/experiences.types";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -17,7 +19,10 @@ import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import InfoIcon from "@mui/icons-material/Info";
-import { capitalizeFirstLetter } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
+import AddIcon from "@mui/icons-material/Add";
+import {
+  capitalizeFirstLetter,
+} from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -26,15 +31,19 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import ExperienceService from "src/experiences/experienceService/experienceService";
 import { debounce } from "src/utils/debounce";
 import {
+  checkInitialFieldErrors,
+  getExperienceDiff,
   getWorkTypeDescription,
   getWorkTypeIcon,
   getWorkTypeTitle,
-  getExperienceDiff,
-  checkInitialFieldErrors,
 } from "src/experiences/experiencesDrawer/util";
 import InlineEditField from "src/theme/InlineEditField/InlineEditField";
-import SummaryEditField from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
+import SkillsContextMenu
+  from "src/experiences/experiencesDrawer/components/experienceEditForm/components/skillsContextMenu/SkillsContextMenu";
+import SummaryEditField
+  from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
 import { ExperienceError } from "src/error/commonErrors";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 const uniqueId = "0ddc6b92-eca6-472b-8e5f-fdce9abfec3b";
 
@@ -58,6 +67,7 @@ export const DATA_TEST_ID = {
   FORM_SKILL_CHIP_DROPDOWN: `experience-edit-form-skill-chip-dropdown-${uniqueId}`,
   FORM_SKILL_CHIP_DELETE_ICON: `experience-edit-form-skill-chip-delete-icon-${uniqueId}`,
   FORM_SKILL_CHIP_UNDO_ICON: `experience-edit-form-skill-chip-undo-icon-${uniqueId}`,
+  FORM_ADD_SKILL_BUTTON: `experience-edit-form-add-skill-button-${uniqueId}`,
 };
 
 interface ExperienceEditFormProps {
@@ -65,6 +75,15 @@ interface ExperienceEditFormProps {
   notifyOnSave: (updatedExperience: Experience) => void;
   notifyOnCancel: () => void;
   notifyOnUnsavedChange?: (hasChanges: boolean) => void;
+}
+
+// Extend the Skill type to include a 'deleted' property for soft deletion on the client.
+type DeletableSkill = Skill & {
+  deleted: boolean
+}
+
+type FormValues = Omit<Experience, "top_skills"> & {
+  top_skills: DeletableSkill[];
 }
 
 // Debounce delay for error checking (ms)
@@ -77,16 +96,26 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   notifyOnUnsavedChange,
 }) => {
   const theme = useTheme();
+  const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
-  const [formValues, setFormValues] = useState<Experience>({ ...experience });
+  const [formValues, setFormValues] = useState<FormValues>({ ...experience, top_skills: experience.top_skills.map((skill) => ({ ...skill, deleted: false })) });
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [workTypeMenuAnchorEl, setWorkTypeMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
   const topSkillsRef = useRef<HTMLDivElement>(null);
+  const [addSkillMenuAnchorEl, setAddSkillMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [remainingSkills, setRemainingSkills] = useState<Skill[]>([]);
+
+  // Initialize remaining skills
+  useEffect(() => {
+    if (experience.remaining_skills && Array.isArray(experience.remaining_skills)) {
+      setRemainingSkills(experience.remaining_skills);
+    }
+  }, [experience.remaining_skills]);
 
   const getFieldError = (value: string, maxLength: number): string | null => {
     return value.length > maxLength ? `Maximum ${maxLength} characters allowed.` : null;
@@ -121,7 +150,14 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   }, [experience]);
 
   // Calculate if there are any changes
-  const hasUnsavedChanges = useMemo(() => getExperienceDiff(experience, formValues) !== null, [formValues, experience]);
+  const hasUnsavedChanges = useMemo(() => {
+    const newExperience: Experience = {
+      ...formValues,
+      top_skills: formValues.top_skills.filter((skill) => !skill.deleted)
+    }
+
+    return getExperienceDiff(experience, newExperience) !== null;
+  }, [formValues, experience]);
 
   // Notify parent of unsaved changes
   useEffect(() => {
@@ -219,7 +255,12 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
     }
 
     // Create a diff of the experience to check for changes
-    const changes = getExperienceDiff(experience, formValues);
+    const newExperience: Experience = {
+      ...formValues,
+      top_skills: formValues.top_skills.filter((skill) => !skill.deleted)
+    }
+
+    const changes = getExperienceDiff(experience, newExperience);
 
     // If no changes detected, don't submit
     if (!changes) return;
@@ -230,12 +271,12 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
       const experienceService = ExperienceService.getInstance();
       const updateExperienceRequest: UpdateExperienceRequest = {
         ...changes,
-        top_skills: changes.top_skills?.map((skill) => ({
+        top_skills: formValues.top_skills.filter(skill => !skill.deleted).map((skill) => ({
           UUID: skill.UUID,
           preferredLabel: skill.preferredLabel,
-          deleted: skill.deleted,
-        })),
-      }
+        }))
+      };
+
       const result = await experienceService.updateExperience(sessionId, experience.UUID, updateExperienceRequest);
 
       notifyOnSave(result);
@@ -263,6 +304,59 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
     }));
 
     handleWorkTypeMenuClose();
+  };
+
+  const handleAddSkillMenuClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    setAddSkillMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleAddSkill = (skillId: string) => {
+    setFormValues((prev) => {
+      const currentSkills = prev.top_skills;
+
+      const remainingSkill = remainingSkills.find((skill) => skill.UUID === skillId);
+      if (!remainingSkill) {
+        return prev;
+      }
+
+      // Remove the skill from remaining skills
+      setRemainingSkills(remainingSkills.filter((skill) => skill.UUID !== skillId));
+
+      // Convert RemainingSkill to Skill by adding the deleted property
+      const newSkill: DeletableSkill = {
+        UUID: remainingSkill.UUID,
+        preferredLabel: remainingSkill.preferredLabel,
+        description: remainingSkill.description,
+        altLabels: remainingSkill.altLabels,
+        deleted: false
+      };
+
+      // Add the new skill to the top skills
+      return {
+        ...prev,
+        top_skills: [...currentSkills, newSkill],
+      };
+    });
+
+    notifyOnUnsavedChange?.(true);
+    setAddSkillMenuAnchorEl(null);
+  };
+
+  const getAddSkillMenuItems = (): MenuItemConfig[] => {
+    // Get current skills to filter out
+    const currentSkillLabels = (formValues.top_skills || [])
+      .map((skill) => skill.preferredLabel.toLowerCase());
+
+    // Filter out skills that already exist
+    return remainingSkills
+      .filter((skill) => !currentSkillLabels.includes(skill.preferredLabel.toLowerCase()))
+      .map((skill) => ({
+        id: skill.UUID,
+        text: capitalizeFirstLetter(skill.preferredLabel),
+        description: skill.description,
+        disabled: false,
+        action: () => handleAddSkill(skill.UUID),
+      }));
   };
 
   const getWorkTypeMenuItems = (): MenuItemConfig[] => {
@@ -471,7 +565,8 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
               <b>Top Skills</b>
             </Typography>
             <HelpTip icon={<InfoIcon />}>
-              Click the dropdown to pick another skill label, or use the delete icon to remove it.
+              Click the dropdown to change the skill label, or use the delete icon to remove it. Deleted skills can be
+              restored with the restore icon. Use the add Skill button to add more.
             </HelpTip>
           </Box>
           <Box
@@ -536,6 +631,31 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                 sx={{ color: theme.palette.text.secondary, backgroundColor: theme.palette.grey[100] }}
               />
             ))}
+            <Chip
+              icon={
+                <AddIcon
+                  sx={{ fontSize: theme.tabiyaSpacing.xl * 5 }} // MUI's default icon sizes are either too small or too large for this specific icon, so we use a custom size (~20px)
+                />
+              }
+              label={"Add skill"}
+              onClick={handleAddSkillMenuClick}
+              data-testid={DATA_TEST_ID.FORM_ADD_SKILL_BUTTON}
+              disabled={getAddSkillMenuItems().length === 0 || !isOnline}
+              sx={{
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.common.black,
+                "&:hover": {
+                  backgroundColor: theme.palette.primary.dark,
+                },
+                ".MuiChip-icon": {
+                  color: theme.palette.common.black,
+                },
+                "&.Mui-disabled": {
+                  backgroundColor: theme.palette.grey[400],
+                  color: theme.palette.text.disabled,
+                },
+              }}
+            />
           </Box>
         </Box>
       </Box>
@@ -550,6 +670,12 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
         open={Boolean(workTypeMenuAnchorEl)}
         notifyOnClose={handleWorkTypeMenuClose}
         items={getWorkTypeMenuItems()}
+      />
+      <SkillsContextMenu
+        anchorEl={addSkillMenuAnchorEl}
+        open={Boolean(addSkillMenuAnchorEl)}
+        notifyOnClose={() => setAddSkillMenuAnchorEl(null)}
+        items={getAddSkillMenuItems()}
       />
       <Backdrop isShown={isSubmitting} message="Updating experience..." />
     </Box>

@@ -1,12 +1,12 @@
 import React from "react";
 import {
-  WorkType,
+  COMPANY_MAX_LENGTH,
   Experience,
   EXPERIENCE_TITLE_MAX_LENGTH,
-  COMPANY_MAX_LENGTH,
   LOCATION_MAX_LENGTH,
   SUMMARY_MAX_LENGTH,
   TIMELINE_MAX_LENGTH,
+  WorkType,
 } from "src/experiences/experienceService/experiences.types";
 import { ReportContent } from "src/experiences/report/reportContent";
 import type { SvgIconProps } from "@mui/material/SvgIcon";
@@ -148,12 +148,12 @@ export const getExperienceDiff = (original: Experience, current: Experience): Pa
   if (originalSkills.length !== currentSkills.length) {
     skillsChanged = true;
   }
+
   currentSkills.forEach((skill) => {
     const originalSkill = originalSkillsMap.get(skill.UUID);
     if (
       !originalSkill ||
-      originalSkill.preferredLabel !== skill.preferredLabel ||
-      originalSkill.deleted !== skill.deleted
+      originalSkill.preferredLabel !== skill.preferredLabel
     ) {
       skillsChanged = true;
     }
