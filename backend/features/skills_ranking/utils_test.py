@@ -18,10 +18,16 @@ def test_get_possible_next_states():
     next_states = get_possible_next_phase("PROOF_OF_VALUE")
     # WHEN getting possible next states
     # THEN the next states should be DISCLOSURE or CANCELLED
-    assert next_states == ["DISCLOSURE", "CANCELLED"]
+    assert next_states == ["MARKET_DISCLOSURE", "CANCELLED"]
 
     # GIVEN disclosure state
-    next_states = get_possible_next_phase("DISCLOSURE")
+    next_states = get_possible_next_phase("MARKET_DISCLOSURE")
+    # WHEN getting possible next states
+    # THEN the next state should be PERCEIVED_RANK
+    assert next_states == ["JOB_SEEKER_DISCLOSURE"]
+
+    # GIVEN job seeker disclosure state
+    next_states = get_possible_next_phase("JOB_SEEKER_DISCLOSURE")
     # WHEN getting possible next states
     # THEN the next state should be PERCEIVED_RANK
     assert next_states == ["PERCEIVED_RANK"]
@@ -68,11 +74,19 @@ def test_get_valid_fields_for_phase():
     valid_fields = get_valid_fields_for_phase("PROOF_OF_VALUE")
     # WHEN getting valid fields for proof_of_value phase
     # THEN the valid fields should be ['phase', 'cancelled_after']
-    assert valid_fields == ["phase", "cancelled_after"]
+    assert valid_fields == ["phase", "cancelled_after",
+                            "succeeded_after", "puzzles_solved",
+                            "correct_rotations", "clicks_count"]
 
-    # GIVEN disclosure phase
-    valid_fields = get_valid_fields_for_phase("DISCLOSURE")
+    # GIVEN market disclosure phase
+    valid_fields = get_valid_fields_for_phase("MARKET_DISCLOSURE")
     # WHEN getting valid fields for disclosure phase
+    # THEN the valid fields should be ['phase']
+    assert valid_fields == ["phase"]
+
+    # GIVEN job seeker disclosure phase
+    valid_fields = get_valid_fields_for_phase("JOB_SEEKER_DISCLOSURE")
+    # WHEN getting valid fields for job seeker disclosure phase
     # THEN the valid fields should be ['phase']
     assert valid_fields == ["phase"]
 

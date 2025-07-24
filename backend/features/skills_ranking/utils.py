@@ -19,7 +19,13 @@ def get_possible_next_phase(current_phase: SkillsRankingPhase) -> list[SkillsRan
         return ["PROOF_OF_VALUE"]
 
     if current_phase == "PROOF_OF_VALUE":
-        return ["DISCLOSURE", "CANCELLED"]
+        return ["MARKET_DISCLOSURE", "CANCELLED"]
+
+    if current_phase == "MARKET_DISCLOSURE":
+        return ["JOB_SEEKER_DISCLOSURE"]
+
+    if current_phase == "JOB_SEEKER_DISCLOSURE":
+        return ["PERCEIVED_RANK"]
 
     if current_phase == "DISCLOSURE":
         return ["PERCEIVED_RANK"]
@@ -51,9 +57,12 @@ def get_valid_fields_for_phase(phase: SkillsRankingPhase) -> list[str]:
         return ["phase"]
 
     if phase == "PROOF_OF_VALUE":
-        return ["phase", "cancelled_after"]
+        return ["phase", "cancelled_after", "succeeded_after", "puzzles_solved", "correct_rotations", "clicks_count"]
 
-    if phase == "DISCLOSURE":
+    if phase == "MARKET_DISCLOSURE":
+        return ["phase"]
+
+    if phase == "JOB_SEEKER_DISCLOSURE":
         return ["phase"]
 
     if phase == "PERCEIVED_RANK":

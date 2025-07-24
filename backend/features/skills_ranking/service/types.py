@@ -8,7 +8,8 @@ SkillsRankingPhase = Literal[
     "INITIAL",
     "BRIEFING",
     "PROOF_OF_VALUE",
-    "DISCLOSURE",
+    "MARKET_DISCLOSURE",
+    "JOB_SEEKER_DISCLOSURE",
     "PERCEIVED_RANK",
     "RETYPED_RANK",
     "CANCELLED",
@@ -97,20 +98,24 @@ class SkillsRankingState(BaseModel):
     """
     Represents the time spent by the user before they cancelled the skills ranking process (ms)
     """
+
     succeeded_after: str | None = None
     """
     Represents the time spent by the user after they succeeded in the skills ranking process (ms)
     """
+
     puzzles_solved: int | None = None
     """
     The number of puzzles the user solved for the proof_of_value task during the skills ranking process.
     This is only relevant for the effort-based proof_of_value task.
     """
+
     correct_rotations: int | None = None
     """
     The number of characters the user rotated correctly for the proof_of_value task during the skills ranking process.
     This is only relevant for the time-based proof_of_value task.
     """
+
     clicks_count: int | None = None
     """
     The number of clicks the user made during the proof_of_value task. character selection, rotation [clockwise/counter-clockwise]
