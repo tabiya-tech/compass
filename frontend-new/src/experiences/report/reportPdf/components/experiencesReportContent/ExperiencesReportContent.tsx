@@ -27,33 +27,35 @@ export const capitalizeFirstLetter = (string: string): string => {
 
 const ExperiencesReportContent: React.FC<ExperienceProps> = ({ experience }) => {
   return (
-    <View wrap={false} style={styles.container} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_CONTAINER}>
+    <View style={styles.container} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_CONTAINER}>
       <View style={styles.contentColumn}>
-        <Text
-          x={0}
-          y={0}
-          style={styles.experienceTitle}
-          data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_TITLE}
-        >
-          {experience.experience_title}
-        </Text>
-        <View style={styles.experienceInfo} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_INFO}>
-          <Text x={0} y={0} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_DATE}>
-            {experience.timeline.end && experience.timeline.start
-              ? `${experience.timeline.start} — ${experience.timeline.end}`
-              : experience.timeline.start || experience.timeline.end}
+        <View wrap={false}>
+          <Text
+            x={0}
+            y={0}
+            style={styles.experienceTitle}
+            data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_TITLE}
+          >
+            {experience.experience_title}
           </Text>
-          {(experience.timeline.start || experience.timeline.end) && experience.company && (
-            <Text x={0} y={0}>
-              ,{" "}
+          <View style={styles.experienceInfo} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_INFO}>
+            <Text x={0} y={0} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_DATE}>
+              {experience.timeline.end && experience.timeline.start
+                ? `${experience.timeline.start} — ${experience.timeline.end}`
+                : experience.timeline.start || experience.timeline.end}
             </Text>
-          )}
-          <Text x={0} y={0} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_COMPANY}>
-            {experience.company && experience.company}
-          </Text>
-          <Text x={0} y={0} style={styles.location} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_LOCATION}>
-            {experience.location && `(${experience.location})`}
-          </Text>
+            {(experience.timeline.start || experience.timeline.end) && experience.company && (
+              <Text x={0} y={0}>
+                ,{" "}
+              </Text>
+            )}
+            <Text x={0} y={0} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_COMPANY}>
+              {experience.company && experience.company}
+            </Text>
+            <Text x={0} y={0} style={styles.location} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_LOCATION}>
+              {experience.location && `(${experience.location})`}
+            </Text>
+          </View>
         </View>
         {experience.summary && (
           <Text x={0} y={0} style={styles.summary} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_SUMMARY}>

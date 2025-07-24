@@ -22,14 +22,12 @@ const Footer: React.FC<{ experiences: Experience[] }> = ({ experiences }) => (
         {ReportContent.DISCLAIMER_TEXT_PART3}
       </Text>
     </View>
-    {experiences.length > 2 ? (
-      <Text
-        x={0}
-        y={0}
-        style={styles.pageNumber}
-        render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
-      />
-    ) : null}
+    <Text
+      x={0}
+      y={0}
+      style={styles.pageNumber}
+      render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
+    />
   </View>
 );
 

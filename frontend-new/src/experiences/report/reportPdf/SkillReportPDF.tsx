@@ -62,19 +62,14 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
   const ExperienceCategory = (title: string, icon: string, experiences: Experience[]) =>
     experiences.length > 0 ? (
       <View style={styles.categoryContainer}>
-        <View wrap={false}>
-          <View style={styles.categoryTitleContainer}>
-            <Image src={getBase64Image(icon)} style={styles.categoryIcon} source={undefined} />
-            <Text x={0} y={0} style={styles.categoryTitle}>
-              {title}
-            </Text>
-          </View>
-          {experiences.slice(0, 1).map((experience, index) => (
-            <ExperiencesReportContent key={index} experience={experience} />
-          ))}
+        <View style={styles.categoryTitleContainer}>
+          <Image src={getBase64Image(icon)} style={styles.categoryIcon} source={undefined} />
+          <Text x={0} y={0} style={styles.categoryTitle}>
+            {title}
+          </Text>
         </View>
-        {experiences.slice(1).map((experience, index) => (
-          <ExperiencesReportContent key={index} experience={experience} />
+        {experiences.map((experience) => (
+          <ExperiencesReportContent key={experience.UUID} experience={experience} />
         ))}
       </View>
     ) : null;

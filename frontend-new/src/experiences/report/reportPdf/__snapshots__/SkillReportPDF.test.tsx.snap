@@ -5,7 +5,7 @@ exports[`Report should render Report correctly 1`] = `
   data-testid="skill-report-container-5a296552-f91f-4c38-b88f-542cacaced8e"
 >
   <page
-    style="font-family: Inter; display: flex; flex-direction: column; padding-bottom: 100px; color: rgb(0, 0, 0);"
+    style="font-family: Inter; display: flex; flex-direction: column; padding-bottom: 126px; color: rgb(0, 0, 0);"
   >
     <view
       data-testid="skill-report-body-5a296552-f91f-4c38-b88f-542cacaced8e"
@@ -129,29 +129,29 @@ exports[`Report should render Report correctly 1`] = `
         <view
           style="display: flex; flex-direction: column; padding-bottom: 10px;"
         >
-          <view>
-            <view
-              style="display: flex; flex-direction: row; align-items: center; margin-bottom: 12px;"
+          <view
+            style="display: flex; flex-direction: row; align-items: center; margin-bottom: 12px;"
+          >
+            <image
+              src="[object Promise]"
+              style="height: 13px; margin-bottom: 2px; margin-right: 8px;"
+            />
+            <text
+              style="font-size: 13px; font-family: Inter; font-weight: bold;"
+              x="0"
+              y="0"
             >
-              <image
-                src="[object Promise]"
-                style="height: 13px; margin-bottom: 2px; margin-right: 8px;"
-              />
-              <text
-                style="font-size: 13px; font-family: Inter; font-weight: bold;"
-                x="0"
-                y="0"
-              >
-                Salary Work
-              </text>
-            </view>
+              Salary Work
+            </text>
+          </view>
+          <view
+            data-testid="experiences-content-report-container-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+            style="display: flex; flex-direction: row; align-items: flex-start; margin-bottom: 14px;"
+          >
             <view
-              data-testid="experiences-content-report-container-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-              style="display: flex; flex-direction: row; align-items: flex-start; margin-bottom: 14px;"
+              style="display: flex; flex-direction: column;"
             >
-              <view
-                style="display: flex; flex-direction: column;"
-              >
+              <view>
                 <text
                   data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
                   style="font-size: 12px; font-family: Inter; font-weight: bold;"
@@ -194,43 +194,43 @@ exports[`Report should render Report correctly 1`] = `
                     (New York, NY)
                   </text>
                 </view>
+              </view>
+              <text
+                data-testid="experiences-content-report-summary-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+                style="font-size: 11px; padding-bottom: 6px; word-break: break-word;"
+                x="0"
+                y="0"
+              >
+                Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
+              </text>
+              <view>
                 <text
-                  data-testid="experiences-content-report-summary-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-                  style="font-size: 11px; padding-bottom: 6px; word-break: break-word;"
+                  style="font-size: 11px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"
                   x="0"
                   y="0"
                 >
-                  Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
+                  Top Skills: 
                 </text>
-                <view>
+                <view
+                  data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+                  style="display: flex; flex-direction: column; flex-wrap: wrap; align-items: flex-start; gap: 4px;"
+                >
                   <text
-                    style="font-size: 11px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"
+                    style="font-size: 10px; color: rgb(33, 31, 29);"
                     x="0"
                     y="0"
                   >
-                    Top Skills: 
+                    • 
+                    Management
                   </text>
-                  <view
-                    data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-                    style="display: flex; flex-direction: column; flex-wrap: wrap; align-items: flex-start; gap: 4px;"
+                  <text
+                    style="font-size: 10px; color: rgb(33, 31, 29);"
+                    x="0"
+                    y="0"
                   >
-                    <text
-                      style="font-size: 10px; color: rgb(33, 31, 29);"
-                      x="0"
-                      y="0"
-                    >
-                      • 
-                      Management
-                    </text>
-                    <text
-                      style="font-size: 10px; color: rgb(33, 31, 29);"
-                      x="0"
-                      y="0"
-                    >
-                      • 
-                      Communication
-                    </text>
-                  </view>
+                    • 
+                    Communication
+                  </text>
                 </view>
               </view>
             </view>
@@ -239,29 +239,29 @@ exports[`Report should render Report correctly 1`] = `
         <view
           style="display: flex; flex-direction: column; padding-bottom: 10px;"
         >
-          <view>
-            <view
-              style="display: flex; flex-direction: row; align-items: center; margin-bottom: 12px;"
+          <view
+            style="display: flex; flex-direction: row; align-items: center; margin-bottom: 12px;"
+          >
+            <image
+              src="[object Promise]"
+              style="height: 13px; margin-bottom: 2px; margin-right: 8px;"
+            />
+            <text
+              style="font-size: 13px; font-family: Inter; font-weight: bold;"
+              x="0"
+              y="0"
             >
-              <image
-                src="[object Promise]"
-                style="height: 13px; margin-bottom: 2px; margin-right: 8px;"
-              />
-              <text
-                style="font-size: 13px; font-family: Inter; font-weight: bold;"
-                x="0"
-                y="0"
-              >
-                Trainee Work
-              </text>
-            </view>
+              Trainee Work
+            </text>
+          </view>
+          <view
+            data-testid="experiences-content-report-container-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+            style="display: flex; flex-direction: row; align-items: flex-start; margin-bottom: 14px;"
+          >
             <view
-              data-testid="experiences-content-report-container-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-              style="display: flex; flex-direction: row; align-items: flex-start; margin-bottom: 14px;"
+              style="display: flex; flex-direction: column;"
             >
-              <view
-                style="display: flex; flex-direction: column;"
-              >
+              <view>
                 <text
                   data-testid="experiences-content-report-experience-title-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
                   style="font-size: 12px; font-family: Inter; font-weight: bold;"
@@ -304,35 +304,35 @@ exports[`Report should render Report correctly 1`] = `
                     (New York, NY)
                   </text>
                 </view>
+              </view>
+              <text
+                data-testid="experiences-content-report-summary-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+                style="font-size: 11px; padding-bottom: 6px; word-break: break-word;"
+                x="0"
+                y="0"
+              >
+                Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
+              </text>
+              <view>
                 <text
-                  data-testid="experiences-content-report-summary-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-                  style="font-size: 11px; padding-bottom: 6px; word-break: break-word;"
+                  style="font-size: 11px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"
                   x="0"
                   y="0"
                 >
-                  Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
+                  Top Skills: 
                 </text>
-                <view>
+                <view
+                  data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
+                  style="display: flex; flex-direction: column; flex-wrap: wrap; align-items: flex-start; gap: 4px;"
+                >
                   <text
-                    style="font-size: 11px; padding-bottom: 4px; font-family: Inter; font-weight: bold;"
+                    style="font-size: 10px; color: rgb(33, 31, 29);"
                     x="0"
                     y="0"
                   >
-                    Top Skills: 
+                    • 
+                    Python Programming
                   </text>
-                  <view
-                    data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
-                    style="display: flex; flex-direction: column; flex-wrap: wrap; align-items: flex-start; gap: 4px;"
-                  >
-                    <text
-                      style="font-size: 10px; color: rgb(33, 31, 29);"
-                      x="0"
-                      y="0"
-                    >
-                      • 
-                      Python Programming
-                    </text>
-                  </view>
                 </view>
               </view>
             </view>
@@ -444,6 +444,11 @@ exports[`Report should render Report correctly 1`] = `
           Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with Compass again or create a complete CV based on this report.
         </text>
       </view>
+      <text
+        style="font-size: 10px; display: flex; justify-content: center; text-align: center;"
+        x="0"
+        y="0"
+      />
     </view>
   </page>
 </document>
