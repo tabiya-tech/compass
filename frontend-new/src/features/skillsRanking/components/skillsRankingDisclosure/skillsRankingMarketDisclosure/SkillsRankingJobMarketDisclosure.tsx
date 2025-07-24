@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
-
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
@@ -13,6 +12,9 @@ import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChat
 import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import { useTheme } from "@mui/material/styles";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import { SkillsRankingError } from "src/features/skillsRanking/errors";
 
 const TYPING_DURATION_MS = 5000;
 
@@ -29,53 +31,84 @@ export interface SkillsRankingJobMarketDisclosureProps {
   skillsRankingState: SkillsRankingState;
 }
 
-const SkillsRankingJobSeekerDisclosure: React.FC<SkillsRankingJobMarketDisclosureProps> = ({
+const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosureProps> = ({
   onFinish,
   skillsRankingState,
 }) => {
   const [step, setStep] = useState(0); // 0: message, 1: typing, 2: done
   const scrollRef = useAutoScrollOnChange(step);
   const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
 
+  const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
   const isReplay = useMemo(() => skillsRankingState.phase !== SkillsRankingPhase.MARKET_DISCLOSURE, [skillsRankingState.phase]);
-  const isImmediateFinishGroup =
-    skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
-    skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4;
+
+  const shouldSkip =
+    !isReplay &&
+    (skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
+     skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4);
+
+  const hasFinishedRef = useRef(false);
 
   const jobPlatformUrl = useMemo(
     () => SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl,
     []
   );
 
-  useEffect(() => {
-    if (isImmediateFinishGroup) {
-      onFinish(skillsRankingState);
+  const handleContinue = useCallback(async () => {
+    if (hasFinishedRef.current) return;
+    hasFinishedRef.current = true;
+
+    if (!activeSessionId) {
+      throw new SkillsRankingError("Active session ID is not available.");
     }
-  }, [isImmediateFinishGroup, onFinish, skillsRankingState]);
+
+    try {
+      const newState = await SkillsRankingService.getInstance().updateSkillsRankingState(
+        activeSessionId,
+        SkillsRankingPhase.JOB_SEEKER_DISCLOSURE
+      );
+      await onFinish(newState);
+    } catch (error) {
+      console.error("Error updating skills ranking state:", error);
+      enqueueSnackbar("Failed to update skills ranking state. Please try again later.", {
+        variant: "error",
+      });
+    }
+  }, [activeSessionId, onFinish, enqueueSnackbar]);
 
   useEffect(() => {
-    if (isReplay || isImmediateFinishGroup) return;
+    if (shouldSkip) {
+      handleContinue();
+      return;
+    }
+
+    if (isReplay) return;
+
+    const timers: NodeJS.Timeout[] = [];
 
     if (step === 0) {
-      const t = setTimeout(() => setStep(1), TYPING_DURATION_MS);
-      return () => clearTimeout(t);
+      timers.push(setTimeout(() => setStep(1), TYPING_DURATION_MS));
     } else if (step === 1) {
-      const t = setTimeout(() => {
+      timers.push(setTimeout(() => {
         setStep(2);
-        onFinish(skillsRankingState);
-      }, TYPING_DURATION_MS);
-      return () => clearTimeout(t);
+        handleContinue();
+      }, TYPING_DURATION_MS));
     }
-  }, [step, isReplay, isImmediateFinishGroup, onFinish, skillsRankingState]);
 
-  if (isImmediateFinishGroup) return null;
+    return () => {
+      timers.forEach(clearTimeout);
+    };
+  }, [step, isReplay, shouldSkip, handleContinue]);
+
+  if (shouldSkip) return null;
 
   return (
     <MessageContainer
       origin={ConversationMessageSender.COMPASS}
       data-testid={DATA_TEST_ID.SKILLS_RANKING_JOB_MARKET_DISCLOSURE_CONTAINER}
       ref={scrollRef}
-      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
     >
       <ChatBubble
         message={`With your current skillset you fulfill the required & most relevant skills of ${skillsRankingState.score.jobs_matching_rank}% of jobs on ${jobPlatformUrl}. This is quite some jobs!`}
@@ -99,4 +132,4 @@ const SkillsRankingJobSeekerDisclosure: React.FC<SkillsRankingJobMarketDisclosur
   );
 };
 
-export default SkillsRankingJobSeekerDisclosure;
+export default SkillsRankingJobMarketDisclosure;

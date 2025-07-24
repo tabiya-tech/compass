@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useContext, useEffect, useRef } from "react";
+import React, { useState, useMemo, useContext, useEffect, useRef, useCallback } from "react";
 import { Box, Slider, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
@@ -58,7 +58,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
     skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
     skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4;
 
-  const handleUpdateState = async () => {
+  const handleUpdateState = useCallback(async () => {
     if (!activeSessionId) {
       throw new SkillsRankingError("Active session ID is not available.");
     }
@@ -82,7 +82,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
       console.error("Failed to update state:", err);
       enqueueSnackbar("Something went wrong. Please try again.", { variant: "error" });
     }
-  };
+  }, [activeSessionId, value, onFinish, enqueueSnackbar]);
 
   const handleSubmit = async () => {
     if (!submitted && skillsRankingState.phase === SkillsRankingPhase.RETYPED_RANK) {
@@ -98,10 +98,42 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
 
   useEffect(() => {
     if (isAutoSubmitGroup && !hasFinishedRef.current) {
-      hasFinishedRef.current = true;
-      handleUpdateState();
+      setStep(1); // Show typing animation
+      const typingTimer = setTimeout(async () => {
+        if (!activeSessionId) return;
+
+        if (skillsRankingState.phase !== SkillsRankingPhase.RETYPED_RANK) {
+          console.warn(
+            `[RetypedRank] Skipping auto-submit. Phase is already ${skillsRankingState.phase}`
+          );
+          return;
+        }
+
+        hasFinishedRef.current = true;
+        try {
+          const newState = await SkillsRankingService.getInstance().updateSkillsRankingState(
+            activeSessionId,
+            SkillsRankingPhase.COMPLETED,
+            undefined,
+            value
+          );
+          await onFinish(newState);
+        } catch (err) {
+          console.error("Failed to update state:", err);
+          enqueueSnackbar("Something went wrong. Please try again.", { variant: "error" });
+        }
+      }, TYPING_DURATION_MS);
+
+      return () => clearTimeout(typingTimer);
     }
-  }, [isAutoSubmitGroup]);
+  }, [
+    isAutoSubmitGroup,
+    activeSessionId,
+    skillsRankingState.phase,
+    value,
+    onFinish,
+    enqueueSnackbar,
+  ]);
 
   if (isAutoSubmitGroup) return null;
 
@@ -110,8 +142,9 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
       origin={ConversationMessageSender.COMPASS}
       ref={scrollRef}
       data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_CONTAINER}
-      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
     >
+      {(!isAutoSubmitGroup && step !== 0) &&
       <ChatBubble
         sender={ConversationMessageSender.COMPASS}
         message={`In any case, if we do not think about other job seekers but again focus on those opportunities available to you, let's move to creating your skills profile that you can share with those employers in the next step.\n\nAs a last question, let's remind ourselves of what I told you further above: check again what I said three messages ago, how many percent of opportunities on ${jobPlatformUrl} do you fulfill the required & most relevant skills of?`}
@@ -179,6 +212,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           </Box>
         </Box>
       </ChatBubble>
+      }
 
       <AnimatePresence mode="wait">
         {step === 1 && (

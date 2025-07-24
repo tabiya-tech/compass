@@ -109,7 +109,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
       origin={ConversationMessageSender.COMPASS}
       ref={scrollRef}
       data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_CONTAINER}
-      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
     >
       <ChatBubble
         sender={ConversationMessageSender.COMPASS}

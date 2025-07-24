@@ -131,7 +131,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       origin={ConversationMessageSender.COMPASS}
       data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTAINER}
       ref={scrollRef}
-      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
     >
       {/* TIME_BASED or first WORK_BASED message */}
       <ChatBubble

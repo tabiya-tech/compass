@@ -23,7 +23,7 @@ export interface RotateToSolveTaskProps {
   disabled?: boolean;
 }
 
-const DEFAULT_STRINGS = ["GJRLK",/* "FQZNC", "EKJGR", "CJFLQ", "GRKLE"*/];
+const DEFAULT_STRINGS = ["GJRLK","FQZNC", "EKJGR", "CJFLQ", "GRKLE"];
 
 interface CharacterState {
   character: string;
