@@ -142,9 +142,9 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
       origin={ConversationMessageSender.COMPASS}
       ref={scrollRef}
       data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_CONTAINER}
-      gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
-      {(!isAutoSubmitGroup && step !== 0) &&
+      {(!isAutoSubmitGroup) &&
       <ChatBubble
         sender={ConversationMessageSender.COMPASS}
         message={`In any case, if we do not think about other job seekers but again focus on those opportunities available to you, let's move to creating your skills profile that you can share with those employers in the next step.\n\nAs a last question, let's remind ourselves of what I told you further above: check again what I said three messages ago, how many percent of opportunities on ${jobPlatformUrl} do you fulfill the required & most relevant skills of?`}

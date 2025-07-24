@@ -108,7 +108,7 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
       origin={ConversationMessageSender.COMPASS}
       data-testid={DATA_TEST_ID.SKILLS_RANKING_JOB_MARKET_DISCLOSURE_CONTAINER}
       ref={scrollRef}
-      gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
       <ChatBubble
         message={`With your current skillset you fulfill the required & most relevant skills of ${skillsRankingState.score.jobs_matching_rank}% of jobs on ${jobPlatformUrl}. This is quite some jobs!`}

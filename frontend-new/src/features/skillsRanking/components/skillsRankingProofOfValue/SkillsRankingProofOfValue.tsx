@@ -189,7 +189,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({
       origin={ConversationMessageSender.COMPASS}
       data-testid={DATA_TEST_ID.SKILLS_RANKING_EFFORT_CONTAINER}
       ref={scrollRef}
-      gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
       <ChatBubble message={effortMessage} sender={ConversationMessageSender.COMPASS}>
         {effortType === EffortType.WORK_BASED && (
