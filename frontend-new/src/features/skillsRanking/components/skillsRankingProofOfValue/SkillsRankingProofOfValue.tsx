@@ -153,7 +153,6 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({
     setHasFinished(true);
     await handleUpdateState(SkillsRankingEffortState.CANCELLED);
     setIsTypingVisible(false);
-    setIsUpdatingState(false);
   }, [handleUpdateState, isReplay]);
 
   useEffect(() => {

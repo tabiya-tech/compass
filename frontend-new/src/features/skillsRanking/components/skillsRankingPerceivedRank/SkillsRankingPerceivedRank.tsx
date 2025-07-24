@@ -119,7 +119,8 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
           <Slider
             value={value}
             onChange={handleChange}
-            disabled={submitted || !isOnline}
+            disabled={submitted || !isOnline||
+              skillsRankingState.phase !== SkillsRankingPhase.PERCEIVED_RANK}
             min={0}
             max={100}
             step={1}
@@ -163,7 +164,10 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
             <PrimaryButton
               onClick={handleSubmit}
               disabled={
-                submitted || !startedEditing || !isOnline
+                submitted ||
+                !startedEditing ||
+                !isOnline ||
+                skillsRankingState.phase !== SkillsRankingPhase.PERCEIVED_RANK
               }
               data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SUBMIT_BUTTON}
             >

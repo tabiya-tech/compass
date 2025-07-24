@@ -262,7 +262,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({ showInactiveSessionAlert =
         setAiIsTyping(false);
       }
     },
-    [addMessageToChat, exploredExperiences, fetchExperiences, , removeMessageFromChat, showSkillsRanking]
+    [addMessageToChat, exploredExperiences, fetchExperiences, removeMessageFromChat, showSkillsRanking]
   );
 
   const initializeChat = useCallback(

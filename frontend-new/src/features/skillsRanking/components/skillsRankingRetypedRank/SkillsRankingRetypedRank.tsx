@@ -156,7 +156,8 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
               setStartedEditing(true);
               setValue(newVal as number);
             }}
-            disabled={submitted || !isOnline}
+            disabled={submitted || !isOnline ||
+              skillsRankingState.phase !== SkillsRankingPhase.RETYPED_RANK}
             min={0}
             max={100}
             step={1}

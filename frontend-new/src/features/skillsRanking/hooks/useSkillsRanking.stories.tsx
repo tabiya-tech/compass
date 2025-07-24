@@ -98,8 +98,8 @@ export const SkillsRankingFlowTester = ({
   const { showSkillsRanking } = useSkillsRanking(addMessage, removeMessage);
 
   React.useEffect(() => {
-    showSkillsRanking(onFinishFlow);
-  }, []);
+    showSkillsRanking(onFinishFlow).then();
+  }, [showSkillsRanking, onFinishFlow]);
 
   return (
     <div style={{ padding: "1rem" }}>
