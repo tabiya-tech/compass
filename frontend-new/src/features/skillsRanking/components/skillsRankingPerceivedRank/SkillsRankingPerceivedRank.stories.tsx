@@ -2,10 +2,10 @@ import { Meta, StoryObj } from "@storybook/react";
 import SkillsRankingPerceivedRank
   from "src/features/skillsRanking/components/skillsRankingPerceivedRank/SkillsRankingPerceivedRank";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
-import { SkillsRankingPhase, SkillsRankingState } from "../../types";
+import { SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import { action } from "@storybook/addon-actions";
-import UserPreferencesStateService from "../../../../userPreferences/UserPreferencesStateService";
-import { SkillsRankingService } from "../../skillsRankingService/skillsRankingService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { Box } from "@mui/material";
 
 const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (

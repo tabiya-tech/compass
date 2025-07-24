@@ -13,7 +13,7 @@ const PHASES = [
   SkillsRankingPhase.INITIAL,
   SkillsRankingPhase.BRIEFING,
   SkillsRankingPhase.PROOF_OF_VALUE,
-  SkillsRankingPhase.DISCLOSURE,
+  SkillsRankingPhase.MARKET_DISCLOSURE,
   SkillsRankingPhase.PERCEIVED_RANK,
   SkillsRankingPhase.RETYPED_RANK,
   SkillsRankingPhase.COMPLETED,

@@ -3,12 +3,12 @@ import { IChatMessage } from "src/chat/Chat.types";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 
 import SkillsRankingBriefing, { SKILLS_RANKING_BRIEFING_MESSAGE_ID, SkillsRankingBriefingProps } from "../components/skillsRankingBriefing/SkillsRankingBriefing";
-import SkillsRankingJobSeekerDisclosure, { SKILLS_RANKING_JOB_SEEKER_DISCLOSURE_MESSAGE_ID, SkillsRankingJobSeekerDisclosureProps } from "../components/skillsRankingDisclosure/SkillsRankingJobSeekerDisclosure";
-import SkillsRankingJobMarketDisclosure, { SKILLS_RANKING_JOB_MARKET_DISCLOSURE_MESSAGE_ID, SkillsRankingJobMarketDisclosureProps } from "../components/skillsRankingDisclosure/SkillsRankingJobMarketDisclosure";
+import SkillsRankingJobSeekerDisclosure, { SKILLS_RANKING_JOB_SEEKER_DISCLOSURE_MESSAGE_ID, SkillsRankingJobSeekerDisclosureProps } from "../components/skillsRankingDisclosure/skillsRankingJobSeekerDisclosure/SkillsRankingJobSeekerDisclosure";
+import SkillsRankingJobMarketDisclosure, { SKILLS_RANKING_JOB_MARKET_DISCLOSURE_MESSAGE_ID, SkillsRankingJobMarketDisclosureProps } from "../components/skillsRankingDisclosure/skillsRankingMarketDisclosure/SkillsRankingJobMarketDisclosure";
 import SkillsRankingPrompt, { SKILLS_RANKING_PROMPT_MESSAGE_ID, SkillsRankingPromptProps } from "../components/skillsRankingPrompt/SkillsRankingPrompt";
 import SkillsRankingRetypedRank, { SKILLS_RANKING_RETYPED_RANK_MESSAGE_ID, SkillsRankingRetypedRankProps } from "../components/skillsRankingRetypedRank/SkillsRankingRetypedRank";
 import SkillsRankingPerceivedRank, { SKILLS_RANKING_PERCEIVED_RANK_MESSAGE_ID, SkillsRankingPerceivedRankProps } from "../components/skillsRankingPerceivedRank/SkillsRankingPerceivedRank";
-import SkillsRankingProofOfValue, { SKILLS_RANKING_EFFORT_MESSAGE_ID, SkillsRankingEffortProps } from "../components/skillsRankingEffort/SkillsRankingProofOfValue";
+import SkillsRankingProofOfValue, { SKILLS_RANKING_EFFORT_MESSAGE_ID, SkillsRankingEffortProps } from "../components/skillsRankingProofOfValue/SkillsRankingProofOfValue";
 import { SkillsRankingState } from "../types";
 
 export const createBriefingMessage = (

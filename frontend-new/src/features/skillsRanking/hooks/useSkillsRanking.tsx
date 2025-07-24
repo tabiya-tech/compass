@@ -1,9 +1,9 @@
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { IChatMessage } from "../../../chat/Chat.types";
-import { SkillsRankingService } from "../skillsRankingService/skillsRankingService";
-import { SkillsRankingError } from "../errors";
-import { SessionError } from "../../../error/commonErrors";
-import { SkillsRankingPhase, SkillsRankingState } from "../types";
+import { IChatMessage } from "src/chat/Chat.types";
+import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
+import { SkillsRankingError } from "src/features/skillsRanking/errors";
+import { SessionError } from "src/error/commonErrors";
+import { SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import {
   skillsRankingHappyPath,
   skillsRankingSadPath,
@@ -16,24 +16,18 @@ import {
   createPerceivedRankMessage,
   createPromptMessage,
   createRetypedRankMessage,
-} from "../utils/createMessages";
-import { generateTypingMessage } from "../../../chat/util";
-
-const TYPING_MESSAGE_TIMEOUT = 5000
+} from "src/features/skillsRanking/utils/createMessages";
 
 const phaseToMessageFactory = {
+  [SkillsRankingPhase.INITIAL]: createPromptMessage,
   [SkillsRankingPhase.BRIEFING]: createBriefingMessage,
   [SkillsRankingPhase.PROOF_OF_VALUE]: createEffortMessage,
-  [SkillsRankingPhase.DISCLOSURE]: (state: SkillsRankingState, onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>) => {
-    const first = createJobMarketDisclosureMessage(state, onFinish);
-    const second = createJobSeekerDisclosureMessage(state, onFinish);
-    return [first, second];
-  },
+  [SkillsRankingPhase.MARKET_DISCLOSURE]: createJobMarketDisclosureMessage,
+  [SkillsRankingPhase.JOB_SEEKER_DISCLOSURE]: createJobSeekerDisclosureMessage,
   [SkillsRankingPhase.PERCEIVED_RANK]: createPerceivedRankMessage,
   [SkillsRankingPhase.RETYPED_RANK]: createRetypedRankMessage,
   [SkillsRankingPhase.COMPLETED]: null,
   [SkillsRankingPhase.CANCELLED]: null,
-  [SkillsRankingPhase.INITIAL]: createPromptMessage,
 };
 
 export const useSkillsRanking = (
@@ -55,7 +49,10 @@ export const useSkillsRanking = (
   const initializeSkillsRankingState = async (): Promise<SkillsRankingState | null> => {
     if (!activeSessionId) throw new SessionError("Active session ID is not available.");
     try {
-      return await SkillsRankingService.getInstance().updateSkillsRankingState(activeSessionId, SkillsRankingPhase.INITIAL);
+      return await SkillsRankingService.getInstance().updateSkillsRankingState(
+        activeSessionId,
+        SkillsRankingPhase.INITIAL
+      );
     } catch (error) {
       console.error(new SkillsRankingError("Error initializing skills ranking state:", error));
       return null;
@@ -63,65 +60,73 @@ export const useSkillsRanking = (
   };
 
   const getPathToPhase = (phase: SkillsRankingPhase): SkillsRankingPhase[] => {
-    const path = skillsRankingSadPath.includes(phase) ? skillsRankingSadPath : skillsRankingHappyPath;
+    const path = skillsRankingSadPath.includes(phase)
+      ? skillsRankingSadPath
+      : skillsRankingHappyPath;
     const index = path.indexOf(phase);
     return path.slice(0, index + 1);
   };
 
-  const handleFlow = (currentPhase: SkillsRankingPhase, onFinishFlow: () => void) => async (newState: SkillsRankingState) => {
-    const typingMessage = generateTypingMessage();
-    addMessage(typingMessage);
+  const handleFlow = (currentPhase: SkillsRankingPhase, onFinishFlow: () => void) => async (
+    newState: SkillsRankingState
+  ) => {
+    if (
+      newState.phase === SkillsRankingPhase.CANCELLED ||
+      newState.phase === SkillsRankingPhase.COMPLETED
+    ) {
+      onFinishFlow();
+      return;
+    }
 
-    setTimeout(() => {
-      removeMessage(typingMessage.message_id);
-      
-      // Check if the new state is cancelled or completed
-      if (
-        newState.phase === SkillsRankingPhase.CANCELLED ||
-        newState.phase === SkillsRankingPhase.COMPLETED
-      ) {
-        onFinishFlow();
-        return;
+    const path = getPathToPhase(newState.phase);
+    const currentIndex = path.indexOf(currentPhase);
+    const nextPhase = path[currentIndex + 1];
+    const factory = phaseToMessageFactory[nextPhase];
+
+    if (process.env.NODE_ENV === "development") {
+      console.debug(`Transitioning from ${currentPhase} to ${nextPhase}`);
+    }
+
+    if (!factory && nextPhase) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn(`No message factory found for phase: ${nextPhase}`);
       }
-      
-      const nextPhaseIndex = getPathToPhase(newState.phase).indexOf(currentPhase) + 1;
-      console.debug(`going from ${currentPhase} to ${getPathToPhase(newState.phase)[getPathToPhase(newState.phase).indexOf(currentPhase) + 1]}`);
-      const path = getPathToPhase(newState.phase);
-      const nextPhase = path[nextPhaseIndex];
-      const factory = phaseToMessageFactory[nextPhase];
-      if (nextPhase && factory) {
-        const result = factory(newState, handleFlow(nextPhase, onFinishFlow));
-        (Array.isArray(result) ? result : [result]).forEach(addMessage);
-      }
-    }, TYPING_MESSAGE_TIMEOUT);
+      return;
+    }
+
+    if (nextPhase && factory) {
+      const nextMessages = factory(newState, handleFlow(nextPhase, onFinishFlow));
+      (Array.isArray(nextMessages) ? nextMessages : [nextMessages]).forEach(addMessage);
+    }
   };
 
   const showSkillsRanking = async (onFinishFlow: () => void) => {
-    const typingMessage = generateTypingMessage();
-    addMessage(typingMessage);
     let state = await getSkillsRankingState();
     state ??= await initializeSkillsRankingState();
+
     if (!state) {
-      removeMessage(typingMessage.message_id);
-      onFinishFlow();
       console.error(new SkillsRankingError("Skills ranking state is still null after initialization."));
+      onFinishFlow();
       return;
     }
 
     const path = getPathToPhase(state.phase);
-    let result: SkillsRankingState = state
-    path.forEach((phase) => {
-      const factory = phaseToMessageFactory[phase];
-      if (factory) {
-        removeMessage(typingMessage.message_id);
-        const result = factory(state, handleFlow(phase, onFinishFlow));
-        (Array.isArray(result) ? result : [result]).forEach(addMessage);
+
+    for (const phase of path) {
+      if (state.phase !== phase) {
+        break;
       }
-    });
+
+      const factory = phaseToMessageFactory[phase];
+      if (!factory) continue;
+
+      const messages = factory(state, handleFlow(phase, onFinishFlow));
+      (Array.isArray(messages) ? messages : [messages]).forEach(addMessage);
+    }
 
     if (
-      result.phase === SkillsRankingPhase.CANCELLED ||
-      result.phase === SkillsRankingPhase.COMPLETED
+      state.phase === SkillsRankingPhase.CANCELLED ||
+      state.phase === SkillsRankingPhase.COMPLETED
     ) {
       onFinishFlow();
     }

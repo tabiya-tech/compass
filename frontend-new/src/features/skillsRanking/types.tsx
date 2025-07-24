@@ -1,14 +1,5 @@
 import { FeatureConfig } from "../featuresService/FeaturesService";
 
-export function isExperimentGroupKey(
-  value: unknown
-): value is keyof typeof SkillsRankingExperimentGroups {
-  return (
-    typeof value === "string" &&
-    value in Object.keys(SkillsRankingExperimentGroups)
-  );
-}
-
 export enum SkillsRankingExperimentGroups {
   GROUP_1 = "Group 1: High Difference/Greater",
   /**
@@ -38,11 +29,21 @@ export enum SkillsRankingExperimentGroups {
    */
 }
 
+export function isExperimentGroupKey(
+  value: unknown
+): value is keyof typeof SkillsRankingExperimentGroups {
+  return (
+    typeof value === "string" &&
+    value in Object.keys(SkillsRankingExperimentGroups)
+  );
+}
+
 export enum SkillsRankingPhase {
   INITIAL = "INITIAL",
   BRIEFING = "BRIEFING",
   PROOF_OF_VALUE = "PROOF_OF_VALUE",
-  DISCLOSURE = "DISCLOSURE",
+  MARKET_DISCLOSURE = "MARKET_DISCLOSURE",
+  JOB_SEEKER_DISCLOSURE = "JOB_SEEKER_DISCLOSURE",
   PERCEIVED_RANK = "PERCEIVED_RANK",
   RETYPED_RANK = "RETYPED_RANK",
   CANCELLED = "CANCELLED",

@@ -2,11 +2,11 @@ import { Meta, StoryObj } from "@storybook/react";
 import SkillsRankingRetypedRank
   from "src/features/skillsRanking/components/skillsRankingRetypedRank/SkillsRankingRetypedRank";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
-import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState } from "../../types";
+import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import { action } from "@storybook/addon-actions";
 import { Box } from "@mui/material";
-import UserPreferencesStateService from "../../../../userPreferences/UserPreferencesStateService";
-import { SkillsRankingService } from "../../skillsRankingService/skillsRankingService";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 
 const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
   <Box sx={{ width: '600px' }}>
@@ -76,14 +76,3 @@ type Story = StoryObj<typeof SkillsRankingRetypedRank>;
 export const Shown: Story = {
   args: {},
 };
-
-export const ShownDisabledButWithData: Story = {
-  args: {
-    skillsRankingState: (() => {
-      let skillsRankingState = getRandomSkillsRankingState();
-      skillsRankingState.experiment_group = SkillsRankingExperimentGroups.GROUP_1
-      skillsRankingState.phase = SkillsRankingPhase.COMPLETED;
-      return skillsRankingState;
-    })()
-  }
-}

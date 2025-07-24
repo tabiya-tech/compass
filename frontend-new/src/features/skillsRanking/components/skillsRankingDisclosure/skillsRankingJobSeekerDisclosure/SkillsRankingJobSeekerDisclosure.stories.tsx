@@ -1,10 +1,10 @@
 import { Meta, StoryObj } from "@storybook/react";
 import SkillsRankingJobSeekerDisclosure
-  from "src/features/skillsRanking/components/skillsRankingDisclosure/SkillsRankingJobSeekerDisclosure";
+  from "src/features/skillsRanking/components/skillsRankingDisclosure/skillsRankingJobSeekerDisclosure/SkillsRankingJobSeekerDisclosure";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
-import UserPreferencesStateService from "../../../../userPreferences/UserPreferencesStateService";
-import { SkillsRankingService } from "../../skillsRankingService/skillsRankingService";
-import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState } from "../../types";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
+import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import { Box } from "@mui/material";
 import { action } from "@storybook/addon-actions";
 
@@ -22,7 +22,7 @@ const meta: Meta<typeof SkillsRankingJobSeekerDisclosure> = {
     onFinish: async (state: SkillsRankingState) => {/*action("onFinish")(state)*/ },
     skillsRankingState: (() => {
       let skillsRankingState = getRandomSkillsRankingState();
-      skillsRankingState.phase = SkillsRankingPhase.DISCLOSURE;
+      skillsRankingState.phase = SkillsRankingPhase.JOB_SEEKER_DISCLOSURE;
       return skillsRankingState;
     })()
   },
@@ -64,7 +64,7 @@ export const ShownForDisclosureGroup: Story = {
   args: {
     skillsRankingState: (() => {
       let skillsRankingState = getRandomSkillsRankingState();
-      skillsRankingState.phase = SkillsRankingPhase.DISCLOSURE;
+      skillsRankingState.phase = SkillsRankingPhase.JOB_SEEKER_DISCLOSURE;
       skillsRankingState.experiment_group = SkillsRankingExperimentGroups.GROUP_1
       return skillsRankingState;
     })()
@@ -75,7 +75,7 @@ export const ShownForNonDisclosureGroup: Story = {
   args:{
     skillsRankingState: (() => {
       let skillsRankingState = getRandomSkillsRankingState();
-      skillsRankingState.phase = SkillsRankingPhase.DISCLOSURE;
+      skillsRankingState.phase = SkillsRankingPhase.JOB_SEEKER_DISCLOSURE;
       skillsRankingState.experiment_group = SkillsRankingExperimentGroups.GROUP_2
       return skillsRankingState;
     })()

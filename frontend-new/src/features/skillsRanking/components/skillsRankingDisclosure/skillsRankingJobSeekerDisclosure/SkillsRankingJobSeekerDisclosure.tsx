@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -13,6 +13,9 @@ import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
+import { AnimatePresence, motion } from "framer-motion";
+import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 
 const DISPLAY_TIMEOUT = 5000;
 
@@ -29,9 +32,9 @@ export interface SkillsRankingJobSeekerDisclosureProps {
 }
 
 const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeekerDisclosureProps>> = ({
-                                                                                                       onFinish,
-                                                                                                       skillsRankingState,
-                                                                                                     }) => {
+  onFinish,
+  skillsRankingState,
+}) => {
   const theme = useTheme();
   const selectedLabel = skillsRankingState.score.comparison_label;
   const selectedIndex = jobSeekerComparisonLabels.findIndex(
@@ -42,74 +45,84 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
     UserPreferencesStateService.getInstance().getActiveSessionId();
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleContinue = async () => {
-    if (skillsRankingState.phase === SkillsRankingPhase.DISCLOSURE) {
-      if (!activeSessionId) {
-        throw new SkillsRankingError("Active session ID is not available.");
-      }
-      try {
-        const newSkillsRankingState =
-          await SkillsRankingService.getInstance().updateSkillsRankingState(
-            activeSessionId,
-            SkillsRankingPhase.PERCEIVED_RANK
-          );
-        onFinish(newSkillsRankingState);
-      } catch (error) {
-        console.error("Error updating skills ranking state:", error);
-        enqueueSnackbar(
-          "Failed to update skills ranking state. Please try again later.",
-          {
-            variant: "error",
-          }
-        );
-      }
-    } else {
+  const isReplay = skillsRankingState.phase !== SkillsRankingPhase.JOB_SEEKER_DISCLOSURE;
+  const [step, setStep] = useState(0);
+  const [hasFinished, setHasFinished] = useState(false);
+  const scrollRef = useAutoScrollOnChange(step);
+
+  const handleContinue = useCallback(async () => {
+    if (skillsRankingState.phase !== SkillsRankingPhase.JOB_SEEKER_DISCLOSURE) {
       console.error(
         new SkillsRankingError(
-          "SkillsRankingJobSeekerDisclosure: handleContinue called in non-DISCLOSURE phase."
+          "SkillsRankingJobSeekerDisclosure: handleContinue called in non-JOB_SEEKER_DISCLOSURE phase."
         )
       );
+      return;
     }
-  };
+
+    if (!activeSessionId) {
+      throw new SkillsRankingError("Active session ID is not available.");
+    }
+
+    try {
+      const newSkillsRankingState =
+        await SkillsRankingService.getInstance().updateSkillsRankingState(
+          activeSessionId,
+          SkillsRankingPhase.PERCEIVED_RANK
+        );
+      await onFinish(newSkillsRankingState);
+    } catch (error) {
+      console.error("Error updating skills ranking state:", error);
+      enqueueSnackbar(
+        "Failed to update skills ranking state. Please try again later.",
+        { variant: "error" }
+      );
+    }
+  }, [
+    skillsRankingState.phase,
+    activeSessionId,
+    onFinish,
+    enqueueSnackbar,
+  ]);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    if (skillsRankingState.phase === SkillsRankingPhase.DISCLOSURE) {
-      timeoutId = setTimeout(() => {
-        handleContinue().then();
-      }, DISPLAY_TIMEOUT);
-    }
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [skillsRankingState.phase]);
+    if (isReplay || hasFinished) return;
 
-  if (
-    skillsRankingState.experiment_group ===
-    SkillsRankingExperimentGroups.GROUP_2 ||
-    skillsRankingState.experiment_group ===
-    SkillsRankingExperimentGroups.GROUP_3
-  ) {
-    return (
-      <MessageContainer
-        origin={ConversationMessageSender.COMPASS}
-        data-testid={DATA_TEST_ID.SKILLS_RANKING_JOB_SEEKER_DISCLOSURE_CONTAINER}
-      >
+    const timers: NodeJS.Timeout[] = [];
+
+    if (step === 0) {
+      timers.push(setTimeout(() => setStep(1), DISPLAY_TIMEOUT));
+    } else if (step === 1) {
+      timers.push(setTimeout(() => setStep(2), DISPLAY_TIMEOUT));
+    } else if (step === 2) {
+        if (!hasFinished) {
+          setHasFinished(true);
+          handleContinue().then();
+        }
+    }
+
+    return () => {
+      timers.forEach(clearTimeout);
+    };
+  }, [step, isReplay, hasFinished, handleContinue]);
+
+  const renderGroupMessage = () => {
+    const isGroupUndisclosed =
+      skillsRankingState.experiment_group ===
+        SkillsRankingExperimentGroups.GROUP_2 ||
+      skillsRankingState.experiment_group ===
+        SkillsRankingExperimentGroups.GROUP_4;
+
+    if (isGroupUndisclosed) {
+      return (
         <ChatBubble
           sender={ConversationMessageSender.COMPASS}
-          message={`Thanks! We’re double-checking the latest SAYouth opportunities so the numbers are accurate. We’ll share your results soon or you can ask for them when we call you for the phone survey.`}
-        ></ChatBubble>
-      </MessageContainer>
-    );
-  }
+          message={`We've gathered the relevant information, but we need to run a few more checks on the opportunities listed on SAYouth.mobi to make sure we give you the most accurate and up-to-date details. We'll notify you as soon as everything is ready. In the meantime, feel free to bring this up during our next phone survey -- we’d be happy to revisit it with you then. Thanks for your patience!`}
+        />
+      );
+    }
 
-  return (
-    <MessageContainer
-      origin={ConversationMessageSender.COMPASS}
-      data-testid={DATA_TEST_ID.SKILLS_RANKING_JOB_SEEKER_DISCLOSURE_CONTAINER}
-    >
+    return (
       <ChatBubble
         sender={ConversationMessageSender.COMPASS}
         message={`Compared to job seekers similar to you, you are in the [${selectedLabel}] group out of five. This means that when we rank 100 people from lowest to highest, and create five equal size groups, the first group are the 20 people fitting most jobs, and the fifth group are the people fitting fewer jobs on the platform than the other 80.`}
@@ -124,7 +137,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
                 textAlign="center"
                 justifyContent={"center"}
                 px={0.5}
-                height={theme.fixedSpacing(theme.tabiyaSpacing.xl *2)}
+                height={theme.fixedSpacing(theme.tabiyaSpacing.xl * 2)}
               >
                 <Box
                   py={0.5}
@@ -132,19 +145,22 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
                   sx={{
                     height: "100%",
                     borderRadius: 1,
-                    fontWeight: 'bold',
-                    backgroundColor: idx === selectedIndex ? theme.palette.success.main : theme.palette.grey[200],
-                    color: 'black',
-                    fontSize: '0.75rem',
-                    whiteSpace: 'wrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    textAlign:"center",
+                    fontWeight: "bold",
+                    backgroundColor:
+                      idx === selectedIndex
+                        ? theme.palette.success.main
+                        : theme.palette.grey[200],
+                    color: "black",
+                    fontSize: "0.75rem",
+                    whiteSpace: "wrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    textAlign: "center",
                     justifyContent: "center",
                     display: "flex",
                     alignContent: "center",
                     flexWrap: "wrap",
-                    flexDirection: "row"
+                    flexDirection: "row",
                   }}
                 >
                   {label}
@@ -164,7 +180,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
                     idx === selectedIndex
                       ? theme.palette.success.main
                       : theme.palette.grey[200],
-                  transition: 'background-color 0.3s ease',
+                  transition: "background-color 0.3s ease",
                 }}
               />
             ))}
@@ -180,6 +196,31 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
           </Box>
         </Box>
       </ChatBubble>
+    );
+  };
+
+  return (
+    <MessageContainer
+      origin={ConversationMessageSender.COMPASS}
+      data-testid={DATA_TEST_ID.SKILLS_RANKING_JOB_SEEKER_DISCLOSURE_CONTAINER}
+      ref={scrollRef}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+    >
+      {renderGroupMessage()}
+
+      <AnimatePresence mode="wait">
+        {step === 1 && (
+          <motion.div
+            key="typing-feedback"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <TypingChatMessage />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </MessageContainer>
   );
 };
