@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { Box, Slide, Typography, Divider, useTheme, useMediaQuery } from "@mui/material";
+import React, { useEffect, useMemo, useState } from "react";
+import { Box, Divider, Slide, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import ExperienceService from "src/experiences/experienceService/experienceService";
-import ExperiencesDrawerHeader from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
+import ExperiencesDrawerHeader
+  from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import { LoadingExperienceDrawerContent } from "../experiencesDrawerContent/ExperiencesDrawerContent";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { ExperienceError } from "src/error/commonErrors";
@@ -53,9 +54,8 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
     const fetchDeletedExperiences = async () => {
       setIsLoading(true);
       try {
-        const allExperiences = await ExperienceService.getInstance().getExperiences(sessionId,  true);
-        const deleted = allExperiences.filter((experience) => experience.deleted);
-        setDeletedExperiences(deleted);
+        const deletedExperiences = await ExperienceService.getInstance().getExperiences(sessionId,  true);
+        setDeletedExperiences(deletedExperiences);
       } catch (error) {
         console.error(new ExperienceError("Failed to fetch deleted experiences", error));
         enqueueSnackbar("Failed to fetch deleted experiences. Please try again later.", {
