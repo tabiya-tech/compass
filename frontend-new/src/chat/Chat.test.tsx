@@ -6,6 +6,7 @@ import Chat, {
   DATA_TEST_ID,
   INACTIVITY_TIMEOUT,
   NOTIFICATION_MESSAGES_TEXT,
+  TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT,
 } from "src/chat/Chat";
 import ChatHeader, { DATA_TEST_ID as CHAT_HEADER_TEST_ID } from "src/chat/ChatHeader/ChatHeader";
 import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "src/chat/chatList/ChatList";
@@ -436,6 +437,12 @@ describe("Chat", () => {
         // AND no message to be sent to the chat service
         expect(ChatService.getInstance().sendMessage).not.toHaveBeenCalled();
         // AND expect the given history to be currently shown in ChatList
+        // wait for the chat list to be updated
+        await waitFor(() => {
+          assertResponseMessagesAreShown(givenChatHistoryResponse, true);
+        }, { timeout: 5000 }); // Increase timeout to 5 seconds to account for typing delay
+
+        // Now check the final state
         assertResponseMessagesAreShown(givenChatHistoryResponse, true);
         // AND expect a snackbar notification was never shown
         expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
@@ -512,6 +519,12 @@ describe("Chat", () => {
         // AND no message to be sent to the chat service
         expect(ChatService.getInstance().sendMessage).not.toHaveBeenCalled();
         // AND expect the given history to be currently shown in ChatList
+        // wait for the chat list to be updated
+        await waitFor(() => {
+          assertResponseMessagesAreShown(givenChatHistoryResponse, true);
+        }, { timeout: TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT * 2 }); // TODO: fix. this is a workaround
+
+        // Now check the final state
         assertResponseMessagesAreShown(givenChatHistoryResponse, true);
         // AND expect a snackbar notification was never shown
         expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
@@ -765,9 +778,12 @@ describe("Chat", () => {
         // AND no message to be sent to the chat service
         expect(ChatService.getInstance().sendMessage).not.toHaveBeenCalled();
         // AND the last message to be a conversation conclusion message
-        const lastMessage = (ChatList as jest.Mock).mock.calls.at(-1)[0].messages.at(-1);
-        expect(lastMessage.type).toBe(CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE);
-        // AND expect input field to have been disabled
+        await waitFor(() => {
+          const lastCall = (ChatList as jest.Mock).mock.calls.at(-1)[0];
+          const lastMessage = lastCall.messages[lastCall.messages.length - 1];
+          expect(lastMessage.type).toBe(CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE);
+        }, { timeout: TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT * 2 }); // TODO: fix. this is a workaround
+        // AND input field to have been disabled
         expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
           expect.objectContaining({ isChatFinished: true, aiIsTyping: false }),
           {}
@@ -1462,7 +1478,7 @@ describe("Chat", () => {
           ],
           true
         );
-      });
+      }, { timeout: TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT * 2 }); // TODO: fix. this is a workaround
       // AND expect input field to have been disabled
       await waitFor(() => {
         expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(

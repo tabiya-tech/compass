@@ -2,27 +2,19 @@ import { getFeatures } from "src/envService";
 
 import { InvalidFeaturesConfig } from "./errors";
 
-type Config = {
+export interface FeatureConfig {
   enabled: boolean;
   config: Record<string, any>;
-};
+}
 
 /**
  * Singleton class to manage features.
  */
 export class FeaturesService {
-  private static instance: FeaturesService;
-  private readonly _state: Map<string, Config>;
+  private readonly _state: Map<string, FeatureConfig>;
 
-  private constructor() {
-    this._state = new Map<string, Config>();
-  }
-
-  public static getInstance(): FeaturesService {
-    if (!FeaturesService.instance) {
-      FeaturesService.instance = new FeaturesService();
-    }
-    return FeaturesService.instance;
+  constructor() {
+    this._state = new Map<string, FeatureConfig>();
   }
 
   /**
@@ -31,7 +23,7 @@ export class FeaturesService {
    *
    * @param featureId - The ID of the feature to retrieve the configuration for.
    */
-  public getConfig(featureId: string): Config {
+  protected getConfig(featureId: string): FeatureConfig {
     if (this._state.has(featureId)) {
       return this._state.get(featureId)!;
     }
@@ -60,7 +52,7 @@ export class FeaturesService {
         };
       }
 
-      const config: Config = featuresConfig[featureId];
+      const config: FeatureConfig = featuresConfig[featureId];
 
       this.validateConfig(config);
 
@@ -77,22 +69,35 @@ export class FeaturesService {
     }
   }
 
-  public isFeatureEnabled(featureId: string): boolean {
+  protected isFeatureEnabled(featureId: string): boolean {
     const config = this.getConfig(featureId);
     return config.enabled;
   }
 
-  public clearState(): void {
-    this._state.clear();
-  }
 
-  private validateConfig(config: any): void {
+  protected validateConfig(config: any): void {
     if (typeof config.enabled !== "boolean") {
+      // TODO: use custom errors for logging and throwing
+      console.error("Invalid config: enabled must be a boolean");
       throw new Error("Invalid config: enabled must be a boolean");
     }
 
+    if (typeof config.featureName !== "string") {
+      console.error("Invalid config: featureName must be a string");
+      throw new Error("Invalid config: featureName must be a string");
+    }
+
     if (typeof config.config !== "object") {
+      console.error("Invalid config: config must be an object");
       throw new Error("Invalid config: config must be an object");
     }
+  }
+
+  protected getFeatureAPIPrefix(featureId: string): string {
+    return `features/${featureId}`;
+  }
+
+  private _clearState(): void {
+    this._state.clear();
   }
 }

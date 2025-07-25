@@ -35,6 +35,8 @@ import ChatProgressBar from "./chatProgressbar/ChatProgressBar";
 import { CurrentPhase, defaultCurrentPhase } from "./chatProgressbar/types";
 import { CompassChatMessageProps } from "./chatMessage/compassChatMessage/CompassChatMessage";
 import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
+import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -42,7 +44,8 @@ export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 export const CHECK_INACTIVITY_INTERVAL = INACTIVITY_TIMEOUT + INACTIVITY_TIMEOUT / 3;
 
 export const FEEDBACK_NOTIFICATION_DELAY = 30 * 60 * 1000; // In milliseconds
-
+// Always add an artificial typing message for the conclusion message
+export const TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT = 1000; // In milliseconds
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
   CONTAINER: `container-${uniqueId}`,
@@ -60,10 +63,9 @@ interface ChatProps {
   disableInactivityCheck?: boolean;
 }
 
-const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableInactivityCheck = false }) => {
+export const Chat: React.FC<Readonly<ChatProps>> = ({ showInactiveSessionAlert = false, disableInactivityCheck = false }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
-
   const [messages, setMessages] = useState<IChatMessage<any>[]>([]);
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
   const [exploredExperiences, setExploredExperiences] = useState<number>(0);
@@ -81,13 +83,12 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
     UserPreferencesStateService.getInstance().getActiveSessionId()
   );
   const [currentUserId] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
+  const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
 
   const navigate = useNavigate();
 
   const initializingRef = useRef(false);
   const [initialized, setInitialized] = useState<boolean>(false);
-
-  const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
 
   // Experiences that have been processed
   const exploredExperiencesCount = useMemo(
@@ -99,13 +100,19 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
    * --- Utility functions ---
    */
 
-  const addMessage = (message: IChatMessage<any>) => {
+  const addMessageToChat = useCallback((message: IChatMessage<any>) => {
     setMessages((prevMessages) => [...prevMessages, message]);
-  };
+  }, []);
 
-  const removeMessage = (messageId: string) => {
+  const removeMessageFromChat = useCallback((messageId: string) => {
     setMessages((prevMessages) => prevMessages.filter((msg) => msg.message_id !== messageId));
-  };
+  }, []);
+
+  const { showSkillsRanking } = useSkillsRanking(addMessageToChat, removeMessageFromChat);
+
+  /**
+   * --- Utility functions ---
+   */
 
   // Depending on the typing state, add or remove the typing message from the messages list
   const addOrRemoveTypingMessage = (userIsTyping: boolean) => {
@@ -195,7 +202,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       if (userMessage) {
         // optimistically add the user's message for a more responsive feel
         const message = generateUserMessage(userMessage, new Date().toISOString());
-        addMessage(message);
+        addMessageToChat(message);
       }
 
       try {
@@ -209,18 +216,37 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
           await fetchExperiences();
         }
 
-        response.messages.forEach((messageItem) => {
-          const message =
-            response.conversation_completed && messageItem === response.messages[response.messages.length - 1]
-              ? generateConversationConclusionMessage(messageItem.message_id, messageItem.message)
-              : generateCompassMessage(
+        response.messages.forEach((messageItem, idx) => {
+          const isConclusion =
+            response.conversation_completed && idx === response.messages.length - 1;
+              if (!isConclusion) {
+              addMessageToChat( generateCompassMessage(
                   messageItem.message_id,
                   messageItem.message,
                   messageItem.sent_at,
                   messageItem.reaction
-                );
-          addMessage(message);
+                ));
+          }
         });
+        // Handle the conclusion message and skills ranking flow for new messages
+        if (response.conversation_completed && response.messages.length) {
+          const lastMessage = response.messages[response.messages.length - 1];
+          const showConclusionMessage = () => {
+            const conclusionMessage = generateConversationConclusionMessage(lastMessage.message_id, lastMessage.message);
+            const typingMessage = generateTypingMessage();
+            addMessageToChat(typingMessage);
+            setTimeout(() => {
+              removeMessageFromChat(typingMessage.message_id);
+              addMessageToChat(conclusionMessage);
+            }, TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT);
+          }
+
+          if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
+            showSkillsRanking(showConclusionMessage);
+          } else {
+            showConclusionMessage();
+          }
+        }
 
         setConversationCompleted(response.conversation_completed);
         setConversationConductedAt(response.conversation_conducted_at);
@@ -231,12 +257,12 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         });
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error));
-        addMessage(generatePleaseRepeatMessage());
+        addMessageToChat(generatePleaseRepeatMessage());
       } finally {
         setAiIsTyping(false);
       }
     },
-    [exploredExperiences, fetchExperiences]
+    [addMessageToChat, exploredExperiences, fetchExperiences, removeMessageFromChat, showSkillsRanking]
   );
 
   const initializeChat = useCallback(
@@ -271,18 +297,38 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
 
         // Set the messages from the chat history
         if (history.messages.length) {
-          setMessages(
-            history.messages.map((message: ConversationMessage) => {
+          // Separate the last message if it's a conclusion
+          const isConclusion = history.conversation_completed;
+          const mappedMessages = history.messages
+            .filter((_, idx) => !(isConclusion && idx ===  history.messages.length - 1))
+            .map((message: ConversationMessage) => {
               if (message.sender === ConversationMessageSender.USER) {
                 return generateUserMessage(message.message, message.sent_at);
               }
-              // If this is the last message and conversation is completed, make it a conclusion message
-              if (history.conversation_completed && message === history.messages[history.messages.length - 1]) {
-                return generateConversationConclusionMessage(message.message_id, message.message);
-              }
               return generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction);
-            })
-          );
+            });
+
+          setMessages(mappedMessages);
+
+          // Handle the conclusion message and skills ranking flow
+          if (isConclusion) {
+            const lastMessage = history.messages[history.messages.length - 1];
+            const showConclusionMessage = () => {
+              const conclusionMessage = generateConversationConclusionMessage(lastMessage.message_id, lastMessage.message);
+              const typingMessage = generateTypingMessage();
+              addMessageToChat(typingMessage);
+              setTimeout(() => {
+                removeMessageFromChat(typingMessage.message_id);
+                addMessageToChat(conclusionMessage);
+              }, TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT);
+            }
+
+            if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
+              showSkillsRanking(showConclusionMessage);
+            } else {
+              showConclusionMessage();
+            }
+          }
 
           setConversationCompleted(history.conversation_completed);
           setConversationConductedAt(history.conversation_conducted_at);
@@ -313,7 +359,7 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
         setAiIsTyping(false);
       }
     },
-    [sendMessage]
+    [sendMessage, showSkillsRanking, addMessageToChat, removeMessageFromChat]
   );
 
   // Resets the text field for the next message
@@ -438,8 +484,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       ) : (
         <ChatProvider
           handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}
-          removeMessage={removeMessage}
-          addMessage={addMessage}
+          removeMessage={removeMessageFromChat}
+          addMessage={addMessageToChat}
         >
           <Box
             width="100%"

@@ -22,6 +22,9 @@ import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
 import { initSentry } from "../src/sentryInit";
 import { ChatProvider } from "../src/chat/ChatContext";
+import { IChatMessage } from "../src/chat/Chat.types";
+import AuthenticationStateService from "../src/auth/services/AuthenticationState.service";
+import UserPreferencesStateService from "../src/userPreferences/UserPreferencesStateService";
 
 const preview: Preview = {
   parameters: {
@@ -62,13 +65,13 @@ const preview: Preview = {
       },
     },
     sentryEnabled: {
-      name: 'Sentry Enabled',
-      description: 'Enable/disable Sentry error reporting',
+      name: "Sentry Enabled",
+      description: "Enable/disable Sentry error reporting",
       toolbar: {
-        icon: 'alert',
+        icon: "alert",
         items: [
-          {value: true, title: 'Enabled'},
-          {value: false, title: 'Disabled'},
+          { value: true, title: "Enabled" },
+          { value: false, title: "Disabled" },
         ],
       },
     },
@@ -86,40 +89,89 @@ const ORIGINAL_SENTRY_DSN = window.tabiyaConfig.FRONTEND_SENTRY_DSN;
 let isSentryInitialized = true;
 
 export const decorators = [
-  ( Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean; }; }) => {
-  const isOnline = context.globals.online;
-  const sentryEnabled = context.globals.sentryEnabled;
-  const prevSentryEnabled = React.useRef(sentryEnabled);
+  (Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean; }; }) => {
+    const isOnline = context.globals.online;
+    const sentryEnabled = context.globals.sentryEnabled;
+    const prevSentryEnabled = React.useRef(sentryEnabled);
 
-  useEffect(() => {
-    if (prevSentryEnabled.current !== sentryEnabled) {
-      // @ts-ignore
-      window.tabiyaConfig.FRONTEND_ENABLE_SENTRY = btoa(sentryEnabled)
-      if (sentryEnabled) {
+    useEffect(() => {
+      if (prevSentryEnabled.current !== sentryEnabled) {
         // @ts-ignore
-        window.tabiyaConfig.FRONTEND_SENTRY_DSN = ORIGINAL_SENTRY_DSN;
-        initSentry();
-        isSentryInitialized = true;
-      } else {
-        // @ts-ignore
-        window.tabiyaConfig.FRONTEND_SENTRY_DSN = undefined;
-        isSentryInitialized = false;
-        // we have to reload since there is no way to notify the components of this change
-        // it is not a provider and the init happens outside of even the react root.render()
-        window.location.reload();
+        window.tabiyaConfig.FRONTEND_ENABLE_SENTRY = btoa(sentryEnabled);
+        if (sentryEnabled) {
+          // @ts-ignore
+          window.tabiyaConfig.FRONTEND_SENTRY_DSN = ORIGINAL_SENTRY_DSN;
+          initSentry();
+          isSentryInitialized = true;
+        } else {
+          // @ts-ignore
+          window.tabiyaConfig.FRONTEND_SENTRY_DSN = undefined;
+          isSentryInitialized = false;
+          // we have to reload since there is no way to notify the components of this change
+          // it is not a provider and the init happens outside of even the react root.render()
+          window.location.reload();
+        }
+        prevSentryEnabled.current = sentryEnabled;
       }
-      prevSentryEnabled.current = sentryEnabled;
-    }
-  }, [sentryEnabled]);
+    }, [sentryEnabled]);
 
-  return (
-    <HashRouter>
-      <IsOnlineContext.Provider value={isOnline}>
-        <CssBaseline />
+    // Mock authentication services for Storybook
+    React.useEffect(() => {
+      // Mock AuthenticationStateService to provide a valid token
+      const mockAuthService = AuthenticationStateService.getInstance();
+      mockAuthService.getUser = () => ({
+        id: "1",
+        name: "Test User",
+        email: "test@example.com",
+      });
+      mockAuthService.getToken = () => "mock-valid-token-for-storybook";
+
+      // Mock UserPreferencesStateService
+      const mockUserPreferencesStateService = UserPreferencesStateService.getInstance();
+      mockUserPreferencesStateService.getActiveSessionId = () => 123;
+
+      // Mock the AuthenticationServiceFactory to provide a mock authentication service
+      const mockAuthenticationService = {
+        isTokenValid: () => ({
+          isValid: true,
+          decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid token
+          failureCause: null,
+        }),
+        refreshToken: async () => {
+          // Mock successful token refresh
+          mockAuthService.setToken("mock-refreshed-token-for-storybook");
+        },
+        getUser: () => ({
+          id: "1",
+          name: "Test User",
+          email: "test@example.com",
+        }),
+        logout: async () => {
+          // Mock logout
+        },
+        cleanup: () => {
+          // Mock cleanup
+        },
+      };
+
+      // Override the getCurrentAuthenticationService method
+      const AuthenticationServiceFactory = require("../src/auth/services/Authentication.service.factory").default;
+      AuthenticationServiceFactory.getCurrentAuthenticationService = () => mockAuthenticationService;
+    }, []);
+
+    return (
+      <HashRouter>
+        <IsOnlineContext.Provider value={isOnline}>
+          <CssBaseline />
           <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
             <SnackbarProvider>
               <div style={{ height: "100vh" }}>
-                <ChatProvider handleOpenExperiencesDrawer={() => {}}>
+                <ChatProvider handleOpenExperiencesDrawer={() => {
+                }} removeMessage={function(messageId: string): void {
+                  throw new Error("Function not implemented.");
+                }} addMessage={function(message: IChatMessage<any>): void {
+                  throw new Error("Function not implemented.");
+                }}>
                   <Story />
                 </ChatProvider>
               </div>
