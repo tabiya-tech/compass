@@ -16,6 +16,8 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
+import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
+import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 
 const DISPLAY_TIMEOUT = 5000;
 
@@ -45,13 +47,14 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
     UserPreferencesStateService.getInstance().getActiveSessionId();
   const { enqueueSnackbar } = useSnackbar();
 
-  const isReplay = skillsRankingState.phase !== SkillsRankingPhase.JOB_SEEKER_DISCLOSURE;
+  const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
+  const isReplay = currentPhase !== SkillsRankingPhase.JOB_SEEKER_DISCLOSURE;
   const [step, setStep] = useState(0);
   const [hasFinished, setHasFinished] = useState(false);
   const scrollRef = useAutoScrollOnChange(step);
 
   const handleContinue = useCallback(async () => {
-    if (skillsRankingState.phase !== SkillsRankingPhase.JOB_SEEKER_DISCLOSURE) {
+    if (currentPhase !== SkillsRankingPhase.JOB_SEEKER_DISCLOSURE) {
       console.error(
         new SkillsRankingError(
           "SkillsRankingJobSeekerDisclosure: handleContinue called in non-JOB_SEEKER_DISCLOSURE phase."
@@ -79,7 +82,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
       );
     }
   }, [
-    skillsRankingState.phase,
+    currentPhase,
     activeSessionId,
     onFinish,
     enqueueSnackbar,
@@ -117,7 +120,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
       return (
         <ChatBubble
           sender={ConversationMessageSender.COMPASS}
-          message={`We've gathered the relevant information, but we need to run a few more checks on the opportunities listed on SAYouth.mobi to make sure we give you the most accurate and up-to-date details. We'll notify you as soon as everything is ready. In the meantime, feel free to bring this up during our next phone survey -- we’d be happy to revisit it with you then. Thanks for your patience!`}
+          message={`We've gathered the relevant information, but we need to run a few more checks on the opportunities listed on SAYouth.mobi to make sure we give you the most accurate and up-to-date details. We'll notify you as soon as everything is ready. In the meantime, feel free to bring this up during our next phone survey -- we'd be happy to revisit it with you then. Thanks for your patience!`}
         />
       );
     }
@@ -206,7 +209,13 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
       ref={scrollRef}
       gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
     >
-      {renderGroupMessage()}
+      <Box sx={{ width: "100%" }}>
+        {renderGroupMessage()}
+
+        <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
+          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+        </ChatMessageFooterLayout>
+      </Box>
 
       <AnimatePresence mode="wait">
         {step === 1 && (

@@ -3,64 +3,51 @@ import { Meta, StoryObj } from "@storybook/react";
 import SkillsRankingJobMarketDisclosure from "src/features/skillsRanking/components/skillsRankingDisclosure/skillsRankingMarketDisclosure/SkillsRankingJobMarketDisclosure";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
 import {
-  SkillsRankingExperimentGroups,
   SkillsRankingPhase,
   SkillsRankingState,
+  SkillsRankingPhaseWithTime,
 } from "src/features/skillsRanking/types";
+import { Box } from "@mui/material";
 
-// Wrapper props for story configuration
-type StoryArgs = {
-  experimentGroup: SkillsRankingExperimentGroups;
-  phase: SkillsRankingPhase;
-  onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>;
+const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
+  <Box sx={{ width: "600px" }}>{children}</Box>
+);
+
+const createPhaseArray = (phase: SkillsRankingPhase): SkillsRankingPhaseWithTime[] => {
+  return [{
+    name: phase,
+    time: new Date().toISOString()
+  }];
 };
 
-const StoryWrapper = ({ experimentGroup, phase, onFinish }: StoryArgs) => {
-  const state = getRandomSkillsRankingState();
-  state.experiment_group = experimentGroup;
-  state.phase = phase;
-
-  return (
-    <SkillsRankingJobMarketDisclosure
-      skillsRankingState={state}
-      onFinish={onFinish}
-    />
-  );
-};
-
-const meta: Meta<StoryArgs> = {
+const meta: Meta<typeof SkillsRankingJobMarketDisclosure> = {
   title: "Features/SkillsRanking/SkillsRankingJobMarketDisclosure",
-  component: StoryWrapper,
+  component: SkillsRankingJobMarketDisclosure,
   tags: ["autodocs"],
-  argTypes: {
-    experimentGroup: {
-      name: "Experiment Group",
-      control: { type: "select" },
-      options: Object.values(SkillsRankingExperimentGroups),
-    },
-    phase: {
-      name: "Phase",
-      control: { type: "select" },
-      options: Object.values(SkillsRankingPhase),
-    },
-    onFinish: { action: "onFinish" },
-  },
+  decorators: [
+    (Story) => (
+      <FixedWidthWrapper>
+        <Story />
+      </FixedWidthWrapper>
+    ),
+  ],
 };
 
 export default meta;
 
-type Story = StoryObj<StoryArgs>;
+type Story = StoryObj<typeof SkillsRankingJobMarketDisclosure>;
 
-export const WithDisclosureFlow: Story = {
-  args: {
-    experimentGroup: SkillsRankingExperimentGroups.GROUP_1,
-    phase: SkillsRankingPhase.MARKET_DISCLOSURE,
-  },
+const createState = (phase: SkillsRankingPhase) => {
+  const state = getRandomSkillsRankingState();
+  state.phase = createPhaseArray(phase);
+  return state;
 };
 
-export const WithoutDisclosureFlow: Story = {
+export const Default: Story = {
   args: {
-    experimentGroup: SkillsRankingExperimentGroups.GROUP_2,
-    phase: SkillsRankingPhase.PROOF_OF_VALUE,
+    onFinish: async (state: SkillsRankingState) => {
+      console.log("onFinish called with state:", state);
+    },
+    skillsRankingState: createState(SkillsRankingPhase.MARKET_DISCLOSURE),
   },
 };
