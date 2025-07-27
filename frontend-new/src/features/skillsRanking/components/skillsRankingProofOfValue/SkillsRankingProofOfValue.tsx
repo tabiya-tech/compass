@@ -22,6 +22,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { EffortType } from "src/features/skillsRanking/components/skillsRankingProofOfValue/types";
 import { SkillsRankingMetrics } from "src/features/skillsRanking/skillsRankingService/types";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
+import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
+import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
+import { Box } from "@mui/material";
 
 const CALCULATION_DELAY = 5000;
 
@@ -67,7 +70,8 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  const isReplay = useMemo(() => skillsRankingState.phase !== SkillsRankingPhase.PROOF_OF_VALUE, [skillsRankingState]);
+  const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
+  const isReplay = useMemo(() => currentPhase !== SkillsRankingPhase.PROOF_OF_VALUE, [currentPhase]);
   const effortType = getEffortTypeForGroup(skillsRankingState.experiment_group);
   const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
 
@@ -190,17 +194,23 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({
       ref={scrollRef}
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
-      <ChatBubble message={effortMessage} sender={ConversationMessageSender.COMPASS}>
-        {effortType === EffortType.WORK_BASED && (
-          <RotateToSolvePuzzle
-            puzzles={5}
-            disabled={!isOnline || hasFinished || isUpdatingState || isReplay}
-            onSuccess={() => setHasCompletedPuzzles(true)}
-            onReport={(report) => setPuzzleMetrics(report)}
-            onCancel={handleCancel}
-          />
-        )}
-      </ChatBubble>
+      <Box sx={{ width: "100%" }}>
+        <ChatBubble message={effortMessage} sender={ConversationMessageSender.COMPASS}>
+          {effortType === EffortType.WORK_BASED && (
+            <RotateToSolvePuzzle
+              puzzles={5}
+              disabled={!isOnline || hasFinished || isUpdatingState || isReplay}
+              onSuccess={() => setHasCompletedPuzzles(true)}
+              onReport={(report) => setPuzzleMetrics(report)}
+              onCancel={handleCancel}
+            />
+          )}
+        </ChatBubble>
+
+        <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
+          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+        </ChatMessageFooterLayout>
+      </Box>
 
       <AnimatePresence mode="wait">
         {isTypingVisible && !isReplay && (
