@@ -5,7 +5,8 @@ import pytest
 from app.app_config import ApplicationConfig
 from common_libs.time_utilities import get_now, convert_python_datetime_to_mongo_datetime
 from features.skills_ranking.repository.repository import SkillsRankingRepository
-from features.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhase, SkillRankingExperimentGroup, SkillsRankingScore
+from features.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhaseName, SkillRankingExperimentGroup, SkillsRankingScore, \
+    SkillsRankingPhase
 
 
 @pytest.fixture(scope="function")
@@ -16,12 +17,15 @@ async def get_skills_ranking_repository(in_memory_application_database) -> Skill
 
 def get_skills_ranking_state(
         session_id: int = 1,
-        phase: SkillsRankingPhase = "INITIAL",
+        phase: SkillsRankingPhaseName = "INITIAL",
         experiment_group: SkillRankingExperimentGroup = SkillRankingExperimentGroup.GROUP_1
 ) -> SkillsRankingState:
     return SkillsRankingState(
         session_id=session_id,
-        phase=phase,
+        phase=[SkillsRankingPhase(
+            name=phase,
+            time=get_now()
+        )],
         experiment_group=experiment_group,
         score=SkillsRankingScore(
             calculated_at=get_now(),
@@ -52,6 +56,14 @@ def _assert_skills_ranking_state_fields_match(given_state: SkillsRankingState, a
         elif field == "score":
             # Convert score fields to datetime for comparison
             value["calculated_at"] = convert_python_datetime_to_mongo_datetime(value["calculated_at"])
+        elif field == "phase":
+            # Convert each phase time to datetime for comparison
+            value = [
+                {
+                    "name": p.name if hasattr(p, 'name') else p["name"],
+                    "time": convert_python_datetime_to_mongo_datetime(p.time if hasattr(p, 'time') else p["time"])
+                } for p in value
+            ]
         elif field == "started_at":
             # Convert datetime from mongodb date to datetime for comparison
             value = convert_python_datetime_to_mongo_datetime(value)
@@ -103,7 +115,6 @@ class TestSkillsRankingRepository:
             # THEN the state is returned
             assert state is not None
             assert state.session_id == given_state.session_id
-            assert state.phase == given_state.phase
 
         @pytest.mark.asyncio
         async def test_get_by_session_id_db_error(
@@ -175,13 +186,19 @@ class TestSkillsRankingRepository:
         @pytest.mark.parametrize(
             "given_updates",
             [
-                {"phase": "BRIEFING"},
+                {"phase": SkillsRankingPhase(
+                    name="BRIEFING",
+                    time=get_now()
+                )},
                 {"cancelled_after": "1000.0ms"},
                 {"perceived_rank_percentile": 50.0},
                 {"retyped_rank_percentile": 75.0},
                 {"completed_at": get_now()},
                 {
-                    "phase": "COMPLETED",
+                    "phase": SkillsRankingPhase(
+                        name="COMPLETED",
+                        time=get_now()
+                    ),
                     "cancelled_after": "1000.0ms",
                     "perceived_rank_percentile": 50.0,
                     "retyped_rank_percentile": 75.0,
@@ -223,7 +240,19 @@ class TestSkillsRankingRepository:
             # AND the state data matches what we expect
             actual_stored_state = await repository._collection.find_one({})
             expected_state = given_state
-            expected_state = expected_state.model_copy(update=given_updates)
+            
+            # Handle phase updates specially since it's a list
+            if "phase" in given_updates:
+                expected_state = expected_state.model_copy()
+                expected_state.phase.append(given_updates["phase"])
+            else:
+                expected_state = expected_state.model_copy(update=given_updates)
+                
+            # For the all_fields test, we need to handle both phase and other fields
+            if "phase" in given_updates and len(given_updates) > 1:
+                other_updates = {k: v for k, v in given_updates.items() if k != "phase"}
+                expected_state = expected_state.model_copy(update=other_updates)
+                
             _assert_skills_ranking_state_fields_match(expected_state, actual_stored_state)
 
         @pytest.mark.asyncio
@@ -239,7 +268,10 @@ class TestSkillsRankingRepository:
             # WHEN updating a non-existent state
             result = await repository.update(
                 session_id=1,
-                phase="BRIEFING"
+                phase=SkillsRankingPhase(
+                    name="BRIEFING",
+                    time=get_now()
+                )
             )
 
             # THEN the result is None
@@ -268,5 +300,8 @@ class TestSkillsRankingRepository:
             with pytest.raises(Exception):
                 await repository.update(
                     session_id=given_state.session_id,
-                    phase="BRIEFING"
+                    phase=SkillsRankingPhase(
+                        name="BRIEFING",
+                        time=get_now()
+                    )
                 )

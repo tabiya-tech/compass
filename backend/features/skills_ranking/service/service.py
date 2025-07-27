@@ -8,7 +8,8 @@ from features.skills_ranking.errors import InvalidNewPhaseError, SkillsRankingSt
 from features.skills_ranking.repository.repository import ISkillsRankingRepository
 from features.skills_ranking.service.calculate_skills_ranking import calculate_belief_difference, get_experiment_group, calculate_skills_to_job_matching_rank, \
     calculate_skills_to_job_seekers_rank, get_ranking_comparison_label
-from features.skills_ranking.service.types import SkillsRankingState, SkillRankingExperimentGroup, SkillsRankingPhase, SkillsRankingScore
+from features.skills_ranking.service.types import SkillsRankingState, SkillRankingExperimentGroup, SkillsRankingPhaseName, SkillsRankingScore, \
+    SkillsRankingPhase
 from features.skills_ranking.utils import get_possible_next_phase, get_valid_fields_for_phase
 
 
@@ -20,7 +21,7 @@ class ISkillsRankingService(ABC):
     @abstractmethod
     async def upsert_state(self, session_id: int,
                            user_id: str | None = None,
-                           phase: SkillsRankingPhase | None = None,
+                           phase: SkillsRankingPhaseName | None = None,
                            cancelled_after: str | None = None,
                            perceived_rank_percentile: float | None = None,
                            retyped_rank_percentile: float | None = None) -> SkillsRankingState:
@@ -58,7 +59,7 @@ class SkillsRankingService(ISkillsRankingService):
             self,
             session_id: int,
             user_id: str | None = None,
-            phase: SkillsRankingPhase | None = None,
+            phase: SkillsRankingPhaseName | None = None,
             cancelled_after: float | None = None,
             perceived_rank_percentile: float | None = None,
             retyped_rank_percentile: float | None = None,
@@ -80,7 +81,10 @@ class SkillsRankingService(ISkillsRankingService):
 
             new_state = SkillsRankingState(
                 session_id=session_id,
-                phase="INITIAL",
+                phase=[SkillsRankingPhase(
+                    name=phase,
+                    time=get_now()
+                )],
                 experiment_group=experiment_group,
                 score=score,
                 started_at=get_now()
@@ -90,10 +94,11 @@ class SkillsRankingService(ISkillsRankingService):
 
         # For updates, validate the new phase if provided
         if phase is not None:
-            possible_next_states = get_possible_next_phase(existing_state.phase)
+            last_phase = existing_state.phase[-1]  # latest phase in history
+            possible_next_states = get_possible_next_phase(last_phase.name)
             if phase not in possible_next_states:
                 raise InvalidNewPhaseError(
-                    current_phase=existing_state.phase,
+                    current_phase=last_phase.name,
                     expected_phases=possible_next_states
                 )
 
@@ -107,20 +112,26 @@ class SkillsRankingService(ISkillsRankingService):
         passed_fields = [field for field, value in updated_fields.items() if value is not None]
 
         # Get the valid fields for this phase
-        valid_fields = get_valid_fields_for_phase(existing_state.phase)
+        valid_fields = get_valid_fields_for_phase(phase=phase if phase else existing_state.phase[-1].name)
 
         # Check for any invalid fields
         invalid_fields = [field for field in passed_fields if field not in valid_fields]
         if invalid_fields:
             raise InvalidFieldsForPhaseError(
-                current_phase=existing_state.phase,
+                current_phase=existing_state.phase[-1].name,
                 invalid_fields=invalid_fields,
                 valid_fields=valid_fields,
+            )
+        new_phase = None
+        if phase is not None:
+            new_phase = SkillsRankingPhase(
+                name=phase,
+                time=get_now()
             )
 
         saved_state = await self._repository.update(
             session_id=session_id,
-            phase=phase,
+            phase=new_phase,
             cancelled_after=cancelled_after,
             perceived_rank_percentile=perceived_rank_percentile,
             retyped_rank_percentile=retyped_rank_percentile,
