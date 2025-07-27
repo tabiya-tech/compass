@@ -1,7 +1,7 @@
-from features.skills_ranking.service.types import SkillsRankingPhase
+from features.skills_ranking.service.types import SkillsRankingPhaseName
 
 
-def get_possible_next_phase(current_phase: SkillsRankingPhase) -> list[SkillsRankingPhase]:
+def get_possible_next_phase(current_phase: SkillsRankingPhaseName) -> list[SkillsRankingPhaseName]:
     """
     Returns the list of possible next phase based on the current phase.
     This is a more explicit and testable alternative to the phase navigation graph.
@@ -40,7 +40,7 @@ def get_possible_next_phase(current_phase: SkillsRankingPhase) -> list[SkillsRan
     return []
 
 
-def get_valid_fields_for_phase(phase: SkillsRankingPhase) -> list[str]:
+def get_valid_fields_for_phase(phase: SkillsRankingPhaseName) -> list[str]:
     """
     Returns the list of valid fields for a given phase.
 

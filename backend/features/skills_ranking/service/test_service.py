@@ -11,7 +11,8 @@ from common_libs.time_utilities import get_now
 from features.skills_ranking.errors import InvalidNewPhaseError
 from features.skills_ranking.repository.repository import ISkillsRankingRepository
 from features.skills_ranking.service.service import SkillsRankingService
-from features.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhase, SkillRankingExperimentGroup, SkillsRankingScore
+from features.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhaseName, SkillRankingExperimentGroup, SkillsRankingScore, \
+    SkillsRankingPhase
 
 
 @pytest.fixture(scope="function")
@@ -25,7 +26,7 @@ def _mock_skills_ranking_repository() -> ISkillsRankingRepository:
 
         async def update(self, *,
                          session_id: int,
-                         phase: SkillsRankingPhase | None = None,
+                         phase: SkillsRankingPhaseName | None = None,
                          cancelled_after: float | None = None,
                          perceived_rank_percentile: float | None = None,
                          retyped_rank_percentile: float | None = None,
@@ -65,12 +66,15 @@ def _mock_user_preference_repository() -> IUserPreferenceRepository:
 
 def get_skills_ranking_state(
         session_id: int = 1,
-        phase: SkillsRankingPhase = "INITIAL",
+        phase: SkillsRankingPhaseName = "INITIAL",
         experiment_group: SkillRankingExperimentGroup = SkillRankingExperimentGroup.GROUP_1
 ) -> SkillsRankingState:
     return SkillsRankingState(
         session_id=session_id,
-        phase=phase,
+        phase=[SkillsRankingPhase(
+            name=phase,
+            time=get_now()
+        )],
         experiment_group=experiment_group,
         score=SkillsRankingScore(
             calculated_at=get_now(),
@@ -113,7 +117,7 @@ class TestSkillsRankingService:
         service = SkillsRankingService(_mock_skills_ranking_repository, _mock_user_preference_repository)
         result = await service.upsert_state(
             session_id=given_state.session_id,
-            phase=given_state.phase,
+            phase="INITIAL",
         )
 
         # THEN the repository get_by_session_id method is called with the state
@@ -145,7 +149,10 @@ class TestSkillsRankingService:
         _mock_skills_ranking_repository.get_by_session_id = AsyncMock(return_value=existing_state)
         _mock_skills_ranking_repository.create = AsyncMock()
         new_state = existing_state.model_copy(deep=True)
-        new_state.phase = cast(SkillsRankingPhase, new_phase)
+        new_state.phase.append(SkillsRankingPhase(
+            name=cast(SkillsRankingPhaseName, new_phase),
+            time=get_now()
+        ))
         _mock_skills_ranking_repository.update = AsyncMock(return_value=new_state)
 
         # AND the set_experiment_by_user_id method will successfully set the experiment groups
@@ -155,21 +162,21 @@ class TestSkillsRankingService:
         service = SkillsRankingService(_mock_skills_ranking_repository, _mock_user_preference_repository)
         result = await service.upsert_state(
             session_id=new_state.session_id,
-            phase=new_state.phase,
+            phase=new_phase,
         )
 
         # THEN the repository get_by_session_id method is called with the state
         _mock_skills_ranking_repository.get_by_session_id.assert_called_once_with(new_state.session_id)
 
         # AND then the repository update method is called with only the changed fields
-        _mock_skills_ranking_repository.update.assert_called_once_with(
-            session_id=new_state.session_id,
-            phase=new_state.phase,
-            cancelled_after=None,
-            perceived_rank_percentile=None,
-            retyped_rank_percentile=None,
-            completed_at=None
-        )
+        _mock_skills_ranking_repository.update.assert_called_once()
+        call_args = _mock_skills_ranking_repository.update.call_args
+        assert call_args.kwargs["session_id"] == new_state.session_id
+        assert call_args.kwargs["phase"].name == new_phase
+        assert call_args.kwargs["cancelled_after"] is None
+        assert call_args.kwargs["perceived_rank_percentile"] is None
+        assert call_args.kwargs["retyped_rank_percentile"] is None
+        assert call_args.kwargs["completed_at"] is None
 
         # AND the repository create method is not called
         _mock_skills_ranking_repository.create.assert_not_called()
@@ -187,10 +194,8 @@ class TestSkillsRankingService:
         # GIVEN an existing state
         existing_state = get_skills_ranking_state(phase="BRIEFING")
 
-        # AND a new state with an invalid transition
-        new_state = get_skills_ranking_state(
-            phase="COMPLETED"
-        )
+        # AND a new phase with an invalid transition
+        new_phase = "COMPLETED"
 
         # AND all repository methods are mocked
         _mock_skills_ranking_repository.get_by_session_id = AsyncMock(return_value=existing_state)
@@ -206,8 +211,8 @@ class TestSkillsRankingService:
         # THEN an InvalidNewPhaseError is raised
         with pytest.raises(InvalidNewPhaseError):
             await service.upsert_state(
-                session_id=new_state.session_id,
-                phase=new_state.phase,
+                session_id=existing_state.session_id,
+                phase=new_phase,
             )
         # AND the repository is not called to update
         _mock_skills_ranking_repository.update.assert_not_called()
