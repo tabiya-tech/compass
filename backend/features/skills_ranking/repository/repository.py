@@ -7,7 +7,8 @@ from pymongo import ReturnDocument
 
 from common_libs.time_utilities import datetime_to_mongo_date, mongo_date_to_datetime
 from features.skills_ranking.repository.collections import Collections
-from features.skills_ranking.service.types import SkillRankingExperimentGroup, SkillsRankingPhase, SkillsRankingState, SkillsRankingScore
+from features.skills_ranking.service.types import SkillRankingExperimentGroup, SkillsRankingPhaseName, SkillsRankingState, SkillsRankingScore, \
+    SkillsRankingPhase
 
 
 class ISkillsRankingRepository(ABC):
@@ -64,7 +65,13 @@ class SkillsRankingRepository(ISkillsRankingRepository):
         return {
             "session_id": skills_ranking_state.session_id,
             "experiment_group": skills_ranking_state.experiment_group.name,
-            "phase": skills_ranking_state.phase,
+            "phase": [
+                {
+                    "name": p.name,
+                    "time": datetime_to_mongo_date(p.time)
+                }
+                for p in skills_ranking_state.phase
+            ],
             "score": {
                 "calculated_at": datetime_to_mongo_date(skills_ranking_state.score.calculated_at),
                 "jobs_matching_rank": skills_ranking_state.score.jobs_matching_rank,
@@ -92,7 +99,12 @@ class SkillsRankingRepository(ISkillsRankingRepository):
         return SkillsRankingState(
             session_id=doc["session_id"],
             experiment_group=SkillRankingExperimentGroup[doc["experiment_group"]],
-            phase=doc["phase"],
+            phase=[
+                SkillsRankingPhase(
+                    name=p["name"],
+                    time=mongo_date_to_datetime(p["time"])
+                ) for p in doc["phase"]
+            ],
             score=SkillsRankingScore(
                 calculated_at=mongo_date_to_datetime(doc["score"]["calculated_at"]),
                 jobs_matching_rank=doc["score"]["jobs_matching_rank"],
@@ -124,30 +136,47 @@ class SkillsRankingRepository(ISkillsRankingRepository):
         return state
 
     # partial of skills ranking state
-    async def update(self, *,
-                     session_id: int,
-                     phase: SkillsRankingPhase | None = None,
-                     cancelled_after: float | None = None,
-                     perceived_rank_percentile: float | None = None,
-                     retyped_rank_percentile: float | None = None,
-                     completed_at: datetime | None = None
-                     ) -> SkillsRankingState:
+    async def update(
+            self,
+            *,
+            session_id: int,
+            phase: SkillsRankingPhase | None = None,
+            cancelled_after: float | None = None,
+            perceived_rank_percentile: float | None = None,
+            retyped_rank_percentile: float | None = None,
+            completed_at: datetime | None = None,
+    ) -> SkillsRankingState:
+        update_ops = {}
 
-        update_fields = {}
-        if phase is not None:
-            update_fields["phase"] = phase
+        # Handle other field updates using $set
+        set_fields = {}
         if cancelled_after is not None:
-            update_fields["cancelled_after"] = cancelled_after
+            set_fields["cancelled_after"] = cancelled_after
         if perceived_rank_percentile is not None:
-            update_fields["perceived_rank_percentile"] = perceived_rank_percentile
+            set_fields["perceived_rank_percentile"] = perceived_rank_percentile
         if retyped_rank_percentile is not None:
-            update_fields["retyped_rank_percentile"] = retyped_rank_percentile
+            set_fields["retyped_rank_percentile"] = retyped_rank_percentile
         if completed_at is not None:
-            update_fields["completed_at"] = datetime_to_mongo_date(completed_at)
+            set_fields["completed_at"] = datetime_to_mongo_date(completed_at)
+        if set_fields:
+            update_ops["$set"] = set_fields
+
+        # Append new phase if provided
+        if phase is not None:
+            update_ops["$push"] = {
+                "phase": {
+                    "name": phase.name,
+                    "time": datetime_to_mongo_date(phase.time)
+                }
+            }
+
+        if not update_ops:
+            return await self._from_db_doc(await self._collection.find_one({"session_id": session_id}))
 
         updated_doc = await self._collection.find_one_and_update(
-            {"session_id": {"$eq": session_id}},
-            {"$set": update_fields},
+            {"session_id": session_id},
+            update_ops,
             return_document=ReturnDocument.AFTER
         )
+
         return self._from_db_doc(updated_doc) if updated_doc else None

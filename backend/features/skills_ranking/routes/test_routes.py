@@ -22,7 +22,8 @@ from features.skills_ranking.repository.repository import ISkillsRankingReposito
 from features.skills_ranking.routes.routes import get_skills_ranking_router
 from features.skills_ranking.service.get_skills_ranking_service import get_skills_ranking_service
 from features.skills_ranking.service.service import ISkillsRankingService
-from features.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhase, SkillRankingExperimentGroup, SkillsRankingScore
+from features.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhaseName, SkillRankingExperimentGroup, SkillsRankingScore, \
+    SkillsRankingPhase
 
 
 def get_mock_user_preferences(session_id: int, experiments: dict[str, str] = None):
@@ -40,12 +41,15 @@ def get_mock_user_preferences(session_id: int, experiments: dict[str, str] = Non
 
 def get_skills_ranking_state(
         session_id: int = 1,
-        phase: SkillsRankingPhase = "INITIAL",
+        phase: SkillsRankingPhaseName = "INITIAL",
         experiment_group: SkillRankingExperimentGroup = SkillRankingExperimentGroup.GROUP_1
 ) -> SkillsRankingState:
     return SkillsRankingState(
         session_id=session_id,
-        phase=phase,
+        phase=[SkillsRankingPhase(
+            name=phase,
+            time=get_now()
+        )],
         experiment_group=experiment_group,
         score=SkillsRankingScore(
             calculated_at=get_now(),
@@ -78,7 +82,7 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
     class MockedSkillsRankingService(ISkillsRankingService):
         async def upsert_state(self, session_id: int,
                                user_id: str | None = None,
-                               phase: SkillsRankingPhase | None = None,
+                               phase: SkillsRankingPhaseName | None = None,
                                cancelled_after: str | None = None,
                                perceived_rank_percentile: float | None = None,
                                retyped_rank_percentile: float | None = None) -> SkillsRankingState:
@@ -125,7 +129,7 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
 
         async def update(self, *,
                          session_id: int,
-                         phase: SkillsRankingPhase | None = None,
+                         phase: SkillsRankingPhaseName | None = None,
                          cancelled_after: str | None = None,
                          perceived_rank_percentile: float | None = None,
                          retyped_rank_percentile: float | None = None,
@@ -191,7 +195,13 @@ class TestSkillsRankingRoutes:
             # AND the response contains the state
             assert response.json() == {
                 "session_id": given_state.session_id,
-                "phase": given_state.phase,
+                "phase": [
+                    {
+                        "name": p.name,
+                        "time": p.time.isoformat().replace("+00:00", "Z")
+                    }
+                    for p in given_state.phase
+                ],
                 "experiment_group": given_state.experiment_group.name,
                 "score": {
                     "calculated_at": given_state.score.calculated_at.isoformat().replace("+00:00", "Z"),
@@ -269,7 +279,7 @@ class TestSkillsRankingRoutes:
             )
             # AND the response contains the created state
             assert response.json()["session_id"] == session_id
-            assert response.json()["phase"] == "INITIAL"
+            assert response.json()["phase"][-1]["name"] == "INITIAL"
 
         @pytest.mark.asyncio
         async def test_upsert_skills_ranking_state_create_error_non_initial(
@@ -347,7 +357,7 @@ class TestSkillsRankingRoutes:
             mocked_preferences.set_experiment_by_user_id.assert_not_called()
             # AND the response contains the updated state
             assert response.json()["session_id"] == session_id
-            assert response.json()["phase"] == "COMPLETED"
+            assert response.json()["phase"][-1]["name"] == "COMPLETED"
 
         @pytest.mark.asyncio
         async def test_upsert_skills_ranking_state_invalid_phase(
@@ -367,7 +377,7 @@ class TestSkillsRankingRoutes:
             mocked_preferences.set_experiment_by_user_id = AsyncMock()
             # AND the service upsert_state should raises InvalidNewPhaseError
             mocked_service.upsert_state = AsyncMock(side_effect=InvalidNewPhaseError(
-                current_phase=existing_state.phase,
+                current_phase=existing_state.phase[-1].name,
                 expected_phases=["BRIEFING", "COMPLETED"]
             ))
 
@@ -401,7 +411,7 @@ class TestSkillsRankingRoutes:
             mocked_preferences.set_experiment_by_user_id = AsyncMock()
             # AND the service upsert_state raises InvalidFieldsForPhaseError
             mocked_service.upsert_state = AsyncMock(side_effect=InvalidFieldsForPhaseError(
-                current_phase=existing_state.phase,
+                current_phase=existing_state.phase[-1].name,
                 invalid_fields=["cancelled_after"],
                 valid_fields=["phase", "perceived_rank_percentile", "retyped_rank_percentile"]
             ))
