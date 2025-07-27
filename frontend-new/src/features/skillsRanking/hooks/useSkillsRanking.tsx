@@ -87,16 +87,17 @@ export const useSkillsRanking = (
   const handleFlow =
     (currentPhase: SkillsRankingPhase, onFinishFlow: () => void) =>
       async (newState: SkillsRankingState) => {
+        const currentPhaseName = newState.phase[newState.phase.length - 1]?.name;
         if (
-          newState.phase === SkillsRankingPhase.CANCELLED ||
-          newState.phase === SkillsRankingPhase.COMPLETED
+          currentPhaseName === SkillsRankingPhase.CANCELLED ||
+          currentPhaseName === SkillsRankingPhase.COMPLETED
         ) {
-          console.debug(`[Flow] Final phase '${newState.phase}' reached`);
+          console.debug(`[Flow] Final phase '${currentPhaseName}' reached`);
           onFinishFlow();
           return;
         }
 
-        const fullPath = skillsRankingSadPath.includes(newState.phase)
+        const fullPath = skillsRankingSadPath.includes(currentPhaseName)
           ? skillsRankingSadPath
           : skillsRankingHappyPath;
 
@@ -135,9 +136,10 @@ export const useSkillsRanking = (
       return;
     }
 
-    const path = getPathToPhase(state.phase);
+    const currentPhaseName = state.phase[state.phase.length - 1]?.name;
+    const path = getPathToPhase(currentPhaseName);
     if (path.length === 0) {
-      console.warn(`[Flow] Invalid phase path for phase: '${state.phase}'`);
+      console.warn(`[Flow] Invalid phase path for phase: '${currentPhaseName}'`);
       onFinishFlow();
       return;
     }
@@ -153,8 +155,8 @@ export const useSkillsRanking = (
     });
 
     if (
-      state.phase === SkillsRankingPhase.CANCELLED ||
-      state.phase === SkillsRankingPhase.COMPLETED
+      currentPhaseName === SkillsRankingPhase.CANCELLED ||
+      currentPhaseName === SkillsRankingPhase.COMPLETED
     ) {
       console.debug(`[Flow] Already completed or cancelled`);
       onFinishFlow();

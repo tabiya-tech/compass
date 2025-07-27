@@ -14,6 +14,9 @@ import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChat
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "@mui/material/styles";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
+import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
+import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
+import { Box } from "@mui/material";
 
 const TYPING_DURATION_MS = 2000;
 const MESSAGE_DURATION_MS = 5000;
@@ -42,7 +45,8 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({
   const [step, setStep] = useState(0);
   const scrollRef = useAutoScrollOnChange(step);
 
-  const isReplay = skillsRankingState.phase !== SkillsRankingPhase.INITIAL;
+  const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
+  const isReplay = currentPhase !== SkillsRankingPhase.INITIAL;
 
   const airtime_amount = useMemo(
     () => SkillsRankingService.getInstance().getConfig().config.airtimeBudget,
@@ -105,7 +109,12 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({
       ref={scrollRef}
     >
       {isReplay ? (
-        <PromptMessage/>
+        <Box sx={{ width: "100%" }}>
+          <PromptMessage/>
+          <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
+            <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+          </ChatMessageFooterLayout>
+        </Box>
       ) : (
         <>
           <AnimatePresence mode="wait">
@@ -129,7 +138,12 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease: "easeOut", delay: step === 1 ? 0.3 : 0 }}
             >
-              <PromptMessage/>
+              <Box sx={{ width: "100%" }}>
+                <PromptMessage/>
+                <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
+                  <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+                </ChatMessageFooterLayout>
+              </Box>
             </motion.div>
           )}
 
