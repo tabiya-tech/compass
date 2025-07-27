@@ -47,9 +47,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
   const [step, setStep] = useState(0); // 0: form, 1: typing, 2: finish
   const hasFinishedRef = useRef(false);
 
-  const jobPlatformUrl = useMemo(() => (
-    SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl
-  ), []);
+  const jobPlatformUrl = useMemo(() => SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl, []);
   const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -106,9 +104,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
         if (!activeSessionId) return;
 
         if (currentPhase !== SkillsRankingPhase.RETYPED_RANK) {
-          console.warn(
-            `[RetypedRank] Skipping auto-submit. Phase is already ${currentPhase}`
-          );
+          console.warn(`[RetypedRank] Skipping auto-submit. Phase is already ${currentPhase}`);
           return;
         }
 
@@ -129,14 +125,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
 
       return () => clearTimeout(typingTimer);
     }
-  }, [
-    isAutoSubmitGroup,
-    activeSessionId,
-    currentPhase,
-    value,
-    onFinish,
-    enqueueSnackbar,
-  ]);
+  }, [isAutoSubmitGroup, activeSessionId, currentPhase, value, onFinish, enqueueSnackbar]);
 
   if (isAutoSubmitGroup) return null;
 
@@ -147,82 +136,83 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
       data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_CONTAINER}
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
-      {(!isAutoSubmitGroup) &&
-      <Box sx={{ width: "100%" }}>
-        <ChatBubble
-          sender={ConversationMessageSender.COMPASS}
-          message={`In any case, if we do not think about other job seekers but again focus on those opportunities available to you, let's move to creating your skills profile that you can share with those employers in the next step.\n\nAs a last question, let's remind ourselves of what I told you further above: check again what I said three messages ago, how many percent of opportunities on ${jobPlatformUrl} do you fulfill the required & most relevant skills of?`}
-        >
-          <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
-            <Slider
-              value={value}
-              onChange={(_, newVal) => {
-                setStartedEditing(true);
-                setValue(newVal as number);
-              }}
-              disabled={submitted || !isOnline ||
-                currentPhase !== SkillsRankingPhase.RETYPED_RANK}
-              min={0}
-              max={100}
-              step={1}
-              marks={[
-                { value: 0, label: "" },
-                { value: 100, label: "" },
-              ]}
-              valueLabelDisplay={value === 0 ? "off" : "on"}
-              data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SLIDER}
-              sx={{
-                height: theme.fixedSpacing(theme.tabiyaSpacing.md),
-                '& .MuiSlider-track': {
-                  backgroundColor: theme.palette.success.main,
-                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-                },
-                '& .MuiSlider-rail': {
-                  backgroundColor: theme.palette.common.white,
-                  border: `1px solid ${theme.palette.grey[300]}`,
-                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-                },
-                '& .MuiSlider-thumb': {
-                  boxShadow: 'none',
-                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-                  width: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-                  height: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-                },
-                '& .MuiSlider-valueLabel': {
-                  backgroundColor: theme.palette.success.main,
-                  color: theme.palette.common.black,
-                  fontWeight: 'bold',
-                  borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-                  top: -10,
-                },
-                '& .MuiSlider-mark': {
-                  display: 'none',
-                },
-              }}
-            />
+      {!isAutoSubmitGroup && (
+        <Box sx={{ width: "100%" }}>
+          <ChatBubble
+            sender={ConversationMessageSender.COMPASS}
+            message={`In any case, if we do not think about other job seekers but again focus on those opportunities available to you, let's move to creating your skills profile that you can share with those employers in the next step.\n\nAs a last question, let's remind ourselves of what I told you further above: check again what I said three messages ago, how many percent of opportunities on ${jobPlatformUrl} do you fulfill the required & most relevant skills of?`}
+          >
+            <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
+              <Slider
+                value={value}
+                onChange={(_, newVal) => {
+                  setStartedEditing(true);
+                  setValue(newVal as number);
+                }}
+                disabled={submitted || !isOnline || currentPhase !== SkillsRankingPhase.RETYPED_RANK}
+                min={0}
+                max={100}
+                step={1}
+                marks={[
+                  { value: 0, label: "" },
+                  { value: 100, label: "" },
+                ]}
+                valueLabelDisplay={value === 0 ? "off" : "on"}
+                data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SLIDER}
+                aria-label="Retyped rank percentile slider"
+                sx={{
+                  height: theme.fixedSpacing(theme.tabiyaSpacing.md),
+                  "& .MuiSlider-track": {
+                    backgroundColor: theme.palette.success.main,
+                    borderRadius: theme.rounding(theme.tabiyaRounding.xs),
+                  },
+                  "& .MuiSlider-rail": {
+                    backgroundColor: theme.palette.common.white,
+                    border: `1px solid ${theme.palette.grey[300]}`,
+                    borderRadius: theme.rounding(theme.tabiyaRounding.xs),
+                  },
+                  "& .MuiSlider-thumb": {
+                    boxShadow: "none",
+                    borderRadius: theme.rounding(theme.tabiyaRounding.xs),
+                    width: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+                    height: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+                  },
+                  "& .MuiSlider-valueLabel": {
+                    backgroundColor: theme.palette.success.main,
+                    color: theme.palette.common.black,
+                    fontWeight: "bold",
+                    borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                    top: -10,
+                  },
+                  "& .MuiSlider-mark": {
+                    display: "none",
+                  },
+                }}
+              />
 
-            <Box mt={theme.spacing(2)} textAlign="right">
-              <PrimaryButton
-                onClick={handleSubmit}
-                disabled={
-                  submitted ||
-                  !startedEditing ||
-                  !isOnline ||
-                  currentPhase !== SkillsRankingPhase.RETYPED_RANK
-                }
-                data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SUBMIT_BUTTON}
-              >
-                Submit
-              </PrimaryButton>
+              <Box mt={theme.spacing(2)} textAlign="right">
+                <PrimaryButton
+                  onClick={handleSubmit}
+                  disabled={
+                    submitted || !startedEditing || !isOnline || currentPhase !== SkillsRankingPhase.RETYPED_RANK
+                  }
+                  data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SUBMIT_BUTTON}
+                >
+                  Submit
+                </PrimaryButton>
+              </Box>
             </Box>
-          </Box>
-        </ChatBubble>
+          </ChatBubble>
 
-        <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
-          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
-        </ChatMessageFooterLayout>
-      </Box>
-      }
+          <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
+            <Timestamp
+              sentAt={
+                skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at
+              }
+            />
+          </ChatMessageFooterLayout>
+        </Box>
+      )}
 
       <AnimatePresence mode="wait">
         {step === 1 && (

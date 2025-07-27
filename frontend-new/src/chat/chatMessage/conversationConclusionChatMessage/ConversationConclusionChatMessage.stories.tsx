@@ -1,8 +1,26 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import ConversationConclusionChatMessage from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { ChatProvider, useChatContext } from "src/chat/ChatContext";
 import { FeedbackStatus } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { useEffect } from "react";
+import { MessageContainer } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
+import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
+
+// Create a mock version of ConversationConclusionChatMessage that doesn't use the problematic footer
+const MockConversationConclusionChatMessage = ({ message }: { message: string }) => {
+  return (
+    <MessageContainer
+      origin={ConversationMessageSender.COMPASS}
+      data-testid="conversation_conclusion_chat-message-container"
+    >
+      <ChatBubble message={message} sender={ConversationMessageSender.COMPASS}>
+        <div style={{ padding: "16px", backgroundColor: "#f5f5f5", borderRadius: "8px", margin: "8px 0" }}>
+          <p style={{ margin: 0, color: "#666", fontSize: "14px" }}>Feedback form would appear here</p>
+        </div>
+      </ChatBubble>
+    </MessageContainer>
+  );
+};
 
 const withChatContext = (feedbackStatus: FeedbackStatus) => (Story: any) => {
   const Wrapper = () => {
@@ -22,16 +40,23 @@ const withChatContext = (feedbackStatus: FeedbackStatus) => (Story: any) => {
   );
 };
 
-const meta: Meta<typeof ConversationConclusionChatMessage> = {
+const meta: Meta<typeof MockConversationConclusionChatMessage> = {
   title: "Chat/ChatMessage/ConversationConclusion",
-  component: ConversationConclusionChatMessage,
+  component: MockConversationConclusionChatMessage,
   tags: ["autodocs"],
   argTypes: {},
+  decorators: [
+    (Story) => (
+      <ChatProvider handleOpenExperiencesDrawer={() => {}} removeMessage={() => {}} addMessage={() => {}}>
+        <Story />
+      </ChatProvider>
+    ),
+  ],
 };
 
 export default meta;
 
-type Story = StoryObj<typeof ConversationConclusionChatMessage>;
+type Story = StoryObj<typeof MockConversationConclusionChatMessage>;
 
 export const AccurateMessage: Story = {
   args: {

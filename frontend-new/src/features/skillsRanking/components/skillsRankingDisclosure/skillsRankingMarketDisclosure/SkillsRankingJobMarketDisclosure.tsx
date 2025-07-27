@@ -50,14 +50,11 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
   const shouldSkip =
     !isReplay &&
     (skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
-     skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4);
+      skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4);
 
   const hasFinishedRef = useRef(false);
 
-  const jobPlatformUrl = useMemo(
-    () => SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl,
-    []
-  );
+  const jobPlatformUrl = useMemo(() => SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl, []);
 
   const handleContinue = useCallback(async () => {
     if (hasFinishedRef.current) return;
@@ -94,10 +91,12 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
     if (step === 0) {
       timers.push(setTimeout(() => setStep(1), TYPING_DURATION_MS));
     } else if (step === 1) {
-      timers.push(setTimeout(() => {
-        setStep(2);
-        handleContinue();
-      }, TYPING_DURATION_MS));
+      timers.push(
+        setTimeout(() => {
+          setStep(2);
+          handleContinue();
+        }, TYPING_DURATION_MS)
+      );
     }
 
     return () => {
@@ -121,7 +120,11 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
         />
 
         <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
-          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+          <Timestamp
+            sentAt={
+              skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at
+            }
+          />
         </ChatMessageFooterLayout>
       </Box>
 

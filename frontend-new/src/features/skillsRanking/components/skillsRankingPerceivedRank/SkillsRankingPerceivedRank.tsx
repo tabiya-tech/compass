@@ -4,10 +4,7 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import {
-  SkillsRankingPhase,
-  SkillsRankingState,
-} from "src/features/skillsRanking/types";
+import { SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -40,9 +37,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
   skillsRankingState,
 }) => {
   const theme = useTheme();
-  const jobPlatformUrl = useMemo(() => (
-    SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl
-  ), []);
+  const jobPlatformUrl = useMemo(() => SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl, []);
 
   const [value, setValue] = useState(0);
   const [startedEditing, setStartedEditing] = useState(false);
@@ -62,12 +57,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
   };
 
   const handleSubmit = async () => {
-    if (
-      submitted ||
-      !startedEditing ||
-      !isOnline ||
-      currentPhase !== SkillsRankingPhase.PERCEIVED_RANK
-    ) {
+    if (submitted || !startedEditing || !isOnline || currentPhase !== SkillsRankingPhase.PERCEIVED_RANK) {
       return;
     }
 
@@ -123,8 +113,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
             <Slider
               value={value}
               onChange={handleChange}
-              disabled={submitted || !isOnline||
-                currentPhase !== SkillsRankingPhase.PERCEIVED_RANK}
+              disabled={submitted || !isOnline || currentPhase !== SkillsRankingPhase.PERCEIVED_RANK}
               min={0}
               max={100}
               step={1}
@@ -134,32 +123,33 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
                 { value: 100, label: "100" },
               ]}
               data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SLIDER}
+              aria-label="Perceived rank percentile slider"
               sx={{
                 height: theme.fixedSpacing(theme.tabiyaSpacing.md),
-                '& .MuiSlider-track': {
+                "& .MuiSlider-track": {
                   backgroundColor: theme.palette.success.main,
                   borderRadius: theme.rounding(theme.tabiyaRounding.xs),
                 },
-                '& .MuiSlider-rail': {
+                "& .MuiSlider-rail": {
                   backgroundColor: theme.palette.common.white,
                   border: `1px solid ${theme.palette.grey[300]}`,
                   borderRadius: theme.rounding(theme.tabiyaRounding.xs),
                 },
-                '& .MuiSlider-thumb': {
-                  boxShadow: 'none',
+                "& .MuiSlider-thumb": {
+                  boxShadow: "none",
                   borderRadius: theme.rounding(theme.tabiyaRounding.xs),
                   width: theme.fixedSpacing(theme.tabiyaSpacing.lg),
                   height: theme.fixedSpacing(theme.tabiyaSpacing.lg),
                 },
-                '& .MuiSlider-valueLabel': {
+                "& .MuiSlider-valueLabel": {
                   backgroundColor: theme.palette.success.main,
                   color: theme.palette.common.black,
-                  fontWeight: 'bold',
+                  fontWeight: "bold",
                   borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.sm),
                   top: -10,
                 },
-                '& .MuiSlider-mark': {
-                  display: 'none',
+                "& .MuiSlider-mark": {
+                  display: "none",
                 },
               }}
             />
@@ -168,10 +158,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
               <PrimaryButton
                 onClick={handleSubmit}
                 disabled={
-                  submitted ||
-                  !startedEditing ||
-                  !isOnline ||
-                  currentPhase !== SkillsRankingPhase.PERCEIVED_RANK
+                  submitted || !startedEditing || !isOnline || currentPhase !== SkillsRankingPhase.PERCEIVED_RANK
                 }
                 data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SUBMIT_BUTTON}
               >
@@ -182,7 +169,11 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
         </ChatBubble>
 
         <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
-          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+          <Timestamp
+            sentAt={
+              skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at
+            }
+          />
         </ChatMessageFooterLayout>
       </Box>
 

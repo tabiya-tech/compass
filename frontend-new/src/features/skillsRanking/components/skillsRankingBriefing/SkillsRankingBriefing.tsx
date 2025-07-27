@@ -35,9 +35,7 @@ enum ScrollStep {
   SECOND_MESSAGE = 2,
 }
 
-const getEffortTypeForGroup = (
-  group: SkillsRankingExperimentGroups
-): "TIME_BASED" | "WORK_BASED" => {
+const getEffortTypeForGroup = (group: SkillsRankingExperimentGroups): "TIME_BASED" | "WORK_BASED" => {
   switch (group) {
     case SkillsRankingExperimentGroups.GROUP_1:
     case SkillsRankingExperimentGroups.GROUP_4:
@@ -57,17 +55,10 @@ export interface SkillsRankingBriefingProps {
   skillsRankingState: SkillsRankingState;
 }
 
-const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
-  onFinish,
-  skillsRankingState,
-}) => {
+const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({ onFinish, skillsRankingState }) => {
   const theme = useTheme();
-  const jobPlatformUrl = useMemo(
-    () => SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl,
-    []
-  );
-  const activeSessionId =
-    UserPreferencesStateService.getInstance().getActiveSessionId();
+  const jobPlatformUrl = useMemo(() => SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl, []);
+  const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -77,11 +68,9 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
 
   const [submitted, setSubmitted] = useState(false);
   const [isTypingVisible, setIsTypingVisible] = useState(false);
-  const [showSecondMessage, setShowSecondMessage] = useState(
-    effortType === "TIME_BASED"
-  );
+  const [showSecondMessage, setShowSecondMessage] = useState(effortType === "TIME_BASED");
 
-  const currentScrollStep= useMemo(() => {
+  const currentScrollStep = useMemo(() => {
     if (isTypingVisible) return ScrollStep.TYPING;
     if (showSecondMessage) return ScrollStep.SECOND_MESSAGE;
     return ScrollStep.INITIAL;
@@ -166,7 +155,11 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
         </ChatBubble>
 
         <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
-          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+          <Timestamp
+            sentAt={
+              skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at
+            }
+          />
         </ChatMessageFooterLayout>
       </Box>
 

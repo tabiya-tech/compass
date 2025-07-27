@@ -23,7 +23,7 @@ export interface RotateToSolveTaskProps {
   disabled?: boolean;
 }
 
-const DEFAULT_STRINGS = ["GJRLK","FQZNC", "EKJGR", "CJFLQ", "GRKLE"];
+const DEFAULT_STRINGS = ["GJRLK", "FQZNC", "EKJGR", "CJFLQ", "GRKLE"];
 
 interface CharacterState {
   character: string;
@@ -84,13 +84,13 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
     if (startTime === null) setStartTime(performance.now());
     setCurrentCharIndex(index);
     setClicksCount((count) => count + 1);
-    
+
     // Track activity
     // Clear existing activity timeout
     if (activityTimeoutId) {
       clearTimeout(activityTimeoutId);
     }
-    
+
     // Set new activity timeout (user is inactive after 2 seconds)
     const newTimeoutId = setTimeout(() => {
       if (onReport) {
@@ -128,13 +128,15 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
     if (activityTimeoutId) {
       clearTimeout(activityTimeoutId);
     }
-    
+
     // Set new activity timeout (user is inactive after 2 seconds)
     const newTimeoutId = setTimeout(() => {
       if (onReport) {
         const metrics: RotateToSolvePuzzleMetricsReport = {
           puzzles_solved: puzzleIndex,
-          correct_rotations: correctRotations + updatedStates.filter((state) => state.character !== " " && isCharacterSolved(state)).length,
+          correct_rotations:
+            correctRotations +
+            updatedStates.filter((state) => state.character !== " " && isCharacterSolved(state)).length,
           clicks_count: clicksCount + 1,
           time_spent_ms: startTime ? Math.round(performance.now() - startTime) : 0,
         };
@@ -154,7 +156,8 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
       const finalReport: RotateToSolvePuzzleMetricsReport = {
         puzzles_solved: puzzleIndex + 1,
         correct_rotations:
-          correctRotations + updatedStates.filter((state) => state.character !== " " && isCharacterSolved(state)).length,
+          correctRotations +
+          updatedStates.filter((state) => state.character !== " " && isCharacterSolved(state)).length,
         clicks_count: clicksCount + 1,
         time_spent_ms: startTime ? Math.round(now - startTime) : 0,
       };
@@ -175,14 +178,18 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
     }
   };
 
-  const getBorderColor = useMemo(() => (solved: boolean, isSelected: boolean): string => {
-    if (isSelected) {
-      if (solved) return theme.palette.success.main;
-      return theme.palette.error.main
-    }
-    if (solved) return theme.palette.success.light;
-    return theme.palette.error.light;
-  }, [theme]);
+  const getBorderColor = useMemo(
+    () =>
+      (solved: boolean, isSelected: boolean): string => {
+        if (isSelected) {
+          if (solved) return theme.palette.success.main;
+          return theme.palette.error.main;
+        }
+        if (solved) return theme.palette.success.light;
+        return theme.palette.error.light;
+      },
+    [theme]
+  );
 
   useEffect(() => {
     setCharacterStates(generateChallenge());
@@ -200,18 +207,9 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
   return (
     <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
       <Typography variant="body1" color="text.secondary" textAlign="center">
-        Rotate each character until it’s upright. Select a character by clicking on it.
-        Rotate a character clockwise by using the{' '}
-        <RotateRightIcon
-          fontSize="inherit"
-          sx={{ verticalAlign: 'text-bottom' }}
-        />
-        {' '}and counterclockwise{' '}
-        <RotateLeftIcon
-          fontSize="inherit"
-          sx={{ verticalAlign: 'text-bottom' }}
-        />
-        {' '}buttons.
+        Rotate each character until it’s upright. Select a character by clicking on it. Rotate a character clockwise by
+        using the <RotateRightIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} /> and counterclockwise{" "}
+        <RotateLeftIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} /> buttons.
       </Typography>
 
       <Box
@@ -272,6 +270,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           onClick={() => updateCharacterRotation(rotationStep)}
           disabled={disabled}
           sx={{ color: theme.palette.common.black }}
+          aria-label="Rotate character clockwise"
         >
           <RotateRightIcon />
         </PrimaryIconButton>
@@ -280,6 +279,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           onClick={() => updateCharacterRotation(-rotationStep)}
           disabled={disabled}
           sx={{ color: theme.palette.common.black }}
+          aria-label="Rotate character counterclockwise"
         >
           <RotateLeftIcon />
         </PrimaryIconButton>
