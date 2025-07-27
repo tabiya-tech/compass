@@ -17,6 +17,8 @@ import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
+import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
+import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 
 const TYPING_DURATION_MS = 5000;
 
@@ -69,7 +71,8 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  const isReplay = skillsRankingState.phase !== SkillsRankingPhase.BRIEFING;
+  const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
+  const isReplay = currentPhase !== SkillsRankingPhase.BRIEFING;
   const effortType = getEffortTypeForGroup(skillsRankingState.experiment_group);
 
   const [submitted, setSubmitted] = useState(false);
@@ -133,33 +136,39 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       ref={scrollRef}
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
-      {/* TIME_BASED or first WORK_BASED message */}
-      <ChatBubble
-        message={
-          effortType === "WORK_BASED"
-            ? `If you are interested, I can calculate what share of ${jobPlatformUrl} opportunities match your skills and how you compare with other seekers — you just need to show me how valuable this information is to you.`
-            : `I will now calculate how many percent of jobs advertised on ${jobPlatformUrl} you have the required & most relevant skills for, and how you compare to other job seekers. This will take some time — if you are not interested you can click "cancel" in the next message, while I calculate. When you are ready please click continue.`
-        }
-        sender={ConversationMessageSender.COMPASS}
-      >
-        {/* Only show button here for TIME_BASED */}
-        {effortType === "TIME_BASED" && (
-          <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="flex-end"
-            padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
-          >
-            <PrimaryButton
-              onClick={handleContinue}
-              disabled={isReplay || !isOnline || submitted || isTypingVisible}
-              data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON}
+      <Box sx={{ width: "100%" }}>
+        {/* TIME_BASED or first WORK_BASED message */}
+        <ChatBubble
+          message={
+            effortType === "WORK_BASED"
+              ? `If you are interested, I can calculate what share of ${jobPlatformUrl} opportunities match your skills and how you compare with other seekers — you just need to show me how valuable this information is to you.`
+              : `I will now calculate how many percent of jobs advertised on ${jobPlatformUrl} you have the required & most relevant skills for, and how you compare to other job seekers. This will take some time — if you are not interested you can click "cancel" in the next message, while I calculate. When you are ready please click continue.`
+          }
+          sender={ConversationMessageSender.COMPASS}
+        >
+          {/* Only show button here for TIME_BASED */}
+          {effortType === "TIME_BASED" && (
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="flex-end"
+              padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
             >
-              Continue
-            </PrimaryButton>
-          </Box>
-        )}
-      </ChatBubble>
+              <PrimaryButton
+                onClick={handleContinue}
+                disabled={isReplay || !isOnline || submitted || isTypingVisible}
+                data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON}
+              >
+                Continue
+              </PrimaryButton>
+            </Box>
+          )}
+        </ChatBubble>
+
+        <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
+          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+        </ChatMessageFooterLayout>
+      </Box>
 
       {/* Typing between WORK_BASED messages */}
       <AnimatePresence mode="wait">
@@ -179,7 +188,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       {/* Second WORK_BASED message + button */}
       {effortType === "WORK_BASED" && showSecondMessage && (
         <ChatBubble
-          message={`You’ll see tilted letters on a few screens. Turn each letter upright using the rotation buttons. You can quit anytime.`}
+          message={`You'll see tilted letters on a few screens. Turn each letter upright using the rotation buttons. You can quit anytime.`}
           sender={ConversationMessageSender.COMPASS}
         >
           <Box

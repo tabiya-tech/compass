@@ -15,6 +15,9 @@ import { useTheme } from "@mui/material/styles";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
+import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
+import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
+import { Box } from "@mui/material";
 
 const TYPING_DURATION_MS = 5000;
 
@@ -41,7 +44,8 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
   const { enqueueSnackbar } = useSnackbar();
 
   const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
-  const isReplay = useMemo(() => skillsRankingState.phase !== SkillsRankingPhase.MARKET_DISCLOSURE, [skillsRankingState.phase]);
+  const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
+  const isReplay = useMemo(() => currentPhase !== SkillsRankingPhase.MARKET_DISCLOSURE, [currentPhase]);
 
   const shouldSkip =
     !isReplay &&
@@ -110,10 +114,16 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
       ref={scrollRef}
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
-      <ChatBubble
-        message={`With your current skillset you fulfill the required & most relevant skills of ${skillsRankingState.score.jobs_matching_rank}% of jobs on ${jobPlatformUrl}. This is quite some jobs!`}
-        sender={ConversationMessageSender.COMPASS}
-      />
+      <Box sx={{ width: "100%" }}>
+        <ChatBubble
+          message={`With your current skillset you fulfill the required & most relevant skills of ${skillsRankingState.score.jobs_matching_rank}% of jobs on ${jobPlatformUrl}. This is quite some jobs!`}
+          sender={ConversationMessageSender.COMPASS}
+        />
+
+        <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
+          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+        </ChatMessageFooterLayout>
+      </Box>
 
       <AnimatePresence mode="wait">
         {step === 1 && (
