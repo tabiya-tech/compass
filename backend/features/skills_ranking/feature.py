@@ -2,7 +2,7 @@ import logging
 from typing import Any
 
 from app.users.auth import Authentication
-from features.skills_ranking.repository.collections import Collections
+from features.skills_ranking.db_provider import SkillsRankingDBProvider, SkillsRankingDbSettings
 from features.skills_ranking.routes.routes import get_skills_ranking_router
 from features.types import IFeature
 
@@ -18,10 +18,18 @@ class Feature(IFeature):
 
         self._logger.info("initializing skills ranking feature")
 
-        # Create the skills ranking state collection and create the index.
-        await application_db.get_collection(Collections.SKILLS_RANKING_STATE).create_index([
-            ("session_id", 1)
-        ], unique=True)
+        # Configure the database provider with settings from config
+        db_settings = SkillsRankingDbSettings(
+            mongodb_uri=config.get("mongodb_uri", ""),
+            database_name=config.get("database_name", "skills_ranking")
+        )
+        SkillsRankingDBProvider.configure(db_settings)
+
+        # Get the skills ranking database and initialize it
+        skills_ranking_db = await SkillsRankingDBProvider.get_skills_ranking_db()
+        await SkillsRankingDBProvider.initialize_skills_ranking_mongo_db(skills_ranking_db, self._logger)
+
+        self._logger.info("skills ranking feature initialized successfully")
 
     def get_api_router(self, auth: Authentication):
         # Add skills ranking routes (Endpoints)
@@ -30,3 +38,5 @@ class Feature(IFeature):
 
     async def tear_down(self):
         self._logger.info("tearing down skills ranking feature")
+        # Clear the database cache
+        SkillsRankingDBProvider.clear_cache()
