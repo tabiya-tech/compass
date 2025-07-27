@@ -1,15 +1,15 @@
 from datetime import datetime
 
-from pydantic import BaseModel, model_validator, field_serializer, field_validator
+from pydantic import BaseModel, field_serializer, field_validator
 
-from features.skills_ranking.service.types import SkillsRankingPhase, SkillsRankingScore, SkillRankingExperimentGroup
+from features.skills_ranking.service.types import SkillsRankingPhaseName, SkillsRankingScore, SkillRankingExperimentGroup, SkillsRankingPhase
 
 
 class UpsertSkillsRankingRequest(BaseModel):
     """
     Upsert Skills Ranking Request — The request to upsert the skills ranking state.
     """
-    phase: SkillsRankingPhase
+    phase: SkillsRankingPhaseName
     """
     The phase of the skills ranking process.
     """
@@ -42,9 +42,9 @@ class SkillsRankingStateResponse(BaseModel):
     the group the user is assigned for each experiment branch
     """
 
-    phase: SkillsRankingPhase
+    phase: list[SkillsRankingPhase]
     """
-    The current phase of the skills ranking process.
+    The full phase history of the skills ranking process.
     """
 
     score: SkillsRankingScore

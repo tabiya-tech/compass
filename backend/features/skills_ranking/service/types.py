@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-SkillsRankingPhase = Literal[
+SkillsRankingPhaseName = Literal[
     "INITIAL",
     "BRIEFING",
     "PROOF_OF_VALUE",
@@ -14,6 +14,26 @@ SkillsRankingPhase = Literal[
     "RETYPED_RANK",
     "CANCELLED",
     "COMPLETED"]
+
+
+class SkillsRankingPhase(BaseModel):
+    """
+    Skills Ranking Phase — The phase of the skills ranking process.
+    """
+
+    name: SkillsRankingPhaseName
+    """
+    The name of the phase.
+    """
+    time: datetime
+    """
+    The time the phase started, in ISO format, in UTC.
+    """
+
+    class Config:
+        extra = "forbid"
+        use_enum_values = True
+        allow_population_by_field_name = True
 
 
 class SkillRankingExperimentGroup(Enum):
@@ -84,7 +104,7 @@ class SkillsRankingState(BaseModel):
     the group the user is assigned for each experiment branch
     """
 
-    phase: SkillsRankingPhase
+    phase: list[SkillsRankingPhase]
     """
     The current phase of the skills ranking process.
     """
