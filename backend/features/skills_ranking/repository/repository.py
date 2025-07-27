@@ -60,8 +60,17 @@ class ISkillsRankingRepository(ABC):
 
 
 class SkillsRankingRepository(ISkillsRankingRepository):
-    def __init__(self, db: AsyncIOMotorDatabase):
-        self._collection = db.get_collection(Collections.SKILLS_RANKING_STATE)
+    def __init__(self, db_provider):
+        """
+        Initialize the repository with a database provider.
+        
+        :param db_provider: A callable that returns an AsyncIOMotorDatabase
+        """
+        self._db_provider = db_provider
+
+    async def _get_db(self) -> AsyncIOMotorDatabase:
+        """Get the skills ranking database from the injected provider."""
+        return await self._db_provider()
 
     @classmethod
     def _to_db_doc(cls, skills_ranking_state: SkillsRankingState) -> Mapping:
@@ -131,7 +140,10 @@ class SkillsRankingRepository(ISkillsRankingRepository):
         )
 
     async def get_by_session_id(self, session_id: int) -> SkillsRankingState | None:
-        _doc = await self._collection.find_one({
+        db = await self._get_db()
+        collection = db.get_collection(Collections.SKILLS_RANKING_STATE)
+        
+        _doc = await collection.find_one({
             "session_id": {
                 "$eq": session_id
             }
@@ -143,8 +155,11 @@ class SkillsRankingRepository(ISkillsRankingRepository):
         return self._from_db_doc(_doc)
 
     async def create(self, state: SkillsRankingState) -> SkillsRankingState:
+        db = await self._get_db()
+        collection = db.get_collection(Collections.SKILLS_RANKING_STATE)
+        
         _doc = self._to_db_doc(state)
-        await self._collection.insert_one(_doc)
+        await collection.insert_one(_doc)
         return state
 
     # partial of skills ranking state
@@ -162,6 +177,9 @@ class SkillsRankingRepository(ISkillsRankingRepository):
             clicks_count: int | None = None,
             completed_at: datetime | None = None,
     ) -> SkillsRankingState:
+        db = await self._get_db()
+        collection = db.get_collection(Collections.SKILLS_RANKING_STATE)
+        
         update_ops = {}
 
         # Handle other field updates using $set
@@ -195,9 +213,9 @@ class SkillsRankingRepository(ISkillsRankingRepository):
             }
 
         if not update_ops:
-            return self._from_db_doc(await self._collection.find_one({"session_id": session_id}))
+            return self._from_db_doc(await collection.find_one({"session_id": session_id}))
 
-        updated_doc = await self._collection.find_one_and_update(
+        updated_doc = await collection.find_one_and_update(
             {"session_id": session_id},
             update_ops,
             return_document=ReturnDocument.AFTER

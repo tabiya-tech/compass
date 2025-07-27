@@ -1,18 +1,26 @@
 import asyncio
 
 from fastapi import Depends
-from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.server_dependencies.db_dependencies import CompassDBProvider
 from features.skills_ranking.repository.repository import ISkillsRankingRepository, SkillsRankingRepository
+from features.skills_ranking.db_provider import SkillsRankingDBProvider
+
+
+def get_skills_ranking_db_provider():
+    """
+    Get the skills ranking database provider.
+    This function can be mocked in tests to provide a different database.
+    """
+    return SkillsRankingDBProvider.get_skills_ranking_db
+
 
 _skills_ranking_repository_singleton: ISkillsRankingRepository | None = None
 _skills_ranking_repository_lock = asyncio.Lock()
 
 
 async def get_skills_ranking_repository(
-        application_db: AsyncIOMotorDatabase = Depends(
-            CompassDBProvider.get_application_db)) -> ISkillsRankingRepository:
+    db_provider=Depends(get_skills_ranking_db_provider)
+) -> ISkillsRankingRepository:
     """
     Get the instance of SkillsRankingRepository.
     """
@@ -26,6 +34,6 @@ async def get_skills_ranking_repository(
         async with _skills_ranking_repository_lock:
             # double check after acquiring the lock
             if _skills_ranking_repository_singleton is None:
-                _skills_ranking_repository_singleton = SkillsRankingRepository(application_db)
+                _skills_ranking_repository_singleton = SkillsRankingRepository(db_provider)
 
     return _skills_ranking_repository_singleton

@@ -7,12 +7,27 @@ from common_libs.time_utilities import get_now, convert_python_datetime_to_mongo
 from features.skills_ranking.repository.repository import SkillsRankingRepository
 from features.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhaseName, SkillRankingExperimentGroup, SkillsRankingScore, \
     SkillsRankingPhase
+from features.skills_ranking.db_provider import SkillsRankingDBProvider, SkillsRankingDbSettings
 
 
 @pytest.fixture(scope="function")
 async def get_skills_ranking_repository(in_memory_application_database) -> SkillsRankingRepository:
+    # Configure the skills ranking database provider with the in-memory database
     application_db = await in_memory_application_database
-    return SkillsRankingRepository(db=application_db)
+    db_settings = SkillsRankingDbSettings(
+        mongodb_uri=application_db.client.address[0] + ":" + str(application_db.client.address[1]),
+        database_name=application_db.name
+    )
+    SkillsRankingDBProvider.configure(db_settings)
+    
+    # Clear any existing cache
+    SkillsRankingDBProvider.clear_cache()
+    
+    # Create a database provider function that returns the configured database
+    async def db_provider():
+        return await SkillsRankingDBProvider.get_skills_ranking_db()
+    
+    return SkillsRankingRepository(db_provider)
 
 
 def get_skills_ranking_state(
@@ -126,10 +141,10 @@ class TestSkillsRankingRepository:
             # GIVEN a repository
             repository = await get_skills_ranking_repository
 
-            # AND the db.find_one method raises an exception]
+            # AND the db.find_one method raises an exception
             given_error = Exception("Database error")
-            _find_one_and_update_spy = mocker.spy(repository._collection, 'find_one')
-            _find_one_and_update_spy.side_effect = given_error
+            # Mock the database provider to raise an exception
+            mocker.patch.object(repository, '_get_db', side_effect=given_error)
 
             # WHEN getting a state
             with pytest.raises(Exception):
@@ -156,10 +171,12 @@ class TestSkillsRankingRepository:
             await repository.create(given_state)
 
             # THEN the state is created in the database
-            assert await repository._collection.count_documents({}) == 1
+            db = await repository._get_db()
+            collection = db.get_collection("skills_ranking_state")
+            assert await collection.count_documents({}) == 1
 
             # AND the state data matches what we expect
-            actual_stored_state = await repository._collection.find_one({})
+            actual_stored_state = await collection.find_one({})
             _assert_skills_ranking_state_fields_match(given_state, actual_stored_state)
 
         @pytest.mark.asyncio
@@ -174,8 +191,8 @@ class TestSkillsRankingRepository:
 
             # AND the db.insert_one method raises an exception
             given_error = Exception("Database error")
-            _insert_one_spy = mocker.spy(repository._collection, 'insert_one')
-            _insert_one_spy.side_effect = given_error
+            # Mock the database provider to raise an exception
+            mocker.patch.object(repository, '_get_db', side_effect=given_error)
 
             # WHEN creating a state
             with pytest.raises(Exception):
@@ -235,10 +252,12 @@ class TestSkillsRankingRepository:
             )
 
             # THEN the state is updated in the database
-            assert await repository._collection.count_documents({}) == 1
+            db = await repository._get_db()
+            collection = db.get_collection("skills_ranking_state")
+            assert await collection.count_documents({}) == 1
 
             # AND the state data matches what we expect
-            actual_stored_state = await repository._collection.find_one({})
+            actual_stored_state = await collection.find_one({})
             expected_state = given_state
             
             # Handle phase updates specially since it's a list
@@ -293,8 +312,8 @@ class TestSkillsRankingRepository:
 
             # AND the db.find_one_and_update method raises an exception
             given_error = Exception("Database error")
-            _find_one_and_update_spy = mocker.spy(repository._collection, 'find_one_and_update')
-            _find_one_and_update_spy.side_effect = given_error
+            # Mock the database provider to raise an exception
+            mocker.patch.object(repository, '_get_db', side_effect=given_error)
 
             # WHEN updating the state
             with pytest.raises(Exception):
