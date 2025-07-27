@@ -50,6 +50,11 @@ export enum SkillsRankingPhase {
   COMPLETED = "COMPLETED",
 }
 
+export interface SkillsRankingPhaseWithTime {
+  name: SkillsRankingPhase;
+  time: string;
+}
+
 export interface SkillsRankingScore {
   jobs_matching_rank: number;
   /**
@@ -78,9 +83,9 @@ export interface SkillsRankingState {
   /**
    * the group the user is assigned for each experiment branch
    */
-  phase: SkillsRankingPhase;
+  phase: SkillsRankingPhaseWithTime[];
   /**
-   * The current phase of the skills ranking process.
+   * The full phase history of the skills ranking process.
    */
   score: SkillsRankingScore;
   /**

@@ -5,6 +5,7 @@ import {
   SkillsRankingPhase,
   SkillsRankingState,
   SkillsRankingExperimentGroups,
+  SkillsRankingPhaseWithTime,
 } from "src/features/skillsRanking/types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
@@ -15,6 +16,13 @@ import { Box } from "@mui/material";
 const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
   <Box sx={{ width: "600px" }}>{children}</Box>
 );
+
+const createPhaseArray = (phase: SkillsRankingPhase): SkillsRankingPhaseWithTime[] => {
+  return [{
+    name: phase,
+    time: new Date().toISOString()
+  }];
+};
 
 const meta: Meta<typeof SkillsRankingBriefing> = {
   title: "Features/SkillsRanking/SkillsRankingBriefing",
@@ -59,7 +67,7 @@ const BaseArgs = {
   },
   skillsRankingState: (() => {
     const base = getRandomSkillsRankingState();
-    base.phase = SkillsRankingPhase.BRIEFING;
+    base.phase = createPhaseArray(SkillsRankingPhase.BRIEFING);
     return base;
   })(),
 };

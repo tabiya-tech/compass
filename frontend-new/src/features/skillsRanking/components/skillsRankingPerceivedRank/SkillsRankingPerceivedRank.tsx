@@ -16,6 +16,8 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
+import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
+import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 
 const uniqueId = "7c582beb-6070-43b0-92fb-7fd0a4cb533e";
 const TYPING_DURATION_MS = 5000;
@@ -51,6 +53,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
 
+  const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
   const scrollRef = useAutoScrollOnChange(submitted ? 1 : 0);
 
   const handleChange = (_: Event, newValue: number | number[]) => {
@@ -63,7 +66,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
       submitted ||
       !startedEditing ||
       !isOnline ||
-      skillsRankingState.phase !== SkillsRankingPhase.PERCEIVED_RANK
+      currentPhase !== SkillsRankingPhase.PERCEIVED_RANK
     ) {
       return;
     }
@@ -99,10 +102,10 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
   };
 
   useEffect(() => {
-    if (skillsRankingState.phase !== SkillsRankingPhase.PERCEIVED_RANK) {
+    if (currentPhase !== SkillsRankingPhase.PERCEIVED_RANK) {
       setValue(skillsRankingState.perceived_rank_percentile ?? 0);
     }
-  }, [skillsRankingState]);
+  }, [skillsRankingState, currentPhase]);
 
   return (
     <MessageContainer
@@ -111,71 +114,77 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
       data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_CONTAINER}
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
-      <ChatBubble
-        sender={ConversationMessageSender.COMPASS}
-        message={`Now, think of 100 people who are jobseekers from South Africa aged 18–34 with a matric from a township or rural school. How many of these 100 job seekers do you believe would be a fit for fewer positions on ${jobPlatformUrl} than you?`}
-      >
-        <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
-          <Slider
-            value={value}
-            onChange={handleChange}
-            disabled={submitted || !isOnline||
-              skillsRankingState.phase !== SkillsRankingPhase.PERCEIVED_RANK}
-            min={0}
-            max={100}
-            step={1}
-            valueLabelDisplay={value === 0 ? "off" : "on"}
-            marks={[
-              { value: 0, label: "0" },
-              { value: 100, label: "100" },
-            ]}
-            data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SLIDER}
-            sx={{
-              height: theme.fixedSpacing(theme.tabiyaSpacing.md),
-              '& .MuiSlider-track': {
-                backgroundColor: theme.palette.success.main,
-                borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-              },
-              '& .MuiSlider-rail': {
-                backgroundColor: theme.palette.common.white,
-                border: `1px solid ${theme.palette.grey[300]}`,
-                borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-              },
-              '& .MuiSlider-thumb': {
-                boxShadow: 'none',
-                borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-                width: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-                height: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-              },
-              '& .MuiSlider-valueLabel': {
-                backgroundColor: theme.palette.success.main,
-                color: theme.palette.common.black,
-                fontWeight: 'bold',
-                borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-                top: -10,
-              },
-              '& .MuiSlider-mark': {
-                display: 'none',
-              },
-            }}
-          />
+      <Box sx={{ width: "100%" }}>
+        <ChatBubble
+          sender={ConversationMessageSender.COMPASS}
+          message={`Now, think of 100 people who are jobseekers from South Africa aged 18–34 with a matric from a township or rural school. How many of these 100 job seekers do you believe would be a fit for fewer positions on ${jobPlatformUrl} than you?`}
+        >
+          <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
+            <Slider
+              value={value}
+              onChange={handleChange}
+              disabled={submitted || !isOnline||
+                currentPhase !== SkillsRankingPhase.PERCEIVED_RANK}
+              min={0}
+              max={100}
+              step={1}
+              valueLabelDisplay={value === 0 ? "off" : "on"}
+              marks={[
+                { value: 0, label: "0" },
+                { value: 100, label: "100" },
+              ]}
+              data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SLIDER}
+              sx={{
+                height: theme.fixedSpacing(theme.tabiyaSpacing.md),
+                '& .MuiSlider-track': {
+                  backgroundColor: theme.palette.success.main,
+                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
+                },
+                '& .MuiSlider-rail': {
+                  backgroundColor: theme.palette.common.white,
+                  border: `1px solid ${theme.palette.grey[300]}`,
+                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
+                },
+                '& .MuiSlider-thumb': {
+                  boxShadow: 'none',
+                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
+                  width: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+                  height: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+                },
+                '& .MuiSlider-valueLabel': {
+                  backgroundColor: theme.palette.success.main,
+                  color: theme.palette.common.black,
+                  fontWeight: 'bold',
+                  borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                  top: -10,
+                },
+                '& .MuiSlider-mark': {
+                  display: 'none',
+                },
+              }}
+            />
 
-          <Box mt={theme.spacing(2)} textAlign="right">
-            <PrimaryButton
-              onClick={handleSubmit}
-              disabled={
-                submitted ||
-                !startedEditing ||
-                !isOnline ||
-                skillsRankingState.phase !== SkillsRankingPhase.PERCEIVED_RANK
-              }
-              data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SUBMIT_BUTTON}
-            >
-              Submit
-            </PrimaryButton>
+            <Box mt={theme.spacing(2)} textAlign="right">
+              <PrimaryButton
+                onClick={handleSubmit}
+                disabled={
+                  submitted ||
+                  !startedEditing ||
+                  !isOnline ||
+                  currentPhase !== SkillsRankingPhase.PERCEIVED_RANK
+                }
+                data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SUBMIT_BUTTON}
+              >
+                Submit
+              </PrimaryButton>
+            </Box>
           </Box>
-        </Box>
-      </ChatBubble>
+        </ChatBubble>
+
+        <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
+          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+        </ChatMessageFooterLayout>
+      </Box>
 
       <AnimatePresence mode="wait">
         {showTyping && (
