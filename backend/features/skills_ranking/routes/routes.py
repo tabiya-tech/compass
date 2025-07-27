@@ -53,6 +53,7 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
                 # return None if no state exists
                 return None
 
+            # Return the full phase array
             return SkillsRankingStateResponse(**state.model_dump())
         except UnauthorizedSessionAccessError:
             logger.warning(f"Unauthorized access to session_id: {session_id} by user_id: {user_info.user_id}")
@@ -105,6 +106,7 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
                 retyped_rank_percentile=request.retyped_rank_percentile,
             )
 
+            # Convert the state to response format, using the latest phase
             return SkillsRankingStateResponse(**new_state.model_dump())
 
         except InvalidNewPhaseError as e:

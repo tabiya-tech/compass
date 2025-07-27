@@ -1,4 +1,4 @@
-from features.skills_ranking.service.types import SkillsRankingPhase
+from features.skills_ranking.service.types import SkillsRankingPhaseName
 
 
 class SkillsRankingStateNotFound(Exception):
@@ -14,7 +14,7 @@ class SkillsRankingStateNotFound(Exception):
 class InvalidNewPhaseError(Exception):
     """Invalid new phase error"""
 
-    def __init__(self, current_phase: SkillsRankingPhase, expected_phases: list[SkillsRankingPhase]):
+    def __init__(self, current_phase: SkillsRankingPhaseName, expected_phases: list[SkillsRankingPhaseName]):
         self.current_phase = current_phase
         self.expected_phases = expected_phases
         super().__init__(f"Invalid new phase: {current_phase}. Expected one of: {expected_phases}")
@@ -23,7 +23,7 @@ class InvalidNewPhaseError(Exception):
 class InvalidFieldsForPhaseError(Exception):
     """Invalid fields for phase error"""
 
-    def __init__(self, current_phase: SkillsRankingPhase, invalid_fields: list[str], valid_fields: list[str]):
+    def __init__(self, current_phase: SkillsRankingPhaseName, invalid_fields: list[str], valid_fields: list[str]):
         self.current_phase = current_phase
         self.invalid_fields = invalid_fields
         self.valid_fields = valid_fields
