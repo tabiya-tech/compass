@@ -84,6 +84,10 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
                                user_id: str | None = None,
                                phase: SkillsRankingPhaseName | None = None,
                                cancelled_after: str | None = None,
+                               succeeded_after: str | None = None,
+                               puzzles_solved: int | None = None,
+                               correct_rotations: int | None = None,
+                               clicks_count: int | None = None,
                                perceived_rank_percentile: float | None = None,
                                retyped_rank_percentile: float | None = None) -> SkillsRankingState:
             raise NotImplementedError()
@@ -131,6 +135,10 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
                          session_id: int,
                          phase: SkillsRankingPhaseName | None = None,
                          cancelled_after: str | None = None,
+                         succeeded_after: str | None = None,
+                         puzzles_solved: int | None = None,
+                         correct_rotations: int | None = None,
+                         clicks_count: int | None = None,
                          perceived_rank_percentile: float | None = None,
                          retyped_rank_percentile: float | None = None,
                          completed_at: datetime | None = None) -> SkillsRankingState:
@@ -210,6 +218,10 @@ class TestSkillsRankingRoutes:
                     "comparison_label": given_state.score.comparison_label,
                 },
                 "cancelled_after": given_state.cancelled_after,
+                "succeeded_after": given_state.succeeded_after,
+                "puzzles_solved": given_state.puzzles_solved,
+                "correct_rotations": given_state.correct_rotations,
+                "clicks_count": given_state.clicks_count,
                 "perceived_rank_percentile": given_state.perceived_rank_percentile,
                 "retyped_rank_percentile": given_state.retyped_rank_percentile,
                 "started_at": given_state.started_at.isoformat().replace("+00:00", "Z"),
@@ -274,6 +286,10 @@ class TestSkillsRankingRoutes:
                 session_id=session_id,
                 phase="INITIAL",
                 cancelled_after=None,
+                succeeded_after=None,
+                puzzles_solved=None,
+                correct_rotations=None,
+                clicks_count=None,
                 perceived_rank_percentile=None,
                 retyped_rank_percentile=None
             )
@@ -350,6 +366,10 @@ class TestSkillsRankingRoutes:
                 session_id=session_id,
                 phase="COMPLETED",
                 cancelled_after=given_new_cancelled_after,
+                succeeded_after=None,
+                puzzles_solved=None,
+                correct_rotations=None,
+                clicks_count=None,
                 perceived_rank_percentile=given_new_perceived_rank,
                 retyped_rank_percentile=given_retyped_rank
             )
