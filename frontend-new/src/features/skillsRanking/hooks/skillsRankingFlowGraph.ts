@@ -10,10 +10,3 @@ export const skillsRankingHappyPath = [
   SkillsRankingPhase.RETYPED_RANK,
   SkillsRankingPhase.COMPLETED
 ]
-
-export const skillsRankingSadPath = [
-  SkillsRankingPhase.INITIAL,
-  SkillsRankingPhase.BRIEFING,
-  SkillsRankingPhase.PROOF_OF_VALUE,
-  SkillsRankingPhase.CANCELLED
-]

@@ -55,6 +55,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
   const [clicksCount, setClicksCount] = useState(0);
   const [correctRotations, setCorrectRotations] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
+  const [activityTimeoutId, setActivityTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
   const theme = useTheme();
 
   const generateChallenge = useCallback((): CharacterState[] => {
@@ -83,6 +84,26 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
     if (startTime === null) setStartTime(performance.now());
     setCurrentCharIndex(index);
     setClicksCount((count) => count + 1);
+    
+    // Track activity
+    // Clear existing activity timeout
+    if (activityTimeoutId) {
+      clearTimeout(activityTimeoutId);
+    }
+    
+    // Set new activity timeout (user is inactive after 2 seconds)
+    const newTimeoutId = setTimeout(() => {
+      if (onReport) {
+        const metrics: RotateToSolvePuzzleMetricsReport = {
+          puzzles_solved: puzzleIndex,
+          correct_rotations: correctRotations,
+          clicks_count: clicksCount + 1,
+          time_spent_ms: startTime ? Math.round(performance.now() - startTime) : 0,
+        };
+        onReport(metrics);
+      }
+    }, 2000);
+    setActivityTimeoutId(newTimeoutId);
   };
 
   const updateCharacterRotation = (delta: number) => {
@@ -102,6 +123,26 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
 
     setCharacterStates(updatedStates);
 
+    // Track activity
+    // Clear existing activity timeout
+    if (activityTimeoutId) {
+      clearTimeout(activityTimeoutId);
+    }
+    
+    // Set new activity timeout (user is inactive after 2 seconds)
+    const newTimeoutId = setTimeout(() => {
+      if (onReport) {
+        const metrics: RotateToSolvePuzzleMetricsReport = {
+          puzzles_solved: puzzleIndex,
+          correct_rotations: correctRotations + updatedStates.filter((state) => state.character !== " " && isCharacterSolved(state)).length,
+          clicks_count: clicksCount + 1,
+          time_spent_ms: startTime ? Math.round(performance.now() - startTime) : 0,
+        };
+        onReport(metrics);
+      }
+    }, 2000);
+    setActivityTimeoutId(newTimeoutId);
+
     const allSolved = updatedStates.every(
       (state) => state.character === " " || (state.checked && isCharacterSolved(state))
     );
@@ -110,7 +151,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
       setIsCelebrating(true);
       const now = performance.now();
 
-      const report: RotateToSolvePuzzleMetricsReport = {
+      const finalReport: RotateToSolvePuzzleMetricsReport = {
         puzzles_solved: puzzleIndex + 1,
         correct_rotations:
           correctRotations + updatedStates.filter((state) => state.character !== " " && isCharacterSolved(state)).length,
@@ -118,12 +159,12 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
         time_spent_ms: startTime ? Math.round(now - startTime) : 0,
       };
 
-      onReport?.(report);
+      onReport?.(finalReport);
 
       setTimeout(() => {
         setIsCelebrating(false);
-        setCorrectRotations(report.correct_rotations);
-        setClicksCount(report.clicks_count);
+        setCorrectRotations(finalReport.correct_rotations);
+        setClicksCount(finalReport.clicks_count);
         const nextPuzzle = puzzleIndex + 1;
         if (nextPuzzle >= puzzles) {
           onSuccess();
@@ -146,6 +187,15 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
   useEffect(() => {
     setCharacterStates(generateChallenge());
   }, [generateChallenge]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (activityTimeoutId) {
+        clearTimeout(activityTimeoutId);
+      }
+    };
+  }, [activityTimeoutId]);
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
