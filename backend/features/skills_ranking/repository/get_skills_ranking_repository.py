@@ -3,15 +3,13 @@ import asyncio
 from fastapi import Depends
 
 from features.skills_ranking.repository.repository import ISkillsRankingRepository, SkillsRankingRepository
-from features.skills_ranking.db_provider import SkillsRankingDBProvider
+from features.skills_ranking.db_provider import get_skills_ranking_state_db
 
 _skills_ranking_repository_singleton: ISkillsRankingRepository | None = None
 _skills_ranking_repository_lock = asyncio.Lock()
 
 
-async def get_skills_ranking_repository(
-    db=Depends(SkillsRankingDBProvider.get_skills_ranking_db)
-) -> ISkillsRankingRepository:
+async def get_skills_ranking_repository() -> ISkillsRankingRepository:
     """
     Get the instance of SkillsRankingRepository.
     """
@@ -25,6 +23,7 @@ async def get_skills_ranking_repository(
         async with _skills_ranking_repository_lock:
             # double check after acquiring the lock
             if _skills_ranking_repository_singleton is None:
+                db = await get_skills_ranking_state_db()
                 _skills_ranking_repository_singleton = SkillsRankingRepository(db)
 
     return _skills_ranking_repository_singleton
