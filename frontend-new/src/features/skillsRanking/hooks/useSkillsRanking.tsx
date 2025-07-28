@@ -9,7 +9,6 @@ import {
 } from "src/features/skillsRanking/types";
 import {
   skillsRankingHappyPath,
-  skillsRankingSadPath,
 } from "./skillsRankingFlowGraph";
 import {
   createBriefingMessage,
@@ -30,7 +29,6 @@ const phaseToMessageFactory = {
   [SkillsRankingPhase.PERCEIVED_RANK]: createPerceivedRankMessage,
   [SkillsRankingPhase.RETYPED_RANK]: createRetypedRankMessage,
   [SkillsRankingPhase.COMPLETED]: null,
-  [SkillsRankingPhase.CANCELLED]: null,
 };
 
 export const useSkillsRanking = (
@@ -73,40 +71,30 @@ export const useSkillsRanking = (
     };
 
   const getPathToPhase = (phase: SkillsRankingPhase): SkillsRankingPhase[] => {
-    const path = skillsRankingSadPath.includes(phase)
-      ? skillsRankingSadPath
-      : skillsRankingHappyPath;
-    const index = path.indexOf(phase);
+    const index = skillsRankingHappyPath.indexOf(phase);
     if (index === -1) {
-      console.warn(`[SkillsRanking] Phase '${phase}' not found in path`, path);
+      console.warn(`[SkillsRanking] Phase '${phase}' not found in path`, skillsRankingHappyPath);
       return [];
     }
-    return path.slice(0, index + 1);
+    return skillsRankingHappyPath.slice(0, index + 1);
   };
 
   const handleFlow =
     (currentPhase: SkillsRankingPhase, onFinishFlow: () => void) =>
       async (newState: SkillsRankingState) => {
         const currentPhaseName = newState.phase[newState.phase.length - 1]?.name;
-        if (
-          currentPhaseName === SkillsRankingPhase.CANCELLED ||
-          currentPhaseName === SkillsRankingPhase.COMPLETED
-        ) {
+        if (currentPhaseName === SkillsRankingPhase.COMPLETED) {
           console.debug(`[Flow] Final phase '${currentPhaseName}' reached`);
           onFinishFlow();
           return;
         }
 
-        const fullPath = skillsRankingSadPath.includes(currentPhaseName)
-          ? skillsRankingSadPath
-          : skillsRankingHappyPath;
-
-        const currentIndex = fullPath.indexOf(currentPhase);
-        const nextPhase = fullPath[currentIndex + 1];
+        const currentIndex = skillsRankingHappyPath.indexOf(currentPhase);
+        const nextPhase = skillsRankingHappyPath[currentIndex + 1];
         const factory = phaseToMessageFactory[nextPhase];
 
         console.debug(
-          `[Flow] going from '${currentPhase}' to '${nextPhase}' along path: ${fullPath.join(
+          `[Flow] going from '${currentPhase}' to '${nextPhase}' along path: ${skillsRankingHappyPath.join(
             " → "
           )}`
         );
@@ -154,11 +142,8 @@ export const useSkillsRanking = (
       }
     });
 
-    if (
-      currentPhaseName === SkillsRankingPhase.CANCELLED ||
-      currentPhaseName === SkillsRankingPhase.COMPLETED
-    ) {
-      console.debug(`[Flow] Already completed or cancelled`);
+    if (currentPhaseName === SkillsRankingPhase.COMPLETED) {
+      console.debug(`[Flow] Already completed`);
       onFinishFlow();
     }
   };
