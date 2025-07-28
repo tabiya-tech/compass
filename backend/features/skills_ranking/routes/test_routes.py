@@ -23,7 +23,7 @@ from features.skills_ranking.routes.routes import get_skills_ranking_router
 from features.skills_ranking.service.get_skills_ranking_service import get_skills_ranking_service
 from features.skills_ranking.service.service import ISkillsRankingService
 from features.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhaseName, SkillRankingExperimentGroup, SkillsRankingScore, \
-    SkillsRankingPhase
+    SkillsRankingPhase, UpdateSkillsRankingRequest
 
 
 def get_mock_user_preferences(session_id: int, experiments: dict[str, str] = None):
@@ -81,18 +81,8 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
     # Mock the skills ranking service
     class MockedSkillsRankingService(ISkillsRankingService):
         async def upsert_state(self, session_id: int,
-                               user_id: str | None = None,
-                               phase: SkillsRankingPhaseName | None = None,
-                               cancelled_after: str | None = None,
-                               succeeded_after: str | None = None,
-                               puzzles_solved: int | None = None,
-                               correct_rotations: int | None = None,
-                               clicks_count: int | None = None,
-                               perceived_rank_percentile: float | None = None,
-                               retyped_rank_percentile: float | None = None) -> SkillsRankingState:
-            raise NotImplementedError()
-
-        async def get_by_session_id(self, session_id: int) -> SkillsRankingState | None:
+                               update_request: UpdateSkillsRankingRequest,
+                               user_id: str | None = None) -> SkillsRankingState:
             raise NotImplementedError()
 
         async def calculate_ranking_and_groups(self) -> str:
@@ -131,17 +121,7 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
         async def create(self, state: SkillsRankingState) -> SkillsRankingState:
             raise NotImplementedError()
 
-        async def update(self, *,
-                         session_id: int,
-                         phase: SkillsRankingPhaseName | None = None,
-                         cancelled_after: str | None = None,
-                         succeeded_after: str | None = None,
-                         puzzles_solved: int | None = None,
-                         correct_rotations: int | None = None,
-                         clicks_count: int | None = None,
-                         perceived_rank_percentile: float | None = None,
-                         retyped_rank_percentile: float | None = None,
-                         completed_at: datetime | None = None) -> SkillsRankingState:
+        async def update(self, *, session_id: int, update_request: UpdateSkillsRankingRequest) -> SkillsRankingState:
             raise NotImplementedError()
 
     mocked_skills_ranking_repository = MockedSkillsRankingRepository()
@@ -282,17 +262,10 @@ class TestSkillsRankingRoutes:
             # THEN the response is ACCEPTED
             assert response.status_code == HTTPStatus.ACCEPTED
             # AND the service upsert_state is called with the correct arguments
-            mocked_service.upsert_state.assert_called_once_with(
-                session_id=session_id,
-                phase="INITIAL",
-                cancelled_after=None,
-                succeeded_after=None,
-                puzzles_solved=None,
-                correct_rotations=None,
-                clicks_count=None,
-                perceived_rank_percentile=None,
-                retyped_rank_percentile=None
-            )
+            mocked_service.upsert_state.assert_called_once()
+            call_args = mocked_service.upsert_state.call_args
+            assert call_args[1]["session_id"] == session_id
+            assert call_args[1]["update_request"].phase == "INITIAL"
             # AND the response contains the created state
             assert response.json()["session_id"] == session_id
             assert response.json()["phase"][-1]["name"] == "INITIAL"
@@ -362,17 +335,13 @@ class TestSkillsRankingRoutes:
             # THEN the response is ACCEPTED
             assert response.status_code == HTTPStatus.ACCEPTED
             # AND the service upsert_state is called with the correct arguments
-            mocked_service.upsert_state.assert_called_once_with(
-                session_id=session_id,
-                phase="COMPLETED",
-                cancelled_after=given_new_cancelled_after,
-                succeeded_after=None,
-                puzzles_solved=None,
-                correct_rotations=None,
-                clicks_count=None,
-                perceived_rank_percentile=given_new_perceived_rank,
-                retyped_rank_percentile=given_retyped_rank
-            )
+            mocked_service.upsert_state.assert_called_once()
+            call_args = mocked_service.upsert_state.call_args
+            assert call_args[1]["session_id"] == session_id
+            assert call_args[1]["update_request"].phase == "COMPLETED"
+            assert call_args[1]["update_request"].cancelled_after == given_new_cancelled_after
+            assert call_args[1]["update_request"].perceived_rank_percentile == pytest.approx(given_new_perceived_rank)
+            assert call_args[1]["update_request"].retyped_rank_percentile == pytest.approx(given_retyped_rank)
             # AND preferences set_experiment_by_user_id is not called
             mocked_preferences.set_experiment_by_user_id.assert_not_called()
             # AND the response contains the updated state
@@ -427,21 +396,19 @@ class TestSkillsRankingRoutes:
             # AND the user has a valid session
             mocked_preferences.get_user_preference_by_user_id = AsyncMock(
                 return_value=get_mock_user_preferences(session_id, {SKILLS_RANKING_FEATURE_ID: existing_state.experiment_group.name}))
-            # AND preferences set_experiment_by_user_id should return
+            # AND preferences set_experiment_by_user_id returns
             mocked_preferences.set_experiment_by_user_id = AsyncMock()
-            # AND the service upsert_state raises InvalidFieldsForPhaseError
+            # AND the service upsert_state should raises InvalidFieldsForPhaseError
             mocked_service.upsert_state = AsyncMock(side_effect=InvalidFieldsForPhaseError(
                 current_phase=existing_state.phase[-1].name,
                 invalid_fields=["cancelled_after"],
                 valid_fields=["phase", "perceived_rank_percentile", "retyped_rank_percentile"]
             ))
 
-            # WHEN a PATCH request is made with invalid fields for the current phase
+            # WHEN a PATCH request is made with invalid fields for the phase
             response = client.patch(f"/conversations/{session_id}/skills-ranking/state", json={
                 "phase": "INITIAL",
-                "cancelled_after": "50.0ms",  # Invalid field for INITIAL phase
-                "perceived_rank_percentile": 75.0,
-                "retyped_rank_percentile": 80.0
+                "cancelled_after": "1000ms"  # Invalid field for INITIAL phase
             })
 
             # THEN the response is BAD_REQUEST
@@ -457,26 +424,23 @@ class TestSkillsRankingRoutes:
                 client_with_mocks: TestClientWithMocks,
                 setup_application_config: ApplicationConfig
         ):
-            client, mocked_service, mocked_skills_ranking_repository, mocked_preferences, _ = client_with_mocks
+            client, mocked_service, _, mocked_preferences, _ = client_with_mocks
             session_id = 1
-            # GIVEN no existing state
-            mocked_skills_ranking_repository.get_by_session_id = AsyncMock(return_value=None)
-            # AND the user does not have access to the session
-            mocked_preferences.get_user_preference_by_user_id = AsyncMock(
-                return_value=get_mock_user_preferences(session_id + 1, {}))
-            # AND preferences set_experiment_by_user_id should not be called
-            mocked_preferences.set_experiment_by_user_id = AsyncMock()
+            # GIVEN the user has no valid session
+            mocked_preferences.get_user_preference_by_user_id = AsyncMock(return_value=None)
             # AND the service upsert_state should not be called
             mocked_service.upsert_state = AsyncMock()
+
             # WHEN a PATCH request is made
             response = client.patch(f"/conversations/{session_id}/skills-ranking/state", json={
                 "phase": "INITIAL"
             })
+
             # THEN the response is FORBIDDEN
             assert response.status_code == HTTPStatus.FORBIDDEN
             assert response.json()["detail"] == "Unauthorized access to session."
-            # AND preferences set_experiment_by_user_id is not called
-            mocked_preferences.set_experiment_by_user_id.assert_not_called()
+            # AND the service upsert_state is not called
+            mocked_service.upsert_state.assert_not_called()
 
         @pytest.mark.asyncio
         async def test_upsert_skills_ranking_state_internal_error(
@@ -492,7 +456,7 @@ class TestSkillsRankingRoutes:
             # AND the user has a valid session
             mocked_preferences.get_user_preference_by_user_id = AsyncMock(
                 return_value=get_mock_user_preferences(session_id, {SKILLS_RANKING_FEATURE_ID: existing_state.experiment_group.name}))
-            # AND preferences set_experiment_by_user_id should not be called
+            # AND preferences set_experiment_by_user_id returns
             mocked_preferences.set_experiment_by_user_id = AsyncMock()
             # AND the service upsert_state will raise an exception
             mocked_service.upsert_state = AsyncMock(side_effect=Exception("Internal error"))
@@ -505,4 +469,6 @@ class TestSkillsRankingRoutes:
             # THEN the response is INTERNAL_SERVER_ERROR
             assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
             assert response.json()["detail"] == "Oops! Something went wrong."
+            # AND the service upsert_state is called
+            mocked_service.upsert_state.assert_called_once()
 

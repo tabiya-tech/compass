@@ -9,7 +9,7 @@ from features.skills_ranking.repository.repository import ISkillsRankingReposito
 from features.skills_ranking.service.calculate_skills_ranking import calculate_belief_difference, get_experiment_group, calculate_skills_to_job_matching_rank, \
     calculate_skills_to_job_seekers_rank, get_ranking_comparison_label
 from features.skills_ranking.service.types import SkillsRankingState, SkillRankingExperimentGroup, SkillsRankingPhaseName, SkillsRankingScore, \
-    SkillsRankingPhase
+    SkillsRankingPhase, UpdateSkillsRankingRequest
 from features.skills_ranking.utils import get_possible_next_phase, get_valid_fields_for_phase
 
 
@@ -20,27 +20,13 @@ class ISkillsRankingService(ABC):
 
     @abstractmethod
     async def upsert_state(self, session_id: int,
-                           user_id: str | None = None,
-                           phase: SkillsRankingPhaseName | None = None,
-                           cancelled_after: str | None = None,
-                           perceived_rank_percentile: float | None = None,
-                           retyped_rank_percentile: float | None = None,
-                           succeeded_after: str | None = None,
-                           puzzles_solved: int | None = None,
-                           correct_rotations: int | None = None,
-                           clicks_count: int | None = None) -> SkillsRankingState:
+                           update_request: UpdateSkillsRankingRequest,
+                           user_id: str | None = None) -> SkillsRankingState:
         """
         Upsert the SkillsRankingState for a given session ID.
         :param session_id: the session ID to upsert the state for.
+        :param update_request: the structured update request containing the fields to update.
         :param user_id: the user ID to associate with the state.
-        :param phase: the phase of the skills ranking process.
-        :param cancelled_after: the proof_of_value spent by the user before they cancelled the skills ranking process.
-        :param perceived_rank_percentile: the rank the user perceives themselves to be at
-        :param retyped_rank_percentile: the retyped rank for the attention check step
-        :param succeeded_after: the proof_of_value spent by the user after they succeeded in the skills ranking process.
-        :param puzzles_solved: the number of puzzles the user solved for the proof_of_value task
-        :param correct_rotations: the number of characters the user rotated correctly for the proof_of_value task
-        :param clicks_count: the number of clicks the user made during the proof_of_value task
         :return: SkillsRankingState
         """
         raise NotImplementedError()
@@ -66,21 +52,14 @@ class SkillsRankingService(ISkillsRankingService):
     async def upsert_state(
             self,
             session_id: int,
-            user_id: str | None = None,
-            phase: SkillsRankingPhaseName | None = None,
-            cancelled_after: str | None = None,
-            perceived_rank_percentile: float | None = None,
-            retyped_rank_percentile: float | None = None,
-            succeeded_after: str | None = None,
-            puzzles_solved: int | None = None,
-            correct_rotations: int | None = None,
-            clicks_count: int | None = None,
+            update_request: UpdateSkillsRankingRequest,
+            user_id: str | None = None
     ) -> SkillsRankingState:
         existing_state = await self._repository.get_by_session_id(session_id)
 
         # see if the state already exists, if not create it
         if existing_state is None:
-            if phase != "INITIAL":
+            if update_request.phase != "INITIAL":
                 raise SkillsRankingStateNotFound(session_id=session_id)
 
             score, experiment_group = await self.calculate_ranking_and_groups()
@@ -94,7 +73,7 @@ class SkillsRankingService(ISkillsRankingService):
             new_state = SkillsRankingState(
                 session_id=session_id,
                 phase=[SkillsRankingPhase(
-                    name=phase,
+                    name=update_request.phase,
                     time=get_now()
                 )],
                 experiment_group=experiment_group,
@@ -105,32 +84,23 @@ class SkillsRankingService(ISkillsRankingService):
             return saved_state
 
         # For updates, validate the new phase if provided
-        if phase is not None:
+        if update_request.phase is not None:
             last_phase = existing_state.phase[-1]  # latest phase in history
             possible_next_states = get_possible_next_phase(last_phase.name)
-            if phase not in possible_next_states:
+            if update_request.phase not in possible_next_states:
                 raise InvalidNewPhaseError(
                     current_phase=last_phase.name,
                     expected_phases=possible_next_states
                 )
 
         # Gather all fields that are being updated (i.e., are not None)
-        updated_fields = {
-            "phase": phase,
-            "cancelled_after": cancelled_after,
-            "perceived_rank_percentile": perceived_rank_percentile,
-            "retyped_rank_percentile": retyped_rank_percentile,
-            "succeeded_after": succeeded_after,
-            "puzzles_solved": puzzles_solved,
-            "correct_rotations": correct_rotations,
-            "clicks_count": clicks_count,
-        }
-        passed_fields = [field for field, value in updated_fields.items() if value is not None]
+        update_dict = update_request.model_dump(exclude_none=True)
+        passed_fields = list(update_dict.keys())
 
         # Get the valid fields for this phase
         valid_fields = get_valid_fields_for_phase(
-            phase=phase if phase else existing_state.phase[-1].name,
-            from_phase=existing_state.phase[-1].name if phase and phase != existing_state.phase[-1].name else None
+            phase=update_request.phase if update_request.phase else existing_state.phase[-1].name,
+            from_phase=existing_state.phase[-1].name if update_request.phase and update_request.phase != existing_state.phase[-1].name else None
         )
 
         # Check for any invalid fields
@@ -142,25 +112,9 @@ class SkillsRankingService(ISkillsRankingService):
                 valid_fields=valid_fields,
             )
         
-        # Only create a new phase entry if the phase is different from the current one
-        new_phase = None
-        if phase is not None and phase != existing_state.phase[-1].name:
-            new_phase = SkillsRankingPhase(
-                name=phase,
-                time=get_now()
-            )
-
         saved_state = await self._repository.update(
             session_id=session_id,
-            phase=new_phase,
-            cancelled_after=cancelled_after,
-            perceived_rank_percentile=perceived_rank_percentile,
-            retyped_rank_percentile=retyped_rank_percentile,
-            succeeded_after=succeeded_after,
-            puzzles_solved=puzzles_solved,
-            correct_rotations=correct_rotations,
-            clicks_count=clicks_count,
-            completed_at=get_now() if phase == "COMPLETED" else None
+            update_request=update_request
         )
         
         if saved_state is None:

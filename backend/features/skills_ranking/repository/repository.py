@@ -5,10 +5,10 @@ from typing import Mapping
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo import ReturnDocument
 
-from common_libs.time_utilities import datetime_to_mongo_date, mongo_date_to_datetime
+from common_libs.time_utilities import datetime_to_mongo_date, mongo_date_to_datetime, get_now
 from features.skills_ranking.repository.collections import Collections
-from features.skills_ranking.service.types import SkillRankingExperimentGroup, SkillsRankingPhaseName, SkillsRankingState, SkillsRankingScore, \
-    SkillsRankingPhase
+from features.skills_ranking.service.types import SkillRankingExperimentGroup, SkillsRankingState, SkillsRankingScore, \
+    SkillsRankingPhase, UpdateSkillsRankingRequest
 
 
 class ISkillsRankingRepository(ABC):
@@ -29,48 +29,25 @@ class ISkillsRankingRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def update(self, *,
-                     session_id: int,
-                     phase: SkillsRankingPhase | None = None,
-                     cancelled_after: str | None = None,
-                     perceived_rank_percentile: float | None = None,
-                     retyped_rank_percentile: float | None = None,
-                     succeeded_after: str | None = None,
-                     puzzles_solved: int | None = None,
-                     correct_rotations: int | None = None,
-                     clicks_count: int | None = None,
-                     completed_at: datetime | None = None
-                     ) -> SkillsRankingState:
+    async def update(self, *, session_id: int, update_request: UpdateSkillsRankingRequest) -> SkillsRankingState:
         """
-        Updates an existing skills ranking state with the provided fields.
+        Updates an existing skills ranking state using a structured update request.
         
-        :param perceived_rank_percentile: The percentile rank the user thinks they have (0-100)
-        :param retyped_rank_percentile: The rank the user retyped to confirm they saw it correctly (0-100)
-        :param cancelled_after: The proof_of_value spent by the user before they cancelled the skills ranking process.
-        :param succeeded_after: The proof_of_value spent by the user after they succeeded in the skills ranking process.
-        :param puzzles_solved: The number of puzzles the user solved for the proof_of_value task
-        :param correct_rotations: The number of characters the user rotated correctly for the proof_of_value task
-        :param clicks_count: The number of clicks the user made during the proof_of_value task
         :param session_id: The ID of the session to update (required)
-        :param phase: Optional phase to update the state to
-        :param completed_at: Optional completion time to set for the state
+        :param update_request: The structured update request containing the fields to update
         :return: The updated SkillsRankingState
         """
         raise NotImplementedError()
 
 
 class SkillsRankingRepository(ISkillsRankingRepository):
-    def __init__(self, db_provider):
+    def __init__(self, skills_ranking_state_db: AsyncIOMotorDatabase):
         """
         Initialize the repository with a database provider.
         
-        :param db_provider: A callable that returns an AsyncIOMotorDatabase
+        :param skills_ranking_state_db: A callable that returns an AsyncIOMotorDatabase
         """
-        self._db_provider = db_provider
-
-    async def _get_db(self) -> AsyncIOMotorDatabase:
-        """Get the skills ranking database from the injected provider."""
-        return await self._db_provider()
+        self._skills_ranking_state_db = skills_ranking_state_db
 
     @classmethod
     def _to_db_doc(cls, skills_ranking_state: SkillsRankingState) -> Mapping:
@@ -81,7 +58,7 @@ class SkillsRankingRepository(ISkillsRankingRepository):
         """
         return {
             "session_id": skills_ranking_state.session_id,
-            "experiment_group": skills_ranking_state.experiment_group.name,
+            "experiment_group": skills_ranking_state.experiment_group.value,
             "phase": [
                 {
                     "name": p.name,
@@ -102,8 +79,8 @@ class SkillsRankingRepository(ISkillsRankingRepository):
             "clicks_count": skills_ranking_state.clicks_count,
             "perceived_rank_percentile": skills_ranking_state.perceived_rank_percentile,
             "retyped_rank_percentile": skills_ranking_state.retyped_rank_percentile,
-            "started_at": datetime_to_mongo_date(skills_ranking_state.started_at),
-            "completed_at": datetime_to_mongo_date(skills_ranking_state.completed_at) if skills_ranking_state.completed_at else None
+            "completed_at": datetime_to_mongo_date(skills_ranking_state.completed_at) if skills_ranking_state.completed_at else None,
+            "started_at": datetime_to_mongo_date(skills_ranking_state.started_at)
         }
 
     @classmethod
@@ -115,12 +92,13 @@ class SkillsRankingRepository(ISkillsRankingRepository):
         """
         return SkillsRankingState(
             session_id=doc["session_id"],
-            experiment_group=SkillRankingExperimentGroup[doc["experiment_group"]],
+            experiment_group=SkillRankingExperimentGroup(doc["experiment_group"]),
             phase=[
                 SkillsRankingPhase(
                     name=p["name"],
                     time=mongo_date_to_datetime(p["time"])
-                ) for p in doc["phase"]
+                )
+                for p in doc["phase"]
             ],
             score=SkillsRankingScore(
                 calculated_at=mongo_date_to_datetime(doc["score"]["calculated_at"]),
@@ -135,13 +113,12 @@ class SkillsRankingRepository(ISkillsRankingRepository):
             clicks_count=doc.get("clicks_count"),
             perceived_rank_percentile=doc.get("perceived_rank_percentile"),
             retyped_rank_percentile=doc.get("retyped_rank_percentile"),
-            started_at=mongo_date_to_datetime(doc["started_at"]),
-            completed_at=mongo_date_to_datetime(doc.get("completed_at")) if doc.get("completed_at") else None
+            completed_at=mongo_date_to_datetime(doc["completed_at"]) if doc.get("completed_at") else None,
+            started_at=mongo_date_to_datetime(doc["started_at"])
         )
 
     async def get_by_session_id(self, session_id: int) -> SkillsRankingState | None:
-        db = await self._get_db()
-        collection = db.get_collection(Collections.SKILLS_RANKING_STATE)
+        collection = self._skills_ranking_state_db.get_collection(Collections.SKILLS_RANKING_STATE)
         
         _doc = await collection.find_one({
             "session_id": {
@@ -155,60 +132,41 @@ class SkillsRankingRepository(ISkillsRankingRepository):
         return self._from_db_doc(_doc)
 
     async def create(self, state: SkillsRankingState) -> SkillsRankingState:
-        db = await self._get_db()
-        collection = db.get_collection(Collections.SKILLS_RANKING_STATE)
+        collection = self._skills_ranking_state_db.get_collection(Collections.SKILLS_RANKING_STATE)
         
         _doc = self._to_db_doc(state)
         await collection.insert_one(_doc)
         return state
 
-    # partial of skills ranking state
-    async def update(
-            self,
-            *,
-            session_id: int,
-            phase: SkillsRankingPhase | None = None,
-            cancelled_after: str | None = None,
-            perceived_rank_percentile: float | None = None,
-            retyped_rank_percentile: float | None = None,
-            succeeded_after: str | None = None,
-            puzzles_solved: int | None = None,
-            correct_rotations: int | None = None,
-            clicks_count: int | None = None,
-            completed_at: datetime | None = None,
-    ) -> SkillsRankingState:
-        db = await self._get_db()
-        collection = db.get_collection(Collections.SKILLS_RANKING_STATE)
+    async def update(self, *, session_id: int, update_request: UpdateSkillsRankingRequest) -> SkillsRankingState:
+        collection = self._skills_ranking_state_db.get_collection(Collections.SKILLS_RANKING_STATE)
         
         update_ops = {}
 
-        # Handle other field updates using $set
+        # Get all non-None fields from the update request
+        update_dict = update_request.model_dump(exclude_none=True)
+        
+        # Handle field updates using $set
         set_fields = {}
-        if cancelled_after is not None:
-            set_fields["cancelled_after"] = cancelled_after
-        if perceived_rank_percentile is not None:
-            set_fields["perceived_rank_percentile"] = perceived_rank_percentile
-        if retyped_rank_percentile is not None:
-            set_fields["retyped_rank_percentile"] = retyped_rank_percentile
-        if succeeded_after is not None:
-            set_fields["succeeded_after"] = succeeded_after
-        if puzzles_solved is not None:
-            set_fields["puzzles_solved"] = puzzles_solved
-        if correct_rotations is not None:
-            set_fields["correct_rotations"] = correct_rotations
-        if clicks_count is not None:
-            set_fields["clicks_count"] = clicks_count
-        if completed_at is not None:
-            set_fields["completed_at"] = datetime_to_mongo_date(completed_at)
+        for field, value in update_dict.items():
+            if field == "phase":
+                # Skip phase as it's handled separately with $push
+                continue
+            elif field == "completed_at":
+                # Convert datetime to MongoDB format
+                set_fields[field] = datetime_to_mongo_date(value)
+            else:
+                set_fields[field] = value
+        
         if set_fields:
             update_ops["$set"] = set_fields
 
         # Append new phase if provided
-        if phase is not None:
+        if update_request.phase is not None:
             update_ops["$push"] = {
                 "phase": {
-                    "name": phase.name,
-                    "time": datetime_to_mongo_date(phase.time)
+                    "name": update_request.phase,
+                    "time": datetime_to_mongo_date(get_now())
                 }
             }
 
