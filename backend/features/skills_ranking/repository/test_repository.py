@@ -6,7 +6,7 @@ from app.app_config import ApplicationConfig
 from common_libs.time_utilities import get_now, convert_python_datetime_to_mongo_datetime
 from features.skills_ranking.repository.repository import SkillsRankingRepository
 from features.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhaseName, SkillRankingExperimentGroup, SkillsRankingScore, \
-    SkillsRankingPhase
+    SkillsRankingPhase, UpdateSkillsRankingRequest
 from features.skills_ranking.db_provider import SkillsRankingDBProvider, SkillsRankingDbSettings
 
 
@@ -23,11 +23,10 @@ async def get_skills_ranking_repository(in_memory_application_database) -> Skill
     # Clear any existing cache
     SkillsRankingDBProvider.clear_cache()
     
-    # Create a database provider function that returns the configured database
-    async def db_provider():
-        return await SkillsRankingDBProvider.get_skills_ranking_db()
+    # Get the actual database object
+    db = await SkillsRankingDBProvider.get_skills_ranking_db()
     
-    return SkillsRankingRepository(db_provider)
+    return SkillsRankingRepository(db)
 
 
 def get_skills_ranking_state(
@@ -66,8 +65,8 @@ def _assert_skills_ranking_state_fields_match(given_state: SkillsRankingState, a
 
     for field, value in given_state.model_dump().items():
         if field == "experiment_group":
-            # Convert enum to string for comparison
-            value = value.name
+            # Convert enum to value for comparison
+            value = value.value
         elif field == "score":
             # Convert score fields to datetime for comparison
             value["calculated_at"] = convert_python_datetime_to_mongo_datetime(value["calculated_at"])
@@ -79,6 +78,17 @@ def _assert_skills_ranking_state_fields_match(given_state: SkillsRankingState, a
                     "time": convert_python_datetime_to_mongo_datetime(p.time if hasattr(p, 'time') else p["time"])
                 } for p in value
             ]
+            # For phase timestamps, allow a small time difference since MongoDB truncates microseconds
+            actual_phases = actual_stored_state[field]
+            assert len(actual_phases) == len(value)
+            for i, (expected_phase, actual_phase) in enumerate(zip(value, actual_phases)):
+                assert expected_phase["name"] == actual_phase["name"]
+                expected_time = expected_phase["time"]
+                actual_time = actual_phase["time"]
+                time_diff = abs((expected_time - actual_time).total_seconds())
+                # Allow up to 5ms difference to account for MongoDB truncation and processing time
+                assert time_diff < 0.005, f"Phase {i} time difference {time_diff}s exceeds 5ms"
+            continue  # Skip the regular assertion for phases
         elif field == "started_at":
             # Convert datetime from mongodb date to datetime for comparison
             value = convert_python_datetime_to_mongo_datetime(value)
@@ -143,8 +153,8 @@ class TestSkillsRankingRepository:
 
             # AND the db.find_one method raises an exception
             given_error = Exception("Database error")
-            # Mock the database provider to raise an exception
-            mocker.patch.object(repository, '_get_db', side_effect=given_error)
+            # Mock the database to raise an exception
+            mocker.patch.object(repository._skills_ranking_state_db, 'get_collection', side_effect=given_error)
 
             # WHEN getting a state
             with pytest.raises(Exception):
@@ -171,7 +181,7 @@ class TestSkillsRankingRepository:
             await repository.create(given_state)
 
             # THEN the state is created in the database
-            db = await repository._get_db()
+            db = repository._skills_ranking_state_db
             collection = db.get_collection("skills_ranking_state")
             assert await collection.count_documents({}) == 1
 
@@ -191,8 +201,8 @@ class TestSkillsRankingRepository:
 
             # AND the db.insert_one method raises an exception
             given_error = Exception("Database error")
-            # Mock the database provider to raise an exception
-            mocker.patch.object(repository, '_get_db', side_effect=given_error)
+            # Mock the database to raise an exception
+            mocker.patch.object(repository._skills_ranking_state_db, 'get_collection', side_effect=given_error)
 
             # WHEN creating a state
             with pytest.raises(Exception):
@@ -203,19 +213,13 @@ class TestSkillsRankingRepository:
         @pytest.mark.parametrize(
             "given_updates",
             [
-                {"phase": SkillsRankingPhase(
-                    name="BRIEFING",
-                    time=get_now()
-                )},
+                {"phase": "BRIEFING"},
                 {"cancelled_after": "1000.0ms"},
                 {"perceived_rank_percentile": 50.0},
                 {"retyped_rank_percentile": 75.0},
                 {"completed_at": get_now()},
                 {
-                    "phase": SkillsRankingPhase(
-                        name="COMPLETED",
-                        time=get_now()
-                    ),
+                    "phase": "COMPLETED",
                     "cancelled_after": "1000.0ms",
                     "perceived_rank_percentile": 50.0,
                     "retyped_rank_percentile": 75.0,
@@ -246,13 +250,14 @@ class TestSkillsRankingRepository:
 
             # AND new values to update with
             # WHEN updating the state with the given updates
+            update_request = UpdateSkillsRankingRequest(**given_updates)
             await repository.update(
                 session_id=given_state.session_id,
-                **given_updates
+                update_request=update_request
             )
 
             # THEN the state is updated in the database
-            db = await repository._get_db()
+            db = repository._skills_ranking_state_db
             collection = db.get_collection("skills_ranking_state")
             assert await collection.count_documents({}) == 1
 
@@ -263,7 +268,10 @@ class TestSkillsRankingRepository:
             # Handle phase updates specially since it's a list
             if "phase" in given_updates:
                 expected_state = expected_state.model_copy()
-                expected_state.phase.append(given_updates["phase"])
+                expected_state.phase.append(SkillsRankingPhase(
+                    name=given_updates["phase"],
+                    time=get_now()
+                ))
             else:
                 expected_state = expected_state.model_copy(update=given_updates)
                 
@@ -285,12 +293,10 @@ class TestSkillsRankingRepository:
 
             # AND no existing state
             # WHEN updating a non-existent state
+            update_request = UpdateSkillsRankingRequest(phase="BRIEFING")
             result = await repository.update(
                 session_id=1,
-                phase=SkillsRankingPhase(
-                    name="BRIEFING",
-                    time=get_now()
-                )
+                update_request=update_request
             )
 
             # THEN the result is None
@@ -312,15 +318,13 @@ class TestSkillsRankingRepository:
 
             # AND the db.find_one_and_update method raises an exception
             given_error = Exception("Database error")
-            # Mock the database provider to raise an exception
-            mocker.patch.object(repository, '_get_db', side_effect=given_error)
+            # Mock the database to raise an exception
+            mocker.patch.object(repository._skills_ranking_state_db, 'get_collection', side_effect=given_error)
 
             # WHEN updating the state
+            update_request = UpdateSkillsRankingRequest(phase="BRIEFING")
             with pytest.raises(Exception):
                 await repository.update(
                     session_id=given_state.session_id,
-                    phase=SkillsRankingPhase(
-                        name="BRIEFING",
-                        time=get_now()
-                    )
+                    update_request=update_request
                 )

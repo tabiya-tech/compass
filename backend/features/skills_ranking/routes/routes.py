@@ -18,7 +18,7 @@ from features.skills_ranking.repository.repository import ISkillsRankingReposito
 from features.skills_ranking.routes.types import UpsertSkillsRankingRequest, SkillsRankingStateResponse
 from features.skills_ranking.service.get_skills_ranking_service import get_skills_ranking_service
 from features.skills_ranking.service.service import ISkillsRankingService
-from features.skills_ranking.service.types import SkillsRankingState
+from features.skills_ranking.service.types import SkillsRankingState, UpdateSkillsRankingRequest
 from features.skills_ranking.errors import SkillsRankingStateNotFound
 
 logger = logging.getLogger(__name__)
@@ -100,14 +100,16 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
 
             new_state = await skills_ranking_service.upsert_state(
                 session_id=session_id,
-                phase=request.phase,
-                cancelled_after=request.cancelled_after,
-                succeeded_after=request.succeeded_after,
-                puzzles_solved=request.puzzles_solved,
-                correct_rotations=request.correct_rotations,
-                clicks_count=request.clicks_count,
-                perceived_rank_percentile=request.perceived_rank_percentile,
-                retyped_rank_percentile=request.retyped_rank_percentile,
+                update_request=UpdateSkillsRankingRequest(
+                    phase=request.phase,
+                    cancelled_after=request.cancelled_after,
+                    succeeded_after=request.succeeded_after,
+                    puzzles_solved=request.puzzles_solved,
+                    correct_rotations=request.correct_rotations,
+                    clicks_count=request.clicks_count,
+                    perceived_rank_percentile=request.perceived_rank_percentile,
+                    retyped_rank_percentile=request.retyped_rank_percentile,
+                )
             )
 
             # Convert the state to response format, using the latest phase
