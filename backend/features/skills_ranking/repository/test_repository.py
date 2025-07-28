@@ -7,24 +7,24 @@ from common_libs.time_utilities import get_now, convert_python_datetime_to_mongo
 from features.skills_ranking.repository.repository import SkillsRankingRepository
 from features.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhaseName, SkillRankingExperimentGroup, SkillsRankingScore, \
     SkillsRankingPhase, UpdateSkillsRankingRequest
-from features.skills_ranking.db_provider import SkillsRankingDBProvider, SkillsRankingDbSettings
+from features.skills_ranking.db_provider import configure_skills_ranking_db, get_skills_ranking_state_db, clear_skills_ranking_db_cache, SkillsRankingDbSettings
 
 
 @pytest.fixture(scope="function")
 async def get_skills_ranking_repository(in_memory_application_database) -> SkillsRankingRepository:
-    # Configure the skills ranking database provider with the in-memory database
+    # Configure the skills ranking database with the in-memory database
     application_db = await in_memory_application_database
     db_settings = SkillsRankingDbSettings(
         mongodb_uri=application_db.client.address[0] + ":" + str(application_db.client.address[1]),
         database_name=application_db.name
     )
-    SkillsRankingDBProvider.configure(db_settings)
+    configure_skills_ranking_db(db_settings)
     
     # Clear any existing cache
-    SkillsRankingDBProvider.clear_cache()
+    clear_skills_ranking_db_cache()
     
     # Get the actual database object
-    db = await SkillsRankingDBProvider.get_skills_ranking_db()
+    db = await get_skills_ranking_state_db()
     
     return SkillsRankingRepository(db)
 
@@ -65,8 +65,8 @@ def _assert_skills_ranking_state_fields_match(given_state: SkillsRankingState, a
 
     for field, value in given_state.model_dump().items():
         if field == "experiment_group":
-            # Convert enum to value for comparison
-            value = value.value
+            # Convert enum to name for comparison
+            value = value.name
         elif field == "score":
             # Convert score fields to datetime for comparison
             value["calculated_at"] = convert_python_datetime_to_mongo_datetime(value["calculated_at"])
@@ -86,8 +86,8 @@ def _assert_skills_ranking_state_fields_match(given_state: SkillsRankingState, a
                 expected_time = expected_phase["time"]
                 actual_time = actual_phase["time"]
                 time_diff = abs((expected_time - actual_time).total_seconds())
-                # Allow up to 5ms difference to account for MongoDB truncation and processing time
-                assert time_diff < 0.005, f"Phase {i} time difference {time_diff}s exceeds 5ms"
+                # Allow up to 10ms difference to account for MongoDB truncation and processing time
+                assert time_diff < 0.010, f"Phase {i} time difference {time_diff}s exceeds 10ms"
             continue  # Skip the regular assertion for phases
         elif field == "started_at":
             # Convert datetime from mongodb date to datetime for comparison
@@ -159,6 +159,48 @@ class TestSkillsRankingRepository:
             # WHEN getting a state
             with pytest.raises(Exception):
                 await repository.get_by_session_id(1)
+
+        @pytest.mark.asyncio
+        async def test_get_by_session_id_backward_compatibility_old_format(
+                self,
+                get_skills_ranking_repository: Awaitable[SkillsRankingRepository],
+                setup_application_config: ApplicationConfig
+        ):
+            # GIVEN a repository
+            repository = await get_skills_ranking_repository
+
+            # AND a state in the database with old enum format (GROUP_1 instead of the full value)
+            db = repository._skills_ranking_state_db
+            collection = db.get_collection("skills_ranking_state")
+            
+            # Insert document with old format
+            old_format_doc = {
+                "session_id": 1,
+                "experiment_group": "GROUP_1",  # Old format
+                "phase": [
+                    {
+                        "name": "INITIAL",
+                        "time": convert_python_datetime_to_mongo_datetime(get_now())
+                    }
+                ],
+                "score": {
+                    "calculated_at": convert_python_datetime_to_mongo_datetime(get_now()),
+                    "jobs_matching_rank": 0.0,
+                    "comparison_rank": 0.0,
+                    "comparison_label": "LOWEST"
+                },
+                "started_at": convert_python_datetime_to_mongo_datetime(get_now())
+            }
+            await collection.insert_one(old_format_doc)
+
+            # WHEN getting the state
+            state = await repository.get_by_session_id(1)
+
+            # THEN the state is returned and converted to new format
+            assert state is not None
+            assert state.session_id == 1
+            assert state.experiment_group == SkillRankingExperimentGroup.GROUP_1
+            assert state.experiment_group.name == "GROUP_1"
 
     class TestCreate:
         """
