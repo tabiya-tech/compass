@@ -102,6 +102,10 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
                 session_id=session_id,
                 phase=request.phase,
                 cancelled_after=request.cancelled_after,
+                succeeded_after=request.succeeded_after,
+                puzzles_solved=request.puzzles_solved,
+                correct_rotations=request.correct_rotations,
+                clicks_count=request.clicks_count,
                 perceived_rank_percentile=request.perceived_rank_percentile,
                 retyped_rank_percentile=request.retyped_rank_percentile,
             )
