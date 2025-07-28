@@ -58,7 +58,7 @@ class SkillsRankingRepository(ISkillsRankingRepository):
         """
         return {
             "session_id": skills_ranking_state.session_id,
-            "experiment_group": skills_ranking_state.experiment_group.value,
+            "experiment_group": skills_ranking_state.experiment_group.name,
             "phase": [
                 {
                     "name": p.name,
@@ -90,9 +90,28 @@ class SkillsRankingRepository(ISkillsRankingRepository):
         :param doc: MongoDB document
         :return: SkillsRankingState instance
         """
+        # Handle backward compatibility for experiment_group
+        experiment_group_value = doc["experiment_group"]
+        try:
+            # Try to create enum directly (new format - enum names)
+            experiment_group = SkillRankingExperimentGroup[experiment_group_value]
+        except (KeyError, ValueError):
+            # If that fails, try to map old format to new format
+            old_to_new_mapping = {
+                "GROUP_1": "Group 1: High Difference/Greater",
+                "GROUP_2": "Group 2: High Difference/Smaller", 
+                "GROUP_3": "Group 3: Underconfidence/Yes",
+                "GROUP_4": "Group 4: Underconfidence/No"
+            }
+            if experiment_group_value in old_to_new_mapping:
+                experiment_group = SkillRankingExperimentGroup(old_to_new_mapping[experiment_group_value])
+            else:
+                # If we can't map it, re-raise the original error
+                raise ValueError(f"'{experiment_group_value}' is not a valid SkillRankingExperimentGroup")
+        
         return SkillsRankingState(
             session_id=doc["session_id"],
-            experiment_group=SkillRankingExperimentGroup(doc["experiment_group"]),
+            experiment_group=experiment_group,
             phase=[
                 SkillsRankingPhase(
                     name=p["name"],
