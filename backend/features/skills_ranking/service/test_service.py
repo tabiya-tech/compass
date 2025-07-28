@@ -12,7 +12,7 @@ from features.skills_ranking.errors import InvalidNewPhaseError
 from features.skills_ranking.repository.repository import ISkillsRankingRepository
 from features.skills_ranking.service.service import SkillsRankingService
 from features.skills_ranking.service.types import SkillsRankingState, SkillsRankingPhaseName, SkillRankingExperimentGroup, SkillsRankingScore, \
-    SkillsRankingPhase
+    SkillsRankingPhase, UpdateSkillsRankingRequest
 
 
 @pytest.fixture(scope="function")
@@ -24,13 +24,10 @@ def _mock_skills_ranking_repository() -> ISkillsRankingRepository:
         async def create(self, state: SkillsRankingState) -> SkillsRankingState:
             raise NotImplementedError()
 
-        async def update(self, *,
-                         session_id: int,
-                         phase: SkillsRankingPhaseName | None = None,
-                         cancelled_after: float | None = None,
-                         perceived_rank_percentile: float | None = None,
-                         retyped_rank_percentile: float | None = None,
-                         completed_at: datetime | None = None) -> SkillsRankingState:
+        async def update(self, *, session_id: int, update_request: UpdateSkillsRankingRequest) -> SkillsRankingState:
+            raise NotImplementedError()
+
+        async def update_structured(self, *, session_id: int, update_request: UpdateSkillsRankingRequest) -> SkillsRankingState:
             raise NotImplementedError()
 
     return MockSkillsRankingRepository()
@@ -117,7 +114,7 @@ class TestSkillsRankingService:
         service = SkillsRankingService(_mock_skills_ranking_repository, _mock_user_preference_repository)
         result = await service.upsert_state(
             session_id=given_state.session_id,
-            phase="INITIAL",
+            update_request=UpdateSkillsRankingRequest(phase="INITIAL"),
         )
 
         # THEN the repository get_by_session_id method is called with the state
@@ -162,7 +159,7 @@ class TestSkillsRankingService:
         service = SkillsRankingService(_mock_skills_ranking_repository, _mock_user_preference_repository)
         result = await service.upsert_state(
             session_id=new_state.session_id,
-            phase=new_phase,
+            update_request=UpdateSkillsRankingRequest(phase=new_phase),
         )
 
         # THEN the repository get_by_session_id method is called with the state
@@ -172,11 +169,7 @@ class TestSkillsRankingService:
         _mock_skills_ranking_repository.update.assert_called_once()
         call_args = _mock_skills_ranking_repository.update.call_args
         assert call_args.kwargs["session_id"] == new_state.session_id
-        assert call_args.kwargs["phase"].name == new_phase
-        assert call_args.kwargs["cancelled_after"] is None
-        assert call_args.kwargs["perceived_rank_percentile"] is None
-        assert call_args.kwargs["retyped_rank_percentile"] is None
-        assert call_args.kwargs["completed_at"] is None
+        assert call_args.kwargs["update_request"].phase == new_phase
 
         # AND the repository create method is not called
         _mock_skills_ranking_repository.create.assert_not_called()
@@ -212,7 +205,7 @@ class TestSkillsRankingService:
         with pytest.raises(InvalidNewPhaseError):
             await service.upsert_state(
                 session_id=existing_state.session_id,
-                phase=new_phase,
+                update_request=UpdateSkillsRankingRequest(phase=new_phase),
             )
         # AND the repository is not called to update
         _mock_skills_ranking_repository.update.assert_not_called()

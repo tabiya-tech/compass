@@ -1,8 +1,8 @@
 from datetime import datetime
 from enum import Enum
-from typing import Literal
+from typing import Literal, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 SkillsRankingPhaseName = Literal[
     "INITIAL",
@@ -13,6 +13,55 @@ SkillsRankingPhaseName = Literal[
     "PERCEIVED_RANK",
     "RETYPED_RANK",
     "COMPLETED"]
+
+
+class UpdateSkillsRankingRequest(BaseModel):
+    """
+    Request model for updating skills ranking state.
+
+    - If a field is omitted, it will not be updated.
+    - If a field is present with a null value, it will be cleared (set to None).
+    - If a field is present with a value, it will be updated to that value.
+    """
+    phase: Optional[SkillsRankingPhaseName] = Field(
+        default=None,
+        description="The phase of the skills ranking process. If omitted, not updated. If null, cleared."
+    )
+    cancelled_after: Optional[str] = Field(
+        default=None,
+        description="Represents the time spent by the user before they cancelled the skills ranking process (ms). If omitted, not updated. If null, cleared."
+    )
+    succeeded_after: Optional[str] = Field(
+        default=None,
+        description="Represents the time spent by the user after they succeeded in the skills ranking process (ms). If omitted, not updated. If null, cleared."
+    )
+    puzzles_solved: Optional[int] = Field(
+        default=None,
+        description="The number of puzzles the user solved for the proof_of_value task. If omitted, not updated. If null, cleared."
+    )
+    correct_rotations: Optional[int] = Field(
+        default=None,
+        description="The number of characters the user rotated correctly for the proof_of_value task. If omitted, not updated. If null, cleared."
+    )
+    clicks_count: Optional[int] = Field(
+        default=None,
+        description="The number of clicks the user made during the proof_of_value task. If omitted, not updated. If null, cleared."
+    )
+    perceived_rank_percentile: Optional[float] = Field(
+        default=None,
+        description="The percentile rank the user thinks they have (0-100). If omitted, not updated. If null, cleared."
+    )
+    retyped_rank_percentile: Optional[float] = Field(
+        default=None,
+        description="The rank the user retyped to confirm they saw it correctly (0-100). If omitted, not updated. If null, cleared."
+    )
+    completed_at: Optional[datetime] = Field(
+        default=None,
+        description="The time the skills ranking process completed. If omitted, not updated. If null, cleared."
+    )
+
+    class Config:
+        extra = "forbid"
 
 
 class SkillsRankingPhase(BaseModel):
