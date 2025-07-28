@@ -35,6 +35,10 @@ class ISkillsRankingRepository(ABC):
                      cancelled_after: str | None = None,
                      perceived_rank_percentile: float | None = None,
                      retyped_rank_percentile: float | None = None,
+                     succeeded_after: str | None = None,
+                     puzzles_solved: int | None = None,
+                     correct_rotations: int | None = None,
+                     clicks_count: int | None = None,
                      completed_at: datetime | None = None
                      ) -> SkillsRankingState:
         """
@@ -43,6 +47,10 @@ class ISkillsRankingRepository(ABC):
         :param perceived_rank_percentile: The percentile rank the user thinks they have (0-100)
         :param retyped_rank_percentile: The rank the user retyped to confirm they saw it correctly (0-100)
         :param cancelled_after: The proof_of_value spent by the user before they cancelled the skills ranking process.
+        :param succeeded_after: The proof_of_value spent by the user after they succeeded in the skills ranking process.
+        :param puzzles_solved: The number of puzzles the user solved for the proof_of_value task
+        :param correct_rotations: The number of characters the user rotated correctly for the proof_of_value task
+        :param clicks_count: The number of clicks the user made during the proof_of_value task
         :param session_id: The ID of the session to update (required)
         :param phase: Optional phase to update the state to
         :param completed_at: Optional completion time to set for the state
@@ -112,6 +120,10 @@ class SkillsRankingRepository(ISkillsRankingRepository):
                 comparison_label=doc["score"]["comparison_label"]
             ),
             cancelled_after=doc.get("cancelled_after"),
+            succeeded_after=doc.get("succeeded_after"),
+            puzzles_solved=doc.get("puzzles_solved"),
+            correct_rotations=doc.get("correct_rotations"),
+            clicks_count=doc.get("clicks_count"),
             perceived_rank_percentile=doc.get("perceived_rank_percentile"),
             retyped_rank_percentile=doc.get("retyped_rank_percentile"),
             started_at=mongo_date_to_datetime(doc["started_at"]),
@@ -141,9 +153,13 @@ class SkillsRankingRepository(ISkillsRankingRepository):
             *,
             session_id: int,
             phase: SkillsRankingPhase | None = None,
-            cancelled_after: float | None = None,
+            cancelled_after: str | None = None,
             perceived_rank_percentile: float | None = None,
             retyped_rank_percentile: float | None = None,
+            succeeded_after: str | None = None,
+            puzzles_solved: int | None = None,
+            correct_rotations: int | None = None,
+            clicks_count: int | None = None,
             completed_at: datetime | None = None,
     ) -> SkillsRankingState:
         update_ops = {}
@@ -156,6 +172,14 @@ class SkillsRankingRepository(ISkillsRankingRepository):
             set_fields["perceived_rank_percentile"] = perceived_rank_percentile
         if retyped_rank_percentile is not None:
             set_fields["retyped_rank_percentile"] = retyped_rank_percentile
+        if succeeded_after is not None:
+            set_fields["succeeded_after"] = succeeded_after
+        if puzzles_solved is not None:
+            set_fields["puzzles_solved"] = puzzles_solved
+        if correct_rotations is not None:
+            set_fields["correct_rotations"] = correct_rotations
+        if clicks_count is not None:
+            set_fields["clicks_count"] = clicks_count
         if completed_at is not None:
             set_fields["completed_at"] = datetime_to_mongo_date(completed_at)
         if set_fields:
@@ -171,7 +195,7 @@ class SkillsRankingRepository(ISkillsRankingRepository):
             }
 
         if not update_ops:
-            return await self._from_db_doc(await self._collection.find_one({"session_id": session_id}))
+            return self._from_db_doc(await self._collection.find_one({"session_id": session_id}))
 
         updated_doc = await self._collection.find_one_and_update(
             {"session_id": session_id},
