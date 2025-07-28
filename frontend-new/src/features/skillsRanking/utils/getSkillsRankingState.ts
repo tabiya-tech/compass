@@ -15,8 +15,8 @@ export const getRandomSkillsRankingState = (phase?: SkillsRankingPhase, experime
     session_id: getRandomSessionID(),
     score: getRandomScore(),
     experiment_group: experimentGroup ?? getRandomExperimentGroup(),
-    cancelled_after: phase === SkillsRankingPhase.CANCELLED ? getRandomString(10) : null, // Random string or null
-    succeeded_after: phase === SkillsRankingPhase.CANCELLED ? getRandomString(10) : null,
+    cancelled_after: Math.random() < 0.3 ? getRandomString(10) : null, // Random string or null
+    succeeded_after: Math.random() < 0.3 ? getRandomString(10) : null,
     puzzles_solved: 0,
     correct_rotations: 0,
     clicks_count:0,
