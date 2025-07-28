@@ -17,6 +17,22 @@ class UpsertSkillsRankingRequest(BaseModel):
     """
     Represents the proof_of_value spent by the user before they cancelled the skills ranking process.
     """
+    succeeded_after: str | None = None
+    """
+    Represents the proof_of_value spent by the user after they succeeded in the skills ranking process.
+    """
+    puzzles_solved: int | None = None
+    """
+    The number of puzzles the user solved for the proof_of_value task.
+    """
+    correct_rotations: int | None = None
+    """
+    The number of characters the user rotated correctly for the proof_of_value task.
+    """
+    clicks_count: int | None = None
+    """
+    The number of clicks the user made during the proof_of_value task.
+    """
     perceived_rank_percentile: float | None = None
     """
     The percentile rank the user thinks they have (0-100).
@@ -56,6 +72,27 @@ class SkillsRankingStateResponse(BaseModel):
     """
     Represents the proof_of_value spent by the user before they cancelled the skills ranking process.
     Can be time in ms or a string indicating the proof_of_value type (e.g., "typed 4 characters").
+    """
+
+    succeeded_after: str | None = None
+    """
+    Represents the proof_of_value spent by the user after they succeeded in the skills ranking process.
+    Can be time in ms or a string indicating the proof_of_value type (e.g., "typed 4 characters").
+    """
+
+    puzzles_solved: int | None = None
+    """
+    The number of puzzles the user solved for the proof_of_value task.
+    """
+
+    correct_rotations: int | None = None
+    """
+    The number of characters the user rotated correctly for the proof_of_value task.
+    """
+
+    clicks_count: int | None = None
+    """
+    The number of clicks the user made during the proof_of_value task.
     """
 
     perceived_rank_percentile: float | None = None

@@ -24,7 +24,11 @@ class ISkillsRankingService(ABC):
                            phase: SkillsRankingPhaseName | None = None,
                            cancelled_after: str | None = None,
                            perceived_rank_percentile: float | None = None,
-                           retyped_rank_percentile: float | None = None) -> SkillsRankingState:
+                           retyped_rank_percentile: float | None = None,
+                           succeeded_after: str | None = None,
+                           puzzles_solved: int | None = None,
+                           correct_rotations: int | None = None,
+                           clicks_count: int | None = None) -> SkillsRankingState:
         """
         Upsert the SkillsRankingState for a given session ID.
         :param session_id: the session ID to upsert the state for.
@@ -33,6 +37,10 @@ class ISkillsRankingService(ABC):
         :param cancelled_after: the proof_of_value spent by the user before they cancelled the skills ranking process.
         :param perceived_rank_percentile: the rank the user perceives themselves to be at
         :param retyped_rank_percentile: the retyped rank for the attention check step
+        :param succeeded_after: the proof_of_value spent by the user after they succeeded in the skills ranking process.
+        :param puzzles_solved: the number of puzzles the user solved for the proof_of_value task
+        :param correct_rotations: the number of characters the user rotated correctly for the proof_of_value task
+        :param clicks_count: the number of clicks the user made during the proof_of_value task
         :return: SkillsRankingState
         """
         raise NotImplementedError()
@@ -60,9 +68,13 @@ class SkillsRankingService(ISkillsRankingService):
             session_id: int,
             user_id: str | None = None,
             phase: SkillsRankingPhaseName | None = None,
-            cancelled_after: float | None = None,
+            cancelled_after: str | None = None,
             perceived_rank_percentile: float | None = None,
             retyped_rank_percentile: float | None = None,
+            succeeded_after: str | None = None,
+            puzzles_solved: int | None = None,
+            correct_rotations: int | None = None,
+            clicks_count: int | None = None,
     ) -> SkillsRankingState:
         existing_state = await self._repository.get_by_session_id(session_id)
 
@@ -108,11 +120,18 @@ class SkillsRankingService(ISkillsRankingService):
             "cancelled_after": cancelled_after,
             "perceived_rank_percentile": perceived_rank_percentile,
             "retyped_rank_percentile": retyped_rank_percentile,
+            "succeeded_after": succeeded_after,
+            "puzzles_solved": puzzles_solved,
+            "correct_rotations": correct_rotations,
+            "clicks_count": clicks_count,
         }
         passed_fields = [field for field, value in updated_fields.items() if value is not None]
 
         # Get the valid fields for this phase
-        valid_fields = get_valid_fields_for_phase(phase=phase if phase else existing_state.phase[-1].name)
+        valid_fields = get_valid_fields_for_phase(
+            phase=phase if phase else existing_state.phase[-1].name,
+            from_phase=existing_state.phase[-1].name if phase and phase != existing_state.phase[-1].name else None
+        )
 
         # Check for any invalid fields
         invalid_fields = [field for field in passed_fields if field not in valid_fields]
@@ -122,8 +141,10 @@ class SkillsRankingService(ISkillsRankingService):
                 invalid_fields=invalid_fields,
                 valid_fields=valid_fields,
             )
+        
+        # Only create a new phase entry if the phase is different from the current one
         new_phase = None
-        if phase is not None:
+        if phase is not None and phase != existing_state.phase[-1].name:
             new_phase = SkillsRankingPhase(
                 name=phase,
                 time=get_now()
@@ -135,8 +156,16 @@ class SkillsRankingService(ISkillsRankingService):
             cancelled_after=cancelled_after,
             perceived_rank_percentile=perceived_rank_percentile,
             retyped_rank_percentile=retyped_rank_percentile,
+            succeeded_after=succeeded_after,
+            puzzles_solved=puzzles_solved,
+            correct_rotations=correct_rotations,
+            clicks_count=clicks_count,
             completed_at=get_now() if phase == "COMPLETED" else None
         )
+        
+        if saved_state is None:
+            raise SkillsRankingStateNotFound(session_id=session_id)
+            
         return saved_state
 
     async def calculate_ranking_and_groups(self) -> Tuple[SkillsRankingScore, SkillRankingExperimentGroup]:
