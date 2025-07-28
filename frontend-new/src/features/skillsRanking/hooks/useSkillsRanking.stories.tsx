@@ -17,16 +17,12 @@ import { SkillsRankingService } from "../skillsRankingService/skillsRankingServi
 const defaultFlowGraph: Record<SkillsRankingPhase, SkillsRankingPhase | ((state: SkillsRankingState, overrides?: any) => SkillsRankingPhase)> = {
   [SkillsRankingPhase.INITIAL]: SkillsRankingPhase.BRIEFING,
   [SkillsRankingPhase.BRIEFING]: SkillsRankingPhase.PROOF_OF_VALUE,
-  [SkillsRankingPhase.PROOF_OF_VALUE]: (state, overrides) =>
-    overrides?.[SkillsRankingPhase.PROOF_OF_VALUE] === "cancel"
-      ? SkillsRankingPhase.CANCELLED
-      : SkillsRankingPhase.MARKET_DISCLOSURE,
+  [SkillsRankingPhase.PROOF_OF_VALUE]: SkillsRankingPhase.MARKET_DISCLOSURE,
   [SkillsRankingPhase.MARKET_DISCLOSURE]: SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
   [SkillsRankingPhase.JOB_SEEKER_DISCLOSURE]: SkillsRankingPhase.PERCEIVED_RANK,
   [SkillsRankingPhase.PERCEIVED_RANK]: SkillsRankingPhase.RETYPED_RANK,
   [SkillsRankingPhase.RETYPED_RANK]: SkillsRankingPhase.COMPLETED,
   [SkillsRankingPhase.COMPLETED]: SkillsRankingPhase.COMPLETED,
-  [SkillsRankingPhase.CANCELLED]: SkillsRankingPhase.CANCELLED,
 };
 
 const getBehaviorMap = (
