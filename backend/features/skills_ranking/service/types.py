@@ -12,7 +12,6 @@ SkillsRankingPhaseName = Literal[
     "JOB_SEEKER_DISCLOSURE",
     "PERCEIVED_RANK",
     "RETYPED_RANK",
-    "CANCELLED",
     "COMPLETED"]
 
 

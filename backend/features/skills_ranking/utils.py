@@ -10,42 +10,47 @@ def get_possible_next_phase(current_phase: SkillsRankingPhaseName) -> list[Skill
         current_phase: The current phase of the skills ranking process
         
     Returns:
-        List of possible next phases
+        List of possible next phases (including the current phase for metrics-only updates)
     """
     if current_phase == "INITIAL":
-        return ["BRIEFING"]
+        return ["INITIAL", "BRIEFING"]
 
     if current_phase == "BRIEFING":
-        return ["PROOF_OF_VALUE"]
+        return ["BRIEFING", "PROOF_OF_VALUE"]
 
     if current_phase == "PROOF_OF_VALUE":
-        return ["MARKET_DISCLOSURE", "CANCELLED"]
+        return ["PROOF_OF_VALUE", "MARKET_DISCLOSURE"]
 
     if current_phase == "MARKET_DISCLOSURE":
-        return ["JOB_SEEKER_DISCLOSURE"]
+        return ["MARKET_DISCLOSURE", "JOB_SEEKER_DISCLOSURE"]
 
     if current_phase == "JOB_SEEKER_DISCLOSURE":
-        return ["PERCEIVED_RANK"]
+        return ["JOB_SEEKER_DISCLOSURE", "PERCEIVED_RANK"]
 
     if current_phase == "DISCLOSURE":
-        return ["PERCEIVED_RANK"]
+        return ["DISCLOSURE", "PERCEIVED_RANK"]
 
     if current_phase == "PERCEIVED_RANK":
-        return ["RETYPED_RANK"]
+        return ["PERCEIVED_RANK", "RETYPED_RANK"]
 
     if current_phase == "RETYPED_RANK":
+        return ["RETYPED_RANK", "COMPLETED"]
+
+    # COMPLETED is a terminal state with no next states, but allows same phase for metrics updates
+    if current_phase == "COMPLETED":
         return ["COMPLETED"]
 
-    # CANCELLED and COMPLETED are terminal states with no next states
+    # Fallback - should not reach here
     return []
 
 
-def get_valid_fields_for_phase(phase: SkillsRankingPhaseName) -> list[str]:
+def get_valid_fields_for_phase(phase: SkillsRankingPhaseName, from_phase: SkillsRankingPhaseName | None = None) -> list[str]:
     """
     Returns the list of valid fields for a given phase.
 
     Args:
         phase: The current phase of the skills ranking process
+        from_phase: The phase we're transitioning from (for transition-specific validation)
 
     Returns:
         List of valid fields for the given phase
@@ -60,6 +65,9 @@ def get_valid_fields_for_phase(phase: SkillsRankingPhaseName) -> list[str]:
         return ["phase", "cancelled_after", "succeeded_after", "puzzles_solved", "correct_rotations", "clicks_count"]
 
     if phase == "MARKET_DISCLOSURE":
+        # Allow metrics fields when transitioning from PROOF_OF_VALUE (for cancellation/completion)
+        if from_phase == "PROOF_OF_VALUE":
+            return ["phase", "cancelled_after", "succeeded_after", "puzzles_solved", "correct_rotations", "clicks_count"]
         return ["phase"]
 
     if phase == "JOB_SEEKER_DISCLOSURE":
@@ -69,7 +77,16 @@ def get_valid_fields_for_phase(phase: SkillsRankingPhaseName) -> list[str]:
         return ["phase", "perceived_rank_percentile"]
 
     if phase == "RETYPED_RANK":
+        # Allow perceived_rank_percentile when transitioning from PERCEIVED_RANK
+        if from_phase == "PERCEIVED_RANK":
+            return ["phase", "perceived_rank_percentile", "retyped_rank_percentile"]
         return ["phase", "retyped_rank_percentile"]
 
-    # CANCELLED and COMPLETED phases do not have any valid fields to update
+    if phase == "COMPLETED":
+        # Allow both perceived and retyped rank when transitioning from RETYPED_RANK
+        if from_phase == "RETYPED_RANK":
+            return ["phase", "perceived_rank_percentile", "retyped_rank_percentile"]
+        return []
+
+    # COMPLETED phase does not have any valid fields to update
     return []
