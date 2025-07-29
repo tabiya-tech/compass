@@ -66,6 +66,7 @@ def _to_entity(doc: dict) -> OccupationEntity:
         code=doc.get("code", ""),
         preferredLabel=doc.get("preferredLabel", ""),
         description=doc.get("description", ""),
+        scopeNote=doc.get("scopeNote", ""),
         altLabels=doc.get("altLabels", []),
     )
 

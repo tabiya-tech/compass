@@ -331,7 +331,7 @@ class TestFeedbackRoutes:
             version=NewFeedbackVersionSpec(frontend=""),
             feedback_items_specs=[]
         )
-        size_of_min_payload = len(json.dumps(given_feedback_request.model_dump()))
+        size_of_min_payload = len(given_feedback_request.model_dump_json())
         over_limit = MAX_PAYLOAD_SIZE - size_of_min_payload + 1
         # Create a feedback with large version
         given_feedback_request.version.frontend = "x" * over_limit

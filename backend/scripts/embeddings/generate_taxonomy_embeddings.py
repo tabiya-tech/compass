@@ -65,7 +65,7 @@ _OCCUPATIONS_EMBEDDING_CONTEXT = EmbeddingContext(
     source_collection=PlatformCollections.OCCUPATIONS.value,
     destination_collection=CompassEmbeddingsCollections.OCCUPATIONS.value,
     id_field_name="occupationId",
-    extra_fields=["code"],
+    extra_fields=["code", "scopeNote"],
     excluded_codes=SCRIPT_SETTINGS.excluded_occupation_codes
 )
 
@@ -74,7 +74,7 @@ _SKILLS_EMBEDDING_CONTEXT = EmbeddingContext(
     source_collection=PlatformCollections.SKILLS.value,
     destination_collection=CompassEmbeddingsCollections.SKILLS.value,
     id_field_name="skillId",
-    extra_fields=["skillType"],
+    extra_fields=["skillType", "scopeNote"],
     excluded_codes=SCRIPT_SETTINGS.excluded_skill_codes
 )
 

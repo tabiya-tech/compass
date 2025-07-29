@@ -6,7 +6,11 @@ from bson import ObjectId
 from app.vector_search.esco_entities import SkillEntity
 
 
-def get_skill_entity(*, preferred_label: str, altlabels: Optional[list[str]] = None, description: Optional[str] = "",
+def get_skill_entity(*,
+                     preferred_label: str,
+                     altlabels: Optional[list[str]] = None,
+                     description: Optional[str] = "",
+                     scope_note: Optional[str] = "",
                      score: Optional[float] = 0) -> SkillEntity:
     return SkillEntity(
         id=f"{uuid.uuid4().hex[:24]}",  # id is a random sting 24 character hex string
@@ -15,6 +19,7 @@ def get_skill_entity(*, preferred_label: str, altlabels: Optional[list[str]] = N
         preferredLabel=preferred_label,
         altLabels=altlabels if altlabels is not None else [preferred_label],  # the preferred label is usually expected to be in the altlabels
         description=description,
+        scopeNote=scope_note,
         skillType="skill/competence",  # We do not care about the skill type
         score=score
     )

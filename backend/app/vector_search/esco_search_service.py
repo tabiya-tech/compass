@@ -134,6 +134,7 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
                 "UUID": {"$first": "$UUID"},
                 "preferredLabel": {"$first": "$preferredLabel"},
                 "description": {"$first": "$description"},
+                "scopeNote": {"$first": "$scopeNote"},
                 "altLabels": {"$first": "$altLabels"},
                 "code": {"$first": "$code"},
                 "score": {"$max": "$score"}
@@ -151,6 +152,7 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
             code=doc.get("code", ""),
             preferredLabel=doc.get("preferredLabel", ""),
             description=doc.get("description", ""),
+            scopeNote=doc.get("scopeNote", ""),
             altLabels=doc.get("altLabels", []),
             score=doc.get("score", 0.0),
         )
@@ -188,6 +190,7 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
             UUID=doc.get("UUID", ""),
             preferredLabel=doc.get("preferredLabel", ""),
             description=doc.get("description", ""),
+            scopeNote=doc.get("scopeNote", ""),
             altLabels=doc.get("altLabels", []),
             skillType=cast(SkillTypeLiteral, doc.get("skillType", "")),
             score=doc.get("score", 0.0),
@@ -199,6 +202,7 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
                 "UUID": {"$first": "$UUID"},
                 "preferredLabel": {"$first": "$preferredLabel"},
                 "description": {"$first": "$description"},
+                "scopeNote": {"$first": "$scopeNote"},
                 "altLabels": {"$first": "$altLabels"},
                 "skillType": {"$first": "$skillType"},
                 "score": {"$max": "$score"}
@@ -254,6 +258,7 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
                         "UUID": {"$first": "$skills.UUID"},
                         "preferredLabel": {"$first": "$skills.preferredLabel"},
                         "description": {"$first": "$skills.description"},
+                        "scopeNote": {"$first": "$skills.scopeNote"},
                         "altLabels": {"$first": "$skills.altLabels"},
                         "skillType": {"$first": "$skills.skillType"},
                         "relationType": {"$first": "$relationType"},
@@ -267,6 +272,7 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
             UUID=skill.get("UUID", ""),
             preferredLabel=skill.get("preferredLabel", ""),
             description=skill.get("description", ""),
+            scopeNote=skill.get("scopeNote", ""),
             altLabels=skill.get("altLabels", []),
             skillType=skill.get("skillType", ""),
             relationType=skill.get("relationType", ""),

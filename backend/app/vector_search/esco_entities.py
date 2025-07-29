@@ -1,4 +1,4 @@
-from typing import List, Literal
+from typing import List, Literal, Optional
 from pydantic import Field
 from pydantic.main import BaseModel
 
@@ -18,6 +18,9 @@ class BaseEntity(BaseModel):
     preferredLabel: str
     altLabels: List[str]
     description: str
+    # Since we want to maintain backward compatibility with data persisted in the db,
+    # we allow scopeNote to be optional and set the default value to an empty string
+    scopeNote: Optional[str] = ""
     score: float
 
 

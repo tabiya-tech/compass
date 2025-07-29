@@ -41,6 +41,7 @@ def _make_skill_entity(uuid: str, label: str) -> SkillEntity:
         preferredLabel=label,
         altLabels=[label + "_alt"],
         description="desc",
+        scopeNote="scope note",
         score=1.0,
         skillType="skill/competence"
     )

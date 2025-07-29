@@ -375,8 +375,10 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
                                 </Input>
                                 """)
 
-        _entities_to_classify = [{f'{entity_type_singular} title': entity.preferredLabel, f'{entity_type_singular} description': entity.description} for entity
-                                 in entities_to_classify]
+        _entities_to_classify = [{f'{entity_type_singular} title': entity.preferredLabel,
+                                  f'{entity_type_singular} description': entity.description + ("\n\n" + entity.scopeNote if entity.scopeNote != "" else ''),
+                                  }
+                                 for entity in entities_to_classify]
         # When json.dumps is used ensure_ascii is False to avoid escaping non-ascii characters.
         # Otherwise, the entities in the response will not match the entities in the input
         return replace_placeholders_with_indent(prompt_template,

@@ -14,7 +14,11 @@ from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
 
-def _get_occupation_entity(*, preferred_label: str, altlabels: Optional[list[str]] = None, description: Optional[str] = "",
+def _get_occupation_entity(*,
+                           preferred_label: str,
+                           altlabels: Optional[list[str]] = None,
+                           description: Optional[str] = "",
+                           scope_note: Optional[str] = "",
                            score: Optional[float] = 0) -> OccupationEntity:
     return OccupationEntity(
         id=f"{uuid.uuid4().hex[:24]}",  # id is a random sting 24 character hex string
@@ -24,6 +28,7 @@ def _get_occupation_entity(*, preferred_label: str, altlabels: Optional[list[str
         preferredLabel=preferred_label,
         altLabels=altlabels if altlabels is not None else [preferred_label],  # the preferred label is usually expected to be in the altlabels
         description=description,
+        scopeNote=scope_note,
         score=score
     )
 

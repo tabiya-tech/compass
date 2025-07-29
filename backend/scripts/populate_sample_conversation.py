@@ -193,6 +193,7 @@ def create_explore_experiences_director_state(_session_id: int) -> ExploreExperi
                 modelId=str(ObjectId()),
                 preferredLabel="bake confections",
                 description="Prepare and bake various confectionery items following recipes and quality standards.",
+                scopeNote="",
                 altLabels=["bake sweets", "prepare confections", "make confectionery"],
                 score=0.9,
                 skillType="skill/competence"
@@ -203,6 +204,7 @@ def create_explore_experiences_director_state(_session_id: int) -> ExploreExperi
                 modelId=str(ObjectId()),
                 preferredLabel="prepare bakery products",
                 description="Prepare various bakery products following recipes and quality standards.",
+                scopeNote="",
                 altLabels=["make bakery items", "create baked goods", "produce bakery products"],
                 score=0.85,
                 skillType="skill/competence"
@@ -213,6 +215,7 @@ def create_explore_experiences_director_state(_session_id: int) -> ExploreExperi
                 modelId=str(ObjectId()),
                 preferredLabel="work according to recipe",
                 description="Follow recipes precisely to ensure consistent quality of food products.",
+                scopeNote="",
                 altLabels=["follow recipes", "adhere to recipes", "use recipes"],
                 score=0.8,
                 skillType="skill/competence"
@@ -243,6 +246,7 @@ def create_explore_experiences_director_state(_session_id: int) -> ExploreExperi
                 modelId=str(ObjectId()),
                 preferredLabel="cake decoration",
                 description="Apply decorative elements and techniques to cakes for aesthetic and thematic purposes.",
+                scopeNote="",
                 altLabels=["decorate cakes", "cake decorating", "cake design"],
                 score=0.95,
                 skillType="skill/competence"
@@ -253,6 +257,7 @@ def create_explore_experiences_director_state(_session_id: int) -> ExploreExperi
                 modelId=str(ObjectId()),
                 preferredLabel="client management",
                 description="Manage client relationships, expectations, and communications throughout a project.",
+                scopeNote="",
                 altLabels=["manage clients", "client relations", "customer management"],
                 score=0.85,
                 skillType="skill/competence"
@@ -263,6 +268,7 @@ def create_explore_experiences_director_state(_session_id: int) -> ExploreExperi
                 modelId=str(ObjectId()),
                 preferredLabel="project planning",
                 description="Plan and organize projects to meet deadlines and client requirements.",
+                scopeNote="",
                 altLabels=["plan projects", "organize projects", "project organization"],
                 score=0.8,
                 skillType="skill/competence"

@@ -75,6 +75,7 @@ def generate_random_experience(index: int) -> ExperienceEntity:
                     preferredLabel=f"preferred label {index}",
                     altLabels=[f"label {index}", f"label {index + 1}"],
                     description=f"Occupation description {index}",
+                    scopeNote=f"Occupation Scope note {index}",
                     score=0.5,
                     code=f"ESCO-{index}"
                 ),
@@ -86,6 +87,7 @@ def generate_random_experience(index: int) -> ExperienceEntity:
                         preferredLabel=f"preferred label {index}",
                         altLabels=[f"label {index}", f"label {index + 1}"],
                         description=f"Skill description {index} ",
+                        scopeNote=f"Skill Scope note {index}",
                         score=0.5,
                         skillType=random.choice(['skill/competence', 'knowledge', 'language', 'attitude', '']),  # nosec B311 # random is used for testing purposes
                         relationType=random.choice(['essential', 'optional', '']),  # nosec B311 # random is used for testing purposes
@@ -102,6 +104,7 @@ def generate_random_experience(index: int) -> ExperienceEntity:
                 preferredLabel=f"preferred label {index}",
                 altLabels=[f"label {index}", f"label {index + 1}"],
                 description=f"Skill description {index} ",
+                scopeNote=f"Skill Scope note {index}",
                 score=0.5,
                 skillType=random.choice(['skill/competence', 'knowledge', 'language', 'attitude', ''])  # nosec B311 # random is used for testing purposes
             )

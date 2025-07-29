@@ -47,6 +47,7 @@
                 "work according to recipes"
               ],
               "description": "Description",
+              "scopeNode": "ScopeNote",
               "score": 1,
               "skillType": "skill/competence"
             }

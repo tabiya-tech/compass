@@ -186,6 +186,7 @@ class TestExperienceRoutes:
                             UUID="bar_uuid",
                             preferredLabel="Baz",
                             description="Foo bar baz",
+                            scopeNote="Foo bar scope note",
                             altLabels=["foo_label_1", "bar_label_2"],
                         )
                     ],
