@@ -389,7 +389,8 @@ const Login: React.FC = () => {
     if (inviteCodeParam) {
       // Check if login code is disabled before attempting anonymous login
       if (loginCodeDisabled) {
-        enqueueSnackbar("Anonymous login is currently disabled. Please login with your email and password.", { variant: "error" });
+        enqueueSnackbar("Invitation code login is currently disabled. Please login with your email and password.", { variant: "error" })
+        console.warn("Invitation code login is disabled, redirecting to email login.");
         // Remove the invite code from the URL
         const newSearchParams = new URLSearchParams(location.search);
         newSearchParams.delete(INVITATIONS_PARAM_NAME);
