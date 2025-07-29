@@ -49,6 +49,11 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 });
 
 describe("Landing Page", () => {
+  beforeEach(() => {
+    (console.error as jest.Mock).mockClear();
+    (console.warn as jest.Mock).mockClear();
+  });
+
   test("should render landing page successfully", () => {
     // GIVEN sentry is initialized
     (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
@@ -121,7 +126,7 @@ describe("Landing Page", () => {
       jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
 
       // AND the application login code is not disabled
-      jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
+      jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("false");
 
       // AND anonymous login function will succeed
       const anonymousLoginMock = jest.fn().mockResolvedValue("mock-token");
@@ -165,7 +170,7 @@ describe("Landing Page", () => {
         login: jest.fn().mockResolvedValue("mock-token"),
       } as unknown as FirebaseInvitationCodeAuthenticationService);
       // AND the application login code is not disabled
-      jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
+      jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("false");
 
       // AND user has not accepted terms
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValueOnce({
@@ -189,37 +194,53 @@ describe("Landing Page", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
-    test("should not show guest button when application login code is not set", () => {
-      // GIVEN the application login code is not set
-      jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue("");
+    test.each([
+      ["", "false"], // Login Code is enabled and no application default code set
+      ["", "true"], // Login Code is disabled and no application default code set
+      ["bar", "true"], // Login Code is disabled, and the application default code set
+    ])(
+      "should not show guest button when application login code = '%s' and enabled = '%s'",
+      (givenApplicationLoginCode, givenIsLoginCodeEnabled) => {
+        // GIVEN the application login code set to given
+        jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
 
-      // AND the component is rendered
-      render(<Landing />);
+        // AND the application login code is either enabled or disabled
+        jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue(givenIsLoginCodeEnabled);
 
-      // THEN expect the guest button to not be in the document
-      expect(screen.queryByTestId(DATA_TEST_ID.LANDING_GUEST_BUTTON)).not.toBeInTheDocument();
+        // WHEN the component is rendered
+        const { container } = render(<Landing />);
 
-      // AND no errors or warnings to have occurred
-      expect(console.error).not.toHaveBeenCalled();
-      expect(console.warn).not.toHaveBeenCalled();
-    });
+        // THEN expect the guest button to not be in the document
+        expect(screen.queryByTestId(DATA_TEST_ID.LANDING_GUEST_BUTTON)).not.toBeInTheDocument();
 
-    test("should not show guest button when application login code is disabled", () => {
+        // AND no errors or warnings to have occurred
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+
+        // AND to match the snapshot
+        expect(container).toMatchSnapshot();
+      }
+    );
+
+    test("should show guest button when application login code is set and enabled", () => {
       // GIVEN the application login code is set
       const givenApplicationLoginCode = "bar";
       jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
-      // AND the application login code is disabled
-      jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("true");
+      // AND the application login code is not disabled
+      jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("false");
 
-      // AND the component is rendered
-      render(<Landing />);
+      // WHEN the component is rendered
+      const { container } = render(<Landing />);
 
-      // THEN expect the guest button to not be in the document
-      expect(screen.queryByTestId(DATA_TEST_ID.LANDING_GUEST_BUTTON)).not.toBeInTheDocument();
+      // THEN expect the guest button to be in the document
+      expect(screen.getByTestId(DATA_TEST_ID.LANDING_GUEST_BUTTON)).toBeInTheDocument();
 
       // AND no errors or warnings to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
+
+      // AND to match the snapshot
+      expect(container).toMatchSnapshot();
     });
 
     test("should handle RestAPIError when continuing as guest", async () => {
@@ -227,7 +248,7 @@ describe("Landing Page", () => {
       const givenApplicationLoginCode = "bar";
       jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
       // AND the application login code is not disabled
-      jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
+      jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("false");
 
       // AND the error scenario
       const error = new RestAPIError(
@@ -265,7 +286,7 @@ describe("Landing Page", () => {
       const givenApplicationLoginCode = "bar";
       jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
       // AND the application login code is not disabled
-      jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
+      jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("false");
 
       // AND the error scenario
       const error = new FirebaseError(
@@ -299,7 +320,7 @@ describe("Landing Page", () => {
       const givenApplicationLoginCode = "bar";
       jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
       // AND the application login code is not disabled
-      jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
+      jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("false");
       // AND user preferences service throws an error
       const mockError = new Error("Failed to get preferences");
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockImplementationOnce(() => {
@@ -326,5 +347,65 @@ describe("Landing Page", () => {
         { variant: "error" }
       );
     });
+  });
+
+  describe("Register button", () => {
+    test.each([
+      ["register-code-provided"], // Registration code is provided
+      [""], // Registration code is not provided
+    ])(
+      "should show register link when registration is enabled and application default registration code is '%s'",
+      (givenApplicationRegistrationCode) => {
+        // GIVEN the application registration code set to given
+        jest
+          .spyOn(EnvServiceModule, "getApplicationRegistrationCode")
+          .mockReturnValue(givenApplicationRegistrationCode);
+
+        // AND the application registration is not disabled
+        jest.spyOn(EnvServiceModule, "getRegistrationDisabled").mockReturnValue("false");
+
+        // WHEN the component is rendered
+        const { container } = render(<Landing />);
+
+        // THEN expect the signup button to be in the document
+        expect(screen.getByTestId(DATA_TEST_ID.LANDING_SIGNUP_BUTTON)).toBeInTheDocument();
+
+        // AND no errors or warnings to have occurred
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+
+        // AND to match the snapshot
+        expect(container).toMatchSnapshot();
+      }
+    );
+
+    test.each([
+      ["register-code-provided"], // Registration code is provided
+      [""], // Registration code is not provided
+    ])(
+      "should not show register link when registration is disabled and application default registration code is '%s'",
+      (givenApplicationRegistrationCode) => {
+        // GIVEN the application registration code set to given
+        jest
+          .spyOn(EnvServiceModule, "getApplicationRegistrationCode")
+          .mockReturnValue(givenApplicationRegistrationCode);
+
+        // AND the application registration is disabled
+        jest.spyOn(EnvServiceModule, "getRegistrationDisabled").mockReturnValue("true");
+
+        // WHEN the component is rendered
+        const { container } = render(<Landing />);
+
+        // THEN expect the signup button to be in the document
+        expect(screen.queryByTestId(DATA_TEST_ID.LANDING_SIGNUP_BUTTON)).not.toBeInTheDocument();
+
+        // AND no errors or warnings to have occurred
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+
+        // AND to match the snapshot
+        expect(container).toMatchSnapshot();
+      }
+    );
   });
 });

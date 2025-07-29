@@ -18,8 +18,9 @@ import {
   getApplicationRegistrationCode,
   getMetricsEnabled,
   getFeatures,
-  getApplicationLoginCodeDisabled,
   getCvUploadEnabled,
+  getLoginCodeDisabled,
+  getRegistrationDisabled,
 } from "./envService";
 import { getRandomString } from "./_test_utilities/specialCharacters";
 
@@ -50,8 +51,11 @@ describe.each([
   ["SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID", getSensitivePersonalDataRSAEncryptionKeyId],
   ["TARGET_ENVIRONMENT_NAME", getTargetEnvironmentName],
   ["FRONTEND_LOGIN_CODE", getApplicationLoginCode],
-  ["FRONTEND_DISABLE_LOGIN_CODE", getApplicationLoginCodeDisabled],
   ["FRONTEND_REGISTRATION_CODE", getApplicationRegistrationCode],
+
+  ["FRONTEND_DISABLE_LOGIN_CODE", getLoginCodeDisabled],
+  ["FRONTEND_DISABLE_REGISTRATION", getRegistrationDisabled],
+
   ["FRONTEND_ENABLE_METRICS", getMetricsEnabled],
   ["FRONTEND_ENABLE_CV_UPLOAD", getCvUploadEnabled],
   ["FRONTEND_FEATURES", getFeatures],

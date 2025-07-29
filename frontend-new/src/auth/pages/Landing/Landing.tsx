@@ -7,7 +7,7 @@ import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
-import { getApplicationLoginCodeDisabled, getApplicationLoginCode } from "src/envService";
+import { getLoginCodeDisabled, getApplicationLoginCode, getRegistrationDisabled } from "src/envService";
 import FirebaseInvitationCodeAuthenticationService from "src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -41,7 +41,11 @@ const Landing: React.FC = () => {
   }, []);
 
   const loginCodeDisabled = useMemo(() => {
-    return getApplicationLoginCodeDisabled().toLowerCase() === "true";
+    return getLoginCodeDisabled().toLowerCase() === "true";
+  }, []);
+
+  const registrationDisabled = useMemo(() => {
+    return getRegistrationDisabled().toLowerCase() === "true";
   }, []);
 
   const handleError = useCallback(
@@ -194,15 +198,17 @@ const Landing: React.FC = () => {
                 >
                   Login
                 </PrimaryButton>
-                <SecondaryButton
-                  fullWidth
-                  disabled={isLoading}
-                  style={{ border: `1px solid ${theme.palette.text.secondary}` }}
-                  onClick={() => navigate(routerPaths.REGISTER)}
-                  data-testid={DATA_TEST_ID.LANDING_SIGNUP_BUTTON}
-                >
-                  Register
-                </SecondaryButton>
+                {!registrationDisabled && (
+                  <SecondaryButton
+                    fullWidth
+                    disabled={isLoading}
+                    style={{ border: `1px solid ${theme.palette.text.secondary}` }}
+                    onClick={() => navigate(routerPaths.REGISTER)}
+                    data-testid={DATA_TEST_ID.LANDING_SIGNUP_BUTTON}
+                  >
+                    Register
+                  </SecondaryButton>
+                )}
               </Box>
               {applicationLoginCode && !loginCodeDisabled && (
                 <>
