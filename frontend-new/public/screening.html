@@ -226,7 +226,7 @@
       </div>
       <section id="chat-page-container">
         <div style="width: 100vw; height: 100vh;" id="chat-page-container-iframe">
-          <!--          <iframe src="/#" title="Compass Chat Application" style="width: 100%; height: 100%;"></iframe>-->
+                    <iframe src="/" title="Compass Chat Application" style="width: 100%; height: 100%;"></iframe>
         </div>
       </section>
       <section id="initial-question" class="section-container text-body" style="display: none;">
@@ -556,6 +556,17 @@
   // #############################################################
   document.addEventListener("DOMContentLoaded", function() {
     // setTimeout(() => handleShowSnackbarNotification(), 2000);
+
+    // 1. backend returns the credentials
+    ///   1. Log the user in with firebase
+    //    2. Show the notification (Credentials have been sent to your email)
+    //    3. Replace the current url (without refreshing).
+    //    4. Show the chat container.
+
+    // Demonstration....
+    // setTimeout(() => history.replaceState({}, "New Title", "/#/"), 1000);
+
+    // return;
 
     // First check if the user is already logged in, and log them in if so.
     const alreadyLoggedIn = handleAlreadyLoggedIn();
