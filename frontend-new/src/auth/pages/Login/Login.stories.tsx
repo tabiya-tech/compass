@@ -2,10 +2,29 @@ import { Meta, StoryObj } from "@storybook/react";
 import Login from "./Login";
 import { EnvVariables } from "src/envService";
 
+interface StoryArgs {
+  loginCode?: string;
+  registrationDisabled?: boolean;
+  loginCodeDisabled?: boolean;
+}
+
 const meta: Meta<typeof Login> = {
   title: "Auth/Login",
   tags: ["autodocs"],
   component: Login,
+  decorators: [
+    (Story, context) => {
+      const { loginCode, registrationDisabled, loginCodeDisabled } = context.args as StoryArgs;
+      (window as any).tabiyaConfig = {
+        ...(window as any).tabiyaConfig,
+        [EnvVariables.FRONTEND_LOGIN_CODE]: loginCode ? window.btoa(loginCode) : "",
+        [EnvVariables.FRONTEND_DISABLE_REGISTRATION]: registrationDisabled ? window.btoa("true") : window.btoa("false"),
+        [EnvVariables.FRONTEND_DISABLE_LOGIN_CODE]: loginCodeDisabled ? window.btoa("true") : window.btoa("false"),
+      };
+
+      return <Story />;
+    },
+  ],
 };
 
 const firebaseSuccessMock = [
@@ -19,35 +38,68 @@ const firebaseSuccessMock = [
 
 export default meta;
 
-export const ShownAsEmptyField: StoryObj<typeof Login> = {
-  args: {},
+export const Default: StoryObj<typeof Login> = {
+  args: {
+    loginCode: "",
+    registrationDisabled: false,
+    loginCodeDisabled: false,
+  },
   parameters: {
     mockData: firebaseSuccessMock,
   },
 };
 
-export const ShownWithApplicationLoginCodeSet: StoryObj<typeof Login> = {
-  args: {},
+export const WithApplicationLoginCode: StoryObj<typeof Login> = {
+  args: {
+    loginCode: "test-login-code",
+    registrationDisabled: false,
+    loginCodeDisabled: false,
+  },
   parameters: {
     mockData: firebaseSuccessMock,
-  },
-  beforeEach: () => {
-    window.tabiyaConfig[EnvVariables.FRONTEND_LOGIN_CODE] = btoa("bar");
-    return () => {
-      delete window.tabiyaConfig[EnvVariables.FRONTEND_LOGIN_CODE];
-    };
   },
 };
 
-export const ShownWithDisabledApplicationLoginCode: StoryObj<typeof Login> = {
-  args: {},
+export const WithLoginCodeDisabled: StoryObj<typeof Login> = {
+  args: {
+    loginCode: "",
+    registrationDisabled: false,
+    loginCodeDisabled: true,
+  },
   parameters: {
     mockData: firebaseSuccessMock,
   },
-  beforeEach: () => {
-    window.tabiyaConfig[EnvVariables.FRONTEND_DISABLE_LOGIN_CODE] = btoa("true");
-    return () => {
-      delete window.tabiyaConfig[EnvVariables.FRONTEND_DISABLE_LOGIN_CODE];
-    };
+};
+
+export const WithRegistrationDisabled: StoryObj<typeof Login> = {
+  args: {
+    loginCode: "",
+    registrationDisabled: true,
+    loginCodeDisabled: false,
+  },
+  parameters: {
+    mockData: firebaseSuccessMock,
+  },
+};
+
+export const WithRegistrationDisabledAndLoginCodeDisabled: StoryObj<typeof Login> = {
+  args: {
+    loginCode: "",
+    registrationDisabled: true,
+    loginCodeDisabled: true,
+  },
+  parameters: {
+    mockData: firebaseSuccessMock,
+  },
+};
+
+export const WithApplicationLoginCodeAndRegistrationDisabled: StoryObj<typeof Login> = {
+  args: {
+    loginCode: "test-login-code",
+    registrationDisabled: true,
+    loginCodeDisabled: false,
+  },
+  parameters: {
+    mockData: firebaseSuccessMock,
   },
 };

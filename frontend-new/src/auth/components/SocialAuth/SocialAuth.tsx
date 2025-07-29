@@ -15,6 +15,7 @@ import UserPreferencesService from "src/userPreferences/UserPreferencesService/u
 import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { getRegistrationDisabled } from "src/envService";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
@@ -114,6 +115,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
   const loginWithPopup = useCallback(async () => {
     try {
       notifyOnLoading(true);
+      const registrationDisabled = getRegistrationDisabled().toLowerCase() === "true";
       // first login with Google
       const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
       await firebaseSocialAuthServiceInstance.loginWithGoogle();
@@ -121,6 +123,12 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       const prefs = UserPreferencesStateService.getInstance().getUserPreferences();
       // if the user is not registered, create user preferences for the first time
       if (!prefs) {
+        // if registration is disabled, show an error message
+        if(registrationDisabled) {
+          enqueueSnackbar("This account isn’t registered. Please contact the provider of this link.", { variant: "error" });
+          return;
+        }
+
         // if no registration code was provided, show the registration code form
         if (!_registrationCode) {
           setShowRegistrationCodeForm(RegistrationCodeFormModalState.SHOW);
@@ -136,7 +144,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
     } finally {
       notifyOnLoading(false);
     }
-  }, [notifyOnLoading, postLoginHandler, _registrationCode, registerUser, handleError]);
+  }, [notifyOnLoading, postLoginHandler, _registrationCode, registerUser, enqueueSnackbar, handleError]);
 
   const handleRegistrationCodeSuccess = useCallback(
     async (registrationCode: string) => {

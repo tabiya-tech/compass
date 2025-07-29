@@ -199,12 +199,87 @@ describe("Testing Login component", () => {
     mockBrowserIsOnLine(true);
   });
 
+  describe("Render tests", () => {
+    test.each([
+      ["login-code-provided"], // Login Code provided
+      [""], // No Login Code provided
+    ])(
+      "should hide login code related elements when login by code is disabled on application and application default login code = %s",
+      async (givenApplicationLoginCode) => {
+        // GIVEN sentry is initialized
+        (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
+
+        // GIVEN the application login code is set
+        jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
+
+        // AND login by code is disabled
+        jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("true");
+
+        // WHEN the component is rendered
+        const { container } = render(<Login />);
+
+        // THEN expect no errors or warnings to have occurred
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+
+        // THEN the start new conversation button should not be present
+        expect(screen.queryByTestId(DATA_TEST_ID.START_NEW_CONVERSATION_BUTTON)).toBeNull();
+
+        // AND the LoginWithInviteCodeForm should not be called
+        expect(LoginWithInviteCodeForm).not.toHaveBeenCalled();
+
+        // AND a reach out link should not be present in DOM because login by code is disabled
+        expect(screen.queryByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).toBeNull();
+
+        // AND the rendered component should match the snapshot
+        expect(container).toMatchSnapshot();
+
+        // AND expect no errors or warnings to be logged
+        expect(console.warn).not.toHaveBeenCalled();
+        expect(console.error).not.toHaveBeenCalled();
+      }
+    );
+
+    test("should show continue as guest if login code is enabled and application default code is set", async () => {
+      // GIVEN sentry is initialized
+      (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
+
+      // GIVEN the application login code is set
+      jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue("login-code-provided");
+
+      // AND login by code is enabled
+      jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("false");
+
+      // WHEN the component is rendered
+      const { container } = render(<Login />);
+
+      // THEN expect no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+
+      // THEN the start new conversation button should be present
+      expect(screen.getByTestId(DATA_TEST_ID.START_NEW_CONVERSATION_BUTTON)).toBeInTheDocument();
+
+      // AND the LoginWithInviteCodeForm should be not be called
+      expect(LoginWithInviteCodeForm).not.toHaveBeenCalled();
+
+      // AND a reach out link should not be present in DOM because the application default login code is set
+      expect(screen.queryByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).toBeNull();
+
+      // AND the rendered component should match the snapshot
+      expect(container).toMatchSnapshot();
+    });
+  });
+
   test("it should show login form successfully", async () => {
     // GIVEN sentry is initialized
     (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
 
     // AND the application login code is not disabled
-    jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
+    jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("false");
+
+    // AND no application login code is set
+    jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue("");
 
     // GIVEN the component is rendered within necessary context providers
     render(<Login />);
@@ -230,24 +305,25 @@ describe("Testing Login component", () => {
 
     // THEN the invite code login form should be displayed
     expect(LoginWithInviteCodeForm).toHaveBeenCalled();
+
+    // AND the link to register if of no user dosn't have an should be present
+    expect(screen.getByTestId(DATA_TEST_ID.REGISTER_LINK)).toBeInTheDocument();
+
     // AND the component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toMatchSnapshot();
   });
 
-  it("should handle application login code", async () => {
+  test("should handle application login code", () => {
     // GIVEN the application login code is set
     const givenApplicationLoginCode = "bar";
     jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
-
-    // AND no application registration code
-    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue("");
 
     // AND some application code
     const givenApplicationRegistrationCode = "foo";
     jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue(givenApplicationRegistrationCode);
 
     // AND the application login code is not disabled
-    jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
+    jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("false");
 
     // AND anonymous login function will succeed
     const anonymousLoginMock = jest.fn().mockResolvedValue("mock-token");
@@ -288,6 +364,26 @@ describe("Testing Login component", () => {
 
     // THEN the login function should be called with the correct arguments.
     expect(anonymousLoginMock).toHaveBeenCalledWith(givenApplicationLoginCode);
+
+    // AND a reach out link should not be present in DOM because the application login code is set
+    expect(screen.queryByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).toBeNull();
+  });
+
+  test("should remove registration link if registration is disabled", () => {
+    // GIVEN registration is disabled
+    jest.spyOn(EnvServiceModule, "getRegistrationDisabled").mockReturnValue("true");
+
+    // AND no application login code is set
+    jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue("");
+
+    // WHEN the component is rendered
+    const { container } = render(<Login />);
+
+    // THEN the registration link should not be present
+    expect(screen.queryByTestId(DATA_TEST_ID.REGISTER_LINK)).toBeNull();
+
+    // AND the component should match the snapshot
+    expect(container).toMatchSnapshot();
   });
 
   test("it should handle email login correctly", async () => {
@@ -437,7 +533,7 @@ describe("Testing Login component", () => {
     // AND no application login code set
     jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue("");
     // AND login code is not disabled
-    jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
+    jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("false");
 
     render(<Login />);
 
@@ -460,7 +556,7 @@ describe("Testing Login component", () => {
 
   test("should not show the application login code prompt if login code is disabled", async () => {
     // GIVEN the application login code is disabled
-    jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("true");
+    jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("true");
 
     // WHEN the component is rendered
     render(<Login />);
@@ -472,6 +568,9 @@ describe("Testing Login component", () => {
     // AND expect no errors or warnings to be logged
     expect(console.warn).not.toHaveBeenCalled();
     expect(console.error).not.toHaveBeenCalled();
+
+    // AND a reach out link should not be present in DOM
+    expect(screen.queryByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).toBeNull();
   });
 
   test("it should prefer the invitation code from url param over the application default code", async () => {
@@ -480,7 +579,7 @@ describe("Testing Login component", () => {
     jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue(givenApplicationLoginCode);
 
     // AND the application login code is not disabled
-    jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
+    jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("false");
 
     // AND an invite code is in the url param
     const givenURLParamLoginCode = "given-url-login-code";
@@ -587,6 +686,24 @@ describe("Testing Login component", () => {
     await waitFor(() => {
       expect(screen.getByTestId(DATA_TEST_ID.LOGIN_BUTTON)).toBeEnabled();
     });
+
+    // AND expect no errors or warnings to be logged
+    expect(console.warn).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
+  });
+
+  test("should show RequestInvitationCode when no application login code is set", async () => {
+    // GIVEN the application login code is not disabled
+    jest.spyOn(EnvServiceModule, "getLoginCodeDisabled").mockReturnValue("false");
+
+    // AND no application login code is set
+    jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue("");
+
+    // WHEN the component is rendered
+    render(<Login />);
+
+    // THEN the RequestInvitationCode component should be shown
+    expect(screen.getByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).toBeInTheDocument();
 
     // AND expect no errors or warnings to be logged
     expect(console.warn).not.toHaveBeenCalled();

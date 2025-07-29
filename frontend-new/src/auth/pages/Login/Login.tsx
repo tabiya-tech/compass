@@ -29,7 +29,8 @@ import { getCoordinates } from "src/metrics/utils/getUserLocation";
 import {
   getApplicationLoginCode,
   getApplicationRegistrationCode,
-  getApplicationLoginCodeDisabled,
+  getLoginCodeDisabled,
+  getRegistrationDisabled,
 } from "src/envService";
 import PasswordReset from "src/auth/components/passwordReset/PasswordReset";
 
@@ -46,7 +47,7 @@ export const DATA_TEST_ID = {
   FORGOT_PASSWORD_LINK: `login-forgot-password-link-${uniqueId}`,
   LOGIN_USING: `login-using-${uniqueId}`,
   FIREBASE_AUTH_CONTAINER: `firebase-auth-container-${uniqueId}`,
-  LOGIN_LINK: `login-login-link-${uniqueId}`,
+  REGISTER_LINK: `login-register-link-${uniqueId}`,
   LANGUAGE_SELECTOR: `login-language-selector-${uniqueId}`,
   REQUEST_LOGIN_CODE_LINK: `login-request-login-code-link-${uniqueId}`,
   START_NEW_CONVERSATION_BUTTON: `login-start-new-conversation-button-${uniqueId}`,
@@ -179,11 +180,15 @@ const Login: React.FC = () => {
   }, []);
 
   const loginCodeDisabled = useMemo(() => {
-    return getApplicationLoginCodeDisabled().toLowerCase() === "true";
+    return getLoginCodeDisabled().toLowerCase() === "true";
   }, []);
 
   const applicationRegistrationCode = useMemo(() => {
     return getApplicationRegistrationCode();
+  }, []);
+
+  const registrationDisabled = useMemo(() => {
+    return getRegistrationDisabled().toLowerCase() === "true";
   }, []);
 
   /* ------------------
@@ -415,6 +420,13 @@ const Login: React.FC = () => {
     setShowResendVerification(false);
   }, [email, password]);
 
+  // Hide `Login Code request link`
+  // `if the application login code is set` OR `if the login code is disabled`
+  const showRequestLoginCode = useMemo(
+    () => !(applicationLoginCode || loginCodeDisabled),
+    [applicationLoginCode, loginCodeDisabled]
+  );
+
   return (
     <Container
       maxWidth="xs"
@@ -485,10 +497,12 @@ const Login: React.FC = () => {
           notifyOnLoading={notifyOnSocialLoading}
           registrationCode={applicationRegistrationCode}
         />
-        <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          Don't have an account? <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>Register</CustomLink>
-        </Typography>
-        {!applicationLoginCode && <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />}
+        {!registrationDisabled && (
+          <Typography variant="caption" data-testid={DATA_TEST_ID.REGISTER_LINK}>
+            Don't have an account? <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>Register</CustomLink>
+          </Typography>
+        )}
+        {showRequestLoginCode && <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />}
       </Box>
       <BugReportButton bottomAlign={true} />
       <Backdrop isShown={isLoading} message={"Logging you in..."} />

@@ -13,6 +13,7 @@ export enum EnvVariables {
   FRONTEND_LOGIN_CODE = "FRONTEND_LOGIN_CODE",
   FRONTEND_DISABLE_LOGIN_CODE = "FRONTEND_DISABLE_LOGIN_CODE",
   FRONTEND_REGISTRATION_CODE = "FRONTEND_REGISTRATION_CODE",
+  FRONTEND_DISABLE_REGISTRATION = "FRONTEND_DISABLE_REGISTRATION",
   FRONTEND_ENABLE_METRICS = "FRONTEND_ENABLE_METRICS",
   FRONTEND_ENABLE_CV_UPLOAD = "FRONTEND_ENABLE_CV_UPLOAD",
   FRONTEND_FEATURES = "FRONTEND_FEATURES",
@@ -135,12 +136,16 @@ export const getApplicationLoginCode = () => {
   return getEnv(EnvVariables.FRONTEND_LOGIN_CODE);
 };
 
-export const getApplicationLoginCodeDisabled = () => {
+export const getApplicationRegistrationCode = () => {
+  return getEnv(EnvVariables.FRONTEND_REGISTRATION_CODE);
+};
+
+export const getLoginCodeDisabled = () => {
   return getEnv(EnvVariables.FRONTEND_DISABLE_LOGIN_CODE);
 };
 
-export const getApplicationRegistrationCode = () => {
-  return getEnv(EnvVariables.FRONTEND_REGISTRATION_CODE);
+export const getRegistrationDisabled = () => {
+  return getEnv(EnvVariables.FRONTEND_DISABLE_REGISTRATION);
 };
 
 export const getMetricsEnabled = () => {

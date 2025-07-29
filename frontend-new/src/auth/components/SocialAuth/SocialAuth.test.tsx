@@ -2,6 +2,7 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, waitFor, screen, userEvent } from "src/_test_utilities/test-utils";
 import SocialAuth, { DATA_TEST_ID } from "./SocialAuth";
+import { DATA_TEST_ID as INVITATION_CODE_FORM_DATA_TEST_ID } from "src/auth/components/registrationCodeFormModal/RegistrationCodeFormModal";
 import { routerPaths } from "src/app/routerPaths";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
@@ -12,13 +13,11 @@ import {
   Language,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { TabiyaUser } from "src/auth/auth.types";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+import * as EnvServiceModule from "src/envService";
 
 // Mock the envService module
-jest.mock("src/envService", () => ({
-  getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
-  getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
-  getBackendUrl: jest.fn(() => "mock-backend-url"),
-}));
+import "src/_test_utilities/envServiceMock";
 
 // Mock the snackbar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
@@ -72,7 +71,7 @@ describe("SocialAuth tests", () => {
         postLoginHandler={givenNotifyOnLogin}
         isLoading={givenIsLoading}
         notifyOnLoading={givenNotifyOnLoading}
-      />,
+      />
     );
 
     // THEN expect the component to be in the document
@@ -127,7 +126,7 @@ describe("SocialAuth tests", () => {
           postLoginHandler={givenNotifyOnLogin}
           isLoading={givenIsLoading}
           notifyOnLoading={givenNotifyOnLoading}
-        />,
+        />
       );
       // AND the login button is clicked
       const loginButton = screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON);
@@ -140,7 +139,7 @@ describe("SocialAuth tests", () => {
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
-    },
+    }
   );
 
   test("should handle sign-in failure", async () => {
@@ -162,7 +161,7 @@ describe("SocialAuth tests", () => {
         postLoginHandler={givenNotifyOnLogin}
         isLoading={givenIsLoading}
         notifyOnLoading={givenNotifyOnLoading}
-      />,
+      />
     );
     // AND expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -182,7 +181,7 @@ describe("SocialAuth tests", () => {
         postLoginHandler={givenNotifyOnLogin}
         isLoading={givenIsLoading}
         notifyOnLoading={givenNotifyOnLoading}
-      />,
+      />
     );
 
     // THEN expect the message text to be in the document
@@ -211,7 +210,7 @@ describe("SocialAuth tests", () => {
         postLoginHandler={givenNotifyOnLogin}
         isLoading={givenIsLoading}
         notifyOnLoading={givenNotifyOnLoading}
-      />,
+      />
     );
 
     // AND the login button is clicked
@@ -223,5 +222,58 @@ describe("SocialAuth tests", () => {
     // AND expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
+  });
+
+  test("it should prompt user with registration code form when account doesn't exist", async () => {
+    const loginWithGoogleSpy = jest
+      .spyOn(FirebaseSocialAuthenticationService.getInstance(), "loginWithGoogle")
+      .mockResolvedValue("");
+
+    // GIVEN registration is enabled
+    jest.spyOn(EnvServiceModule, "getRegistrationDisabled").mockReturnValue("false");
+
+    // AND a SocialAuth component is rendered
+    render(<SocialAuth postLoginHandler={jest.fn()} isLoading={false} notifyOnLoading={jest.fn()} />);
+
+    // AND UserPreferences is null
+    jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(null);
+
+    // WHEN the user clicks on the login button.
+    const loginButton = screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON);
+    await userEvent.click(loginButton);
+
+    // THEN expect the loginWithGoogle function to be called
+    expect(loginWithGoogleSpy).toHaveBeenCalled();
+
+    // AND the the registration code prompt is open
+    expect(screen.getByTestId(INVITATION_CODE_FORM_DATA_TEST_ID.CONTAINER)).toBeVisible();
+  });
+
+  test("should not show registration code form when registration is disabled", async () => {
+    const loginWithGoogleSpy = jest
+      .spyOn(FirebaseSocialAuthenticationService.getInstance(), "loginWithGoogle")
+      .mockResolvedValue("");
+
+    // GIVEN registration is disabled
+    jest.spyOn(EnvServiceModule, "getRegistrationDisabled").mockReturnValue("true");
+
+    // AND a SocialAuth component is rendered
+    render(<SocialAuth postLoginHandler={jest.fn()} isLoading={false} notifyOnLoading={jest.fn()} />);
+
+    // AND UserPreferences is null
+    jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(null);
+
+    // WHEN the user clicks on the login button.
+    const loginButton = screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON);
+    await userEvent.click(loginButton);
+
+    // THEN expect the loginWithGoogle function to be called
+    expect(loginWithGoogleSpy).toHaveBeenCalled();
+
+    // AND expect a message to be displayed indicating that registration is disabled
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+      "This account isn’t registered. Please contact the provider of this link.",
+      { variant: "error" }
+    );
   });
 });
