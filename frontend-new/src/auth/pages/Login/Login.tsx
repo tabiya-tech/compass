@@ -30,6 +30,7 @@ import {
   getApplicationLoginCode,
   getApplicationRegistrationCode,
   getApplicationLoginCodeDisabled,
+  getRegistrationDisabled,
 } from "src/envService";
 import PasswordReset from "src/auth/components/passwordReset/PasswordReset";
 
@@ -180,6 +181,10 @@ const Login: React.FC = () => {
 
   const applicationRegistrationCode = useMemo(() => {
     return getApplicationRegistrationCode();
+  }, []);
+
+  const registrationDisabled = useMemo(() => {
+    return getRegistrationDisabled().toLowerCase() === "true";
   }, []);
 
   /* ------------------
@@ -382,6 +387,22 @@ const Login: React.FC = () => {
     const params = new URLSearchParams(location.search);
     const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
     if (inviteCodeParam) {
+      // Check if login code is disabled before attempting anonymous login
+      if (loginCodeDisabled) {
+        enqueueSnackbar("Anonymous login is currently disabled. Please login with your email and password.", { variant: "error" });
+        // Remove the invite code from the URL
+        const newSearchParams = new URLSearchParams(location.search);
+        newSearchParams.delete(INVITATIONS_PARAM_NAME);
+        navigate(
+          {
+            pathname: location.pathname,
+            search: newSearchParams.toString(),
+          },
+          { replace: true }
+        );
+        return;
+      }
+      
       handleLoginWithInvitationCode(inviteCodeParam).then(() =>
         console.info("Invitation code login successful: " + inviteCodeParam)
       );
@@ -396,7 +417,7 @@ const Login: React.FC = () => {
         { replace: true }
       );
     }
-  }, [handleLoginWithInvitationCode, location, navigate]);
+  }, [handleLoginWithInvitationCode, location, navigate, loginCodeDisabled, enqueueSnackbar]);
 
   // Reset resend verification state when email or password changes
   useEffect(() => {
@@ -473,10 +494,12 @@ const Login: React.FC = () => {
           notifyOnLoading={notifyOnSocialLoading}
           registrationCode={applicationRegistrationCode}
         />
-        <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          Don't have an account? <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>Register</CustomLink>
-        </Typography>
-        {!applicationLoginCode && <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />}
+        {!registrationDisabled && (
+          <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
+            Don't have an account? <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>Register</CustomLink>
+          </Typography>
+        )}
+        {(!applicationLoginCode || !loginCodeDisabled) && <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />}
       </Box>
       <BugReportButton bottomAlign={true} />
       <Backdrop isShown={isLoading} message={"Logging you in..."} />
