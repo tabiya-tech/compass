@@ -26,9 +26,23 @@ class EmbeddingContext(BaseModel):
     """
     source_collection: str
     destination_collection: str
+
     id_field_name: str
+    """
+    id_field_name is the name of the field that will be used as the ID field in the destination collection.
+    """
+
     extra_fields: list[str] = Field(default_factory=list)
+    """
+    extra_fields is a list of field names that will be added to the destination collection.
+    These fields will be copied from the source collection to the destination collection.
+    """
+
     excluded_codes: list[str] = Field(default_factory=list)
+    """
+    excluded_codes is a list of codes that will be excluded from the source collection.
+    These codes will not be copied to the destination collection.
+    """
 
 
 async def _upsert_index(*,
@@ -43,9 +57,9 @@ async def _upsert_index(*,
     :param hot_run: If True, the index will be created. If False, the index will not be created.
     :param collection: The MongoDB collection object
     :param name: The name of the index
-    :param keys: A list of tuples specifying the index fields and order (e.g., [('field1', 1), ('field2', -1)])
+    :param keys: A list of tuples specifying the index fields and order (e.g. [('field1', 1), ('field2', -1)])
     :param logger: The logger object
-    :param index_options: Additional options for the index (e.g., unique=True)
+    :param index_options: Additional options for the index (e.g. unique=True)
     """
 
     # Get the existing indexes in the collection
@@ -70,8 +84,8 @@ async def _upsert_index(*,
         else:
             logger.info(f"Would create index '{collection.name}.{name}' with options {index_options}")
     except OperationFailure as ex:
-        # Error code 85 indicates IndexOptionsConflict, which means even though the name has been updated
-        # the index with the same keys already exists
+        # Error code 85 indicates IndexOptionsConflict, which means even though the name has been updated,
+        # the index with the same keys already exists.
         # For more information read: https://www.mongodb.com/docs/manual/reference/error-codes/#mongodb-error-85
         if ex.code == 85:
             logger.error(f"IndexOptionsConflict: '{collection.name}.{name}': {ex}")
@@ -104,11 +118,12 @@ async def _create_std_indexes(*, hot_run: bool,
             id_field_name: 1,
             'embedded_field': 1
         },
-        unique=True,  # Currently the embeddings of a model are generated only once.
+        unique=True,  # Currently, the embeddings of a model are generated only once.
         name=f"model_id_and_{id_field_name}_index",
         logger=logger,
     )
-    # The modelId, UUID index is needed by the vector search filter
+    # The modelId, UUID index is needed both for the vector search filter and for the relation collection
+    # to efficiently search for the relations of a specific modelId and UUID
     await _upsert_index(
         hot_run=hot_run,
         collection=collection,
@@ -121,7 +136,7 @@ async def _create_std_indexes(*, hot_run: bool,
 async def _create_vector_search_index(*,
                                       hot_run: bool,
                                       collection: AsyncIOMotorCollection,
-                                      logger: logging.Logger
+                                      logger: logging.Logger,
                                       ):
     logger.info(f"Creating vector search index for collection:{collection.name}")
     _index_name = "embedding_index"
@@ -133,6 +148,10 @@ async def _create_vector_search_index(*,
                 "similarity": "cosine",
                 "type": "vector"
             },
+            # Fields that will be used to filter the data in a vector search query must be indexed with a standard index
+            # before they can be used in a vector search index filter.
+            # https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/#atlas-vector-search-pre-filter
+            # The specific fields are indexed in the standard indexes created in _create_std_indexes()
             {
                 "path": "modelId",
                 "type": "filter"
@@ -144,7 +163,7 @@ async def _create_vector_search_index(*,
         ]
     }
 
-    # if search index exists, update it.
+    # if the search index exists, update it.
     embedding_index_exists: bool = False
 
     async for index in collection.list_search_indexes():
@@ -179,7 +198,7 @@ async def create_model_info_indexes(*, hot_run: bool,
                                     ):
     logger.info("Creating indexes for model info collection")
 
-    # Currently the embeddings of a model are generated only once
+    # Currently, the embeddings of a model are generated only once
     # so we can create a unique index on the modelId field
     await _upsert_index(
         hot_run=hot_run,
@@ -206,11 +225,11 @@ async def create_relations_indexes(*, hot_run: bool,
         logger=logger,
     )
 
-    # Currently we do not offer a search by requiredSkillId
+    # Currently, we do not offer a search by requiredSkillId
     # await upsert_index(
     #     to_collection,
     #     {"modelId": 1, "requiredSkillId": 1},
-    #     name="required_skill_id_index"
+    #     name = "required_skill_id_index"
     # )
 
     # This index is used from copy_relations_collection() to efficiently search for already copied relations
@@ -218,7 +237,7 @@ async def create_relations_indexes(*, hot_run: bool,
         hot_run=hot_run,
         collection=collection,
         keys={"modelId": 1, "source_id": 1},
-        unique=True,  # Currently the embeddings of a model are generated only once.
+        unique=True,  # Currently, the embeddings of a model are generated only once.
         name="model_id_and_source_id_index",
         logger=logger,
     )
