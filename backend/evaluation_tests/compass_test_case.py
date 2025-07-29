@@ -12,7 +12,7 @@ class CompassTestCase(BaseModel):
     The name of the test case.
     """
 
-    skip_force: Optional[Literal['skip', 'force']] = None
+    skip_force: Optional[Literal['skip', 'force', '']] = None
     """
     If set to 'skip', the test case will be skipped.
     If set to 'force', only this test case will be run.

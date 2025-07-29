@@ -59,20 +59,22 @@ test_cases = [
 @pytest.mark.evaluation_test
 @pytest.mark.parametrize("test_case", get_test_cases_to_run(test_cases), ids=[test_case.name for test_case in get_test_cases_to_run(test_cases)])
 async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_search_services: Awaitable[SearchServices], caplog):
-
     search_services = await setup_search_services
     # Given the occupation with it's associated skills
     given_job_titles: list[str] = []
     given_occupations_with_skills: list[OccupationSkillEntity] = []
     if test_case.given_occupation_code:
-        given_occupation_skills: OccupationSkillEntity = await search_services.occupation_skill_search_service.get_by_esco_code(
+        given_occupation_skills: list[OccupationSkillEntity] = await search_services.occupation_skill_search_service.get_by_esco_code(
             code=test_case.given_occupation_code,
         )
-        given_occupations_with_skills.append(given_occupation_skills)
-        given_job_titles.append(given_occupation_skills.occupation.preferredLabel)
+        given_occupations_with_skills.extend(given_occupation_skills)
+        given_job_titles.extend([occupation.preferredLabel for occupation in given_occupation_skills])
 
     if test_case.given_occupation_title:
-        tool = InferOccupationTool(search_services.occupation_skill_search_service)
+        tool = InferOccupationTool(
+            occupation_skill_search_service=search_services.occupation_skill_search_service,
+            occupation_search_service=search_services.occupation_search_service
+        )
         result = await tool.execute(
             experience_title=test_case.given_occupation_title,
             work_type=test_case.given_work_type,

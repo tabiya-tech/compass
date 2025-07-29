@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import re
 from typing import Optional
 
 from pydantic import BaseModel
@@ -8,7 +9,8 @@ from app.agent.agent_types import LLMStats
 from app.agent.experience.work_type import WorkType
 from app.countries import Country
 from app.vector_search.esco_entities import OccupationSkillEntity
-from app.vector_search.esco_search_service import OccupationSkillSearchService
+from app.vector_search.esco_search_service import OccupationSkillSearchService, OccupationSearchService
+from app.vector_search.similarity_search_service import FilterSpec
 from ._contextualization_llm import _ContextualizationLLM
 from ._relevant_occupations_classifier_llm import _RelevantOccupationsClassifierLLM
 
@@ -26,11 +28,13 @@ class InferOccupationToolOutput(BaseModel):
 class InferOccupationTool:
 
     def __init__(
-            self,
+            self, *,
             occupation_skill_search_service: OccupationSkillSearchService,
+            occupation_search_service: Optional[OccupationSearchService]
     ):
         self._logger = logging.getLogger(self.__class__.__name__)
         self._occupation_skill_search_service = occupation_skill_search_service
+        self._occupation_search_service = occupation_search_service
 
     async def execute(self, *,
                       experience_title: str,
@@ -72,8 +76,20 @@ class InferOccupationTool:
         # create a task for each title
         # search for the top_p matching occupations for each title initially, and later filter out the irrelevant ones
         tasks = [self._occupation_skill_search_service.search(query=title, k=top_p) for title in titles]
+        if work_type == WorkType.UNSEEN_UNPAID or work_type is None:
+            # get the UUIDs of the unseen occupations from the taxonomy domain
+            unseen_occupations = await self._occupation_search_service.get_by_esco_code(code=re.compile("^I.*"))
+            filter_spec = FilterSpec(UUID=[occupation.UUID for occupation in unseen_occupations])
+            unseen_tasks = [self._occupation_skill_search_service.search(query=title, k=top_p, filter_spec=filter_spec) for title in titles]
+            tasks.extend(unseen_tasks)
+
+        if work_type == WorkType.SELF_EMPLOYMENT or work_type is None:
+            # since there is only one taxonomy domain for self-employment, it is not necessary to search, instead can retrieve the occupations directly
+            self_employment_tasks = [self._occupation_skill_search_service.get_by_esco_code(code="5221_2")]
+            tasks.extend(self_employment_tasks)
 
         list_of_occupation_list = await asyncio.gather(*tasks)
+        # Build a list of unique occupations from the occupation skills based on their UUIDs
         occupations_skills = flattern(list_of_occupation_list)
 
         # 3. Filter out the irrelevant occupations based on the responsibilities and keep the top_k most relevant ones

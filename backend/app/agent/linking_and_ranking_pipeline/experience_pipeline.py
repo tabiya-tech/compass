@@ -143,7 +143,10 @@ class ExperiencePipeline:
         self._config = config
         self._search_services = search_services
         self._cluster_responsibilities_tool = ClusterResponsibilitiesTool()
-        self._infer_occupations_tool = InferOccupationTool(search_services.occupation_skill_search_service)
+        self._infer_occupations_tool = InferOccupationTool(
+            occupation_skill_search_service=search_services.occupation_skill_search_service,
+            occupation_search_service=search_services.occupation_search_service
+        )
         self._skills_linking_tool = SkillLinkingTool(search_services.skill_search_service)
         self._top_skills_picker = PickTopSkillsTool()
         self._logger = logging.getLogger(__class__.__name__)
