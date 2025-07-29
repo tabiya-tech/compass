@@ -4,6 +4,7 @@ import asyncio
 import logging.config
 import time
 from datetime import datetime
+from typing import Any
 
 import vertexai
 from bson.objectid import ObjectId
@@ -54,6 +55,7 @@ COMPASS_DB = (AsyncIOMotorClient(
 
 class Options(BaseModel):
     hot_run: bool = False
+    delete_existing: bool = False
     generate_embeddings: bool = True
     generate_indexes: bool = True
 
@@ -79,7 +81,7 @@ _SKILLS_EMBEDDING_CONTEXT = EmbeddingContext(
 
 async def generate_and_save_embeddings(*,
                                        hot_run: bool,
-                                       documents: list[dict[str, any]],
+                                       documents: list[dict[str, Any]],
                                        ctx: EmbeddingContext,
                                        embeddings_service: EmbeddingService):
     """
@@ -371,6 +373,19 @@ async def copy_relations_collection(*, hot_run: bool = False):
     progress.close()
 
 
+async def delete_existing(*,
+                          hot_run: bool = False,
+                          collection_name: str,
+                          model_id: str):
+    count_before = await COMPASS_DB[collection_name].count_documents({"modelId": ObjectId(model_id)})
+
+    if hot_run:
+        logging.info(f"Deleting {count_before} {collection_name} with model ID {model_id} ...")
+        await COMPASS_DB[collection_name].delete_many({"modelId": ObjectId(model_id)})
+    else:
+        logging.info(f"Would have deleted {count_before} {collection_name} with model ID {model_id}")
+
+
 async def main(opts: Options):
     """
     Main function:
@@ -379,6 +394,13 @@ async def main(opts: Options):
     """
     logger.info("Starting the main function")
     logger.info("Using options: " + opts.__str__())
+
+    if opts.delete_existing:
+        # Delete existing relations and model info collections
+        for collection in CompassEmbeddingsCollections:
+            await delete_existing(hot_run=opts.hot_run,
+                                  collection_name=collection.value,
+                                  model_id=SCRIPT_SETTINGS.tabiya_model_id)
 
     embeddings_service = await get_embeddings_service(service_name=SCRIPT_SETTINGS.embeddings_service_name,
                                                       model_name=SCRIPT_SETTINGS.embeddings_model_name)
@@ -428,6 +450,13 @@ if __name__ == "__main__":
             action="store_true",
             help="Create indexes only")
 
+        options_group.add_argument(
+            "--delete-existing",
+            required=False,
+            action="store_true",
+            help="Delete existing embeddings before copying"
+        )
+
         args = parser.parse_args()
 
         # Whether the main function will generate embeddings,
@@ -438,6 +467,7 @@ if __name__ == "__main__":
 
         _options = Options(
             hot_run=args.hot_run,
+            delete_existing=args.delete_existing,
             generate_embeddings=generate_embeddings,
             generate_indexes=True
         )
