@@ -153,6 +153,10 @@ const Login: React.FC = () => {
       try {
         // Get user's location if they allow it
         const coordinates = await getCoordinates();
+        if (coordinates[0] == null || coordinates[1] == null || isNaN(coordinates[0]) || isNaN(coordinates[1])) {
+          console.warn("Coordinates could not be retrieved or are invalid");
+          return;
+        }
         const locationEvent: UserLocationEvent = {
           event_type: EventType.USER_LOCATION,
           user_id: user_id,
@@ -357,7 +361,15 @@ const Login: React.FC = () => {
         </>
       );
     }
-  }, [applicationLoginCode, handleStartNewConversation, inviteCode, isLoading, loginCodeDisabled, theme, invitationCodeAndEmailFormDividerText]);
+  }, [
+    applicationLoginCode,
+    handleStartNewConversation,
+    inviteCode,
+    isLoading,
+    loginCodeDisabled,
+    theme,
+    invitationCodeAndEmailFormDividerText,
+  ]);
 
   /* ------------------
    * side effects, like checking the invite code in the URL
