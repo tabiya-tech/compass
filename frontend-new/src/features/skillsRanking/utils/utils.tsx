@@ -1,3 +1,8 @@
+// REVIEW: Rename to ts.
+// REVIEW: These functions are not used anywhere in the feature.
+// REVIEW: Remove them.
+
+
 import { Theme } from "@mui/material/styles";
 
 interface StyleParams {

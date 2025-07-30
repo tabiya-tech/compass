@@ -1,5 +1,5 @@
-import React, { useCallback, useContext, useEffect, useRef, useState, useMemo } from "react";
-import { useTheme, Box } from "@mui/material";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Box, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
@@ -8,7 +8,8 @@ import {
   SkillsRankingPhase,
   SkillsRankingState,
 } from "src/features/skillsRanking/types";
-import CancellableTypingChatMessage from "src/features/skillsRanking/components/cancellableTypingChatMessage/CancellableTypingChatMessage";
+import CancellableTypingChatMessage
+  from "src/features/skillsRanking/components/cancellableTypingChatMessage/CancellableTypingChatMessage";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import RotateToSolvePuzzle, {
   RotateToSolvePuzzleMetricsReport,
@@ -25,6 +26,7 @@ import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoS
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 
+// REVIEW: I think these constants should be moved to the root of the feature folder constants file.
 const CALCULATION_DELAY = 5000;
 const EFFORT_METRICS_UPDATE_INTERVAL = 2000;
 
@@ -49,6 +51,7 @@ export interface SkillsRankingEffortProps {
 
 export const SKILLS_RANKING_EFFORT_MESSAGE_ID = `skills-ranking-effort-message-${uniqueId}`;
 
+// REVIEW: I think this is a utility function to be moved outside.
 const getEffortTypeForGroup = (group: SkillsRankingExperimentGroups): EffortType => {
   switch (group) {
     case SkillsRankingExperimentGroups.GROUP_1:
@@ -67,9 +70,11 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
 
+  // REVIEW: move this to a utility function
   const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
   const isReplay = useMemo(() => currentPhase !== SkillsRankingPhase.PROOF_OF_VALUE, [currentPhase]);
   const effortType = getEffortTypeForGroup(skillsRankingState.experiment_group);
+
   const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
 
   // State management
@@ -174,6 +179,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
       if (isReplay || !activeSessionId) return;
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
+      // REVIEW: I think these nesteed ternally operators are a bit hard to read,
       const metrics: SkillsRankingMetrics = {
         cancelled_after:
           state === SkillsRankingEffortState.CANCELLED

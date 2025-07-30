@@ -1,17 +1,13 @@
-import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingScore, SkillsRankingState, SkillsRankingPhaseWithTime } from "../types";
+import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingScore, SkillsRankingState } from "../types";
 import { getRandomString } from "src/_test_utilities/specialCharacters";
 import { jobSeekerComparisonLabels } from "../components/skillsRankingDisclosure/types";
 
-const createPhaseArray = (phase: SkillsRankingPhase): SkillsRankingPhaseWithTime[] => {
-  return [{
-    name: phase,
-    time: new Date().toISOString()
-  }];
-};
-
 export const getRandomSkillsRankingState = (phase?: SkillsRankingPhase, experimentGroup?: SkillsRankingExperimentGroups) : SkillsRankingState => {
   return {
-    phase: createPhaseArray(phase ?? getRandomSkillsRankingPhase()),
+    phase: [{
+      name: phase,
+      time: new Date().toISOString()
+    }],
     session_id: getRandomSessionID(),
     score: getRandomScore(),
     experiment_group: experimentGroup ?? getRandomExperimentGroup(),

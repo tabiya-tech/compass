@@ -1,11 +1,8 @@
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import {
-  SkillsRankingPhase,
-  SkillsRankingState,
-} from "src/features/skillsRanking/types";
+import { SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -48,6 +45,8 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({
   const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
   const isReplay = currentPhase !== SkillsRankingPhase.INITIAL;
 
+  // REVIEW: use airtimeAmount name to keep the camelCase.
+  //         No reason for the useMemo.
   const airtime_amount = useMemo(
     () => SkillsRankingService.getInstance().getConfig().config.airtimeBudget,
     []

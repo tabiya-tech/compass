@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { Box, Typography, useTheme, keyframes } from "@mui/material";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Box, keyframes, Typography, useTheme } from "@mui/material";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import RotateRightIcon from "@mui/icons-material/RotateRight";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
@@ -23,6 +23,7 @@ export interface RotateToSolveTaskProps {
   disabled?: boolean;
 }
 
+// I think this belongs to the constants.file
 const DEFAULT_STRINGS = ["GJRLK", "FQZNC", "EKJGR", "CJFLQ", "GRKLE"];
 
 interface CharacterState {
@@ -34,7 +35,7 @@ interface CharacterState {
 
 const pulseAnimation = keyframes`
   0% { transform: scale(1); border-color: transparent; }
-  50% { transform: scale(1.1); border-color: limegreen; }
+  50% { transform: scale(1.1); border-color: limegreen; } // REVIEW: Use theme......color
   100% { transform: scale(1); border-color: transparent; }
 `;
 

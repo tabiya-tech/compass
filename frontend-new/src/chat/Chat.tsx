@@ -34,7 +34,9 @@ import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableCompo
 import ChatProgressBar from "./chatProgressbar/ChatProgressBar";
 import { CurrentPhase, defaultCurrentPhase } from "./chatProgressbar/types";
 import { CompassChatMessageProps } from "./chatMessage/compassChatMessage/CompassChatMessage";
-import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import {
+  CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
+} from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 
@@ -217,20 +219,22 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({ showInactiveSessionAlert =
         }
 
         response.messages.forEach((messageItem, idx) => {
+          // REVIEW: this is isConclusionMessage, Just a thought "message" in the variable name.
           const isConclusion =
             response.conversation_completed && idx === response.messages.length - 1;
-              if (!isConclusion) {
-              addMessageToChat( generateCompassMessage(
-                  messageItem.message_id,
-                  messageItem.message,
-                  messageItem.sent_at,
-                  messageItem.reaction
-                ));
+          if (!isConclusion) {
+            addMessageToChat(generateCompassMessage(
+              messageItem.message_id,
+              messageItem.message,
+              messageItem.sent_at,
+              messageItem.reaction,
+            ));
           }
         });
         // Handle the conclusion message and skills ranking flow for new messages
         if (response.conversation_completed && response.messages.length) {
           const lastMessage = response.messages[response.messages.length - 1];
+          // REVIEW: this should be in an outside function so that it can be reused both in the initialization and the sendMessage flow
           const showConclusionMessage = () => {
             const conclusionMessage = generateConversationConclusionMessage(lastMessage.message_id, lastMessage.message);
             const typingMessage = generateTypingMessage();
@@ -239,10 +243,10 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({ showInactiveSessionAlert =
               removeMessageFromChat(typingMessage.message_id);
               addMessageToChat(conclusionMessage);
             }, TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT);
-          }
+          };
 
           if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
-            showSkillsRanking(showConclusionMessage);
+            await showSkillsRanking(showConclusionMessage);
           } else {
             showConclusionMessage();
           }
@@ -262,7 +266,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({ showInactiveSessionAlert =
         setAiIsTyping(false);
       }
     },
-    [addMessageToChat, exploredExperiences, fetchExperiences, removeMessageFromChat, showSkillsRanking]
+    [addMessageToChat, exploredExperiences, fetchExperiences, removeMessageFromChat, showSkillsRanking],
   );
 
   const initializeChat = useCallback(
@@ -298,6 +302,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({ showInactiveSessionAlert =
         // Set the messages from the chat history
         if (history.messages.length) {
           // Separate the last message if it's a conclusion
+          // REVIEW: rename this to isConclusionMessage.
           const isConclusion = history.conversation_completed;
           const mappedMessages = history.messages
             .filter((_, idx) => !(isConclusion && idx ===  history.messages.length - 1))
@@ -477,6 +482,8 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({ showInactiveSessionAlert =
     }
   }, [activeSessionId, fetchExperiences]);
 
+
+  // TODO: Rename these props to if we want to rename the functions.
   return (
     <Suspense fallback={<Backdrop isShown={true} transparent={true} />}>
       {isLoggingOut ? (

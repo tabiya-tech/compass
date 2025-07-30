@@ -4,11 +4,7 @@ import React, { useState } from "react";
 import { IChatMessage } from "src/chat/Chat.types";
 import { useSkillsRanking } from "../hooks/useSkillsRanking";
 import { getRandomSkillsRankingState } from "../utils/getSkillsRankingState";
-import {
-  SkillsRankingExperimentGroups,
-  SkillsRankingPhase,
-  SkillsRankingState,
-} from "../types";
+import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState } from "../types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { action } from "@storybook/addon-actions";
 import { SkillsRankingService } from "../skillsRankingService/skillsRankingService";
@@ -168,3 +164,5 @@ export const Group4: Story = {
   },
   render: (args) => <SkillsRankingFlowTester {...args} onFinishFlow={action("flow finished")} />,
 };
+
+// REVIEW: The full flow is not working, it is rendering infinitely.

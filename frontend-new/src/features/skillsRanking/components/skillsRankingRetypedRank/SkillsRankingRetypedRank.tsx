@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useContext, useEffect, useRef, useCallback } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Box, Slider, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
@@ -44,7 +44,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
   const [value, setValue] = useState(0);
   const [startedEditing, setStartedEditing] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [step, setStep] = useState(0); // 0: form, 1: typing, 2: finish
+  const [step, setStep] = useState(0); // 0: form, 1: typing, 2: finish // REVIEW:replace value to [showTyping, setShowTyping] why finish step (Same for other components).
   const hasFinishedRef = useRef(false);
 
   const jobPlatformUrl = useMemo(() => SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl, []);
@@ -55,6 +55,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
   const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
   const scrollRef = useAutoScrollOnChange(step);
 
+  // REVIEW: What is isAutoSubmitGroup? I think the name is not clear. rename to: shouldRetypeRank (and then if not return null)
   const isAutoSubmitGroup =
     skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
     skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4;

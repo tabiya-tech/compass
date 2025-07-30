@@ -3,18 +3,13 @@ import { IChatMessage } from "src/chat/Chat.types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import { SessionError } from "src/error/commonErrors";
-import {
-  SkillsRankingPhase,
-  SkillsRankingState,
-} from "src/features/skillsRanking/types";
-import {
-  skillsRankingHappyPath,
-} from "./skillsRankingFlowGraph";
+import { SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
+import { skillsRankingHappyPath } from "./skillsRankingFlowGraph";
 import {
   createBriefingMessage,
   createEffortMessage,
-  createJobSeekerDisclosureMessage,
   createJobMarketDisclosureMessage,
+  createJobSeekerDisclosureMessage,
   createPerceivedRankMessage,
   createPromptMessage,
   createRetypedRankMessage,
@@ -31,58 +26,82 @@ const phaseToMessageFactory = {
   [SkillsRankingPhase.COMPLETED]: null,
 };
 
-export const useSkillsRanking = (
-  addMessage: (message: IChatMessage<any>) => void,
-  removeMessage: (messageId: string) => void,
-) => {
+const getPathToPhase = (phase: SkillsRankingPhase): SkillsRankingPhase[] => {
+  const index = skillsRankingHappyPath.indexOf(phase);
+  if (index === -1) {
+    console.warn(`[SkillsRanking] Phase '${phase}' not found in path`, skillsRankingHappyPath);
+    return [];
+  }
+  return skillsRankingHappyPath.slice(0, index + 1);
+};
+
+
+const getSkillsRankingState = async (): Promise<SkillsRankingState | null> => {
   const activeSessionId =
     UserPreferencesStateService.getInstance().getActiveSessionId();
 
-  const getSkillsRankingState = async (): Promise<SkillsRankingState | null> => {
+  if (!activeSessionId)
+    throw new SessionError("Active session ID is not available.");
+  try {
+    return await SkillsRankingService.getInstance().getSkillsRankingState(
+      activeSessionId
+    );
+  } catch (error) {
+    console.error(
+      new SkillsRankingError("Error fetching skills ranking state:", error)
+    );
+    return null;
+  }
+};
+
+const initializeSkillsRankingState =
+  async (): Promise<SkillsRankingState | null> => {
+    const activeSessionId =
+      UserPreferencesStateService.getInstance().getActiveSessionId();
+
     if (!activeSessionId)
       throw new SessionError("Active session ID is not available.");
     try {
-      return await SkillsRankingService.getInstance().getSkillsRankingState(
-        activeSessionId
+      return await SkillsRankingService.getInstance().updateSkillsRankingState(
+        activeSessionId,
+        SkillsRankingPhase.INITIAL
       );
     } catch (error) {
       console.error(
-        new SkillsRankingError("Error fetching skills ranking state:", error)
+        new SkillsRankingError("Error initializing skills ranking state:", error)
       );
       return null;
     }
   };
 
-  const initializeSkillsRankingState =
-    async (): Promise<SkillsRankingState | null> => {
-      if (!activeSessionId)
-        throw new SessionError("Active session ID is not available.");
-      try {
-        return await SkillsRankingService.getInstance().updateSkillsRankingState(
-          activeSessionId,
-          SkillsRankingPhase.INITIAL
-        );
-      } catch (error) {
-        console.error(
-          new SkillsRankingError("Error initializing skills ranking state:", error)
-        );
-        return null;
-      }
-    };
 
-  const getPathToPhase = (phase: SkillsRankingPhase): SkillsRankingPhase[] => {
-    const index = skillsRankingHappyPath.indexOf(phase);
-    if (index === -1) {
-      console.warn(`[SkillsRanking] Phase '${phase}' not found in path`, skillsRankingHappyPath);
-      return [];
-    }
-    return skillsRankingHappyPath.slice(0, index + 1);
-  };
+export const useSkillsRanking = (
+  addMessage: (message: IChatMessage<any>) => void,
+  removeMessage: (messageId: string) => void,
+) => {
 
+  // REVIEW: Move this function outside of this hook, if possible in the utils function.
+  // Why it re-compile it if the useSKillsRanking is called multiple times?
+  // const getPathToPhase = (phase: SkillsRankingPhase): SkillsRankingPhase[] => {
+  //   const index = skillsRankingHappyPath.indexOf(phase);
+  //   if (index === -1) {
+  //     console.warn(`[SkillsRanking] Phase '${phase}' not found in path`, skillsRankingHappyPath);
+  //     return [];
+  //   }
+  //   return skillsRankingHappyPath.slice(0, index + 1);
+  // };
+
+  /**
+   * REVIEW: Document what this function does.
+   * rename to: getNextFunction
+   * @param currentPhase
+   * @param onFinishFlow
+   */
   const handleFlow =
-    (currentPhase: SkillsRankingPhase, onFinishFlow: () => void) =>
-      async (newState: SkillsRankingState) => {
+    (currentPhase: SkillsRankingPhase, onFinishFlow: () => void) => async (newState: SkillsRankingState) => {
+        // REVIEW: a function called getRecentPhase perhaps on
         const currentPhaseName = newState.phase[newState.phase.length - 1]?.name;
+
         if (currentPhaseName === SkillsRankingPhase.COMPLETED) {
           console.debug(`[Flow] Final phase '${currentPhaseName}' reached`);
           onFinishFlow();
@@ -112,6 +131,7 @@ export const useSkillsRanking = (
 
   const showSkillsRanking = async (onFinishFlow: () => void) => {
     let state = await getSkillsRankingState();
+
     state ??= await initializeSkillsRankingState();
 
     if (!state) {
@@ -124,7 +144,11 @@ export const useSkillsRanking = (
       return;
     }
 
+    // REVIEW: What if state.phase is Empty or undefined?
+    //         I see the last phase is the current phase.
     const currentPhaseName = state.phase[state.phase.length - 1]?.name;
+    // REVIEW: We can add a guard to call isValidPhaseName
+
     const path = getPathToPhase(currentPhaseName);
     if (path.length === 0) {
       console.warn(`[Flow] Invalid phase path for phase: '${currentPhaseName}'`);

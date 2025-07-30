@@ -1,4 +1,4 @@
-import React, { useMemo, useContext, useState, useCallback, useEffect } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -20,6 +20,7 @@ import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoS
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 
+// This should be located to feature constants. with the documentation of what this duration means.
 const TYPING_DURATION_MS = 5000;
 
 const uniqueId = "0e95404a-2044-4634-a6e8-29cc7b2d754e";
@@ -54,16 +55,20 @@ export interface SkillsRankingBriefingProps {
   onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>;
   skillsRankingState: SkillsRankingState;
 }
+// REVIEW: I think this is a constant, it will not change during the component lifecycle,
+// I think we can move it outside the component. and make it a const.
+const jobPlatformUrl = SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl;
 
 const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({ onFinish, skillsRankingState }) => {
   const theme = useTheme();
-  const jobPlatformUrl = useMemo(() => SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl, []);
-  const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
+
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
 
   const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
+
   const isReplay = currentPhase !== SkillsRankingPhase.BRIEFING;
+
   const effortType = getEffortTypeForGroup(skillsRankingState.experiment_group);
 
   const [submitted, setSubmitted] = useState(false);
@@ -93,10 +98,13 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
     let newSkillsRankingState: SkillsRankingState | null = null;
 
     try {
+      const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
+
       if (!activeSessionId) {
         console.error(new SkillsRankingError("No session ID."));
         return;
       }
+
       newSkillsRankingState = await SkillsRankingService.getInstance().updateSkillsRankingState(
         activeSessionId,
         SkillsRankingPhase.PROOF_OF_VALUE
@@ -116,7 +124,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       setIsTypingVisible(false);
       newSkillsRankingState && onFinish(newSkillsRankingState);
     }, remaining);
-  }, [activeSessionId, onFinish, enqueueSnackbar]);
+  }, [onFinish, enqueueSnackbar]);
 
   return (
     <MessageContainer

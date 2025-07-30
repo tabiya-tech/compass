@@ -35,11 +35,7 @@ const TypographyElement = (props: TypographyElementProps) => {
     props.typographyKey !== "inherit"
   ) {
     return (
-      <Typography 
-        variant={props.typographyKey as any} 
-        ref={typographyRef}
-        sx={{ color: 'text.primary' }}
-      >
+      <Typography variant={props.typographyKey as any} ref={typographyRef}>
         {`<${props.typographyKey}> ${typographyVariant.fontFamily} ${computedFontSizeInPx} = ${computedFontSizeInRem}rem`}
       </Typography>
     );
@@ -57,7 +53,7 @@ const TypographyElements = () => {
         gap: theme.tabiyaSpacing.lg,
       }}
     >
-      <Typography variant="h4" sx={{ color: 'text.primary' }}>Basic Typography</Typography>
+      <Typography variant="h4">Basic Typography</Typography>
       <Box
         sx={{
           gap: theme.tabiyaSpacing.md,
@@ -70,7 +66,7 @@ const TypographyElements = () => {
           <TypographyElement key={typographyKey} typographyKey={typographyKey} theme={theme} />
         ))}
       </Box>
-      <Typography variant="h4" sx={{ color: 'text.primary' }}>Font Weight</Typography>
+      <Typography variant="h4">Font Weight</Typography>
       <Box
         sx={{
           gap: theme.tabiyaSpacing.md,
@@ -79,16 +75,16 @@ const TypographyElements = () => {
           alignItems: "start",
         }}
       >
-        <Typography sx={{ fontWeight: theme.typography.fontWeightBold, color: 'text.primary' }}>
+        <Typography sx={{ fontWeight: theme.typography.fontWeightBold }}>
           {`fontWeightBold: ${theme.typography.fontWeightBold}`}
         </Typography>
-        <Typography sx={{ fontWeight: theme.typography.fontWeightMedium, color: 'text.primary' }}>
+        <Typography sx={{ fontWeight: theme.typography.fontWeightMedium }}>
           {`fontWeightMedium: ${theme.typography.fontWeightMedium}`}
         </Typography>
-        <Typography sx={{ fontWeight: theme.typography.fontWeightRegular, color: 'text.primary' }}>
+        <Typography sx={{ fontWeight: theme.typography.fontWeightRegular }}>
           {`fontWeightRegular: ${theme.typography.fontWeightRegular}`}
         </Typography>
-        <Typography sx={{ fontWeight: theme.typography.fontWeightLight, color: 'text.primary' }}>
+        <Typography sx={{ fontWeight: theme.typography.fontWeightLight }}>
           {`fontWeightLight: ${theme.typography.fontWeightLight}`}
         </Typography>
       </Box>
@@ -101,3 +97,4 @@ export const TypographyStyles: Story = {
     children: <TypographyElements />,
   },
 };
+// REVIEW: Why This was changed?

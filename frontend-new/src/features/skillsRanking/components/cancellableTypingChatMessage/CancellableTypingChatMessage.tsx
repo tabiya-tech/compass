@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, keyframes, useTheme } from "@mui/material";
+import { Box, keyframes, Typography, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { AnimatePresence, motion } from "framer-motion";
 import CustomLink from "src/theme/CustomLink/CustomLink";
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
-const uniqueId = "cancellable-typing-chat-message-eb14a7aa-b515-4ab9-9829-8110346d9090";
+const uniqueId = "cancellable-typing-chat-message-eb14a7aa-b515-4ab9-9829-8110346d9090"; //REVIEW:  I Think this id is not unique.
 
+// REVIEW: Remove this.
 export const CANCELABLE_TYPING_CHAT_MESSAGE_TYPE = `cancellable-typing-chat-message-${uniqueId}`;
 
 export const DATA_TEST_ID = {

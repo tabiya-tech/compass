@@ -11,23 +11,17 @@ export interface FeatureConfig {
  * Singleton class to manage features.
  */
 export class FeaturesService {
-  private readonly _state: Map<string, FeatureConfig>;
+  _featureId: string;
 
-  constructor() {
-    this._state = new Map<string, FeatureConfig>();
+  constructor(featureId: string) {
+    this._featureId = featureId;
   }
 
   /**
    * Get the configuration for a specific feature.
    * The ID is managed in the respective feature implementation.
-   *
-   * @param featureId - The ID of the feature to retrieve the configuration for.
    */
-  protected getConfig(featureId: string): FeatureConfig {
-    if (this._state.has(featureId)) {
-      return this._state.get(featureId)!;
-    }
-
+  protected getConfig(): FeatureConfig {
     const featuresConfigString = getFeatures();
 
     try {
@@ -69,8 +63,8 @@ export class FeaturesService {
     }
   }
 
-  protected isFeatureEnabled(featureId: string): boolean {
-    const config = this.getConfig(featureId);
+  protected isFeatureEnabled(): boolean {
+    const config = this.getConfig();
     return config.enabled;
   }
 
@@ -95,9 +89,5 @@ export class FeaturesService {
 
   protected getFeatureAPIPrefix(featureId: string): string {
     return `features/${featureId}`;
-  }
-
-  private _clearState(): void {
-    this._state.clear();
   }
 }

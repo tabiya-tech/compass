@@ -12,14 +12,31 @@ export enum SkillsRankingExperimentGroups {
   /**
    * Group 2: High Difference/Smaller
    * - work based effort task
-   * - not see ranking results.
+   *
+   *  Note: original: not see ranking results.
+   *
+   *  95%
+   *    not see ranking results.
+   *  5%
+   *    if solved _30_ characters:-
+   *       - see the result
+   *    else:
+   *      - not see the result
    */
   GROUP_3 = "Group 3: Underconfidence/Yes",
+
   /**
    * Group 3: Underconfidence/Yes
    * - work based effort task
-   * - see ranking results.
-   * - confirm they've seen the ranking results
+   *
+   * Note: original: see ranking results.
+   *  95%
+   *    see ranking results.
+   *  5%
+   *    if solved _30_ characters:-
+   *       - see the result
+   *    else:
+   *      - not see the result
    */
   GROUP_4 = "Group 4: Underconfidence/No"
   /**
@@ -29,6 +46,7 @@ export enum SkillsRankingExperimentGroups {
    */
 }
 
+// REVIEW: isExperimentGroupValid()
 export function isExperimentGroupKey(
   value: unknown
 ): value is keyof typeof SkillsRankingExperimentGroups {
@@ -55,22 +73,26 @@ export interface SkillsRankingPhaseWithTime {
 }
 
 export interface SkillsRankingScore {
-  jobs_matching_rank: number;
   /**
    * The rank of the user as compared to the job market.
    */
-  comparison_rank: number;
+
+  jobs_matching_rank: number;
+
   /**
    * The rank of the user as compared to other job seekers.
    */
-  comparison_label: string;
+  comparison_rank: number;
+
   /**
    * The label of the comparison rank, LOWEST, SECOND_LOWEST, MIDDLE, SECOND_HIGHEST, HIGHEST.
    */
-  calculated_at: string;
+  comparison_label: string;
+
   /**
    * The time the score was calculated, in ISO format, in UTC.
    */
+  calculated_at: string;
 }
 
 export interface SkillsRankingState {
@@ -82,19 +104,28 @@ export interface SkillsRankingState {
   /**
    * the group the user is assigned for each experiment branch
    */
+  // REVIEW: phases, it should be clear on how the order looks like, And how to get the most recent phase.
+    //       in the comments, add that the last phase is the most recent one. it is a Stack (Inverse Stack) structure.
   phase: SkillsRankingPhaseWithTime[];
+
   /**
    * The full phase history of the skills ranking process.
    */
   score: SkillsRankingScore;
+
   /**
    * The score given to the user as compared to other job seekers and the job market.
    */
-  cancelled_after?: string | null;
+  // REVIEW: Suggestion not ideal: move these metrics in an object which can be null on GROUP_1 and GROUP_4 and be available on GROUP_2 and GROUP_3
+  // Like we did for the `SkillsRankingScore`, perhaps this is a major change.
+  // so that it is clear on how validation might work on backend or when analysing data.
+
+  // REVIEW: Clarify why undefined | null, in this case. I think we can keep (undefined) for better type safety, but null is not needed I think.
+  cancelled_after?: string;
   /**
    * Represents the time in ms spent by the user before they cancelled the skills ranking process.
    */
-  succeeded_after?: string | null;
+  succeeded_after?: string;
   /**
    * Represents the time in ms spent by the user before they finishing the skills ranking process.
    */
@@ -113,11 +144,12 @@ export interface SkillsRankingState {
    * The number of clicks the user made during the proof_of_value task. character selection, rotation [clockwise/counter-clockwise]
    *     This is only relevant for the time-based proof_of_value task.
    */
-  perceived_rank_percentile?: number | null;
+
+  perceived_rank_percentile?: number;
   /**
    * The percentile rank the user thinks they have (0-100)
    */
-  retyped_rank_percentile?: number | null;
+  retyped_rank_percentile?: number;
   /**
    * The rank the user retyped to confirm they saw it correctly (0-100)
    */

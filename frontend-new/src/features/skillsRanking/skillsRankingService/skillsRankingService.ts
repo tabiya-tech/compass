@@ -2,11 +2,11 @@ import { getBackendUrl } from "src/envService";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
 import {
+  isExperimentGroupKey,
   SkillsRankingConfig,
   SkillsRankingExperimentGroups,
   SkillsRankingPhase,
   SkillsRankingState,
-  isExperimentGroupKey
 } from "src/features/skillsRanking/types";
 import { FeaturesService } from "src/features/featuresService/FeaturesService";
 import { SKILLS_RANKING_FEATURE_ID } from "src/features/skillsRanking/constants";
@@ -150,6 +150,8 @@ export class SkillsRankingService extends FeaturesService{
 
   /**
    * Check if the skills ranking feature is enabled.
+   * // REVIEW: I think the Parent should get featureId in the constructr, and we don't have to create this new function here.
+   * //         Why?: Because if we are going to go with FeatureService
    */
   isSkillsRankingFeatureEnabled(): boolean {
       return super.isFeatureEnabled(this.featureId);
@@ -180,11 +182,16 @@ export class SkillsRankingService extends FeaturesService{
     if (data === null) {
       return null;
     }
+
+    // Validate experiment group returned from the API.
+    // REVIEW: I think this function isExperimentGroupKey should be changed to isValidExperimentGroupKey.
     if (data.experiment_group && isExperimentGroupKey(data.experiment_group)){
       throw new SkillsRankingError(
         `Unknown experiment_group '${data.experiment_group}' from API`
       );
     }
+
+    // REVIEW: Have a private function to convert the data to SkillsRankingState
     return {
       session_id: data.session_id,
       experiment_group: SkillsRankingExperimentGroups[data.experiment_group as keyof typeof SkillsRankingExperimentGroups],
@@ -254,6 +261,8 @@ export class SkillsRankingService extends FeaturesService{
       );
     }
 
+
+
     return {
       session_id: data.session_id,
       experiment_group: SkillsRankingExperimentGroups[data.experiment_group as keyof typeof SkillsRankingExperimentGroups],
@@ -298,11 +307,12 @@ export class SkillsRankingService extends FeaturesService{
       failureMessage: `Failed to update skills ranking metrics for session ${sessionId}`,
       body: JSON.stringify({
         phase: currentPhase,
-        cancelled_after: metrics.cancelled_after ?? null,
-        succeeded_after: metrics.succeeded_after ?? null,
-        puzzles_solved: metrics.puzzles_solved ?? null,
-        correct_rotations: metrics.correct_rotations ?? null,
-        clicks_count: metrics.clicks_count ?? null
+        // REVIEW: reduce  ?? null usage and the caller should be the one sending null if needed.
+        cancelled_after: metrics.cancelled_after,
+        succeeded_after: metrics.succeeded_after,
+        puzzles_solved: metrics.puzzles_solved,
+        correct_rotations: metrics.correct_rotations,
+        clicks_count: metrics.clicks_count
       }),
       expectedContentType: "application/json",
     });
@@ -352,6 +362,7 @@ export class SkillsRankingService extends FeaturesService{
   validateConfig (config: any): void {
     super.validateConfig(config);
     // check internal config properties inside the config.config
+    // REVIEW: use SKillsRankingError instaed of Error.
     if (!config.config.hasOwnProperty("airtimeBudget") || typeof config.config.airtimeBudget !== "string") {
       throw new Error(`Invalid configuration for feature ${this.featureId}: airtimeBudget must be a string`);
     }
