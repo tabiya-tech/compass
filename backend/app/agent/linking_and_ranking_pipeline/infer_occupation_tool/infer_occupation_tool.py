@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import re
+import time
 from typing import Optional
 
 from pydantic import BaseModel
@@ -55,7 +56,8 @@ class InferOccupationTool:
         2.2 Search for the top_p occupations matching the contextual title
         3. Filter out the irrelevant occupations based on the responsibilities and keep the top_k most relevant ones
         """
-
+        start_time = time.time()
+        last_time = time.time()
         # 1. Contextualize the experience title based on the country of interest, company, work type and responsibilities
         #    and infer the contextual title.
         contextualization_llm = _ContextualizationLLM(
@@ -73,6 +75,9 @@ class InferOccupationTool:
         #  using a different case yields imprecise results
         titles: set[str] = {experience_title.strip().lower()}.union(
             {title.strip().lower() for title in contextualization_response.contextual_titles})
+
+        self._logger.debug("Contextualizing the experience title took %.2f seconds",  time.time() - last_time)
+        last_time = time.time()
         # create a task for each title
         # search for the top_p matching occupations for each title initially, and later filter out the irrelevant ones
         tasks = [self._occupation_skill_search_service.search(query=title, k=top_p) for title in titles]
@@ -91,6 +96,8 @@ class InferOccupationTool:
         list_of_occupation_list = await asyncio.gather(*tasks)
         # Build a list of unique occupations from the occupation skills based on their UUIDs
         occupations_skills = flattern(list_of_occupation_list)
+        self._logger.debug("Finding the top_p occupations for the contextualized titles took %.2f seconds",  time.time() - last_time)
+        last_time = time.time()
 
         # 3. Filter out the irrelevant occupations based on the responsibilities and keep the top_k most relevant ones
         relevant_occupations_tool = _RelevantOccupationsClassifierLLM()
@@ -103,12 +110,14 @@ class InferOccupationTool:
         relevant_occupations_uuids = {occupation.UUID for occupation in relevant_occupations_output.most_relevant}
         relevant_occupations_skills = [occupation_skill for occupation_skill in occupations_skills if
                                        occupation_skill.occupation.UUID in relevant_occupations_uuids]
-
-        return InferOccupationToolOutput(contextual_titles=contextualization_response.contextual_titles,
-                                         esco_occupations=relevant_occupations_skills,
-                                         responsibilities=responsibilities,
-                                         llm_stats=contextualization_response.llm_stats + relevant_occupations_output.llm_stats
-                                         )
+        result = InferOccupationToolOutput(contextual_titles=contextualization_response.contextual_titles,
+                                           esco_occupations=relevant_occupations_skills,
+                                           responsibilities=responsibilities,
+                                           llm_stats=contextualization_response.llm_stats + relevant_occupations_output.llm_stats
+                                           )
+        self._logger.debug("Filter out the irrelevant occupations took %.2f seconds",  time.time() - last_time)
+        self._logger.info("Occupation inference took %.2f seconds in total", time.time() - start_time)
+        return result
 
 
 def flattern(list_of_occupation_list: list[list[OccupationSkillEntity]]) -> list[OccupationSkillEntity]:

@@ -1,3 +1,6 @@
+import asyncio
+import logging
+import time
 from abc import abstractmethod
 from typing import TypeVar, List, cast
 import re
@@ -60,6 +63,7 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
         self.embedding_service = embedding_service
         self.config = config
         self._model_id = ObjectId(taxonomy_model_id)
+        self._logger = logging.getLogger(self.__class__.__name__)
 
     @abstractmethod
     def _to_entity(self, doc: dict) -> T:
@@ -88,6 +92,7 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
         :param k: The number of results to return.
         :return: A list of T objects.
         """
+        search_start_time = time.time()
         # Each ESCO entity is duplicated three times, each duplication has a different embedding, one for the
         # preferredLabel, one for the description and one for the altLabels. The search is performed on all three
         # fields, so we need to multiply the number of results by 3 to account for the possible duplication. Those
@@ -122,6 +127,8 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
         ]
         entries = await self.collection.aggregate(pipeline).to_list(length=k)
         result = [self._to_entity(entry) for entry in entries]
+        search_end_time = time.time()
+        self._logger.debug("Search by embeddings took %.2f seconds (db)", search_end_time - search_start_time)
         return result
 
 
@@ -190,6 +197,7 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
         # but we only need one, so we use find_one.
         doc = await self.collection.find_one(query)
         return self._to_entity(doc)
+        search_start_time = time.time()
         # There should be up to 3 entries (one for each embedded field) for each entity,
         # so we group by the modelId and code, and keep the first document for each group.
         query: dict = {
@@ -213,16 +221,18 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
                         "modelId": "$modelId",
                         "code": "$code"
                     },
-                    "doc": { "$first": "$$ROOT" }  # Keep the first full document
+                    "doc": {"$first": "$$ROOT"}  # Keep the first full document
                 }
             },
             {
-                "$replaceRoot": { "newRoot": "$doc" }  # Output the document directly
+                "$replaceRoot": {"newRoot": "$doc"}  # Output the document directly
             }
         ]
 
         docs = await self.collection.aggregate(pipeline).to_list(length=None)
         result = [self._to_entity(doc) for doc in docs if doc]  # transform the documents to OccupationEntity objects
+
+        self._logger.debug("Search by code took %.2f seconds (db)", time.time() - search_start_time)
         return result
 
 
@@ -274,11 +284,14 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
         self._model_id = ObjectId(taxonomy_model_id)
         self.embedding_service = embedding_service
         self.database = db
+        self._logger = logging.getLogger(self.__class__.__name__)
+
         occupation_vector_search_config = VectorSearchConfig(
             collection_name=self.embedding_config.occupation_collection_name,
             index_name=self.embedding_config.embedding_index,
             embedding_key=self.embedding_config.embedding_key)
         self.occupation_search_service = OccupationSearchService(db, embedding_service, occupation_vector_search_config, taxonomy_model_id)
+        self.relations_collection = db.get_collection(self.embedding_config.occupation_to_skill_collection_name)
 
     async def _find_skills_from_occupation(self, occupation: OccupationEntity):
         """
@@ -291,6 +304,7 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
 
         skills = await self.database.get_collection(
             self.embedding_config.occupation_to_skill_collection_name).aggregate([
+        skills = await self.relations_collection.aggregate([
             {"$match": {"modelId": self._model_id, "requiringOccupationId": ObjectId(occupation.id)}},
             {
                 "$lookup": {
@@ -318,7 +332,7 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
                         }
              }
         ]).to_list(length=None)
-        return [AssociatedSkillEntity(
+        result = [AssociatedSkillEntity(
             id=str(skill.get("skillId", "")),
             modelId=str(skill.get("modelId", "")),
             UUID=skill.get("UUID", ""),
@@ -332,17 +346,30 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
             score=0.0
         ) for skill in skills]
 
+        return result
+
     async def _retrieve_skills_of_occupations(self, occupations: list[OccupationEntity]) -> List[OccupationSkillEntity]:
-        occupation_skills: List[OccupationSkillEntity] = []
-        for occupation in occupations:
-            associated_skills = await self._find_skills_from_occupation(occupation)
-            occupation_skills.append(OccupationSkillEntity(occupation=occupation, associated_skills=associated_skills))
-        return occupation_skills
+        # Retrieve the skills of the given occupations by concurrently searching for each occupation,
+        # this is done to speed up the search process.
+
+        search_start_time = time.time()
+
+        async def task(occupation: OccupationEntity) -> OccupationSkillEntity:
+            associated_skills = await self._find_skills_of_occupation(occupation)
+            return OccupationSkillEntity(occupation=occupation, associated_skills=associated_skills)
+
+        tasks = [task(occupation) for occupation in occupations]
+        results = await asyncio.gather(*tasks)
+        search_end_time = time.time()
+        self._logger.debug("Retrieving skills of occupations took %.2f seconds", search_end_time - search_start_time)
+        return results
 
     async def search(self, *, query: str, filter_spec: FilterSpec = None, k: int = 5) -> list[OccupationSkillEntity]:
-        occupation_skills: List[OccupationSkillEntity] = []
+        search_start_time = time.time()
         occupations: list[OccupationEntity] = await self.occupation_search_service.search(query=query, filter_spec=filter_spec, k=k)
         occupation_skills: List[OccupationSkillEntity] = await self._retrieve_skills_of_occupations(occupations=occupations)
+        search_end_time = time.time()
+        self._logger.debug("Search by embeddings took %.2f seconds", search_end_time - search_start_time)
         return occupation_skills
 
     async def get_by_esco_code(self, *, code: str | re.Pattern) -> list[OccupationSkillEntity]:
@@ -351,9 +378,9 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
         :param code: The ESCO code of the occupation.
         :return: The OccupationSkillEntity object.
         """
-        occupation = await self.occupation_search_service.get_by_esco_code(code=code)
-        associated_skills = await self._find_skills_from_occupation(occupation)
-        return OccupationSkillEntity(occupation=occupation, associated_skills=associated_skills)
+        search_start_time = time.time()
         occupations: list[OccupationEntity] = await self.occupation_search_service.get_by_esco_code(code=code)
         occupation_skills: List[OccupationSkillEntity] = await self._retrieve_skills_of_occupations(occupations=occupations)
+        search_end_time = time.time()
+        self._logger.debug("Search by esco code took %.2f seconds", search_end_time - search_start_time)
         return occupation_skills
