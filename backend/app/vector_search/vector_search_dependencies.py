@@ -106,7 +106,7 @@ async def get_occupation_search_service(db: AsyncIOMotorDatabase = Depends(Compa
                     embedding_key=_embedding_config.embedding_key,
                 )
                 _occupation_search_service_singleton = OccupationSearchService(db, embedding_model, occupation_vector_search_config, taxonomy_model_id)
-
+                asyncio.create_task(_occupation_search_service_singleton.watch_db_changes())
     return _occupation_search_service_singleton
 
 
@@ -131,7 +131,8 @@ async def get_occupation_skill_search_service(db: AsyncIOMotorDatabase = Depends
             if _occupation_skill_search_service_singleton is None:  # double check after acquiring the lock
                 logger.info("Creating a new instance of the occupation search service.")
                 _occupation_skill_search_service_singleton = OccupationSkillSearchService(db, embedding_model, taxonomy_model_id)
-
+                # Start watching for changes in the occupation skill search service
+                asyncio.create_task(_occupation_skill_search_service_singleton.watch_db_changes())
     return _occupation_skill_search_service_singleton
 
 

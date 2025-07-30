@@ -6,14 +6,38 @@ from typing import TypeVar, List, cast
 import re
 
 from bson import ObjectId
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from motor.motor_asyncio import AsyncIOMotorDatabase, AsyncIOMotorCollection
 from pydantic import BaseModel
 
 from app.vector_search.embeddings_model import EmbeddingService
 from app.vector_search.esco_entities import OccupationEntity, OccupationSkillEntity, AssociatedSkillEntity, SkillTypeLiteral
 from app.vector_search.esco_entities import SkillEntity
+from app.vector_search.lru_cache import AsyncLRUCache, CacheClearDebouncer
 from app.vector_search.similarity_search_service import SimilaritySearchService, FilterSpec
 from common_libs.environment_settings.constants import EmbeddingConfig
+
+
+# Caching the skills of occupations for the complete esco model (3035 occupations and their associated skills) requires approx 223 MB
+# Here are some measured metrics for the memory footprint of the cache:
+#   3035 occupations require approx 223 MB of memory
+#   2000 occupations require approx 150 MB of memory
+#   1000 occupations require approx 85 MB of memory
+#    500 occupations require approx 50 MB of memory
+#    100 occupations require approx 25 MB of memory
+
+_skills_of_occupation_cache = AsyncLRUCache(name="Skills of Occupations", max_size=3050)
+
+# The Occupations cache is not required to be large, as it is usually used for exact or regex matches
+# for unseen and the microentrepreneurship.
+_occupations_cache = AsyncLRUCache(name="Occupations", max_size=10)
+
+
+async def clear_caches():
+    """
+    Clear the caches used by the search services.
+    """
+    await _skills_of_occupation_cache.clear()
+    await _occupations_cache.clear()
 
 
 class VectorSearchConfig(BaseModel):
@@ -143,10 +167,37 @@ def _re_flags_to_mongo_options(flags: int) -> str:
     return options
 
 
+async def watch_db_changes(*, collection: AsyncIOMotorCollection, debouncer: CacheClearDebouncer, logger: logging.Logger):
+    try:
+        logger.info("Watching database changes for collection: %s", collection.name)
+        async with collection.watch() as stream:
+            async for change in stream:
+                operation = change["operationType"]
+                if operation in {"update", "replace", "delete"}:
+                    logger.debug("Detected DB change (%s)", operation)
+                    await debouncer.schedule_clear()
+                else:
+                    logger.debug("Ignoring change (%s)", operation)
+    except Exception as e:
+        logger.error("Error watching database changes: %s", e)
+
+
 class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
     """
     A service class to perform similarity searches on the occupations' collection.
     """
+
+    async def watch_db_changes(self):
+        """
+        Watch for changes in the "Occupations" collection.
+        If there are any changes, clear the caches to ensure that the next search will retrieve the latest data.
+        :return:
+        """
+        await watch_db_changes(
+            collection=self.collection,
+            debouncer=CacheClearDebouncer(cache=_occupations_cache, logger=self._logger),
+            logger=self._logger
+        )
 
     def _group_fields(self) -> dict:
         return {"_id": "$occupationId",
@@ -188,16 +239,14 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
         :param code: The code of the occupation.
         :return: The OccupationEntity object.
         """
-        query = {
-            "modelId": self._model_id,
-            # use $eq to match the exact code
-            "code": {"$eq": code}
-        }
-        # There should be up to 3 entries (one for each embedded field) for each occupation entity,
-        # but we only need one, so we use find_one.
-        doc = await self.collection.find_one(query)
-        return self._to_entity(doc)
         search_start_time = time.time()
+
+        #  Try cache
+        cached_result = await _occupations_cache.get(code if isinstance(code, str) else code.pattern)
+        if cached_result is not None:
+            self._logger.debug("Search by code took %.2f seconds (cached)", time.time() - search_start_time)
+            return cached_result
+
         # There should be up to 3 entries (one for each embedded field) for each entity,
         # so we group by the modelId and code, and keep the first document for each group.
         query: dict = {
@@ -231,6 +280,9 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
 
         docs = await self.collection.aggregate(pipeline).to_list(length=None)
         result = [self._to_entity(doc) for doc in docs if doc]  # transform the documents to OccupationEntity objects
+
+        # Cache the result
+        await _occupations_cache.set(code if isinstance(code, str) else code.pattern, result)
 
         self._logger.debug("Search by code took %.2f seconds (db)", time.time() - search_start_time)
         return result
@@ -293,7 +345,24 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
         self.occupation_search_service = OccupationSearchService(db, embedding_service, occupation_vector_search_config, taxonomy_model_id)
         self.relations_collection = db.get_collection(self.embedding_config.occupation_to_skill_collection_name)
 
-    async def _find_skills_from_occupation(self, occupation: OccupationEntity):
+    async def watch_db_changes(self):
+        """
+        Watch for changes in the "Relations" and "Occupations" collections.
+        If there are any changes, clear the caches to ensure that the next search will retrieve the latest data.
+        :return:
+        """
+        await watch_db_changes(
+            collection=self.relations_collection,
+            debouncer=CacheClearDebouncer(cache=_skills_of_occupation_cache, logger=self._logger),
+            logger=self._logger
+        )
+        await watch_db_changes(
+            collection=self.occupation_search_service.collection,
+            debouncer=CacheClearDebouncer(cache=_skills_of_occupation_cache, logger=self._logger),
+            logger=self._logger
+        )
+
+    async def _find_skills_of_occupation(self, occupation: OccupationEntity):
         """
         Find the skills associated with an occupation.
         :param occupation: The occupation entity.
@@ -302,8 +371,11 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
         if occupation.modelId != self._model_id.__str__():
             raise ValueError(f"Occupation {occupation.id} does not belong to the model {self._model_id}")
 
-        skills = await self.database.get_collection(
-            self.embedding_config.occupation_to_skill_collection_name).aggregate([
+        #  Try cache
+        cached_result = await _skills_of_occupation_cache.get(occupation.id)
+        if cached_result is not None:
+            return cached_result
+
         skills = await self.relations_collection.aggregate([
             {"$match": {"modelId": self._model_id, "requiringOccupationId": ObjectId(occupation.id)}},
             {
@@ -346,6 +418,8 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
             score=0.0
         ) for skill in skills]
 
+        # Cache the result
+        await _skills_of_occupation_cache.set(occupation.id, result)
         return result
 
     async def _retrieve_skills_of_occupations(self, occupations: list[OccupationEntity]) -> List[OccupationSkillEntity]:

@@ -21,13 +21,14 @@ google-cloud-aiplatform = "^1.53.0"
 pydantic = "^2.7.3"
 pydantic-settings = "^2.3.1"
 fastapi = "^0.111.0"
-
 pyjwt = "^2.8.0"
 sentry-sdk = {extras = ["fastapi"], version = "^2.14.0"}
-pytest-mock = "^3.14.0"
+pympler="^1.1"
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
 pytest-asyncio = "^0.23.6"
+pytest-mock = "^3.14.0"
 tqdm="^4.66"
 httpx = "^0.28.1"
 bandit = "^1.7.8"
