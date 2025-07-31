@@ -1,12 +1,14 @@
-import React, { useMemo, useContext, useState, useCallback, useEffect } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import {
+  EffortType,
   SkillsRankingExperimentGroups,
   SkillsRankingPhase,
   SkillsRankingState,
+  getLatestPhaseName,
 } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -19,8 +21,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
-
-const TYPING_DURATION_MS = 5000;
+import { TYPING_DURATION_MS, getJobPlatformUrl } from "src/features/skillsRanking/constants";
 
 const uniqueId = "0e95404a-2044-4634-a6e8-29cc7b2d754e";
 
@@ -35,16 +36,14 @@ enum ScrollStep {
   SECOND_MESSAGE = 2,
 }
 
-const getEffortTypeForGroup = (
-  group: SkillsRankingExperimentGroups
-): "TIME_BASED" | "WORK_BASED" => {
+const getEffortTypeForGroup = (group: SkillsRankingExperimentGroups): EffortType => {
   switch (group) {
     case SkillsRankingExperimentGroups.GROUP_1:
     case SkillsRankingExperimentGroups.GROUP_4:
-      return "TIME_BASED";
+      return EffortType.TIME_BASED;
     case SkillsRankingExperimentGroups.GROUP_2:
     case SkillsRankingExperimentGroups.GROUP_3:
-      return "WORK_BASED";
+      return EffortType.WORK_BASED;
     default:
       throw new SkillsRankingError("Invalid experiment group.");
   }
@@ -57,31 +56,23 @@ export interface SkillsRankingBriefingProps {
   skillsRankingState: SkillsRankingState;
 }
 
-const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
-  onFinish,
-  skillsRankingState,
-}) => {
+const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({ onFinish, skillsRankingState }) => {
   const theme = useTheme();
-  const jobPlatformUrl = useMemo(
-    () => SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl,
-    []
-  );
-  const activeSessionId =
-    UserPreferencesStateService.getInstance().getActiveSessionId();
+
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
+  const currentPhase = getLatestPhaseName(skillsRankingState);
+
   const isReplay = currentPhase !== SkillsRankingPhase.BRIEFING;
+
   const effortType = getEffortTypeForGroup(skillsRankingState.experiment_group);
 
   const [submitted, setSubmitted] = useState(false);
   const [isTypingVisible, setIsTypingVisible] = useState(false);
-  const [showSecondMessage, setShowSecondMessage] = useState(
-    effortType === "TIME_BASED"
-  );
+  const [showSecondMessage, setShowSecondMessage] = useState(effortType === EffortType.TIME_BASED);
 
-  const currentScrollStep= useMemo(() => {
+  const currentScrollStep = useMemo(() => {
     if (isTypingVisible) return ScrollStep.TYPING;
     if (showSecondMessage) return ScrollStep.SECOND_MESSAGE;
     return ScrollStep.INITIAL;
@@ -90,7 +81,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
   const scrollRef = useAutoScrollOnChange(currentScrollStep);
 
   useEffect(() => {
-    if (effortType === "WORK_BASED" && !isReplay) {
+    if (effortType === EffortType.WORK_BASED && !isReplay) {
       const timeout = setTimeout(() => setShowSecondMessage(true), TYPING_DURATION_MS);
       return () => clearTimeout(timeout);
     }
@@ -104,10 +95,13 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
     let newSkillsRankingState: SkillsRankingState | null = null;
 
     try {
+      const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
+
       if (!activeSessionId) {
         console.error(new SkillsRankingError("No session ID."));
         return;
       }
+
       newSkillsRankingState = await SkillsRankingService.getInstance().updateSkillsRankingState(
         activeSessionId,
         SkillsRankingPhase.PROOF_OF_VALUE
@@ -127,7 +121,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       setIsTypingVisible(false);
       newSkillsRankingState && onFinish(newSkillsRankingState);
     }, remaining);
-  }, [activeSessionId, onFinish, enqueueSnackbar]);
+  }, [onFinish, enqueueSnackbar]);
 
   return (
     <MessageContainer
@@ -140,14 +134,25 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
         {/* TIME_BASED or first WORK_BASED message */}
         <ChatBubble
           message={
-            effortType === "WORK_BASED"
-              ? `If you are interested, I can calculate what share of ${jobPlatformUrl} opportunities match your skills and how you compare with other seekers — you just need to show me how valuable this information is to you.`
-              : `I will now calculate how many percent of jobs advertised on ${jobPlatformUrl} you have the required & most relevant skills for, and how you compare to other job seekers. This will take some time — if you are not interested you can click "cancel" in the next message, while I calculate. When you are ready please click continue.`
+            effortType === EffortType.WORK_BASED ? (
+              <>
+                If you are interested, I can calculate what share of <strong>{getJobPlatformUrl()}</strong>{" "}
+                opportunities match your skills and how you compare with other seekers — you just need to show me how
+                valuable this information is to you.
+              </>
+            ) : (
+              <>
+                I will now calculate how many percent of jobs advertised on <strong>{getJobPlatformUrl()}</strong> you
+                have the required & most relevant skills for, and how you compare to other job seekers. This will take
+                some time — if you are not interested you can click <strong>cancel</strong> in the next message, while I
+                calculate. When you are ready, please click <strong>continue</strong>.
+              </>
+            )
           }
           sender={ConversationMessageSender.COMPASS}
         >
           {/* Only show button here for TIME_BASED */}
-          {effortType === "TIME_BASED" && (
+          {effortType === EffortType.TIME_BASED && (
             <Box
               display="flex"
               flexDirection="row"
@@ -166,13 +171,17 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
         </ChatBubble>
 
         <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
-          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+          <Timestamp
+            sentAt={
+              skillsRankingState.phases[skillsRankingState.phases.length - 1]?.time || skillsRankingState.started_at
+            }
+          />
         </ChatMessageFooterLayout>
       </Box>
 
       {/* Typing between WORK_BASED messages */}
       <AnimatePresence mode="wait">
-        {effortType === "WORK_BASED" && !isReplay && !showSecondMessage && (
+        {effortType === EffortType.WORK_BASED && !isReplay && !showSecondMessage && (
           <motion.div
             key="typing-transition"
             initial={{ opacity: 0, height: 0 }}
@@ -186,9 +195,9 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       </AnimatePresence>
 
       {/* Second WORK_BASED message + button */}
-      {effortType === "WORK_BASED" && showSecondMessage && (
+      {effortType === EffortType.WORK_BASED && showSecondMessage && (
         <ChatBubble
-          message={`You'll see tilted letters on a few screens. Turn each letter upright using the rotation buttons. You can quit anytime.`}
+          message={<>In the next message, you will be asked to solve a few puzzles. You can quit anytime.</>}
           sender={ConversationMessageSender.COMPASS}
         >
           <Box

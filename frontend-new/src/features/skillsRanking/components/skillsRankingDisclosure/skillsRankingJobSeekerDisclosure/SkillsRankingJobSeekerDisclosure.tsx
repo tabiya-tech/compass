@@ -7,6 +7,7 @@ import {
   SkillsRankingExperimentGroups,
   SkillsRankingPhase,
   SkillsRankingState,
+  getLatestPhaseName,
 } from "src/features/skillsRanking/types";
 import { jobSeekerComparisonLabels } from "src/features/skillsRanking/components/skillsRankingDisclosure/types";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
@@ -18,6 +19,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
+import { getJobPlatformUrl } from "../../../constants";
 
 const DISPLAY_TIMEOUT = 5000;
 
@@ -39,19 +41,15 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
 }) => {
   const theme = useTheme();
   const selectedLabel = skillsRankingState.score.comparison_label;
-  const selectedIndex = jobSeekerComparisonLabels.findIndex(
-    (label) => label === selectedLabel
-  );
+  const selectedIndex = jobSeekerComparisonLabels.findIndex((label) => label === selectedLabel);
 
-  const activeSessionId =
-    UserPreferencesStateService.getInstance().getActiveSessionId();
   const { enqueueSnackbar } = useSnackbar();
 
-  const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
+  const currentPhase = getLatestPhaseName(skillsRankingState);
   const isReplay = currentPhase !== SkillsRankingPhase.JOB_SEEKER_DISCLOSURE;
-  const [step, setStep] = useState(0);
+  const [showTyping, setShowTyping] = useState(false);
   const [hasFinished, setHasFinished] = useState(false);
-  const scrollRef = useAutoScrollOnChange(step);
+  const scrollRef = useAutoScrollOnChange(showTyping);
 
   const handleContinue = useCallback(async () => {
     if (currentPhase !== SkillsRankingPhase.JOB_SEEKER_DISCLOSURE) {
@@ -63,64 +61,57 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
       return;
     }
 
+    const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
     if (!activeSessionId) {
       throw new SkillsRankingError("Active session ID is not available.");
     }
 
     try {
-      const newSkillsRankingState =
-        await SkillsRankingService.getInstance().updateSkillsRankingState(
-          activeSessionId,
-          SkillsRankingPhase.PERCEIVED_RANK
-        );
+      const newSkillsRankingState = await SkillsRankingService.getInstance().updateSkillsRankingState(
+        activeSessionId,
+        SkillsRankingPhase.PERCEIVED_RANK
+      );
       await onFinish(newSkillsRankingState);
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
-      enqueueSnackbar(
-        "Failed to update skills ranking state. Please try again later.",
-        { variant: "error" }
-      );
+      enqueueSnackbar("Failed to update skills ranking state. Please try again later.", { variant: "error" });
     }
-  }, [
-    currentPhase,
-    activeSessionId,
-    onFinish,
-    enqueueSnackbar,
-  ]);
+  }, [currentPhase, onFinish, enqueueSnackbar]);
 
   useEffect(() => {
     if (isReplay || hasFinished) return;
 
-    const timers: NodeJS.Timeout[] = [];
-
-    if (step === 0) {
-      timers.push(setTimeout(() => setStep(1), DISPLAY_TIMEOUT));
-    } else if (step === 1) {
-      timers.push(setTimeout(() => setStep(2), DISPLAY_TIMEOUT));
-    } else if (step === 2) {
+    const timer = setTimeout(() => {
+      setShowTyping(true);
+      setTimeout(() => {
+        setShowTyping(false);
         if (!hasFinished) {
           setHasFinished(true);
           handleContinue().then();
         }
-    }
+      }, DISPLAY_TIMEOUT);
+    }, DISPLAY_TIMEOUT);
 
-    return () => {
-      timers.forEach(clearTimeout);
-    };
-  }, [step, isReplay, hasFinished, handleContinue]);
+    return () => clearTimeout(timer);
+  }, [isReplay, hasFinished, handleContinue]);
 
   const renderGroupMessage = () => {
     const isGroupUndisclosed =
-      skillsRankingState.experiment_group ===
-        SkillsRankingExperimentGroups.GROUP_2 ||
-      skillsRankingState.experiment_group ===
-        SkillsRankingExperimentGroups.GROUP_4;
+      skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
+      skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4;
 
     if (isGroupUndisclosed) {
       return (
         <ChatBubble
           sender={ConversationMessageSender.COMPASS}
-          message={`We've gathered the relevant information, but we need to run a few more checks on the opportunities listed on SAYouth.mobi to make sure we give you the most accurate and up-to-date details. We'll notify you as soon as everything is ready. In the meantime, feel free to bring this up during our next phone survey -- we'd be happy to revisit it with you then. Thanks for your patience!`}
+          message={
+            <>
+              We've gathered all relevant information, but we need to run a few more checks on the opportunities listed
+              on <strong>{getJobPlatformUrl()}</strong> to make sure we give you the most accurate and up-to-date
+              details. We'll notify you as soon as everything is ready. In the meantime, feel free to bring this up
+              during our next phone survey — we'd be happy to revisit it with you then. Thanks for your patience!
+            </>
+          }
         />
       );
     }
@@ -128,9 +119,16 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
     return (
       <ChatBubble
         sender={ConversationMessageSender.COMPASS}
-        message={`Compared to job seekers similar to you, you are in the [${selectedLabel}] group out of five. This means that when we rank 100 people from lowest to highest, and create five equal size groups, the first group are the 20 people fitting most jobs, and the fifth group are the people fitting fewer jobs on the platform than the other 80.`}
+        message={
+          <>
+            Compared to job seekers similar to you, you are in the <strong>{selectedLabel}</strong> group out of five.
+            This means that when we rank <strong>100</strong> people from lowest to highest, and create{" "}
+            <strong>five equal size groups</strong>, the first group are the 20 people fitting most jobs, and the fifth
+            group are the people fitting fewer jobs on the platform than the other 80.
+          </>
+        }
       >
-        <Box mt={theme.spacing(4)} px={2}>
+        <Box padding={theme.spacing(theme.tabiyaSpacing.lg)} paddingBottom={theme.spacing(theme.tabiyaSpacing.xl)}>
           {/* Labels */}
           <Box display="flex" justifyContent="space-between" mb={1}>
             {jobSeekerComparisonLabels.map((label, idx) => (
@@ -149,10 +147,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
                     height: "100%",
                     borderRadius: 1,
                     fontWeight: "bold",
-                    backgroundColor:
-                      idx === selectedIndex
-                        ? theme.palette.success.main
-                        : theme.palette.grey[200],
+                    backgroundColor: idx === selectedIndex ? theme.palette.primary.main : theme.palette.grey[200],
                     color: "black",
                     fontSize: "0.75rem",
                     whiteSpace: "wrap",
@@ -179,20 +174,27 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
                 key={idx}
                 flex={1}
                 sx={{
-                  backgroundColor:
-                    idx === selectedIndex
-                      ? theme.palette.success.main
-                      : theme.palette.grey[200],
+                  backgroundColor: idx === selectedIndex ? theme.palette.success.main : theme.palette.grey[200],
                   transition: "background-color 0.3s ease",
                 }}
               />
             ))}
           </Box>
 
-          {/* Percentage ticks */}
-          <Box display="flex" justifyContent="space-between" mt={1}>
-            {[0, 20, 40, 60, 80, 100].map((pct) => (
-              <Typography key={pct} variant="caption">
+          {/* Percentage ticks - positioned at segment boundaries */}
+          <Box display="flex" mt={1} position="relative">
+            {[0, 20, 40, 60, 80, 100].map((pct, index) => (
+              <Typography
+                key={pct}
+                variant="caption"
+                sx={{
+                  position: "absolute",
+                  left: `${(index / 5) * 100}%`,
+                  // move the 100% text to the left to keep it in a position where it is aligned to the right of the bar
+                  transform: index === 0 ? "translateX(0)" : index === 5 ? "translateX(-100%)" : "translateX(-50%)",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {pct}%
               </Typography>
             ))}
@@ -213,12 +215,16 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
         {renderGroupMessage()}
 
         <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
-          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+          <Timestamp
+            sentAt={
+              skillsRankingState.phases[skillsRankingState.phases.length - 1]?.time || skillsRankingState.started_at
+            }
+          />
         </ChatMessageFooterLayout>
       </Box>
 
       <AnimatePresence mode="wait">
-        {step === 1 && (
+        {showTyping && (
           <motion.div
             key="typing-feedback"
             initial={{ opacity: 0, height: 0 }}

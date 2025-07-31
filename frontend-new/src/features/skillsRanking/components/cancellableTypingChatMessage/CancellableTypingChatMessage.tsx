@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, keyframes, useTheme } from "@mui/material";
+import { Box, keyframes, Typography, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { AnimatePresence, motion } from "framer-motion";
 import CustomLink from "src/theme/CustomLink/CustomLink";
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
-const uniqueId = "cancellable-typing-chat-message-eb14a7aa-b515-4ab9-9829-8110346d9090";
-
-export const CANCELABLE_TYPING_CHAT_MESSAGE_TYPE = `cancellable-typing-chat-message-${uniqueId}`;
+const uniqueId = "6cbdaa24-09da-4c18-907c-7d98d210d2e9";
 
 export const DATA_TEST_ID = {
   CANCELLABLE_TYPING_CHAT_MESSAGE_CONTAINER: `cancellable-typing-chat-message-container-${uniqueId}`,
@@ -18,7 +16,7 @@ export const DATA_TEST_ID = {
 
 export const UI_TEXT = {
   TYPING: "Typing",
-  THINKING: "Please wait, this might take a while...",
+  THINKING: "Please wait, this might take a while",
   CANCEL: "Cancel",
 };
 
@@ -58,18 +56,18 @@ const StyledCustomLink: React.FC<React.ComponentProps<typeof CustomLink>> = (pro
         flexDirection: "row",
         gap: theme.spacing(theme.tabiyaSpacing.xxs),
         verticalAlign: "bottom",
-        ...props.style
+        ...props.style,
       }}
     />
   );
 };
 
-const CancellableTypingChatMessage: React.FC<CancellableTypingChatMessageProps> = ({ 
+const CancellableTypingChatMessage: React.FC<CancellableTypingChatMessageProps> = ({
   message = UI_TEXT.TYPING,
   thinkingMessage = UI_TEXT.THINKING,
   waitBeforeThinking = WAIT_BEFORE_THINKING,
   disabled = false,
-  onCancel 
+  onCancel,
 }) => {
   const [displayText, setDisplayText] = useState(message);
   const theme = useTheme();
@@ -100,7 +98,13 @@ const CancellableTypingChatMessage: React.FC<CancellableTypingChatMessageProps> 
           data-testid={DATA_TEST_ID.CANCELLABLE_TYPING_CHAT_MESSAGE_CONTAINER}
         >
           <ChatBubble message="" sender={ConversationMessageSender.COMPASS}>
-            <Box display="flex" alignItems="center" justifyContent="space-between" width="100%" gap={theme.spacing(theme.tabiyaSpacing.md)}>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              width="100%"
+              gap={theme.spacing(theme.tabiyaSpacing.md)}
+            >
               <Box display="flex" alignItems="baseline">
                 <Typography>{displayText}</Typography>
                 <Box component="span" paddingLeft={"1px"}>
@@ -121,11 +125,7 @@ const CancellableTypingChatMessage: React.FC<CancellableTypingChatMessageProps> 
                   ))}
                 </Box>
               </Box>
-              <StyledCustomLink
-                onClick={onCancel}
-                disabled={disabled}
-                data-testid={DATA_TEST_ID.CANCEL_BUTTON}
-              >
+              <StyledCustomLink onClick={onCancel} disabled={disabled} data-testid={DATA_TEST_ID.CANCEL_BUTTON}>
                 <HighlightOffIcon />
                 {UI_TEXT.CANCEL}
               </StyledCustomLink>
@@ -137,4 +137,4 @@ const CancellableTypingChatMessage: React.FC<CancellableTypingChatMessageProps> 
   );
 };
 
-export default CancellableTypingChatMessage; 
+export default CancellableTypingChatMessage;

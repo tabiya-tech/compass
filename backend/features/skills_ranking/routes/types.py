@@ -9,7 +9,7 @@ class UpsertSkillsRankingRequest(BaseModel):
     """
     Upsert Skills Ranking Request — The request to upsert the skills ranking state.
     """
-    phase: SkillsRankingPhaseName
+    phase: SkillsRankingPhaseName | None = None
     """
     The phase of the skills ranking process.
     """
