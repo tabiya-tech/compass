@@ -1,11 +1,9 @@
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import {
-  SkillsRankingPhase,
-  SkillsRankingState,
-} from "src/features/skillsRanking/types";
+import { SkillsRankingPhase, SkillsRankingState, getLatestPhaseName } from "src/features/skillsRanking/types";
+import { getAirtimeBudget } from "src/features/skillsRanking/constants";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -17,9 +15,7 @@ import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoS
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { Box } from "@mui/material";
-
-const TYPING_DURATION_MS = 2000;
-const MESSAGE_DURATION_MS = 5000;
+import { TYPING_DURATION_MS, MESSAGE_DURATION_MS } from "src/features/skillsRanking/constants";
 
 const uniqueId = "1e13ec58-2931-47ef-b1a9-30550519707b";
 
@@ -34,36 +30,29 @@ export interface SkillsRankingPromptProps {
   skillsRankingState: SkillsRankingState;
 }
 
-const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({
-  onFinish,
-  skillsRankingState,
-}) => {
+const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onFinish, skillsRankingState }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
-  const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
 
   const [step, setStep] = useState(0);
   const scrollRef = useAutoScrollOnChange(step);
 
-  const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
+  const currentPhase = getLatestPhaseName(skillsRankingState);
   const isReplay = currentPhase !== SkillsRankingPhase.INITIAL;
 
-  const airtime_amount = useMemo(
-    () => SkillsRankingService.getInstance().getConfig().config.airtimeBudget,
-    []
-  );
+  const airtimeBudget = getAirtimeBudget();
 
   const handleAdvanceState = useCallback(async () => {
     if (isReplay) return;
+    const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
     if (!activeSessionId) {
       throw new SkillsRankingError("Active session ID is not available.");
     }
     try {
-      const newSkillsRankingState =
-        await SkillsRankingService.getInstance().updateSkillsRankingState(
-          activeSessionId,
-          SkillsRankingPhase.BRIEFING
-        );
+      const newSkillsRankingState = await SkillsRankingService.getInstance().updateSkillsRankingState(
+        activeSessionId,
+        SkillsRankingPhase.BRIEFING
+      );
       await onFinish(newSkillsRankingState);
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
@@ -71,7 +60,7 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({
         variant: "error",
       });
     }
-  }, [isReplay, activeSessionId, onFinish, enqueueSnackbar]);
+  }, [isReplay, onFinish, enqueueSnackbar]);
 
   useEffect(() => {
     if (isReplay) return;
@@ -95,11 +84,16 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({
   const PromptMessage = () => {
     return (
       <ChatBubble
-        message={`You are almost there! Remember that if you completely finish this conversation with me you will receive ${airtime_amount} Rand in airtime.`}
+        message={
+          <>
+            You are almost there! Remember that if you completely finish this conversation with me, you will receive{" "}
+            <strong>{airtimeBudget} </strong> in airtime.
+          </>
+        }
         sender={ConversationMessageSender.COMPASS}
       />
     );
-  }
+  };
 
   return (
     <MessageContainer
@@ -110,9 +104,13 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({
     >
       {isReplay ? (
         <Box sx={{ width: "100%" }}>
-          <PromptMessage/>
+          <PromptMessage />
           <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
-            <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+            <Timestamp
+              sentAt={
+                skillsRankingState.phases[skillsRankingState.phases.length - 1]?.time || skillsRankingState.started_at
+              }
+            />
           </ChatMessageFooterLayout>
         </Box>
       ) : (
@@ -139,9 +137,14 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({
               transition={{ duration: 0.4, ease: "easeOut", delay: step === 1 ? 0.3 : 0 }}
             >
               <Box sx={{ width: "100%" }}>
-                <PromptMessage/>
+                <PromptMessage />
                 <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
-                  <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+                  <Timestamp
+                    sentAt={
+                      skillsRankingState.phases[skillsRankingState.phases.length - 1]?.time ||
+                      skillsRankingState.started_at
+                    }
+                  />
                 </ChatMessageFooterLayout>
               </Box>
             </motion.div>
