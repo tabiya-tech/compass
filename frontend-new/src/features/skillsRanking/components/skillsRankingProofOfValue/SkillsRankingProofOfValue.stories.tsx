@@ -14,10 +14,12 @@ const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 const createPhaseArray = (phase: SkillsRankingPhase): SkillsRankingPhaseWithTime[] => {
-  return [{
-    name: phase,
-    time: new Date().toISOString()
-  }];
+  return [
+    {
+      name: phase,
+      time: new Date().toISOString(),
+    },
+  ];
 };
 
 const meta: Meta<typeof SkillsRankingProofOfValue> = {
@@ -39,7 +41,7 @@ type Story = StoryObj<typeof SkillsRankingProofOfValue>;
 
 const createState = (phase: SkillsRankingPhase, experimentGroup: SkillsRankingExperimentGroups) => {
   const state = getRandomSkillsRankingState();
-  state.phase = createPhaseArray(phase);
+  state.phases = createPhaseArray(phase);
   state.experiment_group = experimentGroup;
   return state;
 };
