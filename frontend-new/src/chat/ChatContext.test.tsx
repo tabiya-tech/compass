@@ -7,7 +7,9 @@ import { ChatProvider, useChatContext } from "./ChatContext";
 import { FeedbackStatus } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import CompassChatMessage, { CompassChatMessageProps } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import CompassChatMessage, {
+  CompassChatMessageProps,
+} from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { COMPASS_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 
 // Mock PersistentStorageService
@@ -46,20 +48,26 @@ describe("ChatContext", () => {
       sender: ConversationMessageSender.COMPASS,
       sent_at: FIXED_TIMESTAMP,
       type: COMPASS_CHAT_MESSAGE_TYPE,
-      reaction: null
+      reaction: null,
     };
 
     return (
       <div>
         <button onClick={() => handleOpenExperiencesDrawer()}>Open Drawer</button>
         <button onClick={() => removeMessage("test-message")}>Remove Message</button>
-        <button onClick={() => addMessage({
-          type: COMPASS_CHAT_MESSAGE_TYPE,
-          message_id: messageData.message_id,
-          sender: messageData.sender,
-          payload: messageData,
-          component: (props) => <CompassChatMessage {...(props as CompassChatMessageProps)} />
-        })}>Add Message</button>
+        <button
+          onClick={() =>
+            addMessage({
+              type: COMPASS_CHAT_MESSAGE_TYPE,
+              message_id: messageData.message_id,
+              sender: messageData.sender,
+              payload: messageData,
+              component: (props) => <CompassChatMessage {...(props as CompassChatMessageProps)} />,
+            })
+          }
+        >
+          Add Message
+        </button>
         <button onClick={() => setFeedbackStatus(FeedbackStatus.SUBMITTED)}>Set Feedback</button>
         <button onClick={() => setIsAccountConverted(true)}>Convert Account</button>
         <div data-testid="feedback-status">{feedbackStatus}</div>
@@ -72,8 +80,8 @@ describe("ChatContext", () => {
     render(
       <ChatProvider
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
-        removeMessage={mockRemoveMessage}
-        addMessage={mockAddMessage}
+        removeMessageFromChat={mockRemoveMessage}
+        addMessageToChat={mockAddMessage}
       >
         <TestComponent />
       </ChatProvider>
@@ -87,8 +95,8 @@ describe("ChatContext", () => {
     render(
       <ChatProvider
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
-        removeMessage={mockRemoveMessage}
-        addMessage={mockAddMessage}
+        removeMessageFromChat={mockRemoveMessage}
+        addMessageToChat={mockAddMessage}
       >
         <TestComponent />
       </ChatProvider>
@@ -102,8 +110,8 @@ describe("ChatContext", () => {
     render(
       <ChatProvider
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
-        removeMessage={mockRemoveMessage}
-        addMessage={mockAddMessage}
+        removeMessageFromChat={mockRemoveMessage}
+        addMessageToChat={mockAddMessage}
       >
         <TestComponent />
       </ChatProvider>
@@ -120,14 +128,14 @@ describe("ChatContext", () => {
       message: "Test message",
       sent_at: FIXED_TIMESTAMP,
       type: COMPASS_CHAT_MESSAGE_TYPE,
-      reaction: null
+      reaction: null,
     };
 
     render(
       <ChatProvider
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
-        removeMessage={mockRemoveMessage}
-        addMessage={mockAddMessage}
+        removeMessageFromChat={mockRemoveMessage}
+        addMessageToChat={mockAddMessage}
       >
         <TestComponent />
       </ChatProvider>
@@ -139,7 +147,7 @@ describe("ChatContext", () => {
       message_id: messageData.message_id,
       payload: messageData,
       sender: messageData.sender,
-      type: messageData.type
+      type: messageData.type,
     });
   });
 
@@ -147,8 +155,8 @@ describe("ChatContext", () => {
     render(
       <ChatProvider
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
-        removeMessage={mockRemoveMessage}
-        addMessage={mockAddMessage}
+        removeMessageFromChat={mockRemoveMessage}
+        addMessageToChat={mockAddMessage}
       >
         <TestComponent />
       </ChatProvider>
@@ -162,8 +170,8 @@ describe("ChatContext", () => {
     render(
       <ChatProvider
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
-        removeMessage={mockRemoveMessage}
-        addMessage={mockAddMessage}
+        removeMessageFromChat={mockRemoveMessage}
+        addMessageToChat={mockAddMessage}
       >
         <TestComponent />
       </ChatProvider>
@@ -179,4 +187,4 @@ describe("ChatContext", () => {
     expect(() => render(<TestComponent />)).toThrow("useChatContext must be used within a ChatProvider");
     consoleError.mockRestore();
   });
-}); 
+});

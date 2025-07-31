@@ -1,11 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 import SkillsRankingPrompt from "src/features/skillsRanking/components/skillsRankingPrompt/SkillsRankingPrompt";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
-import {
-  SkillsRankingPhase,
-  SkillsRankingState,
-  SkillsRankingPhaseWithTime,
-} from "src/features/skillsRanking/types";
+import { SkillsRankingPhase, SkillsRankingState, SkillsRankingPhaseWithTime } from "src/features/skillsRanking/types";
 import { Box } from "@mui/material";
 
 const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -13,10 +9,12 @@ const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 const createPhaseArray = (phase: SkillsRankingPhase): SkillsRankingPhaseWithTime[] => {
-  return [{
-    name: phase,
-    time: new Date().toISOString()
-  }];
+  return [
+    {
+      name: phase,
+      time: new Date().toISOString(),
+    },
+  ];
 };
 
 const meta: Meta<typeof SkillsRankingPrompt> = {
@@ -38,7 +36,7 @@ type Story = StoryObj<typeof SkillsRankingPrompt>;
 
 const createState = (phase: SkillsRankingPhase) => {
   const state = getRandomSkillsRankingState();
-  state.phase = createPhaseArray(phase);
+  state.phases = createPhaseArray(phase);
   return state;
 };
 

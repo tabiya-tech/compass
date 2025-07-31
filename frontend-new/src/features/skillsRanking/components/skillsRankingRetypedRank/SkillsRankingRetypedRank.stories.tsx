@@ -2,21 +2,27 @@ import { Meta, StoryObj } from "@storybook/react";
 import SkillsRankingRetypedRank from "src/features/skillsRanking/components/skillsRankingRetypedRank/SkillsRankingRetypedRank";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
 import {
-  SkillsRankingPhase,
   SkillsRankingState,
+  SkillsRankingPhase,
   SkillsRankingPhaseWithTime,
-} from "src/features/skillsRanking/types";
+  SkillsRankingExperimentGroups,
+} from "../../types";
 import { Box } from "@mui/material";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
+import { action } from "@storybook/addon-actions";
 
 const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
   <Box sx={{ width: "600px" }}>{children}</Box>
 );
 
 const createPhaseArray = (phase: SkillsRankingPhase): SkillsRankingPhaseWithTime[] => {
-  return [{
-    name: phase,
-    time: new Date().toISOString()
-  }];
+  return [
+    {
+      name: phase,
+      time: new Date().toISOString(),
+    },
+  ];
 };
 
 const meta: Meta<typeof SkillsRankingRetypedRank> = {
@@ -24,11 +30,33 @@ const meta: Meta<typeof SkillsRankingRetypedRank> = {
   component: SkillsRankingRetypedRank,
   tags: ["autodocs"],
   decorators: [
-    (Story) => (
-      <FixedWidthWrapper>
-        <Story />
-      </FixedWidthWrapper>
-    ),
+    (Story) => {
+      // Mock session ID
+      const mockUserPreferencesStateService = UserPreferencesStateService.getInstance();
+      mockUserPreferencesStateService.getActiveSessionId = () => 1234;
+
+      // Mock state update call
+      // @ts-ignore
+      SkillsRankingService.getInstance().updateSkillsRankingState = (
+        sessionId: number,
+        phase: SkillsRankingPhase,
+        perceivedRankPercentile?: number,
+        retypedRankPercentile?: number
+      ) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            action("success")(`Updated skills ranking state to phase: ${phase}`);
+            resolve(getRandomSkillsRankingState(phase, SkillsRankingExperimentGroups.GROUP_1));
+          }, 1000);
+        });
+      };
+
+      return (
+        <FixedWidthWrapper>
+          <Story />
+        </FixedWidthWrapper>
+      );
+    },
   ],
 };
 
@@ -37,8 +65,8 @@ export default meta;
 type Story = StoryObj<typeof SkillsRankingRetypedRank>;
 
 const createState = (phase: SkillsRankingPhase) => {
-  const state = getRandomSkillsRankingState();
-  state.phase = createPhaseArray(phase);
+  const state = getRandomSkillsRankingState(phase, SkillsRankingExperimentGroups.GROUP_1);
+  state.phases = createPhaseArray(phase);
   return state;
 };
 

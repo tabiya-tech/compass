@@ -6,6 +6,7 @@ import {
   SkillsRankingExperimentGroups,
   SkillsRankingPhase,
   SkillsRankingState,
+  getLatestPhaseName,
 } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
@@ -18,6 +19,7 @@ import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { Box } from "@mui/material";
+import { getJobPlatformUrl } from "src/features/skillsRanking/constants";
 
 const TYPING_DURATION_MS = 5000;
 
@@ -43,26 +45,21 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
-  const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
-  const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
+  const currentPhase = getLatestPhaseName(skillsRankingState);
   const isReplay = useMemo(() => currentPhase !== SkillsRankingPhase.MARKET_DISCLOSURE, [currentPhase]);
 
   const shouldSkip =
     !isReplay &&
     (skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
-     skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4);
+      skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4);
 
   const hasFinishedRef = useRef(false);
-
-  const jobPlatformUrl = useMemo(
-    () => SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl,
-    []
-  );
 
   const handleContinue = useCallback(async () => {
     if (hasFinishedRef.current) return;
     hasFinishedRef.current = true;
 
+    const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
     if (!activeSessionId) {
       throw new SkillsRankingError("Active session ID is not available.");
     }
@@ -79,7 +76,7 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
         variant: "error",
       });
     }
-  }, [activeSessionId, onFinish, enqueueSnackbar]);
+  }, [onFinish, enqueueSnackbar]);
 
   useEffect(() => {
     if (shouldSkip) {
@@ -94,10 +91,12 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
     if (step === 0) {
       timers.push(setTimeout(() => setStep(1), TYPING_DURATION_MS));
     } else if (step === 1) {
-      timers.push(setTimeout(() => {
-        setStep(2);
-        handleContinue();
-      }, TYPING_DURATION_MS));
+      timers.push(
+        setTimeout(() => {
+          setStep(2);
+          handleContinue();
+        }, TYPING_DURATION_MS)
+      );
     }
 
     return () => {
@@ -116,12 +115,22 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
     >
       <Box sx={{ width: "100%" }}>
         <ChatBubble
-          message={`With your current skillset you fulfill the required & most relevant skills of ${skillsRankingState.score.jobs_matching_rank}% of jobs on ${jobPlatformUrl}. This is quite some jobs!`}
+          message={
+            <>
+              With your current skillset you fulfill the required & most relevant skills of{" "}
+              {skillsRankingState.score.jobs_matching_rank}% of jobs on <strong>{getJobPlatformUrl()}</strong>. This is
+              quite some jobs!
+            </>
+          }
           sender={ConversationMessageSender.COMPASS}
         />
 
         <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
-          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+          <Timestamp
+            sentAt={
+              skillsRankingState.phases[skillsRankingState.phases.length - 1]?.time || skillsRankingState.started_at
+            }
+          />
         </ChatMessageFooterLayout>
       </Box>
 

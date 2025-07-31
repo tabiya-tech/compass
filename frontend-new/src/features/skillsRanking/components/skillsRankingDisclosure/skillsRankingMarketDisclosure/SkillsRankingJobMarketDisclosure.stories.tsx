@@ -2,11 +2,7 @@ import React from "react";
 import { Meta, StoryObj } from "@storybook/react";
 import SkillsRankingJobMarketDisclosure from "src/features/skillsRanking/components/skillsRankingDisclosure/skillsRankingMarketDisclosure/SkillsRankingJobMarketDisclosure";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
-import {
-  SkillsRankingPhase,
-  SkillsRankingState,
-  SkillsRankingPhaseWithTime,
-} from "src/features/skillsRanking/types";
+import { SkillsRankingPhase, SkillsRankingState, SkillsRankingPhaseWithTime } from "src/features/skillsRanking/types";
 import { Box } from "@mui/material";
 
 const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -14,10 +10,12 @@ const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 const createPhaseArray = (phase: SkillsRankingPhase): SkillsRankingPhaseWithTime[] => {
-  return [{
-    name: phase,
-    time: new Date().toISOString()
-  }];
+  return [
+    {
+      name: phase,
+      time: new Date().toISOString(),
+    },
+  ];
 };
 
 const meta: Meta<typeof SkillsRankingJobMarketDisclosure> = {
@@ -39,7 +37,7 @@ type Story = StoryObj<typeof SkillsRankingJobMarketDisclosure>;
 
 const createState = (phase: SkillsRankingPhase) => {
   const state = getRandomSkillsRankingState();
-  state.phase = createPhaseArray(phase);
+  state.phases = createPhaseArray(phase);
   return state;
 };
 
