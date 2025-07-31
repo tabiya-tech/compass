@@ -11,23 +11,17 @@ export interface FeatureConfig {
  * Singleton class to manage features.
  */
 export class FeaturesService {
-  private readonly _state: Map<string, FeatureConfig>;
+  _featureId: string;
 
-  constructor() {
-    this._state = new Map<string, FeatureConfig>();
+  constructor(featureId: string) {
+    this._featureId = featureId;
   }
 
   /**
    * Get the configuration for a specific feature.
    * The ID is managed in the respective feature implementation.
-   *
-   * @param featureId - The ID of the feature to retrieve the configuration for.
    */
-  protected getConfig(featureId: string): FeatureConfig {
-    if (this._state.has(featureId)) {
-      return this._state.get(featureId)!;
-    }
-
+  protected getConfig(): FeatureConfig {
     const featuresConfigString = getFeatures();
 
     try {
@@ -44,19 +38,17 @@ export class FeaturesService {
       // The string is expected to be a JSON object with feature IDs as keys
       const featuresConfig = JSON.parse(featuresConfigString);
 
-      if (!featuresConfig[featureId]) {
-        console.debug(`Feature ID not found in features string ${featureId}`);
+      if (!featuresConfig[this._featureId]) {
+        console.debug(`Feature ID not found in features string ${this._featureId}`);
         return {
           enabled: false,
           config: {},
         };
       }
 
-      const config: FeatureConfig = featuresConfig[featureId];
+      const config: FeatureConfig = featuresConfig[this._featureId];
 
       this.validateConfig(config);
-
-      this._state.set(featureId, config);
 
       return config;
     } catch (e) {
@@ -69,35 +61,29 @@ export class FeaturesService {
     }
   }
 
-  protected isFeatureEnabled(featureId: string): boolean {
-    const config = this.getConfig(featureId);
+  protected isFeatureEnabled(): boolean {
+    const config = this.getConfig();
     return config.enabled;
   }
 
-
   protected validateConfig(config: any): void {
     if (typeof config.enabled !== "boolean") {
-      // TODO: use custom errors for logging and throwing
-      console.error("Invalid config: enabled must be a boolean");
-      throw new Error("Invalid config: enabled must be a boolean");
+      console.error(new InvalidFeaturesConfig("Invalid config: enabled must be a boolean"));
+      throw new InvalidFeaturesConfig("Invalid config: enabled must be a boolean");
     }
 
     if (typeof config.featureName !== "string") {
-      console.error("Invalid config: featureName must be a string");
-      throw new Error("Invalid config: featureName must be a string");
+      console.error(new InvalidFeaturesConfig("Invalid config: featureName must be a string"));
+      throw new InvalidFeaturesConfig("Invalid config: featureName must be a string");
     }
 
     if (typeof config.config !== "object") {
-      console.error("Invalid config: config must be an object");
-      throw new Error("Invalid config: config must be an object");
+      console.error(new InvalidFeaturesConfig("Invalid config: config must be an object"));
+      throw new InvalidFeaturesConfig("Invalid config: config must be an object");
     }
   }
 
   protected getFeatureAPIPrefix(featureId: string): string {
     return `features/${featureId}`;
-  }
-
-  private _clearState(): void {
-    this._state.clear();
   }
 }

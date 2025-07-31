@@ -1,13 +1,10 @@
-import React, { useState, useMemo, useContext, useEffect } from "react";
-import { Box, Slider, useTheme } from "@mui/material";
+import React, { useState, useContext, useEffect } from "react";
+import { Box, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import {
-  SkillsRankingPhase,
-  SkillsRankingState,
-} from "src/features/skillsRanking/types";
+import { SkillsRankingState, SkillsRankingPhase, getLatestPhaseName } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -18,6 +15,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
+import { getJobPlatformUrl } from "src/features/skillsRanking/constants";
+import SkillsRankingSlider from "src/features/skillsRanking/components/skillsRankingSlider/SkillsRankingSlider";
 
 const uniqueId = "7c582beb-6070-43b0-92fb-7fd0a4cb533e";
 const TYPING_DURATION_MS = 5000;
@@ -40,20 +39,16 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
   skillsRankingState,
 }) => {
   const theme = useTheme();
-  const jobPlatformUrl = useMemo(() => (
-    SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl
-  ), []);
 
   const [value, setValue] = useState(0);
   const [startedEditing, setStartedEditing] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
 
-  const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
+  const currentPhase = getLatestPhaseName(skillsRankingState);
   const scrollRef = useAutoScrollOnChange(submitted ? 1 : 0);
 
   const handleChange = (_: Event, newValue: number | number[]) => {
@@ -62,12 +57,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
   };
 
   const handleSubmit = async () => {
-    if (
-      submitted ||
-      !startedEditing ||
-      !isOnline ||
-      currentPhase !== SkillsRankingPhase.PERCEIVED_RANK
-    ) {
+    if (submitted || !startedEditing || !isOnline || currentPhase !== SkillsRankingPhase.PERCEIVED_RANK) {
       return;
     }
 
@@ -75,6 +65,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
     setShowTyping(true);
 
     try {
+      const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
       if (!activeSessionId) {
         console.error(new SkillsRankingError("Active session ID is not available."));
         return;
@@ -117,61 +108,28 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
       <Box sx={{ width: "100%" }}>
         <ChatBubble
           sender={ConversationMessageSender.COMPASS}
-          message={`Now, think of 100 people who are jobseekers from South Africa aged 18–34 with a matric from a township or rural school. How many of these 100 job seekers do you believe would be a fit for fewer positions on ${jobPlatformUrl} than you?`}
+          message={
+            <>
+              Now, think of <strong>100</strong> people who are jobseekers from South Africa <strong>aged 18–34</strong>{" "}
+              with a matric from a township or rural school. How many of these <strong>100</strong> job seekers do you
+              believe would be a fit for fewer positions on <strong>{getJobPlatformUrl()}</strong> than you?
+            </>
+          }
         >
-          <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
-            <Slider
+          <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
+            <SkillsRankingSlider
               value={value}
               onChange={handleChange}
-              disabled={submitted || !isOnline||
-                currentPhase !== SkillsRankingPhase.PERCEIVED_RANK}
-              min={0}
-              max={100}
-              step={1}
-              valueLabelDisplay={value === 0 ? "off" : "on"}
-              marks={[
-                { value: 0, label: "0" },
-                { value: 100, label: "100" },
-              ]}
+              disabled={submitted || !isOnline || currentPhase !== SkillsRankingPhase.PERCEIVED_RANK}
               data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SLIDER}
-              sx={{
-                height: theme.fixedSpacing(theme.tabiyaSpacing.md),
-                '& .MuiSlider-track': {
-                  backgroundColor: theme.palette.success.main,
-                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-                },
-                '& .MuiSlider-rail': {
-                  backgroundColor: theme.palette.common.white,
-                  border: `1px solid ${theme.palette.grey[300]}`,
-                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-                },
-                '& .MuiSlider-thumb': {
-                  boxShadow: 'none',
-                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-                  width: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-                  height: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-                },
-                '& .MuiSlider-valueLabel': {
-                  backgroundColor: theme.palette.success.main,
-                  color: theme.palette.common.black,
-                  fontWeight: 'bold',
-                  borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-                  top: -10,
-                },
-                '& .MuiSlider-mark': {
-                  display: 'none',
-                },
-              }}
+              aria-label="Perceived rank percentile slider"
             />
 
             <Box mt={theme.spacing(2)} textAlign="right">
               <PrimaryButton
                 onClick={handleSubmit}
                 disabled={
-                  submitted ||
-                  !startedEditing ||
-                  !isOnline ||
-                  currentPhase !== SkillsRankingPhase.PERCEIVED_RANK
+                  submitted || !startedEditing || !isOnline || currentPhase !== SkillsRankingPhase.PERCEIVED_RANK
                 }
                 data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SUBMIT_BUTTON}
               >
@@ -182,7 +140,11 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
         </ChatBubble>
 
         <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
-          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
+          <Timestamp
+            sentAt={
+              skillsRankingState.phases[skillsRankingState.phases.length - 1]?.time || skillsRankingState.started_at
+            }
+          />
         </ChatMessageFooterLayout>
       </Box>
 

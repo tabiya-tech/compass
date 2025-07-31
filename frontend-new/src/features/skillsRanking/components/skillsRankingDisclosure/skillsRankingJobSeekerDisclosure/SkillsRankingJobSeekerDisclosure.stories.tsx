@@ -18,10 +18,12 @@ const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 const createPhaseArray = (phase: SkillsRankingPhase): SkillsRankingPhaseWithTime[] => {
-  return [{
-    name: phase,
-    time: new Date().toISOString()
-  }];
+  return [
+    {
+      name: phase,
+      time: new Date().toISOString(),
+    },
+  ];
 };
 
 const meta: Meta<typeof SkillsRankingJobSeekerDisclosure> = {
@@ -36,10 +38,7 @@ const meta: Meta<typeof SkillsRankingJobSeekerDisclosure> = {
 
       // Mock state update call
       // @ts-ignore
-      SkillsRankingService.getInstance().updateSkillsRankingState = (
-        sessionId: number,
-        phase: SkillsRankingPhase
-      ) => {
+      SkillsRankingService.getInstance().updateSkillsRankingState = (sessionId: number, phase: SkillsRankingPhase) => {
         return new Promise((resolve) => {
           setTimeout(() => {
             action("success")(`Updated skills ranking state to phase: ${phase}`);
@@ -67,7 +66,7 @@ const BaseArgs = {
   },
   skillsRankingState: (() => {
     const base = getRandomSkillsRankingState();
-    base.phase = createPhaseArray(SkillsRankingPhase.JOB_SEEKER_DISCLOSURE);
+    base.phases = createPhaseArray(SkillsRankingPhase.JOB_SEEKER_DISCLOSURE);
     return base;
   })(),
 };

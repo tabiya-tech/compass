@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useContext, useEffect, useRef, useCallback } from "react";
-import { Box, Slider, useTheme } from "@mui/material";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { Box, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -8,6 +8,7 @@ import {
   SkillsRankingExperimentGroups,
   SkillsRankingPhase,
   SkillsRankingState,
+  getLatestPhaseName,
 } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
@@ -19,6 +20,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
+import { getJobPlatformUrl } from "src/features/skillsRanking/constants";
+import SkillsRankingSlider from "src/features/skillsRanking/components/skillsRankingSlider/SkillsRankingSlider";
 
 const uniqueId = "eb90de4c-2462-4b6d-8b9c-1b5c6ae64129";
 const TYPING_DURATION_MS = 5000;
@@ -44,26 +47,24 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
   const [value, setValue] = useState(0);
   const [startedEditing, setStartedEditing] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [step, setStep] = useState(0); // 0: form, 1: typing, 2: finish
+  const [showTyping, setShowTyping] = useState(false);
   const hasFinishedRef = useRef(false);
 
-  const jobPlatformUrl = useMemo(() => (
-    SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl
-  ), []);
   const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
 
-  const currentPhase = skillsRankingState.phase[skillsRankingState.phase.length - 1]?.name;
-  const scrollRef = useAutoScrollOnChange(step);
+  const currentPhase = getLatestPhaseName(skillsRankingState);
+  const scrollRef = useAutoScrollOnChange(showTyping);
 
-  const isAutoSubmitGroup =
+  const shouldRetypeRank =
     skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
     skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4;
 
   const handleUpdateState = useCallback(async () => {
     if (!activeSessionId) {
-      throw new SkillsRankingError("Active session ID is not available.");
+      console.error(new SkillsRankingError("Active session ID is not available."));
+      return;
     }
     try {
       const newState = await SkillsRankingService.getInstance().updateSkillsRankingState(
@@ -73,8 +74,8 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
         value
       );
       setSubmitted(true);
-      setStep(1);
-      setTimeout(() => setStep(2), TYPING_DURATION_MS);
+      setShowTyping(true);
+      setTimeout(() => setShowTyping(false), TYPING_DURATION_MS);
       setTimeout(() => {
         if (!hasFinishedRef.current) {
           hasFinishedRef.current = true;
@@ -100,15 +101,16 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
   }, [skillsRankingState, currentPhase]);
 
   useEffect(() => {
-    if (isAutoSubmitGroup && !hasFinishedRef.current) {
-      setStep(1); // Show typing animation
+    if (shouldRetypeRank && !hasFinishedRef.current) {
+      setShowTyping(true); // Show typing animation
       const typingTimer = setTimeout(async () => {
-        if (!activeSessionId) return;
+        if (!activeSessionId) {
+          console.error(new SkillsRankingError("Active session ID is not available."));
+          return;
+        }
 
         if (currentPhase !== SkillsRankingPhase.RETYPED_RANK) {
-          console.warn(
-            `[RetypedRank] Skipping auto-submit. Phase is already ${currentPhase}`
-          );
+          console.warn(`[RetypedRank] Skipping auto-submit. Phase is already ${currentPhase}`);
           return;
         }
 
@@ -129,16 +131,9 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
 
       return () => clearTimeout(typingTimer);
     }
-  }, [
-    isAutoSubmitGroup,
-    activeSessionId,
-    currentPhase,
-    value,
-    onFinish,
-    enqueueSnackbar,
-  ]);
+  }, [shouldRetypeRank, activeSessionId, currentPhase, value, onFinish, enqueueSnackbar]);
 
-  if (isAutoSubmitGroup) return null;
+  if (shouldRetypeRank) return <></>;
 
   return (
     <MessageContainer
@@ -147,85 +142,60 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
       data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_CONTAINER}
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
-      {(!isAutoSubmitGroup) &&
-      <Box sx={{ width: "100%" }}>
-        <ChatBubble
-          sender={ConversationMessageSender.COMPASS}
-          message={`In any case, if we do not think about other job seekers but again focus on those opportunities available to you, let's move to creating your skills profile that you can share with those employers in the next step.\n\nAs a last question, let's remind ourselves of what I told you further above: check again what I said three messages ago, how many percent of opportunities on ${jobPlatformUrl} do you fulfill the required & most relevant skills of?`}
-        >
-          <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
-            <Slider
-              value={value}
-              onChange={(_, newVal) => {
-                setStartedEditing(true);
-                setValue(newVal as number);
-              }}
-              disabled={submitted || !isOnline ||
-                currentPhase !== SkillsRankingPhase.RETYPED_RANK}
-              min={0}
-              max={100}
-              step={1}
-              marks={[
-                { value: 0, label: "" },
-                { value: 100, label: "" },
-              ]}
-              valueLabelDisplay={value === 0 ? "off" : "on"}
-              data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SLIDER}
-              sx={{
-                height: theme.fixedSpacing(theme.tabiyaSpacing.md),
-                '& .MuiSlider-track': {
-                  backgroundColor: theme.palette.success.main,
-                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-                },
-                '& .MuiSlider-rail': {
-                  backgroundColor: theme.palette.common.white,
-                  border: `1px solid ${theme.palette.grey[300]}`,
-                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-                },
-                '& .MuiSlider-thumb': {
-                  boxShadow: 'none',
-                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-                  width: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-                  height: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-                },
-                '& .MuiSlider-valueLabel': {
-                  backgroundColor: theme.palette.success.main,
-                  color: theme.palette.common.black,
-                  fontWeight: 'bold',
-                  borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-                  top: -10,
-                },
-                '& .MuiSlider-mark': {
-                  display: 'none',
-                },
-              }}
-            />
+      {!shouldRetypeRank && (
+        <Box sx={{ width: "100%" }}>
+          <ChatBubble
+            sender={ConversationMessageSender.COMPASS}
+            message={
+              <>
+                In any case, if we do not think about other job seekers but again focus on those opportunities available
+                to you, let's move to creating your skills profile that you can share with those employers in the next
+                step.
+                {"\n\n"}
+                As a last question, let's remind ourselves of what I told you further above: check again what I said
+                three messages ago, how many percent of opportunities on <strong>{getJobPlatformUrl()}</strong> do you
+                fulfill the required & most relevant skills of?
+              </>
+            }
+          >
+            <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
+              <SkillsRankingSlider
+                value={value}
+                onChange={(_, newVal) => {
+                  setStartedEditing(true);
+                  setValue(newVal as number);
+                }}
+                disabled={submitted || !isOnline || currentPhase !== SkillsRankingPhase.RETYPED_RANK}
+                data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SLIDER}
+                aria-label="Retyped rank percentile slider"
+              />
 
-            <Box mt={theme.spacing(2)} textAlign="right">
-              <PrimaryButton
-                onClick={handleSubmit}
-                disabled={
-                  submitted ||
-                  !startedEditing ||
-                  !isOnline ||
-                  currentPhase !== SkillsRankingPhase.RETYPED_RANK
-                }
-                data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SUBMIT_BUTTON}
-              >
-                Submit
-              </PrimaryButton>
+              <Box mt={theme.spacing(2)} textAlign="right">
+                <PrimaryButton
+                  onClick={handleSubmit}
+                  disabled={
+                    submitted || !startedEditing || !isOnline || currentPhase !== SkillsRankingPhase.RETYPED_RANK
+                  }
+                  data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SUBMIT_BUTTON}
+                >
+                  Submit
+                </PrimaryButton>
+              </Box>
             </Box>
-          </Box>
-        </ChatBubble>
+          </ChatBubble>
 
-        <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
-          <Timestamp sentAt={skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.started_at} />
-        </ChatMessageFooterLayout>
-      </Box>
-      }
+          <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
+            <Timestamp
+              sentAt={
+                skillsRankingState.phases[skillsRankingState.phases.length - 1]?.time || skillsRankingState.started_at
+              }
+            />
+          </ChatMessageFooterLayout>
+        </Box>
+      )}
 
       <AnimatePresence mode="wait">
-        {step === 1 && (
+        {showTyping && (
           <motion.div
             key="typing"
             initial={{ opacity: 0, height: 0 }}
