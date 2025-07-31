@@ -3,18 +3,13 @@ import { IChatMessage } from "src/chat/Chat.types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import { SessionError } from "src/error/commonErrors";
-import {
-  SkillsRankingPhase,
-  SkillsRankingState,
-} from "src/features/skillsRanking/types";
-import {
-  skillsRankingHappyPath,
-} from "./skillsRankingFlowGraph";
+import { SkillsRankingPhase, SkillsRankingState, getLatestPhaseName } from "src/features/skillsRanking/types";
+import { skillsRankingHappyPath } from "./skillsRankingFlowGraph";
 import {
   createBriefingMessage,
   createEffortMessage,
-  createJobSeekerDisclosureMessage,
   createJobMarketDisclosureMessage,
+  createJobSeekerDisclosureMessage,
   createPerceivedRankMessage,
   createPromptMessage,
   createRetypedRankMessage,
@@ -31,100 +26,99 @@ const phaseToMessageFactory = {
   [SkillsRankingPhase.COMPLETED]: null,
 };
 
+const getPathToPhase = (phase: SkillsRankingPhase): SkillsRankingPhase[] => {
+  const index = skillsRankingHappyPath.indexOf(phase);
+  if (index === -1) {
+    console.warn(`[SkillsRanking] Phase '${phase}' not found in path`, skillsRankingHappyPath);
+    return [];
+  }
+  return skillsRankingHappyPath.slice(0, index + 1);
+};
+
+const getSkillsRankingState = async (): Promise<SkillsRankingState | null> => {
+  const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
+
+  if (!activeSessionId) throw new SessionError("Active session ID is not available.");
+  try {
+    return await SkillsRankingService.getInstance().getSkillsRankingState(activeSessionId);
+  } catch (error) {
+    console.error(new SkillsRankingError("Error fetching skills ranking state:", error));
+    return null;
+  }
+};
+
+const initializeSkillsRankingState = async (): Promise<SkillsRankingState | null> => {
+  const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
+
+  if (!activeSessionId) throw new SessionError("Active session ID is not available.");
+  try {
+    return await SkillsRankingService.getInstance().updateSkillsRankingState(
+      activeSessionId,
+      SkillsRankingPhase.INITIAL
+    );
+  } catch (error) {
+    console.error(new SkillsRankingError("Error initializing skills ranking state:", error));
+    return null;
+  }
+};
+
 export const useSkillsRanking = (
   addMessage: (message: IChatMessage<any>) => void,
-  removeMessage: (messageId: string) => void,
+  removeMessage: (messageId: string) => void
 ) => {
-  const activeSessionId =
-    UserPreferencesStateService.getInstance().getActiveSessionId();
+  /**
+   * Handles the flow transition between skills ranking phases.
+   * Determines the next phase in the flow and creates the appropriate message.
+   * @param currentPhase - The current phase in the skills ranking flow
+   * @param onFinishFlow - Callback to execute when the flow is complete
+   * @returns A function that handles the state transition
+   */
+  const getNextPhaseHandler =
+    (currentPhase: SkillsRankingPhase, onFinishFlow: () => void) => async (newState: SkillsRankingState) => {
+      const currentPhaseName = getLatestPhaseName(newState);
 
-  const getSkillsRankingState = async (): Promise<SkillsRankingState | null> => {
-    if (!activeSessionId)
-      throw new SessionError("Active session ID is not available.");
-    try {
-      return await SkillsRankingService.getInstance().getSkillsRankingState(
-        activeSessionId
-      );
-    } catch (error) {
-      console.error(
-        new SkillsRankingError("Error fetching skills ranking state:", error)
-      );
-      return null;
-    }
-  };
-
-  const initializeSkillsRankingState =
-    async (): Promise<SkillsRankingState | null> => {
-      if (!activeSessionId)
-        throw new SessionError("Active session ID is not available.");
-      try {
-        return await SkillsRankingService.getInstance().updateSkillsRankingState(
-          activeSessionId,
-          SkillsRankingPhase.INITIAL
-        );
-      } catch (error) {
-        console.error(
-          new SkillsRankingError("Error initializing skills ranking state:", error)
-        );
-        return null;
+      if (currentPhaseName === SkillsRankingPhase.COMPLETED) {
+        console.debug(`[Flow] Final phase '${currentPhaseName}' reached`);
+        onFinishFlow();
+        return;
       }
+
+      const currentIndex = skillsRankingHappyPath.indexOf(currentPhase);
+      const nextPhase = skillsRankingHappyPath[currentIndex + 1];
+      const factory = phaseToMessageFactory[nextPhase];
+
+      console.debug(
+        `[Flow] going from '${currentPhase}' to '${nextPhase}' along path: ${skillsRankingHappyPath.join(" → ")}`
+      );
+
+      if (!nextPhase || !factory) {
+        console.debug(`[Flow] No next phase or factory found. Ending flow.`);
+        onFinishFlow();
+        return;
+      }
+
+      const result = factory(newState, getNextPhaseHandler(nextPhase, onFinishFlow));
+      (Array.isArray(result) ? result : [result]).filter((message) => message !== null).forEach(addMessage);
     };
-
-  const getPathToPhase = (phase: SkillsRankingPhase): SkillsRankingPhase[] => {
-    const index = skillsRankingHappyPath.indexOf(phase);
-    if (index === -1) {
-      console.warn(`[SkillsRanking] Phase '${phase}' not found in path`, skillsRankingHappyPath);
-      return [];
-    }
-    return skillsRankingHappyPath.slice(0, index + 1);
-  };
-
-  const handleFlow =
-    (currentPhase: SkillsRankingPhase, onFinishFlow: () => void) =>
-      async (newState: SkillsRankingState) => {
-        const currentPhaseName = newState.phase[newState.phase.length - 1]?.name;
-        if (currentPhaseName === SkillsRankingPhase.COMPLETED) {
-          console.debug(`[Flow] Final phase '${currentPhaseName}' reached`);
-          onFinishFlow();
-          return;
-        }
-
-        const currentIndex = skillsRankingHappyPath.indexOf(currentPhase);
-        const nextPhase = skillsRankingHappyPath[currentIndex + 1];
-        const factory = phaseToMessageFactory[nextPhase];
-
-        console.debug(
-          `[Flow] going from '${currentPhase}' to '${nextPhase}' along path: ${skillsRankingHappyPath.join(
-            " → "
-          )}`
-        );
-
-        if (!nextPhase || !factory) {
-          console.debug(`[Flow] No next phase or factory found. Ending flow.`);
-          onFinishFlow();
-          return;
-        }
-
-        const result = factory(newState, handleFlow(nextPhase, onFinishFlow));
-        (Array.isArray(result) ? result : [result]).forEach(addMessage);
-      };
-
 
   const showSkillsRanking = async (onFinishFlow: () => void) => {
     let state = await getSkillsRankingState();
+
     state ??= await initializeSkillsRankingState();
 
     if (!state) {
-      console.error(
-        new SkillsRankingError(
-          "Skills ranking state is still null after initialization."
-        )
-      );
+      console.error(new SkillsRankingError("Skills ranking state is still null after initialization."));
       onFinishFlow();
       return;
     }
 
-    const currentPhaseName = state.phase[state.phase.length - 1]?.name;
+    const currentPhaseName = getLatestPhaseName(state);
+    if (!currentPhaseName) {
+      console.warn(`[Flow] No current phase found in state`);
+      onFinishFlow();
+      return;
+    }
+
     const path = getPathToPhase(currentPhaseName);
     if (path.length === 0) {
       console.warn(`[Flow] Invalid phase path for phase: '${currentPhaseName}'`);
@@ -137,8 +131,8 @@ export const useSkillsRanking = (
     path.forEach((phase) => {
       const factory = phaseToMessageFactory[phase];
       if (factory) {
-        const result = factory(state, handleFlow(phase, onFinishFlow));
-        (Array.isArray(result) ? result : [result]).forEach(addMessage);
+        const result = factory(state, getNextPhaseHandler(phase, onFinishFlow));
+        (Array.isArray(result) ? result : [result]).filter((message) => message !== null).forEach(addMessage);
       }
     });
 

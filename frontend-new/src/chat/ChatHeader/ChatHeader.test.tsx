@@ -100,7 +100,7 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 
 const renderWithChatProvider = (child: React.ReactNode) => {
   render(
-    <ChatProvider handleOpenExperiencesDrawer={jest.fn} removeMessage={jest.fn} addMessage={jest.fn}>
+    <ChatProvider handleOpenExperiencesDrawer={jest.fn} removeMessageFromChat={jest.fn} addMessageToChat={jest.fn}>
       {child}
     </ChatProvider>
   );
@@ -202,8 +202,8 @@ describe("ChatHeader", () => {
     const givenChatHeader = (
       <ChatProvider
         handleOpenExperiencesDrawer={jest.fn}
-        removeMessage={givenRemoveMessage}
-        addMessage={givenAddMessage}
+        removeMessageFromChat={givenRemoveMessage}
+        addMessageToChat={givenAddMessage}
       >
         <ChatHeader
           notifyOnLogout={givenNotifyOnLogout}
@@ -405,8 +405,8 @@ describe("ChatHeader", () => {
       render(
         <ChatProvider
           handleOpenExperiencesDrawer={givenNotifyOnExperiencesDrawerOpen}
-          removeMessage={givenRemoveMessage}
-          addMessage={givenAddMessage}
+          removeMessageFromChat={givenRemoveMessage}
+          addMessageToChat={givenAddMessage}
         >
           {givenChatHeader}
         </ChatProvider>
@@ -477,8 +477,8 @@ describe("ChatHeader", () => {
       render(
         <ChatProvider
           handleOpenExperiencesDrawer={givenNotifyOnExperiencesDrawerOpen}
-          removeMessage={givenRemoveMessage}
-          addMessage={givenAddMessage}
+          removeMessageFromChat={givenRemoveMessage}
+          addMessageToChat={givenAddMessage}
         >
           {givenChatHeader}
         </ChatProvider>
@@ -794,7 +794,11 @@ describe("ChatHeader", () => {
 
       // AND a ChatHeader component
       const givenChatHeader = (
-        <ChatProvider handleOpenExperiencesDrawer={jest.fn()} removeMessage={jest.fn()} addMessage={jest.fn()}>
+        <ChatProvider
+          handleOpenExperiencesDrawer={jest.fn()}
+          removeMessageFromChat={jest.fn()}
+          addMessageToChat={jest.fn()}
+        >
           <ChatHeader
             notifyOnLogout={jest.fn()}
             startNewConversation={jest.fn()}
@@ -831,7 +835,11 @@ describe("ChatHeader", () => {
       jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValueOnce(mockAnonymousUser);
       // AND a ChatHeader component
       const givenChatHeader = (
-        <ChatProvider handleOpenExperiencesDrawer={jest.fn()} removeMessage={jest.fn()} addMessage={jest.fn()}>
+        <ChatProvider
+          handleOpenExperiencesDrawer={jest.fn()}
+          removeMessageFromChat={jest.fn()}
+          addMessageToChat={jest.fn()}
+        >
           <ChatHeader
             notifyOnLogout={jest.fn()}
             startNewConversation={jest.fn()}
