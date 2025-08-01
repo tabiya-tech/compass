@@ -1,4 +1,4 @@
-from features.skills_ranking.service.types import SkillsRankingPhaseName
+from features.skills_ranking.state.services.type import SkillsRankingPhaseName
 
 
 class SkillsRankingStateNotFound(Exception):
