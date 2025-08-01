@@ -32,6 +32,14 @@ import SkillsRankingProofOfValue, {
 } from "../components/skillsRankingProofOfValue/SkillsRankingProofOfValue";
 import { SkillsRankingState, SkillsRankingExperimentGroups } from "../types";
 
+// Utility function to check if a group should skip market disclosure (and consequently retyped rank)
+export const shouldSkipMarketDisclosure = (experimentGroup: SkillsRankingExperimentGroups): boolean => {
+  return (
+    experimentGroup === SkillsRankingExperimentGroups.GROUP_2 ||
+    experimentGroup === SkillsRankingExperimentGroups.GROUP_4
+  );
+};
+
 export const createBriefingMessage = (
   skillsRankingState: SkillsRankingState,
   onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>
@@ -95,12 +103,10 @@ export const createRetypedRankMessage = (
   onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>
 ): IChatMessage<SkillsRankingRetypedRankProps> | null => {
   // Check if the component should be shown based on experiment group
-  const shouldRetypeRank =
-    skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
-    skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4;
+  const shouldNotShow = shouldSkipMarketDisclosure(skillsRankingState.experiment_group);
 
   // If the component should not be shown, don't create a message
-  if (shouldRetypeRank) {
+  if (shouldNotShow) {
     return null;
   }
 

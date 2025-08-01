@@ -18,7 +18,7 @@ def test_get_possible_next_states():
     next_states = get_possible_next_phase("PROOF_OF_VALUE")
     # WHEN getting possible next states
     # THEN the next state should include PROOF_OF_VALUE and MARKET_DISCLOSURE
-    assert next_states == ["PROOF_OF_VALUE", "MARKET_DISCLOSURE"]
+    assert next_states == ["PROOF_OF_VALUE", "MARKET_DISCLOSURE", "JOB_SEEKER_DISCLOSURE"]
 
     # GIVEN disclosure state
     next_states = get_possible_next_phase("MARKET_DISCLOSURE")
@@ -36,7 +36,7 @@ def test_get_possible_next_states():
     next_states = get_possible_next_phase("PERCEIVED_RANK")
     # WHEN getting possible next states
     # THEN the next state should include PERCEIVED_RANK and RETYPED_RANK
-    assert next_states == ["PERCEIVED_RANK", "RETYPED_RANK"]
+    assert next_states == ["PERCEIVED_RANK", "RETYPED_RANK", "COMPLETED"]
 
     # GIVEN retyped rank state
     next_states = get_possible_next_phase("RETYPED_RANK")

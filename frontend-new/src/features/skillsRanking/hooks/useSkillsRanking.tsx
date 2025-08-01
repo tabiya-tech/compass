@@ -3,8 +3,8 @@ import { IChatMessage } from "src/chat/Chat.types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import { SessionError } from "src/error/commonErrors";
-import { SkillsRankingPhase, SkillsRankingState, getLatestPhaseName } from "src/features/skillsRanking/types";
-import { skillsRankingHappyPath } from "./skillsRankingFlowGraph";
+import { SkillsRankingPhase, SkillsRankingState, getLatestPhaseName, SkillsRankingExperimentGroups } from "src/features/skillsRanking/types";
+import { getFlowPathForGroup, skillsRankingHappyPathFull } from "./skillsRankingFlowGraph";
 import {
   createBriefingMessage,
   createEffortMessage,
@@ -26,13 +26,15 @@ const phaseToMessageFactory = {
   [SkillsRankingPhase.COMPLETED]: null,
 };
 
-const getPathToPhase = (phase: SkillsRankingPhase): SkillsRankingPhase[] => {
-  const index = skillsRankingHappyPath.indexOf(phase);
+const getPathToPhase = (phase: SkillsRankingPhase, experimentGroup?: SkillsRankingExperimentGroups): SkillsRankingPhase[] => {
+  // Use the full path as default if no experiment group is provided
+  const flowPath = experimentGroup ? getFlowPathForGroup(experimentGroup) : skillsRankingHappyPathFull;
+  const index = flowPath.indexOf(phase);
   if (index === -1) {
-    console.warn(`[SkillsRanking] Phase '${phase}' not found in path`, skillsRankingHappyPath);
+    console.warn(`[SkillsRanking] Phase '${phase}' not found in path`, flowPath);
     return [];
   }
-  return skillsRankingHappyPath.slice(0, index + 1);
+  return flowPath.slice(0, index + 1);
 };
 
 const getSkillsRankingState = async (): Promise<SkillsRankingState | null> => {
@@ -83,12 +85,14 @@ export const useSkillsRanking = (
         return;
       }
 
-      const currentIndex = skillsRankingHappyPath.indexOf(currentPhase);
-      const nextPhase = skillsRankingHappyPath[currentIndex + 1];
+      // Get the correct flow path for this experiment group
+      const flowPath = getFlowPathForGroup(newState.experiment_group);
+      const currentIndex = flowPath.indexOf(currentPhase);
+      const nextPhase = flowPath[currentIndex + 1];
       const factory = phaseToMessageFactory[nextPhase];
 
       console.debug(
-        `[Flow] going from '${currentPhase}' to '${nextPhase}' along path: ${skillsRankingHappyPath.join(" → ")}`
+        `[Flow] going from '${currentPhase}' to '${nextPhase}' for group ${newState.experiment_group} using path: ${flowPath.join(" → ")}`
       );
 
       if (!nextPhase || !factory) {
@@ -119,7 +123,7 @@ export const useSkillsRanking = (
       return;
     }
 
-    const path = getPathToPhase(currentPhaseName);
+    const path = getPathToPhase(currentPhaseName, state.experiment_group);
     if (path.length === 0) {
       console.warn(`[Flow] Invalid phase path for phase: '${currentPhaseName}'`);
       onFinishFlow();
