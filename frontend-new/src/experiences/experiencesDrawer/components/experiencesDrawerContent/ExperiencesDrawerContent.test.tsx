@@ -9,13 +9,14 @@ import ExperiencesDrawerContent, {
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { DATA_TEST_ID as CONTEXT_MENU_DATA_TEST_ID } from "src/theme/ContextMenu/ContextMenu";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import ExperienceService from "src/experiences/experienceService/experienceService";
+import { DATA_TEST_ID as SKILL_POPOVER_TEST_ID } from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
@@ -230,9 +231,8 @@ describe("ReportDrawerContent", () => {
     // THEN expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
-    // AND the popover to be in the document
-    const popoverEl = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_POPOVER);
-    expect(popoverEl).toBeInTheDocument();
+    // AND the skill popover to be in the document
+    expect(screen.getByTestId(SKILL_POPOVER_TEST_ID.SKILL_POPOVER)).toBeInTheDocument();
     // AND the skill description to be in the document
     expect(screen.getByText(mockExperiences[0].top_skills[0].description)).toBeInTheDocument();
   });
@@ -246,18 +246,15 @@ describe("ReportDrawerContent", () => {
     render(givenReportDrawerContent);
     // AND the chip is clicked
     const chip = screen.getAllByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_CHIP)[0];
-    fireEvent.click(chip);
+    await userEvent.click(chip);
     // AND the popover is open
-    const popoverEl = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_POPOVER);
-    expect(popoverEl).toBeVisible();
+    expect(screen.getByTestId(SKILL_POPOVER_TEST_ID.SKILL_POPOVER)).toBeInTheDocument();
 
     // WHEN the user clicks outside the popover
-    fireEvent.keyDown(popoverEl, { key: "Escape" });
+    await userEvent.keyboard("{Escape}");
 
     // THEN expect the popover to be invisible
-    await waitFor(() => {
-      expect(popoverEl).not.toBeInTheDocument();
-    });
+    expect(screen.queryByTestId(SKILL_POPOVER_TEST_ID.SKILL_POPOVER)).not.toBeInTheDocument();
     // AND expect the skill description to not be in the document
     expect(screen.queryByText(mockExperiences[0].top_skills[0].description)).not.toBeInTheDocument();
   });

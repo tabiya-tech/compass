@@ -1,0 +1,169 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AddSkillsDrawer should render component successfully 1`] = `
+<div
+  class="MuiBox-root css-lb61rc"
+  data-testid="skills-drawer-82681361-b582-4dc3-8129-63f3f0f66eee"
+  style="webkit-transform: none; transform: none; webkit-transition: -webkit-transform 225ms cubic-bezier(0.0, 0, 0.2, 1) 0ms; transition: transform 225ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;"
+>
+  <div
+    class="MuiBox-root css-1jgly4c"
+  >
+    <div
+      class="MuiBox-root css-1821gv5"
+    >
+      <div
+        class="MuiBox-root css-axw7ok"
+      >
+        <h5
+          class="MuiTypography-root MuiTypography-h5 css-vmt1ul-MuiTypography-root"
+          data-testid="skills-drawer-title-82681361-b582-4dc3-8129-63f3f0f66eee"
+        >
+          Select Skills
+        </h5>
+        <button
+          aria-label="help"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
+          data-mui-internal-clone-element="true"
+          data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+          tabindex="0"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            data-testid="InfoIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"
+            />
+          </svg>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+      <p
+        class="MuiTypography-root MuiTypography-body2 css-1tvo5dz-MuiTypography-root"
+        data-testid="skills-drawer-subtitle-82681361-b582-4dc3-8129-63f3f0f66eee"
+      >
+        These are additional top skills identified by Compass based on your experience.
+      </p>
+    </div>
+    <div
+      class="MuiBox-root css-knb1ux"
+    >
+      <div
+        class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1n9e303-MuiButtonBase-root-MuiChip-root"
+        data-testid="skills-drawer-item-82681361-b582-4dc3-8129-63f3f0f66eee"
+        role="button"
+        tabindex="0"
+      >
+        <span
+          class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+        >
+          <div
+            class="MuiBox-root css-axw7ok"
+          >
+            <div
+              class="MuiBox-root css-70qvj9"
+            >
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1de4ipc-MuiSvgIcon-root"
+                data-testid="skills-drawer-item-unchecked-82681361-b582-4dc3-8129-63f3f0f66eee"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M19 5v14H5V5zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2"
+                />
+              </svg>
+            </div>
+            <p
+              class="MuiTypography-root MuiTypography-body1 css-1y74r5c-MuiTypography-root"
+            >
+              Management
+            </p>
+          </div>
+        </span>
+        <span
+          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </div>
+      <div
+        class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1n9e303-MuiButtonBase-root-MuiChip-root"
+        data-testid="skills-drawer-item-82681361-b582-4dc3-8129-63f3f0f66eee"
+        role="button"
+        tabindex="0"
+      >
+        <span
+          class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+        >
+          <div
+            class="MuiBox-root css-axw7ok"
+          >
+            <div
+              class="MuiBox-root css-70qvj9"
+            >
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1de4ipc-MuiSvgIcon-root"
+                data-testid="skills-drawer-item-unchecked-82681361-b582-4dc3-8129-63f3f0f66eee"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M19 5v14H5V5zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2"
+                />
+              </svg>
+            </div>
+            <p
+              class="MuiTypography-root MuiTypography-body1 css-1y74r5c-MuiTypography-root"
+            >
+              Communication
+            </p>
+          </div>
+        </span>
+        <span
+          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    class="MuiBox-root css-sv3odh"
+  >
+    <hr
+      class="MuiDivider-root MuiDivider-fullWidth css-4rn412-MuiDivider-root"
+      color="primary"
+    />
+    <div
+      class="MuiBox-root css-xtegh"
+    >
+      <button
+        class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-187exs5-MuiButtonBase-root-MuiButton-root"
+        data-testid="skills-drawer-cancel-button-82681361-b582-4dc3-8129-63f3f0f66eee"
+        tabindex="0"
+        type="button"
+      >
+        Cancel
+        <span
+          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </button>
+      <button
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+        data-testid="skills-drawer-ok-button-82681361-b582-4dc3-8129-63f3f0f66eee"
+        disabled=""
+        tabindex="-1"
+        type="button"
+      >
+        Ok
+      </button>
+    </div>
+  </div>
+</div>
+`;

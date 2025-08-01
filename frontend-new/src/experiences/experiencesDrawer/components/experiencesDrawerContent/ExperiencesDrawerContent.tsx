@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from "react";
-import { Box, Chip, Grid, Popover, Skeleton, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { DiveInPhase, Experience } from "src/experiences/experienceService/experiences.types";
+import { Box, Chip, Grid, Skeleton, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { DiveInPhase, Experience, Skill } from "src/experiences/experienceService/experiences.types";
 import { Theme } from "@mui/material/styles";
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import InfoIcon from "@mui/icons-material/Info";
@@ -12,6 +12,7 @@ import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import RestoreIcon from "@mui/icons-material/Restore";
+import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 
 const uniqueId = "34a59a9e-e7f6-4a10-8b72-0fd401c727de";
 
@@ -24,7 +25,6 @@ export const DATA_TEST_ID = {
   EXPERIENCES_DRAWER_SKILLS_CONTAINER: `experiences-drawer-skills-container-${uniqueId}`,
   EXPERIENCES_DRAWER_CONTENT_SUMMARY: `experiences-drawer-content-summary-${uniqueId}`,
   EXPERIENCES_DRAWER_CHIP: `experiences-drawer-chip-${uniqueId}`,
-  EXPERIENCES_DRAWER_POPOVER: `experiences-drawer-popover-${uniqueId}`,
   EXPERIENCES_DRAWER_MORE_BUTTON: `experiences-drawer-more-button-${uniqueId}`,
   EXPERIENCES_DRAWER_RESTORE_TO_ORIGINAL_BUTTON: `experiences-drawer-restore-to-original-button-${uniqueId}`,
   RESTORE_EXPERIENCE_BUTTON: `restore-experience-button-${uniqueId}`,
@@ -57,14 +57,13 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
   const theme = useTheme();
   const isOnline = useContext(IsOnlineContext);
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
-  const [skillDescription, setSkillDescription] = React.useState<string>("");
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [selectedSkill, setSelectedSkill] = React.useState<Skill | null>(null);
+  const [popoverAnchorEl, setPopoverAnchorEl] = React.useState<HTMLElement | null>(null);
   const [moreMenuAnchorEl, setMoreMenuAnchorEl] = React.useState<HTMLElement | null>(null);
 
   const formattedSkills = useMemo(() => {
     if (experience.top_skills.length === 0) return [];
-    return experience.top_skills
+    return experience.top_skills;
   }, [experience.top_skills]);
 
   const handleEditClick = () => {
@@ -122,15 +121,9 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
     ];
   };
 
-  const handleChipClick = (event: React.MouseEvent<HTMLElement>, description: string) => {
-    setAnchorEl(event.currentTarget);
-    setSkillDescription(description);
-    setIsOpen(true);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-    setIsOpen(false);
+  const handleChipClick = (event: React.MouseEvent<HTMLElement>, skill: Skill) => {
+    setPopoverAnchorEl(event.currentTarget);
+    setSelectedSkill(skill);
   };
 
   return (
@@ -192,7 +185,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
         >
           <b>Top Skills</b>
         </Typography>
-        <HelpTip icon={<InfoIcon sx={{ padding: 0.1 }} />}>Tap on the skill to see more details</HelpTip>
+        <HelpTip icon={<InfoIcon sx={{ padding: 0.1 }} />}>Tap a skill to see more details.</HelpTip>
       </Box>
       <Box
         display="flex"
@@ -210,28 +203,18 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
               key={skill.UUID}
               label={capitalizeFirstLetter(skill.preferredLabel)}
               sx={{ color: theme.palette.text.secondary, backgroundColor: theme.palette.grey[100] }}
-              onClick={(event) => handleChipClick(event, skill.description)}
+              onClick={(event) => handleChipClick(event, skill)}
               data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CHIP}
             />
           ))
         )}
       </Box>
-      <Popover
-        open={isOpen}
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        onClose={handleClose}
-        data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_POPOVER}
-      >
-        <Typography sx={{ maxWidth: 500, padding: isSmallMobile ? 4 : 2 }}>{skillDescription}</Typography>
-      </Popover>
+      <SkillPopover
+        open={Boolean(popoverAnchorEl)}
+        anchorEl={popoverAnchorEl}
+        onClose={() => setPopoverAnchorEl(null)}
+        skill={selectedSkill}
+      />
       <ContextMenu
         anchorEl={moreMenuAnchorEl}
         open={Boolean(moreMenuAnchorEl)}

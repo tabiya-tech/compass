@@ -2,7 +2,7 @@
 
 exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
 <div
-  class="MuiBox-root css-11gwlou"
+  class="MuiBox-root css-1uptyvx"
   data-testid="experience-edit-form-container-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
 >
   <div
@@ -339,8 +339,10 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
         data-testid="experience-edit-form-skills-container-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
       >
         <div
-          class="MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-filledDefault css-ondr1i-MuiChip-root"
+          class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1hjtbll-MuiButtonBase-root-MuiChip-root"
           data-testid="experience-edit-form-skill-chip-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+          role="button"
+          tabindex="0"
         >
           <span
             class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
@@ -348,11 +350,11 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
             <div
               class="MuiBox-root css-70qvj9"
             >
-              <span
-                style="text-decoration: none;"
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-1pp3g1p-MuiTypography-root"
               >
                 Management
-              </span>
+              </p>
               <svg
                 aria-hidden="true"
                 class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-13b6f3w-MuiSvgIcon-root"
@@ -366,7 +368,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
               </svg>
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-7fr91u-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-6eh098-MuiSvgIcon-root"
                 data-testid="experience-edit-form-skill-chip-delete-icon-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -377,10 +379,15 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
               </svg>
             </div>
           </span>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
         </div>
         <div
-          class="MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-filledDefault css-ondr1i-MuiChip-root"
+          class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1hjtbll-MuiButtonBase-root-MuiChip-root"
           data-testid="experience-edit-form-skill-chip-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+          role="button"
+          tabindex="0"
         >
           <span
             class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
@@ -388,11 +395,11 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
             <div
               class="MuiBox-root css-70qvj9"
             >
-              <span
-                style="text-decoration: none;"
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-1pp3g1p-MuiTypography-root"
               >
                 Communication
-              </span>
+              </p>
               <svg
                 aria-hidden="true"
                 class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-13b6f3w-MuiSvgIcon-root"
@@ -406,7 +413,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
               </svg>
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-7fr91u-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-6eh098-MuiSvgIcon-root"
                 data-testid="experience-edit-form-skill-chip-delete-icon-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -417,6 +424,9 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
               </svg>
             </div>
           </span>
+          <span
+            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
         </div>
         <div
           aria-disabled="true"
