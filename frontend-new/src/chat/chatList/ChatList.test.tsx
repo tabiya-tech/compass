@@ -27,7 +27,9 @@ import ChatBubble, {
 } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { ReactionKind } from "src/chat/reaction/reaction.types";
 import TypingChatMessage, { TypingChatMessageProps } from "../chatMessage/typingChatMessage/TypingChatMessage";
-import ConversationConclusionChatMessage, { ConversationConclusionChatMessageProps } from "../chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import ConversationConclusionChatMessage, {
+  ConversationConclusionChatMessageProps,
+} from "../chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 
 // mock the chat message component
 jest.mock("src/chat/chatMessage/userChatMessage/UserChatMessage", () => {
@@ -105,7 +107,7 @@ describe("ChatList", () => {
   test("should render the Chat List and show the appropriate message type for each message", () => {
     // GIVEN message data for different types of messages
     const givenDate = new Date().toISOString();
-    
+
     // AND user message data
     const userMessageData: UserChatMessageProps = {
       message: "Hello",
@@ -182,7 +184,9 @@ describe("ChatList", () => {
         message_id: nanoid(),
         sender: ConversationMessageSender.COMPASS,
         payload: conclusionMessageData,
-        component: (props) => <ConversationConclusionChatMessage {...(props as ConversationConclusionChatMessageProps)} />,
+        component: (props) => (
+          <ConversationConclusionChatMessage {...(props as ConversationConclusionChatMessageProps)} />
+        ),
       },
       {
         type: ERROR_CHAT_MESSAGE_TYPE,
@@ -197,8 +201,8 @@ describe("ChatList", () => {
     render(
       <ChatProvider
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
-        removeMessage={mockRemoveMessage}
-        addMessage={mockAddMessage}
+        removeMessageFromChat={mockRemoveMessage}
+        addMessageToChat={mockAddMessage}
       >
         <ChatList messages={givenMessages} />
       </ChatProvider>
@@ -232,25 +236,14 @@ describe("ChatList", () => {
     });
 
     // AND expect the Compass Chat message components to be called with the correct messages
-    expect(CompassChatMessage).toHaveBeenNthCalledWith(
-      1,
-      compassMessageData,
-      {}
-    );
-    expect(CompassChatMessage).toHaveBeenNthCalledWith(
-      2,
-        compassMessageData2,
-      {}
-    );
+    expect(CompassChatMessage).toHaveBeenNthCalledWith(1, compassMessageData, {});
+    expect(CompassChatMessage).toHaveBeenNthCalledWith(2, compassMessageData2, {});
 
     // AND expect the Typing Chat Message component to be rendered
     expect(TypingChatMessage).toHaveBeenCalledWith({ waitBeforeThinking: 15000 }, {});
 
     // AND expect the Conversation Conclusion Chat Message component to be rendered
-    expect(ConversationConclusionChatMessage).toHaveBeenCalledWith(
-      conclusionMessageData,
-      {}
-    );
+    expect(ConversationConclusionChatMessage).toHaveBeenCalledWith(conclusionMessageData, {});
 
     // AND expect the Chat Bubble component to be rendered for the error message
     expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
@@ -282,8 +275,8 @@ describe("ChatList", () => {
       message: "Hello",
       sent_at: givenDate,
       type: USER_CHAT_MESSAGE_TYPE,
-      reaction: null
-    }
+      reaction: null,
+    };
     const givenCompassMessageData = {
       message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
@@ -291,7 +284,7 @@ describe("ChatList", () => {
       sent_at: new Date().toISOString(),
       type: USER_CHAT_MESSAGE_TYPE,
       reaction: null,
-    }
+    };
     const givenMessages: IChatMessage<any>[] = [
       {
         type: USER_CHAT_MESSAGE_TYPE,
@@ -306,15 +299,15 @@ describe("ChatList", () => {
         sender: ConversationMessageSender.COMPASS,
         payload: givenCompassMessageData,
         component: (props) => <CompassChatMessage {...(props as CompassChatMessageProps)} />,
-      }
+      },
     ];
 
     // WHEN the chat list is rendered
     render(
       <ChatProvider
         handleOpenExperiencesDrawer={mockHandleOpenExperiencesDrawer}
-        removeMessage={mockRemoveMessage}
-        addMessage={mockAddMessage}
+        removeMessageFromChat={mockRemoveMessage}
+        addMessageToChat={mockAddMessage}
       >
         <ChatList messages={givenMessages} />
       </ChatProvider>

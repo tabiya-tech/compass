@@ -43,10 +43,29 @@
       :root {
           --dark-blue: #002147;
           --primary: #00FF91;
+          --foreground: #41403D;
       }
 
       * {
+          font-family: Inter, sans-serif;
+          color: var(--foreground);
+      }
+
+      html {
+          overflow: hidden;
+      }
+
+      body, html {
+          padding: 0;
+          margin: 0;
+          max-height: 100vh;
           font-size: 16px;
+      }
+
+      iframe {
+          border: none;
+          margin: 0;
+          padding: 0;
       }
 
       .container {
@@ -57,12 +76,23 @@
           min-height: 100vh;
       }
 
+      .section-container {
+          max-width: 444px;
+          padding: 4px;
+      }
+
       .content .title {
           font-family: 'IBM Plex Mono', monospace;
           font-weight: bold;
           color: var(--dark-blue);
-          font-size: 1.75rem;
+          font-size: clamp(1.3rem, 0.5 * (1.23rem + 2dvh + 1.5dvw), 1.675rem);
+          line-height: 2.75rem;
           text-align: center;
+      }
+
+      .text-body {
+          font-size: clamp(0.75rem, 0.5 * (0.58rem + 1.33dvh + 1dvw), 1rem);
+          line-height: 1.5rem;
       }
 
       .btn {
@@ -111,327 +141,455 @@
           font-family: 'Inter', sans-serif;
           color: red;
       }
+
+      .text-bold {
+          font-weight: bold;
+      }
+
+
+      /*  Snackbar   */
+      #snackbar-notification {
+          visibility: hidden;
+          background-color: var(--primary);
+          color: var(--dark-blue);
+          text-align: center;
+          border-radius: 5px;
+          padding: 20px;
+          position: fixed;
+          height: auto;
+          z-index: 1;
+          top: 30px;
+          right: 30px;
+          font-size: 17px;
+          align-self: center;
+          margin: 10px;
+      }
+
+      #snackbar-notification.show {
+          visibility: visible;
+          -webkit-animation: fadein 0.5s, fadeout 0.5s 4.5s;
+          animation: fadein 0.5s, fadeout 0.5s 4.5s;
+      }
+
+      @-webkit-keyframes fadein {
+          from {
+              top: 0;
+              opacity: 0;
+          }
+          to {
+              top: 30px;
+              opacity: 1;
+          }
+      }
+
+      @keyframes fadein {
+          from {
+              top: 0;
+              opacity: 0;
+          }
+          to {
+              top: 30px;
+              opacity: 1;
+          }
+      }
+
+      @-webkit-keyframes fadeout {
+          from {
+              top: 30px;
+              opacity: 1;
+          }
+          to {
+              top: 0;
+              opacity: 0;
+          }
+      }
+
+      @keyframes fadeout {
+          from {
+              top: 30px;
+              opacity: 1;
+          }
+          to {
+              top: 0;
+              opacity: 0;
+          }
+      }
   </style>
 </head>
 <body>
+<div id="snackbar-notification">Login credentials have been sent to your email.</div>
 <div>
   <div class="container">
     <div class="content">
       <div class="logo-container">
         <img src="/logo.svg" alt="Compass Logo" width="200" height="100" />
       </div>
-      <section id="initial-question" style="display: none;">
-        <div class="title">Do you have one hour to spend?</div>
+      <section id="chat-page-container">
+        <div style="width: 100vw; height: 100vh;" id="chat-page-container-iframe">
+                    <iframe src="/" title="Compass Chat Application" style="width: 100%; height: 100%;"></iframe>
+        </div>
+      </section>
+      <section id="initial-question" class="section-container text-body" style="display: none;">
+        <div class="title">Thank you for joining our study and confirming your email.</div>
+        <div>
+          <p><span class="text-bold">Your next step:</span> a task related to your skills and previous work experiences
+            as well as some initial questions.</p>
+          <p><span class="text-bold">Required time:</span> up to 1 hour -- you can start it now or anytime in the next 2
+            weeks by simply clicking the link in the E-Mail again.</p>
+          <p>You’ll receive XX Rand airtime as a token of appreciation after finishing the task and another XX Rand
+            about 3 months later when you complete a phone survey with us.</p>
+          <p class="text-bold">Do you have a stable internet connection and about 1 hour free right now?</p>
+        </div>
         <div class="buttons">
           <button class="btn btn-primary" id="yes-btn">Yes</button>
           <button class="btn btn-secondary" id="no-btn">No</button>
         </div>
       </section>
 
-      <section id="user-is-busy-section" style="display: none;">
-        <div class="title">Return whenever you are ready, thanks. I am waiting</div>
+      <section id="user-is-busy-section" class="section-container text-body" style="display: none;">
+        <div class="title">No problem!</div>
+        <div>
+          <p>
+            Please plan a time when you have a good internet connection and about an hour free.
+          </p>
+          <p>When you’re ready, simply click the link in your email again to continue. :) We thank you for
+            participating!</p>
+        </div>
         <div>
           <div class="buttons">
             <button class="btn btn-primary" id="return-home">I have got time</button>
           </div>
         </div>
       </section>
-      <section id="invalid-query-params" style="display: none;">
+      <section id="invalid-query-params" style="display: none;" class="section-container text-body">
         <div>
           <div class="error-message">Invalid query parameters. Please provide email and externalUserId in the URL.</div>
         </div>
       </section>
-      <section id="wait-a-moment" style="display: none;">
+      <section id="wait-a-moment" style="display: none;" class="section-container text-body">
         <div>
           <div class="title">Wait a moment......</div>
         </div>
       </section>
-      <section id="server-error-message" style="display: none;">
+      <section id="server-error-message" style="display: none;" class="section-container text-body">
         <div>
-          <div class="error-message" id="server-error-message-content">Unknown error occurred. Please try again later.</div>
+          <div class="error-message" id="server-error-message-content">Unknown error occurred. Please try again later.
+          </div>
         </div>
       </section>
     </div>
   </div>
 
-  <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+</div>
+<script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
-  <script>
-    // #############################################################
-    // #                    CONSTANTS
-    // #############################################################
-    const IDS = {
-      SECTIONS: {
-        INITIAL_QUESTION: "initial-question",
-        USER_IS_BUSY_SECTION: "user-is-busy-section",
-        INVALID_QUERY_PARAMS: "invalid-query-params",
-        SERVER_ERROR_MESSAGE: "server-error-message",
-        WAIT_A_MOMENT: "wait-a-moment",
-      },
-      YES_BTN: "yes-btn",
-      NO_BTN: "no-btn",
-      RETURN_HOME_BTN: "return-home",
-    };
+<script>
+  // #############################################################
+  // #                    CONSTANTS
+  // #############################################################
 
-    const ENV_KEYS = {
-      CLIENT_ID: "client_id_0.0.1",
-      TOKEN: "token_0.0.1",
-      LOGIN_METHOD: "login_method_0.0.1",
-    };
+  const IDS = {
+    SECTIONS: {
+      INITIAL_QUESTION: "initial-question",
+      USER_IS_BUSY_SECTION: "user-is-busy-section",
+      INVALID_QUERY_PARAMS: "invalid-query-params",
+      SERVER_ERROR_MESSAGE: "server-error-message",
+      WAIT_A_MOMENT: "wait-a-moment",
+      CHAT_CONTAINER: "chat-page-container",
+    },
+    YES_BTN: "yes-btn",
+    NO_BTN: "no-btn",
+    RETURN_HOME_BTN: "return-home",
+  };
 
-    const LOGIN_METHODS = {
-      FIREBASE_EMAIL: "FIREBASE_EMAIL",
-    };
+  const CHAT_PAGE_CONTAINER_IFRAME = "chat-page-container-iframe";
 
-    // #############################################################
-    // #                    UTILITY - FUNCTIONS
-    // #############################################################
-    const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
-    const getNextBackoff = (initial_backoff_ms, attempt) => {
-      if (attempt <= 1) return 0;
-      return initial_backoff_ms * 2 ** (attempt - 2);
-    };
+  const ENV_KEYS = {
+    CLIENT_ID: "client_id_0.0.1",
+    TOKEN: "token_0.0.1",
+    LOGIN_METHOD: "login_method_0.0.1",
+  };
 
-    const INITIAL_BACKOFF_MS = 1000;
-    const MAX_ATTEMPTS = 4;
-    const RETRY_STATUS_CODES = [
-      429, // Too Many Requests
-      502, // Bad Gateway
-      503, // Service Unavailable
-    ];
+  const LOGIN_METHODS = {
+    FIREBASE_EMAIL: "FIREBASE_EMAIL",
+  };
 
-    async function fetchWithRetry(url, init) {
-      let response;
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        console.debug("customFetch: Attempt", attempt, "for URL:", url, ", at ", new Date().toISOString());
+  // #############################################################
+  // #                    UTILITY - FUNCTIONS
+  // #############################################################
+  const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+  const getNextBackoff = (initial_backoff_ms, attempt) => {
+    if (attempt <= 1) return 0;
+    return initial_backoff_ms * 2 ** (attempt - 2);
+  };
 
-        response = await fetch(url, init);
+  const INITIAL_BACKOFF_MS = 1000;
+  const MAX_ATTEMPTS = 4;
+  const RETRY_STATUS_CODES = [
+    429, // Too Many Requests
+    502, // Bad Gateway
+    503, // Service Unavailable
+  ];
 
-        // if the request is successful, return the response
-        // without retrying
-        if (response.ok)
-          return response;
+  async function fetchWithRetry(url, init) {
+    let response;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      console.debug("customFetch: Attempt", attempt, "for URL:", url, ", at ", new Date().toISOString());
 
-        // if the response status is in retry status codes,
-        // wait for some time and retry
-        if (RETRY_STATUS_CODES.includes(response.status)) {
-          const backOffMs = getNextBackoff(INITIAL_BACKOFF_MS, attempt + 1);
-          await sleep(backOffMs);
-          continue;
-        }
+      response = await fetch(url, init);
 
-        // otherwise, it is not for a retry to return the actual response
+      // if the request is successful, return the response
+      // without retrying
+      if (response.ok)
         return response;
+
+      // if the response status is in retry status codes,
+      // wait for some time and retry
+      if (RETRY_STATUS_CODES.includes(response.status)) {
+        const backOffMs = getNextBackoff(INITIAL_BACKOFF_MS, attempt + 1);
+        await sleep(backOffMs);
+        continue;
       }
 
-      console.warn(
-        `customFetch: Reached max attempts (${MAX_ATTEMPTS}) without success.`,
-      );
-
-      return response
+      // otherwise, it is not for a retry to return the actual response
+      return response;
     }
 
-    /**
-     * Retrieves URL parameters for email and externalUserId.
-     *
-     * @returns {{ email: string, externalUserId: string }}
-     */
-    function getUrlParams() {
-      const urlParams = new URLSearchParams(window.location.search);
+    console.warn(
+      `customFetch: Reached max attempts (${MAX_ATTEMPTS}) without success.`,
+    );
 
-      const email = urlParams.get("email");
-      const externalUserId = urlParams.get("externalUserId");
+    return response;
+  }
 
-      return { email, externalUserId };
+  /**
+   * Retrieves URL parameters for email and externalUserId.
+   *
+   * @returns {{ email: string, externalUserId: string }}
+   */
+  function getUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const email = urlParams.get("email");
+    const externalUserId = urlParams.get("externalUserId");
+
+    return { email, externalUserId };
+  }
+
+  /**
+   * Loads the configuration script from the given source URL.
+   */
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => resolve(script);
+      script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+      document.head.appendChild(script);
+    });
+  }
+
+  /**
+   * Hides all sections.
+   */
+  function hideAllSections() {
+    document.getElementById(IDS.SECTIONS.INITIAL_QUESTION).style.display = "none";
+    document.getElementById(IDS.SECTIONS.USER_IS_BUSY_SECTION).style.display = "none";
+    document.getElementById(IDS.SECTIONS.INVALID_QUERY_PARAMS).style.display = "none";
+    document.getElementById(IDS.SECTIONS.SERVER_ERROR_MESSAGE).style.display = "none";
+    document.getElementById(IDS.SECTIONS.WAIT_A_MOMENT).style.display = "none";
+    document.getElementById(IDS.SECTIONS.CHAT_CONTAINER).style.display = "none";
+  }
+
+  /**
+   * Shows the specified section by its ID.
+   *
+   * @param {string} sectionId - The ID of the section to show.
+   */
+  function showSection(sectionId) {
+    hideAllSections();
+    document.getElementById(sectionId).style.display = "block";
+  }
+
+  function getClientID() {
+    let clientId = localStorage.getItem(ENV_KEYS.CLIENT_ID);
+    if (!clientId) {
+      clientId = window.crypto.randomUUID();
+      localStorage.setItem(ENV_KEYS.CLIENT_ID, clientId);
     }
 
-    /**
-     * Loads the configuration script from the given source URL.
-     */
-    function loadScript(src) {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = src;
-        script.onload = () => resolve(script);
-        script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
-        document.head.appendChild(script);
+    return clientId;
+  }
+
+  /**
+   * Handles the case when the user is busy and cannot participate.
+   *
+   * It shows the 'no-response' section.
+   */
+  function handleUserIsBusy() {
+    showSection(IDS.SECTIONS.USER_IS_BUSY_SECTION);
+  }
+
+  /**
+   * Handle the user is ready to start to chat with compass.
+   * @returns {Promise<void>}
+   */
+  async function handleYesClick(context) {
+    console.debug("Using Context", context);
+    try {
+      showSection(IDS.SECTIONS.WAIT_A_MOMENT);
+
+      const response = await fetchWithRetry(context.configs.RCT_BACKEND_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": context.configs.RCT_BACKEND_API_KEY,
+        },
+        body: JSON.stringify(context.request),
       });
-    }
 
-    /**
-     * Hides all sections.
-     */
-    function hideAllSections() {
-      document.getElementById(IDS.SECTIONS.INITIAL_QUESTION).style.display = "none";
-      document.getElementById(IDS.SECTIONS.USER_IS_BUSY_SECTION).style.display = "none";
-      document.getElementById(IDS.SECTIONS.INVALID_QUERY_PARAMS).style.display = "none";
-      document.getElementById(IDS.SECTIONS.SERVER_ERROR_MESSAGE).style.display = "none";
-      document.getElementById(IDS.SECTIONS.WAIT_A_MOMENT).style.display = "none";
-    }
+      console.log("done with fetch, response status:", response.status);
 
-    /**
-     * Shows the specified section by its ID.
-     *
-     * @param {string} sectionId - The ID of the section to show.
-     */
-    function showSection(sectionId) {
-      hideAllSections();
-      document.getElementById(sectionId).style.display = "block";
-    }
+      const data = await response.json();
+      if (!response.ok) {
+        console.error("Error:", response);
 
-    function getClientID() {
-      let clientId = localStorage.getItem(ENV_KEYS.CLIENT_ID);
-      if (!clientId) {
-        clientId = window.crypto.randomUUID();
-        localStorage.setItem(ENV_KEYS.CLIENT_ID, clientId);
+        showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+        document.getElementById("server-error-message-content").innerHTML = data.message;
+        return;
       }
 
-      return clientId;
-    }
+      if (data.group === "not_using_compass") {
+        window.location.href = context.configs.CONTROL_GROUP_REDIRECT_LINK;
+      } else if (data.group === "using_compass") {
+        const credentials = data.credentials;
 
-    /**
-     * Handles the case when the user is busy and cannot participate.
-     *
-     * It shows the 'no-response' section.
-     */
-    function handleUserIsBusy() {
-      showSection(IDS.SECTIONS.USER_IS_BUSY_SECTION);
-    }
-
-    /**
-     * Handle the user is ready to start to chat with compass.
-     * @returns {Promise<void>}
-     */
-    async function handleYesClick(context) {
-      console.debug("Using Context", context);
-      try {
-        showSection(IDS.SECTIONS.WAIT_A_MOMENT);
-
-        const response = await fetchWithRetry(context.configs.RCT_BACKEND_API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": context.configs.RCT_BACKEND_API_KEY,
-          },
-          body: JSON.stringify(context.request),
+        firebase.initializeApp({
+          apiKey: context.configs.RCT_FIREBASE_API_KEY,
+          authDomain: atob(window.tabiyaConfig.FIREBASE_AUTH_DOMAIN),
         });
 
-        console.log("done with fetch, response status:", response.status);
+        const userCredential = await firebase.auth().signInWithEmailAndPassword(context.request.email, atob(credentials.password));
+        const token = await userCredential.user.getIdToken();
 
-        const data = await response.json();
-        if (!response.ok) {
-          console.error("Error:", response);
+        // Set the client ID and token in localStorage
+        localStorage.setItem(ENV_KEYS.TOKEN, token);
+        localStorage.setItem(ENV_KEYS.LOGIN_METHOD, LOGIN_METHODS.FIREBASE_EMAIL);
 
-          showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
-          document.getElementById("server-error-message-content").innerHTML = data.message;
-          return;
-        }
-
-        if (data.group === "not_using_compass") {
-          window.location.href = context.configs.CONTROL_GROUP_REDIRECT_LINK;
-        } else if (data.group === "using_compass") {
-          const credentials = data.credentials;
-
-          firebase.initializeApp({
-            apiKey: context.configs.RCT_FIREBASE_API_KEY,
-            authDomain: atob(window.tabiyaConfig.FIREBASE_AUTH_DOMAIN),
-          });
-
-          const userCredential = await firebase.auth().signInWithEmailAndPassword(context.request.email, atob(credentials.password));
-          const token = await userCredential.user.getIdToken();
-
-          // Set the client ID and token in localStorage
-          localStorage.setItem(ENV_KEYS.TOKEN, token);
-          localStorage.setItem(ENV_KEYS.LOGIN_METHOD, LOGIN_METHODS.FIREBASE_EMAIL);
-
-          window.location.href = "/#/";
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        // Handle error as needed
-        showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+        showSection(IDS.SECTIONS.CHAT_CONTAINER);
+        // window.location.href = "/#/";
       }
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle error as needed
+      showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+    }
+  }
+
+  function handleReturnHome() {
+    // show the initial question section again
+    showSection(IDS.SECTIONS.INITIAL_QUESTION);
+  }
+
+  function handleShowSnackbarNotification() {
+    const snackbar = document.getElementById("snackbar-notification");
+    snackbar.className = "show";
+    setTimeout(() => {
+      snackbar.className = snackbar.className.replace("show", "");
+    }, 5000);
+  }
+
+  function setupEventListeners(context) {
+    document.getElementById("yes-btn").addEventListener("click", handleYesClick.bind(null, context));
+    document.getElementById("no-btn").addEventListener("click", handleUserIsBusy);
+    document.getElementById("return-home").addEventListener("click", handleReturnHome);
+  }
+
+  function handleAlreadyLoggedIn() {
+    const token = localStorage.getItem(ENV_KEYS.TOKEN);
+    const loginMethod = localStorage.getItem(ENV_KEYS.LOGIN_METHOD);
+
+    if (token && loginMethod) {
+      console.debug("User is already logged in with method:", loginMethod);
+      // Redirect to the main application or perform any other action
+      window.location.replace("/#/");
+      return true;
+    } else {
+      console.debug("No user is logged in, proceeding with screening.");
+      return false;
+    }
+  }
+
+  function handleAppLoaded() {
+    console.debug("Application loaded successfully");
+
+    const screeningConfig = window.screeningConfig;
+
+    const RCT_BACKEND_API_URL = atob(screeningConfig.RCT_BACKEND_API_URL);
+    const RCT_BACKEND_API_KEY = atob(screeningConfig.RCT_BACKEND_API_KEY);
+    const RCT_FIREBASE_API_KEY = atob(screeningConfig.RCT_FIREBASE_API_KEY);
+    const CONTROL_GROUP_REDIRECT_LINK = atob(screeningConfig.CONTROL_GROUP_REDIRECT_LINK);
+
+    const { email, externalUserId } = getUrlParams();
+
+    const context = {
+      configs: {
+        RCT_BACKEND_API_URL,
+        RCT_BACKEND_API_KEY,
+        RCT_FIREBASE_API_KEY,
+        CONTROL_GROUP_REDIRECT_LINK,
+      },
+      request: {
+        email,
+        externalUserId,
+        clientId: getClientID(),
+      },
+    };
+
+    // Setup event listeners after configs are loaded
+    setupEventListeners(context);
+  }
+
+  // #############################################################
+  // #                    MAIN Entry Point
+  // #############################################################
+  document.addEventListener("DOMContentLoaded", function() {
+    // setTimeout(() => handleShowSnackbarNotification(), 2000);
+
+    // 1. backend returns the credentials
+    ///   1. Log the user in with firebase
+    //    2. Show the notification (Credentials have been sent to your email)
+    //    3. Replace the current url (without refreshing).
+    //    4. Show the chat container.
+
+    // Demonstration....
+    // setTimeout(() => history.replaceState({}, "New Title", "/#/"), 1000);
+
+    // return;
+
+    // First check if the user is already logged in, and log them in if so.
+    const alreadyLoggedIn = handleAlreadyLoggedIn();
+    if (alreadyLoggedIn) {
+      return;
     }
 
-    function handleReturnHome() {
-      // show the initial question section again
+    // Get URL parameters
+    const { email, externalUserId } = getUrlParams();
+
+    if (!email || !externalUserId) {
+      console.error("Email and externalUserId are required in the URL parameters.");
+      showSection(IDS.SECTIONS.INVALID_QUERY_PARAMS);
+      return;
+    } else {
       showSection(IDS.SECTIONS.INITIAL_QUESTION);
     }
 
-    function setupEventListeners(context) {
-      document.getElementById("yes-btn").addEventListener("click", handleYesClick.bind(null, context));
-      document.getElementById("no-btn").addEventListener("click", handleUserIsBusy);
-      document.getElementById("return-home").addEventListener("click", handleReturnHome);
-    }
+    const frontendFeatures = JSON.parse(atob(window.tabiyaConfig.FRONTEND_FEATURES));
+    const screeningConfigPath = frontendFeatures.screening.config.config_buckets_url;
 
-    function handleAlreadyLoggedIn() {
-      const token = localStorage.getItem(ENV_KEYS.TOKEN);
-      const loginMethod = localStorage.getItem(ENV_KEYS.LOGIN_METHOD);
-
-      if (token && loginMethod) {
-        console.debug("User is already logged in with method:", loginMethod);
-        // Redirect to the main application or perform any other action
-        window.location.href = "/#/"; // Adjust the redirect as needed
-      } else {
-        console.debug("No user is logged in, proceeding with screening.");
-      }
-    }
-
-    function handleAppLoaded() {
-      console.debug("Application loaded successfully");
-
-      const screeningConfig = window.screeningConfig;
-
-      const RCT_BACKEND_API_URL = atob(screeningConfig.RCT_BACKEND_API_URL);
-      const RCT_BACKEND_API_KEY = atob(screeningConfig.RCT_BACKEND_API_KEY);
-      const RCT_FIREBASE_API_KEY = atob(screeningConfig.RCT_FIREBASE_API_KEY);
-      const CONTROL_GROUP_REDIRECT_LINK = atob(screeningConfig.CONTROL_GROUP_REDIRECT_LINK);
-
-      const { email, externalUserId } = getUrlParams();
-
-      const context = {
-        configs: {
-          RCT_BACKEND_API_URL,
-          RCT_BACKEND_API_KEY,
-          RCT_FIREBASE_API_KEY,
-          CONTROL_GROUP_REDIRECT_LINK,
-        },
-        request: {
-          email,
-          externalUserId,
-          clientId: getClientID(),
-        },
-      };
-
-      // Setup event listeners after configs are loaded
-      setupEventListeners(context);
-    }
-
-    // #############################################################
-    // #                    MAIN Entry Point
-    // #############################################################
-    document.addEventListener("DOMContentLoaded", function() {
-      // First check if the user is already logged in, and log them in if so.
-      handleAlreadyLoggedIn();
-
-      // Get URL parameters
-      const { email, externalUserId } = getUrlParams();
-
-      if (!email || !externalUserId) {
-        console.error("Email and externalUserId are required in the URL parameters.");
-        showSection(IDS.SECTIONS.INVALID_QUERY_PARAMS);
-        return;
-      } else {
-        showSection(IDS.SECTIONS.INITIAL_QUESTION);
-      }
-
-      const frontendFeatures = JSON.parse(atob(window.tabiyaConfig.FRONTEND_FEATURES));
-      const screeningConfigPath = frontendFeatures.screening.config.config_buckets_url;
-
-      loadScript(screeningConfigPath).then(handleAppLoaded);
-    });
-  </script>
-</div>
+    loadScript(screeningConfigPath).then(handleAppLoaded);
+  });
+</script>
 </body>
 </html>

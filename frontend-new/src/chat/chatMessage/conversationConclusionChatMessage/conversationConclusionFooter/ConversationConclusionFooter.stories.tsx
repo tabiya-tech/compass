@@ -2,7 +2,10 @@ import React, { ReactNode, useMemo } from "react";
 import { Meta, StoryObj } from "@storybook/react";
 import ConversationConclusionFooter from "./ConversationConclusionFooter";
 import { ChatProvider, useChatContext } from "src/chat/ChatContext";
-import { FeedbackItem, QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+import {
+  FeedbackItem,
+  QUESTION_KEYS,
+} from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -21,7 +24,7 @@ const mockFeedbackInProgress: FeedbackItem[] = [
     simplified_answer: {
       rating_numeric: 4,
       comment: "Very helpful conversation!",
-    }
+    },
   },
 ];
 
@@ -52,7 +55,7 @@ const StorybookWrapper = ({
     isAnonymous
       ? ({
           id: "anonymous-user",
-      } as TabiyaUser)
+        } as TabiyaUser)
       : ({
           id: "test-user",
           name: "Test User",
@@ -78,7 +81,7 @@ const StorybookWrapper = ({
     },
     sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
     has_sensitive_personal_data: false,
-    experiments: {}
+    experiments: {},
   });
 
   // we need a wrapper for the children to set the feedback status
@@ -96,12 +99,16 @@ const StorybookWrapper = ({
     }, [setFeedbackStatus]);
 
     return <>{children}</>;
-  }
+  };
 
-  return <ChatProvider handleOpenExperiencesDrawer={() => {}} removeMessage={() => {}} addMessage={() => {}}><StoryContent/></ChatProvider>;
+  return (
+    <ChatProvider handleOpenExperiencesDrawer={() => {}} removeMessageFromChat={() => {}} addMessageToChat={() => {}}>
+      <StoryContent />
+    </ChatProvider>
+  );
 };
 
-const meta : Meta<typeof ConversationConclusionFooter> = {
+const meta: Meta<typeof ConversationConclusionFooter> = {
   title: "Chat/ConversationConclusionFooter",
   component: ConversationConclusionFooter,
   parameters: {
@@ -159,7 +166,6 @@ export const CustomerSatisfactionRatingSubmittedAndFeedbackNotStarted: Story = {
     ),
   ],
 };
-
 
 // Story: Feedback in progress
 export const FeedbackInProgress: Story = {
