@@ -247,17 +247,17 @@ export class SkillsRankingService extends FeaturesService {
 
     // Add rank fields for phases that allow them
     if (phase === SkillsRankingPhase.PERCEIVED_RANK) {
-      body.perceived_rank_percentile = perceived_rank_percentile ?? null;
+      body.perceived_rank_percentile = perceived_rank_percentile ?? undefined;
     }
 
     if (phase === SkillsRankingPhase.RETYPED_RANK) {
-      body.retyped_rank_percentile = retyped_rank_percentile ?? null;
+      body.retyped_rank_percentile = retyped_rank_percentile ?? undefined;
     }
 
     // Allow both rank fields when transitioning to COMPLETED
     if (phase === SkillsRankingPhase.COMPLETED) {
-      body.perceived_rank_percentile = perceived_rank_percentile ?? null;
-      body.retyped_rank_percentile = retyped_rank_percentile ?? null;
+      body.perceived_rank_percentile = perceived_rank_percentile ?? undefined;
+      body.retyped_rank_percentile = retyped_rank_percentile ?? undefined;
     }
 
     const response = await customFetch(url, {
