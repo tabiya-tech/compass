@@ -17,6 +17,7 @@ import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessage
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { getJobPlatformUrl } from "src/features/skillsRanking/constants";
 import SkillsRankingSlider from "src/features/skillsRanking/components/skillsRankingSlider/SkillsRankingSlider";
+import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
 const uniqueId = "7c582beb-6070-43b0-92fb-7fd0a4cb533e";
 const TYPING_DURATION_MS = 5000;
@@ -71,9 +72,14 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
         return;
       }
 
+      // Determine the next phase based on experiment group
+      const nextPhase = shouldSkipMarketDisclosure(skillsRankingState.experiment_group) 
+        ? SkillsRankingPhase.COMPLETED 
+        : SkillsRankingPhase.RETYPED_RANK;
+
       const updatedState = await SkillsRankingService.getInstance().updateSkillsRankingState(
         activeSessionId,
-        SkillsRankingPhase.RETYPED_RANK,
+        nextPhase,
         value
       );
 

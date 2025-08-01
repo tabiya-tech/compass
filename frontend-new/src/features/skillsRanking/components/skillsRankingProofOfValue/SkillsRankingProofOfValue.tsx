@@ -30,6 +30,7 @@ import {
   EFFORT_METRICS_UPDATE_INTERVAL,
   TYPING_DURATION_MS,
 } from "src/features/skillsRanking/constants";
+import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
 const uniqueId = "d08ec52d-cd41-4934-b62f-dcd10eadfb3c";
 
@@ -251,10 +252,15 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
       try {
         setIsUpdatingState(true);
         hasFinishedRef.current = true;
-        // Always transition to MARKET_DISCLOSURE, cancellation is just a flag
+        
+        // Determine the next phase based on experiment group
+        const nextPhase = shouldSkipMarketDisclosure(skillsRankingState.experiment_group)
+          ? SkillsRankingPhase.JOB_SEEKER_DISCLOSURE
+          : SkillsRankingPhase.MARKET_DISCLOSURE;
+        
         const newState = await SkillsRankingService.getInstance().updateSkillsRankingState(
           activeSessionId,
-          SkillsRankingPhase.MARKET_DISCLOSURE,
+          nextPhase,
           undefined,
           undefined,
           metrics
@@ -270,7 +276,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
         setIsUpdatingState(false);
       }
     },
-    [isReplay, activeSessionId, isDisabled, puzzleMetrics, effortType, onFinish, enqueueSnackbar]
+    [isReplay, activeSessionId, isDisabled, puzzleMetrics, effortType, onFinish, enqueueSnackbar, skillsRankingState.experiment_group]
   );
 
   const handleComplete = useCallback(async () => {

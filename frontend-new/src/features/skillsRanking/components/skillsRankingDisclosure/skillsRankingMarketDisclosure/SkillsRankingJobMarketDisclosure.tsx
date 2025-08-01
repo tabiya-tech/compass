@@ -3,7 +3,6 @@ import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import {
-  SkillsRankingExperimentGroups,
   SkillsRankingPhase,
   SkillsRankingState,
   getLatestPhaseName,
@@ -20,6 +19,7 @@ import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessage
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { Box } from "@mui/material";
 import { getJobPlatformUrl } from "src/features/skillsRanking/constants";
+import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
 const TYPING_DURATION_MS = 5000;
 
@@ -48,10 +48,8 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
   const currentPhase = getLatestPhaseName(skillsRankingState);
   const isReplay = useMemo(() => currentPhase !== SkillsRankingPhase.MARKET_DISCLOSURE, [currentPhase]);
 
-  const shouldSkip =
-    !isReplay &&
-    (skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
-      skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4);
+  // Use the utility function instead of local variable
+  const shouldSkip = !isReplay && shouldSkipMarketDisclosure(skillsRankingState.experiment_group);
 
   const hasFinishedRef = useRef(false);
 

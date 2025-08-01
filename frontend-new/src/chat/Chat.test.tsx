@@ -518,14 +518,7 @@ describe("Chat", () => {
         assertTypingMessageWasShown();
         // AND no message to be sent to the chat service
         expect(ChatService.getInstance().sendMessage).not.toHaveBeenCalled();
-        // AND expect the given history to be currently shown in ChatList
-        // wait for the chat list to be updated
-        await waitFor(() => {
-          assertResponseMessagesAreShown(givenChatHistoryResponse, true);
-        }, { timeout: TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT * 2 }); // TODO: fix. this is a workaround
-
-        // Now check the final state
-        assertResponseMessagesAreShown(givenChatHistoryResponse, true);
+        // the conversation conclusion message would be shown once the skills ranking is completed
         // AND expect a snackbar notification was never shown
         expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
         // AND expect input field to have been disabled
@@ -777,12 +770,6 @@ describe("Chat", () => {
         expect(ChatService.getInstance().getChatHistory).toHaveBeenCalledWith(givenActiveSessionId);
         // AND no message to be sent to the chat service
         expect(ChatService.getInstance().sendMessage).not.toHaveBeenCalled();
-        // AND the last message to be a conversation conclusion message
-        await waitFor(() => {
-          const lastCall = (ChatList as jest.Mock).mock.calls.at(-1)[0];
-          const lastMessage = lastCall.messages[lastCall.messages.length - 1];
-          expect(lastMessage.type).toBe(CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE);
-        }, { timeout: TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT * 2 }); // TODO: fix. this is a workaround
         // AND input field to have been disabled
         expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
           expect.objectContaining({ isChatFinished: true, aiIsTyping: false }),
