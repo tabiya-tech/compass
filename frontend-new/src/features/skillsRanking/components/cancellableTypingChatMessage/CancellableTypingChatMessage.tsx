@@ -72,6 +72,11 @@ const CancellableTypingChatMessage: React.FC<CancellableTypingChatMessageProps> 
   const [displayText, setDisplayText] = useState(message);
   const theme = useTheme();
 
+  // Update displayText when message prop changes
+  useEffect(() => {
+    setDisplayText(message);
+  }, [message]);
+
   useEffect(() => {
     // Change text after waitBeforeThinking duration
     const textChangeTimer = setTimeout(() => {

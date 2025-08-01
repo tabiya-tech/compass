@@ -81,6 +81,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
   const [hasFinished, setHasFinished] = useState(false);
   const [isTypingVisible, setIsTypingVisible] = useState(false);
   const [isUpdatingState, setIsUpdatingState] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const [puzzleMetrics, setPuzzleMetrics] = useState<RotateToSolvePuzzleMetricsReport | null>(null);
 
   // Refs for tracking
@@ -209,7 +210,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
         }
       }
     },
-    [effortType, isReplay, currentPhase, hasFinishedRef.current]
+    [effortType, isReplay, currentPhase]
   );
 
   const handleUpdateState = useCallback(
@@ -309,6 +310,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
     }
 
     setHasFinished(true);
+    setIsCancelling(true);
     setIsTypingVisible(true);
 
     setTimeout(async () => {
@@ -340,7 +342,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [effortType, handleUpdateState, hasFinishedRef.current, isReplay, isDisabled, currentPhase]);
+  }, [effortType, handleUpdateState, isReplay, isDisabled, currentPhase]);
 
   // Work-based completion flow
   useEffect(() => {
@@ -394,7 +396,11 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
             transition={{ duration: 0.3 }}
           >
             {effortType === EffortType.TIME_BASED ? (
-              <CancellableTypingChatMessage onCancel={handleCancel} disabled={isDisabled} />
+              <CancellableTypingChatMessage 
+                message={isCancelling ? "Cancelling" : "Calculating"} 
+                onCancel={handleCancel} 
+                disabled={isDisabled} 
+              />
             ) : (
               <TypingChatMessage />
             )}

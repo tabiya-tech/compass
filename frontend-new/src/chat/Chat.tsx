@@ -329,16 +329,16 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
           // Handle the conclusion message and skills ranking flow
           if (isConclusionMessage) {
             const lastMessage = history.messages[history.messages.length - 1];
-            const showConclusionMessage = createShowConclusionMessage(
-              lastMessage,
-              addMessageToChat,
-              removeMessageFromChat
-            );
 
             if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
-              showSkillsRanking(showConclusionMessage);
-            } else {
-              showConclusionMessage();
+              showSkillsRanking(() => {
+                // During initialization, just add the conclusion message directly without typing
+                const conclusionMessage = generateConversationConclusionMessage(
+                  lastMessage.message_id,
+                  lastMessage.message
+                );
+                addMessageToChat(conclusionMessage);
+              });
             }
           }
 
@@ -371,7 +371,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         setAiIsTyping(false);
       }
     },
-    [sendMessage, showSkillsRanking, addMessageToChat, removeMessageFromChat]
+    [sendMessage, showSkillsRanking, addMessageToChat]
   );
 
   // Resets the text field for the next message
