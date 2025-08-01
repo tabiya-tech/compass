@@ -9,13 +9,11 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { WorkType } from "src/experiences/experienceService/experiences.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import {
-  DATA_TEST_ID as SUMMARY_EDIT_FIELD_DATA_TEST_ID,
-} from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
+import { DATA_TEST_ID as SUMMARY_EDIT_FIELD_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
 import { ExperienceError } from "src/error/commonErrors";
 import ExperienceService from "src/experiences/experienceService/experienceService";
-import SkillsContextMenu
-  from "src/experiences/experiencesDrawer/components/experienceEditForm/components/skillsContextMenu/SkillsContextMenu";
+import { DATA_TEST_ID as ADD_SKILLS_DRAWER_DATA_TEST_ID } from "src/experiences/experiencesDrawer/components/experienceEditForm/components/addSkillsDrawer/AddSkillsDrawer";
+import { DATA_TEST_ID as SKILL_POPOVER_TEST_ID } from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 
 // mock the user preferences state service
 jest.mock("src/userPreferences/UserPreferencesStateService", () => ({
@@ -71,15 +69,6 @@ jest.mock("./components/SummaryEditField/SummaryEditField", () => {
     )),
   };
 });
-
-// mock the SkillsContextMenu
-jest.mock(
-  "src/experiences/experiencesDrawer/components/experienceEditForm/components/skillsContextMenu/SkillsContextMenu",
-  () => ({
-    __esModule: true,
-    default: jest.fn(),
-  })
-);
 
 describe("ExperienceEditForm", () => {
   beforeEach(() => {
@@ -574,7 +563,9 @@ describe("ExperienceEditForm", () => {
     expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to update experience:", givenError));
   });
 
-  test("should add a new skill when selecting from the dropdown", async () => {
+  test("should add a new skill when selecting from the drawer", async () => {
+    // Mock scrollIntoView
+    window.HTMLElement.prototype.scrollIntoView = jest.fn();
     // GIVEN the ExperienceEditForm component with an experience that has remaining skills
     const notifyOnSave = jest.fn();
     const notifyOnUnsavedChange = jest.fn();
@@ -587,20 +578,6 @@ describe("ExperienceEditForm", () => {
         altLabels: ["alt1", "alt2"],
       })),
     };
-    // AND simulate adding a skill
-    (SkillsContextMenu as jest.Mock).mockImplementation(({ items, open, notifyOnClose }) => {
-      if (open && items.length > 0) {
-        items[0].action();
-        if (notifyOnClose) notifyOnClose();
-      }
-      return (
-        <div>
-          {items.map((item: MenuItemConfig) => (
-            <div key={item.id}>{item.text}</div>
-          ))}
-        </div>
-      );
-    });
 
     // WHEN the component is rendered
     const givenExperienceEditForm = (
@@ -616,6 +593,12 @@ describe("ExperienceEditForm", () => {
     const addSkillButton = screen.getByTestId(DATA_TEST_ID.FORM_ADD_SKILL_BUTTON);
     expect(addSkillButton).toBeEnabled();
     await userEvent.click(addSkillButton);
+    // AND select the first skill in the drawer
+    const uncheckedIcons = screen.getAllByTestId(ADD_SKILLS_DRAWER_DATA_TEST_ID.SKILL_DRAWER_ITEM_UNCHECKED);
+    await userEvent.click(uncheckedIcons[0]);
+    // AND click Ok button in the drawer
+    const okButton = screen.getByTestId(ADD_SKILLS_DRAWER_DATA_TEST_ID.SKILL_DRAWER_OK_BUTTON);
+    await userEvent.click(okButton);
 
     // THEN a new skill chip should be added
     const skillChips = screen.getAllByTestId(DATA_TEST_ID.FORM_SKILL_CHIP);
@@ -653,5 +636,79 @@ describe("ExperienceEditForm", () => {
     expect(addSkillButton).toHaveAttribute("aria-disabled", "true");
     // AND no errors should have occurred
     expect(console.error).not.toHaveBeenCalled();
+  });
+
+  test("should show AddSkillsDrawer when Add Skill button is clicked", async () => {
+    // Mock scrollIntoView
+    window.HTMLElement.prototype.scrollIntoView = jest.fn();
+    // GIVEN the ExperienceEditForm component with an experience that has remaining skills
+    const notifyOnSave = jest.fn();
+    const notifyOnUnsavedChange = jest.fn();
+    const experience = {
+      ...mockExperiences[0],
+      remaining_skills: Array.from({ length: 15 }, () => ({
+        UUID: `skill-${Math.random()}`,
+        preferredLabel: `Skill ${Math.random()}`,
+        description: "Test skill",
+        altLabels: ["alt1", "alt2"],
+      })),
+    };
+    // AND the component is rendered
+    const givenExperienceEditForm = (
+      <ExperienceEditForm
+        experience={experience}
+        notifyOnSave={notifyOnSave}
+        notifyOnCancel={jest.fn()}
+        notifyOnUnsavedChange={notifyOnUnsavedChange}
+      />
+    );
+    render(givenExperienceEditForm);
+
+    // WHEN add skill button is clicked
+    const addSkillButton = screen.getByTestId(DATA_TEST_ID.FORM_ADD_SKILL_BUTTON);
+    await userEvent.click(addSkillButton);
+
+    // THEN the AddSkillsDrawer should be opened
+    expect(screen.getByTestId(ADD_SKILLS_DRAWER_DATA_TEST_ID.SKILLS_DRAWER)).toBeInTheDocument();
+
+    // WHEN the Cancel button in the drawer is clicked
+    const cancelButton = screen.getByTestId(ADD_SKILLS_DRAWER_DATA_TEST_ID.SKILL_DRAWER_CANCEL_BUTTON);
+    await userEvent.click(cancelButton);
+
+    // THEN the AddSkillsDrawer should be closed
+    expect(screen.queryByTestId(ADD_SKILLS_DRAWER_DATA_TEST_ID.SKILLS_DRAWER)).not.toBeInTheDocument();
+  });
+
+  test("should show skill popover when skill chip is clicked", async () => {
+    // GIVEN the ExperienceEditForm component with an experience that has skills
+    const notifyOnSave = jest.fn();
+    const notifyOnUnsavedChange = jest.fn();
+    const experience = mockExperiences[0];
+    // AND the component is rendered
+    const givenExperienceEditForm = (
+      <ExperienceEditForm
+        experience={experience}
+        notifyOnSave={notifyOnSave}
+        notifyOnCancel={jest.fn()}
+        notifyOnUnsavedChange={notifyOnUnsavedChange}
+      />
+    );
+    render(givenExperienceEditForm);
+
+    // WHEN a skill chip is clicked
+    const skillChip = screen.getAllByTestId(DATA_TEST_ID.FORM_SKILL_CHIP)[0];
+    await userEvent.click(skillChip);
+
+    // THEN the SkillPopover should be opened
+    expect(screen.getByTestId(SKILL_POPOVER_TEST_ID.SKILL_POPOVER)).toBeInTheDocument();
+
+    // WHEN the popover is closed
+    await userEvent.keyboard("{Escape}");
+
+    // THEN the SkillPopover should be closed
+    expect(screen.queryByTestId(SKILL_POPOVER_TEST_ID.SKILL_POPOVER)).not.toBeInTheDocument();
+    // AND no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
   });
 });
