@@ -5,7 +5,6 @@ import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import {
-  SkillsRankingExperimentGroups,
   SkillsRankingPhase,
   SkillsRankingState,
   getLatestPhaseName,
@@ -22,6 +21,7 @@ import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessage
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { getJobPlatformUrl } from "src/features/skillsRanking/constants";
 import SkillsRankingSlider from "src/features/skillsRanking/components/skillsRankingSlider/SkillsRankingSlider";
+import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
 const uniqueId = "eb90de4c-2462-4b6d-8b9c-1b5c6ae64129";
 const TYPING_DURATION_MS = 5000;
@@ -57,9 +57,8 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
   const currentPhase = getLatestPhaseName(skillsRankingState);
   const scrollRef = useAutoScrollOnChange(showTyping);
 
-  const shouldRetypeRank =
-    skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
-    skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4;
+  // Use the utility function instead of local variable
+  const shouldNotShow = shouldSkipMarketDisclosure(skillsRankingState.experiment_group);
 
   const handleUpdateState = useCallback(async () => {
     if (!activeSessionId) {
@@ -101,7 +100,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
   }, [skillsRankingState, currentPhase]);
 
   useEffect(() => {
-    if (shouldRetypeRank && !hasFinishedRef.current) {
+    if (shouldNotShow && !hasFinishedRef.current) {
       setShowTyping(true); // Show typing animation
       const typingTimer = setTimeout(async () => {
         if (!activeSessionId) {
@@ -131,9 +130,9 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
 
       return () => clearTimeout(typingTimer);
     }
-  }, [shouldRetypeRank, activeSessionId, currentPhase, value, onFinish, enqueueSnackbar]);
+  }, [shouldNotShow, activeSessionId, currentPhase, value, onFinish, enqueueSnackbar]);
 
-  if (shouldRetypeRank) return <></>;
+  if (shouldNotShow) return <></>;
 
   return (
     <MessageContainer
@@ -142,7 +141,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
       data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_CONTAINER}
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
-      {!shouldRetypeRank && (
+      {!shouldNotShow && (
         <Box sx={{ width: "100%" }}>
           <ChatBubble
             sender={ConversationMessageSender.COMPASS}

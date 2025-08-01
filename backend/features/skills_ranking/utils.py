@@ -19,7 +19,7 @@ def get_possible_next_phase(current_phase: SkillsRankingPhaseName) -> list[Skill
         return ["BRIEFING", "PROOF_OF_VALUE"]
 
     if current_phase == "PROOF_OF_VALUE":
-        return ["PROOF_OF_VALUE", "MARKET_DISCLOSURE"]
+        return ["PROOF_OF_VALUE", "MARKET_DISCLOSURE", "JOB_SEEKER_DISCLOSURE"]
 
     if current_phase == "MARKET_DISCLOSURE":
         return ["MARKET_DISCLOSURE", "JOB_SEEKER_DISCLOSURE"]
@@ -27,11 +27,8 @@ def get_possible_next_phase(current_phase: SkillsRankingPhaseName) -> list[Skill
     if current_phase == "JOB_SEEKER_DISCLOSURE":
         return ["JOB_SEEKER_DISCLOSURE", "PERCEIVED_RANK"]
 
-    if current_phase == "DISCLOSURE":
-        return ["DISCLOSURE", "PERCEIVED_RANK"]
-
     if current_phase == "PERCEIVED_RANK":
-        return ["PERCEIVED_RANK", "RETYPED_RANK"]
+        return ["PERCEIVED_RANK", "RETYPED_RANK", "COMPLETED"]
 
     if current_phase == "RETYPED_RANK":
         return ["RETYPED_RANK", "COMPLETED"]
@@ -77,14 +74,14 @@ def get_valid_fields_for_phase(phase: SkillsRankingPhaseName, from_phase: Skills
         return ["phase", "perceived_rank_percentile"]
 
     if phase == "RETYPED_RANK":
-        # Allow perceived_rank_percentile when transitioning from PERCEIVED_RANK
+        # Allow both perceived and retyped rank when transitioning from PERCEIVED_RANK
         if from_phase == "PERCEIVED_RANK":
             return ["phase", "perceived_rank_percentile", "retyped_rank_percentile"]
         return ["phase", "retyped_rank_percentile"]
 
     if phase == "COMPLETED":
         # Allow both perceived and retyped rank when transitioning from RETYPED_RANK
-        if from_phase == "RETYPED_RANK":
+        if from_phase == "RETYPED_RANK" or from_phase == "PERCEIVED_RANK":
             return ["phase", "perceived_rank_percentile", "retyped_rank_percentile"]
         return []
 
