@@ -41,7 +41,7 @@ async def get_skills_ranking_state_db(mongo_db_uri: str = Depends(lambda: get_sk
 
     return _skills_ranking_mongo_db
 
-
+# REVIEW: Rename to `initialize_skills_ranking_state_db` for consistency with other initialization functions
 async def initialize_skills_ranking_db(skills_ranking_db: AsyncIOMotorDatabase, collection_name: str, logger: logging.Logger):
     """ Initialize the Skills Ranking MongoDB database."""
     try:

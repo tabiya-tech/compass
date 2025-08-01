@@ -83,6 +83,7 @@ class SkillsRankingPhase(BaseModel):
     class Config:
         extra = "forbid"
         use_enum_values = True
+        # REVIEW: Perfect yeah this was complaining about allow_population_by_field_name
         populate_by_name = True
 
 

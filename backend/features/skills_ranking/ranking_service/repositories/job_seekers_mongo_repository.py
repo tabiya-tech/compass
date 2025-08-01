@@ -49,8 +49,9 @@ class JobSeekersMongoRepository(IJobSeekersRepository):
 
     async def save_job_seeker_rank(self, job_seeker: JobSeeker) -> None:
         try:
+            # REVIEW: use eq to avoid nosql injection
             existing_document = await self._collection.find_one(
-                {"user_id": job_seeker.user_id},
+                {"user_id": {"$eq": job_seeker.user_id}},
                 {'_id': False}
             )
 
@@ -61,8 +62,9 @@ class JobSeekersMongoRepository(IJobSeekersRepository):
             document = _to_db_document(job_seeker)
             document["created_at"] = get_now()
 
+            # REVIEW: use eq to avoid nosql injection
             result = await self._collection.update_one(
-                {"user_id": job_seeker.user_id},
+                {"user_id": {"$eq": job_seeker.user_id}},
                 {"$set": document},
                 upsert=True
             )

@@ -2,7 +2,6 @@ from abc import ABC
 
 from features.skills_ranking.ranking_service.services.types import JobSeeker
 
-
 class IJobSeekersRepository(ABC):
     """
     Interface for jobseeker repository to manage jobseeker data and their ranks.

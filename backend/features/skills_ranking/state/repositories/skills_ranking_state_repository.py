@@ -8,7 +8,7 @@ from common_libs.time_utilities import datetime_to_mongo_date, mongo_date_to_dat
 from features.skills_ranking.state.services.type import SkillRankingExperimentGroup, SkillsRankingState, SkillsRankingScore, \
     SkillsRankingPhase, UpdateSkillsRankingRequest
 
-
+# REVIEW: perhaps move this to the types file since that's where the other Repository interface for regsitration repository is defined?
 class ISkillsRankingStateRepository(ABC):
     @abstractmethod
     async def get_by_session_id(self, session_id: int) -> SkillsRankingState:

@@ -18,6 +18,7 @@ class IRankingService(ABC):
                                       prior_belief: float,
                                       participants_skills_uuids: set[str]) -> SkillsRankingScore:
         """
+        # REVIEW: I think this just returns the participant's ranking score based on their skills and prior belief. Isnt responsible for assigning groups.
         Assigns participants to one of four experimental groups based on the difference between their self-assessed ranking (`prior_belief`),
         And the actual ranking (`actual_value`), and a threshold value (`threshold`).
 
@@ -77,6 +78,7 @@ class RankingService(IRankingService):
         await self._job_seekers_repository.save_job_seeker_rank(job_seeker)
 
         # 5. Read the `opportunities-seekers ranks dataset`.
+        # REVIEW: filter out the participant's rank from the job seekers ranks
         job_seekers_ranks = await self._job_seekers_repository.get_job_seekers_ranks(job_seekers_batch_size)
 
         # 6. Get the opportunity seekers ranking by using (`opportunities seekers ranks dataset`, participants rank from the previous step),
@@ -84,6 +86,7 @@ class RankingService(IRankingService):
         other_job_seekers_ranks = other_job_seekers_ranking(job_seekers_ranks=job_seekers_ranks,
                                                             participant_rank=opportunities_rank)
 
+        # REVIEW: question when we have this, is this going to return both the score and the group?
         # 7. Compute the get_group using (self_estimated_rank, actual rank from step 3, high_difference_threshold)
         # user_group = get_group(
         #     self_estimated_rank=prior_belief,
@@ -101,6 +104,8 @@ class RankingService(IRankingService):
         # 9. Return the score
         return score
 
+    # REVIEW: according to the linter this can be a function rather than a method, but I think it makes sense to keep it as a method
+    # since we dont use it anywhere else and it is related to the class.
     def _get_comparison_label(self, rank: float):
         """
         Get the comparison label based on the rank.

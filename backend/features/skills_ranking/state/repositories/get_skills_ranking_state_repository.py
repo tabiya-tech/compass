@@ -12,6 +12,7 @@ _skills_ranking_repository_singleton: ISkillsRankingStateRepository | None = Non
 _skills_ranking_repository_lock = asyncio.Lock()
 
 
+# REVIEW: not called get_skills_ranking_state_mongo_repository because there wont be any other repository type for the state?
 async def get_skills_ranking_state_repository(db: AsyncIOMotorDatabase = Depends(get_skills_ranking_state_db),
                                               collection_name: str = Depends(
                                                   lambda: get_skills_ranking_config().skills_ranking_state_collection_name)) -> ISkillsRankingStateRepository:

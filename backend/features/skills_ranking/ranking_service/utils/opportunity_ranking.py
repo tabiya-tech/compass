@@ -10,7 +10,8 @@ def _calculate_overlap_score(*,
 
     # Avoid division by zero if no UUID columns in opportunities (ie: a opportunity has zero skills).
     if len(opportunity_skills_uuids) == 0:
-        return 0.0
+        # REVIEW: update to 1.0 and explain why
+        return 1.0
 
 
     # Calculate the final score.
@@ -25,6 +26,21 @@ def get_opportunity_ranking(*,
     """
     Computes the opportunity ranking for a participant based on their skills, and the skills of other jobseekers.
     """
+    # # REVIEW: do we have to loop twice? since opportunities_skills_uuids is potentially large,
+    # how about instead...
+    #     total = 0
+    #     matches = 0
+    #
+    #     for opportunity_skills in opportunities_skills_uuids:
+    #         score = _calculate_overlap_score(
+    #             opportunity_skills_uuids=opportunity_skills,
+    #             participant_skills_uuids=participant_skills_uuids
+    #         )
+    #         total += 1
+    #         if score >= opportunity_matching_threshold:
+    #             matches += 1
+    #
+    #     return (matches / total) * 100 if total else 0
 
     scores = [
         _calculate_overlap_score(

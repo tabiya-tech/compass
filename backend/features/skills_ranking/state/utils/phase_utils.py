@@ -90,3 +90,5 @@ def get_valid_fields_for_phase(phase: SkillsRankingPhaseName, from_phase: Skills
 
     # COMPLETED phase does not have any valid fields to update
     return []
+
+# REVIEW: some merging will be required since I changed this a bit on the working branch
