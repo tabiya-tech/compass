@@ -16,8 +16,8 @@ const TEST_SESSION_ID = 123;
 const getPhaseFlowForGroup = (experimentGroup: SkillsRankingExperimentGroups): SkillsRankingPhase[] => {
   switch (experimentGroup) {
     case SkillsRankingExperimentGroups.GROUP_1:
-    case SkillsRankingExperimentGroups.GROUP_4:
-      // Time-based flow
+    case SkillsRankingExperimentGroups.GROUP_3:
+      // Full flow - includes market disclosure and retyped rank
       return [
         SkillsRankingPhase.INITIAL,
         SkillsRankingPhase.BRIEFING,
@@ -29,8 +29,8 @@ const getPhaseFlowForGroup = (experimentGroup: SkillsRankingExperimentGroups): S
         SkillsRankingPhase.COMPLETED,
       ];
     case SkillsRankingExperimentGroups.GROUP_2:
-    case SkillsRankingExperimentGroups.GROUP_3:
-      // Work-based flow
+    case SkillsRankingExperimentGroups.GROUP_4:
+      // Same flow but market disclosure auto-skips internally
       return [
         SkillsRankingPhase.INITIAL,
         SkillsRankingPhase.BRIEFING,
@@ -38,7 +38,6 @@ const getPhaseFlowForGroup = (experimentGroup: SkillsRankingExperimentGroups): S
         SkillsRankingPhase.MARKET_DISCLOSURE,
         SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
         SkillsRankingPhase.PERCEIVED_RANK,
-        SkillsRankingPhase.RETYPED_RANK,
         SkillsRankingPhase.COMPLETED,
       ];
     default:
@@ -86,12 +85,31 @@ class MockSkillsRankingService {
       this.isInitialized = true;
     }
 
+    // Handle conditional transitions based on experiment group
+    let targetPhase = phase;
+    
+    // If ProofOfValue is transitioning to MARKET_DISCLOSURE, check if we should skip to JOB_SEEKER_DISCLOSURE
+    if (phase === SkillsRankingPhase.MARKET_DISCLOSURE && 
+        (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2 || 
+         this.experimentGroup === SkillsRankingExperimentGroups.GROUP_4)) {
+      targetPhase = SkillsRankingPhase.JOB_SEEKER_DISCLOSURE;
+      console.log(`[Mock] Skipping MARKET_DISCLOSURE for group ${this.experimentGroup}, going to JOB_SEEKER_DISCLOSURE`);
+    }
+    
+    // If PerceivedRank is transitioning to RETYPED_RANK, check if we should skip to COMPLETED
+    if (phase === SkillsRankingPhase.RETYPED_RANK && 
+        (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2 || 
+         this.experimentGroup === SkillsRankingExperimentGroups.GROUP_4)) {
+      targetPhase = SkillsRankingPhase.COMPLETED;
+      console.log(`[Mock] Skipping RETYPED_RANK for group ${this.experimentGroup}, going to COMPLETED`);
+    }
+
     // Create new state with the target phase
-    this.currentState = getRandomSkillsRankingState(phase, this.experimentGroup);
+    this.currentState = getRandomSkillsRankingState(targetPhase, this.experimentGroup);
 
     // For PROOF_OF_VALUE phase, ensure we don't have cancelled_after or succeeded_after
     // as this would make the component think it's already finished
-    if (phase === SkillsRankingPhase.PROOF_OF_VALUE) {
+    if (targetPhase === SkillsRankingPhase.PROOF_OF_VALUE) {
       this.currentState.cancelled_after = undefined;
       this.currentState.succeeded_after = undefined;
       this.currentState.puzzles_solved = 0;
@@ -105,26 +123,26 @@ class MockSkillsRankingService {
     // Ensure the state is actually in the target phase
     if (this.currentState.phases && this.currentState.phases.length > 0) {
       this.currentState.phases[this.currentState.phases.length - 1] = {
-        name: phase,
+        name: targetPhase,
         time: new Date().toISOString(),
       };
     } else {
       // If phases array is empty or doesn't exist, create it
       this.currentState.phases = [
         {
-          name: phase,
+          name: targetPhase,
           time: new Date().toISOString(),
         },
       ];
     }
 
     console.log(`[Mock] State phases after fix:`, this.currentState.phases);
-    console.log(`[Mock] Latest phase name after fix:`, getLatestPhaseName(this.currentState));
+    console.log(`[Mock] Latest phase after fix:`, getLatestPhaseName(this.currentState));
 
     // Double-check that the phase is correct
     const actualPhase = getLatestPhaseName(this.currentState);
-    if (actualPhase !== phase) {
-      console.warn(`[Mock] Phase mismatch! Expected: ${phase}, Got: ${actualPhase}`);
+    if (actualPhase !== targetPhase) {
+      console.warn(`[Mock] Phase mismatch! Expected: ${targetPhase}, Got: ${actualPhase}`);
     }
 
     // Update state with provided data
@@ -141,7 +159,7 @@ class MockSkillsRankingService {
     // Update phases array to include the new phase
     if (this.currentState.phases) {
       this.currentState.phases.push({
-        name: phase,
+        name: targetPhase,
         time: new Date().toISOString(),
       });
     }

@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import {
-  SkillsRankingExperimentGroups,
   SkillsRankingPhase,
   SkillsRankingState,
   getLatestPhaseName,
@@ -20,6 +19,7 @@ import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoS
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { getJobPlatformUrl } from "../../../constants";
+import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
 const DISPLAY_TIMEOUT = 5000;
 
@@ -94,13 +94,10 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
 
     return () => clearTimeout(timer);
   }, [isReplay, hasFinished, handleContinue]);
+  const isGroupUndisclosed = useMemo(() => shouldSkipMarketDisclosure(skillsRankingState.experiment_group), [skillsRankingState.experiment_group]);
 
   const renderGroupMessage = () => {
-    const isGroupUndisclosed =
-      skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_2 ||
-      skillsRankingState.experiment_group === SkillsRankingExperimentGroups.GROUP_4;
-
-    if (isGroupUndisclosed) {
+   if (isGroupUndisclosed) {
       return (
         <ChatBubble
           sender={ConversationMessageSender.COMPASS}
