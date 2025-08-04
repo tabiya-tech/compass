@@ -3,16 +3,23 @@ import { IChatMessage } from "src/chat/Chat.types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import { SessionError } from "src/error/commonErrors";
-import { SkillsRankingPhase, SkillsRankingState, getLatestPhaseName, SkillsRankingExperimentGroups } from "src/features/skillsRanking/types";
+import {
+  SkillsRankingPhase,
+  SkillsRankingState,
+  getLatestPhaseName,
+  SkillsRankingExperimentGroups,
+} from "src/features/skillsRanking/types";
 import { getFlowPathForGroup, skillsRankingHappyPathFull } from "./skillsRankingFlowGraph";
 import {
   createBriefingMessage,
+  createCompletionAdviceMessage,
   createEffortMessage,
   createJobMarketDisclosureMessage,
   createJobSeekerDisclosureMessage,
   createPerceivedRankMessage,
   createPromptMessage,
   createRetypedRankMessage,
+  shouldSkipMarketDisclosure,
 } from "src/features/skillsRanking/utils/createMessages";
 
 const phaseToMessageFactory = {
@@ -23,10 +30,13 @@ const phaseToMessageFactory = {
   [SkillsRankingPhase.JOB_SEEKER_DISCLOSURE]: createJobSeekerDisclosureMessage,
   [SkillsRankingPhase.PERCEIVED_RANK]: createPerceivedRankMessage,
   [SkillsRankingPhase.RETYPED_RANK]: createRetypedRankMessage,
-  [SkillsRankingPhase.COMPLETED]: null,
+  [SkillsRankingPhase.COMPLETED]: createCompletionAdviceMessage,
 };
 
-const getPathToPhase = (phase: SkillsRankingPhase, experimentGroup?: SkillsRankingExperimentGroups): SkillsRankingPhase[] => {
+const getPathToPhase = (
+  phase: SkillsRankingPhase,
+  experimentGroup?: SkillsRankingExperimentGroups
+): SkillsRankingPhase[] => {
   // Use the full path as default if no experiment group is provided
   const flowPath = experimentGroup ? getFlowPathForGroup(experimentGroup) : skillsRankingHappyPathFull;
   const index = flowPath.indexOf(phase);
@@ -81,10 +91,27 @@ export const useSkillsRanking = (
 
       if (currentPhaseName === SkillsRankingPhase.COMPLETED) {
         console.debug(`[Flow] Final phase '${currentPhaseName}' reached`);
-        onFinishFlow();
+
+        // Check if we should show completion advice based on experiment group
+        const shouldShowAdvice = !shouldSkipMarketDisclosure(newState.experiment_group);
+        if (shouldShowAdvice) {
+          console.debug(`[Flow] Showing completion advice for group ${newState.experiment_group}`);
+          const factory = phaseToMessageFactory[SkillsRankingPhase.COMPLETED];
+          if (factory) {
+            const result = factory(newState, async (skillsRankingState: SkillsRankingState) => {
+              console.debug(`[Flow] Completion advice finished, calling onFinishFlow`);
+              onFinishFlow();
+            });
+            (Array.isArray(result) ? result : [result]).filter((message) => message !== null).forEach(addMessage);
+          }
+        } else {
+          console.debug(
+            `[Flow] Skipping completion advice for group ${newState.experiment_group}, calling onFinishFlow directly`
+          );
+          onFinishFlow();
+        }
         return;
       }
-
       // Get the correct flow path for this experiment group
       const flowPath = getFlowPathForGroup(newState.experiment_group);
       const currentIndex = flowPath.indexOf(currentPhase);
@@ -134,16 +161,28 @@ export const useSkillsRanking = (
 
     path.forEach((phase) => {
       const factory = phaseToMessageFactory[phase];
+
+      if (phase === SkillsRankingPhase.COMPLETED) {
+        // Check if we should show completion advice based on experiment group
+        const shouldShowAdvice = !shouldSkipMarketDisclosure(state.experiment_group);
+        if (!shouldShowAdvice) {
+          console.debug(`[Flow] Skipping completion advice for phase: ${phase} in group: ${state.experiment_group}`);
+          onFinishFlow();
+          return;
+        }
+        console.debug(`[Flow] Showing completion advice for phase: ${phase} in group: ${state.experiment_group}`);
+        const result = factory(state, async (skillsRankingState: SkillsRankingState) => {
+          console.debug(`[Flow] Completion advice finished during replay, calling onFinishFlow`);
+          onFinishFlow();
+        });
+        (Array.isArray(result) ? result : [result]).filter((message) => message !== null).forEach(addMessage);
+        return;
+      }
       if (factory) {
         const result = factory(state, getNextPhaseHandler(phase, onFinishFlow));
         (Array.isArray(result) ? result : [result]).filter((message) => message !== null).forEach(addMessage);
       }
     });
-
-    if (currentPhaseName === SkillsRankingPhase.COMPLETED) {
-      console.debug(`[Flow] Already completed`);
-      onFinishFlow();
-    }
   };
 
   return { showSkillsRanking };

@@ -194,9 +194,9 @@ export type SkillsRankingMetrics = {
 export interface SkillsRankingConfig extends FeatureConfig {
   config: {
     /**
-     * The amount of airtime the user will receive for completing the skills ranking process.
+     * The amount of compensation (perhaps in airtime) the user will receive for completing the skills ranking process.
      */
-    airtimeBudget: string;
+    compensationAmount: string;
     /**
      * The minimum time in seconds the user must spend on the skills ranking process.
      */

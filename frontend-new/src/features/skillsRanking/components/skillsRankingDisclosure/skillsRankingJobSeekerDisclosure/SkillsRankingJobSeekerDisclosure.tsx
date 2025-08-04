@@ -103,10 +103,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
           sender={ConversationMessageSender.COMPASS}
           message={
             <>
-              We've gathered all relevant information, but we need to run a few more checks on the opportunities listed
-              on <strong>{getJobPlatformUrl()}</strong> to make sure we give you the most accurate and up-to-date
-              details. We'll notify you as soon as everything is ready. In the meantime, feel free to bring this up
-              during our next phone survey — we'd be happy to revisit it with you then. Thanks for your patience!
+              Thanks! We’re double-checking the latest {getJobPlatformUrl()} opportunities so the numbers are accurate. We’ll share your results soon or you can ask for them when we call you for the phone survey.
             </>
           }
         />
@@ -118,10 +115,8 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
         sender={ConversationMessageSender.COMPASS}
         message={
           <>
-            Compared to job seekers similar to you, you are in the <strong>{selectedLabel}</strong> group out of five.
-            This means that when we rank <strong>100</strong> people from lowest to highest, and create{" "}
-            <strong>five equal size groups</strong>, the first group are the 20 people fitting most jobs, and the fifth
-            group are the people fitting fewer jobs on the platform than the other 80.
+            Moreover, <strong>Compared to other {getJobPlatformUrl()} users, you are in group [{jobSeekerComparisonLabels.indexOf(selectedLabel) + 1}] of {jobSeekerComparisonLabels.length}.</strong><br/>
+            Imagine lining up 100 {getJobPlatformUrl()} users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You’re in block <strong>[{jobSeekerComparisonLabels.indexOf(selectedLabel) + 1}]</strong>, which is the <strong>[{selectedLabel}]</strong> block.<br/>
           </>
         }
       >

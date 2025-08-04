@@ -370,3 +370,69 @@ class TestSkillsRankingRepository:
                     session_id=given_state.session_id,
                     update_request=update_request
                 )
+
+        @pytest.mark.asyncio
+        async def test_update_experiment_group_field(
+                self,
+                get_skills_ranking_repository: Awaitable[SkillsRankingStateRepository],
+                setup_application_config: ApplicationConfig
+        ):
+            # GIVEN a repository
+            repository = await get_skills_ranking_repository
+
+            # AND an existing state with GROUP_1
+            given_state = get_skills_ranking_state(experiment_group=SkillRankingExperimentGroup.GROUP_1)
+            await repository.create(given_state)
+
+            # WHEN updating the experiment group to GROUP_2
+            update_request = UpdateSkillsRankingRequest(experiment_group=SkillRankingExperimentGroup.GROUP_2)
+            updated_state = await repository.update(
+                session_id=given_state.session_id,
+                update_request=update_request
+            )
+
+            # THEN the state is returned with the updated experiment group
+            assert updated_state is not None
+            assert updated_state.experiment_group == SkillRankingExperimentGroup.GROUP_2
+
+            # AND the state is updated in the database
+            db = repository._skills_ranking_state_db
+            collection = db.get_collection("skills_ranking_state")
+            actual_stored_state = await collection.find_one({})
+            assert actual_stored_state["experiment_group"] == "GROUP_2"
+
+        @pytest.mark.asyncio
+        async def test_update_phase_and_experiment_group_together(
+                self,
+                get_skills_ranking_repository: Awaitable[SkillsRankingStateRepository],
+                setup_application_config: ApplicationConfig
+        ):
+            # GIVEN a repository
+            repository = await get_skills_ranking_repository
+
+            # AND an existing state with GROUP_1
+            given_state = get_skills_ranking_state(experiment_group=SkillRankingExperimentGroup.GROUP_1)
+            await repository.create(given_state)
+
+            # WHEN updating both phase and experiment group
+            update_request = UpdateSkillsRankingRequest(
+                phase="MARKET_DISCLOSURE",
+                experiment_group=SkillRankingExperimentGroup.GROUP_3
+            )
+            updated_state = await repository.update(
+                session_id=given_state.session_id,
+                update_request=update_request
+            )
+
+            # THEN the state is returned with both updates
+            assert updated_state is not None
+            assert updated_state.experiment_group == SkillRankingExperimentGroup.GROUP_3
+            assert updated_state.phase[-1].name == "MARKET_DISCLOSURE"
+
+            # AND the state is updated in the database
+            db = repository._skills_ranking_state_db
+            collection = db.get_collection("skills_ranking_state")
+            actual_stored_state = await collection.find_one({})
+            assert actual_stored_state["experiment_group"] == "GROUP_3"
+            assert len(actual_stored_state["phase"]) == 2  # Original + new phase
+            assert actual_stored_state["phase"][-1]["name"] == "MARKET_DISCLOSURE"

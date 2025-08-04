@@ -30,6 +30,10 @@ import SkillsRankingProofOfValue, {
   SKILLS_RANKING_EFFORT_MESSAGE_ID,
   SkillsRankingEffortProps,
 } from "../components/skillsRankingProofOfValue/SkillsRankingProofOfValue";
+import SkillsRankingCompletionAdvice, {
+  SKILLS_RANKING_COMPLETION_ADVICE_MESSAGE_ID,
+  SkillsRankingCompletionAdviceProps,
+} from "../components/skillsRankingCompletionAdvice/SkillsRankingCompletionAdvice";
 import { SkillsRankingState, SkillsRankingExperimentGroups } from "../types";
 
 // Utility function to check if a group should skip market disclosure (and consequently retyped rank)
@@ -149,3 +153,27 @@ export const createEffortMessage = (
   sender: ConversationMessageSender.COMPASS,
   component: (props: SkillsRankingEffortProps) => React.createElement(SkillsRankingProofOfValue, props),
 });
+
+export const createCompletionAdviceMessage = (
+  skillsRankingState: SkillsRankingState,
+  onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>
+): IChatMessage<SkillsRankingCompletionAdviceProps> | null => {
+  // Check if the component should be shown based on experiment group
+  const shouldNotShow = shouldSkipMarketDisclosure(skillsRankingState.experiment_group);
+
+  // If the component should not be shown, don't create a message
+  if (shouldNotShow) {
+    return null;
+  }
+
+  return {
+    message_id: SKILLS_RANKING_COMPLETION_ADVICE_MESSAGE_ID,
+    type: SKILLS_RANKING_COMPLETION_ADVICE_MESSAGE_ID,
+    payload: {
+      skillsRankingState,
+      onFinish,
+    },
+    sender: ConversationMessageSender.COMPASS,
+    component: (props: SkillsRankingCompletionAdviceProps) => React.createElement(SkillsRankingCompletionAdvice, props),
+  };
+};

@@ -53,6 +53,8 @@ export interface SkillsRankingEffortProps {
 
 export const SKILLS_RANKING_EFFORT_MESSAGE_ID = `skills-ranking-effort-message-${uniqueId}`;
 
+// here since this is the only place where we use this check
+// if another place arises, we can move it to a common utils file
 const getEffortTypeForGroup = (group: SkillsRankingExperimentGroups): EffortType => {
   switch (group) {
     case SkillsRankingExperimentGroups.GROUP_1:
@@ -75,10 +77,16 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
   const isReplay = useMemo(() => currentPhase !== SkillsRankingPhase.PROOF_OF_VALUE, [currentPhase]);
   const effortType = getEffortTypeForGroup(skillsRankingState.experiment_group);
 
+  // Determine replay state for puzzle component
+  const puzzleIsReplay = useMemo(() => isReplay, [isReplay]);
+  const puzzleIsReplayFinished = useMemo(
+    () => isReplay && !!skillsRankingState.succeeded_after,
+    [isReplay, skillsRankingState.succeeded_after]
+  );
+
   const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
 
   // State management
-  const [hasCompletedPuzzles, setHasCompletedPuzzles] = useState(false);
   const [hasFinished, setHasFinished] = useState(false);
   const [isTypingVisible, setIsTypingVisible] = useState(false);
   const [isUpdatingState, setIsUpdatingState] = useState(false);
@@ -90,61 +98,42 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
   const startTimeRef = useRef<number | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasFinishedRef = useRef<boolean>(false);
-  const throttledMetricsUpdaterRef = useRef<{
-    onActivity: (metrics: SkillsRankingMetrics) => void;
-    onInactivity: (metrics: SkillsRankingMetrics) => void;
+  const lastMetricsRef = useRef<SkillsRankingMetrics | null>(null);
+  const debouncedUpdaterRef = useRef<{
+    update: (metrics: SkillsRankingMetrics) => void;
     forceUpdate: (metrics: SkillsRankingMetrics) => void;
+    abort: () => void;
     cleanup: () => void;
   } | null>(null);
-  const lastMetricsRef = useRef<SkillsRankingMetrics | null>(null);
 
   // Restore state from existing data
   useEffect(() => {
-    if (skillsRankingState.puzzles_solved && skillsRankingState.puzzles_solved > 0) {
-      setHasCompletedPuzzles(true);
-    }
     if (skillsRankingState.cancelled_after || skillsRankingState.succeeded_after) {
       setHasFinished(true);
       hasFinishedRef.current = true;
     }
   }, [skillsRankingState]);
 
-  // Cleanup throttled updater on unmount
-  useEffect(() => {
-    return () => {
-      if (throttledMetricsUpdaterRef.current) {
-        throttledMetricsUpdaterRef.current.cleanup();
-        throttledMetricsUpdaterRef.current = null;
-      }
-      hasFinishedRef.current = false;
-    };
-  }, []);
-
-  // Initialize throttled metrics updater
+  // Create debounced updater once when component mounts
   useEffect(() => {
     if (activeSessionId && !isReplay && effortType === EffortType.WORK_BASED) {
-      throttledMetricsUpdaterRef.current = SkillsRankingService.getInstance().createThrottledMetricsUpdater(
+      debouncedUpdaterRef.current = SkillsRankingService.getInstance().createDebouncedMetricsUpdater(
         activeSessionId,
         EFFORT_METRICS_UPDATE_INTERVAL
       );
     }
 
-    // Cleanup throttled updater when component unmounts or phase changes
+    // Cleanup on unmount
     return () => {
-      if (throttledMetricsUpdaterRef.current) {
-        throttledMetricsUpdaterRef.current.cleanup();
-        throttledMetricsUpdaterRef.current = null;
+      if (debouncedUpdaterRef.current) {
+        debouncedUpdaterRef.current.cleanup();
+        debouncedUpdaterRef.current = null;
       }
     };
   }, [activeSessionId, isReplay, effortType]);
 
-  // Cleanup throttled updater when phase changes away from PROOF_OF_VALUE
+  // Reset hasFinishedRef when phase changes away from PROOF_OF_VALUE
   useEffect(() => {
-    if (currentPhase !== SkillsRankingPhase.PROOF_OF_VALUE && throttledMetricsUpdaterRef.current) {
-      throttledMetricsUpdaterRef.current.cleanup();
-      throttledMetricsUpdaterRef.current = null;
-    }
-    // Reset hasFinishedRef when phase changes
     if (currentPhase !== SkillsRankingPhase.PROOF_OF_VALUE) {
       hasFinishedRef.current = false;
     }
@@ -153,8 +142,8 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
   const effortMessage =
     effortType === EffortType.TIME_BASED ? (
       <>
-        Please wait while I run the calculations, or click <strong>cancel</strong> if you want to continue the
-        conversation without the information.
+        Please wait while I run the calculations, or click <strong>cancel</strong> at any time if you do not want to
+        wait any longer for the information.
       </>
     ) : (
       ""
@@ -163,16 +152,16 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
   // Determine if component should be disabled
   const isDisabled = useMemo(() => {
     return (
-      !isOnline || 
-      hasFinished || 
+      !isOnline ||
+      hasFinished ||
       hasFinishedRef.current ||
-      isUpdatingState || 
-      isReplay || 
+      isUpdatingState ||
+      isReplay ||
       currentPhase !== SkillsRankingPhase.PROOF_OF_VALUE
     );
   }, [isOnline, hasFinished, isUpdatingState, isReplay, currentPhase]);
 
-  // Handle puzzle metrics update with throttled periodic updates
+  // Handle puzzle metrics update with debounced updates
   const handlePuzzleMetricsUpdate = useCallback(
     (report: RotateToSolvePuzzleMetricsReport) => {
       setPuzzleMetrics(report);
@@ -182,13 +171,13 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
         startTimeRef.current = Date.now();
       }
 
-      // Use throttled updater for periodic progress updates (only during PROOF_OF_VALUE phase)
+      // Use debounced updater for progress updates (only during PROOF_OF_VALUE phase)
       if (
-        throttledMetricsUpdaterRef.current &&
         !isReplay &&
         effortType === EffortType.WORK_BASED &&
         currentPhase === SkillsRankingPhase.PROOF_OF_VALUE &&
-        !hasFinishedRef.current
+        !hasFinishedRef.current &&
+        activeSessionId
       ) {
         const metrics: SkillsRankingMetrics = {
           puzzles_solved: report.puzzles_solved,
@@ -206,24 +195,21 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
 
         if (hasChanged) {
           lastMetricsRef.current = metrics;
-          // Report activity (this will trigger throttled updates)
-          throttledMetricsUpdaterRef.current.onActivity(metrics);
+
+          // Use the stored debounced updater
+          if (debouncedUpdaterRef.current) {
+            debouncedUpdaterRef.current.update(metrics);
+          }
         }
       }
     },
-    [effortType, isReplay, currentPhase]
+    [effortType, isReplay, currentPhase, activeSessionId]
   );
 
   const handleUpdateState = useCallback(
     async (state: SkillsRankingEffortState) => {
       if (isReplay || !activeSessionId || isDisabled || hasFinishedRef.current) return;
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-
-      // Cleanup throttled updater before transitioning to next phase
-      if (throttledMetricsUpdaterRef.current) {
-        throttledMetricsUpdaterRef.current.cleanup();
-        throttledMetricsUpdaterRef.current = null;
-      }
 
       const getCancelledAfter = () => {
         if (state !== SkillsRankingEffortState.CANCELLED) return undefined;
@@ -252,12 +238,12 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
       try {
         setIsUpdatingState(true);
         hasFinishedRef.current = true;
-        
+
         // Determine the next phase based on experiment group
         const nextPhase = shouldSkipMarketDisclosure(skillsRankingState.experiment_group)
           ? SkillsRankingPhase.JOB_SEEKER_DISCLOSURE
           : SkillsRankingPhase.MARKET_DISCLOSURE;
-        
+
         const newState = await SkillsRankingService.getInstance().updateSkillsRankingState(
           activeSessionId,
           nextPhase,
@@ -276,7 +262,16 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
         setIsUpdatingState(false);
       }
     },
-    [isReplay, activeSessionId, isDisabled, puzzleMetrics, effortType, onFinish, enqueueSnackbar, skillsRankingState.experiment_group]
+    [
+      isReplay,
+      activeSessionId,
+      isDisabled,
+      puzzleMetrics,
+      effortType,
+      onFinish,
+      enqueueSnackbar,
+      skillsRankingState.experiment_group,
+    ]
   );
 
   const handleComplete = useCallback(async () => {
@@ -302,19 +297,6 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
       timeoutRef.current = null;
     }
 
-    // Force final metrics update before cancelling
-    if (throttledMetricsUpdaterRef.current && puzzleMetrics) {
-      const metrics: SkillsRankingMetrics = {
-        puzzles_solved: puzzleMetrics.puzzles_solved,
-        correct_rotations: puzzleMetrics.correct_rotations,
-        clicks_count: puzzleMetrics.clicks_count,
-      };
-      throttledMetricsUpdaterRef.current.forceUpdate(metrics);
-      // Cleanup after force update
-      throttledMetricsUpdaterRef.current.cleanup();
-      throttledMetricsUpdaterRef.current = null;
-    }
-
     setHasFinished(true);
     setIsCancelling(true);
     setIsTypingVisible(true);
@@ -323,13 +305,14 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
       setIsTypingVisible(false);
       await handleUpdateState(SkillsRankingEffortState.CANCELLED);
     }, TYPING_DURATION_MS);
-  }, [handleUpdateState, isDisabled, isReplay, puzzleMetrics]);
+  }, [handleUpdateState, isDisabled, isReplay]);
 
   // Handle puzzle success
   const handlePuzzleSuccess = useCallback(() => {
     if (isDisabled) return;
-    setHasCompletedPuzzles(true);
-  }, [isDisabled]);
+    // Immediately trigger completion when all puzzles are done
+    handleComplete().then();
+  }, [isDisabled, handleComplete]);
 
   // Time-based flow
   useEffect(() => {
@@ -350,19 +333,6 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
     };
   }, [effortType, handleUpdateState, isReplay, isDisabled, currentPhase]);
 
-  // Work-based completion flow
-  useEffect(() => {
-    if (isReplay || !hasCompletedPuzzles || isDisabled || hasFinishedRef.current) return;
-
-    setIsTypingVisible(true);
-    setTimeout(() => {
-      if (!hasFinishedRef.current && currentPhase === SkillsRankingPhase.PROOF_OF_VALUE) {
-        setIsTypingVisible(false);
-        handleComplete().then();
-      }
-    }, TYPING_DURATION_MS);
-  }, [hasCompletedPuzzles, handleComplete, isReplay, isDisabled, currentPhase]);
-
   return (
     <MessageContainer
       origin={ConversationMessageSender.COMPASS}
@@ -374,11 +344,16 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
         <ChatBubble message={effortMessage} sender={ConversationMessageSender.COMPASS}>
           {effortType === EffortType.WORK_BASED && (
             <RotateToSolvePuzzle
-              puzzles={5}
+              puzzles={Math.max(1, 5 - (skillsRankingState.puzzles_solved || 0))}
               disabled={isDisabled}
               onSuccess={handlePuzzleSuccess}
               onReport={handlePuzzleMetricsUpdate}
               onCancel={handleCancel}
+              isReplay={puzzleIsReplay}
+              isReplayFinished={puzzleIsReplayFinished}
+              initialPuzzlesSolved={skillsRankingState.puzzles_solved || 0}
+              initialCorrectRotations={skillsRankingState.correct_rotations || 0}
+              initialClicksCount={skillsRankingState.clicks_count || 0}
             />
           )}
         </ChatBubble>
@@ -402,10 +377,10 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
             transition={{ duration: 0.3 }}
           >
             {effortType === EffortType.TIME_BASED ? (
-              <CancellableTypingChatMessage 
-                message={isCancelling ? "Cancelling" : "Calculating"} 
-                onCancel={handleCancel} 
-                disabled={isDisabled} 
+              <CancellableTypingChatMessage
+                message={isCancelling ? "Cancelling" : "Calculating"}
+                onCancel={handleCancel}
+                disabled={isDisabled}
               />
             ) : (
               <TypingChatMessage />
