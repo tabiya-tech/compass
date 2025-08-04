@@ -3,7 +3,7 @@ import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { SkillsRankingPhase, SkillsRankingState, getLatestPhaseName } from "src/features/skillsRanking/types";
-import { getAirtimeBudget } from "src/features/skillsRanking/constants";
+import { getCompensationAmount } from "src/features/skillsRanking/constants";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -25,6 +25,13 @@ export const DATA_TEST_ID = {
 
 export const SKILLS_RANKING_PROMPT_MESSAGE_ID = `skills-ranking-prompt-message-${uniqueId}`;
 
+enum PromptStep {
+  INITIAL_TYPING = 0,
+  SHOW_MESSAGE = 1,
+  FINAL_TYPING = 2,
+  COMPLETED = 3,
+}
+
 export interface SkillsRankingPromptProps {
   onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>;
   skillsRankingState: SkillsRankingState;
@@ -34,13 +41,13 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState<PromptStep>(PromptStep.INITIAL_TYPING);
   const scrollRef = useAutoScrollOnChange(step);
 
   const currentPhase = getLatestPhaseName(skillsRankingState);
   const isReplay = currentPhase !== SkillsRankingPhase.INITIAL;
 
-  const airtimeBudget = getAirtimeBudget();
+  const compensationAmount = getCompensationAmount();
 
   const handleAdvanceState = useCallback(async () => {
     if (isReplay) return;
@@ -67,13 +74,13 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
 
     let timeoutId: NodeJS.Timeout;
 
-    if (step === 0) {
-      timeoutId = setTimeout(() => setStep(1), TYPING_DURATION_MS);
-    } else if (step === 1) {
-      timeoutId = setTimeout(() => setStep(2), MESSAGE_DURATION_MS);
-    } else if (step === 2) {
+    if (step === PromptStep.INITIAL_TYPING) {
+      timeoutId = setTimeout(() => setStep(PromptStep.SHOW_MESSAGE), TYPING_DURATION_MS);
+    } else if (step === PromptStep.SHOW_MESSAGE) {
+      timeoutId = setTimeout(() => setStep(PromptStep.FINAL_TYPING), MESSAGE_DURATION_MS);
+    } else if (step === PromptStep.FINAL_TYPING) {
       timeoutId = setTimeout(() => {
-        setStep(3); // done
+        setStep(PromptStep.COMPLETED);
         handleAdvanceState().then();
       }, TYPING_DURATION_MS);
     }
@@ -86,8 +93,7 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
       <ChatBubble
         message={
           <>
-            You are almost there! Remember that if you completely finish this conversation with me, you will receive{" "}
-            <strong>{airtimeBudget} </strong> in airtime.
+            <strong>Almost done!</strong> Answer a few more research questions and we’ll send you <strong>{compensationAmount} </strong> airtime once you have completed all tasks.
           </>
         }
         sender={ConversationMessageSender.COMPASS}
@@ -116,7 +122,7 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
       ) : (
         <>
           <AnimatePresence mode="wait">
-            {step === 0 && (
+            {step === PromptStep.INITIAL_TYPING && (
               <motion.div
                 key="typing-1"
                 initial={{ opacity: 0, height: 0 }}
@@ -134,7 +140,7 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
               key="main-message"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: "easeOut", delay: step === 1 ? 0.3 : 0 }}
+              transition={{ duration: 0.4, ease: "easeOut", delay: step === PromptStep.SHOW_MESSAGE ? 0.3 : 0 }}
             >
               <Box sx={{ width: "100%" }}>
                 <PromptMessage />
@@ -151,7 +157,7 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
           )}
 
           <AnimatePresence mode="wait">
-            {step === 2 && (
+            {step === PromptStep.FINAL_TYPING && (
               <motion.div
                 key="typing-2"
                 initial={{ opacity: 0, height: 0 }}

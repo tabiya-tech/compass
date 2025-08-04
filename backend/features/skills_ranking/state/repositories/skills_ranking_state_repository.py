@@ -139,6 +139,9 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
             elif field == "completed_at":
                 # Convert datetime to MongoDB format
                 set_fields[field] = datetime_to_mongo_date(value)
+            elif field == "experiment_group":
+                # Convert enum to name for storage
+                set_fields[field] = value.name
             else:
                 set_fields[field] = value
         
