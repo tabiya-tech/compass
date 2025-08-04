@@ -1,6 +1,3 @@
-from fontTools.varLib.interpolatableHelpers import matching_cost
-
-
 def _calculate_overlap_score(*,
                              opportunity_skills_uuids: set[str],
                              participant_skills_uuids: set[str]) -> float:
@@ -26,6 +23,7 @@ def get_opportunity_ranking(*,
                             opportunity_matching_threshold: float = 0) -> float:
     """
     Computes the opportunity ranking for a participant based on their skills, and the skills of other jobseekers.
+    :returns the percentage of opportunities that match the participant's skills above the threshold. (0-1)
     """
 
     total_opportunities = 0
@@ -39,5 +37,5 @@ def get_opportunity_ranking(*,
         if score >= opportunity_matching_threshold:
             matching_opportunities += 1
 
-    percentage_above_threshold = (matching_opportunities / total_opportunities) * 100 if total_opportunities else 0
+    percentage_above_threshold = (matching_opportunities / total_opportunities) if total_opportunities else 0
     return percentage_above_threshold

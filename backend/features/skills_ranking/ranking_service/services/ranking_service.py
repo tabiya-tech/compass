@@ -61,23 +61,26 @@ class RankingService(IRankingService):
                                                      participant_skills_uuids=participants_skills_uuids,
                                                      opportunity_matching_threshold=opportunity_matching_threshold)
 
-        # 4. Save the participant's rank in the opportunity seekers ranks dataset
+        # 4. Read the `opportunities-seekers ranks dataset`.
+        job_seekers_ranks = await self._job_seekers_repository.get_job_seekers_ranks(job_seekers_batch_size)
+
+
+        # 5. Get the opportunity seekers ranking by using (`opportunities seekers ranks dataset`, participants rank from the previous step),
+        other_job_seekers_ranks = other_job_seekers_ranking(job_seekers_ranks=job_seekers_ranks,
+                                                            participant_rank=opportunities_rank)
+
+        # 6. Save the participant's rank in the opportunity seekers ranks dataset
         job_seeker = JobSeeker(
             user_id=user_id,
             skills_uuids=participants_skills_uuids,
             opportunity_rank=opportunities_rank,
+            compared_to_others_rank=other_job_seekers_ranks,
             prior_belief=prior_belief
         )
 
-        # 5. Read the `opportunities-seekers ranks dataset`.
-        job_seekers_ranks = await self._job_seekers_repository.get_job_seekers_ranks(job_seekers_batch_size)
+        # 7. Add the participant's rank to the jobseeker ranks database after getting the current version.
+        # await self._job_seekers_repository.save_job_seeker_rank(job_seeker)
 
-        # 5.1. Add the participant's rank to the jobseeker ranks database after getting the current version.
-        await self._job_seekers_repository.save_job_seeker_rank(job_seeker)
-
-        # 6. Get the opportunity seekers ranking by using (`opportunities seekers ranks dataset`, participants rank from the previous step),
-        other_job_seekers_ranks = other_job_seekers_ranking(job_seekers_ranks=job_seekers_ranks,
-                                                            participant_rank=opportunities_rank)
 
         score = SkillsRankingScore(
             jobs_matching_rank=opportunities_rank,

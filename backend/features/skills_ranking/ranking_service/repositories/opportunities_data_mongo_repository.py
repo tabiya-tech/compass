@@ -29,6 +29,8 @@ class OpportunitiesDataRepository(IOpportunitiesDataRepository):
                     skills_sets.extend({skill["UUID"] for skill in opportunity_doc.get("skills", [])} for opportunity_doc in opportunities_docs)
                     opportunities_docs = []
 
+            # process any remaining documents in the last batch
+            skills_sets.extend({skill["UUID"] for skill in opportunity_doc.get("skills", [])} for opportunity_doc in opportunities_docs)
             return skills_sets
         except:
             self._logger.error("Failed to get skills from opportunities")

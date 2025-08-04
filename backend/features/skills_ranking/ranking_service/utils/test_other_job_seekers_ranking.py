@@ -29,57 +29,57 @@ class TestCase(BaseModel):
 
 test_cases: list[TestCase] = [
     TestCase(
-        jobseekers_ranks=[10, 20, 30, 40, 50],
-        participant_rank=30,
-        expected_percentile=60.0,
+        jobseekers_ranks=[0.1, 0.2, 0.3, 0.4, 0.5],
+        participant_rank=0.3,
+        expected_percentile=0.60,
         doc="3 out of 5 jobseekers have rank <= 30 → (3/5)*100 = 60.0"
     ),
     TestCase(
-        jobseekers_ranks=[10, 20, 30, 40, 50],
-        participant_rank=10,
-        expected_percentile=20.0,
+        jobseekers_ranks=[0.1, 0.2, 0.3, 0.4, 0.5],
+        participant_rank=0.1,
+        expected_percentile=0.2,
         doc="1 out of 5 jobseekers have rank <= 10 → (1/5)*100 = 20.0"
     ),
     TestCase(
-        jobseekers_ranks=[10, 20, 30, 40, 50],
-        participant_rank=50,
-        expected_percentile=100.0,
+        jobseekers_ranks=[0.10, 0.20, 0.30, 0.40, 0.50],
+        participant_rank=0.5,
+        expected_percentile=1,
         doc="All 5 have rank <= 50 → (5/5)*100 = 100.0"
     ),
     TestCase(
-        jobseekers_ranks=[10, 20, 30, 40, 50],
-        participant_rank=5,
+        jobseekers_ranks=[0.10, 0.20, 0.30, 0.40, 0.50],
+        participant_rank=0.05,
         expected_percentile=0.0,
         doc="0 out of 5 have rank <= 5 → (0/5)*100 = 0.0"
     ),
     TestCase(
         jobseekers_ranks=[],
-        participant_rank=50,
-        expected_percentile=100.0,
+        participant_rank=0.5,
+        expected_percentile=1,
         doc="Empty list → You a re the only participant, so you are at 100%"
     ),
     TestCase(
-        jobseekers_ranks=[60, 70, 80],
-        participant_rank=70,
-        expected_percentile=66.67,
+        jobseekers_ranks=[0.60, 0.70, 0.80],
+        participant_rank=0.7,
+        expected_percentile=0.6667,
         doc="2 out of 3 have rank <= 70 → (2/3)*100 = 66.67"
     ),
     TestCase(
-        jobseekers_ranks=[50, 50, 50, 50],
-        participant_rank=50,
-        expected_percentile=62.5,
+        jobseekers_ranks=[0.50, 0.50, 0.50, 0.50],
+        participant_rank=0.5,
+        expected_percentile=0.625,
         doc="All 4 jobseekers have same rank as participant, so average rank is (1+2+3+4)/4 = 2.5 → (2.5/4)*100 = 62.5"
     ),
     TestCase(
-        jobseekers_ranks=[90, 92, 95, 97],
-        participant_rank=85,
+        jobseekers_ranks=[0.9, 0.92, 0.95, 0.97],
+        participant_rank=0.85,
         expected_percentile=0.0,
         doc="No jobseeker has rank <= 85 → (0/4)*100 = 0.0"
     ),
     TestCase(
-        jobseekers_ranks=[10, 20, 20, 30],
-        participant_rank=20,
-        expected_percentile=62.5,
+        jobseekers_ranks=[0.1, 0.2, 0.2, 0.3],
+        participant_rank=0.2,
+        expected_percentile=0.625,
         doc="2 of 5 have rank 20, so average rank is (2+3)/2 = 2.5 → (2.5/4)*100 = 62.5"
     ),
 ]

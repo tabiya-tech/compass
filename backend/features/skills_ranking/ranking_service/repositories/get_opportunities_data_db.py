@@ -5,7 +5,6 @@ from fastapi import Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from common_libs.database.get_mongo_db_connection import get_mongo_db_connection
-from common_libs.database.utils import initialize_mongo_db_indexes
 from features.skills_ranking.config import get_skills_ranking_config
 
 _opportunities_data_db_singleton: AsyncIOMotorDatabase | None = None
@@ -32,17 +31,3 @@ async def get_opportunities_data_db(
                 _opportunities_data_db_singleton = get_mongo_db_connection(mongo_db_uri, database_name)
 
     return _opportunities_data_db_singleton
-
-
-async def initialize_opportunities_data_db(_db: AsyncIOMotorDatabase, collection_name: str):
-    await initialize_mongo_db_indexes(
-        _db,
-        collection_name,
-        [
-            {
-                "name": "active_opportunities_index",
-                "fields": [("active", 1)]
-            }
-        ],
-        _logger
-    )

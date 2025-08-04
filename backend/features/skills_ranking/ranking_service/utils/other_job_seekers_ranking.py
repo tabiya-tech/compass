@@ -12,8 +12,10 @@ def other_job_seekers_ranking(*,
     """
 
     if not job_seekers_ranks:
-        return 100.0
+        return 1.0
 
     rank = stats.percentileofscore(job_seekers_ranks, participant_rank, kind='rank')
 
-    return round(rank, 2) # Round to two decimal places for consistency
+    # Round to four decimal places for consistency (100.00 when converted to percentage it will be two decimal places)
+    # Convert to the decimal percentage between 0 and 1
+    return round(rank / 100, 4)

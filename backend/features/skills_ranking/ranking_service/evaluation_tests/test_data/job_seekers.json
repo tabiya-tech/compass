@@ -1,0 +1,558 @@
+[
+  {
+    "skills": [
+      {
+        "preferred_label": "upper secondary education qualification",
+        "uuid": "c6e4b1a3-2c3f-4e9e-9b2e-2f2f3a3c9f3e"
+      },
+      {
+        "preferred_label": "lower secondary education qualification",
+        "uuid": "a2f1c3e4-7b8d-4c9f-9e2f-1d3e4f5a6b7c"
+      },
+      {
+        "preferred_label": "prepare bread products",
+        "uuid": "d45134e3-cb0f-488c-a621-3e4595eb4a38"
+      },
+      {
+        "preferred_label": "prepare bakery products",
+        "uuid": "4a8a1444-c6d9-493e-be3c-e3aff288a34e"
+      },
+      {
+        "preferred_label": "bakery production methods",
+        "uuid": "9d1ff44b-9e9c-4df7-9a1a-78bf1d3cbe40"
+      },
+      {
+        "preferred_label": "advise customers on bread",
+        "uuid": "2a82b10f-281c-469d-b76f-2376d778bd2a"
+      },
+      {
+        "preferred_label": "place orders for bakery ingredients",
+        "uuid": "a0aefccc-1514-4aa7-b660-efd70fde0e97"
+      },
+      {
+        "preferred_label": "enforce health and safety regulations for bread products",
+        "uuid": "8f5b98bb-5e05-4a42-a29a-6585a830505a"
+      },
+      {
+        "preferred_label": "Ensure correct use of bakery equipment",
+        "uuid": "726594eb-ba33-4f91-b446-ba243cf68dc1"
+      },
+      {
+        "preferred_label": "tend bakery ovens",
+        "uuid": "2dfcc035-715e-4a08-9b99-dc7c4ad9b6b6"
+      }
+    ],
+    "opportunityRank": 0.4,
+    "comparedToOthersRank": 0.75
+  },
+  {
+    "skills": [
+      {
+        "preferred_label": "upper secondary education qualification",
+        "uuid": "c6e4b1a3-2c3f-4e9e-9b2e-2f2f3a3c9f3e"
+      },
+      {
+        "preferred_label": "lower secondary education qualification",
+        "uuid": "a2f1c3e4-7b8d-4c9f-9e2f-1d3e4f5a6b7c"
+      },
+      {
+        "preferred_label": "SAP Data Services",
+        "uuid": "43ae5a06-c71e-48c5-85d8-9d8174abaf7a"
+      },
+      {
+        "preferred_label": "business intelligence",
+        "uuid": "bcfe0dd3-31c5-4b38-bda2-a3a79351c986"
+      },
+      {
+        "preferred_label": "business ICT systems",
+        "uuid": "58f3f5b1-9c5d-4de3-b3c5-b0a36b1341e7"
+      },
+      {
+        "preferred_label": "Oracle WebLogic",
+        "uuid": "4c6065af-f562-44cd-a639-0745cdf16abf"
+      },
+      {
+        "preferred_label": "IBM Informix",
+        "uuid": "de2d40a7-376f-40ac-8a2b-41e60d603530"
+      },
+      {
+        "preferred_label": "identify software for warehouse management",
+        "uuid": "53ee71ae-afba-4081-8837-71472264232f"
+      },
+      {
+        "preferred_label": "communication",
+        "uuid": "2f51e650-8e64-446a-90fa-15a71e16a190"
+      },
+      {
+        "preferred_label": "sales activities",
+        "uuid": "112c8ede-c3d6-441e-851d-c010cc027f44"
+      },
+      {
+        "preferred_label": "sales strategies",
+        "uuid": "bd51d3e2-f005-441f-b07e-1d4c489e6ecf"
+      },
+      {
+        "preferred_label": "implement sales strategies",
+        "uuid": "a4d34a28-9ae8-4cdb-872a-a6f041a21faf"
+      },
+      {
+        "preferred_label": "achieve sales targets",
+        "uuid": "705786d7-9547-458e-bc55-b1e384057a8c"
+      },
+      {
+        "preferred_label": "carry out sales analysis",
+        "uuid": "57b60f48-1f38-405e-bc0d-cff68cafc4ea"
+      },
+      {
+        "preferred_label": "maximise sales revenues",
+        "uuid": "5b2cb035-daea-4bc7-a813-19328a81d008"
+      },
+      {
+        "preferred_label": "sell products",
+        "uuid": "538eda95-3743-4b03-bf36-3dd082cca4c0"
+      },
+      {
+        "preferred_label": "provide education management support",
+        "uuid": "2f7b2761-52ae-492d-9fb1-89ba2bd686f8"
+      },
+      {
+        "preferred_label": "provide learning support",
+        "uuid": "dfb534b4-32eb-4052-8080-b32d8de44cd2"
+      },
+      {
+        "preferred_label": "liaise with educational support staff",
+        "uuid": "a7395b7c-6a60-4c62-a49d-f38d8ee8f9f2"
+      },
+      {
+        "preferred_label": "provide information on school services",
+        "uuid": "f9e43ba8-1a71-4aa9-a4c4-a89d4367a6ab"
+      },
+      {
+        "preferred_label": "ensure student welfare",
+        "uuid": "d93cd3a4-b45b-4d26-b5f9-94d75469f17a"
+      },
+      {
+        "preferred_label": "assist students in their learning",
+        "uuid": "33b0f342-eb9a-4db5-b43f-eb7e06c180f3"
+      }
+    ],
+    "opportunityRank": 0.8,
+    "comparedToOthersRank": 1.0
+  },
+  {
+    "skills": [
+      {
+        "preferred_label": "",
+        "uuid": ""
+      }
+    ],
+    "opportunityRank": 0.1,
+    "comparedToOthersRank": 0.1
+  },
+  {
+    "skills": [
+      {
+        "preferred_label": "upper secondary education qualification",
+        "uuid": "c6e4b1a3-2c3f-4e9e-9b2e-2f2f3a3c9f3e"
+      },
+      {
+        "preferred_label": "lower secondary education qualification",
+        "uuid": "a2f1c3e4-7b8d-4c9f-9e2f-1d3e4f5a6b7c"
+      },
+      {
+        "preferred_label": "SAP Data Services",
+        "uuid": "43ae5a06-c71e-48c5-85d8-9d8174abaf7a"
+      },
+      {
+        "preferred_label": "business intelligence",
+        "uuid": "bcfe0dd3-31c5-4b38-bda2-a3a79351c986"
+      },
+      {
+        "preferred_label": "business ICT systems",
+        "uuid": "58f3f5b1-9c5d-4de3-b3c5-b0a36b1341e7"
+      },
+      {
+        "preferred_label": "Oracle WebLogic",
+        "uuid": "4c6065af-f562-44cd-a639-0745cdf16abf"
+      },
+      {
+        "preferred_label": "IBM Informix",
+        "uuid": "de2d40a7-376f-40ac-8a2b-41e60d603530"
+      },
+      {
+        "preferred_label": "identify software for warehouse management",
+        "uuid": "53ee71ae-afba-4081-8837-71472264232f"
+      },
+      {
+        "preferred_label": "communication",
+        "uuid": "2f51e650-8e64-446a-90fa-15a71e16a190"
+      },
+      {
+        "preferred_label": "sales activities",
+        "uuid": "112c8ede-c3d6-441e-851d-c010cc027f44"
+      },
+      {
+        "preferred_label": "sales strategies",
+        "uuid": "bd51d3e2-f005-441f-b07e-1d4c489e6ecf"
+      },
+      {
+        "preferred_label": "implement sales strategies",
+        "uuid": "a4d34a28-9ae8-4cdb-872a-a6f041a21faf"
+      },
+      {
+        "preferred_label": "achieve sales targets",
+        "uuid": "705786d7-9547-458e-bc55-b1e384057a8c"
+      },
+      {
+        "preferred_label": "carry out sales analysis",
+        "uuid": "57b60f48-1f38-405e-bc0d-cff68cafc4ea"
+      },
+      {
+        "preferred_label": "maximise sales revenues",
+        "uuid": "5b2cb035-daea-4bc7-a813-19328a81d008"
+      },
+      {
+        "preferred_label": "sell products",
+        "uuid": "538eda95-3743-4b03-bf36-3dd082cca4c0"
+      },
+      {
+        "preferred_label": "analyse call performance trends",
+        "uuid": "1acfcfff-f260-4048-8d12-6cb0eefa3f8b"
+      },
+      {
+        "preferred_label": "maintain high quality of calls",
+        "uuid": "ba742813-28c5-4762-9085-eb8820f7b1dd"
+      },
+      {
+        "preferred_label": "call-centre technologies",
+        "uuid": "94620d0a-7de7-4a01-a2a7-6e87d1364f71"
+      },
+      {
+        "preferred_label": "measure call quality",
+        "uuid": "0543c531-89d8-461d-aab7-29a818a9f78d"
+      },
+      {
+        "preferred_label": "call quality assurance management",
+        "uuid": "02619a07-ebbc-4025-b7d8-f576812d9617"
+      },
+      {
+        "preferred_label": "manage difficult clients",
+        "uuid": "b5057127-5d65-4b2c-a9c2-68700f274628"
+      }
+    ],
+    "opportunityRank": 0.7,
+    "comparedToOthersRank": 0.9
+  },
+  {
+    "skills": [
+      {
+        "preferred_label": "lower secondary education qualification",
+        "uuid": "a2f1c3e4-7b8d-4c9f-9e2f-1d3e4f5a6b7c"
+      },
+      {
+        "preferred_label": "lay bricks",
+        "uuid": "8a32baa1-4a1d-446a-8184-7df756cdb262"
+      },
+      {
+        "preferred_label": "check straightness of brick",
+        "uuid": "6e78f45b-c282-40d7-9270-0a9fc414ca3d"
+      },
+      {
+        "preferred_label": "transfer bricks",
+        "uuid": "7989e0e0-e348-45b7-8294-62ac7072925c"
+      },
+      {
+        "preferred_label": "lay underlayment",
+        "uuid": "f258588c-5643-4bd5-8307-4581746eab4d"
+      },
+      {
+        "preferred_label": "build garden masonry",
+        "uuid": "cd01b056-bc8d-4d5e-8257-c9be1bb00d4a"
+      },
+      {
+        "preferred_label": "construction industry",
+        "uuid": "aa806fb8-8f75-4050-a638-a43f8853e846"
+      },
+      {
+        "preferred_label": "construction products",
+        "uuid": "8049e493-0e78-4368-98fc-b586a313f96f"
+      }
+    ],
+    "opportunityRank": 0.2,
+    "comparedToOthersRank": 0.35
+  },
+  {
+    "skills": [
+      {
+        "preferred_label": "lower secondary education qualification",
+        "uuid": "a2f1c3e4-7b8d-4c9f-9e2f-1d3e4f5a6b7c"
+      },
+      {
+        "preferred_label": "provide education management support",
+        "uuid": "2f7b2761-52ae-492d-9fb1-89ba2bd686f8"
+      },
+      {
+        "preferred_label": "provide learning support",
+        "uuid": "dfb534b4-32eb-4052-8080-b32d8de44cd2"
+      },
+      {
+        "preferred_label": "liaise with educational support staff",
+        "uuid": "a7395b7c-6a60-4c62-a49d-f38d8ee8f9f2"
+      },
+      {
+        "preferred_label": "provide information on school services",
+        "uuid": "f9e43ba8-1a71-4aa9-a4c4-a89d4367a6ab"
+      },
+      {
+        "preferred_label": "ensure student welfare",
+        "uuid": "d93cd3a4-b45b-4d26-b5f9-94d75469f17a"
+      },
+      {
+        "preferred_label": "assist students in their learning",
+        "uuid": "33b0f342-eb9a-4db5-b43f-eb7e06c180f3"
+      },
+      {
+        "preferred_label": "cooperate with education professionals",
+        "uuid": "52b2f880-b497-408d-aaf6-a39e1418a4fd"
+      },
+      {
+        "preferred_label": "assist students with their enrolment",
+        "uuid": "42d8b9a4-83fc-4fcf-bbca-6dc92e3fb1e4"
+      },
+      {
+        "preferred_label": "promote education programmes",
+        "uuid": "32f2c417-b2c9-4cb2-b2f1-ebe1f3b68a76"
+      }
+    ],
+    "opportunityRank": 0.2,
+    "comparedToOthersRank": 0.35
+  },
+  {
+    "skills": [
+      {
+        "preferred_label": "lower secondary education qualification",
+        "uuid": "a2f1c3e4-7b8d-4c9f-9e2f-1d3e4f5a6b7c"
+      },
+      {
+        "preferred_label": "prepare bread products",
+        "uuid": "d45134e3-cb0f-488c-a621-3e4595eb4a38"
+      },
+      {
+        "preferred_label": "prepare bakery products",
+        "uuid": "4a8a1444-c6d9-493e-be3c-e3aff288a34e"
+      },
+      {
+        "preferred_label": "bakery production methods",
+        "uuid": "9d1ff44b-9e9c-4df7-9a1a-78bf1d3cbe40"
+      },
+      {
+        "preferred_label": "advise customers on bread",
+        "uuid": "2a82b10f-281c-469d-b76f-2376d778bd2a"
+      },
+      {
+        "preferred_label": "place orders for bakery ingredients",
+        "uuid": "a0aefccc-1514-4aa7-b660-efd70fde0e97"
+      },
+      {
+        "preferred_label": "enforce health and safety regulations for bread products",
+        "uuid": "8f5b98bb-5e05-4a42-a29a-6585a830505a"
+      },
+      {
+        "preferred_label": "Ensure correct use of bakery equipment",
+        "uuid": "726594eb-ba33-4f91-b446-ba243cf68dc1"
+      },
+      {
+        "preferred_label": "tend bakery ovens",
+        "uuid": "2dfcc035-715e-4a08-9b99-dc7c4ad9b6b6"
+      },
+      {
+        "preferred_label": "lay bricks",
+        "uuid": "8a32baa1-4a1d-446a-8184-7df756cdb262"
+      },
+      {
+        "preferred_label": "check straightness of brick",
+        "uuid": "6e78f45b-c282-40d7-9270-0a9fc414ca3d"
+      },
+      {
+        "preferred_label": "transfer bricks",
+        "uuid": "7989e0e0-e348-45b7-8294-62ac7072925c"
+      },
+      {
+        "preferred_label": "lay underlayment",
+        "uuid": "f258588c-5643-4bd5-8307-4581746eab4d"
+      },
+      {
+        "preferred_label": "build garden masonry",
+        "uuid": "cd01b056-bc8d-4d5e-8257-c9be1bb00d4a"
+      },
+      {
+        "preferred_label": "construction industry",
+        "uuid": "aa806fb8-8f75-4050-a638-a43f8853e846"
+      },
+      {
+        "preferred_label": "construction products",
+        "uuid": "8049e493-0e78-4368-98fc-b586a313f96f"
+      }
+    ],
+    "opportunityRank": 0.3,
+    "comparedToOthersRank": 0.6
+  },
+  {
+    "skills": [
+      {
+        "preferred_label": "lower secondary education qualification",
+        "uuid": "a2f1c3e4-7b8d-4c9f-9e2f-1d3e4f5a6b7c"
+      },
+      {
+        "preferred_label": "communication",
+        "uuid": "2f51e650-8e64-446a-90fa-15a71e16a190"
+      },
+      {
+        "preferred_label": "sales activities",
+        "uuid": "112c8ede-c3d6-441e-851d-c010cc027f44"
+      },
+      {
+        "preferred_label": "sales strategies",
+        "uuid": "bd51d3e2-f005-441f-b07e-1d4c489e6ecf"
+      },
+      {
+        "preferred_label": "implement sales strategies",
+        "uuid": "a4d34a28-9ae8-4cdb-872a-a6f041a21faf"
+      },
+      {
+        "preferred_label": "achieve sales targets",
+        "uuid": "705786d7-9547-458e-bc55-b1e384057a8c"
+      },
+      {
+        "preferred_label": "carry out sales analysis",
+        "uuid": "57b60f48-1f38-405e-bc0d-cff68cafc4ea"
+      },
+      {
+        "preferred_label": "maximise sales revenues",
+        "uuid": "5b2cb035-daea-4bc7-a813-19328a81d008"
+      },
+      {
+        "preferred_label": "sell products",
+        "uuid": "538eda95-3743-4b03-bf36-3dd082cca4c0"
+      },
+      {
+        "preferred_label": "provide education management support",
+        "uuid": "2f7b2761-52ae-492d-9fb1-89ba2bd686f8"
+      },
+      {
+        "preferred_label": "provide learning support",
+        "uuid": "dfb534b4-32eb-4052-8080-b32d8de44cd2"
+      },
+      {
+        "preferred_label": "liaise with educational support staff",
+        "uuid": "a7395b7c-6a60-4c62-a49d-f38d8ee8f9f2"
+      },
+      {
+        "preferred_label": "provide information on school services",
+        "uuid": "f9e43ba8-1a71-4aa9-a4c4-a89d4367a6ab"
+      },
+      {
+        "preferred_label": "ensure student welfare",
+        "uuid": "d93cd3a4-b45b-4d26-b5f9-94d75469f17a"
+      },
+      {
+        "preferred_label": "assist students in their learning",
+        "uuid": "33b0f342-eb9a-4db5-b43f-eb7e06c180f3"
+      },
+      {
+        "preferred_label": "cooperate with education professionals",
+        "uuid": "52b2f880-b497-408d-aaf6-a39e1418a4fd"
+      },
+      {
+        "preferred_label": "assist students with their enrolment",
+        "uuid": "42d8b9a4-83fc-4fcf-bbca-6dc92e3fb1e4"
+      },
+      {
+        "preferred_label": "promote education programmes",
+        "uuid": "32f2c417-b2c9-4cb2-b2f1-ebe1f3b68a76"
+      }
+    ],
+    "opportunityRank": 0.4,
+    "comparedToOthersRank": 0.75
+  },
+  {
+    "skills": [
+      {
+        "preferred_label": "show professional responsibility",
+        "uuid": "2943b996-8f5b-4465-8eeb-69d0960e1ac5"
+      },
+      {
+        "preferred_label": "perform cleaning duties",
+        "uuid": "bcb7ef53-cca6-4971-9a99-975291f8c1b0"
+      },
+      {
+        "preferred_label": "conduct cleaning tasks",
+        "uuid": "cef14fdd-7ee4-448d-b51a-a2a29a85214d"
+      },
+      {
+        "preferred_label": "cleaning techniques",
+        "uuid": "77e5d84e-8a99-428f-b5ca-1580aecc48bd"
+      },
+      {
+        "preferred_label": "cleaning products",
+        "uuid": "b889571e-822f-4b9d-8a78-31ebfad7fb0f"
+      },
+      {
+        "preferred_label": "maintain cleaning equipment",
+        "uuid": "4f1c098a-961b-4f04-9085-535756dcc54b"
+      },
+      {
+        "preferred_label": "cleaning industry health and safety measures",
+        "uuid": "c4db20a9-85eb-411c-9910-72d1e3b27b9a"
+      },
+      {
+        "preferred_label": "encourage staff in cleaning activities",
+        "uuid": "3d4d46a8-816b-4e01-b0de-60b1516da58d"
+      }
+    ],
+    "opportunityRank": 0.2,
+    "comparedToOthersRank": 0.35
+  },
+  {
+    "skills": [
+      {
+        "preferred_label": "provide education management support",
+        "uuid": "2f7b2761-52ae-492d-9fb1-89ba2bd686f8"
+      },
+      {
+        "preferred_label": "provide learning support",
+        "uuid": "dfb534b4-32eb-4052-8080-b32d8de44cd2"
+      },
+      {
+        "preferred_label": "liaise with educational support staff",
+        "uuid": "a7395b7c-6a60-4c62-a49d-f38d8ee8f9f2"
+      },
+      {
+        "preferred_label": "provide information on school services",
+        "uuid": "f9e43ba8-1a71-4aa9-a4c4-a89d4367a6ab"
+      },
+      {
+        "preferred_label": "ensure student welfare",
+        "uuid": "d93cd3a4-b45b-4d26-b5f9-94d75469f17a"
+      },
+      {
+        "preferred_label": "assist students in their learning",
+        "uuid": "33b0f342-eb9a-4db5-b43f-eb7e06c180f3"
+      },
+      {
+        "preferred_label": "cooperate with education professionals",
+        "uuid": "52b2f880-b497-408d-aaf6-a39e1418a4fd"
+      },
+      {
+        "preferred_label": "assist students with their enrolment",
+        "uuid": "42d8b9a4-83fc-4fcf-bbca-6dc92e3fb1e4"
+      },
+      {
+        "preferred_label": "promote education programmes",
+        "uuid": "32f2c417-b2c9-4cb2-b2f1-ebe1f3b68a76"
+      }
+    ],
+    "opportunityRank": 0.2,
+    "comparedToOthersRank": 0.35
+  }
+]
