@@ -17,6 +17,34 @@ SkillsRankingPhaseName = Literal[
     "COMPLETED"]
 
 
+class SkillRankingExperimentGroup(Enum):
+    """
+    Skills Ranking Experiment Groups assigned to the user. Each group has its own branch in the skills ranking flow
+
+    Differences between the groups:
+
+    Group 1:
+        - time based proof_of_value task
+        - see ranking results.
+        - confirm they've seen the ranking results
+    Group 2:
+        - work based proof_of_value task
+        - not see ranking results.
+    Group 3:
+            - work based proof_of_value task
+            - see ranking results.
+            - confirm they've seen the ranking results
+    Group 4:
+        - time based proof_of_value task
+        - not see ranking results.
+    """
+
+    GROUP_1 = "Group 1: High Difference/Greater"
+    GROUP_2 = "Group 2: High Difference/Smaller"
+    GROUP_3 = "Group 3: Underconfidence/Yes"
+    GROUP_4 = "Group 4: Underconfidence/No"
+
+
 class UpdateSkillsRankingRequest(BaseModel):
     """
     Request model for updating skills ranking state.
@@ -61,6 +89,10 @@ class UpdateSkillsRankingRequest(BaseModel):
         default=None,
         description="The time the skills ranking process completed. If omitted, not updated. If null, cleared."
     )
+    experiment_group: Optional[SkillRankingExperimentGroup] = Field(
+        default=None,
+        description="The experiment group assigned to the user. If omitted, not updated. If null, cleared."
+    )
 
     class Config:
         extra = "forbid"
@@ -84,34 +116,6 @@ class SkillsRankingPhase(BaseModel):
         extra = "forbid"
         use_enum_values = True
         populate_by_name = True
-
-
-class SkillRankingExperimentGroup(Enum):
-    """
-    Skills Ranking Experiment Groups assigned to the user. Each group has its own branch in the skills ranking flow
-
-    Differences between the groups:
-
-    Group 1:
-        - time based proof_of_value task
-        - see ranking results.
-        - confirm they've seen the ranking results
-    Group 2:
-        - work based proof_of_value task
-        - not see ranking results.
-    Group 3:
-            - work based proof_of_value task
-            - see ranking results.
-            - confirm they've seen the ranking results
-    Group 4:
-        - time based proof_of_value task
-        - not see ranking results.
-    """
-
-    GROUP_1 = "Group 1: High Difference/Greater"
-    GROUP_2 = "Group 2: High Difference/Smaller"
-    GROUP_3 = "Group 3: Underconfidence/Yes"
-    GROUP_4 = "Group 4: Underconfidence/No"
 
 
 class SkillsRankingState(BaseModel):

@@ -1,6 +1,6 @@
 from datetime import datetime
 from http import HTTPStatus
-from typing import Generator
+from typing import Generator, Tuple
 from unittest.mock import AsyncMock
 
 import pytest
@@ -87,10 +87,11 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
     class MockedSkillsRankingService(ISkillsRankingStateService):
         async def upsert_state(self, session_id: int,
                                update_request: UpdateSkillsRankingRequest,
-                               user_id: str | None = None) -> SkillsRankingState:
+                               user_id: str) -> SkillsRankingState:
             raise NotImplementedError()
 
-        async def calculate_ranking_and_groups(self) -> str:
+        async def calculate_ranking_and_groups(self, user_id: str, session_id: int) -> Tuple[
+            SkillsRankingScore, SkillRankingExperimentGroup]:
             raise NotImplementedError()
 
     mocked_service = MockedSkillsRankingService()
@@ -127,6 +128,9 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
             raise NotImplementedError()
 
         async def update(self, *, session_id: int, update_request: UpdateSkillsRankingRequest) -> SkillsRankingState:
+            raise NotImplementedError()
+
+        async def update_experiment_group(self, session_id: int, experiment_group: SkillRankingExperimentGroup) -> SkillsRankingState:
             raise NotImplementedError()
 
     mocked_skills_ranking_repository = MockedSkillsRankingStateRepository()

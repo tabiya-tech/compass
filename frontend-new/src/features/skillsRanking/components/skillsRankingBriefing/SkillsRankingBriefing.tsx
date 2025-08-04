@@ -136,16 +136,16 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
           message={
             effortType === EffortType.WORK_BASED ? (
               <>
-                If you are interested, I can calculate what share of <strong>{getJobPlatformUrl()}</strong>{" "}
-                opportunities match your skills and how you compare with other seekers — you just need to show me how
+                If you are interested,  <strong>I can calculate what share of </strong>{getJobPlatformUrl()}{" "}
+                <strong>opportunities match your skills and how you compare with other seekers</strong> — you just need to show me how
                 valuable this information is to you.
               </>
             ) : (
               <>
-                I will now calculate how many percent of jobs advertised on <strong>{getJobPlatformUrl()}</strong> you
-                have the required & most relevant skills for, and how you compare to other job seekers. This will take
-                some time — if you are not interested you can click <strong>cancel</strong> in the next message, while I
-                calculate. When you are ready, please click <strong>continue</strong>.
+                If you are interested,  <strong>I can calculate what share of</strong>{getJobPlatformUrl()}{" "}
+                <strong>opportunities match your skills and how you compare with other seekers</strong> This might take
+                some time — if you are not interested in waiting any longer, you can click <strong>cancel</strong> at any time in the next message,
+                while I calculate. <br/><br/>When you are ready please click <strong>continue</strong>.
               </>
             )
           }
@@ -197,7 +197,9 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       {/* Second WORK_BASED message + button */}
       {effortType === EffortType.WORK_BASED && showSecondMessage && (
         <ChatBubble
-          message={<>In the next message, you will be asked to solve a few puzzles. You can quit anytime.</>}
+          message={<>
+            You’ll see tilted letters on a few screens. Turn each letter upright using the rotation buttons. You can cancel anytime. In 5% of cases, <strong>more letters fixed = higher chance of receiving the information.</strong> The rest of the time it depends on me.
+          </>}
           sender={ConversationMessageSender.COMPASS}
         >
           <Box

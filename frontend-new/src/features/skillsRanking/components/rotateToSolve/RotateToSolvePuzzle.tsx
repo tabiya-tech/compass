@@ -6,7 +6,7 @@ import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import { DEFAULT_STRINGS } from "src/features/skillsRanking/constants";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
-const PUZZLE_FEEDBACK_DURATION = 3000;
+const PUZZLE_FEEDBACK_DURATION = 5000;
 
 export interface RotateToSolvePuzzleMetricsReport {
   puzzles_solved: number;
@@ -24,6 +24,11 @@ export interface RotateToSolveTaskProps {
   rotationStep?: number;
   puzzles?: number;
   disabled?: boolean;
+  isReplay?: boolean;
+  isReplayFinished?: boolean;
+  initialPuzzlesSolved?: number;
+  initialCorrectRotations?: number;
+  initialClicksCount?: number;
 }
 
 interface CharacterState {
@@ -48,18 +53,23 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
   rotationStep = 45,
   puzzles = 1,
   disabled = false,
+  isReplay = false,
+  isReplayFinished = false,
+  initialPuzzlesSolved = 0,
+  initialCorrectRotations = 0,
+  initialClicksCount = 0,
 }) => {
   const [characterStates, setCharacterStates] = useState<CharacterState[]>([]);
   const [currentCharIndex, setCurrentCharIndex] = useState<number | null>(null);
-  const [puzzleIndex, setPuzzleIndex] = useState(0);
+  const [puzzleIndex, setPuzzleIndex] = useState(initialPuzzlesSolved);
   const [isCelebrating, setIsCelebrating] = useState(false);
   const [showCompletionMessage, setShowCompletionMessage] = useState(false);
   const [completionMessage, setCompletionMessage] = useState("");
   const [isAllComplete, setIsAllComplete] = useState(false);
-  const [clicksCount, setClicksCount] = useState(0);
+  const [clicksCount, setClicksCount] = useState(initialClicksCount);
   const [correctRotations, setCorrectRotations] = useState(0);
+  const [totalCorrectRotations, setTotalCorrectRotations] = useState(initialCorrectRotations);
   const [startTime, setStartTime] = useState<number | null>(null);
-  const [activityTimeoutId, setActivityTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
   const theme = useTheme();
   const pulseAnimation = createPulseAnimation(theme.palette.primary.main);
 
@@ -68,7 +78,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
     return Array.from(puzzleString).map((char) => {
       let angle = 0;
       while (angle % 360 === 0) {
-        angle = rotationStep * (Math.floor(Math.random() * (180 / rotationStep)) - 2);
+        angle = rotationStep * (Math.floor(Math.random() * (360 / rotationStep)) - 2);
       }
       return {
         character: char,
@@ -85,34 +95,25 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
   };
 
   const selectCharacter = (index: number) => {
-    if (disabled || isAllComplete || characterStates[index].character === " ") return;
+    if (disabled || isReplay || isAllComplete || characterStates[index].character === " ") return;
     if (startTime === null) setStartTime(performance.now());
     setCurrentCharIndex(index);
     setClicksCount((count) => count + 1);
 
-    // Track activity
-    // Clear existing activity timeout
-    if (activityTimeoutId) {
-      clearTimeout(activityTimeoutId);
+    // Report metrics immediately
+    if (onReport) {
+      const metrics: RotateToSolvePuzzleMetricsReport = {
+        puzzles_solved: puzzleIndex,
+        correct_rotations: correctRotations,
+        clicks_count: clicksCount + 1,
+        time_spent_ms: startTime ? Math.round(performance.now() - startTime) : 0,
+      };
+      onReport(metrics);
     }
-
-    // Set new activity timeout (user is inactive after 2 seconds)
-    const newTimeoutId = setTimeout(() => {
-      if (onReport) {
-        const metrics: RotateToSolvePuzzleMetricsReport = {
-          puzzles_solved: puzzleIndex,
-          correct_rotations: correctRotations,
-          clicks_count: clicksCount + 1,
-          time_spent_ms: startTime ? Math.round(performance.now() - startTime) : 0,
-        };
-        onReport(metrics);
-      }
-    }, 2000);
-    setActivityTimeoutId(newTimeoutId);
   };
 
   const updateCharacterRotation = (delta: number) => {
-    if (disabled || isAllComplete || currentCharIndex === null) return;
+    if (disabled || isReplay || isAllComplete || currentCharIndex === null) return;
 
     setClicksCount((count) => count + 1);
 
@@ -128,27 +129,24 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
 
     setCharacterStates(updatedStates);
 
-    // Track activity
-    // Clear existing activity timeout
-    if (activityTimeoutId) {
-      clearTimeout(activityTimeoutId);
-    }
+    // Calculate how many characters are now solved in current puzzle
+    const solvedCharacters = updatedStates.filter(
+      (state) => state.character !== " " && isCharacterSolved(state)
+    ).length;
 
-    // Set new activity timeout (user is inactive after 2 seconds)
-    const newTimeoutId = setTimeout(() => {
-      if (onReport) {
-        const metrics: RotateToSolvePuzzleMetricsReport = {
-          puzzles_solved: puzzleIndex,
-          correct_rotations:
-            correctRotations +
-            updatedStates.filter((state) => state.character !== " " && isCharacterSolved(state)).length,
-          clicks_count: clicksCount + 1,
-          time_spent_ms: startTime ? Math.round(performance.now() - startTime) : 0,
-        };
-        onReport(metrics);
-      }
-    }, 2000);
-    setActivityTimeoutId(newTimeoutId);
+    // Update correct rotations state for current puzzle
+    setCorrectRotations(solvedCharacters);
+
+    // Report metrics immediately
+    if (onReport) {
+      const metrics: RotateToSolvePuzzleMetricsReport = {
+        puzzles_solved: puzzleIndex,
+        correct_rotations: totalCorrectRotations + solvedCharacters,
+        clicks_count: clicksCount + 1,
+        time_spent_ms: startTime ? Math.round(performance.now() - startTime) : 0,
+      };
+      onReport(metrics);
+    }
 
     const allSolved = updatedStates.every(
       (state) => state.character === " " || (state.checked && isCharacterSolved(state))
@@ -161,9 +159,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
 
       const finalReport: RotateToSolvePuzzleMetricsReport = {
         puzzles_solved: puzzleIndex + 1,
-        correct_rotations:
-          correctRotations +
-          updatedStates.filter((state) => state.character !== " " && isCharacterSolved(state)).length,
+        correct_rotations: totalCorrectRotations + solvedCharacters,
         clicks_count: clicksCount + 1,
         time_spent_ms: startTime ? Math.round(now - startTime) : 0,
       };
@@ -175,22 +171,27 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
       if (nextPuzzle >= puzzles) {
         setCompletionMessage("All puzzles complete! Well done!");
         setIsAllComplete(true);
-      } else {
-        setCompletionMessage("Puzzle complete! Please solve one more...");
-      }
-      setShowCompletionMessage(true);
-
-      setTimeout(() => {
-        setIsCelebrating(false);
-        setShowCompletionMessage(false);
-        setCorrectRotations(finalReport.correct_rotations);
-        setClicksCount(finalReport.clicks_count);
-        if (nextPuzzle >= puzzles) {
+        setShowCompletionMessage(true);
+        // Don't hide the completion message for final puzzle
+        setTimeout(() => {
+          setIsCelebrating(false);
+          setClicksCount(finalReport.clicks_count);
           onSuccess();
-        } else {
+        }, PUZZLE_FEEDBACK_DURATION);
+      } else {
+        setCompletionMessage(
+          "Puzzle complete! Please solve another one or cancel if you are not that interested in the information."
+        );
+        setShowCompletionMessage(true);
+        setTimeout(() => {
+          setIsCelebrating(false);
+          setShowCompletionMessage(false);
+          setClicksCount(finalReport.clicks_count);
+          setTotalCorrectRotations(totalCorrectRotations + solvedCharacters); // Use solvedCharacters from current scope
           setPuzzleIndex(nextPuzzle);
-        }
-      }, PUZZLE_FEEDBACK_DURATION);
+          setCorrectRotations(0); // Reset for next puzzle
+        }, PUZZLE_FEEDBACK_DURATION);
+      }
     }
   };
 
@@ -211,14 +212,16 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
     setCharacterStates(generateChallenge());
   }, [generateChallenge]);
 
-  // Cleanup timeouts on unmount
+  // Initialize replay state
   useEffect(() => {
-    return () => {
-      if (activityTimeoutId) {
-        clearTimeout(activityTimeoutId);
-      }
-    };
-  }, [activityTimeoutId]);
+    if (isReplay && isReplayFinished) {
+      setIsAllComplete(true);
+      setShowCompletionMessage(true);
+      setCompletionMessage("All puzzles complete! Well done!");
+    }
+  }, [isReplay, isReplayFinished]);
+
+  // No cleanup needed since we removed the activity timeout
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
@@ -284,7 +287,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
         <PrimaryIconButton
           size="small"
           onClick={() => updateCharacterRotation(-rotationStep)}
-          disabled={disabled || isAllComplete}
+          disabled={disabled || isReplay || isAllComplete}
           sx={{ color: theme.palette.common.black }}
           aria-label="Rotate character counterclockwise"
         >
@@ -293,7 +296,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
         <PrimaryIconButton
           size="small"
           onClick={() => updateCharacterRotation(rotationStep)}
-          disabled={disabled || isAllComplete}
+          disabled={disabled || isReplay || isAllComplete}
           sx={{ color: theme.palette.common.black }}
           aria-label="Rotate character clockwise"
         >
@@ -301,32 +304,42 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
         </PrimaryIconButton>
       </Box>
 
-      {/* Completion message */}
-      {showCompletionMessage && (
-        <Box
-          sx={{
-            padding: theme.spacing(2),
-            backgroundColor: theme.palette.success.light,
-            color: theme.palette.success.contrastText,
-            borderRadius: 1,
-            textAlign: "center",
-            animation: "fadeIn 0.3s ease-in",
-            "@keyframes fadeIn": {
-              "0%": { opacity: 0, transform: "translateY(-10px)" },
-              "100%": { opacity: 1, transform: "translateY(0)" },
-            },
-          }}
-        >
-          <Typography variant="body1" fontWeight="bold">
-            {completionMessage}
-          </Typography>
-        </Box>
-      )}
-
-      <Box display="flex" justifyContent="flex-end" width="100%" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-        <PrimaryButton onClick={onCancel} disabled={disabled || isAllComplete} sx={{ marginTop: theme.spacing(2) }}>
+      <Box
+        display="flex"
+        flexDirection="row-reverse"
+        alignItems="center"
+        width="100%"
+        height={theme.fixedSpacing(theme.tabiyaSpacing.xl * 2)} // xl is not quite big enough and we dont want the componenent to move around
+        padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+        gap={2}
+      >
+        {/* Cancel button on the right (appears first due to row-reverse) */}
+        <PrimaryButton onClick={onCancel} disabled={disabled || isReplay || isAllComplete} sx={{ flexShrink: 0 }}>
           Cancel
         </PrimaryButton>
+
+        {/* Status message on the left (appears second due to row-reverse) */}
+        {showCompletionMessage && (
+          <Box
+            sx={{
+              padding: theme.spacing(1, 2),
+              backgroundColor: theme.palette.success.light,
+              color: theme.palette.success.contrastText,
+              borderRadius: 1,
+              textAlign: "center",
+              flex: 1,
+              animation: "fadeIn 0.3s ease-in",
+              "@keyframes fadeIn": {
+                "0%": { opacity: 0, transform: "translateY(-10px)" },
+                "100%": { opacity: 1, transform: "translateY(0)" },
+              },
+            }}
+          >
+            <Typography variant="body2" fontWeight="bold">
+              {completionMessage}
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   );

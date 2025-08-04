@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Tuple
+from typing import Tuple, cast
+import random
+import logging
 
 from app.application_state import IApplicationStateManager
 from app.users.repositories import IUserPreferenceRepository
@@ -10,11 +12,12 @@ from features.skills_ranking.state.repositories.skills_ranking_state_repository 
 from features.skills_ranking.state.repositories.types import IRegistrationDataRepository
 from features.skills_ranking.state.services.type import SkillsRankingState, SkillRankingExperimentGroup, \
     SkillsRankingScore, \
-    SkillsRankingPhase, UpdateSkillsRankingRequest
+    SkillsRankingPhase, UpdateSkillsRankingRequest, SkillsRankingPhaseName
 from features.skills_ranking.ranking_service.services.ranking_service import IRankingService
 from features.skills_ranking.state.utils.get_group import get_group
-from features.skills_ranking.state.utils.phase_utils import get_possible_next_phase, get_valid_fields_for_phase
+from features.skills_ranking.state.utils.phase_utils import get_possible_next_phase
 
+CORRECT_ROTATIONS_THRESHOLD_FOR_GROUP_SWITCH = 30
 
 class ISkillsRankingStateService(ABC):
     """
@@ -24,7 +27,7 @@ class ISkillsRankingStateService(ABC):
     @abstractmethod
     async def upsert_state(self, session_id: int,
                            update_request: UpdateSkillsRankingRequest,
-                           user_id: str | None = None) -> SkillsRankingState:
+                           user_id: str) -> SkillsRankingState:
         """
         Upsert the SkillsRankingState for a given session ID.
         :param session_id: the session ID to upsert the state for.
@@ -63,11 +66,60 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         self._application_state_manager = application_state_manage
         self._high_difference_threshold = high_difference_threshold
 
+    def _should_apply_random_group_switch(self, experiment_group: SkillRankingExperimentGroup) -> bool:
+        """
+        Determine if the random group switch should be applied.
+        Only applies to groups 2 and 3 with a 5% probability.
+        """
+        if experiment_group not in [SkillRankingExperimentGroup.GROUP_2, SkillRankingExperimentGroup.GROUP_3]:
+            return False
+
+        # 5% chance of triggering the random check
+        return random.random() < 0.05 # nosec B311 # we are intentionally using a random check here for group switching
+
+
+    def _get_switched_update_request(self, update_request: UpdateSkillsRankingRequest, existing_state: SkillsRankingState) -> UpdateSkillsRankingRequest:
+        """
+        Determine if a group switch should occur and return an updated request with the correct phase and group.
+        Only switches groups if the random check passes and the user is transitioning from PROOF_OF_VALUE.
+        """
+        # Only apply group switching when transitioning FROM PROOF_OF_VALUE
+        if update_request.phase is None or existing_state.phase[-1].name != "PROOF_OF_VALUE":
+            return update_request
+            
+        # Only apply to groups 2 and 3
+        if existing_state.experiment_group not in [SkillRankingExperimentGroup.GROUP_2, SkillRankingExperimentGroup.GROUP_3]:
+            return update_request
+            
+        # Only apply if random check passes (5% chance)
+        if not self._should_apply_random_group_switch(existing_state.experiment_group):
+            return update_request
+            
+        # Determine the new group based on correct_rotations
+        if existing_state.correct_rotations is None or existing_state.correct_rotations <= CORRECT_ROTATIONS_THRESHOLD_FOR_GROUP_SWITCH:
+            new_group = SkillRankingExperimentGroup.GROUP_2  # No information
+        else:
+            new_group = SkillRankingExperimentGroup.GROUP_3  # Information
+            
+        # Determine the correct phase for the new group
+        # Group 2 and 4 skip MARKET_DISCLOSURE, while Group 1 and 3 see it
+        if new_group in [SkillRankingExperimentGroup.GROUP_2, SkillRankingExperimentGroup.GROUP_4]:
+            correct_phase = "JOB_SEEKER_DISCLOSURE"
+        else:
+            correct_phase = "MARKET_DISCLOSURE"
+
+        # Create a new update request with both the group change and phase adjustment
+        return UpdateSkillsRankingRequest(
+            phase=cast(SkillsRankingPhaseName, correct_phase),
+            experiment_group=new_group,
+            **update_request.model_dump(exclude={'phase', 'experiment_group'})
+        )
+
     async def upsert_state(
             self,
             session_id: int,
             update_request: UpdateSkillsRankingRequest,
-            user_id: str | None = None
+            user_id: str
     ) -> SkillsRankingState:
         existing_state = await self._repository.get_by_session_id(session_id)
 
@@ -109,29 +161,26 @@ class SkillsRankingStateService(ISkillsRankingStateService):
                     expected_phases=possible_next_states
                 )
 
-        # Gather all fields that are being updated (i.e., are not None)
-        update_dict = update_request.model_dump(exclude_none=True)
-        passed_fields = list(update_dict.keys())
-
-        # Get the valid fields for this phase
-        valid_fields = get_valid_fields_for_phase(
-            phase=update_request.phase if update_request.phase else existing_state.phase[-1].name,
-            from_phase=existing_state.phase[-1].name if update_request.phase and update_request.phase !=
-                                                        existing_state.phase[-1].name else None
-        )
-
-        # Check for any invalid fields
-        invalid_fields = [field for field in passed_fields if field not in valid_fields]
-        if invalid_fields:
-            raise InvalidFieldsForPhaseError(
-                current_phase=existing_state.phase[-1].name,
-                invalid_fields=invalid_fields,
-                valid_fields=valid_fields,
+        # Apply random group switching logic - this may modify the update_request
+        # Only applies when transitioning FROM PROOF_OF_VALUE for groups 2 and 3 with 5% probability
+        updated_request = self._get_switched_update_request(update_request, existing_state)
+        
+        # Automatically set completed_at when transitioning to COMPLETED phase
+        if updated_request.phase == "COMPLETED":
+            updated_request.completed_at = get_now()
+        
+        # Update user preferences if group actually changed
+        if (updated_request.experiment_group is not None and 
+            updated_request.experiment_group != existing_state.experiment_group):
+            await self._user_preferences_repository.set_experiment_by_user_id(
+                user_id=user_id,
+                experiment_id=SKILLS_RANKING_EXPERIMENT_ID,
+                experiment_config=updated_request.experiment_group.name
             )
 
         saved_state = await self._repository.update(
             session_id=session_id,
-            update_request=update_request
+            update_request=updated_request
         )
 
         if saved_state is None:

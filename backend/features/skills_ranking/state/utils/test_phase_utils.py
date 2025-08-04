@@ -1,4 +1,4 @@
-from features.skills_ranking.state.utils.phase_utils import get_possible_next_phase, get_valid_fields_for_phase
+from features.skills_ranking.state.utils.phase_utils import get_possible_next_phase
 
 
 def test_get_possible_next_states():
@@ -49,44 +49,3 @@ def test_get_possible_next_states():
     # WHEN getting possible next states
     # THEN there should only be COMPLETED (terminal state but allows metrics updates)
     assert next_states == ["COMPLETED"]
-
-
-def test_get_valid_fields_for_phase():
-    """Test that get_valid_fields_for_phase returns the correct fields for each phase."""
-    # Test basic phase validation
-    assert get_valid_fields_for_phase("INITIAL") == ["phase"]
-    assert get_valid_fields_for_phase("BRIEFING") == ["phase"]
-    assert get_valid_fields_for_phase("PROOF_OF_VALUE") == ["phase", "cancelled_after", "succeeded_after", "puzzles_solved", "correct_rotations", "clicks_count"]
-    assert get_valid_fields_for_phase("MARKET_DISCLOSURE") == ["phase"]
-    assert get_valid_fields_for_phase("JOB_SEEKER_DISCLOSURE") == ["phase"]
-    assert get_valid_fields_for_phase("PERCEIVED_RANK") == ["phase", "perceived_rank_percentile"]
-    assert get_valid_fields_for_phase("RETYPED_RANK") == ["phase", "retyped_rank_percentile"]
-    assert get_valid_fields_for_phase("COMPLETED") == []
-
-    # Test transition-specific validation
-    # When transitioning from PROOF_OF_VALUE to MARKET_DISCLOSURE, allow metrics fields
-    assert get_valid_fields_for_phase("MARKET_DISCLOSURE", from_phase="PROOF_OF_VALUE") == [
-        "phase", "cancelled_after", "succeeded_after", "puzzles_solved", "correct_rotations", "clicks_count"
-    ]
-    
-    # When transitioning from PERCEIVED_RANK to RETYPED_RANK, allow both perceived and retyped rank
-    assert get_valid_fields_for_phase("RETYPED_RANK", from_phase="PERCEIVED_RANK") == [
-        "phase", "perceived_rank_percentile", "retyped_rank_percentile"
-    ]
-    
-    # When transitioning from RETYPED_RANK to COMPLETED, allow both perceived and retyped rank
-    assert get_valid_fields_for_phase("COMPLETED", from_phase="RETYPED_RANK") == [
-        "phase", "perceived_rank_percentile", "retyped_rank_percentile"
-    ]
-    
-    # When not transitioning from PROOF_OF_VALUE, MARKET_DISCLOSURE only allows phase
-    assert get_valid_fields_for_phase("MARKET_DISCLOSURE", from_phase="BRIEFING") == ["phase"]
-    assert get_valid_fields_for_phase("MARKET_DISCLOSURE", from_phase=None) == ["phase"]
-    
-    # When not transitioning from PERCEIVED_RANK, RETYPED_RANK only allows retyped_rank_percentile
-    assert get_valid_fields_for_phase("RETYPED_RANK", from_phase="BRIEFING") == ["phase", "retyped_rank_percentile"]
-    assert get_valid_fields_for_phase("RETYPED_RANK", from_phase=None) == ["phase", "retyped_rank_percentile"]
-    
-    # When not transitioning from RETYPED_RANK, COMPLETED allows no fields
-    assert get_valid_fields_for_phase("COMPLETED", from_phase="BRIEFING") == []
-    assert get_valid_fields_for_phase("COMPLETED", from_phase=None) == []

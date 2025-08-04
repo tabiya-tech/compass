@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
-from features.skills_ranking.state.services.type import SkillsRankingState, UpdateSkillsRankingRequest
+from features.skills_ranking.state.services.type import SkillsRankingState, UpdateSkillsRankingRequest, \
+    SkillRankingExperimentGroup
 
 
 class IRegistrationDataRepository(ABC):
