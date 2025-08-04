@@ -150,10 +150,10 @@
       /*  Snackbar   */
       #snackbar-notification {
           visibility: hidden;
-          background-color: var(--primary);
-          color: var(--dark-blue);
+          background-color: #E8F5E9;  /* primary light green */
+          color: #1D6023;  /*primary dark green */
           text-align: center;
-          border-radius: 5px;
+          border-radius: 4px;
           padding: 20px;
           position: fixed;
           height: auto;
@@ -163,6 +163,10 @@
           font-size: 17px;
           align-self: center;
           margin: 10px;
+          box-shadow:
+              0px 3px 5px -1px rgba(0,0,0,0.2),
+              0px 6px 10px 0px rgba(0,0,0,0.14),
+              0px 1px 18px 0px rgba(0,0,0,0.12); /* Mui snackbar shadow */
       }
 
       #snackbar-notification.show {
@@ -226,7 +230,7 @@
       </div>
       <section id="chat-page-container">
         <div style="width: 100vw; height: 100vh;" id="chat-page-container-iframe">
-                    <iframe src="/" title="Compass Chat Application" style="width: 100%; height: 100%;"></iframe>
+          <iframe src="about:blank" title="Compass Chat Application" style="width: 100%; height: 100%;"></iframe>
         </div>
       </section>
       <section id="initial-question" class="section-container text-body" style="display: none;">
@@ -305,6 +309,8 @@
   };
 
   const CHAT_PAGE_CONTAINER_IFRAME = "chat-page-container-iframe";
+
+  const LOGO_CONTAINER = "logo-container";
 
   const ENV_KEYS = {
     CLIENT_ID: "client_id_0.0.1",
@@ -411,6 +417,11 @@
   function showSection(sectionId) {
     hideAllSections();
     document.getElementById(sectionId).style.display = "block";
+
+    const logo = document.querySelector(`.${LOGO_CONTAINER}`);
+    if (logo) {
+      logo.style.display = sectionId === IDS.SECTIONS.CHAT_CONTAINER ? "none" : "flex";
+    }
   }
 
   function getClientID() {
@@ -479,7 +490,16 @@
         localStorage.setItem(ENV_KEYS.LOGIN_METHOD, LOGIN_METHODS.FIREBASE_EMAIL);
 
         showSection(IDS.SECTIONS.CHAT_CONTAINER);
-        // window.location.href = "/#/";
+
+        // Set chat iframe source and handle its load event
+        const chatIframe = document.querySelector(`#${CHAT_PAGE_CONTAINER_IFRAME} iframe`);
+        if (chatIframe) {
+          chatIframe.onload = () => {
+            handleShowSnackbarNotification();
+            history.replaceState({}, document.title, "/#/");
+          };
+          chatIframe.src = "/#/";
+        }
       }
     } catch (error) {
       console.error("Error:", error);
@@ -550,24 +570,17 @@
 
     // Setup event listeners after configs are loaded
     setupEventListeners(context);
+
+    // Show an initial question section after config is loaded
+    showSection(IDS.SECTIONS.INITIAL_QUESTION);
   }
 
   // #############################################################
   // #                    MAIN Entry Point
   // #############################################################
+  // Show "wait-a-moment" section on first render
+  showSection(IDS.SECTIONS.WAIT_A_MOMENT);
   document.addEventListener("DOMContentLoaded", function() {
-    // setTimeout(() => handleShowSnackbarNotification(), 2000);
-
-    // 1. backend returns the credentials
-    ///   1. Log the user in with firebase
-    //    2. Show the notification (Credentials have been sent to your email)
-    //    3. Replace the current url (without refreshing).
-    //    4. Show the chat container.
-
-    // Demonstration....
-    // setTimeout(() => history.replaceState({}, "New Title", "/#/"), 1000);
-
-    // return;
 
     // First check if the user is already logged in, and log them in if so.
     const alreadyLoggedIn = handleAlreadyLoggedIn();
@@ -582,8 +595,6 @@
       console.error("Email and externalUserId are required in the URL parameters.");
       showSection(IDS.SECTIONS.INVALID_QUERY_PARAMS);
       return;
-    } else {
-      showSection(IDS.SECTIONS.INITIAL_QUESTION);
     }
 
     const frontendFeatures = JSON.parse(atob(window.tabiyaConfig.FRONTEND_FEATURES));
