@@ -6,10 +6,8 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.users.auth import Authentication
 from features.skills_ranking.config import SkillsRankingConfig, set_skills_ranking_config, get_skills_ranking_config
-from features.skills_ranking.ranking_service.repositories.get_job_seekers_db import get_job_seekers_db, \
-    initialize_job_seekers_db
-from features.skills_ranking.ranking_service.repositories.get_opportunities_data_db import get_opportunities_data_db, \
-    initialize_opportunities_data_db
+from features.skills_ranking.ranking_service.repositories.get_job_seekers_db import get_job_seekers_db
+from features.skills_ranking.ranking_service.repositories.get_opportunities_data_db import get_opportunities_data_db
 from features.skills_ranking.state.repositories.get_registration_data_db import get_registration_data_db
 from features.skills_ranking.state.repositories.get_skills_ranking_state_db import get_skills_ranking_state_db, \
     initialize_skills_ranking_state_db
@@ -63,12 +61,8 @@ class SkillsRankingFeature(IFeature):
         )
 
         # Initialize the databases
-        await asyncio.gather(
-            initialize_skills_ranking_state_db(skills_ranking_state_db, _config.skills_ranking_state_collection_name,
-                                               self._logger),
-            initialize_opportunities_data_db(opportunity_data_db, _config.opportunity_data_collection_name),
-            initialize_job_seekers_db(job_seekers_data_db, _config.job_seekers_collection_name),
-        )
+        await initialize_skills_ranking_state_db(skills_ranking_state_db, _config.skills_ranking_state_collection_name,
+                                               self._logger)
 
         # cache the databases so that they can be closed later, on tear down
         self._databases = [

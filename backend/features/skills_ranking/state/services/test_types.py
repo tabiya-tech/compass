@@ -44,7 +44,6 @@ def get_test_application_state_manager():
 
     return TestApplicationStateManager()
 
-
 def get_test_registration_data_repository():
     class TestRegistrationDataRepository(IRegistrationDataRepository):
         async def get_prior_belief(self, user_id: str) -> float:

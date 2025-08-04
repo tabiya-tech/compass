@@ -17,4 +17,9 @@ class JobSeeker(BaseModel):
     The rank of the job seeker based on their skills in relation to available opportunities.
     """
 
+    compared_to_others_rank: float
+    """
+    The rank of the job seeker compared to others in the same opportunity.
+    """
+
     prior_belief: float

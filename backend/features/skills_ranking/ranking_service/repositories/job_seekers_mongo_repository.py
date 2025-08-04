@@ -11,7 +11,7 @@ def _to_db_document(job_seeker: JobSeeker) -> dict:
     return {
         "user_id": job_seeker.user_id,
         "skills_uuids": list(job_seeker.skills_uuids),
-        "opportunity_rank": job_seeker.opportunity_rank
+        "opportunityRank": job_seeker.opportunity_rank
     }
 
 
@@ -23,7 +23,7 @@ class JobSeekersMongoRepository(IJobSeekersRepository):
 
     async def get_job_seekers_ranks(self, batch_size: int) -> list[float]:
         try:
-            cursor = self._collection.find({}, {'opportunity_rank': 1, '_id': False}).batch_size(batch_size)
+            cursor = self._collection.find({}, {'opportunityRank': 1, '_id': False}).batch_size(batch_size)
 
             ranks = []
             docs = []
@@ -32,20 +32,29 @@ class JobSeekersMongoRepository(IJobSeekersRepository):
 
                 if len(docs) >= batch_size:
                     # Process the batch
-                    for job_seeker in docs:
-                        rank = job_seeker.get("opportunity_rank")
-                        if rank is not None or isinstance(rank, float):
-                            ranks.append(rank)
-                        else:
-                            self._logger.error(f"Found job seeker with missing or invalid rank: {job_seeker}")
+                    ranks.extend(self._validate_job_seeker(docs))
 
                     # Reset the doc list for the next batch
                     docs = []
 
+            # process the remaining docs.
+            ranks.extend(self._validate_job_seeker(docs))
             return ranks
         except Exception as e:
             self._logger.error(f"Failed to get job seeker ranks: {e}")
             raise
+
+    def _validate_job_seeker(self, job_seeker_docs: list[dict]):
+        ranks = []
+        for job_seeker_doc in job_seeker_docs:
+            rank = job_seeker_doc.get("opportunityRank")
+            if rank is not None or isinstance(rank, float):
+                ranks.append(rank)
+            else:
+                self._logger.error(f"Found job seeker with missing or invalid rank: {job_seeker_doc}")
+
+        return ranks
+
 
     async def save_job_seeker_rank(self, job_seeker: JobSeeker) -> None:
         try:
