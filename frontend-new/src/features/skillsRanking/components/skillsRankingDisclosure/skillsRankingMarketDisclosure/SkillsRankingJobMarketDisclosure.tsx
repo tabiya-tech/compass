@@ -18,12 +18,16 @@ import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { Box } from "@mui/material";
-import { getJobPlatformUrl } from "src/features/skillsRanking/constants";
+import { getJobPlatformUrl, TYPING_DURATION_MS } from "src/features/skillsRanking/constants";
 import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
-const TYPING_DURATION_MS = 5000;
-
 const uniqueId = "579104a2-f36b-4ca5-a0c5-b2b44aaa52e1";
+
+enum MarketDisclosureStep {
+  SHOW_MESSAGE = 0,
+  SHOW_TYPING = 1,
+  COMPLETED = 2,
+}
 
 export const DATA_TEST_ID = {
   SKILLS_RANKING_JOB_MARKET_DISCLOSURE_CONTAINER: `skills-ranking-job-market-disclosure-container-${uniqueId}`,
@@ -40,7 +44,7 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
   onFinish,
   skillsRankingState,
 }) => {
-  const [step, setStep] = useState(0); // 0: message, 1: typing, 2: done
+  const [step, setStep] = useState<MarketDisclosureStep>(MarketDisclosureStep.SHOW_MESSAGE);
   const scrollRef = useAutoScrollOnChange(step);
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
@@ -78,7 +82,7 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
 
   useEffect(() => {
     if (shouldSkip) {
-      handleContinue();
+      handleContinue().then();
       return;
     }
 
@@ -86,13 +90,13 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
 
     const timers: NodeJS.Timeout[] = [];
 
-    if (step === 0) {
-      timers.push(setTimeout(() => setStep(1), TYPING_DURATION_MS));
-    } else if (step === 1) {
+    if (step === MarketDisclosureStep.SHOW_MESSAGE) {
+      timers.push(setTimeout(() => setStep(MarketDisclosureStep.SHOW_TYPING), TYPING_DURATION_MS));
+    } else if (step === MarketDisclosureStep.SHOW_TYPING) {
       timers.push(
         setTimeout(() => {
-          setStep(2);
-          handleContinue();
+          setStep(MarketDisclosureStep.COMPLETED);
+          handleContinue().then();
         }, TYPING_DURATION_MS)
       );
     }
@@ -102,6 +106,7 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
     };
   }, [step, isReplay, shouldSkip, handleContinue]);
 
+  // gets skipped for groups 2 and 4
   if (shouldSkip) return null;
 
   return (
@@ -115,9 +120,7 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
         <ChatBubble
           message={
             <>
-              With your current skillset you fulfill the required & most relevant skills of{" "}
-              {skillsRankingState.score.jobs_matching_rank}% of jobs on <strong>{getJobPlatformUrl()}</strong>. This is
-              quite some jobs!
+              You meet the key skills for <strong>{skillsRankingState.score.jobs_matching_rank}%</strong> of opportunities advertised on {getJobPlatformUrl()}. That’s a solid range of options!
             </>
           }
           sender={ConversationMessageSender.COMPASS}
@@ -133,7 +136,7 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
       </Box>
 
       <AnimatePresence mode="wait">
-        {step === 1 && (
+        {step === MarketDisclosureStep.SHOW_TYPING && (
           <motion.div
             key="typing-feedback"
             initial={{ opacity: 0, height: 0 }}

@@ -4,11 +4,7 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import {
-  SkillsRankingPhase,
-  SkillsRankingState,
-  getLatestPhaseName,
-} from "src/features/skillsRanking/types";
+import { SkillsRankingPhase, SkillsRankingState, getLatestPhaseName } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -19,12 +15,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
-import { getJobPlatformUrl } from "src/features/skillsRanking/constants";
+import { getJobPlatformUrl, TYPING_DURATION_MS } from "src/features/skillsRanking/constants";
 import SkillsRankingSlider from "src/features/skillsRanking/components/skillsRankingSlider/SkillsRankingSlider";
 import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
 const uniqueId = "eb90de4c-2462-4b6d-8b9c-1b5c6ae64129";
-const TYPING_DURATION_MS = 5000;
 
 export const DATA_TEST_ID = {
   SKILLS_RANKING_RETYPED_RANK_CONTAINER: `skills-ranking-retyped-rank-container-${uniqueId}`,
@@ -118,7 +113,6 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           const newState = await SkillsRankingService.getInstance().updateSkillsRankingState(
             activeSessionId,
             SkillsRankingPhase.COMPLETED,
-            undefined,
             value
           );
           await onFinish(newState);
@@ -147,13 +141,14 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
             sender={ConversationMessageSender.COMPASS}
             message={
               <>
-                In any case, if we do not think about other job seekers but again focus on those opportunities available
-                to you, let's move to creating your skills profile that you can share with those employers in the next
-                step.
-                {"\n\n"}
-                As a last question, let's remind ourselves of what I told you further above: check again what I said
-                three messages ago, how many percent of opportunities on <strong>{getJobPlatformUrl()}</strong> do you
-                fulfill the required & most relevant skills of?
+                It is almost time to move to creating your skills profile that you can share with those employers in the
+                next step.
+                <br />
+                <br />
+                As a last question, let's recall what I told you further above just regarding your own fit with
+                opportunities:{" "}
+                <strong>check again what I said three messages ago, how many percent of opportunities</strong> on{" "}
+                {getJobPlatformUrl()} do you meet the key skills for?
               </>
             }
           >

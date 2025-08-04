@@ -87,19 +87,25 @@ class MockSkillsRankingService {
 
     // Handle conditional transitions based on experiment group
     let targetPhase = phase;
-    
+
     // If ProofOfValue is transitioning to MARKET_DISCLOSURE, check if we should skip to JOB_SEEKER_DISCLOSURE
-    if (phase === SkillsRankingPhase.MARKET_DISCLOSURE && 
-        (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2 || 
-         this.experimentGroup === SkillsRankingExperimentGroups.GROUP_4)) {
+    if (
+      phase === SkillsRankingPhase.MARKET_DISCLOSURE &&
+      (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2 ||
+        this.experimentGroup === SkillsRankingExperimentGroups.GROUP_4)
+    ) {
       targetPhase = SkillsRankingPhase.JOB_SEEKER_DISCLOSURE;
-      console.log(`[Mock] Skipping MARKET_DISCLOSURE for group ${this.experimentGroup}, going to JOB_SEEKER_DISCLOSURE`);
+      console.log(
+        `[Mock] Skipping MARKET_DISCLOSURE for group ${this.experimentGroup}, going to JOB_SEEKER_DISCLOSURE`
+      );
     }
-    
+
     // If PerceivedRank is transitioning to RETYPED_RANK, check if we should skip to COMPLETED
-    if (phase === SkillsRankingPhase.RETYPED_RANK && 
-        (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2 || 
-         this.experimentGroup === SkillsRankingExperimentGroups.GROUP_4)) {
+    if (
+      phase === SkillsRankingPhase.RETYPED_RANK &&
+      (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2 ||
+        this.experimentGroup === SkillsRankingExperimentGroups.GROUP_4)
+    ) {
       targetPhase = SkillsRankingPhase.COMPLETED;
       console.log(`[Mock] Skipping RETYPED_RANK for group ${this.experimentGroup}, going to COMPLETED`);
     }
@@ -182,7 +188,7 @@ class MockSkillsRankingService {
   getConfig(): any {
     return {
       config: {
-        airtimeBudget: "50 Rand",
+        compensationAmount: "R20",
         jobPlatformUrl: "SAYouth.mobi",
       },
     };
@@ -205,11 +211,11 @@ const setupMocks = (experimentGroup: SkillsRankingExperimentGroups) => {
     mockService.isSkillsRankingFeatureEnabled.bind(mockService);
   SkillsRankingService.getInstance().getConfig = mockService.getConfig.bind(mockService);
 
-  // Add createThrottledMetricsUpdater method for ProofOfValue component
-  SkillsRankingService.getInstance().createThrottledMetricsUpdater = () => ({
-    onActivity: () => {},
-    onInactivity: () => {},
+  // Add createDebouncedMetricsUpdater method for ProofOfValue component
+  SkillsRankingService.getInstance().createDebouncedMetricsUpdater = () => ({
+    update: () => {},
     forceUpdate: () => {},
+    abort: () => {},
     cleanup: () => {},
   });
 };
