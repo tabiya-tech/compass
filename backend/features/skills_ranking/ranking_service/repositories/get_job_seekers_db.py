@@ -30,18 +30,3 @@ async def get_job_seekers_db(mongo_db_uri: str = Depends(lambda: get_skills_rank
                 _job_seekers_db_singleton = get_mongo_db_connection(mongo_db_uri, database_name)
 
     return _job_seekers_db_singleton
-
-
-async def initialize_job_seekers_db(_db: AsyncIOMotorDatabase, collection_name: str):
-    await initialize_mongo_db_indexes(
-        _db,
-        collection_name,
-        [
-            {
-                "name": "user_id_unique_index",
-                "fields": [("user_id", 1)],
-                "options": {"unique": True}
-            }
-        ],
-        _logger
-    )

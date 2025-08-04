@@ -35,7 +35,7 @@ test_cases: list[TestCase] = [
         jobs_skills=[{"skill1", "skill2"}, {"skill3", "skill4"}],
         participant_skills_uuids={"skill1", "skill5"},
         matching_threshold=0.5,
-        expected_ranking=50,
+        expected_ranking=0.5,
         doc="Participant fits 50% skills of 1 job out of 2 jobs, so 50% ranking."
     ),
 ]

@@ -207,6 +207,14 @@ class SkillsRankingStateService(ISkillsRankingStateService):
             participants_skills_uuids=top_skills_uuids
         )
 
+        # Because the ranking service returns scores between 0 and 1, we need to convert it to a values between 0 and 100
+        savable_score = SkillsRankingScore(
+            jobs_matching_rank= score.jobs_matching_rank * 100,
+            comparison_rank=score.comparison_rank * 100,
+            comparison_label=score.comparison_label,
+            calculated_at=score.calculated_at
+        )
+
         # THEN compute the experiment group based on the prior belief and the actual rank
         experiment_group = get_group(
             self_estimated_rank=prior_belief,
@@ -215,4 +223,4 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         )
 
         # Return the score, and the experiment group
-        return score, experiment_group
+        return savable_score, experiment_group
