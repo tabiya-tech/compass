@@ -11,7 +11,8 @@ _registration_repository_singleton: IRegistrationDataRepository | None = None
 _registration_repository_lock = asyncio.Lock()
 
 
-async def get_registration_data_repository(db=Depends(get_registration_data_db)) -> IRegistrationDataRepository:
+async def get_registration_data_repository(db=Depends(get_registration_data_db),
+                                           collection_name = Depends(lambda: get_skills_ranking_config().registration_data_collection_name)) -> IRegistrationDataRepository:
     global _registration_repository_singleton
 
     # initial check to avoid the lock if the singleton instance is already created (lock is expensive)
@@ -22,9 +23,7 @@ async def get_registration_data_repository(db=Depends(get_registration_data_db))
 
             # double check after acquiring the lock
             if _registration_repository_singleton is None:
-                _config = get_skills_ranking_config()
-                _registration_repository_singleton = RegistrationMongoRepository(db,
-                                                                                 _config.registration_data_collection_name)
+                _registration_repository_singleton = RegistrationMongoRepository(db, collection_name)
 
     return _registration_repository_singleton
 
