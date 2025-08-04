@@ -236,8 +236,8 @@
             as well as some initial questions.</p>
           <p><span class="text-bold">Required time:</span> up to 1 hour -- you can start it now or anytime in the next 2
             weeks by simply clicking the link in the E-Mail again.</p>
-          <p>You’ll receive XX Rand airtime as a token of appreciation after finishing the task and another XX Rand
-            about 3 months later when you complete a phone survey with us.</p>
+          <p>You’ll receive <strong>20 Rand</strong> airtime as a token of appreciation after finishing the task and another <strong>40 Rand</strong>
+            about <span id="config-experiment-duration"></span> later when you complete a phone survey with us.</p>
           <p class="text-bold">Do you have a stable internet connection and about 1 hour free right now?</p>
         </div>
         <div class="buttons">
@@ -301,6 +301,7 @@
     YES_BTN: "yes-btn",
     NO_BTN: "no-btn",
     RETURN_HOME_BTN: "return-home",
+    EXPERIMENT_DURATION_SPAN: "config-experiment-duration"
   };
 
   const CHAT_PAGE_CONTAINER_IFRAME = "chat-page-container-iframe";
@@ -587,6 +588,9 @@
 
     const frontendFeatures = JSON.parse(atob(window.tabiyaConfig.FRONTEND_FEATURES));
     const screeningConfigPath = frontendFeatures.screening.config.config_buckets_url;
+    const experimentDuration = frontendFeatures.screening.config.experimentDuration;
+
+    document.getElementById(IDS.EXPERIMENT_DURATION_SPAN).textContent = experimentDuration;
 
     loadScript(screeningConfigPath).then(handleAppLoaded);
   });
