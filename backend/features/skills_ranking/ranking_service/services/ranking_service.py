@@ -79,8 +79,7 @@ class RankingService(IRankingService):
         )
 
         # 7. Add the participant's rank to the jobseeker ranks database after getting the current version.
-        # await self._job_seekers_repository.save_job_seeker_rank(job_seeker)
-
+        await self._job_seekers_repository.save_job_seeker_rank(job_seeker)
 
         score = SkillsRankingScore(
             jobs_matching_rank=opportunities_rank,

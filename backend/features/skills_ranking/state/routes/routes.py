@@ -99,6 +99,7 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
                     raise SkillsRankingStateNotFound(session_id=session_id)
 
             new_state = await skills_ranking_service.upsert_state(
+                user_id=user_info.user_id,
                 session_id=session_id,
                 user_id=user_info.user_id,
                 update_request=UpdateSkillsRankingRequest(
