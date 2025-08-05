@@ -230,9 +230,6 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
       const metrics: SkillsRankingMetrics = {
         cancelled_after: getCancelledAfter(),
         succeeded_after: getSucceededAfter(),
-        correct_rotations: puzzleMetrics?.correct_rotations,
-        puzzles_solved: puzzleMetrics?.puzzles_solved,
-        clicks_count: puzzleMetrics?.clicks_count,
       };
 
       try {

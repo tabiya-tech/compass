@@ -45,7 +45,7 @@ export const CHECK_INACTIVITY_INTERVAL = INACTIVITY_TIMEOUT + INACTIVITY_TIMEOUT
 
 export const FEEDBACK_NOTIFICATION_DELAY = 30 * 60 * 1000; // In milliseconds
 // Always add an artificial typing message for the conclusion message
-export const TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT = 1000; // In milliseconds
+export const TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT = 3000; // In milliseconds
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
   CONTAINER: `container-${uniqueId}`,
@@ -66,14 +66,13 @@ interface ChatProps {
 const createShowConclusionMessage = (
   lastMessage: ConversationMessage,
   addMessageToChat: (message: IChatMessage<any>) => void,
-  removeMessageFromChat: (messageId: string) => void
+  setAiIsTyping: (isTyping: boolean) => void
 ) => {
   return () => {
     const conclusionMessage = generateConversationConclusionMessage(lastMessage.message_id, lastMessage.message);
-    const typingMessage = generateTypingMessage();
-    addMessageToChat(typingMessage);
+    setAiIsTyping(true);
     setTimeout(() => {
-      removeMessageFromChat(typingMessage.message_id);
+      setAiIsTyping(false);
       addMessageToChat(conclusionMessage);
     }, TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT);
   };
@@ -254,7 +253,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
           const showConclusionMessage = createShowConclusionMessage(
             lastMessage,
             addMessageToChat,
-            removeMessageFromChat
+            setAiIsTyping
           );
 
           if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
@@ -278,7 +277,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         setAiIsTyping(false);
       }
     },
-    [addMessageToChat, exploredExperiences, fetchExperiences, removeMessageFromChat, showSkillsRanking]
+    [addMessageToChat, exploredExperiences, fetchExperiences, showSkillsRanking]
   );
 
   const initializeChat = useCallback(
@@ -331,14 +330,17 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
             const lastMessage = history.messages[history.messages.length - 1];
 
             if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
-              showSkillsRanking(() => {
-                // During initialization, just add the conclusion message directly without typing
-                const conclusionMessage = generateConversationConclusionMessage(
-                  lastMessage.message_id,
-                  lastMessage.message
-                );
-                addMessageToChat(conclusionMessage);
-              });
+              const showConclusionMessage = createShowConclusionMessage(
+                lastMessage,
+                addMessageToChat,
+                setAiIsTyping
+              );
+
+              if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
+                await showSkillsRanking(showConclusionMessage);
+              } else {
+                showConclusionMessage();
+              }
             }
           }
 
