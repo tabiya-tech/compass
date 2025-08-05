@@ -22,6 +22,7 @@ def _clone_entity(entity: T, preferred_label: Optional[str] = None) -> BaseEntit
         preferredLabel=preferred_label or entity.preferredLabel,
         altLabels=list(entity.altLabels),  # <-- make a shallow copy!,
         scopeNote=entity.scopeNote,
+        originUUID=entity.originUUID,
         description=entity.description,
         score=entity.score
     )

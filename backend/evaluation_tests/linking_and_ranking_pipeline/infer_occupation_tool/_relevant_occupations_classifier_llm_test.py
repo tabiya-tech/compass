@@ -19,6 +19,7 @@ def _get_occupation_entity(*,
                            altlabels: Optional[list[str]] = None,
                            description: Optional[str] = "",
                            scope_note: Optional[str] = "",
+                           origin_uuid: Optional[str] = "",
                            score: Optional[float] = 0) -> OccupationEntity:
     return OccupationEntity(
         id=f"{uuid.uuid4().hex[:24]}",  # id is a random sting 24 character hex string
@@ -29,6 +30,7 @@ def _get_occupation_entity(*,
         altLabels=altlabels if altlabels is not None else [preferred_label],  # the preferred label is usually expected to be in the altlabels
         description=description,
         scopeNote=scope_note,
+        originUUID=origin_uuid if origin_uuid else f"{uuid.uuid4()}",
         score=score
     )
 
