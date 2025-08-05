@@ -207,6 +207,7 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
                 "preferredLabel": {"$first": "$preferredLabel"},
                 "description": {"$first": "$description"},
                 "scopeNote": {"$first": "$scopeNote"},
+                "originUIID": {"$first": "originUIID"},
                 "altLabels": {"$first": "$altLabels"},
                 "code": {"$first": "$code"},
                 "score": {"$max": "$score"}
@@ -225,6 +226,7 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
             preferredLabel=doc.get("preferredLabel", ""),
             description=doc.get("description", ""),
             scopeNote=doc.get("scopeNote", ""),
+            originUUID=doc.get("originUUID", ""),
             altLabels=doc.get("altLabels", []),
             score=doc.get("score", 0.0),
         )

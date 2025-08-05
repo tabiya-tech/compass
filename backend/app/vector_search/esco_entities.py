@@ -21,6 +21,9 @@ class BaseEntity(BaseModel):
     # Since we want to maintain backward compatibility with data persisted in the db,
     # we allow scopeNote to be optional and set the default value to an empty string
     scopeNote: Optional[str] = ""
+    # Since we want to maintain backward compatibility with data persisted in the db,
+    # we allow originUUID to be optional and set the default value to an empty string
+    originUUID: Optional[str] = ""
     score: float
 
 
