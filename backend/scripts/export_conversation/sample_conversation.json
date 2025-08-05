@@ -48,6 +48,7 @@
               ],
               "description": "Description",
               "scopeNode": "ScopeNote",
+              "originUUID": "86c1cd65-5e1e-4018-90cd-a8ef446e4bfc",
               "score": 1,
               "skillType": "skill/competence"
             }
