@@ -374,9 +374,11 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
                                 'Given {entity_types_plural_capitalized}': {entities_to_classify}
                                 </Input>
                                 """)
-
         _entities_to_classify = [{f'{entity_type_singular} title': entity.preferredLabel,
-                                  f'{entity_type_singular} description': entity.description + ("\n\n" + entity.scopeNote if entity.scopeNote != "" else ''),
+                                  f'{entity_type_singular} description': entity.description +
+                                                                         # because the already existing taxonomyModels have None scopeNote
+                                                                         # use `not entity.ScopeNote` to catch those cases.
+                                                                         ("" if not entity.scopeNote else "\n\n" + entity.scopeNote),
                                   }
                                  for entity in entities_to_classify]
         # When json.dumps is used ensure_ascii is False to avoid escaping non-ascii characters.
