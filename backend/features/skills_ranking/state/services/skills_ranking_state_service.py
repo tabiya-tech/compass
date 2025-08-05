@@ -209,8 +209,8 @@ class SkillsRankingStateService(ISkillsRankingStateService):
 
         # Because the ranking service returns scores between 0 and 1, we need to convert it to a values between 0 and 100
         savable_score = SkillsRankingScore(
-            jobs_matching_rank= score.jobs_matching_rank * 100,
-            comparison_rank=score.comparison_rank * 100,
+            jobs_matching_rank= round(score.jobs_matching_rank * 100, 2),
+            comparison_rank=round(score.comparison_rank * 100, 2),
             comparison_label=score.comparison_label,
             calculated_at=score.calculated_at
         )

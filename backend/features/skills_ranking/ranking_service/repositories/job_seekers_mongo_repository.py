@@ -9,9 +9,10 @@ from ..services.types import JobSeeker
 
 def _to_db_document(job_seeker: JobSeeker) -> dict:
     return {
-        "user_id": job_seeker.user_id,
-        "skills_uuids": list(job_seeker.skills_uuids),
-        "opportunityRank": job_seeker.opportunity_rank
+        "compassUserId": job_seeker.user_id,
+        "skillsUUIDs": list(job_seeker.skills_uuids),
+        "opportunityRank": job_seeker.opportunity_rank,
+        "comparedToOthersRank": job_seeker.compared_to_others_rank,
     }
 
 
