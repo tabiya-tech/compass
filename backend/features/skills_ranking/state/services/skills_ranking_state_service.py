@@ -149,7 +149,7 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         # Second, let's get all the skills for this specific session.
         state = await self._application_state_manager.get_state(session_id=session_id)
         experiences_data = state.explore_experiences_director_state.experiences_state.values()
-        top_skills_uuids = {skill.UUID for experience in experiences_data for skill in experience.experience.top_skills}
+        top_skills_uuids = {skill.originUUID for experience in experiences_data for skill in experience.experience.top_skills}
 
         # Compute the ranking score for this participant
         score = await self._ranking_service.get_participant_ranking(
