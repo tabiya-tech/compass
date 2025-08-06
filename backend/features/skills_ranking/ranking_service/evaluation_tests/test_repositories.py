@@ -1,7 +1,7 @@
 import json
 import os
-from uuid import uuid4
 
+from features.skills_ranking.ranking_service.evaluation_tests._types import IntegrationTestCase
 from features.skills_ranking.ranking_service.repositories.types import IJobSeekersRepository
 from features.skills_ranking.ranking_service.services.opportunities_data_service import IOpportunitiesDataService
 from features.skills_ranking.ranking_service.services.types import JobSeeker
@@ -17,7 +17,8 @@ class TestOpportunitiesDataService(IOpportunitiesDataService):
 
     async def get_opportunities_skills_uuids(self):
         skills_uuids = [
-            {skill.get("uuid") for skill in opportunity.get("skills", []) if skill.get("uuid")} for opportunity in self._test_opportunities_data
+            {skill.get("uuid") for skill in opportunity.get("given_skills", []) if skill.get("uuid")} for opportunity in
+            self._test_opportunities_data
         ]
 
         # filter out empty and None values
@@ -26,20 +27,27 @@ class TestOpportunitiesDataService(IOpportunitiesDataService):
 
 class TestJobSeekersDataRepository(IJobSeekersRepository):
     def __init__(self):
-        with open(os.path.join(TEST_DATA_FILES_PATH, 'job_seekers.json'), 'r') as file:
+        with open(os.path.join(TEST_DATA_FILES_PATH, 'integration_test_data.json'), 'r') as file:
             self._test_job_seekers_data = json.load(file)
 
-    async def get_job_seekers_ranks(self, batch_size: int) -> list[float]:
-        return [job_seeker.get("opportunityRank") for job_seeker in self._test_job_seekers_data]
+        with(open(os.path.join(TEST_DATA_FILES_PATH, 'job_seekers_skills.json'), 'r')) as file:
+            self._job_seekers_skills = json.load(file)
 
-    def get_all_job_seekers(self):
-        return [JobSeeker(
-            user_id=uuid4().__str__(),
-            skills_uuids={skill.get("uuid") for skill in job_seeker.get("skills", [])},
-            opportunity_rank=job_seeker.get("opportunityRank", 0.0),
-            compared_to_others_rank=job_seeker.get("comparedToOthersRank", 0.0),
-            prior_belief=0.0
-        ) for job_seeker in self._test_job_seekers_data]
+    async def get_job_seekers_ranks(self, batch_size: int) -> list[float]:
+        return [job_seeker.get("expected_opportunity_rank") for job_seeker in self._test_job_seekers_data]
+
+    def get_test_cases(self) -> list[IntegrationTestCase]:
+        print(self._test_job_seekers_data)
+        return [IntegrationTestCase(**test_case) for test_case in self._test_job_seekers_data]
 
     async def save_job_seeker_rank(self, job_seeker: JobSeeker) -> None:
         return None
+
+    def get_skills_by_external_user_id(self, external_user_id: str) -> set[str]:
+        """
+        Get the skills associated with a jobseeker by their external user ID.
+        """
+        job_seeker_skills = next(job_seeker.get("given_skills") for job_seeker in self._job_seekers_skills if
+                                 job_seeker.get("given_external_user_id") == external_user_id)
+
+        return {skill.get("uuid") for skill in job_seeker_skills}

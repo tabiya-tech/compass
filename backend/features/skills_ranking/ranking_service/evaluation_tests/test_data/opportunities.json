@@ -1,7 +1,7 @@
 [
   {
-    "opportunity_ref_id": "1596370",
-    "skills": [
+    "given_opportunity_ref_id": "1596370",
+    "given_skills": [
       {
         "preferred_label": "",
         "uuid": ""
@@ -9,8 +9,8 @@
     ]
   },
   {
-    "opportunity_ref_id": "1628603",
-    "skills": [
+    "given_opportunity_ref_id": "1628603",
+    "given_skills": [
       {
         "preferred_label": "prepare bread products",
         "uuid": "d45134e3-cb0f-488c-a621-3e4595eb4a38"
@@ -54,8 +54,8 @@
     ]
   },
   {
-    "opportunity_ref_id": "1647762",
-    "skills": [
+    "given_opportunity_ref_id": "1647762",
+    "given_skills": [
       {
         "preferred_label": "SAP Data Services",
         "uuid": "43ae5a06-c71e-48c5-85d8-9d8174abaf7a"
@@ -103,8 +103,8 @@
     ]
   },
   {
-    "opportunity_ref_id": "1657622",
-    "skills": [
+    "given_opportunity_ref_id": "1657622",
+    "given_skills": [
       {
         "preferred_label": "communication",
         "uuid": "2f51e650-8e64-446a-90fa-15a71e16a190"
@@ -152,8 +152,8 @@
     ]
   },
   {
-    "opportunity_ref_id": "1657624",
-    "skills": [
+    "given_opportunity_ref_id": "1657624",
+    "given_skills": [
       {
         "preferred_label": "upper secondary education qualification",
         "uuid": "c6e4b1a3-2c3f-4e9e-9b2e-2f2f3a3c9f3e"
@@ -165,8 +165,8 @@
     ]
   },
   {
-    "opportunity_ref_id": "1657626",
-    "skills": [
+    "given_opportunity_ref_id": "1657626",
+    "given_skills": [
       {
         "preferred_label": "upper secondary education qualification",
         "uuid": "c6e4b1a3-2c3f-4e9e-9b2e-2f2f3a3c9f3e"
@@ -174,8 +174,8 @@
     ]
   },
   {
-    "opportunity_ref_id": "1662446",
-    "skills": [
+    "given_opportunity_ref_id": "1662446",
+    "given_skills": [
       {
         "preferred_label": "provide education management support",
         "uuid": "2f7b2761-52ae-492d-9fb1-89ba2bd686f8"
@@ -223,8 +223,8 @@
     ]
   },
   {
-    "opportunity_ref_id": "1775712",
-    "skills": [
+    "given_opportunity_ref_id": "1775712",
+    "given_skills": [
       {
         "preferred_label": "show professional responsibility",
         "uuid": "2943b996-8f5b-4465-8eeb-69d0960e1ac5"
@@ -272,8 +272,8 @@
     ]
   },
   {
-    "opportunity_ref_id": "1775902",
-    "skills": [
+    "given_opportunity_ref_id": "1775902",
+    "given_skills": [
       {
         "preferred_label": "lower secondary education qualification",
         "uuid": "a2f1c3e4-7b8d-4c9f-9e2f-1d3e4f5a6b7c"
@@ -317,8 +317,8 @@
     ]
   },
   {
-    "opportunity_ref_id": "1790687",
-    "skills": [
+    "given_opportunity_ref_id": "1790687",
+    "given_skills": [
       {
         "preferred_label": "upper secondary education qualification",
         "uuid": "c6e4b1a3-2c3f-4e9e-9b2e-2f2f3a3c9f3e"

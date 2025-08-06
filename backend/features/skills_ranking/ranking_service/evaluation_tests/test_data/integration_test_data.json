@@ -1,0 +1,122 @@
+[
+  {
+    "given_external_user_id": "148b53a2-659b-4e78-9436-3add1c03c435",
+    "given_compass_user_id": "724533ee-beb9-47d6-ae44-d41254107826",
+    "given_prior_opportunity_rank_belief": 0.35,
+    "given_prior_job_seekers_rank_belief": 0.7,
+    "given_random_target_group": 2,
+    "expected_overlap_scores": [1, 0.8, 0, 0, 0.5, 1, 0,0, 0.1, 0.1],
+    "expected_number_of_jobs_above_threshold": 3,
+    "expected_opportunity_rank": 0.3,
+    "expected_job_seekers_rank": 0.65,
+    "expected_assigned_group": "Group 2b"
+  },
+  {
+    "given_external_user_id": "9639cc2a-f53c-4514-98de-36446d5436fb",
+    "given_compass_user_id": "8744ed8a-3ac1-44eb-ac56-f4280022120e",
+    "given_prior_opportunity_rank_belief": 0.43,
+    "given_prior_job_seekers_rank_belief": 0.65,
+    "given_random_target_group": 1,
+    "expected_overlap_scores": [1, 0, 0.55, 0.73, 0.5, 1, 0.55, 0, 0.2, 0.2],
+    "expected_number_of_jobs_above_threshold": 5,
+    "expected_opportunity_rank": 0.5,
+    "expected_job_seekers_rank": 0.9,
+    "expected_assigned_group": "Group 1b"
+  },
+  {
+    "given_external_user_id": "7adfb8aa-c06d-4971-a502-9ffc8e562d3f",
+    "given_compass_user_id": "62878c4a-21cf-43a9-92c4-eb006e8fda73",
+    "given_prior_opportunity_rank_belief": 0.22,
+    "given_prior_job_seekers_rank_belief": 0.44,
+    "given_random_target_group": 2,
+    "expected_overlap_scores": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "expected_number_of_jobs_above_threshold": 1,
+    "expected_opportunity_rank": 0.1,
+    "expected_job_seekers_rank": 0.05,
+    "expected_assigned_group": "Group 2b"
+  },
+  {
+    "given_external_user_id": "202061f4-82da-45d3-9ce6-1d869ee6f12e",
+    "given_compass_user_id": "56c11ef0-ddc6-4a02-8b6b-c93b05573bb8",
+    "given_prior_opportunity_rank_belief": 0.24,
+    "given_prior_job_seekers_rank_belief": 0.35,
+    "expected_overlap_scores": [1, 0, 0.55, 0.73, 0.5, 1, 0, 0, 0.1, 0.8],
+    "expected_number_of_jobs_above_threshold": 5,
+    "expected_opportunity_rank": 0.5,
+    "expected_job_seekers_rank": 0.9,
+    "given_random_target_group": 2,
+    "expected_assigned_group": "Group 2a"
+  },
+  {
+    "given_external_user_id": "9319d9b9-e278-40a8-b2a4-40983d3eb641",
+    "given_compass_user_id": "c85f0c82-41cc-4c03-ae88-e535d4dfd20a",
+    "given_prior_opportunity_rank_belief": 0.55,
+    "given_prior_job_seekers_rank_belief": 0.62,
+    "expected_overlap_scores": [1, 0, 0, 0, 0, 0, 0, 0, 0.8, 0],
+    "expected_number_of_jobs_above_threshold": 2,
+    "expected_opportunity_rank": 0.2,
+    "expected_job_seekers_rank": 0.3,
+    "given_random_target_group": 1,
+    "expected_assigned_group": "Group 1a"
+  },
+  {
+    "given_external_user_id": "0083d2ae-eec1-4b71-888e-fd7cb0e93257",
+    "given_compass_user_id": "10cf9bf8-3ebe-4f42-bf4f-e00fe0ffaf6a",
+    "given_prior_opportunity_rank_belief": 0.63,
+    "given_prior_job_seekers_rank_belief": 0.89,
+    "expected_overlap_scores": [1, 0, 0, 0, 0, 0, 0.82, 0, 0.1, 0],
+    "expected_number_of_jobs_above_threshold": 2,
+    "expected_opportunity_rank": 0.2,
+    "expected_job_seekers_rank": 0.3,
+    "given_random_target_group": 2,
+    "expected_assigned_group": "Group 2b"
+  },
+  {
+    "given_external_user_id": "7bdb4544-a207-457a-bffc-97efd1f064ec",
+    "given_compass_user_id": "6f77134a-8c8d-4049-9ee9-d7774877f3ec",
+    "given_prior_opportunity_rank_belief": 0.15,
+    "given_prior_job_seekers_rank_belief": 0.32,
+    "expected_overlap_scores": [1, 0.8, 0, 0, 0, 0, 0, 0, 0.8, 0],
+    "expected_number_of_jobs_above_threshold": 3,
+    "expected_opportunity_rank": 0.3,
+    "expected_job_seekers_rank": 0.65,
+    "given_random_target_group": 1,
+    "expected_assigned_group": "Group 1b"
+  },
+  {
+    "given_external_user_id": "3b0bb1f4-399b-4077-9491-c2b96b922abb",
+    "given_compass_user_id": "ceaa76c4-e1b7-4f7d-9c02-187d3079f9df",
+    "given_prior_opportunity_rank_belief": 0.33,
+    "given_prior_job_seekers_rank_belief": 0.15,
+    "expected_overlap_scores": [1, 0, 0, 0.73, 0, 0, 0.82, 0, 0.1, 0.1],
+    "expected_number_of_jobs_above_threshold": 3,
+    "expected_opportunity_rank": 0.3,
+    "expected_job_seekers_rank": 0.65,
+    "given_random_target_group": 2,
+    "expected_assigned_group": "Group 2b"
+  },
+  {
+    "given_external_user_id": "5d6d34a3-32a4-44d1-b87a-f2fd8db1cfc4",
+    "given_compass_user_id": "e4c9fc59-1d95-40d3-b62e-0a21e1928978",
+    "given_prior_opportunity_rank_belief": 0.47,
+    "given_prior_job_seekers_rank_belief": 0.53,
+    "expected_overlap_scores": [1, 0, 0, 0, 0, 0, 0, 0.73, 0, 0],
+    "expected_number_of_jobs_above_threshold": 2,
+    "expected_opportunity_rank": 0.2,
+    "expected_job_seekers_rank": 0.3,
+    "given_random_target_group": 2,
+    "expected_assigned_group": "Group 2b"
+  },
+  {
+    "given_external_user_id": "bc76baac-7da7-4cf4-b11b-676ad2edd531",
+    "given_compass_user_id": "d8b1b8b7-18d0-4ecd-8360-5a056a7f76c0",
+    "given_prior_opportunity_rank_belief": 0.51,
+    "given_prior_job_seekers_rank_belief": 0.24,
+    "given_random_target_group": 1,
+    "expected_overlap_scores": [1, 0, 0, 0, 0, 0, 0.82, 0, 0, 0],
+    "expected_number_of_jobs_above_threshold": 2,
+    "expected_opportunity_rank": 0.2,
+    "expected_job_seekers_rank": 0.3,
+    "expected_assigned_group": "Group 1a"
+  }
+]

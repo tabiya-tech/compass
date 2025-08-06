@@ -5,17 +5,17 @@ from features.skills_ranking.ranking_service.utils.opportunity_ranking import ge
 
 
 class TestCase(BaseModel):
-    jobs_skills: list[set[str]]
+    given_jobs_skills: list[set[str]]
     """
     The skills required for each job, represented as a list of sets of skill UUIDs.
     """
 
-    participant_skills_uuids: set[str]
+    given_participant_skills_uuids: set[str]
     """
     The skills of the participant, represented as a set of skill UUIDs.
     """
 
-    matching_threshold: float
+    given_matching_threshold: float
     """
     The threshold for matching ranks, which skills to match to consider a participant fit for a job.
     """
@@ -32,11 +32,25 @@ class TestCase(BaseModel):
 
 test_cases: list[TestCase] = [
     TestCase(
-        jobs_skills=[{"skill1", "skill2"}, {"skill3", "skill4"}],
-        participant_skills_uuids={"skill1", "skill5"},
-        matching_threshold=0.5,
+        given_jobs_skills=[{"skill1", "skill2"}, {"skill3", "skill4"}],
+        given_participant_skills_uuids={"skill6", "skill7"},
+        given_matching_threshold=0.5,
+        expected_ranking=0,
+        doc="Participant doesn't fit any job skills, so 0% ranking."
+    ),
+    TestCase(
+        given_jobs_skills=[{"skill1", "skill2", "skill3"}, {"skill4", "skill5", "skill6"}],
+        given_participant_skills_uuids={"skill1", "skill2", "skill5"},
+        given_matching_threshold=0.5,
         expected_ranking=0.5,
-        doc="Participant fits 50% skills of 1 job out of 2 jobs, so 50% ranking."
+        doc="Participant fits more than 50% skills of 1 job out of 2 jobs, so 50% ranking."
+    ),
+    TestCase(
+        given_jobs_skills=[{"skill1", "skill2"}, {"skill3", "skill4"}],
+        given_participant_skills_uuids={"skill1", "skill2", "skill3", "skill4"},
+        given_matching_threshold=0.5,
+        expected_ranking=1.0,
+        doc="Participant fits all skills of 1 job and all skills of another job, so 100% ranking."
     ),
 ]
 
@@ -47,13 +61,13 @@ test_cases: list[TestCase] = [
     ) for case in test_cases])
 def test_opportunity_ranking(case):
     # GIVEN the parameters for the opportunity ranking
-    given_jobs_skills = case.jobs_skills
+    given_jobs_skills = case.given_jobs_skills
 
     # AND the participant's skills
-    given_participant_skills_uuids = case.participant_skills_uuids
+    given_participant_skills_uuids = case.given_participant_skills_uuids
 
     # AND the matching threshold
-    given_matching_threshold = case.matching_threshold
+    given_matching_threshold = case.given_matching_threshold
 
     # WHEN we compute the opportunity ranking
     result = get_opportunity_ranking(

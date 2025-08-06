@@ -46,7 +46,7 @@ def get_group(*,
     target_group = _get_random_group()
 
     # Difference between self-estimated and actual rank
-    belief_rank_gap = self_estimated_rank - actual_rank
+    belief_rank_gap = actual_rank - self_estimated_rank
 
     if target_group == TargetGroup.HIGH_DIFFERENCE:
         # -- Group 1: Will be assigned based on the high difference. --

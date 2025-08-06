@@ -6,8 +6,9 @@ def _calculate_overlap_score(*,
     :returns a percentage: 0-1
     """
     # Avoid division by zero if no UUID columns in opportunities (i.e.: an opportunity has zero skills).
+    # If the opportunity has no skills, we consider it a perfect match for everyone.
     if len(opportunity_skills_uuids) == 0:
-        return 1 # If the opportunity has no skills, we consider it a perfect match for everyone.
+        return 1
 
     # Find the common UUIDs between the opportunity and the person's skills.
     overlapping_uuids = opportunity_skills_uuids.intersection(participant_skills_uuids)
@@ -33,8 +34,10 @@ def get_opportunity_ranking(*,
         score = _calculate_overlap_score(
                     opportunity_skills_uuids=opportunity_skills,
                     participant_skills_uuids=participant_skills_uuids)
+
+
         total_opportunities += 1
-        if score >= opportunity_matching_threshold:
+        if score > opportunity_matching_threshold:
             matching_opportunities += 1
 
     percentage_above_threshold = (matching_opportunities / total_opportunities) if total_opportunities else 0
