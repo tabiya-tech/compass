@@ -124,7 +124,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
                 </>
               ) : (
                 <>
-                  Before we really finish our conversation, I just have one last question related to the above -- if you think of 100 people who are jobseekers from South Africa aged 18-34 with a matric from a township or rural school. How many of these 100 job seekers do you believe would be a fit for <strong>fewer positions</strong> on {getJobPlatformUrl()} than you?
+                  Before we really finish our conversation, I just have one last question related to the above —  if you think of 100 people who are jobseekers from South Africa aged 18-34 with a matric from a township or rural school. How many of these 100 job seekers do you believe would be a fit for <strong>fewer positions</strong> on {getJobPlatformUrl()} than you?
                 </>
               )}
             </>

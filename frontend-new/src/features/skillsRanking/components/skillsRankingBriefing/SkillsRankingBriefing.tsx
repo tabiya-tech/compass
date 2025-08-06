@@ -70,7 +70,9 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
 
   const [submitted, setSubmitted] = useState(false);
   const [isTypingVisible, setIsTypingVisible] = useState(false);
-  const [showSecondMessage, setShowSecondMessage] = useState(effortType === EffortType.TIME_BASED);
+  const [showSecondMessage, setShowSecondMessage] = useState(
+    effortType === EffortType.TIME_BASED || (effortType === EffortType.WORK_BASED && isReplay)
+  );
 
   const currentScrollStep = useMemo(() => {
     if (isTypingVisible) return ScrollStep.TYPING;
@@ -196,27 +198,37 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
 
       {/* Second WORK_BASED message + button */}
       {effortType === EffortType.WORK_BASED && showSecondMessage && (
-        <ChatBubble
-          message={<>
-            You’ll see tilted letters on a few screens. Turn each letter upright using the rotation buttons. You can cancel anytime. In 5% of cases, <strong>more letters fixed = higher chance of receiving the information.</strong> The rest of the time it depends on me.
-          </>}
-          sender={ConversationMessageSender.COMPASS}
-        >
-          <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="flex-end"
-            padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+        <Box sx={{ width: "100%" }}>
+          <ChatBubble
+            message={<>
+              You'll see tilted letters on a few screens. Turn each letter upright using the rotation buttons. You can cancel anytime. In 5% of cases, <strong>more letters fixed = higher chance of receiving the information.</strong> The rest of the time it depends on me.
+            </>}
+            sender={ConversationMessageSender.COMPASS}
           >
-            <PrimaryButton
-              onClick={handleContinue}
-              disabled={isReplay || !isOnline || submitted || isTypingVisible}
-              data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON}
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="flex-end"
+              padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
             >
-              Continue
-            </PrimaryButton>
-          </Box>
-        </ChatBubble>
+              <PrimaryButton
+                onClick={handleContinue}
+                disabled={isReplay || !isOnline || submitted || isTypingVisible}
+                data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON}
+              >
+                Continue
+              </PrimaryButton>
+            </Box>
+          </ChatBubble>
+
+          <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
+            <Timestamp
+              sentAt={
+                skillsRankingState.phases[skillsRankingState.phases.length - 1]?.time || skillsRankingState.started_at
+              }
+            />
+          </ChatMessageFooterLayout>
+        </Box>
       )}
 
       {/* Final typing shown after clicking continue */}

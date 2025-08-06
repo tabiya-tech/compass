@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Box, keyframes, Typography, useTheme } from "@mui/material";
+import { Box, keyframes, Theme, Typography, useTheme, useMediaQuery } from "@mui/material";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import RotateRightIcon from "@mui/icons-material/RotateRight";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
@@ -72,6 +72,8 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
   const [startTime, setStartTime] = useState<number | null>(null);
   const theme = useTheme();
   const pulseAnimation = createPulseAnimation(theme.palette.primary.main);
+
+  const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
   const generateChallenge = useCallback((): CharacterState[] => {
     const puzzleString = stringPool[puzzleIndex % stringPool.length];
@@ -224,7 +226,8 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
   // No cleanup needed since we removed the activity timeout
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
+    <Box display="flex" flexDirection="column" alignItems="center" 
+    gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
       <Typography variant="body1" color="text.secondary">
         Rotate each letter until it’s upright. Select a letter by clicking on it, then rotate it clockwise with{" "}
         <RotateRightIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} /> or counterclockwise with{" "}
@@ -307,11 +310,13 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
       <Box
         display="flex"
         flexDirection="row-reverse"
-        alignItems="center"
+        alignItems="flex-end"
         width="100%"
         height={theme.fixedSpacing(theme.tabiyaSpacing.xl * 2)} // xl is not quite big enough and we dont want the componenent to move around
         padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
-        gap={2}
+        gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+        marginTop={isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+        zIndex={20} // bring the notification above the puzzle buttons
       >
         {/* Cancel button on the right (appears first due to row-reverse) */}
         <PrimaryButton onClick={onCancel} disabled={disabled || isReplay || isAllComplete} sx={{ flexShrink: 0 }}>
@@ -335,7 +340,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
               },
             }}
           >
-            <Typography variant="body2" fontWeight="bold">
+            <Typography variant="caption" fontWeight="bold">
               {completionMessage}
             </Typography>
           </Box>
