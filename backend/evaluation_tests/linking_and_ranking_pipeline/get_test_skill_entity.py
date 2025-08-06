@@ -12,6 +12,7 @@ def get_skill_entity(*,
                      description: Optional[str] = "",
                      scope_note: Optional[str] = "",
                      origin_uuid: Optional[str] = None,
+                     uuid_history: Optional[list[str]] = None,
                      score: Optional[float] = 0) -> SkillEntity:
     return SkillEntity(
         id=f"{uuid.uuid4().hex[:24]}",  # id is a random sting 24 character hex string
@@ -22,6 +23,7 @@ def get_skill_entity(*,
         description=description,
         scopeNote=scope_note,
         originUUID=origin_uuid if origin_uuid else f"{uuid.uuid4()}",
+        UUIDHistory=uuid_history if uuid_history is not None else [f"{uuid.uuid4()}"],  # we can use a random UUID for the history
         skillType="skill/competence",  # We do not care about the skill type
         score=score
     )

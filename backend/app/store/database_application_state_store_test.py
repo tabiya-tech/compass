@@ -77,6 +77,7 @@ def generate_random_experience(index: int) -> ExperienceEntity:
                     description=f"Occupation description {index}",
                     scopeNote=f"Occupation Scope note {index}",
                     originUUID=str(uuid4()),
+                    UUIDHistory=[str(uuid4())],
                     score=0.5,
                     code=f"ESCO-{index}"
                 ),
@@ -90,6 +91,7 @@ def generate_random_experience(index: int) -> ExperienceEntity:
                         description=f"Skill description {index} ",
                         scopeNote=f"Skill Scope note {index}",
                         originUUID=str(uuid4()),
+                        UUIDHistory=[str(uuid4())],
                         score=0.5,
                         skillType=random.choice(['skill/competence', 'knowledge', 'language', 'attitude', '']),  # nosec B311 # random is used for testing purposes
                         relationType=random.choice(['essential', 'optional', '']),  # nosec B311 # random is used for testing purposes

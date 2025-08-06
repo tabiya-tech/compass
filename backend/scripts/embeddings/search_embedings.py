@@ -68,6 +68,7 @@ def _to_entity(doc: dict) -> OccupationEntity:
         description=doc.get("description", ""),
         scopeNote=doc.get("scopeNote", ""),
         originUUID=doc.get("originUUID", ""),
+        UUIDHistory=doc.get("UUIDHistory", []),
         altLabels=doc.get("altLabels", []),
     )
 

@@ -188,6 +188,7 @@ class TestExperienceRoutes:
                             description="Foo bar baz",
                             scopeNote="Foo bar scope note",
                             originUUID="origin_uuid",
+                            UUIDHistory=["bar_uuid", "origin_uuid"],
                             altLabels=["foo_label_1", "bar_label_2"],
                         )
                     ],
