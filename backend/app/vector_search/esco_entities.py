@@ -24,6 +24,9 @@ class BaseEntity(BaseModel):
     # Since we want to maintain backward compatibility with data persisted in the db,
     # we allow originUUID to be optional and set the default value to an empty string
     originUUID: Optional[str] = ""
+    # UUIDHistory is a list of UUIDs that the entity have and had in the past.
+    # This is useful for tracking changes in the entity's UUID over time.
+    UUIDHistory: Optional[list[str]] = Field(default_factory=list)
     score: float
 
 

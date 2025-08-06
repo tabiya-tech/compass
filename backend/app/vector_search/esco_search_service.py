@@ -208,6 +208,7 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
                 "description": {"$first": "$description"},
                 "scopeNote": {"$first": "$scopeNote"},
                 "originUUID": {"$first": "$originUUID"},
+                "UUIDHistory": {"$first": "$UUIDHistory"},
                 "altLabels": {"$first": "$altLabels"},
                 "code": {"$first": "$code"},
                 "score": {"$max": "$score"}
@@ -227,6 +228,7 @@ class OccupationSearchService(AbstractEscoSearchService[OccupationEntity]):
             description=doc.get("description", ""),
             scopeNote=doc.get("scopeNote", ""),
             originUUID=doc.get("originUUID", ""),
+            UUIDHistory=doc.get("UUIDHistory", []),
             altLabels=doc.get("altLabels", []),
             score=doc.get("score", 0.0),
         )
@@ -308,6 +310,7 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
             description=doc.get("description", ""),
             scopeNote=doc.get("scopeNote", ""),
             originUUID=doc.get("originUUID", ""),
+            UUIDHistory=doc.get("UUIDHistory", []),
             altLabels=doc.get("altLabels", []),
             skillType=cast(SkillTypeLiteral, doc.get("skillType", "")),
             score=doc.get("score", 0.0),
@@ -321,6 +324,7 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
                 "description": {"$first": "$description"},
                 "scopeNote": {"$first": "$scopeNote"},
                 "originUUID": {"$first": "$originUUID"},
+                "UUIDHistory": {"$first": "$UUIDHistory"},
                 "altLabels": {"$first": "$altLabels"},
                 "skillType": {"$first": "$skillType"},
                 "score": {"$max": "$score"}
@@ -402,6 +406,7 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
                         "description": {"$first": "$skills.description"},
                         "scopeNote": {"$first": "$skills.scopeNote"},
                         "originUUID": {"$first": "$skills.originUUID"},
+                        "UUIDHistory": {"$first": "$skills.UUIDHistory"},
                         "altLabels": {"$first": "$skills.altLabels"},
                         "skillType": {"$first": "$skills.skillType"},
                         "relationType": {"$first": "$relationType"},
@@ -419,6 +424,7 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
             altLabels=skill.get("altLabels", []),
             skillType=skill.get("skillType", ""),
             originUUID=skill.get("originUUID", ""),
+            UUIDHistory=skill.get("UUIDHistory", []),
             relationType=skill.get("relationType", ""),
             signallingValueLabel=skill.get("signallingValueLabel", ""),
             score=0.0
