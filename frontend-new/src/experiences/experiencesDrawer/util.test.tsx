@@ -141,7 +141,8 @@ describe("experiencesDrawer util", () => {
             UUID: "skill-1",
             description: "foo",
             preferredLabel: "javascript",
-            altLabels: ["react"]
+            altLabels: ["react"],
+            order_index: 0,
           },
         ],
       };

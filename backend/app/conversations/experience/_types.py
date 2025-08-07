@@ -10,26 +10,45 @@ from app.vector_search.esco_entities import SkillEntity
 # ------------------------- Utility Functions -------------------------
 
 def convert_skill_entities_to_skills_response(
-        skills_entities: list[SkillEntity | tuple[int, SkillEntity]]) -> list["SkillResponse"]:
+        skills_entities: list[SkillEntity | tuple[int, SkillEntity]],
+        start_index: int = 0
+) -> list["SkillResponse"]:
     """
-    Extracts the SkillEntity objects from a list of SkillEntity or tuple[int, SkillEntity].
-    If the input is a tuple, it extracts the second element (the SkillEntity).
+    Extracts SkillEntity objects from a list of SkillEntity or tuple[int, SkillEntity]
+    and assigns each a sequential order_index starting from start_index.
 
-    If it is a tuple, return a sorted list of Skill Entities based on their index in the tuple.
+    For tuples, the second element is used and the list is sorted by the first element.
+    Otherwise, the list is simply enumerated.
     """
 
     if not skills_entities or len(skills_entities) == 0:
         return []
 
     if isinstance(skills_entities[0], tuple):
-        # sort by an index in the tuple.
-        ordered_list = []
-        for index, skill_entity in sorted(skills_entities, key=lambda x: x[0]):
-            ordered_list.append(SkillResponse.from_skill_entity(skill_entity=skill_entity))
-
-        return ordered_list
+        return [
+            SkillResponse.from_skill_entity(skill_entity=skill_entity, order_index=start_index + idx)
+            for idx, skill_entity in sorted(skills_entities, key=lambda x: x[0])
+        ]
     else:
-        return [SkillResponse.from_skill_entity(skill_entity=skill_entity) for skill_entity in skills_entities]
+        return [
+            SkillResponse.from_skill_entity(skill_entity=skill_entity, order_index=start_index + idx)
+            for idx, skill_entity in enumerate(skills_entities)
+        ]
+
+def assign_order_indexes_to_skills(
+        top_skills_raw: list[SkillEntity | tuple[int, SkillEntity]],
+        remaining_skills_raw: list[SkillEntity | tuple[int, SkillEntity]]
+) -> tuple[list["SkillResponse"], list["SkillResponse"]]:
+    """
+    Assigns order_index to all skills, ensuring remaining_skills indexes
+    continue from the last top_skill.
+    Returns (ordered_top_skills, ordered_remaining_skills).
+    """
+    top_skills = convert_skill_entities_to_skills_response(top_skills_raw, start_index=0)
+    remaining_skills = convert_skill_entities_to_skills_response(
+        remaining_skills_raw, start_index=len(top_skills)
+    )
+    return top_skills, remaining_skills
 
 
 # ------------------------- Response Models -------------------------
@@ -46,12 +65,13 @@ class SkillResponse(BaseModel):
     preferredLabel: str
     altLabels: list[str]
     description: str
+    order_index: int
 
     class Config:
         extra = "forbid"
 
     @staticmethod
-    def from_skill_entity(skill_entity: SkillEntity) -> "SkillResponse":
+    def from_skill_entity(skill_entity: SkillEntity, order_index: int) -> "SkillResponse":
         """
         Build a SkillResponse from a SkillEntity.
         """
@@ -60,7 +80,8 @@ class SkillResponse(BaseModel):
             UUID=skill_entity.UUID,
             preferredLabel=skill_entity.preferredLabel,
             altLabels=skill_entity.altLabels,
-            description=skill_entity.description
+            description=skill_entity.description,
+            order_index=order_index,
         )
 
 
@@ -142,6 +163,11 @@ class ExperienceResponse(BaseModel):
         attributes and creating any necessary nested objects.
         """
 
+        top_skills, remaining_skills = assign_order_indexes_to_skills(
+            experience_entity.top_skills,
+            experience_entity.remaining_skills
+        )
+
         return ExperienceResponse(
             UUID=experience_entity.uuid,
             experience_title=experience_entity.experience_title,
@@ -149,8 +175,8 @@ class ExperienceResponse(BaseModel):
             location=experience_entity.location,
             timeline=experience_entity.timeline,
             work_type=experience_entity.work_type,
-            top_skills=convert_skill_entities_to_skills_response(experience_entity.top_skills),
-            remaining_skills=convert_skill_entities_to_skills_response(experience_entity.remaining_skills),
+            top_skills=top_skills,
+            remaining_skills=remaining_skills,
             summary=experience_entity.summary,
             exploration_phase=dive_in_phase.name,
         )

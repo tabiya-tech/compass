@@ -10,6 +10,7 @@ export interface Skill {
   preferredLabel: string;
   description: string;
   altLabels: string[];
+  order_index: number;
 }
 
 export interface Timeline {

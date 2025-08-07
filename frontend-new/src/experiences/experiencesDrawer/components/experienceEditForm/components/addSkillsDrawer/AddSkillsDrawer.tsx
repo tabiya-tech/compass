@@ -6,8 +6,9 @@ import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import InfoIcon from "@mui/icons-material/Info";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
-import { Skill  } from "src/experiences/experienceService/experiences.types";
+import { Skill } from "src/experiences/experienceService/experiences.types";
 import { capitalizeFirstLetter } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
+import { sortSkillsByOrderIndex } from "src/experiences/experiencesDrawer/util";
 import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import { deduplicateSkills } from "src/utils/skillsUtils";
@@ -32,8 +33,6 @@ interface AddSkillsDrawerProps {
   skills: Skill[];
   onAddSkill: (skillIds: string[]) => void;
 }
-
-
 
 const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAddSkill }) => {
   const theme = useTheme();
@@ -73,6 +72,12 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
     setPopoverAnchorEl(event.currentTarget);
     setPopoverSkill(skill);
   };
+
+  // Sort unique skills by order_index
+  const sortedUniqueSkills = React.useMemo(
+    () => sortSkillsByOrderIndex(uniqueSkills),
+    [uniqueSkills]
+  );
 
   return (
     <Slide direction="left" in={true} appear={true}>
@@ -115,9 +120,8 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
               These are additional top skills identified by Compass based on your experience.
             </Typography>
           </Box>
-          
           <Box display="flex" flexWrap="wrap" whiteSpace="normal" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
-            {uniqueSkills.map((skill) => (
+            {sortedUniqueSkills.map((skill) => (
               <Chip
                 key={skill.UUID}
                 onClick={(event) => handleSkillLabelClick(event, skill)}

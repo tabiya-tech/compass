@@ -14,6 +14,7 @@ import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import RestoreIcon from "@mui/icons-material/Restore";
 import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 import { deduplicateSkills } from "src/utils/skillsUtils";
+import { sortSkillsByOrderIndex } from "src/experiences/experiencesDrawer/util";
 
 const uniqueId = "34a59a9e-e7f6-4a10-8b72-0fd401c727de";
 
@@ -65,7 +66,8 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
   const formattedSkills = useMemo(() => {
     if (experience.top_skills.length === 0) return [];
     // Deduplicate skills to handle any duplicates that might exist
-    return deduplicateSkills(experience.top_skills).uniqueSkills;
+    const { uniqueSkills } = deduplicateSkills(experience.top_skills);
+    return sortSkillsByOrderIndex(uniqueSkills);
   }, [experience.top_skills]);
 
   const handleEditClick = () => {

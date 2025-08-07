@@ -1,17 +1,15 @@
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import { Box, Divider, Drawer, Skeleton, Slide, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
-import ExperiencesDrawerHeader
-  from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
-import {
-  LoadingExperienceDrawerContent,
-} from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
+import ExperiencesDrawerHeader from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
+import { LoadingExperienceDrawerContent } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import { DiveInPhase, Experience } from "src/experiences/experienceService/experiences.types";
 import { StoredPersonalInfo } from "src/sensitiveData/types";
 import CustomTextField from "src/theme/CustomTextField/CustomTextField";
 import CustomAccordion from "src/theme/CustomAccordion/CustomAccordion";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { groupExperiencesByWorkType } from "src/experiences/report/util";
+import { sortSkillsByOrderIndex } from "src/experiences/experiencesDrawer/util";
 import { ReportContent } from "src/experiences/report/reportContent";
 import StoreIcon from "@mui/icons-material/Store";
 import WorkIcon from "@mui/icons-material/Work";
@@ -28,8 +26,7 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
 import CustomLink from "src/theme/CustomLink/CustomLink";
-import RestoreExperiencesDrawer
-  from "src/experiences/experiencesDrawer/components/restoreExperiencesDrawer/RestoreExperiencesDrawer";
+import RestoreExperiencesDrawer from "src/experiences/experiencesDrawer/components/restoreExperiencesDrawer/RestoreExperiencesDrawer";
 import { ExperienceError } from "src/error/commonErrors";
 
 const LazyLoadedDownloadDropdown = lazyWithPreload(
@@ -115,9 +112,18 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   const [showRestoreToOriginalConfirmDialog, setShowRestoreToOriginalConfirmDialog] = React.useState(false);
   const [experienceToRestoreToOriginal, setExperienceToRestoreToOriginal] = React.useState<Experience | null>(null);
 
-  useEffect(() => {
-    setHasTopSkills(experiences.some((experience) => experience.top_skills && experience.top_skills.length > 0));
+  // Sort top_skills by order_index for each experience
+  const sortedExperiences = useMemo(() => {
+    return experiences.map((exp) => ({
+      ...exp,
+      top_skills: sortSkillsByOrderIndex(exp.top_skills),
+    }));
   }, [experiences]);
+
+  // Use sortedExperiences everywhere instead of experiences
+  useEffect(() => {
+    setHasTopSkills(sortedExperiences.some((experience) => experience.top_skills && experience.top_skills.length > 0));
+  }, [sortedExperiences]);
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setPersonalInfo({ ...personalInfo, [field]: e.target.value });
@@ -286,21 +292,18 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
 
   // Experiences that have been processed
   const exploredExperiences = useMemo(
-    () => experiences.filter((experience) => experience.exploration_phase === DiveInPhase.PROCESSED),
-    [experiences]
+    () => sortedExperiences.filter((experience) => experience.exploration_phase === DiveInPhase.PROCESSED),
+    [sortedExperiences]
   );
 
   // Group experiences by work type using experiences with filtered skills
-  const groupedExperiences = useMemo(
-    () => groupExperiencesByWorkType(experiences),
-    [experiences]
-  );
+  const groupedExperiences = useMemo(() => groupExperiencesByWorkType(sortedExperiences), [sortedExperiences]);
 
   // Filter out deleted skills from explored experiences for download
   const exploredExperiencesWithoutDeletedSkills = useMemo(() => {
     return exploredExperiences.map((experience) => ({
       ...experience,
-      top_skills: experience.top_skills
+      top_skills: experience.top_skills,
     }));
   }, [exploredExperiences]);
 

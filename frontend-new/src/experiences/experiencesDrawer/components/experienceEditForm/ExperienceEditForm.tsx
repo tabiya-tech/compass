@@ -34,6 +34,7 @@ import {
   getWorkTypeDescription,
   getWorkTypeIcon,
   getWorkTypeTitle,
+  sortSkillsByOrderIndex,
 } from "src/experiences/experiencesDrawer/util";
 import InlineEditField from "src/theme/InlineEditField/InlineEditField";
 import SummaryEditField from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
@@ -78,6 +79,7 @@ interface ExperienceEditFormProps {
 // Extend the Skill type to include a 'deleted' property for soft deletion on the client.
 type DeletableSkill = Skill & {
   deleted: boolean;
+  newlyAdded?: boolean;
 };
 
 type FormValues = Omit<Experience, "top_skills"> & {
@@ -332,7 +334,9 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             preferredLabel: remainingSkill.preferredLabel,
             description: remainingSkill.description,
             altLabels: remainingSkill.altLabels,
+            order_index: remainingSkill.order_index,
             deleted: false,
+            newlyAdded: true,
           });
         }
       });
@@ -388,6 +392,9 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
     setPopoverAnchorEl(event.currentTarget);
     setPopoverSkill(skill);
   };
+
+  // Sort top_skills by order_index for display
+  const sortedTopSkills = useMemo(() => sortSkillsByOrderIndex(formValues.top_skills), [formValues.top_skills]);
 
   return (
     <>
@@ -600,7 +607,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                 gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
                 data-testid={DATA_TEST_ID.FORM_SKILLS_CONTAINER}
               >
-                {(formValues.top_skills ?? []).map((skill) => (
+                {sortedTopSkills.map((skill) => (
                   <Chip
                     key={skill.UUID}
                     onClick={(event) => handleSkillChipClick(event, skill)}
@@ -665,7 +672,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                     }
                     sx={{
                       color: theme.palette.text.secondary,
-                      backgroundColor: theme.palette.grey[100],
+                      backgroundColor: skill.newlyAdded ? theme.palette.grey[300] : theme.palette.grey[100],
                       cursor: "pointer",
                     }}
                   />
