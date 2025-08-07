@@ -6,10 +6,11 @@ import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import InfoIcon from "@mui/icons-material/Info";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
-import { Skill } from "src/experiences/experienceService/experiences.types";
+import { Skill  } from "src/experiences/experienceService/experiences.types";
 import { capitalizeFirstLetter } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 import HelpTip from "src/theme/HelpTip/HelpTip";
+import { deduplicateSkills } from "src/utils/skillsUtils";
 
 const uniqueId = "82681361-b582-4dc3-8129-63f3f0f66eee";
 
@@ -23,6 +24,7 @@ export const DATA_TEST_ID = {
   SKILL_DRAWER_CANCEL_BUTTON: `skills-drawer-cancel-button-${uniqueId}`,
   SKILL_DRAWER_OK_BUTTON: `skills-drawer-ok-button-${uniqueId}`,
   SKILL_DRAWER_HELP_TIP: `skills-drawer-help-tip-${uniqueId}`,
+  SKILL_DRAWER_DUPLICATE_WARNING: `skills-drawer-duplicate-warning-${uniqueId}`,
 };
 
 interface AddSkillsDrawerProps {
@@ -31,6 +33,8 @@ interface AddSkillsDrawerProps {
   onAddSkill: (skillIds: string[]) => void;
 }
 
+
+
 const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAddSkill }) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -38,6 +42,9 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
   const [popoverAnchorEl, setPopoverAnchorEl] = React.useState<HTMLElement | null>(null);
   const [popoverSkill, setPopoverSkill] = useState<Skill | null>(null);
   const drawerRef = React.useRef<HTMLDivElement>(null);
+
+  // Deduplicate skills and check for duplicates
+  const { uniqueSkills } = deduplicateSkills(skills);
 
   // Scroll to top when drawer opens
   React.useEffect(() => {
@@ -101,15 +108,16 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
                 Select Skills
               </Typography>
               <HelpTip icon={<InfoIcon />} data-testid={DATA_TEST_ID.SKILL_DRAWER_HELP_TIP}>
-                Tap a skill to see more details. You can select multiple skills that apply to you.
+                Tap a skill to see more details. You can select any skills that apply to you and click "Ok" to add them.
               </HelpTip>
             </Box>
             <Typography variant="body2" fontWeight="bold" data-testid={DATA_TEST_ID.SKILL_DRAWER_SUBTITLE}>
               These are additional top skills identified by Compass based on your experience.
             </Typography>
           </Box>
+          
           <Box display="flex" flexWrap="wrap" whiteSpace="normal" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
-            {skills.map((skill) => (
+            {uniqueSkills.map((skill) => (
               <Chip
                 key={skill.UUID}
                 onClick={(event) => handleSkillLabelClick(event, skill)}

@@ -41,6 +41,7 @@ import { ExperienceError } from "src/error/commonErrors";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import AddSkillsDrawer from "src/experiences/experiencesDrawer/components/experienceEditForm/components/addSkillsDrawer/AddSkillsDrawer";
 import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
+import { deduplicateSkills } from "src/utils/skillsUtils";
 
 const uniqueId = "0ddc6b92-eca6-472b-8e5f-fdce9abfec3b";
 
@@ -117,7 +118,8 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   // Initialize remaining skills
   useEffect(() => {
     if (experience.remaining_skills && Array.isArray(experience.remaining_skills)) {
-      setRemainingSkills(experience.remaining_skills);
+      // Deduplicate remaining skills to handle any duplicates from the backend
+      setRemainingSkills(deduplicateSkills(experience.remaining_skills).uniqueSkills);
     }
   }, [experience.remaining_skills]);
 
@@ -365,8 +367,10 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   const isExperienceTitleEmpty = formValues.experience_title === "";
   // Memoized filtered remaining skills to avoid repeating filter logic
   const filteredRemainingSkills = useMemo(() => {
-    const currentSkillLabels = (formValues.top_skills ?? []).map((s) => s.preferredLabel.toLowerCase());
-    return remainingSkills.filter((skill) => !currentSkillLabels.includes(skill.preferredLabel.toLowerCase()));
+    const currentSkillUuids = new Set((formValues.top_skills ?? []).map((s) => s.UUID));
+    // Filter out skills that are already in top_skills and deduplicate remaining skills
+    const filteredSkills = remainingSkills.filter((skill) => !currentSkillUuids.has(skill.UUID));
+    return deduplicateSkills(filteredSkills).uniqueSkills;
   }, [remainingSkills, formValues.top_skills]);
 
   // Scroll and focus add skill chip when the drawer closes
