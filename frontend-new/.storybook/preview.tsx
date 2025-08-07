@@ -22,6 +22,7 @@ import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
 import { initSentry } from "../src/sentryInit";
 import { ChatProvider } from "../src/chat/ChatContext";
+import { IChatMessage } from "../src/chat/Chat.types";
 
 const preview: Preview = {
   parameters: {
@@ -45,7 +46,7 @@ const preview: Preview = {
       // An alternative to this would have been to use the `body` element to run the a11y tests on that,
       // but this does not work well because it reports false positives and false negatives.
       // The same selector is used in the `a11y` parameter in the `test-runner.js` file.
-      element: "#storybook-root:not([aria-hidden=\"true\"]), body > div[role=\"presentation\"]",
+      element: '#storybook-root:not([aria-hidden="true"]), body > div[role="presentation"]',
     },
   },
   globalTypes: {
@@ -62,13 +63,13 @@ const preview: Preview = {
       },
     },
     sentryEnabled: {
-      name: 'Sentry Enabled',
-      description: 'Enable/disable Sentry error reporting',
+      name: "Sentry Enabled",
+      description: "Enable/disable Sentry error reporting",
       toolbar: {
-        icon: 'alert',
+        icon: "alert",
         items: [
-          {value: true, title: 'Enabled'},
-          {value: false, title: 'Disabled'},
+          { value: true, title: "Enabled" },
+          { value: false, title: "Disabled" },
         ],
       },
     },
@@ -86,47 +87,55 @@ const ORIGINAL_SENTRY_DSN = window.tabiyaConfig.FRONTEND_SENTRY_DSN;
 let isSentryInitialized = true;
 
 export const decorators = [
-  ( Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean; }; }) => {
-  const isOnline = context.globals.online;
-  const sentryEnabled = context.globals.sentryEnabled;
-  const prevSentryEnabled = React.useRef(sentryEnabled);
+  (Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean } }) => {
+    const isOnline = context.globals.online;
+    const sentryEnabled = context.globals.sentryEnabled;
+    const prevSentryEnabled = React.useRef(sentryEnabled);
 
-  useEffect(() => {
-    if (prevSentryEnabled.current !== sentryEnabled) {
-      // @ts-ignore
-      window.tabiyaConfig.FRONTEND_ENABLE_SENTRY = btoa(sentryEnabled)
-      if (sentryEnabled) {
+    useEffect(() => {
+      if (prevSentryEnabled.current !== sentryEnabled) {
         // @ts-ignore
-        window.tabiyaConfig.FRONTEND_SENTRY_DSN = ORIGINAL_SENTRY_DSN;
-        initSentry();
-        isSentryInitialized = true;
-      } else {
-        // @ts-ignore
-        window.tabiyaConfig.FRONTEND_SENTRY_DSN = undefined;
-        isSentryInitialized = false;
-        // we have to reload since there is no way to notify the components of this change
-        // it is not a provider and the init happens outside of even the react root.render()
-        window.location.reload();
+        window.tabiyaConfig.FRONTEND_ENABLE_SENTRY = btoa(sentryEnabled);
+        if (sentryEnabled) {
+          // @ts-ignore
+          window.tabiyaConfig.FRONTEND_SENTRY_DSN = ORIGINAL_SENTRY_DSN;
+          initSentry();
+          isSentryInitialized = true;
+        } else {
+          // @ts-ignore
+          window.tabiyaConfig.FRONTEND_SENTRY_DSN = undefined;
+          isSentryInitialized = false;
+          // we have to reload since there is no way to notify the components of this change
+          // it is not a provider and the init happens outside of even the react root.render()
+          window.location.reload();
+        }
+        prevSentryEnabled.current = sentryEnabled;
       }
-      prevSentryEnabled.current = sentryEnabled;
-    }
-  }, [sentryEnabled]);
+    }, [sentryEnabled]);
 
-  return (
-    <HashRouter>
-      <IsOnlineContext.Provider value={isOnline}>
-        <CssBaseline />
+    return (
+      <HashRouter>
+        <IsOnlineContext.Provider value={isOnline}>
+          <CssBaseline />
           <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
             <SnackbarProvider>
               <div style={{ height: "100vh" }}>
-                <ChatProvider handleOpenExperiencesDrawer={() => {}}>
+                <ChatProvider
+                  handleOpenExperiencesDrawer={() => {}}
+                  removeMessageFromChat={function (messageId: string): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                  addMessageToChat={function (message: IChatMessage<any>): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                >
                   <Story />
                 </ChatProvider>
               </div>
             </SnackbarProvider>
           </ThemeProvider>
-      </IsOnlineContext.Provider>
-    </HashRouter>
+        </IsOnlineContext.Provider>
+      </HashRouter>
     );
-  }
+  },
 ];
