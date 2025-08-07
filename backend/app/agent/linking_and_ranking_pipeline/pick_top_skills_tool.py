@@ -265,6 +265,10 @@ class PickTopSkillsTool:
             entity for entity in skills_to_rank
             if entity.UUID not in most_relevant_skills_uuids
         ]
+        
+        # Deduplicate the remaining skills to avoid duplicates in the output
+        # This is necessary because the original skills_to_rank list may contain duplicates
+        remaining_entities = list({entity.UUID: entity for entity in remaining_entities}.values())
 
         _return_error = None
         if errors:

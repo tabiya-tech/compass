@@ -120,3 +120,11 @@ export class ExperienceError extends Error {
     this.cause = cause;
   }
 }
+
+export class DuplicateSkillError extends Error {
+  constructor(message: string, cause?: unknown) {
+    super(message);
+    this.name = "DuplicateSkillError";
+    this.cause = cause;
+  }
+}
