@@ -427,7 +427,9 @@ def compare_to_template(*, template: dict, actual_cfg: dict, parent: str = "root
         for key, template_value in template.items():
             actual_value = actual_cfg.get(key, "")
             if isinstance(template_value, str) and _is_regex(template_value):
-                regex_pattern = re.compile(template_value[1:-1])  # Extract regex pattern
+                # When extracting the regex pattern, include all flags
+                # So that we can support multi-line regex patterns.
+                regex_pattern = re.compile(template_value[1:-1], re.DOTALL)  # Extract regex pattern
             else:
                 # otherwise it is required,
                 # At least one character, including new lines support.
