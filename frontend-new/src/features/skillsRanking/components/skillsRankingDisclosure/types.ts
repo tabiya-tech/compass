@@ -1,0 +1,1 @@
+export const jobSeekerComparisonLabels = ["LOWEST", "SECOND LOWEST", "MIDDLE", "SECOND HIGHEST", "HIGHEST"]
