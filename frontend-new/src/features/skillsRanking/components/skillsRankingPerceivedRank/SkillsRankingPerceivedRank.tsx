@@ -15,7 +15,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
-import { getJobPlatformUrl, TYPING_DURATION_MS } from "src/features/skillsRanking/constants";
+import { getJobPlatformUrl, getDefaultTypingDurationMs } from "src/features/skillsRanking/constants";
 import SkillsRankingSlider from "src/features/skillsRanking/components/skillsRankingSlider/SkillsRankingSlider";
 import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
@@ -89,7 +89,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
       setTimeout(() => {
         setShowTyping(false);
         onFinish(updatedState);
-      }, TYPING_DURATION_MS);
+      }, getDefaultTypingDurationMs());
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
       enqueueSnackbar("Failed to update skills ranking state. Please try again later.", {

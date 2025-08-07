@@ -9,7 +9,7 @@ import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChat
 import { AnimatePresence, motion } from "framer-motion";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
-import { TYPING_DURATION_MS } from "src/features/skillsRanking/constants";
+import { getDefaultTypingDurationMs } from "src/features/skillsRanking/constants";
 import { shouldSkipMarketDisclosure } from "../../utils/createMessages";
 
 const uniqueId = "b6492d47-2685-4af7-baa0-5279606aa05f";
@@ -67,7 +67,7 @@ const SkillsRankingCompletionAdvice: React.FC<Readonly<SkillsRankingCompletionAd
       const finishTimeout = setTimeout(() => {
         setStep(CompletionAdviceStep.COMPLETED);
         onFinish(skillsRankingState).then();
-      }, TYPING_DURATION_MS);
+      }, getDefaultTypingDurationMs());
 
       return () => clearTimeout(finishTimeout);
     }, ADVICE_SHOWN_DURATION_MS); // Show advice for 5 seconds before typing

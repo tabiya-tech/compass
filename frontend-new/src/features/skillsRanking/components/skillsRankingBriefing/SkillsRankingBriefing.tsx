@@ -21,7 +21,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
-import { TYPING_DURATION_MS, getJobPlatformUrl } from "src/features/skillsRanking/constants";
+import { getDefaultTypingDurationMs, getJobPlatformUrl } from "src/features/skillsRanking/constants";
 
 const uniqueId = "0e95404a-2044-4634-a6e8-29cc7b2d754e";
 
@@ -84,7 +84,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
 
   useEffect(() => {
     if (effortType === EffortType.WORK_BASED && !isReplay) {
-      const timeout = setTimeout(() => setShowSecondMessage(true), TYPING_DURATION_MS);
+      const timeout = setTimeout(() => setShowSecondMessage(true), getDefaultTypingDurationMs());
       return () => clearTimeout(timeout);
     }
   }, [effortType, isReplay]);
@@ -117,7 +117,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
     }
 
     const elapsed = Date.now() - start;
-    const remaining = Math.max(0, TYPING_DURATION_MS - elapsed);
+    const remaining = Math.max(0, getDefaultTypingDurationMs() - elapsed);
 
     setTimeout(() => {
       setIsTypingVisible(false);
@@ -144,7 +144,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
               </>
             ) : (
               <>
-                If you are interested,  <strong>I can calculate what share of</strong>{getJobPlatformUrl()}{" "}
+                If you are interested,  <strong>I can calculate what share of </strong>{getJobPlatformUrl()}{" "}
                 <strong>opportunities match your skills and how you compare with other seekers</strong> This might take
                 some time — if you are not interested in waiting any longer, you can click <strong>cancel</strong> at any time in the next message,
                 while I calculate. <br/><br/>When you are ready please click <strong>continue</strong>.

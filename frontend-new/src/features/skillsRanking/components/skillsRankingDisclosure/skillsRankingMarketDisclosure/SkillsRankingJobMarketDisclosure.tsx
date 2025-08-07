@@ -18,7 +18,7 @@ import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { Box } from "@mui/material";
-import { getJobPlatformUrl, TYPING_DURATION_MS } from "src/features/skillsRanking/constants";
+import { getJobPlatformUrl, getDefaultTypingDurationMs } from "src/features/skillsRanking/constants";
 import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
 const uniqueId = "579104a2-f36b-4ca5-a0c5-b2b44aaa52e1";
@@ -91,13 +91,13 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
     const timers: NodeJS.Timeout[] = [];
 
     if (step === MarketDisclosureStep.SHOW_MESSAGE) {
-      timers.push(setTimeout(() => setStep(MarketDisclosureStep.SHOW_TYPING), TYPING_DURATION_MS));
+      timers.push(setTimeout(() => setStep(MarketDisclosureStep.SHOW_TYPING), getDefaultTypingDurationMs()));
     } else if (step === MarketDisclosureStep.SHOW_TYPING) {
       timers.push(
         setTimeout(() => {
           setStep(MarketDisclosureStep.COMPLETED);
           handleContinue().then();
-        }, TYPING_DURATION_MS)
+        }, getDefaultTypingDurationMs())
       );
     }
 

@@ -201,6 +201,18 @@ export interface SkillsRankingConfig extends FeatureConfig {
      * The minimum time in seconds the user must spend on the skills ranking process.
      */
     jobPlatformUrl: string;
+    /**
+     * Short typing duration in milliseconds for quick transitions.
+     */
+    shortTypingDurationMs: number;
+    /**
+     * Default typing duration in milliseconds for standard transitions.
+     */
+    defaultTypingDurationMs: number;
+    /**
+     * Long typing duration in milliseconds for extended transitions.
+     */
+    longTypingDurationMs: number;
   };
 }
 

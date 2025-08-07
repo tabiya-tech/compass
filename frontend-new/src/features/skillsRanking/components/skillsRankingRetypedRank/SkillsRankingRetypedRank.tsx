@@ -15,7 +15,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
-import { getJobPlatformUrl, TYPING_DURATION_MS } from "src/features/skillsRanking/constants";
+import { getJobPlatformUrl, getDefaultTypingDurationMs } from "src/features/skillsRanking/constants";
 import SkillsRankingSlider from "src/features/skillsRanking/components/skillsRankingSlider/SkillsRankingSlider";
 import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
@@ -69,13 +69,13 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
       );
       setSubmitted(true);
       setShowTyping(true);
-      setTimeout(() => setShowTyping(false), TYPING_DURATION_MS);
+      setTimeout(() => setShowTyping(false), getDefaultTypingDurationMs());
       setTimeout(() => {
         if (!hasFinishedRef.current) {
           hasFinishedRef.current = true;
           onFinish(newState);
         }
-      }, TYPING_DURATION_MS + 300);
+      }, getDefaultTypingDurationMs() + 300);
     } catch (err) {
       console.error("Failed to update state:", err);
       enqueueSnackbar("Something went wrong. Please try again.", { variant: "error" });
@@ -120,7 +120,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           console.error("Failed to update state:", err);
           enqueueSnackbar("Something went wrong. Please try again.", { variant: "error" });
         }
-      }, TYPING_DURATION_MS);
+              }, getDefaultTypingDurationMs());
 
       return () => clearTimeout(typingTimer);
     }

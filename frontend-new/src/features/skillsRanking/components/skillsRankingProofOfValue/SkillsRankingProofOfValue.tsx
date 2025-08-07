@@ -28,7 +28,8 @@ import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/compone
 import {
   CALCULATION_DELAY,
   EFFORT_METRICS_UPDATE_INTERVAL,
-  TYPING_DURATION_MS,
+  getDefaultTypingDurationMs,
+  getShortTypingDurationMs,
 } from "src/features/skillsRanking/constants";
 import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
@@ -276,9 +277,9 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
 
     setIsTypingVisible(true);
 
-    // Use TYPING_DURATION_MS for work-based users (who completed puzzles)
+    // Use default typing duration for work-based users (who completed puzzles)
     // Use CALCULATION_DELAY for time-based users (who just waited)
-    const delay = effortType === EffortType.WORK_BASED ? TYPING_DURATION_MS : CALCULATION_DELAY;
+    const delay = effortType === EffortType.WORK_BASED ? getDefaultTypingDurationMs() : CALCULATION_DELAY;
 
     setTimeout(async () => {
       setIsTypingVisible(false);
@@ -301,7 +302,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
     setTimeout(async () => {
       setIsTypingVisible(false);
       await handleUpdateState(SkillsRankingEffortState.CANCELLED);
-    }, TYPING_DURATION_MS);
+    }, getShortTypingDurationMs());
   }, [handleUpdateState, isDisabled, isReplay]);
 
   // Handle puzzle success

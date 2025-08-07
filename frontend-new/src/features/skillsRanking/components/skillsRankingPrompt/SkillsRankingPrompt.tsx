@@ -15,7 +15,7 @@ import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoS
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { Box } from "@mui/material";
-import { TYPING_DURATION_MS, MESSAGE_DURATION_MS } from "src/features/skillsRanking/constants";
+import { getDefaultTypingDurationMs, MESSAGE_DURATION_MS } from "src/features/skillsRanking/constants";
 
 const uniqueId = "1e13ec58-2931-47ef-b1a9-30550519707b";
 
@@ -75,14 +75,14 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
     let timeoutId: NodeJS.Timeout;
 
     if (step === PromptStep.INITIAL_TYPING) {
-      timeoutId = setTimeout(() => setStep(PromptStep.SHOW_MESSAGE), TYPING_DURATION_MS);
+      timeoutId = setTimeout(() => setStep(PromptStep.SHOW_MESSAGE), getDefaultTypingDurationMs());
     } else if (step === PromptStep.SHOW_MESSAGE) {
       timeoutId = setTimeout(() => setStep(PromptStep.FINAL_TYPING), MESSAGE_DURATION_MS);
     } else if (step === PromptStep.FINAL_TYPING) {
       timeoutId = setTimeout(() => {
         setStep(PromptStep.COMPLETED);
         handleAdvanceState().then();
-      }, TYPING_DURATION_MS);
+      }, getDefaultTypingDurationMs());
     }
 
     return () => clearTimeout(timeoutId);

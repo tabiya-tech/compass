@@ -190,6 +190,9 @@ class MockSkillsRankingService {
       config: {
         compensationAmount: "R20",
         jobPlatformUrl: "SAYouth.mobi",
+        defaultTypingDurationMs: 5000,
+        shortTypingDurationMs: 3000,
+        longTypingDurationMs: 10000,
       },
     };
   }
