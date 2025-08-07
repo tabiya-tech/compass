@@ -99,11 +99,11 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
    * --- Utility functions ---
    */
 
-  const addMessage = (message: IChatMessage<any>) => {
+  const addMessageToChat = useCallback((message: IChatMessage<any>) => {
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 
-  const removeMessage = (messageId: string) => {
+  const removeMessageFromChat = useCallback((messageId: string) => {
     setMessages((prevMessages) => prevMessages.filter((msg) => msg.message_id !== messageId));
   };
 
@@ -438,8 +438,8 @@ const Chat: React.FC<ChatProps> = ({ showInactiveSessionAlert = false, disableIn
       ) : (
         <ChatProvider
           handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}
-          removeMessage={removeMessage}
-          addMessage={addMessage}
+          removeMessageFromChat={removeMessageFromChat}
+          addMessageToChat={addMessageToChat}
         >
           <Box
             width="100%"

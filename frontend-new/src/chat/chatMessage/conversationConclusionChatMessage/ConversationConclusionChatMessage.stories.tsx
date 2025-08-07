@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import ConversationConclusionChatMessage from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { ChatProvider, useChatContext } from "src/chat/ChatContext";
 import { FeedbackStatus } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
 import { useEffect } from "react";
+import ConversationConclusionChatMessage from "./ConversationConclusionChatMessage";
 
 const withChatContext = (feedbackStatus: FeedbackStatus) => (Story: any) => {
   const Wrapper = () => {
@@ -16,7 +16,7 @@ const withChatContext = (feedbackStatus: FeedbackStatus) => (Story: any) => {
   };
 
   return (
-    <ChatProvider handleOpenExperiencesDrawer={() => {}} removeMessage={() => {}} addMessage={() => {}}>
+    <ChatProvider handleOpenExperiencesDrawer={() => {}} removeMessageFromChat={() => {}} addMessageToChat={() => {}}>
       <Wrapper />
     </ChatProvider>
   );
@@ -27,6 +27,13 @@ const meta: Meta<typeof ConversationConclusionChatMessage> = {
   component: ConversationConclusionChatMessage,
   tags: ["autodocs"],
   argTypes: {},
+  decorators: [
+    (Story) => (
+      <ChatProvider handleOpenExperiencesDrawer={() => {}} removeMessageFromChat={() => {}} addMessageToChat={() => {}}>
+        <Story />
+      </ChatProvider>
+    ),
+  ],
 };
 
 export default meta;
