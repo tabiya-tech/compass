@@ -2,40 +2,26 @@ import { getFeatures } from "src/envService";
 
 import { InvalidFeaturesConfig } from "./errors";
 
-type Config = {
+export interface FeatureConfig {
   enabled: boolean;
   config: Record<string, any>;
-};
+}
 
 /**
  * Singleton class to manage features.
  */
 export class FeaturesService {
-  private static instance: FeaturesService;
-  private readonly _state: Map<string, Config>;
+  _featureId: string;
 
-  private constructor() {
-    this._state = new Map<string, Config>();
-  }
-
-  public static getInstance(): FeaturesService {
-    if (!FeaturesService.instance) {
-      FeaturesService.instance = new FeaturesService();
-    }
-    return FeaturesService.instance;
+  constructor(featureId: string) {
+    this._featureId = featureId;
   }
 
   /**
    * Get the configuration for a specific feature.
    * The ID is managed in the respective feature implementation.
-   *
-   * @param featureId - The ID of the feature to retrieve the configuration for.
    */
-  public getConfig(featureId: string): Config {
-    if (this._state.has(featureId)) {
-      return this._state.get(featureId)!;
-    }
-
+  protected getConfig(): FeatureConfig {
     const featuresConfigString = getFeatures();
 
     try {
@@ -52,19 +38,17 @@ export class FeaturesService {
       // The string is expected to be a JSON object with feature IDs as keys
       const featuresConfig = JSON.parse(featuresConfigString);
 
-      if (!featuresConfig[featureId]) {
-        console.debug(`Feature ID not found in features string ${featureId}`);
+      if (!featuresConfig[this._featureId]) {
+        console.debug(`Feature ID not found in features string ${this._featureId}`);
         return {
           enabled: false,
           config: {},
         };
       }
 
-      const config: Config = featuresConfig[featureId];
+      const config: FeatureConfig = featuresConfig[this._featureId];
 
       this.validateConfig(config);
-
-      this._state.set(featureId, config);
 
       return config;
     } catch (e) {
@@ -77,22 +61,29 @@ export class FeaturesService {
     }
   }
 
-  public isFeatureEnabled(featureId: string): boolean {
-    const config = this.getConfig(featureId);
+  protected isFeatureEnabled(): boolean {
+    const config = this.getConfig();
     return config.enabled;
   }
 
-  public clearState(): void {
-    this._state.clear();
-  }
-
-  private validateConfig(config: any): void {
+  protected validateConfig(config: any): void {
     if (typeof config.enabled !== "boolean") {
-      throw new Error("Invalid config: enabled must be a boolean");
+      console.error(new InvalidFeaturesConfig("Invalid config: enabled must be a boolean"));
+      throw new InvalidFeaturesConfig("Invalid config: enabled must be a boolean");
+    }
+
+    if (typeof config.featureName !== "string") {
+      console.error(new InvalidFeaturesConfig("Invalid config: featureName must be a string"));
+      throw new InvalidFeaturesConfig("Invalid config: featureName must be a string");
     }
 
     if (typeof config.config !== "object") {
-      throw new Error("Invalid config: config must be an object");
+      console.error(new InvalidFeaturesConfig("Invalid config: config must be an object"));
+      throw new InvalidFeaturesConfig("Invalid config: config must be an object");
     }
+  }
+
+  protected getFeatureAPIPrefix(featureId: string): string {
+    return `features/${featureId}`;
   }
 }
