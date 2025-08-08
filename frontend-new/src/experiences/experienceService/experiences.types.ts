@@ -10,7 +10,7 @@ export interface Skill {
   preferredLabel: string;
   description: string;
   altLabels: string[];
-  order_index: number;
+  order_index: number; // REVIEW: Keep the camelCase for order_index to match the frontend expectations and JSON schema conventions.
 }
 
 export interface Timeline {

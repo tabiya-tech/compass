@@ -67,6 +67,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
     if (experience.top_skills.length === 0) return [];
     // Deduplicate skills to handle any duplicates that might exist
     const { uniqueSkills } = deduplicateSkills(experience.top_skills);
+    // REVIEW: I don't think this is important here.
     return sortSkillsByOrderIndex(uniqueSkills);
   }, [experience.top_skills]);
 

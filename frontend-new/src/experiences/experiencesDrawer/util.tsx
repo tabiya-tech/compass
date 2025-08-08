@@ -71,7 +71,7 @@ export const getWorkTypeIcon = (workType: WorkType | null, iconProps?: SvgIconPr
 };
 
 /**
- * Sorts skills by their order_index
+ * Sorts skills by their order_index in ascending order (starting from 0 upwards).
  * @param skills Array of skills to sort
  * @returns New array of skills sorted by order_index
  */

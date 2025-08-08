@@ -9,10 +9,7 @@ from app.vector_search.esco_entities import SkillEntity
 
 # ------------------------- Utility Functions -------------------------
 
-def convert_skill_entities_to_skills_response(
-        skills_entities: list[SkillEntity | tuple[int, SkillEntity]],
-        start_index: int = 0
-) -> list["SkillResponse"]:
+def convert_skill_entities_to_skills_response(skills_entities: list[SkillEntity | tuple[int, SkillEntity]]) -> list["SkillResponse"]:
     """
     Extracts SkillEntity objects from a list of SkillEntity or tuple[int, SkillEntity]
     and assigns each a sequential order_index starting from start_index.
@@ -24,12 +21,15 @@ def convert_skill_entities_to_skills_response(
     if not skills_entities or len(skills_entities) == 0:
         return []
 
+
     if isinstance(skills_entities[0], tuple):
         return [
-            SkillResponse.from_skill_entity(skill_entity=skill_entity, order_index=start_index + idx)
+            SkillResponse.from_skill_entity(skill_entity=skill_entity, order_index=idx)
             for idx, skill_entity in sorted(skills_entities, key=lambda x: x[0])
         ]
     else:
+        # unexplored-experiences:
+        # they don't have any skills, it is going to be an empty list.
         return [
             SkillResponse.from_skill_entity(skill_entity=skill_entity, order_index=start_index + idx)
             for idx, skill_entity in enumerate(skills_entities)
@@ -44,6 +44,7 @@ def assign_order_indexes_to_skills(
     continue from the last top_skill.
     Returns (ordered_top_skills, ordered_remaining_skills).
     """
+    # REVIEW: This function needs to be reviewd
     top_skills = convert_skill_entities_to_skills_response(top_skills_raw, start_index=0)
     remaining_skills = convert_skill_entities_to_skills_response(
         remaining_skills_raw, start_index=len(top_skills)
@@ -81,7 +82,7 @@ class SkillResponse(BaseModel):
             preferredLabel=skill_entity.preferredLabel,
             altLabels=skill_entity.altLabels,
             description=skill_entity.description,
-            order_index=order_index,
+            order_index=order_index,  # REVIEW: Keep the camelCase for order_index to match the frontend expectations and JSON schema conventions. orderIndex
         )
 
 
