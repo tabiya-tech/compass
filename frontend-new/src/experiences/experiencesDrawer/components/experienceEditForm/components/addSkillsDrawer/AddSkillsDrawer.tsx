@@ -6,7 +6,7 @@ import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import InfoIcon from "@mui/icons-material/Info";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
-import { Skill  } from "src/experiences/experienceService/experiences.types";
+import { Skill } from "src/experiences/experienceService/experiences.types";
 import { capitalizeFirstLetter } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 import HelpTip from "src/theme/HelpTip/HelpTip";
@@ -32,8 +32,6 @@ interface AddSkillsDrawerProps {
   skills: Skill[];
   onAddSkill: (skillIds: string[]) => void;
 }
-
-
 
 const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAddSkill }) => {
   const theme = useTheme();
@@ -108,14 +106,15 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
                 Select Skills
               </Typography>
               <HelpTip icon={<InfoIcon />} data-testid={DATA_TEST_ID.SKILL_DRAWER_HELP_TIP}>
-                Tap a skill to see more details. You can select any skills that apply to you and click "Ok" to add them.
+                Tap a skill to view more details. You can select any skills that apply to you and tap Ok button to add
+                them.
               </HelpTip>
             </Box>
             <Typography variant="body2" fontWeight="bold" data-testid={DATA_TEST_ID.SKILL_DRAWER_SUBTITLE}>
               These are additional top skills identified by Compass based on your experience.
             </Typography>
           </Box>
-          
+
           <Box display="flex" flexWrap="wrap" whiteSpace="normal" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
             {uniqueSkills.map((skill) => (
               <Chip

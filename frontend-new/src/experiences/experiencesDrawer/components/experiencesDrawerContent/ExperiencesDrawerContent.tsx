@@ -187,7 +187,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
         >
           <b>Top Skills</b>
         </Typography>
-        <HelpTip icon={<InfoIcon sx={{ padding: 0.1 }} />}>Tap a skill to see more details.</HelpTip>
+        <HelpTip icon={<InfoIcon sx={{ padding: 0.1 }} />}>Tap a skill to view more details.</HelpTip>
       </Box>
       <Box
         display="flex"
