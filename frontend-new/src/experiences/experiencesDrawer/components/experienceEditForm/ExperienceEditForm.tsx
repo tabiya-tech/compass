@@ -441,7 +441,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                 <b>Experience info</b>
               </Typography>
               <HelpTip icon={<InfoIcon />}>
-                Click a field to update the work type, title, dates, company, location, or summary of your experience.
+                Tap a field to update the work type, title, dates, company, location, or summary of your experience.
               </HelpTip>
             </Box>
             <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
@@ -589,8 +589,8 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                   <b>Top Skills</b>
                 </Typography>
                 <HelpTip icon={<InfoIcon />}>
-                  Tap a skill to see more details. Use the dropdown to change the skill label, the delete icon to remove
-                  it, and the restore icon to bring back deleted skills. Tap the Add Skill button to add more.
+                  Tap a skill to view more details. Use the dropdown to change the skill label and the delete icon to
+                  remove it. Tap the Add Skill button to add more.
                 </HelpTip>
               </Box>
               <Box
