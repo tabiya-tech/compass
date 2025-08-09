@@ -94,22 +94,24 @@ class RankingService(IRankingService):
     def _get_comparison_label(self, rank: float):
         """
         Get the comparison label based on the rank.
+        It should be the same as the one used in the frontend.
+        ref: frontend-new/src/features/skillsRanking/components/skillsRankingDisclosure/types.ts#jobSeekerComparisonLabels
 
-        :param rank:
-        :return:
+        :param rank: The rank of the participant, which should be between 0.0 and 1.0.
+        :return: A string representing the comparison label based on the rank.
         """
 
-        if rank < 20:
-            comparison_label = "LOWEST"
-        elif rank < 40:
-            comparison_label = "SECOND_LOWEST"
-        elif rank < 60:
-            comparison_label = "MIDDLE"
-        elif rank < 80:
-            comparison_label = "SECOND_HIGHEST"
+        # GUARD: ensure that the rank is between 0.0 and 1.0
+        if rank > 1.0 or rank < 0.0:
+            raise ValueError(f"Rank must be between 0.0 and 1.0, got {rank}")
+
+        if rank < 0.2:
+            return "LOWEST"
+        elif rank < 0.4:
+            return "SECOND LOWEST"
+        elif rank < 0.6:
+            return "MIDDLE"
+        elif rank < 0.8:
+            return "SECOND HIGHEST"
         else:
-            comparison_label = "HIGHEST"
-
-        self._logger.debug(f"Participant rank comparison label: {comparison_label} for rank: {rank}")
-
-        return comparison_label
+            return "HIGHEST"
