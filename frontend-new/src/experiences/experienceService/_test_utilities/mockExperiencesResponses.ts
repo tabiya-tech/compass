@@ -20,12 +20,14 @@ export const mockExperiences: Experience[] = [
         preferredLabel: "Management",
         description: "The process of dealing with or controlling things or people",
         altLabels: ["Leadership", "Administration"],
+        orderIndex: 0,
       },
       {
         UUID: "815f3660-4c7f-43ba-859d-cf50dd527fe0",
         preferredLabel: "Communication",
         description: "The imparting or exchanging of information or news",
         altLabels: ["Interpersonal Communication", "Public Speaking"],
+        orderIndex: 1,
       },
     ],
     remaining_skills: [],
@@ -50,6 +52,7 @@ export const mockExperiences: Experience[] = [
         preferredLabel: "Python Programming",
         description: "The ability to write code in Python",
         altLabels: ["Python Development", "Software Development"],
+        orderIndex: 0,
       },
     ],
     remaining_skills: [],
@@ -139,6 +142,7 @@ const generateRandomSkill = (usedLabels: string[]): Skill => {
     preferredLabel: randomLabel,
     description: faker.hacker.phrase(),
     altLabels: [faker.hacker.verb(), faker.hacker.adjective()],
+    orderIndex: Math.floor(Math.random() * 30),
   };
 };
 

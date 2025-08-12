@@ -1,5 +1,7 @@
 import { Meta } from "@storybook/react/*";
-import ExperienceEditForm from "./ExperienceEditForm";
+import ExperienceEditForm, {
+  DeletableSkill,
+} from "src/experiences/experiencesDrawer/components/experienceEditForm/ExperienceEditForm";
 import { generateRandomExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import {
   EXPERIENCE_TITLE_MAX_LENGTH,
@@ -74,6 +76,33 @@ export const FieldOverflowError: Story = {
         start: "s".repeat(TIMELINE_MAX_LENGTH + 5),
         end: "e".repeat(TIMELINE_MAX_LENGTH + 5),
       },
+    },
+  },
+};
+
+export const ShownWithNewAddedSkills: Story = {
+  args: {
+    experience: {
+      ...generateRandomExperiences(1)[0],
+      top_skills: [
+        {
+          UUID: "skill-1",
+          preferredLabel: "Order supplies",
+          description: "Ability to manage and order supplies efficiently",
+          altLabels: ["Supply Management", "Inventory Control"],
+          orderIndex: 0,
+          newlyAdded: true,
+        } as DeletableSkill,
+        {
+          UUID: "skill-2",
+          preferredLabel: "Apply health and safety standards",
+          description: "Knowledge of health and safety standards in the workplace",
+          altLabels: ["Health Standards", "Safety Regulations"],
+          orderIndex: 1,
+          newlyAdded: true,
+        } as DeletableSkill,
+        ...(generateRandomExperiences(1)[0].top_skills || []),
+      ],
     },
   },
 };

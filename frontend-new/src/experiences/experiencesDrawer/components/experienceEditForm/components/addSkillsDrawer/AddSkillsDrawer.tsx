@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Theme, useTheme } from "@mui/material/styles";
-import { Divider, useMediaQuery, Box, Typography, Slide, Chip } from "@mui/material";
+import { Box, Chip, Divider, Slide, Typography, useMediaQuery } from "@mui/material";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import InfoIcon from "@mui/icons-material/Info";
@@ -114,7 +114,6 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
               These are additional top skills identified by Compass based on your experience.
             </Typography>
           </Box>
-
           <Box display="flex" flexWrap="wrap" whiteSpace="normal" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
             {uniqueSkills.map((skill) => (
               <Chip

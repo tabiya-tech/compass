@@ -34,6 +34,7 @@ import {
   getWorkTypeDescription,
   getWorkTypeIcon,
   getWorkTypeTitle,
+  sortSkillsByOrderIndex,
 } from "src/experiences/experiencesDrawer/util";
 import InlineEditField from "src/theme/InlineEditField/InlineEditField";
 import SummaryEditField from "src/experiences/experiencesDrawer/components/experienceEditForm/components/SummaryEditField/SummaryEditField";
@@ -76,8 +77,9 @@ interface ExperienceEditFormProps {
 }
 
 // Extend the Skill type to include a 'deleted' property for soft deletion on the client.
-type DeletableSkill = Skill & {
+export type DeletableSkill = Skill & {
   deleted: boolean;
+  newlyAdded?: boolean;
 };
 
 type FormValues = Omit<Experience, "top_skills"> & {
@@ -332,17 +334,19 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             preferredLabel: remainingSkill.preferredLabel,
             description: remainingSkill.description,
             altLabels: remainingSkill.altLabels,
+            orderIndex: remainingSkill.orderIndex,
             deleted: false,
+            newlyAdded: true,
           });
         }
       });
 
       setRemainingSkills(updatedRemainingSkills);
 
-      // Add the new skills to the top skills
+      // Add the new skills to the top skills, ensuring newlyAdded skills are placed by their orderIndex.
       return {
         ...prev,
-        top_skills: [...currentSkills, ...newSkills],
+        top_skills: sortSkillsByOrderIndex([...currentSkills, ...newSkills]),
       };
     });
 
@@ -665,7 +669,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                     }
                     sx={{
                       color: theme.palette.text.secondary,
-                      backgroundColor: theme.palette.grey[100],
+                      backgroundColor: skill.newlyAdded ? theme.palette.grey[300] : theme.palette.grey[100],
                       cursor: "pointer",
                     }}
                   />
