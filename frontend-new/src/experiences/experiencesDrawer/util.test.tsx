@@ -14,6 +14,7 @@ import {
   getWorkTypeDescription,
   getWorkTypeIcon,
   getWorkTypeTitle,
+  sortSkillsByOrderIndex,
   WORK_TYPE_DESCRIPTIONS,
 } from "src/experiences/experiencesDrawer/util";
 import { ReportContent } from "src/experiences/report/reportContent";
@@ -141,7 +142,8 @@ describe("experiencesDrawer util", () => {
             UUID: "skill-1",
             description: "foo",
             preferredLabel: "javascript",
-            altLabels: ["react"]
+            altLabels: ["react"],
+            orderIndex: 0,
           },
         ],
       };
@@ -163,5 +165,28 @@ describe("experiencesDrawer util", () => {
         top_skills: current.top_skills,
       });
     });
+  });
+
+  test("should sort skills by orderIndex in ascending order", () => {
+    // GIVEN an experience with skills in random order
+    const mockTopSkills = [
+      { UUID: "skill-3", preferredLabel: "skill 1", description: "", altLabels: [], orderIndex: 2 },
+      { UUID: "skill-1", preferredLabel: "skill 2", description: "", altLabels: [], orderIndex: 0 },
+      { UUID: "skill-2", preferredLabel: "skill 3", description: "", altLabels: [], orderIndex: 1 },
+    ];
+    const experience: Experience = {
+      ...mockExperiences[0],
+      top_skills: mockTopSkills,
+    };
+
+    // WHEN sorting the skills
+    const sortedSkills = sortSkillsByOrderIndex(experience.top_skills);
+
+    // THEN expect the skills to be sorted by orderIndex in ascending order
+    expect(sortedSkills.map((skill) => skill.orderIndex)).toEqual([0, 1, 2]);
+    // AND the order of UUIDs should match the expected sorted order
+    expect(sortedSkills.map((skill) => skill.UUID)).toEqual(["skill-1", "skill-2", "skill-3"]);
+    // AND it should not mutate the original array
+    expect(experience.top_skills.map((skill) => skill.UUID)).toEqual(["skill-3", "skill-1", "skill-2"]);
   });
 });

@@ -15,6 +15,7 @@ describe("SkillPopover", () => {
         preferredLabel: "Skill Name",
         description: "Skill Description",
         altLabels: ["foo", "bar", "baz"],
+        orderIndex: 1,
       },
     };
 

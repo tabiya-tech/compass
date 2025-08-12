@@ -4,6 +4,7 @@ import {
   Experience,
   EXPERIENCE_TITLE_MAX_LENGTH,
   LOCATION_MAX_LENGTH,
+  Skill,
   SUMMARY_MAX_LENGTH,
   TIMELINE_MAX_LENGTH,
   WorkType,
@@ -67,6 +68,15 @@ export const getWorkTypeIcon = (workType: WorkType | null, iconProps?: SvgIconPr
     default:
       return <QuizIcon {...iconProps} />;
   }
+};
+
+/**
+ * Sorts skills by their orderIndex in ascending order (starting from 0 upwards).
+ * @param skills Array of skills to sort
+ * @returns New array of skills sorted by orderIndex
+ */
+export const sortSkillsByOrderIndex = <T extends Skill>(skills: T[]): T[] => {
+  return [...skills].sort((a, b) => a.orderIndex - b.orderIndex);
 };
 
 /**
@@ -151,10 +161,7 @@ export const getExperienceDiff = (original: Experience, current: Experience): Pa
 
   currentSkills.forEach((skill) => {
     const originalSkill = originalSkillsMap.get(skill.UUID);
-    if (
-      !originalSkill ||
-      originalSkill.preferredLabel !== skill.preferredLabel
-    ) {
+    if (!originalSkill || originalSkill.preferredLabel !== skill.preferredLabel) {
       skillsChanged = true;
     }
   });

@@ -9,28 +9,29 @@ from app.vector_search.esco_entities import SkillEntity
 
 # ------------------------- Utility Functions -------------------------
 
-def convert_skill_entities_to_skills_response(
-        skills_entities: list[SkillEntity | tuple[int, SkillEntity]]) -> list["SkillResponse"]:
+def convert_skill_entities_to_skills_response(skills_entities: list[SkillEntity | tuple[int, SkillEntity]]) -> list["SkillResponse"]:
     """
-    Extracts the SkillEntity objects from a list of SkillEntity or tuple[int, SkillEntity].
-    If the input is a tuple, it extracts the second element (the SkillEntity).
+    Extracts SkillEntity objects from a list of SkillEntity or tuple[int, SkillEntity]
+    in an ordered format each with orderIndex.
 
-    If it is a tuple, return a sorted list of Skill Entities based on their index in the tuple.
+    For tuples, the first element is the order index, which will be used as the orderIndex.
     """
 
     if not skills_entities or len(skills_entities) == 0:
         return []
 
     if isinstance(skills_entities[0], tuple):
-        # sort by an index in the tuple.
-        ordered_list = []
-        for index, skill_entity in sorted(skills_entities, key=lambda x: x[0]):
-            ordered_list.append(SkillResponse.from_skill_entity(skill_entity=skill_entity))
-
-        return ordered_list
+        return [
+            SkillResponse.from_skill_entity(skill_entity=skill_entity, order_index=idx)
+            for idx, skill_entity in sorted(skills_entities, key=lambda x: x[0])
+        ]
     else:
-        return [SkillResponse.from_skill_entity(skill_entity=skill_entity) for skill_entity in skills_entities]
-
+        # unexplored-experiences:
+        # they don't have any skills, it is going to be an empty list.
+        return [
+            SkillResponse.from_skill_entity(skill_entity=skill_entity, order_index=0)
+            for idx, skill_entity in enumerate(skills_entities)
+        ]
 
 # ------------------------- Response Models -------------------------
 
@@ -46,12 +47,13 @@ class SkillResponse(BaseModel):
     preferredLabel: str
     altLabels: list[str]
     description: str
+    orderIndex: int
 
     class Config:
         extra = "forbid"
 
     @staticmethod
-    def from_skill_entity(skill_entity: SkillEntity) -> "SkillResponse":
+    def from_skill_entity(skill_entity: SkillEntity, order_index: int) -> "SkillResponse":
         """
         Build a SkillResponse from a SkillEntity.
         """
@@ -60,7 +62,8 @@ class SkillResponse(BaseModel):
             UUID=skill_entity.UUID,
             preferredLabel=skill_entity.preferredLabel,
             altLabels=skill_entity.altLabels,
-            description=skill_entity.description
+            description=skill_entity.description,
+            orderIndex=order_index,
         )
 
 

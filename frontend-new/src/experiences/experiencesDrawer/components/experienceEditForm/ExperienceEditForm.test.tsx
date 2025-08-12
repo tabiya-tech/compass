@@ -221,6 +221,7 @@ describe("ExperienceEditForm", () => {
           preferredLabel: "javascript",
           description: "A programming language",
           altLabels: ["js", "ecmascript"],
+          orderIndex: 0,
         },
       ],
     };
@@ -275,12 +276,14 @@ describe("ExperienceEditForm", () => {
           preferredLabel: "javascript",
           description: "A programming language",
           altLabels: ["js", "ecmascript"],
+          orderIndex: 0,
         },
         {
           UUID: "skill-2",
           preferredLabel: "react",
           description: "A library for building user interfaces",
           altLabels: ["reactjs", "reactjs.org"],
+          orderIndex: 1,
         },
       ],
     };
@@ -333,12 +336,14 @@ describe("ExperienceEditForm", () => {
           preferredLabel: "javascript",
           description: "A programming language",
           altLabels: ["js", "ecmascript"],
+          orderIndex: 0,
         },
         {
           UUID: "skill-2",
           preferredLabel: "react",
           description: "A library for building user interfaces",
           altLabels: ["reactjs", "reactjs.org"],
+          orderIndex: 1,
         },
       ],
     };
@@ -576,6 +581,7 @@ describe("ExperienceEditForm", () => {
         preferredLabel: `Skill ${Math.random()}`,
         description: "Test skill",
         altLabels: ["alt1", "alt2"],
+        orderIndex: 0,
       })),
     };
 
@@ -651,6 +657,7 @@ describe("ExperienceEditForm", () => {
         preferredLabel: `Skill ${Math.random()}`,
         description: "Test skill",
         altLabels: ["alt1", "alt2"],
+        orderIndex: 0,
       })),
     };
     // AND the component is rendered
