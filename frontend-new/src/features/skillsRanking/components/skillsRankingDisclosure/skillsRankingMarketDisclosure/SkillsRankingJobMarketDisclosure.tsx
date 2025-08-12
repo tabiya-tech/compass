@@ -1,12 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import {
-  SkillsRankingPhase,
-  SkillsRankingState,
-  getLatestPhaseName,
-} from "src/features/skillsRanking/types";
+import { getLatestPhaseName, SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import { AnimatePresence, motion } from "framer-motion";
@@ -18,7 +14,7 @@ import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { Box } from "@mui/material";
-import { getJobPlatformUrl, getDefaultTypingDurationMs } from "src/features/skillsRanking/constants";
+import { getJobPlatformUrl, getLongTypingDurationMs } from "src/features/skillsRanking/constants";
 import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
 const uniqueId = "579104a2-f36b-4ca5-a0c5-b2b44aaa52e1";
@@ -91,13 +87,13 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
     const timers: NodeJS.Timeout[] = [];
 
     if (step === MarketDisclosureStep.SHOW_MESSAGE) {
-      timers.push(setTimeout(() => setStep(MarketDisclosureStep.SHOW_TYPING), getDefaultTypingDurationMs()));
+      timers.push(setTimeout(() => setStep(MarketDisclosureStep.SHOW_TYPING), getLongTypingDurationMs()));
     } else if (step === MarketDisclosureStep.SHOW_TYPING) {
       timers.push(
         setTimeout(() => {
           setStep(MarketDisclosureStep.COMPLETED);
           handleContinue().then();
-        }, getDefaultTypingDurationMs())
+        }, getLongTypingDurationMs())
       );
     }
 

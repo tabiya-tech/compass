@@ -1,13 +1,9 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import {
-  SkillsRankingPhase,
-  SkillsRankingState,
-  getLatestPhaseName,
-} from "src/features/skillsRanking/types";
+import { getLatestPhaseName, SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import { jobSeekerComparisonLabels } from "src/features/skillsRanking/components/skillsRankingDisclosure/types";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
@@ -18,10 +14,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
-import { getJobPlatformUrl } from "src/features/skillsRanking/constants";
+import { getDefaultTypingDurationMs, getJobPlatformUrl } from "src/features/skillsRanking/constants";
 import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
-const DISPLAY_TIMEOUT = 5000;
 
 const uniqueId = "9b0dbc80-c786-4c24-ba9d-04b6946fa0b9";
 export const DATA_TEST_ID = {
@@ -89,8 +84,8 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
           setHasFinished(true);
           handleContinue().then();
         }
-      }, DISPLAY_TIMEOUT);
-    }, DISPLAY_TIMEOUT);
+      }, getDefaultTypingDurationMs());
+    }, getDefaultTypingDurationMs());
 
     return () => clearTimeout(timer);
   }, [isReplay, hasFinished, handleContinue]);
