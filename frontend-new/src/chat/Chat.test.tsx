@@ -53,6 +53,7 @@ import { TYPING_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/typingChatMessage
 import { ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
 import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
+import { getRandomSessionID } from "../features/skillsRanking/utils/getSkillsRankingState";
 
 // Mock Components ----------
 // mock the snackbar
@@ -1036,6 +1037,63 @@ describe("Chat", () => {
         expect(console.error).toHaveBeenCalledTimes(1);
         expect(console.error).toHaveBeenCalledWith(new ChatError("Failed to send message:", givenError));
       });
+    });
+
+    describe("fetching of conversation state", () => {
+      test("should fetch explored experiences on initialization for the notification", async () => {
+        const getChatHistorySpy = jest.spyOn(ChatService.getInstance(), "getChatHistory");
+        const getExperiencesSpy = jest.spyOn(ExperienceService.getInstance(), "getExperiences");
+
+        // GIVEN a logged-in user
+        const givenUser: TabiyaUser = getMockUser();
+        AuthenticationStateService.getInstance().setUser(givenUser);
+
+        // AND the user has an active session id
+        const givenActiveSessionId = getRandomSessionID();
+        UserPreferencesStateService.getInstance().setUserPreferences(
+          getMockUserPreferences(givenUser, givenActiveSessionId)
+        );
+
+        // AND the chat history will not return later
+        let chatHistoryResolve
+        getChatHistorySpy.mockReturnValue(new Promise((resolve) => {
+          chatHistoryResolve = resolve
+        }))
+
+        // GUARD for typescript asserting chatHistoryResolve is defined
+        expect(chatHistoryResolve).toBeDefined();
+
+        // WHEN the component is mounted
+        render(<Chat />);
+
+        // THEN chatservice.getChatHistory should be called with the active session ID
+        expect(getChatHistorySpy).toHaveBeenCalledWith(givenActiveSessionId)
+
+        // AND expect the getExperiences method to be called with the active session ID
+        expect(getExperiencesSpy).not.toHaveBeenCalledWith(givenActiveSessionId);
+
+        // WHEN the getChatHistory resolves a current phase which is not INIT
+        chatHistoryResolve!({
+          messages: [],
+          conversation_completed: false,
+          conversation_conducted_at: null,
+          experiences_explored: 0,
+          current_phase: {
+            percentage: 0,
+            phase: ConversationPhase.INTRO,
+            current: null,
+            total: null,
+          },
+        })
+
+        // THEN expect the getExperiences method to be called with the active session ID
+        await waitFor(() => {
+          expect(getExperiencesSpy).toHaveBeenCalledWith(givenActiveSessionId);
+        });
+
+        // AND expect the Chat component to be initialized
+        await assertChatInitialized();
+      })
     });
   });
 

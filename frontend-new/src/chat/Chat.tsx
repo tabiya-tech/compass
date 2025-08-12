@@ -32,9 +32,11 @@ import { issueNewSession } from "./issueNewSession";
 import { ChatProvider } from "src/chat/ChatContext";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 import ChatProgressBar from "./chatProgressbar/ChatProgressBar";
-import { CurrentPhase, defaultCurrentPhase } from "./chatProgressbar/types";
+import { ConversationPhase, CurrentPhase, defaultCurrentPhase } from "./chatProgressbar/types";
 import { CompassChatMessageProps } from "./chatMessage/compassChatMessage/CompassChatMessage";
-import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import {
+  CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
+} from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 
@@ -485,11 +487,14 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   }, [aiIsTyping]);
 
   // Fetch experiences when the active session id changes
+  // And when not currentPhase is not `INITIALIZING`.
+  // We don't want to fetch experiences when the conversation state is partially initialized
+  // As fetch experiences will also initialize state thus we face race hazard (concurrency issue)
   useEffect(() => {
-    if (activeSessionId) {
-      fetchExperiences();
+    if (activeSessionId && currentPhase.phase !== ConversationPhase.INITIALIZING) {
+      fetchExperiences().then()
     }
-  }, [activeSessionId, fetchExperiences]);
+  }, [activeSessionId, fetchExperiences, currentPhase.phase]);
 
   return (
     <Suspense fallback={<Backdrop isShown={true} transparent={true} />}>
