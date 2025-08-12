@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from typing import Tuple, cast
 import random
 
-from app.agent.explore_experiences_agent_director import ExperienceState
 from app.application_state import IApplicationStateManager
 from app.users.repositories import IUserPreferenceRepository
 from common_libs.time_utilities import get_now
@@ -248,18 +247,25 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         state = await self._application_state_manager.get_state(session_id=session_id)
         #  Get all the experience data from the state of the user
         #  All the experience user explored in the session.
-        experiences_data: list[ExperienceState] = state.explore_experiences_director_state.experiences_state.values()
+        experiences_data = state.explore_experiences_director_state.experiences_state.values()
 
-        # get the origin UUIDs of the top skills from all experiences
-        top_skills_origin_uuids: set[str] = {
-            skill.originUUID for experience in experiences_data for skill in experience.experience.top_skills
-        }
+        # a list of all experiences that the user has discovered and explored
+        participant_experiences = [exp_state.experience for exp_state in experiences_data]
+
+        # for each experience, we will get the top skills and the remaining skills
+        participant_skills = []
+        for experience in participant_experiences:
+            participant_skills += experience.top_skills
+            participant_skills += experience.remaining_skills
+
+        # Flatten the list of skills and get the originUUIDs
+        participant_skills_uuids: set[str] = {skill.originUUID for skill in participant_skills}
 
         # 3. Compute the ranking score for this participant
         score = await self._ranking_service.get_participant_ranking(
             user_id=user_id,
             prior_beliefs=prior_beliefs,
-            participants_skills_uuids=top_skills_origin_uuids
+            participants_skills_uuids=participant_skills_uuids
         )
 
         # 4. Because the ranking service returns scores between 0 and 1,
@@ -285,8 +291,8 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         return savable_score, experiment_group
 
     def _get_group(self,
-                         self_estimated_rank: float,
-                         actual_rank: float):
+                   self_estimated_rank: float,
+                   actual_rank: float):
 
         return get_group(
             self_estimated_rank=self_estimated_rank,
