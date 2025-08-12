@@ -461,7 +461,8 @@ class TestSkillsRankingService:
             expected_skills_uuids: set[str] = {
                 skill.originUUID for experience in
                 (given_application_state.explore_experiences_director_state.experiences_state.values()) for skill in
-                experience.experience.top_skills
+                # we expect both top skills and remaining skills to be included when calculating the ranks
+                experience.experience.top_skills + experience.experience.remaining_skills
             }
 
             #

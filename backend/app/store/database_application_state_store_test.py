@@ -114,6 +114,21 @@ def generate_random_experience(index: int) -> ExperienceEntity:
                 score=0.5,
                 skillType=random.choice(['skill/competence', 'knowledge', 'language', 'attitude', ''])  # nosec B311 # random is used for testing purposes
             )
+        ],
+        remaining_skills=[
+            SkillEntity(
+                id=f"Remaining Skill {index}",
+                UUID=str(uuid4()),
+                modelId=str(ObjectId()),
+                preferredLabel=f"Remaining preferred label {index}",
+                altLabels=[f"Remaining label {index}", f"label {index + 1}"],
+                description=f"Remaining Skill description {index} ",
+                scopeNote=f"Remaining Skill Scope note {index}",
+                originUUID=str(uuid4()),
+                UUIDHistory=[str(uuid4)],
+                score=0.5,
+                skillType=random.choice(['skill/competence', 'knowledge', 'language', 'attitude', ''])  # nosec B311 # random is used for testing purposes
+            )
         ])
 
 
