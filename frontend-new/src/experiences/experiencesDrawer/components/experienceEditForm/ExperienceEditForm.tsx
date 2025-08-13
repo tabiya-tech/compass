@@ -43,6 +43,7 @@ import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import AddSkillsDrawer from "src/experiences/experiencesDrawer/components/experienceEditForm/components/addSkillsDrawer/AddSkillsDrawer";
 import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 import { deduplicateSkills } from "src/utils/skillsUtils";
+import RestoreIcon from "src/theme/Icons/RestoreIcon";
 
 const uniqueId = "0ddc6b92-eca6-472b-8e5f-fdce9abfec3b";
 
@@ -647,12 +648,8 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                               justifyContent: "center",
                             }}
                           >
-                            <img
-                              src={`${process.env.PUBLIC_URL}/restore-icon.svg`}
-                              alt="Restore"
-                              // xl wasn't quite big enough, we're going for ~16px
-                              style={{ width: theme.tabiyaSpacing.xl * 4, height: theme.tabiyaSpacing.xl * 4 }}
-                            />
+                            {/* xl wasn't quite big enough, we're going for ~16px*/}
+                            <RestoreIcon width={theme.tabiyaSpacing.xl * 4} height={theme.tabiyaSpacing.xl * 4} />
                           </Box>
                         ) : (
                           <DeleteIcon
