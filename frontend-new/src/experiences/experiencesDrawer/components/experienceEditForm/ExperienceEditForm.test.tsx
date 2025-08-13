@@ -595,14 +595,14 @@ describe("ExperienceEditForm", () => {
       />
     );
     render(givenExperienceEditForm);
-    // AND add skill button is clicked
+    // AND the add skill button is clicked
     const addSkillButton = screen.getByTestId(DATA_TEST_ID.FORM_ADD_SKILL_BUTTON);
     expect(addSkillButton).toBeEnabled();
     await userEvent.click(addSkillButton);
     // AND select the first skill in the drawer
     const uncheckedIcons = screen.getAllByTestId(ADD_SKILLS_DRAWER_DATA_TEST_ID.SKILL_DRAWER_ITEM_UNCHECKED);
     await userEvent.click(uncheckedIcons[0]);
-    // AND click Ok button in the drawer
+    // AND click the OK button in the drawer
     const okButton = screen.getByTestId(ADD_SKILLS_DRAWER_DATA_TEST_ID.SKILL_DRAWER_OK_BUTTON);
     await userEvent.click(okButton);
 
@@ -671,7 +671,7 @@ describe("ExperienceEditForm", () => {
     );
     render(givenExperienceEditForm);
 
-    // WHEN add skill button is clicked
+    // WHEN the add skill button is clicked
     const addSkillButton = screen.getByTestId(DATA_TEST_ID.FORM_ADD_SKILL_BUTTON);
     await userEvent.click(addSkillButton);
 
