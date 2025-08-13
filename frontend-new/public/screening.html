@@ -37,6 +37,7 @@
   </noscript>
 
   <script defer src="/data/env.js"></script>
+  <script defer src="https://browser.sentry-cdn.com/8.28.0/bundle.tracing.replay.feedback.min.js" crossorigin="anonymous"></script>
 
   <style>
       /* Colors */
@@ -434,6 +435,119 @@
     return clientId;
   }
 
+  // #############################################################
+  // #                    SENTRY INTEGRATION
+  // #############################################################
+  const SENTRY_CONFIG_DEFAULT = {
+    tracesSampleRate: 1.0,
+    replaysSessionSampleRate: 0,
+    replaysOnErrorSampleRate: 1.0,
+    replayIntegration: false,
+    levels: ["error", "warn"],
+  };
+
+  function loadSentryConfig() {
+    const enabledStr = window.tabiyaConfig?.FRONTEND_ENABLE_SENTRY ? atob(window.tabiyaConfig.FRONTEND_ENABLE_SENTRY) : "false";
+    const dsn = window.tabiyaConfig?.FRONTEND_SENTRY_DSN ? atob(window.tabiyaConfig.FRONTEND_SENTRY_DSN) : "";
+    const cfgStr = window.tabiyaConfig?.FRONTEND_SENTRY_CONFIG ? atob(window.tabiyaConfig.FRONTEND_SENTRY_CONFIG) : "";
+    const errors = [];
+    const warnings = [];
+    let cfg = { ...SENTRY_CONFIG_DEFAULT };
+    if (!cfgStr) {
+      warnings.push("Sentry config is not available, reverting to default config");
+    } else {
+      try {
+        const parsed = JSON.parse(cfgStr);
+        cfg = {
+          tracesSampleRate: parsed?.tracesSampleRate ?? SENTRY_CONFIG_DEFAULT.tracesSampleRate,
+          replaysSessionSampleRate: parsed?.replaysSessionSampleRate ?? SENTRY_CONFIG_DEFAULT.replaysSessionSampleRate,
+          replaysOnErrorSampleRate: parsed?.replaysOnErrorSampleRate ?? SENTRY_CONFIG_DEFAULT.replaysOnErrorSampleRate,
+          replayIntegration: parsed?.replayIntegration ?? SENTRY_CONFIG_DEFAULT.replayIntegration,
+          levels: parsed?.levels ?? SENTRY_CONFIG_DEFAULT.levels,
+        };
+      } catch (e) {
+        errors.push(new Error("Error parsing Sentry config JSON, reverting to default config"));
+      }
+    }
+    return { enabled: String(enabledStr).toLowerCase() === "true", dsn, cfg, errors, warnings };
+  }
+
+  function initSentryIfEnabled() {
+    const { enabled, dsn, cfg, errors, warnings } = loadSentryConfig();
+    if (!enabled) {
+      console.info("Sentry is not enabled. Sentry will not be initialized.");
+      return;
+    }
+    if (!dsn) {
+      console.warn("Sentry is enabled but DSN is not available. Sentry will not be initialized.");
+      return;
+    }
+    if (!window.Sentry || typeof window.Sentry.init !== "function") {
+      console.warn("Sentry SDK not loaded. Sentry will not be initialized.");
+      return;
+    }
+
+    const backendUrl = window.tabiyaConfig?.BACKEND_URL ? atob(window.tabiyaConfig.BACKEND_URL) : "";
+    const environment = window.tabiyaConfig?.TARGET_ENVIRONMENT_NAME ? atob(window.tabiyaConfig.TARGET_ENVIRONMENT_NAME) : undefined;
+
+    const integrations = [
+      Sentry.browserTracingIntegration(),
+      Sentry.feedbackIntegration({
+        showBranding: false,
+        autoInject: false,
+        colorScheme: "light",
+        enableScreenshot: true,
+      }),
+    ];
+    if (typeof Sentry.captureConsoleIntegration === "function") {
+      integrations.push(Sentry.captureConsoleIntegration({ levels: cfg.levels }));
+    } else {
+      console.info("Sentry captureConsoleIntegration not available in this bundle; skipping console capture integration.");
+    }
+    if (cfg.replayIntegration && typeof Sentry.replayIntegration === "function") {
+      integrations.push(Sentry.replayIntegration());
+    }
+
+    Sentry.init({
+      dsn: dsn,
+      environment: environment,
+      integrations: integrations,
+      tracesSampleRate: cfg.tracesSampleRate,
+      tracePropagationTargets: ["localhost", backendUrl].filter(Boolean),
+      replaysSessionSampleRate: cfg.replaysSessionSampleRate,
+      replaysOnErrorSampleRate: cfg.replaysOnErrorSampleRate,
+      beforeSend(event, hint) {
+        event.tags = {
+          ...event.tags,
+          client_id: getClientID(),
+        };
+        return event;
+      },
+    });
+
+    // Set a session tag for client_id
+    Sentry.setTag("client_id", getClientID());
+
+    // Attach version info
+    try {
+      fetch("/data/version.json")
+        .then((r) => (r.ok ? r.json() : null))
+        .then((info) => {
+          if (info && info.frontend) {
+            Sentry.setContext("Frontend Version", info.frontend);
+          }
+        })
+        .catch(() => {});
+    } catch (err) {
+      // if something goes wrong warn and exit
+      console.warn("Something went wrong while setting sentry version context", err)
+    }
+
+    // Log any warnings/errors after init so they can be captured
+    warnings.forEach((w) => console.warn(`Warning loading Sentry: ${w}`));
+    errors.forEach((e) => console.error(`Error loading Sentry: ${e.message}`, e));
+  }
+
   /**
    * Handles the case when the user is busy and cannot participate.
    *
@@ -581,6 +695,8 @@
   // Show "wait-a-moment" section on first render
   showSection(IDS.SECTIONS.WAIT_A_MOMENT);
   document.addEventListener("DOMContentLoaded", function() {
+    // Initialize Sentry as early as possible after env is loaded
+    initSentryIfEnabled();
 
     // First check if the user is already logged in, and log them in if so.
     const alreadyLoggedIn = handleAlreadyLoggedIn();
