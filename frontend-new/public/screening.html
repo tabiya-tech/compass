@@ -130,11 +130,10 @@
           gap: 40px;
       }
 
-      .logo-container {
+      .logo-container, .research-logo-container{
           display: flex;
           justify-content: center;
           align-items: center;
-          padding-bottom: 2rem;
       }
 
       .error-message {
@@ -146,6 +145,66 @@
           font-weight: bold;
       }
 
+      /* Research consent section styles */
+      .research-info {
+          margin-bottom: 1.5rem;
+      }
+
+      .research-heading {
+          font-family: 'Inter', sans-serif;
+          font-weight: bold;
+          color: var(--dark-blue);
+          font-size: 1rem;
+          margin-bottom: 0.2rem;
+          margin-top: 1rem;
+      }
+
+      .research-text {
+          margin: 0;
+      }
+
+      .research-section {
+          margin-bottom: 0.7rem;
+      }
+
+      .research-info ul {
+          padding-left: 20px;
+          margin-top: 0.2rem;
+          margin-bottom: 0.5rem;
+      }
+
+      .consent-options {
+          display: flex;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 20px;
+          margin-top: 2rem;
+          margin-bottom: 1rem;
+      }
+
+      /* Make research consent section scrollable */
+      #research-consent-section {
+          max-height: 100dvh;
+          overflow-y: auto;
+          padding: 0;
+      }
+      .research-consent-section-content{
+         padding: 4px;
+      }
+
+      #research-consent-section::-webkit-scrollbar {
+          width: 8px;
+      }
+
+      #research-consent-section::-webkit-scrollbar-track {
+          background: transparent;
+          margin-top: 120px;
+      }
+
+      #research-consent-section::-webkit-scrollbar-thumb {
+          background-color: #1D6023;
+          border-radius: 4px;
+      }
 
       /*  Snackbar   */
       #snackbar-notification {
@@ -233,6 +292,78 @@
           <iframe src="about:blank" title="Compass Chat Application" style="width: 100%; height: 100%;"></iframe>
         </div>
       </section>
+
+      <section id="research-consent-section" class="section-container text-body" style="display: none;">
+        <div class="research-consent-section-content">
+          <div class="research-logo-container">
+            <img src="/logo.svg" alt="Compass Logo" width="200" height="100" />
+          </div>
+          <div>
+            <p class="text-bold">Before we start, we would like to inform you about the research, your rights, and your benefits. Please agree or disagree to participate at the end of the page.</p>
+            <div class="research-info">
+              <div class="research-section">
+                <p class="research-heading">Title of Research</p>
+                <p class="research-text">AI-driven Career Counseling</p>
+              </div>
+              <div class="research-section">
+                <p class="research-heading">Who is Doing This Study?</p>
+                <p class="research-text">Researchers from Tabiya, the University of Oxford, and the University of Cape Town (UCT).</p>
+              </div>
+              <div class="research-section">
+                <p class="research-heading">Why Are We Doing This Study?</p>
+                <p class="research-text">We want to see if using Compass, an online tool, helps young people clearly describe their skills and find better job opportunities.</p>
+              </div>
+              <div class="research-section">
+                <p class="research-heading">What Do You Need to Do?</p>
+                <ul>
+                  <li>Complete an online conversation with Compass. It may take up to 1 hour.</li>
+                  <li>You will be asked questions related to your skills, experiences, and career aspirations.</li>
+                  <li>Your responses will be used to create a personalized CV.</li>
+                  <li>After a few weeks, you will be contacted via phone to complete a short follow-up survey (approximately 30 minutes).</li>
+                </ul>
+              </div>
+              <div class="research-section">
+                <p class="research-heading">Is Participation Voluntary?</p>
+                <p class="research-text">Yes, participating is your choice. You can skip questions or stop at any time without any penalties.</p>
+              </div>
+              <div class="research-section">
+                <p class="research-heading">Privacy and Confidentiality</p>
+                <p class="research-text">Your information will remain confidential. Researchers will use your responses without revealing your identity in any reports or presentations.</p>
+              </div>
+              <div class="research-section">
+                <p class="research-heading">Compensation</p>
+                <ul>
+                  <li>You receive <span class="text-bold">R20</span> airtime after finishing the Compass activity.</li>
+                  <li>You receive an additional <span class="text-bold">R40</span> airtime after completing the follow-up phone survey.</li>
+                </ul>
+              </div>
+              <div class="research-section">
+                <p class="research-heading">Risks and Benefits</p>
+                <p class="research-text">There are no known risks. Your participation helps improve job-search support for youth in South Africa.</p>
+              </div>
+              <div class="research-section">
+                <p class="research-heading">Questions?</p>
+                <p class="research-text">Email <span class="text-bold">jasmin.baier@tabiya.org</span> for questions or concerns about the study.</p>
+              </div>
+              <div class="research-section">
+                <p class="research-heading">Consent to Participate</p>
+                <p class="research-text">By clicking below, you agree that:</p>
+                <ul>
+                  <li>You have read and understand the information provided above.</li>
+                  <li>You voluntarily agree to participate in this study.</li>
+                  <li>Your information can be confidentially used for research.</li>
+                  <li>You understand you can withdraw at any time without any penalty.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="consent-options">
+              <button id="consent-agree-btn" class="btn btn-primary">I Agree</button>
+              <button id="consent-disagree-btn" class="btn btn-secondary">I Do Not Agree</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="initial-question" class="section-container text-body" style="display: none;">
         <div class="title">Thank you for joining our study and confirming your email.</div>
         <div>
@@ -265,6 +396,18 @@
           </div>
         </div>
       </section>
+
+      <section id="decline-consent-section" class="section-container text-body" style="display: none;">
+        <div>
+          <p>
+            We understand your decision. Thank you for your interest up to now. Feel free to contact us if you are interested in reconnecting in the future.
+          </p>
+          <div class="buttons">
+            <button class="btn btn-primary" id="reconsider-btn">I've Changed My Mind</button>
+          </div>
+        </div>
+      </section>
+
       <section id="invalid-query-params" style="display: none;" class="section-container text-body">
         <div>
           <div class="error-message">Invalid query parameters. Please provide email and externalUserId in the URL.</div>
@@ -295,8 +438,10 @@
 
   const IDS = {
     SECTIONS: {
+      RESEARCH_CONSENT_SECTION: "research-consent-section",
       INITIAL_QUESTION: "initial-question",
       USER_IS_BUSY_SECTION: "user-is-busy-section",
+      DECLINE_CONSENT_SECTION: "decline-consent-section",
       INVALID_QUERY_PARAMS: "invalid-query-params",
       SERVER_ERROR_MESSAGE: "server-error-message",
       WAIT_A_MOMENT: "wait-a-moment",
@@ -305,6 +450,9 @@
     YES_BTN: "yes-btn",
     NO_BTN: "no-btn",
     RETURN_HOME_BTN: "return-home",
+    CONSENT_AGREE_BTN: "consent-agree-btn",
+    CONSENT_DISAGREE_BTN: "consent-disagree-btn",
+    RECONSIDER_BTN: "reconsider-btn",
     EXPERIMENT_DURATION_SPAN: "config-experiment-duration"
   };
 
@@ -401,8 +549,10 @@
    * Hides all sections.
    */
   function hideAllSections() {
+    document.getElementById(IDS.SECTIONS.RESEARCH_CONSENT_SECTION).style.display = "none";
     document.getElementById(IDS.SECTIONS.INITIAL_QUESTION).style.display = "none";
     document.getElementById(IDS.SECTIONS.USER_IS_BUSY_SECTION).style.display = "none";
+    document.getElementById(IDS.SECTIONS.DECLINE_CONSENT_SECTION).style.display = "none";
     document.getElementById(IDS.SECTIONS.INVALID_QUERY_PARAMS).style.display = "none";
     document.getElementById(IDS.SECTIONS.SERVER_ERROR_MESSAGE).style.display = "none";
     document.getElementById(IDS.SECTIONS.WAIT_A_MOMENT).style.display = "none";
@@ -420,7 +570,10 @@
 
     const logo = document.querySelector(`.${LOGO_CONTAINER}`);
     if (logo) {
-      logo.style.display = sectionId === IDS.SECTIONS.CHAT_CONTAINER ? "none" : "flex";
+      logo.style.display =
+        sectionId === IDS.SECTIONS.CHAT_CONTAINER ||
+        sectionId === IDS.SECTIONS.RESEARCH_CONSENT_SECTION
+          ? "none" : "flex";
     }
   }
 
@@ -521,10 +674,66 @@
     }, 5000);
   }
 
+  async function recordTermsResponse(context, body) {
+    const url = `${context.configs.RCT_BACKEND_API_URL}?external-user-id=${encodeURIComponent(context.request.externalUserId)}`;
+    return await fetchWithRetry(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": context.configs.RCT_BACKEND_API_KEY,
+      },
+      body: JSON.stringify(body),
+    });
+  }
+
+  async function handleConsentAgree(context) {
+    try {
+      const nowIso = new Date().toISOString();
+      const response = await recordTermsResponse(context, { acceptedTc: nowIso });
+      if (!response.ok) {
+        const data = await response.json();
+        console.error("Failed to record acceptance:", data);
+        showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+        document.getElementById("server-error-message-content").innerHTML = data.message || "Failed to record acceptance";
+        return;
+      }
+      showSection(IDS.SECTIONS.INITIAL_QUESTION);
+    } catch (err) {
+      console.error("Error while recording acceptance:", err);
+      showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+    }
+  }
+
+  async function handleConsentDisagree(context) {
+    try {
+      const nowIso = new Date().toISOString();
+      const response = await recordTermsResponse(context, { rejectedTc: nowIso });
+      if (!response.ok) {
+        const data = await response.json();
+        console.error("Failed to record rejection:", data);
+        showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+        document.getElementById("server-error-message-content").innerHTML = data.message || "Failed to record rejection";
+        return;
+      }
+      showSection(IDS.SECTIONS.DECLINE_CONSENT_SECTION);
+    } catch (err) {
+      console.error("Error while recording rejection:", err);
+      showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+    }
+  }
+
+  function handleReconsider() {
+    // User changed their mind, show research consent section again
+    showSection(IDS.SECTIONS.RESEARCH_CONSENT_SECTION);
+  }
+
   function setupEventListeners(context) {
     document.getElementById("yes-btn").addEventListener("click", handleYesClick.bind(null, context));
     document.getElementById("no-btn").addEventListener("click", handleUserIsBusy);
     document.getElementById("return-home").addEventListener("click", handleReturnHome);
+    document.getElementById(IDS.CONSENT_AGREE_BTN).addEventListener("click", handleConsentAgree.bind(null, context));
+    document.getElementById(IDS.CONSENT_DISAGREE_BTN).addEventListener("click", handleConsentDisagree.bind(null, context));
+    document.getElementById(IDS.RECONSIDER_BTN).addEventListener("click", handleReconsider);
   }
 
   function handleAlreadyLoggedIn() {
@@ -561,6 +770,10 @@
         RCT_FIREBASE_API_KEY,
         CONTROL_GROUP_REDIRECT_LINK,
       },
+      groups: {
+        USING_COMPASS: atob(screeningConfig.USER_GROUP_USING_COMPASS),
+        NOT_USING_COMPASS: atob(screeningConfig.USER_GROUP_NOT_USING_COMPASS),
+      },
       request: {
         email,
         externalUserId,
@@ -571,8 +784,53 @@
     // Setup event listeners after configs are loaded
     setupEventListeners(context);
 
-    // Show an initial question section after config is loaded
-    showSection(IDS.SECTIONS.INITIAL_QUESTION);
+    // Before showing anything, check consent/group status and redirect accordingly
+    checkConsentAndRedirect(context);
+  }
+
+  async function checkConsentAndRedirect(context) {
+    try {
+      const url = `${context.configs.RCT_BACKEND_API_URL}?external-user-id=${encodeURIComponent(context.request.externalUserId)}`;
+      const response = await fetchWithRetry(url, {
+        method: "GET",
+        headers: { "x-api-key": context.configs.RCT_BACKEND_API_KEY },
+      });
+
+      // User not found, show consent screen
+      if (response.status === 404) {
+        showSection(IDS.SECTIONS.RESEARCH_CONSENT_SECTION);
+        return;
+      }
+
+      // Handle server errors
+      if (!response.ok) {
+        showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+        return;
+      }
+
+      const data = await response.json();
+      const { acceptedTc, rejectedTc, group } = data;
+
+      if (acceptedTc && group) {
+        // User has accepted and has a group redirect accordingly
+        return group === context.groups.USING_COMPASS
+          ? window.location.replace("/#/")
+          : window.location.href = context.configs.CONTROL_GROUP_REDIRECT_LINK;
+      } else if (acceptedTc) {
+        // User has accepted, but no group show initial question
+        return showSection(IDS.SECTIONS.INITIAL_QUESTION);
+      } else if (rejectedTc) {
+        // User has rejected, show a decline section
+        return showSection(IDS.SECTIONS.DECLINE_CONSENT_SECTION);
+      } else {
+        // User has not accepted or rejected, show consent section
+        return showSection(IDS.SECTIONS.RESEARCH_CONSENT_SECTION);
+      }
+
+    } catch (err) {
+      console.error("Failed to check consent/group status:", err);
+      showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+    }
   }
 
   // #############################################################
