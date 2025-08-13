@@ -161,7 +161,7 @@ exports[`AddSkillsDrawer should render component successfully 1`] = `
         tabindex="-1"
         type="button"
       >
-        Ok
+        OK
       </button>
     </div>
   </div>

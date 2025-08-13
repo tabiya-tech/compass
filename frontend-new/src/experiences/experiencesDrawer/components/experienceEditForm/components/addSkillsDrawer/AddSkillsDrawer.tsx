@@ -106,8 +106,7 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
                 Select Skills
               </Typography>
               <HelpTip icon={<InfoIcon />} data-testid={DATA_TEST_ID.SKILL_DRAWER_HELP_TIP}>
-                Tap a skill to view more details. You can select any skills that apply to you and tap Ok button to add
-                them.
+                Tap a skill to view more details. You can select the skills you want to add to your experience.
               </HelpTip>
             </Box>
             <Typography variant="body2" fontWeight="bold" data-testid={DATA_TEST_ID.SKILL_DRAWER_SUBTITLE}>
@@ -179,7 +178,7 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
               disabled={selectedSkillIds.length === 0}
               data-testid={DATA_TEST_ID.SKILL_DRAWER_OK_BUTTON}
             >
-              Ok
+              OK
             </PrimaryButton>
           </Box>
         </Box>
