@@ -28,6 +28,7 @@ import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIErro
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import RestoreExperiencesDrawer from "src/experiences/experiencesDrawer/components/restoreExperiencesDrawer/RestoreExperiencesDrawer";
 import { ExperienceError } from "src/error/commonErrors";
+import RestoreIcon from "src/theme/Icons/RestoreIcon";
 
 const LazyLoadedDownloadDropdown = lazyWithPreload(
   () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown")
@@ -459,7 +460,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
           <Box
             sx={{
               marginTop: "auto",
-              padding: isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : 0,
+              padding: theme.fixedSpacing(theme.tabiyaSpacing.md),
               alignSelf: "center",
             }}
           >
@@ -467,7 +468,13 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
               onClick={() => setShowRestoreDrawer(true)}
               disableWhenOffline={true}
               data-testid={DATA_TEST_ID.RESTORE_DELETED_EXPERIENCES_LINK}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: theme.fixedSpacing(theme.tabiyaSpacing.xs),
+              }}
             >
+              <RestoreIcon color={theme.palette.text.primary} />
               Restore deleted experiences
             </CustomLink>
           </Box>
