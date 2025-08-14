@@ -38,3 +38,9 @@ class OpportunitiesDataServiceConfig(BaseModel):
     """
     The limit of the number of opportunities to fetch skills from.
     """
+
+    opportunities_data_stale_time: int = Field(default=6 * 60 * 60, ge=1)
+    """
+    Opportunity data stale time in seconds.
+    Default is 6 hours (6 * 60 * 60 seconds).
+    """
