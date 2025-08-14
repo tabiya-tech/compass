@@ -21,6 +21,8 @@ const uniqueId = "1e13ec58-2931-47ef-b1a9-30550519707b";
 
 export const DATA_TEST_ID = {
   SKILLS_RANKING_PROMPT_CONTAINER: `skills-ranking-prompt-container-${uniqueId}`,
+  REPLAY_CONTAINER: `skills-ranking-prompt-replay-container-${uniqueId}`,
+  MAIN_MESSAGE_CONTAINER: `skills-ranking-prompt-main-message-${uniqueId}`,
 };
 
 export const SKILLS_RANKING_PROMPT_MESSAGE_ID = `skills-ranking-prompt-message-${uniqueId}`;
@@ -93,7 +95,8 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
       <ChatBubble
         message={
           <>
-            <strong>Almost done!</strong> Answer a few more research questions and we’ll send you <strong>{compensationAmount} </strong> airtime once you have completed all tasks.
+            <strong>Almost done!</strong> Answer a few more research questions and we’ll send you{" "}
+            <strong>{compensationAmount} </strong> airtime once you have completed all tasks.
           </>
         }
         sender={ConversationMessageSender.COMPASS}
@@ -109,7 +112,7 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
       ref={scrollRef}
     >
       {isReplay ? (
-        <Box sx={{ width: "100%" }}>
+        <Box sx={{ width: "100%" }} data-testid={DATA_TEST_ID.REPLAY_CONTAINER}>
           <PromptMessage />
           <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
             <Timestamp
@@ -142,7 +145,7 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease: "easeOut", delay: step === PromptStep.SHOW_MESSAGE ? 0.3 : 0 }}
             >
-              <Box sx={{ width: "100%" }}>
+              <Box sx={{ width: "100%" }} data-testid={DATA_TEST_ID.MAIN_MESSAGE_CONTAINER}>
                 <PromptMessage />
                 <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
                   <Timestamp

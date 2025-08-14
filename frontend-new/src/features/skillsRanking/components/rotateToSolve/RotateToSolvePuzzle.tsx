@@ -8,6 +8,18 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const PUZZLE_FEEDBACK_DURATION = 5000;
 
+const uniqueId = "2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11";
+export const DATA_TEST_ID = {
+  CONTAINER: `rotate-to-solve-container-${uniqueId}`,
+  INSTRUCTION_TEXT: `rotate-to-solve-instruction-${uniqueId}`,
+  CHARACTERS_CONTAINER: `rotate-to-solve-characters-container-${uniqueId}`,
+  CHARACTER_BOX: `rotate-to-solve-character-box-${uniqueId}`,
+  ROTATE_LEFT_BUTTON: `rotate-to-solve-rotate-left-${uniqueId}`,
+  ROTATE_RIGHT_BUTTON: `rotate-to-solve-rotate-right-${uniqueId}`,
+  CANCEL_BUTTON: `rotate-to-solve-cancel-${uniqueId}`,
+  COMPLETION_MESSAGE: `rotate-to-solve-completion-message-${uniqueId}`,
+};
+
 export interface RotateToSolvePuzzleMetricsReport {
   puzzles_solved: number;
   correct_rotations: number;
@@ -226,9 +238,14 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
   // No cleanup needed since we removed the activity timeout
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" 
-    gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
-      <Typography variant="body1" color="text.secondary">
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+      data-testid={DATA_TEST_ID.CONTAINER}
+    >
+      <Typography variant="body1" color="text.secondary" data-testid={DATA_TEST_ID.INSTRUCTION_TEXT}>
         Rotate each letter until it’s upright. Select a letter by clicking on it, then rotate it clockwise with{" "}
         <RotateRightIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} /> or counterclockwise with{" "}
         <RotateLeftIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />.
@@ -245,6 +262,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           backgroundColor: "background.paper",
           border: (theme) => `1px solid ${theme.palette.divider}`,
         }}
+        data-testid={DATA_TEST_ID.CHARACTERS_CONTAINER}
       >
         {characterStates.map((charState, index) => {
           const isSelected = index === currentCharIndex;
@@ -269,6 +287,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
                 cursor: disabled ? "default" : "pointer",
                 animation: isCelebrating && solved ? `${pulseAnimation} 0.4s ease-in-out` : "none",
               }}
+              data-testid={DATA_TEST_ID.CHARACTER_BOX}
             >
               <Typography
                 sx={{
@@ -293,6 +312,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           disabled={disabled || isReplay || isAllComplete}
           sx={{ color: theme.palette.common.black }}
           aria-label="Rotate character counterclockwise"
+          data-testid={DATA_TEST_ID.ROTATE_LEFT_BUTTON}
         >
           <RotateLeftIcon />
         </PrimaryIconButton>
@@ -302,6 +322,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           disabled={disabled || isReplay || isAllComplete}
           sx={{ color: theme.palette.common.black }}
           aria-label="Rotate character clockwise"
+          data-testid={DATA_TEST_ID.ROTATE_RIGHT_BUTTON}
         >
           <RotateRightIcon />
         </PrimaryIconButton>
@@ -315,11 +336,18 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
         height={theme.fixedSpacing(theme.tabiyaSpacing.xl * 2)} // xl is not quite big enough and we dont want the componenent to move around
         padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
         gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
-        marginTop={isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+        marginTop={
+          isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : theme.fixedSpacing(theme.tabiyaSpacing.sm)
+        }
         zIndex={20} // bring the notification above the puzzle buttons
       >
         {/* Cancel button on the right (appears first due to row-reverse) */}
-        <PrimaryButton onClick={onCancel} disabled={disabled || isReplay || isAllComplete} sx={{ flexShrink: 0 }}>
+        <PrimaryButton
+          onClick={onCancel}
+          disabled={disabled || isReplay || isAllComplete}
+          sx={{ flexShrink: 0 }}
+          data-testid={DATA_TEST_ID.CANCEL_BUTTON}
+        >
           Cancel
         </PrimaryButton>
 
@@ -339,6 +367,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
                 "100%": { opacity: 1, transform: "translateY(0)" },
               },
             }}
+            data-testid={DATA_TEST_ID.COMPLETION_MESSAGE}
           >
             <Typography variant="caption" fontWeight="bold">
               {completionMessage}
