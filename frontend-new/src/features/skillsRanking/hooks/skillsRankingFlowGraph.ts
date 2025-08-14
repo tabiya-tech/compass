@@ -1,4 +1,5 @@
 import { SkillsRankingPhase, SkillsRankingExperimentGroups } from "../types";
+import { SkillsRankingError } from "../errors";
 
 // Flow path for groups that see market disclosure and retyped rank (groups 1 & 3)
 export const skillsRankingHappyPathFull = [
@@ -32,6 +33,7 @@ export const getFlowPathForGroup = (experimentGroup: SkillsRankingExperimentGrou
     case SkillsRankingExperimentGroups.GROUP_4:
       return skillsRankingHappyPathSkipped;
     default:
+      console.error(new SkillsRankingError("Invalid experiment group." + experimentGroup));
       return skillsRankingHappyPathFull;
   }
 };
