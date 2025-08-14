@@ -1,0 +1,76 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SkillsRankingPrompt snapshot: initial render in INITIAL phase (non-replay) 1`] = `
+<div>
+  <div
+    class="MuiBox-root css-1gdiawx"
+    data-testid="skills-ranking-prompt-container-1e13ec58-2931-47ef-b1a9-30550519707b"
+    origin="COMPASS"
+  >
+    <div
+      animate="[object Object]"
+      exit="[object Object]"
+      initial="[object Object]"
+      transition="[object Object]"
+    >
+      <div
+        animate="visible"
+        exit="hidden"
+        initial="hidden"
+        transition="[object Object]"
+        variants="[object Object]"
+      >
+        <div
+          class="MuiBox-root css-1c8zvho"
+          data-testid="typing-chat-message-container-eb14a7aa-b515-4ab9-9829-8110346d9090"
+          origin="COMPASS"
+        >
+          <div
+            class="MuiBox-root css-u9ttk8"
+            data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+            origin="COMPASS"
+          >
+            <p
+              class="MuiTypography-root MuiTypography-body1 css-13zm2uq-MuiTypography-root"
+              data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
+            />
+            <div
+              class="MuiBox-root css-0"
+              data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+            >
+              <div
+                class="MuiBox-root css-x1sij0"
+              >
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+                >
+                  Typing
+                </p>
+                <span
+                  class="MuiBox-root css-sz63p1"
+                >
+                  <span
+                    class="MuiTypography-root MuiTypography-body1 css-18f2if6-MuiTypography-root"
+                  >
+                    .
+                  </span>
+                  <span
+                    class="MuiTypography-root MuiTypography-body1 css-1dvtvwe-MuiTypography-root"
+                  >
+                    .
+                  </span>
+                  <span
+                    class="MuiTypography-root MuiTypography-body1 css-4a4pgt-MuiTypography-root"
+                  >
+                    .
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

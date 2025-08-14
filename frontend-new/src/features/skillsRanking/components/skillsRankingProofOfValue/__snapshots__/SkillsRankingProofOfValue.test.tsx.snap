@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SkillsRankingProofOfValue snapshot: work-based initial render (non-replay) 1`] = `
+<div>
+  <div
+    class="MuiBox-root css-1s6oyup"
+    data-testid="skills-ranking-effort-container-d08ec52d-cd41-4934-b62f-dcd10eadfb3c"
+    origin="COMPASS"
+  >
+    <div
+      class="MuiBox-root css-8atqhb"
+    >
+      <div
+        class="MuiBox-root css-u9ttk8"
+        data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+        origin="COMPASS"
+      >
+        <p
+          class="MuiTypography-root MuiTypography-body1 css-13zm2uq-MuiTypography-root"
+          data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
+        />
+        <div
+          class="MuiBox-root css-0"
+          data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+        >
+          <div
+            data-disabled="false"
+            data-replay="false"
+            data-replay-finished="false"
+            data-testid="rotate-mock-root"
+          >
+            <button
+              data-testid="rotate-mock-report-button"
+            >
+              report
+            </button>
+            <button
+              data-testid="rotate-mock-success-button"
+            >
+              success
+            </button>
+            <button
+              data-testid="rotate-mock-cancel-button"
+            >
+              cancel
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="MuiBox-root css-1qcd69q"
+        data-testid="chat-message-footer-layout-container-7772f20a-9d0c-4072-b24f-97eca2f43d7b"
+      >
+        <span
+          class="MuiTypography-root MuiTypography-caption css-1l3yql3-MuiTypography-root"
+          data-testid="chat-message-timestamp-c9253326-05ee-4bff-9d43-7852ca78a033"
+        >
+          sent 
+          just now
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;
