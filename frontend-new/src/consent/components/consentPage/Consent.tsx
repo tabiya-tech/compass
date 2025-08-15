@@ -249,7 +249,9 @@ const Consent: React.FC = () => {
               label={
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT}>
                   I have read and accept the{" "}
-                  <CustomLink onClick={() => handleExternalNavigationOnNewTab("https://www.tabiya.org/compass/terms")}>
+                  <CustomLink
+                    onClick={() => handleExternalNavigationOnNewTab("https://www.tabiya.org/compass-terms-privacy")}
+                  >
                     {termsAndConditionsLabel}
                   </CustomLink>{" "}
                   of Compass.
@@ -273,7 +275,9 @@ const Consent: React.FC = () => {
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_CHECKBOX_TEXT}>
                   I have read and accept the{" "}
                   <CustomLink
-                    onClick={() => handleExternalNavigationOnNewTab("https://www.tabiya.org/compass/privacy")}
+                    onClick={() =>
+                      handleExternalNavigationOnNewTab("https://tabiya.org/compass-terms-privacy/#privacy-policy")
+                    }
                   >
                     {privacyPolicyLabel}
                   </CustomLink>{" "}
