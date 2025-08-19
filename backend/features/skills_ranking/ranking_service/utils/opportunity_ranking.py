@@ -37,7 +37,7 @@ def get_opportunity_ranking(*,
 
 
         total_opportunities += 1
-        if score > opportunity_matching_threshold:
+        if score >= opportunity_matching_threshold:
             matching_opportunities += 1
 
     percentage_above_threshold = (matching_opportunities / total_opportunities) if total_opportunities else 0

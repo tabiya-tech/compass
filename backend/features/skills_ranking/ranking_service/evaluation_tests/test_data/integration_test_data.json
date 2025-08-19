@@ -8,10 +8,10 @@
     "given_matching_threshold": 0.5,
     "given_high_difference_threshold": 0.2,
     "expected_overlap_scores": [1, 0.8, 0, 0, 0.5, 1, 0,0, 0.1, 0.1],
-    "expected_number_of_jobs_above_threshold": 3,
-    "expected_opportunity_rank": 0.3,
-    "expected_job_seekers_rank": 0.65,
-    "expected_assigned_group": "Group 2b"
+    "expected_number_of_jobs_above_threshold": 4,
+    "expected_opportunity_rank": 0.4,
+    "expected_job_seekers_rank": 0.75,
+    "expected_assigned_group": "Group 2a"
   },
   {
     "given_external_user_id": "9639cc2a-f53c-4514-98de-36446d5436fb",
@@ -22,8 +22,8 @@
     "given_matching_threshold": 0.5,
     "given_high_difference_threshold": 0.2,
     "expected_overlap_scores": [1, 0, 0.55, 0.73, 0.5, 1, 0.55, 0, 0.2, 0.2],
-    "expected_number_of_jobs_above_threshold": 5,
-    "expected_opportunity_rank": 0.5,
+    "expected_number_of_jobs_above_threshold": 6,
+    "expected_opportunity_rank": 0.6,
     "expected_job_seekers_rank": 0.9,
     "expected_assigned_group": "Group 1b"
   },
@@ -49,8 +49,8 @@
     "given_matching_threshold": 0.5,
     "given_high_difference_threshold": 0.2,
     "expected_overlap_scores": [1, 0, 0.55, 0.73, 0.5, 1, 0, 0, 0.1, 0.8],
-    "expected_number_of_jobs_above_threshold": 5,
-    "expected_opportunity_rank": 0.5,
+    "expected_number_of_jobs_above_threshold": 6,
+    "expected_opportunity_rank": 0.6,
     "expected_job_seekers_rank": 0.9,
     "given_random_target_group": 2,
     "expected_assigned_group": "Group 2a"
@@ -93,7 +93,7 @@
     "expected_overlap_scores": [1, 0.8, 0, 0, 0, 0, 0, 0, 0.8, 0],
     "expected_number_of_jobs_above_threshold": 3,
     "expected_opportunity_rank": 0.3,
-    "expected_job_seekers_rank": 0.65,
+    "expected_job_seekers_rank": 0.6,
     "given_random_target_group": 1,
     "expected_assigned_group": "Group 1b"
   },
@@ -107,7 +107,7 @@
     "expected_overlap_scores": [1, 0, 0, 0.73, 0, 0, 0.82, 0, 0.1, 0.1],
     "expected_number_of_jobs_above_threshold": 3,
     "expected_opportunity_rank": 0.3,
-    "expected_job_seekers_rank": 0.65,
+    "expected_job_seekers_rank": 0.6,
     "given_random_target_group": 2,
     "expected_assigned_group": "Group 2b"
   },
