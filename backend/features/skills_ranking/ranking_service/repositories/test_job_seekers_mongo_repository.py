@@ -11,6 +11,7 @@ def _get_test_job_seeker():
     return JobSeeker(
         user_id="12345",
         skills_uuids={"skill-1", "skill-2"},
+        skill_groups_uuids={"skill-group-1", "skill-group-2"},
         opportunity_rank=0.75,
         compared_to_others_rank=0.8
     )
@@ -107,6 +108,7 @@ class TestSaveJobSeekerRank:
             external_user_id="ext-12345",
             opportunity_dataset_version="v1.0",
             skills_uuids={"skill-1", "skill-2", "skill-3"},
+            skill_groups_uuids={"skill-group-1", "skill-group-2"},
             taxonomy_model_id="taxonomy-1",
             opportunity_rank_prior_belief=0.1,
             opportunity_rank=0.85,

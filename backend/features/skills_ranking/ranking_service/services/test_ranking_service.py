@@ -24,7 +24,7 @@ class TestGetComparisonLabel:
         given_participant_rank = participant_rank
 
         # WHEN the comparison label is computed
-        ranking_service = RankingService(None, None, None)  # type: ignore not used in this test
+        ranking_service = RankingService(None, None, None, None)  # type: ignore not used in this test
         actual_comparison_label = ranking_service._get_comparison_label(given_participant_rank)
 
         # THEN the actual comparison label matches the expected value
@@ -44,7 +44,7 @@ class TestGetComparisonLabel:
         given_participant_rank = participant_rank
 
         # WHEN the comparison label is computed
-        ranking_service = RankingService(None, None, None)  # type: ignore not used in this test
+        ranking_service = RankingService(None, None, None, None)  # type: ignore not used in this test
 
         # THEN it raises a ValueError
         with pytest.raises(ValueError):

@@ -11,6 +11,7 @@ from features.skills_ranking.types import PriorBeliefs
 
 test_opportunities_data_service = test_repositories.TestOpportunitiesDataService()
 test_job_seekers_data_repository = test_repositories.TestJobSeekersDataRepository()
+test_taxonomy_repository = test_repositories.TestTaxonomyRepository()
 
 # get the test cases from the jobseeker data repository
 test_cases = test_job_seekers_data_repository.get_test_cases()
@@ -56,6 +57,7 @@ async def test_ranking_service_integration(test_case: IntegrationTestCase, mocke
 
     # AND the ranking service is initialized
     ranking_service = RankingService(test_job_seekers_data_repository,
+                                     test_taxonomy_repository,
                                      test_opportunities_data_service,
                                      RankingServiceConfig(matching_threshold=given_matching_threshold,
                                                           fetch_job_seekers_batch_size=fetch_data_batch_size))
