@@ -104,6 +104,9 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   );
   const [currentUserId] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
   const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
+  // CV upload states
+  const [isUploadingCv, setIsUploadingCv] = useState<boolean>(false);
+  const [uploadProgressPercent, setUploadProgressPercent] = useState<number>(0);
 
   const navigate = useNavigate();
 
@@ -214,6 +217,40 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.SUCCESSFULLY_LOGGED_OUT, { variant: "success" });
     setIsLoggingOut(false);
   }, [enqueueSnackbar, navigate]);
+
+  // Handles CV upload. For now, this only simulates an upload and disables chat.
+  const handleUploadCv = useCallback(async (file: File) => {
+    // If already uploading, ignore
+    if (isUploadingCv) return;
+    try {
+      setIsUploadingCv(true);
+      setUploadProgressPercent(0);
+      enqueueSnackbar(`Uploading ${file.name}...`, { variant: "info" });
+
+      // Simulate progress over 5 seconds; replace with real upload implementation later
+      await new Promise<void>((resolve) => {
+        const start = Date.now();
+        const durationMs = 5000; // 5s to visualize the bar
+        const interval = setInterval(() => {
+          const elapsed = Date.now() - start;
+          const pct = Math.min(100, Math.round((elapsed / durationMs) * 100));
+          setUploadProgressPercent(pct);
+          if (pct >= 100) {
+            clearInterval(interval);
+            resolve();
+          }
+        }, 80);
+      });
+
+      enqueueSnackbar("CV uploaded", { variant: "success" });
+    } catch (e) {
+      console.error(e);
+      enqueueSnackbar("Failed to upload CV", { variant: "error" });
+    } finally {
+      setIsUploadingCv(false);
+      setUploadProgressPercent(0);
+    }
+  }, [enqueueSnackbar, isUploadingCv]);
 
   // Goes to the chat service to send a message
   const sendMessage = useCallback(
@@ -552,6 +589,9 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 handleSend={handleSend}
                 aiIsTyping={aiIsTyping}
                 isChatFinished={conversationCompleted}
+                isUploadingCv={isUploadingCv}
+                uploadProgressPercent={uploadProgressPercent}
+                onUploadCv={handleUploadCv}
               />
             </Box>
           </Box>
