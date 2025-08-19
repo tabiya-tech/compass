@@ -12,11 +12,47 @@ exports[`ChatMessageField should render correctly 1`] = `
       class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1u4qoj3-MuiFormControl-root-MuiTextField-root"
     >
       <div
-        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedEnd css-8z051r-MuiInputBase-root-MuiOutlinedInput-root"
+        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedStart MuiInputBase-adornedEnd css-1q3i3t1-MuiInputBase-root-MuiOutlinedInput-root"
       >
+        <div
+          class="MuiInputAdornment-root MuiInputAdornment-positionStart MuiInputAdornment-outlined MuiInputAdornment-sizeMedium css-ittuaa-MuiInputAdornment-root"
+        >
+          <span
+            class="notranslate"
+          >
+            ​
+          </span>
+          <div
+            style="opacity: 1;"
+          >
+            <button
+              aria-label="add"
+              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeSmall css-1gp9nik-MuiButtonBase-root-MuiIconButton-root"
+              data-testid="chat-message-field-plus-button-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+              tabindex="0"
+              title="more actions"
+              type="button"
+            >
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-ldtitb-MuiSvgIcon-root"
+                data-testid="chat-message-field-plus-icon-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+                />
+              </svg>
+              <span
+                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+              />
+            </button>
+          </div>
+        </div>
         <textarea
           aria-invalid="false"
-          class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedEnd css-f55ppk-MuiInputBase-input-MuiOutlinedInput-input"
+          class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedStart MuiInputBase-inputAdornedEnd css-1mf2yww-MuiInputBase-input-MuiOutlinedInput-input"
           data-testid="chat-message-field-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
           id=":r0:"
           maxlength="1100"
@@ -25,7 +61,7 @@ exports[`ChatMessageField should render correctly 1`] = `
         />
         <textarea
           aria-hidden="true"
-          class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedEnd css-f55ppk-MuiInputBase-input-MuiOutlinedInput-input"
+          class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedStart MuiInputBase-inputAdornedEnd css-1mf2yww-MuiInputBase-input-MuiOutlinedInput-input"
           readonly=""
           style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
           tabindex="-1"
@@ -35,7 +71,7 @@ exports[`ChatMessageField should render correctly 1`] = `
         >
           <button
             class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-sizeMedium css-1ifbsno-MuiButtonBase-root-MuiIconButton-root"
-            data-testid="chat-message-field-button-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+            data-testid="chat-message-field-send-button-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
             disabled=""
             tabindex="-1"
             title="send message"
@@ -44,7 +80,7 @@ exports[`ChatMessageField should render correctly 1`] = `
             <svg
               aria-hidden="true"
               class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-6v3pcw-MuiSvgIcon-root"
-              data-testid="chat-message-field-icon-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+              data-testid="chat-message-field-send-icon-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
               focusable="false"
               viewBox="0 0 24 24"
             >
@@ -69,6 +105,22 @@ exports[`ChatMessageField should render correctly 1`] = `
           </legend>
         </fieldset>
       </div>
+    </div>
+    <input
+      accept=".pdf,.doc,.docx,.odt,.rtf,.txt"
+      data-testid="chat-message-field-hidden-file-input-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+      style="display: none;"
+      type="file"
+    />
+    <div
+      data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
+    >
+      <div
+        data-testid="upload-cv-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+      >
+        Upload CV
+      </div>
+      ;
     </div>
   </div>
 </div>

@@ -7,9 +7,35 @@ import ChatMessageField, {
   DISALLOWED_CHARACTERS,
   ERROR_MESSAGES,
   PLACEHOLDER_TEXTS,
+  MENU_ITEM_ID,
+  MAX_FILE_SIZE_BYTES,
 } from "./ChatMessageField";
 import { render, screen, fireEvent, act, userEvent, waitFor } from "src/_test_utilities/test-utils";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
+import { ConversationPhase } from "src/chat/chatProgressbar/types";
+import ContextMenu from "src/theme/ContextMenu/ContextMenu";
+import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
+import { StatusCodes } from "http-status-codes";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
+
+// mock the ContextMenu
+jest.mock("src/theme/ContextMenu/ContextMenu", () => {
+  const actual = jest.requireActual("src/theme/ContextMenu/ContextMenu");
+  return {
+    __esModule: true,
+    default: jest.fn(({ items }: { items: MenuItemConfig[] }) => (
+      <div data-testid={actual.DATA_TEST_ID.MENU}>
+        {items.map((item) => (
+          <div key={item.id} data-testid={item.id} onClick={item.action}>
+            {item.text}
+          </div>
+        ))}
+        ;
+      </div>
+    )),
+    DATA_TEST_ID: actual.DATA_TEST_ID,
+  };
+});
 
 describe("ChatMessageField", () => {
   beforeEach(() => {
@@ -19,7 +45,14 @@ describe("ChatMessageField", () => {
 
   test("should render correctly", () => {
     // WHEN ChatMessageField is rendered
-    render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} />);
+    render(
+      <ChatMessageField
+        aiIsTyping={false}
+        isChatFinished={false}
+        handleSend={jest.fn()}
+        currentPhase={ConversationPhase.INTRO}
+      />
+    );
 
     //THEN expect no errors or warnings has occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -28,10 +61,14 @@ describe("ChatMessageField", () => {
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toBeInTheDocument();
     // AND the ChatMessageField input to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD)).toBeInTheDocument();
-    // AND the ChatMessageField button to be in the document
-    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeInTheDocument();
-    // AND the ChatMessageField icon to be in the document
-    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_ICON)).toBeInTheDocument();
+    // AND the ChatMessageField send button to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeInTheDocument();
+    // AND the ChatMessageField send icon to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_ICON)).toBeInTheDocument();
+    // AND the ChatMessageField plus button to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON)).toBeInTheDocument();
+    // AND the ChatMessageField plus icon to be in the document
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_ICON)).toBeInTheDocument();
     // AND to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_CONTAINER)).toMatchSnapshot();
   });
@@ -49,7 +86,7 @@ describe("ChatMessageField", () => {
     // THEN expect the error message to be in the document
     expect(screen.getByText(`Message limit is ${CHAT_MESSAGE_MAX_LENGTH} characters.`)).toBeInTheDocument();
     // AND the send button to be disabled
-    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeDisabled();
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeDisabled();
     // AND the input field should be enabled
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD)).toBeEnabled();
     // AND no errors or warnings to have occurred
@@ -71,7 +108,7 @@ describe("ChatMessageField", () => {
     // THEN expect the error message to be in the document
     expect(screen.getByText(`${ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS}${invalidChar}`)).toBeInTheDocument();
     // AND the send button should be enabled
-    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeEnabled();
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeEnabled();
     // AND the input field should be enabled
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD)).toBeEnabled();
     // AND no errors or warnings to have occurred
@@ -93,7 +130,7 @@ describe("ChatMessageField", () => {
     expect(screen.queryByText(ERROR_MESSAGES.MESSAGE_LIMIT)).toBeNull();
     expect(screen.queryByText(ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS)).toBeNull();
     // AND the send button should be enabled
-    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeEnabled();
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeEnabled();
     // AND the input field should be enabled
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD)).toBeEnabled();
     // AND no errors or warnings to have occurred
@@ -151,7 +188,7 @@ describe("ChatMessageField", () => {
         `${message.length}/${CHAT_MESSAGE_MAX_LENGTH}`
       );
       // AND the send button should be enabled
-      expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeEnabled();
+      expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeEnabled();
       // AND the input field should be enabled
       expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD)).toBeEnabled();
       // AND no errors or warnings to have occurred
@@ -174,7 +211,7 @@ describe("ChatMessageField", () => {
       // THEN expect the character counter not to be in the document
       expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_CHAR_COUNTER)).not.toBeInTheDocument();
       // AND the send button should be enabled
-      expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON)).toBeEnabled();
+      expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeEnabled();
       // AND the input field should be enabled
       expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD)).toBeEnabled();
       // AND no errors or warnings to have occurred
@@ -197,7 +234,7 @@ describe("ChatMessageField", () => {
         const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
         await userEvent.type(chatMessageField, givenMessage);
         // AND the button is clicked
-        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON);
         await userEvent.click(chatMessageFieldButton);
 
         // THEN expect handleSend to be called with the actual message
@@ -226,7 +263,7 @@ describe("ChatMessageField", () => {
         // THEN expect handleSend not to be called
         expect(handleSend).not.toHaveBeenCalled();
         // AND expect the button to be disabled
-        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON);
         expect(chatMessageFieldButton).toBeDisabled();
         // AND chat message input to be enabled
         expect(chatMessageField).toBeEnabled();
@@ -247,7 +284,7 @@ describe("ChatMessageField", () => {
         render(<ChatMessageField aiIsTyping={givenAiIsTyping} isChatFinished={false} handleSend={handleSend} />);
 
         // THEN expect the chat message field button to be disabled
-        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON);
         expect(chatMessageFieldButton).toBeDisabled();
         // AND the chat message field to be disabled
         const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
@@ -271,7 +308,7 @@ describe("ChatMessageField", () => {
         render(<ChatMessageField aiIsTyping={false} isChatFinished={givenIsChatFinished} handleSend={handleSend} />);
 
         // THEN expect chat message field button to be disabled
-        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON);
         expect(chatMessageFieldButton).toBeDisabled();
         // AND the chat message field to be disabled
         const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
@@ -293,7 +330,7 @@ describe("ChatMessageField", () => {
         render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={handleSend} />);
 
         // THEN expect the chat message field button to be disabled
-        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON);
         expect(chatMessageFieldButton).toBeDisabled();
         // AND the chat message field to be disabled
         const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
@@ -316,7 +353,7 @@ describe("ChatMessageField", () => {
         fireEvent.change(ChatMessageFieldInput, { target: { value: message } });
 
         // THEN expect the chat message field button to be disabled
-        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON);
         expect(chatMessageFieldButton).toBeDisabled();
         // AND the chat message field to be enabled
         const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
@@ -365,7 +402,7 @@ describe("ChatMessageField", () => {
         await userEvent.type(chatMessageField, messageWithWhitespace);
 
         // AND the button is clicked
-        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+        const chatMessageFieldButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON);
         await userEvent.click(chatMessageFieldButton);
 
         // THEN expect handleSend to be called with the trimmed message
@@ -395,7 +432,7 @@ describe("ChatMessageField", () => {
         const charCounter = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_CHAR_COUNTER);
         expect(charCounter).toHaveTextContent(`${messageContent.length}/${CHAT_MESSAGE_MAX_LENGTH}`);
         // AND the send button should be enabled
-        const sendButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON);
+        const sendButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON);
         expect(sendButton).toBeEnabled();
         // AND there should be no error message
         expect(screen.queryByText(`Message limit is ${CHAT_MESSAGE_MAX_LENGTH} characters.`)).not.toBeInTheDocument();
@@ -512,6 +549,204 @@ describe("ChatMessageField", () => {
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("Plus button", () => {
+      test("should open file picker and handle file upload when plus button is clicked", async () => {
+        // GIVEN an INTRO phase and a mock onUploadCv
+        const mockOnUploadCv = jest.fn().mockResolvedValue(["parsed CV content"]);
+        render(
+          <ChatMessageField
+            aiIsTyping={false}
+            isChatFinished={false}
+            handleSend={jest.fn()}
+            currentPhase={ConversationPhase.INTRO}
+            onUploadCv={mockOnUploadCv}
+          />
+        );
+
+        // WHEN the plus button is clicked
+        const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
+        await userEvent.click(plusButton);
+
+        // AND the context menu is opened
+        await waitFor(() => {
+          expect(ContextMenu).toHaveBeenCalledWith(
+            expect.objectContaining({
+              anchorEl: plusButton,
+              open: true,
+            }),
+            {}
+          );
+        });
+
+        // AND the user clicks an upload file option
+        const uploadFileOption = screen.getByTestId(MENU_ITEM_ID.UPLOAD_CV);
+        await userEvent.click(uploadFileOption);
+
+        // AND a file is selected
+        const fileInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT);
+        const file = new File(["dummy content"], "cv.pdf", { type: "application/pdf" });
+        await userEvent.upload(fileInput, file);
+
+        // THEN expect onUploadCv to be called with the file
+        expect(mockOnUploadCv).toHaveBeenCalledWith(file);
+        // AND the composed content (intro + bullets) should be added to the input field
+        const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+        await waitFor(() => {
+          expect(chatMessageField).toHaveValue("These are my experiences:\n• parsed CV content");
+        });
+        // AND no errors or warnings to have occurred
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      test("should show error message when file upload exceeds size limit", async () => {
+        // GIVEN an INTRO phase and a mock onUploadCv
+        const mockOnUploadCv = jest.fn();
+        render(
+          <ChatMessageField
+            aiIsTyping={false}
+            isChatFinished={false}
+            handleSend={jest.fn()}
+            currentPhase={ConversationPhase.INTRO}
+            onUploadCv={mockOnUploadCv}
+          />
+        );
+
+        // WHEN the plus button is clicked
+        const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
+        await userEvent.click(plusButton);
+
+        // AND the context menu is opened
+        await waitFor(() => {
+          expect(ContextMenu).toHaveBeenCalledWith(
+            expect.objectContaining({
+              anchorEl: plusButton,
+              open: true,
+            }),
+            {}
+          );
+        });
+
+        // AND the user clicks an upload file option
+        const uploadFileOption = screen.getByTestId(MENU_ITEM_ID.UPLOAD_CV);
+        await userEvent.click(uploadFileOption);
+
+        // AND a file is selected that exceeds the size limit
+        const fileInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT);
+        const largeFile = new File([new ArrayBuffer(MAX_FILE_SIZE_BYTES * 2)], "large_cv.pdf", {
+          type: "application/pdf",
+        });
+        await userEvent.upload(fileInput, largeFile);
+
+        // THEN expect onUploadCv not to be called
+        expect(mockOnUploadCv).not.toHaveBeenCalled();
+        // AND expect an error message to be shown
+        await waitFor(() => {
+          expect(screen.getByText(ERROR_MESSAGES.MAX_FILE_SIZE)).toBeInTheDocument();
+        });
+        // AND no errors or warnings to have occurred
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      test("should disable text field and display the correct placeholder when uploading a file", async () => {
+        // GIVEN a mock onUploadCv that resolves after a delay
+        const mockOnUploadCv = jest.fn().mockResolvedValue(["parsed CV content"]);
+        // AND the file is being uploaded
+        const mockIsUploadingCv = true;
+
+        // WHEN ChatMessageField is rendered
+        render(
+          <ChatMessageField
+            aiIsTyping={false}
+            isChatFinished={false}
+            handleSend={jest.fn()}
+            currentPhase={ConversationPhase.COLLECT_EXPERIENCES}
+            onUploadCv={mockOnUploadCv}
+            isUploadingCv={mockIsUploadingCv}
+          />
+        );
+
+        // THEN expect the text field to be disabled while uploading
+        const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+        expect(chatMessageField).toBeDisabled();
+        // AND the placeholder should indicate uploading
+        expect(chatMessageField).toHaveAttribute("placeholder", PLACEHOLDER_TEXTS.UPLOADING);
+        // AND no errors or warnings to have occurred
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      test("should not show plus button when it is not a relevant phase", async () => {
+        // GIVEN a non-relevant phase and a mock onUploadCv
+        const currentPhase = ConversationPhase.DIVE_IN;
+
+        // WHEN ChatMessageField is rendered
+        render(
+          <ChatMessageField
+            aiIsTyping={false}
+            isChatFinished={false}
+            handleSend={jest.fn()}
+            currentPhase={currentPhase}
+            onUploadCv={jest.fn()}
+          />
+        );
+
+        // THEN expect the plus button not to be in the document
+        expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON)).not.toBeInTheDocument();
+
+        // AND no errors or warnings to have occurred
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      test("should handle 413 error when uploading a CV with too much text", async () => {
+        // GIVEN an INTRO phase
+        const givenPhase = ConversationPhase.INTRO;
+        // AND a mock onUploadCv that rejects with a 413 error
+        const tooLargeErrorAlt = new Error(ERROR_MESSAGES.FILE_TOO_DENSE);
+        (tooLargeErrorAlt as any).statusCode = StatusCodes.REQUEST_TOO_LONG;
+        (tooLargeErrorAlt as any).errorCode = ErrorConstants.ErrorCodes.TOO_LARGE_PAYLOAD;
+
+        const mockOnUploadCv = jest.fn().mockRejectedValue(tooLargeErrorAlt);
+
+        // AND ChatMessageField is rendered
+        render(
+          <ChatMessageField
+            aiIsTyping={false}
+            isChatFinished={false}
+            handleSend={jest.fn()}
+            currentPhase={givenPhase}
+            onUploadCv={mockOnUploadCv}
+          />
+        );
+
+        // WHEN plus button is clicked
+        const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
+        await userEvent.click(plusButton);
+
+        // AND the user clicks an upload file option
+        const uploadFileOption = screen.getByTestId(MENU_ITEM_ID.UPLOAD_CV);
+        await userEvent.click(uploadFileOption);
+
+        // AND a file is selected
+        const fileInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT);
+        const file = new File(["dummy content"], "cv.pdf", { type: "application/pdf" });
+        await userEvent.upload(fileInput, file);
+
+        // THEN expect onUploadCv to be called with the file
+        expect(mockOnUploadCv).toHaveBeenCalledWith(file);
+
+        // AND the specific error message for too dense content to be shown
+        await waitFor(() => {
+          expect(screen.getByText(ERROR_MESSAGES.FILE_TOO_DENSE)).toBeInTheDocument();
+        });
+
+        // AND console.error should be called for logging the error
+        expect(console.error).toHaveBeenCalled();
       });
     });
   });

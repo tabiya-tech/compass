@@ -5,6 +5,7 @@ import { IChatMessage } from "src/chat/Chat.types";
 import {
   generateCompassMessage,
   generateConversationConclusionMessage,
+  generateCVTypingMessage,
   generatePleaseRepeatMessage,
   generateSomethingWentWrongMessage,
   generateTypingMessage,
@@ -34,11 +35,12 @@ import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableCompo
 import ChatProgressBar from "./chatProgressbar/ChatProgressBar";
 import { ConversationPhase, CurrentPhase, defaultCurrentPhase } from "./chatProgressbar/types";
 import { CompassChatMessageProps } from "./chatMessage/compassChatMessage/CompassChatMessage";
-import {
-  CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
-} from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
+import cvService from "src/CV/CVService/CVService";
+import { CV_UPLOADED_DISPLAY_TIME } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
+import { nanoid } from "nanoid";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -104,6 +106,8 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   );
   const [currentUserId] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
   const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
+  // CV upload states
+  const [isUploadingCv, setIsUploadingCv] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -216,6 +220,61 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     setIsLoggingOut(false);
   }, [enqueueSnackbar, navigate]);
 
+  // Handles CV upload
+  const handleUploadCv = useCallback(
+    async (file: File) => {
+      // If already uploading, ignore
+      if (isUploadingCv) return [] as string[];
+
+      setIsUploadingCv(true);
+      const uploadingMessageId = nanoid();
+      try {
+        enqueueSnackbar(`Uploading ${file.name}...`, { variant: "info" });
+
+        // Add a CV typing message to indicate uploading
+        addMessageToChat({
+          ...generateCVTypingMessage(false),
+          message_id: uploadingMessageId,
+        });
+
+        const currentUserId = authenticationStateService.getInstance().getUser()?.id;
+        if (!currentUserId) {
+          throw new ChatError("User ID is not available");
+        }
+
+        const response = await cvService.getInstance().uploadCV(currentUserId, file);
+
+        // Remove the uploading message
+        removeMessageFromChat(uploadingMessageId);
+
+        // Create a new ID for the success message
+        const successMessageId = nanoid();
+        addMessageToChat({
+          ...generateCVTypingMessage(true),
+          message_id: successMessageId,
+        });
+
+        // Remove the "uploaded" message after display time
+        setTimeout(() => {
+          removeMessageFromChat(successMessageId);
+        }, CV_UPLOADED_DISPLAY_TIME);
+
+        enqueueSnackbar("CV uploaded", { variant: "success" });
+
+        return response;
+      } catch (e) {
+        console.error(e);
+        removeMessageFromChat(uploadingMessageId);
+        enqueueSnackbar("Failed to upload CV. Please try again.", { variant: "error" });
+        // Return empty list on failure to avoid unhandled rejections in tests/UX
+        return [] as string[];
+      } finally {
+        setIsUploadingCv(false);
+      }
+    },
+    [enqueueSnackbar, isUploadingCv, addMessageToChat, removeMessageFromChat]
+  );
+
   // Goes to the chat service to send a message
   const sendMessage = useCallback(
     async (userMessage: string, sessionId: number) => {
@@ -255,14 +314,13 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
           const lastMessage = response.messages[response.messages.length - 1];
 
           if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
-            const showConclusionMessage = createShowConclusionMessage(
-                lastMessage,
-                addMessageToChat,
-                setAiIsTyping
-            );
+            const showConclusionMessage = createShowConclusionMessage(lastMessage, addMessageToChat, setAiIsTyping);
             await showSkillsRanking(showConclusionMessage);
           } else {
-            const conclusionMessage = generateConversationConclusionMessage(lastMessage.message_id, lastMessage.message);
+            const conclusionMessage = generateConversationConclusionMessage(
+              lastMessage.message_id,
+              lastMessage.message
+            );
 
             addMessageToChat(conclusionMessage);
           }
@@ -335,14 +393,13 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
             const lastMessage = history.messages[history.messages.length - 1];
 
             if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
-              const showConclusionMessage = createShowConclusionMessage(
-                  lastMessage,
-                  addMessageToChat,
-                  setAiIsTyping
-              );
+              const showConclusionMessage = createShowConclusionMessage(lastMessage, addMessageToChat, setAiIsTyping);
               await showSkillsRanking(showConclusionMessage);
             } else {
-              const conclusionMessage = generateConversationConclusionMessage(lastMessage.message_id, lastMessage.message);
+              const conclusionMessage = generateConversationConclusionMessage(
+                lastMessage.message_id,
+                lastMessage.message
+              );
               addMessageToChat(conclusionMessage);
             }
           }
@@ -493,7 +550,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   // As fetch experiences will also initialize state thus we face race hazard (concurrency issue)
   useEffect(() => {
     if (activeSessionId && currentPhase.phase !== ConversationPhase.INITIALIZING) {
-      fetchExperiences().then()
+      fetchExperiences().then();
     }
   }, [activeSessionId, fetchExperiences, currentPhase.phase]);
 
@@ -553,6 +610,9 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 handleSend={handleSend}
                 aiIsTyping={aiIsTyping}
                 isChatFinished={conversationCompleted}
+                isUploadingCv={isUploadingCv}
+                onUploadCv={handleUploadCv}
+                currentPhase={currentPhase.phase}
               />
             </Box>
           </Box>
