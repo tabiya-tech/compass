@@ -1,4 +1,4 @@
-import { Box, Divider, Icon, ListItemIcon, ListItemText, Menu, MenuItem, Typography, useTheme } from "@mui/material";
+import { Box, Divider, Icon, ListItemIcon, ListItemText, Menu, MenuItem, Typography, useTheme, PopoverOrigin } from "@mui/material";
 import { MenuItemConfig } from "./menuItemConfig.types";
 
 export interface ContextMenuProps {
@@ -7,6 +7,8 @@ export interface ContextMenuProps {
   anchorEl: HTMLElement | null;
   notifyOnClose: () => void;
   headerMessage?: string;
+  anchorOrigin?: PopoverOrigin;
+  transformOrigin?: PopoverOrigin;
 }
 
 const uniqueId = "b7499b01-8082-4209-8667-c7d559a70caf";
@@ -28,14 +30,8 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
   return (
     <Menu
       elevation={2}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "center",
-      }}
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
+      anchorOrigin={props.anchorOrigin ?? { vertical: "bottom", horizontal: "center" }}
+      transformOrigin={props.transformOrigin ?? { vertical: "top", horizontal: "right" }}
       anchorEl={props.anchorEl}
       open={props.open}
       onClose={props.notifyOnClose}

@@ -53,7 +53,9 @@ import { TYPING_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/typingChatMessage
 import { ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
 import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
-import { getRandomSessionID } from "../features/skillsRanking/utils/getSkillsRankingState";
+import { getRandomSessionID } from "src/features/skillsRanking/utils/getSkillsRankingState";
+import CVService from "src/CV/CVService/CVService";
+import { CV_TYPING_CHAT_MESSAGE_TYPE } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
 
 // Mock Components ----------
 // mock the snackbar
@@ -1471,35 +1473,11 @@ describe("Chat", () => {
       });
 
       // THEN expect the previous conversation and the response from the chat service to be shown in the chat
-      await waitFor(() => {
-        assertMessagesAreShown(
-          [
-            ...givenPreviousConversation.messages.map((message) => ({
-              message_id: expect.any(String),
-              type: expect.any(String),
-              sender: message.sender,
-              payload: {
-                message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined,
-                message: message.message,
-                sent_at: message.sent_at,
-                reaction: message.sender === ConversationMessageSender.COMPASS ? message.reaction : undefined,
-              },
-              component: expect.any(Function),
-            })),
-            {
-              message_id: expect.any(String),
-              type: USER_CHAT_MESSAGE_TYPE,
-              sender: ConversationMessageSender.USER,
-              payload: {
-                message: givenMessage,
-                sent_at: expect.any(String),
-              },
-              component: expect.any(Function),
-            },
-            // the last message will be replaced with a conversation conclusion message
-            ...givenSendMessageResponse.messages
-              .filter((message, index) => index !== givenSendMessageResponse.messages.length - 1)
-              .map((message) => ({
+      await waitFor(
+        () => {
+          assertMessagesAreShown(
+            [
+              ...givenPreviousConversation.messages.map((message) => ({
                 message_id: expect.any(String),
                 type: expect.any(String),
                 sender: message.sender,
@@ -1511,19 +1489,46 @@ describe("Chat", () => {
                 },
                 component: expect.any(Function),
               })),
-            {
-              message_id: expect.any(String),
-              type: CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
-              sender: ConversationMessageSender.COMPASS,
-              payload: {
-                message: expect.any(String),
+              {
+                message_id: expect.any(String),
+                type: USER_CHAT_MESSAGE_TYPE,
+                sender: ConversationMessageSender.USER,
+                payload: {
+                  message: givenMessage,
+                  sent_at: expect.any(String),
+                },
+                component: expect.any(Function),
               },
-              component: expect.any(Function),
-            },
-          ],
-          true
-        );
-      }, { timeout: TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT * 2 }); // TODO: fix. this is a workaround
+              // the last message will be replaced with a conversation conclusion message
+              ...givenSendMessageResponse.messages
+                .filter((message, index) => index !== givenSendMessageResponse.messages.length - 1)
+                .map((message) => ({
+                  message_id: expect.any(String),
+                  type: expect.any(String),
+                  sender: message.sender,
+                  payload: {
+                    message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined,
+                    message: message.message,
+                    sent_at: message.sent_at,
+                    reaction: message.sender === ConversationMessageSender.COMPASS ? message.reaction : undefined,
+                  },
+                  component: expect.any(Function),
+                })),
+              {
+                message_id: expect.any(String),
+                type: CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
+                sender: ConversationMessageSender.COMPASS,
+                payload: {
+                  message: expect.any(String),
+                },
+                component: expect.any(Function),
+              },
+            ],
+            true
+          );
+        },
+        { timeout: TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT * 2 }
+      ); // TODO: fix. this is a workaround
       // AND expect input field to have been disabled
       await waitFor(() => {
         expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
@@ -2321,6 +2326,112 @@ describe("Chat", () => {
 
       // reset the timers
       jest.useRealTimers();
+    });
+  });
+
+  describe("uploading a CV", () => {
+    test("should upload a CV and add uploading CV message to chat", async () => {
+      // GIVEN a logged-in user and active session
+      const givenUser = getMockUser();
+      AuthenticationStateService.getInstance().setUser(givenUser);
+      const givenActiveSessionId = 123;
+      UserPreferencesStateService.getInstance().setUserPreferences(
+        getMockUserPreferences(givenUser, givenActiveSessionId)
+      );
+
+      // AND the conversation history has a welcome message
+      const givenPreviousConversation: ConversationResponse = getMockConversationResponse(
+        [
+          {
+            message_id: nanoid(),
+            message: "90dac7d1-d396-4516-9078-00032539d8dc",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+            reaction: null,
+          },
+        ],
+        ConversationPhase.INTRO,
+        0
+      );
+      jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
+
+      // AND a mock file to upload
+      const file = new File(["dummy content"], "example.pdf", { type: "application/pdf" });
+      // AND the upload service will resolve successfully
+      jest.spyOn(CVService.getInstance(), "uploadCV").mockResolvedValueOnce(["line 1", "line 2"]);
+
+      // WHEN the component is rendered
+      render(<Chat />);
+      // AND the Chat component is initialized
+      await assertChatInitialized();
+      // AND the file is uploaded via the ChatMessageField component
+      await act(async () => {
+        const onUploadCv = (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].onUploadCv;
+        await onUploadCv(file);
+      });
+
+      // THEN expect the upload service to be called with the file and user id
+      expect(CVService.getInstance().uploadCV).toHaveBeenCalledWith(givenUser.id, file);
+      // AND expect the snackbar messages to be shown
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Uploading example.pdf...", { variant: "info" });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("CV uploaded", { variant: "success" });
+      // AND expect the success CV message to be added to the chat
+      await waitFor(() => {
+        assertMessagesAreShown(
+          [
+            {
+              message_id: "success-cv-message-id",
+              type: CV_TYPING_CHAT_MESSAGE_TYPE,
+              sender: ConversationMessageSender.COMPASS,
+              payload: {
+                isUploaded: true,
+              },
+              component: expect.any(Function),
+            },
+          ],
+          false
+        );
+      });
+      // AND no errors or warnings were logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should handle CV upload failure gracefully", async () => {
+      // GIVEN a logged-in user
+      const givenUser = getMockUser();
+      AuthenticationStateService.getInstance().setUser(givenUser);
+      const givenActiveSessionId = 123;
+      UserPreferencesStateService.getInstance().setUserPreferences(
+        getMockUserPreferences(givenUser, givenActiveSessionId)
+      );
+      jest
+        .spyOn(ChatService.getInstance(), "getChatHistory")
+        .mockResolvedValueOnce(getMockConversationResponse([], ConversationPhase.INTRO, 0));
+
+      // AND a mock file to upload
+      const file = new File(["dummy content"], "example.pdf", { type: "application/pdf" });
+
+      // AND the upload service will reject
+      const uploadError = new Error("Upload failed");
+      jest.spyOn(CVService.getInstance(), "uploadCV").mockRejectedValueOnce(uploadError);
+
+      // WHEN the component is rendered
+      render(<Chat />);
+      // AND the Chat component is initialized
+      await assertChatInitialized();
+      // AND the CV file upload fails
+      await act(async () => {
+        const onUploadCv = (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].onUploadCv;
+        await onUploadCv(file);
+      });
+
+      // THEN expect the error to be logged
+      expect(console.error).toHaveBeenCalledWith(uploadError);
+      // AND expect the error snackbar to be shown
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to upload CV. Please try again.", {
+        variant: "error",
+      });
     });
   });
 });
