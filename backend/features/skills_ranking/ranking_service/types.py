@@ -19,6 +19,11 @@ class JobSeeker(BaseModel):
     The set of unique skill identifiers associated with the job seeker.
     """
 
+    skill_groups_uuids: set[str]
+    """
+    The set of unique skill group identifiers associated with the job seeker.
+    """
+
     taxonomy_model_id: Optional[str] = None
     """
     The taxonomy model identifier used when the user was ranked.

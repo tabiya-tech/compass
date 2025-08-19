@@ -14,7 +14,7 @@ class OpportunitiesDataRepository(IOpportunitiesDataRepository):
     async def get_opportunities_skills_uuids(self, limit: int, batch_size: int) -> list[set[str]]:
         try:
             # fetch the opportunities from the collection
-            cursor = self._collection.find({"active": {"$eq": True}}, {'skills.UUID': 1, '_id': False}).limit(limit).batch_size(
+            cursor = self._collection.find({"active": {"$eq": True}}, {'skillGroups.UUID': 1, '_id': False}).limit(limit).batch_size(
                 batch_size)
 
             skills_sets = []
@@ -26,11 +26,11 @@ class OpportunitiesDataRepository(IOpportunitiesDataRepository):
                 # And the cursor will fetch the next batch.
                 if len(opportunities_docs) >= batch_size:
                     # process the batch
-                    skills_sets.extend({skill["UUID"] for skill in opportunity_doc.get("skills", [])} for opportunity_doc in opportunities_docs)
+                    skills_sets.extend({skill["UUID"] for skill in opportunity_doc.get("skillGroups", [])} for opportunity_doc in opportunities_docs)
                     opportunities_docs = []
 
             # process any remaining documents in the last batch
-            skills_sets.extend({skill["UUID"] for skill in opportunity_doc.get("skills", [])} for opportunity_doc in opportunities_docs)
+            skills_sets.extend({skill["UUID"] for skill in opportunity_doc.get("skillGroups", [])} for opportunity_doc in opportunities_docs)
 
             # if no skills were found, log an error so that it can be caught by Sentry.
             if len(skills_sets) == 0:

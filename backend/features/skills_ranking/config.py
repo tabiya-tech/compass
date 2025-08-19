@@ -43,6 +43,11 @@ class SkillsRankingConfig(RankingServiceConfig, OpportunitiesDataServiceConfig, 
     The collection name for the opportunity data.
     """
 
+    skills_collection_name: str = RankingDefaultCollections.SKILLS
+    """
+    The collection name for the skills.
+    """
+
     registration_data_mongodb_uri: str
     """
     The URI of the registration database MongoDB instance.

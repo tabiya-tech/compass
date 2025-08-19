@@ -6,7 +6,7 @@ from .opportunities_data_service import IOpportunitiesDataService
 from features.skills_ranking.ranking_service.types import JobSeeker
 from features.skills_ranking.types import SkillsRankingScore, PriorBeliefs
 from common_libs.time_utilities import get_now
-from features.skills_ranking.ranking_service.repositories.types import IJobSeekersRepository
+from features.skills_ranking.ranking_service.repositories.types import IJobSeekersRepository, ITaxonomyRepository
 from features.skills_ranking.ranking_service.utils.opportunity_ranking import get_opportunity_ranking
 from features.skills_ranking.ranking_service.utils.other_job_seekers_ranking import other_job_seekers_ranking
 
@@ -32,10 +32,12 @@ class RankingService(IRankingService):
 
     def __init__(self,
                  job_seekers_repository: IJobSeekersRepository,
+                 taxonomy_repository: ITaxonomyRepository,
                  opportunities_data_service: IOpportunitiesDataService,
                  config: RankingServiceConfig):
 
         self._job_seekers_repository = job_seekers_repository
+        self._taxonomy_repository = taxonomy_repository
         self._opportunities_data_service = opportunities_data_service
         self._logger = logging.getLogger(RankingService.__name__)
         self._config = config
@@ -57,8 +59,10 @@ class RankingService(IRankingService):
         opportunities_skills_uuids = await self._opportunities_data_service.get_opportunities_skills_uuids()
 
         # 3. Get the participant skills opportunity ranking by using (`opportunities_skills_uuids`, `participant_skills_uuids`, `opportunity_matching_threshold`)
+        #    Note: We are using participant skill groups uuids instead of skill ids
+        participant_skill_groups_uuids = await self._taxonomy_repository.get_skill_groups_from_skills(participants_skills_uuids)
         opportunities_rank = get_opportunity_ranking(opportunities_skills_uuids=opportunities_skills_uuids,
-                                                     participant_skills_uuids=participants_skills_uuids,
+                                                     participant_skills_uuids=participant_skill_groups_uuids,
                                                      opportunity_matching_threshold=opportunity_matching_threshold)
 
         # 4. Read the `opportunities-seekers ranks dataset`.
@@ -72,6 +76,7 @@ class RankingService(IRankingService):
         job_seeker = JobSeeker(
             user_id=user_id,
             skills_uuids=participants_skills_uuids,
+            skill_groups_uuids=participant_skill_groups_uuids,
             opportunity_rank=opportunities_rank,
             compared_to_others_rank=other_job_seekers_ranks,
             compare_to_others_prior_belief=prior_beliefs.compare_to_others_prior_belief,

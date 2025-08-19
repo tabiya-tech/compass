@@ -8,3 +8,8 @@ class DefaultCollections:
     """
     Default collection name for job seekers data.
     """
+
+    SKILLS = "skills"
+    """
+    Skills collection name
+    """

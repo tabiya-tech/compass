@@ -2,7 +2,7 @@ import json
 import os
 
 from features.skills_ranking.ranking_service.evaluation_tests._types import IntegrationTestCase
-from features.skills_ranking.ranking_service.repositories.types import IJobSeekersRepository
+from features.skills_ranking.ranking_service.repositories.types import IJobSeekersRepository, ITaxonomyRepository
 from features.skills_ranking.ranking_service.services.opportunities_data_service import IOpportunitiesDataService
 from features.skills_ranking.ranking_service.types import JobSeeker
 
@@ -53,3 +53,8 @@ class TestJobSeekersDataRepository(IJobSeekersRepository):
 
         # return the set of skill UUIDs for the jobseeker
         return {skill.get("uuid") for skill in job_seeker_skills}
+
+
+class TestTaxonomyRepository(ITaxonomyRepository):
+    async def get_skill_groups_from_skills(self, skills_uuids: set[str]) -> set[str]:
+        return skills_uuids

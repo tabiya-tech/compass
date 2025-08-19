@@ -10,31 +10,31 @@ given_skills_uuids = [uuid4().__str__() for _ in range(10)]
 given_test_opportunities_data = [
     {
         "active": True,
-        "skills": [{"UUID": given_skills_uuids[0]}, {"UUID": given_skills_uuids[1]}]
+        "skillGroups": [{"UUID": given_skills_uuids[0]}, {"UUID": given_skills_uuids[1]}]
     },
     {
         "active": False,
-        "skills": [{"UUID": given_skills_uuids[2]}, {"UUID": given_skills_uuids[3]}]
+        "skillGroups": [{"UUID": given_skills_uuids[2]}, {"UUID": given_skills_uuids[3]}]
     },
     {
         "active": True,
-        "skills": [{"UUID": given_skills_uuids[4]}, {"UUID": given_skills_uuids[5]}, {"UUID": given_skills_uuids[6]}]
+        "skillGroups": [{"UUID": given_skills_uuids[4]}, {"UUID": given_skills_uuids[5]}, {"UUID": given_skills_uuids[6]}]
     },
     {
         "active": True,
-        "skills": [{"UUID": given_skills_uuids[6]}, {"UUID": given_skills_uuids[7]}]
+        "skillGroups": [{"UUID": given_skills_uuids[6]}, {"UUID": given_skills_uuids[7]}]
     },
     {
         "active": True,
-        "skills": [{"UUID": given_skills_uuids[8]}, {"UUID": given_skills_uuids[9]}]
+        "skillGroups": [{"UUID": given_skills_uuids[8]}, {"UUID": given_skills_uuids[9]}]
     },
     {
         "active": True,
-        "skills": [{"UUID": given_skills_uuids[7]}, {"UUID": given_skills_uuids[5]}]
+        "skillGroups": [{"UUID": given_skills_uuids[7]}, {"UUID": given_skills_uuids[5]}]
     },
     {
         "active": True,
-        "skills": [{"UUID": given_skills_uuids[3]}, {"UUID": given_skills_uuids[8]}]
+        "skillGroups": [{"UUID": given_skills_uuids[3]}, {"UUID": given_skills_uuids[8]}]
     }
 ]
 expected_opportunities_skills_uuids = [

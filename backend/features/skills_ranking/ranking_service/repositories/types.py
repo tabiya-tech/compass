@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from features.skills_ranking.ranking_service.types import JobSeeker
 
@@ -38,5 +38,23 @@ class IOpportunitiesDataRepository(ABC):
         :param batch_size: The number of opportunities to process in each batch.
 
         :raises Exception: If an error fetching skills from opportunities.
+        """
+        raise NotImplementedError
+
+
+
+class ITaxonomyRepository(ABC):
+    """
+    Interface for taxonomy repository/service to manage skills, skill groups from the taxonomy datasource (API or Database)
+    """
+
+    @abstractmethod
+    async def get_skill_groups_from_skills(self, skills_uuids: set[str]) -> set[str]:
+        """
+        Get skill groups uuids from skill uuids.
+        Uses taxonomy skill hierarchy, to determine the parent group for each skill.
+
+        :param skills_uuids: The set of skill UUIDs to fetch skill groups for.
+        :return: A list of skill groups associated with the given skills.
         """
         raise NotImplementedError
