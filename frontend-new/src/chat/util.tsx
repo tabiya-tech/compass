@@ -8,6 +8,7 @@ import CompassChatMessage, { CompassChatMessageProps, COMPASS_CHAT_MESSAGE_TYPE 
 import ConversationConclusionChatMessage, { ConversationConclusionChatMessageProps, CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import TypingChatMessage, { TypingChatMessageProps, TYPING_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import ErrorChatMessage, { ErrorChatMessageProps, ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
+import CVTypingChatMessage, { CV_TYPING_CHAT_MESSAGE_TYPE, CVTypingChatMessageProps } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
 
 export const FIXED_MESSAGES_TEXT = {
   AI_IS_TYPING: "Typing...",
@@ -76,6 +77,21 @@ export const generateTypingMessage = (waitBeforeThinking?: number): IChatMessage
     sender: ConversationMessageSender.COMPASS,
     payload: payload,
     component: (prop: TypingChatMessageProps) => <TypingChatMessage {...prop}/>,
+  };
+};
+
+// Generate a CV typing message
+export const generateCVTypingMessage = (isUploaded = false): IChatMessage<CVTypingChatMessageProps> => {
+  const payload: CVTypingChatMessageProps = {
+    isUploaded: isUploaded,
+  };
+
+  return {
+    type: CV_TYPING_CHAT_MESSAGE_TYPE,
+    message_id: nanoid(),
+    payload: payload,
+    sender: ConversationMessageSender.COMPASS,
+    component: (prop: CVTypingChatMessageProps) => <CVTypingChatMessage {...prop}/>,
   };
 };
 
