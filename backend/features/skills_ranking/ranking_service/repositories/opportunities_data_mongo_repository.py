@@ -40,3 +40,26 @@ class OpportunitiesDataRepository(IOpportunitiesDataRepository):
         except:
             self._logger.error("Failed to get skills from opportunities")
             raise
+
+    async def get_opportunities(self, limit: int, batch_size: int) -> list[dict]:
+        try:
+            projection = {
+                'active': 1,
+                'occupation': 1,
+                'opportunityText': 1,
+                'opportunityTitle': 1,
+                'opportunityUrl': 1,
+                'postedAt': 1,
+                'skills': 1,
+                'skillGroups': 1,
+                '_id': 0,
+            }
+            cursor = self._collection.find({}, projection).limit(limit).batch_size(batch_size)
+
+            docs: list[dict] = []
+            async for doc in cursor:
+                docs.append(doc)
+            return docs
+        except Exception as e:
+            self._logger.error(f"Failed to get relevant opportunities docs: {e}")
+            raise

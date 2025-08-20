@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import datetime
 
 from pydantic import BaseModel
 
@@ -51,5 +52,34 @@ class JobSeeker(BaseModel):
 
     opportunity_dataset_version: Optional[str] = None
     """
-    The version of the opportunity dataset used for ranking the job seeker.
+    The hash of the opportunity dataset used during ranking.
+    This is used to ensure that the ranking is consistent with the dataset used at the time of
+    calculation.
+    """
+
+    embedding_version: Optional[str] = None
+    """
+    The embeddings model version/name used during calculation.
+    """
+
+
+    number_of_total_opportunities: Optional[int] = None
+    """
+    Total number of opportunities considered at ranking time.
+    """
+
+    total_matching_opportunities: Optional[int] = None
+    """
+    Number of opportunities matching above the threshold.
+    """
+
+    matching_threshold: Optional[float] = None
+    """
+    The matching threshold used for this calculation.
+    """
+
+    opportunities_last_fetch_time: Optional[datetime] = None
+    """
+    The last time the opportunities dataset was fetched into cache.
+    Used for traceability of the dataset freshness at ranking time.
     """

@@ -20,6 +20,26 @@ class IOpportunitiesDataService(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_opportunities(self) -> list[dict]:
+        """
+        Get the subset of opportunities fields that contribute to ranking versioning.
+
+        :return: The list of opportunities.
+
+        :raises Exception: If an error fetching opportunities.
+        """
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def last_fetch_time(self):
+        """
+        Returns the last time the opportunities cache was fetched.
+        property here so that it can be accessed without parentheses.
+        """
+        raise NotImplementedError
+
 
 class OpportunitiesDataService(IOpportunitiesDataService):
     def __init__(self,
@@ -36,6 +56,10 @@ class OpportunitiesDataService(IOpportunitiesDataService):
             fetch_latest_value=self._fetch_opportunities_skills_uuids)
 
         self._logger.info("Opportunities data service initialized")
+
+    @property
+    def last_fetch_time(self):
+        return self._cache_manager._last_fetch_time
 
     async def _fetch_opportunities_skills_uuids(self) -> list[set[str]]:
         """
@@ -61,3 +85,7 @@ class OpportunitiesDataService(IOpportunitiesDataService):
         except Exception as e:
             self._logger.error(f"Failed to fetch opportunities data: {e}")
             raise
+
+    async def get_opportunities(self) -> list[dict]:
+        return await self._opportunities_data_repository.get_opportunities(
+            self._config.fetch_opportunities_limit, self._config.fetch_opportunities_batch_size)

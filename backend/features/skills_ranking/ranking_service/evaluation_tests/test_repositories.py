@@ -2,6 +2,7 @@ import json
 import os
 
 from features.skills_ranking.ranking_service.evaluation_tests._types import IntegrationTestCase
+from datetime import datetime, timezone
 from features.skills_ranking.ranking_service.repositories.types import IJobSeekersRepository, ITaxonomyRepository
 from features.skills_ranking.ranking_service.services.opportunities_data_service import IOpportunitiesDataService
 from features.skills_ranking.ranking_service.types import JobSeeker
@@ -14,6 +15,7 @@ class TestOpportunitiesDataService(IOpportunitiesDataService):
     def __init__(self):
         with open(os.path.join(TEST_DATA_FILES_PATH, 'opportunities.json'), 'r') as file:
             self._test_opportunities_data = json.load(file)
+        self._last_fetch_time = datetime.now(tz=timezone.utc)
 
     async def get_opportunities_skills_uuids(self):
         # for each opportunity, extract the UUIDs of the skills
@@ -23,6 +25,28 @@ class TestOpportunitiesDataService(IOpportunitiesDataService):
         ]
 
         return skills_uuids
+
+    async def get_opportunities(self):
+        """
+        Get the subset of opportunities fields that contribute to ranking versioning.
+        """
+        # return the list of opportunities with the expected fields
+        return [
+            {
+                "active": opportunity.get("active"),
+                "occupation": opportunity.get("occupation"),
+                "opportunityText": opportunity.get("opportunityText"),
+                "opportunityTitle": opportunity.get("opportunityTitle"),
+                "opportunityUrl": opportunity.get("opportunityUrl"),
+                "postedAt": opportunity.get("postedAt"),
+                "skills": {skill.get("uuid") for skill in opportunity.get("given_skills", []) if skill.get("uuid")},
+                "skillGroups": opportunity.get("skillGroups", [])
+            } for opportunity in self._test_opportunities_data
+        ]
+
+    @property
+    def last_fetch_time(self):
+        return self._last_fetch_time
 
 
 class TestJobSeekersDataRepository(IJobSeekersRepository):

@@ -62,7 +62,7 @@ test_cases = [
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("test_case", test_cases, ids=[case.id for case in test_cases])
-async def test_ranking_service_success(test_case, in_memory_job_seekers_db, in_memory_opportunity_data_db, caplog):
+async def test_ranking_service_success(test_case, in_memory_job_seekers_db, in_memory_opportunity_data_db, caplog, setup_application_config):
     # GIVEN a participant with user id, set of skills and a prior belief
     given_user_id = get_random_user_id()
     given_participant_skills_uuids = test_case.given_participant_skills_uuids
