@@ -34,13 +34,16 @@ class RankingService(IRankingService):
                  job_seekers_repository: IJobSeekersRepository,
                  taxonomy_repository: ITaxonomyRepository,
                  opportunities_data_service: IOpportunitiesDataService,
-                 config: RankingServiceConfig):
+                 config: RankingServiceConfig,
+                 *,
+                 taxonomy_model_id: str):
 
         self._job_seekers_repository = job_seekers_repository
         self._taxonomy_repository = taxonomy_repository
         self._opportunities_data_service = opportunities_data_service
         self._logger = logging.getLogger(RankingService.__name__)
         self._config = config
+        self._taxonomy_model_id = taxonomy_model_id
 
     # ----------- MAIN Entry point function -----------
     async def get_participant_ranking(self,
@@ -61,9 +64,12 @@ class RankingService(IRankingService):
         # 3. Get the participant skills opportunity ranking by using (`opportunities_skills_uuids`, `participant_skills_uuids`, `opportunity_matching_threshold`)
         #    Note: We are using participant skill groups uuids instead of skill ids
         participant_skill_groups_uuids = await self._taxonomy_repository.get_skill_groups_from_skills(participants_skills_uuids)
-        opportunities_rank = get_opportunity_ranking(opportunities_skills_uuids=opportunities_skills_uuids,
-                                                     participant_skills_uuids=participant_skill_groups_uuids,
-                                                     opportunity_matching_threshold=opportunity_matching_threshold)
+        opportunities_rank, number_of_total_opportunities, total_matching_opportunities = \
+            get_opportunity_ranking(
+                opportunities_skills_uuids=opportunities_skills_uuids,
+                participant_skills_uuids=participant_skill_groups_uuids,
+                opportunity_matching_threshold=opportunity_matching_threshold
+            )
 
         # 4. Read the `opportunities-seekers ranks dataset`.
         job_seekers_ranks = await self._job_seekers_repository.get_job_seekers_ranks(job_seekers_batch_size)
@@ -80,7 +86,13 @@ class RankingService(IRankingService):
             opportunity_rank=opportunities_rank,
             compared_to_others_rank=other_job_seekers_ranks,
             compare_to_others_prior_belief=prior_beliefs.compare_to_others_prior_belief,
-            opportunity_rank_prior_belief=prior_beliefs.opportunity_rank_prior_belief
+            opportunity_rank_prior_belief=prior_beliefs.opportunity_rank_prior_belief,
+            opportunity_dataset_version=self._opportunities_data_service.dataset_version,
+            taxonomy_model_id=self._taxonomy_model_id,
+            number_of_total_opportunities=number_of_total_opportunities,
+            total_matching_opportunities=total_matching_opportunities,
+            matching_threshold=opportunity_matching_threshold,
+            opportunities_last_fetch_time=self._opportunities_data_service.last_fetch_time
         )
 
         # 7. Add the participant's rank to the jobseeker ranks database after getting the current version.

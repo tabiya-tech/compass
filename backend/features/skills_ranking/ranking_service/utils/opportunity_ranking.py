@@ -21,10 +21,14 @@ def _calculate_overlap_score(*,
 def get_opportunity_ranking(*,
                             opportunities_skills_uuids: list[set[str]],
                             participant_skills_uuids: set[str],
-                            opportunity_matching_threshold: float = 0) -> float:
+                            opportunity_matching_threshold: float = 0) -> tuple[float, int, int]:
     """
     Computes the opportunity ranking for a participant based on their skills, and the skills of other jobseekers.
-    :returns the percentage of opportunities that match the participant's skills above the threshold. (0-1)
+
+    Returns:
+    - percentage_above_threshold (float 0-1)
+    - total_opportunities (int)
+    - matching_opportunities (int)
     """
 
     total_opportunities = 0
@@ -32,13 +36,12 @@ def get_opportunity_ranking(*,
 
     for opportunity_skills in opportunities_skills_uuids:
         score = _calculate_overlap_score(
-                    opportunity_skills_uuids=opportunity_skills,
-                    participant_skills_uuids=participant_skills_uuids)
-
+            opportunity_skills_uuids=opportunity_skills,
+            participant_skills_uuids=participant_skills_uuids)
 
         total_opportunities += 1
         if score >= opportunity_matching_threshold:
             matching_opportunities += 1
 
     percentage_above_threshold = (matching_opportunities / total_opportunities) if total_opportunities else 0
-    return percentage_above_threshold
+    return percentage_above_threshold, total_opportunities, matching_opportunities

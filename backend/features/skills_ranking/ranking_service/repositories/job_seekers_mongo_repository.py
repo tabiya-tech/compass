@@ -26,6 +26,10 @@ def _to_db_document(job_seeker: JobSeeker) -> dict:
         "compareToOthersPriorBelief": job_seeker.compare_to_others_prior_belief,
         "comparedToOthersRank": job_seeker.compared_to_others_rank,
         "opportunityDatasetVersion": job_seeker.opportunity_dataset_version,
+        "numberOfTotalOpportunities": job_seeker.number_of_total_opportunities,
+        "totalMatchingOpportunities": job_seeker.total_matching_opportunities,
+        "matchingThreshold": job_seeker.matching_threshold,
+        "opportunitiesLastFetchTime": job_seeker.opportunities_last_fetch_time,
         "updatedAt": get_now()
     }
 
@@ -45,7 +49,12 @@ def _from_db_document(document: dict) -> JobSeeker:
         opportunity_rank=document.get("opportunityRank"),
         compare_to_others_prior_belief=document.get("compareToOthersPriorBelief"),
         compared_to_others_rank=document.get("comparedToOthersRank"),
-        opportunity_dataset_version=document.get("opportunityDatasetVersion")
+        opportunity_dataset_version=document.get("opportunityDatasetVersion"),
+        
+        number_of_total_opportunities=document.get("numberOfTotalOpportunities"),
+        total_matching_opportunities=document.get("totalMatchingOpportunities"),
+        matching_threshold=document.get("matchingThreshold"),
+        opportunities_last_fetch_time=document.get("opportunitiesLastFetchTime"),
     )
 
 class JobSeekersMongoRepository(IJobSeekersRepository):

@@ -4,6 +4,7 @@ import pytest
 from pydantic import BaseModel
 
 from common_libs.test_utilities import get_random_user_id
+from common_libs.time_utilities import truncate_microseconds
 from features.skills_ranking.ranking_service.repositories.get_job_seekers_repository import get_job_seekers_repository
 from features.skills_ranking.ranking_service.repositories.job_seekers_mongo_repository import _from_db_document
 from features.skills_ranking.ranking_service.repositories.get_opportunities_data_repository import \
@@ -27,6 +28,9 @@ class TestCase(BaseModel):
     expected_participant_score: float
     expected_comparison_rank: float
     expected_comparison_label: str
+    expected_data_set_version: str
+    expected_total_opportunities: int
+    expected_total_matching_opportunities: int
     expected_discovered_skill_groups: set[str]
 
 
@@ -53,6 +57,9 @@ test_cases = [
             }
         ],
         expected_discovered_skill_groups={"skill-group-uuid-1"},
+        expected_total_opportunities=1,
+        expected_total_matching_opportunities=1,
+        expected_data_set_version="eb55be98a4adab8e7e3466ce42e3919d", # calculated manually.
         expected_participant_score=1.0,
         expected_comparison_rank=1.0,
         expected_comparison_label="HIGHEST"
@@ -62,7 +69,7 @@ test_cases = [
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("test_case", test_cases, ids=[case.id for case in test_cases])
-async def test_ranking_service_success(test_case, in_memory_job_seekers_db, in_memory_opportunity_data_db, caplog):
+async def test_ranking_service_success(test_case, in_memory_job_seekers_db, in_memory_opportunity_data_db, caplog, setup_application_config):
     # GIVEN a participant with user id, set of skills and a prior belief
     given_user_id = get_random_user_id()
     given_participant_skills_uuids = test_case.given_participant_skills_uuids
@@ -114,6 +121,9 @@ async def test_ranking_service_success(test_case, in_memory_job_seekers_db, in_m
     # AND the comparison label to be as expected
     assert participant_score.comparison_label == test_case.expected_comparison_label
 
+    # AND the opportunities data set version to be as expected
+    assert opportunities_data_service.dataset_version == test_case.expected_data_set_version
+
     # AND the calculated_at field to be set and of type datetime
     assert participant_score.calculated_at is not None
     assert isinstance(participant_score.calculated_at, datetime.datetime)
@@ -129,6 +139,11 @@ async def test_ranking_service_success(test_case, in_memory_job_seekers_db, in_m
     assert saved_job_seeker.opportunity_rank_prior_belief == given_participant_prior_beliefs.opportunity_rank_prior_belief
     assert saved_job_seeker.skills_uuids == test_case.given_participant_skills_uuids
     assert saved_job_seeker.skill_groups_uuids == test_case.expected_discovered_skill_groups
+    assert saved_job_seeker.total_matching_opportunities == test_case.expected_total_matching_opportunities
+    assert saved_job_seeker.number_of_total_opportunities == test_case.expected_total_opportunities
+    assert saved_job_seeker.matching_threshold == ranking_service_config.matching_threshold
+    assert saved_job_seeker.opportunity_dataset_version == test_case.expected_data_set_version
+    assert saved_job_seeker.opportunities_last_fetch_time == truncate_microseconds(opportunities_data_service.last_fetch_time) # truncate microseconds because mongo does not store them
 
 
     # AND no error should be logged during the process

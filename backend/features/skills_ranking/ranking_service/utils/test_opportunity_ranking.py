@@ -25,6 +25,11 @@ class TestCase(BaseModel):
     The expected percentage of jobs that the participant is qualified for based on their skills.
     """
 
+    expected_matching: int
+    """
+    The expected number of jobs that meet or exceed the matching threshold.
+    """
+
     doc: str
     """
     Documentation string explaining the test case.
@@ -36,6 +41,7 @@ test_cases: list[TestCase] = [
         given_participant_skills_uuids={"skill6", "skill7"},
         given_matching_threshold=0.5,
         expected_ranking=0,
+        expected_matching=0,
         doc="Participant doesn't fit any job skills, so 0% ranking."
     ),
     TestCase(
@@ -43,6 +49,7 @@ test_cases: list[TestCase] = [
         given_participant_skills_uuids={"skill1", "skill2", "skill5"},
         given_matching_threshold=0.5,
         expected_ranking=0.5,
+        expected_matching=1,
         doc="Participant fits more than 50% skills of 1 job out of 2 jobs, so 50% ranking."
     ),
     TestCase(
@@ -50,6 +57,7 @@ test_cases: list[TestCase] = [
         given_participant_skills_uuids={"skill1", "skill2", "skill3", "skill4"},
         given_matching_threshold=0.5,
         expected_ranking=1.0,
+        expected_matching=2,
         doc="Participant fits all skills of 1 job and all skills of another job, so 100% ranking."
     ),
 ]
@@ -70,7 +78,7 @@ def test_opportunity_ranking(case):
     given_matching_threshold = case.given_matching_threshold
 
     # WHEN we compute the opportunity ranking
-    result = get_opportunity_ranking(
+    result, total, matching = get_opportunity_ranking(
         opportunities_skills_uuids=given_jobs_skills,
         participant_skills_uuids=given_participant_skills_uuids,
         opportunity_matching_threshold=given_matching_threshold
@@ -78,3 +86,8 @@ def test_opportunity_ranking(case):
 
     # THEN the result should match the expected ranking
     assert result == case.expected_ranking, f"Expected {case.expected_ranking}%, got {result}% for case: {case.doc}"
+
+    # AND the total number of opportunities should match the length of given_jobs_skills
+    assert total == len(given_jobs_skills), f"Expected {len(given_jobs_skills)} total opportunities, got {total}"
+    # AND the number of matching opportunities should be calculated correctly
+    assert matching == case.expected_matching, f"Expected {case.expected_matching} matching opportunities, got {matching}"

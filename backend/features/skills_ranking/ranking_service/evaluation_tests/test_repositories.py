@@ -2,6 +2,7 @@ import json
 import os
 
 from features.skills_ranking.ranking_service.evaluation_tests._types import IntegrationTestCase
+from datetime import datetime, timezone
 from features.skills_ranking.ranking_service.repositories.types import IJobSeekersRepository, ITaxonomyRepository
 from features.skills_ranking.ranking_service.services.opportunities_data_service import IOpportunitiesDataService
 from features.skills_ranking.ranking_service.types import JobSeeker
@@ -14,6 +15,8 @@ class TestOpportunitiesDataService(IOpportunitiesDataService):
     def __init__(self):
         with open(os.path.join(TEST_DATA_FILES_PATH, 'opportunities.json'), 'r') as file:
             self._test_opportunities_data = json.load(file)
+        self._last_fetch_time = datetime.now(tz=timezone.utc)
+        self._dataset_version = "md5-integration"
 
     async def get_opportunities_skills_uuids(self):
         # for each opportunity, extract the UUIDs of the skills
@@ -23,6 +26,14 @@ class TestOpportunitiesDataService(IOpportunitiesDataService):
         ]
 
         return skills_uuids
+
+    @property
+    def last_fetch_time(self):
+        return self._last_fetch_time
+
+    @property
+    def dataset_version(self):
+        return self._dataset_version
 
 
 class TestJobSeekersDataRepository(IJobSeekersRepository):
