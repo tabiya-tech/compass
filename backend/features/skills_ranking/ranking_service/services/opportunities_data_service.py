@@ -21,6 +21,17 @@ class IOpportunitiesDataService(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_opportunities(self) -> list[dict]:
+        """
+        Get the subset of opportunities fields that contribute to ranking versioning.
+
+        :return: The list of opportunities.
+
+        :raises Exception: If an error fetching opportunities.
+        """
+        raise NotImplementedError
+
 
 class OpportunitiesDataService(IOpportunitiesDataService):
     def __init__(self, opportunities_data_repository: IOpportunitiesDataRepository,
@@ -30,4 +41,8 @@ class OpportunitiesDataService(IOpportunitiesDataService):
 
     async def get_opportunities_skills_uuids(self) -> list[set[str]]:
         return await self._opportunities_data_repository.get_opportunities_skills_uuids(
+            self._config.fetch_opportunities_limit, self._config.fetch_opportunities_batch_size)
+
+    async def get_opportunities(self) -> list[dict]:
+        return await self._opportunities_data_repository.get_opportunities(
             self._config.fetch_opportunities_limit, self._config.fetch_opportunities_batch_size)

@@ -40,3 +40,19 @@ class IOpportunitiesDataRepository(ABC):
         :raises Exception: If an error fetching skills from opportunities.
         """
         raise NotImplementedError
+
+    async def get_opportunities(self, limit: int, batch_size: int) -> list[dict]:
+        """
+        Get the subset of opportunities fields that contribute to ranking versioning.
+
+        Expected fields per document:
+        - active
+        - occupation
+        - opportunityText
+        - opportunityTitle
+        - opportunityUrl
+        - postedAt
+        - skills
+        - skillGroups (optional)
+        """
+        raise NotImplementedError

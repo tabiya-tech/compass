@@ -43,7 +43,7 @@ def get_group_from_test_case(group_name: str) -> SkillRankingExperimentGroup:
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("test_case", test_cases)
-async def test_ranking_service_integration(test_case: IntegrationTestCase, mocker):
+async def test_ranking_service_integration(test_case: IntegrationTestCase, mocker, setup_application_config):
     # GIVEN the participant skills
     given_participant_skills = test_job_seekers_data_repository.get_skills_by_external_user_id(
         test_case.given_external_user_id)
@@ -59,6 +59,15 @@ async def test_ranking_service_integration(test_case: IntegrationTestCase, mocke
                                      test_opportunities_data_service,
                                      RankingServiceConfig(matching_threshold=given_matching_threshold,
                                                           fetch_job_seekers_batch_size=fetch_data_batch_size))
+
+    # AND the version is calculated for the dataset
+    def _fake_compute_version(_opportunities):
+        return "md5-integration"
+
+    mocker.patch(
+        "features.skills_ranking.ranking_service.utils.opportunities_dataset_version.compute_opportunities_dataset_version_from_docs",
+        side_effect=_fake_compute_version,
+    )
 
     # WHEN the actual rank is calculated
     given_prior_beliefs = PriorBeliefs(
