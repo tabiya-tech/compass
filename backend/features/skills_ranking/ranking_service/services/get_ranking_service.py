@@ -9,6 +9,7 @@ from features.skills_ranking.config import get_skills_ranking_config
 from features.skills_ranking.ranking_service.repositories.get_job_seekers_repository import get_job_seekers_repository
 from features.skills_ranking.ranking_service.repositories.types import IJobSeekersRepository, ITaxonomyRepository
 from features.skills_ranking.ranking_service.repositories.get_taxonomy_repository import get_taxonomy_repository
+from app.app_config import get_application_config
 
 _ranking_service_singleton: IRankingService | None = None
 _ranking_service_lock = asyncio.Lock()
@@ -33,6 +34,7 @@ async def get_ranking_service(
                     job_seekers_repository=job_seekers_repository,
                     taxonomy_repository=taxonomy_repository,
                     opportunities_data_service=opportunities_data_service,
-                    config=config)
+                    config=config,
+                    taxonomy_model_id=get_application_config().taxonomy_model_id)
 
     return _ranking_service_singleton

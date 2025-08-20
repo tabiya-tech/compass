@@ -13,7 +13,8 @@ class CacheManager(Generic[T]):
 
     def __init__(self,
                  stale_time: int,
-                 fetch_latest_value: Callable[[], Coroutine[None, None, T]]):
+                 fetch_latest_value: Callable[[], Coroutine[None, None, T]],
+                 compute_version: Optional[Callable[[T], str]] = None):
         """
         Initialize the CacheManager.
 
@@ -24,6 +25,7 @@ class CacheManager(Generic[T]):
 
         self._stale_time = stale_time
         self._fetch_latest_value = fetch_latest_value
+        self._compute_version = compute_version
 
         self._cached_value: Optional[T] = None
         """
@@ -32,6 +34,11 @@ class CacheManager(Generic[T]):
         """
 
         self._last_fetch_time: Optional[datetime] = None
+        self._cached_version: Optional[str] = None
+        """
+        Optional version string computed from the cached value at fetch time.
+        """
+
         """
         The last time the value was fetched.
         None means that the value has never been fetched.
@@ -81,6 +88,14 @@ class CacheManager(Generic[T]):
             # Fetch new data
             self._cached_value = await self._fetch_latest_value()
             self._last_fetch_time = datetime.now()
+
+            # Compute version if requested
+            if self._compute_version is not None:
+                try:
+                    self._cached_version = self._compute_version(self._cached_value)
+                except Exception as e:
+                    self._logger.error(f"Failed to compute cached value version: {e}")
+                    self._cached_version = None
 
             self._logger.info("data fetched and cache updated successfully")
         except Exception as e:
@@ -168,3 +183,7 @@ class CacheManager(Generic[T]):
             return self._cached_value
 
         raise RuntimeError("Unexpected state in CacheManager.get()")
+
+    @property
+    def version(self) -> Optional[str]:
+        return self._cached_version

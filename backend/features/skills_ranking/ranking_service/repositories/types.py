@@ -42,7 +42,6 @@ class IOpportunitiesDataRepository(ABC):
         raise NotImplementedError
 
 
-
 class ITaxonomyRepository(ABC):
     """
     Interface for taxonomy repository/service to manage skills, skill groups from the taxonomy datasource (API or Database)
