@@ -24,6 +24,24 @@ class TestOpportunitiesDataService(IOpportunitiesDataService):
 
         return skills_uuids
 
+    async def get_opportunities(self):
+        """
+        Get the subset of opportunities fields that contribute to ranking versioning.
+        """
+        # return the list of opportunities with the expected fields
+        return [
+            {
+                "active": opportunity.get("active"),
+                "occupation": opportunity.get("occupation"),
+                "opportunityText": opportunity.get("opportunityText"),
+                "opportunityTitle": opportunity.get("opportunityTitle"),
+                "opportunityUrl": opportunity.get("opportunityUrl"),
+                "postedAt": opportunity.get("postedAt"),
+                "skills": {skill.get("uuid") for skill in opportunity.get("given_skills", []) if skill.get("uuid")},
+                "skillGroups": opportunity.get("skillGroups", [])
+            } for opportunity in self._test_opportunities_data
+        ]
+
 
 class TestJobSeekersDataRepository(IJobSeekersRepository):
     def __init__(self):
