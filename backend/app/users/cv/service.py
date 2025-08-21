@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
+from .utils.markdown_converter import convert_cv_bytes_to_markdown
 
 @dataclass(slots=True)
 class ParsedCV:
@@ -21,7 +22,8 @@ class CVUploadService:
     """
 
     async def parse_cv(self, *, user_id: str, file_bytes: bytes, filename: str, content_type: str | None) -> ParsedCV:
-        # Placeholder implementation; extraction will be implemented in the next step.
-        return ParsedCV(experiences_data="")
+        # Convert the CV file to Markdown and return it as experiences_data for now.
+        markdown_text = convert_cv_bytes_to_markdown(file_bytes, filename)
+        return ParsedCV(experiences_data=markdown_text)
 
 
