@@ -1,6 +1,7 @@
 from fastapi import APIRouter, FastAPI
 
 from app.users.sensitive_personal_data.routes import add_user_sensitive_personal_data_routes
+from app.users.cv.routes import add_user_cv_routes
 from app.users.auth import Authentication
 from app.users.preferences import add_user_preference_routes
 
@@ -32,6 +33,11 @@ def add_users_routes(app: FastAPI, authentication: Authentication):
     add_user_sensitive_personal_data_routes(users_router, authentication)
 
     # we can add more routes related to the users management here
+
+    ############################################
+    # Add the user CV upload routes
+    ############################################
+    add_user_cv_routes(users_router, authentication)
 
     ############################################
     # Add the users router to the app
