@@ -1,0 +1,20 @@
+from __future__ import annotations
+
+# 10 MB limit in bytes
+MAX_CV_SIZE_BYTES = 10 * 1024 * 1024
+
+# Allow ~1MB multipart overhead to avoid false positives on header-based checks (legacy/multipart context)
+MAX_MULTIPART_OVERHEAD_BYTES = 1 * 1024 * 1024
+
+# Allowed content types and extensions
+ALLOWED_MIME_TYPES = {
+    "text/plain",
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+}
+ALLOWED_EXTENSIONS = {".txt", ".pdf", ".docx"}
+
+# Markdown conversion character limit
+MAX_MARKDOWN_CHARS = 5000
+
+
