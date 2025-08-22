@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/react";
-import { getBackendUrl, getSentryDSN, getSentryEnabled, getTargetEnvironmentName, getSentryConfig } from "./envService";
+import { getBackendUrl, getSentryConfig, getSentryDSN, getSentryEnabled, getTargetEnvironmentName } from "./envService";
 import React from "react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
 import { serializeError } from "./error/errorSerializer";
@@ -136,6 +136,16 @@ export function initSentry() {
           session_id: UserPreferencesStateService.getInstance().getActiveSessionId()
         }
       }
+
+      try {
+        // Stringify the event and replace 'auth' with 'htau' to avoid Sentry from filtering our auth module logs.
+        // Replace 'token' with 't0ken' to avoid Sentry from filtering logs related to the token.
+        // For the list of fields ignored, see: https://docs.sentry.io/security-legal-pii/scrubbing/server-side-scrubbing/
+        event = JSON.parse(JSON.stringify(event)
+          .replace(/auth/gi, "htau")
+          .replace(/oken/gi, "0ken"));
+      } catch (e) {} // If the event cannot be stringifies, we just ignore the error
+
       return event;
     },
   });
