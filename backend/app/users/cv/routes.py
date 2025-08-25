@@ -2,7 +2,7 @@ import asyncio
 import logging
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Path, UploadFile, File, Request
+from fastapi import APIRouter, Depends, HTTPException, Path, Request
 from pydantic import Field
 
 from app.constants.errors import HTTPErrorResponse
@@ -104,13 +104,22 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
             HTTPStatus.BAD_REQUEST: {"model": HTTPErrorResponse},
             HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse},
         },
-        name="upload user CV (raw stream)",
+        name="upload user CV",
         description=(
-            "Upload a CV file as a raw stream. Send the file bytes as the request body, "
-            "set Content-Type to one of txt/pdf/docx types, and include a 'filename' or 'x-filename' header."
+            "Upload a CV file by streaming the raw request body. Set Content-Type to one of txt/pdf/docx types. "
+            "Optionally include a 'filename' or 'x-filename' header; otherwise the filename will be inferred."
         ),
+        openapi_extra={
+            "requestBody": {
+                "required": True,
+                "content": {
+                    "application/pdf": {"schema": {"type": "string", "format": "binary"}},
+                    "text/plain": {"schema": {"type": "string", "format": "binary"}},
+                },
+            }
+        },
     )
-    async def _upload_cv_raw(
+    async def _upload_cv(
         request: Request,
         user_id: str = Path(description="the unique identifier of the user", examples=["1"]),
         user_info: UserInfo = Depends(auth.get_user_info()),
@@ -127,8 +136,15 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
             raise HTTPException(status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE, detail="Only txt, pdf, docx formats are allowed")
 
         filename = _get_filename_from_headers(request) or ""
-        if not filename or not _has_allowed_extension(filename):
-            raise HTTPException(status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE, detail="A valid filename header with .txt, .pdf, or .docx is required")
+        if not filename:
+            if content_type == "text/plain":
+                filename = "upload.txt"
+            elif content_type == "application/pdf":
+                filename = "upload.pdf"
+            elif content_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                filename = "upload.docx"
+        if filename and not _has_allowed_extension(filename):
+            raise HTTPException(status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE, detail="Only txt, pdf, docx filename extensions are allowed")
 
         total_read = 0
         chunks: list[bytes] = []
