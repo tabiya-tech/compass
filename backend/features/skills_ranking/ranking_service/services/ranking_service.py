@@ -9,6 +9,9 @@ from common_libs.time_utilities import get_now
 from features.skills_ranking.ranking_service.repositories.types import IJobSeekersRepository, ITaxonomyRepository
 from features.skills_ranking.ranking_service.utils.opportunity_ranking import get_opportunity_ranking
 from features.skills_ranking.ranking_service.utils.other_job_seekers_ranking import other_job_seekers_ranking
+from features.skills_ranking.ranking_service.utils.opportunities_dataset_version import compute_opportunities_dataset_version_from_docs
+
+from app.app_config import get_application_config
 
 
 class IRankingService(ABC):
@@ -61,9 +64,12 @@ class RankingService(IRankingService):
         # 3. Get the participant skills opportunity ranking by using (`opportunities_skills_uuids`, `participant_skills_uuids`, `opportunity_matching_threshold`)
         #    Note: We are using participant skill groups uuids instead of skill ids
         participant_skill_groups_uuids = await self._taxonomy_repository.get_skill_groups_from_skills(participants_skills_uuids)
-        opportunities_rank = get_opportunity_ranking(opportunities_skills_uuids=opportunities_skills_uuids,
-                                                     participant_skills_uuids=participant_skill_groups_uuids,
-                                                     opportunity_matching_threshold=opportunity_matching_threshold)
+        opportunities_rank, number_of_total_opportunities, total_matching_opportunities = \
+            get_opportunity_ranking(
+                opportunities_skills_uuids=opportunities_skills_uuids,
+                participant_skills_uuids=participant_skill_groups_uuids,
+                opportunity_matching_threshold=opportunity_matching_threshold
+            )
 
         # 4. Read the `opportunities-seekers ranks dataset`.
         job_seekers_ranks = await self._job_seekers_repository.get_job_seekers_ranks(job_seekers_batch_size)
@@ -73,6 +79,15 @@ class RankingService(IRankingService):
                                                             participant_rank=opportunities_rank)
 
         # 6. Save the participant's rank in the opportunity seekers ranks dataset
+        app_cfg = get_application_config()
+
+        # Compute opportunity dataset version from the meaningful data in opportunities docs
+        opportunities_relevant_docs = await self._opportunities_data_service.get_opportunities()
+        # REVIEW: This has performance issues, we can not be computing the dataset version on every request.
+        #         A better idea would be to just get it from the opportunities data version cache manager because calcuating this version is a heavy function
+        #         So it should be cached too.
+        opportunity_dataset_version = compute_opportunities_dataset_version_from_docs(opportunities_relevant_docs)
+
         job_seeker = JobSeeker(
             user_id=user_id,
             skills_uuids=participants_skills_uuids,
@@ -80,7 +95,14 @@ class RankingService(IRankingService):
             opportunity_rank=opportunities_rank,
             compared_to_others_rank=other_job_seekers_ranks,
             compare_to_others_prior_belief=prior_beliefs.compare_to_others_prior_belief,
-            opportunity_rank_prior_belief=prior_beliefs.opportunity_rank_prior_belief
+            opportunity_rank_prior_belief=prior_beliefs.opportunity_rank_prior_belief,
+            opportunity_dataset_version=opportunity_dataset_version,
+            taxonomy_model_id=app_cfg.taxonomy_model_id,
+            embedding_version=f"{app_cfg.embeddings_service_name}:{app_cfg.embeddings_model_name}",
+            number_of_total_opportunities=number_of_total_opportunities,
+            total_matching_opportunities=total_matching_opportunities,
+            matching_threshold=opportunity_matching_threshold,
+            opportunities_last_fetch_time=self._opportunities_data_service.last_fetch_time
         )
 
         # 7. Add the participant's rank to the jobseeker ranks database after getting the current version.

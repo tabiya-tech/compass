@@ -70,7 +70,7 @@ def test_opportunity_ranking(case):
     given_matching_threshold = case.given_matching_threshold
 
     # WHEN we compute the opportunity ranking
-    result = get_opportunity_ranking(
+    result, total, matching = get_opportunity_ranking(
         opportunities_skills_uuids=given_jobs_skills,
         participant_skills_uuids=given_participant_skills_uuids,
         opportunity_matching_threshold=given_matching_threshold
@@ -78,3 +78,12 @@ def test_opportunity_ranking(case):
 
     # THEN the result should match the expected ranking
     assert result == case.expected_ranking, f"Expected {case.expected_ranking}%, got {result}% for case: {case.doc}"
+
+    # AND the total number of opportunities should match the length of given_jobs_skills
+    assert total == len(given_jobs_skills), f"Expected {len(given_jobs_skills)} total opportunities, got {total}"
+    # AND the number of matching opportunities should be calculated correctly
+    # REVIEW: Optional, I think this number should be in the TestCase, Why duplicate the implementation here?
+    expected_matching = sum(
+        1 for skills in given_jobs_skills if len(skills.intersection(given_participant_skills_uuids)) / len(skills) > given_matching_threshold
+    )
+    assert matching == expected_matching, f"Expected {expected_matching} matching opportunities, got {matching}"

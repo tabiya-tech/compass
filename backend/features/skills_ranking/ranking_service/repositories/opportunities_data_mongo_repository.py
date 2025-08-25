@@ -40,3 +40,30 @@ class OpportunitiesDataRepository(IOpportunitiesDataRepository):
         except:
             self._logger.error("Failed to get skills from opportunities")
             raise
+
+    async def get_opportunities(self, limit: int, batch_size: int) -> list[dict]:
+        # REVIEW: Do we want to track this list of opportunities.
+        #         eg:
+        #         - if an opportunity title is changed, but the skillgroups remains the same, do we want to say that it was a different dataset.
+        #            Suggestion: the data that are used to rank the user(skill-groups UUIDs for now). And the advantage is the less data will be transfered in the network
+        try:
+            projection = {
+                'active': 1,
+                'occupation': 1,
+                'opportunityText': 1,
+                'opportunityTitle': 1,
+                'opportunityUrl': 1,
+                'postedAt': 1,
+                'skills': 1,
+                'skillGroups': 1,
+                '_id': 0,
+            }
+            cursor = self._collection.find({}, projection).limit(limit).batch_size(batch_size)
+
+            docs: list[dict] = []
+            async for doc in cursor:
+                docs.append(doc)
+            return docs
+        except Exception as e:
+            self._logger.error(f"Failed to get relevant opportunities docs: {e}")
+            raise
