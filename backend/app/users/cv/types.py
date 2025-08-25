@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 
-class CVUploadResponse(BaseModel):
+class ParsedCV(BaseModel):
     experiences_data: list[str]
 

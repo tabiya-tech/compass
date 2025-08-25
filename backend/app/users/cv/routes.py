@@ -8,7 +8,7 @@ from pydantic import Field
 from app.constants.errors import HTTPErrorResponse
 from app.users.auth import Authentication, UserInfo
 from .service import CVUploadService, ICVUploadService
-from .types import CVUploadResponse
+from .types import ParsedCV
 
 
 logger = logging.getLogger(__name__)
@@ -96,7 +96,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
     @router.post(
         path="",
         status_code=HTTPStatus.OK,
-        response_model=CVUploadResponse,
+        response_model=ParsedCV,
         responses={
             HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
             HTTPStatus.UNSUPPORTED_MEDIA_TYPE: {"model": HTTPErrorResponse},
@@ -124,7 +124,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
         user_id: str = Path(description="the unique identifier of the user", examples=["1"]),
         user_info: UserInfo = Depends(auth.get_user_info()),
         service: ICVUploadService = Depends(_get_cv_service),
-    ) -> CVUploadResponse:
+    ) -> ParsedCV:
         # Validate size early using Content-Length (no multipart overhead for raw)
         _validate_request_size_header(request)
 
@@ -171,7 +171,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
                 filename=filename,
                 content_type=content_type,
             )
-            return CVUploadResponse(experiences_data=parsed.experiences_data)
+            return ParsedCV(experiences_data=parsed.experiences_data)
         except HTTPException:
             raise
         except Exception as e:
