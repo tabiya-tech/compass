@@ -6,17 +6,15 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { AnimatePresence, motion } from "framer-motion";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
+import { ConversationPhase } from "src/chat/chatProgressbar/types";
 
 export interface ChatMessageFieldProps {
   handleSend: (message: string) => void;
   aiIsTyping: boolean;
   isChatFinished: boolean;
-  // When true, the input and send should be disabled and an upload progress bar shown
   isUploadingCv?: boolean;
-  // 0-100 percentage for the thin progress at the top of the field
-  uploadProgressPercent?: number;
-  // Optional upload handler. If not provided, selecting a file will do nothing.
-  onUploadCv?: (file: File, reportProgress: (percent: number) => void) => Promise<void> | void;
+  onUploadCv?: (file: File) => Promise<string>;
+  currentPhase?: ConversationPhase;
 }
 
 const uniqueId = "2a76494f-351d-409d-ba58-e1b2cfaf2a53";
@@ -26,10 +24,22 @@ export const DISALLOWED_CHARACTERS = /["\\{}[\]*_#`<>~|]/g; // avoid special cha
 export const DATA_TEST_ID = {
   CHAT_MESSAGE_FIELD_CONTAINER: `chat-message-field-container-${uniqueId}`,
   CHAT_MESSAGE_FIELD: `chat-message-field-${uniqueId}`,
-  CHAT_MESSAGE_FIELD_BUTTON: `chat-message-field-button-${uniqueId}`,
-  CHAT_MESSAGE_FIELD_ICON: `chat-message-field-icon-${uniqueId}`,
+  CHAT_MESSAGE_FIELD_SEND_BUTTON: `chat-message-field-send-button-${uniqueId}`,
+  CHAT_MESSAGE_FIELD_SEND_ICON: `chat-message-field-send-icon-${uniqueId}`,
   CHAT_MESSAGE_CHAR_COUNTER: `chat-message-char-counter-${uniqueId}`,
+  CHAT_MESSAGE_FIELD_PLUS_BUTTON: `chat-message-field-plus-button-${uniqueId}`,
+  CHAT_MESSAGE_FIELD_PLUS_ICON: `chat-message-field-plus-icon-${uniqueId}`,
+  CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT: `chat-message-field-hidden-file-input-${uniqueId}`,
 };
+
+export const MENU_ITEM_ID = {
+  UPLOAD_CV: `upload-cv-${uniqueId}`,
+};
+
+export const MENU_ITEM_TEXT = {
+  UPLOAD_CV: "Upload CV",
+};
+
 export const PLACEHOLDER_TEXTS = {
   CHAT_FINISHED: "Conversation has been completed. You can't send any more messages.",
   AI_TYPING: "AI is typing..., wait for it to finish.",
@@ -40,7 +50,11 @@ export const PLACEHOLDER_TEXTS = {
 export const ERROR_MESSAGES = {
   MESSAGE_LIMIT: `Message limit is ${CHAT_MESSAGE_MAX_LENGTH} characters.`,
   INVALID_SPECIAL_CHARACTERS: `Invalid special characters: `,
+  MAX_FILE_SIZE: "Selected file is too large. Maximum size is 3 MB.",
 };
+
+// Define the max file size in bytes 3 MB
+export const MAX_FILE_SIZE_BYTES = 3 * 1024 * 1024;
 
 const StyledTextField = styled(TextField)(({ theme, disabled }) => ({
   "& .MuiOutlinedInput-root": {
@@ -221,14 +235,24 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     const file = files[0];
-    // Reset the input so selecting the same file again will trigger onChange
+    // Reset the input, so selecting the same file again will trigger onChange
     e.target.value = "";
+
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setErrorMessage(ERROR_MESSAGES.MAX_FILE_SIZE);
+      return;
+    }
+
+    if (errorMessage === ERROR_MESSAGES.MAX_FILE_SIZE) {
+      setErrorMessage("");
+    }
+
     if (!props.onUploadCv) return;
     try {
-      await props.onUploadCv(file, (_percent: number) => {});
+      const parsedContent = await props.onUploadCv(file);
+      setMessage(parsedContent);
     } catch (err) {
-      // swallow; parent can surface errors via snackbar
-      // no-op
+      console.error("Error parsing CV file:", err);
     }
   };
 
@@ -276,8 +300,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       return PLACEHOLDER_TEXTS.CHAT_FINISHED;
     }
     if (props.isUploadingCv) {
-      const pct = Math.min(Math.max(props.uploadProgressPercent ?? 0, 0), 100);
-      return `${PLACEHOLDER_TEXTS.UPLOADING} ${pct}%`;
+      return PLACEHOLDER_TEXTS.UPLOADING;
     }
     if (props.aiIsTyping) {
       return PLACEHOLDER_TEXTS.AI_TYPING;
@@ -286,7 +309,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       return PLACEHOLDER_TEXTS.OFFLINE;
     }
     return PLACEHOLDER_TEXTS.DEFAULT;
-  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, props.uploadProgressPercent, isOnline]);
+  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, isOnline]);
 
   // Check if the send button should be disabled
   const sendIsDisabled = useCallback(() => {
@@ -304,6 +327,10 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const inputIsDisabled = useCallback(() => {
     return props.isChatFinished || props.aiIsTyping || props.isUploadingCv || !isOnline;
   }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline]);
+
+  // Check if the current phase is relevant for showing the plus button
+  const isRelevantPhase =
+    props.currentPhase === ConversationPhase.INTRO || props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES;
 
   return (
     <Box
@@ -327,52 +354,6 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           position: "relative",
         }}
       >
-        {/* Thin upload progress bar at the very top of the field container */}
-        {props.isUploadingCv && (
-          <motion.div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              height: theme.fixedSpacing(theme.tabiyaSpacing.xs),
-              backgroundColor: theme.palette.primary.main,
-              borderTopLeftRadius: theme.rounding(theme.tabiyaRounding.xs),
-              borderTopRightRadius: theme.rounding(theme.tabiyaRounding.xs),
-              zIndex: 1,
-            }}
-            initial={{ width: 0 }}
-            animate={{ width: `${Math.min(Math.max(props.uploadProgressPercent ?? 0, 0), 100)}%` }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          />
-        )}
-        {/* Inline plus overlayed inside the text field (multiline doesn't support startAdornment) */}
-        <AnimatePresence initial={false}>
-          {message.trim().length === 0 && !inputIsDisabled() && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: 8,
-                transform: "translateY(-50%)",
-                zIndex: 2,
-              }}
-            >
-              <IconButton
-                aria-label="add"
-                onClick={handlePlusClick}
-                onKeyDown={(event) => event.stopPropagation()}
-                size="small"
-                title="more actions"
-              >
-                <AddIcon sx={{ color: theme.palette.primary.dark }} />
-              </IconButton>
-            </motion.div>
-          )}
-        </AnimatePresence>
         <StyledTextField
           placeholder={placeHolder}
           variant="outlined"
@@ -386,27 +367,46 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           inputRef={inputRef}
           error={!!errorMessage}
           helperText={errorMessage}
-          sx={{
-            // Add left padding when the inline plus is visible to avoid overlap with placeholder
-            "& .MuiOutlinedInput-input": {
-              paddingLeft:
-                message.trim().length === 0 && !inputIsDisabled()
-                  ? theme.fixedSpacing(theme.tabiyaSpacing.xl)
-                  : undefined,
-            },
-          }}
           InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <AnimatePresence initial={false}>
+                  {message.trim().length === 0 && !inputIsDisabled() && isRelevantPhase && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <IconButton
+                        aria-label="add"
+                        onClick={handlePlusClick}
+                        onKeyDown={(event) => event.stopPropagation()}
+                        size="small"
+                        title="more actions"
+                        data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON}
+                      >
+                        <AddIcon
+                          sx={{ color: theme.palette.primary.dark }}
+                          data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_ICON}
+                        />
+                      </IconButton>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </InputAdornment>
+            ),
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
-                  data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_BUTTON}
+                  data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON}
                   onClick={handleButtonClick}
                   onKeyDown={(event) => event.stopPropagation()}
                   disabled={sendIsDisabled()}
                   title="send message"
                 >
                   <SendIcon
-                    data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_ICON}
+                    data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_ICON}
                     sx={{
                       color: sendIsDisabled() ? theme.palette.grey[400] : theme.palette.primary.dark,
                     }}
@@ -427,22 +427,25 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           style={{ display: "none" }}
           accept=".pdf,.doc,.docx,.odt,.rtf,.txt"
           onChange={handleFileSelected}
+          data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT}
         />
         {/* Context menu for plus actions using themed icon button with text */}
         <ContextMenu
           anchorEl={menuAnchorEl}
           open={isMenuOpen}
           notifyOnClose={handleMenuClose}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          transformOrigin={{ vertical: "bottom", horizontal: "right" }}
-          items={[{
-            id: "upload-cv",
-            text: "Upload CV",
-            description: "Attach your CV to the conversation",
-            icon: <UploadFileIcon />,
-            disabled: inputIsDisabled(),
-            action: handleFileMenuItemClick,
-          }]}
+          anchorOrigin={{ vertical: "top", horizontal: "left" }}
+          transformOrigin={{ vertical: "bottom", horizontal: "left" }}
+          items={[
+            {
+              id: MENU_ITEM_ID.UPLOAD_CV,
+              text: MENU_ITEM_TEXT.UPLOAD_CV,
+              description: "Attach your CV to the conversation",
+              icon: <UploadFileIcon />,
+              disabled: inputIsDisabled(),
+              action: handleFileMenuItemClick,
+            },
+          ]}
         />
         {showCharCounter && (
           <Typography
