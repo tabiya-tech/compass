@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from .utils.markdown_converter import convert_cv_bytes_to_markdown
+from app.users.cv.utils.llm_extractor import CVExperienceExtractor
 
 @dataclass(slots=True)
 class ParsedCV:
@@ -22,8 +23,12 @@ class CVUploadService:
     """
 
     async def parse_cv(self, *, user_id: str, file_bytes: bytes, filename: str, content_type: str | None) -> ParsedCV:
-        # Convert the CV file to Markdown and return it as experiences_data for now.
+        # Convert the CV file to Markdown
         markdown_text = convert_cv_bytes_to_markdown(file_bytes, filename)
-        return ParsedCV(experiences_data=markdown_text)
+        # Use LLM to extract bulleted experiences directly
+        extractor = CVExperienceExtractor()
+        bullets = await extractor.extract_bulleted_direct(markdown_text)
+        # Return as array of strings
+        return ParsedCV(experiences_data=bullets)
 
 
