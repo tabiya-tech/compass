@@ -83,6 +83,9 @@ class RankingService(IRankingService):
 
         # Compute opportunity dataset version from the meaningful data in opportunities docs
         opportunities_relevant_docs = await self._opportunities_data_service.get_opportunities()
+        # REVIEW: This has performance issues, we can not be computing the dataset version on every request.
+        #         A better idea would be to just get it from the opportunities data version cache manager because calcuating this version is a heavy function
+        #         So it should be cached too.
         opportunity_dataset_version = compute_opportunities_dataset_version_from_docs(opportunities_relevant_docs)
 
         job_seeker = JobSeeker(

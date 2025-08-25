@@ -56,11 +56,15 @@ class JobSeeker(BaseModel):
     This is used to ensure that the ranking is consistent with the dataset used at the time of
     calculation.
     """
+    # REVIEW: reason is not exact
 
     embedding_version: Optional[str] = None
     """
     The embeddings model version/name used during calculation.
     """
+    # REVIEW: Clarify why we would need to know the weddings version, perhaps the application version. (version.json).
+    #         I think we want to couple the ranking service with compass, skills can come from another tool apart from compass eg: horizon or CV upload.
+
 
 
     number_of_total_opportunities: Optional[int] = None

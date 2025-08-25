@@ -82,6 +82,7 @@ def test_opportunity_ranking(case):
     # AND the total number of opportunities should match the length of given_jobs_skills
     assert total == len(given_jobs_skills), f"Expected {len(given_jobs_skills)} total opportunities, got {total}"
     # AND the number of matching opportunities should be calculated correctly
+    # REVIEW: Optional, I think this number should be in the TestCase, Why duplicate the implementation here?
     expected_matching = sum(
         1 for skills in given_jobs_skills if len(skills.intersection(given_participant_skills_uuids)) / len(skills) > given_matching_threshold
     )

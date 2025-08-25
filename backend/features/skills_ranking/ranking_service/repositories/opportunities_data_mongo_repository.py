@@ -42,6 +42,10 @@ class OpportunitiesDataRepository(IOpportunitiesDataRepository):
             raise
 
     async def get_opportunities(self, limit: int, batch_size: int) -> list[dict]:
+        # REVIEW: Do we want to track this list of opportunities.
+        #         eg:
+        #         - if an opportunity title is changed, but the skillgroups remains the same, do we want to say that it was a different dataset.
+        #            Suggestion: the data that are used to rank the user(skill-groups UUIDs for now). And the advantage is the less data will be transfered in the network
         try:
             projection = {
                 'active': 1,
