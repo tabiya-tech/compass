@@ -31,6 +31,7 @@ const defaultProps = {
   summary: "This is a summary of the experience.",
   experience_uuid: "exp-uuid-123",
   notifyOnChange: mockNotifyOnChange,
+  isSummaryEdited: false,
 };
 
 describe("SummaryEditField", () => {
@@ -42,7 +43,7 @@ describe("SummaryEditField", () => {
       sessions: [1234],
       user_feedback_answered_questions: {},
     } as any);
-    resetAllMethodMocks(UserPreferencesStateService.getInstance())
+    resetAllMethodMocks(UserPreferencesStateService.getInstance());
   });
 
   test("should render with initial summary and no error", () => {
@@ -85,13 +86,17 @@ describe("SummaryEditField", () => {
     expect(mockNotifyOnChange).toHaveBeenCalled();
     // AND value is updated
     expect(textarea).toHaveValue("New summary");
+    // AND a badge is shown indicating the field is edited
+    expect(screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY_BADGE)).toBeInTheDocument();
   });
 
   test("should restore summary to unedited when restore is clicked (success path)", async () => {
-    jest.useFakeTimers()
+    jest.useFakeTimers();
     // GIVEN unedited summary from service
     const uneditedSummary = "Unedited summary from service.";
-    jest.spyOn(ExperienceService.getInstance(), "getUneditedExperience").mockResolvedValue({ summary: uneditedSummary } as Experience);
+    jest
+      .spyOn(ExperienceService.getInstance(), "getUneditedExperience")
+      .mockResolvedValue({ summary: uneditedSummary } as Experience);
     render(<SummaryEditField {...defaultProps} />);
     // WHEN restore is clicked
     const restoreBtn = screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY_RESTORE);
@@ -130,10 +135,9 @@ describe("SummaryEditField", () => {
     await waitFor(() => {
       expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to restore summary:", givenError));
     });
-    expect(mockEnqueueSnackbar).toHaveBeenCalledWith(
-      "Failed to restore summary. Please try again later.",
-      { variant: "error" }
-    );
+    expect(mockEnqueueSnackbar).toHaveBeenCalledWith("Failed to restore summary. Please try again later.", {
+      variant: "error",
+    });
     // AND the notifyOnChange function is not called
     expect(mockNotifyOnChange).not.toHaveBeenCalled();
   });
@@ -142,9 +146,13 @@ describe("SummaryEditField", () => {
     // GIVEN slow service
     let resolvePromise: any;
     jest.spyOn(ExperienceService.getInstance(), "getUneditedExperience").mockReturnValueOnce(
-      new Promise((res) => { resolvePromise = res; })
+      new Promise((res) => {
+        resolvePromise = res;
+      })
     );
-    jest.spyOn(ExperienceService.getInstance(), "updateExperience").mockResolvedValue({ summary: "restored" } as Experience);
+    jest
+      .spyOn(ExperienceService.getInstance(), "updateExperience")
+      .mockResolvedValue({ summary: "restored" } as Experience);
     // WHEN component is rendered
     render(<SummaryEditField {...defaultProps} />);
     const restoreBtn = screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY_RESTORE);
@@ -164,11 +172,11 @@ describe("SummaryEditField", () => {
 
   test("should disable restore button if offline", async () => {
     // GIVEN offline context
-    mockBrowserIsOnLine(false)
+    mockBrowserIsOnLine(false);
     render(<SummaryEditField {...defaultProps} />);
     // THEN restore button is disabled
     await waitFor(() => {
       expect(screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY_RESTORE)).toHaveAttribute("aria-disabled", "true");
     });
   });
-}); 
+});

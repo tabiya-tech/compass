@@ -20,7 +20,7 @@ const meta: Meta<typeof SummaryEditField> = {
           uuid: "1234",
           summary: "This is the original summary of the experience.".repeat(15),
         }),
-        updateExperience: (sessionId: number, experience_uuid: string, data: {summary: string}) => {
+        updateExperience: (sessionId: number, experience_uuid: string, data: { summary: string }) => {
           return new Promise((resolve) => {
             setTimeout(() => {
               resolve({
@@ -36,9 +36,11 @@ const meta: Meta<typeof SummaryEditField> = {
       // @ts-ignore
       ExperienceService.getInstance().updateExperience = mockExperienceService.updateExperience;
 
-      return (<div style={{ width: "40%", padding: "20px" }}>
-        <Story />
-      </div>);
+      return (
+        <div style={{ width: "40%", padding: "20px" }}>
+          <Story />
+        </div>
+      );
     },
   ],
 };
@@ -60,7 +62,6 @@ export const ShownWithLongText: Story = {
   },
 };
 
-
 export const Empty: Story = {
   args: {
     summary: "",
@@ -74,11 +75,11 @@ export const Error: Story = {
     notifyOnChange: action("notifyOnChange"),
     error: "An error has occurred",
   },
-}
+};
 
 export const Disabled: Story = {
   args: {
     summary: "This is a summary of the experience.",
     notifyOnChange: action("notifyOnChange"),
   },
-}
+};

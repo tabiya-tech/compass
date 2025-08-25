@@ -1,7 +1,14 @@
-import { TextField, TextFieldProps, styled } from "@mui/material";
+import { Badge, TextField, TextFieldProps, styled, useTheme } from "@mui/material";
+
+const uniqueId = "be128c36-2209-4d9d-8557-648dcb14ca88";
+
+export const DATA_TEST_ID = {
+  INLINE_EDIT_FIELD_BADGE: `inline-edit-field-badge-${uniqueId}`,
+};
 
 export type InlineEditFieldProps = TextFieldProps & {
-  "data-testid": string
+  "data-testid": string;
+  showEditBadge?: boolean;
 };
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -24,8 +31,32 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   padding: theme.fixedSpacing(theme.tabiyaSpacing.xs),
 }));
 
-const InlineEditField: React.FC<InlineEditFieldProps> = (props) => {
-  return <StyledTextField {...props} />;
+const InlineEditField: React.FC<InlineEditFieldProps> = ({ showEditBadge = false, ...props }) => {
+  const theme = useTheme();
+
+  const field = <StyledTextField {...props} />;
+
+  return (
+    <Badge
+      variant="dot"
+      invisible={!showEditBadge}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "left",
+      }}
+      sx={{
+        width: "100%",
+        "& .MuiBadge-badge": {
+          backgroundColor: theme.palette.grey[300],
+          top: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+          left: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+        },
+      }}
+      data-testid={DATA_TEST_ID.INLINE_EDIT_FIELD_BADGE}
+    >
+      {field}
+    </Badge>
+  );
 };
 
-export default InlineEditField
+export default InlineEditField;

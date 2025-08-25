@@ -1,6 +1,6 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Experience, SUMMARY_MAX_LENGTH } from "src/experiences/experienceService/experiences.types";
-import { Box, Stack, Typography, useTheme } from "@mui/material";
+import { Badge, Box, Stack, Typography, useTheme } from "@mui/material";
 import InlineEditField from "src/theme/InlineEditField/InlineEditField";
 import RestoreIcon from "@mui/icons-material/Restore";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
@@ -19,6 +19,7 @@ export interface SummaryEditFieldProps {
     maxLength?: number
   ) => void;
   error?: string;
+  isSummaryEdited: boolean;
 }
 
 const uniqueId = "b1a6b2cd-cfac-46ff-9c35-0298d87def6b";
@@ -27,6 +28,7 @@ export const DATA_TEST_ID = {
   FORM_SUMMARY: `form-summary-${uniqueId}`,
   FORM_SUMMARY_RESTORE: `form-summary-restore-${uniqueId}`,
   FORM_SUMMARY_HELPER: `form-summary-error-${uniqueId}`,
+  FORM_SUMMARY_BADGE: `form-summary-badge-${uniqueId}`,
 };
 
 const StyledCustomLink: React.FC<React.ComponentProps<typeof CustomLink>> = (props) => {
@@ -52,6 +54,7 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
   experience_uuid,
   notifyOnChange,
   error,
+  isSummaryEdited,
 }) => {
   const theme = useTheme();
   const isOnline = useContext(IsOnlineContext);
@@ -92,7 +95,8 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSummaryValue(event.target.value);
+    const newValue = event.target.value;
+    setSummaryValue(newValue);
     notifyOnChange(event, SUMMARY_FIELD_NAME, SUMMARY_MAX_LENGTH);
   };
   // decide when to show error messages
@@ -106,64 +110,80 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
 
   return (
     <Box>
-      <Box
+      <Badge
+        variant="dot"
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+        invisible={!isSummaryEdited}
         sx={{
-          backgroundColor: theme.palette.grey[100],
-          borderRadius: theme.fixedSpacing(theme.tabiyaRounding.sm),
+          display: "block",
           width: "100%",
+          "& .MuiBadge-badge": {
+            backgroundColor: theme.palette.grey[300],
+            top: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+            left: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+          },
         }}
+        data-testid={DATA_TEST_ID.FORM_SUMMARY_BADGE}
       >
-        {/* Toolbar */}
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            borderBottom: `1px solid ${theme.palette.grey[200]}`,
-            padding: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+            backgroundColor: theme.palette.grey[100],
+            borderRadius: theme.fixedSpacing(theme.tabiyaRounding.sm),
+            width: "100%",
           }}
         >
-          <Stack direction="row" spacing={1}>
-            <StyledCustomLink
-              onClick={restoreToOriginalSummary}
-              disabled={!isOnline || isRestoring}
-              data-testid={DATA_TEST_ID.FORM_SUMMARY_RESTORE}
-              variant="caption"
-            >
-              <RestoreIcon /> Revert
-            </StyledCustomLink>
-            {/* Other buttons */}
-          </Stack>
-        </Box>
-
-        {/* Text area */}
-        <Box
-          sx={{
-            padding: theme.spacing(theme.tabiyaSpacing.sm),
-          }}
-        >
-          <InlineEditField
-            placeholder="Summary of experience"
-            value={summaryValue}
-            onChange={handleInputChange}
-            multiline
-            minRows={8}
-            inputProps={{ maxLength: SUMMARY_MAX_LENGTH + 1 }} // +1 to allow the user to overflow and see the error
+          {/* Toolbar */}
+          <Box
             sx={{
-              border: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              borderBottom: `1px solid ${theme.palette.grey[200]}`,
               padding: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-              fontSize: theme.typography.body2.fontSize,
-              backgroundColor: "transparent",
-              "& textarea": {
-                padding: 0,
-                resize: "none",
-              },
             }}
-            data-testid={DATA_TEST_ID.FORM_SUMMARY}
-            error={!!error}
-          />
+          >
+            <Stack direction="row" spacing={1}>
+              <StyledCustomLink
+                onClick={restoreToOriginalSummary}
+                disabled={!isOnline || isRestoring}
+                data-testid={DATA_TEST_ID.FORM_SUMMARY_RESTORE}
+                variant="caption"
+              >
+                <RestoreIcon /> Revert
+              </StyledCustomLink>
+              {/* Other buttons */}
+            </Stack>
+          </Box>
+
+          {/* Text area */}
+          <Box
+            sx={{
+              padding: theme.spacing(theme.tabiyaSpacing.sm),
+            }}
+          >
+            <InlineEditField
+              placeholder="Summary of experience"
+              value={summaryValue}
+              onChange={handleInputChange}
+              multiline
+              minRows={8}
+              inputProps={{ maxLength: SUMMARY_MAX_LENGTH + 1 }} // +1 to allow the user to overflow and see the error
+              sx={{
+                border: 0,
+                padding: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                fontSize: theme.typography.body2.fontSize,
+                backgroundColor: "transparent",
+                "& textarea": {
+                  padding: 0,
+                  resize: "none",
+                },
+              }}
+              data-testid={DATA_TEST_ID.FORM_SUMMARY}
+              error={!!error}
+            />
+          </Box>
         </Box>
-      </Box>
+      </Badge>
       {(errorText || successText) && (
         <Typography
           variant="caption"
