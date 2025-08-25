@@ -6,7 +6,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
   data-testid="experience-edit-form-container-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
 >
   <div
-    class="MuiBox-root css-1q095yz"
+    class="MuiBox-root css-quwgsm"
   >
     <h5
       class="MuiTypography-root MuiTypography-h5 css-vmt1ul-MuiTypography-root"
@@ -78,75 +78,59 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
     <div
       class="MuiBox-root css-yd8sa2"
     >
-      <div
-        class="MuiBox-root css-6b1g0m"
-        data-testid="experience-edit-form-work-type-title-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+      <span
+        class="MuiBadge-root css-112xqrm-MuiBadge-root"
       >
         <div
-          class="MuiBox-root css-axw7ok"
+          class="MuiBox-root css-6b1g0m"
+          data-testid="experience-edit-form-work-type-title-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
         >
+          <div
+            class="MuiBox-root css-axw7ok"
+          >
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1de4ipc-MuiSvgIcon-root"
+              data-testid="WorkIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2m-6 0h-4V4h4z"
+              />
+            </svg>
+            <p
+              class="MuiTypography-root MuiTypography-body1 css-ckgs5j-MuiTypography-root"
+            >
+              Salary Work
+            </p>
+          </div>
           <svg
             aria-hidden="true"
             class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1de4ipc-MuiSvgIcon-root"
-            data-testid="WorkIcon"
+            data-testid="experience-edit-form-work-type-dropdown-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
             focusable="false"
             viewBox="0 0 24 24"
           >
             <path
-              d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2m-6 0h-4V4h4z"
+              d="m7 10 5 5 5-5z"
             />
           </svg>
-          <p
-            class="MuiTypography-root MuiTypography-body1 css-ckgs5j-MuiTypography-root"
-          >
-            Salary Work
-          </p>
         </div>
-        <svg
-          aria-hidden="true"
-          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1de4ipc-MuiSvgIcon-root"
-          data-testid="experience-edit-form-work-type-dropdown-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
-          focusable="false"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="m7 10 5 5 5-5z"
-          />
-        </svg>
-      </div>
+        <span
+          class="MuiBadge-badge MuiBadge-dot MuiBadge-invisible MuiBadge-anchorOriginTopLeft MuiBadge-anchorOriginTopLeftRectangular MuiBadge-overlapRectangular css-1roxe2m-MuiBadge-badge"
+        />
+      </span>
       <div
         class="MuiBox-root css-1lxwves"
       >
         <div
-          class="MuiFormControl-root MuiTextField-root css-roagy8-MuiFormControl-root-MuiTextField-root"
           data-testid="experience-edit-form-experience-title-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
         >
-          <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary Mui-focused MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
-          >
-            <input
-              aria-invalid="false"
-              class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-              id=":r1:"
-              placeholder="Experience title"
-              type="text"
-              value="Project Manager"
-            />
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-            >
-              <legend
-                class="css-ihdtdm"
-              >
-                <span
-                  class="notranslate"
-                >
-                  ​
-                </span>
-              </legend>
-            </fieldset>
-          </div>
+          <input
+            type="text"
+            value="Project Manager"
+          />
         </div>
       </div>
       <div
@@ -156,70 +140,24 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
           class="MuiBox-root css-i9gxme"
         >
           <div
-            class="MuiFormControl-root MuiTextField-root css-1g03syv-MuiFormControl-root-MuiTextField-root"
             data-testid="experience-edit-form-start-date-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           >
-            <div
-              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
-            >
-              <input
-                aria-invalid="false"
-                class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-                id=":r2:"
-                placeholder="Start date"
-                type="text"
-                value="2022"
-              />
-              <fieldset
-                aria-hidden="true"
-                class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-              >
-                <legend
-                  class="css-ihdtdm"
-                >
-                  <span
-                    class="notranslate"
-                  >
-                    ​
-                  </span>
-                </legend>
-              </fieldset>
-            </div>
+            <input
+              type="text"
+              value="2022"
+            />
           </div>
         </div>
         <div
           class="MuiBox-root css-i9gxme"
         >
           <div
-            class="MuiFormControl-root MuiTextField-root css-1g03syv-MuiFormControl-root-MuiTextField-root"
             data-testid="experience-edit-form-end-date-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           >
-            <div
-              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
-            >
-              <input
-                aria-invalid="false"
-                class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-                id=":r3:"
-                placeholder="End date"
-                type="text"
-                value="Present"
-              />
-              <fieldset
-                aria-hidden="true"
-                class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-              >
-                <legend
-                  class="css-ihdtdm"
-                >
-                  <span
-                    class="notranslate"
-                  >
-                    ​
-                  </span>
-                </legend>
-              </fieldset>
-            </div>
+            <input
+              type="text"
+              value="Present"
+            />
           </div>
         </div>
       </div>
@@ -230,70 +168,24 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
           class="MuiBox-root css-8atqhb"
         >
           <div
-            class="MuiFormControl-root MuiTextField-root css-1g03syv-MuiFormControl-root-MuiTextField-root"
             data-testid="experience-edit-form-company-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           >
-            <div
-              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
-            >
-              <input
-                aria-invalid="false"
-                class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-                id=":r4:"
-                placeholder="Company"
-                type="text"
-                value="Business Inc"
-              />
-              <fieldset
-                aria-hidden="true"
-                class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-              >
-                <legend
-                  class="css-ihdtdm"
-                >
-                  <span
-                    class="notranslate"
-                  >
-                    ​
-                  </span>
-                </legend>
-              </fieldset>
-            </div>
+            <input
+              type="text"
+              value="Business Inc"
+            />
           </div>
         </div>
         <div
           class="MuiBox-root css-8atqhb"
         >
           <div
-            class="MuiFormControl-root MuiTextField-root css-1g03syv-MuiFormControl-root-MuiTextField-root"
             data-testid="experience-edit-form-location-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           >
-            <div
-              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
-            >
-              <input
-                aria-invalid="false"
-                class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-                id=":r5:"
-                placeholder="Location"
-                type="text"
-                value="New York, NY"
-              />
-              <fieldset
-                aria-hidden="true"
-                class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-              >
-                <legend
-                  class="css-ihdtdm"
-                >
-                  <span
-                    class="notranslate"
-                  >
-                    ​
-                  </span>
-                </legend>
-              </fieldset>
-            </div>
+            <input
+              type="text"
+              value="New York, NY"
+            />
           </div>
         </div>
       </div>
@@ -338,96 +230,110 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
         class="MuiBox-root css-zefc5s"
         data-testid="experience-edit-form-skills-container-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
       >
-        <div
-          class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1hjtbll-MuiButtonBase-root-MuiChip-root"
-          data-testid="experience-edit-form-skill-chip-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
-          role="button"
-          tabindex="0"
+        <span
+          class="MuiBadge-root css-18nnry3-MuiBadge-root"
         >
-          <span
-            class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+          <div
+            class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1hjtbll-MuiButtonBase-root-MuiChip-root"
+            data-testid="experience-edit-form-skill-chip-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+            role="button"
+            tabindex="0"
           >
-            <div
-              class="MuiBox-root css-70qvj9"
+            <span
+              class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
             >
-              <p
-                class="MuiTypography-root MuiTypography-body1 css-1pp3g1p-MuiTypography-root"
+              <div
+                class="MuiBox-root css-70qvj9"
               >
-                Management
-              </p>
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-13b6f3w-MuiSvgIcon-root"
-                data-testid="experience-edit-form-skill-chip-dropdown-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="m7 10 5 5 5-5z"
-                />
-              </svg>
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-6eh098-MuiSvgIcon-root"
-                data-testid="experience-edit-form-skill-chip-delete-icon-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"
-                />
-              </svg>
-            </div>
-          </span>
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-1pp3g1p-MuiTypography-root"
+                >
+                  Management
+                </p>
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-13b6f3w-MuiSvgIcon-root"
+                  data-testid="experience-edit-form-skill-chip-dropdown-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="m7 10 5 5 5-5z"
+                  />
+                </svg>
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-rhy01h-MuiSvgIcon-root"
+                  data-testid="experience-edit-form-skill-chip-delete-icon-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"
+                  />
+                </svg>
+              </div>
+            </span>
+            <span
+              class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+            />
+          </div>
           <span
-            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+            class="MuiBadge-badge MuiBadge-dot MuiBadge-invisible MuiBadge-anchorOriginTopLeft MuiBadge-anchorOriginTopLeftRectangular MuiBadge-overlapRectangular css-1roxe2m-MuiBadge-badge"
           />
-        </div>
-        <div
-          class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1hjtbll-MuiButtonBase-root-MuiChip-root"
-          data-testid="experience-edit-form-skill-chip-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
-          role="button"
-          tabindex="0"
+        </span>
+        <span
+          class="MuiBadge-root css-18nnry3-MuiBadge-root"
         >
-          <span
-            class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+          <div
+            class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1hjtbll-MuiButtonBase-root-MuiChip-root"
+            data-testid="experience-edit-form-skill-chip-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+            role="button"
+            tabindex="0"
           >
-            <div
-              class="MuiBox-root css-70qvj9"
+            <span
+              class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
             >
-              <p
-                class="MuiTypography-root MuiTypography-body1 css-1pp3g1p-MuiTypography-root"
+              <div
+                class="MuiBox-root css-70qvj9"
               >
-                Communication
-              </p>
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-13b6f3w-MuiSvgIcon-root"
-                data-testid="experience-edit-form-skill-chip-dropdown-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="m7 10 5 5 5-5z"
-                />
-              </svg>
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-6eh098-MuiSvgIcon-root"
-                data-testid="experience-edit-form-skill-chip-delete-icon-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"
-                />
-              </svg>
-            </div>
-          </span>
+                <p
+                  class="MuiTypography-root MuiTypography-body1 css-1pp3g1p-MuiTypography-root"
+                >
+                  Communication
+                </p>
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-13b6f3w-MuiSvgIcon-root"
+                  data-testid="experience-edit-form-skill-chip-dropdown-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="m7 10 5 5 5-5z"
+                  />
+                </svg>
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-rhy01h-MuiSvgIcon-root"
+                  data-testid="experience-edit-form-skill-chip-delete-icon-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"
+                  />
+                </svg>
+              </div>
+            </span>
+            <span
+              class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+            />
+          </div>
           <span
-            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+            class="MuiBadge-badge MuiBadge-dot MuiBadge-invisible MuiBadge-anchorOriginTopLeft MuiBadge-anchorOriginTopLeftRectangular MuiBadge-overlapRectangular css-1roxe2m-MuiBadge-badge"
           />
-        </div>
+        </span>
         <div
           aria-disabled="true"
           class="MuiButtonBase-root Mui-disabled MuiChip-root MuiChip-filled Mui-disabled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-rmnwll-MuiButtonBase-root-MuiChip-root"

@@ -10,7 +10,7 @@ const meta: Meta<typeof InlineEditField> = {
     placeholder: "Click to edit",
     sx: { width: "20%" },
     "data-testid": "foo-testid",
-  }
+  },
 };
 
 export default meta;
@@ -22,11 +22,19 @@ export const Shown: Story = {
   },
 };
 
+export const Edited: Story = {
+  args: {
+    placeholder: "This field is edited already",
+    disabled: false,
+    showEditBadge: true,
+  },
+};
+
 export const ShownAsTextArea: Story = {
   args: {
     placeholder: "Click to edit",
     multiline: true,
-    minRows: 4
+    minRows: 4,
   },
 };
 

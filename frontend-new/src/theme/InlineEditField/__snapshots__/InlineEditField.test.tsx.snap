@@ -10,3 +10,45 @@ exports[`render tests should render correctly 1`] = `
   value=""
 />
 `;
+
+exports[`render tests should show badge when field is edited 1`] = `
+<span
+  class="MuiBadge-root css-7jfqov-MuiBadge-root"
+  data-testid="inline-edit-field-badge-be128c36-2209-4d9d-8557-648dcb14ca88"
+>
+  <div
+    class="MuiFormControl-root MuiTextField-root css-1g03syv-MuiFormControl-root-MuiTextField-root"
+    data-testid="foo-testid"
+  >
+    <div
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+    >
+      <input
+        aria-invalid="false"
+        class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+        id=":r1:"
+        placeholder="foo"
+        type="text"
+        value=""
+      />
+      <fieldset
+        aria-hidden="true"
+        class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+      >
+        <legend
+          class="css-ihdtdm"
+        >
+          <span
+            class="notranslate"
+          >
+            ​
+          </span>
+        </legend>
+      </fieldset>
+    </div>
+  </div>
+  <span
+    class="MuiBadge-badge MuiBadge-dot MuiBadge-anchorOriginTopLeft MuiBadge-anchorOriginTopLeftRectangular MuiBadge-overlapRectangular css-1ecccjx-MuiBadge-badge"
+  />
+</span>
+`;

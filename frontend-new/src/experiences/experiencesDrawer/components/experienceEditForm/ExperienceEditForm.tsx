@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Box, Chip, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Badge, Box, Chip, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import {
   COMPANY_MAX_LENGTH,
@@ -394,6 +394,15 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
     setPopoverSkill(skill);
   };
 
+  // Check if a field is edited
+  const isFieldEdited = (field: keyof Experience) => formValues[field] !== experience[field];
+
+  // Check if a skill has been edited (different preferred label)
+  const isSkillEdited = (skill: DeletableSkill) => {
+    const originalSkill = experience.top_skills.find((s) => s.UUID === skill.UUID);
+    return originalSkill && skill.preferredLabel !== originalSkill.preferredLabel;
+  };
+
   return (
     <>
       {showAddSkillsDrawer ? (
@@ -415,7 +424,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             flexDirection="column"
             position="sticky"
             top={0}
-            zIndex={1}
+            zIndex={2}
             bgcolor={theme.palette.background.paper}
             gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
             padding={isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : theme.tabiyaSpacing.xl}
@@ -450,33 +459,46 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
               </HelpTip>
             </Box>
             <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
-              <Box
-                display="flex"
-                justifyItems="start"
-                onClick={handleWorkTypeMenuClick}
+              <Badge
+                variant="dot"
+                anchorOrigin={{ vertical: "top", horizontal: "left" }}
+                invisible={!isFieldEdited("work_type")}
                 sx={{
-                  backgroundColor: theme.palette.grey[100],
-                  borderRadius: theme.fixedSpacing(theme.tabiyaRounding.sm),
-                  padding: theme.fixedSpacing(theme.tabiyaSpacing.xs),
-                  paddingX: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-                  cursor: "pointer",
-                  width: "fit-content",
+                  "& .MuiBadge-badge": {
+                    backgroundColor: theme.palette.grey[300],
+                    top: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+                    left: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+                  },
                 }}
-                data-testid={DATA_TEST_ID.FORM_WORK_TYPE}
               >
-                <Box display="flex" alignItems="center" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-                  {React.cloneElement(getWorkTypeIcon(formValues.work_type), {
-                    sx: { color: theme.palette.text.secondary },
-                  })}
-                  <Typography variant="body1" fontWeight="bold" color={theme.palette.text.secondary}>
-                    {getWorkTypeTitle(formValues.work_type)}
-                  </Typography>
+                <Box
+                  display="flex"
+                  justifyItems="start"
+                  onClick={handleWorkTypeMenuClick}
+                  sx={{
+                    backgroundColor: theme.palette.grey[100],
+                    borderRadius: theme.fixedSpacing(theme.tabiyaRounding.sm),
+                    padding: theme.fixedSpacing(theme.tabiyaSpacing.xs),
+                    paddingX: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                    cursor: "pointer",
+                    width: "fit-content",
+                  }}
+                  data-testid={DATA_TEST_ID.FORM_WORK_TYPE}
+                >
+                  <Box display="flex" alignItems="center" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
+                    {React.cloneElement(getWorkTypeIcon(formValues.work_type), {
+                      sx: { color: theme.palette.text.secondary },
+                    })}
+                    <Typography variant="body1" fontWeight="bold" color={theme.palette.text.secondary}>
+                      {getWorkTypeTitle(formValues.work_type)}
+                    </Typography>
+                  </Box>
+                  <ArrowDropDownIcon
+                    sx={{ color: theme.palette.text.secondary }}
+                    data-testid={DATA_TEST_ID.FORM_WORK_TYPE_DROPDOWN}
+                  />
                 </Box>
-                <ArrowDropDownIcon
-                  sx={{ color: theme.palette.text.secondary }}
-                  data-testid={DATA_TEST_ID.FORM_WORK_TYPE_DROPDOWN}
-                />
-              </Box>
+              </Badge>
               <Box display="flex" flexDirection="column" alignItems="flex-start">
                 <InlineEditField
                   placeholder="Experience title"
@@ -491,6 +513,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                     },
                   }}
                   error={!!fieldErrors.experience_title}
+                  showEditBadge={isFieldEdited("experience_title")}
                 />
                 {fieldErrors.experience_title && (
                   <Typography
@@ -515,6 +538,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                     onChange={(event) => handleTimelineChange(event, "start")}
                     data-testid={DATA_TEST_ID.FORM_START_DATE}
                     error={!!fieldErrors.timeline_start}
+                    showEditBadge={isFieldEdited("timeline") && formValues.timeline.start !== experience.timeline.start}
                   />
                   {fieldErrors.timeline_start && (
                     <Typography
@@ -533,6 +557,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                     onChange={(event) => handleTimelineChange(event, "end")}
                     data-testid={DATA_TEST_ID.FORM_END_DATE}
                     error={!!fieldErrors.timeline_end}
+                    showEditBadge={isFieldEdited("timeline") && formValues.timeline.end !== experience.timeline.end}
                   />
                   {fieldErrors.timeline_end && (
                     <Typography
@@ -553,6 +578,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                     onChange={(event) => handleInputChange(event, "company", COMPANY_MAX_LENGTH)}
                     data-testid={DATA_TEST_ID.FORM_COMPANY}
                     error={!!fieldErrors.company}
+                    showEditBadge={isFieldEdited("company")}
                   />
                   {fieldErrors.company && (
                     <Typography
@@ -571,6 +597,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                     onChange={(event) => handleInputChange(event, "location", LOCATION_MAX_LENGTH)}
                     data-testid={DATA_TEST_ID.FORM_LOCATION}
                     error={!!fieldErrors.location}
+                    showEditBadge={isFieldEdited("location")}
                   />
                   {fieldErrors.location && (
                     <Typography
@@ -588,6 +615,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                 summary={formValues.summary ?? ""}
                 error={fieldErrors.summary}
                 experience_uuid={formValues.UUID}
+                isSummaryEdited={isFieldEdited("summary")}
               />
               <Box display="flex" alignItems="center">
                 <Typography variant="body1" sx={{ wordBreak: "break-all" }}>
@@ -606,70 +634,84 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                 data-testid={DATA_TEST_ID.FORM_SKILLS_CONTAINER}
               >
                 {(formValues.top_skills ?? []).map((skill) => (
-                  <Chip
+                  <Badge
                     key={skill.UUID}
-                    onClick={(event) => handleSkillChipClick(event, skill)}
-                    data-testid={DATA_TEST_ID.FORM_SKILL_CHIP}
-                    label={
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Typography
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          sx={{
-                            textDecoration: skill.deleted ? "line-through" : "none",
-                            color: skill.deleted ? theme.palette.text.disabled : "inherit",
-                          }}
-                        >
-                          {capitalizeFirstLetter(skill.preferredLabel)}
-                        </Typography>
-                        <ArrowDropDownIcon
-                          sx={{
-                            fontSize: "30px",
-                            marginLeft: 1,
-                            cursor: "pointer",
-                          }}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleSkillMenuClick(event, skill.UUID);
-                          }}
-                          data-testid={DATA_TEST_ID.FORM_SKILL_CHIP_DROPDOWN}
-                        />
-                        {skill.deleted ? (
-                          <Box
-                            component="span"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              toggleSkillDeletion(skill.UUID);
-                            }}
-                            data-testid={DATA_TEST_ID.FORM_SKILL_CHIP_UNDO_ICON}
+                    variant={"dot"}
+                    invisible={!(isSkillEdited(skill) || skill.newlyAdded)}
+                    anchorOrigin={{ vertical: "top", horizontal: "left" }}
+                    sx={{
+                      display: "block",
+                      width: "fit-content",
+                      "& .MuiBadge-badge": {
+                        backgroundColor: theme.palette.grey[300],
+                        top: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+                        left: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                      },
+                    }}
+                  >
+                    <Chip
+                      onClick={(event) => handleSkillChipClick(event, skill)}
+                      data-testid={DATA_TEST_ID.FORM_SKILL_CHIP}
+                      label={
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Typography
+                            overflow="hidden"
+                            textOverflow="ellipsis"
                             sx={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              justifyContent: "center",
+                              textDecoration: skill.deleted ? "line-through" : "none",
+                              color: skill.deleted ? theme.palette.text.disabled : "inherit",
                             }}
                           >
-                            {/* xl wasn't quite big enough, we're going for ~16px*/}
-                            <RestoreIcon width={theme.tabiyaSpacing.xl * 4} height={theme.tabiyaSpacing.xl * 4} />
-                          </Box>
-                        ) : (
-                          <DeleteIcon
-                            fontSize="small"
-                            sx={{ color: theme.palette.error.main }}
+                            {capitalizeFirstLetter(skill.preferredLabel)}
+                          </Typography>
+                          <ArrowDropDownIcon
+                            sx={{
+                              fontSize: "30px",
+                              marginLeft: 1,
+                              cursor: "pointer",
+                            }}
                             onClick={(event) => {
                               event.stopPropagation();
-                              toggleSkillDeletion(skill.UUID);
+                              handleSkillMenuClick(event, skill.UUID);
                             }}
-                            data-testid={DATA_TEST_ID.FORM_SKILL_CHIP_DELETE_ICON}
+                            data-testid={DATA_TEST_ID.FORM_SKILL_CHIP_DROPDOWN}
                           />
-                        )}
-                      </Box>
-                    }
-                    sx={{
-                      color: theme.palette.text.secondary,
-                      backgroundColor: skill.newlyAdded ? theme.palette.grey[300] : theme.palette.grey[100],
-                      cursor: "pointer",
-                    }}
-                  />
+                          {skill.deleted ? (
+                            <Box
+                              component="span"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                toggleSkillDeletion(skill.UUID);
+                              }}
+                              data-testid={DATA_TEST_ID.FORM_SKILL_CHIP_UNDO_ICON}
+                              sx={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              {/* xl wasn't quite big enough, we're going for ~16px*/}
+                              <RestoreIcon width={theme.tabiyaSpacing.xl * 4} height={theme.tabiyaSpacing.xl * 4} />
+                            </Box>
+                          ) : (
+                            <DeleteIcon
+                              fontSize="small"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                toggleSkillDeletion(skill.UUID);
+                              }}
+                              data-testid={DATA_TEST_ID.FORM_SKILL_CHIP_DELETE_ICON}
+                            />
+                          )}
+                        </Box>
+                      }
+                      sx={{
+                        color: theme.palette.text.secondary,
+                        backgroundColor: theme.palette.grey[100],
+                        cursor: "pointer",
+                      }}
+                    />
+                  </Badge>
                 ))}
                 <Chip
                   ref={addSkillChipRef}

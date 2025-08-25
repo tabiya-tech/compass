@@ -70,6 +70,16 @@ jest.mock("./components/SummaryEditField/SummaryEditField", () => {
   };
 });
 
+// mock the InlineEditField
+jest.mock("src/theme/InlineEditField/InlineEditField", () => ({
+  __esModule: true,
+  default: jest.fn(({ value, onChange, "data-testid": testId }) => (
+    <div data-testid={testId}>
+      <input type="text" value={value ?? ""} onChange={(e) => onChange({ target: { value: e.target.value } })} />
+    </div>
+  )),
+}));
+
 describe("ExperienceEditForm", () => {
   beforeEach(() => {
     jest.clearAllMocks();
