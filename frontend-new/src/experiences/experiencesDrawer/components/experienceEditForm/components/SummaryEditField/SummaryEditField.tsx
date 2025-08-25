@@ -39,6 +39,7 @@ const StyledCustomLink: React.FC<React.ComponentProps<typeof CustomLink>> = (pro
       style={{
         display: "inline-flex",
         flexDirection: "row",
+        alignItems: "center",
         gap: theme.spacing(theme.tabiyaSpacing.xs),
         verticalAlign: "bottom",
         ...props.style,
@@ -149,7 +150,9 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
                 data-testid={DATA_TEST_ID.FORM_SUMMARY_RESTORE}
                 variant="caption"
               >
-                <RestoreIcon /> Revert
+                {/* We wanted to have an icon of 20*20; By default, material icon sizes are 24*24
+                    We went with using md(16) * 1.25 = 20 */}
+                <RestoreIcon sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md * 1.25) }} /> Revert
               </StyledCustomLink>
               {/* Other buttons */}
             </Stack>
