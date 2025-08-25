@@ -21,6 +21,7 @@ import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 import { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
+import { getRegistrationDisabled } from "src/envService";
 
 const LazyLoadedSensitiveDataForm = lazyWithPreload(
   () => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm")
@@ -181,6 +182,9 @@ const App = () => {
 
   if (loading) return <Backdrop isShown={loading} transparent={true} />;
 
+  // Check if registration is disabled
+  const isRegistrationDisabled = getRegistrationDisabled().toLowerCase() === "true";
+
   const router = sentryCreateBrowserRouter([
     {
       path: routerPaths.ROOT,
@@ -198,14 +202,15 @@ const App = () => {
         </ProtectedRoute>
       ),
     },
-    {
+    // Only include register route if registration is not disabled
+    ...(isRegistrationDisabled ? [] : [{
       path: routerPaths.REGISTER,
       element: (
         <ProtectedRoute key={ProtectedRouteKeys.REGISTER}>
           <Register />
         </ProtectedRoute>
       ),
-    },
+    }]),
     {
       path: routerPaths.LOGIN,
       element: (

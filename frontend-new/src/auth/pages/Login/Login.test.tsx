@@ -592,4 +592,22 @@ describe("Testing Login component", () => {
     expect(console.warn).not.toHaveBeenCalled();
     expect(console.error).not.toHaveBeenCalled();
   });
+
+  test("should show RequestInvitationCode when no application login code is set", async () => {
+    // GIVEN the application login code is not disabled
+    jest.spyOn(EnvServiceModule, "getApplicationLoginCodeDisabled").mockReturnValue("false");
+
+    // AND no application login code is set
+    jest.spyOn(EnvServiceModule, "getApplicationLoginCode").mockReturnValue("");
+
+    // WHEN the component is rendered
+    render(<Login />);
+
+    // THEN the RequestInvitationCode component should be shown
+    expect(screen.getByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).toBeInTheDocument();
+
+    // AND expect no errors or warnings to be logged
+    expect(console.warn).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
+  });
 });
