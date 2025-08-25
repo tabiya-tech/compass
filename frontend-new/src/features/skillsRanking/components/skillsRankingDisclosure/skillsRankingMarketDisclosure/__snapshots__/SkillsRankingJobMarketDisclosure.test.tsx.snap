@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SkillsRankingJobMarketDisclosure snapshot: non-replay initial render (not skipped) 1`] = `
+<div>
+  <div
+    class="MuiBox-root css-1s6oyup"
+    data-testid="skills-ranking-job-market-disclosure-container-579104a2-f36b-4ca5-a0c5-b2b44aaa52e1"
+    origin="COMPASS"
+  >
+    <div
+      class="MuiBox-root css-8atqhb"
+    >
+      <div
+        class="MuiBox-root css-u9ttk8"
+        data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+        origin="COMPASS"
+      >
+        <p
+          class="MuiTypography-root MuiTypography-body1 css-13zm2uq-MuiTypography-root"
+          data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
+        >
+          You meet the key skills for 
+          <strong>
+            42
+            %
+          </strong>
+           of opportunities advertised on 
+          x
+          . That’s a solid range of options!
+        </p>
+        <div
+          class="MuiBox-root css-0"
+          data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+        />
+      </div>
+      <div
+        class="MuiBox-root css-1qcd69q"
+        data-testid="chat-message-footer-layout-container-7772f20a-9d0c-4072-b24f-97eca2f43d7b"
+      >
+        <span
+          class="MuiTypography-root MuiTypography-caption css-1l3yql3-MuiTypography-root"
+          data-testid="chat-message-timestamp-c9253326-05ee-4bff-9d43-7852ca78a033"
+        >
+          sent 
+          just now
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;
