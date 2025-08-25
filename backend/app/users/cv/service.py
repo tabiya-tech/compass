@@ -1,14 +1,8 @@
-from __future__ import annotations
-
-from dataclasses import dataclass
 from typing import Protocol
 
+from .types import ParsedCV
 from .utils.markdown_converter import convert_cv_bytes_to_markdown
-from app.users.cv.utils.llm_extractor import CVExperienceExtractor
-
-@dataclass(slots=True)
-class ParsedCV:
-    experiences_data: str
+from .utils.llm_extractor import CVExperienceExtractor
 
 
 class ICVUploadService(Protocol):
