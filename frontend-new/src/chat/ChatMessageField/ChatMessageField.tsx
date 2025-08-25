@@ -11,12 +11,10 @@ export interface ChatMessageFieldProps {
   handleSend: (message: string) => void;
   aiIsTyping: boolean;
   isChatFinished: boolean;
-  // When true, the input and send should be disabled and an upload progress bar shown
+  // When true, the input and send should be disabled
   isUploadingCv?: boolean;
-  // 0-100 percentage for the thin progress at the top of the field
-  uploadProgressPercent?: number;
   // Optional upload handler. If not provided, selecting a file will do nothing.
-  onUploadCv?: (file: File, reportProgress: (percent: number) => void) => Promise<void> | void;
+  onUploadCv?: (file: File) => Promise<string>;
 }
 
 const uniqueId = "2a76494f-351d-409d-ba58-e1b2cfaf2a53";
@@ -40,7 +38,11 @@ export const PLACEHOLDER_TEXTS = {
 export const ERROR_MESSAGES = {
   MESSAGE_LIMIT: `Message limit is ${CHAT_MESSAGE_MAX_LENGTH} characters.`,
   INVALID_SPECIAL_CHARACTERS: `Invalid special characters: `,
+  MAX_FILE_SIZE: "Selected file is too large. Maximum size is 10 MB.",
 };
+
+// Define the max file size in bytes 10 MB
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
 const StyledTextField = styled(TextField)(({ theme, disabled }) => ({
   "& .MuiOutlinedInput-root": {
@@ -76,6 +78,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const [maxRows, setMaxRows] = useState(4);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(menuAnchorEl);
+  const [parsedCvData, setParsedCvData] = useState<string | null>(null);
 
   // Use effect to determine if the screen width is mobile and if the number of rows should be adjusted
   useEffect(() => {
@@ -221,11 +224,18 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     const file = files[0];
-    // Reset the input so selecting the same file again will trigger onChange
+    // Reset the input, so selecting the same file again will trigger onChange
     e.target.value = "";
+
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setErrorMessage(ERROR_MESSAGES.MAX_FILE_SIZE);
+      return;
+    }
     if (!props.onUploadCv) return;
     try {
-      await props.onUploadCv(file, (_percent: number) => {});
+      const parsed = await props.onUploadCv(file);
+      setParsedCvData(parsed);
+      setMessage(parsed);
     } catch (err) {
       // swallow; parent can surface errors via snackbar
       // no-op
@@ -276,8 +286,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       return PLACEHOLDER_TEXTS.CHAT_FINISHED;
     }
     if (props.isUploadingCv) {
-      const pct = Math.min(Math.max(props.uploadProgressPercent ?? 0, 0), 100);
-      return `${PLACEHOLDER_TEXTS.UPLOADING} ${pct}%`;
+      return PLACEHOLDER_TEXTS.UPLOADING;
     }
     if (props.aiIsTyping) {
       return PLACEHOLDER_TEXTS.AI_TYPING;
@@ -286,7 +295,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       return PLACEHOLDER_TEXTS.OFFLINE;
     }
     return PLACEHOLDER_TEXTS.DEFAULT;
-  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, props.uploadProgressPercent, isOnline]);
+  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, isOnline]);
 
   // Check if the send button should be disabled
   const sendIsDisabled = useCallback(() => {
@@ -327,25 +336,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           position: "relative",
         }}
       >
-        {/* Thin upload progress bar at the very top of the field container */}
-        {props.isUploadingCv && (
-          <motion.div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              height: theme.fixedSpacing(theme.tabiyaSpacing.xs),
-              backgroundColor: theme.palette.primary.main,
-              borderTopLeftRadius: theme.rounding(theme.tabiyaRounding.xs),
-              borderTopRightRadius: theme.rounding(theme.tabiyaRounding.xs),
-              zIndex: 1,
-            }}
-            initial={{ width: 0 }}
-            animate={{ width: `${Math.min(Math.max(props.uploadProgressPercent ?? 0, 0), 100)}%` }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-          />
-        )}
-        {/* Inline plus overlayed inside the text field (multiline doesn't support startAdornment) */}
+        {/* Inline plus overlay inside the text field (multiline doesn't support startAdornment) */}
         <AnimatePresence initial={false}>
           {message.trim().length === 0 && !inputIsDisabled() && (
             <motion.div
@@ -433,8 +424,8 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           anchorEl={menuAnchorEl}
           open={isMenuOpen}
           notifyOnClose={handleMenuClose}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          transformOrigin={{ vertical: "bottom", horizontal: "right" }}
+          anchorOrigin={{ vertical: "top", horizontal: "left" }}
+          transformOrigin={{ vertical: "bottom", horizontal: "left" }}
           items={[{
             id: "upload-cv",
             text: "Upload CV",

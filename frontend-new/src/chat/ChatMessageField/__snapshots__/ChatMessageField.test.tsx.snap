@@ -9,7 +9,33 @@ exports[`ChatMessageField should render correctly 1`] = `
     class="MuiBox-root css-zeiu9o"
   >
     <div
-      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1u4qoj3-MuiFormControl-root-MuiTextField-root"
+      style="position: absolute; top: 50%; left: 8px; transform: translateY(-50%); z-index: 2; opacity: 1;"
+    >
+      <button
+        aria-label="add"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeSmall css-1gp9nik-MuiButtonBase-root-MuiIconButton-root"
+        tabindex="0"
+        title="more actions"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-ldtitb-MuiSvgIcon-root"
+          data-testid="AddIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+          />
+        </svg>
+        <span
+          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </button>
+    </div>
+    <div
+      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1qtkoa9-MuiFormControl-root-MuiTextField-root"
     >
       <div
         class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedEnd css-8z051r-MuiInputBase-root-MuiOutlinedInput-root"
@@ -18,7 +44,7 @@ exports[`ChatMessageField should render correctly 1`] = `
           aria-invalid="false"
           class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedEnd css-f55ppk-MuiInputBase-input-MuiOutlinedInput-input"
           data-testid="chat-message-field-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
-          id=":r0:"
+          id=":r1:"
           maxlength="1100"
           placeholder="Type your message..."
           style="height: 0px; overflow: hidden;"
@@ -70,6 +96,11 @@ exports[`ChatMessageField should render correctly 1`] = `
         </fieldset>
       </div>
     </div>
+    <input
+      accept=".pdf,.doc,.docx,.odt,.rtf,.txt"
+      style="display: none;"
+      type="file"
+    />
   </div>
 </div>
 `;

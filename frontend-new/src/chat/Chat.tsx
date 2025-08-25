@@ -5,6 +5,7 @@ import { IChatMessage } from "src/chat/Chat.types";
 import {
   generateCompassMessage,
   generateConversationConclusionMessage,
+  generateCVTypingMessage,
   generatePleaseRepeatMessage,
   generateSomethingWentWrongMessage,
   generateTypingMessage,
@@ -39,6 +40,9 @@ import {
 } from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
+import cvService from "src/chat/CV/CVService/CVService";
+import { CV_UPLOADED_DISPLAY_TIME } from "src/chat/CV/CVTypingChatMessage/CVTypingChatMessage";
+import { nanoid } from "nanoid";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -106,7 +110,6 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
   // CV upload states
   const [isUploadingCv, setIsUploadingCv] = useState<boolean>(false);
-  const [uploadProgressPercent, setUploadProgressPercent] = useState<number>(0);
 
   const navigate = useNavigate();
 
@@ -221,36 +224,49 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   // Handles CV upload. For now, this only simulates an upload and disables chat.
   const handleUploadCv = useCallback(async (file: File) => {
     // If already uploading, ignore
-    if (isUploadingCv) return;
+    if (isUploadingCv) return "";
+
+    setIsUploadingCv(true);
     try {
-      setIsUploadingCv(true);
-      setUploadProgressPercent(0);
       enqueueSnackbar(`Uploading ${file.name}...`, { variant: "info" });
 
-      // Simulate progress over 5 seconds; replace with real upload implementation later
-      await new Promise<void>((resolve) => {
-        const start = Date.now();
-        const durationMs = 5000; // 5s to visualize the bar
-        const interval = setInterval(() => {
-          const elapsed = Date.now() - start;
-          const pct = Math.min(100, Math.round((elapsed / durationMs) * 100));
-          setUploadProgressPercent(pct);
-          if (pct >= 100) {
-            clearInterval(interval);
-            resolve();
-          }
-        }, 80);
+      // Add a CV typing message to indicate uploading
+      const uploadingMessageId = nanoid();
+      addMessageToChat({
+        ...generateCVTypingMessage(false),
+        message_id: uploadingMessageId
       });
 
+      const currentUserId = authenticationStateService.getInstance().getUser()?.id;
+      if (!currentUserId) {
+        throw new ChatError("User ID is not available");
+      }
+
+      const response = await cvService.getInstance().uploadCV(currentUserId, file);
+
+      removeMessageFromChat(uploadingMessageId);
+      const uploadedMessageId = nanoid();
+      addMessageToChat({
+        ...generateCVTypingMessage(true),
+        message_id: uploadedMessageId
+      });
+
+      // Remove the "uploaded" message after display time
+      setTimeout(() => {
+        removeMessageFromChat(uploadedMessageId);
+      }, CV_UPLOADED_DISPLAY_TIME);
+
       enqueueSnackbar("CV uploaded", { variant: "success" });
+
+      return response;
     } catch (e) {
       console.error(e);
       enqueueSnackbar("Failed to upload CV", { variant: "error" });
+      return "";
     } finally {
       setIsUploadingCv(false);
-      setUploadProgressPercent(0);
     }
-  }, [enqueueSnackbar, isUploadingCv]);
+  }, [enqueueSnackbar, isUploadingCv, addMessageToChat, removeMessageFromChat]);
 
   // Goes to the chat service to send a message
   const sendMessage = useCallback(
@@ -590,7 +606,6 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 aiIsTyping={aiIsTyping}
                 isChatFinished={conversationCompleted}
                 isUploadingCv={isUploadingCv}
-                uploadProgressPercent={uploadProgressPercent}
                 onUploadCv={handleUploadCv}
               />
             </Box>
