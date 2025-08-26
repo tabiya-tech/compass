@@ -1,10 +1,17 @@
 import pytest
+import os
 
 from app.users.cv.utils.llm_extractor import CVExperienceExtractor
 from evaluation_tests.cv_parser.test_cases import test_cases, CVParserTestCase
 from evaluation_tests.cv_parser.cv_parser_evaluator import CVParserEvaluator
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationResult, EvaluationRecord
 
+
+def write_to_file(folder: str, base_file_name: str, content: str) -> None:
+    os.makedirs(folder, exist_ok=True)
+    file_path = os.path.join(folder, f"{base_file_name}.md")
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(content)
 
 class CVParserEvaluationRecord(EvaluationRecord):
     markdown_cv: str
@@ -25,6 +32,14 @@ class CVParserEvaluationRecord(EvaluationRecord):
 async def test_cv_parser(case: CVParserTestCase, common_folder_path: str):
     extractor = CVExperienceExtractor()
     items = await extractor.extract_bulleted_direct(case.markdown_cv)
+
+    # write to an output file for manual inspection
+    write_to_file(folder=common_folder_path + f"cv_parser_{case.name}",
+                  base_file_name="input_cv",
+                  content=case.markdown_cv)
+    write_to_file(folder=common_folder_path + f"cv_parser_{case.name}",
+                  base_file_name="extracted_items",
+                  content="\n".join(items) if items else "(no items extracted)")
 
     record = CVParserEvaluationRecord(test_case=case.name,
                                       markdown_cv=case.markdown_cv,

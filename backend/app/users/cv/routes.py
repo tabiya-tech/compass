@@ -150,6 +150,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
         chunks: list[bytes] = []
         try:
             async for chunk in request.stream():
+                logger.info("recv-chunk bytes=%s", len(chunk))
                 if not chunk:
                     break
                 total_read += len(chunk)

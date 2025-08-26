@@ -19,4 +19,4 @@ def convert_cv_bytes_to_markdown(file_bytes: Union[bytes, BytesIO], filename: st
     markdown_text = getattr(result, "markdown", None) or getattr(result, "text_content", "")
     return markdown_text or ""
 
-
+# TODO: consider content size

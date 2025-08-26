@@ -7,3 +7,4 @@ test_output/
 logs/
 feedback-reports/
 exports/
+app/users/cv/utils/outputs/

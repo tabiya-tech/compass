@@ -40,8 +40,8 @@ import {
 } from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
-import cvService from "src/chat/CV/CVService/CVService";
-import { CV_UPLOADED_DISPLAY_TIME } from "src/chat/CV/CVTypingChatMessage/CVTypingChatMessage";
+import cvService from "src/CV/CVService/CVService";
+import { CV_UPLOADED_DISPLAY_TIME } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
 import { nanoid } from "nanoid";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
