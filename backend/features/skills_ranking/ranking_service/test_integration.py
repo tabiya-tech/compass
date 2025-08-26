@@ -38,7 +38,11 @@ test_cases = [
     TestCase(
         id="sample",
         given_participant_skills_uuids={"skill-uuid-1"},
-        given_job_seekers_prior_belies=PriorBeliefs(),
+        given_job_seekers_prior_belies=PriorBeliefs(
+            external_user_id=get_random_user_id(),
+            compare_to_others_prior_belief=0.5,
+            opportunity_rank_prior_belief=0.5
+        ),
         given_opportunities_skills_uuids=[
             {
                 "active": True,
@@ -137,6 +141,7 @@ async def test_ranking_service_success(test_case, in_memory_job_seekers_db, in_m
     assert saved_job_seeker.compared_to_others_rank == test_case.expected_comparison_rank
     assert saved_job_seeker.compare_to_others_prior_belief == given_participant_prior_beliefs.compare_to_others_prior_belief
     assert saved_job_seeker.opportunity_rank_prior_belief == given_participant_prior_beliefs.opportunity_rank_prior_belief
+    assert saved_job_seeker.external_user_id == given_participant_prior_beliefs.external_user_id
     assert saved_job_seeker.skills_uuids == test_case.given_participant_skills_uuids
     assert saved_job_seeker.skill_groups_uuids == test_case.expected_discovered_skill_groups
     assert saved_job_seeker.total_matching_opportunities == test_case.expected_total_matching_opportunities

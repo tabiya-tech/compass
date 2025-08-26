@@ -432,6 +432,7 @@ class TestSkillsRankingService:
 
             # AND the prior beliefs will be returned
             given_prior_beliefs = PriorBeliefs(
+                external_user_id=get_random_user_id(),
                 compare_to_others_prior_belief=random.random(),  # nosec used for testing purposes
                 opportunity_rank_prior_belief=random.random(),  # nosec used for testing purposes
             )

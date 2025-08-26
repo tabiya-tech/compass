@@ -48,6 +48,7 @@ def get_test_registration_data_repository():
     class TestRegistrationDataRepository(IRegistrationDataRepository):
         async def get_prior_beliefs(self, user_id: str) -> PriorBeliefs:
             return PriorBeliefs(
+                external_user_id="given-external-user-id",
                 opportunity_rank_prior_belief=0.0,
                 compare_to_others_prior_belief=0.0
             )

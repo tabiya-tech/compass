@@ -119,6 +119,7 @@ async def test_get_participant_ranking_saves_metadata_and_uses_dataset_version(m
     await service.get_participant_ranking(
         user_id="user-1",
         prior_beliefs=PriorBeliefs(
+            external_user_id=get_random_printable_string(10),
             compare_to_others_prior_belief=0.3,
             opportunity_rank_prior_belief=0.6,
         ),

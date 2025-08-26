@@ -228,4 +228,4 @@ class TestComputingVersion:
         actual_version = _compute_version_from_skills(given_skills)
 
         # THEN the version should be the MD5 hash of the expected string
-        assert  actual_version == hashlib.md5(test_case["expected_string"].encode("utf-8")).hexdigest()
+        assert  actual_version == hashlib.md5(test_case["expected_string"].encode("utf-8")).hexdigest()  # nosec B324 - test reasons

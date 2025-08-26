@@ -83,6 +83,7 @@ class RankingService(IRankingService):
             user_id=user_id,
             skills_uuids=participants_skills_uuids,
             skill_groups_uuids=participant_skill_groups_uuids,
+            external_user_id=prior_beliefs.external_user_id,
             opportunity_rank=opportunities_rank,
             compared_to_others_rank=other_job_seekers_ranks,
             compare_to_others_prior_belief=prior_beliefs.compare_to_others_prior_belief,
