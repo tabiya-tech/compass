@@ -10,11 +10,13 @@ class TestGetPriorBeliefs:
     async def test_get_prior_beliefs_success(self, in_memory_registration_data_db):
         # GIVEN a compass user id
         given_user_id = get_random_user_id()
+        given_external_user_id = get_random_user_id()
 
         # AND given a collection name, and a document with all the fields
         given_collection_name = "registration_data"
         given_document = {
             "compassUserId": given_user_id,
+            "externalUserId": given_external_user_id,
             "opportunityRankPriorBelief": 0.8,
             "compareToOthersPriorBelief": 0.5
         }
@@ -32,6 +34,7 @@ class TestGetPriorBeliefs:
         # THEN the returned PriorBeliefs object should match the expected values
         assert prior_beliefs.opportunity_rank_prior_belief == given_document["opportunityRankPriorBelief"]
         assert prior_beliefs.compare_to_others_prior_belief == given_document["compareToOthersPriorBelief"]
+        assert prior_beliefs.external_user_id == given_external_user_id
 
     @pytest.mark.asyncio
     async def test_get_prior_beliefs_not_found(self, in_memory_registration_data_db):

@@ -37,6 +37,11 @@ class PriorBeliefs(BaseModel):
     Prior beliefs about the jobseeker's rank.
     """
 
+    external_user_id: Optional[str] = None
+    """
+    The external user ID of the job seeker, where the prior beliefs were recorded.
+    """
+
     compare_to_others_prior_belief: Optional[float] = None
     """
     The prior belief of the job seeker's rank compared to other job seekers.
