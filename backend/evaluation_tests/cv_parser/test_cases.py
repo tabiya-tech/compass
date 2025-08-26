@@ -41,7 +41,7 @@ entrepreneurship_case = CVParserTestCase(
         "- Co-founded Acme Inc. (2022 - Present), CEO, Washington, DC, USA\n"
         "- Owner, Dinner For Two, Berlin (2010 - 2020)\n"
     ),
-    min_items=2,
+    min_items=2, #TODO: exact number of items
     must_contain_keywords=["Co-founded", "CEO", "Dinner For Two", "Berlin"],
 )
 
@@ -63,4 +63,6 @@ test_cases: list[CVParserTestCase] = [
     noisy_markdown,
 ]
 
+
+# check noisy markdown (unstructured)
 
