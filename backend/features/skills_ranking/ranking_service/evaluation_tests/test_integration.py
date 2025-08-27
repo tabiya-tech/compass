@@ -6,7 +6,7 @@ from features.skills_ranking.ranking_service.evaluation_tests._types import Inte
 from features.skills_ranking.ranking_service.services.config import RankingServiceConfig
 from features.skills_ranking.ranking_service.services.ranking_service import RankingService
 from features.skills_ranking.state.services.type import SkillRankingExperimentGroup
-from features.skills_ranking.state.utils.get_group import TargetGroup, get_group
+from features.skills_ranking.state.utils.get_group import TargetGroup, _get_group_based_on_ranks
 from features.skills_ranking.types import PriorBeliefs
 
 test_opportunities_data_service = test_repositories.TestOpportunitiesDataService()
@@ -84,7 +84,7 @@ async def test_ranking_service_integration(test_case: IntegrationTestCase, mocke
     given_high_difference_threshold = test_case.given_high_difference_threshold
 
     # WHEN the group is computed
-    actual_assigned_group = get_group(self_estimated_rank=test_case.given_prior_opportunity_rank_belief,
+    actual_assigned_group = _get_group_based_on_ranks(self_estimated_rank=test_case.given_prior_opportunity_rank_belief,
                                       actual_rank=actual_rank.jobs_matching_rank,
                                       high_difference_threshold=given_high_difference_threshold)
 

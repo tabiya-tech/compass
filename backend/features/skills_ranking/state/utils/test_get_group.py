@@ -2,7 +2,7 @@ import pytest
 from pydantic import BaseModel
 
 from features.skills_ranking.state.services.type import SkillRankingExperimentGroup
-from features.skills_ranking.state.utils.get_group import TargetGroup, get_group
+from features.skills_ranking.state.utils.get_group import TargetGroup, _get_group_based_on_ranks, get_group_based_on_randomization, get_group
 
 TEST_THRESHOLD = 0.2
 
@@ -156,30 +156,77 @@ test_cases: list[TestCase] = [
 ]
 
 
-@pytest.mark.parametrize("case", [
-    pytest.param(
-        case,
-        id=f"should return {case.expected_group.name}, given group:{case.expected_group},self rank:{case.given_self_estimated_rank} and actual rank:{case.given_actual_rank}"
-    ) for case in test_cases])
-def test_compute_group(case: TestCase, mocker):
-    # GIVEN the self_estimated_rank
-    given_self_estimated_rank = case.given_self_estimated_rank
+class TestGetGroupBasedOnRanks:
+    @pytest.mark.parametrize("case", [
+        pytest.param(
+            case,
+            id=f"should return {case.expected_group.name}, given group:{case.expected_group},self rank:{case.given_self_estimated_rank} and actual rank:{case.given_actual_rank}"
+        ) for case in test_cases])
+    def test_compute_group(self, case: TestCase, mocker):
+        # GIVEN the self_estimated_rank
+        given_self_estimated_rank = case.given_self_estimated_rank
 
-    # AND the actual value is 80,
-    given_actual_rank = case.given_actual_rank
+        # AND the actual value is 80,
+        given_actual_rank = case.given_actual_rank
 
-    # AND the threshold
-    given_threshold = TEST_THRESHOLD
+        # AND the threshold
+        given_threshold = TEST_THRESHOLD
 
-    # AND the random will return a specific target group
-    mocker.patch("features.skills_ranking.state.utils.get_group._get_random_group", return_value=case.given_target_group)
+        # AND the random will return a specific target group
+        mocker.patch("features.skills_ranking.state.utils.get_group._get_random_group", return_value=case.given_target_group)
 
-    # WHEN we compute the group
-    actual_group = get_group(
-        self_estimated_rank=given_self_estimated_rank,
-        actual_rank=given_actual_rank,
-        high_difference_threshold=given_threshold
-    )
+        # WHEN we compute the group
+        actual_group = _get_group_based_on_ranks(
+            self_estimated_rank=given_self_estimated_rank,
+            actual_rank=given_actual_rank,
+            high_difference_threshold=given_threshold
+        )
 
-    # THEN the actual_group should be GROUP_1
-    assert actual_group == case.expected_group, f"Expected {case.expected_group}, but got {actual_group} for case: {case}"
+        # THEN the actual_group should be GROUP_1
+        assert actual_group == case.expected_group, f"Expected {case.expected_group}, but got {actual_group} for case: {case}"
+
+
+class TestGetGroupBasedOnRandomization:
+    def test_get_group_based_on_randomization(self, mocker):
+        # GIVEN random generate.choice is will should return GROUP_1
+        mock_generator = mocker.MagicMock()
+        mock_generator.choice.return_value = SkillRankingExperimentGroup.GROUP_1
+        mocker.patch('features.skills_ranking.state.utils.get_group._random_generator', mock_generator)
+
+        # WHEN we get the group based on randomization
+        actual_group = get_group_based_on_randomization()
+
+        # THEN the actual group should GROUP 1
+        assert actual_group == SkillRankingExperimentGroup.GROUP_1, f"Expected one of the four groups, but got {actual_group}"
+
+        # AND random.generate.choice should be called with all four groups
+        mock_generator.choice.assert_called_once_with(
+            [SkillRankingExperimentGroup.GROUP_1, SkillRankingExperimentGroup.GROUP_2,
+             SkillRankingExperimentGroup.GROUP_3, SkillRankingExperimentGroup.GROUP_4])
+
+
+
+class TestGetGroup:
+    def test_get_group(self, mocker):
+        # GIVEN the self_estimated_rank
+        given_self_estimated_rank = 0.5
+
+        # AND the actual value is 80,
+        given_actual_rank = 0.8
+
+        # AND the threshold
+        given_threshold = TEST_THRESHOLD
+
+        # AND the get_group_based_on_randomization will return GROUP_1
+        mocker.patch("features.skills_ranking.state.utils.get_group.get_group_based_on_randomization",
+                     return_value=SkillRankingExperimentGroup.GROUP_1)
+
+        # WHEN we compute the group
+        actual_group = get_group(
+            self_estimated_rank=given_self_estimated_rank,
+            actual_rank=given_actual_rank,
+            high_difference_threshold=given_threshold
+        )
+
+        # THEN the actual_group should be GROUP_1
+        assert actual_group == SkillRankingExperimentGroup.GROUP_1, f"Expected GROUP_1, but got {actual_group}"
