@@ -20,10 +20,10 @@ def _get_random_group() -> TargetGroup:
     return _random_generator.choice([TargetGroup.HIGH_DIFFERENCE, TargetGroup.UNDERCONFIDENT])
 
 
-def get_group(*,
-              self_estimated_rank: float,
-              actual_rank: float,
-              high_difference_threshold: float) -> SkillRankingExperimentGroup:
+def _get_group_based_on_ranks(*,
+                              self_estimated_rank: float,
+                              actual_rank: float,
+                              high_difference_threshold: float) -> SkillRankingExperimentGroup:
     """
     Assigns participants to one of four experimental groups based on the difference between their self-assessed ranking (`prior_belief`),
     And the actual ranking (`actual_value`), and a `high_difference_threshold` value (`high_difference_threshold`).
@@ -72,3 +72,21 @@ def get_group(*,
             return SkillRankingExperimentGroup.GROUP_3
         else:
             return SkillRankingExperimentGroup.GROUP_4
+
+
+def get_group_based_on_randomization() -> SkillRankingExperimentGroup:
+    """
+    Assigns participants to one of four experimental groups based on randomization.
+    :return: A randomly assigned SkillRankingExperimentGroup.
+    """
+    return _random_generator.choice(
+        [SkillRankingExperimentGroup.GROUP_1, SkillRankingExperimentGroup.GROUP_2, SkillRankingExperimentGroup.GROUP_3,
+         SkillRankingExperimentGroup.GROUP_4])
+
+
+def get_group(*,
+              self_estimated_rank: float,
+              actual_rank: float,
+              high_difference_threshold: float):
+    # now we are using randomization to assign the group but we can use another strategy to assign the group based on ranks
+    return get_group_based_on_randomization()
