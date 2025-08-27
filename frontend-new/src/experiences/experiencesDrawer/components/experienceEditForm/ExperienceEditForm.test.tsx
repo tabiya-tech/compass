@@ -728,4 +728,103 @@ describe("ExperienceEditForm", () => {
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
   });
+
+  test("should not allow editing a deleted skill", async () => {
+    // GIVEN an experience with skills
+    const experienceWithSkills = {
+      ...mockExperiences[0],
+      top_skills: [
+        {
+          UUID: "skill-1",
+          preferredLabel: "javascript",
+          description: "A programming language",
+          altLabels: ["js", "ecmascript"],
+          orderIndex: 0,
+        },
+        {
+          UUID: "skill-2",
+          preferredLabel: "react",
+          description: "A library for building user interfaces",
+          altLabels: ["reactjs", "reactjs.org"],
+          orderIndex: 1,
+        },
+      ],
+    };
+
+    // WHEN the component is rendered
+    const givenExperienceEditForm = (
+      <ExperienceEditForm
+        experience={experienceWithSkills}
+        notifyOnSave={jest.fn()}
+        notifyOnCancel={jest.fn()}
+        notifyOnUnsavedChange={jest.fn()}
+      />
+    );
+    render(givenExperienceEditForm);
+
+    // AND a skill is deleted
+    const deleteIcons = screen.getAllByTestId(DATA_TEST_ID.FORM_SKILL_CHIP_DELETE_ICON);
+    await userEvent.click(deleteIcons[0]);
+
+    // THEN expect deleted skill (first one) should not have a dropdown
+    expect(screen.getAllByTestId(DATA_TEST_ID.FORM_SKILL_CHIP_DROPDOWN)).toHaveLength(1);
+    // AND the undo icon is present instead
+    expect(screen.getByTestId(DATA_TEST_ID.FORM_SKILL_CHIP_UNDO_ICON)).toBeInTheDocument();
+    // AND no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+  });
+
+  test("should prioritize deletion over editing for skills with both states", async () => {
+    // GIVEN an experience with skills
+    const experienceWithSkills = {
+      ...mockExperiences[0],
+      top_skills: [
+        {
+          UUID: "skill-1",
+          preferredLabel: "javascript",
+          description: "A programming language",
+          altLabels: ["js", "ecmascript"],
+          orderIndex: 0,
+        },
+      ],
+    };
+
+    // WHEN the component is rendered
+    const givenExperienceEditForm = (
+      <ExperienceEditForm
+        experience={experienceWithSkills}
+        notifyOnSave={jest.fn()}
+        notifyOnCancel={jest.fn()}
+        notifyOnUnsavedChange={jest.fn()}
+      />
+    );
+    render(givenExperienceEditForm);
+
+    // AND a skill's preferred label is first edited
+    const skillDropdown = screen.getByTestId(DATA_TEST_ID.FORM_SKILL_CHIP_DROPDOWN);
+    await userEvent.click(skillDropdown);
+
+    // AND the alternative label is selected from a menu
+    const altLabelItem = screen.getByTestId("ecmascript");
+    await userEvent.click(altLabelItem);
+
+    // THEN expect the skill chip to show the new label
+    const skillChips = screen.getAllByTestId(DATA_TEST_ID.FORM_SKILL_CHIP);
+    expect(skillChips[0]).toHaveTextContent("Ecmascript");
+
+    // WHEN the skill is then deleted
+    const deleteIcon = screen.getByTestId(DATA_TEST_ID.FORM_SKILL_CHIP_DELETE_ICON);
+    await userEvent.click(deleteIcon);
+
+    // THEN the deletion status should take precedence over the edit status
+    // The dropdown should be hidden
+    expect(screen.queryByTestId(DATA_TEST_ID.FORM_SKILL_CHIP_DROPDOWN)).not.toBeInTheDocument();
+
+    // AND the undo icon should be visible
+    expect(screen.getByTestId(DATA_TEST_ID.FORM_SKILL_CHIP_UNDO_ICON)).toBeInTheDocument();
+    // AND no errors or warning to have occurred
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+  });
 });

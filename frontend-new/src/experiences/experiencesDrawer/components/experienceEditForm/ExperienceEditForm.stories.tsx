@@ -12,6 +12,7 @@ import {
 } from "src/experiences/experienceService/experiences.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import ExperienceService from "src/experiences/experienceService/experienceService";
+import { faker } from "@faker-js/faker";
 
 const meta: Meta<typeof ExperienceEditForm> = {
   title: "Experiences/ExperienceEditForm",
@@ -103,6 +104,21 @@ export const ShownWithNewAddedSkills: Story = {
         } as DeletableSkill,
         ...(generateRandomExperiences(1)[0].top_skills || []),
       ],
+    },
+  },
+};
+
+export const ShownWithLongSkillLabel: Story = {
+  args: {
+    experience: {
+      ...generateRandomExperiences(1)[0],
+      top_skills: Array.from({ length: 5 }, (_, index) => ({
+        UUID: faker.string.uuid(),
+        preferredLabel: faker.lorem.sentence(8),
+        description: faker.lorem.paragraph(3),
+        altLabels: Array.from({ length: 3 }, () => faker.lorem.words(3)),
+        orderIndex: index,
+      })),
     },
   },
 };

@@ -637,11 +637,11 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                   <Badge
                     key={skill.UUID}
                     variant={"dot"}
-                    invisible={!(isSkillEdited(skill) || skill.newlyAdded)}
+                    invisible={skill.deleted || !(isSkillEdited(skill) || skill.newlyAdded)}
                     anchorOrigin={{ vertical: "top", horizontal: "left" }}
                     sx={{
                       display: "block",
-                      width: "fit-content",
+                      width: "100%",
                       "& .MuiBadge-badge": {
                         backgroundColor: theme.palette.grey[300],
                         top: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
@@ -664,18 +664,20 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                           >
                             {capitalizeFirstLetter(skill.preferredLabel)}
                           </Typography>
-                          <ArrowDropDownIcon
-                            sx={{
-                              fontSize: "30px",
-                              marginLeft: 1,
-                              cursor: "pointer",
-                            }}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              handleSkillMenuClick(event, skill.UUID);
-                            }}
-                            data-testid={DATA_TEST_ID.FORM_SKILL_CHIP_DROPDOWN}
-                          />
+                          {!skill.deleted && (
+                            <ArrowDropDownIcon
+                              sx={{
+                                fontSize: "30px",
+                                marginLeft: 1,
+                                cursor: "pointer",
+                              }}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleSkillMenuClick(event, skill.UUID);
+                              }}
+                              data-testid={DATA_TEST_ID.FORM_SKILL_CHIP_DROPDOWN}
+                            />
+                          )}
                           {skill.deleted ? (
                             <Box
                               component="span"
@@ -688,6 +690,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                                 display: "inline-flex",
                                 alignItems: "center",
                                 justifyContent: "center",
+                                paddingLeft: theme.fixedSpacing(theme.tabiyaSpacing.sm),
                               }}
                             >
                               {/* xl wasn't quite big enough, we're going for ~16px*/}

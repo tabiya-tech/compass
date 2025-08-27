@@ -4,6 +4,7 @@ import { generateRandomExperiences } from "src/experiences/experienceService/_te
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import ExperienceService from "src/experiences/experienceService/experienceService";
+import { faker } from "@faker-js/faker";
 
 const meta: Meta<typeof ExperiencesDrawer> = {
   title: "Experiences/ExperiencesDrawer",
@@ -158,5 +159,23 @@ export const ShownWithUnExploredExperiences = {
   args: {
     isOpen: true,
     experiences: shownWithUnExploredExperiences_experiences,
+  },
+};
+
+export const ShownWithExperienceAndLongSkillLabel = {
+  args: {
+    isOpen: true,
+    experiences: [
+      {
+        ...generateRandomExperiences(1)[0],
+        top_skills: Array.from({ length: 5 }, (_, index) => ({
+          UUID: faker.string.uuid(),
+          preferredLabel: faker.lorem.sentence(8),
+          description: faker.lorem.paragraph(3),
+          altLabels: Array.from({ length: 3 }, () => faker.lorem.words(3)),
+          orderIndex: index,
+        })),
+      },
+    ],
   },
 };
