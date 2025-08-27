@@ -24,26 +24,33 @@ export const Shown: Story = {
 
 export const ShownWithLongDescription: StoryObj = {
   args: {
-    skills: [
-      {
-        UUID: faker.string.uuid(),
-        preferredLabel: faker.company.catchPhrase(),
-        description: faker.lorem.paragraphs(3, "\n"),
-        altLabels: Array.from({ length: 8 }, () => faker.company.catchPhrase()),
-      },
-    ],
+    skills: Array.from({ length: 5 }, (_, index) => ({
+      UUID: faker.string.uuid(),
+      preferredLabel: faker.company.catchPhrase(),
+      description: faker.lorem.paragraphs(3, "\n"),
+      altLabels: Array.from({ length: 8 }, () => faker.company.catchPhrase()),
+    })),
   },
 };
 
 export const ShownWithManyAltLabels: StoryObj = {
   args: {
-    skills: [
-      {
-        UUID: faker.string.uuid(),
-        preferredLabel: faker.company.catchPhrase(),
-        description: faker.lorem.paragraph(3),
-        altLabels: Array.from({ length: 15 }, () => faker.company.catchPhrase()),
-      },
-    ],
+    skills: Array.from({ length: 5 }, () => ({
+      UUID: faker.string.uuid(),
+      preferredLabel: faker.company.catchPhrase(),
+      description: faker.lorem.paragraph(3),
+      altLabels: Array.from({ length: 15 }, () => faker.company.catchPhrase()),
+    })),
+  },
+};
+
+export const ShownWithLongPreferredLabel: StoryObj = {
+  args: {
+    skills: Array.from({ length: 10 }, () => ({
+      UUID: faker.string.uuid(),
+      preferredLabel: faker.lorem.sentence(8),
+      description: faker.lorem.paragraph(2),
+      altLabels: Array.from({ length: 2 }, () => faker.lorem.words(3)),
+    })),
   },
 };

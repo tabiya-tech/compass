@@ -231,7 +231,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
         data-testid="experience-edit-form-skills-container-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
       >
         <span
-          class="MuiBadge-root css-18nnry3-MuiBadge-root"
+          class="MuiBadge-root css-vpf073-MuiBadge-root"
         >
           <div
             class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1hjtbll-MuiButtonBase-root-MuiChip-root"
@@ -283,7 +283,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
           />
         </span>
         <span
-          class="MuiBadge-root css-18nnry3-MuiBadge-root"
+          class="MuiBadge-root css-vpf073-MuiBadge-root"
         >
           <div
             class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1hjtbll-MuiButtonBase-root-MuiChip-root"
