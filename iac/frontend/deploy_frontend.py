@@ -89,7 +89,7 @@ def deploy_frontend(*,
         bucket.name,
         frontend_artifacts_dir,
         "",
-        ["index.html", "data/version.json"],
+        ["index.html", "screening.html", "data/version.json", "data/env.js", "data/config/field.yaml"],  # do not cache these files
         [bucket])
 
     _make_bucket_public(basic_config, bucket.name, [bucket])
