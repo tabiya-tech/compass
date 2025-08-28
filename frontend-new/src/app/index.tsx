@@ -73,6 +73,16 @@ const App = () => {
       if (
         authenticationServiceInstance.isTokenValid(token).failureCause === TokenValidationFailureCause.TOKEN_EXPIRED
       ) {
+        // IF — no valid session in the provider (firebase or external provider),
+        //    — and the token has expired,
+        // THEN Log out the user to clear the state because we cannot refresh the token.
+        const isProviderSessionValid = await authenticationServiceInstance.isProviderSessionValid()
+        if (!isProviderSessionValid) {
+          console.error(new AuthenticationError("Authentication provider session is not valid/available. Logging out user."))
+          await authenticationServiceInstance.logout();
+          return
+        }
+
         console.debug("Token is expired getting new token for user...");
         await authenticationServiceInstance.refreshToken();
         token = authenticationStateService.getToken();

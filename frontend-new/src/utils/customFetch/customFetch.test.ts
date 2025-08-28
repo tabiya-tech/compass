@@ -3,7 +3,7 @@ import "src/_test_utilities/consoleMock";
 
 import {
   customFetch,
-  ExtendedRequestInit,
+  ExtendedRequestInit, LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
   MAX_ATTEMPTS,
   MIN_TOKEN_VALIDITY_SECONDS,
   RETRY_STATUS_CODES,
@@ -16,7 +16,10 @@ import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import * as UtilsModule from "src/utils/customFetch/utils";
 import { StatusCodes } from "http-status-codes";
+import { enqueueSnackbar } from "notistack";
 import { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
+import { AuthenticationError } from "../../error/commonErrors";
+import { routerPaths } from "../../app/routerPaths";
 
 // Mock the dynamic import
 jest.mock("src/auth/services/Authentication.service.factory", () => ({
@@ -31,6 +34,11 @@ jest.mock("src/auth/services/Authentication.service.factory", () => ({
     }),
   },
 }));
+
+jest.mock("notistack", () => ({
+  __esModule: true,
+  enqueueSnackbar: jest.fn()
+}))
 
 const VALID_TOKEN_RESPONSE = {
   decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid token by default
@@ -588,6 +596,7 @@ describe("Api Service tests", () => {
               failureCause: null,
             }),
           refreshToken: jest.fn().mockResolvedValue(undefined),
+          isProviderSessionValid: jest.fn().mockResolvedValue(true),
         };
         (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
 
@@ -718,6 +727,7 @@ describe("Api Service tests", () => {
             failureCause: null,
           }),
         refreshToken: jest.fn().mockResolvedValue(undefined),
+        isProviderSessionValid: jest.fn().mockResolvedValue(true),
       };
       (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
 
@@ -802,6 +812,73 @@ describe("Api Service tests", () => {
       expect(error).toBeDefined();
       expect(error).toBeInstanceOf(RestAPIError);
       expect(error?.message).toBe(`RestAPIError: ${givenFailureMessage}`);
+    });
+
+    test("it should log the user out, if the token has expired and no provider session available", async () => {
+      // GIVEN an API URL and an expired token
+      const givenApiUrl = "givenAPIUrl";
+      const givenToken = "expiredToken";
+      const givenServiceName = "Some service";
+      const givenServiceFunction = "Some function";
+      const givenMethod = "GET";
+      const givenFailureMessage = "fetchWithAuth failed";
+
+      // AND the auth token is retrievable
+      jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValueOnce(givenToken);
+
+      // AND the auth service factory is mocked to return a service that validates tokens
+      //      and returns an expired token,
+      //      and it will return false when asked to check if the provider session is valid
+      const mockAuthService = {
+        isTokenValid: jest.fn().mockReturnValue({
+          isValid: false,
+          decodedToken: { exp: Math.floor(Date.now() / 1000) - 1 }, // expired
+          failureCause: TokenValidationFailureCause.TOKEN_EXPIRED,
+        }),
+        isProviderSessionValid: jest.fn().mockResolvedValue(false),
+        logout: jest.fn().mockResolvedValue(undefined),
+      };
+      (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
+
+      // AND fetch is mocked
+      const mockFetch = jest.spyOn(global, "fetch");
+
+      // WHEN fetchWithAuth is called
+      const responsePromise = customFetch(givenApiUrl, {
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: givenServiceName,
+        serviceFunction: givenServiceFunction,
+        method: givenMethod,
+        failureMessage: givenFailureMessage,
+        authRequired: true,
+      });
+
+      // THEN expect the function to throw
+      await expect(responsePromise).rejects.toThrowWithMessage(
+        AuthenticationError,
+        "Authentication provider session is not valid/available. Logging out user."
+      );
+
+      // THEN the token should be refreshed
+      expect(mockAuthService.isTokenValid).toHaveBeenCalled();
+
+      // AND logout should be called
+      expect(mockAuthService.logout).toHaveBeenCalled();
+
+      // AND enqueueSnackbar should not be called with log out message.
+      expect(enqueueSnackbar).toHaveBeenCalledWith(
+        `${ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.AUTHENTICATION_FAILURE} We are logging you out ....`,
+        {
+          autoHideDuration: LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
+          variant: "error",
+        }
+      );
+
+      // AND the request should be retried with the new token
+      expect(mockFetch).not.toHaveBeenCalled();
+
+      // AND the user should be redirected to the landing page.
+      expect(window.location.hash).toBe(`#${routerPaths.LANDING}`)
     });
   });
 });

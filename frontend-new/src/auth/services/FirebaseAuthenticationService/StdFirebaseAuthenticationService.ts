@@ -1,6 +1,8 @@
+import firebase from "firebase/compat/app";
 import { firebaseAuth } from "src/auth/firebaseConfig";
 import { TabiyaUser, Token } from "src/auth/auth.types";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import { FirebaseError } from "src/error/FirebaseError/firebaseError";
 
 export interface FirebaseToken extends Token {
   name: string;
@@ -203,6 +205,42 @@ class StdFirebaseAuthenticationService {
       return { isValid: false, failureCause: FirebaseTokenValidationFailureCause.INVALID_FIREBASE_USER_ID };
     }
     return { isValid: true };
+  }
+
+  /**
+   * Returns the current firebase user if logged in, or null if not logged in.
+   * @private
+   */
+  public getCurrentUser(): Promise<firebase.User | null> {
+    return new Promise((resolve, reject) => {
+      const unsubscribe = firebaseAuth.onAuthStateChanged(user => {
+        if (user) {
+          resolve(user)
+        } else {
+          resolve(null)
+        }
+
+        unsubscribe()
+      }, firebaseError => {
+        const error = new FirebaseError("StdFirebaseAuthenticationService", "getCurrentUser", "auth/auth-user-is-null", "Failed to get current user from Firebase Auth", firebaseError);
+        reject(error)
+        unsubscribe()
+      })
+    })
+  }
+
+  /**
+   * Checks if a firebase active session/user exists in the local storage. (i.e.: IndexDB)
+   * @returns {boolean} True if an active session exists, false otherwise.
+   */
+  public async isAuthSessionValid(): Promise<boolean> {
+    try {
+      const currentUser = await this.getCurrentUser()
+      return currentUser != null;
+    } catch (error) {
+      console.error(error)
+      return false;
+    }
   }
 }
 

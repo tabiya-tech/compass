@@ -7,6 +7,7 @@ import UserPreferencesService from "src/userPreferences/UserPreferencesService/u
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 
 jest.mock("firebase/compat/app", () => {
   const mockAuth = {
@@ -114,5 +115,29 @@ describe("SocialAuthService class tests", () => {
       // THEN the error should be thrown
       await expect(socialLoginPromise).rejects.toThrow("The user could not be found");
     });
+  });
+
+  describe("isProviderSessionValid", () => {
+    it.each([true, false])(
+      "should always return '%s' stdFirebaseAuthService.isAuthSessionValid returns '%s'",
+      async (expected) => {
+        // GIVEN the expected result from StdFirebaseAuthenticationService.isAuthSessionValid
+        const expectedResult = expected;
+        jest
+          .spyOn(StdFirebaseAuthenticationService.getInstance(), "isAuthSessionValid")
+          .mockResolvedValue(expectedResult);
+
+        // WHEN we query if the provider session is valid
+        const actualResult = await authService.isProviderSessionValid();
+
+        // THEN it should return the expected result
+        expect(actualResult).toBe(expectedResult);
+        expect(StdFirebaseAuthenticationService.getInstance().isAuthSessionValid).toHaveBeenCalled();
+
+        // AND no errors or warnings should be logged
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+      }
+    );
   });
 });

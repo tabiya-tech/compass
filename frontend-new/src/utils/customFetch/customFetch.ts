@@ -1,3 +1,4 @@
+import { enqueueSnackbar } from "notistack";
 import { AuthenticationError, TokenError } from "src/error/commonErrors";
 import { getRestAPIErrorFactory, RestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
@@ -7,6 +8,7 @@ import { sleep, getNextBackoff, calculateTimeToTokenExpiry } from "./utils";
 import { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
 
 import { StatusCodes } from "http-status-codes";
+import { routerPaths } from "src/app/routerPaths";
 
 // Status codes that should trigger a retry
 // We are certain that these status codes are temporary issues and can be retried,
@@ -32,6 +34,10 @@ export const MAX_ATTEMPTS = 4;
 // threshold for minimum time the token should be valid for
 // if the token is valid for less than this time, it will be refreshed
 export const MIN_TOKEN_VALIDITY_SECONDS = 30; // 30 sec
+
+// Duration to be waited by the snackbar telling you you have been logged out.
+// It is 10 seconds twice of the default one
+export const LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION = 10000;
 
 // This function is used to make authenticated fetch requests
 // It adds the Authorization header with the Token from the session storage
@@ -82,6 +88,28 @@ const refreshToken = async (
     );
     throw new AuthenticationError("No authentication service available for authentication");
   }
+
+  const isProviderSessionValid = await authService.isProviderSessionValid();
+
+  if (!isProviderSessionValid) {
+    const userFriendlyErrorMessage = ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.AUTHENTICATION_FAILURE
+    await authService.logout();
+    enqueueSnackbar(`${userFriendlyErrorMessage} We are logging you out ....`, {
+      autoHideDuration: LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
+      variant: "error",
+    });
+
+    // Redirect to the landing page
+    // We are using window.location.href instead of React router's useNavigate hook.
+    // Because the React router requires to be in a React component to use to navigate function.
+    // Or the navigate function should be chained from a React component all the way here.
+    // It is not extendable and not maintainable.
+    // So we are using window.location.href to redirect to the landing page.
+    window.location.href = `/#${routerPaths.LANDING}`;
+
+    throw new AuthenticationError("Authentication provider session is not valid/available. Logging out user.");
+  }
+
   try {
     await authService.refreshToken();
     console.debug(

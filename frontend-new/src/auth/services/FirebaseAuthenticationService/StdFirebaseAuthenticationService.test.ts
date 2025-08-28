@@ -8,6 +8,7 @@ import { jwtDecode } from "jwt-decode";
 import { FirebaseToken } from "./StdFirebaseAuthenticationService";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import firebase from "firebase/compat/app";
 
 // Mock jwt-decode
 jest.mock("jwt-decode", () => ({
@@ -265,5 +266,96 @@ describe("StdFirebaseAuthenticationService", () => {
       expect(result.isValid).toBe(false);
       expect(result.failureCause).toBe(expectedFailureCause);
     });
+  });
+
+  describe("getCurrentUser", () => {
+    it("should return null if there is no user in the firebase storage", async () => {
+      // GIVEN firebase.onAuthStateChanged calls back with null
+      const mockUnsubscribe = jest.fn();
+      (firebaseAuth.onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
+        // Simulate the callback being called with the null/no-user
+        callback(null);
+        return mockUnsubscribe;
+      });
+
+      // WHEN getting the current user
+      const user = await service.getCurrentUser();
+
+      // THEN it should return the user
+      expect(user).toBe(null);
+    })
+
+    it("should return the user if the user is in the firebase storage", async () => {
+      // GIVEN firebase.onAuthStateChanged calls back with a user
+      const mockUser = { displayName: "Test User" } as firebase.User;
+      const mockUnsubscribe = jest.fn();
+      (firebaseAuth.onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
+        // Simulate the callback being called with the mock user
+        callback(mockUser);
+        return mockUnsubscribe;
+      });
+
+      // WHEN getting the current user
+      const user = await service.getCurrentUser();
+
+      // THEN it should return the user
+      expect(user).toBe(mockUser);
+    })
+
+
+
+    it("should reject with an error if firebase.getUser throws an error", async () => {
+      // GIVEN firebase.onAuthStateChanged calls the onError callback
+      const mockUnsubscribe = jest.fn();
+      (firebaseAuth.onAuthStateChanged as jest.Mock).mockImplementation((_callback, onError) => {
+        // Simulate the callback being called with the null/no-user
+        onError(new Error("Firebase error"));
+        return mockUnsubscribe;
+      });
+
+      // WHEN getting the current user
+      const getCurrentUserPromise = service.getCurrentUser();
+
+      // THEN it should reject with an error
+      await expect(getCurrentUserPromise).rejects.toThrow("Failed to get current user from Firebase Auth");
+    })
+  })
+
+  describe("isAuthSessionValid", () => {
+    it("should return true if there is a valid auth session", async () => {
+      // GIVEN getCurrentUser returns a valid user
+      jest.spyOn(service, "getCurrentUser").mockResolvedValue({ displayName: "kkk" } as firebase.User);
+
+      // WHEN checking if auth session is valid
+      const isValid = await service.isAuthSessionValid();
+
+      // THEN it should be false
+      expect(isValid).toBe(true);
+    })
+
+    it("should return false if there is no valid auth session", async () => {
+      // GIVEN getCurrentUser returns null
+      jest.spyOn(service, "getCurrentUser").mockResolvedValue(null);
+
+      // WHEN checking if auth session is valid
+      const isValid = await service.isAuthSessionValid();
+
+      // THEN it should be false
+      expect(isValid).toBe(false);
+    })
+
+    it("should return false if getCurrentUser throws an error", async () => {
+      // GIVEN getCurrentUser throws an error
+      jest.spyOn(service, "getCurrentUser").mockRejectedValue(new Error("Failed to get user"));
+
+      // WHEN checking if auth session is valid
+      const isValid = await service.isAuthSessionValid();
+
+      // THEN it should be false
+      expect(isValid).toBe(false);
+
+      // AND it should log the error
+      expect(console.error).toHaveBeenCalledWith(new Error("Failed to get user"));
+    })
   });
 });

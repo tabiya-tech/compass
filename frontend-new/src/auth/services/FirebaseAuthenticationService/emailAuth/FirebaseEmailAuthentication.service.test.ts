@@ -643,5 +643,29 @@ describe("AuthService class tests", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
   });
+
+  describe("isProviderSessionValid", () => {
+    it.each([true, false])(
+      "should always return '%s' stdFirebaseAuthService.isAuthSessionValid returns '%s'",
+      async (expected) => {
+        // GIVEN the expected result from StdFirebaseAuthenticationService.isAuthSessionValid
+        const expectedResult = expected;
+        jest
+          .spyOn(StdFirebaseAuthenticationService.getInstance(), "isAuthSessionValid")
+          .mockResolvedValue(expectedResult);
+
+        // WHEN we query if the provider session is valid
+        const actualResult = await authService.isProviderSessionValid();
+
+        // THEN it should return the expected result
+        expect(actualResult).toBe(expectedResult);
+        expect(StdFirebaseAuthenticationService.getInstance().isAuthSessionValid).toHaveBeenCalled();
+
+        // AND no errors or warnings should be logged
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+      }
+    );
+  });
 });
 
