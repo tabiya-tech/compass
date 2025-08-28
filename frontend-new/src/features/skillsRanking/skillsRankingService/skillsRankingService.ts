@@ -115,6 +115,7 @@ export class SkillsRankingService extends FeaturesService {
       serviceFunction: "getSkillsRankingState",
       failureMessage: `Failed to get skills ranking state for session ${sessionId}`,
       expectedContentType: "application/json",
+      retryOnFailedToFetch: true
     });
 
     const data = await response.json();

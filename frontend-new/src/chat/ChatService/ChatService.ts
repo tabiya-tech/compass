@@ -81,6 +81,7 @@ export default class ChatService {
       serviceFunction,
       failureMessage: `Failed to get chat history for session id ${sessionId}`,
       expectedContentType: "application/json",
+      retryOnFailedToFetch: true
     });
 
     const responseBody = await response.text();

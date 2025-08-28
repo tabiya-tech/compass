@@ -30,6 +30,7 @@ export const useFieldsConfig = () => {
         serviceFunction: "useFieldsConfig",
         failureMessage: `Failed to fetch fields configuration from ${CONFIG_PATH}`,
         authRequired: false,
+        retryOnFailedToFetch: true,
       });
 
       const yamlText = await response.text();

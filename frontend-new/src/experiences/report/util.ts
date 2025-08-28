@@ -55,6 +55,7 @@ export const getBase64Image = async (url: string) => {
     serviceFunction: "getBase64Image",
     failureMessage: `Failed to fetch image: ${url}`,
     authRequired: false,
+    retryOnFailedToFetch: true,
   });
 
   const blob = await response.blob();

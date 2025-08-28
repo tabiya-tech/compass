@@ -173,6 +173,7 @@ export default class UserPreferencesService {
       serviceFunction: serviceFunction,
       failureMessage: `Failed to get user preferences for user with id ${userId}`,
       expectedContentType: "application/json",
+      retryOnFailedToFetch: true
     });
 
     const userPreferences = await this.parseJsonResponse(response, userId, errorFactory);
