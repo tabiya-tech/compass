@@ -147,6 +147,15 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
 
     return { isValid: true, decodedToken: decodedToken as FirebaseToken };
   }
+
+  /**
+   * Checks if a firebase active session/user exists in the local storage. (i.e.: IndexDB)
+   *
+   * @returns {boolean} True if an active session exists, false otherwise.
+   */
+  async isProviderSessionValid(): Promise<boolean> {
+    return await this.stdFirebaseAuthServiceInstance.isAuthSessionValid()
+  }
 }
 
 export default FirebaseSocialAuthenticationService;

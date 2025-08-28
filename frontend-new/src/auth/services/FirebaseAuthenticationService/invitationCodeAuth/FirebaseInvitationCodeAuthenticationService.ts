@@ -89,7 +89,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     // `super.onSuccessfulLogin` also sets the token,
     // We are setting it here because we want to createUserPreferences before calling
     // super.onSuccessfulLogin, otherwise creating will fail.
-    this.authenticationStateService.setToken(token)
+    this.authenticationStateService.setToken(token);
 
     // create user preferences for the first time.
     const prefs = await UserPreferencesService.getInstance().createUserPreferences({
@@ -186,6 +186,16 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     }
 
     return { isValid: true, decodedToken: decodedToken as FirebaseToken };
+  }
+
+  /**
+   * Checks if a firebase active session/user exists in the local storage. (i.e.: IndexDB)
+   *
+   * @returns {boolean} True if an active session exists, false otherwise.
+   */
+
+  async isProviderSessionValid(): Promise<boolean> {
+    return await this.stdFirebaseAuthServiceInstance.isAuthSessionValid()
   }
 }
 

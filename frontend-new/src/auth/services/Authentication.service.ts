@@ -73,6 +73,14 @@ abstract class AuthenticationService {
   abstract getUser(token: string): TabiyaUser | null;
 
   /**
+   * Checks if an active session, especially when using third party authentication providers.
+   * like firebase or OAuth providers, exists.
+   *
+   * @returns {boolean} True if an active session exists, false otherwise.
+   */
+  abstract isProviderSessionValid(): Promise<boolean>
+
+  /**
    * Updates the application state when a successful logout occurs
    */
   async onSuccessfulLogout(): Promise<void> {

@@ -52,6 +52,10 @@ class TestAuthenticationService extends AuthenticationService {
   getUser(_token: string): TabiyaUser | null {
     throw new Error("Method not implemented.");
   }
+
+  async isProviderSessionValid(): Promise<boolean> {
+    return false
+  }
 }
 
 function getTestUser(): TabiyaUser {
