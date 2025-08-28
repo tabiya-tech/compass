@@ -75,8 +75,21 @@ class InferOccupationTool:
         #  using a different case yields imprecise results
         titles: set[str] = {experience_title.strip().lower()}.union(
             {title.strip().lower() for title in contextualization_response.contextual_titles})
+        # Filter out empty titles to avoid calling embeddings with empty text
+        titles_before_filtering = len(titles)
+        titles = {t for t in titles if t}
+        titles_after_filtering = len(titles)
+        # log warnings for titles that were filtered out for being empty
+        if titles_after_filtering < titles_before_filtering:
+            self._logger.warning("Filtered out empty titles during Occupation inference",
+                                 extra={"experience_title": experience_title, "company": company,
+                                        "work_type": work_type, "responsibilities": responsibilities,
+                                        "country_of_interest": country_of_interest,
+                                        "titles_before_filtering": titles_before_filtering,
+                                        "titles_after_filtering": titles_after_filtering,
+                                        "number_of_titles": number_of_titles, "top_p": top_p})
 
-        self._logger.debug("Contextualizing the experience title took %.2f seconds",  time.time() - last_time)
+        self._logger.debug("Contextualizing the experience title took %.2f seconds", time.time() - last_time)
         last_time = time.time()
         # create a task for each title
         # search for the top_p matching occupations for each title initially, and later filter out the irrelevant ones
@@ -85,7 +98,8 @@ class InferOccupationTool:
             # get the UUIDs of the unseen occupations from the taxonomy domain
             unseen_occupations = await self._occupation_search_service.get_by_esco_code(code=re.compile("^I.*"))
             filter_spec = FilterSpec(UUID=[occupation.UUID for occupation in unseen_occupations])
-            unseen_tasks = [self._occupation_skill_search_service.search(query=title, k=top_p, filter_spec=filter_spec) for title in titles]
+            unseen_tasks = [self._occupation_skill_search_service.search(query=title, k=top_p, filter_spec=filter_spec)
+                            for title in titles]
             tasks.extend(unseen_tasks)
 
         if work_type == WorkType.SELF_EMPLOYMENT or work_type is None:
@@ -96,7 +110,8 @@ class InferOccupationTool:
         list_of_occupation_list = await asyncio.gather(*tasks)
         # Build a list of unique occupations from the occupation skills based on their UUIDs
         occupations_skills = flattern(list_of_occupation_list)
-        self._logger.debug("Finding the top_p occupations for the contextualized titles took %.2f seconds",  time.time() - last_time)
+        self._logger.debug("Finding the top_p occupations for the contextualized titles took %.2f seconds",
+                           time.time() - last_time)
         last_time = time.time()
 
         # 3. Filter out the irrelevant occupations based on the responsibilities and keep the top_k most relevant ones
@@ -115,7 +130,7 @@ class InferOccupationTool:
                                            responsibilities=responsibilities,
                                            llm_stats=contextualization_response.llm_stats + relevant_occupations_output.llm_stats
                                            )
-        self._logger.debug("Filter out the irrelevant occupations took %.2f seconds",  time.time() - last_time)
+        self._logger.debug("Filter out the irrelevant occupations took %.2f seconds", time.time() - last_time)
         self._logger.info("Occupation inference took %.2f seconds in total", time.time() - start_time)
         return result
 

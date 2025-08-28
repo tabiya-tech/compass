@@ -123,7 +123,11 @@ class AbstractEscoSearchService(SimilaritySearchService[T]):
         # are then grouped by the UUID and the best score is selected. The final number of results is limited to k.
         embedding: list[float]
         if isinstance(query, str):
-            embedding = await self.embedding_service.embed(query)
+            stripped_query = query.strip()
+            if not stripped_query:
+                self._logger.warning("Empty text query received; returning no results without embedding.")
+                return []
+            embedding = await self.embedding_service.embed(stripped_query)
         else:
             embedding = query
 

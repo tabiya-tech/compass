@@ -63,6 +63,10 @@ class GoogleEmbeddingService(EmbeddingService):
         Splits the texts into batches, according to the region's maximum batch size, and processes them.
         Retries the embedding generation in case of errors.
         """
+        # reject empty/whitespace-only inputs early
+        empty_indices = [idx for idx, txt in enumerate(text_list) if not isinstance(txt, str) or not txt.strip()]
+        if empty_indices:
+            raise ValueError(f"embed_batch received empty texts at indices: {empty_indices}")
         # make sure we are in the correct region
         vertexai.init(location=self.region)
 
