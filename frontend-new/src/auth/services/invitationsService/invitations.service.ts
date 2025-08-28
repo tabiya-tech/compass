@@ -42,7 +42,8 @@ export default class InvitationsService {
         serviceName: serviceName,
         serviceFunction: serviceFunction,
         failureMessage: `Failed to check status for invitation code ${code}`,
-        authRequired: false
+        authRequired: false,
+        retryOnFailedToFetch: true
       });
 
       const responseBody = await response.text();

@@ -159,6 +159,7 @@ describe("ChatService", () => {
         serviceFunction: "getChatHistory",
         failureMessage: `Failed to get chat history for session id ${givenSessionId}`,
         expectedContentType: "application/json",
+        retryOnFailedToFetch: true
       });
 
       // AND returns the history response

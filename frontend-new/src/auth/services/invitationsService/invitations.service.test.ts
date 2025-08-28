@@ -55,6 +55,7 @@ describe("InvitationsService", () => {
           failureMessage: "Failed to check status for invitation code test-code",
           serviceFunction: "checkInvitationCodeStatus",
           serviceName: "InvitationsService",
+          retryOnFailedToFetch: true
         }
       );
 
