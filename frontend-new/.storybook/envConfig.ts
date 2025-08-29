@@ -15,6 +15,7 @@ export const getEnvConfig = async (head: string | undefined = ''): Promise<strin
       replaysSessionSampleRate: 0,
       replaysOnErrorSampleRate: 1.0,
       replayIntegration: false,
+      enableLogs: false,
       levels: ["error"]
     }))
   };

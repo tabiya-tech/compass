@@ -15,6 +15,7 @@ jest.mock("@sentry/react", () => ({
   replayIntegration: jest.fn(),
   feedbackIntegration: jest.fn(),
   captureConsoleIntegration: jest.fn(),
+  consoleLoggingIntegration: jest.fn(),
   reactRouterV6BrowserTracingIntegration: jest.fn(),
   setUser: jest.fn(),
   setTag: jest.fn(),
@@ -120,12 +121,14 @@ describe("sentryInit", () => {
     const mockBrowserTracing = { name: "browserTracing" };
     const mockFeedback = { name: "feedback" };
     const mockConsole = { name: "console" };
+    const mockLogs = { name: "logs" };
     const mockRouter = { name: "router" };
     const mockReplay = { name: "replay" };
     (Sentry.browserTracingIntegration as jest.Mock).mockReturnValue(mockBrowserTracing);
     (Sentry.replayIntegration as jest.Mock).mockReturnValue(mockReplay);
     (Sentry.feedbackIntegration as jest.Mock).mockReturnValue(mockFeedback);
     (Sentry.captureConsoleIntegration as jest.Mock).mockReturnValue(mockConsole);
+    (Sentry.consoleLoggingIntegration as jest.Mock).mockReturnValue(mockLogs);
     (Sentry.reactRouterV6BrowserTracingIntegration as jest.Mock).mockReturnValue(mockRouter);
 
     function assertSentryInitCalledWithCorrectConfig(expectedConfig: SentryConfig) {
@@ -133,15 +136,22 @@ describe("sentryInit", () => {
       if (expectedConfig.replayIntegration) {
         expectedIntegrations.push(mockReplay);
       }
+
+      if(expectedConfig.enableLogs) {
+        expectedIntegrations.push(mockLogs);
+      }
+
       expect(Sentry.init).toHaveBeenCalledWith({
         dsn: "mock-dsn",
         environment: "given-target-environment-name",
         integrations: expectedIntegrations,
+        enableLogs: expectedConfig.enableLogs,
         tracesSampleRate: expectedConfig.tracesSampleRate,
         tracePropagationTargets: ["localhost", "https://api.example.com"],
         replaysSessionSampleRate: expectedConfig.replaysSessionSampleRate,
         replaysOnErrorSampleRate: expectedConfig.replaysOnErrorSampleRate,
         beforeSend: expect.any(Function),
+        beforeSendLog: expect.any(Function)
       });
 
       // AND the Sentry.captureConsoleIntegration  should be called with default levels
@@ -219,6 +229,7 @@ describe("sentryInit", () => {
           replaysSessionSampleRate: 0.2,
           replaysOnErrorSampleRate: 0.3,
           replayIntegration: true,
+          enableLogs: true,
           levels: ["error", "warn", "info", "debug"],
         }),
         {
@@ -226,6 +237,7 @@ describe("sentryInit", () => {
           replaysSessionSampleRate: 0.2,
           replaysOnErrorSampleRate: 0.3,
           replayIntegration: true,
+          enableLogs: true,
           levels: ["error", "warn", "info", "debug"],
         },
       ],
@@ -253,6 +265,11 @@ describe("sentryInit", () => {
         "Only Replays On Error Sample Rate",
         JSON.stringify({ replaysOnErrorSampleRate: 0.7 }),
         { ...SENTRY_CONFIG_DEFAULT, replaysOnErrorSampleRate: 0.7 },
+      ],
+      [
+        "Only Logs enabled",
+        JSON.stringify({ enableLogs: true }),
+        { ...SENTRY_CONFIG_DEFAULT, enableLogs: true },
       ],
       ["Only Levels", JSON.stringify({ levels: ["error"] }), { ...SENTRY_CONFIG_DEFAULT, levels: ["error"] }],
     ])("should use given config %s", (_, givenJsonConfig: string, expectedConfig: SentryConfig) => {
