@@ -63,7 +63,7 @@
     "@mui/system": "^5.15.15",
     "@react-pdf/renderer": "^3.4.5",
     "@sentry/cli": "^2.39.1",
-    "@sentry/react": "^8.28.0",
+    "@sentry/react": "^9.41.0",
     "@sentry/webpack-plugin": "^2.22.6",
     "@types/js-yaml": "^4.0.9",
     "colorjs.io": "^0.5.2",
