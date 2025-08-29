@@ -151,7 +151,8 @@ test_cases_data_extraction = [
         ],
         user_input="Graphic design teacher working online",
         collected_data_so_far=[
-            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None, location=None, start_date='2020/06',
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None,
+                          location=None, start_date='2020/06',
                           end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT')
         ],
@@ -186,7 +187,8 @@ test_cases_data_extraction = [
         ],
         user_input="OK, so it was Graphic design teacher and i was working online",
         collected_data_so_far=[
-            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None, location=None, start_date='2020/06',
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None,
+                          location=None, start_date='2020/06',
                           end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT')
         ],
@@ -229,7 +231,8 @@ test_cases_data_extraction = [
                    "I really enjoyed it and would love to do it again. "
                    "Especially because it was fulfilling and I learned a lot.",
         collected_data_so_far=[
-            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None, location=None, start_date='2020/06',
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None,
+                          location=None, start_date='2020/06',
                           end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT')
         ],
@@ -261,7 +264,8 @@ test_cases_data_extraction = [
         ],
         user_input="I sell shoes at the local market on weekends?",
         collected_data_so_far=[
-            CollectedData(index=0, defined_at_turn_number=1, experience_title='Selling Shoes', company='Local Market', location=None, start_date=None,
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Selling Shoes', company='Local Market',
+                          location=None, start_date=None,
                           end_date=None,
                           paid_work=None, work_type='SELF_EMPLOYMENT')
         ],
@@ -293,7 +297,8 @@ test_cases_data_extraction = [
         ],
         user_input="I started selling shoes at the local market on weekends in 2019.",
         collected_data_so_far=[
-            CollectedData(index=0, defined_at_turn_number=1, experience_title='Selling Shoes', company='Local Market', location=None, start_date=None,
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Selling Shoes', company='Local Market',
+                          location=None, start_date=None,
                           end_date=None,
                           paid_work=None, work_type='SELF_EMPLOYMENT')
         ],
@@ -325,7 +330,8 @@ test_cases_data_extraction = [
         ],
         user_input="you know, i was wrong i don't sell shoes at the local market on weekends.",
         collected_data_so_far=[
-            CollectedData(index=0, experience_title='Selling Shoes', company='Local Market', location=None, start_date=None, end_date=None,
+            CollectedData(index=0, experience_title='Selling Shoes', company='Local Market', location=None,
+                          start_date=None, end_date=None,
                           paid_work=None, work_type='SELF_EMPLOYMENT')
         ],
         expected_last_referenced_experience_index=-1,  # The experience should be deleted
@@ -351,10 +357,13 @@ test_cases_data_extraction = [
             """)),
         ],
         user_input="You got it wrong, I only have one experience. Figure out which one should be deleted.",
-        collected_data_so_far=[CollectedData(index=0, defined_at_turn_number=3, experience_title='Volunteer Peer mentor, Educator and a mentor manager',
+        collected_data_so_far=[CollectedData(index=0, defined_at_turn_number=3,
+                                             experience_title='Volunteer Peer mentor, Educator and a mentor manager',
                                              company='Mombasa Youth Empowerment Network, the Kenya Red Cross Society, and the Mombasa County Government',
-                                             location='Mombasa', start_date='2016', end_date='2022', paid_work=False, work_type='None'),
-                               CollectedData(index=1, defined_at_turn_number=9, experience_title='Volunteering', company=None, location=None, start_date='',
+                                             location='Mombasa', start_date='2016', end_date='2022', paid_work=False,
+                                             work_type='None'),
+                               CollectedData(index=1, defined_at_turn_number=9, experience_title='Volunteering',
+                                             company=None, location=None, start_date='',
                                              end_date='', paid_work=False, work_type='UNSEEN_UNPAID')],
         expected_last_referenced_experience_index=-1,  # The experience should be deleted
         expected_collected_data_count=1,
@@ -363,7 +372,8 @@ test_cases_data_extraction = [
              "defined_at_turn_number": 3,
              "experience_title": ContainsString("Volunteer Peer mentor, Educator and a mentor manager"),
              "location": ContainsString("Mombasa"),
-             "company": ContainsString("Mombasa Youth Empowerment Network, the Kenya Red Cross Society, and the Mombasa County Government"),
+             "company": ContainsString(
+                 "Mombasa Youth Empowerment Network, the Kenya Red Cross Society, and the Mombasa County Government"),
              "paid_work": False,
              "start_date": '2016',
              "end_date": '2022',
@@ -398,10 +408,12 @@ test_cases_data_extraction = [
         ],
         user_input="No, I don't get paid for that. It's just something I do to help her out",
         collected_data_so_far=[
-            CollectedData(index=0, experience_title='Helping Neighbors with their gardens', company='Neighbors', location='Nairobi', start_date=None,
+            CollectedData(index=0, experience_title='Helping Neighbors with their gardens', company='Neighbors',
+                          location='Nairobi', start_date=None,
                           end_date=None,
                           paid_work=False, work_type='UNSEEN_UNPAID'),
-            CollectedData(index=1, experience_title='Helping Grandmother with Transportation', company='Grandmother', location=None, start_date=None,
+            CollectedData(index=1, experience_title='Helping Grandmother with Transportation', company='Grandmother',
+                          location=None, start_date=None,
                           end_date=None,
                           paid_work=None, work_type='UNSEEN_UNPAID')
         ],
@@ -431,11 +443,14 @@ test_cases_data_extraction = [
         ],
         user_input="No, I haven't.",
         collected_data_so_far=[
-            CollectedData(index=0, experience_title='delivery job', company='Uber Eats', location='Paris', start_date='2021/01', end_date='2023/03',
+            CollectedData(index=0, experience_title='delivery job', company='Uber Eats', location='Paris',
+                          start_date='2021/01', end_date='2023/03',
                           paid_work=True,
                           work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT'),
-            CollectedData(index=1, experience_title='Selling old furniture', company='Flea Market of rue Jean Henri Fabre',
-                          location='15th arrondissement, near the Eiffel Tower', start_date='2019', end_date='Present', paid_work=True,
+            CollectedData(index=1, experience_title='Selling old furniture',
+                          company='Flea Market of rue Jean Henri Fabre',
+                          location='15th arrondissement, near the Eiffel Tower', start_date='2019', end_date='Present',
+                          paid_work=True,
                           work_type='SELF_EMPLOYMENT')
         ],
         expected_last_referenced_experience_index=-1,
@@ -456,7 +471,8 @@ test_cases_data_extraction = [
         ],
         user_input="June 2020. Started teaching graphic design online. Still doing it.",
         collected_data_so_far=[
-            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelance Work', company=None, location=None, start_date=None, end_date=None,
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelance Work', company=None,
+                          location=None, start_date=None, end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT'),
         ],
         expected_last_referenced_experience_index=0,
@@ -496,16 +512,152 @@ test_cases_data_extraction = [
         ],
         user_input="No, that's all the information I have about that experience.",
         collected_data_so_far=[
-            CollectedData(index=0, defined_at_turn_number=2, experience_title='Project Manager', company='University of Oxford', location='Remote',
-                          start_date='2018', end_date='2020', paid_work=True, work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT'),
-            CollectedData(index=1, defined_at_turn_number=6, experience_title='Software Architect', company='ProUbis GmbH', location='Berlin',
-                          start_date='2010', end_date='2018', paid_work=True, work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT'),
-            CollectedData(index=2, defined_at_turn_number=9, experience_title='Software Developer', company='Ubis GmbH', location='Berlin', start_date='1998',
+            CollectedData(index=0, defined_at_turn_number=2, experience_title='Project Manager',
+                          company='University of Oxford', location='Remote',
+                          start_date='2018', end_date='2020', paid_work=True,
+                          work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT'),
+            CollectedData(index=1, defined_at_turn_number=6, experience_title='Software Architect',
+                          company='ProUbis GmbH', location='Berlin',
+                          start_date='2010', end_date='2018', paid_work=True,
+                          work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT'),
+            CollectedData(index=2, defined_at_turn_number=9, experience_title='Software Developer', company='Ubis GmbH',
+                          location='Berlin', start_date='1998',
                           end_date='', paid_work=False, work_type='FORMAL_SECTOR_UNPAID_TRAINEE_WORK')
         ],
         expected_last_referenced_experience_index=-1,
         expected_collected_data_count=3
-    )
+    ),
+    _TestCaseDataExtraction(
+        name="empty_experience_not_added",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+            ("I've worked for a company as a paid employee before.",
+             "What is the title of this experience?"),
+            ("I prefer not to say.",
+             "Thanks! To help me track it, I can tentatively label the title as 'Employee' at 'Company' for now. Does that look right, or would you prefer to provide specifics later")
+        ],
+        user_input="No, that's not the title, and 'Company' isn't my employer. I don't want to add this yet.",
+        collected_data_so_far=[],
+        expected_last_referenced_experience_index=-1,
+        expected_collected_data_count=0
+    ),
+    _TestCaseDataExtraction(
+        name="update_title_removed_results_in_empty_then_deleted",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+            ("Earlier you set my title; I actually don't want to provide a title.",
+             "Okay, would you like me to remove the title for this experience?"),
+        ],
+        user_input="Yes, remove the title. I don't want to provide one.",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='TitleOnly', company=None, location=None,
+                          start_date=None,
+                          end_date=None,
+                          paid_work=None, work_type='UNSEEN_UNPAID')
+        ],
+        expected_last_referenced_experience_index=-1,
+        expected_collected_data_count=0
+    ),
+    _TestCaseDataExtraction(
+        # TODO: this case can fail if the llm decides to set empty as None instead of ''
+        name="update_company_removed_results_in_empty_then_deleted",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+            ("Earlier you set my company; I actually don't want to provide a company.",
+             "Okay, would you like me to remove the company for this experience?"),
+        ],
+        user_input="Yes, remove the company. I don't want to provide one.",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='', company='Company', location=None,
+                          start_date=None,
+                          end_date=None,
+                          paid_work=None, work_type='UNSEEN_UNPAID')
+        ],
+        expected_last_referenced_experience_index=-1,
+        expected_collected_data_count=0
+    ),
+    _TestCaseDataExtraction(
+        name="update_location_removed_results_in_empty_then_deleted",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+            ("Earlier you set my location; I actually don't want to provide a location.",
+             "Okay, would you like me to remove the location for this experience?"),
+        ],
+        user_input="Yes, remove the location. I don't want to provide one.",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='', company=None, location='Location',
+                          start_date=None,
+                          end_date=None,
+                          paid_work=None, work_type='UNSEEN_UNPAID')
+        ],
+        expected_last_referenced_experience_index=-1,
+        expected_collected_data_count=0
+    ),
+    _TestCaseDataExtraction(
+        # TODO: this case can fail if the llm decides to set empty as None instead of ''
+        name="update_start_date_removed_results_in_empty_then_deleted",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+            ("Earlier you set my start date; I actually don't want to provide a start date.",
+             "Okay, would you like me to remove the start date for this experience?"),
+        ],
+        user_input="Yes, remove the start date. I don't want to provide one.",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='', company=None, location=None,
+                          start_date='Start Date', end_date=None,
+                          paid_work=None, work_type='UNSEEN_UNPAID')
+        ],
+        expected_last_referenced_experience_index=-1,
+        expected_collected_data_count=0
+    ),
+    _TestCaseDataExtraction(
+        name="update_end_date_removed_results_in_empty_then_deleted",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+            ("Earlier you set my end date; I actually don't want to provide an end date.",
+             "Okay, would you like me to remove the end date for this experience?"),
+        ],
+        user_input="Yes, remove the end date. I don't want to provide one.",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='', company=None, location=None,
+                          start_date=None,
+                          end_date='End Date',
+                          paid_work=None, work_type='UNSEEN_UNPAID')
+        ],
+        expected_last_referenced_experience_index=-1,
+        expected_collected_data_count=0
+    ),
+    _TestCaseDataExtraction(
+        name="update_paid_work_removed_results_in_empty_then_deleted",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+            ("Earlier you set my paid work; I actually don't want to provide a paid work.",
+             "Okay, would you like me to remove the paid work for this experience?"),
+        ],
+        user_input="Yes, remove the paid work. I don't want to provide one.",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='', company=None, location=None,
+                          start_date=None,
+                          end_date=None,
+                          paid_work=True, work_type='UNSEEN_UNPAID')
+        ],
+        expected_last_referenced_experience_index=-1,
+        expected_collected_data_count=0
+    ),
 ]
 
 
@@ -557,7 +709,9 @@ async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytes
                 f"Expected {test_case.expected_collected_data_count} collected data, but got {len(collected_data)}"
             )
         if test_case.expected_collected_data is not None:
-            _failures = check_actual_data_matches_expected(actual_data=collected_data, expected_data=test_case.expected_collected_data, preserve_order=True)
+            _failures = check_actual_data_matches_expected(actual_data=collected_data,
+                                                           expected_data=test_case.expected_collected_data,
+                                                           preserve_order=True)
             failures.extend(_failures)
 
         if len(failures) > 0:

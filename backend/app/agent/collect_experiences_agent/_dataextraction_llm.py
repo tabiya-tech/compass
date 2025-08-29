@@ -74,6 +74,21 @@ class _DataExtractionLLM:
         self._llm_caller = LLMCaller[_CollectedExperience](model_response_type=_CollectedExperience)
         self.logger = logger
 
+    @staticmethod
+    def _is_experience_empty(item: CollectedData) -> bool:
+        """Return True if the experience has no substantive fields populated."""
+        return CollectedData.all_fields_empty(item)
+
+    @staticmethod
+    def _find_duplicate_index(item: CollectedData, items: list[CollectedData], exclude_index: int | None = None) -> int:
+        """Return absolute index of a duplicate item in 'items' (excluding exclude_index), or -1 if none."""
+        for idx, existing in enumerate(items):
+            if exclude_index is not None and idx == exclude_index:
+                continue
+            if CollectedData.compare_relaxed(item, existing):
+                return idx
+        return -1
+
     async def execute(self, *, user_input: AgentInput, context: ConversationContext,
                       collected_experience_data_so_far: list[CollectedData]) -> tuple[int, list[LLMStats]]:
         """
@@ -171,21 +186,18 @@ class _DataExtractionLLM:
                 company=_data.company,
                 location=_data.location
             )
-            if CollectedData.all_fields_empty(new_item):
+            if _DataExtractionLLM._is_experience_empty(new_item):
                 self.logger.warning("Experience data is empty: %s", new_item)
                 experience_index = -1
             else:
-                # Sometimes the LLM may add duplicates, so we remove them
-                found_duplicate_index = find_duplicate(new_item, collected_experience_data_so_far)
-
-                if found_duplicate_index >= 0:
+                duplicate_index = _DataExtractionLLM._find_duplicate_index(new_item, collected_experience_data_so_far)
+                if duplicate_index >= 0:
                     self.logger.warning("Duplicate experience data detected and will not be added: %s", new_item)
-                    experience_index = found_duplicate_index
+                    experience_index = duplicate_index
                 else:
                     collected_experience_data_so_far.append(new_item)
                     experience_index = len(collected_experience_data_so_far) - 1
-                    self.logger.info("Experience data added with index:%s\n"
-                                     "  - data: %s", experience_index, new_item.model_dump())
+                    self.logger.info("Experience data added with index:%s\n  - data: %s", experience_index, new_item.model_dump())
         elif data_operation == _DataOperation.UPDATE:
             # update the experience in the collected experience data
             if 0 <= _data.index < len(collected_experience_data_so_far):
@@ -207,12 +219,27 @@ class _DataExtractionLLM:
                     to_update.company = _data.company
                 if _data.location is not None:
                     to_update.location = _data.location
-                experience_index = _data.index
-                after_update = to_update.model_dump()
-                self.logger.info("Experience data with index:%s updated:"
-                                 "\n  - diff:%s",
-                                 _data.index,
-                                 dict_diff(before_update, after_update))
+                # Resolve empties/duplicates inline to keep indexes consistent
+                if _DataExtractionLLM._is_experience_empty(to_update):
+                    self.logger.warning("Updated experience became empty and will be removed: %s", to_update)
+                    del collected_experience_data_so_far[_data.index]
+                    experience_index = -1
+                else:
+                    duplicate_index = _DataExtractionLLM._find_duplicate_index(
+                        to_update, collected_experience_data_so_far, exclude_index=_data.index)
+                    if duplicate_index >= 0:
+                        # Remove the updated (current) one; keep the existing duplicate
+                        # we are subtracting 1 from kept_index calculation when duplicate is after current because deleting current shifts indexes
+                        kept_index = duplicate_index if duplicate_index < _data.index else duplicate_index - 1
+                        self.logger.warning("Updated experience duplicates an existing one; removing updated: %s", to_update)
+                        del collected_experience_data_so_far[_data.index]
+                        experience_index = kept_index
+                    else:
+                        experience_index = _data.index
+                        after_update = to_update.model_dump()
+                        self.logger.info("Experience data with index:%s updated:\n  - diff:%s",
+                                         experience_index,
+                                         dict_diff(before_update, after_update))
             else:
                 self.logger.error("Invalid index:%s for updating experience", _data.index)
         elif data_operation == _DataOperation.DELETE:
@@ -225,15 +252,6 @@ class _DataExtractionLLM:
         else:
             self.logger.error("Invalid data operation:%s", _data.data_operation)
 
-        for i, _data in enumerate(collected_experience_data_so_far):
-            # Sometimes the LLM may add an empty experience, so we skip it
-            if CollectedData.all_fields_empty(_data):
-                self.logger.error("Experience data is empty: %s", _data)
-                # todo: del collected_experience_data_so_far[i]
-            # Sometimes the LLM may add a duplicate experience, so we remove it
-            elif find_duplicate(_data, collected_experience_data_so_far[:i] + collected_experience_data_so_far[i + 1:]) >= 0:
-                # todo: del collected_experience_data_so_far[i]
-                self.logger.error("Duplicate experience data detected: %s", _data)
 
         return experience_index, llm_stats
 
