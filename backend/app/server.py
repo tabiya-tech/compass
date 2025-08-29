@@ -29,6 +29,7 @@ from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
 from features.loader import FeatureLoader
 from starlette.datastructures import State
+from app.middleware.gzip_request import GZipRequestMiddleware
 
 
 def setup_logging():
@@ -270,6 +271,9 @@ app = FastAPI(
 app.state = cast(State, app.state)
 app.state.startup_complete = asyncio.Event()
 app.state.shutdown_complete = asyncio.Event()
+
+# --- Add GZipRequestMiddleware before other middlewares ---
+app.add_middleware(GZipRequestMiddleware)
 
 ############################################
 # Setup the CORS policy

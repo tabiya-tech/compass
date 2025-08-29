@@ -9,6 +9,7 @@ import { TokenValidationFailureCause } from "src/auth/services/Authentication.se
 
 import { StatusCodes } from "http-status-codes";
 import { routerPaths } from "src/app/routerPaths";
+import pako from "pako";
 
 // Status codes that should trigger a retry
 // We are certain that these status codes are temporary issues and can be retried,
@@ -58,6 +59,9 @@ export type ExtendedRequestInit = RequestInit & {
 
   // If the customFetch should retry the request on didn't fetch errors.
   retryOnFailedToFetch?: boolean;
+
+  compressRequestBody?: boolean;
+  compressionThreshold?: number;
 };
 
 export const defaultInit: ExtendedRequestInit = {
@@ -66,6 +70,8 @@ export const defaultInit: ExtendedRequestInit = {
   serviceFunction: "Unknown method",
   failureMessage: "Unknown error",
   authRequired: true,
+  compressRequestBody: true,
+  compressionThreshold: 1024,
 };
 
 /*
@@ -199,6 +205,8 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
     expectedStatusCode,
     retriableStatusCodes = [],
     retryOnFailedToFetch = false,
+    compressRequestBody = true,
+    compressionThreshold = 1024,
     ...options
   } = init;
 
@@ -242,7 +250,44 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
         headers.set("Authorization", `Bearer ${token}`);
       }
 
-      const enhancedInit = { ...options, headers };
+      let processedBody = options.body;
+
+      // Handle request body compression
+      if (compressRequestBody && options.body) {
+        // Handle FormData separately never compress it
+        if (options.body instanceof FormData) {
+          processedBody = options.body;
+        } else {
+          // Convert body to string if needed
+          const bodyString = typeof options.body === "string" ? options.body : JSON.stringify(options.body);
+
+          // Set Content-Type for JSON if not already set
+          if (!headers.has("Content-Type")) {
+            headers.set("Content-Type", "application/json");
+          }
+
+          // Apply compression if the body exceeds a threshold
+          if (bodyString.length > compressionThreshold) {
+            try {
+              const compressed = pako.gzip(bodyString);
+              processedBody = new Blob([compressed]);
+              headers.set("Content-Encoding", "gzip");
+            } catch (error) {
+              console.warn(`Failed to compress request for ${serviceName}.${serviceFunction}:`, error);
+              processedBody = bodyString;
+              headers.delete("Content-Encoding");
+            }
+          } else {
+            processedBody = bodyString;
+          }
+        }
+      }
+
+      const enhancedInit = {
+        ...options,
+        headers,
+        body: processedBody,
+      };
 
       response = await fetch(apiUrl, enhancedInit);
     } catch (e: any) {
