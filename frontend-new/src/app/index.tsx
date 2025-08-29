@@ -132,7 +132,7 @@ const App = () => {
         await authenticationServiceInstance.logout();
         return;
       }
-      console.debug("User authenticated: Welcome,", user.email);
+
       UserPreferencesStateService.getInstance().setUserPreferences(preferences);
 
       console.debug("User preferences loaded", preferences);
