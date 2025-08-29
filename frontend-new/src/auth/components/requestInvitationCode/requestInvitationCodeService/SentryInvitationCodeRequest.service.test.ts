@@ -1,8 +1,9 @@
+import "src/_test_utilities/sentryMock"
+
 import * as Sentry from "@sentry/react";
 import { requestInvitationCode } from "./SentryInvitationCodeRequest.service";
 import { RequestInvitationCodeError } from "src/error/commonErrors";
 
-jest.mock("@sentry/react");
 
 describe("requestInvitationCode", () => {
   beforeEach(() => {

@@ -2,11 +2,11 @@ import React from "react";
 import { render, screen } from "src/_test_utilities/test-utils";
 import userEvent from "@testing-library/user-event";
 import * as Sentry from "@sentry/react";
+import "src/_test_utilities/sentryMock"
 
 import RequestInvitationCode, { DATA_TEST_ID as REQUEST_INVITATION_CODE_DATA_TEST_ID, UI_TEXT} from "./RequestInvitationCode";
 import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import RequestInvitationCodeFormModal, { DATA_TEST_ID as REQUEST_INVITATION_CODE_FORM_MODAL_DATA_TEST_ID } from "src/auth/components/requestInvitationCode/requestInvitationCodeFormModal/RequestInvitationCodeFormModal";
-jest.mock("@sentry/react");
 jest.mock("src/auth/components/requestInvitationCode/requestInvitationCodeFormModal/RequestInvitationCodeFormModal", () => {
   const actual = jest.requireActual("src/auth/components/requestInvitationCode/requestInvitationCodeFormModal/RequestInvitationCodeFormModal");
   return {

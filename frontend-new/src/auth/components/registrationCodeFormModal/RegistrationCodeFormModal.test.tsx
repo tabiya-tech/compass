@@ -1,6 +1,9 @@
 // silence chatty console
 import "src/_test_utilities/consoleMock";
 
+// Mock Sentry
+import "src/_test_utilities/sentryMock"
+
 import React from "react";
 import { render, screen, fireEvent, act } from "src/_test_utilities/test-utils";
 import userEvent from "@testing-library/user-event";
@@ -44,9 +47,6 @@ jest.mock("src/auth/components/requestInvitationCode/requestInvitationCodeFormMo
     }),
   };
 });
-
-// Mock Sentry
-jest.mock("@sentry/react");
 
 describe("RegistrationCodeFormModal", () => {
   test("renders correctly when modal is shown and call onSuccess with the provided code", () => {

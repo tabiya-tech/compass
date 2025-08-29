@@ -28,7 +28,7 @@ const LazyLoadedSensitiveDataForm = lazyWithPreload(
 const LazyLoadedChat = lazyWithPreload(() => import("src/chat/Chat"));
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
-const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouter(createHashRouter);
+const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouterV6(createHashRouter);
 
 const uniqueId = "17ccbdb7-1855-44b2-bc68-ef066e5c4e6f";
 export const SNACKBAR_KEYS = {

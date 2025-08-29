@@ -153,6 +153,7 @@ export function initSentry() {
     .loadInfo()
     .then(({ frontend }) => {
       // Set the frontend version in Sentry
+      // @ts-ignore
       Sentry.setContext("Frontend Version", frontend);
     });
 

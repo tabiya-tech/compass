@@ -5,7 +5,8 @@
 jest.mock("@sentry/react", () => ({
   withSentry: (Component: any) => Component,
   getFeedback: jest.fn(),
+  captureFeedback: jest.fn(),
   withProfiler: (Component: any) => Component,
-  wrapCreateBrowserRouter: (Component: any) => Component,
+  wrapCreateBrowserRouterV6: (Component: any) => Component,
   isInitialized: jest.fn(),
 }));
