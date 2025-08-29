@@ -141,6 +141,7 @@ class SkillsExplorerAgent(Agent):
         if _first_time_for_experience:
             self.state.first_time_for_experience[self.experience_entity.uuid] = False
             self.state.question_asked_until_now = []  # Reset the questions asked until now for this experience
+            self.state.answers_provided = []  # Reset the answers provided for this experience
 
         responsibilities_llm_stats = []
         if user_input.message == "":
@@ -198,7 +199,7 @@ class SkillsExplorerAgent(Agent):
 
             # set the questions and answers
             if len(self.state.question_asked_until_now) != len(self.state.answers_provided):
-                self.logger.warning("The number of questions asked (%d) does not match the number of answers provided (%d).",
+                self.logger.error("The number of questions asked (%d) does not match the number of answers provided (%d).",
                                     len(self.state.question_asked_until_now), len(self.state.answers_provided))
                 # If they don't match, we will just zip them, but this may lead to loss of information
             self.experience_entity.questions_and_answers = list(zip(self.state.question_asked_until_now, self.state.answers_provided))
