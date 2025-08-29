@@ -14,6 +14,7 @@ export interface SentryConfig {
   replaysSessionSampleRate: number;
   replaysOnErrorSampleRate: number;
   replayIntegration: boolean;
+  enableLogs: boolean; // See: https://docs.sentry.io/platforms/javascript/guides/react/logs/
   levels: string[];
 }
 
@@ -22,6 +23,7 @@ export const SENTRY_CONFIG_DEFAULT: SentryConfig = {
   replaysSessionSampleRate: 0, // 0% of sessions will be replayed
   replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors will be replayed
   replayIntegration: false, //  Turn off replay integration to reduce bundle size
+  enableLogs: false, // Enable logs to be sent to Sentry, this depends on the 'levels' configuration
   levels: ["error"], //  Capture only error level logs
 };
 
@@ -60,11 +62,25 @@ export function loadSentryConfig(): SentryConfigResult {
       replaysSessionSampleRate: _config?.replaysSessionSampleRate ?? SENTRY_CONFIG_DEFAULT.replaysSessionSampleRate,
       replaysOnErrorSampleRate: _config?.replaysOnErrorSampleRate ?? SENTRY_CONFIG_DEFAULT.replaysOnErrorSampleRate,
       replayIntegration: _config?.replayIntegration ?? SENTRY_CONFIG_DEFAULT.replayIntegration,
+      enableLogs: _config?.enableLogs ?? SENTRY_CONFIG_DEFAULT.enableLogs,
       levels: _config?.levels ?? SENTRY_CONFIG_DEFAULT.levels,
     },
     errors: errors,
     warnings: warnings,
   };
+}
+
+function obfuscateEvent<T>(event: T): T {
+  try {
+    // Stringify the event and replace 'auth' with 'htua' to avoid Sentry from filtering our auth module logs.
+    // Replace 'token' with 't0ken' to avoid Sentry from filtering logs related to the token.
+    // For the list of fields ignored, see: https://docs.sentry.io/security-legal-pii/scrubbing/server-side-scrubbing/
+    event = JSON.parse(JSON.stringify(event)
+      .replace(/auth/gi, "htua")
+      .replace(/oken/gi, "0ken"));
+  } catch (e) {} // If the event cannot be stringifies, we just ignore the error
+
+  return event;
 }
 
 export function initSentry() {
@@ -108,6 +124,13 @@ export function initSentry() {
   if (cfg.replayIntegration) {
     integrations.push(Sentry.replayIntegration());
   }
+
+  // This will allow JavaScript console object functions (console.log, console.error, console.warn, etc) to send logs to Sentry
+  if(cfg.enableLogs) {
+    // send `console.log`, `console.warn`, and `console.error` calls as logs to Sentry
+    integrations.push(Sentry.consoleLoggingIntegration())
+  }
+
   Sentry.init({
     dsn: dsn,
     environment: getTargetEnvironmentName(),
@@ -119,6 +142,10 @@ export function initSentry() {
     // Session Replay
     replaysSessionSampleRate: cfg.replaysSessionSampleRate, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
     replaysOnErrorSampleRate: cfg.replaysOnErrorSampleRate, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+
+    // Logs
+    enableLogs: cfg.enableLogs,
+
     // Add the beforeSend callback to modify the event before sending it
     beforeSend(event, hint) {
       // This will add the error details to the extra field of the event
@@ -137,18 +164,20 @@ export function initSentry() {
         }
       }
 
-      try {
-        // Stringify the event and replace 'auth' with 'htau' to avoid Sentry from filtering our auth module logs.
-        // Replace 'token' with 't0ken' to avoid Sentry from filtering logs related to the token.
-        // For the list of fields ignored, see: https://docs.sentry.io/security-legal-pii/scrubbing/server-side-scrubbing/
-        event = JSON.parse(JSON.stringify(event)
-          .replace(/auth/gi, "htau")
-          .replace(/oken/gi, "0ken"));
-      } catch (e) {} // If the event cannot be stringifies, we just ignore the error
-
-      return event;
+      return obfuscateEvent(event)
     },
+    beforeSendLog(log) {
+      log.attributes = {
+        ...(log.attributes || {}),
+        "client_id": UserPreferencesService.getInstance().getClientID(),
+        "user_id": AuthenticationStateService.getInstance().getUser()?.id,
+        "session_id": UserPreferencesStateService.getInstance().getActiveSessionId(),
+      }
+
+      return obfuscateEvent(log)
+    }
   });
+
   InfoService.getInstance()
     .loadInfo()
     .then(({ frontend }) => {

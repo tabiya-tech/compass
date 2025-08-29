@@ -14,6 +14,7 @@ window.tabiyaConfig = {
       replaysSessionSampleRate: 0, // 0% of sessions will be replayed
       replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors will be replayed
       replayIntegration: false, //  Turn off replay integration to reduce bundle size
+      enableLogs: false, // Turn on/off sending logs to sentry
       levels: ["error", "warn"], //  Capture only error level logs
     })
   ),

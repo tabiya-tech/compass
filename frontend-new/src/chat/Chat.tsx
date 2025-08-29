@@ -207,6 +207,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   // Goes to the authentication service to log the user out
   // Navigates to the login page
   const handleLogout = useCallback(async () => {
+    console.debug("Logging out the user.....")
     setIsLoggingOut(true);
     const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
     await authenticationService!.logout();
