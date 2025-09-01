@@ -143,5 +143,33 @@ describe("CVService", () => {
         expect(console.warn).not.toHaveBeenCalled();
       }
     );
+
+    test("should handle 413 Payload Too Large errors with a user-friendly message", async () => {
+      // GIVEN a file to upload and a user ID
+      const givenFile = new File(["file content"], "test-file.pdf", { type: "application/pdf" });
+      const givenUserId = "user123";
+
+      // AND the API responds with a 413 Payload Too Large status
+      setupAPIServiceSpy(StatusCodes.REQUEST_TOO_LONG, "Payload Too Large", "text/plain");
+
+      // WHEN uploadCV is called
+      const service = CVService.getInstance();
+      const uploadPromise = service.uploadCV(givenUserId, givenFile);
+
+      // THEN it should reject with an error that matches the actual structure from the implementation
+      const expectedError = {
+        serviceName: "CVService",
+        serviceFunction: "uploadCV",
+        method: "POST",
+        path: `${givenApiServerUrl}/users`,
+        statusCode: StatusCodes.REQUEST_TOO_LONG,
+        errorCode: ErrorConstants.ErrorCodes.TOO_LARGE_PAYLOAD,
+      };
+      await expect(uploadPromise).rejects.toMatchObject(expectedError);
+
+      // AND no errors or warnings should have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
   });
 });

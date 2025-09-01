@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
+import { StatusCodes } from "http-status-codes";
 
 export interface ChatMessageFieldProps {
   handleSend: (message: string) => void;
@@ -51,6 +52,7 @@ export const ERROR_MESSAGES = {
   MESSAGE_LIMIT: `Message limit is ${CHAT_MESSAGE_MAX_LENGTH} characters.`,
   INVALID_SPECIAL_CHARACTERS: `Invalid special characters: `,
   MAX_FILE_SIZE: "Selected file is too large. Maximum size is 3 MB.",
+  FILE_TOO_DENSE: "The file contains too much text. Please shorten it and upload again.",
 };
 
 // Define the max file size in bytes 3 MB
@@ -251,8 +253,14 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     try {
       const parsedContent = await props.onUploadCv(file);
       setMessage(parsedContent);
-    } catch (err) {
+      setErrorMessage("");
+    } catch (err: any) {
       console.error("Error parsing CV file:", err);
+      if (err.statusCode === StatusCodes.REQUEST_TOO_LONG) {
+        setErrorMessage(ERROR_MESSAGES.FILE_TOO_DENSE);
+        return;
+      }
+      setErrorMessage(`Failed to upload CV: ${err?.message || "Unknown error"}`);
     }
   };
 

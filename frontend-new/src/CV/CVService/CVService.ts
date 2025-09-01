@@ -48,36 +48,51 @@ export default class CVService {
       "x-filename": file.name,
     };
 
-    const response = await customFetch(constructedUploadUrl, {
-      method: method,
-      body: file, // stream raw file bytes; backend expects raw body, not multipart
-      headers,
-      expectedStatusCode: StatusCodes.OK,
-      serviceName,
-      serviceFunction,
-      failureMessage: `Failed to upload CV for user ${userId}`,
-      expectedContentType: "application/json",
-    });
-
-    const responseText = await response.text();
-
-    let parseResponse: { experiences_data?: string[] };
     try {
-      parseResponse = JSON.parse(responseText);
-    } catch (e: any) {
-      throw errorFactory(
-        response.status,
-        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
-        "Response did not contain valid JSON",
-        {
-          responseText,
-          error: e,
-        }
-      );
-    }
+      const response = await customFetch(constructedUploadUrl, {
+        method: method,
+        body: file, // stream raw file bytes; backend expects raw body, not multipart
+        headers,
+        expectedStatusCode: StatusCodes.OK,
+        serviceName,
+        serviceFunction,
+        failureMessage: `Failed to upload CV for user ${userId}`,
+        expectedContentType: "application/json",
+      });
 
-    const experiences = Array.isArray(parseResponse.experiences_data) ? parseResponse.experiences_data : [];
-    // Return a single string for now (existing callers expect a string)
-    return experiences.join("\n");
+      const responseText = await response.text();
+
+      let parseResponse: { experiences_data?: string[] };
+      try {
+        parseResponse = JSON.parse(responseText);
+      } catch (e: any) {
+        throw errorFactory(
+          response.status,
+          ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+          "Response did not contain valid JSON",
+          {
+            responseText,
+            error: e,
+          }
+        );
+      }
+
+      const experiences = Array.isArray(parseResponse.experiences_data) ? parseResponse.experiences_data : [];
+      // Return a single string for now (existing callers expect a string)
+      return experiences.join("\n");
+    } catch (error: any) {
+      // Check if the error is a 413 Payload Too Large error
+      if (error.statusCode === StatusCodes.REQUEST_TOO_LONG) {
+        throw errorFactory(
+          StatusCodes.REQUEST_TOO_LONG,
+          ErrorConstants.ErrorCodes.TOO_LARGE_PAYLOAD,
+          "The file is too large or contains too much text",
+          {
+            error: error,
+          }
+        );
+      }
+      throw error;
+    }
   }
 }

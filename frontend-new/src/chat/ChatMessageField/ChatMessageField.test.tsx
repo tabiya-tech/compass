@@ -15,6 +15,8 @@ import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
+import { StatusCodes } from "http-status-codes";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
@@ -699,6 +701,52 @@ describe("ChatMessageField", () => {
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      test("should handle 413 error when uploading a CV with too much text", async () => {
+        // GIVEN an INTRO phase
+        const givenPhase = ConversationPhase.INTRO;
+        // AND a mock onUploadCv that rejects with a 413 error
+        const tooLargeErrorAlt = new Error(ERROR_MESSAGES.FILE_TOO_DENSE);
+        (tooLargeErrorAlt as any).statusCode = StatusCodes.REQUEST_TOO_LONG;
+        (tooLargeErrorAlt as any).errorCode = ErrorConstants.ErrorCodes.TOO_LARGE_PAYLOAD;
+
+        const mockOnUploadCv = jest.fn().mockRejectedValue(tooLargeErrorAlt);
+
+        // AND ChatMessageField is rendered
+        render(
+          <ChatMessageField
+            aiIsTyping={false}
+            isChatFinished={false}
+            handleSend={jest.fn()}
+            currentPhase={givenPhase}
+            onUploadCv={mockOnUploadCv}
+          />
+        );
+
+        // WHEN plus button is clicked
+        const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
+        await userEvent.click(plusButton);
+
+        // AND the user clicks an upload file option
+        const uploadFileOption = screen.getByTestId(MENU_ITEM_ID.UPLOAD_CV);
+        await userEvent.click(uploadFileOption);
+
+        // AND a file is selected
+        const fileInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT);
+        const file = new File(["dummy content"], "cv.pdf", { type: "application/pdf" });
+        await userEvent.upload(fileInput, file);
+
+        // THEN expect onUploadCv to be called with the file
+        expect(mockOnUploadCv).toHaveBeenCalledWith(file);
+
+        // AND the specific error message for too dense content to be shown
+        await waitFor(() => {
+          expect(screen.getByText(ERROR_MESSAGES.FILE_TOO_DENSE)).toBeInTheDocument();
+        });
+
+        // AND console.error should be called for logging the error
+        expect(console.error).toHaveBeenCalled();
       });
     });
   });
