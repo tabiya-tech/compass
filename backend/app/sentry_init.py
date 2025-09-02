@@ -1,11 +1,12 @@
+import logging
+
 import sentry_sdk
-from sentry_sdk.types import Event, Hint
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.types import Event, Hint
 
 from app.app_config import get_application_config
 from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,8 @@ def init_sentry(dsn: str, environment: str = None):
         traces_sample_rate=1.0,
         environment=environment,
         send_default_pii=False,
-        before_send=attach_ticket_info
+        before_send=attach_ticket_info,
+        enable_logs=True
     )
 
 
