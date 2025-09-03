@@ -4,73 +4,100 @@ import logging
 from textwrap import dedent
 from typing import Optional
 
+from pydantic import BaseModel, Field
+
+from app.agent.llm_caller import LLMCaller
+from app.agent.prompt_template import sanitize_input
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LLMConfig
+from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
+
+
+_TAGS_TO_FILTER = [
+    "CV Markdown",
+    "System Instructions",
+    "User's Last Input",
+    "Conversation History",
+]
+
+
+class CVExtractionResponse(BaseModel):
+    experiences: list[str] = Field(default_factory=list)
 
 
 class CVExperienceExtractor:
     def __init__(self, logger: Optional[logging.Logger] = None):
         self._logger = logger or logging.getLogger(self.__class__.__name__)
+        self._llm_caller: LLMCaller[CVExtractionResponse] = LLMCaller[CVExtractionResponse](
+            model_response_type=CVExtractionResponse
+        )
+        self._llm = GeminiGenerativeLLM(
+            system_instructions=self._json_system_instructions(),
+            config=LLMConfig(
+                generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
+                    "max_output_tokens": 2048
+                }
+            )
+        )
 
     @staticmethod
     def _prompt(markdown_cv: str) -> str:
+        clean_md = sanitize_input(markdown_cv, _TAGS_TO_FILTER)
         return dedent(
             """
             <CV Markdown>
             {markdown}
             </CV Markdown>
             """
-        ).format(markdown=markdown_cv)
+        ).format(markdown=clean_md)
 
     @staticmethod
-    def _lines_system_instructions() -> str:
+    def _json_system_instructions() -> str:
         return dedent(
             """
             <System Instructions>
             You are an expert CV parser.
-            Task: From the provided <CV Markdown> content, output ONLY a list of work/livelihood experience statements, one per line.
+            Task: From the provided <CV Markdown> content, output ONLY job/livelihood experiences as a JSON object with the schema below.
 
-            Output format:
-            - Each line must be a single sentence.
-            - Do not number items. Do not prefix with '-' or '*'. Do not include any prose, JSON, or code fences.
-            - If unsure about a field, omit that clause.
-            - Do not add headings or any other text before or after the list.
-            - Distinguish experiences from responsibilities/tasks:
-              • Output only job/livelihood experiences (e.g., roles like "Worked as ...", "Co-founded ...", "Owned ...", "Volunteered ...").
-              • An experience typically includes a role/title and usually a company/organization or receiver of work, and a timeframe (e.g., from X to Y, since X, Present). Location is optional.
-              • Do NOT output standalone responsibilities/tasks (e.g., "Configured monitoring tools...", "Automated tasks...", "Coordinated incident response...") unless they are clearly part of a separate role that includes a role/title and timeframe in the same sentence.
-            - Ignore standalone project lists unless they clearly describe a separate job/livelihood experience.
-            
-            Examples (format to emulate):
-            Worked as a project manager at the University of Oxford, from 2018 to 2020. It was a paid job and you worked remotely.
-            Co-founded Acme Inc. in 2022, a gen-ai startup based in DC, USA. You owned this business and your role was CEO.
-            Volunteered as an instructor at Community Center in Berlin, from 2015 to 2017.
+            JSON Output Schema (must strictly follow):
+            {
+              "experiences": ["string", ...]
+            }
+
+            Rules for experiences:
+            - Each item must be a single sentence describing a work/livelihood experience.
+            - Do not number items and do not add bullets or prefixes.
+            - Prefer sentences that include a role/title and usually an org/receiver and timeframe.
+            - Do NOT include standalone responsibilities/tasks unless they belong to a separate role in the same sentence.
+            - No prose outside the JSON. Respond with JSON only.
             </System Instructions>
             """
         )
 
     async def extract_experiences(self, markdown_cv: str) -> list[str]:
-        llm = GeminiGenerativeLLM(
-            system_instructions=self._lines_system_instructions(),
-            config=LLMConfig(language_model_name="gemini-2.0-flash-001",
-                             generation_config={"temperature": 0.2, "max_output_tokens": 2048})
-        )
-        prompt = self._prompt(markdown_cv)
-        llm_response = await llm.generate_content(llm_input=prompt)
-        text = llm_response.text or ""
-        lines = [line.strip() for line in text.splitlines()]
-        items: list[str] = []
-        for line in lines:
-            if not line:
-                continue
-            # Strip any bullet/number artifacts in case the model still emits them
-            if line.startswith("- ") or line.startswith("* "):
-                line = line[2:].strip()
-            elif line[0].isdigit() and (len(line) > 1 and (line[1:3] == ". " or line[1] == '.')):
-                line = line.split('.', 1)[1].strip()
-            items.append(line)
-        if not items and text:
-            items = [text.strip()]
+        self._logger.info("Extracting experiences from markdown {md_length_chars=%s}", len(markdown_cv or ""))
+        try:
+            prompt = self._prompt(markdown_cv.strip())
+            self._logger.debug("Prompt preview: %s", prompt[:200].replace("\n", " "))
+            model_response, _ = await self._llm_caller.call_llm(
+                llm=self._llm,
+                llm_input=prompt,
+                logger=self._logger,
+            )
+        except Exception as e:  # Guard against unexpected errors; return empty list rather than raise
+            self._logger.exception("LLM extraction failed: %s", e)
+            model_response = None
+
+        if not model_response:
+            self._logger.error("LLM returned no data; experiences list is empty")
+            return []
+
+        # Return the parsed list
+        items = model_response.experiences or []
+        self._logger.info("Experiences extracted {items=%s}", len(items))
+        if items:
+            self._logger.debug("Extraction preview: %s", "; ".join(items[:3]))
+        else:
+            self._logger.error("LLM returned an empty 'experiences' array")
         return items
 
 

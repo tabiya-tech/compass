@@ -14,8 +14,8 @@ from app.users.cv.constants import (
 )
 from app.users.cv.errors import MarkdownTooLongError, PayloadTooLargeErrorResponse
 from app.users.auth import Authentication, UserInfo
-from .service import CVUploadService, ICVUploadService
-from .types import ParsedCV
+from app.users.cv.service import CVUploadService, ICVUploadService
+from app.users.cv.types import ParsedCV
 
 
 logger = logging.getLogger(__name__)
@@ -113,6 +113,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
                 "required": True,
                 "content": {
                     "application/pdf": {"schema": {"type": "string", "format": "binary"}},
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {"schema": {"type": "string", "format": "binary"}},
                     "text/plain": {"schema": {"type": "string", "format": "binary"}},
                 },
             }
@@ -126,6 +127,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
     ) -> ParsedCV:
         # Validate size early using Content-Length (no multipart overhead for raw)
         _validate_request_size_header(request)
+        content_length_header = request.headers.get("content-length")
 
         if user_info.user_id != user_id:
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Cannot upload CV for a different user")
@@ -143,20 +145,36 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
                 filename = "upload.pdf"
             elif content_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                 filename = "upload.docx"
-        if filename and not _has_allowed_extension(filename):
+        logger.info(
+            "CV upload started {user_id=%s, content_type='%s', content_length=%s, filename='%s'}",
+            user_id,
+            content_type,
+            content_length_header,
+            filename,
+        )
+        if not _has_allowed_extension(filename):
             raise HTTPException(status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE, detail="Only txt, pdf, docx filename extensions are allowed")
 
         total_read = 0
         chunks: list[bytes] = []
         try:
+            logger.info(
+                "Receiving file data {filename='%s', max_size_bytes=%s}",
+                filename,
+                MAX_CV_SIZE_BYTES,
+            )
             async for chunk in request.stream():
-                logger.info("recv-chunk bytes=%s", len(chunk))
+                logger.debug("Streaming chunk received {chunk_bytes=%s}", len(chunk) if chunk else 0)
                 if not chunk:
                     break
                 total_read += len(chunk)
                 if total_read > MAX_CV_SIZE_BYTES:
-                    logger.warning("413 via streaming-read: total_read_bytes=%s limit=%s", total_read, MAX_CV_SIZE_BYTES)
-                    raise HTTPException(status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE, detail="CV exceeds 10MB limit")
+                    logger.warning(
+                        "Upload aborted: file exceeds max size {total_read_bytes=%s, max_bytes=%s}",
+                        total_read,
+                        MAX_CV_SIZE_BYTES,
+                    )
+                    raise HTTPException(status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE, detail=f"CV exceeds {MAX_CV_SIZE_BYTES/1024/1024}MB limit")
                 chunks.append(chunk)
         except HTTPException:
             raise
@@ -167,21 +185,23 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")
 
         file_bytes = b"".join(chunks)
-        logger.info(
-            "cv-upload read complete: bytes=%s filename='%s' content_type='%s'",
-            len(file_bytes),
-            filename,
-            content_type,
-        )
+        logger.info("Finished receiving file {filename='%s', total_bytes=%s, content_type='%s'}", filename, len(file_bytes), content_type)
 
         try:
+            logger.info("Processing CV {filename='%s', size_bytes=%s}", filename, len(file_bytes))
             parsed = await service.parse_cv(
                 user_id=user_id,
                 file_bytes=file_bytes,
                 filename=filename,
-                content_type=content_type,
             )
-            return ParsedCV(experiences_data=parsed.experiences_data)
+            items = getattr(parsed, "experiences_data", []) or []
+            if not items:
+                logger.error("No experiences extracted {filename='%s'}", filename)
+            else:
+                preview = "; ".join(items[:3])
+                logger.info("Parsing complete {items=%s}", len(items))
+                logger.debug("Extraction preview: %s", preview)
+            return parsed
         except MarkdownTooLongError as e:
             # Map markdown length guard to 413 Payload Too Large
             length = getattr(e, "length", None)

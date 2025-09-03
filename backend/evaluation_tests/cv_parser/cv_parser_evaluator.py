@@ -1,18 +1,19 @@
-import json
 import logging
 from textwrap import dedent
 
 from pydantic import BaseModel
 
+from app.agent.llm_caller import LLMCaller
+from app.agent.prompt_template import sanitize_input
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LLMConfig
+from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
 
 
 class CVParserEvaluationOutput(BaseModel):
-    evaluator_name: str = "CV Parser Evaluator"
-    score: int
     reasoning: str
+    score: int
     meets_requirements: bool
+    evaluator_name: str = "CV Parser Evaluator"
 
     class Config:
         extra = "forbid"
@@ -21,14 +22,14 @@ class CVParserEvaluationOutput(BaseModel):
 class CVParserEvaluator:
     def __init__(self):
         self._logger = logging.getLogger(self.__class__.__name__)
+        self._llm_caller: LLMCaller[CVParserEvaluationOutput] = LLMCaller[CVParserEvaluationOutput](
+            model_response_type=CVParserEvaluationOutput
+        )
         self._llm = GeminiGenerativeLLM(
             system_instructions=self.get_system_instructions(),
             config=LLMConfig(
-                language_model_name="gemini-2.0-flash-001",
-                generation_config={
-                    "temperature": 0.2,
-                    "max_output_tokens": 1024,
-                    "response_mime_type": "application/json",
+                generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
+                    "max_output_tokens": 1024
                 }
             )
         )
@@ -41,12 +42,12 @@ class CVParserEvaluator:
             You are an expert evaluator.
             Task: Assess the extracted CV experience lines against the CV markdown.
             Consider coverage (did we capture the main roles), precision (avoid hallucinations), and formatting.
-            Respond ONLY with a compact JSON object:
+            Respond ONLY with a compact JSON object matching this schema (reasoning first):
             {
-              "evaluator_name": "CV Parser Evaluator",
-              "score": <integer 0-100>,
               "reasoning": "<one short paragraph>",
-              "meets_requirements": <true|false>
+              "score": <integer 0-100>,
+              "meets_requirements": <true|false>,
+              "evaluator_name": "CV Parser Evaluator"
             }
             </System Instructions>
             """
@@ -67,45 +68,21 @@ class CVParserEvaluator:
             </Extracted List>
             </Input>
             """
-        ).format(markdown=markdown_cv, bullets=bullets)
+        ).format(
+            markdown=sanitize_input(markdown_cv, ["System Instructions", "User's Last Input", "Conversation History", "CV Markdown"]),
+            bullets=sanitize_input(bullets, ["System Instructions", "User's Last Input", "Conversation History", "CV Markdown"]) 
+        )
 
     async def evaluate(self, *, markdown_cv: str, items: list[str]) -> CVParserEvaluationOutput:
         prompt = self.get_prompt(markdown_cv=markdown_cv, items=items)
-        resp = await self._llm.generate_content(llm_input=prompt)
-        text = (resp.text or "").strip()
-        try:
-            data = json.loads(text)
-        except Exception:
-            # try to strip code fences and extract JSON substring
-            cleaned = text
-            if cleaned.startswith("```"):
-                # remove leading fence line (best-effort, no exceptions swallowed)
-                first_nl = cleaned.find("\n")
-                if first_nl != -1:
-                    cleaned = cleaned[first_nl + 1 :]
-                if cleaned.endswith("```"):
-                    cleaned = cleaned[: -3]
-                cleaned = cleaned.strip()
-            # heuristic: slice between first '{' and last '}'
-            if '{' in cleaned and '}' in cleaned:
-                try:
-                    start = cleaned.find('{')
-                    end = cleaned.rfind('}') + 1
-                    candidate = cleaned[start:end]
-                    data = json.loads(candidate)
-                except Exception:
-                    self._logger.warning("Evaluator did not return JSON; wrapping raw text")
-                    return CVParserEvaluationOutput(score=0, reasoning=text[:500], meets_requirements=False)
-            else:
-                self._logger.warning("Evaluator did not return JSON; wrapping raw text")
-                return CVParserEvaluationOutput(score=0, reasoning=text[:500], meets_requirements=False)
-
-        # Map to model; enforce defaults
-        return CVParserEvaluationOutput(
-            evaluator_name=str(data.get("evaluator_name", "CV Parser Evaluator")),
-            score=int(data.get("score", 0)),
-            reasoning=str(data.get("reasoning", ""))[:1000],
-            meets_requirements=bool(data.get("meets_requirements", False)),
+        model_response, _ = await self._llm_caller.call_llm(
+            llm=self._llm,
+            llm_input=prompt,
+            logger=self._logger,
         )
+        if not model_response:
+            self._logger.warning("Evaluator did not return JSON; returning default failure result")
+            return CVParserEvaluationOutput(reasoning="No response", score=0, meets_requirements=False)
+        return model_response
 
 

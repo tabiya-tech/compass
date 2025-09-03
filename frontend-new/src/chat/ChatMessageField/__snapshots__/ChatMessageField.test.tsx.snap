@@ -107,7 +107,7 @@ exports[`ChatMessageField should render correctly 1`] = `
       </div>
     </div>
     <input
-      accept=".pdf,.doc,.docx,.odt,.rtf,.txt"
+      accept=".pdf,.docx,.txt"
       data-testid="chat-message-field-hidden-file-input-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
       style="display: none;"
       type="file"
