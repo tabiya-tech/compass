@@ -54,6 +54,8 @@ export const ERROR_MESSAGES = {
   INVALID_SPECIAL_CHARACTERS: `Invalid special characters: `,
   MAX_FILE_SIZE: "Selected file is too large. Maximum size is 3 MB.",
   FILE_TOO_DENSE: "The uploaded file content is too long to process. Please reduce its length and try again.",
+  EMPTY_CV_PARSE: "We couldn't detect experiences in your CV. Please check the file and try again.",
+  GENERIC_UPLOAD_ERROR: "Failed to parse your CV. Please try again or use a different file.",
 };
 
 // Define the max file size in bytes 3 MB
@@ -259,6 +261,11 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     if (!props.onUploadCv) return;
     try {
       const experiences = await props.onUploadCv(file);
+      // Empty responses are treated as an error for the UX
+      if (!Array.isArray(experiences) || experiences.length === 0) {
+        setErrorMessage(ERROR_MESSAGES.EMPTY_CV_PARSE);
+        return;
+      }
       // Only compose and set message on success
       const intro = "These are my experiences:";
       const bullets = Array.isArray(experiences)
@@ -282,6 +289,8 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
         maybeCode === ErrorConstants.ErrorCodes.TOO_LARGE_PAYLOAD
       ) {
         setErrorMessage(ERROR_MESSAGES.FILE_TOO_DENSE);
+      } else {
+        setErrorMessage(ERROR_MESSAGES.GENERIC_UPLOAD_ERROR);
       }
       // Do not modify the text field message on failure
     }
@@ -456,7 +465,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           type="file"
           ref={fileInputRef}
           style={{ display: "none" }}
-          accept=".pdf,.doc,.docx,.odt,.rtf,.txt"
+          accept=".pdf,.docx,.txt"
           onChange={handleFileSelected}
           data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT}
         />

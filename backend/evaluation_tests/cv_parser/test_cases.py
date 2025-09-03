@@ -1,3 +1,5 @@
+from textwrap import dedent
+
 from pydantic import BaseModel
 
 
@@ -178,11 +180,19 @@ multilingual_case = CVParserTestCase(
     markdown_cv=(
         "- Développeur, Société Générale, Paris (2010-2012)\n"
         "- Ingeniero, Telefónica, Madrid (2013-2015)\n"
+        "- 软件工程师, 腾讯, 深圳 (2016-2018)\n"
+        "- 产品经理, 阿里巴巴, 杭州 (2019-2021)\n"
+        "- የፕሮግራሚንግ ባለሙያ, አዲስ አበባ ቴክ, አዲስ አበባ (2017-2019)\n"
+        "- ማህበረሰብ አስተዳደር, ኢትዮጵያ ሶፍትዌር, አዲስ አበባ (2020-2022)\n"
     ),
     expected_item_keywords=[
         ["développeur", "société générale", "paris", "2010", "2012"],
         ["ingeniero", "telefónica", "madrid", "2013", "2015"],
-    ],
+        ["软件工程师", "腾讯", "深圳", "2016", "2018"],  # Chinese: Software Engineer, Tencent, Shenzhen
+        ["产品经理", "阿里巴巴", "杭州", "2019", "2021"],  # Chinese: Product Manager, Alibaba, Hangzhou
+        ["የፕሮግራሚንግ ባለሙያ", "አዲስ አበባ ቴክ", "አዲስ አበባ", "2017", "2019"],  # Amharic: Programming Professional, Addis Ababa Tech, Addis Ababa
+        ["ማህበረሰብ አስተዳደር", "ኢትዮጵያ ሶፍትዌር", "አዲስ አበባ", "2020", "2022"],  # Amharic: Community Manager, Ethiopia Software, Addis Ababa
+    ]
 )
 
 duplicates_case = CVParserTestCase(
@@ -220,6 +230,88 @@ off_topic_case = CVParserTestCase(
     expected_item_keywords=[],
 )
 
+# Realistic, noisy CV cases (multi-section, 2-3 pages feel)
+realistic_full_cv = CVParserTestCase(
+    name="realistic_full_cv",
+    markdown_cv=dedent(
+        """
+        # John A. Doe
+        123 Main Street, New York, NY 10001 | +1 212 555 1234 | john.doe@example.com | https://linkedin.com/in/johndoe
+        
+        ## Summary
+        Seasoned engineer with 10+ years experience building cloud services and data platforms. Passionate about mentoring.
+        
+        ## Skills
+        - Languages: Python, TypeScript, Go
+        - Cloud: GCP, AWS
+        
+        ## Experience
+        - Senior Software Engineer, Acme Corp, New York (2019 - Present)
+          - Led migration of monolith to microservices
+          - Reduced cloud spend by 20%
+          
+        - Project Manager, University of Oxford (2016 - 2018), Remote
+          - Managed cross-functional team of 12
+        
+        - Owner, Doe Consulting, Boston (2014 - 2016)
+        
+        ## Projects
+        - Open Source: Maintainer of data-utils
+        
+        ## Education
+        - BSc Computer Science, MIT (2010 - 2014)
+        
+        ## Certifications
+        - GCP Professional Cloud Architect (2020)
+        
+        ## References
+        Available upon request.
+        """
+    ),
+    expected_item_keywords=[
+        ["senior software engineer", "acme", "new york", "2019"],
+        ["project manager", "university of oxford", "2016", "2018"],
+        ["owner", "doe consulting", "2014", "2016"],
+    ],
+)
+
+realistic_full_cv_with_noise = CVParserTestCase(
+    name="realistic_full_cv_with_noise",
+    markdown_cv=dedent(
+        """
+        # Jane Q. Public
+        Address: 55 High Street, London SW1A 1AA, UK | Email: jane.public@mail.com | Phone: +44 20 7946 0958
+        
+        ## Personal Statement
+        Curious builder and lifelong learner. Outside work: hiking, pottery, and volunteering.
+        
+        ## Experience
+        - Data Engineer, Alpha Corp, Paris (2019 - 2023)
+          - Built real-time pipelines on GCP (Pub/Sub, Dataflow)
+        - Barista, GoodBrew LLC, Lyon (2016 - 2019)
+          - Trained 5 junior baristas
+          
+        ## Projects
+        - Personal: Portfolio website (https://jane.dev)
+        
+        ## Education
+        - MSc Data Science, Sorbonne (2017 - 2019)
+        
+        ## Skills
+        - Python, SQL, Airflow, Terraform
+        
+        ## Certifications
+        - AWS Certified Solutions Architect (Associate) (2021)
+        
+        ## References
+        - Available on request
+        """),
+    expected_item_keywords=[
+        ["data engineer", "alpha", "paris", "2019", "2023"],
+        ["barista", "goodbrew", "lyon", "2016", "2019"],
+    ],
+)
+
 test_cases: list[CVParserTestCase] = [
     simple_single_role_with_headings,
     multi_roles_mixed_with_headings,
@@ -237,6 +329,8 @@ test_cases: list[CVParserTestCase] = [
     duplicates_case,
     long_cv_case,
     off_topic_case,
+    realistic_full_cv,
+    realistic_full_cv_with_noise,
 ]   
 
 

@@ -79,7 +79,7 @@ describe("CVService", () => {
       );
 
       // AND expect the response to be as expected
-      expect(actualResponse).toEqual(["Experience 1", "Experience 2", "Experience 3"]);
+      expect(actualResponse).toEqual(expectedResponse.experiences_data);
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
