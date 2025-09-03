@@ -37,6 +37,7 @@ class BackendServiceConfig:
     backend_url: str | pulumi.Output[str]
     frontend_url: str | pulumi.Output[str]
     sentry_dsn: str
+    sentry_config: Optional[str]
     enable_sentry: str
     enable_metrics: str
     default_country_of_user: str
@@ -327,6 +328,9 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_SENTRY_DSN",
                             value=backend_service_cfg.sentry_dsn),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_SENTRY_CONFIG",
+                            value=backend_service_cfg.sentry_config),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_ENABLE_SENTRY",
                             value=backend_service_cfg.enable_sentry),

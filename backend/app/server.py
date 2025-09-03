@@ -54,8 +54,18 @@ def setup_sentry():
         sentry_dsn = os.getenv("BACKEND_SENTRY_DSN")
         target_environment_name = os.getenv("TARGET_ENVIRONMENT_NAME")
 
+        # Optional JSON configuration similar to frontend
+        raw_config = os.getenv("BACKEND_SENTRY_CONFIG", "")
+        cfg = None
+        if raw_config:
+            try:
+                cfg = json.loads(raw_config)
+                logging.info(f"Loaded BACKEND_SENTRY_CONFIG: {cfg}")
+            except json.JSONDecodeError as e:
+                logging.warning(f"Invalid BACKEND_SENTRY_CONFIG JSON. Using defaults. Error: {e}")
+
         if sentry_dsn:
-            init_sentry(sentry_dsn, target_environment_name)
+            init_sentry(sentry_dsn, target_environment_name, cfg)
         else:
             logging.warning("BACKEND_SENTRY_DSN environment variable is not set. Sentry will not be initialized")
     else:
