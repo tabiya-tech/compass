@@ -117,8 +117,10 @@ class SkillsExplorerAgent(Agent):
         """
 
         existing_responsibilities = experience.responsibilities
-        responsibilities = list(set(existing_responsibilities.responsibilities + new_responsibilities_data.responsibilities))
-        non_responsibilities = list(set(existing_responsibilities.non_responsibilities + new_responsibilities_data.non_responsibilities))
+        responsibilities = list(
+            set(existing_responsibilities.responsibilities + new_responsibilities_data.responsibilities))
+        non_responsibilities = list(
+            set(existing_responsibilities.non_responsibilities + new_responsibilities_data.non_responsibilities))
         other_peoples_responsibilities = list(
             set(existing_responsibilities.other_peoples_responsibilities + new_responsibilities_data.other_peoples_responsibilities))
         existing_responsibilities.responsibilities = responsibilities
@@ -198,11 +200,15 @@ class SkillsExplorerAgent(Agent):
             self.state.experiences_explored.append(structured_summary)
 
             # set the questions and answers
-            if len(self.state.question_asked_until_now) != len(self.state.answers_provided):
-                self.logger.error("The number of questions asked (%d) does not match the number of answers provided (%d).",
-                                    len(self.state.question_asked_until_now), len(self.state.answers_provided))
+            # We expect that the number of questions asked is equal to the number of answers provided + 1
+            # since the exploration starts with a question from the agent and ends with a question from the agent
+            if len(self.state.question_asked_until_now) != len(self.state.answers_provided) + 1:
+                self.logger.error(
+                    "The number of questions asked (%d) does not match the number of answers provided (%d).",
+                    len(self.state.question_asked_until_now), len(self.state.answers_provided))
                 # If they don't match, we will just zip them, but this may lead to loss of information
-            self.experience_entity.questions_and_answers = list(zip(self.state.question_asked_until_now, self.state.answers_provided))
+            self.experience_entity.questions_and_answers = list(
+                zip(self.state.question_asked_until_now, self.state.answers_provided))
 
         conversation_llm_output.llm_stats = responsibilities_llm_stats + conversation_llm_output.llm_stats
         return conversation_llm_output
