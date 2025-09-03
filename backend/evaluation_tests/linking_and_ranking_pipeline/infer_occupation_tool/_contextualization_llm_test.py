@@ -68,6 +68,26 @@ test_cases = [
         given_responsibilities=["I collect fares", "I assist passengers", "I maintain the vehicle", "I ensure safety"],
         given_country_of_interest=Country.KENYA,
         given_number_of_titles=5
+    ),
+    ContextualizationTestCase(
+        name="Empty title",
+        skip_force="force",
+        given_experience_title="",
+        given_company=None,
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_responsibilities=["I stock shelves", "I serve customers", "I handle cash transactions", "I manage inventory"],
+        given_country_of_interest=Country.KENYA,
+        given_number_of_titles=10
+    ),
+    ContextualizationTestCase(
+        name="Empty title with spaces",
+        skip_force="force",
+        given_experience_title="    ",
+        given_company=None,
+        given_work_type=WorkType.SELF_EMPLOYMENT,
+        given_responsibilities=["I stock shelves", "I serve customers", "I handle cash transactions", "I manage inventory"],
+        given_country_of_interest=Country.KENYA,
+        given_number_of_titles=10
     )
 ]
 
