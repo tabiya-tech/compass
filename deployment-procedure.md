@@ -436,6 +436,22 @@ VERTEX_API_REGION=<region>
 BACKEND_ENABLE_SENTRY=<True/False>
 FRONTEND_ENABLE_SENTRY=<True/False>
 
+# Configure sentry for the environment
+
+# Sentry DSNs (from Step 1.9)
+FRONTEND_SENTRY_DSN=<frontend-sentry-dsn>
+BACKEND_SENTRY_DSN=<backend-sentry-dsn>
+
+# Optional: Frontend Sentry JSON config
+# Fields: tracesSampleRate, replaysSessionSampleRate, replaysOnErrorSampleRate, replayIntegration, enableLogs, levels
+FRONTEND_SENTRY_CONFIG='{"tracesSampleRate": 0.2, "replaysSessionSampleRate": 0, "replaysOnErrorSampleRate": 1.0, "replayIntegration": false, "enableLogs": false, "levels": ["error"]}'
+
+# Optional: Backend Sentry JSON config
+# Fields: tracesSampleRate, enableLogs, levels
+# - enableLogs=false forces event level to ERROR even if levels are broader
+# - levels accepted: debug, info, warning, error (maps to event threshold)
+BACKEND_SENTRY_CONFIG='{"tracesSampleRate": 0.2, "enableLogs": false, "levels": ["error"]}'
+
 # Enable or Disable Metrics for this environment.
 BACKEND_ENABLE_METRICS=<True/False>
 FRONTEND_ENABLE_METRICS=<True/False>
