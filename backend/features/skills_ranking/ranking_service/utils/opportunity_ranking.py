@@ -1,3 +1,6 @@
+from features.skills_ranking.ranking_service.utils.hash_opportunities_skills import hash_opportunities_skills
+
+
 def _calculate_overlap_score(*,
                              opportunity_skills_uuids: set[str],
                              participant_skills_uuids: set[str]) -> float:
@@ -21,7 +24,7 @@ def _calculate_overlap_score(*,
 def get_opportunity_ranking(*,
                             opportunities_skills_uuids: list[set[str]],
                             participant_skills_uuids: set[str],
-                            opportunity_matching_threshold: float = 0) -> tuple[float, int, int]:
+                            opportunity_matching_threshold: float = 0) -> tuple[float, int, int, str]:
     """
     Computes the opportunity ranking for a participant based on their skills, and the skills of other jobseekers.
 
@@ -29,10 +32,12 @@ def get_opportunity_ranking(*,
     - percentage_above_threshold (float 0-1)
     - total_opportunities (int)
     - matching_opportunities (int)
+    - hash (str): hash of the opportunities the participant matched (above threshold)
     """
 
     total_opportunities = 0
-    matching_opportunities = 0
+
+    matching_opportunities = []
 
     for opportunity_skills in opportunities_skills_uuids:
         score = _calculate_overlap_score(
@@ -41,7 +46,10 @@ def get_opportunity_ranking(*,
 
         total_opportunities += 1
         if score >= opportunity_matching_threshold:
-            matching_opportunities += 1
+            matching_opportunities.append(opportunity_skills)
 
-    percentage_above_threshold = (matching_opportunities / total_opportunities) if total_opportunities else 0
-    return percentage_above_threshold, total_opportunities, matching_opportunities
+    total_matching_opportunities = len(matching_opportunities)
+    percentage_above_threshold = (total_matching_opportunities / total_opportunities) if total_opportunities else 0
+    matching_opportunities_hash = hash_opportunities_skills(matching_opportunities)
+
+    return percentage_above_threshold, total_opportunities, total_matching_opportunities, matching_opportunities_hash

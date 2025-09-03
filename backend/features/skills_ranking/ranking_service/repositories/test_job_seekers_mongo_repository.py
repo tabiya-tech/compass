@@ -1,20 +1,44 @@
+from datetime import datetime, timezone
 from unittest.mock import Mock
 
 import pytest
 
+from common_libs.time_utilities import get_now, truncate_microseconds
 from features.skills_ranking.ranking_service.repositories.job_seekers_mongo_repository import JobSeekersMongoRepository, \
     _from_db_document
-from features.skills_ranking.ranking_service.types import JobSeeker
+from features.skills_ranking.ranking_service.types import JobSeeker, DatasetInfo, OpportunitiesInfo
 
 
 def _get_test_job_seeker():
     return JobSeeker(
         user_id="12345",
-        skills_uuids={"skill-1", "skill-2"},
-        skill_groups_uuids={"skill-group-1", "skill-group-2"},
-        opportunity_rank=0.75,
-        compared_to_others_rank=0.8
+        external_user_id="ext-12345",
+        skills_origin_uuids={"skill-origin-1", "skill-origin-2"},
+        skill_groups_origin_uuids={"skill-group-origin-1", "skill-group-origin-2"},
+        opportunity_rank_prior_belief=0.1,
+        opportunity_rank=0.85,
+        compare_to_others_prior_belief=None,
+        compared_to_others_rank=0.9,
+        opportunity_rank_history={truncate_microseconds(get_now()): 0.2},
+        compared_to_others_rank_history={truncate_microseconds(get_now()): 0.1},
+        dataset_info=DatasetInfo(
+            taxonomy_model_id="model-123",
+            matching_threshold=0.04,
+            fetch_time=truncate_microseconds(get_now()),
+            entities_used="skillGroups",
+            input_opportunities=OpportunitiesInfo(
+                total_count=10,
+                hash="input-hash-123",
+                hash_algo="md5"
+            ),
+            matching_opportunities=OpportunitiesInfo(
+                total_count=5,
+                hash="matching-hash-456",
+                hash_algo="md5"
+            )
+        )
     )
+
 
 class TestGetJobSeekersRanks:
     @pytest.mark.asyncio
@@ -47,7 +71,7 @@ class TestGetJobSeekersRanks:
                                       doc.get("opportunityRank") is not None]
         assert job_seekers_ranks == expected_job_seekers_ranks \
  \
-        # AND an error should be logged because we have a document with no rank
+            # AND an error should be logged because we have a document with no rank
         assert "Found job seeker with missing or invalid rank" in caplog.text
 
     @pytest.mark.asyncio
@@ -89,6 +113,90 @@ class TestGetJobSeekersRanks:
         # AND an error should be logged indicating no jobseeker ranks were found
         assert "No job seeker ranks found in the database." in caplog.text
 
+    @pytest.mark.asyncio
+    async def test_should_handle_different_versions_of_job_seekers(self, in_memory_job_seekers_db):
+        # GIVEN a job seeker document with no dataset_info field (v0 schema)
+        v0_job_seeker_doc = {
+            "comparedToOthersRank": 0.5,
+            "createdAt": {"$date": "2025-08-21T11:11:23.247Z"},
+            "externalUserId": "1",
+            "opportunityDatasetVersion": "v-0",
+            "opportunityRank": 0.166,
+            "skillGroupsUUIDs": ["skill-uuid-1"],
+            "skillsUUIDs": ["skill-group-uuid-1"],
+            "updatedAt": {"$date": "2025-08-21T11:11:23.247Z"}
+        }
+
+        # AND a job seeker document with flat dataset_info field (v1 schema)
+        v1_job_seeker_doc = {
+            "comparedToOthersRank": 0.1,
+            "createdAt": {"$date": "2025-08-29T10:53:56.167Z"},
+            "externalUserId": "ext-user-v1-doc",
+            "opportunityDatasetVersion": "version-2",
+            "opportunityRank": 0.1,
+            "skillGroupsUUIDs": ["skill-group-uuid-2"],
+            "skillsUUIDs": ["skill-uuid-2"],
+            "updatedAt": {"$date": "2021-08-29T10:53:56.167Z"},
+            "compareToOthersPriorBelief": 0.1,
+            "compassUserId": "compass-user-id-1",
+            "opportunityRankPriorBelief": 0.1,
+            "taxonomyModelId": "taxonomy-model-v1",
+            "matchingThreshold": 0.05,
+            "numberOfTotalOpportunities": 5,
+            "opportunitiesLastFetchTime": {"$date": "2021-08-29T09:16:38.293Z"},
+            "totalMatchingOpportunities": 2
+        }
+
+        # AND a job seeker document with latest schema data info (v2 schema)
+        v2_job_seeker_doc = {
+            'compassUserId': '12345',
+            'externalUserId': 'ext-12345',
+            'skillsOriginUUIDs': ['skill-origin-1', 'skill-origin-2'],
+            'skillGroupsOriginUUIDs': ['skill-group-origin-1', 'skill-group-origin-2'],
+
+            'opportunityRankPriorBelief': 0.1,
+            'opportunityRank': 0.85,
+
+            'compareToOthersPriorBelief': 0.3,
+            'comparedToOthersRank': 0.9,
+            'datasetInfo': {
+                'taxonomyModelId': 'model-123',
+                'entitiesUsed': 'skills_groups',
+                'matchingThreshold': 0.04,
+                'inputOpportunities': {
+                    'totalCount': 10,
+                    'hash': 'input-hash-123'
+                },
+                'matchingOpportunities': {
+                    'totalCount': 5,
+                    'hash': 'matching-hash-456'
+                },
+                'fetchTime': datetime(2025, 9, 3, 16, 16, 27, 7000, tzinfo=timezone.utc)},
+            'opportunityRankHistory': {
+                '2025-09-03 16:16:27.007000+00:00': 0.2
+            },
+            'comparedToOthersRankHistory': {
+                '2025-09-03 16:16:27.007000+00:00': 0.1
+            },
+            'updatedAt': datetime(2025, 9, 3, 16, 16, 27, 7311, tzinfo=timezone.utc)
+        }
+
+        # AND all the job seekers documents are in the db
+        given_in_memory_job_seekers_db = in_memory_job_seekers_db
+        collection_name = "job_seekers_data"
+        await given_in_memory_job_seekers_db.get_collection(collection_name).insert_many([
+            v0_job_seeker_doc,
+            v1_job_seeker_doc,
+            v2_job_seeker_doc
+        ])
+
+        # WHEN we query the job seeker's rank from the database
+        job_seekers_data_repository = JobSeekersMongoRepository(given_in_memory_job_seekers_db, collection_name)
+        job_seekers_ranks = await job_seekers_data_repository.get_job_seekers_ranks(10)
+
+        # THEN it should return the actual ranks without errors
+        assert job_seekers_ranks == [0.166, 0.1, 0.85]
+
 
 class TestSaveJobSeekerRank:
     @pytest.mark.asyncio
@@ -103,18 +211,7 @@ class TestSaveJobSeekerRank:
         job_seekers_data_repository = JobSeekersMongoRepository(given_in_memory_job_seekers_db, collection_name)
 
         # AND a jobseeker with a rank to be saved
-        given_job_seeker =JobSeeker(
-            user_id="12345",
-            external_user_id="ext-12345",
-            opportunity_dataset_version="v1.0",
-            skills_uuids={"skill-1", "skill-2", "skill-3"},
-            skill_groups_uuids={"skill-group-1", "skill-group-2"},
-            taxonomy_model_id="taxonomy-1",
-            opportunity_rank_prior_belief=0.1,
-            opportunity_rank=0.85,
-            compare_to_others_prior_belief=None,
-            compared_to_others_rank=0.9
-        )
+        given_job_seeker = _get_test_job_seeker()
 
         # WHEN the repository.save_job_seeker_rank is called with the given params
         await job_seekers_data_repository.save_job_seeker_rank(given_job_seeker)
@@ -131,7 +228,6 @@ class TestSaveJobSeekerRank:
         # AND the saved jobseeker should have the timestamp fields, and they should match the given time
         assert "updatedAt" in saved_job_seeker
         assert "createdAt" in saved_job_seeker
-
 
     @pytest.mark.asyncio
     async def test_save_job_seeker_rank_success_only_required_fields(self, in_memory_job_seekers_db):
@@ -175,12 +271,13 @@ class TestSaveJobSeekerRank:
 
         # WHEN the repository.save_job_seeker_rank is called with the given params
         await job_seekers_data_repository.save_job_seeker_rank(given_job_seeker)
-        first_job_seeker_doc = await given_in_memory_job_seekers_db.get_collection(collection_name).find_one({"compassUserId": given_job_seeker.user_id})
+        first_job_seeker_doc = await given_in_memory_job_seekers_db.get_collection(collection_name).find_one(
+            {"compassUserId": given_job_seeker.user_id})
 
         # AND the same jobseeker is saved again
         await job_seekers_data_repository.save_job_seeker_rank(given_job_seeker)
-        second_job_seeker_doc = await given_in_memory_job_seekers_db.get_collection(collection_name).find_one({"compassUserId": given_job_seeker.user_id})
-
+        second_job_seeker_doc = await given_in_memory_job_seekers_db.get_collection(collection_name).find_one(
+            {"compassUserId": given_job_seeker.user_id})
 
         # THEN the jobseeker rank is saved successfully in the database without duplication
         saved_job_seekers = await given_in_memory_job_seekers_db.get_collection(collection_name).find(
@@ -204,6 +301,40 @@ class TestSaveJobSeekerRank:
         # AND the updatedAt for second saved jobseeker should be different from the first one
         assert first_job_seeker_doc["updatedAt"] != second_job_seeker_doc["updatedAt"]
 
+    @pytest.mark.asyncio
+    async def test_save_job_seeker_rank_success_document_already_exists_histories(self, in_memory_job_seekers_db,
+                                                                                  caplog):
+        # GIVEN an instance of JobSeekersMongo Database
+        given_in_memory_job_seekers_db = in_memory_job_seekers_db
+
+        # AND the collection name is 'job_seekers_data'
+        collection_name = "job_seekers_data"
+
+        # AND the jobseeker data repository is created
+        job_seekers_data_repository = JobSeekersMongoRepository(given_in_memory_job_seekers_db, collection_name)
+
+        # AND a jobseeker with a rank to be saved
+        given_job_seeker = _get_test_job_seeker()
+
+        # WHEN the repository.save_job_seeker_rank is called with the given params
+        await job_seekers_data_repository.save_job_seeker_rank(given_job_seeker)
+        first_job_seeker_doc = await given_in_memory_job_seekers_db.get_collection(collection_name).find_one(
+            {"compassUserId": given_job_seeker.user_id})
+
+        # AND the same jobseeker is saved again with histories updated.
+        given_job_seeker.opportunity_rank_history = {get_now(): 0.4}
+        given_job_seeker.compared_to_others_rank_history = {get_now(): 0.3}
+        await job_seekers_data_repository.save_job_seeker_rank(given_job_seeker)
+        second_job_seeker_doc = await given_in_memory_job_seekers_db.get_collection(collection_name).find_one(
+            {"compassUserId": given_job_seeker.user_id})
+
+        # AND saved jobseeker should not be None and should match the given jobseeker
+        assert _from_db_document(first_job_seeker_doc) != _from_db_document(second_job_seeker_doc)
+
+        # AND the histories should be merged
+        _formatted_doc = _from_db_document(second_job_seeker_doc)
+        assert len(_formatted_doc.opportunity_rank_history.items()) == 2
+        assert len(_formatted_doc.compared_to_others_rank_history.items()) == 2
 
     @pytest.mark.asyncio
     async def test_save_job_seeker_rank_db_throws_an_error(self, in_memory_job_seekers_db, mocker):

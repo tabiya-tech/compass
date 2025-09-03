@@ -1,14 +1,12 @@
 import asyncio
-import hashlib
 from datetime import datetime, timedelta
 
 import pytest
 
+from common_libs.time_utilities import get_now
 from features.skills_ranking.ranking_service.repositories.get_test_classes import get_test_opportunities_data_repository
 from features.skills_ranking.ranking_service.services.config import OpportunitiesDataServiceConfig
-from features.skills_ranking.ranking_service.services.opportunities_data_service import OpportunitiesDataService, \
-    _compute_version_from_skills
-
+from features.skills_ranking.ranking_service.services.opportunities_data_service import OpportunitiesDataService
 
 class TestOpportunitiesDataService:
 
@@ -150,7 +148,7 @@ class TestCachingMechanismForOpportunitiesDataService:
 
         # GIVEN the data in memory is stale
         #   BY: Simulate stale data by setting last fetch time to a pastime
-        opportunities_data_service._cache_manager._last_fetch_time = datetime.now() - timedelta(hours=1)
+        opportunities_data_service._cache_manager._last_fetch_time = get_now() - timedelta(hours=1)
 
         # AND repository.get_opportunities_skills_uuids will return a different version of the data
         given_second_db_version = [{"skill2"}]
@@ -181,51 +179,3 @@ class TestCachingMechanismForOpportunitiesDataService:
 
         # AND the _hot_cache should be updated with the new data
         assert opportunities_data_service._cache_manager._cached_value == given_second_db_version
-
-
-class TestComputingVersion:
-    @pytest.mark.parametrize(
-        "test_case",
-        [
-            dict(
-                id="empty_list",
-                given_skills=[],
-                expected_string="[]" # the one to be md 5 hashed
-            ),
-            dict(
-                id="single_empty_set",
-                given_skills=[set()],
-                expected_string='[[]]'  # the one to be md 5 hashed
-            ),
-            dict(
-                id="multiple_empty_sets",
-                given_skills=[set("1"), set()],
-                expected_string='[["1"], []]'  # the one to be md 5 hashed
-            ),
-            dict(
-                id="multiple_empty_sets with reversed order",
-                given_skills=[set(), set("1")],
-                expected_string='[["1"], []]'
-            ),
-            dict(
-                id="single_set with multiple items ordered",
-                given_skills=[{"1", "2"}],
-                expected_string='[["1", "2"]]'
-            ),
-            dict(
-                id="single set with multiple items unordered",
-                given_skills=[{"2", "1"}],
-                expected_string='[["1", "2"]]'
-            )
-        ],
-        ids=lambda case: case["id"]
-    )
-    def test_compute_version_from_skills(self, test_case):
-        # GIVEN a list of sets of skills
-        given_skills = test_case["given_skills"]
-
-        # WHEN _compute_version_from_skills is called
-        actual_version = _compute_version_from_skills(given_skills)
-
-        # THEN the version should be the MD5 hash of the expected string
-        assert  actual_version == hashlib.md5(test_case["expected_string"].encode("utf-8")).hexdigest()  # nosec B324 - test reasons

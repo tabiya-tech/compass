@@ -3,7 +3,7 @@ from abc import ABC
 
 from .config import RankingServiceConfig
 from .opportunities_data_service import IOpportunitiesDataService
-from features.skills_ranking.ranking_service.types import JobSeeker
+from features.skills_ranking.ranking_service.types import JobSeeker, DatasetInfo, OpportunitiesInfo
 from features.skills_ranking.types import SkillsRankingScore, PriorBeliefs
 from common_libs.time_utilities import get_now
 from features.skills_ranking.ranking_service.repositories.types import IJobSeekersRepository, ITaxonomyRepository
@@ -64,7 +64,7 @@ class RankingService(IRankingService):
         # 3. Get the participant skills opportunity ranking by using (`opportunities_skills_uuids`, `participant_skills_uuids`, `opportunity_matching_threshold`)
         #    Note: We are using participant skill groups uuids instead of skill ids
         participant_skill_groups_uuids = await self._taxonomy_repository.get_skill_groups_from_skills(participants_skills_uuids)
-        opportunities_rank, number_of_total_opportunities, total_matching_opportunities = \
+        opportunities_rank, number_of_total_opportunities, total_matching_opportunities, matching_opportunities_hash = \
             get_opportunity_ranking(
                 opportunities_skills_uuids=opportunities_skills_uuids,
                 participant_skills_uuids=participant_skill_groups_uuids,
@@ -79,21 +79,38 @@ class RankingService(IRankingService):
                                                             participant_rank=opportunities_rank)
 
         # 6. Save the participant's rank in the opportunity seekers ranks dataset
+        calculated_at = get_now()
         job_seeker = JobSeeker(
             user_id=user_id,
-            skills_uuids=participants_skills_uuids,
-            skill_groups_uuids=participant_skill_groups_uuids,
+            skills_origin_uuids=participants_skills_uuids,
+            skill_groups_origin_uuids=participant_skill_groups_uuids,
             external_user_id=prior_beliefs.external_user_id,
             opportunity_rank=opportunities_rank,
             compared_to_others_rank=other_job_seekers_ranks,
             compare_to_others_prior_belief=prior_beliefs.compare_to_others_prior_belief,
             opportunity_rank_prior_belief=prior_beliefs.opportunity_rank_prior_belief,
-            opportunity_dataset_version=self._opportunities_data_service.dataset_version,
-            taxonomy_model_id=self._taxonomy_model_id,
-            number_of_total_opportunities=number_of_total_opportunities,
-            total_matching_opportunities=total_matching_opportunities,
-            matching_threshold=opportunity_matching_threshold,
-            opportunities_last_fetch_time=self._opportunities_data_service.last_fetch_time
+
+            # keep the current rank in the histories.
+            opportunity_rank_history={calculated_at: opportunities_rank},
+            compared_to_others_rank_history={calculated_at: other_job_seekers_ranks},
+
+            # add the dataset info used to calculate the rank
+            dataset_info=DatasetInfo(
+                taxonomy_model_id=self._taxonomy_model_id,
+                matching_threshold=opportunity_matching_threshold,
+                entities_used="skillGroups",
+                fetch_time=self._opportunities_data_service.last_fetch_time,
+                input_opportunities=OpportunitiesInfo(
+                    total_count=number_of_total_opportunities,
+                    hash=self._opportunities_data_service.dataset_version,
+                    hash_algo="md5"
+                ),
+                matching_opportunities=OpportunitiesInfo(
+                    total_count=total_matching_opportunities,
+                    hash=matching_opportunities_hash,
+                    hash_algo="md5"
+                )
+            )
         )
 
         # 7. Add the participant's rank to the jobseeker ranks database after getting the current version.

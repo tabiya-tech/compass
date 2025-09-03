@@ -129,9 +129,9 @@ async def test_get_participant_ranking_saves_metadata_and_uses_dataset_version(m
     # THEN the job seeker is saved with expected metadata
     saved = fake_repository.saved_job_seeker
     assert saved is not None
-    assert saved.opportunity_dataset_version == fake_opportunities_service.dataset_version
-    assert saved.number_of_total_opportunities == 2
-    assert saved.total_matching_opportunities == 2  # threshold is inclusive (>= 0.5), both opportunities count
-    assert saved.matching_threshold == 0.5
-    assert saved.taxonomy_model_id == setup_application_config.taxonomy_model_id
-    assert saved.opportunities_last_fetch_time == fake_opportunities_service.last_fetch_time
+    assert saved.dataset_info.input_opportunities.hash == fake_opportunities_service.dataset_version
+    assert saved.dataset_info.input_opportunities.total_count == 2
+    assert saved.dataset_info.matching_opportunities.total_count == 2  # threshold is inclusive (>= 0.5), both opportunities count
+    assert saved.dataset_info.matching_threshold == 0.5
+    assert saved.dataset_info.taxonomy_model_id == setup_application_config.taxonomy_model_id
+    assert saved.dataset_info.fetch_time == fake_opportunities_service.last_fetch_time
