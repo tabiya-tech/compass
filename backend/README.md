@@ -166,6 +166,11 @@ The backend uses the following environment variables:
 - `BACKEND_ENABLE_METRICS`: Set to `True` to enable metrics tracking.
 - `BACKEND_ENABLE_SENTRY`: Set to `True` to enable Sentry error tracking. Set to `False`to disable locally or on CI/CD pipeline so that the unit tests can run successfully.
 - `BACKEND_SENTRY_DSN`: (optional) The Sentry Data Source Name used to track backend errors.
+- `BACKEND_SENTRY_CONFIG`: (optional) A JSON object controlling backend Sentry behavior. Supported fields:
+  - `tracesSampleRate` (number): Transaction tracing sample rate (default: 1.0)
+  - `enableLogs` (boolean): When true, LoggingIntegration is enabled
+  - `logLevel` (string): Capture Python logs at or above this level via LoggingIntegration (`debug|info|warning|error|critical`; default `info`)
+  - `eventLevel` (string): Send Python logs at or above this level to Sentry as events (`debug|info|warning|error|critical`; default `error`)
 - `TARGET_ENVIRONMENT`: (optional) The target environment where the backend is running. When set to `dev` or `local`, CORS will be set to allow all origins.
 - `BACKEND_FEATURES`: (optional) A JSON like dictionary with the features enabled status and configurations specific to each feature.
 - `BACKEND_EXPERIENCE_PIPELINE_CONFIG`: (optional) The configuration for the experience pipeline as a JSON like dictionary. See `class ExperiencePipelineConfig`.
@@ -199,6 +204,7 @@ TARGET_ENVIRONMENT_TYPE=<TARGET_ENVIRONMENT_TYPE>
 BACKEND_ENABLE_METRICS=False|True
 BACKEND_ENABLE_SENTRY=False|True
 BACKEND_SENTRY_DSN=<BACKEND_SENTRY_DSN>
+BACKEND_SENTRY_CONFIG='{"tracesSampleRate": 0.2, "enableLogs": true, "logLevel": "info", "eventLevel": "error"}'
 BACKEND_FEATURES=<BACKEND_FEATURES>
 BACKEND_EXPERIENCE_PIPELINE_CONFIG=<BACKEND_EXPERIENCE_PIPELINE_CONFIG>
 ```

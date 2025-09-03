@@ -61,6 +61,7 @@ def main():
         backend_url=backend_url,
         frontend_url=frontend_url,
         sentry_dsn=getenv("BACKEND_SENTRY_DSN", True, False),
+        sentry_config=getenv("BACKEND_SENTRY_CONFIG", True, False),
         enable_sentry=getenv("BACKEND_ENABLE_SENTRY"),
         enable_metrics=getenv("BACKEND_ENABLE_METRICS"),
         default_country_of_user=getenv("DEFAULT_COUNTRY_OF_USER"),
