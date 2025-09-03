@@ -1,6 +1,7 @@
 import pytest
 from pydantic import BaseModel
 
+from features.skills_ranking.ranking_service.utils.hash_opportunities_skills import hash_opportunities_skills
 from features.skills_ranking.ranking_service.utils.opportunity_ranking import get_opportunity_ranking
 
 
@@ -30,6 +31,11 @@ class TestCase(BaseModel):
     The expected number of jobs that meet or exceed the matching threshold.
     """
 
+    expected_matching_opportunities_hash: str
+    """
+    The expected hash of the matching opportunities' skills.
+    """
+
     doc: str
     """
     Documentation string explaining the test case.
@@ -40,6 +46,7 @@ test_cases: list[TestCase] = [
         given_jobs_skills=[{"skill1", "skill2"}, {"skill3", "skill4"}],
         given_participant_skills_uuids={"skill6", "skill7"},
         given_matching_threshold=0.5,
+        expected_matching_opportunities_hash=hash_opportunities_skills([]),
         expected_ranking=0,
         expected_matching=0,
         doc="Participant doesn't fit any job skills, so 0% ranking."
@@ -48,6 +55,7 @@ test_cases: list[TestCase] = [
         given_jobs_skills=[{"skill1", "skill2", "skill3"}, {"skill4", "skill5", "skill6"}],
         given_participant_skills_uuids={"skill1", "skill2", "skill5"},
         given_matching_threshold=0.5,
+        expected_matching_opportunities_hash=hash_opportunities_skills([{"skill1", "skill2", "skill3"}]),
         expected_ranking=0.5,
         expected_matching=1,
         doc="Participant fits more than 50% skills of 1 job out of 2 jobs, so 50% ranking."
@@ -55,6 +63,7 @@ test_cases: list[TestCase] = [
     TestCase(
         given_jobs_skills=[{"skill1", "skill2"}, {"skill3", "skill4"}],
         given_participant_skills_uuids={"skill1", "skill2", "skill3", "skill4"},
+        expected_matching_opportunities_hash=hash_opportunities_skills([{"skill1", "skill2"}, {"skill3", "skill4"}]),
         given_matching_threshold=0.5,
         expected_ranking=1.0,
         expected_matching=2,
@@ -78,7 +87,7 @@ def test_opportunity_ranking(case):
     given_matching_threshold = case.given_matching_threshold
 
     # WHEN we compute the opportunity ranking
-    result, total, matching = get_opportunity_ranking(
+    result, total, matching, matching_hash = get_opportunity_ranking(
         opportunities_skills_uuids=given_jobs_skills,
         participant_skills_uuids=given_participant_skills_uuids,
         opportunity_matching_threshold=given_matching_threshold
@@ -91,3 +100,6 @@ def test_opportunity_ranking(case):
     assert total == len(given_jobs_skills), f"Expected {len(given_jobs_skills)} total opportunities, got {total}"
     # AND the number of matching opportunities should be calculated correctly
     assert matching == case.expected_matching, f"Expected {case.expected_matching} matching opportunities, got {matching}"
+
+    # AND the matching hash should be as expected
+    assert matching_hash == case.expected_matching_opportunities_hash

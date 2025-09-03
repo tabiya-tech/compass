@@ -1,7 +1,78 @@
-from typing import Optional
+from typing import Optional, Literal
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+HashAlgorithms = Literal["md5"]  # We can add more algorithms in the future if needed.
+
+class OpportunitiesInfo(BaseModel):
+    total_count: int
+    """
+    Total number of opportunities.
+    """
+
+    hash: str
+    """
+    Hash of the actual opportunities skills/skill groups. 
+    (Only skills and skill groups are hashed since they are the ones used to rank users.)
+    
+    We use a hash instead of storing the entire dataset to reduce storage requirements.  
+    
+    Hashing function:  
+        features.skills_ranking.ranking_service.services.opportunities_data_service._compute_version_from_skills
+    """
+
+    hash_algo: HashAlgorithms
+    """
+    Algorithm used to compute the hash. Default is "md5".
+    """
+
+    class Config:
+        extra = "forbid"
+
+
+class DatasetInfo(BaseModel):
+    taxonomy_model_id: str
+    """
+    The taxonomy model identifier used when the user was ranked.
+    """
+
+    entities_used: Literal["skills", "skillGroups"]
+    """
+    The entities used to rank the user, either "skills" or "skillGroups".
+    """
+
+    matching_threshold: float
+    """
+    The matching threshold used to generate this ranking.
+    """
+
+    input_opportunities: OpportunitiesInfo
+    """
+    All the input opportunities used to generate the rank of the user. 
+    """
+
+    matching_opportunities: OpportunitiesInfo
+    """
+    The opportunities that matched the user above the matching threshold.
+    """
+
+    fetch_time: datetime
+    """
+    The time the dataset was fetched from the source (ie: database, api).
+    """
+
+    class Config:
+        extra = "forbid"
+
+
+RankingHistory = dict[datetime, float]
+"""
+The history entry of a ranking, consisting of a timestamp and the ranking value at that time.
+
+For now we are using a dict of date-time to float, but in the future we might want to use a more complex structure.
+Consisting of the dataset version that was used at the time.
+"""
 
 
 class JobSeeker(BaseModel):
@@ -15,19 +86,14 @@ class JobSeeker(BaseModel):
     The external identifier for the job seeker, if available.
     """
 
-    skills_uuids: set[str]
+    skills_origin_uuids: set[str]
     """
     The set of unique skill identifiers associated with the job seeker.
     """
 
-    skill_groups_uuids: set[str]
+    skill_groups_origin_uuids: set[str]
     """
     The set of unique skill group identifiers associated with the job seeker.
-    """
-
-    taxonomy_model_id: Optional[str] = None
-    """
-    The taxonomy model identifier used when the user was ranked.
     """
 
     opportunity_rank_prior_belief: Optional[float] = None
@@ -50,29 +116,21 @@ class JobSeeker(BaseModel):
     The rank of the job seeker compared to other job seekers.
     """
 
-    opportunity_dataset_version: Optional[str] = None
+    dataset_info: DatasetInfo
     """
-    The hash of the opportunity dataset used during ranking.
-    This is used to ensure that we can tell which calculations used the same dataset.
-    """
-
-    number_of_total_opportunities: Optional[int] = None
-    """
-    Total number of opportunities considered at ranking time.
+    The information about the dataset used to rank the job seeker.
+    eg: the opportunities, and taxonomy model and the matching threshold.
     """
 
-    total_matching_opportunities: Optional[int] = None
+    opportunity_rank_history: RankingHistory = Field(default_factory=dict)
     """
-    Number of opportunities matching above the threshold.
-    """
-
-    matching_threshold: Optional[float] = None
-    """
-    The matching threshold used for this calculation.
+    The history of the job seeker's rank in relation to available opportunities over time.
     """
 
-    opportunities_last_fetch_time: Optional[datetime] = None
+    compared_to_others_rank_history: RankingHistory = Field(default_factory=dict)
     """
-    The last time the opportunities dataset was fetched into cache.
-    Used for traceability of the dataset freshness at ranking time.
+    The history of the job seeker's rank compared to other job seekers over time.
     """
+
+    class Config:
+        extra = "forbid"

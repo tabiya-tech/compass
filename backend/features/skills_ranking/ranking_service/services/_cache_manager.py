@@ -3,6 +3,8 @@ import logging
 from datetime import datetime
 from typing import Optional, Callable, Coroutine, TypeVar, Generic
 
+from common_libs.time_utilities import get_now
+
 T = TypeVar('T')
 
 
@@ -71,7 +73,7 @@ class CacheManager(Generic[T]):
         if self._last_fetch_time is None:
             return False
 
-        since_last_fetch_time = datetime.now() - self._last_fetch_time
+        since_last_fetch_time = get_now() - self._last_fetch_time
 
         # check if the active period is less than or equal to the stale time
         is_data_fresh = since_last_fetch_time.total_seconds() <= self._stale_time
@@ -87,7 +89,7 @@ class CacheManager(Generic[T]):
 
             # Fetch new data
             self._cached_value = await self._fetch_latest_value()
-            self._last_fetch_time = datetime.now()
+            self._last_fetch_time = get_now()
 
             # Compute version if requested
             if self._compute_version is not None:
