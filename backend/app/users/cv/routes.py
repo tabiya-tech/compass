@@ -113,6 +113,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
                 "required": True,
                 "content": {
                     "application/pdf": {"schema": {"type": "string", "format": "binary"}},
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {"schema": {"type": "string", "format": "binary"}},
                     "text/plain": {"schema": {"type": "string", "format": "binary"}},
                 },
             }
@@ -143,7 +144,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
                 filename = "upload.pdf"
             elif content_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                 filename = "upload.docx"
-        if filename and not _has_allowed_extension(filename):
+        if not _has_allowed_extension(filename):
             raise HTTPException(status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE, detail="Only txt, pdf, docx filename extensions are allowed")
 
         total_read = 0
@@ -156,7 +157,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
                 total_read += len(chunk)
                 if total_read > MAX_CV_SIZE_BYTES:
                     logger.warning("413 via streaming-read: total_read_bytes=%s limit=%s", total_read, MAX_CV_SIZE_BYTES)
-                    raise HTTPException(status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE, detail="CV exceeds 10MB limit")
+                    raise HTTPException(status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE, detail=f"CV exceeds {MAX_CV_SIZE_BYTES/1024/1024}MB limit")
                 chunks.append(chunk)
         except HTTPException:
             raise
@@ -179,9 +180,8 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
                 user_id=user_id,
                 file_bytes=file_bytes,
                 filename=filename,
-                content_type=content_type,
             )
-            return ParsedCV(experiences_data=parsed.experiences_data)
+            return parsed
         except MarkdownTooLongError as e:
             # Map markdown length guard to 413 Payload Too Large
             length = getattr(e, "length", None)

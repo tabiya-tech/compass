@@ -456,7 +456,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           type="file"
           ref={fileInputRef}
           style={{ display: "none" }}
-          accept=".pdf,.doc,.docx,.odt,.rtf,.txt"
+          accept=".pdf,.docx,.txt"
           onChange={handleFileSelected}
           data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT}
         />

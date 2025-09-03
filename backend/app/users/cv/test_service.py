@@ -38,7 +38,6 @@ class TestCVUploadService:
             user_id="user-1",
             file_bytes=given_bytes,
             filename=given_filename,
-            content_type="application/pdf",
         )
 
         # THEN returns the extracted items
@@ -77,7 +76,6 @@ class TestCVUploadService:
                 user_id="user-1",
                 file_bytes=b"...",
                 filename="cv.pdf",
-                content_type="application/pdf",
             )
         assert err.value is error
         extractor_cls.assert_not_called()
@@ -102,7 +100,6 @@ class TestCVUploadService:
             user_id="u",
             file_bytes=b"x",
             filename="a.txt",
-            content_type="text/plain",
         )
 
         # THEN

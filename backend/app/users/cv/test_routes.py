@@ -23,7 +23,7 @@ TestClientWithMocks = tuple[TestClient, ICVUploadService, UserInfo]
 @pytest.fixture(scope='function')
 def client_with_mocks() -> TestClientWithMocks:
     class MockCVService(ICVUploadService):
-        async def parse_cv(self, *, user_id: str, file_bytes: bytes, filename: str, content_type: str | None) -> ParsedCV:
+        async def parse_cv(self, *, user_id: str, file_bytes: bytes, filename: str) -> ParsedCV:
             return ParsedCV(experiences_data=["parsed"])
 
     _instance_cv_service = MockCVService()

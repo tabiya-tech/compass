@@ -8,13 +8,23 @@ from markitdown import MarkItDown
 from app.users.cv.constants import MAX_MARKDOWN_CHARS
 from app.users.cv.errors import MarkdownTooLongError
 
+_converter: MarkItDown | None = None
+_converter_factory_ref: object | None = None
 
- 
+
+def _get_markitdown() -> MarkItDown:
+    global _converter, _converter_factory_ref
+    # We dont add locks and stuff because it would be overkill
+    if _converter is None or _converter_factory_ref is not MarkItDown:
+        _converter = MarkItDown()
+        _converter_factory_ref = MarkItDown
+    return _converter
+
 
 def convert_cv_bytes_to_markdown(
-    file_bytes: Union[bytes, BytesIO],
-    filename: str,
-    logger: logging.Logger,
+        file_bytes: Union[bytes, BytesIO],
+        filename: str,
+        logger: logging.Logger,
 ) -> str:
     """Convert CV bytes to Markdown using MarkItDown.
 
@@ -22,7 +32,7 @@ def convert_cv_bytes_to_markdown(
     help the converter infer the file type.
     """
     stream = file_bytes if isinstance(file_bytes, BytesIO) else BytesIO(file_bytes)
-    converter = MarkItDown()
+    converter = _get_markitdown()
     result = converter.convert_stream(stream, filename=filename)
 
     # MarkItDown returns an object; prefer markdown if present, otherwise text_content
@@ -37,5 +47,3 @@ def convert_cv_bytes_to_markdown(
         )
         raise MarkdownTooLongError(len(markdown_text), MAX_MARKDOWN_CHARS)
     return markdown_text
-
-# TODO: consider content size

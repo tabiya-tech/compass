@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-# 10 MB limit in bytes
-MAX_CV_SIZE_BYTES = 10 * 1024 * 1024
+# 3 MB limit in bytes
+MAX_CV_SIZE_BYTES = 3 * 1024 * 1024
 
 # Allow ~1MB multipart overhead to avoid false positives on header-based checks (legacy/multipart context)
 MAX_MULTIPART_OVERHEAD_BYTES = 1 * 1024 * 1024
