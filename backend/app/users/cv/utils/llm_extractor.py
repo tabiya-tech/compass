@@ -86,7 +86,7 @@ class CVExperienceExtractor:
             model_response = None
 
         if not model_response:
-            self._logger.warning("CVExperienceExtractor received no model response; returning empty experiences list")
+            self._logger.error("CVExperienceExtractor received no model response; returning empty experiences list")
             return []
 
         # Return the parsed list

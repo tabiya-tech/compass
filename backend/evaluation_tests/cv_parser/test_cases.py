@@ -1,3 +1,5 @@
+from textwrap import dedent
+
 from pydantic import BaseModel
 
 
@@ -231,29 +233,40 @@ off_topic_case = CVParserTestCase(
 # Realistic, noisy CV cases (multi-section, 2-3 pages feel)
 realistic_full_cv = CVParserTestCase(
     name="realistic_full_cv",
-    markdown_cv=(
-        "# John A. Doe\n\n"
-        "123 Main Street, New York, NY 10001 | +1 212 555 1234 | john.doe@example.com | https://linkedin.com/in/johndoe\n\n"
-        "## Summary\n\n"
-        "Seasoned engineer with 10+ years experience building cloud services and data platforms. Passionate about mentoring.\n\n"
-        "## Skills\n\n"
-        "- Languages: Python, TypeScript, Go\n"
-        "- Cloud: GCP, AWS\n\n"
-        "## Experience\n\n"
-        "- Senior Software Engineer, Acme Corp, New York (2019 - Present)\n"
-        "  - Led migration of monolith to microservices\n"
-        "  - Reduced cloud spend by 20%\n"
-        "- Project Manager, University of Oxford (2016 - 2018), Remote\n"
-        "  - Managed cross-functional team of 12\n"
-        "- Owner, Doe Consulting, Boston (2014 - 2016)\n\n"
-        "## Projects\n\n"
-        "- Open Source: Maintainer of data-utils\n\n"
-        "## Education\n\n"
-        "- BSc Computer Science, MIT (2010 - 2014)\n\n"
-        "## Certifications\n\n"
-        "- GCP Professional Cloud Architect (2020)\n\n"
-        "## References\n\n"
-        "Available upon request.\n"
+    markdown_cv=dedent(
+        """
+        # John A. Doe
+        123 Main Street, New York, NY 10001 | +1 212 555 1234 | john.doe@example.com | https://linkedin.com/in/johndoe
+        
+        ## Summary
+        Seasoned engineer with 10+ years experience building cloud services and data platforms. Passionate about mentoring.
+        
+        ## Skills
+        - Languages: Python, TypeScript, Go
+        - Cloud: GCP, AWS
+        
+        ## Experience
+        - Senior Software Engineer, Acme Corp, New York (2019 - Present)
+          - Led migration of monolith to microservices
+          - Reduced cloud spend by 20%
+          
+        - Project Manager, University of Oxford (2016 - 2018), Remote
+          - Managed cross-functional team of 12
+        
+        - Owner, Doe Consulting, Boston (2014 - 2016)
+        
+        ## Projects
+        - Open Source: Maintainer of data-utils
+        
+        ## Education
+        - BSc Computer Science, MIT (2010 - 2014)
+        
+        ## Certifications
+        - GCP Professional Cloud Architect (2020)
+        
+        ## References
+        Available upon request.
+        """
     ),
     expected_item_keywords=[
         ["senior software engineer", "acme", "new york", "2019"],
@@ -264,27 +277,35 @@ realistic_full_cv = CVParserTestCase(
 
 realistic_full_cv_with_noise = CVParserTestCase(
     name="realistic_full_cv_with_noise",
-    markdown_cv=(
-        "# Jane Q. Public\n\n"
-        "Address: 55 High Street, London SW1A 1AA, UK | Email: jane.public@mail.com | Phone: +44 20 7946 0958\n\n"
-        "## Personal Statement\n\n"
-        "Curious builder and lifelong learner. Outside work: hiking, pottery, and volunteering.\n\n"
-        "## Experience\n\n"
-        "- Data Engineer, Alpha Corp, Paris (2019 - 2023)\n"
-        "  - Built real-time pipelines on GCP (Pub/Sub, Dataflow)\n"
-        "- Barista, GoodBrew LLC, Lyon (2016 - 2019)\n"
-        "  - Trained 5 junior baristas\n\n"
-        "## Projects\n\n"
-        "- Personal: Portfolio website (https://jane.dev)\n\n"
-        "## Education\n\n"
-        "- MSc Data Science, Sorbonne (2017 - 2019)\n\n"
-        "## Skills\n\n"
-        "- Python, SQL, Airflow, Terraform\n\n"
-        "## Certifications\n\n"
-        "- AWS Certified Solutions Architect (Associate) (2021)\n\n"
-        "## References\n\n"
-        "- Available on request\n"
-    ),
+    markdown_cv=dedent(
+        """
+        # Jane Q. Public
+        Address: 55 High Street, London SW1A 1AA, UK | Email: jane.public@mail.com | Phone: +44 20 7946 0958
+        
+        ## Personal Statement
+        Curious builder and lifelong learner. Outside work: hiking, pottery, and volunteering.
+        
+        ## Experience
+        - Data Engineer, Alpha Corp, Paris (2019 - 2023)
+          - Built real-time pipelines on GCP (Pub/Sub, Dataflow)
+        - Barista, GoodBrew LLC, Lyon (2016 - 2019)
+          - Trained 5 junior baristas
+          
+        ## Projects
+        - Personal: Portfolio website (https://jane.dev)
+        
+        ## Education
+        - MSc Data Science, Sorbonne (2017 - 2019)
+        
+        ## Skills
+        - Python, SQL, Airflow, Terraform
+        
+        ## Certifications
+        - AWS Certified Solutions Architect (Associate) (2021)
+        
+        ## References
+        - Available on request
+        """),
     expected_item_keywords=[
         ["data engineer", "alpha", "paris", "2019", "2023"],
         ["barista", "goodbrew", "lyon", "2016", "2019"],
