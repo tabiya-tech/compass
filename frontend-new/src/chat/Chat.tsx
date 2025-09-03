@@ -34,9 +34,7 @@ import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableCompo
 import ChatProgressBar from "./chatProgressbar/ChatProgressBar";
 import { ConversationPhase, CurrentPhase, defaultCurrentPhase } from "./chatProgressbar/types";
 import { CompassChatMessageProps } from "./chatMessage/compassChatMessage/CompassChatMessage";
-import {
-  CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
-} from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 
@@ -68,15 +66,22 @@ interface ChatProps {
 const createShowConclusionMessage = (
   lastMessage: ConversationMessage,
   addMessageToChat: (message: IChatMessage<any>) => void,
-  setAiIsTyping: (isTyping: boolean) => void
+  setAiIsTyping: (isTyping: boolean) => void,
+  skipTyping: boolean = false
 ) => {
   return () => {
     const conclusionMessage = generateConversationConclusionMessage(lastMessage.message_id, lastMessage.message);
-    setAiIsTyping(true);
-    setTimeout(() => {
-      setAiIsTyping(false);
+
+    // Skip typing message when skills ranking is already completed
+    if (skipTyping) {
       addMessageToChat(conclusionMessage);
-    }, TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT);
+    } else {
+      setAiIsTyping(true);
+      setTimeout(() => {
+        setAiIsTyping(false);
+        addMessageToChat(conclusionMessage);
+      }, TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT);
+    }
   };
 };
 
@@ -207,7 +212,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   // Goes to the authentication service to log the user out
   // Navigates to the login page
   const handleLogout = useCallback(async () => {
-    console.debug("Logging out the user.....")
+    console.debug("Logging out the user.....");
     setIsLoggingOut(true);
     const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
     await authenticationService!.logout();
@@ -255,14 +260,22 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
           const lastMessage = response.messages[response.messages.length - 1];
 
           if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
+            // Check if skill ranking is already completed
+            const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(activeSessionId!);
+            const isAlreadyCompleted = skillsRankingState?.completed_at !== undefined;
+
             const showConclusionMessage = createShowConclusionMessage(
-                lastMessage,
-                addMessageToChat,
-                setAiIsTyping
+              lastMessage,
+              addMessageToChat,
+              setAiIsTyping,
+              isAlreadyCompleted
             );
             await showSkillsRanking(showConclusionMessage);
           } else {
-            const conclusionMessage = generateConversationConclusionMessage(lastMessage.message_id, lastMessage.message);
+            const conclusionMessage = generateConversationConclusionMessage(
+              lastMessage.message_id,
+              lastMessage.message
+            );
 
             addMessageToChat(conclusionMessage);
           }
@@ -282,7 +295,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         setAiIsTyping(false);
       }
     },
-    [addMessageToChat, exploredExperiences, fetchExperiences, showSkillsRanking, setAiIsTyping]
+    [addMessageToChat, exploredExperiences, fetchExperiences, activeSessionId, showSkillsRanking]
   );
 
   const initializeChat = useCallback(
@@ -335,14 +348,22 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
             const lastMessage = history.messages[history.messages.length - 1];
 
             if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
+              // Check if skill ranking is already completed
+              const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(sessionId);
+              const isAlreadyCompleted = skillsRankingState?.completed_at !== undefined;
+
               const showConclusionMessage = createShowConclusionMessage(
-                  lastMessage,
-                  addMessageToChat,
-                  setAiIsTyping
+                lastMessage,
+                addMessageToChat,
+                setAiIsTyping,
+                isAlreadyCompleted
               );
               await showSkillsRanking(showConclusionMessage);
             } else {
-              const conclusionMessage = generateConversationConclusionMessage(lastMessage.message_id, lastMessage.message);
+              const conclusionMessage = generateConversationConclusionMessage(
+                lastMessage.message_id,
+                lastMessage.message
+              );
               addMessageToChat(conclusionMessage);
             }
           }
@@ -493,7 +514,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   // As fetch experiences will also initialize state thus we face race hazard (concurrency issue)
   useEffect(() => {
     if (activeSessionId && currentPhase.phase !== ConversationPhase.INITIALIZING) {
-      fetchExperiences().then()
+      fetchExperiences().then();
     }
   }, [activeSessionId, fetchExperiences, currentPhase.phase]);
 
