@@ -148,7 +148,6 @@ backend_features_config = {}
 if _backend_features_config:
     try:
         backend_features_config = json.loads(_backend_features_config)
-        logger.info(f"Loaded backend features configuration: {backend_features_config}")
     except json.JSONDecodeError as e:
         logger.warning(f"Falling back to empty backend features configuration due to error: {e}")
 else:
