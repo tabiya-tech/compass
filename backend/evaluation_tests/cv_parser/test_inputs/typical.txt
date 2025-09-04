@@ -1,0 +1,60 @@
+Jane M. Smith
+45B Greenhill Rd, Apt #12
+London, UK - SW6 2XY
+Phone: +44 7700 900123
+Email: janesmith1990@gmail.com
+GitHub: github.com/janesmith90   LinkedIn: linkedin.com/in/jane-smith-uk
+
+============================================================
+Professional Summary
+============================================================
+Motivated software developer with ~7 years of experience.
+Worked on fintech apps, e-commerce platforms, and some random
+side projects (including a game engine attempt that never shipped).
+Passionate about solving problems... and sometimes creating them :)
+
+============================================================
+Skills
+============================================================
+- Programming: Python, Java, C++ (kinda rusty), JavaScript/TypeScript
+- Databases: MySQL, MongoDB, PostgreSQL
+- DevOps: Docker, Jenkins, AWS (S3, Lambda, EC2)
+- Other stuff: Linux wizardry, regex abuse, a little bit of Rust
+
+============================================================
+Experience
+============================================================
+Software Engineer (Mid-Level)
+FinServTech Ltd. (London, UK)          2019 – Present
+    * Built & maintained backend APIs (Python/Django + Flask mix)
+    * Wrote gnarly SQL queries that broke prod once (oops)
+    * Helped migrate legacy SOAP services to REST/GraphQL
+    * Automated deployment pipelines w/ Jenkins & Docker
+    * Mentored interns, sometimes over too much coffee
+
+Junior Developer
+BrightApps (remote, part-time)         2016 – 2019
+    - Developed React components for a travel booking site
+    - Integrated payment providers (Stripe, PayPal… almost Bitcoin)
+    - Fixed countless CSS bugs (cross-browser nightmares)
+    - Learned the art of naming variables like `data2_final_really`
+
+============================================================
+Education
+============================================================
+B.Sc. Computer Science
+University of Manchester
+2012 – 2015
+Final year project: “Distributed Systems for Real-Time Chat Apps”
+(aka trying to reinvent Slack in 3 months)
+
+============================================================
+Hobbies & Interests
+============================================================
+- Amateur guitar player (mostly 90s rock covers)
+- Running half-marathons, aiming for a full marathon “someday”
+- Collecting retro video games (NES, Sega Mega Drive, Game Boy)
+- Blogging about random tech rants on Medium
+- Learning Japanese (こんにちは!)
+
+References available on request.
