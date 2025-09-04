@@ -74,22 +74,30 @@ class CVExperienceExtractor:
         )
 
     async def extract_experiences(self, markdown_cv: str) -> list[str]:
+        self._logger.info("Extracting experiences from markdown {md_length_chars=%s}", len(markdown_cv or ""))
         try:
             prompt = self._prompt(markdown_cv.strip())
+            self._logger.debug("Prompt preview: %s", prompt[:200].replace("\n", " "))
             model_response, _ = await self._llm_caller.call_llm(
                 llm=self._llm,
                 llm_input=prompt,
                 logger=self._logger,
             )
         except Exception as e:  # Guard against unexpected errors; return empty list rather than raise
-            self._logger.exception("CVExperienceExtractor LLM call failed: %s", e)
+            self._logger.exception("LLM extraction failed: %s", e)
             model_response = None
 
         if not model_response:
-            self._logger.error("CVExperienceExtractor received no model response; returning empty experiences list")
+            self._logger.error("LLM returned no data; experiences list is empty")
             return []
 
         # Return the parsed list
-        return model_response.experiences or []
+        items = model_response.experiences or []
+        self._logger.info("Experiences extracted {items=%s}", len(items))
+        if items:
+            self._logger.debug("Extraction preview: %s", "; ".join(items[:3]))
+        else:
+            self._logger.error("LLM returned an empty 'experiences' array")
+        return items
 
 

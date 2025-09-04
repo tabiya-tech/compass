@@ -31,13 +31,16 @@ def convert_cv_bytes_to_markdown(
     The function accepts raw bytes or a BytesIO stream. The filename is used to
     help the converter infer the file type.
     """
+    logger.info("Converting file to markdown {filename='%s'}", filename)
     stream = file_bytes if isinstance(file_bytes, BytesIO) else BytesIO(file_bytes)
     converter = _get_markitdown()
+    logger.debug("Using converter: %s", type(converter).__name__)
     result = converter.convert_stream(stream, filename=filename)
 
     # MarkItDown returns an object; prefer markdown if present, otherwise text_content
     markdown_text = getattr(result, "markdown", None) or getattr(result, "text_content", "")
     markdown_text = markdown_text or ""
+    logger.info("Markdown conversion done {length_chars=%s}", len(markdown_text))
     if len(markdown_text) > MAX_MARKDOWN_CHARS:
         logger.warning(
             "markdown too long: converted_len=%s limit=%s filename='%s'",
@@ -46,4 +49,5 @@ def convert_cv_bytes_to_markdown(
             filename,
         )
         raise MarkdownTooLongError(len(markdown_text), MAX_MARKDOWN_CHARS)
+    logger.debug("Markdown conversion success {filename='%s', length_chars=%s}", filename, len(markdown_text))
     return markdown_text
