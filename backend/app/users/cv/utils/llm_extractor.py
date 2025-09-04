@@ -65,9 +65,19 @@ class CVExperienceExtractor:
 
             Rules for experiences:
             - Each item must be a single sentence describing a work/livelihood experience.
+            - Each experience must be captured. Even if two experiences look similar, as long as they are 
+              unique in role/title, location, company, or timeframe
             - Do not number items and do not add bullets or prefixes.
-            - Prefer sentences that include a role/title and usually an org/receiver and timeframe.
+            - An experience typically includes a role/title and usually a company/organization or receiver of work, a timeframe (e.g., from X to Y, since X, Present) and a location.
             - Do NOT include standalone responsibilities/tasks unless they belong to a separate role in the same sentence.
+            - Do NOT include personal data: no person names of the CV owner, no email addresses, no phone numbers,
+              no street addresses, no personal websites or profile links (LinkedIn, GitHub, etc.). Company/organization names
+              and city/country locations are allowed.
+            
+            Examples (format to emulate; style guidance, not strict):
+            Worked as a project manager at the University of Oxford, from 2018 to 2020. It was a paid job and you worked remotely.
+            Co-founded Acme Inc. in 2022, a gen-ai startup based in DC, USA. You owned this business and your role was CEO.
+            Volunteered as an instructor at Community Center in Berlin, from 2015 to 2017.
             - No prose outside the JSON. Respond with JSON only.
             </System Instructions>
             """
