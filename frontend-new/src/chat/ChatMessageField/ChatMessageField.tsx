@@ -9,6 +9,7 @@ import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
+import AnimatedDotBadge from "src/theme/AnimatedDotBadge/AnimatedDotBadge";
 
 export interface ChatMessageFieldProps {
   handleSend: (message: string) => void;
@@ -95,6 +96,14 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const [maxRows, setMaxRows] = useState(4);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(menuAnchorEl);
+  const [showPlusBadge, setShowPlusBadge] = useState(false);
+  const [badgeSeen, setBadgeSeen] = useState<boolean>(false);
+
+  // Show the dot badge whenever in COLLECT_EXPERIENCES and not yet seen
+  useEffect(() => {
+    const shouldShow = props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES && !badgeSeen && !isMenuOpen;
+    setShowPlusBadge(shouldShow);
+  }, [props.currentPhase, badgeSeen, isMenuOpen]);
 
   // Use effect to determine if the screen width is mobile and if the number of rows should be adjusted
   useEffect(() => {
@@ -225,6 +234,10 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     e.stopPropagation();
     if (inputIsDisabled()) return;
     setMenuAnchorEl(e.currentTarget);
+    setShowPlusBadge(false); // hide once user opens the menu
+    if (!badgeSeen) {
+      setBadgeSeen(true);
+    }
   };
 
   const handleMenuClose = () => setMenuAnchorEl(null);
@@ -426,10 +439,12 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                         title="more actions"
                         data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON}
                       >
-                        <AddIcon
-                          sx={{ color: theme.palette.primary.dark }}
-                          data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_ICON}
-                        />
+                        <AnimatedDotBadge show={showPlusBadge}>
+                          <AddIcon
+                            sx={{ color: theme.palette.primary.dark }}
+                            data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_ICON}
+                          />
+                        </AnimatedDotBadge>
                       </IconButton>
                     </motion.div>
                   )}
@@ -482,7 +497,8 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
               text: MENU_ITEM_TEXT.UPLOAD_CV,
               description: "Attach your CV to the conversation",
               icon: <UploadFileIcon />,
-              disabled: inputIsDisabled(),
+              disabled:
+                inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
               action: handleFileMenuItemClick,
             },
           ]}
