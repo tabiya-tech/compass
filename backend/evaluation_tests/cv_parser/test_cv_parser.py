@@ -1,7 +1,8 @@
 import pytest
 import os
 
-from evaluation_tests.matcher import ContainsString, match_expected
+from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
+from evaluation_tests.matcher import ContainsString, match_expected, Matcher
 
 from app.users.cv.utils.llm_extractor import CVExperienceExtractor
 from evaluation_tests.cv_parser.test_cases import test_cases, CVParserTestCase
@@ -28,11 +29,11 @@ class CVParserEvaluationRecord(EvaluationRecord):
 
 # No helper matching logic – keep it simple and consistent with other eval tests using matchers
 
-
+test_cases_to_run = get_test_cases_to_run(test_cases)
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-pro-preview-05-06/")
 @pytest.mark.repeat(3)
-@pytest.mark.parametrize("case", test_cases, ids=[c.name for c in test_cases])
+@pytest.mark.parametrize("case", test_cases_to_run, ids=[c.name for c in test_cases_to_run])
 async def test_cv_parser(case: CVParserTestCase, common_folder_path: str):
     extractor = CVExperienceExtractor()
     items = await extractor.extract_experiences(case.markdown_cv)
@@ -51,24 +52,28 @@ async def test_cv_parser(case: CVParserTestCase, common_folder_path: str):
 
     failures = []
 
-    # Behavioral checks: each expected item is a list of required substrings that must all appear in a single extracted line
-    for expected_keywords in case.expected_item_keywords:
+    # Behavioral checks: each expected matcher can be a list (ALL must match within a single line) or a single matcher
+    for expected in case.expected_experiences:
         found = False
+        # Normalize to list-of-matchers
+        expected_list = expected if isinstance(expected, list) else [expected]
         for actual in items:
-            # All keywords must be present in the same line (case-insensitive)
-            if all(match_expected(actual, ContainsString(k, case_sensitive=False))[0] for k in expected_keywords):
+            if all(match_expected(actual, matcher)[0] for matcher in expected_list):
                 found = True
                 break
         if not found:
             failures.append(
-                "Did not find an extracted line containing all required keywords:\n"
-                f"required={expected_keywords}\n"
+                "Did not find an extracted line matching expected constraints:\n"
+                f"expected={expected_list}\n"
                 f"extracted={items}"
             )
 
     # If no items are expected, ensure none are returned
-    if not case.expected_item_keywords and len(items) != 0:
+    expected_count = len(case.expected_experiences)
+    if expected_count == 0 and len(items) != 0:
         failures.append(f"Expected no items, but got {len(items)}: {items}")
+    elif expected_count != len(items):
+        failures.append(f"Expected {expected_count} items, but got {len(items)}: {items}")
 
     # LLM evaluation (simple enablement, no extra complexity)
     evaluator = CVParserEvaluator()
