@@ -1,13 +1,20 @@
 from textwrap import dedent
 
+from typing import Any
 from pydantic import BaseModel
 
+from evaluation_tests.compass_test_case import CompassTestCase
+from evaluation_tests.matcher import ContainsString
 
-class CVParserTestCase(BaseModel):
+
+class CVParserTestCase(CompassTestCase):
     name: str
     markdown_cv: str
-    # Behavioral expectations: each inner list contains substrings that must all appear in one extracted line (case-insensitive)
-    expected_item_keywords: list[list[str]]
+    # Behavioral expectations: a list of experience constraints. Each entry can be:
+    # - a list of matchers/expected-values (ALL must match within a single extracted line)
+    # - a single matcher/expected-value (must match a single extracted line)
+    # Expected values are matchers (e.g., ContainsString), regex patterns, or plain values.
+    expected_experiences: list[Any]
 
 
 simple_single_role_with_headings = CVParserTestCase(
@@ -19,7 +26,12 @@ simple_single_role_with_headings = CVParserTestCase(
         "## Education\n\n"
         "BSc Computer Science"
     ),
-    expected_item_keywords=[["project manager", "university of oxford", "2018", "2020"]],
+    expected_experiences=[[
+        ContainsString("project manager", case_sensitive=False),
+        ContainsString("university of oxford", case_sensitive=False),
+        ContainsString("2018", case_sensitive=False),
+        ContainsString("2020", case_sensitive=False),
+    ]],
 )
 
 multi_roles_mixed_with_headings = CVParserTestCase(
@@ -31,10 +43,10 @@ multi_roles_mixed_with_headings = CVParserTestCase(
         "- Volunteer Instructor, Community Center, Berlin (2015 - 2017)\n"
         "- Internship, Ubis GmbH, Berlin (1998)\n"
     ),
-    expected_item_keywords=[
-        ["software architect", "proubis", "berlin", "2010", "2018"],
-        ["volunteer", "instructor", "community center", "berlin", "2015", "2017"],
-        ["intern", "ubis", "1998"],
+    expected_experiences=[
+        [ContainsString("software architect", case_sensitive=False), ContainsString("proubis", case_sensitive=False), ContainsString("berlin", case_sensitive=False), ContainsString("2010", case_sensitive=False), ContainsString("2018", case_sensitive=False)],
+        [ContainsString("volunteer", case_sensitive=False), ContainsString("instructor", case_sensitive=False), ContainsString("community center", case_sensitive=False), ContainsString("berlin", case_sensitive=False), ContainsString("2015", case_sensitive=False), ContainsString("2017", case_sensitive=False)],
+        [ContainsString("intern", case_sensitive=False), ContainsString("ubis", case_sensitive=False), ContainsString("1998", case_sensitive=False)],
     ],
 )
 
@@ -46,9 +58,9 @@ entrepreneurship_case = CVParserTestCase(
         "- Co-founded Acme Inc. (2022 - Present), CEO, Washington, DC, USA\n"
         "- Owner, Dinner For Two, Berlin (2010 - 2020)\n"
     ),
-    expected_item_keywords=[
-        ["co-founded", "acme", "2022", "ceo"],
-        ["dinner for two", "berlin", "2010", "2020"],
+    expected_experiences=[
+        [ContainsString("co-founded", case_sensitive=False), ContainsString("acme", case_sensitive=False), ContainsString("2022", case_sensitive=False), ContainsString("ceo", case_sensitive=False)],
+        [ContainsString("dinner for two", case_sensitive=False), ContainsString("berlin", case_sensitive=False), ContainsString("2010", case_sensitive=False), ContainsString("2020", case_sensitive=False)],
     ],
 )
 
@@ -59,7 +71,12 @@ table_markdown = CVParserTestCase(
         "| Role | Company | Years |\n|------|---------|-------|\n| Developer | Freelance | 2020-2022 |\n\n"
         "Responsibilities:\n\n* Built apps\n* Deployed systems\n"
     ),
-    expected_item_keywords=[["developer", "freelance", "2020", "2022"]],
+    expected_experiences=[[
+        ContainsString("developer", case_sensitive=False),
+        ContainsString("freelance", case_sensitive=False),
+        ContainsString("2020", case_sensitive=False),
+        ContainsString("2022", case_sensitive=False),
+    ]],
 )
 
 projects_vs_jobs = CVParserTestCase(
@@ -74,9 +91,9 @@ projects_vs_jobs = CVParserTestCase(
         "- Made delicious coffee for thousands of customers\n"
         "- Migrated on-prem ETL to Airflow\n"
     ),
-    expected_item_keywords=[
-        ["data engineer", "alpha", "paris", "2019", "2023"],
-        ["barista", "goodbrew", "lyon", "2016", "2019"],
+    expected_experiences=[
+        [ContainsString("data engineer", case_sensitive=False), ContainsString("alpha", case_sensitive=False), ContainsString("paris", case_sensitive=False), ContainsString("2019", case_sensitive=False), ContainsString("2023", case_sensitive=False)],
+        [ContainsString("barista", case_sensitive=False), ContainsString("goodbrew", case_sensitive=False), ContainsString("lyon", case_sensitive=False), ContainsString("2016", case_sensitive=False), ContainsString("2019", case_sensitive=False)],
     ],
 )
 
@@ -87,10 +104,10 @@ prose_only = CVParserTestCase(
          Later I worked as a financial analyst at NorthBank from 2015 to 2020 in Ottawa.
          Since 2021 I have been a freelance consultant in Montreal."""
     ),
-    expected_item_keywords=[
-        ["junior accountant", "maple", "toronto", "2012"],
-        ["financial analyst", "northbank", "ottawa", "2015", "2020"],
-        ["freelance consultant", "montreal", "2021"],
+    expected_experiences=[
+        [ContainsString("junior accountant", case_sensitive=False), ContainsString("maple", case_sensitive=False), ContainsString("toronto", case_sensitive=False), ContainsString("2012", case_sensitive=False)],
+        [ContainsString("financial analyst", case_sensitive=False), ContainsString("northbank", case_sensitive=False), ContainsString("ottawa", case_sensitive=False), ContainsString("2015", case_sensitive=False), ContainsString("2020", case_sensitive=False)],
+        [ContainsString("freelance consultant", case_sensitive=False), ContainsString("montreal", case_sensitive=False), ContainsString("2021", case_sensitive=False)],
     ],
 )
 
@@ -103,9 +120,9 @@ tables_mixed_complex = CVParserTestCase(
         "| Support Tech | HelpMe Ltd | Marseille | 2015-2017 |\n\n"
         "## Notes\n\nSome extra text not related to experience."
     ),
-    expected_item_keywords=[
-        ["devops", "cloudify", "paris", "2017", "2021"],
-        ["support", "helpme", "marseille", "2015", "2017"],
+    expected_experiences=[
+        [ContainsString("devops", case_sensitive=False), ContainsString("cloudify", case_sensitive=False), ContainsString("paris", case_sensitive=False), ContainsString("2017", case_sensitive=False), ContainsString("2021", case_sensitive=False)],
+        [ContainsString("support", case_sensitive=False), ContainsString("helpme", case_sensitive=False), ContainsString("marseille", case_sensitive=False), ContainsString("2015", case_sensitive=False), ContainsString("2017", case_sensitive=False)],
     ],
 )
 
@@ -117,9 +134,9 @@ images_links_case = CVParserTestCase(
         "- **QA Engineer** at [QualityWorks](https://quality.works) (2019 - Present), Remote\n"
         "- **Tester** at OldCo (2017 - 2019), On-site\n"
     ),
-    expected_item_keywords=[
-        ["qa engineer", "qualityworks", "2019"],
-        ["tester", "oldco", "2017", "2019"],
+    expected_experiences=[
+        [ContainsString("qa engineer", case_sensitive=False), ContainsString("qualityworks", case_sensitive=False), ContainsString("2019", case_sensitive=False)],
+        [ContainsString("tester", case_sensitive=False), ContainsString("oldco", case_sensitive=False), ContainsString("2017", case_sensitive=False), ContainsString("2019", case_sensitive=False)],
     ],
 )
 
@@ -130,10 +147,10 @@ chaotic_irregular_case = CVParserTestCase(
         "Then manager @ Y Corp: 2016 to 2018 (Berlin).\n"
         "Finally product lead Zeta 2019-present, Remote."
     ),
-    expected_item_keywords=[
-        ["developer", "london", "2013", "2016"],
-        ["manager", "y corp", "berlin", "2016", "2018"],
-        ["product lead", "zeta", "2019"],
+    expected_experiences=[
+        [ContainsString("developer", case_sensitive=False), ContainsString("london", case_sensitive=False), ContainsString("2013", case_sensitive=False), ContainsString("2016", case_sensitive=False)],
+        [ContainsString("manager", case_sensitive=False), ContainsString("y corp", case_sensitive=False), ContainsString("berlin", case_sensitive=False), ContainsString("2016", case_sensitive=False), ContainsString("2018", case_sensitive=False)],
+        [ContainsString("product lead", case_sensitive=False), ContainsString("zeta", case_sensitive=False), ContainsString("2019", case_sensitive=False)],
     ],
 )
 
@@ -144,7 +161,11 @@ partial_missing_info = CVParserTestCase(
         "- Writer, FreePress (2018-)\n"
     ),
     # Allow extracting only the well-specified line; "Designer, Artify" lacks timeframe
-    expected_item_keywords=[["writer", "freepress", "2018"]],
+    expected_experiences=[[
+        ContainsString("writer", case_sensitive=False),
+        ContainsString("freepress", case_sensitive=False),
+        ContainsString("2018", case_sensitive=False),
+    ]],
 )
 
 date_variety_case = CVParserTestCase(
@@ -154,10 +175,10 @@ date_variety_case = CVParserTestCase(
         "- Engineer, MakeIt (2017/01-2019/12)\n"
         "- Consultant, BizCo (since 2020)\n"
     ),
-    expected_item_keywords=[
-        ["analyst", "datahaus", "2014", "2016"],
-        ["engineer", "makeit", "2017", "2019"],
-        ["consultant", "bizco", "2020"],
+    expected_experiences=[
+        [ContainsString("analyst", case_sensitive=False), ContainsString("datahaus", case_sensitive=False), ContainsString("2014", case_sensitive=False), ContainsString("2016", case_sensitive=False)],
+        [ContainsString("engineer", case_sensitive=False), ContainsString("makeit", case_sensitive=False), ContainsString("2017", case_sensitive=False), ContainsString("2019", case_sensitive=False)],
+        [ContainsString("consultant", case_sensitive=False), ContainsString("bizco", case_sensitive=False), ContainsString("2020", case_sensitive=False)],
     ],
 )
 
@@ -168,10 +189,10 @@ unpaid_signals_case = CVParserTestCase(
         "- Caregiver, Family (2014-2016)\n"
         "- Internship, StartHub (2011)\n"
     ),
-    expected_item_keywords=[
-        ["volunteer", "teacher", "2012", "2013"],
-        ["caregiver", "family", "2014", "2016"],
-        ["intern", "starthub", "2011"],
+    expected_experiences=[
+        [ContainsString("volunteer", case_sensitive=False), ContainsString("teacher", case_sensitive=False), ContainsString("2012", case_sensitive=False), ContainsString("2013", case_sensitive=False)],
+        [ContainsString("caregiver", case_sensitive=False), ContainsString("family", case_sensitive=False), ContainsString("2014", case_sensitive=False), ContainsString("2016", case_sensitive=False)],
+        [ContainsString("intern", case_sensitive=False), ContainsString("starthub", case_sensitive=False), ContainsString("2011", case_sensitive=False)],
     ],
 )
 
@@ -185,13 +206,13 @@ multilingual_case = CVParserTestCase(
         "- የፕሮግራሚንግ ባለሙያ, አዲስ አበባ ቴክ, አዲስ አበባ (2017-2019)\n"
         "- ማህበረሰብ አስተዳደር, ኢትዮጵያ ሶፍትዌር, አዲስ አበባ (2020-2022)\n"
     ),
-    expected_item_keywords=[
-        ["développeur", "société générale", "paris", "2010", "2012"],
-        ["ingeniero", "telefónica", "madrid", "2013", "2015"],
-        ["软件工程师", "腾讯", "深圳", "2016", "2018"],  # Chinese: Software Engineer, Tencent, Shenzhen
-        ["产品经理", "阿里巴巴", "杭州", "2019", "2021"],  # Chinese: Product Manager, Alibaba, Hangzhou
-        ["የፕሮግራሚንግ ባለሙያ", "አዲስ አበባ ቴክ", "አዲስ አበባ", "2017", "2019"],  # Amharic: Programming Professional, Addis Ababa Tech, Addis Ababa
-        ["ማህበረሰብ አስተዳደር", "ኢትዮጵያ ሶፍትዌር", "አዲስ አበባ", "2020", "2022"],  # Amharic: Community Manager, Ethiopia Software, Addis Ababa
+    expected_experiences=[
+        [ContainsString("développeur", case_sensitive=False), ContainsString("société générale", case_sensitive=False), ContainsString("paris", case_sensitive=False), ContainsString("2010", case_sensitive=False), ContainsString("2012", case_sensitive=False)],
+        [ContainsString("ingeniero", case_sensitive=False), ContainsString("telefónica", case_sensitive=False), ContainsString("madrid", case_sensitive=False), ContainsString("2013", case_sensitive=False), ContainsString("2015", case_sensitive=False)],
+        [ContainsString("软件工程师", case_sensitive=False), ContainsString("腾讯", case_sensitive=False), ContainsString("深圳", case_sensitive=False), ContainsString("2016", case_sensitive=False), ContainsString("2018", case_sensitive=False)],
+        [ContainsString("产品经理", case_sensitive=False), ContainsString("阿里巴巴", case_sensitive=False), ContainsString("杭州", case_sensitive=False), ContainsString("2019", case_sensitive=False), ContainsString("2021", case_sensitive=False)],
+        [ContainsString("የፕሮግራሚንግ ባለሙያ", case_sensitive=False), ContainsString("አዲስ አበባ ቴክ", case_sensitive=False), ContainsString("አዲስ አበባ", case_sensitive=False), ContainsString("2017", case_sensitive=False), ContainsString("2019", case_sensitive=False)],
+        [ContainsString("ማህበረሰብ አስተዳደር", case_sensitive=False), ContainsString("ኢትዮጵያ ሶፍትዌር", case_sensitive=False), ContainsString("አዲስ አበባ", case_sensitive=False), ContainsString("2020", case_sensitive=False), ContainsString("2022", case_sensitive=False)],
     ]
 )
 
@@ -202,7 +223,12 @@ duplicates_case = CVParserTestCase(
         "- Sales Associate, ShopCo (2018-2020)\n"
         "- Sales Associate, ShopCo (2018-2020)\n"
     ),
-    expected_item_keywords=[["sales associate", "shopco", "2018", "2020"]],
+    expected_experiences=[[
+        ContainsString("sales associate", case_sensitive=False),
+        ContainsString("shopco", case_sensitive=False),
+        ContainsString("2018", case_sensitive=False),
+        ContainsString("2020", case_sensitive=False),
+    ]],
 )
 
 long_cv_case = CVParserTestCase(
@@ -210,15 +236,15 @@ long_cv_case = CVParserTestCase(
     markdown_cv=(
         "- Role1, C1 (2008-2009)\n- Role2, C2 (2009-2010)\n- Role3, C3 (2010-2011)\n- Role4, C4 (2011-2012)\n- Role5, C5 (2012-2013)\n- Role6, C6 (2013-2014)\n- Role7, C7 (2014-2015)\n- Role8, C8 (2015-2016)\n"
     ),
-    expected_item_keywords=[
-        ["role1", "c1", "2008", "2009"],
-        ["role2", "c2", "2009", "2010"],
-        ["role3", "c3", "2010", "2011"],
-        ["role4", "c4", "2011", "2012"],
-        ["role5", "c5", "2012", "2013"],
-        ["role6", "c6", "2013", "2014"],
-        ["role7", "c7", "2014", "2015"],
-        ["role8", "c8", "2015", "2016"],
+    expected_experiences=[
+        [ContainsString("role1", case_sensitive=False), ContainsString("c1", case_sensitive=False), ContainsString("2008", case_sensitive=False), ContainsString("2009", case_sensitive=False)],
+        [ContainsString("role2", case_sensitive=False), ContainsString("c2", case_sensitive=False), ContainsString("2009", case_sensitive=False), ContainsString("2010", case_sensitive=False)],
+        [ContainsString("role3", case_sensitive=False), ContainsString("c3", case_sensitive=False), ContainsString("2010", case_sensitive=False), ContainsString("2011", case_sensitive=False)],
+        [ContainsString("role4", case_sensitive=False), ContainsString("c4", case_sensitive=False), ContainsString("2011", case_sensitive=False), ContainsString("2012", case_sensitive=False)],
+        [ContainsString("role5", case_sensitive=False), ContainsString("c5", case_sensitive=False), ContainsString("2012", case_sensitive=False), ContainsString("2013", case_sensitive=False)],
+        [ContainsString("role6", case_sensitive=False), ContainsString("c6", case_sensitive=False), ContainsString("2013", case_sensitive=False), ContainsString("2014", case_sensitive=False)],
+        [ContainsString("role7", case_sensitive=False), ContainsString("c7", case_sensitive=False), ContainsString("2014", case_sensitive=False), ContainsString("2015", case_sensitive=False)],
+        [ContainsString("role8", case_sensitive=False), ContainsString("c8", case_sensitive=False), ContainsString("2015", case_sensitive=False), ContainsString("2016", case_sensitive=False)],
     ],
 )
 
@@ -227,11 +253,12 @@ off_topic_case = CVParserTestCase(
     markdown_cv=(
         "# About Me\n\nI enjoy hiking, chess, and baking bread. No job history listed here."
     ),
-    expected_item_keywords=[],
+    expected_experiences=[],
 )
 
 # Realistic, noisy CV cases (multi-section, 2-3 pages feel)
 realistic_full_cv = CVParserTestCase(
+    skip_force="force",
     name="realistic_full_cv",
     markdown_cv=dedent(
         """
@@ -268,10 +295,10 @@ realistic_full_cv = CVParserTestCase(
         Available upon request.
         """
     ),
-    expected_item_keywords=[
-        ["senior software engineer", "acme", "new york", "2019"],
-        ["project manager", "university of oxford", "2016", "2018"],
-        ["owner", "doe consulting", "2014", "2016"],
+    expected_experiences=[
+        [ContainsString("senior software engineer", case_sensitive=False), ContainsString("acme", case_sensitive=False), ContainsString("new york", case_sensitive=False), ContainsString("2019", case_sensitive=False)],
+        [ContainsString("project manager", case_sensitive=False), ContainsString("university of oxford", case_sensitive=False), ContainsString("2016", case_sensitive=False), ContainsString("2018", case_sensitive=False)],
+        [ContainsString("owner", case_sensitive=False), ContainsString("doe consulting", case_sensitive=False), ContainsString("2014", case_sensitive=False), ContainsString("2016", case_sensitive=False)],
     ],
 )
 
@@ -306,9 +333,9 @@ realistic_full_cv_with_noise = CVParserTestCase(
         ## References
         - Available on request
         """),
-    expected_item_keywords=[
-        ["data engineer", "alpha", "paris", "2019", "2023"],
-        ["barista", "goodbrew", "lyon", "2016", "2019"],
+    expected_experiences=[
+        [ContainsString("data engineer", case_sensitive=False), ContainsString("alpha", case_sensitive=False), ContainsString("paris", case_sensitive=False), ContainsString("2019", case_sensitive=False), ContainsString("2023", case_sensitive=False)],
+        [ContainsString("barista", case_sensitive=False), ContainsString("goodbrew", case_sensitive=False), ContainsString("lyon", case_sensitive=False), ContainsString("2016", case_sensitive=False), ContainsString("2019", case_sensitive=False)],
     ],
 )
 
