@@ -9,7 +9,9 @@ from pydantic import BaseModel, Field
 from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template import sanitize_input
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
+from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG, get_config_variation
+from common_libs.retry import Retry
+from app.agent.penalty import get_penalty
 
 
 _TAGS_TO_FILTER = [
@@ -38,6 +40,10 @@ class CVExperienceExtractor:
                 }
             )
         )
+        # Penalty levels follow the shared penalty strategy
+        self._penalty_level_exception = 3
+        self._penalty_level_no_response = 2
+        self._penalty_level_empty = 1
 
     @staticmethod
     def _prompt(markdown_cv: str) -> str:
@@ -85,29 +91,50 @@ class CVExperienceExtractor:
 
     async def extract_experiences(self, markdown_cv: str) -> list[str]:
         self._logger.info("Extracting experiences from markdown {md_length_chars=%s}", len(markdown_cv or ""))
-        try:
-            prompt = self._prompt(markdown_cv.strip())
-            self._logger.debug("Prompt preview: %s", prompt[:200].replace("\n", " "))
-            model_response, _ = await self._llm_caller.call_llm(
-                llm=self._llm,
-                llm_input=prompt,
-                logger=self._logger,
+        prompt = self._prompt((markdown_cv or "").strip())
+        self._logger.debug("Prompt preview: %s", prompt[:200].replace("\n", " "))
+
+        async def _callback(attempt: int, max_retries: int) -> tuple[list[str], float, BaseException | None]:
+            # Vary temperature/top_p slightly across retries to escape bad local minima
+            temperature_cfg = get_config_variation(start_temperature=0.0, end_temperature=0.3,
+                                                   start_top_p=0.9, end_top_p=1.0,
+                                                   attempt=attempt, max_retries=max_retries)
+            llm = GeminiGenerativeLLM(
+                system_instructions=self._json_system_instructions(),
+                config=LLMConfig(
+                    generation_config=temperature_cfg | JSON_GENERATION_CONFIG | {
+                        "max_output_tokens": 2048
+                    }
+                )
             )
-        except Exception as e:  # Guard against unexpected errors; return empty list rather than raise
-            self._logger.exception("LLM extraction failed: %s", e)
-            model_response = None
+            try:
+                model_response, _ = await self._llm_caller.call_llm(
+                    llm=llm,
+                    llm_input=prompt,
+                    logger=self._logger,
+                )
+            except Exception as e:
+                # Hard error: assign higher penalty
+                return [], get_penalty(self._penalty_level_exception), e
 
-        if not model_response:
-            self._logger.error("LLM returned no data; experiences list is empty")
-            return []
+            if not model_response:
+                # No response: retryable with penalty
+                return [], get_penalty(self._penalty_level_no_response), ValueError("LLM returned no model response")
 
-        # Return the parsed list
-        items = model_response.experiences or []
-        self._logger.info("Experiences extracted {items=%s}", len(items))
+            items = model_response.experiences or []
+            if not items:
+                # Empty list: retryable with small penalty
+                return [], get_penalty(self._penalty_level_empty), ValueError("LLM returned empty experiences list")
+
+            # Success
+            return items, 0.0, None
+
+        items, _penalty, _error = await Retry[list[str]].call_with_penalty(callback=_callback, logger=self._logger)
         if items:
+            self._logger.info("Experiences extracted {items=%s}", len(items))
             self._logger.debug("Extraction preview: %s", "; ".join(items[:3]))
         else:
-            self._logger.error("LLM returned an empty 'experiences' array")
+            self._logger.error("LLM extraction failed to produce items after retries")
         return items
 
 
