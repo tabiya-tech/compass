@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 # 3 MB limit in bytes
 MAX_CV_SIZE_BYTES = 3 * 1024 * 1024
 
@@ -14,7 +12,10 @@ ALLOWED_MIME_TYPES = {
 }
 ALLOWED_EXTENSIONS = {".txt", ".pdf", ".docx"}
 
-# Markdown conversion character limit
+# Markdown conversion character limit (business rule; enforced in service)
 MAX_MARKDOWN_CHARS = 5000
+
+# Markdown conversion timeout in seconds
+MARKDOWN_CONVERSION_TIMEOUT_SECONDS = 60
 
 

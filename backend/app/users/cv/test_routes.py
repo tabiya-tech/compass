@@ -14,6 +14,7 @@ from app.users.cv.routes import (
     MAX_CV_SIZE_BYTES,
 )
 from app.users.cv.service import ICVUploadService, ParsedCV
+from app.users.cv.errors import MarkdownTooLongError, MarkdownConversionTimeoutError, EmptyMarkdownError
 from common_libs.test_utilities.mock_auth import MockAuth
 
 
@@ -97,7 +98,7 @@ class TestUploadCV:
         # WHEN uploading the CV for another user
         response = client.post(f"/{given_other_user_id}/cv", files={"file": ("cv" + given_ext, given_file_content, given_mime)}, headers=headers)
 
-        # THEN the request is forbidden and service is not called
+        # THEN the request is forbidden and the service is not called
         assert response.status_code == HTTPStatus.FORBIDDEN
         parse_spy.assert_not_called()
 
@@ -152,4 +153,43 @@ class TestUploadCV:
 
         # THEN the request results in an internal server error
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+
+    @pytest.mark.asyncio
+    async def test_service_markdown_too_long_maps_to_413(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service raises MarkdownTooLongError after conversion
+        mocker.patch.object(mocked_service, "parse_cv", side_effect=MarkdownTooLongError(6000, 5000))
+        given_mime = next(iter(ALLOWED_MIME_TYPES))
+        given_ext = next(iter(ALLOWED_EXTENSIONS))
+        headers = {"Content-Type": given_mime, "x-filename": f"cv{given_ext}"}
+        # WHEN uploading the CV
+        response = client.post(f"/{mocked_user.user_id}/cv", data=b"hello", headers=headers)
+        # THEN it maps to 413
+        assert response.status_code == HTTPStatus.REQUEST_ENTITY_TOO_LARGE
+
+    @pytest.mark.asyncio
+    async def test_service_timeout_maps_to_408(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service raises MarkdownConversionTimeoutError
+        mocker.patch.object(mocked_service, "parse_cv", side_effect=MarkdownConversionTimeoutError(60))
+        given_mime = next(iter(ALLOWED_MIME_TYPES))
+        given_ext = next(iter(ALLOWED_EXTENSIONS))
+        headers = {"Content-Type": given_mime, "x-filename": f"cv{given_ext}"}
+        # WHEN uploading the CV
+        response = client.post(f"/{mocked_user.user_id}/cv", data=b"hello", headers=headers)
+        # THEN it maps to 408
+        assert response.status_code == HTTPStatus.REQUEST_TIMEOUT
+
+    @pytest.mark.asyncio
+    async def test_service_empty_markdown_maps_to_422(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service raises EmptyMarkdownError
+        mocker.patch.object(mocked_service, "parse_cv", side_effect=EmptyMarkdownError("cv.pdf"))
+        given_mime = next(iter(ALLOWED_MIME_TYPES))
+        given_ext = next(iter(ALLOWED_EXTENSIONS))
+        headers = {"Content-Type": given_mime, "x-filename": f"cv{given_ext}"}
+        # WHEN uploading the CV
+        response = client.post(f"/{mocked_user.user_id}/cv", data=b"hello", headers=headers)
+        # THEN it maps to 422
+        assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
