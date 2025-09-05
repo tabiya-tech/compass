@@ -123,3 +123,11 @@ export const CVUploadGenericError: Story = {
     currentPhase: ConversationPhase.INTRO,
   },
 };
+
+export const PlusBadgeAppearsOnPhaseTransition: Story = {
+  render: (args) => <ChatMessageFieldWrapper {...args} />,
+  args: {
+    handleSend: action("Message sent"),
+    currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
+  },
+};
