@@ -1,8 +1,10 @@
 import logging
+import asyncio
 import pytest
 
+from app.users.cv.constants import MAX_MARKDOWN_CHARS
 from app.users.cv.service import CVUploadService
-from app.users.cv.errors import MarkdownTooLongError
+from app.users.cv.errors import MarkdownTooLongError, MarkdownConversionTimeoutError, EmptyMarkdownError
 
 
 class TestCVUploadService:
@@ -32,7 +34,7 @@ class TestCVUploadService:
         extractor_cls = mocker.Mock(return_value=extractor_instance)
         mocker.patch("app.users.cv.service.CVExperienceExtractor", extractor_cls)
 
-        # WHEN parsing
+        # WHEN parsing the CV in the service
         service = CVUploadService()
         result = await service.parse_cv(
             user_id="user-1",
@@ -40,7 +42,7 @@ class TestCVUploadService:
             filename=given_filename,
         )
 
-        # THEN returns the extracted items
+        # THEN the service returns the extracted items
         assert result.experiences_data == extracted_items
 
         # AND converter was called once with a logger
@@ -59,29 +61,25 @@ class TestCVUploadService:
         extractor_instance.extract_experiences.assert_awaited_once_with("# Markdown CV")
 
     @pytest.mark.asyncio
-    async def test_parse_cv_propagates_markdown_too_long_error(self, mocker):
-        # GIVEN a converter that raises MarkdownTooLongError
-        error = MarkdownTooLongError(6000, 5000)
-        convert_mock = mocker.Mock(side_effect=error)
+    async def test_parse_cv_raises_when_markdown_exceeds_limit(self, mocker):
+        # GIVEN the converter returns markdown longer than the configured limit
+        too_long_text = "A" * (MAX_MARKDOWN_CHARS + 1)
+        convert_mock = mocker.Mock(return_value=too_long_text)
         mocker.patch("app.users.cv.service.convert_cv_bytes_to_markdown", convert_mock)
 
         # AND an extractor patched (should not be called)
         extractor_cls = mocker.Mock()
         mocker.patch("app.users.cv.service.CVExperienceExtractor", extractor_cls)
 
-        # WHEN/THEN parsing raises the same error
+        # WHEN parsing the CV
         service = CVUploadService()
-        with pytest.raises(MarkdownTooLongError) as err:
-            await service.parse_cv(
-                user_id="user-1",
-                file_bytes=b"...",
-                filename="cv.pdf",
-            )
-        assert err.value is error
+        # THEN a MarkdownTooLongError is raised and the extractor is not called
+        with pytest.raises(MarkdownTooLongError):
+            await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf")
         extractor_cls.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_parse_cv_handles_empty_extractor_output(self, mocker):
+    async def test_parse_cv_returns_empty_when_extractor_returns_empty(self, mocker):
         # GIVEN converter returns markdown
         mocker.patch(
             "app.users.cv.service.convert_cv_bytes_to_markdown",
@@ -94,7 +92,7 @@ class TestCVUploadService:
         extractor_cls = mocker.Mock(return_value=extractor_instance)
         mocker.patch("app.users.cv.service.CVExperienceExtractor", extractor_cls)
 
-        # WHEN
+        # WHEN parsing the CV
         service = CVUploadService()
         result = await service.parse_cv(
             user_id="u",
@@ -102,6 +100,39 @@ class TestCVUploadService:
             filename="a.txt",
         )
 
-        # THEN
+        # THEN the service returns an empty list of experiences
         assert result.experiences_data == []
+
+    @pytest.mark.asyncio
+    async def test_parse_cv_raises_on_empty_markdown(self, mocker):
+        # GIVEN converter returns empty markdown
+        mocker.patch(
+            "app.users.cv.service.convert_cv_bytes_to_markdown",
+            mocker.Mock(return_value="   ")
+        )
+
+        # AND extractor should not be called
+        extractor_cls = mocker.Mock()
+        mocker.patch("app.users.cv.service.CVExperienceExtractor", extractor_cls)
+
+        # WHEN parsing the CV
+        service = CVUploadService()
+        # THEN EmptyMarkdownError is raised and the extractor is not called
+        with pytest.raises(EmptyMarkdownError):
+            await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf")
+        extractor_cls.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_parse_cv_times_out_and_maps_error(self, mocker):
+        # GIVEN the timeout wrapper raises asyncio.TimeoutError
+        mocker.patch(
+            "app.users.cv.service.call_with_timeout",
+            mocker.AsyncMock(side_effect=asyncio.TimeoutError())
+        )
+
+        # WHEN parsing the CV
+        service = CVUploadService()
+        # THEN the service raises MarkdownConversionTimeoutError
+        with pytest.raises(MarkdownConversionTimeoutError):
+            await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf")
 

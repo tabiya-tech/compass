@@ -12,7 +12,7 @@ from app.users.cv.constants import (
     ALLOWED_MIME_TYPES,
     ALLOWED_EXTENSIONS,
 )
-from app.users.cv.errors import MarkdownTooLongError, PayloadTooLargeErrorResponse
+from app.users.cv.errors import MarkdownTooLongError, PayloadTooLargeErrorResponse, MarkdownConversionTimeoutError, EmptyMarkdownError
 from app.users.auth import Authentication, UserInfo
 from app.users.cv.service import CVUploadService, ICVUploadService
 from app.users.cv.types import ParsedCV
@@ -208,6 +208,12 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
             limit = getattr(e, "limit", None)
             logger.warning("413 via markdown-length: converted_len=%s limit=%s filename='%s'", length, limit, filename)
             raise HTTPException(status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE, detail=str(e))
+        except MarkdownConversionTimeoutError as e:
+            logger.warning("Markdown conversion timeout {timeout_sec=%s, filename='%s'}", getattr(e, 'timeout_seconds', None), filename)
+            raise HTTPException(status_code=HTTPStatus.REQUEST_TIMEOUT, detail=str(e))
+        except EmptyMarkdownError as e:
+            logger.warning("Markdown conversion returned empty content {filename='%s'}", filename)
+            raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
         except HTTPException:
             raise
         except Exception as e:
