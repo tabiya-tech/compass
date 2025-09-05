@@ -4,6 +4,7 @@ import { ConversationMessageSender } from "src/chat/ChatService/ChatService.type
 import {
   FIXED_MESSAGES_TEXT,
   generateCompassMessage,
+  generateCVTypingMessage,
   generatePleaseRepeatMessage,
   generateSomethingWentWrongMessage,
   generateTypingMessage,
@@ -17,6 +18,8 @@ import { USER_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/userChatMessage/Use
 import { COMPASS_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { TYPING_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import { ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
+import { CV_TYPING_CHAT_MESSAGE_TYPE } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
+
 // Mock nanoid to return a fixed value for testing
 jest.mock("nanoid", () => ({
   nanoid: jest.fn().mockReturnValue("foo-nanoid"),
@@ -49,7 +52,7 @@ describe("Chat Utils", () => {
           message: givenMessage,
           sent_at: givenSentAt,
         },
-        component: expect.any(Function)
+        component: expect.any(Function),
       });
 
       // AND expect the component to be a function that returns a UserChatMessage
@@ -81,7 +84,7 @@ describe("Chat Utils", () => {
           message: givenMessage,
           sent_at: givenSentAt,
         },
-        component: expect.any(Function)
+        component: expect.any(Function),
       });
       // AND expect the component to be a function that returns a UserChatMessage
       expect(result.component).toEqual(expect.any(Function));
@@ -120,7 +123,7 @@ describe("Chat Utils", () => {
           sent_at: givenSentAt,
           reaction: givenReaction,
         },
-        component: expect.any(Function)
+        component: expect.any(Function),
       });
       // AND expect the component to be a function that returns a CompassChatMessage
       expect(result.component).toEqual(expect.any(Function));
@@ -150,7 +153,7 @@ describe("Chat Utils", () => {
           sent_at: givenSentAt,
           reaction: null,
         },
-        component: expect.any(Function)
+        component: expect.any(Function),
       });
       // AND expect the component to be a function that returns a CompassChatMessage
       expect(result.component).toEqual(expect.any(Function));
@@ -176,7 +179,7 @@ describe("Chat Utils", () => {
         payload: {
           waitBeforeThinking: undefined,
         },
-        component: expect.any(Function)
+        component: expect.any(Function),
       });
       // AND expect the component to be a function that returns a TypingChatMessage
       expect(result.component).toEqual(expect.any(Function));
@@ -204,7 +207,7 @@ describe("Chat Utils", () => {
         payload: {
           message: FIXED_MESSAGES_TEXT.SOMETHING_WENT_WRONG,
         },
-        component: expect.any(Function)
+        component: expect.any(Function),
       });
       // AND expect the component to be a function that returns a ChatBubble
       expect(result.component).toEqual(expect.any(Function));
@@ -232,7 +235,7 @@ describe("Chat Utils", () => {
         payload: {
           message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
         },
-        component: expect.any(Function)
+        component: expect.any(Function),
       });
       // AND expect the component to be a function that returns a ChatBubble
       expect(result.component).toEqual(expect.any(Function));
@@ -265,7 +268,7 @@ describe("Chat Utils", () => {
       expect(console.error).toHaveBeenCalledWith(
         new InvalidConversationPhasePercentage(newPhase.percentage, "greater than 100")
       );
-    })
+    });
 
     test("should log an error if newPhase.percentage is less than previousPhase.percentage and set it to previousPhase.percentage", () => {
       // GIVEN the newPhase with percentage less than previousPhase.percentage
@@ -280,14 +283,14 @@ describe("Chat Utils", () => {
         phase: ConversationPhase.UNKNOWN,
         percentage: newPhase.percentage,
         current: null,
-        total: null
+        total: null,
       });
 
       // AND console.error to have been called with the correct error message
       expect(console.error).toHaveBeenCalledWith(
         new InvalidConversationPhasePercentage(newPhase.percentage, "less than previous percentage 50")
       );
-    })
+    });
 
     test("should log an error if newPhase.percentage is less than 0 and set it to 0", () => {
       // GIVEN the newPhase with percentage less than 0
@@ -302,14 +305,14 @@ describe("Chat Utils", () => {
         phase: ConversationPhase.UNKNOWN,
         percentage: 0,
         current: null,
-        total: null
+        total: null,
       });
 
       // AND console.error to have been called with the correct error message
       expect(console.error).toHaveBeenCalledWith(
         new InvalidConversationPhasePercentage(newPhase.percentage, "less than 0")
       );
-    })
+    });
 
     test("should return the new phase if percentage is valid", () => {
       // GIVEN the newPhase with valid percentage
@@ -325,7 +328,7 @@ describe("Chat Utils", () => {
       // AND expect no errors or warnings to have been logged
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
-    })
+    });
 
     test("it should not fail if no previous phase is provided", () => {
       // GIVEN the newPhase with valid percentage
@@ -340,6 +343,35 @@ describe("Chat Utils", () => {
       // AND expect no errors or warnings to have been logged
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
-    })
+    });
+  });
+
+  describe("generateCVTypingMessage", () => {
+    test("should generate a CV typing message with the correct structure when isUploaded is false", () => {
+      // GIVEN a nanoid returns a specific value
+      (nanoid as jest.Mock).mockReturnValue("foo-nanoid");
+      const isUploaded = false;
+
+      // WHEN generating a CV typing message
+      const result = generateCVTypingMessage(isUploaded);
+
+      // THEN expect the message to have the correct structure
+      expect(result).toEqual({
+        message_id: "foo-nanoid",
+        sender: ConversationMessageSender.COMPASS,
+        type: CV_TYPING_CHAT_MESSAGE_TYPE,
+        payload: {
+          isUploaded: isUploaded,
+        },
+        component: expect.any(Function),
+      });
+      // AND expect the component to be a function that returns a CVTypingChatMessage
+      expect(result.component).toEqual(expect.any(Function));
+      // AND expect nanoid to have been called
+      expect(nanoid).toHaveBeenCalled();
+      // AND expect no errors or warnings to have been logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
   });
 });
