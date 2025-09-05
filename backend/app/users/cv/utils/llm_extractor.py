@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 from textwrap import dedent
 from typing import Optional

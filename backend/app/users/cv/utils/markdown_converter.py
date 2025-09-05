@@ -1,12 +1,8 @@
-from __future__ import annotations
-
 from io import BytesIO
 import logging
 from typing import Union
 
 from markitdown import MarkItDown
-from app.users.cv.constants import MAX_MARKDOWN_CHARS
-from app.users.cv.errors import MarkdownTooLongError
 
 _converter: MarkItDown | None = None
 _converter_factory_ref: object | None = None
@@ -41,13 +37,5 @@ def convert_cv_bytes_to_markdown(
     markdown_text = getattr(result, "markdown", None) or getattr(result, "text_content", "")
     markdown_text = markdown_text or ""
     logger.info("Markdown conversion done {length_chars=%s}", len(markdown_text))
-    if len(markdown_text) > MAX_MARKDOWN_CHARS:
-        logger.warning(
-            "markdown too long: converted_len=%s limit=%s filename='%s'",
-            len(markdown_text),
-            MAX_MARKDOWN_CHARS,
-            filename,
-        )
-        raise MarkdownTooLongError(len(markdown_text), MAX_MARKDOWN_CHARS)
     logger.debug("Markdown conversion success {filename='%s', length_chars=%s}", filename, len(markdown_text))
     return markdown_text
