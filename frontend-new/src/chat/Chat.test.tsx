@@ -6,7 +6,6 @@ import Chat, {
   DATA_TEST_ID,
   INACTIVITY_TIMEOUT,
   NOTIFICATION_MESSAGES_TEXT,
-  TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT,
 } from "src/chat/Chat";
 import ChatHeader, { DATA_TEST_ID as CHAT_HEADER_TEST_ID } from "src/chat/ChatHeader/ChatHeader";
 import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "src/chat/chatList/ChatList";
@@ -54,6 +53,7 @@ import { ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/E
 import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { getRandomSessionID } from "../features/skillsRanking/utils/getSkillsRankingState";
+import { SkillsRankingService } from "../features/skillsRanking/skillsRankingService/skillsRankingService";
 
 // Mock Components ----------
 // mock the snackbar
@@ -1317,6 +1317,10 @@ describe("Chat", () => {
     });
 
     test("should send a message successfully and receive a concluded conversation", async () => {
+      // Mock skills ranking state to indicate ranking NOT completed (so typing should be shown)
+      const mockSkillsRankingService = SkillsRankingService.getInstance();
+      jest.spyOn(mockSkillsRankingService, "getSkillsRankingState").mockResolvedValueOnce(null);
+
       // GIVEN a user is logged in
       const givenUser: TabiyaUser = getMockUser();
       AuthenticationStateService.getInstance().setUser(givenUser);
@@ -1523,7 +1527,7 @@ describe("Chat", () => {
           ],
           true
         );
-      }, { timeout: TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT * 2 }); // TODO: fix. this is a workaround
+      });
       // AND expect input field to have been disabled
       await waitFor(() => {
         expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
