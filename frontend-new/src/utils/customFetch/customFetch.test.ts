@@ -3,7 +3,8 @@ import "src/_test_utilities/consoleMock";
 
 import {
   customFetch,
-  ExtendedRequestInit, LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
+  ExtendedRequestInit,
+  LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
   MAX_ATTEMPTS,
   MIN_TOKEN_VALIDITY_SECONDS,
   RETRY_STATUS_CODES,
@@ -37,14 +38,24 @@ jest.mock("src/auth/services/Authentication.service.factory", () => ({
 
 jest.mock("notistack", () => ({
   __esModule: true,
-  enqueueSnackbar: jest.fn()
-}))
+  enqueueSnackbar: jest.fn(),
+}));
 
 const VALID_TOKEN_RESPONSE = {
   decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid token by default
   isValid: true,
   failureCause: null,
 };
+
+// Mock pako
+jest.mock("pako", () => {
+  const fn = jest.fn((data: any) => new Uint8Array([1, 2, 3, 4]));
+  return {
+    __esModule: true,
+    gzip: fn,
+    default: { gzip: fn },
+  };
+});
 
 describe("Api Service tests", () => {
   beforeEach(() => {
@@ -456,8 +467,7 @@ describe("Api Service tests", () => {
 
     // AND the server responds with the given status code
     const windowFetch = setupFetchSpy(500, {}, "");
-    windowFetch
-      .mockRejectedValue(new TypeError("failed to fetch"));
+    windowFetch.mockRejectedValue(new TypeError("failed to fetch"));
 
     jest.spyOn(UtilsModule, "sleep").mockImplementation(() => Promise.resolve());
 
@@ -469,7 +479,7 @@ describe("Api Service tests", () => {
       method: givenMethod,
       failureMessage: givenFailureMessage,
       authRequired: false,
-      retryOnFailedToFetch: true
+      retryOnFailedToFetch: true,
     });
 
     // THEN the function will reject
@@ -485,7 +495,7 @@ describe("Api Service tests", () => {
     expect(UtilsModule.sleep).toHaveBeenNthCalledWith(2, 2000); // First retry backoff
     expect(UtilsModule.sleep).toHaveBeenNthCalledWith(3, 4000); // Second retry backoff
     expect(UtilsModule.sleep).toHaveBeenNthCalledWith(4, 8000); // Third retry backoff
-  })
+  });
 
   test("should fail if fetch fails to go through", async () => {
     // GIVEN an API URL and a valid auth token in sessionStorage
@@ -878,7 +888,207 @@ describe("Api Service tests", () => {
       expect(mockFetch).not.toHaveBeenCalled();
 
       // AND the user should be redirected to the landing page.
-      expect(window.location.hash).toBe(`#${routerPaths.LANDING}`)
+      expect(window.location.hash).toBe(`#${routerPaths.LANDING}`);
+    });
+  });
+
+  describe("Request body compression", () => {
+    test("should compress JSON bodies that exceed the threshold", async () => {
+      // GIVEN an API URL and a large JSON body
+      const givenApiUrl = "givenAPIUrl";
+      const givenLargeBody = { data: "foo".repeat(2000) };
+      const stringifiedBody = JSON.stringify(givenLargeBody);
+
+      // AND the server responds with a StatusCodes.OK status code
+      const mockFetch = setupFetchSpy(StatusCodes.OK, "Success", "application/json;charset=UTF-8");
+
+      // WHEN customFetch is called with a large JSON body
+      await customFetch(givenApiUrl, {
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: "TestService",
+        serviceFunction: "testFunction",
+        method: "POST",
+        failureMessage: "Test failed",
+        body: stringifiedBody,
+        authRequired: false,
+      });
+
+      // THEN expect pako.gzip to have been called with the stringified body
+      expect(require("pako").gzip).toHaveBeenCalledWith(stringifiedBody);
+
+      // AND expect fetch to have been called with a Blob containing the compressed data
+      expect(mockFetch).toHaveBeenCalledWith(
+        givenApiUrl,
+        expect.objectContaining({
+          body: expect.any(Blob),
+          headers: expect.objectContaining({
+            map: expect.objectContaining({
+              "content-encoding": "gzip",
+              "content-type": "application/json",
+            }),
+          }),
+        })
+      );
+    });
+
+    test("should not compress JSON bodies below the threshold", async () => {
+      // GIVEN an API URL and a small JSON body
+      const givenApiUrl = "givenAPIUrl";
+      const givenSmallBody = { data: "foo" };
+
+      // AND the server responds with a StatusCodes.OK status code
+      const mockFetch = setupFetchSpy(StatusCodes.OK, "Success", "application/json;charset=UTF-8");
+
+      // WHEN customFetch is called with a small JSON body
+      await customFetch(givenApiUrl, {
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: "TestService",
+        serviceFunction: "testFunction",
+        method: "POST",
+        failureMessage: "Test failed",
+        body: JSON.stringify(givenSmallBody),
+        authRequired: false,
+      });
+
+      // THEN expect pako.gzip not to haveBeenCalled
+      expect(require("pako").gzip).not.toHaveBeenCalled();
+
+      // AND expect fetch to have been called with the stringified JSON
+      expect(mockFetch).toHaveBeenCalledWith(
+        givenApiUrl,
+        expect.objectContaining({
+          body: JSON.stringify(givenSmallBody),
+          headers: expect.objectContaining({
+            map: expect.objectContaining({
+              "content-type": "application/json",
+            }),
+          }),
+        })
+      );
+
+      // AND Content-Encoding should not be set
+      expect(mockFetch).toHaveBeenCalledWith(
+        givenApiUrl,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            map: expect.not.objectContaining({
+              "content-encoding": "gzip",
+            }),
+          }),
+        })
+      );
+    });
+
+    test("should handle compression errors gracefully", async () => {
+      // GIVEN an API URL and a large JSON body
+      const givenApiUrl = "givenAPIUrl";
+      const givenLargeBody = { data: "foo".repeat(2000) };
+      const stringifiedBody = JSON.stringify(givenLargeBody);
+
+      // AND pako.gzip throws an error
+      require("pako").gzip.mockImplementationOnce(() => {
+        throw new Error("Compression failed");
+      });
+
+      // AND the server responds with a StatusCodes.OK status code
+      const mockFetch = setupFetchSpy(StatusCodes.OK, "Success", "application/json;charset=UTF-8");
+
+      // AND spy on console.warn
+      const consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+      // WHEN customFetch is called with a large JSON body that fails to compress
+      await customFetch(givenApiUrl, {
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: "TestService",
+        serviceFunction: "testFunction",
+        method: "POST",
+        failureMessage: "Test failed",
+        body: stringifiedBody,
+        authRequired: false,
+      });
+
+      // THEN expect a warning to be logged
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "Failed to compress request for TestService.testFunction:",
+        expect.any(Error)
+      );
+
+      // AND expect fetch to be called with the uncompressed body as fallback
+      expect(mockFetch).toHaveBeenCalledWith(
+        givenApiUrl,
+        expect.objectContaining({
+          body: JSON.stringify(givenLargeBody),
+          headers: expect.objectContaining({
+            map: expect.not.objectContaining({
+              "content-encoding": "gzip",
+            }),
+          }),
+        })
+      );
+    });
+
+    test("should not compress when compressRequestBody is false", async () => {
+      // GIVEN an API URL and a large JSON body
+      const givenApiUrl = "givenAPIUrl";
+      const givenLargeBody = { data: "foo".repeat(2000) };
+      const stringifiedBody = JSON.stringify(givenLargeBody);
+
+      // AND the server responds with a StatusCodes.OK status code
+      const mockFetch = setupFetchSpy(StatusCodes.OK, "Success", "application/json;charset=UTF-8");
+
+      // WHEN customFetch is called with compression disabled
+      await customFetch(givenApiUrl, {
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: "TestService",
+        serviceFunction: "testFunction",
+        method: "POST",
+        failureMessage: "Test failed",
+        body: stringifiedBody,
+        authRequired: false,
+        compressRequestBody: false,
+      });
+
+      // THEN expect pako.gzip not to have been called
+      expect(require("pako").gzip).not.toHaveBeenCalled();
+
+      // AND expect fetch to have been called with the stringified body
+      expect(mockFetch).toHaveBeenCalledWith(
+        givenApiUrl,
+        expect.objectContaining({
+          body: stringifiedBody,
+        })
+      );
+    });
+
+    test("should not compress FormData bodies", async () => {
+      // GIVEN an API URL and a FormData body
+      const givenApiUrl = "givenAPIUrl";
+      const givenFormData = new FormData();
+      givenFormData.append("test", "value");
+
+      // AND the server responds with a StatusCodes.OK status code
+      const mockFetch = setupFetchSpy(StatusCodes.OK, "Success", "application/json;charset=UTF-8");
+
+      // WHEN customFetch is called with FormData body
+      await customFetch(givenApiUrl, {
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: "TestService",
+        serviceFunction: "testFunction",
+        method: "POST",
+        failureMessage: "Test failed",
+        body: givenFormData,
+        authRequired: false,
+      });
+
+      // THEN expect fetch to have been called with the original FormData
+      expect(mockFetch).toHaveBeenCalledWith(
+        givenApiUrl,
+        expect.objectContaining({
+          body: givenFormData,
+        })
+      );
+      // AND pako.gzip should not have been called
+      expect(require("pako").gzip).not.toHaveBeenCalled();
     });
   });
 });
