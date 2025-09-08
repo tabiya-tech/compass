@@ -93,7 +93,7 @@ export const CVUploadSuccess: Story = {
   args: {
     handleSend: action("Message sent"),
     onUploadCv: successUpload,
-    currentPhase: ConversationPhase.INTRO,
+    currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
   },
 };
 
@@ -102,7 +102,7 @@ export const CVUploadEmptyResponse: Story = {
   args: {
     handleSend: action("Message sent"),
     onUploadCv: emptyUpload,
-    currentPhase: ConversationPhase.INTRO,
+    currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
   },
 };
 
@@ -111,7 +111,7 @@ export const CVUploadPayloadTooLarge: Story = {
   args: {
     handleSend: action("Message sent"),
     onUploadCv: tooLargeErrorUpload,
-    currentPhase: ConversationPhase.INTRO,
+    currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
   },
 };
 
@@ -120,7 +120,7 @@ export const CVUploadGenericError: Story = {
   args: {
     handleSend: action("Message sent"),
     onUploadCv: genericErrorUpload,
-    currentPhase: ConversationPhase.INTRO,
+    currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
   },
 };
 
@@ -131,3 +131,11 @@ export const PlusBadgeAppearsOnPhaseTransition: Story = {
     currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
   },
 };
+
+export const CVUploadDisabledInOtherPhases: Story = {
+    render: (args) => <ChatMessageFieldWrapper {...args} />,
+    args: {
+        handleSend: action("Message sent"),
+        currentPhase: ConversationPhase.INTRO,
+    },
+}

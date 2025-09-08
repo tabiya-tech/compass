@@ -495,7 +495,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
             {
               id: MENU_ITEM_ID.UPLOAD_CV,
               text: MENU_ITEM_TEXT.UPLOAD_CV,
-              description: "Attach your CV to the conversation",
+              description: props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES ? "You can upload your CV as soon as we start exploring your experiences" : "Attach your CV to the conversation",
               icon: <UploadFileIcon />,
               disabled:
                 inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
