@@ -99,8 +99,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const isMenuOpen = Boolean(menuAnchorEl);
   const [showPlusBadge, setShowPlusBadge] = useState(false);
   const [badgeSeen, setBadgeSeen] = useState<boolean>(false);
-  const isCvUploadEnabled = getCvUploadEnabled() === "true";
-  console.log("isCvUploadEnabled", isCvUploadEnabled);
+  const isCvUploadEnabled = getCvUploadEnabled().toLowerCase() === "true";
 
   // Show the dot badge whenever in COLLECT_EXPERIENCES and not yet seen
   useEffect(() => {
