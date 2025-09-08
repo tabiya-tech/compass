@@ -57,6 +57,7 @@ To develop this application locally, follow these steps:
      - `FRONTEND_ENABLE_SENTRY`: (**Optional**) A boolean value to enable or disable Sentry error tracking
      - `FRONTEND_SENTRY_CONFIG`: (**Optional**) A json object containing the Sentry configuration. This is used to configure Sentry for the frontend application. See [SentryConfig](./src/sentryInit.ts) for more details.
      - `FRONTEND_ENABLE_METRICS`: (**Optional**) A boolean value to enable or disable metrics tracking
+     - `FRONTEND_ENABLE_CV_UPLOAD`: (**Optional**) A boolean value to enable or disable CV upload functionality. Defaults to `false` if not set.
      - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY`:(**Mandatory**) The RSA public key used to encrypt sensitive personal data. It is in the [PEM](https://www.rfc-editor.org/rfc/rfc7468) format.
      - `SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID`: (**Mandatory**) The ID of the RSA public key. This is used to identify the key used to encrypt the sensitive personal data as it may be rotated over time.
      - `FRONTEND_LOGIN_CODE`: (**Optional**) The login code for the frontend application. It is optional, if not provided user will be prompted to enter the login code.

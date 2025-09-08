@@ -19,6 +19,7 @@ import {
   getMetricsEnabled,
   getFeatures,
   getApplicationLoginCodeDisabled,
+  getCvUploadEnabled,
 } from "./envService";
 import { getRandomString } from "./_test_utilities/specialCharacters";
 
@@ -52,6 +53,7 @@ describe.each([
   ["FRONTEND_DISABLE_LOGIN_CODE", getApplicationLoginCodeDisabled],
   ["FRONTEND_REGISTRATION_CODE", getApplicationRegistrationCode],
   ["FRONTEND_ENABLE_METRICS", getMetricsEnabled],
+  ["FRONTEND_ENABLE_CV_UPLOAD", getCvUploadEnabled],
   ["FRONTEND_FEATURES", getFeatures],
 ])("Env Getters", (ENV_KEY, getterFn) => {
   describe(`${ENV_KEY} Getter (${getterFn.name}) tests`, () => {
@@ -63,7 +65,7 @@ describe.each([
       });
       // WHEN getter Function is called
       const apiUrl = getterFn();
-      // THEN expect it to return an empty string
+      // THEN expect it to return the appropriate default value
       expect(apiUrl).toBe("");
     });
 
@@ -118,7 +120,7 @@ describe.each([
       });
       // WHEN getter Function is called
       const apiUrl = getterFn();
-      // THEN expect it to return an empty string
+      // THEN expect it to return the appropriate default value
       expect(apiUrl).toBe("");
       // AND expect an error to have been logged
       expect(console.error).toHaveBeenCalledWith(

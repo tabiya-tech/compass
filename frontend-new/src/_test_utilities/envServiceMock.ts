@@ -6,4 +6,5 @@ jest.mock("src/envService", () => ({
   getApplicationRegistrationCode: jest.fn(() => ""),
   getApplicationLoginCodeDisabled: jest.fn(() => "false"),
   getMetricsEnabled: jest.fn(() => "true"),
+  getCvUploadEnabled: jest.fn(() => "true"),
 }));

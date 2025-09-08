@@ -28,6 +28,9 @@ window.tabiyaConfig = {
   FRONTEND_REGISTRATION_CODE: btoa("registration_code"),
   FRONTEND_DISABLE_LOGIN_CODE: btoa("false"),
 
+  // CV Upload feature flag (optional, defaults to false if not set)
+  FRONTEND_ENABLE_CV_UPLOAD: btoa("true"),
+
   // Optional features settings.
   FRONTEND_FEATURES: btoa("{}"),
 };
