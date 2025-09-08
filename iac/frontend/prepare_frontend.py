@@ -119,6 +119,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
 
     # features
     features = getenv("FRONTEND_FEATURES", False, False)
+    enable_cv_upload: Optional[str] = getenv("FRONTEND_ENABLE_CV_UPLOAD", False, False)
 
     # validations, apart from the keys are required, some values also need to be validated
     # the sensitive encryption key should be a valid RSA public key.
@@ -144,6 +145,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "FRONTEND_LOGIN_CODE": base64_encode(login_code),
         "FRONTEND_DISABLE_LOGIN_CODE": base64_encode(disable_login_code),
         "FRONTEND_REGISTRATION_CODE": base64_encode(registration_code),
+        "FRONTEND_ENABLE_CV_UPLOAD": base64_encode(enable_cv_upload or ""),
         "FRONTEND_FEATURES": base64_encode(features),
     }
 

@@ -41,6 +41,7 @@ import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRank
 import cvService from "src/CV/CVService/CVService";
 import { CV_UPLOADED_DISPLAY_TIME } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
 import { nanoid } from "nanoid";
+import { getCvUploadEnabled } from "src/envService";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
 // Set the interval to check every TIMEOUT/3,
@@ -108,6 +109,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
   // CV upload states
   const [isUploadingCv, setIsUploadingCv] = useState<boolean>(false);
+  const _isCVUploadEnabled = getCvUploadEnabled().toLowerCase() === "true";
 
   const navigate = useNavigate();
 
@@ -611,7 +613,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 aiIsTyping={aiIsTyping}
                 isChatFinished={conversationCompleted}
                 isUploadingCv={isUploadingCv}
-                onUploadCv={handleUploadCv}
+                onUploadCv={ _isCVUploadEnabled ? handleUploadCv : undefined}
                 currentPhase={currentPhase.phase}
               />
             </Box>

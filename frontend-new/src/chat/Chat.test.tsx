@@ -1,5 +1,6 @@
-// silence chatty console\
+// silence chatty console
 import "src/_test_utilities/consoleMock";
+
 import { act, render, screen, waitFor } from "src/_test_utilities/test-utils";
 import Chat, {
   CHECK_INACTIVITY_INTERVAL,
@@ -188,6 +189,15 @@ jest.mock("src/chat/ChatContext", () => {
     ...actual,
     ChatProvider: jest.fn().mockImplementation(({ children }) => <div>{children}</div>),
   };
+});
+
+// mock the env service
+jest.mock("src/envService", () => {
+  const actual = jest.requireActual("src/envService");
+  return {
+    ...actual,
+  getCvUploadEnabled: jest.fn(() => "true"),
+  }
 });
 
 describe("Chat", () => {
