@@ -30,18 +30,9 @@ class CVExperienceExtractor:
         self._llm_caller: LLMCaller[CVExtractionResponse] = LLMCaller[CVExtractionResponse](
             model_response_type=CVExtractionResponse
         )
-        self._llm = GeminiGenerativeLLM(
-            system_instructions=self._json_system_instructions(),
-            config=LLMConfig(
-                generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
-                    "max_output_tokens": 2048
-                }
-            )
-        )
-        # Penalty levels follow the shared penalty strategy
-        self._penalty_level_exception = 3
-        self._penalty_level_no_response = 2
-        self._penalty_level_empty = 1
+        # Since all errors (hard error, no response, empty list) result in an empty reponse
+        # we treat them all as retryable with the same penalty
+        self._penalty_level = 1
 
     @staticmethod
     def _prompt(markdown_cv: str) -> str:
@@ -71,6 +62,7 @@ class CVExperienceExtractor:
             - Each item must be a single sentence describing a work/livelihood experience.
             - Each experience must be captured. Even if two experiences look similar, as long as they are 
               unique in role/title, location, company, or timeframe
+            - Skip any expeeriences that are completely duplicated
             - Do not number items and do not add bullets or prefixes.
             - An experience typically includes a role/title and usually a company/organization or receiver of work, a timeframe (e.g., from X to Y, since X, Present) and a location.
             - Do NOT include standalone responsibilities/tasks unless they belong to a separate role in the same sentence.
@@ -112,17 +104,14 @@ class CVExperienceExtractor:
                     logger=self._logger,
                 )
             except Exception as e:
-                # Hard error: assign higher penalty
-                return [], get_penalty(self._penalty_level_exception), e
+                return [], get_penalty(self._penalty_level), e
 
             if not model_response:
-                # No response: retryable with penalty
-                return [], get_penalty(self._penalty_level_no_response), ValueError("LLM returned no model response")
+                return [], get_penalty(self._penalty_level), ValueError("LLM returned no model response")
 
             items = model_response.experiences or []
             if not items:
-                # Empty list: retryable with small penalty
-                return [], get_penalty(self._penalty_level_empty), ValueError("LLM returned empty experiences list")
+                return [], get_penalty(self._penalty_level), ValueError("LLM returned empty experiences list")
 
             # Success
             return items, 0.0, None

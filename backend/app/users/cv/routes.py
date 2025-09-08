@@ -222,6 +222,3 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
 
     users_router.include_router(router)
 
-   
-
-

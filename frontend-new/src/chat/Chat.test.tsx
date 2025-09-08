@@ -191,15 +191,6 @@ jest.mock("src/chat/ChatContext", () => {
   };
 });
 
-// mock the env service
-jest.mock("src/envService", () => {
-  const actual = jest.requireActual("src/envService");
-  return {
-    ...actual,
-  getCvUploadEnabled: jest.fn(() => "true"),
-  }
-});
-
 describe("Chat", () => {
   // ExperienceService methods to be mocked
   const mockGetExperiences = jest.fn();

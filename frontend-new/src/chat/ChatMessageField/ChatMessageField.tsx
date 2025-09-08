@@ -10,6 +10,7 @@ import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
 import AnimatedDotBadge from "src/theme/AnimatedDotBadge/AnimatedDotBadge";
+import { getCvUploadEnabled } from "src/envService";
 
 export interface ChatMessageFieldProps {
   handleSend: (message: string) => void;
@@ -98,6 +99,8 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const isMenuOpen = Boolean(menuAnchorEl);
   const [showPlusBadge, setShowPlusBadge] = useState(false);
   const [badgeSeen, setBadgeSeen] = useState<boolean>(false);
+  const isCvUploadEnabled = getCvUploadEnabled() === "true";
+  console.log("isCvUploadEnabled", isCvUploadEnabled);
 
   // Show the dot badge whenever in COLLECT_EXPERIENCES and not yet seen
   useEffect(() => {
@@ -424,7 +427,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
             startAdornment: (
               <InputAdornment position="start">
                 <AnimatePresence initial={false}>
-                  {message.trim().length === 0 && !inputIsDisabled() && isRelevantPhase && (
+                  {message.trim().length === 0 && !inputIsDisabled() && isRelevantPhase && isCvUploadEnabled && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -476,33 +479,37 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           }}
         />
         {/* Hidden input for file selection */}
-        <input
-          type="file"
-          ref={fileInputRef}
-          style={{ display: "none" }}
-          accept=".pdf,.docx,.txt"
-          onChange={handleFileSelected}
-          data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT}
-        />
+        {isCvUploadEnabled && (
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            accept=".pdf,.docx,.txt"
+            onChange={handleFileSelected}
+            data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT}
+          />
+        )}
         {/* Context menu for plus actions using themed icon button with text */}
-        <ContextMenu
-          anchorEl={menuAnchorEl}
-          open={isMenuOpen}
-          notifyOnClose={handleMenuClose}
-          anchorOrigin={{ vertical: "top", horizontal: "left" }}
-          transformOrigin={{ vertical: "bottom", horizontal: "left" }}
-          items={[
-            {
-              id: MENU_ITEM_ID.UPLOAD_CV,
-              text: MENU_ITEM_TEXT.UPLOAD_CV,
-              description: props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES ? "You can upload your CV as soon as we start exploring your experiences" : "Attach your CV to the conversation",
-              icon: <UploadFileIcon />,
-              disabled:
-                inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
-              action: handleFileMenuItemClick,
-            },
-          ]}
-        />
+        {isCvUploadEnabled && (
+          <ContextMenu
+            anchorEl={menuAnchorEl}
+            open={isMenuOpen}
+            notifyOnClose={handleMenuClose}
+            anchorOrigin={{ vertical: "top", horizontal: "left" }}
+            transformOrigin={{ vertical: "bottom", horizontal: "left" }}
+            items={[
+              {
+                id: MENU_ITEM_ID.UPLOAD_CV,
+                text: MENU_ITEM_TEXT.UPLOAD_CV,
+                description: props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES ? "You can upload your CV as soon as we start exploring your experiences" : "Attach your CV to the conversation",
+                icon: <UploadFileIcon />,
+                disabled:
+                  inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
+                action: handleFileMenuItemClick,
+              },
+            ]}
+          />
+        )}
         {showCharCounter && (
           <Typography
             data-testid={DATA_TEST_ID.CHAT_MESSAGE_CHAR_COUNTER}

@@ -17,6 +17,15 @@ import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
+import { getCvUploadEnabled } from "src/envService";
+
+// mock the getCvUploadEnabled function
+jest.mock("src/envService", () => ({
+  ...jest.requireActual("src/envService"),
+  getCvUploadEnabled: jest.fn(),
+}));
+
+const mockGetCvUploadEnabled = getCvUploadEnabled as jest.MockedFunction<typeof getCvUploadEnabled>;
 
 // mock the ContextMenu
 jest.mock("src/theme/ContextMenu/ContextMenu", () => {
@@ -41,6 +50,8 @@ describe("ChatMessageField", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     unmockBrowserIsOnLine();
+    // Default to CV upload enabled for most tests
+    mockGetCvUploadEnabled.mockReturnValue("true");
   });
 
   test("should render correctly", () => {
@@ -748,6 +759,146 @@ describe("ChatMessageField", () => {
         // AND console.error should be called for logging the error
         expect(console.error).toHaveBeenCalled();
       });
+    });
+  });
+
+  describe("CV Upload Feature Flag", () => {
+    test("should show plus button and context menu when CV upload is enabled", () => {
+      // GIVEN CV upload is enabled
+      mockGetCvUploadEnabled.mockReturnValue("true");
+
+      // WHEN ChatMessageField is rendered with a relevant phase
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={jest.fn()}
+          currentPhase={ConversationPhase.INTRO}
+          onUploadCv={jest.fn()}
+        />
+      );
+
+      // THEN expect the plus button to be in the document
+      expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON)).toBeInTheDocument();
+      // AND expect the plus icon to be in the document
+      expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_ICON)).toBeInTheDocument();
+      // AND expect the hidden file input to be in the document
+      expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT)).toBeInTheDocument();
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should hide plus button and context menu when CV upload is disabled", () => {
+      // GIVEN CV upload is disabled
+      mockGetCvUploadEnabled.mockReturnValue("false");
+
+      // WHEN ChatMessageField is rendered with a relevant phase
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={jest.fn()}
+          currentPhase={ConversationPhase.INTRO}
+          onUploadCv={jest.fn()}
+        />
+      );
+
+      // THEN expect the plus button not to be in the document
+      expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON)).not.toBeInTheDocument();
+      // AND expect the plus icon not to be in the document
+      expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_ICON)).not.toBeInTheDocument();
+      // AND expect the hidden file input not to be in the document
+      expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT)).not.toBeInTheDocument();
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should hide plus button and context menu when CV upload flag is not set (empty string)", () => {
+      // GIVEN CV upload flag is not set (returns empty string)
+      mockGetCvUploadEnabled.mockReturnValue("");
+
+      // WHEN ChatMessageField is rendered with a relevant phase
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={jest.fn()}
+          currentPhase={ConversationPhase.INTRO}
+          onUploadCv={jest.fn()}
+        />
+      );
+
+      // THEN expect the plus button not to be in the document
+      expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON)).not.toBeInTheDocument();
+      // AND expect the plus icon not to be in the document
+      expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_ICON)).not.toBeInTheDocument();
+      // AND expect the hidden file input not to be in the document
+      expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT)).not.toBeInTheDocument();
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should not show context menu when CV upload is disabled even if plus button is clicked", async () => {
+      // GIVEN CV upload is disabled
+      mockGetCvUploadEnabled.mockReturnValue("false");
+
+      // WHEN ChatMessageField is rendered with a relevant phase
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={jest.fn()}
+          currentPhase={ConversationPhase.INTRO}
+          onUploadCv={jest.fn()}
+        />
+      );
+
+      // THEN expect the plus button not to be in the document
+      expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON)).not.toBeInTheDocument();
+      // AND expect the context menu not to be rendered
+      expect(ContextMenu).not.toHaveBeenCalled();
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should show context menu when CV upload is enabled and plus button is clicked", async () => {
+      // GIVEN CV upload is enabled
+      mockGetCvUploadEnabled.mockReturnValue("true");
+      // AND a mock onUploadCv function
+      const mockOnUploadCv = jest.fn();
+
+      // WHEN ChatMessageField is rendered with a relevant phase
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={jest.fn()}
+          currentPhase={ConversationPhase.INTRO}
+          onUploadCv={mockOnUploadCv}
+        />
+      );
+
+      // AND the plus button is clicked
+      const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
+      await userEvent.click(plusButton);
+
+      // THEN expect the context menu to be rendered
+      await waitFor(() => {
+        expect(ContextMenu).toHaveBeenCalledWith(
+          expect.objectContaining({
+            anchorEl: plusButton,
+            open: true,
+          }),
+          {}
+        );
+      });
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
   });
 });
