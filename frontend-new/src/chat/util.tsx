@@ -91,7 +91,7 @@ export const generateCVTypingMessage = (isUploaded = false): IChatMessage<CVTypi
     message_id: nanoid(),
     payload: payload,
     sender: ConversationMessageSender.COMPASS,
-    component: (prop: CVTypingChatMessageProps) => <CVTypingChatMessage {...prop}/>,
+    component: (prop: CVTypingChatMessageProps) => <CVTypingChatMessage {...prop} />,
   };
 };
 

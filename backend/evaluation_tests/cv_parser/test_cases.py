@@ -162,6 +162,10 @@ partial_missing_info = CVParserTestCase(
     ),
     # Allow extracting only the well-specified line; "Designer, Artify" lacks timeframe
     expected_experiences=[[
+        ContainsString("designer", case_sensitive=False),
+        ContainsString("artify", case_sensitive=False)
+    ],
+    [
         ContainsString("writer", case_sensitive=False),
         ContainsString("freepress", case_sensitive=False),
         ContainsString("2018", case_sensitive=False),
@@ -258,7 +262,6 @@ off_topic_case = CVParserTestCase(
 
 # Realistic, noisy CV cases (multi-section, 2-3 pages feel)
 realistic_full_cv = CVParserTestCase(
-    skip_force="force",
     name="realistic_full_cv",
     markdown_cv=dedent(
         """

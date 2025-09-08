@@ -19,7 +19,4 @@ class TestMarkdownConverter:
 
         # THEN the short markdown is returned
         assert actual == "# Hello"
-
-    # Length/emptiness are business rules validated in the service; no length checks here anymore
-
-
+        
