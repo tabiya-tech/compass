@@ -691,7 +691,7 @@ describe("ChatMessageField", () => {
         expect(console.warn).not.toHaveBeenCalled();
       });
 
-      test("should not show plus button when it is not a relevant phase", async () => {
+      test("should show plus button in all phases when CV upload is enabled", async () => {
         // GIVEN a non-relevant phase and a mock onUploadCv
         const currentPhase = ConversationPhase.DIVE_IN;
 
@@ -706,8 +706,8 @@ describe("ChatMessageField", () => {
           />
         );
 
-        // THEN expect the plus button not to be in the document
-        expect(screen.queryByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON)).not.toBeInTheDocument();
+        // THEN expect the plus button to be in the document
+        expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON)).toBeInTheDocument();
 
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
@@ -892,6 +892,129 @@ describe("ChatMessageField", () => {
           expect.objectContaining({
             anchorEl: plusButton,
             open: true,
+          }),
+          {}
+        );
+      });
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should show correct context menu message for INTRO phase", async () => {
+      // GIVEN CV upload is enabled and current phase is INTRO
+      mockGetCvUploadEnabled.mockReturnValue("true");
+      const currentPhase = ConversationPhase.INTRO;
+
+      // WHEN ChatMessageField is rendered
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={jest.fn()}
+          currentPhase={currentPhase}
+          onUploadCv={jest.fn()}
+        />
+      );
+
+      // AND the plus button is clicked
+      const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
+      await userEvent.click(plusButton);
+
+      // THEN expect the context menu to be rendered with the correct description
+      await waitFor(() => {
+        expect(ContextMenu).toHaveBeenCalledWith(
+          expect.objectContaining({
+            anchorEl: plusButton,
+            open: true,
+            items: expect.arrayContaining([
+              expect.objectContaining({
+                description: "You can upload your CV as soon as we start exploring your experiences",
+                disabled: true, // Should be disabled in INTRO phase
+              }),
+            ]),
+          }),
+          {}
+        );
+      });
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should show correct context menu message for COLLECT_EXPERIENCES phase", async () => {
+      // GIVEN CV upload is enabled and current phase is COLLECT_EXPERIENCES
+      mockGetCvUploadEnabled.mockReturnValue("true");
+      const currentPhase = ConversationPhase.COLLECT_EXPERIENCES;
+
+      // WHEN ChatMessageField is rendered
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={jest.fn()}
+          currentPhase={currentPhase}
+          onUploadCv={jest.fn()}
+        />
+      );
+
+      // AND the plus button is clicked
+      const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
+      await userEvent.click(plusButton);
+
+      // THEN expect the context menu to be rendered with the correct description
+      await waitFor(() => {
+        expect(ContextMenu).toHaveBeenCalledWith(
+          expect.objectContaining({
+            anchorEl: plusButton,
+            open: true,
+            items: expect.arrayContaining([
+              expect.objectContaining({
+                description: "Attach your CV to the conversation",
+                disabled: false, // Should be enabled in COLLECT_EXPERIENCES phase
+              }),
+            ]),
+          }),
+          {}
+        );
+      });
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should show correct context menu message for phases after COLLECT_EXPERIENCES", async () => {
+      // GIVEN CV upload is enabled and current phase is after COLLECT_EXPERIENCES
+      mockGetCvUploadEnabled.mockReturnValue("true");
+      const currentPhase = ConversationPhase.DIVE_IN;
+
+      // WHEN ChatMessageField is rendered
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={jest.fn()}
+          currentPhase={currentPhase}
+          onUploadCv={jest.fn()}
+        />
+      );
+
+      // AND the plus button is clicked
+      const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
+      await userEvent.click(plusButton);
+
+      // THEN expect the context menu to be rendered with the correct description
+      await waitFor(() => {
+        expect(ContextMenu).toHaveBeenCalledWith(
+          expect.objectContaining({
+            anchorEl: plusButton,
+            open: true,
+            items: expect.arrayContaining([
+              expect.objectContaining({
+                description: "CV upload is only available during experience collection",
+                disabled: true, // Should be disabled after COLLECT_EXPERIENCES phase
+              }),
+            ]),
           }),
           {}
         );
