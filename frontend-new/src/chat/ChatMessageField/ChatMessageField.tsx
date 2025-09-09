@@ -383,9 +383,6 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     return props.isChatFinished || props.aiIsTyping || props.isUploadingCv || !isOnline;
   }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline]);
 
-  // Check if the current phase is relevant for showing the plus button
-  const isRelevantPhase =
-    props.currentPhase === ConversationPhase.INTRO || props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES;
 
   return (
     <Box
@@ -426,7 +423,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
             startAdornment: (
               <InputAdornment position="start">
                 <AnimatePresence initial={false}>
-                  {message.trim().length === 0 && !inputIsDisabled() && isRelevantPhase && isCvUploadEnabled && (
+                  {message.trim().length === 0 && !inputIsDisabled() && isCvUploadEnabled && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -500,7 +497,12 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
               {
                 id: MENU_ITEM_ID.UPLOAD_CV,
                 text: MENU_ITEM_TEXT.UPLOAD_CV,
-                description: props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES ? "You can upload your CV as soon as we start exploring your experiences" : "Attach your CV to the conversation",
+                description: 
+                  props.currentPhase === ConversationPhase.INTRO 
+                    ? "You can upload your CV as soon as we start exploring your experiences"
+                    : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
+                    ? "Attach your CV to the conversation"
+                    : "CV upload is only available during experience collection",
                 icon: <UploadFileIcon />,
                 disabled:
                   inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
