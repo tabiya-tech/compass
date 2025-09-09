@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Literal, final
+from typing import Literal, final, Any
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -518,8 +518,22 @@ class UIInteractionEvent(AbstractUserAccountEvent):
     """
     action: any arbitrary actions on an element. Could be ["clicked", "seen"] or ["seen_twice"] or ["swiped"]
     """
+    details: dict[str, Any] = Field(default_factory=dict)
+    """
+    details: any additional details about the interaction
+    """
 
-    def __init__(self, *, user_id: str, element_id: str, actions: list[str], timestamp: str, client_id: str | None = None, relevant_experiments: dict[str, str] = None):
+    def __init__(
+        self,
+        *,
+        user_id: str,
+        element_id: str,
+        actions: list[str],
+        timestamp: str,
+        client_id: str | None = None,
+        relevant_experiments: dict[str, str] = None,
+        details: dict[str, Any] | None = None
+    ):
         super().__init__(
             user_id=user_id,
             client_id=client_id,
@@ -527,7 +541,8 @@ class UIInteractionEvent(AbstractUserAccountEvent):
             element_id=element_id,
             actions=actions,
             timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc),
-            relevant_experiments=relevant_experiments or {}
+            relevant_experiments=relevant_experiments or {},
+            details=details or {}
         )
 
     class Config:

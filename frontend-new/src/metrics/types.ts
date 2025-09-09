@@ -64,6 +64,7 @@ export interface UIInteractionEvent extends BaseMetricsEvent {
   element_id: string; // element ids should be unique
   timestamp: string;
   relevant_experiments: Record<string, string>;
+  details: Record<string, any>; // Additional details about the interaction
 }
 
 export type MetricsEventUnion = 

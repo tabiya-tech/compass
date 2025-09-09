@@ -4,8 +4,7 @@ import "src/_test_utilities/consoleMock";
 import "src/_test_utilities/sentryMock";
 
 import ChatHeader, { DATA_TEST_ID, FEEDBACK_FORM_TEXT, MENU_ITEM_ID } from "./ChatHeader";
-import { render, screen } from "src/_test_utilities/test-utils";
-import { act, fireEvent, waitFor, within, userEvent } from "src/_test_utilities/test-utils";
+import { act, fireEvent, render, screen, userEvent, waitFor, within } from "src/_test_utilities/test-utils";
 import { routerPaths } from "src/app/routerPaths";
 import { testNavigateToPath } from "src/_test_utilities/routeNavigation";
 import ContextMenu, { DATA_TEST_ID as CONTEXT_MENU_DATA_TEST_ID } from "src/theme/ContextMenu/ContextMenu";
@@ -28,6 +27,9 @@ import React from "react";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { FEEDBACK_NOTIFICATION_DELAY } from "src/chat/Chat";
 import { SessionError } from "src/error/commonErrors";
+import { ConversationPhase } from "src/chat/chatProgressbar/types";
+import MetricsService from "src/metrics/metricsService";
+import { EventType } from "src/metrics/types";
 
 // Mock PersistentStorageService
 jest.mock("src/app/PersistentStorageService/PersistentStorageService");
@@ -133,6 +135,8 @@ describe("ChatHeader", () => {
         conversationCompleted={false}
         progressPercentage={0}
         timeUntilNotification={null}
+        conversationPhase={ConversationPhase.INTRO}
+        collectedExperiences={1}
       />
     );
     // AND a user is logged in
@@ -182,6 +186,8 @@ describe("ChatHeader", () => {
         conversationCompleted={false}
         progressPercentage={0}
         timeUntilNotification={null}
+        conversationPhase={ConversationPhase.INTRO}
+        collectedExperiences={1}
       />
     );
     renderWithChatProvider(givenChatHeader);
@@ -214,6 +220,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       </ChatProvider>
     );
@@ -232,6 +240,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
       // AND the chat header is rendered
@@ -268,6 +278,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
       // AND the chat header is rendered
@@ -319,6 +331,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
 
@@ -361,6 +375,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
       // AND the chat header is rendered
@@ -389,6 +405,10 @@ describe("ChatHeader", () => {
       const givenNotifyOnExperiencesDrawerOpen = jest.fn();
       const givenRemoveMessage = jest.fn();
       const givenAddMessage = jest.fn();
+      // AND a logged-in user for metrics
+      const mockUser = { id: "foo123", name: "Foo", email: "foo@bar" };
+      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(mockUser);
+      const metricsSpy = jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValue();
       const givenChatHeader = (
         <ChatHeader
           notifyOnLogout={jest.fn()}
@@ -399,6 +419,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
       // AND the chat header is rendered
@@ -418,6 +440,22 @@ describe("ChatHeader", () => {
 
       // THEN expect notifyOnExperiencesDrawerOpen to be called
       expect(givenNotifyOnExperiencesDrawerOpen).toHaveBeenCalled();
+      // AND the metrics event to be sent
+      expect(metricsSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event_type: EventType.UI_INTERACTION,
+          user_id: mockUser.id,
+          actions: ["view_experiences_and_skills"],
+          element_id: DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES,
+          timestamp: expect.any(String),
+          relevant_experiments: {},
+          details: {
+            conversation_phase: ConversationPhase.INTRO,
+            experiences_explored: 0,
+            collected_experiences: 1,
+          },
+        })
+      );
     });
 
     test("should show notification badge when new experience is explored", async () => {
@@ -437,6 +475,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
       renderWithChatProvider(givenChatHeader);
@@ -471,6 +511,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
       // renderWithChatProvider(givenChatHeader);
@@ -522,6 +564,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
       renderWithChatProvider(givenChatHeader);
@@ -560,6 +604,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
       renderWithChatProvider(givenChatHeader);
@@ -602,6 +648,8 @@ describe("ChatHeader", () => {
             conversationCompleted={false}
             progressPercentage={0}
             timeUntilNotification={null}
+            conversationPhase={ConversationPhase.INTRO}
+            collectedExperiences={1}
           />
         );
         // AND the chat header is rendered
@@ -681,6 +729,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
 
@@ -726,6 +776,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
 
@@ -770,6 +822,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={0}
           timeUntilNotification={null}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
 
@@ -808,6 +862,8 @@ describe("ChatHeader", () => {
             conversationCompleted={false}
             progressPercentage={0}
             timeUntilNotification={null}
+            conversationPhase={ConversationPhase.INTRO}
+            collectedExperiences={1}
           />
         </ChatProvider>
       );
@@ -849,6 +905,8 @@ describe("ChatHeader", () => {
             conversationCompleted={false}
             progressPercentage={0}
             timeUntilNotification={null}
+            conversationPhase={ConversationPhase.INTRO}
+            collectedExperiences={1}
           />
         </ChatProvider>
       );
@@ -913,6 +971,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={50}
           timeUntilNotification={givenTimeUntilNotification}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
       // AND the time is advanced by the given time until notification
@@ -943,6 +1003,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={50}
           timeUntilNotification={givenTimeUntilNotification}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
       // AND the time is advanced by the given time until notification
@@ -986,6 +1048,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={70}
           timeUntilNotification={givenTimeUntilNotification}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
       // AND the time is advanced by the given time until notification
@@ -1018,6 +1082,8 @@ describe("ChatHeader", () => {
           conversationCompleted={false}
           progressPercentage={50}
           timeUntilNotification={0}
+          conversationPhase={ConversationPhase.INTRO}
+          collectedExperiences={1}
         />
       );
 
@@ -1044,6 +1110,8 @@ describe("ChatHeader", () => {
         conversationCompleted: false,
         progressPercentage: 0,
         timeUntilNotification: null,
+        conversationPhase: ConversationPhase.INTRO,
+        collectedExperiences: 1,
         ...props,
       };
 

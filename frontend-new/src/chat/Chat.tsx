@@ -591,6 +591,8 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 conversationCompleted={conversationCompleted}
                 timeUntilNotification={timeUntilFeedbackNotification}
                 progressPercentage={currentPhase.percentage}
+                conversationPhase={currentPhase.phase}
+                collectedExperiences={experiences?.length}
               />
             </Box>
             <Box paddingBottom={theme.spacing(theme.tabiyaSpacing.lg)} paddingX={theme.spacing(theme.tabiyaSpacing.md)}>

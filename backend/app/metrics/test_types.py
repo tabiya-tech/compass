@@ -534,6 +534,7 @@ class TestUIInteractionEvent:
         given_timestamp = "2025-03-04T06:45:00+00:00"
         given_user_id = get_random_user_id()
         given_relevant_experiments = {"exp1": "group1", "exp2": "group2"}
+        given_details = {"foo1": "bar1", "foo2": "bar2"}
 
         # WHEN creating an instance of the event
         actual_event = UIInteractionEvent(
@@ -541,7 +542,8 @@ class TestUIInteractionEvent:
             actions=given_actions,
             timestamp=given_timestamp,
             user_id=given_user_id,
-            relevant_experiments=given_relevant_experiments
+            relevant_experiments=given_relevant_experiments,
+            details=given_details
         )
 
         # THEN the basic event fields should be set
@@ -560,6 +562,9 @@ class TestUIInteractionEvent:
 
         # AND the relevant experiments should be set correctly
         assert actual_event.relevant_experiments == given_relevant_experiments
+
+        # AND the details should be set correctly
+        assert actual_event.details == given_details
 
     def test_extra_fields_are_not_allowed(self, setup_application_config: ApplicationConfig):
         # GIVEN all required fields

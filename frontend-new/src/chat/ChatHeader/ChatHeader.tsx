@@ -20,6 +20,10 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 import { SessionError } from "src/error/commonErrors";
 import TextConfirmModalDialog from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
 import { HighlightedSpan } from "src/consent/components/consentPage/Consent";
+import MetricsService from "src/metrics/metricsService";
+import { EventType } from "src/metrics/types";
+import { MetricsError } from "src/error/commonErrors";
+import { ConversationPhase } from "src/chat/chatProgressbar/types";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
@@ -30,6 +34,8 @@ export type ChatHeaderProps = {
   conversationCompleted: boolean;
   timeUntilNotification: number | null;
   progressPercentage: number;
+  conversationPhase: ConversationPhase;
+  collectedExperiences: number;
 };
 
 const uniqueId = "7413b63a-887b-4f41-b930-89e9770db12b";
@@ -79,6 +85,8 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   conversationCompleted,
   timeUntilNotification,
   progressPercentage,
+  conversationPhase,
+  collectedExperiences,
 }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -116,6 +124,29 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   const handleViewExperiences = () => {
     handleOpenExperiencesDrawer();
     setExploredExperiencesNotification(false);
+    try {
+      const user_id = authenticationStateService.getInstance().getUser()?.id;
+      if (!user_id) {
+        console.error(new MetricsError("Unable to send Experiences and Skills view metrics: user id is missing"));
+        return;
+      }
+
+      MetricsService.getInstance().sendMetricsEvent({
+        event_type: EventType.UI_INTERACTION,
+        user_id: user_id,
+        actions: ["view_experiences_and_skills"],
+        element_id: DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES,
+        timestamp: new Date().toISOString(),
+        relevant_experiments: {},
+        details: {
+          conversation_phase: conversationPhase,
+          experiences_explored: experiencesExplored,
+          collected_experiences: collectedExperiences,
+        },
+      });
+    } catch (error) {
+      console.error(new MetricsError(`Unable to send Experiences and Skills view metrics: ${error}`));
+    }
   };
 
   useEffect(() => {
