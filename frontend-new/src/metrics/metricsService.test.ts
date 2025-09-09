@@ -136,7 +136,8 @@ describe("MetricsService", () => {
           actions: ["foo", "bar"],
           element_id: "foo_element",
           timestamp: new Date().toISOString(),
-          relevant_experiments: { "exp1": "group1", "exp2": "group2" }
+          relevant_experiments: { "exp1": "group1", "exp2": "group2" },
+          details: { "foo1": "bar1", "foo2": "bar2" },
         },
       ];
 

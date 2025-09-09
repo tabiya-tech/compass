@@ -95,7 +95,8 @@ def get_ui_interaction_request() -> dict:
         "actions": [get_random_printable_string(10), get_random_printable_string(10)],
         "element_id": get_random_printable_string(10),
         "timestamp": datetime.now().isoformat(),
-        "relevant_experiments": {"exp1": "group1", "exp2": "group2"}
+        "relevant_experiments": {"exp1": "group1", "exp2": "group2"},
+        "details": {"foo1": "bar1", "foo2": "bar2"}
     }
 
 
