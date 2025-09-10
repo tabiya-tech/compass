@@ -27,6 +27,7 @@ pympler="^1.1"
 
 scipy = "^1.16.1"
 markitdown = {extras = ["pdf", "docx"], version = "^0.1.2"}
+brotli = "^1.1.0"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
 pytest-asyncio = "^0.23.6"

@@ -75,6 +75,7 @@ describe("CVService", () => {
           serviceFunction: "uploadCV",
           failureMessage: `Failed to upload CV for user ${givenUserId}`,
           expectedContentType: "application/json",
+          compressRequestBody: false, // File uploads should not be compressed
         })
       );
 
