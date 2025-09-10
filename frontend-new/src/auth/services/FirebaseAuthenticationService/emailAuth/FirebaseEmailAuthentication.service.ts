@@ -14,6 +14,7 @@ import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
 import { TokenError } from "src/error/commonErrors";
 import firebase from "firebase/compat/app";
 import { EmailAuthProvider } from "firebase/auth";
+import { AuthBroadcastChannel, AuthChannelMessage } from "src/auth/services/authBroadcastChannel/authBroadcastChannel";
 
 type UserCredential = firebase.auth.UserCredential;
 
@@ -170,6 +171,8 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
   async logout(): Promise<void> {
     await this.stdFirebaseAuthServiceInstance.logout();
     await super.onSuccessfulLogout();
+
+    AuthBroadcastChannel.getInstance().broadcast(AuthChannelMessage.LOGOUT_USER);
   }
 
   /**
