@@ -57,6 +57,7 @@ export default class CVService {
       serviceFunction,
       failureMessage: `Failed to upload CV for user ${userId}`,
       expectedContentType: "application/json",
+      compressRequestBody: false, // Disable compression for file uploads
     });
 
     const responseText = await response.text();

@@ -66,6 +66,7 @@
     "@sentry/react": "^9.41.0",
     "@sentry/webpack-plugin": "^2.22.6",
     "@types/js-yaml": "^4.0.9",
+    "brotli-wasm": "^3.0.1",
     "colorjs.io": "^0.5.2",
     "docx": "^8.5.0",
     "firebase": "^10.12.2",

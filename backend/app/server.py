@@ -29,6 +29,7 @@ from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
 from features.loader import FeatureLoader
 from starlette.datastructures import State
+from app.middleware.brotli_request import BrotliRequestMiddleware
 
 
 def setup_logging():
@@ -269,6 +270,9 @@ app = FastAPI(
 app.state = cast(State, app.state)
 app.state.startup_complete = asyncio.Event()
 app.state.shutdown_complete = asyncio.Event()
+
+# --- Add BrotliRequestMiddleware before other middlewares ---
+app.add_middleware(BrotliRequestMiddleware)
 
 ############################################
 # Setup the CORS policy

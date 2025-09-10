@@ -9,6 +9,7 @@ import { TokenValidationFailureCause } from "src/auth/services/Authentication.se
 
 import { StatusCodes } from "http-status-codes";
 import { routerPaths } from "src/app/routerPaths";
+import brotliPromise from "brotli-wasm";
 
 // Status codes that should trigger a retry
 // We are certain that these status codes are temporary issues and can be retried,
@@ -39,6 +40,13 @@ export const MIN_TOKEN_VALIDITY_SECONDS = 30; // 30 sec
 // It is 10 seconds twice of the default one
 export const LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION = 10000;
 
+// Minimum request body size before compression is applied
+// we have a minimum size because brotli compression below a certain size doesnt make sense
+// at lower sizes, besides the time and computational cost, it tends to not bring any benefit, might even increase the size.
+// REF: https://datatracker.ietf.org/doc/html/rfc7932#section-4.1
+// we chose 512 because its on the higher end of the requests we currently send from our frontend.
+export const COMPRESSION_THRESHOLD = 512;
+
 // This function is used to make authenticated fetch requests
 // It adds the Authorization header with the Token from the session storage
 // It also checks if the response is in the expected format
@@ -58,6 +66,8 @@ export type ExtendedRequestInit = RequestInit & {
 
   // If the customFetch should retry the request on didn't fetch errors.
   retryOnFailedToFetch?: boolean;
+
+  compressRequestBody?: boolean;
 };
 
 export const defaultInit: ExtendedRequestInit = {
@@ -66,6 +76,7 @@ export const defaultInit: ExtendedRequestInit = {
   serviceFunction: "Unknown method",
   failureMessage: "Unknown error",
   authRequired: true,
+  compressRequestBody: true,
 };
 
 /*
@@ -199,6 +210,7 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
     expectedStatusCode,
     retriableStatusCodes = [],
     retryOnFailedToFetch = false,
+    compressRequestBody = true,
     ...options
   } = init;
 
@@ -242,7 +254,53 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
         headers.set("Authorization", `Bearer ${token}`);
       }
 
-      const enhancedInit = { ...options, headers };
+      let processedBody = options.body;
+
+      // Handle request body compression
+      if (compressRequestBody && options.body) {
+        // Skip compression for FormData, File objects, and multipart content types
+        const contentType = headers.get("Content-Type") || "";
+        const isFormData = options.body instanceof FormData;
+        const isFile = options.body instanceof File;
+        const isMultipart = contentType.includes("multipart/");
+        
+        if (isFormData || isFile || isMultipart) {
+          console.debug(`Skipping compression for ${serviceName}.${serviceFunction} because the body is a FormData, File, or multipart content type`);
+          processedBody = options.body;
+        } else {
+          // Convert body to string if needed
+          const bodyString = typeof options.body === "string" ? options.body : JSON.stringify(options.body);
+
+          // Set Content-Type for JSON if not already set
+          if (!headers.has("Content-Type")) {
+            headers.set("Content-Type", "application/json");
+          }
+
+          // Apply compression if the body exceeds a threshold
+          if (bodyString.length > COMPRESSION_THRESHOLD) {
+            console.debug(`Compressing request for ${serviceName}.${serviceFunction} with body size ${bodyString.length}`);
+            try {
+              const brotli = await brotliPromise;
+              const compressed = brotli.compress(new TextEncoder().encode(bodyString));
+              processedBody = new Blob([compressed]);
+              headers.set("Content-Encoding", "br");
+            } catch (error) {
+              console.warn(`Failed to compress request for ${serviceName}.${serviceFunction}:`, error);
+              processedBody = bodyString;
+              headers.delete("Content-Encoding");
+            }
+          } else {
+            console.debug(`Skipping compression for ${serviceName}.${serviceFunction} because the body is below the threshold. Body size: ${bodyString.length}`);
+            processedBody = bodyString;
+          }
+        }
+      }
+
+      const enhancedInit = {
+        ...options,
+        headers,
+        body: processedBody,
+      };
 
       response = await fetch(apiUrl, enhancedInit);
     } catch (e: any) {
