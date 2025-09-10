@@ -12,7 +12,8 @@ import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { FirebaseError } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
-
+import { AuthChannelMessage } from "src/auth/services/authBroadcastChannel/authBroadcastChannel";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 jest.mock("firebase/compat/app", () => {
   return {
@@ -36,6 +37,21 @@ jest.mock("src/auth/services/invitationsService/invitations.service", () => {
   return {
     invitationsService: {
       checkInvitationCodeStatus: jest.fn(),
+    },
+  };
+});
+
+// mock authBroadcastChannel
+const mockBroadcast = jest.fn();
+jest.mock("src/auth/services/authBroadcastChannel/authBroadcastChannel.ts", () => {
+  return {
+    AuthChannelMessage: { LOGOUT_USER: "LOGOUT_USER" },
+    AuthBroadcastChannel: {
+      getInstance: jest.fn(() => ({
+        registerListener: jest.fn(),
+        broadcast: mockBroadcast,
+        closeChannel: jest.fn(),
+      })),
     },
   };
 });
@@ -95,9 +111,11 @@ describe("AuthService class tests", () => {
       // AND the user has some preferences
       const givenUserPreferences: UserPreference = {
         user_id: "foo-id",
-        sessions:[]
+        sessions: [],
       } as unknown as UserPreference;
-      jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValueOnce(givenUserPreferences)
+      jest
+        .spyOn(UserPreferencesService.getInstance(), "getUserPreferences")
+        .mockResolvedValueOnce(givenUserPreferences);
 
       // WHEN the login is attempted
       const actualToken = await authService.login(givenEmail, givenPassword);
@@ -146,12 +164,9 @@ describe("AuthService class tests", () => {
       const emailLoginPromise = authService.login(givenEmail, givenPassword);
 
       // THEN the error callback should be called with Email not verified
-      await expect(emailLoginPromise).rejects.toThrow(new FirebaseError(
-        "EmailAuthService",
-        "login",
-        FirebaseErrorCodes.EMAIL_NOT_VERIFIED,
-        "Email not verified"
-      ));
+      await expect(emailLoginPromise).rejects.toThrow(
+        new FirebaseError("EmailAuthService", "login", FirebaseErrorCodes.EMAIL_NOT_VERIFIED, "Email not verified")
+      );
 
       // AND the user should be logged out
       expect(StdFirebaseAuthenticationService.getInstance().logout).toHaveBeenCalled();
@@ -189,12 +204,14 @@ describe("AuthService class tests", () => {
       const emailLoginPromise = authService.login(givenEmail, givenPassword);
 
       // THEN an error should be thrown
-      await expect(emailLoginPromise).rejects.toThrow(new FirebaseError(
-        "EmailAuthService",
-        "signInWithEmailAndPassword",
-        FirebaseErrorCodes.INTERNAL_ERROR,
-        "Internal error"
-      ));
+      await expect(emailLoginPromise).rejects.toThrow(
+        new FirebaseError(
+          "EmailAuthService",
+          "signInWithEmailAndPassword",
+          FirebaseErrorCodes.INTERNAL_ERROR,
+          "Internal error"
+        )
+      );
 
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
@@ -222,12 +239,61 @@ describe("AuthService class tests", () => {
       const emailLoginPromise = authService.login(givenEmail, givenPassword);
 
       // THEN an error should be thrown
-      await expect(emailLoginPromise).rejects.toThrow(new FirebaseError(
-        "EmailAuthService",
-        "logout",
-        FirebaseErrorCodes.INTERNAL_ERROR,
-        "Internal error"
-      ));
+      await expect(emailLoginPromise).rejects.toThrow(
+        new FirebaseError("EmailAuthService", "logout", FirebaseErrorCodes.INTERNAL_ERROR, "Internal error")
+      );
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("logout", () => {
+    test("should successfully logout a user", async () => {
+      // GIVEN the user is logged in with email auth
+      PersistentStorageService.setLoginMethod("FIREBASE_EMAIL");
+
+      // AND the logout method resolves
+      jest.spyOn(StdFirebaseAuthenticationService.getInstance(), "logout").mockResolvedValueOnce();
+
+      // WHEN logging out the user
+      await authService.logout();
+
+      // THEN the StdFirebaseAuthenticationService logout method should be called
+      expect(StdFirebaseAuthenticationService.getInstance().logout).toHaveBeenCalled();
+
+      // AND the Authentication State should be cleared
+      expect(AuthenticationStateService.getInstance().getUser()).toBeNull();
+
+      // AND the UserPreference State should be cleared
+      expect(UserPreferencesStateService.getInstance().getUserPreferences()).toBeNull();
+
+      // AND a logout message should be broadcasted to other tabs
+      expect(mockBroadcast).toHaveBeenCalledWith(AuthChannelMessage.LOGOUT_USER);
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw an error if the logout method fails", async () => {
+      // GIVEN the user is logged in with email auth
+      PersistentStorageService.setLoginMethod("FIREBASE_EMAIL");
+
+      // AND logout method rejects with an error
+      jest
+        .spyOn(StdFirebaseAuthenticationService.getInstance(), "logout")
+        .mockRejectedValueOnce(new Error("Logout failed"));
+
+      // WHEN logging out the user
+      const logoutPromise = authService.logout();
+
+      // THEN the logout promise should be rejected with the error
+      await expect(logoutPromise).rejects.toThrow("Logout failed");
+
+      // AND the StdFirebaseAuthenticationService logout method should be called
+      expect(StdFirebaseAuthenticationService.getInstance().logout).toHaveBeenCalled();
 
       // AND no errors or warnings should be logged
       expect(console.error).not.toHaveBeenCalled();
@@ -266,9 +332,11 @@ describe("AuthService class tests", () => {
       // AND the user preferences can be created
       const givenUserPreferences: UserPreference = {
         user_id: "foo-id",
-        sessions:[]
+        sessions: [],
       } as unknown as UserPreference;
-      jest.spyOn(UserPreferencesService.getInstance(), "createUserPreferences").mockResolvedValueOnce(givenUserPreferences);
+      jest
+        .spyOn(UserPreferencesService.getInstance(), "createUserPreferences")
+        .mockResolvedValueOnce(givenUserPreferences);
 
       // WHEN the registration is attempted
       const actualToken = await authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationCode);
@@ -367,7 +435,7 @@ describe("AuthService class tests", () => {
         linkWithCredential: jest.fn().mockResolvedValue({
           user: mockUserAfterLinking,
         }),
-        sendEmailVerification: jest.fn()
+        sendEmailVerification: jest.fn(),
       };
 
       // AND the user is currently logged in
@@ -513,12 +581,14 @@ describe("AuthService class tests", () => {
       const resendPromise = authService.resendVerificationEmail(givenEmail, givenPassword);
 
       // THEN the error callback should be called with Email already verified
-      await expect(resendPromise).rejects.toThrow(new FirebaseError(
-        "EmailAuthService",
-        "resendVerificationEmail",
-        FirebaseErrorCodes.EMAIL_ALREADY_VERIFIED,
-        "Email already verified"
-      ));
+      await expect(resendPromise).rejects.toThrow(
+        new FirebaseError(
+          "EmailAuthService",
+          "resendVerificationEmail",
+          FirebaseErrorCodes.EMAIL_ALREADY_VERIFIED,
+          "Email already verified"
+        )
+      );
 
       // AND no errors or warnings should be logged
       expect(console.error).not.toHaveBeenCalled();
@@ -539,12 +609,14 @@ describe("AuthService class tests", () => {
       const resendPromise = authService.resendVerificationEmail(givenEmail, givenPassword);
 
       // THEN the error callback should be called with User not found
-      await expect(resendPromise).rejects.toThrow(new FirebaseError(
-        "EmailAuthService",
-        "signInWithEmailAndPassword",
-        FirebaseErrorCodes.USER_NOT_FOUND,
-        "User not found"
-      ));
+      await expect(resendPromise).rejects.toThrow(
+        new FirebaseError(
+          "EmailAuthService",
+          "signInWithEmailAndPassword",
+          FirebaseErrorCodes.USER_NOT_FOUND,
+          "User not found"
+        )
+      );
 
       // AND no errors or warnings should be logged
       expect(console.error).not.toHaveBeenCalled();
@@ -561,17 +633,19 @@ describe("AuthService class tests", () => {
         code: "auth/internal-error",
         message: "Internal error",
       });
-    
+
       // WHEN resending the verification email
       const resendPromise = authService.resendVerificationEmail(givenEmail, givenPassword);
 
       // THEN the error callback should be called with Internal error
-      await expect(resendPromise).rejects.toThrow(new FirebaseError(
-        "EmailAuthService",
-        "signInWithEmailAndPassword",
-        FirebaseErrorCodes.INTERNAL_ERROR,
-        "Internal error"
-      ));
+      await expect(resendPromise).rejects.toThrow(
+        new FirebaseError(
+          "EmailAuthService",
+          "signInWithEmailAndPassword",
+          FirebaseErrorCodes.INTERNAL_ERROR,
+          "Internal error"
+        )
+      );
 
       // AND no errors or warnings should be logged
       expect(console.error).not.toHaveBeenCalled();
@@ -609,12 +683,9 @@ describe("AuthService class tests", () => {
       const resetPromise = authService.resetPassword(givenEmail);
 
       // THEN it should throw a FirebaseError
-      await expect(resetPromise).rejects.toThrow(new FirebaseError(
-        "EmailAuthService",
-        "resetPassword",
-        FirebaseErrorCodes.INVALID_EMAIL,
-        "Invalid email format"
-      ));
+      await expect(resetPromise).rejects.toThrow(
+        new FirebaseError("EmailAuthService", "resetPassword", FirebaseErrorCodes.INVALID_EMAIL, "Invalid email format")
+      );
 
       // AND no errors or warnings should be logged
       expect(console.error).not.toHaveBeenCalled();
@@ -631,12 +702,14 @@ describe("AuthService class tests", () => {
       const resetPromise = authService.resetPassword(givenEmail);
 
       // THEN it should throw a FirebaseError with INTERNAL_ERROR
-      await expect(resetPromise).rejects.toThrow(new FirebaseError(
-        "EmailAuthService",
-        "resetPassword",
-        FirebaseErrorCodes.INTERNAL_ERROR,
-        "An unknown error occurred"
-      ));
+      await expect(resetPromise).rejects.toThrow(
+        new FirebaseError(
+          "EmailAuthService",
+          "resetPassword",
+          FirebaseErrorCodes.INTERNAL_ERROR,
+          "An unknown error occurred"
+        )
+      );
 
       // AND no errors or warnings should be logged
       expect(console.error).not.toHaveBeenCalled();
@@ -668,4 +741,3 @@ describe("AuthService class tests", () => {
     );
   });
 });
-

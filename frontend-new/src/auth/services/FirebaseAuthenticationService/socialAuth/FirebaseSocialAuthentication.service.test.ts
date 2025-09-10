@@ -8,6 +8,8 @@ import AuthenticationStateService from "src/auth/services/AuthenticationState.se
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { AuthChannelMessage } from "src/auth/services/authBroadcastChannel/authBroadcastChannel";
 
 jest.mock("firebase/compat/app", () => {
   const mockAuth = {
@@ -19,8 +21,8 @@ jest.mock("firebase/compat/app", () => {
     }),
   };
   // @ts-ignore
- mockAuth.auth.GoogleAuthProvider = class {
-   static PROVIDER_ID = "google.com";
+  mockAuth.auth.GoogleAuthProvider = class {
+    static PROVIDER_ID = "google.com";
   };
   return mockAuth;
 });
@@ -36,6 +38,21 @@ jest.mock("firebaseui", () => {
         }),
         reset: jest.fn(),
       },
+    },
+  };
+});
+
+// mock authBroadcastChannel
+const mockBroadcast = jest.fn();
+jest.mock("src/auth/services/authBroadcastChannel/authBroadcastChannel.ts", () => {
+  return {
+    AuthChannelMessage: { LOGOUT_USER: "LOGOUT_USER" },
+    AuthBroadcastChannel: {
+      getInstance: jest.fn(() => ({
+        registerListener: jest.fn(),
+        broadcast: mockBroadcast,
+        closeChannel: jest.fn(),
+      })),
     },
   };
 });
@@ -83,9 +100,11 @@ describe("SocialAuthService class tests", () => {
       // AND the user has some preferences
       const givenUserPreferences: UserPreference = {
         user_id: "foo-id",
-        sessions:[]
+        sessions: [],
       } as unknown as UserPreference;
-      jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValueOnce(givenUserPreferences);
+      jest
+        .spyOn(UserPreferencesService.getInstance(), "getUserPreferences")
+        .mockResolvedValueOnce(givenUserPreferences);
 
       // WHEN the Google login is attempted
       const actualToken = await authService.loginWithGoogle();
@@ -114,6 +133,56 @@ describe("SocialAuthService class tests", () => {
 
       // THEN the error should be thrown
       await expect(socialLoginPromise).rejects.toThrow("The user could not be found");
+    });
+  });
+
+  describe("logout", () => {
+    test("should log out the user successfully", async () => {
+      // GIVEN the user is logged in with social auth
+      PersistentStorageService.setLoginMethod("FIREBASE_SOCIAL");
+      // AND the logout method resolves
+      jest.spyOn(StdFirebaseAuthenticationService.getInstance(), "logout").mockResolvedValueOnce();
+
+      // WHEN logging out the user
+      await authService.logout();
+
+      // THEN the StdFirebaseAuthenticationService logout method should be called
+      expect(StdFirebaseAuthenticationService.getInstance().logout).toHaveBeenCalled();
+
+      // AND the Authentication State should be cleared
+      expect(AuthenticationStateService.getInstance().getUser()).toBeNull();
+
+      // AND the UserPreference State should be cleared
+      expect(UserPreferencesStateService.getInstance().getUserPreferences()).toBeNull();
+
+      // AND a logout message should be broadcasted to other tabs
+      expect(mockBroadcast).toHaveBeenCalledWith(AuthChannelMessage.LOGOUT_USER);
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should handle errors during logout", async () => {
+      // GIVEN the user is logged in with social auth
+      PersistentStorageService.setLoginMethod("FIREBASE_SOCIAL");
+      // AND logout method rejects with an error
+      jest
+        .spyOn(StdFirebaseAuthenticationService.getInstance(), "logout")
+        .mockRejectedValueOnce(new Error("Logout failed!"));
+
+      // WHEN logging out the user
+      const logoutPromise = authService.logout();
+
+      // THEN the logout promise should be rejected with the error
+      await expect(logoutPromise).rejects.toThrow("Logout failed!");
+
+      // AND the StdFirebaseAuthenticationService logout method should be called
+      expect(StdFirebaseAuthenticationService.getInstance().logout).toHaveBeenCalled();
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
   });
 

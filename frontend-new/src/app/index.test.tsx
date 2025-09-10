@@ -16,7 +16,8 @@ import {
 import { DATA_TEST_ID as BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/Backdrop";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
-
+import { routerPaths } from "src/app/routerPaths";
+import { AuthBroadcastChannel, AuthChannelMessage } from "src/auth/services/authBroadcastChannel/authBroadcastChannel";
 
 // mock the snackbar
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
@@ -61,6 +62,20 @@ jest.mock("react-router-dom", () => {
   };
 });
 
+// mock authBroadcastChannel
+jest.mock("src/auth/services/authBroadcastChannel/authBroadcastChannel.ts", () => {
+  return {
+    AuthChannelMessage: { LOGOUT_USER: "LOGOUT_USER" },
+    AuthBroadcastChannel: {
+      getInstance: jest.fn(() => ({
+        registerListener: jest.fn(),
+        broadcast: jest.fn(),
+        closeChannel: jest.fn(),
+      })),
+    },
+  };
+});
+
 async function waitForAppLoadingToFinish() {
   // Wait for the backdrop to disappear so that we know the app has finished loading and the dom has settled
   // not doing this can cause the Warning: An update to App inside a test was not wrapped in act(...).
@@ -85,9 +100,7 @@ describe("index", () => {
       logout: jest.fn(),
       cleanup: jest.fn(),
     } as any;
-    jest
-      .spyOn(AuthenticationFactoryModule.default, "getCurrentAuthenticationService")
-      .mockReturnValue(mockAuthService);
+    jest.spyOn(AuthenticationFactoryModule.default, "getCurrentAuthenticationService").mockReturnValue(mockAuthService);
     // Mock the AuthenticationServiceFactory to reset app state properly
     // since we clean up on application startup
     jest.spyOn(AuthenticationFactoryModule.default, "resetAuthenticationState").mockResolvedValue();
@@ -95,7 +108,7 @@ describe("index", () => {
   describe("main compass app test", () => {
     test("should render app successfully", async () => {
       // GIVEN AuthenticationStateService.loadToken will successfully load the token
-      jest.spyOn(AuthenticationStateService.prototype, "loadToken").mockImplementation(() => {})
+      jest.spyOn(AuthenticationStateService.prototype, "loadToken").mockImplementation(() => {});
 
       // WHEN the app is rendered
       render(<App />);
@@ -227,7 +240,6 @@ describe("index", () => {
       // WHEN the preferences are resolved
       act(() => resolvePreferences(mockPreferences));
 
-
       // THEN the backdrop should be hidden
       await waitFor(() => {
         expect(screen.queryByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).not.toBeInTheDocument();
@@ -274,4 +286,35 @@ describe("index", () => {
     });
   });
 
+  describe("register logout listener", () => {
+    test("should register logout listener, call logout and navigate to landing on logout", async () => {
+      // GIVEN AuthenticationStateService.loadToken will successfully load the token
+      jest.spyOn(AuthenticationStateService.prototype, "loadToken").mockImplementation(() => {});
+
+      // WHEN the app is rendered
+      render(<App />);
+
+      // THEN expect the broadcast channel is set up
+      const mockGetInstance = AuthBroadcastChannel.getInstance as jest.Mock;
+      // AND the logout listener should be registered
+      const mockChannel = mockGetInstance.mock.results[0].value;
+      expect(mockChannel.registerListener).toHaveBeenCalledWith(AuthChannelMessage.LOGOUT_USER, expect.any(Function));
+
+      // WHEN a logout message is received
+      const logoutListener = mockChannel.registerListener.mock.calls[0][1];
+      await act(async () => {
+        await logoutListener();
+      });
+
+      // THEN the authentication service logout should be called
+      expect(AuthenticationFactoryModule.default.getCurrentAuthenticationService()!.logout).toHaveBeenCalled();
+      // AND the page should redirect to the landing page
+      expect(window.location.href).toContain(routerPaths.LANDING);
+      // AND the broadcast channel should be closed
+      expect(mockChannel.closeChannel).toHaveBeenCalled();
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
 });

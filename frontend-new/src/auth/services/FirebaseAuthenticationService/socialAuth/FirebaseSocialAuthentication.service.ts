@@ -11,6 +11,7 @@ import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
 import AuthenticationService from "src/auth/services/Authentication.service";
 import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
 import { TokenError } from "src/error/commonErrors";
+import { AuthBroadcastChannel, AuthChannelMessage } from "src/auth/services/authBroadcastChannel/authBroadcastChannel";
 
 class FirebaseSocialAuthenticationService extends AuthenticationService {
   private static instance: FirebaseSocialAuthenticationService;
@@ -83,6 +84,8 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
   async logout(): Promise<void> {
     await this.stdFirebaseAuthServiceInstance.logout();
     await super.onSuccessfulLogout();
+
+    AuthBroadcastChannel.getInstance().broadcast(AuthChannelMessage.LOGOUT_USER);
   }
 
   /**
