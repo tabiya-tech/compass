@@ -21,6 +21,7 @@ import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 import { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
+import { AuthBroadcastChannel, AuthChannelMessage } from "src/auth/services/authBroadcastChannel/authBroadcastChannel";
 
 const LazyLoadedSensitiveDataForm = lazyWithPreload(
   () => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm")
@@ -49,6 +50,23 @@ const ProtectedRouteKeys = {
 
 const App = () => {
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const channel = AuthBroadcastChannel.getInstance();
+
+    const logoutListener = async () => {
+      const authService = AuthenticationServiceFactory.getCurrentAuthenticationService();
+      await authService?.logout();
+
+      // Redirect without a page reload
+      window.location.href = `/#${routerPaths.LANDING}`;
+
+      channel.closeChannel();
+    };
+
+    // Register listener
+    channel.registerListener(AuthChannelMessage.LOGOUT_USER, logoutListener);
+  }, []);
 
   const loadApplicationState = async () => {
     try {
