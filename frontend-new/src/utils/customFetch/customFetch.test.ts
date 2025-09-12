@@ -2,7 +2,6 @@
 import "src/_test_utilities/consoleMock";
 
 import {
-  COMPRESSION_THRESHOLD,
   customFetch,
   ExtendedRequestInit,
   LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
@@ -895,10 +894,10 @@ describe("Api Service tests", () => {
   });
 
   describe("Request body compression", () => {
-    test("should compress JSON bodies that exceed the threshold", async () => {
+    test("should compress JSON bodies whose performance gain exceeds minimum", async () => {
       // GIVEN an API URL and a large JSON body
       const givenApiUrl = "givenAPIUrl";
-      const givenLargeBody = { data: "foo".repeat(COMPRESSION_THRESHOLD) };
+      const givenLargeBody = { data: "foo".repeat(100) };
       const stringifiedBody = JSON.stringify(givenLargeBody);
 
       // AND the server responds with a StatusCodes.OK status code
@@ -934,10 +933,10 @@ describe("Api Service tests", () => {
       );
     });
 
-    test("should not compress JSON bodies below the threshold", async () => {
+    test("should not compress JSON bodies whose performance gain is below the minimum allowed threshold", async () => {
       // GIVEN an API URL and a small JSON body
       const givenApiUrl = "givenAPIUrl";
-      const givenSmallBody = { data: "foo" };
+      const givenSmallBody = "a";
 
       // AND the server responds with a StatusCodes.OK status code
       const mockFetch = setupFetchSpy(StatusCodes.OK, "Success", "application/json;charset=UTF-8");
@@ -953,11 +952,7 @@ describe("Api Service tests", () => {
         authRequired: false,
       });
 
-      // THEN expect brotli-wasm compress not to haveBeenCalled
-      const mockBrotli = await mockBrotliPromise;
-      expect(mockBrotli.compress).not.toHaveBeenCalled();
-
-      // AND expect fetch to have been called with the stringified JSON
+      // THEN expect fetch to have been called with the stringified JSON not the compressed blob
       expect(mockFetch).toHaveBeenCalledWith(
         givenApiUrl,
         expect.objectContaining({
