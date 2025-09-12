@@ -40,6 +40,21 @@ jest.mock("src/auth/services/invitationsService/invitations.service", () => {
   };
 });
 
+// mock authBroadcastChannel
+jest.mock("src/auth/services/authBroadcastChannel/authBroadcastChannel.ts", () => {
+  return {
+    AuthChannelMessage: { LOGOUT_USER: "LOGOUT_USER" },
+    AuthBroadcastChannel: {
+      getInstance: jest.fn(() => ({
+        registerListener: jest.fn(),
+        broadcast: jest.fn(),
+        closeChannel: jest.fn(),
+      })),
+    },
+  };
+});
+
+
 describe("AuthService class tests", () => {
   const authService: FirebaseEmailAuthenticationService = FirebaseEmailAuthenticationService.getInstance();
 
