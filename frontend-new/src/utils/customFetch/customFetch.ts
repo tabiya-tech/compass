@@ -4,7 +4,7 @@ import { getRestAPIErrorFactory, RestAPIErrorFactory } from "src/error/restAPIEr
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 
-import { sleep, getNextBackoff, calculateTimeToTokenExpiry } from "./utils";
+import { calculateCompressionGainPercent, calculateTimeToTokenExpiry, getNextBackoff, sleep } from "./utils";
 import { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
 
 import { StatusCodes } from "http-status-codes";
@@ -40,12 +40,9 @@ export const MIN_TOKEN_VALIDITY_SECONDS = 30; // 30 sec
 // It is 10 seconds twice of the default one
 export const LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION = 10000;
 
-// Minimum request body size before compression is applied
-// we have a minimum size because brotli compression below a certain size doesnt make sense
-// at lower sizes, besides the time and computational cost, it tends to not bring any benefit, might even increase the size.
-// REF: https://datatracker.ietf.org/doc/html/rfc7932#section-4.1
-// we chose 512 because its on the higher end of the requests we currently send from our frontend.
-export const COMPRESSION_THRESHOLD = 512;
+// Minimum performance gain percentage to consider compression
+// Otherwise it is not worth the CPU cost of compressing and decompressing
+export const MIN_PERFORMANCE_GAIN_PERCENT = 5;
 
 // This function is used to make authenticated fetch requests
 // It adds the Authorization header with the Token from the session storage
@@ -276,22 +273,28 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
             headers.set("Content-Type", "application/json");
           }
 
-          // Apply compression if the body exceeds a threshold
-          if (bodyString.length > COMPRESSION_THRESHOLD) {
-            console.debug(`Compressing request for ${serviceName}.${serviceFunction} with body size ${bodyString.length}`);
-            try {
-              const brotli = await brotliPromise;
-              const compressed = brotli.compress(new TextEncoder().encode(bodyString));
-              processedBody = new Blob([compressed]);
-              headers.set("Content-Encoding", "br");
-            } catch (error) {
-              console.warn(`Failed to compress request for ${serviceName}.${serviceFunction}:`, error);
+          try {
+            let rawBytes = new TextEncoder().encode(bodyString);
+
+            const brotli = await brotliPromise;
+            let compressedBytes = brotli.compress(rawBytes);
+
+            // First, check if we want to compress based on the throughput gain. (if it is less than MIN_PERFORMANCE_GAIN_PERCENT, do not compress)
+            // This is to avoid the CPU overhead of compressing and decompressing small payloads.
+            const performanceGainPercent = calculateCompressionGainPercent(rawBytes.length, compressedBytes.length)
+            if (performanceGainPercent < MIN_PERFORMANCE_GAIN_PERCENT) {
+              console.debug(`Skipping compression for ${serviceName}.${serviceFunction} because the gain is below the threshold. Body size: ${rawBytes.length}, gain: ${performanceGainPercent}`);
               processedBody = bodyString;
               headers.delete("Content-Encoding");
+            } else {
+              console.debug(`Compressing request for ${serviceName}.${serviceFunction} with body size ${rawBytes.length}, gain: ${performanceGainPercent}`);
+              processedBody = new Blob([compressedBytes]);
+              headers.set("Content-Encoding", "br");
             }
-          } else {
-            console.debug(`Skipping compression for ${serviceName}.${serviceFunction} because the body is below the threshold. Body size: ${bodyString.length}`);
+          } catch (error) {
+            console.warn(`Failed to compress request for ${serviceName}.${serviceFunction}:`, error);
             processedBody = bodyString;
+            headers.delete("Content-Encoding");
           }
         }
       }

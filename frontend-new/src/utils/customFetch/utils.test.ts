@@ -1,4 +1,4 @@
-import { sleep, getNextBackoff, calculateTimeToTokenExpiry } from "./utils";
+import { calculateCompressionGainPercent, calculateTimeToTokenExpiry, getNextBackoff, sleep } from "./utils";
 
 describe("sleep", () => {
   beforeEach(() => {
@@ -114,5 +114,22 @@ describe("calculateTimeToTokenExpiry", () => {
 
     // THEN it should return approximately 0
     expect(result).toBeCloseTo(0, -1); // Allow for small timing differences
+  });
+});
+
+describe("calculateCompressionGainPercent", () => {
+  test.each([
+    [50, 1000, 500],
+    [75, 1000, 250],
+    [5, 1000, 950],
+    [0, 1000, 1000],
+    [0, 0, 0],
+    [-100, 1000, 2000]
+  ])("should return %i% for originalSize=%i and compressedSize=%i", (expected, originalSize, compressedSize) => {
+    // GIVEN original and compressed sizes
+    // WHEN we calculate the compression gain percent
+    const actualResult = calculateCompressionGainPercent(originalSize, compressedSize);
+    // THEN it should return the expected value
+    expect(actualResult).toBe(expected);
   });
 });

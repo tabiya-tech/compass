@@ -22,3 +22,13 @@ export const calculateTimeToTokenExpiry = (exp: number): number => {
   const currentTime = Math.floor(Date.now() / 1000); // current time in seconds
   return exp - currentTime; // time to expiry in seconds
 }
+/**
+ * Calculates the percentage gain from compression.
+ *
+ * @param originalSize - The original size before compression.
+ * @param compressedSize - The size after compression.
+ */
+export const calculateCompressionGainPercent = (originalSize: number, compressedSize: number): number => {
+  if (originalSize === 0) return 0;
+  return ((originalSize - compressedSize) / originalSize) * 100;
+}
