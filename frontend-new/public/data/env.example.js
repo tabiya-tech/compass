@@ -24,9 +24,39 @@ window.tabiyaConfig = {
   SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID: btoa("key_id"),
 
   // Application default invitation codes.
+  // 
+  // Authentication Flow Configuration:
+  // These 4 flags control the authentication behavior of the application:
+  //
+  // FRONTEND_LOGIN_CODE: Sets a default invitation code for anonymous login. (Guest login)
+  //   - If set, users can click "Continue as Guest" to login anonymously
+  //   - If empty, users must use their own invitation code or email/password
+  //
+  // FRONTEND_REGISTRATION_CODE: Sets a default invitation code for registration.
+  //   - If set, users can register with this code without needing their own
+  //   - If empty, users must provide their own invitation code to register
+  //
+  // FRONTEND_DISABLE_LOGIN_CODE: Disables anonymous login functionality.
+  //   - If "true", anonymous login is completely disabled regardless of FRONTEND_LOGIN_CODE
+  //   - If "false", anonymous login works based on FRONTEND_LOGIN_CODE setting
+  //   - When disabled, users can only login with email/password and google
+  //
+  // FRONTEND_DISABLE_REGISTRATION: Disables user registration entirely.
+  //   - If "true", registration page is completely inaccessible (404 error)
+  //   - If "false", registration works based on FRONTEND_REGISTRATION_CODE setting
+  //   - When disabled, "Register" links are hidden and registration route is removed
+  //
+  // Common configurations:
+  // - Open registration: FRONTEND_DISABLE_REGISTRATION="false", FRONTEND_REGISTRATION_CODE=""
+  // - Invitation-only registration: FRONTEND_DISABLE_REGISTRATION="false", FRONTEND_REGISTRATION_CODE="some_code"
+  // - Closed registration: FRONTEND_DISABLE_REGISTRATION="true"
+  // - Anonymous login enabled: FRONTEND_DISABLE_LOGIN_CODE="false", FRONTEND_LOGIN_CODE="some_code"
+  // - Anonymous login disabled: FRONTEND_DISABLE_LOGIN_CODE="true"
+  //
   FRONTEND_LOGIN_CODE: btoa("login_code"),
   FRONTEND_REGISTRATION_CODE: btoa("registration_code"),
   FRONTEND_DISABLE_LOGIN_CODE: btoa("false"),
+  FRONTEND_DISABLE_REGISTRATION: btoa("false"),
 
   // CV Upload feature flag (optional, defaults to false if not set)
   FRONTEND_ENABLE_CV_UPLOAD: btoa("true"),
