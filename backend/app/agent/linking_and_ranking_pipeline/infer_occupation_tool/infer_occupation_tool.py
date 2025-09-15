@@ -58,6 +58,8 @@ class InferOccupationTool:
         """
         start_time = time.time()
         last_time = time.time()
+        llm_stats = []
+        
         # 1. Contextualize the experience title based on the country of interest, company, work type and responsibilities
         #    and infer the contextual title.
         contextualization_llm = _ContextualizationLLM(
@@ -70,6 +72,8 @@ class InferOccupationTool:
             responsibilities=responsibilities,
             number_of_titles=number_of_titles
         )
+        llm_stats.extend(contextualization_response.llm_stats)
+        
         # 2. Search for the top_p occupations matching the title
         #  creates a set to remove duplicates and convert to lowercase as the esco titles in the db are lowercase, and
         #  using a different case yields imprecise results
@@ -91,6 +95,7 @@ class InferOccupationTool:
 
         self._logger.debug("Contextualizing the experience title took %.2f seconds", time.time() - last_time)
         last_time = time.time()
+        
         # create a task for each title
         # search for the top_p matching occupations for each title initially, and later filter out the irrelevant ones
         tasks = [self._occupation_skill_search_service.search(query=title, k=top_p) for title in titles]
@@ -107,9 +112,23 @@ class InferOccupationTool:
             self_employment_tasks = [self._occupation_skill_search_service.get_by_esco_code(code="5221_2")]
             tasks.extend(self_employment_tasks)
 
-        list_of_occupation_list = await asyncio.gather(*tasks)
+        # Use return_exceptions=True to handle individual task failures gracefully
+        list_of_occupation_list = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # Filter out exceptions and log them
+        valid_occupation_lists = []
+        for i, result in enumerate(list_of_occupation_list):
+            if isinstance(result, Exception):
+                self._logger.error(
+                    "Failed to search occupations for title task %d. Error: %s",
+                    i, exc_info=result
+                )
+            else:
+                valid_occupation_lists.append(result)
+        
         # Build a list of unique occupations from the occupation skills based on their UUIDs
-        occupations_skills = flattern(list_of_occupation_list)
+        occupations_skills = flattern(valid_occupation_lists)
+        
         self._logger.debug("Finding the top_p occupations for the contextualized titles took %.2f seconds",
                            time.time() - last_time)
         last_time = time.time()
@@ -122,14 +141,17 @@ class InferOccupationTool:
             responsibilities=responsibilities,
             top_k=top_k
         )
+        llm_stats.extend(relevant_occupations_output.llm_stats)
         relevant_occupations_uuids = {occupation.UUID for occupation in relevant_occupations_output.most_relevant}
         relevant_occupations_skills = [occupation_skill for occupation_skill in occupations_skills if
                                        occupation_skill.occupation.UUID in relevant_occupations_uuids]
-        result = InferOccupationToolOutput(contextual_titles=contextualization_response.contextual_titles,
-                                           esco_occupations=relevant_occupations_skills,
-                                           responsibilities=responsibilities,
-                                           llm_stats=contextualization_response.llm_stats + relevant_occupations_output.llm_stats
-                                           )
+        
+        result = InferOccupationToolOutput(
+            contextual_titles=contextualization_response.contextual_titles,
+            esco_occupations=relevant_occupations_skills,
+            responsibilities=responsibilities,
+            llm_stats=llm_stats
+        )
         self._logger.debug("Filter out the irrelevant occupations took %.2f seconds", time.time() - last_time)
         self._logger.info("Occupation inference took %.2f seconds in total", time.time() - start_time)
         return result

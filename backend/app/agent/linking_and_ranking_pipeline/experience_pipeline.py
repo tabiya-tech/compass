@@ -207,7 +207,25 @@ class ExperiencePipeline:
                 country_of_interest=country_of_interest,
                 work_type=work_type))
 
-        cluster_results: list[ClusterPipelineResult] = await asyncio.gather(*tasks)
+        # Process clusters with error handling - if one cluster fails, others can still succeed
+        cluster_results: list[ClusterPipelineResult] = []
+        cluster_tasks_with_results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        for i, result in enumerate(cluster_tasks_with_results):
+            if isinstance(result, Exception):
+                # Log the error but continue processing other clusters
+                cluster = cluster_tool_response.clusters[i]
+                self._logger.error(
+                    "Failed to process cluster '%s' with responsibilities: %s. Error: %s",
+                    cluster.cluster_name,
+                    json.dumps(cluster.responsibilities, ensure_ascii=False),
+                    str(result),
+                    exc_info=result
+                )
+                # Skip failed clusters - don't create fallback results
+                continue
+            else:
+                cluster_results.append(result)
         # 3. Return the top skill of each cluster
         top_skills = []
         remaining_skills = []
@@ -299,18 +317,21 @@ class ExperiencePipeline:
                              country_of_interest: Country,
                              work_type: WorkType) -> ClusterPipelineResult:
         llm_stats = []
+        
         # 2.1 Infer the occupations and associated skills
-
-        inferred_occupations_response = await self._infer_occupations_tool.execute(experience_title=experience_title,
-                                                                                   company=company_name,
-                                                                                   work_type=work_type,
-                                                                                   responsibilities=responsibilities,
-                                                                                   country_of_interest=country_of_interest,
-                                                                                   number_of_titles=config.number_of_occupation_alt_titles,
-                                                                                   top_k=config.number_of_occupations_per_cluster,
-                                                                                   top_p=config.number_of_occupations_candidates_per_title)
+        inferred_occupations_response = await self._infer_occupations_tool.execute(
+            experience_title=experience_title,
+            company=company_name,
+            work_type=work_type,
+            responsibilities=responsibilities,
+            country_of_interest=country_of_interest,
+            number_of_titles=config.number_of_occupation_alt_titles,
+            top_k=config.number_of_occupations_per_cluster,
+            top_p=config.number_of_occupations_candidates_per_title
+        )
         llm_stats.extend(inferred_occupations_response.llm_stats)
         occupation_labels = [esco_occupation.occupation.preferredLabel for esco_occupation in inferred_occupations_response.esco_occupations]
+        
         # 2.2 Link responsibilities to the associated skills
         top_skills_response = await self._skills_linking_tool.execute(
             job_titles=inferred_occupations_response.contextual_titles,
@@ -324,6 +345,7 @@ class ExperiencePipeline:
         top_skills = top_skills_response.top_skills
         llm_stats.extend(top_skills_response.llm_stats)
         top_skills_labels = [skill.preferredLabel for skill in top_skills]
+        
         if self._logger.isEnabledFor(logging.INFO):
             self._logger.info("Skills_linking_tool for:"
                               "\n  - responsibilities group: %s "
@@ -337,6 +359,7 @@ class ExperiencePipeline:
                               json.dumps(occupation_labels, ensure_ascii=False),
                               json.dumps(top_skills_labels, ensure_ascii=False)
                               )
+        
         # 2.3 Rank the skills to get the top skill of the cluster
         # For now, return the unranked skills
         return ClusterPipelineResult(
