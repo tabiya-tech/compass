@@ -7,6 +7,7 @@ import InfoService from "./info/info.service";
 import AuthenticationStateService from "./auth/services/AuthenticationState.service";
 import UserPreferencesStateService from "./userPreferences/UserPreferencesStateService";
 import UserPreferencesService from "./userPreferences/UserPreferencesService/userPreferences.service";
+import { ConsoleLevel } from "@sentry/core/build/types/types-hoist/instrument";
 
 export interface SentryConfig {
   // See https://docs.sentry.io/platforms/javascript/configuration/options/
@@ -16,6 +17,7 @@ export interface SentryConfig {
   replayIntegration: boolean;
   enableLogs: boolean; // See: https://docs.sentry.io/platforms/javascript/guides/react/logs/
   levels: string[];
+  logLevels: string[];
 }
 
 export const SENTRY_CONFIG_DEFAULT: SentryConfig = {
@@ -25,6 +27,7 @@ export const SENTRY_CONFIG_DEFAULT: SentryConfig = {
   replayIntegration: false, //  Turn off replay integration to reduce bundle size
   enableLogs: false, // Enable logs to be sent to Sentry, this depends on the 'levels' configuration
   levels: ["error"], //  Capture only error level logs
+  logLevels: ["error", "warn", "info"], // Capture error, warn and info levels logs
 };
 
 export interface SentryConfigResult {
@@ -64,6 +67,7 @@ export function loadSentryConfig(): SentryConfigResult {
       replayIntegration: _config?.replayIntegration ?? SENTRY_CONFIG_DEFAULT.replayIntegration,
       enableLogs: _config?.enableLogs ?? SENTRY_CONFIG_DEFAULT.enableLogs,
       levels: _config?.levels ?? SENTRY_CONFIG_DEFAULT.levels,
+      logLevels: _config?.logLevels ?? SENTRY_CONFIG_DEFAULT.logLevels,
     },
     errors: errors,
     warnings: warnings,
@@ -75,9 +79,7 @@ function obfuscateEvent<T>(event: T): T {
     // Stringify the event and replace 'auth' with 'htua' to avoid Sentry from filtering our auth module logs.
     // Replace 'token' with 't0ken' to avoid Sentry from filtering logs related to the token.
     // For the list of fields ignored, see: https://docs.sentry.io/security-legal-pii/scrubbing/server-side-scrubbing/
-    event = JSON.parse(JSON.stringify(event)
-      .replace(/auth/gi, "htua")
-      .replace(/oken/gi, "0ken"));
+    event = JSON.parse(JSON.stringify(event).replace(/auth/gi, "htua").replace(/oken/gi, "0ken"));
   } catch (e) {} // If the event cannot be stringifies, we just ignore the error
 
   return event;
@@ -126,9 +128,12 @@ export function initSentry() {
   }
 
   // This will allow JavaScript console object functions (console.log, console.error, console.warn, etc) to send logs to Sentry
-  if(cfg.enableLogs) {
-    // send `console.log`, `console.warn`, and `console.error` calls as logs to Sentry
-    integrations.push(Sentry.consoleLoggingIntegration())
+  if (cfg.enableLogs) {
+    integrations.push(
+      Sentry.consoleLoggingIntegration({
+        levels: cfg.logLevels as ConsoleLevel[],
+      })
+    );
   }
 
   Sentry.init({
@@ -160,22 +165,22 @@ export function initSentry() {
         event.tags = {
           ...event.tags,
           user_id: AuthenticationStateService.getInstance().getUser()?.id,
-          session_id: UserPreferencesStateService.getInstance().getActiveSessionId()
-        }
+          session_id: UserPreferencesStateService.getInstance().getActiveSessionId(),
+        };
       }
 
-      return obfuscateEvent(event)
+      return obfuscateEvent(event);
     },
     beforeSendLog(log) {
       log.attributes = {
         ...(log.attributes || {}),
-        "client_id": UserPreferencesService.getInstance().getClientID(),
-        "user_id": AuthenticationStateService.getInstance().getUser()?.id,
-        "session_id": UserPreferencesStateService.getInstance().getActiveSessionId(),
-      }
+        client_id: UserPreferencesService.getInstance().getClientID(),
+        user_id: AuthenticationStateService.getInstance().getUser()?.id,
+        session_id: UserPreferencesStateService.getInstance().getActiveSessionId(),
+      };
 
-      return obfuscateEvent(log)
-    }
+      return obfuscateEvent(log);
+    },
   });
 
   InfoService.getInstance()
@@ -187,7 +192,7 @@ export function initSentry() {
     });
 
   // Set the tag for the client ID in Sentry, It is not per event, but per session.
-  Sentry.setTag("client_id", UserPreferencesService.getInstance().getClientID())
+  Sentry.setTag("client_id", UserPreferencesService.getInstance().getClientID());
 
   // Log any errors and warning that occurred while loading Sentry
   // Do this at the end, so that if entry is initialized, the errors are sent to Sentry

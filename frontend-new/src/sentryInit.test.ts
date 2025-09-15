@@ -137,7 +137,7 @@ describe("sentryInit", () => {
         expectedIntegrations.push(mockReplay);
       }
 
-      if(expectedConfig.enableLogs) {
+      if (expectedConfig.enableLogs) {
         expectedIntegrations.push(mockLogs);
       }
 
@@ -151,10 +151,10 @@ describe("sentryInit", () => {
         replaysSessionSampleRate: expectedConfig.replaysSessionSampleRate,
         replaysOnErrorSampleRate: expectedConfig.replaysOnErrorSampleRate,
         beforeSend: expect.any(Function),
-        beforeSendLog: expect.any(Function)
+        beforeSendLog: expect.any(Function),
       });
 
-      // AND the Sentry.captureConsoleIntegration  should be called with default levels
+      // AND the Sentry.captureConsoleIntegration should be called with default levels
       expect(Sentry.captureConsoleIntegration).toHaveBeenCalledWith({
         levels: expectedConfig.levels,
       });
@@ -231,6 +231,7 @@ describe("sentryInit", () => {
           replayIntegration: true,
           enableLogs: true,
           levels: ["error", "warn", "info", "debug"],
+          logLevels: ["error", "warn", "info", "debug", "log"],
         }),
         {
           tracesSampleRate: 0.1,
@@ -239,6 +240,7 @@ describe("sentryInit", () => {
           replayIntegration: true,
           enableLogs: true,
           levels: ["error", "warn", "info", "debug"],
+          logLevels: ["error", "warn", "info", "debug", "log"]
         },
       ],
       [
@@ -266,12 +268,13 @@ describe("sentryInit", () => {
         JSON.stringify({ replaysOnErrorSampleRate: 0.7 }),
         { ...SENTRY_CONFIG_DEFAULT, replaysOnErrorSampleRate: 0.7 },
       ],
-      [
-        "Only Logs enabled",
-        JSON.stringify({ enableLogs: true }),
-        { ...SENTRY_CONFIG_DEFAULT, enableLogs: true },
-      ],
+      ["Only Logs enabled", JSON.stringify({ enableLogs: true }), { ...SENTRY_CONFIG_DEFAULT, enableLogs: true }],
       ["Only Levels", JSON.stringify({ levels: ["error"] }), { ...SENTRY_CONFIG_DEFAULT, levels: ["error"] }],
+      [
+        "Only Log Levels",
+        JSON.stringify({ logLevels: ["error", "warn", "info"] }),
+        { ...SENTRY_CONFIG_DEFAULT, logLevels: ["error", "warn", "info"] } as SentryConfig,
+      ],
     ])("should use given config %s", (_, givenJsonConfig: string, expectedConfig: SentryConfig) => {
       // GIVEN the necessary configuration values are available
       const givenTargetEnvironmentName = "given-target-environment-name";
