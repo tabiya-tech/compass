@@ -22,7 +22,7 @@ class OpportunitiesInfo(BaseModel):
         features.skills_ranking.ranking_service.services.opportunities_data_service._compute_version_from_skills
     """
 
-    hash_algo: HashAlgorithms
+    hash_algo: Optional[HashAlgorithms]
     """
     Algorithm used to compute the hash. Default is "md5".
     """
@@ -52,9 +52,10 @@ class DatasetInfo(BaseModel):
     All the input opportunities used to generate the rank of the user. 
     """
 
-    matching_opportunities: OpportunitiesInfo
+    matching_opportunities: Optional[OpportunitiesInfo]
     """
     The opportunities that matched the user above the matching threshold.
+    This can be None if the ranking was done before we started storing this information.
     """
 
     fetch_time: datetime
@@ -76,6 +77,11 @@ Consisting of the dataset version that was used at the time.
 
 
 class JobSeeker(BaseModel):
+    id: Optional[str] = None
+    """
+    The unique identifier for the job seeker document in the database.
+    """
+
     user_id: str
     """
     The unique identifier for the job seeker.

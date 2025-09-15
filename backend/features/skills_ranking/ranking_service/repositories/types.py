@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import AsyncIterator
 
 from features.skills_ranking.ranking_service.types import JobSeeker
 
@@ -20,6 +21,25 @@ class IJobSeekersRepository(ABC):
     async def save_job_seeker_rank(self, job_seeker: JobSeeker) -> None:
         """
         Save jobseeker rank.
+        """
+        raise NotImplementedError
+
+    async def update_job_seeker(self, job_seeker: JobSeeker):
+        """
+        Update jobseeker data in the repository.
+
+        :param job_seeker: The jobseeker to update.
+        :return: None
+        """
+        raise NotImplementedError
+
+
+    def stream(self, batch_size: int = 100) -> AsyncIterator[JobSeeker]:
+        """
+        Stream jobseekers from the repository in batches.
+
+        :param batch_size: The batch size to use when streaming jobseekers.
+        :return:
         """
         raise NotImplementedError
 

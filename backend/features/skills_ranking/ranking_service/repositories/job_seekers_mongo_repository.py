@@ -1,12 +1,21 @@
 import datetime
 import logging
+from typing import AsyncIterator
 
+from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from common_libs.time_utilities import get_now, mongo_date_to_datetime, datetime_to_mongo_date, \
     convert_python_datetime_to_mongo_datetime
 from .types import IJobSeekersRepository
 from features.skills_ranking.ranking_service.types import JobSeeker, OpportunitiesInfo, DatasetInfo
+
+
+class JobSeekerNotFoundError(Exception):
+    """
+    Jobseeker not found in the data store (MongoDB Database)
+    """
+    pass
 
 
 def _to_db_document(job_seeker: JobSeeker) -> dict:
@@ -32,6 +41,7 @@ def _to_db_document(job_seeker: JobSeeker) -> dict:
     }
 
     return {
+        "_id": ObjectId(job_seeker.id) if job_seeker.id else None,
         "compassUserId": job_seeker.user_id,
         "externalUserId": job_seeker.external_user_id,
         "skillsOriginUUIDs": list(job_seeker.skills_origin_uuids),
@@ -56,7 +66,9 @@ def _to_db_document(job_seeker: JobSeeker) -> dict:
                 "totalCount": job_seeker.dataset_info.matching_opportunities.total_count,
                 "hash": job_seeker.dataset_info.matching_opportunities.hash,
                 "hashAlgo": job_seeker.dataset_info.matching_opportunities.hash_algo,
-            },
+                # If the `matching opportunities` is None, we don't store it in the database. We keep None value.
+                # (Because of legacy `jobseekers` documents with no matching opportunities)
+            } if job_seeker.dataset_info.matching_opportunities else None,
             "fetchTime": datetime_to_mongo_date(job_seeker.dataset_info.fetch_time)
         },
 
@@ -84,7 +96,9 @@ def _from_db_document(document: dict) -> JobSeeker:
         total_count=dataset_info_doc.get("matchingOpportunities", {}).get("totalCount", 0),
         hash=dataset_info_doc.get("matchingOpportunities", {}).get("hash", ""),
         hash_algo=dataset_info_doc.get("inputOpportunities", {}).get("hashAlgo"),
-    )
+        # If the `matching opportunities` is None, we don't store it in the database. We keep None value.
+        # (Because of legacy `jobseekers` documents with no matching opportunities
+    ) if dataset_info_doc.get("matchingOpportunities") else None
 
     dataset_info = DatasetInfo(
         taxonomy_model_id=dataset_info_doc.get("taxonomyModelId"),
@@ -111,6 +125,7 @@ def _from_db_document(document: dict) -> JobSeeker:
     }
 
     return JobSeeker(
+        id=str(document.get("_id")),
         user_id=document.get("compassUserId"),
         external_user_id=document.get("externalUserId"),
         skills_origin_uuids=set(document.get("skillsOriginUUIDs", [])),
@@ -212,3 +227,50 @@ class JobSeekersMongoRepository(IJobSeekersRepository):
         except Exception as e:
             self._logger.error(f"Failed to save job seeker rank for {job_seeker.user_id}: {e}")
             raise
+
+    async def update_job_seeker(self, job_seeker: JobSeeker):
+        """
+        Update jobseeker data in the repository.
+
+        :param job_seeker: The jobseeker to update.
+        :return: None if successful,
+        :raises ValueError: If the jobseeker does not have a valid user_id.
+        :raises JobSeekerNotFoundError: If the jobseeker does not exist in the database.
+        """
+
+        if not job_seeker.id:
+            raise ValueError("Job seeker must have a valid id to update.")
+
+        try:
+            # check if the jobseeker already exists in the database to prevent data collision
+            existing_document = await self._collection.find_one({"_id": {"$eq": ObjectId(job_seeker.id)}})
+
+            if not existing_document:
+                self._logger.error(
+                    f"Job seeker {job_seeker.user_id} does not exist in the database. Cannot update non-existing job seeker.")
+                raise JobSeekerNotFoundError(f"Job seeker with id {job_seeker.id} not found.")
+
+            # convert the jobseeker to a MongoDB document
+            document = _to_db_document(job_seeker)
+
+            # Set the updated At now
+            document["updatedAt"] = get_now()
+
+            del document["_id"]
+
+            await self._collection.find_one_and_update(
+                {"_id": {"$eq": existing_document.get("_id")}},
+                {"$set": document},
+            )
+        except Exception as e:
+            self._logger.error(f"Failed to save job seeker rank for {job_seeker.user_id}: {e}")
+            raise
+
+    async def stream(self, batch_size: int = 100) -> AsyncIterator[JobSeeker]:
+        """
+        Stream all jobseekers from the database in batches.
+        """
+
+        cursor = self._collection.find({}).batch_size(batch_size)
+        async for document in cursor:
+            yield _from_db_document(document)
