@@ -16,6 +16,7 @@ window.tabiyaConfig = {
       replayIntegration: false, //  Turn off replay integration to reduce bundle size
       enableLogs: false, // Turn on/off sending logs to sentry
       levels: ["error", "warn"], //  Capture only error level logs
+      logLevels: ["error", "warn", "info"], //  Capture error, warn and info levels logs
     })
   ),
   // The FRONTEND_ENABLE_METRICS variable is picked up by the Metrics SDK.
