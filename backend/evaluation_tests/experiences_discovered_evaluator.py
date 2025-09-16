@@ -93,7 +93,7 @@ class ExperiencesDiscoveredEvaluator:
         # Use GeminiGenerativeLLM as the LLM for evaluation
         self.llm = GeminiGenerativeLLM(
             config=LLMConfig(
-                language_model_name="gemini-2.5-pro-preview-05-06",
+                language_model_name="gemini-2.0-flash-001",
                 generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG
 
             ),
