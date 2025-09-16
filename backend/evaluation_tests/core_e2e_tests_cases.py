@@ -291,5 +291,38 @@ test_cases = [
             without a car.  
             """) + france_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
+    ),
+    E2ETestCase(
+        skip_force="force",
+        country_of_user=Country.UNSPECIFIED,
+        conversation_rounds=100,
+        name='cv_upload_style_e2e',
+        simulated_user_prompt=dedent("""
+            You are a professional with diverse experiences. 
+            If asked if you want to start the conversation, agree to start without saying anything about your experiences. 
+            Only after agreeing to start, wait for the agent to ask you about your experiences, and then you will respond in CV format with bullet points:
+            
+            <Message>
+                These are my experiences:
+                • Worked as a project manager at the University of Oxford, from 2018 to 2020. It was a paid job and you worked remotely.
+                • Worked as a software architect at ProUbis GmbH in berlin, from 2010 to 2018. It was a full-time job.
+                • You owned a bar/restaurant called Dinner For Two in Berlin from 2010 until covid-19, then you sold it.
+                • Co-founded Acme Inc. in 2022, a gen-ai startup based in DC, USA. You owned this business and your role was CEO.
+                • In 1998 did an unpaid internship as a Software Developer for Ubis GmbH in Berlin. 
+                • Between 2015-2017 volunteer, taught coding to kids in a community center in Berlin.
+                • Helped your elderly neigh bor with groceries and cleaning every week since 2019.
+            </Message>
+            
+            You will provide all this information at once when asked about your experiences. Provide the information exactly as you see it in the <Message /> section
+             
+            Do not give the information again later in the conversation,
+            but instead refer to the list of experiences you provided at the start of the conversation as "I have already shared the information".
+            
+            If they say they don't have access to that information skip the experience by saying, 
+            "I don't have access to that information right now, let's skip it and move on."
+            
+            You can come up with activities you have done during each experience.
+            """) + system_instruction_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     )
 ]
