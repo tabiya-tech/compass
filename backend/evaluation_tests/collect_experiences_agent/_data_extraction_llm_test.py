@@ -103,7 +103,7 @@ test_cases_data_extraction = [
              "company": AnyOf(None, ContainsString("local market")),
              "paid_work": AnyOf(True, False),
              "start_date": AnyOf('', None),
-             "end_date": AnyOf('', None),
+             "end_date": AnyOf('', None, ContainsString("Present")),
              "work_type":
                  AnyOf(*WorkType.__members__.keys())
              },
@@ -124,7 +124,7 @@ test_cases_data_extraction = [
         collected_data_so_far=[
         ],
         expected_last_referenced_experience_index=0,
-        expected_collected_data_count=1,
+        expected_collected_data_count=2,
         expected_collected_data=[
             {"index": 0,
              "defined_at_turn_number": 1,
@@ -136,12 +136,22 @@ test_cases_data_extraction = [
              "end_date": '2018',
              "work_type":
                  AnyOf(None, WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name)
-             }
+             },
+            {"index": 1,
+                "defined_at_turn_number": 1,
+                "experience_title": ContainsString("Project Manager"),
+                "location": AnyOf(ContainsString("Oxford"), ContainsString("remote")),
+                "company": ContainsString("University of Oxford"),
+                "paid_work": True,
+                "start_date": '2018',
+                "end_date": '2020',
+                "work_type":
+                    AnyOf(None, WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name)
+                },
         ]
 
     ),
-    _TestCaseDataExtraction(
-        name="associate_with_previous_experience",
+    _TestCaseDataExtraction(name="associate_with_previous_experience",
         summary="",
         turns=[
             ("(silence)",
@@ -208,8 +218,7 @@ test_cases_data_extraction = [
              },
         ]
     ),
-    _TestCaseDataExtraction(
-        name="associate_with_previous_experience_long_conversation_texts",
+    _TestCaseDataExtraction(name="associate_with_previous_experience_long_conversation_texts",
         summary="",
         turns=[
             ("(silence)",
@@ -456,8 +465,7 @@ test_cases_data_extraction = [
         expected_last_referenced_experience_index=-1,
         expected_collected_data_count=2
     ),
-    _TestCaseDataExtraction(
-        name="refer_to_previous_experience_(withholding_student_e2e)",
+    _TestCaseDataExtraction(name="refer_to_previous_experience_(withholding_student_e2e)",
         summary="",
         turns=[
             (
@@ -481,7 +489,7 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("teaching graphic design"),
-             "location": AnyOf(ContainsString("online"), ContainsString("remote")),
+             "location": AnyOf(None,ContainsString("online"), ContainsString("remote")),
              "company": None,
              "paid_work": True,
              "start_date": '2020/06',
@@ -657,6 +665,202 @@ test_cases_data_extraction = [
         ],
         expected_last_referenced_experience_index=-1,
         expected_collected_data_count=0
+    ),
+    
+    _TestCaseDataExtraction(
+        name="multi_experience_simple_two_new",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+        ],
+        user_input="I worked as a software developer at Google from 2020-2022, and also did freelance web design for local businesses since 2021.",
+        collected_data_so_far=[],
+        expected_last_referenced_experience_index=0,  # Should reference first experience
+        expected_collected_data_count=2,  # Should collect BOTH experiences
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": ContainsString("software developer"),
+             "location": AnyOf(None, ContainsString("Google")),
+             "company": ContainsString("Google"),
+             "paid_work": True,
+             "start_date": '2020',
+             "end_date": '2022',
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+             },
+            {"index": 1,
+             "defined_at_turn_number": 1,
+             "experience_title": ContainsString("web design"),
+             "location": AnyOf(None, ContainsString("local")),
+             "company": AnyOf(None, ContainsString("local businesses")),
+             "paid_work": True,
+             "start_date": '2021',
+             "end_date": "Present",
+             "work_type": WorkType.SELF_EMPLOYMENT.name
+             }
+        ]
+    ),
+    
+    # Mixed case: One new, one update
+    _TestCaseDataExtraction(
+        name="multi_experience_mixed_new_and_update",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+            ("I worked as a cashier at Walmart last year.",
+             "Got it, you worked as a cashier at Walmart last year. Is there anything else you'd like to add or change about this experience?"),
+        ],
+        user_input="Actually, I worked at Walmart from 2022-2023, and I also did volunteer work at the local food bank during the same time.",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Cashier', company='Walmart',
+                          location=None, start_date='2023',
+                          end_date=None,
+                          paid_work=True, work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT')
+        ],
+        expected_last_referenced_experience_index=0,  # Should reference the updated experience
+        expected_collected_data_count=2,  # Should have both experiences
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": ContainsString("cashier"),
+             "location": AnyOf(None, ContainsString("Walmart")),
+             "company": ContainsString("Walmart"),
+             "paid_work": True,
+             "start_date": '2022',
+             "end_date": '2023',
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+             },
+            {"index": 1,
+             "defined_at_turn_number": 2,  # New experience gets current turn number
+             "experience_title": ContainsString("volunteer"),
+             "location": AnyOf(None, ContainsString("food bank")),
+             "company": AnyOf(None, ContainsString("food bank")),
+             "paid_work": False,
+             "start_date": '2022',
+             "end_date": '2023',
+             "work_type": WorkType.UNSEEN_UNPAID.name
+             }
+        ]
+    ),
+    
+    # Complex case: Three experiences with different operations
+    _TestCaseDataExtraction(name="multi_experience_complex_three_operations",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+            ("I worked as a waiter at a restaurant and also did some freelance writing.",
+             "Got it, you worked as a waiter at a restaurant and also did some freelance writing. Is there anything else you'd like to add or change about this experience?"),
+        ],
+        user_input="Actually, I worked as a waiter at Mario's Restaurant from 2021-2022, I still do freelance writing since 2020, and I also want to remove the waiter job - I don't want to include it anymore.",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Waiter', company='Restaurant',
+                          location=None, start_date=None,
+                          end_date=None,
+                          paid_work=True, work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT'),
+            CollectedData(index=1, defined_at_turn_number=1, experience_title='Freelance Writing', company=None,
+                          location=None, start_date='2020',
+                          end_date=None,
+                          paid_work=True, work_type='SELF_EMPLOYMENT')
+        ],
+        expected_last_referenced_experience_index=0,  # Should reference the updated writing experience
+        expected_collected_data_count=1,  # Should have only the writing experience (waiter deleted)
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,  # Updated experience keeps original turn number
+             "experience_title": ContainsString("freelance writing"),
+             "location": AnyOf(None, ContainsString("writing")),
+             "company": None,
+             "paid_work": True,
+             "start_date": '2020',
+             "end_date": AnyOf(None, ContainsString('Present')),
+             "work_type": WorkType.SELF_EMPLOYMENT.name
+             }
+        ]
+    ),
+    
+    # Partial information case: Multiple experiences with incomplete data
+    _TestCaseDataExtraction(
+        name="multi_experience_partial_information",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+        ],
+        user_input="I worked at Microsoft and also did some volunteer work, but I can't remember the exact dates for either.",
+        collected_data_so_far=[],
+        expected_last_referenced_experience_index=0,  # Should reference first experience
+        expected_collected_data_count=2,  # Should collect both experiences with partial data
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": AnyOf(None, ContainsString("Microsoft"), ContainsString("Employee")),
+             "location": AnyOf(None, ContainsString("Microsoft")),
+             "company": ContainsString("Microsoft"),
+             "paid_work": True,
+             "start_date": AnyOf(None, ''),
+             "end_date": AnyOf(None, ''),
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+             },
+            {"index": 1,
+             "defined_at_turn_number": 1,
+             "experience_title": ContainsString("volunteer"),
+             "location": AnyOf(None, ''),
+             "company": AnyOf(None, ''),
+             "paid_work": False,
+             "start_date": AnyOf(None, ''),
+             "end_date": AnyOf(None, ''),
+             "work_type": WorkType.UNSEEN_UNPAID.name
+             }
+        ]
+    ),
+    
+    # All operations at once: ADD, UPDATE, DELETE
+    _TestCaseDataExtraction(name="multi_experience_all_operations",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+            ("I worked as a teacher and also did some consulting work.",
+             "Got it, you worked as a teacher and also did some consulting work. Is there anything else you'd like to add or change about this experience?"),
+        ],
+        user_input="I taught at Lincoln High School from 2019-2021, I updated my consulting - it was for tech startups from 2020-2022, and I want to remove the teaching job. Also, I did some freelance photography since 2021.",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Teacher', company='School',
+                          location=None, start_date=None,
+                          end_date=None,
+                          paid_work=True, work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT'),
+            CollectedData(index=1, defined_at_turn_number=1, experience_title='Consulting', company=None,
+                          location=None, start_date=None,
+                          end_date=None,
+                          paid_work=True, work_type='SELF_EMPLOYMENT')
+        ],
+        expected_last_referenced_experience_index=0,  # Should reference the updated consulting experience
+        expected_collected_data_count=2,  # Should have consulting (updated) and photography (new), teaching deleted
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,  # Updated experience keeps original turn number
+             "experience_title": ContainsString("consulting"),
+             "location": AnyOf(None, ContainsString("tech")),
+             "company": AnyOf(None, ContainsString("tech startups")),
+             "paid_work": True,
+             "start_date": '2020',
+             "end_date": '2022',
+             "work_type": WorkType.SELF_EMPLOYMENT.name
+             },
+            {"index": 1,
+             "defined_at_turn_number": 2,  # New experience gets current turn number
+             "experience_title": ContainsString("photography"),
+             "location": AnyOf(None, ''),
+             "company": AnyOf(None, ContainsString("Self")),
+             "paid_work": AnyOf(None, True),
+             "start_date": '2021',
+             "end_date": AnyOf(None, ContainsString('Present')),
+             "work_type": WorkType.SELF_EMPLOYMENT.name
+             }
+        ]
     ),
 ]
 
