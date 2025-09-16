@@ -561,4 +561,77 @@ test_cases = [
              },
         ],
     ),
+    CollectExperiencesAgentTestCase(
+        skip_force="force",
+        name='cv_upload_style_experiences',
+        simulated_user_prompt=dedent("""
+            You are a professional with diverse experiences. When asked about your experiences, 
+            you will respond in one message exactly like it is Message Section
+            
+            #Message
+            These are my experiences:
+            • Worked as a project manager at the University of Oxford, from 2018 to 2020. It was a paid job and you worked remotely.
+            • Worked as a software architect at ProUbis GmbH in berlin, from 2010 to 2018. It was a full-time job.
+            • You owned a bar/restaurant called Dinner For Two in Berlin from 2010 until covid-19, then you sold it.
+            • Co-founded Acme Inc. in 2022, a gen-ai startup based in DC, USA. You owned this business and your role was CEO.
+            • In 1998 did an unpaid internship as a Software Developer for Ubis GmbH in Berlin. 
+            • Between 2015-2017 volunteer, taught coding to kids in a community center in Berlin.
+            • Helped your elderly neighbor with groceries and cleaning every week since 2019.
+            
+            You will provide all this information at once when asked about your experiences. Do not add additional information or invent information.
+            You have no other experiences than the above 7.
+            """) + sa_prompt,
+        country_of_user=Country.SOUTH_AFRICA,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        expected_experiences_count_min=7,
+        expected_experiences_count_max=7,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (2, 2),
+                             WorkType.SELF_EMPLOYMENT: (2, 2),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (1, 1),
+                             WorkType.UNSEEN_UNPAID: (2, 2)},
+        expected_experience_data=[
+            {"experience_title": ContainsString("project manager"),
+             "location": ContainsString("remote"),
+             "company": ContainsString("University of Oxford"),
+             "timeline": DictContaining({"start": "2018", "end": "2020"}),
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("software architect"),
+             "location": ContainsString("Berlin"),
+             "company": ContainsString("ProUbis GmbH"),
+             "timeline": DictContaining({"start": "2010", "end": "2018"}),
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("Owned a bar/restaurant"),
+             "location": ContainsString("Berlin"),
+             "company": ContainsString("Dinner For Two"),
+             "timeline": DictContaining({"start": "2010", "end": "2020"}),
+             "work_type": WorkType.SELF_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("CEO"),
+             "location": ContainsString("DC"),
+             "company": ContainsString("Acme Inc."),
+             "timeline": DictContaining({"start": "2022", "end": AnyOf('', ContainsString("present"))}),
+             "work_type": WorkType.SELF_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("Software Developer"),
+             "location": ContainsString("Berlin"),
+             "company": ContainsString("Ubis GmbH"),
+             "timeline": DictContaining({"start": ContainsString("1998"), "end": ContainsString("1998")}),
+             "work_type": WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name,
+             },
+            {"experience_title": ContainsString("Teach coding"),
+             "location": ContainsString("Berlin"),
+             "company": ContainsString("community center"),
+             "timeline": DictContaining({"start": ContainsString("2015"), "end": ContainsString("2017")}),
+             "work_type": WorkType.UNSEEN_UNPAID.name,
+             },
+            {"experience_title": ContainsString("Help"),
+             "location": AnyValue(),
+             "company": ContainsString("neighbor"),
+             "timeline": DictContaining({"start": ContainsString("2019"), "end": AnyOf('', ContainsString("present"))}),
+             "work_type": WorkType.UNSEEN_UNPAID.name,
+             },
+        ],
+    ),
 ]
