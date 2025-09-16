@@ -37,7 +37,7 @@ class ExperienceSummarizerEvaluator:
             model_response_type=ExperienceSummarizerEvalutionOutput)
         self._llm = GeminiGenerativeLLM(
             system_instructions=ExperienceSummarizerEvaluator.get_system_instructions(country_of_user=country_of_user),
-            config=LLMConfig(language_model_name="gemini-2.5-pro-preview-05-06",
+            config=LLMConfig(language_model_name="gemini-2.5-pro",
                              generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG)
         )
 
