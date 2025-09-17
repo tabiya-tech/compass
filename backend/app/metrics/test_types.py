@@ -25,6 +25,8 @@ from app.metrics.types import (
     MessageReactionCreatedEvent,
     ExperienceExploredEvent,
     UIInteractionEvent,
+    ExperienceChangedEvent,
+    SkillChangedEvent,
 )
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_application_config, \
     get_random_printable_string
@@ -584,5 +586,137 @@ class TestUIInteractionEvent:
                 actions=given_actions,
                 timestamp=given_timestamp,
                 user_id=given_user_id,
+                extra_field=given_extra_field  # type: ignore
+            )
+
+
+class TestExperienceChangedEvent:
+    @pytest.mark.parametrize("action", ["EDITED", "DELETED", "RESTORED"])
+    def test_fields_are_set_correctly(self, action, setup_application_config: ApplicationConfig,
+                                      mocker: pytest_mock.MockerFixture):
+        # datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # GIVEN a session id and user id
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+        given_work_type = WorkType.SELF_EMPLOYMENT.name
+        given_edited_fields = ["foo", "bar"]
+
+        # WHEN creating an instance of the event
+        actual_event = ExperienceChangedEvent(
+            session_id=given_session_id,
+            user_id=given_user_id,
+            action=action,  # type: ignore
+            work_type=given_work_type,
+            edited_fields=given_edited_fields,
+        )
+
+        # THEN the basic event fields should be set correctly
+        assert_basic_event_fields_are_set(actual_event, EventType.EXPERIENCE_ENTITY_CHANGED, setup_application_config,
+                                          fixed_time)
+
+        # AND the session id should be anonymized
+        assert actual_event.anonymized_session_id is not None
+        assert actual_event.anonymized_session_id != given_session_id
+
+        # AND the user id should be anonymized
+        assert actual_event.anonymized_user_id is not None
+        assert actual_event.anonymized_user_id != given_user_id
+
+        # AND the action and entity type should be set correctly
+        assert actual_event.action == action
+        assert actual_event.entity_type == "EXPERIENCE"
+
+        # AND the work type and edited fields should be set correctly
+        assert actual_event.work_type == given_work_type
+        assert actual_event.edited_fields == given_edited_fields
+
+    @pytest.mark.parametrize("action", ["EDITED", "DELETED", "RESTORED"])
+    def test_extra_fields_are_not_allowed(self, action, setup_application_config: ApplicationConfig):
+        # GIVEN all required fields
+        given_user_id = get_random_user_id()
+        given_session_id = get_random_session_id()
+        given_work_type = WorkType.SELF_EMPLOYMENT.name
+        given_edited_fields = ["foo", "bar"]
+
+        # AND an extra field
+        given_extra_field = "extra_field"
+
+        # WHEN creating an instance of the event
+        # THEN it should raise a TypeError indicating that the extra field is not allowed.
+        with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
+            ExperienceChangedEvent(
+                user_id=given_user_id,
+                session_id=given_session_id,
+                action=action,
+                work_type=given_work_type,
+                edited_fields=given_edited_fields,
+                extra_field=given_extra_field  # type: ignore
+            )
+
+
+class TestSkillChangedEvent:
+    @pytest.mark.parametrize("action", ["EDITED", "DELETED", "ADDED"])
+    def test_fields_are_set_correctly(self, action, setup_application_config: ApplicationConfig,
+                                      mocker: pytest_mock.MockerFixture):
+        # datetime.now returns a fixed time
+        fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
+        mocker.patch('common_libs.time_utilities._time_utils.datetime', new=mocker.Mock(now=lambda tz=None: fixed_time))
+
+        # GIVEN a session id and user id and some uuids and work type
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+        given_uuids = [get_random_printable_string(8) for _ in range(3)]
+        given_work_type = WorkType.SELF_EMPLOYMENT.name
+
+        # WHEN creating an instance of the event
+        actual_event = SkillChangedEvent(
+            session_id=given_session_id,
+            user_id=given_user_id,
+            uuids=given_uuids,
+            action=action,  # type: ignore
+            work_type=given_work_type,
+        )
+
+        # THEN the basic event fields should be set correctly
+        assert_basic_event_fields_are_set(actual_event, EventType.EXPERIENCE_ENTITY_CHANGED, setup_application_config,
+                                          fixed_time)
+
+        # AND the session id should be anonymized
+        assert actual_event.anonymized_session_id is not None
+        assert actual_event.anonymized_session_id != given_session_id
+
+        # AND the user id should be anonymized
+        assert actual_event.anonymized_user_id is not None
+        assert actual_event.anonymized_user_id != given_user_id
+
+        # AND the action and entity type should be set correctly
+        assert actual_event.action == action
+        assert actual_event.entity_type == "SKILL"
+
+        # AND the uuids and work type should be set correctly
+        assert actual_event.uuids == given_uuids
+        assert actual_event.work_type == given_work_type
+
+    @pytest.mark.parametrize("action", ["EDITED", "DELETED", "ADDED"])
+    def test_extra_fields_are_not_allowed(self, action, setup_application_config: ApplicationConfig):
+        # GIVEN required fields
+        given_session_id = get_random_session_id()
+        given_user_id = get_random_user_id()
+        given_uuids = [get_random_printable_string(8)]
+
+        # AND an extra field
+        given_extra_field = "extra_field"
+
+        # WHEN creating an instance of the event with an extra field
+        # THEN it should raise a TypeError indicating that the extra field is not allowed.
+        with pytest.raises(TypeError, match="got an unexpected keyword argument 'extra_field'"):
+            SkillChangedEvent(
+                session_id=given_session_id,
+                user_id=given_user_id,
+                uuids=given_uuids,
+                action=action,
                 extra_field=given_extra_field  # type: ignore
             )

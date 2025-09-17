@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Literal, final, Any
+from typing import Literal, final, Any, Optional
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -365,6 +365,133 @@ class MessageReactionCreatedEvent(AbstractConversationEvent):
             kind=kind.name,
             reasons=[reason.name for reason in reasons],
             relevant_experiments=relevant_experiments or {}
+        )
+
+    class Config:
+        extra = "forbid"
+
+
+ActionLiteral = Literal["EDITED", "DELETED", "ADDED", "RESTORED"]
+EntityTypeLiteral = Literal["SKILL", "EXPERIENCE"]
+
+class ExperienceEntityChangedEvent(AbstractConversationEvent):
+    """
+    Base metric event representing changes to experience-related entities
+    (skills or experiences).
+    """
+
+    action: ActionLiteral
+    """
+    action - the type of change performed
+    """
+
+    entity_type: EntityTypeLiteral
+    """
+    entity_type - the type of entity being changed
+    """
+
+    work_type: Optional[str] = None
+    """
+    work_type - the category/type of work associated with the entity
+    """
+
+    def __init__(
+            self,
+            *,
+            user_id: str,
+            client_id: str | None = None,
+            session_id: int,
+            event_type: EventType,
+            action: ActionLiteral,
+            entity_type: EntityTypeLiteral,
+            work_type: Optional[str] = None,
+            relevant_experiments: dict[str, str] | None = None,
+            **kwargs: Any,
+    ):
+        super().__init__(
+            user_id=user_id,
+            client_id=client_id,
+            session_id=session_id,
+            event_type=event_type,
+            action=action,
+            entity_type=entity_type,
+            work_type=work_type,
+            relevant_experiments=relevant_experiments or {},
+            **kwargs,
+        )
+
+    class Config:
+        extra = "forbid"
+
+
+class ExperienceChangedEvent(ExperienceEntityChangedEvent):
+    """
+    Event representing a change to an EXPERIENCE entity.
+    """
+
+    edited_fields: Optional[list[str]] = None
+    """
+    edited_fields - list of field names that were modified
+    """
+
+    def __init__(
+            self,
+            *,
+            user_id: str,
+            client_id: str | None = None,
+            session_id: int,
+            action: ActionLiteral,
+            work_type: str,
+            edited_fields: Optional[list[str]] = None,
+            relevant_experiments: dict[str, str] | None = None,
+    ):
+        super().__init__(
+            user_id=user_id,
+            client_id=client_id,
+            session_id=session_id,
+            event_type=EventType.EXPERIENCE_ENTITY_CHANGED,
+            action=action,
+            entity_type="EXPERIENCE",
+            work_type=work_type,
+            edited_fields=edited_fields,
+            relevant_experiments=relevant_experiments,
+        )
+
+    class Config:
+        extra = "forbid"
+
+
+class SkillChangedEvent(ExperienceEntityChangedEvent):
+    """
+    Event representing a change to a SKILL entity.
+    """
+
+    uuids: list[str]
+    """
+    uuids - unique identifiers for the changed skills
+    """
+
+    def __init__(
+            self,
+            *,
+            user_id: str,
+            client_id: str | None = None,
+            session_id: int,
+            uuids: list[str],
+            action: ActionLiteral,
+            work_type: Optional[str] = None,
+            relevant_experiments: dict[str, str] | None = None,
+    ):
+        super().__init__(
+            user_id=user_id,
+            client_id=client_id,
+            session_id=session_id,
+            event_type=EventType.EXPERIENCE_ENTITY_CHANGED,
+            uuids=uuids,
+            action=action,
+            entity_type="SKILL",
+            work_type=work_type,
+            relevant_experiments=relevant_experiments or {},
         )
 
     class Config:
