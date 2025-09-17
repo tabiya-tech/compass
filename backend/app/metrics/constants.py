@@ -12,6 +12,7 @@ class EventType(Enum):
     MESSAGE_REACTION_CREATED = 100006
     EXPERIENCE_DISCOVERED = 100007
     EXPERIENCE_EXPLORED = 100008
+    EXPERIENCE_ENTITY_CHANGED = 100009
 
     # Frontend events
     # As a convention, all events created on the frontend should start with 20000

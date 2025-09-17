@@ -25,9 +25,13 @@ async def get_experience_service(
         async with _experience_service_lock:
             # double check after acquiring the lock
             if _experience_service_singleton is None:
+                app_state_recorder = ApplicationStateMetricsRecorder(
+                    application_state_manager=application_state_manager,
+                    metrics_service=metrics_service
+                )
                 _experience_service_singleton = ExperienceService(
-                    application_state_metrics_recorder=ApplicationStateMetricsRecorder(
-                        application_state_manager=application_state_manager,
-                        metrics_service=metrics_service))
+                    application_state_metrics_recorder=app_state_recorder,
+                    metrics_service=metrics_service,
+                )
 
     return _experience_service_singleton

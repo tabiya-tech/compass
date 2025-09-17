@@ -11,7 +11,7 @@ from app.metrics.types import ConversationPhaseLiteral, ConversationPhaseEvent, 
     MessageReactionCreatedEvent, ConversationTurnEvent, \
     FeedbackProvidedEvent, FeedbackTypeLiteral, FeedbackRatingValueEvent, \
     CVFormatLiteral, CVDownloadedEvent, DeviceSpecificationEvent, UserLocationEvent, ExperienceDiscoveredEvent, \
-    ExperienceExploredEvent, UIInteractionEvent
+    ExperienceExploredEvent, UIInteractionEvent, ExperienceChangedEvent, SkillChangedEvent
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_printable_string
 from common_libs.time_utilities import mongo_date_to_datetime, truncate_microseconds, get_now
 
@@ -134,6 +134,32 @@ def get_ui_interaction_event():
     )
 
 
+def get_experience_changed_event():
+    action = random.choice(["EDITED", "DELETED", "RESTORED"])  # nosec B311
+    edited_fields = [get_random_printable_string(8) for _ in range(2)] if action == "EDITED" else None
+
+    return ExperienceChangedEvent(
+        user_id=get_random_user_id(),
+        session_id=get_random_session_id(),
+        action=action,
+        work_type=get_random_printable_string(10),
+        edited_fields=edited_fields,
+    )
+
+
+def get_skill_changed_event():
+    action = random.choice(["ADDED", "DELETED", "EDITED"])  # nosec B311
+    uuids = [get_random_printable_string(8) for _ in range(3)]
+
+    return SkillChangedEvent(
+        user_id=get_random_user_id(),
+        session_id=get_random_session_id(),
+        uuids=uuids,
+        action=action,
+        work_type=get_random_printable_string(10)
+    )
+
+
 def _assert_metric_event_fields_match(given_event_dict: Dict[str, Any], actual_stored_event: Dict[str, Any]) -> None:
     # Remove MongoDB _id if present
     given_event_dict.pop("_id", None)
@@ -169,6 +195,8 @@ class TestRecordEvent:
             lambda: get_cv_downloaded_event("PDF"),
             lambda: get_device_specification_event(),
             lambda: get_ui_interaction_event(),
+            lambda: get_experience_changed_event(),
+            lambda: get_skill_changed_event(),
         ],
         ids=[
             "UserAccountCreatedEvent",
@@ -182,6 +210,8 @@ class TestRecordEvent:
             "CVDownloadedEvent",
             "DeviceSpecificationEvent",
             "UIInteractionEvent",
+            "ExperienceChangedEvent",
+            "SkillChangedEvent",
         ]
     )
     async def test_record_single_event_success(
@@ -234,7 +264,9 @@ class TestRecordEvent:
             get_cv_downloaded_event("PDF"),
             get_cv_downloaded_event("DOCX"),
             get_device_specification_event(),
-            get_ui_interaction_event()
+            get_ui_interaction_event(),
+            get_experience_changed_event(),
+            get_skill_changed_event()
         ]
         repository = await get_metrics_repository
 
@@ -267,6 +299,8 @@ class TestRecordEvent:
             lambda: get_cv_downloaded_event("PDF"),
             lambda: get_device_specification_event(),
             lambda: get_ui_interaction_event(),
+            lambda: get_experience_changed_event(),
+            lambda: get_skill_changed_event(),
         ],
         ids=[
             "UserAccountCreatedEvent",
@@ -279,6 +313,8 @@ class TestRecordEvent:
             "CVDownloadedEvent",
             "DeviceSpecificationEvent",
             "UIInteractionEvent",
+            "ExperienceChangedEvent",
+            "SkillChangedEvent",
         ]
     )
     async def test_record_event_database_bulk_write_failure(
@@ -330,7 +366,9 @@ class TestRecordEvent:
             get_user_location_event(),
             get_experience_discovered_event(experience_count=3),
             get_experience_explored_event(experience_count=3),
-            get_ui_interaction_event()
+            get_ui_interaction_event(),
+            get_experience_changed_event(),
+            get_skill_changed_event(),
         ]
         repository = await get_metrics_repository
 

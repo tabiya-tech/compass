@@ -1,7 +1,8 @@
 import pytest
+from types import SimpleNamespace
 
 from ._types import SkillUpdate
-from .utils import _get_skills_update_value
+from .utils import _get_skills_update_value, compute_top_skill_changes
 from ...vector_search.esco_entities import SkillEntity
 
 
@@ -83,3 +84,45 @@ class TestGetSkillsUpdateValue:
 
         # THEN the result should be an empty list.
         assert result == expected_new_skills
+
+
+class TestComputeTopSkillChanges:
+    @pytest.mark.parametrize("prev_skills, payload, expected", [
+        (
+                [(0, _get_test_skill_entity("s1", "label1"))],
+                None,
+                {"ADDED": set(), "DELETED": set(), "EDITED": set()},
+        ),
+        (
+                [(0, _get_test_skill_entity("s1", "label1"))],
+                [{"UUID": "s1", "preferredLabel": "label1"}],
+                {"ADDED": set(), "DELETED": set(), "EDITED": set()},
+        ),
+        (
+                [(0, _get_test_skill_entity("s1", "label1"))],
+                [
+                    {"UUID": "s1", "preferredLabel": "label1"},
+                    {"UUID": "s2", "preferredLabel": "label2"},
+                ],
+                {"ADDED": {"s2"}, "DELETED": set(), "EDITED": set()},
+        ),
+        (
+                [(0, _get_test_skill_entity("s1", "label1"))],
+                [],
+                {"ADDED": set(), "DELETED": {"s1"}, "EDITED": set()},
+        ),
+        (
+                [(0, _get_test_skill_entity("s1", "old"))],
+                [{"UUID": "s1", "preferredLabel": "new"}],
+                {"ADDED": set(), "DELETED": set(), "EDITED": {"s1"}},
+        ),
+    ])
+    def test_compute_top_skill_changes(self, prev_skills, payload, expected):
+        # GIVEN an experience entity with previous top skills
+        exp = SimpleNamespace(top_skills=prev_skills)
+
+        # WHEN compute_top_skill_changes is called with a new payload
+        result = compute_top_skill_changes(exp, payload)
+
+        # THEN the result should match the expected sets for ADDED, DELETED, and EDITED skills
+        assert result == expected
