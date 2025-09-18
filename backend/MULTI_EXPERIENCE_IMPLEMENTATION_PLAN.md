@@ -101,7 +101,7 @@ graph LR
   - **Expectation**: LLM handles multiple experiences in response but the response is not processed correctly
     - Test cases from the `_data_extraction_llm_test.py` should now pass
 
-- [ ] Create multi-experience conversation test cases in `_conversation_llm_test.py`
+- [X] Create multi-experience conversation test cases in `collect_experiences_agent_simulated_user_test`
   - Test simple, mixed, and complex scenarios
   - Test cases with partial and complete experiences
   - Test cases with multiple experiences
