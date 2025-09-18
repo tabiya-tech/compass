@@ -562,7 +562,6 @@ test_cases = [
         ],
     ),
     CollectExperiencesAgentTestCase(
-        skip_force="force",
         name='cv_upload_style_experiences',
         simulated_user_prompt=dedent("""
             You are a professional with diverse experiences. When asked about your experiences, 
@@ -631,6 +630,256 @@ test_cases = [
              "company": ContainsString("neighbor"),
              "timeline": DictContaining({"start": ContainsString("2019"), "end": AnyOf('', ContainsString("present"))}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
+             },
+        ],
+    ),
+    CollectExperiencesAgentTestCase(
+        name='incomplete_multi_experience_e2e',
+        simulated_user_prompt=dedent("""
+            You are a young person from South Africa with multiple work experiences. When asked about your experiences, 
+            you will respond in one message exactly like it is in the Message Section below.
+            
+            #Message
+            These are my experiences:
+            • Worked as a software developer from 2020 to 2022. It was a paid job.
+            • Did freelance web design since 2023. I work for different clients.
+            • Volunteered at an animal shelter. It was unpaid work.
+            • Helped my family with their restaurant business. I did everything from serving to cooking.
+            
+            You will provide all this information at once when asked about your experiences. The information is intentionally incomplete - 
+            you're missing company names, locations, specific dates, and other details. Expect the agent to ask follow-up questions 
+            to get the complete information. You should provide the missing details when asked specific questions about them.
+            You have no other experiences than the above 4.
+            """) + sa_prompt,
+        country_of_user=Country.SOUTH_AFRICA,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        expected_experiences_count_min=4,
+        expected_experiences_count_max=4,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+                             WorkType.SELF_EMPLOYMENT: (1, 1),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (2, 2)},
+        expected_experience_data=[
+            {"experience_title": ContainsString("software developer"),
+             "location": AnyOf(ContainsString("Cape Town"), ContainsString("Johannesburg"), ContainsString("Pretoria"), ContainsString("Gqeberha")),
+             "company": AnyOf(ContainsString("TechCorp"), ContainsString("Tech Solutions")),
+             "timeline": DictContaining({"start": "2020", "end": "2022"}),
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("web design"),
+             "location": AnyOf(ContainsString("Durban"), ContainsString("Cape Town"), ContainsString("Johannesburg"), ContainsString("Pretoria"), ContainsString("Gqeberha")),
+             "company": ContainsString("different clients"),
+             "timeline": DictContaining({"start": "2023", "end": AnyOf("Present", "")}),
+             "work_type": WorkType.SELF_EMPLOYMENT.name,
+             },
+            {"experience_title": AnyOf(ContainsString("volunteer"), ContainsString("family"), ContainsString("restaurant")),
+             "location": AnyOf(ContainsString("Durban"), ContainsString("Cape Town"), ContainsString("Johannesburg"), ContainsString("Pretoria"), ContainsString("Gqeberha")),
+             "company": AnyOf(ContainsString("animal shelter"), ContainsString("Family Business"), ContainsString("local animal shelter"), ContainsString("family restaurant")),
+             "timeline": DictContaining({"start": AnyOf("2018", "2010", "2015", "2023/06"), "end": AnyOf("2019", "2020", "2023/12", "Present")}),
+             "work_type": WorkType.UNSEEN_UNPAID.name,
+             },
+            {"experience_title": AnyOf(ContainsString("volunteer"), ContainsString("family"), ContainsString("restaurant")),
+             "location": AnyOf(ContainsString("Durban"), ContainsString("Cape Town"), ContainsString("Johannesburg"), ContainsString("Pretoria"), ContainsString("Gqeberha")),
+             "company": AnyOf(ContainsString("animal shelter"), ContainsString("Family Business"), ContainsString("local animal shelter"), ContainsString("family restaurant")),
+             "timeline": DictContaining({"start": AnyOf("2018", "2010", "2015", "2023/06"), "end": AnyOf("2019", "2020", "2023/12", "Present")}),
+             "work_type": WorkType.UNSEEN_UNPAID.name,
+             },
+        ],
+    ),
+
+    CollectExperiencesAgentTestCase(
+        name='comprehensive_multi_experience_e2e',
+        simulated_user_prompt=dedent("""
+            You are a young person from South Africa with a diverse work history. When asked about your experiences, 
+            you will respond naturally and provide information as the agent asks for it. You have the following experiences:
+            
+            • Software Developer at TechCorp (2020-2022)
+              - Full-time paid job in Cape Town
+              - Worked on web applications and mobile apps
+              - Left to pursue freelance work
+              
+            • Freelance Web Designer (2022-Present)
+              - Self-employed, working with various clients
+              - Based in Johannesburg but work remotely
+              - Specialize in e-commerce websites
+              
+            • Volunteer at Local Animal Shelter (2019-2021)
+              - Unpaid volunteer work in Durban
+              - Helped with animal care and adoption events
+              - Worked weekends and holidays
+              
+            • Part-time Tutor (2021-2023)
+              - Taught math and science to high school students
+              - Worked for a tutoring company in Pretoria
+              - Paid hourly work, 10-15 hours per week
+              
+            • Family Restaurant Helper (2018-2020)
+              - Helped parents with their small restaurant business
+              - Did everything from serving customers to cooking
+              - Unpaid family work, learned business skills
+               
+            When asked about your experiences, provide all the information for every experience at the same time.
+            Be specific about dates, locations, and work types. You're proud of your diverse experience and want to share it all.
+            """) + sa_prompt,
+        country_of_user=Country.SOUTH_AFRICA,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=25)],
+        expected_experiences_count_min=5,
+        expected_experiences_count_max=5,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (2, 2),  # Software Developer + Tutor
+                             WorkType.SELF_EMPLOYMENT: (1, 1),  # Freelance Web Designer
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (2, 2)},  # Animal Shelter + Family Restaurant
+        expected_experience_data=[
+            {"experience_title": ContainsString("software developer"),
+             "location": ContainsString("Cape Town"),
+             "company": ContainsString("TechCorp"),
+             "timeline": DictContaining({"start": "2020", "end": "2022"}),
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("web design"),
+             "location": AnyOf(ContainsString("Johannesburg"), ContainsString("remote")),
+             "company": AnyOf(ContainsString("clients"), ContainsString("freelance")),
+             "timeline": DictContaining({"start": "2022", "end": AnyOf("Present", "")}),
+             "work_type": WorkType.SELF_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("volunteer"),
+             "location": ContainsString("Durban"),
+             "company": ContainsString("animal shelter"),
+             "timeline": DictContaining({"start": "2019", "end": "2021"}),
+             "work_type": WorkType.UNSEEN_UNPAID.name,
+             },
+            {"experience_title": ContainsString("tutor"),
+             "location": ContainsString("Pretoria"),
+             "company": AnyOf(ContainsString("tutoring"), ContainsString("company")),
+             "timeline": DictContaining({"start": "2021", "end": "2023"}),
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+             },
+            {"experience_title": AnyOf(ContainsString("family"), ContainsString("restaurant")),
+             "location": AnyOf(ContainsString("Durban"), ContainsString("Cape Town"), ContainsString("Johannesburg"), ContainsString("Pretoria"), ContainsString("Gqeberha")),
+             "company": AnyOf(ContainsString("family"), ContainsString("restaurant")),
+             "timeline": DictContaining({"start": "2018", "end": "2020"}),
+             "work_type": WorkType.UNSEEN_UNPAID.name,
+             },
+        ],
+    ),
+
+    CollectExperiencesAgentTestCase(
+        name='large_scale_multi_experience_e2e',
+        simulated_user_prompt=dedent("""
+            You are a young person from South Africa with an extensive work history. When asked about your experiences, 
+            you will respond naturally and provide information as the agent asks for it. You have the following experiences:
+            
+            • Software Developer at TechCorp (2020-2022)
+              - Full-time paid job in Cape Town
+              - Worked on web applications and mobile apps
+              
+            • Freelance Web Designer (2022-Present)
+              - Self-employed, working with various clients
+              - Based in Johannesburg but work remotely
+              
+            • Volunteer at Local Animal Shelter (2019-2021)
+              - Unpaid volunteer work in Durban
+              - Helped with animal care and adoption events
+              
+            • Part-time Tutor (2021-2023)
+              - Taught math and science to high school students
+              - Worked for a tutoring company in Pretoria
+              
+            • Family Restaurant Helper (2018-2020)
+              - Helped parents with their small restaurant business
+              - Did everything from serving customers to cooking
+              
+            • Intern at Marketing Agency (2019)
+              - Summer internship in Johannesburg
+              - Helped with social media campaigns
+              
+            • Freelance Graphic Designer (2021-2022)
+              - Created logos and branding materials
+              - Worked with small businesses in Cape Town
+              
+            • Volunteer at Community Center (2020-2021)
+              - Helped organize events and programs
+              - Worked in Durban during weekends
+              
+            • Part-time Sales Associate (2018-2019)
+              - Worked at a retail store in Pretoria
+              - Sold electronics and helped customers
+              
+            • Freelance Content Writer (2023-Present)
+              - Write articles and blog posts for various clients
+              - Work remotely from home
+              
+            When asked about your experiences, provide all the information for every experience at the same time.
+            Be specific about dates, locations, and work types. You have a lot of diverse experience and want to share it all.
+            """) + sa_prompt,
+        country_of_user=Country.SOUTH_AFRICA,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=20)],
+        expected_experiences_count_min=10,
+        expected_experiences_count_max=10,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (3, 3),  # Software Developer + Tutor + Sales Associate
+                             WorkType.SELF_EMPLOYMENT: (3, 3),  # Web Designer + Graphic Designer + Content Writer
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (1, 1),  # Marketing Intern
+                             WorkType.UNSEEN_UNPAID: (3, 3)},  # Animal Shelter + Family Restaurant + Community Center
+        expected_experience_data=[
+            {"experience_title": ContainsString("software developer"),
+             "location": ContainsString("Cape Town"),
+             "company": ContainsString("TechCorp"),
+             "timeline": DictContaining({"start": "2020", "end": "2022"}),
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("web design"),
+             "location": AnyOf(ContainsString("Johannesburg"), ContainsString("remote")),
+             "company": AnyOf(ContainsString("clients"), ContainsString("freelance")),
+             "timeline": DictContaining({"start": "2022", "end": AnyOf("Present", "")}),
+             "work_type": WorkType.SELF_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("volunteer"),
+             "location": ContainsString("Durban"),
+             "company": ContainsString("animal shelter"),
+             "timeline": DictContaining({"start": "2019", "end": "2021"}),
+             "work_type": WorkType.UNSEEN_UNPAID.name,
+             },
+            {"experience_title": ContainsString("tutor"),
+             "location": ContainsString("Pretoria"),
+             "company": AnyOf(ContainsString("tutoring"), ContainsString("company")),
+             "timeline": DictContaining({"start": "2021", "end": "2023"}),
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+             },
+            {"experience_title": AnyOf(ContainsString("family"), ContainsString("restaurant")),
+             "location": AnyOf(ContainsString("Durban"), ContainsString("Cape Town"), ContainsString("Johannesburg"), ContainsString("Pretoria"), ContainsString("Gqeberha")),
+             "company": AnyOf(ContainsString("family"), ContainsString("restaurant")),
+             "timeline": DictContaining({"start": "2018", "end": "2020"}),
+             "work_type": WorkType.UNSEEN_UNPAID.name,
+             },
+            {"experience_title": ContainsString("intern"),
+             "location": ContainsString("Johannesburg"),
+             "company": ContainsString("marketing"),
+             "timeline": DictContaining({"start": "2019", "end": "2019"}),
+             "work_type": WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name,
+             },
+            {"experience_title": ContainsString("graphic design"),
+             "location": ContainsString("Cape Town"),
+             "company": AnyOf(ContainsString("businesses"), ContainsString("clients")),
+             "timeline": DictContaining({"start": "2021", "end": "2022"}),
+             "work_type": WorkType.SELF_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("volunteer"),
+             "location": ContainsString("Durban"),
+             "company": ContainsString("community"),
+             "timeline": DictContaining({"start": "2020", "end": "2021"}),
+             "work_type": WorkType.UNSEEN_UNPAID.name,
+             },
+            {"experience_title": ContainsString("sales"),
+             "location": ContainsString("Pretoria"),
+             "company": AnyOf(ContainsString("retail"), ContainsString("store")),
+             "timeline": DictContaining({"start": "2018", "end": "2019"}),
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("content writer"),
+             "location": AnyOf(ContainsString("remote"), ContainsString("home")),
+             "company": AnyOf(ContainsString("clients"), ContainsString("freelance")),
+             "timeline": DictContaining({"start": "2023", "end": AnyOf("Present", "")}),
+             "work_type": WorkType.SELF_EMPLOYMENT.name,
              },
         ],
     ),
