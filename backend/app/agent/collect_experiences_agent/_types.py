@@ -53,3 +53,43 @@ class CollectedData(BaseModel):
                     experience.company == "" or experience.company is None,
                     experience.location == "" or experience.location is None,
                     ])
+
+    @staticmethod
+    def is_incomplete(experience: 'CollectedData') -> bool:
+        """
+        Check if an experience is incomplete (has some but not all required fields).
+        An experience is considered incomplete if it has a title but is missing other important details.
+        """
+        if CollectedData.all_fields_empty(experience):
+            return False  # Completely empty, not incomplete
+        
+        # Has a title but missing other important fields
+        has_title = experience.experience_title and experience.experience_title.strip() != ""
+        missing_important_fields = (
+            (experience.start_date is None or experience.start_date.strip() == "") or
+            (experience.end_date is None or experience.end_date.strip() == "") or
+            (experience.company is None or experience.company.strip() == "") or
+            (experience.location is None or experience.location.strip() == "")
+        )
+        
+        return has_title and missing_important_fields
+
+    @staticmethod
+    def get_missing_fields(experience: 'CollectedData') -> list[str]:
+        """
+        Get a list of missing fields for an incomplete experience.
+        """
+        missing_fields = []
+
+        if not experience.experience_title or experience.experience_title.strip() == "":
+            missing_fields.append("experience_title")
+        if not experience.start_date or experience.start_date.strip() == "":
+            missing_fields.append("start_date")
+        if not experience.end_date or experience.end_date.strip() == "":
+            missing_fields.append("end_date")
+        if not experience.company or experience.company.strip() == "":
+            missing_fields.append("company")
+        if not experience.location or experience.location.strip() == "":
+            missing_fields.append("location")
+            
+        return missing_fields

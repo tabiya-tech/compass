@@ -22,6 +22,49 @@ _NO_EXPERIENCE_COLLECTED = "No experience data has been collected yet"
 _FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step."
 
 
+def _find_incomplete_experiences(collected_data: list[CollectedData]) -> list[tuple[int, CollectedData, list[str]]]:
+    """
+    Find incomplete experiences and return them with their index and missing fields.
+    Returns a list of tuples: (index, experience, missing_fields)
+    """
+    incomplete_experiences = []
+    for i, experience in enumerate(collected_data):
+        if CollectedData.is_incomplete(experience):
+            missing_fields = CollectedData.get_missing_fields(experience)
+            incomplete_experiences.append((i, experience, missing_fields))
+    return incomplete_experiences
+
+
+def _get_incomplete_experiences_instructions(collected_data: list[CollectedData]) -> str:
+    """
+    Generate instructions for handling incomplete experiences.
+    """
+    incomplete_experiences = _find_incomplete_experiences(collected_data)
+    
+    if not incomplete_experiences:
+        return ""
+    
+    instructions = dedent("""\
+        #Incomplete Experiences Priority
+            IMPORTANT: You have incomplete experiences from previous work types that need more information.
+            Before moving on to explore new work types, you should prioritize asking questions to complete these incomplete experiences.
+            
+            Incomplete experiences that need more information:
+    """)
+    
+    for i, (index, experience, missing_fields) in enumerate(incomplete_experiences, 1):
+        missing_fields_str = ", ".join(missing_fields)
+        instructions += f"            {i}. Experience #{index + 1}: \"{experience.experience_title}\" - Missing: {missing_fields_str}\n"
+    
+    instructions += dedent("""\
+        
+            When you have incomplete experiences, ask questions to fill in the missing information for these experiences.
+            Only move on to exploring new work types after you have gathered all available information for incomplete experiences.
+    """)
+    
+    return instructions
+
+
 class ConversationLLMAgentOutput(AgentOutput):
     exploring_type_finished: bool = False
 
@@ -335,6 +378,8 @@ class _ConversationLLM:
                 Keep in mind that you only see part of the conversation history and not the entire conversation, so it's ok if 
                 some information above in not in the conversation history.        
                 
+                {incomplete_experiences_instructions}
+                
                 The last work experience we discussed was:
                     {last_referenced_experience}
                 
@@ -366,6 +411,7 @@ class _ConversationLLM:
                                                     explored_types=explored_types
                                                 ),
                                                 collected_experience_data=_get_collected_experience_data(collected_data),
+                                                incomplete_experiences_instructions=_get_incomplete_experiences_instructions(collected_data),
                                                 missing_fields=_get_missing_fields(collected_data, last_referenced_experience_index),
                                                 not_missing_fields=_get_not_missing_fields(collected_data, last_referenced_experience_index),
                                                 work_type_definitions=WORK_TYPE_DEFINITIONS_FOR_PROMPT,
@@ -409,6 +455,15 @@ def _transition_instructions(*,
                              exploring_type: WorkType,
                              unexplored_types: list[WorkType],
                              ):
+    # Check if there are incomplete experiences that need to be completed first
+    incomplete_experiences = _find_incomplete_experiences(collected_data)
+    if incomplete_experiences:
+        return dedent("""\
+        IMPORTANT: You have incomplete experiences that need more information before moving to the next work type.
+        Ask questions to complete the missing information for these incomplete experiences.
+        Do not respond with <END_OF_WORKTYPE> until all incomplete experiences have been completed.
+        """)
+    
     # if not all_fields_collected: # need to fill missing fields
     #    return dedent("""\
     #        To transition to the next phase you must ask questions to fill the missing fields for the experiences that I shared with you.
