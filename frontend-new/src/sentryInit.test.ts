@@ -1,12 +1,15 @@
 import "src/_test_utilities/consoleMock";
 
 import * as Sentry from "@sentry/react";
-import { initSentry, SENTRY_CONFIG_DEFAULT, SentryConfig } from "./sentryInit";
+import { CompressionError, initSentry, SENTRY_CONFIG_DEFAULT, SentryConfig, sentryTransport } from "./sentryInit";
 import { getBackendUrl, getSentryDSN, getSentryEnabled, getSentryConfig } from "./envService";
 import * as EnvServiceModule from "./envService";
 import InfoService from "./info/info.service";
 import { VersionItem } from "./info/info.types";
 import { getRandomString } from "./_test_utilities/specialCharacters";
+import { createTransport } from "@sentry/core";
+import { setupFetchSpy } from "./_test_utilities/fetchSpy";
+import brotliPromise from "brotli-wasm";
 
 // Mock all the required dependencies
 jest.mock("@sentry/react", () => ({
@@ -22,6 +25,10 @@ jest.mock("@sentry/react", () => ({
   setContext: jest.fn(),
 }));
 
+jest.mock("@sentry/core", () => ({
+  createTransport: jest.fn()
+}));
+
 jest.mock("./envService", () => ({
   getBackendUrl: jest.fn(),
   getTargetEnvironmentName: jest.fn(),
@@ -29,6 +36,16 @@ jest.mock("./envService", () => ({
   getSentryEnabled: jest.fn(),
   getSentryConfig: jest.fn(),
 }));
+
+jest.mock("brotli-wasm", () => ({
+  __esModule: true,
+  default: Promise.resolve({
+    compress: jest.fn().mockImplementation((input) => input),
+  }),
+}));
+
+// Mock fetch globally
+global.fetch = jest.fn();
 
 function getRandomVersion(): VersionItem {
   return {
@@ -152,6 +169,7 @@ describe("sentryInit", () => {
         replaysOnErrorSampleRate: expectedConfig.replaysOnErrorSampleRate,
         beforeSend: expect.any(Function),
         beforeSendLog: expect.any(Function),
+        transport: expect.any(Function)
       });
 
       // AND the Sentry.captureConsoleIntegration should be called with default levels
@@ -292,5 +310,137 @@ describe("sentryInit", () => {
       // AND no warning should be logged
       expect(console.warn).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe("sentryTransport", () => {
+  test("should call fetch with compressed request and return the right transport", async () => {
+    // # PHASE 1: Test sentryTransport function that creates a transport with createTransport
+
+    // GIVEN some sentry options with url and another random value from options
+    const givenOptions = {
+      url: "given-url",
+      otherField: "other-value",
+      headers: {
+        someRandomHeader: "some-random-value",
+      },
+    };
+
+    // WHEN the sentryTransport is called with the givenOptions
+    sentryTransport(givenOptions);
+
+    // THEN expect createTransport to be called with the given options and a makeRequest function
+    expect(createTransport).toHaveBeenCalledWith(givenOptions, expect.any(Function));
+
+    // # PHASE 2: Testing the makeRequest function
+
+    // GIVEN the makeRequest function from the createTransport call
+    const makeRequest = (createTransport as jest.Mock).mock.calls[0][1];
+
+    // AND fetch is mocked return a status code
+    const givenResponseStatusCode = 200;
+    const fetchSpy = setupFetchSpy(givenResponseStatusCode, undefined, "");
+
+    // AND given a compressed value from brotli (brotli.compress) will always return the same value
+    const givenCompressedValue = new Uint8Array(Buffer.from("compressed-body"));
+    const brotli = await brotliPromise;
+    (brotli.compress as jest.Mock).mockReturnValue(givenCompressedValue);
+
+    // AND a sample request body
+    const givenRequestBody = "given-body-json-file";
+    const givenRequestBodyBytes = new Uint8Array(Buffer.from(givenRequestBody));
+    const givenRequest = {
+      body: givenRequestBody,
+      method: "POST",
+    };
+
+    // WHEN the makeRequest function is called with the given request
+    const result = await makeRequest(givenRequest);
+
+    // THEN the request body should be compressed with the right body
+    expect((await brotliPromise).compress).toHaveBeenCalledWith(expect.objectContaining(givenRequestBodyBytes));
+
+    // THEN expect fetch to be called with the right parameters and data correctly compressed
+    expect(fetchSpy).toHaveBeenCalledWith(
+      givenOptions.url,
+      expect.objectContaining({
+        method: givenRequest.method,
+        headers: {
+          ...givenOptions.headers,
+          "Content-Encoding": "br", // Data correctly compressed
+        },
+        body: givenCompressedValue,
+      })
+    );
+
+    // AND it should return the right status code
+    expect(result.statusCode).toBe(givenResponseStatusCode);
+
+    // AND no errors or warnings should be logged
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+  });
+
+  test("should handle error if compression fails", async () => {
+    // GIVEN some sentry options with url and another random value from options
+    const givenOptions = {
+      url: "given-url",
+      otherField: "other-value",
+      headers: {
+        someRandomHeader: "some-random-value",
+      },
+    };
+
+    // WHEN the sentryTransport is called with the givenOptions
+    sentryTransport(givenOptions);
+
+    // AND the makeRequest function from the createTransport call
+    const makeRequest = (createTransport as jest.Mock).mock.calls[0][1];
+
+    // AND fetch is mocked return a status code
+    const givenResponseStatusCode = 200;
+    const fetchSpy = setupFetchSpy(givenResponseStatusCode, undefined, "");
+
+    // AND given a compressed value from brotli (brotli.compress) will always return the same value
+    const brotli = await brotliPromise;
+    const givenThrownError = new Error("Compression failed");
+    (brotli.compress as jest.Mock).mockImplementation(() => {
+      throw givenThrownError;
+    });
+
+    // AND a sample request body
+    const givenRequestBodyBytes = new Uint8Array(Buffer.from("already-compressed-body"));
+    const givenRequest = {
+      body: givenRequestBodyBytes,
+      method: "POST",
+    };
+
+    // WHEN the makeRequest function is called with the given request
+    const result = await makeRequest(givenRequest);
+
+    // THEN the request body should be compressed with the right body
+    expect((await brotliPromise).compress).toHaveBeenCalledWith(expect.objectContaining(givenRequestBodyBytes));
+
+    // THEN expect fetch to be called with the right parameters and data should not be compressed
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      givenOptions.url,
+      expect.objectContaining({
+        method: givenRequest.method,
+        headers: {
+          ...givenOptions.headers,
+        },
+        body: givenRequestBodyBytes,
+      })
+    );
+
+    // AND it should return the right status code
+    expect(result.statusCode).toBe(givenResponseStatusCode);
+
+    // AND no errors or warnings should be logged
+    expect(console.error).toHaveBeenCalledWith(
+      new CompressionError("Error compressing Sentry request body, sending uncompressed", givenThrownError)
+    );
+    expect(console.warn).not.toHaveBeenCalled();
   });
 });

@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/react";
+import { createTransport, type Transport,  type TransportRequest } from "@sentry/core";
 import { getBackendUrl, getSentryConfig, getSentryDSN, getSentryEnabled, getTargetEnvironmentName } from "./envService";
 import React from "react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
@@ -8,6 +9,7 @@ import AuthenticationStateService from "./auth/services/AuthenticationState.serv
 import UserPreferencesStateService from "./userPreferences/UserPreferencesStateService";
 import UserPreferencesService from "./userPreferences/UserPreferencesService/userPreferences.service";
 import { ConsoleLevel } from "@sentry/core/build/types/types-hoist/instrument";
+import brotliPromise from "brotli-wasm";
 
 export interface SentryConfig {
   // See https://docs.sentry.io/platforms/javascript/configuration/options/
@@ -85,6 +87,68 @@ function obfuscateEvent<T>(event: T): T {
   return event;
 }
 
+export class CompressionError extends Error {
+  constructor(message: string, cause?: any) {
+    super(message, { cause });
+    this.name = "CompressionError";
+  }
+}
+
+/**
+ * Custom transport to send events to Sentry.
+ * This is created because we want
+ * 1. to compress sentry requests before sending them.
+ *
+ * docs: https://docs.sentry.io/platforms/javascript/guides/react/configuration/transports/
+ */
+export function sentryTransport(options: any): Transport {
+  /**
+   * Function Callback function to make the request to sentry
+   * @param request
+   */
+  async function makeRequest(request: TransportRequest) {
+    // Compress the request body and add the appropriate headers.
+    const brotli = await brotliPromise;
+    const rawBytes = typeof request.body === "string" ? new TextEncoder().encode(request.body) : request.body;
+
+    let requestBody, contentEncoding;
+    try {
+      requestBody = brotli.compress(rawBytes);
+      contentEncoding = "br";
+    } catch (e) {
+      console.error(new CompressionError("Error compressing Sentry request body, sending uncompressed", e));
+      // If an error compressing the body, we just send the uncompressed body
+      requestBody = rawBytes;
+      contentEncoding = undefined
+    }
+
+    const requestOptions: RequestInit = {
+      // Don't worry about the gain, Sentry payloads are usually large,
+      body: requestBody,
+      method: "POST",
+      headers: {
+        ...(options.headers || {}),
+        "Content-Encoding": contentEncoding,
+      },
+      ...options.fetchOptions
+    };
+
+    const response = await fetch(options.url, requestOptions);
+
+    // Return the status code, and the rate limit headers to Sentry
+    return {
+      statusCode: response.status,
+      headers: {
+        "x-sentry-rate-limits": response.headers.get("X-Sentry-Rate-Limits"),
+        "retry-after": response.headers.get("Retry-After"),
+      },
+    };
+  }
+
+  // Return the transport created with the custom makeRequest function
+  return createTransport(options, makeRequest);
+}
+
 export function initSentry() {
   // Load Sentry configuration
   const { dsn, enabled, cfg, errors, warnings } = loadSentryConfig();
@@ -150,6 +214,9 @@ export function initSentry() {
 
     // Logs
     enableLogs: cfg.enableLogs,
+
+    // Custom transport.
+    transport: sentryTransport,
 
     // Add the beforeSend callback to modify the event before sending it
     beforeSend(event, hint) {
