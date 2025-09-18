@@ -95,7 +95,7 @@ graph LR
   - Test everything at the same time (new, update, delete, pre-existing...)
   - **Expectation**: All test cases fail
 
-- [ ] Modify data extraction LLM prompt
+- [X] Modify data extraction LLM prompt
   - Remove "one experience at a time" restriction in llm prompt
   - Update JSON schema for array of experiences
   - **Expectation**: LLM handles multiple experiences in response but the response is not processed correctly
@@ -114,7 +114,7 @@ graph LR
   - **Expectation**: Multiple experiences processed correctly but the partially processed experiences can not be continued later
     - Test cases from the `collect_experiences_agent_simulated_user_test.py` with adding and deleting experiences should now pass
 
-- [ ] UPDATE data extraction response processing
+- [X] UPDATE data extraction response processing
   - Handle array of experiences in `execute()` method with UPDATE operation
   - Handle conflicting update operations while maintaining the order of the experiences
   - **Expectation**: Multiple experiences processed correctly with UPDATE operation
@@ -122,6 +122,7 @@ graph LR
 
 - [ ] Update agent state/state management to handle multiple partially collected experiences and go through collecting each one
   - Perhaps add `partially_collected_experiences` field or add a flag called `is_partially_collected` to the experience
+  - Also an option to check if any of the fields are None (meaning they have not been collected yet)
   - Add methods to track incomplete experiences
   - Add logic to prioritize which experience to ask about next
   - **Expectation**: State correctly tracks multiple partially collected experiences
