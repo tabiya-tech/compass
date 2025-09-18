@@ -128,7 +128,7 @@ graph LR
   - **Expectation**: State correctly tracks multiple partially collected experiences
     - Test cases from the first step with partially collected experiences should now pass
 
-- [ ] Create end-to-end multi-experience test in `collect_experiences_agent_simulated_user_test.py` and `app_conversation_e2e_test.py`
+- [X] Create end-to-end multi-experience test in `collect_experiences_agent_simulated_user_test.py` and `app_conversation_e2e_test.py`
   - Comprehensive test with 3-4 experiences
   - Test complete flow from input to collection
   - Test with 5-10 experiences (align with expectations on cv length)

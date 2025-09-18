@@ -293,7 +293,6 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
     E2ETestCase(
-        skip_force="force",
         country_of_user=Country.UNSPECIFIED,
         conversation_rounds=100,
         name='cv_upload_style_e2e',
@@ -324,5 +323,41 @@ test_cases = [
             You can come up with activities you have done during each experience.
             """) + system_instruction_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
+    ),
+    
+    # Comprehensive multi-experience E2E test covering new functionality
+    E2ETestCase(
+        country_of_user=Country.SOUTH_AFRICA,
+        conversation_rounds=100,
+        name='comprehensive_multi_experience_e2e',
+        simulated_user_prompt=dedent("""
+            You are a young person from South Africa with a diverse work history. You have multiple experiences across different work types.
+            If asked if you want to start the conversation, agree to start without saying anything about your experiences.
+            
+            You have the following experiences:
+            
+            • Worked as a software developer at TechCorp from 2020 to 2022. It was a full-time paid job in Cape Town. I worked on web applications and mobile apps, then left to pursue freelance work.
+            
+            • I'm currently freelancing as a web designer since 2022. I'm self-employed, working with various clients. I'm based in Johannesburg but work remotely, and I specialize in e-commerce websites.
+            
+            • Volunteered at a local animal shelter from 2019 to 2021. It was unpaid volunteer work in Durban. I helped with animal care and adoption events, working weekends and holidays.
+            
+            • Worked as a part-time tutor from 2021 to 2023. I taught math and science to high school students for a tutoring company in Pretoria. It was paid hourly work, about 10-15 hours per week.
+            
+            • Helped out at my family's restaurant business from 2018 to 2020. I did everything from serving customers to cooking. It was unpaid family work where I learned business skills.
+            
+            • Did a summer internship at a marketing agency in 2019. It was in Johannesburg and I helped with social media campaigns. It was unpaid trainee work.
+            
+            • Worked as a freelance graphic designer from 2021 to 2022. I created logos and branding materials for small businesses in Cape Town. It was self-employed contract work.
+            
+            • Volunteered at a community center from 2020 to 2021. I helped organize events and programs in Durban during weekends. It was unpaid community service.
+               
+            When the agent asks about your experiences, provide information naturally as they ask questions. 
+            Be specific about dates, locations, and work types when asked. You're proud of your diverse experience 
+            and want to share it all. You can provide multiple experiences at once or individually as the agent asks.
+            
+            You can come up with specific activities and details for each experience when asked.
+            """) + sa_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)]
     )
 ]
