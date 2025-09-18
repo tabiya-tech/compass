@@ -107,7 +107,7 @@ graph LR
   - Test cases with multiple experiences
   - **Expectation**: All test cases fail
 
-- [ ] ADD, DELETE data extraction response processing
+- [X] ADD, DELETE data extraction response processing
   - Handle array of experiences in `execute()` method
   - ADD, DELETE operation handling for multiple experiences ( dont handle UPDATE for now)
   - keep the idea of storing experiences in agent state in the collected_experiences array
@@ -120,7 +120,7 @@ graph LR
   - **Expectation**: Multiple experiences processed correctly with UPDATE operation
     - Test cases from the `collect_experiences_agent_simulated_user_test.py` with updating pre-existing experiences should now pass
 
-- [ ] Update agent state/state management to handle multiple partially collected experiences and go through collecting each one
+- [X] Update agent state/state management to handle multiple partially collected experiences and go through collecting each one
   - Perhaps add `partially_collected_experiences` field or add a flag called `is_partially_collected` to the experience
   - Also an option to check if any of the fields are None (meaning they have not been collected yet)
   - Add methods to track incomplete experiences
