@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/react";
-import { createTransport, type Transport,  type TransportRequest } from "@sentry/core";
+import { createTransport, type Transport,  type TransportRequest, type TransportMakeRequestResponse } from "@sentry/core";
 import { getBackendUrl, getSentryConfig, getSentryDSN, getSentryEnabled, getTargetEnvironmentName } from "./envService";
 import React from "react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
@@ -108,11 +108,11 @@ export function sentryTransport(options: any): Transport {
    */
   async function makeRequest(request: TransportRequest) {
     // Compress the request body and add the appropriate headers.
-    const brotli = await brotliPromise;
     const rawBytes = typeof request.body === "string" ? new TextEncoder().encode(request.body) : request.body;
 
     let requestBody, contentEncoding;
     try {
+      const brotli = await brotliPromise;
       requestBody = brotli.compress(rawBytes);
       contentEncoding = "br";
     } catch (e) {
@@ -133,16 +133,23 @@ export function sentryTransport(options: any): Transport {
       ...options.fetchOptions
     };
 
+    // Make the request to Sentry (options.url = dsn) using custom fetch
     const response = await fetch(options.url, requestOptions);
 
     // Return the status code, and the rate limit headers to Sentry
-    return {
+    let result: TransportMakeRequestResponse = {
       statusCode: response.status,
       headers: {
+        // Sentry uses these headers to determine rate limits
+        // We are forwarding the headers from the response to Sentry
+        // So that sentry will internally handle retries, backoff, etc.
+        // See https://docs.sentry.io/api/ratelimits/#headers
         "x-sentry-rate-limits": response.headers.get("X-Sentry-Rate-Limits"),
         "retry-after": response.headers.get("Retry-After"),
       },
-    };
+    }
+
+    return result
   }
 
   // Return the transport created with the custom makeRequest function
