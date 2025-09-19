@@ -57,8 +57,8 @@ class _CollectedDataWithReasoning(CollectedData):
 
 class _CollectedExperience(BaseModel):
     associations: Optional[str] = ""
-    experience_references: Optional[str] = ""
-    experience_index: int = -1
+    experience_references: Optional[str] = "" # REVIEW: I don't think we need experience_references, or should be renamed to plural
+    experience_index: int = -1  # REVIEW: I don't think we need experience_index, or should be renamed to plural
     ignored_experiences: Optional[str] = None
     collected_experience_data: Optional[list[_CollectedDataWithReasoning]] = None
 
@@ -100,16 +100,21 @@ class _DataExtractionLLM:
         :param context: The conversation context with the conversation history
         :param collected_experience_data_so_far: The collected experience data so far
         :return: The extracted experience data and the LLM stats
+        REVIEW: (the tuple of last referenced index and the LLM stats)
         """
+
         # collected_experience_data_so_far.sort(key=lambda x: x.index) # sort the collected experience data by index
-        # remove the property defined_at_turn_number
+        # 1. remove the property defined_at_turn_number and de-serialize to json
         cleaned_experience_dicts_for_prompt: list[dict] = []
         for collected_item in collected_experience_data_so_far:
-            collected_item_dict = collected_item.model_dump()
-            del collected_item_dict["defined_at_turn_number"]
+            collected_item_dict = collected_item.model_dump(exclude={"defined_at_turn_number"}) # REVIEW: Try this.
+            # del collected_item_dict["defined_at_turn_number"]
             cleaned_experience_dicts_for_prompt.append(collected_item_dict)
 
+        # 2. Convert the cleaned experience dict to a JSON string with an indent of 2 spaces for LLM
         json_data = json.dumps(cleaned_experience_dicts_for_prompt, indent=2)
+
+        # 3. Construct the system instructions based on the collected data so far.
         llm = GeminiGenerativeLLM(
             system_instructions=_DataExtractionLLM._create_extraction_system_instructions(json_data),
             config=LLMConfig(
@@ -147,12 +152,19 @@ class _DataExtractionLLM:
                          response_data.experience_references,
                          len(experiences_data))
 
+
+        # REVIEW: Move these complicated functions in a separete module, with different functions it can be a class,
+        #         So that we can unit-test it separately. (What do you think?)
+        # REVIEW(Anselme): Suggest another simple algorithm.
+
         # Process each experience in the array
         last_processed_index = -1
         current_turn_index = context.history.turns[-1].index + 1 if context.history.turns else 1
 
-        # use index_mapping to ensure we use original indexes from llm to the new ones after the update.delete
+        # use index_mapping to ensure we use original indexes from llm to the new ones after the update & delete
+        # REVIEW: index_mapping is a dict where keys are original indexes and value is the same as key
         index_mapping = {original_index: original_index for original_index in range(len(collected_experience_data_so_far))}
+
         # keep track of pending deletes and adds to apply them after the updates
         # this is because updates will not change the index mapping, but deletes and adds will
         pending_delete_original_indexes: list[int] = []
@@ -166,7 +178,7 @@ class _DataExtractionLLM:
                 self.logger.error("Invalid data operation: %s", _data.data_operation)
                 continue
 
-            if _data.data_operation is None or data_operation == _DataOperation.NOOP:
+            if _data.data_operation is None or data_operation == _DataOperation.NOOP: # REVIEW: data_operation == _DataOperation.NOOP
                 # Either the LLM did not return a data operation or the LLM returned NOOP
                 self.logger.info("No operation to be performed on experience: %s", _data.experience_title)
                 continue
@@ -196,7 +208,7 @@ class _DataExtractionLLM:
                     # Resolve empties/duplicates inline to keep indexes consistent
                     if _DataExtractionLLM._is_experience_empty(to_update):
                         self.logger.warning("Updated experience became empty and will be removed: %s", to_update)
-                        del collected_experience_data_so_far[current_index]
+                        del collected_experience_data_so_far[current_index] # REVIEW: Won't this shuffle the indexes (can't we push it to the pending_delete
                         # update index mapping after deletion
                         _DataExtractionLLM._update_index_mapping_after_deletion(index_mapping, current_index)
                         experience_index = -1
@@ -208,7 +220,7 @@ class _DataExtractionLLM:
                             # we are subtracting 1 from kept_index calculation when duplicate is after current because deleting current shifts indexes
                             kept_index = duplicate_index if duplicate_index < current_index else duplicate_index - 1
                             self.logger.warning("Updated experience duplicates an existing one; removing updated: %s", to_update)
-                            del collected_experience_data_so_far[current_index]
+                            del collected_experience_data_so_far[current_index]  # REVIEW: Won't this shuffle the indexes (can't we push it to the pending_delete
                             # update index mapping after deletion
                             _DataExtractionLLM._update_index_mapping_after_deletion(index_mapping, current_index)
                             experience_index = kept_index

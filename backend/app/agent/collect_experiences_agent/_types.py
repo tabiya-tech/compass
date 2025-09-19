@@ -79,6 +79,12 @@ class CollectedData(BaseModel):
         """
         Get a list of missing fields for an incomplete experience.
         """
+        # REVIEW, I think this functions we can only keep one.
+        #           and check `if not get_missing_fields(...)` because not [] will be truthy
+        #           also, if it is "" it means that the user explicit don't want to talk about it, otherwise I think that is why it is left None.
+        #           so if a value is "", it doesn't mean that it is missing or incomplete.
+        #           see: app.agent.collect_experiences_agent._conversation_llm._get_missing_fields (A similar function)
+
         missing_fields = []
 
         if not experience.experience_title or experience.experience_title.strip() == "":

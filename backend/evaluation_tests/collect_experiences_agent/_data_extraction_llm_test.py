@@ -151,7 +151,7 @@ test_cases_data_extraction = [
         ]
 
     ),
-    _TestCaseDataExtraction(name="associate_with_previous_experience",
+    _TestCaseDataExtraction(name="associate_with_previous_experience", # REVIEW: Not associating (3/6)
         summary="",
         turns=[
             ("(silence)",
@@ -218,7 +218,7 @@ test_cases_data_extraction = [
              },
         ]
     ),
-    _TestCaseDataExtraction(name="associate_with_previous_experience_long_conversation_texts",
+    _TestCaseDataExtraction(name="associate_with_previous_experience_long_conversation_texts", # REVIEW: Not associating (4/6) failed
         summary="",
         turns=[
             ("(silence)",
@@ -465,7 +465,7 @@ test_cases_data_extraction = [
         expected_last_referenced_experience_index=-1,
         expected_collected_data_count=2
     ),
-    _TestCaseDataExtraction(name="refer_to_previous_experience_(withholding_student_e2e)",
+    _TestCaseDataExtraction(name="refer_to_previous_experience_(withholding_student_e2e)",  # REVIEW: Not associating (3/3) failed
         summary="",
         turns=[
             (
@@ -818,7 +818,8 @@ test_cases_data_extraction = [
     ),
     
     # All operations at once: ADD, UPDATE, DELETE
-    _TestCaseDataExtraction(name="multi_experience_all_operations",
+    _TestCaseDataExtraction(
+        name="multi_experience_all_operations",
         summary="",
         turns=[
             ("(silence)",

@@ -689,6 +689,7 @@ test_cases = [
 
     CollectExperiencesAgentTestCase(
         name='comprehensive_multi_experience_e2e',
+        skip_force="force",
         simulated_user_prompt=dedent("""
             You are a young person from South Africa with a diverse work history. When asked about your experiences, 
             you will respond naturally and provide information as the agent asks for it. You have the following experiences:
@@ -765,6 +766,7 @@ test_cases = [
 
     CollectExperiencesAgentTestCase(
         name='large_scale_multi_experience_e2e',
+        skip_force="force",
         simulated_user_prompt=dedent("""
             You are a young person from South Africa with an extensive work history. When asked about your experiences, 
             you will respond naturally and provide information as the agent asks for it. You have the following experiences:
