@@ -465,7 +465,7 @@ test_cases_data_extraction = [
         expected_last_referenced_experience_index=-1,
         expected_collected_data_count=2
     ),
-    _TestCaseDataExtraction(name="refer_to_previous_experience_(withholding_student_e2e)",  # REVIEW: Not associating (3/3) failed
+    _TestCaseDataExtraction(name="refer_to_previous_experience_(withholding_student_e2e)",  # REVIEW: Not associating (3/6) failed
         summary="",
         turns=[
             (

@@ -163,7 +163,7 @@ class _DataExtractionLLM:
 
         # use index_mapping to ensure we use original indexes from llm to the new ones after the update & delete
         # REVIEW: index_mapping is a dict where keys are original indexes and value is the same as key
-        index_mapping = {original_index: original_index for original_index in range(len(collected_experience_data_so_far))}
+        index_mapping = {experience.index: experience.index for experience in collected_experience_data_so_far}
 
         # keep track of pending deletes and adds to apply them after the updates
         # this is because updates will not change the index mapping, but deletes and adds will
@@ -178,7 +178,7 @@ class _DataExtractionLLM:
                 self.logger.error("Invalid data operation: %s", _data.data_operation)
                 continue
 
-            if _data.data_operation is None or data_operation == _DataOperation.NOOP: # REVIEW: data_operation == _DataOperation.NOOP
+            if data_operation == _DataOperation.NOOP: # REVIEW: data_operation == _DataOperation.NOOP
                 # Either the LLM did not return a data operation or the LLM returned NOOP
                 self.logger.info("No operation to be performed on experience: %s", _data.experience_title)
                 continue
