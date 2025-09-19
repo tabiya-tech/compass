@@ -2,6 +2,7 @@ from app.agent.experience import WorkType, ExperienceEntity
 from app.vector_search.esco_entities import SkillEntity
 
 from ._types import SkillUpdate
+from app.metrics.types import ActionLiteral
 
 
 def _get_skills_update_value(update_value: list[SkillUpdate],
@@ -76,10 +77,59 @@ def update_experience_entity(experience_entity: ExperienceEntity[tuple[int, Skil
                                                                          value,
                                                                          experience_skills_map)
 
-                experience_entity.top_skills = top_skills
-                experience_entity.remaining_skills = remaining_skills
+                experience_entity.top_skills = top_skills # type: ignore generics
+                experience_entity.remaining_skills = remaining_skills # type: ignore generics
         elif field == "work_type":
             # the value of the work type is a string (the enum name)
             experience_entity.work_type = WorkType.from_string_key(value)
         else:
             setattr(experience_entity, field, value)
+
+
+def compute_top_skill_changes(
+        experience_entity: ExperienceEntity[tuple[int, SkillEntity]],
+        new_top_skills_payload: list[SkillUpdate] | None
+) -> dict[ActionLiteral, set[str]]:
+    """
+    Compare current top_skills with an incoming payload of updated top_skills.
+
+    The result is a dictionary with three sets of UUIDs:
+      - ADDED: skills newly introduced in the payload
+      - DELETED: skills that were in current top_skills but not in the payload
+      - EDITED: skills that exist in both but have a changed preferredLabel
+    """
+
+    if new_top_skills_payload is None:
+        return {"ADDED": set(), "DELETED": set(), "EDITED": set()}
+
+    # Current top_skills
+    prev_map = {
+        str(skill.UUID): str(skill.preferredLabel)
+        for _, skill in (experience_entity.top_skills or [])
+    }
+
+    # New top_skills
+    new_map: dict[str, str] = {
+        update["UUID"]: update["preferredLabel"]
+        for update in new_top_skills_payload
+        if "UUID" in update and "preferredLabel" in update
+    }
+
+    # Compute set differences
+    prev_ids, new_ids = set(prev_map), set(new_map)
+
+    added   = new_ids - prev_ids      # in payload, not in current
+    deleted = prev_ids - new_ids      # in current, missing in payload
+    edited  = {sid for sid in prev_ids & new_ids if prev_map[sid] != new_map[sid]}
+
+    return {"ADDED": added, "DELETED": deleted, "EDITED": edited}
+
+
+def get_work_type_from_experience(experience_entity: ExperienceEntity) -> str | None:
+    """
+    Return the work_type string for the given experience entity.
+    """
+    if experience_entity.work_type is None:
+        return "None"
+
+    return experience_entity.work_type.name
