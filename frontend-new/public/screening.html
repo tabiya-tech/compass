@@ -721,7 +721,15 @@
   function getClientID() {
     let clientId = localStorage.getItem(ENV_KEYS.CLIENT_ID);
     if (!clientId) {
-      clientId = window.crypto.randomUUID();
+      try {
+        clientId = window.crypto.randomUUID();
+      } catch (_error) {
+        // Use the math.random to generate a random string if the crypto API is not available.
+        // Since it is not widely supported for older browser versions,
+        // see: https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID#browser_compatibility
+        console.error("Failed to generate random UUID. Using a random string instead.", _error);
+        clientId = Math.random().toString(36) + Math.random().toString(36);  // NOSONAR used for unique identifying a client
+      }
       localStorage.setItem(ENV_KEYS.CLIENT_ID, clientId);
     }
 
