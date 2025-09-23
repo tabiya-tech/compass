@@ -64,15 +64,17 @@ jest.mock("react-router-dom", () => {
 
 // mock authBroadcastChannel
 jest.mock("src/auth/services/authBroadcastChannel/authBroadcastChannel.ts", () => {
+  const unsubscribeMock = jest.fn();
   return {
     AuthChannelMessage: { LOGOUT_USER: "LOGOUT_USER" },
     AuthBroadcastChannel: {
       getInstance: jest.fn(() => ({
-        registerListener: jest.fn(),
+        registerListener: jest.fn(() => unsubscribeMock),
         broadcast: jest.fn(),
         closeChannel: jest.fn(),
       })),
     },
+    __unsubscribeMock: unsubscribeMock,
   };
 });
 
@@ -306,13 +308,13 @@ describe("index", () => {
         await logoutListener();
       });
 
-      // THEN the authentication service logout should be called
-      expect(AuthenticationFactoryModule.default.getCurrentAuthenticationService()!.logout).toHaveBeenCalled();
+      // THEN the authentication state should be reset
+      expect(AuthenticationFactoryModule.default.resetAuthenticationState).toHaveBeenCalled();
       // AND the page should redirect to the landing page
       expect(window.location.href).toContain(routerPaths.LANDING);
-      // AND the broadcast channel should be closed
-      expect(mockChannel.closeChannel).toHaveBeenCalled();
-      // AND expect no errors or warning to have occurred
+      // AND the broadcast channel should remain ope
+      expect(mockChannel.closeChannel).not.toHaveBeenCalled();
+      // AND expect no errors or warning to have occurred (closed only on full teardown)
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
     });

@@ -55,18 +55,20 @@ const App = () => {
   useEffect(() => {
     const channel = AuthBroadcastChannel.getInstance();
 
+    // When another tab logs out, perform local cleanup only
+    // Do not run the full logout flow here — that would rebroadcast or close the shared channel
     const logoutListener = async () => {
-      const authService = AuthenticationServiceFactory.getCurrentAuthenticationService();
-      await authService?.logout();
+      await AuthenticationServiceFactory.resetAuthenticationState();
 
       // Redirect without a page reload
       window.location.href = `/#${routerPaths.LANDING}`;
-
-      channel.closeChannel();
     };
+    const unsubscribeLogout = channel.registerListener(AuthChannelMessage.LOGOUT_USER, logoutListener);
 
-    // Register listener
-    channel.registerListener(AuthChannelMessage.LOGOUT_USER, logoutListener);
+    return () => {
+      unsubscribeLogout();
+      // Unsubscribe only. Keep the shared channel open; close it only on page unload/root teardown
+    };
   }, []);
 
   const loadApplicationState = async () => {
@@ -95,11 +97,13 @@ const App = () => {
         // IF — no valid session in the provider (firebase or external provider),
         //    — and the token has expired,
         // THEN Log out the user to clear the state because we cannot refresh the token.
-        const isProviderSessionValid = await authenticationServiceInstance.isProviderSessionValid()
+        const isProviderSessionValid = await authenticationServiceInstance.isProviderSessionValid();
         if (!isProviderSessionValid) {
-          console.error(new AuthenticationError("Authentication provider session is not valid/available. Logging out user."))
+          console.error(
+            new AuthenticationError("Authentication provider session is not valid/available. Logging out user.")
+          );
           await authenticationServiceInstance.logout();
-          return
+          return;
         }
 
         console.debug("Token is expired getting new token for user...");
@@ -202,6 +206,13 @@ const App = () => {
         currentAuthenticationService?.cleanup();
         // Remove the visibility change event listener
         document.removeEventListener("visibilitychange", handleVisibilityChange);
+
+        // Close the shared broadcast channel on full app teardown / unmount
+        try {
+          AuthBroadcastChannel.getInstance().closeChannel();
+        } catch {
+          /* no-op */
+        }
       } catch (error) {
         console.error(new AuthenticationError("Error cleaning up auth", error));
       }
@@ -231,14 +242,18 @@ const App = () => {
       ),
     },
     // Only include register route if registration is not disabled
-    ...(isRegistrationDisabled ? [] : [{
-      path: routerPaths.REGISTER,
-      element: (
-        <ProtectedRoute key={ProtectedRouteKeys.REGISTER}>
-          <Register />
-        </ProtectedRoute>
-      ),
-    }]),
+    ...(isRegistrationDisabled
+      ? []
+      : [
+          {
+            path: routerPaths.REGISTER,
+            element: (
+              <ProtectedRoute key={ProtectedRouteKeys.REGISTER}>
+                <Register />
+              </ProtectedRoute>
+            ),
+          },
+        ]),
     {
       path: routerPaths.LOGIN,
       element: (

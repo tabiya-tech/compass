@@ -28,6 +28,14 @@ export class AuthBroadcastChannel {
   registerListener(message: AuthChannelMessage, callback: () => void) {
     const listeners = (this.listeners[message] ??= []);
     listeners.push(callback);
+
+    // Return an unsubscribe function
+    return () => {
+      const arr = this.listeners[message];
+      if (!arr) return;
+      const idx = arr.indexOf(callback);
+      if (idx >= 0) arr.splice(idx, 1);
+    };
   }
 
   /**
@@ -46,7 +54,11 @@ export class AuthBroadcastChannel {
    */
   closeChannel() {
     this.listeners = {};
-    this.channel.close();
+    try {
+      this.channel.close();
+    } catch {
+      /* no-op */
+    }
     AuthBroadcastChannel.instance = undefined!;
   }
 
