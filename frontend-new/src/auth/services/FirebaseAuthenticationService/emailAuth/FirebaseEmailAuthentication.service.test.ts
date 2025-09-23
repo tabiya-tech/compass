@@ -45,7 +45,7 @@ jest.mock("src/auth/services/invitationsService/invitations.service", () => {
 const mockBroadcast = jest.fn();
 jest.mock("src/auth/services/authBroadcastChannel/authBroadcastChannel.ts", () => {
   return {
-    AuthChannelMessage: { LOGOUT_USER: "LOGOUT_USER" },
+    AuthChannelMessage: { LOGOUT_USER: "LOGOUT_USER", LOGIN_USER: "LOGIN_USER" },
     AuthBroadcastChannel: {
       getInstance: jest.fn(() => ({
         registerListener: jest.fn(),
@@ -128,6 +128,9 @@ describe("AuthService class tests", () => {
 
       // AND the UserPreference State should be set
       expect(UserPreferencesStateService.getInstance().getUserPreferences()).toEqual(givenUserPreferences);
+
+      // AND a login message should be broadcasted to other tabs
+      expect(mockBroadcast).toHaveBeenCalledWith(AuthChannelMessage.LOGIN_USER);
 
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
