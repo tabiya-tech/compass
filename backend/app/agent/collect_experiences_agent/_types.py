@@ -78,18 +78,20 @@ class CollectedData(BaseModel):
     def get_missing_fields(experience: 'CollectedData') -> list[str]:
         """
         Get a list of missing fields for an incomplete experience.
+        Empty strings ("") mean the user explicitly declined to provide information, so they are not considered missing.
+        Only None values indicate missing information that hasn't been asked for yet.
         """
         missing_fields = []
 
-        if not experience.experience_title or experience.experience_title.strip() == "":
+        if experience.experience_title is None:
             missing_fields.append("experience_title")
-        if not experience.start_date or experience.start_date.strip() == "":
+        if experience.start_date is None:
             missing_fields.append("start_date")
-        if not experience.end_date or experience.end_date.strip() == "":
+        if experience.end_date is None:
             missing_fields.append("end_date")
-        if not experience.company or experience.company.strip() == "":
+        if experience.company is None:
             missing_fields.append("company")
-        if not experience.location or experience.location.strip() == "":
+        if experience.location is None:
             missing_fields.append("location")
             
         return missing_fields

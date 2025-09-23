@@ -1,3 +1,5 @@
+from typing import Optional
+
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.collect_experiences_agent import CollectExperiencesAgent, CollectExperiencesAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
@@ -10,9 +12,16 @@ class CollectExperiencesAgentExecutor:
     Executes the Collect Experiences agent
     """
 
-    def __init__(self, conversation_manager: ConversationMemoryManager, session_id: int, country_of_user: Country):
+    def __init__(self, conversation_manager: ConversationMemoryManager, session_id: int, country_of_user: Country, 
+                 injected_state: Optional[CollectExperiencesAgentState] = None):
         self._agent = CollectExperiencesAgent()
-        self._agent.set_state(CollectExperiencesAgentState(session_id=session_id,country_of_user=country_of_user))
+        
+        # use injected state if provided, otherwise create a new one
+        if injected_state is not None:
+            self._agent.set_state(injected_state)
+        else:
+            self._agent.set_state(CollectExperiencesAgentState(session_id=session_id, country_of_user=country_of_user))
+            
         self._conversation_manager = conversation_manager
 
     def get_experiences(self):
