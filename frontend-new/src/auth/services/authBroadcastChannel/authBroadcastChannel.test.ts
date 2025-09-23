@@ -57,6 +57,31 @@ describe("AuthBroadcastChannel", () => {
     expect(console.warn).not.toHaveBeenCalled();
   });
 
+  test("should register listener and return unsubscribe which removes the listener", () => {
+    const mockCallback = jest.fn();
+
+    // GIVEN a listener registered for LOGOUT_USER and an unsubscribe function returned
+    const unsubscribe = authBroadcastChannel.registerListener(AuthChannelMessage.LOGOUT_USER, mockCallback);
+    expect(typeof unsubscribe).toBe("function");
+    expect(mockCallback).not.toHaveBeenCalled();
+
+    // WHEN broadcasting LOGOUT_USER the first time
+    act(() => authBroadcastChannel.broadcast(AuthChannelMessage.LOGOUT_USER));
+
+    // THEN the listener should be called exactly once
+    expect(mockCallback).toHaveBeenCalledTimes(1);
+
+    // WHEN unsubscribing and broadcasting again
+    unsubscribe();
+    act(() => authBroadcastChannel.broadcast(AuthChannelMessage.LOGOUT_USER));
+
+    // THEN the listener should NOT be called again
+    expect(mockCallback).toHaveBeenCalledTimes(1);
+    // AND no unexpected console errors/warnings
+    expect(console.error).not.toHaveBeenCalled();
+    expect(console.warn).not.toHaveBeenCalled();
+  });
+
   test("should not trigger listener after channel is closed", () => {
     // GIVEN a listener registered for LOGOUT_USER
     const mockCallback = jest.fn();
