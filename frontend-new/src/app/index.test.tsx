@@ -66,7 +66,7 @@ jest.mock("react-router-dom", () => {
 jest.mock("src/auth/services/authBroadcastChannel/authBroadcastChannel.ts", () => {
   const unsubscribeMock = jest.fn();
   return {
-    AuthChannelMessage: { LOGOUT_USER: "LOGOUT_USER" },
+    AuthChannelMessage: { LOGOUT_USER: "LOGOUT_USER", LOGIN_USER: "LOGIN_USER" },
     AuthBroadcastChannel: {
       getInstance: jest.fn(() => ({
         registerListener: jest.fn(() => unsubscribeMock),
@@ -282,13 +282,18 @@ describe("index", () => {
       // THEN the cleanup method should have been called
       expect(AuthenticationFactoryModule.default.getCurrentAuthenticationService()!.cleanup).toHaveBeenCalled();
 
+      // AND the broadcast channel should be closed on full teardown
+      const mockGetInstance = AuthBroadcastChannel.getInstance as jest.Mock;
+      const channelInstanceOnCleanup = mockGetInstance.mock.results[mockGetInstance.mock.results.length - 1].value;
+      expect(channelInstanceOnCleanup.closeChannel).toHaveBeenCalledTimes(1);
+
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
     });
   });
 
-  describe("register logout listener", () => {
+  describe("register listeners", () => {
     test("should register logout listener, call logout and navigate to landing on logout", async () => {
       // GIVEN AuthenticationStateService.loadToken will successfully load the token
       jest.spyOn(AuthenticationStateService.prototype, "loadToken").mockImplementation(() => {});
@@ -315,6 +320,36 @@ describe("index", () => {
       // AND the broadcast channel should remain ope
       expect(mockChannel.closeChannel).not.toHaveBeenCalled();
       // AND expect no errors or warning to have occurred (closed only on full teardown)
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should register login listener, reload app state and navigate to root on login", async () => {
+      // GIVEN AuthenticationStateService.loadToken will successfully load the token
+      jest.spyOn(AuthenticationStateService.prototype, "loadToken").mockImplementation(() => {});
+
+      // WHEN the app is rendered
+      render(<App />);
+
+      // THEN expect the broadcast channel is set up
+      const mockGetInstance = AuthBroadcastChannel.getInstance as jest.Mock;
+      const mockChannel = mockGetInstance.mock.results[0].value;
+
+      // AND the login listener should be registered
+      expect(mockChannel.registerListener).toHaveBeenCalledWith(AuthChannelMessage.LOGIN_USER, expect.any(Function));
+
+      // WHEN a login message is received
+      const loginListener =
+        mockChannel.registerListener.mock.calls.find((c: any[]) => c[0] === AuthChannelMessage.LOGIN_USER)?.[1];
+      await act(async () => {
+        await loginListener();
+      });
+
+      // THEN the page should redirect to the root page
+      expect(window.location.href).toContain(routerPaths.ROOT);
+      // AND the broadcast channel should remain open (closed only on full teardown)
+      expect(mockChannel.closeChannel).not.toHaveBeenCalled();
+      // AND expect no errors or warnings
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
     });

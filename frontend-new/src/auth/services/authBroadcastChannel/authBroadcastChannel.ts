@@ -2,7 +2,7 @@ const CHANNEL_NAME = "auth-channel";
 
 export enum AuthChannelMessage {
   LOGOUT_USER = "LOGOUT_USER",
-  // Add more events here in the future
+  LOGIN_USER = "LOGIN_USER",
 }
 
 export class AuthBroadcastChannel {
@@ -56,9 +56,11 @@ export class AuthBroadcastChannel {
     this.listeners = {};
     try {
       this.channel.close();
-    } catch {
-      /* no-op */
+    } catch (e) {
+      // ignore error
+      console.error(new Error("Failed to close AuthBroadcastChanel", { cause: e }));
     }
+
     AuthBroadcastChannel.instance = undefined!;
   }
 
@@ -67,6 +69,14 @@ export class AuthBroadcastChannel {
    */
   private readonly handleMessage = (event: MessageEvent) => {
     const message = event.data as AuthChannelMessage;
-    this.listeners[message]?.forEach((cb) => cb());
+
+    this.listeners[message]?.forEach((cb) => {
+      try {
+        cb();
+      } catch (e) {
+        // ignore the error so that at least other listeners can be called
+        console.error(new Error(`Failed to handle AuthBroadcastChanel.message: ${message}`, { cause: e }));
+      }
+    });
   };
 }

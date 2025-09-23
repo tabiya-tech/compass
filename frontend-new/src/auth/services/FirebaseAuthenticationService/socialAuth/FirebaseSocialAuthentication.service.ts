@@ -67,6 +67,10 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
 
     // call the parent class method once the user is successfully logged in
     await super.onSuccessfulLogin(tokenResponse);
+
+    // Broadcast login to other tabs
+    AuthBroadcastChannel.getInstance().broadcast(AuthChannelMessage.LOGIN_USER);
+
     return tokenResponse;
   }
 

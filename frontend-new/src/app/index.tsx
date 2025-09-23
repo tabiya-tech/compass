@@ -52,25 +52,6 @@ const ProtectedRouteKeys = {
 const App = () => {
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const channel = AuthBroadcastChannel.getInstance();
-
-    // When another tab logs out, perform local cleanup only
-    // Do not run the full logout flow here — that would rebroadcast or close the shared channel
-    const logoutListener = async () => {
-      await AuthenticationServiceFactory.resetAuthenticationState();
-
-      // Redirect without a page reload
-      window.location.href = `/#${routerPaths.LANDING}`;
-    };
-    const unsubscribeLogout = channel.registerListener(AuthChannelMessage.LOGOUT_USER, logoutListener);
-
-    return () => {
-      unsubscribeLogout();
-      // Unsubscribe only. Keep the shared channel open; close it only on page unload/root teardown
-    };
-  }, []);
-
   const loadApplicationState = async () => {
     try {
       const authenticationServiceInstance = AuthenticationServiceFactory.getCurrentAuthenticationService();
@@ -166,6 +147,38 @@ const App = () => {
   };
 
   useEffect(() => {
+    const channel = AuthBroadcastChannel.getInstance();
+
+    // When another tab logs out, perform local cleanup only
+    // Do not run the full logout flow here — that would rebroadcast or close the shared channel
+    const logoutListener = async () => {
+      await AuthenticationServiceFactory.resetAuthenticationState();
+
+      // Redirect without a page reload
+      window.location.href = `/#${routerPaths.LANDING}`;
+    };
+
+    // When another tab logs in, reload the application state
+    const loginListener = async () => {
+      try {
+        await loadApplicationState();
+        window.location.href = `/#${routerPaths.ROOT}`;
+      } catch (e) {
+        console.error(new Error("Error loading application state after login broadcast"), { cause : e });
+      }
+    };
+
+    const unsubscribeLogout = channel.registerListener(AuthChannelMessage.LOGOUT_USER, logoutListener);
+    const unsubscribeLogin = channel.registerListener(AuthChannelMessage.LOGIN_USER, loginListener);
+
+    return () => {
+      unsubscribeLogout();
+      unsubscribeLogin();
+      // Keep the shared channel open; close it only on page unload/root teardown
+    };
+  }, []);
+
+  useEffect(() => {
     const authenticationStateService = AuthenticationStateService.getInstance();
 
     const initializeAuth = async () => {
@@ -208,11 +221,7 @@ const App = () => {
         document.removeEventListener("visibilitychange", handleVisibilityChange);
 
         // Close the shared broadcast channel on full app teardown / unmount
-        try {
-          AuthBroadcastChannel.getInstance().closeChannel();
-        } catch {
-          /* no-op */
-        }
+        AuthBroadcastChannel.getInstance().closeChannel();
       } catch (error) {
         console.error(new AuthenticationError("Error cleaning up auth", error));
       }
