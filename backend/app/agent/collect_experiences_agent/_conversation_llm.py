@@ -43,26 +43,28 @@ def _get_incomplete_experiences_instructions(collected_data: list[CollectedData]
     
     if not incomplete_experiences:
         return ""
+
+    incomplete_experiences_list = []
+    for i, (index, experience, missing_fields) in enumerate(incomplete_experiences, 1):
+        missing_fields_str = ", ".join(missing_fields)
+        incomplete_experiences_list.append(f"{i}. Experience #{index + 1}: \"{experience.experience_title}\" - Missing: {missing_fields_str}")
     
-    instructions = dedent("""\
+    incomplete_experiences_text = "\n".join(incomplete_experiences_list)
+    
+    instructions_template = dedent("""\
         #Incomplete Experiences Priority
             IMPORTANT: You have incomplete experiences from previous work types that need more information.
             Before moving on to explore new work types, you should prioritize asking questions to complete these incomplete experiences.
             
             Incomplete experiences that need more information:
-    """)
-    
-    for i, (index, experience, missing_fields) in enumerate(incomplete_experiences, 1):
-        missing_fields_str = ", ".join(missing_fields)
-        instructions += f"            {i}. Experience #{index + 1}: \"{experience.experience_title}\" - Missing: {missing_fields_str}\n"
-    
-    instructions += dedent("""\
+                {incomplete_experiences_list}
         
             When you have incomplete experiences, ask questions to fill in the missing information for these experiences.
             Only move on to exploring new work types after you have gathered all available information for incomplete experiences.
     """)
     
-    return instructions
+    return replace_placeholders_with_indent(instructions_template, 
+                                          incomplete_experiences_list=incomplete_experiences_text)
 
 
 class ConversationLLMAgentOutput(AgentOutput):

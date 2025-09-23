@@ -1,8 +1,11 @@
 from textwrap import dedent
+from typing import Optional
 
 from pydantic import ConfigDict
 
 from app.agent.experience import WorkType
+from app.agent.collect_experiences_agent import CollectExperiencesAgentState
+from app.agent.collect_experiences_agent._types import CollectedData
 from app.countries import Country
 from evaluation_tests.discovered_experience_test_case import DiscoveredExperienceTestCase
 from evaluation_tests.matcher import AnyOf, ContainsString, NON_EMPTY_STRING_REGEX, DictContaining, AnyValue
@@ -36,6 +39,12 @@ france_prompt = system_instruction_prompt + dedent("""
 
 
 class CollectExperiencesAgentTestCase(EvaluationTestCase, DiscoveredExperienceTestCase):
+    injected_state: Optional[CollectExperiencesAgentState] = None
+    """
+    Optional pre-existing agent state to inject into the executor.
+    If provided, the agent will continue from this state instead of starting fresh.
+    """
+    
     model_config = ConfigDict(extra="forbid")
 
 
@@ -649,6 +658,13 @@ test_cases = [
             You will provide all this information at once when asked about your experiences. The information is intentionally incomplete - 
             you're missing company names, locations, specific dates, and other details. Expect the agent to ask follow-up questions 
             to get the complete information. You should provide the missing details when asked specific questions about them.
+            
+            #Follow-up Details (only provide when specifically asked):
+            For Software Developer: Company was "TechCorp", located in "Cape Town", worked on web applications
+            For Freelance Web Design: Work from home in "Johannesburg", clients include small businesses and startups
+            For Animal Shelter: "Durban Animal Rescue Center", worked weekends from 2019 to 2021
+            For Family Restaurant: "Mama's Kitchen" in "Pretoria", helped from 2018 to 2020
+            
             You have no other experiences than the above 4.
             """) + sa_prompt,
         country_of_user=Country.SOUTH_AFRICA,
@@ -660,28 +676,85 @@ test_cases = [
                              WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
                              WorkType.UNSEEN_UNPAID: (2, 2)},
         expected_experience_data=[
+            # Final expectations after follow-up questions - should include all details
             {"experience_title": ContainsString("software developer"),
-             "location": AnyOf(ContainsString("Cape Town"), ContainsString("Johannesburg"), ContainsString("Pretoria"), ContainsString("Gqeberha")),
-             "company": AnyOf(ContainsString("TechCorp"), ContainsString("Tech Solutions")),
+             "location": ContainsString("Cape Town"),  # Provided in follow-up
+             "company": ContainsString("TechCorp"),   # Provided in follow-up
              "timeline": DictContaining({"start": "2020", "end": "2022"}),
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("web design"),
-             "location": AnyOf(ContainsString("Durban"), ContainsString("Cape Town"), ContainsString("Johannesburg"), ContainsString("Pretoria"), ContainsString("Gqeberha")),
-             "company": ContainsString("different clients"),
+             "location": ContainsString("Johannesburg"),  # Provided in follow-up
+             "company": AnyOf(ContainsString("small businesses"), ContainsString("startups"), ContainsString("clients")),
              "timeline": DictContaining({"start": "2023", "end": AnyOf("Present", "")}),
              "work_type": WorkType.SELF_EMPLOYMENT.name,
              },
-            {"experience_title": AnyOf(ContainsString("volunteer"), ContainsString("family"), ContainsString("restaurant")),
-             "location": AnyOf(ContainsString("Durban"), ContainsString("Cape Town"), ContainsString("Johannesburg"), ContainsString("Pretoria"), ContainsString("Gqeberha")),
-             "company": AnyOf(ContainsString("animal shelter"), ContainsString("Family Business"), ContainsString("local animal shelter"), ContainsString("family restaurant")),
-             "timeline": DictContaining({"start": AnyOf("2018", "2010", "2015", "2023/06"), "end": AnyOf("2019", "2020", "2023/12", "Present")}),
+            {"experience_title": ContainsString("volunteer"),
+             "location": ContainsString("Durban"),  # Provided in follow-up
+             "company": ContainsString("Animal Rescue Center"),  # Provided in follow-up
+             "timeline": DictContaining({"start": "2019", "end": "2021"}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
              },
-            {"experience_title": AnyOf(ContainsString("volunteer"), ContainsString("family"), ContainsString("restaurant")),
-             "location": AnyOf(ContainsString("Durban"), ContainsString("Cape Town"), ContainsString("Johannesburg"), ContainsString("Pretoria"), ContainsString("Gqeberha")),
-             "company": AnyOf(ContainsString("animal shelter"), ContainsString("Family Business"), ContainsString("local animal shelter"), ContainsString("family restaurant")),
-             "timeline": DictContaining({"start": AnyOf("2018", "2010", "2015", "2023/06"), "end": AnyOf("2019", "2020", "2023/12", "Present")}),
+            {"experience_title": ContainsString("family"),
+             "location": ContainsString("Pretoria"),  # Provided in follow-up
+             "company": ContainsString("Mama's Kitchen"),  # Provided in follow-up
+             "timeline": DictContaining({"start": "2018", "end": "2020"}),
+             "work_type": WorkType.UNSEEN_UNPAID.name,
+             },
+        ],
+    ),
+    CollectExperiencesAgentTestCase(
+        name='progressive_experience_disclosure_e2e',
+        simulated_user_prompt=dedent("""
+            You are a young person from South Africa with multiple work experiences. You will follow a progressive disclosure approach:
+            
+            #First Response (when asked about experiences):
+            "I have 2 main experiences:
+            1. Software Developer (2020-2022) - paid job
+            2. Freelance Web Designer (2023-present) - self-employed"
+            
+            #Second Response (when asked for more details about Software Developer):
+            "I worked as a Software Developer at TechCorp in Cape Town from 2020 to 2022. 
+            It was a full-time paid position where I worked on web applications and mobile apps."
+            
+            #Third Response (when asked for more details about Freelance Web Designer):
+            "I do freelance web design from home in Johannesburg since 2023. 
+            I work with various clients including SmallBiz Solutions and StartupXYZ. 
+            I specialize in e-commerce websites and branding."
+            
+            #Fourth Response (when asked if there are any other experiences):
+            "I also volunteered at Durban Animal Rescue Center on weekends from 2019 to 2021. 
+            It was unpaid work helping with animal care and adoption events."
+            
+            You will provide information progressively as the agent asks for it. Don't volunteer extra information.
+            You have no other experiences than the above 3.
+            """) + sa_prompt,
+        country_of_user=Country.SOUTH_AFRICA,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=20)],
+        expected_experiences_count_min=3,
+        expected_experiences_count_max=3,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+                             WorkType.SELF_EMPLOYMENT: (1, 1),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (1, 1)},
+        expected_experience_data=[
+            # Progressive disclosure expectations - information revealed in stages
+            {"experience_title": ContainsString("software developer"),
+             "location": ContainsString("Cape Town"),  # Provided in follow-up
+             "company": ContainsString("TechCorp"),   # Provided in follow-up
+             "timeline": DictContaining({"start": "2020", "end": "2022"}),
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("web design"),
+             "location": ContainsString("Johannesburg"),  # Provided in follow-up
+             "company": AnyOf(ContainsString("SmallBiz Solutions"), ContainsString("StartupXYZ"), ContainsString("clients")),
+             "timeline": DictContaining({"start": "2023", "end": AnyOf("Present", "")}),
+             "work_type": WorkType.SELF_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("volunteer"),
+             "location": ContainsString("Durban"),  # Provided in follow-up
+             "company": ContainsString("Animal Rescue Center"),  # Provided in follow-up
+             "timeline": DictContaining({"start": "2019", "end": "2021"}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
              },
         ],
@@ -882,5 +955,174 @@ test_cases = [
              "work_type": WorkType.SELF_EMPLOYMENT.name,
              },
         ],
+    ),
+    CollectExperiencesAgentTestCase(
+        name='complete_conversation_from_injected_state_e2e',
+        simulated_user_prompt=dedent("""
+            You are a young person from South Africa. You have already started a conversation with an agent 
+            and provided some basic information about your experiences. The agent is now asking for more details.
+            
+            #Previous conversation context:
+            You already mentioned that you have 3 experiences:
+            1. Software Developer (2020-2022) - paid job
+            2. Freelance Web Designer (2023-present) - self-employed
+            3. Volunteer at Animal Shelter - unpaid work
+            
+            #Current response (when asked for more details):
+            "For the Software Developer role, I worked at TechCorp in Cape Town from 2020 to 2022. 
+            For the freelance work, I'm based in Johannesburg and work with clients like SmallBiz Solutions and StartupXYZ.
+            For the volunteer work, I helped at Durban Animal Rescue Center on weekends from 2019 to 2021."
+            
+            You will provide all the additional details when asked. You have no other experiences than the above 3.
+            """) + sa_prompt,
+        country_of_user=Country.SOUTH_AFRICA,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=25)],
+        expected_experiences_count_min=3,
+        expected_experiences_count_max=3,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+                             WorkType.SELF_EMPLOYMENT: (1, 1),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (1, 1)},
+        expected_experience_data=[
+            # Final expectations after completing the conversation with follow-up details
+            {"experience_title": ContainsString("software developer"),
+             "location": ContainsString("Cape Town"),  # Provided in follow-up
+             "company": ContainsString("TechCorp"),   # Provided in follow-up
+             "timeline": DictContaining({"start": "2020", "end": "2022"}),
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("web design"),
+             "location": ContainsString("Johannesburg"),  # Provided in follow-up
+             "company": AnyOf(ContainsString("SmallBiz Solutions"), ContainsString("StartupXYZ"), ContainsString("clients")),
+             "timeline": DictContaining({"start": "2023", "end": AnyOf("Present", "")}),
+             "work_type": WorkType.SELF_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("volunteer"),
+             "location": ContainsString("Durban"),  # Provided in follow-up
+             "company": ContainsString("Animal Rescue Center"),  # Provided in follow-up
+             "timeline": DictContaining({"start": "2019", "end": "2021"}),
+             "work_type": WorkType.UNSEEN_UNPAID.name,
+             },
+        ],
+        injected_state=CollectExperiencesAgentState(
+            session_id=888,
+            country_of_user=Country.SOUTH_AFRICA,
+            collected_data=[
+                CollectedData(
+                    uuid="test-uuid-1",
+                    index=0,
+                    defined_at_turn_number=1,
+                    experience_title="Software Developer",
+                    company=None,  # Missing - should be filled in follow-up
+                    location=None,  # Missing - should be filled in follow-up
+                    start_date="2020",
+                    end_date="2022",
+                    paid_work=True,
+                    work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+                ),
+                CollectedData(
+                    uuid="test-uuid-2",
+                    index=1,
+                    defined_at_turn_number=1,
+                    experience_title="Freelance Web Designer",
+                    company=None,  # Missing - should be filled in follow-up
+                    location=None,  # Missing - should be filled in follow-up
+                    start_date="2023",
+                    end_date="Present",
+                    paid_work=True,
+                    work_type=WorkType.SELF_EMPLOYMENT.name
+                ),
+                CollectedData(
+                    uuid="test-uuid-3",
+                    index=2,
+                    defined_at_turn_number=1,
+                    experience_title="Volunteer at Animal Shelter",
+                    company=None,  # Missing - should be filled in follow-up
+                    location=None,  # Missing - should be filled in follow-up
+                    start_date=None,  # Missing - should be filled in follow-up
+                    end_date=None,  # Missing - should be filled in follow-up
+                    paid_work=False,
+                    work_type=WorkType.UNSEEN_UNPAID.name
+                )
+            ],
+            unexplored_types=[WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK],
+            explored_types=[WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT, WorkType.SELF_EMPLOYMENT, WorkType.UNSEEN_UNPAID],
+            first_time_visit=False  # Not first time since we have existing data
+        )
+    ),
+    CollectExperiencesAgentTestCase(
+        name='continue_from_partial_state_e2e',
+        simulated_user_prompt=dedent("""
+            You are a young person from South Africa. You have already started a conversation with an agent 
+            and provided some basic information about your experiences. Now the agent is asking for more details.
+            
+            #Previous conversation context:
+            You already mentioned that you have 2 experiences:
+            1. Software Developer (2020-2022) - paid job
+            2. Freelance Web Designer (2023-present) - self-employed
+            
+            #Current response (when asked for more details):
+            "For the Software Developer role, I worked at TechCorp in Cape Town. 
+            For the freelance work, I'm based in Johannesburg and work with clients like SmallBiz Solutions."
+            
+            You will provide the additional details when asked. You have no other experiences than the above 2.
+            """) + sa_prompt,
+        country_of_user=Country.SOUTH_AFRICA,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=25)],
+        expected_experiences_count_min=2,
+        expected_experiences_count_max=2,
+        expected_work_types={WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+                             WorkType.SELF_EMPLOYMENT: (1, 1),
+                             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+                             WorkType.UNSEEN_UNPAID: (0, 0)},
+        expected_experience_data=[
+            # Expectations for updated experiences with additional details
+            {"experience_title": ContainsString("software developer"),
+             "location": ContainsString("Cape Town"),  # Now provided in follow-up
+             "company": ContainsString("TechCorp"),   # Now provided in follow-up
+             "timeline": DictContaining({"start": "2020", "end": "2022"}),
+             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+             },
+            {"experience_title": ContainsString("web design"),
+             "location": ContainsString("Johannesburg"),  # Now provided in follow-up
+             "company": ContainsString("SmallBiz Solutions"),  # Now provided in follow-up
+             "timeline": DictContaining({"start": "2023", "end": AnyOf("Present", "")}),
+             "work_type": WorkType.SELF_EMPLOYMENT.name,
+             },
+        ],
+        # Inject a partially collected state
+        injected_state=CollectExperiencesAgentState(
+            session_id=999,
+            country_of_user=Country.SOUTH_AFRICA,
+            collected_data=[
+                CollectedData(
+                    uuid="test-uuid-1",
+                    index=0,
+                    defined_at_turn_number=1,
+                    experience_title="Software Developer",
+                    company=None,  # Missing - should be filled in follow-up
+                    location=None,  # Missing - should be filled in follow-up
+                    start_date="2020",
+                    end_date="2022",
+                    paid_work=True,
+                    work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+                ),
+                CollectedData(
+                    uuid="test-uuid-2",
+                    index=1,
+                    defined_at_turn_number=1,
+                    experience_title="Freelance Web Designer",
+                    company=None,  # Missing - should be filled in follow-up
+                    location=None,  # Missing - should be filled in follow-up
+                    start_date="2023",
+                    end_date="Present",
+                    paid_work=True,
+                    work_type=WorkType.SELF_EMPLOYMENT.name
+                )
+            ],
+            unexplored_types=[WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK, WorkType.UNSEEN_UNPAID],
+            explored_types=[WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT, WorkType.SELF_EMPLOYMENT],
+            first_time_visit=False  # Not first time since we have existing data
+        )
     ),
 ]

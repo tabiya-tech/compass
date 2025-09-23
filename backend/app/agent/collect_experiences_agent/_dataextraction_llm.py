@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, LLMStats
 from app.agent.collect_experiences_agent._types import CollectedData
+from app.agent.collect_experiences_agent._data_processor import ExperienceDataProcessor
 from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT, WorkType
 from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template import sanitize_input
@@ -21,7 +22,8 @@ from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
 
 # The tags are part of the prompt template and should not be used as input data
-_TAGS_TO_FILTER = ["system instructions", "previously extracted experience data", "user's last input", "conversation history"]
+_TAGS_TO_FILTER = ["system instructions", "previously extracted experience data", "user's last input",
+                   "conversation history"]
 
 
 class _DataOperation(Enum):
@@ -57,8 +59,6 @@ class _CollectedDataWithReasoning(CollectedData):
 
 class _CollectedExperience(BaseModel):
     associations: Optional[str] = ""
-    experience_references: Optional[str] = ""
-    experience_index: int = -1
     ignored_experiences: Optional[str] = None
     collected_experience_data: Optional[list[_CollectedDataWithReasoning]] = None
 
@@ -74,21 +74,6 @@ class _DataExtractionLLM:
         self._llm_caller = LLMCaller[_CollectedExperience](model_response_type=_CollectedExperience)
         self.logger = logger
 
-    @staticmethod
-    def _is_experience_empty(item: CollectedData) -> bool:
-        """Return True if the experience has no substantive fields populated."""
-        return CollectedData.all_fields_empty(item)
-
-    @staticmethod
-    def _find_duplicate_index(item: CollectedData, items: list[CollectedData], exclude_index: int | None = None) -> int:
-        """Return absolute index of a duplicate item in 'items' (excluding exclude_index), or -1 if none."""
-        for idx, existing in enumerate(items):
-            if exclude_index is not None and idx == exclude_index:
-                continue
-            if CollectedData.compare_relaxed(item, existing):
-                return idx
-        return -1
-
     async def execute(self, *, user_input: AgentInput, context: ConversationContext,
                       collected_experience_data_so_far: list[CollectedData]) -> tuple[int, list[LLMStats]]:
         """
@@ -99,22 +84,26 @@ class _DataExtractionLLM:
         :param user_input:  The user's last input
         :param context: The conversation context with the conversation history
         :param collected_experience_data_so_far: The collected experience data so far
-        :return: The extracted experience data and the LLM stats
+        :return: Tuple of the last referenced experience index and the LLM stats
         """
+
         # collected_experience_data_so_far.sort(key=lambda x: x.index) # sort the collected experience data by index
-        # remove the property defined_at_turn_number
+        # 1. remove the property defined_at_turn_number and de-serialize to json
         cleaned_experience_dicts_for_prompt: list[dict] = []
         for collected_item in collected_experience_data_so_far:
-            collected_item_dict = collected_item.model_dump()
-            del collected_item_dict["defined_at_turn_number"]
+            collected_item_dict = collected_item.model_dump(exclude={"defined_at_turn_number"})
             cleaned_experience_dicts_for_prompt.append(collected_item_dict)
 
+        # 2. Convert the cleaned experience dict to a JSON string with an indent of 2 spaces for LLM
         json_data = json.dumps(cleaned_experience_dicts_for_prompt, indent=2)
+
+        # 3. Construct the system instructions based on the collected data so far.
         llm = GeminiGenerativeLLM(
             system_instructions=_DataExtractionLLM._create_extraction_system_instructions(json_data),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
-                    "max_output_tokens": 3000  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
+                    "max_output_tokens": 3000
+                    # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
                 }
             ))
 
@@ -140,165 +129,21 @@ class _DataExtractionLLM:
         self.logger.info("Reasoning:"
                          "\n  - associations: %s"
                          "\n  - ignored_experiences: %s"
-                         "\n  - experience_references: %s"
                          "\n  - processing %d experiences",
                          response_data.associations,
                          response_data.ignored_experiences,
-                         response_data.experience_references,
                          len(experiences_data))
 
-        # Process each experience in the array
-        last_processed_index = -1
+        # Process experience data operations using the dedicated processor
         current_turn_index = context.history.turns[-1].index + 1 if context.history.turns else 1
+        processor = ExperienceDataProcessor(self.logger)
+        last_processed_index, collected_experience_data_so_far = processor.process_experience_operations(
+            experiences_data, collected_experience_data_so_far, current_turn_index)
 
-        # use index_mapping to ensure we use original indexes from llm to the new ones after the update.delete
-        index_mapping = {original_index: original_index for original_index in range(len(collected_experience_data_so_far))}
-        # keep track of pending deletes and adds to apply them after the updates
-        # this is because updates will not change the index mapping, but deletes and adds will
-        pending_delete_original_indexes: list[int] = []
-        pending_add_payloads: list[_CollectedDataWithReasoning] = []
-
-        for _data in experiences_data:
-            data_operation = _DataOperation.from_string_key(_data.data_operation)
-
-            if data_operation is None:
-                # This may happen if the LLM fails to return a valid data operation string
-                self.logger.error("Invalid data operation: %s", _data.data_operation)
-                continue
-
-            if _data.data_operation is None or data_operation == _DataOperation.NOOP:
-                # Either the LLM did not return a data operation or the LLM returned NOOP
-                self.logger.info("No operation to be performed on experience: %s", _data.experience_title)
-                continue
-
-            # Apply updates immediately using current mapping
-            if data_operation == _DataOperation.UPDATE:
-                current_index = index_mapping.get(_data.index, -1)
-                if 0 <= current_index < len(collected_experience_data_so_far):
-                    to_update = collected_experience_data_so_far[current_index]
-                    before_update = to_update.model_dump()
-                    self.logger.info("Updating experience with index: %s", _data.index)
-                    # once a value is set, it should not be set to None again
-                    if _data.experience_title is not None:
-                        to_update.experience_title = _data.experience_title
-                    if _data.paid_work is not None:
-                        to_update.paid_work = _data.paid_work
-                    if WorkType.from_string_key(_data.work_type) is not None:
-                        to_update.work_type = _data.work_type
-                    if _data.start_date is not None:
-                        to_update.start_date = _data.start_date
-                    if _data.end_date is not None:
-                        to_update.end_date = _data.end_date
-                    if _data.company is not None:
-                        to_update.company = _data.company
-                    if _data.location is not None:
-                        to_update.location = _data.location
-                    # Resolve empties/duplicates inline to keep indexes consistent
-                    if _DataExtractionLLM._is_experience_empty(to_update):
-                        self.logger.warning("Updated experience became empty and will be removed: %s", to_update)
-                        del collected_experience_data_so_far[current_index]
-                        # update index mapping after deletion
-                        _DataExtractionLLM._update_index_mapping_after_deletion(index_mapping, current_index)
-                        experience_index = -1
-                    else:
-                        duplicate_index = _DataExtractionLLM._find_duplicate_index(
-                            to_update, collected_experience_data_so_far, exclude_index=current_index)
-                        if duplicate_index >= 0:
-                            # Remove the updated (current) one; keep the existing duplicate
-                            # we are subtracting 1 from kept_index calculation when duplicate is after current because deleting current shifts indexes
-                            kept_index = duplicate_index if duplicate_index < current_index else duplicate_index - 1
-                            self.logger.warning("Updated experience duplicates an existing one; removing updated: %s", to_update)
-                            del collected_experience_data_so_far[current_index]
-                            # update index mapping after deletion
-                            _DataExtractionLLM._update_index_mapping_after_deletion(index_mapping, current_index)
-                            experience_index = kept_index
-                        else:
-                            experience_index = _data.index
-                            after_update = to_update.model_dump()
-                            self.logger.info("Experience data with index:%s updated:\n  - diff:%s",
-                                             experience_index,
-                                             dict_diff(before_update, after_update))
-                        last_processed_index = experience_index
-                else:
-                    self.logger.error("Invalid index:%s for updating experience", _data.index)
-
-            elif data_operation == _DataOperation.DELETE:
-                # we delete outside the loop to keep indexes consistent
-                pending_delete_original_indexes.append(_data.index)
-
-            elif data_operation == _DataOperation.ADD:
-                # we add at the end because we want to have stable indexes before adding
-                pending_add_payloads.append(_data)
-
-            else:
-                self.logger.error("Invalid data operation:%s", _data.data_operation)
-
-        # sort the pending deletes before applying them
-        # the idea is that if we dont sort first, we may delete an item that will change the index of another item we want to delete
-        # causing us to skip it or delete the wrong item
-        for original_index in sorted(pending_delete_original_indexes):
-            current_index = index_mapping.get(original_index, -1)
-            if 0 <= current_index < len(collected_experience_data_so_far):
-                self.logger.info("Deleting experience with index:%s", original_index)
-                del collected_experience_data_so_far[current_index]
-                # this handles shifting of indexes after deletion
-                _DataExtractionLLM._update_index_mapping_after_deletion(index_mapping, current_index)
-            else:
-                self.logger.error("Invalid index:%s for deleting experience", original_index)
-
-        # get the next available index from the original collected experience data
-        next_available_index = (
-            max([existing_item.index for existing_item in collected_experience_data_so_far]) + 1
-        ) if collected_experience_data_so_far else 0
-
-        # keep track of how many items we have added to calculate the new index
-        # we add the new items at the end of the list
-        appended_add_count = 0
-        for add_payload in pending_add_payloads:
-            new_index = next_available_index + appended_add_count
-            appended_add_count += 1
-            self.logger.info("Adding new experience with index: %s", new_index)
-
-            work_type = WorkType.from_string_key(add_payload.work_type)
-            work_type = work_type.name if work_type is not None else None
-
-            new_item = CollectedData(
-                index=new_index,
-                defined_at_turn_number=current_turn_index,
-                experience_title=add_payload.experience_title,
-                paid_work=add_payload.paid_work,
-                work_type=work_type,
-                start_date=add_payload.start_date,
-                end_date=add_payload.end_date,
-                company=add_payload.company,
-                location=add_payload.location
-            )
-            if _DataExtractionLLM._is_experience_empty(new_item):
-                self.logger.warning("Experience data is empty: %s", new_item)
-            else:
-                duplicate_index = _DataExtractionLLM._find_duplicate_index(new_item, collected_experience_data_so_far)
-                if duplicate_index >= 0:
-                    self.logger.warning("Duplicate experience data detected and will not be added: %s", new_item)
-                else:
-                    collected_experience_data_so_far.append(new_item)
-                    last_processed_index = new_index
-                    self.logger.info("Experience data added with index:%s\n  - data: %s", new_index, new_item.model_dump())
-
-        # reindex the items to start from 0 to N-1 since any deletes may have created gaps
-        if pending_delete_original_indexes:
-            self._make_indices_contiguous(collected_experience_data_so_far)
+        # Reindex the items to start from 0 to N-1 since any deletes may have created gaps
+        self._make_indices_contiguous(collected_experience_data_so_far)
 
         return last_processed_index, llm_stats
-
-    @staticmethod
-    def _update_index_mapping_after_deletion(index_mapping: dict[int, int], deleted_index: int) -> None:
-        """
-        Update the index mapping after a deletion to reflect the index shift.
-        When an item at index 'deleted_index' is deleted, all items after it shift down by 1.
-        """
-        for original_index, current_index in index_mapping.items():
-            if current_index > deleted_index:
-                index_mapping[original_index] = current_index - 1
 
     def _make_indices_contiguous(self, collected_experience_data_so_far: list[CollectedData]) -> None:
         """
@@ -317,14 +162,15 @@ class _DataExtractionLLM:
             item.index = new_index
             if old_index != new_index:
                 self.logger.info("Reindexing experience '%s': %s -> %s", item.experience_title, old_index, new_index)
-        
+
         # Log the reindexing operation summary
         after_indices = [item.index for item in collected_experience_data_so_far]
         if before_indices != after_indices:
             self.logger.info("Made indices contiguous: %s -> %s", before_indices, after_indices)
 
     @staticmethod
-    def _prompt_template(collected_experience_data_so_far: list[CollectedData], context: ConversationContext, user_message: str) -> str:
+    def _prompt_template(collected_experience_data_so_far: list[CollectedData], context: ConversationContext,
+                         user_message: str) -> str:
 
         return dedent("""\
             <Conversation History>
@@ -462,20 +308,6 @@ class _DataExtractionLLM:
                                            An empty string "" if no experiences will be ignored. 
                                            e.g. Experience was not referred in the '<User's Last Input>'.
                                            Formatted as a json string.      
-                    - experience_references: Provide a brief explanation (up to 100 words) about which experiences you will update or delete or add. 
-                                This field should not contain any ignored experiences.
-                                Follow the instructions in '#New Experience handling', '#Update Experience handling' and '#Delete Experience handling' 
-                                to determine which experiences you will be working with.
-                                Include the indexes of the experiences from the <Previously Extracted Experience Data>.
-                                Use the 'associations' to guide you in your explanation.
-                                Formatted as a json string 
-                    - experience_index: The index of the <Previously Extracted Experience Data> list if the 
-                                experience is updated or deleted, or the next index in the list if it is a new experience. 
-                                Use -1 if no experience is referenced.
-                                For multiple experiences, use the index of the first experience being processed.
-                                Follow the instructions in '#New Experience handling', '#Update Experience handling' and '#Delete Experience handling' 
-                                to determine which experience you will be working with.
-                                Formatted as an integer.
                     - collected_experience_data: an array of dictionaries with the information about the experiences referenced by the user.
                             Empty array `[]` if no experiences are referenced or they should be ignored. Otherwise, each dictionary in the array should contain the following fields:
                             {{
@@ -565,8 +397,9 @@ def format_history_for_prompt(collected_experience_data_so_far: list[CollectedDa
                 _experience_ref = f" (see <Previously Extracted Experience Data> index={_data.index})"
                 break
 
-        _output += (f"{ConversationHistoryFormatter.USER}: '{sanitize_input(turn.input.message, _TAGS_TO_FILTER)}{_experience_ref}'\n"
-                    f"{ConversationHistoryFormatter.MODEL}: '{sanitize_input(turn.output.message_for_user, _TAGS_TO_FILTER)}'\n")
+        _output += (
+            f"{ConversationHistoryFormatter.USER}: '{sanitize_input(turn.input.message, _TAGS_TO_FILTER)}{_experience_ref}'\n"
+            f"{ConversationHistoryFormatter.MODEL}: '{sanitize_input(turn.output.message_for_user, _TAGS_TO_FILTER)}'\n")
     return _output
 
 

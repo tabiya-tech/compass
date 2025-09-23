@@ -155,9 +155,8 @@ class CollectExperiencesAgent(Agent):
         #   provided a new experience, we need to handle this as
         #   a) if the user has not finished with the previous one we should ask them to complete it first
         #   b) the model may have made a mistake interpreting the user input as we need to clarify
-        conversation_llm_output: ConversationLLMAgentOutput
         exploring_type = self._state.unexplored_types[0] if len(self._state.unexplored_types) > 0 else None
-        conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
+        conversation_llm_output: ConversationLLMAgentOutput = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
                                                                context=context,
                                                                user_input=user_input,
                                                                country_of_user=self._state.country_of_user,

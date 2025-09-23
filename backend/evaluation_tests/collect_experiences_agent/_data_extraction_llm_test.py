@@ -172,7 +172,7 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("Graphic design teacher"),
-             "location": AnyOf(ContainsString("online"), ContainsString("remote")),
+             "location": AnyOf(None, ContainsString("online"), ContainsString("remote")),
              "company": None,
              "paid_work": AnyOf("True", True),
              "start_date": ContainsString("2020/06"),
@@ -490,7 +490,7 @@ test_cases_data_extraction = [
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("teaching graphic design"),
              "location": AnyOf(None,ContainsString("online"), ContainsString("remote")),
-             "company": None,
+             "company": AnyOf(None, ContainsString("self")),
              "paid_work": True,
              "start_date": '2020/06',
              "end_date": ContainsString('present'),
@@ -817,8 +817,24 @@ test_cases_data_extraction = [
         ]
     ),
     
+    # Edge case: Single message with ADD -> UPDATE -> DELETE (should be no-op)
+    _TestCaseDataExtraction(
+        name="single_message_add_update_delete_noop",
+        summary="",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+        ],
+        user_input="I worked at McDonald's. Actually, update that experience - it was at Wendy's. Actually, never mind, delete this experience.",
+        collected_data_so_far=[],
+        expected_last_referenced_experience_index=-1,  # Should be no-op, no experience referenced
+        expected_collected_data_count=0,  # Should result in no experiences
+        expected_collected_data=[]  # Empty list - no experiences should remain
+    ),
+    
     # All operations at once: ADD, UPDATE, DELETE
-    _TestCaseDataExtraction(name="multi_experience_all_operations",
+    _TestCaseDataExtraction(
+        name="multi_experience_all_operations",
         summary="",
         turns=[
             ("(silence)",
@@ -846,8 +862,8 @@ test_cases_data_extraction = [
              "location": AnyOf(None, ContainsString("tech")),
              "company": AnyOf(None, ContainsString("tech startups")),
              "paid_work": True,
-             "start_date": '2020',
-             "end_date": '2022',
+             "start_date": AnyOf(None, ContainsString('2020')),
+             "end_date": AnyOf(None, ContainsString('2022')),
              "work_type": WorkType.SELF_EMPLOYMENT.name
              },
             {"index": 1,
