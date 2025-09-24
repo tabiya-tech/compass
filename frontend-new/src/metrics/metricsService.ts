@@ -1,11 +1,65 @@
-import { getBackendUrl, getMetricsEnabled } from "src/envService";
+import { getBackendUrl, getMetricsConfig, getMetricsEnabled } from "src/envService";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
 import { MetricsError } from "src/error/commonErrors";
-import { MetricsEventUnion, SavableMetricsEventUnion } from "src/metrics/types";
+import { MetricsEventUnion, SavableMetricsEventUnion, EventType } from "src/metrics/types";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 
-export const METRICS_FLUSH_INTERVAL_MS = 15000; // 15 seconds
+interface FrontendMetricsConfig {
+  flushIntervalMs: number;
+  events: Record<keyof typeof EventType, { enabled: boolean }>;
+}
+
+export function loadFrontendMetricsConfig(): FrontendMetricsConfig {
+  const defaultFlushMs = 15000; // Default to 15 seconds
+
+  // Default all events to enabled
+  const defaultEvents: Record<keyof typeof EventType, { enabled: boolean }> = {} as any;
+  for (const key of Object.keys(EventType).filter((k) => isNaN(Number(k)))) {
+    defaultEvents[key as keyof typeof EventType] = { enabled: true };
+  }
+
+  const defaultConfig: FrontendMetricsConfig = {
+    flushIntervalMs: defaultFlushMs,
+    events: defaultEvents,
+  };
+
+  const raw = getMetricsConfig();
+  if (!raw) {
+    console.debug("Metrics config is not available, using the default config");
+    return defaultConfig;
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    const cfg: FrontendMetricsConfig = {
+      flushIntervalMs:
+        typeof parsed?.flushIntervalMs === "number" && parsed.flushIntervalMs > 0
+          ? parsed.flushIntervalMs
+          : defaultFlushMs,
+      events: { ...defaultEvents },
+    };
+
+    if (parsed?.events && typeof parsed.events === "object") {
+      for (const [key, value] of Object.entries(parsed.events)) {
+        if (key in EventType) {
+          const k = key as keyof typeof EventType;
+          cfg.events[k].enabled = (value as { enabled?: boolean })?.enabled !== false;
+        } else {
+          console.debug(`Ignoring unknown event key in metrics config: ${key}`);
+        }
+      }
+    }
+
+    return cfg;
+  } catch (e) {
+    console.warn("Failed to parse FRONTEND_METRICS_CONFIG, using defaults", e);
+    return defaultConfig;
+  }
+}
+
+export const cfg = loadFrontendMetricsConfig();
+export const METRICS_FLUSH_INTERVAL_MS = cfg.flushIntervalMs;
 
 export default class MetricsService {
   readonly apiServerUrl: string;
@@ -75,12 +129,19 @@ export default class MetricsService {
       return;
     }
 
+    const eventName = EventType[event.event_type] as keyof typeof EventType;
+
+    if (!cfg.events[eventName].enabled) {
+      console.debug(`Metric event ${eventName} is disabled. No metrics will be sent`);
+      return;
+    }
+
     const userPreferencesService = UserPreferencesService.getInstance();
 
     const savableEvent: SavableMetricsEventUnion = {
       ...event,
-      client_id: userPreferencesService.getClientID()
-    }
+      client_id: userPreferencesService.getClientID(),
+    };
 
     try {
       console.debug("Adding metrics event to buffer:", event.event_type);

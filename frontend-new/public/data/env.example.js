@@ -21,6 +21,20 @@ window.tabiyaConfig = {
   ),
   // The FRONTEND_ENABLE_METRICS variable is picked up by the Metrics SDK.
   FRONTEND_ENABLE_METRICS: btoa("false"),
+  FRONTEND_METRICS_CONFIG: btoa(
+    JSON.stringify({
+      flushIntervalMs: 15000, // Interval (in ms) at which metrics are flushed.
+      events: {  // Turn on/off specific events
+        CV_DOWNLOADED: { enabled: true },
+        DEMOGRAPHICS: { enabled: true },
+        USER_LOCATION: { enabled: true },
+        DEVICE_SPECIFICATION: { enabled: true },
+        NETWORK_INFORMATION: { enabled: true },
+        UI_INTERACTION: { enabled: true }
+      }
+    })
+  ),
+
   SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY: btoa("sensitive-data-encryption-key"),
   SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID: btoa("key_id"),
 

@@ -15,6 +15,7 @@ export enum EnvVariables {
   FRONTEND_REGISTRATION_CODE = "FRONTEND_REGISTRATION_CODE",
   FRONTEND_DISABLE_REGISTRATION = "FRONTEND_DISABLE_REGISTRATION",
   FRONTEND_ENABLE_METRICS = "FRONTEND_ENABLE_METRICS",
+  FRONTEND_METRICS_CONFIG = "FRONTEND_METRICS_CONFIG",
   FRONTEND_ENABLE_CV_UPLOAD = "FRONTEND_ENABLE_CV_UPLOAD",
   FRONTEND_FEATURES = "FRONTEND_FEATURES",
 }
@@ -150,6 +151,10 @@ export const getRegistrationDisabled = () => {
 
 export const getMetricsEnabled = () => {
   return getEnv(EnvVariables.FRONTEND_ENABLE_METRICS);
+};
+
+export const getMetricsConfig = () => {
+  return getEnv(EnvVariables.FRONTEND_METRICS_CONFIG);
 };
 
 export const getFeatures = () => {

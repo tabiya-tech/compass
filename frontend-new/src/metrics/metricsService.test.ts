@@ -1,28 +1,37 @@
 import "src/_test_utilities/consoleMock";
-import "src/_test_utilities/envServiceMock";
 
 import { waitFor } from "src/_test_utilities/test-utils";
-import MetricsService, { METRICS_FLUSH_INTERVAL_MS } from "src/metrics/metricsService";
+import MetricsService, { METRICS_FLUSH_INTERVAL_MS, loadFrontendMetricsConfig } from "src/metrics/metricsService";
 import { CVDownloadedEvent, EventType, MetricsEventUnion, SavableMetricsEventUnion } from "src/metrics/types";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { CVFormat } from "src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown";
 import { StatusCodes } from "http-status-codes";
 import * as CustomFetchModule from "src/utils/customFetch/customFetch";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import * as MetricsModule from "src/metrics/metricsService";
+import * as EnvServiceModule from "src/envService";
+
+jest.mock("src/envService", () => ({
+  getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
+  getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
+  getBackendUrl: jest.fn(() => "mock-backend-url"),
+  getMetricsEnabled: jest.fn(() => "true"),
+  getMetricsConfig: jest.fn(() => ""),
+}));
 
 const addClientId = (event: MetricsEventUnion, clientId: string): SavableMetricsEventUnion => {
   return {
     ...event,
     client_id: clientId,
-  }
-}
+  };
+};
 
 describe("MetricsService", () => {
   let givenApiServerUrl: string = "/path/to/api";
 
   beforeEach(() => {
     // GIVEN a mocked API server URL
-    jest.spyOn(require("src/envService"), "getBackendUrl").mockReturnValue(givenApiServerUrl);
+    jest.spyOn(EnvServiceModule, "getBackendUrl").mockReturnValue(givenApiServerUrl);
 
     // Reset timers and mocks
     jest.useFakeTimers();
@@ -111,7 +120,7 @@ describe("MetricsService", () => {
         {
           event_type: EventType.USER_LOCATION,
           user_id: "456",
-          coordinates: [123.456, 78.910],
+          coordinates: [123.456, 78.91],
           timestamp: new Date().toISOString(),
         },
         {
@@ -121,7 +130,8 @@ describe("MetricsService", () => {
           os_type: "Windows",
           browser_type: "Chrome",
           browser_version: "1.0.0",
-          user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          user_agent:
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
           timestamp: new Date().toISOString(),
         },
         {
@@ -136,8 +146,8 @@ describe("MetricsService", () => {
           actions: ["foo", "bar"],
           element_id: "foo_element",
           timestamp: new Date().toISOString(),
-          relevant_experiments: { "exp1": "group1", "exp2": "group2" },
-          details: { "foo1": "bar1", "foo2": "bar2" },
+          relevant_experiments: { exp1: "group1", exp2: "group2" },
+          details: { foo1: "bar1", foo2: "bar2" },
         },
       ];
 
@@ -150,7 +160,7 @@ describe("MetricsService", () => {
 
       // WHEN sending the events
       const service = MetricsService.getInstance();
-      givenEvents.forEach(event => service.sendMetricsEvent(event));
+      givenEvents.forEach((event) => service.sendMetricsEvent(event));
 
       // AND the flush interval passes
       jest.advanceTimersByTime(METRICS_FLUSH_INTERVAL_MS);
@@ -168,7 +178,7 @@ describe("MetricsService", () => {
           serviceFunction: "flushEvents",
           failureMessage: "Failed to send metrics events",
           expectedStatusCode: StatusCodes.ACCEPTED,
-          body: JSON.stringify(givenEvents.map(event => addClientId(event, givenClientId))),
+          body: JSON.stringify(givenEvents.map((event) => addClientId(event, givenClientId))),
         });
       });
     });
@@ -219,7 +229,7 @@ describe("MetricsService", () => {
       // AND an unsuccessful response from the API
       const errorResponse = new Error("Something went wrong");
       const fetchSpy = setupAPIServiceSpy(StatusCodes.BAD_REQUEST, errorResponse, "application/json;charset=UTF-8");
-      fetchSpy.mockRejectedValueOnce(errorResponse)
+      fetchSpy.mockRejectedValueOnce(errorResponse);
 
       // WHEN sending a metrics event
       const service = MetricsService.getInstance();
@@ -284,7 +294,7 @@ describe("MetricsService", () => {
 
     test("should not add events if metrics are disabled and log a warning", () => {
       // GIVEN the metrics are disabled
-      jest.spyOn(require("src/envService"), "getMetricsEnabled").mockReturnValueOnce("false");
+      jest.spyOn(EnvServiceModule, "getMetricsEnabled").mockReturnValueOnce("false");
       // AND a metrics event
       const givenEvent: CVDownloadedEvent = {
         event_type: EventType.CV_DOWNLOADED,
@@ -302,6 +312,109 @@ describe("MetricsService", () => {
       expect(service["_eventBuffer"]).toHaveLength(0);
       // AND the warning to be logged
       expect(console.warn).toHaveBeenCalledWith("Metrics are disabled. No metrics will be sent.");
+    });
+
+    test("should not record metrics for disabled event types and log a debug message", () => {
+      // GIVEN a metrics event
+      const givenEvent: CVDownloadedEvent = {
+        event_type: EventType.CV_DOWNLOADED,
+        cv_format: CVFormat.PDF,
+        session_id: 123,
+        user_id: "456",
+        timestamp: new Date().toISOString(),
+      };
+
+      // AND the metrics config has the CV_DOWNLOADED event disabled
+      MetricsModule.cfg.events.CV_DOWNLOADED.enabled = false;
+
+      // AND a spy on console.debug
+      const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+      // WHEN sending the metrics event
+      const service = MetricsService.getInstance();
+      service.sendMetricsEvent(givenEvent);
+
+      // THEN the event should not be added to the internal buffer
+      expect(service["_eventBuffer"]).toHaveLength(0);
+
+      // AND a debug message should be logged
+      expect(debugSpy).toHaveBeenCalledWith("Metric event CV_DOWNLOADED is disabled. No metrics will be sent");
+    });
+  });
+
+  describe("loadFrontendMetricsConfig", () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    test("should return defaults when no config is provided", () => {
+      // GIVEN envService returns an empty string
+      jest.spyOn(EnvServiceModule, "getMetricsConfig").mockReturnValueOnce("");
+      const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+      // WHEN loading the config
+      const cfg = loadFrontendMetricsConfig();
+
+      // THEN defaults are applied
+      expect(cfg.flushIntervalMs).toBe(15000);
+      // AND all events are enabled
+      expect(Object.values(cfg.events).every((e) => e.enabled)).toBe(true);
+      // AND a debug message is logged
+      expect(debugSpy).toHaveBeenCalledWith("Metrics config is not available, using the default config");
+    });
+
+    test("should apply provided flushIntervalMs and event flags", () => {
+      // GIVEN a config that sets flushIntervalMs and disables CV_DOWNLOADED
+      const parsed = { flushIntervalMs: 30000, events: { CV_DOWNLOADED: { enabled: false } } };
+      const raw = JSON.stringify(parsed);
+      jest.spyOn(EnvServiceModule, "getMetricsConfig").mockReturnValueOnce(raw);
+
+      // WHEN loading the config
+      const cfg = loadFrontendMetricsConfig();
+
+      // THEN flushIntervalMs is updated
+      expect(cfg.flushIntervalMs).toBe(30000);
+      // AND CV_DOWNLOADED is disabled
+      expect(cfg.events.CV_DOWNLOADED.enabled).toBe(false);
+      // AND at least one other event remains enabled
+      expect(Object.values(cfg.events).some((e) => e.enabled)).toBe(true);
+    });
+
+    test("should ignore unknown event keys and log a debug message", () => {
+      // GIVEN a config with an unknown event
+      const parsed = {
+        events: { UNKNOWN_EVENT: { enabled: false }, CV_DOWNLOADED: { enabled: true } },
+      };
+      const raw = JSON.stringify(parsed);
+      jest.spyOn(EnvServiceModule, "getMetricsConfig").mockReturnValueOnce(raw);
+      const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+      // WHEN loading the config
+      const cfg = loadFrontendMetricsConfig();
+
+      // THEN known events are preserved
+      expect(cfg.events.CV_DOWNLOADED.enabled).toBe(true);
+      // AND unknown keys are ignored with a debug log
+      expect(debugSpy).toHaveBeenCalledWith("Ignoring unknown event key in metrics config: UNKNOWN_EVENT");
+    });
+
+    test("should return defaults and log a warning on malformed JSON", () => {
+      // GIVEN a malformed JSON string
+      jest.spyOn(EnvServiceModule, "getMetricsConfig").mockReturnValueOnce("}{");
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+      // WHEN loading the config
+      const cfg = loadFrontendMetricsConfig();
+
+      // THEN defaults are used
+      expect(cfg.flushIntervalMs).toBe(15000);
+      // AND all events are enabled
+      expect(Object.values(cfg.events).every((e) => e.enabled)).toBe(true);
+      // AND a warning is logged
+      expect(warnSpy).toHaveBeenCalledWith(
+        "Failed to parse FRONTEND_METRICS_CONFIG, using defaults",
+        expect.any(Error)
+      );
     });
   });
 });
