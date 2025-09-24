@@ -72,6 +72,7 @@ def init_sentry(dsn: str, environment: str | None = None, config: Optional[Backe
         environment=environment,
         send_default_pii=False,
         before_send=attach_ticket_info,
+        enable_logs=cfg.get("enableLogs", False)
     )
 
 
