@@ -17,6 +17,7 @@ import {
   getApplicationLoginCode,
   getApplicationRegistrationCode,
   getMetricsEnabled,
+  getMetricsConfig,
   getFeatures,
   getCvUploadEnabled,
   getLoginCodeDisabled,
@@ -57,6 +58,7 @@ describe.each([
   ["FRONTEND_DISABLE_REGISTRATION", getRegistrationDisabled],
 
   ["FRONTEND_ENABLE_METRICS", getMetricsEnabled],
+  ["FRONTEND_METRICS_CONFIG", getMetricsConfig],
   ["FRONTEND_ENABLE_CV_UPLOAD", getCvUploadEnabled],
   ["FRONTEND_FEATURES", getFeatures],
 ])("Env Getters", (ENV_KEY, getterFn) => {
