@@ -76,6 +76,13 @@ export const defaultInit: ExtendedRequestInit = {
   compressRequestBody: true,
 };
 
+class CustomFetchError extends Error {
+  constructor(message: string, public attempt: number, cause: unknown = null) {
+    super(message, { cause });
+    this.name = "CustomFetchError";
+  }
+}
+
 /*
  * Refresh the token using the authentication service.
  * */
@@ -84,23 +91,21 @@ const refreshToken = async (
   serviceName: string,
   serviceFunction: string,
   failureMessage: string,
-  errorFactory: RestAPIErrorFactory
+  errorFactory: RestAPIErrorFactory,
 ): Promise<string> => {
   // import the Authentication service factory dynamically to avoid circular dependencies.
   // If the response status is 401 Unauthorized, try to refresh the token.
   const authServiceFactory = await import("src/auth/services/Authentication.service.factory");
   const authService = authServiceFactory.default.getCurrentAuthenticationService();
   if (!authService) {
-    console.warn(
-      `customFetch: No authentication service available for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
-    );
-    throw new AuthenticationError("No authentication service available for authentication");
+    throw new AuthenticationError(
+      `customFetch: No authentication service available for (${serviceName}.${serviceFunction}) on attempt: ${attempt}.`);
   }
 
   const isProviderSessionValid = await authService.isProviderSessionValid();
 
   if (!isProviderSessionValid) {
-    const userFriendlyErrorMessage = ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.AUTHENTICATION_FAILURE
+    const userFriendlyErrorMessage = ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.AUTHENTICATION_FAILURE;
     await authService.logout();
     enqueueSnackbar(`${userFriendlyErrorMessage} We are logging you out ....`, {
       autoHideDuration: LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
@@ -121,22 +126,19 @@ const refreshToken = async (
   try {
     await authService.refreshToken();
     console.debug(
-      `customFetch: Token refreshed successfully for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
+      `customFetch: Token refreshed successfully for ${serviceName}.${serviceFunction} on attempt ${attempt}.`,
     );
     const newToken = AuthenticationStateService.getInstance().getToken();
     if (!newToken) {
-      console.warn(
-        `customFetch: No token available after refreshing for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
-      );
-      throw new AuthenticationError("No token available after refreshing");
+      throw new AuthenticationError(
+        `customFetch: No token available after refreshing for ${serviceName}.${serviceFunction} on attempt ${attempt}.`);
     }
+
     return newToken;
   } catch (e: any) {
-    console.warn(
-      `customFetch: Failed to refresh token for ${serviceName}.${serviceFunction} on attempt ${attempt}.`,
-      e
-    );
-    throw errorFactory(0, ErrorConstants.ErrorCodes.API_ERROR, failureMessage, e);
+    const error = new CustomFetchError(
+      `customFetch: Failed to refresh token for ${serviceName}.${serviceFunction}.`, attempt, e);
+    throw errorFactory(0, ErrorConstants.ErrorCodes.API_ERROR, failureMessage, error);
   }
 };
 
@@ -150,22 +152,22 @@ const checkToken = async (
   attempt: number,
   serviceName: string,
   serviceFunction: string,
-  errorFactory: RestAPIErrorFactory
+  errorFactory: RestAPIErrorFactory,
 ) => {
   if (!token) {
-    console.warn(`customFetch: No token available for ${serviceName}.${serviceFunction} on attempt ${attempt}.`);
-    throw errorFactory(0, ErrorConstants.ErrorCodes.API_ERROR, "No token available for authentication", null);
+    const cause = new CustomFetchError(`customFetch: No token available for ${serviceName}.${serviceFunction}.`, attempt);
+    throw errorFactory(0, ErrorConstants.ErrorCodes.API_ERROR, "No token available for authentication", cause);
   }
+
   // import the Authentication service factory dynamically to avoid circular dependencies.
   // If the response status is 401 Unauthorized, try to refresh the token.
   const authServiceFactory = await import("src/auth/services/Authentication.service.factory");
   const authService = authServiceFactory.default.getCurrentAuthenticationService();
   if (!authService) {
-    console.warn(
-      `customFetch: No authentication service available for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
-    );
-    throw new AuthenticationError("No authentication service available for authentication");
+    const cause = new CustomFetchError(`customFetch: No authentication service available for ${serviceName}.${serviceFunction}.`, attempt);
+    throw new AuthenticationError("No authentication service available for authentication", cause);
   }
+
   const { isValid, failureCause, decodedToken } = authService.isTokenValid(token);
 
   // If the token is valid, we are certain that the decodedToken is not null.
@@ -174,7 +176,7 @@ const checkToken = async (
     console.debug(
       "customFetch: Token is valid but about to expire, refreshing token for",
       serviceName,
-      serviceFunction
+      serviceFunction,
     );
     throw new TokenError(TokenValidationFailureCause.TOKEN_EXPIRED);
   }
@@ -192,10 +194,8 @@ const checkToken = async (
   }
 
   // Otherwise, if the token is invalid for any other reason, throw an error.
-  console.warn(
-    `customFetch: Token is invalid for ${serviceName}.${serviceFunction} on attempt ${attempt}. Failure cause: ${failureCause}`
-  );
-  throw new AuthenticationError(`Token is invalid: ${failureCause}`);
+  const cause = new CustomFetchError(`customFetch: Token is invalid for ${serviceName}.${serviceFunction}. Failure cause: ${failureCause}`, attempt);
+  throw new AuthenticationError(`Token is invalid: ${failureCause}`, cause);
 };
 
 export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = defaultInit): Promise<Response> => {
@@ -220,6 +220,9 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
 
   const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, init.method ?? "GET", apiUrl);
   let failedDueToRetryableStatusCode = 1;
+
+  // Collect retry warnings instead of logging each one individually
+  const attemptErrors: Error[] = [];
 
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     let token = authRequired ? AuthenticationStateService.getInstance().getToken() : null;
@@ -260,7 +263,7 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
         const isFormData = options.body instanceof FormData;
         const isFile = options.body instanceof File;
         const isMultipart = contentType.includes("multipart/");
-        
+
         if (isFormData || isFile || isMultipart) {
           console.debug(`Skipping compression for ${serviceName}.${serviceFunction} because the body is a FormData, File, or multipart content type`);
           processedBody = options.body;
@@ -281,7 +284,7 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
 
             // First, check if we want to compress based on the throughput gain. (if it is less than MIN_PERFORMANCE_GAIN_PERCENT, do not compress)
             // This is to avoid the CPU overhead of compressing and decompressing small payloads.
-            const performanceGainPercent = calculateCompressionGainPercent(rawBytes.length, compressedBytes.length)
+            const performanceGainPercent = calculateCompressionGainPercent(rawBytes.length, compressedBytes.length);
             if (performanceGainPercent < MIN_PERFORMANCE_GAIN_PERCENT) {
               console.debug(`Skipping compression for ${serviceName}.${serviceFunction} because the gain is below the threshold. Body size: ${rawBytes.length}, gain: ${performanceGainPercent}`);
               processedBody = bodyString;
@@ -309,13 +312,13 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
     } catch (e: any) {
       // If the caller, has set the retryOnFailedToFetch to true, and the fetch fails due to a network error,
       // We should sleep for some time and retry the request.
-      if(retryOnFailedToFetch) {
-        console.warn(
-          `customFetch: Failed to fetch ${serviceName}.${serviceFunction} on attempt ${attempt}. Error:`,
-          e
-        );
+      if (retryOnFailedToFetch) {
+        // Instead of logging immediately, add to grouped attemptErrors
+        const error = new CustomFetchError(`Attempt ${attempt}: Failed to fetch ${serviceName}.${serviceFunction}`, attempt, e);
+        console.debug(error);
+        attemptErrors.push(error);
 
-        const backOffMs = getNextBackoff(INITIAL_BACKOFF_MS, attempt+1);
+        const backOffMs = getNextBackoff(INITIAL_BACKOFF_MS, attempt + 1);
         console.debug("sleeping for", backOffMs, "ms before retrying", serviceName, serviceFunction, "attempt", attempt);
         await sleep(backOffMs);
 
@@ -341,8 +344,16 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
           response.status,
           ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER,
           `Response Content-Type should be '${init.expectedContentType}'`,
-          `Content-Type header was ${responseContentType}`
+          `Content-Type header was ${responseContentType}`,
         );
+      }
+
+      // if there were any warnings, we log them grouped together
+      if (attemptErrors.length > 0) {
+        console.warn(new CustomFetchError(
+          `customFetch: ${serviceName}.${serviceFunction} succeeded after ${attempt} attempts.`,
+          attempt,
+          attemptErrors));
       }
 
       return response;
@@ -363,6 +374,11 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
         }
       }
     } else if (combinedRetriableStatusCodes.includes(response.status)) {
+      // Instead of logging immediately, add to grouped attemptErrors
+      const error = new CustomFetchError(`Attempt ${attempt}: Got retriable status ${response.status} from ${serviceName}.${serviceFunction}`, attempt);
+      console.debug(error);
+      attemptErrors.push(error);
+
       // The response status is in the list of combined retryable status codes,
       // If it is not the first attempt, before fetching, sleep for some time that exponentially increases
       // Based on the attempt number.
@@ -377,8 +393,11 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
     const responseBody = await response.text();
     throw errorFactory(response.status, ErrorConstants.ErrorCodes.API_ERROR, failureMessage, responseBody);
   }
-  console.warn(
-    `customFetch: Reached max attempts (${MAX_ATTEMPTS}) for ${serviceName}.${serviceFunction} without success.`
-  );
-  throw errorFactory(0, ErrorConstants.ErrorCodes.API_ERROR, failureMessage, null);
+
+  // if all attempts failed, we log them grouped together
+  const cause = new CustomFetchError(
+    `customFetch: Reached max attempts (${MAX_ATTEMPTS}) for ${serviceName}.${serviceFunction} without success.`,
+    MAX_ATTEMPTS,
+    attemptErrors);
+  throw errorFactory(0, ErrorConstants.ErrorCodes.API_ERROR, failureMessage, cause);
 };

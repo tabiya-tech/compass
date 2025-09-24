@@ -64,6 +64,48 @@ describe("serializeError", () => {
     });
   });
 
+  it("serializes an Error object with more than one cause", () => {
+    // construct a deeply nested error
+    const grandChild1Error = new Error("Grandchild1 error");
+    const child1Error = new Error("Child1 error", { cause: grandChild1Error });
+
+    const grandChild2Error = new Error("Grandchild2 error");
+    const child2Error = new Error("Child2 error", { cause: grandChild2Error });
+
+    const rootError = new Error("Root error", { cause: [child1Error, child2Error] });
+
+    const result = serializeError(rootError);
+
+    expect(result).toMatchObject({
+      name: "Error",
+      message: "Root error",
+      stack: expect.any(String),
+      messageChain: expect.stringContaining("Error: Root error\n  ↳ Error: Child1 error\n   ↳ Error: Grandchild1 error\n  ↳ Error: Child2 error\n   ↳ Error: Grandchild2 error"),
+      cause: {
+        "0": {
+          name: "Error",
+          message: "Child1 error",
+          stack: expect.any(String),
+          cause: {
+            name: "Error",
+            message: "Grandchild1 error",
+            stack: expect.any(String),
+          },
+        },
+        "1": {
+          name: "Error",
+          message: "Child2 error",
+          stack: expect.any(String),
+          cause: {
+            name: "Error",
+            message: "Grandchild2 error",
+            stack: expect.any(String),
+          },
+        }
+      },
+    });
+  });
+
   it("serializes a generic object", () => {
     const obj = { key: "value" };
     const result = serializeError(obj);
