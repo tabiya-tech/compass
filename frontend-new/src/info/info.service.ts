@@ -46,6 +46,9 @@ export default class InfoService {
         };
       });
     } catch (error) {
+      // Since we don't want the caller to know about the error,
+      // we log it and return an empty object.
+      console.error(error);
       return { date: "", branch: "", buildNumber: "", sha: "" };
     }
   }

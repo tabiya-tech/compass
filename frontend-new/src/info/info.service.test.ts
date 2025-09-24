@@ -1,3 +1,6 @@
+// mute chatty console
+import "src/_test_utilities/consoleMock";
+
 import InfoService from "./info.service";
 import infoURL from "./info.constants";
 
@@ -8,7 +11,7 @@ import * as CustomFetchModule from "src/utils/customFetch/customFetch";
 
 describe("InfoService", () => {
   describe("Test the loadInfoFromUrl function", () => {
-    afterEach(() => {
+    afterAll(() => {
       jest.restoreAllMocks();
       // reset the instance cache
       InfoService.getInstance().clearCache();
@@ -76,6 +79,9 @@ describe("InfoService", () => {
         retryOnFailedToFetch: true
       });
       expect(actualResult).toMatchObject({ date: "", branch: "", buildNumber: "", sha: "" });
+
+      // AND an error should be logged
+      expect(console.error).toHaveBeenCalled()
     });
 
     test.each([{}, { foo: "bar" }, null])(
@@ -135,6 +141,9 @@ describe("InfoService", () => {
         retryOnFailedToFetch: true
       });
       expect(actualResult).toMatchObject({ date: "", branch: "", buildNumber: "", sha: "" });
+
+      // AND an error should be logged
+      expect(console.error).toHaveBeenCalled()
     });
   });
 
