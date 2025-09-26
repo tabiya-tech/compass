@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { startTransition, useEffect, useState } from "react";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import Login from "src/auth/pages/Login/Login";
 import ErrorPage from "src/error/errorPage/ErrorPage";
@@ -162,9 +162,13 @@ const App = () => {
     const loginListener = async () => {
       try {
         await loadApplicationState();
-        window.location.href = `/#${routerPaths.ROOT}`;
+
+        // Use startTransition to delay navigation, preventing suspension errors from lazy-loaded components
+        startTransition(() => {
+          window.location.href = `/#${routerPaths.ROOT}`;
+        });
       } catch (e) {
-        console.error(new Error("Error loading application state after login broadcast"), { cause : e });
+        console.error(new Error("Error loading application state after login broadcast"), { cause: e });
       }
     };
 
