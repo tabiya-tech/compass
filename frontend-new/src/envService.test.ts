@@ -22,6 +22,7 @@ import {
   getCvUploadEnabled,
   getLoginCodeDisabled,
   getRegistrationDisabled,
+  getSocialAuthDisabled,
 } from "./envService";
 import { getRandomString } from "./_test_utilities/specialCharacters";
 
@@ -56,6 +57,7 @@ describe.each([
 
   ["FRONTEND_DISABLE_LOGIN_CODE", getLoginCodeDisabled],
   ["FRONTEND_DISABLE_REGISTRATION", getRegistrationDisabled],
+  ["FRONTEND_DISABLE_SOCIAL_AUTH", getSocialAuthDisabled],
 
   ["FRONTEND_ENABLE_METRICS", getMetricsEnabled],
   ["FRONTEND_METRICS_CONFIG", getMetricsConfig],
