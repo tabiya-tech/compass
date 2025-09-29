@@ -488,4 +488,19 @@ describe("Testing Register component", () => {
       expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenURLParamRegistrationCode);
     });
   });
+
+  test("should not display SocialAuth when social auth is disabled", async () => {
+    // GIVEN social auth is disabled and the application registration code is set
+    jest.spyOn(EnvServiceModule, "getSocialAuthDisabled").mockReturnValue("true");
+    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue("foo");
+
+    // WHEN the component is rendered
+    render(<Register />);
+
+    // THEN SocialAuth should not be displayed
+    expect(SocialAuth as unknown as jest.Mock).not.toHaveBeenCalled();
+    // AND expect no console warnings or errors
+    expect(console.warn).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
+  });
 });
