@@ -44,6 +44,8 @@ window.tabiyaConfig = {
   FRONTEND_DISABLE_LOGIN_CODE: btoa("false"),
   FRONTEND_DISABLE_REGISTRATION: btoa("false"),
 
+  FRONTEND_DISABLE_SOCIAL_AUTH: btoa("false"),
+
   // CV Upload feature flag (optional, defaults to false if not set)
   FRONTEND_ENABLE_CV_UPLOAD: btoa("true"),
 

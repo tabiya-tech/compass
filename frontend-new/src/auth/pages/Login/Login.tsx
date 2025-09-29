@@ -31,6 +31,7 @@ import {
   getApplicationRegistrationCode,
   getLoginCodeDisabled,
   getRegistrationDisabled,
+  getSocialAuthDisabled,
 } from "src/envService";
 import PasswordReset from "src/auth/components/passwordReset/PasswordReset";
 
@@ -189,6 +190,10 @@ const Login: React.FC = () => {
 
   const registrationDisabled = useMemo(() => {
     return getRegistrationDisabled().toLowerCase() === "true";
+  }, []);
+
+  const socialAuthDisabled = useMemo(() => {
+    return getSocialAuthDisabled().toLowerCase() === "true";
   }, []);
 
   /* ------------------
@@ -490,13 +495,15 @@ const Login: React.FC = () => {
             )}
           </PrimaryButton>
         </Box>
-        <SocialAuth
-          disabled={false}
-          postLoginHandler={handlePostLogin}
-          isLoading={isLoading}
-          notifyOnLoading={notifyOnSocialLoading}
-          registrationCode={applicationRegistrationCode}
-        />
+        {!socialAuthDisabled && (
+          <SocialAuth
+            disabled={false}
+            postLoginHandler={handlePostLogin}
+            isLoading={isLoading}
+            notifyOnLoading={notifyOnSocialLoading}
+            registrationCode={applicationRegistrationCode}
+          />
+        )}
         {!registrationDisabled && (
           <Typography variant="caption" data-testid={DATA_TEST_ID.REGISTER_LINK}>
             Don't have an account? <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>Register</CustomLink>

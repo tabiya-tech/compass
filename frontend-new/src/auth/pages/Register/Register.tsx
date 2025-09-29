@@ -18,7 +18,7 @@ import { InvitationType } from "src/auth/services/invitationsService/invitations
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
-import { getApplicationRegistrationCode } from "src/envService";
+import { getApplicationRegistrationCode, getSocialAuthDisabled } from "src/envService";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -95,6 +95,10 @@ const Register: React.FC = () => {
 
   const applicationRegistrationCode = useMemo(() => {
     return getApplicationRegistrationCode();
+  }, []);
+
+  const socialAuthDisabled = useMemo(() => {
+    return getSocialAuthDisabled().toLowerCase() === "true";
   }, []);
 
   /* -----------
@@ -215,14 +219,16 @@ const Register: React.FC = () => {
           notifyOnRegister={handleRegister}
           isRegistering={isLoading}
         />
-        <SocialAuth
-          postLoginHandler={handlePostLogin}
-          isLoading={isLoading}
-          disabled={!registrationCode && !applicationRegistrationCode}
-          label={"Register with Google"}
-          notifyOnLoading={notifyOnSocialLoading}
-          registrationCode={registrationCode || applicationRegistrationCode}
-        />
+        {!socialAuthDisabled && (
+          <SocialAuth
+            postLoginHandler={handlePostLogin}
+            isLoading={isLoading}
+            disabled={!registrationCode && !applicationRegistrationCode}
+            label={"Register with Google"}
+            notifyOnLoading={notifyOnSocialLoading}
+            registrationCode={registrationCode || applicationRegistrationCode}
+          />
+        )}
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
           Already have an account? <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>Login</CustomLink>
         </Typography>
