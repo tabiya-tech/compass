@@ -251,6 +251,7 @@ export function initSentry() {
         client_id: UserPreferencesService.getInstance().getClientID(),
         user_id: AuthenticationStateService.getInstance().getUser()?.id,
         session_id: UserPreferencesStateService.getInstance().getActiveSessionId(),
+        component_name: "compass-frontend"
       };
 
       return obfuscateEvent(log);

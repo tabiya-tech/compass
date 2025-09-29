@@ -51,6 +51,16 @@ def _determine_event_level(level: str) -> int:
 def init_sentry(dsn: str, environment: str | None = None, config: Optional[BackendSentryConfig] = None):
     logger.info("Initializing Sentry...")
 
+    # Use LogRecord factory to add component_name to all log records
+    old_factory = logging.getLogRecordFactory()
+
+    def record_factory(*args, **kwargs):
+        record = old_factory(*args, **kwargs)
+        record.component_name = "compass-backend"
+        return record
+
+    logging.setLogRecordFactory(record_factory)
+
     # Merge provided config with defaults
     cfg: BackendSentryConfig = {**SENTRY_CONFIG_DEFAULT, **(config or {})}
 
