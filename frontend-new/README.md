@@ -64,6 +64,7 @@ To develop this application locally, follow these steps:
      - `FRONTEND_DISABLE_LOGIN_CODE`: (**Optional**) A boolean value to disable the login code prompt. If set to true, we disable the anonymous login code prompt and the user will only be able to log in using an existing account.
      - `FRONTEND_REGISTRATION_CODE`: (**Optional**) The registration code for the frontend application. It is optional, if not provided user will be prompted to enter the registration code.
      - `FRONTEND_DISABLE_REGISTRATION`: (**Optional**) A boolean value to disable the registration entirely.
+     - `FRONTEND_DISABLE_SOCIAL_AUTH`: (**Optional**) A boolean value to disable social authentication options on the login and registration pages.
      - `FRONTEND_FEATURES`: (**optional**) A JSON like dictionary with the features enabled status and configurations specific to each feature.
 
    Please request the necessary environment variable values from the project team.
