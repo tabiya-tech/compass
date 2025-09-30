@@ -6,6 +6,7 @@ interface StoryArgs {
   loginCode?: string;
   registrationDisabled?: boolean;
   loginCodeDisabled?: boolean;
+  socialAuthDisabled?: boolean;
 }
 
 const meta: Meta<typeof Login> = {
@@ -14,12 +15,13 @@ const meta: Meta<typeof Login> = {
   component: Login,
   decorators: [
     (Story, context) => {
-      const { loginCode, registrationDisabled, loginCodeDisabled } = context.args as StoryArgs;
+      const { loginCode, registrationDisabled, loginCodeDisabled, socialAuthDisabled } = context.args as StoryArgs;
       (window as any).tabiyaConfig = {
         ...(window as any).tabiyaConfig,
         [EnvVariables.FRONTEND_LOGIN_CODE]: loginCode ? window.btoa(loginCode) : "",
         [EnvVariables.FRONTEND_DISABLE_REGISTRATION]: registrationDisabled ? window.btoa("true") : window.btoa("false"),
         [EnvVariables.FRONTEND_DISABLE_LOGIN_CODE]: loginCodeDisabled ? window.btoa("true") : window.btoa("false"),
+        [EnvVariables.FRONTEND_DISABLE_SOCIAL_AUTH]: socialAuthDisabled ? window.btoa("true") : window.btoa("false"),
       };
 
       return <Story />;
@@ -98,6 +100,15 @@ export const WithApplicationLoginCodeAndRegistrationDisabled: StoryObj<typeof Lo
     loginCode: "test-login-code",
     registrationDisabled: true,
     loginCodeDisabled: false,
+  },
+  parameters: {
+    mockData: firebaseSuccessMock,
+  },
+};
+
+export const WithSocialAuthDisabled: StoryObj<typeof Login> = {
+  args: {
+    socialAuthDisabled: true,
   },
   parameters: {
     mockData: firebaseSuccessMock,

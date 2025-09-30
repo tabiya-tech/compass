@@ -1,7 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
 import Register from "./Register";
-import Login from "../Login/Login";
-import { EnvVariables } from "../../../envService";
+import { EnvVariables } from "src/envService";
 
 const meta: Meta<typeof Register> = {
   title: "Auth/Register",
@@ -15,12 +14,22 @@ export const Shown: StoryObj<typeof Register> = {
   args: {},
 };
 
-export const ShownWithApplicationRegistrationCodeSet: StoryObj<typeof Login> = {
+export const ShownWithApplicationRegistrationCodeSet: StoryObj<typeof Register> = {
   args: {},
   beforeEach: () => {
     window.tabiyaConfig[EnvVariables.FRONTEND_REGISTRATION_CODE] = btoa("bar");
     return () => {
       delete window.tabiyaConfig[EnvVariables.FRONTEND_REGISTRATION_CODE];
+    };
+  },
+};
+
+export const ShownWithSocialAuthDisabled: StoryObj<typeof Register> = {
+  args: {},
+  beforeEach: () => {
+    window.tabiyaConfig[EnvVariables.FRONTEND_DISABLE_SOCIAL_AUTH] = btoa("true");
+    return () => {
+      delete window.tabiyaConfig[EnvVariables.FRONTEND_DISABLE_SOCIAL_AUTH];
     };
   },
 };
