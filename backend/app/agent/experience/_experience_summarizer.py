@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from app.agent.experience import WorkType
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
+from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.countries import Country, get_country_glossary
 from app.vector_search.esco_entities import SkillEntity
@@ -80,11 +81,14 @@ class ExperienceSummarizer:
                     - experience_summary: the summary of the user's experience in a raw formatted non markdown text as a JSON string.
                 
                 Your response must always be a JSON object with the schema above
+                
+                {language_style}
         </System Instructions>
             """)
         return replace_placeholders_with_indent(
             _summarize_system_instructions,
-            country_instructions=_country_instructions
+            country_instructions=_country_instructions,
+            language_style=STD_LANGUAGE_STYLE()
         )
 
     @staticmethod

@@ -466,12 +466,14 @@ class _DataExtractionLLM:
                 <Previously Extracted Experience Data> 
                     {previously_extracted_data} 
                 </Previously Extracted Experience Data>   
+                
+                {language_style}
                 """)
 
         return replace_placeholders_with_indent(system_instructions_template,
                                                 current_date=datetime.now().strftime("%Y/%m"),
                                                 agent_character=STD_AGENT_CHARACTER,
-                                                language_style=STD_LANGUAGE_STYLE,
+                                                language_style=STD_LANGUAGE_STYLE(),
                                                 previously_extracted_data=previously_extracted_data,
                                                 work_type_definitions=WORK_TYPE_DEFINITIONS_FOR_PROMPT
                                                 )

@@ -19,7 +19,7 @@ from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_vari
 from common_libs.retry import Retry
 
 _NO_EXPERIENCE_COLLECTED = "No experience data has been collected yet"
-_FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step."
+_FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step." # TODO: Hardcoded
 
 
 class ConversationLLMAgentOutput(AgentOutput):
@@ -359,7 +359,7 @@ class _ConversationLLM:
         return replace_placeholders_with_indent(system_instructions_template,
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 agent_character=STD_AGENT_CHARACTER,
-                                                language_style=STD_LANGUAGE_STYLE,
+                                                language_style=STD_LANGUAGE_STYLE(),
                                                 exploring_type_instructions=_get_explore_experiences_instructions(
                                                     collected_data=collected_data,
                                                     exploring_type=exploring_type,
@@ -442,7 +442,7 @@ def _transition_instructions(*,
         summarize_and_confirm = dedent("""
             Explicitly summarize all the work experiences you collected and explicitly ask me if I would like to add or change anything in the information 
             you collected before moving forward to the next step. 
-            Ask me: 
+            Ask me: (In user's language)
                 "Let's recap the information we have collected so far:
                 {summary_of_experiences}
                 Is there anything you would like to add or change?"
@@ -461,6 +461,8 @@ def _transition_instructions(*,
             It is not your responsibility to conduct the next step.
             
             You must perform the summarization and confirmation step before ending the conversation.
+            
+            {language_style}
             """)
         return replace_placeholders_with_indent(summarize_and_confirm,
                                                 summary_of_experiences=_get_summary_of_experiences(collected_data),

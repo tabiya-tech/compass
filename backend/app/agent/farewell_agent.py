@@ -1,5 +1,6 @@
 from textwrap import dedent
 
+from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE
 from app.agent.simple_llm_agent.simple_llm_agent import SimpleLLMAgent
 from app.agent.agent_types import AgentType, AgentInput, AgentOutput
 from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions, \
@@ -40,9 +41,12 @@ class FarewellAgent(SimpleLLMAgent):
             {response_part}
             
             {finish_instructions}
+            
+            {language_style}
             """)
 
         system_instructions = system_instructions_template.format(response_part=response_part,
-                                                                  finish_instructions=finish_instructions)
+                                                                  finish_instructions=finish_instructions,
+                                                                  language_style=STD_LANGUAGE_STYLE())
         super().__init__(agent_type=AgentType.FAREWELL_AGENT,
                          system_instructions=system_instructions)

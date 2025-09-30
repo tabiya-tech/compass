@@ -252,7 +252,7 @@ class _ConversationLLM:
             get_question_c=_get_question_c(work_type),
             question_asked_until_now="\n".join(f"- \"{s}\"" for s in question_asked_until_now),
             agent_character=STD_AGENT_CHARACTER,
-            language_style=STD_LANGUAGE_STYLE,
+            language_style=STD_LANGUAGE_STYLE(),
             experience_title=f"'{experience_title}'",
             work_type=f" ({WorkType.work_type_short(work_type)})" if work_type is not None else ""
         )
@@ -304,7 +304,7 @@ class _ConversationLLM:
                                                 experiences_explored_instructions=experiences_explored_instructions,
                                                 experience_title=f"'{experience_title}'",
                                                 work_type=f" ({WorkType.work_type_short(work_type)})" if work_type is not None else "",
-                                                language_style=STD_LANGUAGE_STYLE,
+                                                language_style=STD_LANGUAGE_STYLE(),
                                                 )
 
 

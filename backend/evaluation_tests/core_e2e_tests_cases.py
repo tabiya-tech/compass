@@ -35,6 +35,14 @@ france_prompt = system_instruction_prompt + dedent("""
 """)
 
 
+def i18n_prompt(language: str):
+    return dedent(f"""
+    You talk in {language} like a native speaker.
+    
+    Some Important things you need to consider:-
+        If asked in English, then you need to tell me "You only speak {language}", and ask to repeat then reply in the {language} language.
+    """)
+
 class ExperiencePipelineConfigCase(BaseModel):
     given_number_of_clusters: int = 5
     """
@@ -56,10 +64,46 @@ class E2ETestCase(EvaluationTestCase, ExperiencePipelineConfigCase):
 class E2ESpecificTestCase(E2ETestCase, DiscoveredExperienceTestCase):
     model_config = ConfigDict(extra="forbid")
 
+class I18NE2ESpecificTestCase(E2ETestCase, DiscoveredExperienceTestCase):
+    model_config = ConfigDict(extra="forbid")
+    language: str
+
+
+i18n_test_cases = [
+    I18NE2ESpecificTestCase(
+        country_of_user=Country.UNSPECIFIED,
+        conversation_rounds=100,
+        language=language,
+        skip_force="force",
+        name='i18n_e2e_'+language.lower().replace(" ", "_"),
+        simulated_user_prompt=i18n_prompt(language) +  dedent("""
+            You're a Gen Y living alone. you have this single experience as an employee:
+            
+            - Teaching assistant at some University in Tokyo from Jan 2021 to 2023 Aug (Paid).
+            - Selling Shoes at Shoe Soles, a shoe store in Tokyo, from 2023 to present.
+            
+            When asked you will reply with the information about this experience all at once, in a single message.
+            You have never had another job experience beside the shoe salesperson job and teaching assistant. Also never
+            did any internship, never run your own business, never volunteered, never did any freelance work.
+            Be as concise as possible, and do not make up any information.
+            """) + system_instruction_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=1,
+        expected_work_types={
+            WorkType.SELF_EMPLOYMENT: (0, 0),
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+            WorkType.UNSEEN_UNPAID: (0, 0),
+        }
+    ) for language in ["Italian", "Spanish", "Bengali (Bangladesh)", "German", "Aamharic (Ethiopia)", "Swahili", "Kinyarwanda (Rwanda)"]
+    # ) for language in ["Spanish"]
+]
 
 test_cases = [
+    *i18n_test_cases,
     E2ESpecificTestCase(
-        country_of_user=Country.UNSPECIFIED,
+        country_of_user=Country.ITALY,
         conversation_rounds=50,
         name='asks_about_process_e2e',
         simulated_user_prompt=dedent("""
@@ -79,7 +123,7 @@ test_cases = [
             During the part when you are asked about to describe the tasks you performed in your job,
             make sure to ask how long it will take to finish the conversation.
             """) + system_instruction_prompt,
-        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
         expected_experiences_count_min=1,
         expected_experiences_count_max=1,
         expected_work_types={
@@ -293,7 +337,6 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
     ),
     E2ETestCase(
-        skip_force="force",
         country_of_user=Country.UNSPECIFIED,
         conversation_rounds=100,
         name='cv_upload_style_e2e',

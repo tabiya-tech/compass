@@ -6,6 +6,7 @@ class Country(Enum):
     SOUTH_AFRICA = "South Africa"
     KENYA = "Kenya"
     FRANCE = "France"
+    ITALY = "Italy"
     UNSPECIFIED = "Unspecified"
 
 

@@ -402,7 +402,7 @@ class ExploreExperiencesAgentDirector(Agent):
             questions_and_answers=current_experience.questions_and_answers
         )
 
-        agent_output: AgentOutput = AgentOutput(
+        agent_output: AgentOutput = AgentOutput( # REVIEW: Hardcoded
             message_for_user=f"Based on the information provided about your experience as '{current_experience.experience_title}', "
                              f"here’s a brief overview:\n\n"
                              f"{current_experience.summary}\n\n"

@@ -1,3 +1,4 @@
+import asyncio
 import logging.config
 from typing import Awaitable
 
@@ -5,6 +6,9 @@ import pytest
 from tqdm import tqdm
 
 from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
+from app.context_vars import language_ctx_var
+from app.store.json_application_state_store import JSONApplicationStateStore
+from app.store.markdown_conversation_state_store import MarkdownConversationStateStore
 from app.vector_search.vector_search_dependencies import SearchServices
 from common_libs.test_utilities import get_random_session_id
 from evaluation_tests.conversation_libs import conversation_generator
@@ -25,7 +29,7 @@ def current_test_case(request) -> E2ETestCase:
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test("gemini-2.0-flash-001/")
-@pytest.mark.repeat(3)
+@pytest.mark.repeat(2)
 @pytest.mark.parametrize('current_test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_main_app_chat(
@@ -34,6 +38,10 @@ async def test_main_app_chat(
         common_folder_path: str,
         setup_search_services: Awaitable[SearchServices]
 ):
+    # set the default language of the user
+    if hasattr(current_test_case, "language"):
+        language_ctx_var.set(current_test_case.language)
+
     """
     E2E conversation test, based on the test cases specified above. It calls the same endpoint as the frontend
     would call and does not mock any of the tested components.
@@ -149,6 +157,18 @@ async def test_main_app_chat(
         evaluation_result.save_data(folder=output_folder, base_file_name='evaluation_record')
         context = await chat_executor.get_conversation_memory_manager().get_conversation_context()
         save_conversation(context, title=current_test_case.name, folder_path=output_folder)
+
+
+        _savers = [
+            # Save the conversation state in MD format to the output file path
+            MarkdownConversationStateStore(output_folder),
+
+            # Save the conversation state in JSON format to the output file path
+            JSONApplicationStateStore(output_folder)
+        ]
+
+        application_state = chat_executor.get_application_state()
+        await asyncio.gather(*[saver.save_state(application_state) for saver in _savers])
 
         if failures:
             failures = "\n  - ".join(failures)

@@ -215,7 +215,7 @@ class WelcomeAgent(Agent):
         ), 0, None
 
     @staticmethod
-    async def get_first_encounter_message():
+    async def get_first_encounter_message(): # REVIEW: Hardcoded.
         return dedent("""\
                 Welcome! I’m Compass, here to guide you in capturing and highlighting your skills.
                 Here’s how this process works:
@@ -311,7 +311,7 @@ class WelcomeAgent(Agent):
             Read your instructions carefully and stick to them.     
         """)
         system_instructions = replace_placeholders_with_indent(system_instructions_template,
-                                                               language_style=STD_LANGUAGE_STYLE,
+                                                               language_style=STD_LANGUAGE_STYLE(),
                                                                agent_character=STD_AGENT_CHARACTER,
                                                                json_response_instructions=WelcomeAgent.get_json_response_instructions(state))
         return system_instructions
