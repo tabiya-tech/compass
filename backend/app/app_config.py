@@ -1,8 +1,9 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.countries import Country
+from app.users.cv.constants import DEFAULT_MAX_UPLOADS_PER_USER, DEFAULT_RATE_LIMIT_PER_MINUTE
 from app.version.types import Version
 
 from features.types import FeatureSetupConfig
@@ -62,6 +63,11 @@ class ApplicationConfig(BaseModel):
     The configuration for the experience pipeline.
     This is a dictionary that can contain various settings for the pipeline.
     """
+
+    # CV storage and upload limits
+    cv_storage_bucket: str
+    cv_max_uploads_per_user: Optional[int] = Field(default=DEFAULT_MAX_UPLOADS_PER_USER, gt=0)
+    cv_rate_limit_per_minute: Optional[int] = Field(default=DEFAULT_RATE_LIMIT_PER_MINUTE, gt=0)
 
 
 _application_config: ApplicationConfig | None = None

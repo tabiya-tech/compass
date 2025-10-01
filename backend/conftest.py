@@ -151,6 +151,7 @@ def setup_application_config() -> Generator[ApplicationConfig, Any, None]:
         taxonomy_model_id=str(ObjectId()),  # get a random object id.
         embeddings_service_name="foo-service",
         embeddings_model_name="bar-model",
+        cv_storage_bucket="foo-bucket",
         features={}
     )
 

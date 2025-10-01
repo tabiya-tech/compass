@@ -28,3 +28,12 @@ class EmptyMarkdownError(Exception):
         super().__init__(detail)
         self.filename = filename
 
+
+class CVLimitExceededError(Exception):
+    """Raised when the maximum number of stored CVs is reached."""
+    pass
+
+
+class CVUploadRateLimitExceededError(Exception):
+    """Raised when the CV upload rate limit is exceeded."""
+    pass

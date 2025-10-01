@@ -120,6 +120,23 @@ class CompassDBProvider:
                 ("user_id", 1)
             ], unique=True)
 
+            # Create the indexes related to the user cv uploads
+            # 2 User-CV-Upload documents cannot reference to the
+            #   — same object path.
+            #   — same markdown object path.
+            #
+            # This will help us prevent deleting documents of others and rate limiting users.
+            await userdata_db.get_collection(Collections.USER_CV_UPLOADS).create_index([
+                ("object_path", 1)
+            ], unique=True)
+            await userdata_db.get_collection(Collections.USER_CV_UPLOADS).create_index([
+                ("markdown_object_path", 1)
+            ], unique=True)
+
+            await userdata_db.get_collection(Collections.USER_CV_UPLOADS).create_index([
+                ("user_id", 1)
+            ])
+
             logger.info("Finished creating indexes for the userdata database")
         except Exception as e:
             logger.exception(e)

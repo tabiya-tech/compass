@@ -11,3 +11,4 @@ class Collections:
     USER_FEEDBACK = "user_feedback"
     REACTIONS = "reactions"
     COMPASS_METRICS = "metric_events"
+    USER_CV_UPLOADS: str = "user_cv_uploads"

@@ -11,4 +11,6 @@ REQUIRED_SERVICES = [
     "dlp.googleapis.com",
     # GCP Cloud Run
     "run.googleapis.com",
+    # GCP Cloud Storage (for CV uploads bucket)
+    "storage.googleapis.com",
 ]
