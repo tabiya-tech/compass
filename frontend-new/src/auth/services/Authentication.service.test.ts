@@ -416,9 +416,8 @@ describe("AuthenticationService", () => {
       expect(result.decodedToken).toBeNull();
       expect(result.failureCause).toBe(TokenValidationFailureCause.ERROR_DECODING_TOKEN);
 
-      // AND expect the error to have been logged
-      expect(console.error).toHaveBeenCalled();
-      // AND expect no warning to have occurred
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
     });
   });
