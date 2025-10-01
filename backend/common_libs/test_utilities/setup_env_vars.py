@@ -121,6 +121,9 @@ def setup_env_vars(*, env_vars: dict[str, str] = None):
         'BACKEND_ENABLE_SENTRY': "false",
         'BACKEND_ENABLE_METRICS': "false",
         'DEFAULT_COUNTRY_OF_USER': Country.UNSPECIFIED.value,
+        'BACKEND_CV_STORAGE_BUCKET': "foo",
+        'BACKEND_CV_MAX_UPLOADS_PER_USER': "5",
+        'BACKEND_CV_RATE_LIMIT_PER_MINUTE': "10",
         # Add more environment variables as needed here
     }
 

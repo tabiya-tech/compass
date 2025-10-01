@@ -207,6 +207,11 @@ BACKEND_SENTRY_DSN=<BACKEND_SENTRY_DSN>
 BACKEND_SENTRY_CONFIG='{"tracesSampleRate": 0.2, "enableLogs": true, "logLevel": "info", "eventLevel": "error"}'
 BACKEND_FEATURES=<BACKEND_FEATURES>
 BACKEND_EXPERIENCE_PIPELINE_CONFIG=<BACKEND_EXPERIENCE_PIPELINE_CONFIG>
+
+# CV storage and limits (optional; required to persist uploads)
+BACKEND_CV_STORAGE_BUCKET=<GCS_BUCKET_NAME>
+BACKEND_CV_MAX_UPLOADS_PER_USER=<INTEGER>
+BACKEND_CV_RATE_LIMIT_PER_MINUTE=<INTEGER>
 ```
 
 > ATTENTION: The .env file should be kept secure and not shared with others as it contains sensitive information.

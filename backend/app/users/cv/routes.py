@@ -3,7 +3,6 @@ import logging
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Request
-from pydantic import Field
 
 from app.constants.errors import HTTPErrorResponse
 from app.users.cv.constants import (
@@ -12,9 +11,13 @@ from app.users.cv.constants import (
     ALLOWED_MIME_TYPES,
     ALLOWED_EXTENSIONS,
 )
-from app.users.cv.errors import MarkdownTooLongError, PayloadTooLargeErrorResponse, MarkdownConversionTimeoutError, EmptyMarkdownError
+from app.users.cv.errors import MarkdownTooLongError, PayloadTooLargeErrorResponse, MarkdownConversionTimeoutError, \
+    EmptyMarkdownError, CVLimitExceededError, CVUploadRateLimitExceededError
 from app.users.auth import Authentication, UserInfo
 from app.users.cv.service import CVUploadService, ICVUploadService
+from app.users.cv.get_repository import get_user_cv_repository
+from app.users.cv.repository import IUserCVRepository
+from app.users.cv.storage import _get_cv_storage_service, ICVCloudStorageService
 from app.users.cv.types import ParsedCV
 
 
@@ -29,12 +32,15 @@ _cv_service_lock = asyncio.Lock()
 _cv_service_singleton: ICVUploadService | None = None
 
 
-async def _get_cv_service() -> ICVUploadService:
+async def _get_cv_service(
+        repository: IUserCVRepository = Depends(get_user_cv_repository),
+        cv_storage_service: ICVCloudStorageService = Depends(_get_cv_storage_service)) -> ICVUploadService:
+
     global _cv_service_singleton
     if _cv_service_singleton is None:
         async with _cv_service_lock:
             if _cv_service_singleton is None:
-                _cv_service_singleton = CVUploadService()
+                _cv_service_singleton = CVUploadService(repository=repository, cv_cloud_storage_service=cv_storage_service)
     return _cv_service_singleton
 
 
@@ -100,6 +106,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
             HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
             HTTPStatus.UNSUPPORTED_MEDIA_TYPE: {"model": HTTPErrorResponse},
             HTTPStatus.REQUEST_ENTITY_TOO_LARGE: {"model": _PayloadTooLargeErrorResponse},
+            HTTPStatus.TOO_MANY_REQUESTS: {"model": HTTPErrorResponse},
             HTTPStatus.BAD_REQUEST: {"model": HTTPErrorResponse},
             HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse},
         },
@@ -216,9 +223,14 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
             raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
         except HTTPException:
             raise
+        except CVLimitExceededError as e:
+            logger.warning("Max uploads per user exceeded {user_id=%s}", user_id)
+            raise HTTPException(status_code=HTTPStatus.TOO_MANY_REQUESTS, detail=str(e))
+        except CVUploadRateLimitExceededError as e:
+            logger.warning("Rate limit exceeded for user {user_id=%s}", user_id)
+            raise HTTPException(status_code=HTTPStatus.TOO_MANY_REQUESTS, detail=str(e))
         except Exception as e:
             logger.exception(e)
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")
 
     users_router.include_router(router)
-

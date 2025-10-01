@@ -58,14 +58,10 @@ class TestAbstractClasses:
 
 
 class TestDefaultValues:
-    def test_optional_values_are_not_passed(self, mocker):
+    def test_optional_values_are_not_passed(self, mocker, setup_application_config: ApplicationConfig):
         # GIVEN a Sample foo event.
         class _FooEvent(AbstractCompassMetricEvent):
             pass
-
-        # AND sample application config is created
-        given_application_config = get_random_application_config()
-        set_application_config(given_application_config)
 
         # AND get_now will return a fixed time
         fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)
@@ -80,8 +76,8 @@ class TestDefaultValues:
         )
 
         # THEN the default values should be taken from application config object
-        assert given_event.environment_name == given_application_config.environment_name
-        assert given_event.version == given_application_config.version_info.to_version_string()
+        assert given_event.environment_name == setup_application_config.environment_name
+        assert given_event.version == setup_application_config.version_info.to_version_string()
 
         # AND given_event timestamp will be the fixed time
         assert given_event.timestamp == fixed_time
@@ -93,10 +89,6 @@ class TestDefaultValues:
         # GIVEN a Sample foo event.
         class _FooEvent(AbstractCompassMetricEvent):
             pass
-
-        # AND sample application config is created
-        given_application_config = get_random_application_config()
-        set_application_config(given_application_config)
 
         # AND get_now will return a fixed time
         fixed_time = datetime(2025, 3, 4, 6, 45, 0, tzinfo=timezone.utc)

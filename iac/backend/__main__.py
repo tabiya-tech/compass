@@ -77,6 +77,10 @@ def main():
 
         features=getenv("BACKEND_FEATURES", True, False),
         experience_pipeline_config=getenv("BACKEND_EXPERIENCE_PIPELINE_CONFIG", False, False),
+
+        # CV limits (no bucket name env)
+        cv_max_uploads_per_user=getenv("BACKEND_CV_MAX_UPLOADS_PER_USER", False, False),
+        cv_rate_limit_per_minute=getenv("BACKEND_CV_RATE_LIMIT_PER_MINUTE", False, False),
     )
 
     # version of the artifacts to deploy

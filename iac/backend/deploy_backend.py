@@ -10,6 +10,7 @@ from pulumi import Output
 from backend._construct_api_gateway_cfg import construct_api_gateway_cfg
 from lib import ProjectBaseConfig, get_resource_name, get_project_base_config, Version
 from scripts.formatters import construct_docker_tag
+from backend.cv_bucket import _create_cv_upload_bucket, _grant_cloud_run_sa_access_to_cv_bucket
 
 api_gateway_config_file_name = "api_gateway_config.yaml"
 
@@ -51,6 +52,8 @@ class BackendServiceConfig:
     api_gateway_timeout: str
     features: Optional[str]
     experience_pipeline_config: Optional[str]
+    cv_max_uploads_per_user: Optional[str]
+    cv_rate_limit_per_minute: Optional[str]
 
 
 """
@@ -229,6 +232,7 @@ def _deploy_cloud_run_service(
         fully_qualified_image_name: Output[str],
         backend_service_cfg: BackendServiceConfig,
         dependencies: list[pulumi.Resource],
+        cv_bucket_name: Output[str],
 ):
     # See https://cloud.google.com/run/docs/securing/service-identity#per-service-identity for more information
     # Create a service account for the Cloud Run service
@@ -346,6 +350,16 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_EXPERIENCE_PIPELINE_CONFIG",
                             value=backend_service_cfg.experience_pipeline_config),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_CV_STORAGE_BUCKET",
+                            value=cv_bucket_name,
+                        ),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_CV_MAX_UPLOADS_PER_USER",
+                            value=backend_service_cfg.cv_max_uploads_per_user),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_CV_RATE_LIMIT_PER_MINUTE",
+                            value=backend_service_cfg.cv_rate_limit_per_minute),
                         # Add more environment variables here
                     ],
                 )
@@ -355,7 +369,7 @@ def _deploy_cloud_run_service(
         opts=pulumi.ResourceOptions(depends_on=dependencies + [iam_member], provider=basic_config.provider),
     )
     pulumi.export("cloud_run_url", service.uri)
-    return service
+    return service, service_account
 
 
 # export a function build_and_push_image that will be used in the main pulumi program
@@ -391,12 +405,23 @@ def deploy_backend(
         tag=docker_tag
     )
 
+    # Create a private GCS bucket for CV uploads using helper
+    cv_bucket = _create_cv_upload_bucket(basic_config=basic_config)
+
     # Deploy the image as a cloud run service
-    cloud_run = _deploy_cloud_run_service(
+    cloud_run, cloud_run_sa = _deploy_cloud_run_service(
         basic_config=basic_config,
         fully_qualified_image_name=fully_qualified_image_name,
         backend_service_cfg=backend_service_cfg,
-        dependencies=[membership],
+        dependencies=[membership, cv_bucket],
+        cv_bucket_name=cv_bucket.name,
+    )
+
+    # Grant Cloud Run service account access to the bucket
+    _grant_cloud_run_sa_access_to_cv_bucket(
+        basic_config=basic_config,
+        bucket=cv_bucket,
+        service_account=cloud_run_sa,
     )
 
     _api_gateway = _setup_api_gateway(

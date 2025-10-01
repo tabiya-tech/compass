@@ -14,7 +14,8 @@ from app.users.cv.routes import (
     MAX_CV_SIZE_BYTES,
 )
 from app.users.cv.service import ICVUploadService, ParsedCV
-from app.users.cv.errors import MarkdownTooLongError, MarkdownConversionTimeoutError, EmptyMarkdownError
+from app.users.cv.errors import MarkdownTooLongError, MarkdownConversionTimeoutError, EmptyMarkdownError, \
+    CVLimitExceededError, CVUploadRateLimitExceededError
 from common_libs.test_utilities.mock_auth import MockAuth
 
 
@@ -192,4 +193,30 @@ class TestUploadCV:
         response = client.post(f"/{mocked_user.user_id}/cv", data=b"hello", headers=headers)
         # THEN it maps to 422
         assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+    @pytest.mark.asyncio
+    async def test_service_max_uploads_maps_to_429(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service raises CVLimitExceededError when user exceeds uploads
+        mocker.patch.object(mocked_service, "parse_cv", side_effect=CVLimitExceededError("Maximum number of CV uploads reached"))
+        given_mime = next(iter(ALLOWED_MIME_TYPES))
+        given_ext = next(iter(ALLOWED_EXTENSIONS))
+        headers = {"Content-Type": given_mime, "x-filename": f"cv{given_ext}"}
+        # WHEN uploading the CV
+        response = client.post(f"/{mocked_user.user_id}/cv", data=b"hello", headers=headers)
+        # THEN it maps to 429 Too Many Requests
+        assert response.status_code == HTTPStatus.TOO_MANY_REQUESTS
+
+    @pytest.mark.asyncio
+    async def test_service_rate_limit_maps_to_429(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service raises CVUploadRateLimitExceededError when rate limit exceeded
+        mocker.patch.object(mocked_service, "parse_cv", side_effect=CVUploadRateLimitExceededError("Too many CV uploads, try again later"))
+        given_mime = next(iter(ALLOWED_MIME_TYPES))
+        given_ext = next(iter(ALLOWED_EXTENSIONS))
+        headers = {"Content-Type": given_mime, "x-filename": f"cv{given_ext}"}
+        # WHEN uploading the CV
+        response = client.post(f"/{mocked_user.user_id}/cv", data=b"hello", headers=headers)
+        # THEN it maps to 429 Too Many Requests
+        assert response.status_code == HTTPStatus.TOO_MANY_REQUESTS
 

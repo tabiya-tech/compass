@@ -187,7 +187,10 @@ application_config = ApplicationConfig(
     embeddings_service_name=os.getenv("EMBEDDINGS_SERVICE_NAME"),
     embeddings_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"),
     features=backend_features_config,
-    experience_pipeline_config=experience_pipeline_config
+    experience_pipeline_config=experience_pipeline_config,
+    cv_storage_bucket=os.getenv("BACKEND_CV_STORAGE_BUCKET"),
+    cv_max_uploads_per_user=os.getenv("BACKEND_CV_MAX_UPLOADS_PER_USER"),
+    cv_rate_limit_per_minute=os.getenv("BACKEND_CV_RATE_LIMIT_PER_MINUTE")
 )
 
 set_application_config(application_config)

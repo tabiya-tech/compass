@@ -18,4 +18,7 @@ MAX_MARKDOWN_CHARS = 5000
 # Markdown conversion timeout in seconds
 MARKDOWN_CONVERSION_TIMEOUT_SECONDS = 60
 
-
+# Defaults for limits when envs are not provided
+DEFAULT_MAX_UPLOADS_PER_USER = 3
+DEFAULT_RATE_LIMIT_PER_MINUTE = 2
+RATE_LIMIT_WINDOW_MINUTES = 1
