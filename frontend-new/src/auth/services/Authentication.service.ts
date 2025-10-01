@@ -5,7 +5,6 @@ import { Language } from "src/userPreferences/UserPreferencesService/userPrefere
 import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { TokenError } from "src/error/commonErrors";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 
@@ -226,7 +225,6 @@ abstract class AuthenticationService {
       console.debug("Token checked. Token is valid");
       return { isValid: true, decodedToken: decodedToken };
     } catch (error) {
-      console.error(new TokenError("Error decoding token", error));
       return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.ERROR_DECODING_TOKEN };
     }
   }

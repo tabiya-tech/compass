@@ -68,17 +68,14 @@ export class FeaturesService {
 
   protected validateConfig(config: any): void {
     if (typeof config.enabled !== "boolean") {
-      console.error(new InvalidFeaturesConfig("Invalid config: enabled must be a boolean"));
       throw new InvalidFeaturesConfig("Invalid config: enabled must be a boolean");
     }
 
     if (typeof config.featureName !== "string") {
-      console.error(new InvalidFeaturesConfig("Invalid config: featureName must be a string"));
       throw new InvalidFeaturesConfig("Invalid config: featureName must be a string");
     }
 
     if (typeof config.config !== "object") {
-      console.error(new InvalidFeaturesConfig("Invalid config: config must be an object"));
       throw new InvalidFeaturesConfig("Invalid config: config must be an object");
     }
   }
