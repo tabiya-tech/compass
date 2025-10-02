@@ -308,7 +308,10 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
   // Handle puzzle success
   const handlePuzzleSuccess = useCallback(() => {
     if (isDisabled) return;
-    // Immediately trigger completion when all puzzles are done
+    // Flush any pending debounced metrics update before completing
+    if (debouncedUpdaterRef.current && lastMetricsRef.current) {
+      debouncedUpdaterRef.current.forceUpdate(lastMetricsRef.current);
+    }
     handleComplete().then();
   }, [isDisabled, handleComplete]);
 
@@ -341,18 +344,25 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
       <Box sx={{ width: "100%" }}>
         <ChatBubble message={effortMessage} sender={ConversationMessageSender.COMPASS}>
           {effortType === EffortType.WORK_BASED && (
-            <RotateToSolvePuzzle
-              puzzles={Math.max(1, 5 - (skillsRankingState.puzzles_solved || 0))}
-              disabled={isDisabled}
-              onSuccess={handlePuzzleSuccess}
-              onReport={handlePuzzleMetricsUpdate}
-              onCancel={handleCancel}
-              isReplay={puzzleIsReplay}
-              isReplayFinished={puzzleIsReplayFinished}
-              initialPuzzlesSolved={skillsRankingState.puzzles_solved || 0}
-              initialCorrectRotations={skillsRankingState.correct_rotations || 0}
-              initialClicksCount={skillsRankingState.clicks_count || 0}
-            />
+            <>
+              {Math.max(0, 5 - (skillsRankingState.puzzles_solved || 0)) === 0 ? (
+                // If nothing remains, immediately complete (no extra puzzle rendered)
+                handlePuzzleSuccess() as any
+              ) : (
+                <RotateToSolvePuzzle
+                  puzzles={Math.max(0, 5 - (skillsRankingState.puzzles_solved || 0))}
+                  disabled={isDisabled}
+                  onSuccess={handlePuzzleSuccess}
+                  onReport={handlePuzzleMetricsUpdate}
+                  onCancel={handleCancel}
+                  isReplay={puzzleIsReplay}
+                  isReplayFinished={puzzleIsReplayFinished}
+                  initialPuzzlesSolved={skillsRankingState.puzzles_solved || 0}
+                  initialCorrectRotations={skillsRankingState.correct_rotations || 0}
+                  initialClicksCount={skillsRankingState.clicks_count || 0}
+                />
+              )}
+            </>
           )}
         </ChatBubble>
 
