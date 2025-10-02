@@ -182,7 +182,8 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
 
       // Show completion message
       const nextPuzzle = puzzleIndex + 1;
-      if (nextPuzzle >= puzzles) {
+      const completedInSession = nextPuzzle - initialPuzzlesSolved;
+      if (completedInSession >= puzzles) {
         setCompletionMessage("All puzzles complete! Well done!");
         setIsAllComplete(true);
         setShowCompletionMessage(true);
