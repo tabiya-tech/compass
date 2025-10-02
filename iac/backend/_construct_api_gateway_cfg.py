@@ -33,8 +33,9 @@ def _convert_open_api_3_to_2(openapi3: dict):
             # OpenAPI 3 and OpenAPI 2 has different way to handle the schema/type
             if 'parameters' in openapi3['paths'][path][method]:
                 for param in openapi3['paths'][path][method]['parameters']:
-                    schema = param.pop('schema', {type: None})
-                    param['type'] = schema['type']
+                    schema = param.pop('schema', {'type': None})
+                    if schema and 'type' in schema:
+                        param['type'] = schema['type']
 
             # Add quota/rate-limiter
             metric_costs = {'metricCosts': {}}  # set the default value
