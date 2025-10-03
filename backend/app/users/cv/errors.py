@@ -37,3 +37,10 @@ class CVLimitExceededError(Exception):
 class CVUploadRateLimitExceededError(Exception):
     """Raised when the CV upload rate limit is exceeded."""
     pass
+
+
+class DuplicateCVUploadError(Exception):
+    """Raised when a CV with the same MD5 hash has already been uploaded."""
+    def __init__(self, md5_hash: str):
+        super().__init__(f"CV with hash {md5_hash} has already been uploaded")
+        self.md5_hash = md5_hash

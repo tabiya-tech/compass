@@ -12,7 +12,7 @@ from app.users.cv.constants import (
     ALLOWED_EXTENSIONS,
 )
 from app.users.cv.errors import MarkdownTooLongError, PayloadTooLargeErrorResponse, MarkdownConversionTimeoutError, \
-    EmptyMarkdownError, CVLimitExceededError, CVUploadRateLimitExceededError
+    EmptyMarkdownError, CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError
 from app.users.auth import Authentication, UserInfo
 from app.users.cv.service import CVUploadService, ICVUploadService
 from app.users.cv.get_repository import get_user_cv_repository
@@ -107,6 +107,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
             HTTPStatus.UNSUPPORTED_MEDIA_TYPE: {"model": HTTPErrorResponse},
             HTTPStatus.REQUEST_ENTITY_TOO_LARGE: {"model": _PayloadTooLargeErrorResponse},
             HTTPStatus.TOO_MANY_REQUESTS: {"model": HTTPErrorResponse},
+            HTTPStatus.CONFLICT: {"model": HTTPErrorResponse},
             HTTPStatus.BAD_REQUEST: {"model": HTTPErrorResponse},
             HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse},
         },
@@ -229,6 +230,9 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
         except CVUploadRateLimitExceededError as e:
             logger.warning("Rate limit exceeded for user {user_id=%s}", user_id)
             raise HTTPException(status_code=HTTPStatus.TOO_MANY_REQUESTS, detail=str(e))
+        except DuplicateCVUploadError as e:
+            logger.warning("Duplicate CV upload detected {user_id=%s, md5_hash=%s}", user_id, e.md5_hash)
+            raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="This CV has already been uploaded")
         except Exception as e:
             logger.exception(e)
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")

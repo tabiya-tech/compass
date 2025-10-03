@@ -5,9 +5,28 @@ import pytest
 from app.users.cv.constants import MAX_MARKDOWN_CHARS
 from app.users.cv.service import CVUploadService
 from app.users.cv.errors import MarkdownTooLongError, MarkdownConversionTimeoutError, EmptyMarkdownError, \
-    CVLimitExceededError, CVUploadRateLimitExceededError
+    CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError
 from app.users.cv.repository import IUserCVRepository
+from app.users.cv.storage import ICVCloudStorageService
 from app.users.cv.types import UserCVUpload
+
+
+class MockCVRepository(IUserCVRepository):
+    """Mock repository for testing."""
+    async def insert_upload(self, upload: UserCVUpload) -> str:
+        return "mock_id"
+    
+    async def count_uploads_for_user(self, user_id: str) -> int:
+        return 0
+    
+    async def count_uploads_for_user_in_window(self, user_id: str, *, minutes: int) -> int:
+        return 0
+
+
+class MockCVCloudStorageService(ICVCloudStorageService):
+    """Mock storage service for testing."""
+    def upload_cv(self, *, document: UserCVUpload, markdown_text: str, original_bytes: bytes) -> None: # Noncompliant - we keep this method empty cause its a mock for a test
+        pass
 
 
 class TestCVUploadService:
@@ -38,19 +57,7 @@ class TestCVUploadService:
         mocker.patch("app.users.cv.service.CVExperienceExtractor", extractor_cls)
 
         # WHEN parsing the CV in the service
-        class _Repo(IUserCVRepository):
-            async def insert_upload(self, upload: UserCVUpload) -> str:
-                return "id"
-            async def count_uploads_for_user(self, user_id: str) -> int:
-                return 0
-            async def count_uploads_for_user_in_window(self, user_id: str, *, minutes: int) -> int:
-                return 0
-
-        class _Storage:
-            def upload_cv(self, *, document, markdown_text: str, original_bytes: bytes):
-                return None
-
-        service = CVUploadService(repository=_Repo(), cv_cloud_storage_service=_Storage())
+        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_max_uploads_per_user": 999,
             "cv_rate_limit_per_minute": 999,
@@ -93,19 +100,8 @@ class TestCVUploadService:
         mocker.patch("app.users.cv.service.CVExperienceExtractor", extractor_cls)
 
         # WHEN parsing the CV
-        class _Repo(IUserCVRepository):
-            async def insert_upload(self, upload: UserCVUpload) -> str:
-                return "id"
-            async def count_uploads_for_user(self, user_id: str) -> int:
-                return 0
-            async def count_uploads_for_user_in_window(self, user_id: str, *, minutes: int) -> int:
-                return 0
-
-        class _Storage:
-            def upload_cv(self, *, document, markdown_text: str, original_bytes: bytes):
-                return None
-
-        service = CVUploadService(repository=_Repo(), cv_cloud_storage_service=_Storage())
+        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService())
+        
         # THEN a MarkdownTooLongError is raised and the extractor is not invoked to extract
         with pytest.raises(MarkdownTooLongError):
             await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf")
@@ -126,19 +122,7 @@ class TestCVUploadService:
         mocker.patch("app.users.cv.service.CVExperienceExtractor", extractor_cls)
 
         # WHEN parsing the CV
-        class _Repo(IUserCVRepository):
-            async def insert_upload(self, upload: UserCVUpload) -> str:
-                return "id"
-            async def count_uploads_for_user(self, user_id: str) -> int:
-                return 0
-            async def count_uploads_for_user_in_window(self, user_id: str, *, minutes: int) -> int:
-                return 0
-
-        class _Storage:
-            def upload_cv(self, *, document, markdown_text: str, original_bytes: bytes):
-                return None
-
-        service = CVUploadService(repository=_Repo(), cv_cloud_storage_service=_Storage())
+        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_max_uploads_per_user": 999,
             "cv_rate_limit_per_minute": 999,
@@ -167,19 +151,8 @@ class TestCVUploadService:
         mocker.patch("app.users.cv.service.CVExperienceExtractor", extractor_cls)
 
         # WHEN parsing the CV
-        class _Repo(IUserCVRepository):
-            async def insert_upload(self, upload: UserCVUpload) -> str:
-                return "id"
-            async def count_uploads_for_user(self, user_id: str) -> int:
-                return 0
-            async def count_uploads_for_user_in_window(self, user_id: str, *, minutes: int) -> int:
-                return 0
-
-        class _Storage:
-            def upload_cv(self, *, document, markdown_text: str, original_bytes: bytes):
-                return None
-
-        service = CVUploadService(repository=_Repo(), cv_cloud_storage_service=_Storage())
+        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService())
+        
         # THEN EmptyMarkdownError is raised and the extractor is not invoked to extract
         with pytest.raises(EmptyMarkdownError):
             await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf")
@@ -194,106 +167,116 @@ class TestCVUploadService:
         )
 
         # WHEN parsing the CV
-        class _Repo(IUserCVRepository):
-            async def insert_upload(self, upload: UserCVUpload) -> str:
-                return "id"
-            async def count_uploads_for_user(self, user_id: str) -> int:
-                return 0
-            async def count_uploads_for_user_in_window(self, user_id: str, *, minutes: int) -> int:
-                return 0
-
-        class _Storage:
-            def upload_cv(self, *, document, markdown_text: str, original_bytes: bytes):
-                return None
-
-        service = CVUploadService(repository=_Repo(), cv_cloud_storage_service=_Storage())
+        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService())
+        
         # THEN the service raises MarkdownConversionTimeoutError
         with pytest.raises(MarkdownConversionTimeoutError):
             await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf")
 
     @pytest.mark.asyncio
     async def test_blocks_when_total_limit_reached(self, mocker):
+        # GIVEN converter returns valid markdown
         mocker.patch("app.users.cv.service.convert_cv_bytes_to_markdown", mocker.Mock(return_value="# md"))
         extractor_instance = mocker.Mock()
         extractor_instance.extract_experiences = mocker.AsyncMock(return_value=["x"])
         mocker.patch("app.users.cv.service.CVExperienceExtractor", mocker.Mock(return_value=extractor_instance))
 
-        class _RepoMock(IUserCVRepository):
-            async def insert_upload(self, upload: UserCVUpload) -> str:
-                return "id"
+        # AND a custom repository that returns count of 3 (exceeds limit)
+        class CustomRepoMock(MockCVRepository):
             async def count_uploads_for_user(self, user_id: str) -> int:
                 return 3
-            async def count_uploads_for_user_in_window(self, user_id: str, *, minutes: int) -> int:
-                return 0
 
-        class _Storage:
-            def upload_cv(self, *, document, markdown_text: str, original_bytes: bytes):
-                return None
-
-        service = CVUploadService(repository=_RepoMock(), cv_cloud_storage_service=_Storage())
+        # AND application config with max uploads limit of 3
+        service = CVUploadService(repository=CustomRepoMock(), cv_cloud_storage_service=MockCVCloudStorageService())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_storage_bucket": "bucket",
             "cv_max_uploads_per_user": 3,
             "cv_rate_limit_per_minute": 10,
         })()))
 
+        # WHEN parsing the CV
+        # THEN CVLimitExceededError is raised
         with pytest.raises(CVLimitExceededError):
             await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf")
 
     @pytest.mark.asyncio
     async def test_blocks_when_rate_limit_reached(self, mocker):
+        # GIVEN converter returns valid markdown
         mocker.patch("app.users.cv.service.convert_cv_bytes_to_markdown", mocker.Mock(return_value="# md"))
         extractor_instance = mocker.Mock()
         extractor_instance.extract_experiences = mocker.AsyncMock(return_value=["x"])
         mocker.patch("app.users.cv.service.CVExperienceExtractor", mocker.Mock(return_value=extractor_instance))
 
-        class _RepoMock(IUserCVRepository):
-            async def insert_upload(self, upload: UserCVUpload) -> str:
-                return "id"
-            async def count_uploads_for_user(self, user_id: str) -> int:
-                return 0
+        # AND a custom repository that returns rate limit count of 5 (exceeds limit)
+        class CustomRepoMock(MockCVRepository):
             async def count_uploads_for_user_in_window(self, user_id: str, *, minutes: int) -> int:
                 return 5
 
-        class _Storage:
-            def upload_cv(self, *, document, markdown_text: str, original_bytes: bytes):
-                return None
-
-        service = CVUploadService(repository=_RepoMock(), cv_cloud_storage_service=_Storage())
+        # AND application config with rate limit of 5 per minute
+        service = CVUploadService(repository=CustomRepoMock(), cv_cloud_storage_service=MockCVCloudStorageService())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_storage_bucket": "bucket",
             "cv_max_uploads_per_user": 100,
             "cv_rate_limit_per_minute": 5,
         })()))
 
+        # WHEN parsing the CV
+        # THEN CVUploadRateLimitExceededError is raised
         with pytest.raises(CVUploadRateLimitExceededError):
             await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf")
 
     @pytest.mark.asyncio
     async def test_allows_when_under_limits(self, mocker):
+        # GIVEN converter returns valid markdown
         mocker.patch("app.users.cv.service.convert_cv_bytes_to_markdown", mocker.Mock(return_value="# md"))
         extractor_instance = mocker.Mock()
         extractor_instance.extract_experiences = mocker.AsyncMock(return_value=["x"])
         mocker.patch("app.users.cv.service.CVExperienceExtractor", mocker.Mock(return_value=extractor_instance))
 
-        class _RepoMock(IUserCVRepository):
-            async def insert_upload(self, upload: UserCVUpload) -> str:
-                return "id"
+        # AND a custom repository that returns count of 1 (under limit)
+        class CustomRepoMock(MockCVRepository):
             async def count_uploads_for_user(self, user_id: str) -> int:
                 return 1
-            async def count_uploads_for_user_in_window(self, user_id: str, *, minutes: int) -> int:
-                return 0
 
-        class _Storage:
-            def upload_cv(self, *, document, markdown_text: str, original_bytes: bytes):
-                return None
-
-        service = CVUploadService(repository=_RepoMock(), cv_cloud_storage_service=_Storage())
+        # AND application config with limits that allow the upload
+        service = CVUploadService(repository=CustomRepoMock(), cv_cloud_storage_service=MockCVCloudStorageService())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_storage_bucket": "bucket",
             "cv_max_uploads_per_user": 3,
             "cv_rate_limit_per_minute": 2,
         })()))
 
+        # WHEN parsing the CV
         result = await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf")
+        
+        # THEN the service returns the extracted experiences
         assert result.experiences_data == ["x"]
+
+    @pytest.mark.asyncio
+    async def test_raises_duplicate_cv_upload_error(self, mocker):
+        # GIVEN converter returns valid markdown
+        mocker.patch("app.users.cv.service.convert_cv_bytes_to_markdown", mocker.Mock(return_value="# md"))
+        extractor_instance = mocker.Mock()
+        extractor_instance.extract_experiences = mocker.AsyncMock(return_value=["x"])
+        mocker.patch("app.users.cv.service.CVExperienceExtractor", mocker.Mock(return_value=extractor_instance))
+
+        # AND a custom repository that raises DuplicateCVUploadError
+        class CustomRepoMock(MockCVRepository):
+            async def insert_upload(self, upload: UserCVUpload) -> str:
+                # Simulate duplicate CV upload error
+                raise DuplicateCVUploadError("duplicate_hash_123")
+
+        # AND application config with limits that allow the upload
+        service = CVUploadService(repository=CustomRepoMock(), cv_cloud_storage_service=MockCVCloudStorageService())
+        mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
+            "cv_storage_bucket": "bucket",
+            "cv_max_uploads_per_user": 3,
+            "cv_rate_limit_per_minute": 2,
+        })()))
+
+        # WHEN parsing the CV
+        # THEN DuplicateCVUploadError is raised
+        with pytest.raises(DuplicateCVUploadError) as exc_info:
+            await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf")
+        
+        assert exc_info.value.md5_hash == "duplicate_hash_123"

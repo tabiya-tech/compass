@@ -15,3 +15,4 @@ class UserCVUpload(BaseModel):
     object_path: str = Field(description="GCS object path where the original file is stored")
     markdown_object_path: str = Field(description="GCS object path where markdown is stored")
     markdown_char_len: int = Field(description="Character length of markdown")
+    md5_hash: str = Field(description="MD5 hash of the original file content")

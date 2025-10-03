@@ -15,7 +15,7 @@ from app.users.cv.routes import (
 )
 from app.users.cv.service import ICVUploadService, ParsedCV
 from app.users.cv.errors import MarkdownTooLongError, MarkdownConversionTimeoutError, EmptyMarkdownError, \
-    CVLimitExceededError, CVUploadRateLimitExceededError
+    CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError
 from common_libs.test_utilities.mock_auth import MockAuth
 
 
@@ -219,4 +219,18 @@ class TestUploadCV:
         response = client.post(f"/{mocked_user.user_id}/cv", data=b"hello", headers=headers)
         # THEN it maps to 429 Too Many Requests
         assert response.status_code == HTTPStatus.TOO_MANY_REQUESTS
+
+    @pytest.mark.asyncio
+    async def test_service_duplicate_cv_maps_to_409(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service raises DuplicateCVUploadError when duplicate CV is uploaded
+        mocker.patch.object(mocked_service, "parse_cv", side_effect=DuplicateCVUploadError("duplicate_hash_123"))
+        given_mime = next(iter(ALLOWED_MIME_TYPES))
+        given_ext = next(iter(ALLOWED_EXTENSIONS))
+        headers = {"Content-Type": given_mime, "x-filename": f"cv{given_ext}"}
+        # WHEN uploading the CV
+        response = client.post(f"/{mocked_user.user_id}/cv", data=b"hello", headers=headers)
+        # THEN it maps to 409 Conflict
+        assert response.status_code == HTTPStatus.CONFLICT
+        assert "already been uploaded" in response.json()["detail"]
 

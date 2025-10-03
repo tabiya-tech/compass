@@ -6,6 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.users.cv.repository import UserCVRepository
 from app.users.cv.types import UserCVUpload
+from app.users.cv.errors import DuplicateCVUploadError
 from common_libs import time_utilities as time_utils
 
 
@@ -17,7 +18,7 @@ async def get_user_cv_repository(
     return repository
 
 
-def _get_upload(*, user_id: str, created_at: datetime, suffix: str, markdown_len: int = 10) -> UserCVUpload:
+def _get_upload(*, user_id: str, created_at: datetime, suffix: str, markdown_len: int = 10, md5_hash: str = "test_hash_123") -> UserCVUpload:
     return UserCVUpload(
         user_id=user_id,
         created_at=created_at,
@@ -26,6 +27,7 @@ def _get_upload(*, user_id: str, created_at: datetime, suffix: str, markdown_len
         object_path=f"users/{user_id}/{suffix}/cv{suffix}.pdf",
         markdown_object_path=f"users/{user_id}/{suffix}/cv.md",
         markdown_char_len=markdown_len,
+        md5_hash=md5_hash,
     )
 
 
@@ -36,6 +38,7 @@ def _assert_upload_doc_matches(actual: dict, given: UserCVUpload) -> None:
     assert actual["object_path"] == given.object_path
     assert actual["markdown_object_path"] == given.markdown_object_path
     assert actual["markdown_char_len"] == given.markdown_char_len
+    assert actual["md5_hash"] == given.md5_hash
     # created_at is stored as Mongo date
     assert actual["created_at"] == time_utils.convert_python_datetime_to_mongo_datetime(given.created_at)
 
@@ -47,7 +50,7 @@ class TestUserCVRepository:
         repository = await get_user_cv_repository
         now = datetime.now(timezone.utc)
         given_user = "user-1"
-        given_upload = _get_upload(user_id=given_user, created_at=now, suffix="1")
+        given_upload = _get_upload(user_id=given_user, created_at=now, suffix="1", md5_hash="unique_hash_001")
 
         # WHEN inserting the upload
         inserted_id = await repository.insert_upload(given_upload)
@@ -64,8 +67,8 @@ class TestUserCVRepository:
         now = datetime.now(timezone.utc)
 
         # GIVEN two uploads, one recent and one 5 minutes ago
-        recent_upload = _get_upload(user_id=user_id, created_at=now, suffix="r")
-        older_upload = _get_upload(user_id=user_id, created_at=now - timedelta(minutes=5), suffix="o")
+        recent_upload = _get_upload(user_id=user_id, created_at=now, suffix="r", md5_hash="recent_hash_123")
+        older_upload = _get_upload(user_id=user_id, created_at=now - timedelta(minutes=5), suffix="o", md5_hash="older_hash_456")
         await repository.insert_upload(recent_upload)
         await repository.insert_upload(older_upload)
 
@@ -88,5 +91,45 @@ class TestUserCVRepository:
         recent = await repository.count_uploads_for_user_in_window(user_id, minutes=1)
         # THEN zero is returned
         assert recent == 0
+
+    @pytest.mark.asyncio
+    async def test_insert_upload_raises_duplicate_cv_error_for_same_user_and_hash(self, get_user_cv_repository: Awaitable[UserCVRepository]):
+        repository = await get_user_cv_repository
+        now = datetime.now(timezone.utc)
+        user_id = "user-1"
+        md5_hash = "same_hash_123"
+        
+        # GIVEN a first upload
+        first_upload = _get_upload(user_id=user_id, created_at=now, suffix="1", md5_hash=md5_hash)
+        await repository.insert_upload(first_upload)
+        
+        # GIVEN a second upload with same user_id and md5_hash
+        second_upload = _get_upload(user_id=user_id, created_at=now, suffix="2", md5_hash=md5_hash)
+        
+        # WHEN inserting the second upload
+        # THEN DuplicateCVUploadError is raised
+        with pytest.raises(DuplicateCVUploadError) as exc_info:
+            await repository.insert_upload(second_upload)
+        
+        assert exc_info.value.md5_hash == md5_hash
+
+    @pytest.mark.asyncio
+    async def test_insert_upload_allows_same_hash_for_different_users(self, get_user_cv_repository: Awaitable[UserCVRepository]):
+        repository = await get_user_cv_repository
+        now = datetime.now(timezone.utc)
+        md5_hash = "same_hash_456"
+        
+        # GIVEN uploads from different users with same MD5 hash
+        upload_user1 = _get_upload(user_id="user-1", created_at=now, suffix="1", md5_hash=md5_hash)
+        upload_user2 = _get_upload(user_id="user-2", created_at=now, suffix="2", md5_hash=md5_hash)
+        
+        # WHEN inserting both uploads
+        id1 = await repository.insert_upload(upload_user1)
+        id2 = await repository.insert_upload(upload_user2)
+        
+        # THEN both should succeed (different users can have same file)
+        assert id1 != id2
+        assert isinstance(id1, str)
+        assert isinstance(id2, str)
 
 
