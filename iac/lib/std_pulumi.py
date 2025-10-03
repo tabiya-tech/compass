@@ -120,6 +120,18 @@ def getenv(name: str, secret: bool = False, required: bool = True) -> str:
     """
 
     value = os.getenv(name)
+
+    # Treat empty/placeholder values as unset when not required
+    if not required:
+        if value is None:
+            value = None
+        else:
+            trimmed = value.strip()
+            if trimmed == "" or trimmed.lower() in ("none", "null"):
+                value = None
+            else:
+                value = trimmed
+
     if required and not value:
         raise ValueError(f"environment variable {name} is not set")
 

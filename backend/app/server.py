@@ -30,6 +30,10 @@ from common_libs.logging.log_utilities import setup_logging_config
 from features.loader import FeatureLoader
 from starlette.datastructures import State
 from app.middleware.brotli_request import BrotliRequestMiddleware
+from app.users.cv.constants import (
+    DEFAULT_MAX_UPLOADS_PER_USER,
+    DEFAULT_RATE_LIMIT_PER_MINUTE,
+)
 
 
 def setup_logging():
@@ -189,8 +193,8 @@ application_config = ApplicationConfig(
     features=backend_features_config,
     experience_pipeline_config=experience_pipeline_config,
     cv_storage_bucket=os.getenv("BACKEND_CV_STORAGE_BUCKET"),
-    cv_max_uploads_per_user=os.getenv("BACKEND_CV_MAX_UPLOADS_PER_USER"),
-    cv_rate_limit_per_minute=os.getenv("BACKEND_CV_RATE_LIMIT_PER_MINUTE")
+    cv_max_uploads_per_user=os.getenv("BACKEND_CV_MAX_UPLOADS_PER_USER") or DEFAULT_MAX_UPLOADS_PER_USER,
+    cv_rate_limit_per_minute=os.getenv("BACKEND_CV_RATE_LIMIT_PER_MINUTE") or DEFAULT_RATE_LIMIT_PER_MINUTE,
 )
 
 set_application_config(application_config)
