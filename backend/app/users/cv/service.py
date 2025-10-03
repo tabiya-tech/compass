@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from app.users.cv.types import ParsedCV
 from app.users.cv.constants import MAX_MARKDOWN_CHARS, MARKDOWN_CONVERSION_TIMEOUT_SECONDS, RATE_LIMIT_WINDOW_MINUTES
 from app.users.cv.errors import MarkdownTooLongError, MarkdownConversionTimeoutError, EmptyMarkdownError, \
-    CVUploadRateLimitExceededError, CVLimitExceededError
+    CVUploadRateLimitExceededError, CVLimitExceededError, DuplicateCVUploadError
 from app.users.cv.utils.markdown_converter import convert_cv_bytes_to_markdown
 from common_libs.call_with_timeout.call_with_timeout import call_with_timeout
 from app.users.cv.utils.llm_extractor import CVExperienceExtractor
@@ -96,6 +96,7 @@ class CVUploadService(ICVUploadService):
                 user_id=user_id,
                 filename=filename,
                 markdown_text=markdown_text,
+                file_bytes=file_bytes,
             )
 
             self._cv_cloud_storage_service.upload_cv(
@@ -105,6 +106,9 @@ class CVUploadService(ICVUploadService):
             )
 
             await self._repository.insert_upload(user_cv_upload_record)
+        except DuplicateCVUploadError as e:
+            self._logger.warning("Duplicate CV upload detected {user_id=%s, md5_hash=%s}", user_id, e.md5_hash)
+            raise
         except Exception as e:
             self._logger.exception(e)
 

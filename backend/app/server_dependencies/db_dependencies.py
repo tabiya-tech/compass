@@ -137,6 +137,12 @@ class CompassDBProvider:
                 ("user_id", 1)
             ])
 
+            # Create unique compound index on user_id and MD5 hash to prevent duplicate file uploads per user
+            await userdata_db.get_collection(Collections.USER_CV_UPLOADS).create_index([
+                ("user_id", 1),
+                ("md5_hash", 1)
+            ], unique=True)
+
             logger.info("Finished creating indexes for the userdata database")
         except Exception as e:
             logger.exception(e)

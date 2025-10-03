@@ -41,7 +41,7 @@ def test_upload_cv_writes_original_and_markdown(mocker):
 
     # and a user upload record
     mocker.patch("app.users.cv.storage.uuid.uuid4", **{"return_value.hex": "fixedid"})
-    record = build_user_cv_upload_record(user_id="user/with/slash", filename="cv.PDF", markdown_text="# md")
+    record = build_user_cv_upload_record(user_id="user/with/slash", filename="cv.PDF", markdown_text="# md", file_bytes=b"pdf-bytes")
 
     # WHEN uploading the original and markdown
     service.upload_cv(document=record, markdown_text="# md", original_bytes=b"pdf-bytes")
@@ -56,7 +56,7 @@ def test_build_user_cv_upload_record_builds_paths_and_metadata(mocker):
     mocker.patch("app.users.cv.storage.uuid.uuid4", **{"return_value.hex": "abc123"})
 
     # WHEN building the record
-    record = build_user_cv_upload_record(user_id="u/1", filename="Resume.docx", markdown_text="hello")
+    record = build_user_cv_upload_record(user_id="u/1", filename="Resume.docx", markdown_text="hello", file_bytes=b"docx-bytes")
 
     # THEN paths are correct and safe, and metadata is set
     assert record.user_id == "u/1"
@@ -82,7 +82,7 @@ def test_upload_cv_uses_configured_bucket_name(mocker):
     dummy_client = RecordingClient()
     mocker.patch("app.users.cv.storage.storage.Client", return_value=dummy_client)
     service = GCPCVCloudStorageService(bucket_name="expected-bucket")
-    record = build_user_cv_upload_record(user_id="u", filename="cv.pdf", markdown_text="hi")
+    record = build_user_cv_upload_record(user_id="u", filename="cv.pdf", markdown_text="hi", file_bytes=b"pdf-bytes")
 
     # WHEN
     service.upload_cv(document=record, markdown_text="hi", original_bytes=b"pdf")
@@ -107,7 +107,7 @@ def test_upload_cv_bubbles_gcp_errors(mocker):
 
     mocker.patch("app.users.cv.storage.storage.Client", return_value=FailingClient())
     service = GCPCVCloudStorageService(bucket_name="b")
-    record = build_user_cv_upload_record(user_id="u", filename="cv.pdf", markdown_text="md")
+    record = build_user_cv_upload_record(user_id="u", filename="cv.pdf", markdown_text="md", file_bytes=b"pdf-bytes")
 
     # WHEN/THEN the exception propagates to the caller
     with pytest.raises(RuntimeError):
@@ -125,7 +125,7 @@ def test_build_user_cv_upload_record_sets_content_type_by_extension(filename, ex
     mocker.patch("app.users.cv.storage.uuid.uuid4", **{"return_value.hex": "id"})
 
     # WHEN
-    record = build_user_cv_upload_record(user_id="u", filename=filename, markdown_text="x")
+    record = build_user_cv_upload_record(user_id="u", filename=filename, markdown_text="x", file_bytes=b"test-bytes")
 
     # THEN
     assert record.content_type == expected

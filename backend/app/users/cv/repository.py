@@ -3,9 +3,11 @@ from datetime import timedelta
 from abc import ABC, abstractmethod
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from pymongo.errors import DuplicateKeyError
 
 from app.server_dependencies.database_collections import Collections
 from app.users.cv.types import UserCVUpload
+from app.users.cv.errors import DuplicateCVUploadError
 from common_libs.time_utilities import get_now, datetime_to_mongo_date
 
 
@@ -39,12 +41,26 @@ class UserCVRepository(IUserCVRepository):
             "object_path": upload.object_path,
             "markdown_object_path": upload.markdown_object_path,
             "markdown_char_len": upload.markdown_char_len,
+            "md5_hash": upload.md5_hash,
         }
 
     async def insert_upload(self, upload: UserCVUpload) -> str:
         payload = self._to_db_doc(upload)
-        result = await self._collection.insert_one(payload)
-        return str(result.inserted_id)
+        try:
+            result = await self._collection.insert_one(payload)
+            return str(result.inserted_id)
+        except DuplicateKeyError as e:
+            # Check if this is specifically a duplicate CV upload by examining the error details
+            # PyMongo DuplicateKeyError includes details about which fields caused the violation
+            error_details = getattr(e, 'details', {})
+            key_value = error_details.get('keyValue', {})
+            
+            # If both user_id and md5_hash are in the keyValue, it's our compound index violation
+            if 'user_id' in key_value and 'md5_hash' in key_value:
+                raise DuplicateCVUploadError(upload.md5_hash)
+            else:
+                # Re-raise other duplicate key errors (object_path, markdown_object_path)
+                raise
 
     async def count_uploads_for_user(self, user_id: str) -> int:
         return await self._collection.count_documents({"user_id": {"$eq": user_id}})

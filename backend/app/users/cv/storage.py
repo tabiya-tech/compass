@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import uuid
 
 from abc import ABC, abstractmethod
@@ -49,7 +50,8 @@ def _get_content_type(filename: str) -> str:
 def build_user_cv_upload_record(*,
                                 user_id: str,
                                 filename: str,
-                                markdown_text: str) -> UserCVUpload:
+                                markdown_text: str,
+                                file_bytes: bytes) -> UserCVUpload:
     unique_id = uuid.uuid4().hex
     safe_user = user_id.replace("/", "_")
     object_prefix = f"users/{safe_user}/{unique_id}"
@@ -64,7 +66,8 @@ def build_user_cv_upload_record(*,
         content_type=_get_content_type(filename),
         object_path=original_object_path,
         markdown_object_path=markdown_object_path,
-        markdown_char_len=len(markdown_text)
+        markdown_char_len=len(markdown_text),
+        md5_hash=hashlib.md5(file_bytes).hexdigest()  # nosec - MD5 is fine for non-cryptographic uses
     )
 
 
