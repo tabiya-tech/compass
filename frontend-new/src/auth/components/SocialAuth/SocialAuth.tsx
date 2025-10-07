@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { Box, Button, Divider, Typography, useTheme } from "@mui/material";
@@ -44,7 +45,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
                                                            notifyOnLoading,
                                                          }) => {
   const isOnline = useContext(IsOnlineContext);
-
+  const { t } = useTranslation();
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -180,7 +181,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
           data-testid={DATA_TEST_ID.CONTINUE_WITH_GOOGLE}
         >
-          Or continue with
+          {t("or_continue_with")}
         </Typography>
       </Divider>
       <Box width="100%">
@@ -205,7 +206,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
             <div style={{ display: "flex", alignItems: "center" }}>
               <GoogleIcon disabled={socialAuthLoading} />
             </div>
-            <Typography variant="body2">{label ?? "Login with Google"}</Typography>
+            <Typography variant="body2">{label ?? t("login_with_google")}</Typography>
           </Button>
           {!isOnline && (
             <Typography
@@ -213,7 +214,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
               sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
               data-testid={DATA_TEST_ID.FIREBASE_FALLBACK_TEXT}
             >
-              Google login is not available when offline.
+              {t("google_login_is_not_available_when_offline")}
             </Typography>
           )}
         </div>
