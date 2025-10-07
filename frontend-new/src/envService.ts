@@ -19,6 +19,7 @@ export enum EnvVariables {
   FRONTEND_ENABLE_CV_UPLOAD = "FRONTEND_ENABLE_CV_UPLOAD",
   FRONTEND_FEATURES = "FRONTEND_FEATURES",
   FRONTEND_DISABLE_SOCIAL_AUTH = "FRONTEND_DISABLE_SOCIAL_AUTH",
+  FRONTEND_SUPPORTED_LANGUAGES = "FRONTEND_SUPPORTED_LANGUAGES",
 }
 
 export const requiredEnvVariables = [
@@ -169,6 +170,11 @@ export const getCvUploadEnabled = () => {
 export const getSocialAuthDisabled = () => {
   return getEnv(EnvVariables.FRONTEND_DISABLE_SOCIAL_AUTH);
 };
+
+export const getSupportedLanguages = () => {
+  return getEnv(EnvVariables.FRONTEND_SUPPORTED_LANGUAGES);
+};
+
 
 export const ensureRequiredEnvVars = () => {
   requiredEnvVariables.forEach((key: EnvVariables) => {

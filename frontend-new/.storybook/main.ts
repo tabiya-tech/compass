@@ -18,6 +18,7 @@ const config: StorybookConfig = {
     "@storybook/addon-styling-webpack",
     "@storybook/addon-themes",
     "storybook-addon-mock",
+    "storybook-react-i18next",
   ],
   // Framework configuration
   framework: {
