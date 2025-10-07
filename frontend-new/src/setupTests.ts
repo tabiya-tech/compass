@@ -16,6 +16,7 @@ Object.assign(global, { TextDecoder, TextEncoder });
 jest.mock("firebase/compat/app", () => require("src/_test_utilities/firebaseMock"));
 
 
+
 /* 
 ──────────────────────────────────────────────────────────────
 🧪 TEST CONTEXT
@@ -41,10 +42,12 @@ Feature: Global Test Environment Setup
 jest.mock("react-i18next", () => {
     const enTranslations = require("src/locales/en/translation.json");
     
+    const stableT = (key: string) =>
+    (enTranslations as Record<string, string>)[key] || key;
+
     return {
         useTranslation: () => ({
-            t: (key: string) =>
-                (enTranslations as Record<string, string>)[key] || key,
+            t: stableT,
             i18n: {
                 changeLanguage: jest.fn().mockResolvedValue(null),
             }
