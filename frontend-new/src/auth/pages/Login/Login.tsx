@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, CircularProgress, Container, Divider, Typography, useTheme } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -62,6 +63,7 @@ enum ActiveForm {
 
 const Login: React.FC = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const location = useLocation();
 
   const [inviteCode, setInviteCode] = useState("");
@@ -214,7 +216,7 @@ const Login: React.FC = () => {
         sendMetricsEvent(prefs.user_id);
         // and then navigate the user to the root page
         navigate(routerPaths.ROOT, { replace: true });
-        enqueueSnackbar("Welcome back!", { variant: "success" });
+        enqueueSnackbar(t("welcome_back"), { variant: "success" });
       }
     } catch (error: unknown) {
       console.error(new AuthenticationError("An error occurred while trying to get your preferences", error));
@@ -228,7 +230,7 @@ const Login: React.FC = () => {
         variant: "error",
       });
     }
-  }, [navigate, enqueueSnackbar]);
+  }, [navigate, enqueueSnackbar, t]); 
 
   /* ------------------
    * Actual login handlers
@@ -270,7 +272,7 @@ const Login: React.FC = () => {
         const firebaseInvitationAuthServiceInstance = FirebaseInvitationCodeAuthenticationService.getInstance();
         await firebaseInvitationAuthServiceInstance.login(code);
         console.info("User logged in via invitation code.");
-        enqueueSnackbar("Invitation code is valid", { variant: "success" });
+        enqueueSnackbar(t("invitation_code_valid"), { variant: "success" });
         await handlePostLogin();
       } catch (error) {
         await handleError(error as Error);
@@ -278,7 +280,7 @@ const Login: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [enqueueSnackbar, handleError, handlePostLogin]
+    [enqueueSnackbar, handleError, handlePostLogin, t]
   );
 
   /**
@@ -301,11 +303,11 @@ const Login: React.FC = () => {
         await handleLoginWithInvitationCode(inviteCode);
       } else if (activeLoginForm === ActiveForm.EMAIL && email && password) {
         await handleLoginWithEmail(email, password);
-      } else {
-        enqueueSnackbar("Please fill in the email and password fields", { variant: "error" });
+       } else {
+        enqueueSnackbar(t("fill_in_email_and_password"), { variant: "error" });
       }
     },
-    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password, enqueueSnackbar]
+    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password, enqueueSnackbar, t]
   );
 
   const handleStartNewConversation = useCallback(() => {
@@ -321,19 +323,19 @@ const Login: React.FC = () => {
 
   const invitationCodeAndEmailFormDividerText = useMemo(() => {
     if (applicationLoginCode) {
-      return "Or login to your account to continue";
+      return t("or_login_to_your_account_to_continue");
     } else {
-      return "or";
+      return t("or");
     }
-  }, [applicationLoginCode]);
+  }, [applicationLoginCode, t]);
 
   const getLoginCodeComponent = useMemo(() => {
     if (loginCodeDisabled) {
       return (
         <>
-          <Typography variant="body2">Login to your account to continue</Typography>
+          <Typography variant="body2">{t("login_to_your_account_to_continue")}</Typography>
           <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
-            Login using
+            {t("login_using")}
           </Typography>
         </>
       );
@@ -347,13 +349,13 @@ const Login: React.FC = () => {
               onClick={handleStartNewConversation}
               data-testid={DATA_TEST_ID.START_NEW_CONVERSATION_BUTTON}
             >
-              Continue as Guest
+              {t("continue_as_guest")}
             </PrimaryButton>
           ) : (
             <React.Fragment>
-              <Typography variant="body2">Login to your account to continue</Typography>
+              <Typography variant="body2">{t("login_to_your_account_to_continue")}</Typography>
               <Typography variant="subtitle2" data-testid={DATA_TEST_ID.SUBTITLE}>
-                Login using
+                {t("login_using")}
               </Typography>
               <LoginWithInviteCodeForm
                 inviteCode={inviteCode}
@@ -382,6 +384,7 @@ const Login: React.FC = () => {
     loginCodeDisabled,
     theme,
     invitationCodeAndEmailFormDividerText,
+    t,
   ]);
 
   /* ------------------
@@ -449,7 +452,7 @@ const Login: React.FC = () => {
         gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
         width={"100%"}
       >
-        <AuthHeader title={"Welcome to Compass!"} />
+        <AuthHeader title={t("welcome_to_compass")} />
         <Box
           component="form"
           onSubmit={handleLoginSubmit}
@@ -489,12 +492,12 @@ const Login: React.FC = () => {
               <CircularProgress
                 color={"secondary"}
                 data-testid={DATA_TEST_ID.LOGIN_BUTTON_CIRCULAR_PROGRESS}
-                aria-label={"Logging in"}
+                aria-label={t("logging_in_aria")}
                 size={16}
                 sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
               />
             ) : (
-              "Login"
+              t("login")
             )}
           </PrimaryButton>
         </Box>
@@ -509,13 +512,13 @@ const Login: React.FC = () => {
         )}
         {!registrationDisabled && (
           <Typography variant="caption" data-testid={DATA_TEST_ID.REGISTER_LINK}>
-            Don't have an account? <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>Register</CustomLink>
+          {t("dont_have_an_account")} <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>{t("register")}</CustomLink>
           </Typography>
         )}
         {showRequestLoginCode && <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />}
       </Box>
       <BugReportButton bottomAlign={true} />
-      <Backdrop isShown={isLoading} message={"Logging you in..."} />
+      <Backdrop isShown={isLoading} message={t("logging_you_in")} />
     </Container>
   );
 };

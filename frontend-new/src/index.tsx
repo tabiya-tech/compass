@@ -14,6 +14,8 @@ import ErrorPage from "src/error/errorPage/ErrorPage";
 import { initSentry } from "./sentryInit";
 import { ensureRequiredEnvVars } from "./envService";
 
+import "./i18n/i18n";
+
 // initialize react sentry for log aggregation
 initSentry();
 
