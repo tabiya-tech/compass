@@ -229,7 +229,7 @@ const Login: React.FC = () => {
         variant: "error",
       });
     }
-  }, [navigate, enqueueSnackbar, t]); 
+  }, [navigate, enqueueSnackbar]); 
 
   /* ------------------
    * Actual login handlers
@@ -277,7 +277,7 @@ const Login: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [enqueueSnackbar, handleError, handlePostLogin, t]
+    [enqueueSnackbar, handleError, handlePostLogin]
   );
 
   /**
@@ -300,11 +300,11 @@ const Login: React.FC = () => {
         await handleLoginWithInvitationCode(inviteCode);
       } else if (activeLoginForm === ActiveForm.EMAIL && email && password) {
         await handleLoginWithEmail(email, password);
-       } else {
+      } else {
         enqueueSnackbar(t("fill_in_email_and_password"), { variant: "error" });
       }
     },
-    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password, enqueueSnackbar, t]
+    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password, enqueueSnackbar]
   );
 
   const handleStartNewConversation = useCallback(() => {
@@ -324,7 +324,7 @@ const Login: React.FC = () => {
     } else {
       return t("or");
     }
-  }, [applicationLoginCode, t]);
+  }, [applicationLoginCode]);
 
   const getLoginCodeComponent = useMemo(() => {
     if (loginCodeDisabled) {
@@ -381,7 +381,6 @@ const Login: React.FC = () => {
     loginCodeDisabled,
     theme,
     invitationCodeAndEmailFormDividerText,
-    t,
   ]);
 
   /* ------------------
