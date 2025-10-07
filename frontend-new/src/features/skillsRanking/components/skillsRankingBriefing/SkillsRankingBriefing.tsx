@@ -22,6 +22,7 @@ import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoS
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { getDefaultTypingDurationMs, getJobPlatformUrl } from "src/features/skillsRanking/constants";
+import { useTranslation, Trans } from "react-i18next";
 
 const uniqueId = "0e95404a-2044-4634-a6e8-29cc7b2d754e";
 
@@ -58,6 +59,7 @@ export interface SkillsRankingBriefingProps {
 
 const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({ onFinish, skillsRankingState }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -110,7 +112,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       );
     } catch (err) {
       console.error(err);
-      enqueueSnackbar("Failed to continue. Please try again later.", { variant: "error" });
+      enqueueSnackbar(t("features.skillsRanking.components.skillsRankingBriefing.failedToContinue"), { variant: "error" });
       setSubmitted(false);
       setIsTypingVisible(false);
       return;
@@ -123,7 +125,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       setIsTypingVisible(false);
       newSkillsRankingState && onFinish(newSkillsRankingState);
     }, remaining);
-  }, [onFinish, enqueueSnackbar]);
+  }, [onFinish, enqueueSnackbar, t]);
 
   return (
     <MessageContainer
@@ -137,18 +139,17 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
         <ChatBubble
           message={
             effortType === EffortType.WORK_BASED ? (
-              <>
-                If you are interested,  <strong>I can calculate what share of </strong>{getJobPlatformUrl()}{" "}
-                <strong>opportunities match your skills and how you compare with other seekers</strong> — you just need to show me how
-                valuable this information is to you.
-              </>
+              <Trans
+                i18nKey="features.skillsRanking.components.skillsRankingBriefing.introWorkBased"
+                components={[<strong />]}
+                values={{ jobPlatformUrl: getJobPlatformUrl() }}
+              />
             ) : (
-              <>
-                If you are interested,  <strong>I can calculate what share of </strong>{getJobPlatformUrl()}{" "}
-                <strong>opportunities match your skills and how you compare with other seekers</strong> This might take
-                some time — if you are not interested in waiting any longer, you can click <strong>cancel</strong> at any time in the next message,
-                while I calculate. <br/><br/>When you are ready please click <strong>continue</strong>.
-              </>
+              <Trans
+                i18nKey="features.skillsRanking.components.skillsRankingBriefing.introTimeBased"
+                components={[<strong />, <strong />]}
+                values={{ jobPlatformUrl: getJobPlatformUrl() }}
+              />
             )
           }
           sender={ConversationMessageSender.COMPASS}
@@ -166,7 +167,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
                 disabled={isReplay || !isOnline || submitted || isTypingVisible}
                 data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON}
               >
-                Continue
+                {t("common.buttons.continue")}
               </PrimaryButton>
             </Box>
           )}
@@ -200,9 +201,12 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       {effortType === EffortType.WORK_BASED && showSecondMessage && (
         <Box sx={{ width: "100%" }}>
           <ChatBubble
-            message={<>
-              You'll see tilted letters on a few screens. Turn each letter upright using the rotation buttons. You can cancel anytime. In 5% of cases, <strong>more letters fixed = higher chance of receiving the information.</strong> The rest of the time it depends on me.
-            </>}
+            message={
+              <Trans
+                i18nKey="features.skillsRanking.components.skillsRankingBriefing.puzzleInstructions"
+                components={[<strong />]}
+              />
+            }
             sender={ConversationMessageSender.COMPASS}
           >
             <Box
@@ -216,7 +220,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
                 disabled={isReplay || !isOnline || submitted || isTypingVisible}
                 data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON}
               >
-                Continue
+                {t("common.buttons.continue")}
               </PrimaryButton>
             </Box>
           </ChatBubble>

@@ -1,4 +1,5 @@
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
 
 import { waitFor } from "src/_test_utilities/test-utils";
 import MetricsService, { METRICS_FLUSH_INTERVAL_MS, loadFrontendMetricsConfig } from "src/metrics/metricsService";
@@ -10,14 +11,6 @@ import * as CustomFetchModule from "src/utils/customFetch/customFetch";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import * as MetricsModule from "src/metrics/metricsService";
 import * as EnvServiceModule from "src/envService";
-
-jest.mock("src/envService", () => ({
-  getFirebaseAPIKey: jest.fn(() => "mock-api-key"),
-  getFirebaseDomain: jest.fn(() => "mock-auth-domain"),
-  getBackendUrl: jest.fn(() => "mock-backend-url"),
-  getMetricsEnabled: jest.fn(() => "true"),
-  getMetricsConfig: jest.fn(() => ""),
-}));
 
 const addClientId = (event: MetricsEventUnion, clientId: string): SavableMetricsEventUnion => {
   return {

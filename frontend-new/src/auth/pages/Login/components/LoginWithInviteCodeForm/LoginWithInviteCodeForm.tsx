@@ -1,5 +1,6 @@
 import { TextField } from "@mui/material";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 const uniqueId = "300d373e-b913-4bd5-9045-3a28d490cf2c";
 
@@ -20,6 +21,9 @@ const LoginWithInviteCodeForm: React.FC<Readonly<LoginFormProps>> = ({
   notifyOnInviteCodeChanged,
   isDisabled,
 }) => {
+
+  const { t } = useTranslation();
+
   const handleInviteCodeChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     event.preventDefault();
     notifyOnInviteCodeChanged(event.target.value);
@@ -28,7 +32,7 @@ const LoginWithInviteCodeForm: React.FC<Readonly<LoginFormProps>> = ({
   return (
     <TextField
       fullWidth
-      label="Login Code"
+      label={t("auth.pages.login.components.loginWithInviteCodeForm.loginCode")}
       variant="outlined"
       value={inviteCode}
       disabled={isDisabled}

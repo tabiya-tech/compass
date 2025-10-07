@@ -9,7 +9,9 @@ from app.conversation_memory.conversation_memory_types import ConversationMemory
 from app.countries import Country
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from app.agent.experience import WorkType
-from app.agent.skill_explorer_agent._conversation_llm import _ConversationLLM, _FINAL_MESSAGE
+from app.agent.skill_explorer_agent._conversation_llm import _ConversationLLM, _FINAL_MESSAGE_KEY
+from app.i18n.translation_service import t
+
 from common_libs.test_utilities import get_random_session_id
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
@@ -204,7 +206,7 @@ async def test_skills_explorer_agent_first_message(test_case, caplog: pytest.Log
         logger.info(out)
 
         # THEN expect that the conversation has not ended
-        assert out.message_for_user != _FINAL_MESSAGE
+        assert out.message_for_user != t("messages", _FINAL_MESSAGE_KEY)
         # AND the model is asking the first question
         assert out.message_for_user.lower().find("typical day") != -1
         # And there are not <br> tags in the output

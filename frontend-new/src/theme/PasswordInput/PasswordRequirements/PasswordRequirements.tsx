@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 const uniqueId = "480b210a-d548-4fc6-a2c0-35f46e98e537";
@@ -19,17 +20,18 @@ interface PasswordRequirementsProps {
 
 const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({ validationResults }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const validationCriteria = useMemo(() => [
-    { label: "Password must be at least 8 characters long.", isValid: validationResults.isLongEnough },
-    { label: "Password must include at least one lowercase letter.", isValid: validationResults.hasLowercase },
-    { label: "Password must include at least one uppercase letter.", isValid: validationResults.hasUppercase },
-    { label: "Password must include at least one number.", isValid: validationResults.hasNumber },
+    { label: t("common.validation.passwordMinLength"), isValid: validationResults.isLongEnough },
+    { label: t("common.validation.passwordNeedLowercase"), isValid: validationResults.hasLowercase },
+    { label: t("common.validation.passwordNeedUppercase"), isValid: validationResults.hasUppercase },
+    { label: t("common.validation.passwordNeedNumber"), isValid: validationResults.hasNumber },
     {
-      label: "Password must include at least one special character such as: !@#$%*& etc.",
+      label: t("common.validation.passwordNeedSpecialChar"),
       isValid: validationResults.hasSpecialChar,
     },
-  ], [validationResults]);
+  ], [validationResults, t]);
 
   return (
     // we have to use a component that can be a child of a <p>

@@ -11,6 +11,7 @@ import { ExperienceError } from "src/error/commonErrors";
 import { Experience, SUMMARY_MAX_LENGTH } from "src/experiences/experienceService/experiences.types";
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import i18n from "src/i18n/i18n"; 
 
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
@@ -107,7 +108,9 @@ describe("SummaryEditField", () => {
       expect(within(summaryContainer).getByRole("textbox")).toHaveValue(uneditedSummary);
     });
     // AND success message is shown
-    expect(screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY_HELPER)).toHaveTextContent("Summary restored.");
+    expect(screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY_HELPER)).toHaveTextContent(
+      i18n.t("experiences.experiencesDrawer.components.experienceEditForm.components.summaryEditField.restored")
+    );
     // AND notifyOnChange is called with unedited summary
     expect(mockNotifyOnChange).toHaveBeenCalledWith(
       expect.objectContaining({ target: { value: uneditedSummary } }),
@@ -135,7 +138,7 @@ describe("SummaryEditField", () => {
     await waitFor(() => {
       expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to restore summary:", givenError));
     });
-    expect(mockEnqueueSnackbar).toHaveBeenCalledWith("Failed to restore summary. Please try again later.", {
+    expect(mockEnqueueSnackbar).toHaveBeenCalledWith(i18n.t("experiences.experiencesDrawer.components.experienceEditForm.components.summaryEditField.restoreFailed"), {
       variant: "error",
     });
     // AND the notifyOnChange function is not called

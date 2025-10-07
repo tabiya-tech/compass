@@ -1,4 +1,5 @@
 import React, { SetStateAction, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Typography, useTheme } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -23,6 +24,7 @@ import { HighlightedSpan } from "src/consent/components/consentPage/Consent";
 import MetricsService from "src/metrics/metricsService";
 import { EventType } from "src/metrics/types";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
+import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
@@ -59,22 +61,6 @@ export const MENU_ITEM_ID = {
   REGISTER: `register-${uniqueId}`,
 };
 
-export const MENU_ITEM_TEXT = {
-  SETTINGS: "settings",
-  LOGOUT: "logout",
-  START_NEW_CONVERSATION: "start new conversation",
-  REPORT_BUG: "report a bug",
-  REGISTER: "register",
-};
-
-export const FEEDBACK_FORM_TEXT = {
-  TITLE: "Give general feedback",
-  MESSAGE_PLACEHOLDER:
-    "We'd love to hear your thoughts! Please share any feedback or suggestions you have for improving Compass.",
-  SUBMIT_BUTTON_LABEL: "Send Feedback",
-  SUCCESS_MESSAGE: "Thank you for your feedback!",
-};
-
 const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   notifyOnLogout,
   startNewConversation,
@@ -88,6 +74,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   collectedExperiences,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [showConversionDialog, setShowConversionDialog] = useState(false);
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
@@ -160,10 +147,10 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       const feedback = Sentry.getFeedback();
       if (feedback) {
         const form = await feedback.createForm({
-          formTitle: FEEDBACK_FORM_TEXT.TITLE,
-          messagePlaceholder: FEEDBACK_FORM_TEXT.MESSAGE_PLACEHOLDER,
-          submitButtonLabel: FEEDBACK_FORM_TEXT.SUBMIT_BUTTON_LABEL,
-          successMessageText: FEEDBACK_FORM_TEXT.SUCCESS_MESSAGE,
+          formTitle: t("chat.chatHeader.giveGeneralFeedback"),
+          messagePlaceholder: t("chat.chatHeader.feedbackMessagePlaceholder"),
+          submitButtonLabel: t("chat.chatHeader.sendFeedback"),
+          successMessageText: t("chat.chatHeader.feedbackSuccessMessage"),
           enableScreenshot: false,
         });
         form.appendToDom();
@@ -177,7 +164,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     } catch (error) {
       console.error("Error creating feedback form:", error);
     }
-  }, [sentryEnabled]);
+  }, [sentryEnabled, t]);
 
   // Show notification after 30 minutes if conversation is not completed
   useEffect(() => {
@@ -215,7 +202,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       if (shouldPrompt && !notificationShownRef.current) {
         const snackbarKey = enqueueSnackbar(
           <Typography variant="body1">
-            We'd love to hear your feedback on your experience so far!{" "}
+            {t("chat.chatHeader.feedbackMessage")}{" "}
             <CustomLink
               onClick={async () => {
                 closeSnackbar(snackbarKey);
@@ -223,7 +210,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
               }}
               data-testid={DATA_TEST_ID.CHAT_HEADER_FEEDBACK_LINK}
             >
-              Give Feedback
+              {t("chat.chatHeader.giveFeedback")}
             </CustomLink>
           </Typography>,
           {
@@ -251,13 +238,14 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     handleGiveFeedback,
     timeUntilNotification,
     progressPercentage,
+    t
   ]);
 
   const contextMenuItems: MenuItemConfig[] = useMemo(
     () => [
       {
         id: MENU_ITEM_ID.START_NEW_CONVERSATION,
-        text: MENU_ITEM_TEXT.START_NEW_CONVERSATION,
+        text: t("common.buttons.startNewConversation").toLowerCase(),
         disabled: !isOnline,
         action: startNewConversation,
       },
@@ -265,48 +253,61 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       // Will be added back once it has meaningful functionality.
       // {
       //   id: MENU_ITEM_ID.SETTINGS_SELECTOR,
-      //   text: MENU_ITEM_TEXT.SETTINGS,
+      //   text: t("common.buttons.settings").toLowerCase(),
       //   disabled: !isOnline,
       //   action: () => setIsDrawerOpen(true),
       // },
       ...(sentryEnabled
         ? [
-            {
-              id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
-              text: MENU_ITEM_TEXT.REPORT_BUG,
-              disabled: !isOnline,
-              action: () => {
-                const feedback = Sentry.getFeedback();
-                if (feedback) {
-                  feedback.createForm().then((form) => {
-                    if (form) {
-                      form.appendToDom();
-                      form.open();
-                    }
-                  });
-                }
-              },
+          {
+            id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
+            text: t("feedback.bugReport.reportBug").toLowerCase(),
+            disabled: !isOnline,
+            action: () => {
+              const feedback = Sentry.getFeedback();
+              if (feedback) {
+                feedback.createForm({
+                  formTitle: t("chat.chatHeader.giveGeneralFeedback"),
+                  nameLabel: t("chat.chatHeader.nameLabel"),
+                  namePlaceholder: t("chat.chatHeader.namePlaceholder"),
+                  emailLabel: t("chat.chatHeader.emailLabel"),
+                  emailPlaceholder: t("chat.chatHeader.emailPlaceholder"),
+                  isRequiredLabel: t("chat.chatHeader.requiredLabel"),
+                  messageLabel: t("chat.chatHeader.descriptionLabel"),
+                  messagePlaceholder: t("chat.chatHeader.feedbackMessagePlaceholder"),
+                  addScreenshotButtonLabel: t("chat.chatHeader.addScreenshot"),
+                  submitButtonLabel: t("chat.chatHeader.sendFeedback"),
+                  cancelButtonLabel: t("chat.chatHeader.cancelButton"),
+                  successMessageText: t("chat.chatHeader.feedbackSuccessMessage")
+                }).then((form) => {
+                  if (form) {
+                    form.appendToDom();
+                    form.open(); // shows the feedback form
+                  }
+                });
+              }
             },
-          ]
+          },
+        ]
         : []),
       ...(isAnonymous
         ? [
-            {
-              id: MENU_ITEM_ID.REGISTER,
-              text: MENU_ITEM_TEXT.REGISTER,
-              disabled: !isOnline,
-              action: () => setShowConversionDialog(true),
-            },
-          ]
+          {
+            id: MENU_ITEM_ID.REGISTER,
+            text: t("common.buttons.register").toLowerCase(),
+            disabled: !isOnline,
+            action: () => setShowConversionDialog(true),
+          },
+        ]
         : []),
       {
         id: MENU_ITEM_ID.LOGOUT_BUTTON,
-        text: MENU_ITEM_TEXT.LOGOUT,
+        text: t("common.buttons.logout").toLowerCase(),
         disabled: false,
         action: handleLogout,
       },
     ],
-    [isAnonymous, isOnline, startNewConversation, sentryEnabled, handleLogout]
+    [isAnonymous, isOnline, startNewConversation, sentryEnabled, handleLogout, t]
   );
 
   return (
@@ -319,12 +320,12 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       <NavLink style={{ lineHeight: 0 }} to={routerPaths.ROOT} data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO_LINK}>
         <img
           src={`${process.env.PUBLIC_URL}/compass.svg`}
-          alt="Compass Logo"
+          alt={t("app.compassLogoAlt")}
           height={12 * theme.tabiyaSpacing.xl} // xl wasn't quite big enough, we're going for ~48px
           data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO}
         />
       </NavLink>
-      <Typography variant="h1">Compass</Typography>
+      <Typography variant="h1">{t("app.appName")}</Typography>
       <Box
         sx={{
           display: "flex",
@@ -339,7 +340,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           }}
           onClick={handleViewExperiences}
           data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES}
-          title="view experiences"
+          title={t("chat.chatHeader.viewExperiences").toLowerCase()}
           disabled={!isOnline}
         >
           <AnimatedBadge
@@ -356,23 +357,24 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
             }}
             onClick={handleGiveFeedback}
             data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_FEEDBACK}
-            title="give feedback"
+            title={t("chat.chatHeader.giveFeedback").toLowerCase()}
             disabled={!isOnline}
           >
             <FeedbackOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_FEEDBACK} />
           </PrimaryIconButton>
         )}
+        <LanguageContextMenu removeMargin={true} />
         <PrimaryIconButton
           sx={{
             color: theme.palette.common.black,
           }}
           onClick={(event) => setAnchorEl(event.currentTarget)}
           data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_USER}
-          title="user info"
+          title={t("chat.chatHeader.userInfo").toLowerCase()}
         >
           <img
             src={`${process.env.PUBLIC_URL}/user-icon.svg`}
-            alt="User Icon"
+            alt={t("chat.chatHeader.userIconAlt")}
             data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_USER}
           />
         </PrimaryIconButton>
@@ -395,23 +397,23 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         onCancel={handleConfirmLogout}
         onDismiss={() => setShowLogoutConfirmation(false)}
         onConfirm={handleRegister}
-        title="Before you go"
-        confirmButtonText="Register"
-        cancelButtonText="Logout"
+        title={t("chat.chatHeader.beforeYouGo")}
+        confirmButtonText={t("common.buttons.register")}
+        cancelButtonText={t("common.buttons.logout")}
         showCloseIcon={true}
         textParagraphs={[
           {
             id: "1",
-            text: <>Are you sure you want to log out?</>,
+            text: <>{t("chat.chatHeader.logoutConfirmationMessage")}</>,
           },
           {
             id: "2",
             text: (
               <>
-                You're currently using an anonymous account.
+                {t("chat.chatHeader.anonymousAccountWarning")}
                 <HighlightedSpan>
                   {" "}
-                  If you log out, you'll lose access to your conversation history and experiences
+                  {t("chat.chatHeader.logoutWarningAnonymous")}
                 </HighlightedSpan>
                 .
               </>
@@ -421,8 +423,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
             id: "3",
             text: (
               <>
-                <HighlightedSpan>Create an account to save your progress</HighlightedSpan> and continue your journey
-                later.
+                <HighlightedSpan>{t("chat.chatHeader.createAccountToSaveProgress")}</HighlightedSpan> {t("chat.chatHeader.continueYourJourneyLater")}
               </>
             ),
           },

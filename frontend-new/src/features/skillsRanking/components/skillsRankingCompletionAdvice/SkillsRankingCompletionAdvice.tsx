@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -38,6 +39,8 @@ const SkillsRankingCompletionAdvice: React.FC<Readonly<SkillsRankingCompletionAd
   skillsRankingState,
 }) => {
   const theme = useTheme();
+  // i18n hook must be called unconditionally and before any early returns
+  const { t } = useTranslation();
   const componentShown = useRef(false);
 
   const currentPhase = getLatestPhaseName(skillsRankingState);
@@ -76,7 +79,7 @@ const SkillsRankingCompletionAdvice: React.FC<Readonly<SkillsRankingCompletionAd
   }, [onFinish, skillsRankingState, isReplay]);
 
   if (shouldSkipMarketDisclosure(skillsRankingState.experiment_group)) {
-    return <></>;
+    return <></>; // safe early return after hook usage
   }
 
   return (
@@ -86,15 +89,7 @@ const SkillsRankingCompletionAdvice: React.FC<Readonly<SkillsRankingCompletionAd
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
       <Box sx={{ width: "100%" }}>
-        <ChatBubble
-          message={
-            <>
-              Some advice: These numbers are for you. How might these numbers change the way you look for roles this
-              week? Pause and consider where your time and energy now feel best spent in your strategy to find a job.
-            </>
-          }
-          sender={ConversationMessageSender.COMPASS}
-        />
+        <ChatBubble message={<>{t("features.skillsRanking.components.skillsRankingCompletionAdvice.adviceMessage")}</>} sender={ConversationMessageSender.COMPASS} />
 
         <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
           <Timestamp

@@ -19,6 +19,8 @@ export enum EnvVariables {
   FRONTEND_ENABLE_CV_UPLOAD = "FRONTEND_ENABLE_CV_UPLOAD",
   FRONTEND_FEATURES = "FRONTEND_FEATURES",
   FRONTEND_DISABLE_SOCIAL_AUTH = "FRONTEND_DISABLE_SOCIAL_AUTH",
+  FRONTEND_SUPPORTED_LOCALES = "FRONTEND_SUPPORTED_LOCALES",
+  FRONTEND_DEFAULT_LOCALE = "FRONTEND_DEFAULT_LOCALE",
 }
 
 export const requiredEnvVariables = [
@@ -28,6 +30,8 @@ export const requiredEnvVariables = [
   EnvVariables.TARGET_ENVIRONMENT_NAME,
   EnvVariables.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY,
   EnvVariables.SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID,
+  EnvVariables.FRONTEND_SUPPORTED_LOCALES,
+  EnvVariables.FRONTEND_DEFAULT_LOCALE,
 ];
 
 /**
@@ -168,6 +172,14 @@ export const getCvUploadEnabled = () => {
 
 export const getSocialAuthDisabled = () => {
   return getEnv(EnvVariables.FRONTEND_DISABLE_SOCIAL_AUTH);
+};
+
+export const getSupportedLocales = () => {
+  return getEnv(EnvVariables.FRONTEND_SUPPORTED_LOCALES);
+};
+
+export const getDefaultLocale = () => {
+  return getEnv(EnvVariables.FRONTEND_DEFAULT_LOCALE);
 };
 
 export const ensureRequiredEnvVars = () => {

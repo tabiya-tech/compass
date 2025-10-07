@@ -1,4 +1,5 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "src/chat/Chat.types";
@@ -67,11 +68,12 @@ export const DATA_TEST_ID = {
   CHAT_CONTAINER: `chat-container-${uniqueId}`,
 };
 
+// i18n notification message keys (tests/components should resolve via t(<key>))
 export const NOTIFICATION_MESSAGES_TEXT = {
-  NEW_CONVERSATION_STARTED: "New conversation started",
-  SUCCESSFULLY_LOGGED_OUT: "Successfully logged out",
-  FAILED_TO_START_CONVERSATION: "Failed to start new conversation",
-};
+  NEW_CONVERSATION_STARTED: "chat.chat.notifications.startConversationSuccess",
+  SUCCESSFULLY_LOGGED_OUT: "chat.chat.notifications.logoutSuccess",
+  FAILED_TO_START_CONVERSATION: "chat.chat.notifications.startConversationFailed",
+} as const;
 
 interface ChatProps {
   showInactiveSessionAlert?: boolean;
@@ -105,6 +107,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   disableInactivityCheck = false,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [messages, setMessages] = useState<IChatMessage<any>[]>([]);
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
@@ -214,11 +217,11 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
       setExperiences(data);
     } catch (error) {
       console.error(new ChatError("Failed to retrieve experiences", error));
-      enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
+      enqueueSnackbar(t("chat.chat.notifications.experiencesFetchFailed"), { variant: "error" });
     } finally {
       setIsLoading(false);
     }
-  }, [enqueueSnackbar, activeSessionId]);
+  }, [enqueueSnackbar, activeSessionId, t]);
 
   // Opens the experiences drawer and get experiences if needed
   const handleOpenExperiencesDrawer = useCallback(async () => {
@@ -233,9 +236,9 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
     await authenticationService!.logout();
     navigate(routerPaths.LANDING, { replace: true });
-    enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.SUCCESSFULLY_LOGGED_OUT, { variant: "success" });
+    enqueueSnackbar(t("chat.chat.notifications.logoutSuccess"), { variant: "success" });
     setIsLoggingOut(false);
-  }, [enqueueSnackbar, navigate]);
+  }, [enqueueSnackbar, navigate,t]);
 
   // Helper to stop polling and cleanup
   const stopPollingForUpload = useCallback((uploadId: string, intervalId?: NodeJS.Timeout, timeoutId?: NodeJS.Timeout) => {
@@ -301,12 +304,12 @@ return {
           return msg;
         }));
       },
-      onComplete: (status: UploadStatus) => {
+  onComplete: (status: UploadStatus) => {
         stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
         removeMessageFromChat(messageId);
         const items: string[] | undefined = status.experience_bullets ?? undefined;
         if (Array.isArray(items) && items.length > 0) {
-          const intro = "These are my experiences:";
+          const intro = t("chat.util.messages.experiencesIntro");
           const bullets = items
             .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
             .filter(Boolean)
@@ -314,7 +317,7 @@ return {
           const composed = bullets ? `${intro}\n${bullets}` : intro;
           setPrefillMessage(composed);
         }
-        enqueueSnackbar("CV uploaded successfully", { variant: "success" });
+        enqueueSnackbar(t("chat.cvUploadPolling.uploadedSuccessfully"), { variant: "success" });
       },
       onTerminal: (_status: UploadStatus) => {
         stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
@@ -348,7 +351,7 @@ return {
         } else if (statusCode) {
           enqueueSnackbar(getUploadErrorMessage(statusCode, detail), { variant: "error" });
         } else {
-          enqueueSnackbar("Network error while checking upload status.", { variant: "error" });
+          enqueueSnackbar(t("chat.cvUploadPolling.networkErrorStatus"), { variant: "error" });
         }
         console.error("Error polling upload status:", error);
       },
@@ -358,27 +361,27 @@ return {
       }
     });
     setActiveUploads(prev => new Map(prev).set(uploadId, { messageId, intervalId: handles.intervalId as any, timeoutId: handles.timeoutId as any }));
-  }, [activeUploads, enqueueSnackbar, removeMessageFromChat, messages, stopPollingForUpload, getCvUploadDisplayMessageMemo]);
+  }, [activeUploads, enqueueSnackbar, removeMessageFromChat, messages, stopPollingForUpload, getCvUploadDisplayMessageMemo, t]);
 
   // Helper function to cancel an upload
   const handleCancelUpload = useCallback(async (uploadId: string) => {
     try {
       // If it's the temporary uploadId, just show cancelled state
-      if (uploadId === "uploading") {
+      if (uploadId === "chat.chatMessageField.placeholders.uploading") {
         setMessages(prev => prev.map(msg => {
           if (msg.type === CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE && !msg.payload.disabled) {
             return {
               ...msg,
               payload: {
                 ...msg.payload,
-                message: "CV upload cancelled",
+                message: t("chat.cvUploadPolling.cancelled"),
                 disabled: true,
               }
             };
           }
           return msg;
         }));
-        enqueueSnackbar("CV upload cancelled", { variant: "info" });
+        enqueueSnackbar(t("chat.cvUploadPolling.cancelled"), { variant: "info" });
         return;
       }
 
@@ -394,7 +397,7 @@ return {
             ...msg,
             payload: {
               ...msg.payload,
-              message: "CV upload cancelled",
+              message: t("chat.cvUploadPolling.cancelled"),
               disabled: true,
             }
           };
@@ -408,12 +411,12 @@ return {
         stopPollingForUpload(uploadId, uploadInfo.intervalId, uploadInfo.timeoutId);
       }
 
-      enqueueSnackbar("CV upload cancelled", { variant: "info" });
+      enqueueSnackbar(t("chat.cvUploadPolling.cancelled"), { variant: "info" });
     } catch (error) {
       console.error("Error cancelling upload:", error);
-      enqueueSnackbar("Failed to cancel upload", { variant: "error" });
+      enqueueSnackbar(t("chat.cvUploadPolling.failedToCancel"), { variant: "error" });
     }
-  }, [activeUploads, enqueueSnackbar, stopPollingForUpload]);
+  }, [activeUploads, enqueueSnackbar, stopPollingForUpload, t]);
 
   // Handles CV upload
   const handleUploadCv = useCallback(
@@ -428,7 +431,7 @@ return {
         // Clear any previous prefill and CV upload errors to avoid stale text on new uploads
         setPrefillMessage(null);
         setCvUploadError(null);
-        enqueueSnackbar(`Uploading ${file.name}...`, { variant: "info" });
+  enqueueSnackbar(t("chat.cvUploadPolling.uploadingFileNamed", { filename: file.name }), { variant: "info" });
 
         const currentUserId = authenticationStateService.getInstance().getUser()?.id;
         if (!currentUserId) {
@@ -438,7 +441,7 @@ return {
         // Show the cancellable message immediately
         addMessageToChat({
           ...generateCancellableCVTypingMessage(
-            "uploading", // temporary ID until we get the real one
+            "chat.chatMessageField.placeholders.uploading", // temporary ID until we get the real one
             handleCancelUpload,
             false,
             false,
@@ -482,7 +485,7 @@ return {
           // No upload id – treat as immediate failure
           removeMessageFromChat(uploadingMessageId);
           console.log("Failed to start upload. Backend did not return uploadId ", response)
-          enqueueSnackbar("Failed to start upload.", { variant: "error" });
+          enqueueSnackbar(t("chat.cvUploadPolling.failedToStart"), { variant: "error" });
           return [] as string[];
         }
 
@@ -499,7 +502,7 @@ return {
         setIsUploadingCv(false);
       }
     },
-    [isUploadingCv, enqueueSnackbar, addMessageToChat, handleCancelUpload, startPollingForUpload, removeMessageFromChat]
+    [isUploadingCv, enqueueSnackbar, addMessageToChat, handleCancelUpload, startPollingForUpload, removeMessageFromChat, t]
   );
 
   // Goes to the chat service to send a message
@@ -704,16 +707,16 @@ return {
     setNewConversationDialog(false);
     setExploredExperiencesNotification(false);
     if (await initializeChat(currentUserId, null)) {
-      enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.NEW_CONVERSATION_STARTED, { variant: "success" });
+      enqueueSnackbar(t("chat.chat.notifications.startConversationSuccess"), { variant: "success" });
     } else {
       // Add a message to the chat saying that something went wrong
       setMessages([generateSomethingWentWrongMessage()]);
       // Set the conversation as completed to prevent the user from sending any messages
       setConversationCompleted(true);
       // Notify the user that the chat failed to start
-      enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.FAILED_TO_START_CONVERSATION, { variant: "error" });
+      enqueueSnackbar(t("chat.chat.notifications.startConversationFailed"), { variant: "error" });
     }
-  }, [enqueueSnackbar, initializeChat, currentUserId]);
+  }, [enqueueSnackbar, initializeChat, currentUserId,t]);
 
   /**
    * --- UseEffects ---
@@ -732,11 +735,11 @@ return {
         // Set the conversation as completed to prevent the user from sending any messages
         setConversationCompleted(true);
         // Notify the user that the chat failed to start
-        enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.FAILED_TO_START_CONVERSATION, { variant: "error" });
+        enqueueSnackbar(t("chat.chat.notifications.startConversationFailed"), { variant: "error" });
       }
       setInitialized(true);
     });
-  }, [enqueueSnackbar, initializeChat, activeSessionId, currentUserId]);
+  }, [enqueueSnackbar, initializeChat, activeSessionId, currentUserId,t]);
 
   // show the user backdrop when the user is inactive for INACTIVITY_TIMEOUT
   useEffect(() => {
@@ -811,7 +814,7 @@ return {
   return (
     <Suspense fallback={<Backdrop isShown={true} transparent={true} />}>
       {isLoggingOut ? (
-        <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
+        <Backdrop isShown={isLoggingOut} message={t("chat.chat.backdrop.loggingOut")} />
       ) : (
         <ChatProvider
           handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}
@@ -885,20 +888,20 @@ return {
           {newConversationDialog && (
             <ConfirmModalDialog
               isOpen={newConversationDialog}
-              title="Start New Conversation?"
+              title={t("chat.chat.startNewConversationDialog.title")}
               content={
                 <>
-                  Once you start a new conversation, all messages from the current conversation will be lost forever.
+                  {t("chat.chat.startNewConversationDialog.content")}
                   <br />
                   <br />
-                  Are you sure you want to start a new conversation?
+                  {t("chat.chat.startNewConversationDialog.confirmation")}
                 </>
               }
               onCancel={() => setNewConversationDialog(false)}
               onConfirm={handleConfirmNewConversation}
               onDismiss={() => setNewConversationDialog(false)}
-              cancelButtonText="Cancel"
-              confirmButtonText="Yes, I'm sure"
+              cancelButtonText={t("common.buttons.cancel")}
+              confirmButtonText={t("common.buttons.confirm")}
             />
           )}
         </ChatProvider>

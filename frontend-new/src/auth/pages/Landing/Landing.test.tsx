@@ -16,11 +16,12 @@ import { UserPreference } from "src/userPreferences/UserPreferencesService/userP
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { FirebaseError } from "src/error/FirebaseError/firebaseError";
-import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
-import {
-  FirebaseErrorCodes,
-  USER_FRIENDLY_FIREBASE_ERROR_MESSAGES,
-} from "src/error/FirebaseError/firebaseError.constants";
+
+const DATA_VALIDATION_ERROR=
+      "There seems to be an issue with your request. " +
+      "If you're submitting data, please make sure they're valid and try again. " +
+      "If the problem persists, clear your browser's cache and refresh the page.";
+
 
 // mock the router
 jest.mock("react-router-dom", () => {
@@ -276,7 +277,7 @@ describe("Landing Page", () => {
 
       // AND the error message to be shown
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        `Failed to login: ${ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.DATA_VALIDATION_ERROR}`,
+        `Failed to login: ${DATA_VALIDATION_ERROR}`,
         { variant: "error" }
       );
     });
@@ -310,7 +311,7 @@ describe("Landing Page", () => {
 
       // AND the error message to be shown
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        `Failed to login: ${USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR]}`,
+        `Failed to login: An internal error has occurred.`,
         { variant: "error" }
       );
     });

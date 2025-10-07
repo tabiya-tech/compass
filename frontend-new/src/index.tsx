@@ -10,9 +10,18 @@ import ViewPortWrapper from "src/app/ViewPortWrapper";
 
 import * as Sentry from "@sentry/react";
 import ErrorPage from "src/error/errorPage/ErrorPage";
+import { useTranslation } from "react-i18next";
 
 import { initSentry } from "./sentryInit";
 import { ensureRequiredEnvVars } from "./envService";
+
+import "./i18n/i18n";
+
+// Error boundary fallback that uses i18n like the rest of the app
+const ErrorBoundaryFallback: React.FC = () => {
+  const { t } = useTranslation();
+  return <ErrorPage errorMessage={t("error.errorPage.defaultMessage")} />;
+};
 
 // initialize react sentry for log aggregation
 initSentry();
@@ -75,9 +84,7 @@ waitForRoot()
     const root = ReactDOM.createRoot(rootElement);
     root.render(
       <React.StrictMode>
-        <Sentry.ErrorBoundary
-          fallback={<ErrorPage errorMessage={"Something went wrong with Compass. Try reloading the page..."} />}
-        >
+        <Sentry.ErrorBoundary fallback={<ErrorBoundaryFallback />}>
           <CssBaseline />
           <ThemeProvider theme={applicationTheme(ThemeMode.LIGHT)}>
             <SnackbarProvider>

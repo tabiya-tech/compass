@@ -1,6 +1,6 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { Box, CircularProgress, Container, Typography, useMediaQuery, useTheme } from "@mui/material";
-
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
@@ -49,16 +49,6 @@ type DataTestIdType = {
   [key: string]: string; // Allow for dynamic keys
 };
 
-export const SENSITIVE_DATA_FORM_FIXED_TEXT = {
-  TITLE: "Provide Your Information",
-  SUBTITLE: "We use your data to personalize your experience and may contact you about Compass.",
-  UNSKIPPABLE_SUBTITLE: "Please provide the following information to continue.",
-  SKIPPABLE_SUBTITLE: "You can skip this step.",
-  FAILED_TO_LOAD_CONFIG: "Failed to load form configuration",
-  INVALID_FORM: "Please correct the errors in the form before submitting.",
-  HELP_TIP_TEXT: "Your information is encrypted using state-of-the-art, end-to-end encryption and stored securely.",
-};
-
 // Create a function to generate the DATA_TEST_ID object
 const createDataTestId = (fields: FieldDefinition[]): DataTestIdType => {
   const baseIds = {
@@ -89,17 +79,6 @@ const createDataTestId = (fields: FieldDefinition[]): DataTestIdType => {
 
 // Initial DATA_TEST_ID with only base fields
 export const DATA_TEST_ID: DataTestIdType = createDataTestId([]);
-
-export const ERROR_MESSAGE = {
-  ENCRYPTED_DATA_TOO_LARGE:
-    "The personal data seems to be too large to be saved." +
-    "Please try again by entering smaller values for the fields." +
-    "If the problem persists, clear your browser's cache and refresh the page.",
-  DEFAULT:
-    "The personal data could not be saved." +
-    "Please try again and if the problem persists, clear your browser's cache and refresh the page.",
-  CONFIG_LOADING_ERROR: "Failed to load the form configuration. Please refresh the page and try again.",
-};
 
 function isFormValid(result: Record<string, boolean>): boolean {
   for (let value of Object.values(result)) {
@@ -194,6 +173,7 @@ const renderField = (
 
 const SensitiveDataForm: React.FC = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -268,14 +248,14 @@ const SensitiveDataForm: React.FC = () => {
           configError,
         },
       });
-      enqueueSnackbar(ERROR_MESSAGE.CONFIG_LOADING_ERROR, { variant: "error" });
+      enqueueSnackbar(t("sensitiveData.components.sensitiveDataForm.failedToLoadConfig"), { variant: "error" });
       return;
     }
 
     // Check if the form is valid based on current validation state
     if (!isFormValid(validationErrors)) {
       console.warn("User attempted to submit invalid sensitive data form.");
-      enqueueSnackbar("Please correct the errors in the form before submitting.", { variant: "error" });
+      enqueueSnackbar(t("sensitiveData.components.sensitiveDataForm.invalidForm"), { variant: "error" });
       return;
     }
 
@@ -301,22 +281,22 @@ const SensitiveDataForm: React.FC = () => {
       PersistentStorageService.setPersonalInfo(extractPersonalInfo(sensitiveData, fields));
       console.info("User confirmed providing personal data and saved successfully.");
 
-      enqueueSnackbar("Personal data saved successfully and securely.", { variant: "success" });
+      enqueueSnackbar(t("sensitiveData.components.sensitiveDataForm.savedSuccess"), { variant: "success" });
       navigate(routerPaths.ROOT);
     } catch (e) {
       console.error("Failed to save personal data", e);
-      let friendlyErrorMessage = ERROR_MESSAGE.DEFAULT;
+      let friendlyErrorMessage = t("sensitiveData.components.sensitiveDataForm.errorDefault");
       if (e instanceof RestAPIError) {
         friendlyErrorMessage = getUserFriendlyErrorMessage(e);
       } else if (e instanceof EncryptedDataTooLarge) {
-        friendlyErrorMessage = ERROR_MESSAGE.ENCRYPTED_DATA_TOO_LARGE;
+        friendlyErrorMessage = t("sensitiveData.components.sensitiveDataForm.errorEncryptedDataTooLarge");
       }
       enqueueSnackbar(friendlyErrorMessage, { variant: "error" });
 
       setIsSavingSensitiveData(false);
       setIsSubmitButtonEnabled(true);
     }
-  }, [configLoading, configError, validationErrors, enqueueSnackbar, sensitiveData, fields, userPreferences, navigate]);
+  }, [configLoading, configError, validationErrors, enqueueSnackbar, sensitiveData, fields, userPreferences, navigate, t]);
 
   const handleRejectProvidingSensitiveData = useCallback(async () => {
     setIsRejecting(true);
@@ -328,15 +308,15 @@ const SensitiveDataForm: React.FC = () => {
       console.info("User rejected providing sensitive data. Logging out user.");
 
       navigate(routerPaths.LANDING, { replace: true });
-      enqueueSnackbar("Successfully logged out.", { variant: "success" });
+      enqueueSnackbar(t("consent.components.consentPage.snackbarLoggedOutSuccess"), { variant: "success" });
     } catch (e) {
       console.error("Failed to log out", e);
-      enqueueSnackbar("Failed to log out.", { variant: "error" });
+      enqueueSnackbar(t("consent.components.consentPage.snackbarLoggedOutFailure"), { variant: "error" });
     } finally {
       setIsSubmitButtonEnabled(true);
       setIsRejecting(false);
     }
-  }, [enqueueSnackbar, navigate]);
+  }, [enqueueSnackbar, navigate, t]);
 
   const handleSkipProvidingSensitiveData = useCallback(async () => {
     setIsSkipping(true);
@@ -351,11 +331,11 @@ const SensitiveDataForm: React.FC = () => {
       });
       console.info("User skipped providing sensitive data.");
 
-      enqueueSnackbar("Personal data collection skipped.", { variant: "success" });
+  enqueueSnackbar(t("sensitiveData.components.sensitiveDataForm.collectionSkipped"), { variant: "success" });
       navigate(routerPaths.ROOT);
     } catch (e) {
       console.error("Failed to skip personal data", e);
-      let friendlyErrorMessage = ERROR_MESSAGE.DEFAULT;
+      let friendlyErrorMessage = t("sensitiveData.components.sensitiveDataForm.errorDefault");
       if (e instanceof RestAPIError) {
         friendlyErrorMessage = getUserFriendlyErrorMessage(e);
       }
@@ -363,7 +343,7 @@ const SensitiveDataForm: React.FC = () => {
     } finally {
       setIsSkipping(false);
     }
-  }, [enqueueSnackbar, navigate, userPreferences]);
+  }, [enqueueSnackbar, navigate, userPreferences, t]);
 
   const isPIIRequired =
     userPreferences?.sensitive_personal_data_requirement === SensitivePersonalDataRequirement.REQUIRED;
@@ -373,10 +353,10 @@ const SensitiveDataForm: React.FC = () => {
     if (!userPreferences) {
       const error = new UserPreferenceError("User preferences not found");
       console.error(error);
-      enqueueSnackbar(ERROR_MESSAGE.DEFAULT, { variant: "error" });
+      enqueueSnackbar(t("sensitiveData.components.sensitiveDataForm.errorDefault"), { variant: "error" });
       throw error;
     }
-  }, [enqueueSnackbar, userPreferences]);
+  }, [enqueueSnackbar, userPreferences, t]);
 
   // Show error state if configuration failed to load
   if (configError) {
@@ -385,7 +365,7 @@ const SensitiveDataForm: React.FC = () => {
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100%">
           <Box color="error.main" mb={2}>
             <Typography data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_ERROR_MESSAGE}>
-              {SENSITIVE_DATA_FORM_FIXED_TEXT.FAILED_TO_LOAD_CONFIG}
+              {t("sensitiveData.components.sensitiveDataForm.failedToLoadConfig")}
             </Typography>
           </Box>
           <PrimaryButton
@@ -394,7 +374,7 @@ const SensitiveDataForm: React.FC = () => {
             onClick={() => window.location.reload()}
             data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_REFRESH_BUTTON}
           >
-            Refresh Page
+            {t("sensitiveData.components.sensitiveDataForm.refreshPage")}
           </PrimaryButton>
         </Box>
       </Container>
@@ -420,14 +400,14 @@ const SensitiveDataForm: React.FC = () => {
               }}
             >
               <AuthHeader
-                title={SENSITIVE_DATA_FORM_FIXED_TEXT.TITLE}
+                title={t("sensitiveData.components.sensitiveDataForm.title")}
                 subtitle={
                   <>
-                    {SENSITIVE_DATA_FORM_FIXED_TEXT.SUBTITLE}
+                    {t("sensitiveData.components.sensitiveDataForm.subtitle")}
                     {isPIIRequired
-                      ? " " + SENSITIVE_DATA_FORM_FIXED_TEXT.UNSKIPPABLE_SUBTITLE
-                      : " " + SENSITIVE_DATA_FORM_FIXED_TEXT.SKIPPABLE_SUBTITLE}
-                    <HelpTip icon={<PrivacyTipIcon />}>{SENSITIVE_DATA_FORM_FIXED_TEXT.HELP_TIP_TEXT}</HelpTip>
+                      ? " " + t("sensitiveData.components.sensitiveDataForm.unskippableSubtitle")
+                      : " " + t("sensitiveData.components.sensitiveDataForm.skippableSubtitle")}
+                    <HelpTip icon={<PrivacyTipIcon />}>{t("sensitiveData.components.sensitiveDataForm.helpTipText")}</HelpTip>
                   </>
                 }
               />
@@ -460,7 +440,7 @@ const SensitiveDataForm: React.FC = () => {
                         setConfirmingReject(true);
                       }}
                     >
-                      No, thank you
+                      {t("common.buttons.noThankYou")}
                     </CustomLink>
                   ) : (
                     <CustomLink
@@ -471,7 +451,7 @@ const SensitiveDataForm: React.FC = () => {
                         setConfirmingSkip(true);
                       }}
                     >
-                      Skip
+                      {t("common.buttons.skip")}
                     </CustomLink>
                   )}
 
@@ -494,7 +474,7 @@ const SensitiveDataForm: React.FC = () => {
                         data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS}
                       />
                     ) : (
-                      "Start conversation"
+                      t("sensitiveData.components.sensitiveDataForm.startConversation")
                     )}
                   </PrimaryButton>
                 </Box>
@@ -503,21 +483,20 @@ const SensitiveDataForm: React.FC = () => {
           </Container>
           <TextConfirmModalDialog
             isOpen={confirmingReject}
-            title="Are you sure?"
+            title={t("common.modal.areYouSure")}
             textParagraphs={[
               {
                 id: "1",
                 text: (
                   <>
-                    We're sorry that you chose not to provide your data. Providing this information helps Compass
-                    deliver a more personalized experience for you. You will not be able to proceed and will be{" "}
-                    <HighlightedSpan>logged out.</HighlightedSpan>
+                    {t("sensitiveData.components.sensitiveDataForm.rejectParagraph1")}{" "}
+                    <HighlightedSpan>{t("common.backdrop.loggingYouOut")}</HighlightedSpan>
                   </>
                 ),
               },
               {
                 id: "2",
-                text: <>Are you sure you want to exit?</>,
+                text: <>{t("common.modal.areYouSureYouWantToExit")}</>,
               },
             ]}
             onCancel={handleRejectProvidingSensitiveData}
@@ -527,26 +506,25 @@ const SensitiveDataForm: React.FC = () => {
             onConfirm={() => {
               setConfirmingReject(false);
             }}
-            cancelButtonText="Yes, exit"
-            confirmButtonText="I want to stay"
+            cancelButtonText={t("common.buttons.yesExit")}
+            confirmButtonText={t("common.buttons.iWantToStay")}
           />
           <TextConfirmModalDialog
             isOpen={confirmingSkip}
-            title="Are you sure?"
+            title={t("common.modal.areYouSure")}
             textParagraphs={[
               {
                 id: "1",
                 text: (
                   <>
-                    We're sorry that you prefer not to provide your data. Providing this information helps Compass
-                    deliver a more personalized experience for you. Please note that if you skip this step,{" "}
-                    <HighlightedSpan>you won't be able to provide this information later.</HighlightedSpan>
+                    {t("sensitiveData.components.sensitiveDataForm.skipParagraph1")}{" "}
+                    <HighlightedSpan>{t("sensitiveData.components.sensitiveDataForm.skipParagraph1Highlighted")}</HighlightedSpan>
                   </>
                 ),
               },
               {
                 id: "2",
-                text: <>Are you sure you want to skip?</>,
+                text: <>{t("sensitiveData.components.sensitiveDataForm.areYouSureYouWantToSkip")}</>,
               },
             ]}
             onCancel={handleSkipProvidingSensitiveData}
@@ -556,10 +534,10 @@ const SensitiveDataForm: React.FC = () => {
             onConfirm={() => {
               setConfirmingSkip(false);
             }}
-            cancelButtonText="Yes, skip"
-            confirmButtonText="Share data"
+            cancelButtonText={t("sensitiveData.components.sensitiveDataForm.yesSkip")}
+            confirmButtonText={t("sensitiveData.components.sensitiveDataForm.shareData")}
           />
-          <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? "Skipping..." : "Logging you out..."} />
+          <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? t("sensitiveData.components.sensitiveDataForm.skipping") : t("common.backdrop.loggingYouOut")} />
         </>
       )}
     </Suspense>

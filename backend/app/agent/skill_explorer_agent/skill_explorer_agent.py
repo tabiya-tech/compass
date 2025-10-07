@@ -5,11 +5,12 @@ from pydantic import BaseModel, Field, field_serializer, field_validator
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentType
 from app.agent.agent_types import AgentInput, AgentOutput
-from ._conversation_llm import _ConversationLLM, _FINAL_MESSAGE
+from ._conversation_llm import _ConversationLLM, _FINAL_MESSAGE_KEY
 from app.agent.experience.experience_entity import ExperienceEntity, ResponsibilitiesData
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from ._responsibilities_extraction_tool import _ResponsibilitiesExtractionTool
 from app.countries import Country
+from app.i18n.translation_service import t
 
 
 class SkillsExplorerAgentState(BaseModel):
@@ -178,7 +179,7 @@ class SkillsExplorerAgent(Agent):
                                                                work_type=self.experience_entity.work_type,
                                                                logger=self.logger)
 
-        if conversation_llm_output.message_for_user != _FINAL_MESSAGE:
+        if conversation_llm_output.message_for_user != t("messages", _FINAL_MESSAGE_KEY):
             # don't add the final message to the list of questions asked, since it is not a question
             self.state.question_asked_until_now.append(conversation_llm_output.message_for_user)
         if conversation_llm_output.finished:

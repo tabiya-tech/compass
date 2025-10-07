@@ -39,6 +39,7 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
     """
     Factory function to create a test client with mocked dependencies
     """
+
     # mock the conversation service
     class MockConversationService(IConversationService):
         async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool, filter_pii: bool):
@@ -119,7 +120,9 @@ class TestConversationsRoutes:
     # ----- send message tests -----
 
     @pytest.mark.asyncio
-    async def test_send_successful(self, authenticated_client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_send_successful(self, authenticated_client_with_mocks: TestClientWithMocks,
+                                   setup_application_config,
+                                   mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
         # GIVEN a payload to send a message
         given_user_message = ConversationInput(
@@ -183,7 +186,7 @@ class TestConversationsRoutes:
             given_session_id,
             given_user_message.user_input,
             False,  # clear_memory
-            False   # filter_pii
+            False  # filter_pii
         )
 
     @pytest.mark.asyncio
@@ -207,7 +210,7 @@ class TestConversationsRoutes:
         assert response.status_code == HTTPStatus.UNAUTHORIZED
 
     @pytest.mark.asyncio
-    async def test_send_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_send_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks, setup_application_config):
         client, mocked_conversation_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
         # GIVEN a payload to send a message
         given_user_message = ConversationInput(
@@ -240,7 +243,7 @@ class TestConversationsRoutes:
 
     @pytest.mark.asyncio
     async def test_send_message_too_large(self, authenticated_client_with_mocks: TestClientWithMocks,
-                                          mocker: pytest_mock.MockerFixture):
+                                          setup_application_config):
         client, _, mocked_preferences_repository, _ = authenticated_client_with_mocks
         # GIVEN a payload with a message that is too long
         given_user_message = ConversationInput(
@@ -263,6 +266,7 @@ class TestConversationsRoutes:
 
     @pytest.mark.asyncio
     async def test_send_conversation_already_concluded(self, authenticated_client_with_mocks: TestClientWithMocks,
+                                                       setup_application_config,
                                                        mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
         # GIVEN a payload to send a message
@@ -294,11 +298,12 @@ class TestConversationsRoutes:
             given_session_id,
             given_user_message.user_input,
             False,  # clear_memory
-            False   # filter_pii
+            False  # filter_pii
         )
 
     @pytest.mark.asyncio
     async def test_send_service_internal_server_error(self, authenticated_client_with_mocks: TestClientWithMocks,
+                                                      setup_application_config,
                                                       mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
         # GIVEN a payload to send a message
@@ -330,12 +335,13 @@ class TestConversationsRoutes:
             given_session_id,
             given_user_message.user_input,
             False,  # clear_memory
-            False   # filter_pii
+            False  # filter_pii
         )
 
     @pytest.mark.asyncio
     async def test_send_user_preferences_internal_server_error(self,
                                                                authenticated_client_with_mocks: TestClientWithMocks,
+                                                               setup_application_config,
                                                                mocker: pytest_mock.MockerFixture):
         client, _, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
         # GIVEN a payload to send a message
@@ -384,7 +390,7 @@ class TestConversationsRoutes:
 
     @pytest.mark.asyncio
     async def test_get_history_successful(self, authenticated_client_with_mocks: TestClientWithMocks,
-                                          mocker: pytest_mock.MockerFixture):
+                                          mocker: pytest_mock.MockerFixture, setup_application_config):
         client, mocked_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id
         given_session_id = 123
@@ -447,6 +453,7 @@ class TestConversationsRoutes:
 
     @pytest.mark.asyncio
     async def test_get_history_forbidden(self, authenticated_client_with_mocks: TestClientWithMocks,
+                                         setup_application_config,
                                          mocker: pytest_mock.MockerFixture):
         client, mocked_conversation_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id
@@ -472,6 +479,7 @@ class TestConversationsRoutes:
 
     @pytest.mark.asyncio
     async def test_get_history_service_internal_server_error(self, authenticated_client_with_mocks: TestClientWithMocks,
+                                                             setup_application_config,
                                                              mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id
@@ -498,6 +506,7 @@ class TestConversationsRoutes:
     @pytest.mark.asyncio
     async def test_get_history_user_preferences_internal_server_error(self,
                                                                       authenticated_client_with_mocks: TestClientWithMocks,
+                                                                      setup_application_config,
                                                                       mocker: pytest_mock.MockerFixture):
         client, _, mocked_preferences_repository, mocked_user = authenticated_client_with_mocks
         # GIVEN a valid session id

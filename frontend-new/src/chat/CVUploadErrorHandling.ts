@@ -1,42 +1,44 @@
 import { StatusCodes } from "http-status-codes";
 import { UploadStatus } from "./Chat.types";
+import i18n from "src/i18n/i18n";
 
 /**
- * Centralized CV upload error messages
+ * Centralized CV upload error message KEYS
+ * NOTE: These are i18n keys. Resolve to text via t()/i18n.t() at call/render time.
  */
-export const CV_UPLOAD_ERROR_MESSAGES = {
+export const CV_UPLOAD_ERROR_I18N_KEYS = {
   // Character limit errors
-  MESSAGE_LIMIT: "Message limit is 1000 characters.",
-  INVALID_SPECIAL_CHARACTERS: "Invalid special characters: ",
-  
+  MESSAGE_LIMIT: "common.chat.errors.messageLimit",
+  INVALID_SPECIAL_CHARACTERS: "common.chat.errors.invalidSpecialCharacters",
+
   // File size and type errors
-  MAX_FILE_SIZE: "Selected file is too large. Maximum size is 3 MB.",
-  FILE_TOO_DENSE: "The uploaded file content is too long to process. Please reduce its length and try again.",
-  UNSUPPORTED_FILE_TYPE: "Unsupported file type. Allowed: PDF, DOCX, TXT.",
-  
+  MAX_FILE_SIZE: "common.upload.errors.maxFileSize",
+  FILE_TOO_DENSE: "common.upload.errors.tooDense",
+  UNSUPPORTED_FILE_TYPE: "common.upload.errors.unsupportedFileType",
+
   // CV processing errors
-  CV_MARKDOWN_TOO_LONG: "Your CV content is too long. Please shorten your CV and try again.",
-  EMPTY_CV_PARSE: "We couldn't detect experiences in your CV. Please check the file and try again.",
-  GENERIC_UPLOAD_ERROR: "Failed to parse your CV. Please try again or use a different file.",
-  
+  CV_MARKDOWN_TOO_LONG: "common.upload.errors.cvMarkdownTooLong",
+  EMPTY_CV_PARSE: "common.upload.errors.emptyParse",
+  GENERIC_UPLOAD_ERROR: "common.upload.errors.generic",
+
   // Rate limiting and quota errors
-  RATE_LIMIT_WAIT: "Too many uploads at once. Please wait one minute and try again.",
-  MAX_UPLOADS_REACHED: "You've reached the maximum number of CV uploads for this conversation. Further uploads aren't allowed.",
-  
+  RATE_LIMIT_WAIT: "common.upload.errors.rateLimit",
+  MAX_UPLOADS_REACHED: "common.upload.errors.maxUploadsReached",
+
   // Duplicate and conflict errors
-  DUPLICATE_CV: "This CV has already been uploaded. Select it from your previously uploaded CVs.",
-  
+  DUPLICATE_CV: "common.upload.errors.duplicate",
+
   // Timeout errors
-  UPLOAD_TIMEOUT: "The upload timed out. Please try again.",
-  
+  UPLOAD_TIMEOUT: "common.upload.errors.timeout",
+
   // Authentication errors
-  UNAUTHORIZED: "You are not authorized. Please sign in again.",
-  
+  UNAUTHORIZED: "common.upload.errors.unauthorized",
+
   // Not found errors
-  UPLOAD_NOT_FOUND: "Upload not found. It may have failed to start.",
-  
+  UPLOAD_NOT_FOUND: "common.upload.errors.uploadNotFound",
+
   // Generic server errors
-  SERVER_ERROR: "We couldn't process your CV right now. Please try again.",
+  SERVER_ERROR: "common.upload.errors.generic",
 } as const;
 
 /**
@@ -46,33 +48,34 @@ export const CV_UPLOAD_ERROR_MESSAGES = {
 export const getCvUploadErrorMessageFromHttpStatus = (status: number, detail?: string): string => {
   switch (status) {
     case StatusCodes.UNAUTHORIZED:
-      return CV_UPLOAD_ERROR_MESSAGES.UNAUTHORIZED;
+      return CV_UPLOAD_ERROR_I18N_KEYS.UNAUTHORIZED;
     
     case StatusCodes.FORBIDDEN:
-      return CV_UPLOAD_ERROR_MESSAGES.MAX_UPLOADS_REACHED;
+      return CV_UPLOAD_ERROR_I18N_KEYS.MAX_UPLOADS_REACHED;
     
     case StatusCodes.NOT_FOUND:
-      return CV_UPLOAD_ERROR_MESSAGES.UPLOAD_NOT_FOUND;
+      return CV_UPLOAD_ERROR_I18N_KEYS.UPLOAD_NOT_FOUND;
     
     case StatusCodes.REQUEST_TOO_LONG:
-      return CV_UPLOAD_ERROR_MESSAGES.FILE_TOO_DENSE;
+      return CV_UPLOAD_ERROR_I18N_KEYS.FILE_TOO_DENSE;
     
     case StatusCodes.UNSUPPORTED_MEDIA_TYPE:
-      return CV_UPLOAD_ERROR_MESSAGES.UNSUPPORTED_FILE_TYPE;
+      return CV_UPLOAD_ERROR_I18N_KEYS.UNSUPPORTED_FILE_TYPE;
     
     case StatusCodes.TOO_MANY_REQUESTS:
-      return CV_UPLOAD_ERROR_MESSAGES.RATE_LIMIT_WAIT;
+      return CV_UPLOAD_ERROR_I18N_KEYS.RATE_LIMIT_WAIT;
     
     case StatusCodes.CONFLICT:
-      return CV_UPLOAD_ERROR_MESSAGES.DUPLICATE_CV;
+      return CV_UPLOAD_ERROR_I18N_KEYS.DUPLICATE_CV;
     
     case StatusCodes.REQUEST_TIMEOUT:
     case StatusCodes.GATEWAY_TIMEOUT:
-      return CV_UPLOAD_ERROR_MESSAGES.UPLOAD_TIMEOUT;
+      return CV_UPLOAD_ERROR_I18N_KEYS.UPLOAD_TIMEOUT;
     
     case StatusCodes.INTERNAL_SERVER_ERROR:
     default:
-      return detail || CV_UPLOAD_ERROR_MESSAGES.SERVER_ERROR;
+      // If backend provided a detail message, return it as-is (will be rendered literally)
+      return detail || CV_UPLOAD_ERROR_I18N_KEYS.SERVER_ERROR;
   }
 };
 
@@ -88,31 +91,31 @@ export const getCvUploadErrorMessageFromErrorCode = (status: UploadStatus): stri
   
   switch (errorCode) {
     case "MARKDOWN_TOO_LONG":
-      return CV_UPLOAD_ERROR_MESSAGES.CV_MARKDOWN_TOO_LONG;
+      return CV_UPLOAD_ERROR_I18N_KEYS.CV_MARKDOWN_TOO_LONG;
     
     case "EMPTY_CV_PARSE":
-      return CV_UPLOAD_ERROR_MESSAGES.EMPTY_CV_PARSE;
+      return CV_UPLOAD_ERROR_I18N_KEYS.EMPTY_CV_PARSE;
     
     case "FILE_TOO_DENSE":
-      return CV_UPLOAD_ERROR_MESSAGES.FILE_TOO_DENSE;
+      return CV_UPLOAD_ERROR_I18N_KEYS.FILE_TOO_DENSE;
     
     case "RATE_LIMIT_WAIT":
-      return CV_UPLOAD_ERROR_MESSAGES.RATE_LIMIT_WAIT;
+      return CV_UPLOAD_ERROR_I18N_KEYS.RATE_LIMIT_WAIT;
     
     case "MAX_UPLOADS_REACHED":
-      return CV_UPLOAD_ERROR_MESSAGES.MAX_UPLOADS_REACHED;
+      return CV_UPLOAD_ERROR_I18N_KEYS.MAX_UPLOADS_REACHED;
     
     case "DUPLICATE_CV":
-      return CV_UPLOAD_ERROR_MESSAGES.DUPLICATE_CV;
+      return CV_UPLOAD_ERROR_I18N_KEYS.DUPLICATE_CV;
     
     case "UNSUPPORTED_FILE_TYPE":
-      return CV_UPLOAD_ERROR_MESSAGES.UNSUPPORTED_FILE_TYPE;
+      return CV_UPLOAD_ERROR_I18N_KEYS.UNSUPPORTED_FILE_TYPE;
     
     case "UPLOAD_TIMEOUT":
-      return CV_UPLOAD_ERROR_MESSAGES.UPLOAD_TIMEOUT;
+      return CV_UPLOAD_ERROR_I18N_KEYS.UPLOAD_TIMEOUT;
     
     default:
-      return errorDetail || CV_UPLOAD_ERROR_MESSAGES.GENERIC_UPLOAD_ERROR;
+      return errorDetail || CV_UPLOAD_ERROR_I18N_KEYS.GENERIC_UPLOAD_ERROR;
   }
 };
 
@@ -124,22 +127,22 @@ export const getUploadErrorMessage = (status: number, detail?: string): string =
   switch (status) {
     case 401:
     case 403:
-      return "You are not authorized. Please sign in again.";
+      return i18n.t(CV_UPLOAD_ERROR_I18N_KEYS.UNAUTHORIZED);
     case 404:
-      return "Upload not found. It may have failed to start.";
+      return i18n.t(CV_UPLOAD_ERROR_I18N_KEYS.UPLOAD_NOT_FOUND);
     case 413:
-      return "File too large. Please upload a smaller CV.";
+      return i18n.t(CV_UPLOAD_ERROR_I18N_KEYS.MAX_FILE_SIZE);
     case 415:
-      return "Unsupported file type. Allowed: PDF, DOCX, TXT.";
+      return i18n.t(CV_UPLOAD_ERROR_I18N_KEYS.UNSUPPORTED_FILE_TYPE);
     case 429:
-      return "You are uploading too fast. Please wait and try again.";
+      return i18n.t(CV_UPLOAD_ERROR_I18N_KEYS.RATE_LIMIT_WAIT);
     case 408:
     case 504:
-      return "The upload timed out. Please try again.";
+      return i18n.t(CV_UPLOAD_ERROR_I18N_KEYS.UPLOAD_TIMEOUT);
     case 409:
-      return "This CV seems to have been uploaded already.";
+      return i18n.t(CV_UPLOAD_ERROR_I18N_KEYS.DUPLICATE_CV);
     case 500:
     default:
-      return detail || "We couldn't process your CV right now. Please try again.";
+      return detail || i18n.t(CV_UPLOAD_ERROR_I18N_KEYS.GENERIC_UPLOAD_ERROR);
   }
 };

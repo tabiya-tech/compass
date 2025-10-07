@@ -1,9 +1,10 @@
 import React, { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Popover, Typography, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import { DislikeReason, DislikeReasonMessages } from "src/chat/reaction/reaction.types";
+import { DislikeReason, DislikeReasonTransalationKey } from "src/chat/reaction/reaction.types";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 export interface DislikeReasonPopoverProps {
@@ -23,13 +24,18 @@ export const DATA_TEST_ID = {
   CLOSE_ICON_BUTTON: `dislike-reason-popover-close-icon-button-${uniqueId}`,
 };
 
+
 export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
   anchorEl,
   open,
   onClose,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isOnline = useContext(IsOnlineContext)
+
+  const getDislikeReasonLabel = (reason: DislikeReason) =>
+    t(`${DislikeReasonTransalationKey[reason]}`);
 
   const handleReasonClick = (reason: DislikeReason) => {
     // for now, our ui only allows selecting one reason
@@ -61,11 +67,11 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
       >
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="subtitle1" color={theme.palette.text.secondary} data-testid={DATA_TEST_ID.TITLE}>
-            Please tell us what the issue is?
+            {t("chat.reaction.components.dislikeReasonPopover.title")}
           </Typography>
           <PrimaryIconButton
             onClick={() => onClose([])} // close without selecting a reason
-            title="close feedback"
+            title={t("chat.reaction.components.dislikeReasonPopover.closeButton")}
             sx={{ color: theme.palette.text.secondary }}
             data-testid={DATA_TEST_ID.CLOSE_ICON_BUTTON}
           >
@@ -73,18 +79,22 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
           </PrimaryIconButton>
         </Box>
         <Box display="flex" flexDirection="row" flexWrap="wrap" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-          {Object.entries(DislikeReasonMessages).map(([enumValue, message]) => (
-            <PrimaryButton
-              key={enumValue}
-              onClick={() => handleReasonClick(enumValue as DislikeReason)}
-              title={message}
-              style={{ color: theme.palette.text.secondary }}
-              data-testid={DATA_TEST_ID.BUTTON}
-              disabled={!isOnline}
-            >
-              {message}
-            </PrimaryButton>
-          ))}
+          {Object.values(DislikeReason).map((reason) => {
+            const label = getDislikeReasonLabel(reason);
+
+            return (
+              <PrimaryButton
+                key={reason}
+                onClick={() => handleReasonClick(reason)}
+                title={label}
+                style={{ color: theme.palette.text.secondary }}
+                data-testid={DATA_TEST_ID.BUTTON}
+                disabled={!isOnline}
+              >
+                {label}
+              </PrimaryButton>
+            );
+          })}
         </Box>
       </Box>
     </Popover>

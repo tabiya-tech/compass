@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, field_serializer, field_validator
 from app.agent.experience.timeline import Timeline
 from app.agent.experience.work_type import WorkType
 from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity
+from app.i18n.translation_service import t
 
 
 class ResponsibilitiesData(BaseModel):
@@ -175,6 +176,20 @@ class ExperienceEntity(BaseModel, Generic[SkillEntityT]):
         )
 
     @staticmethod
+    def _tr_work_type_short(work_type: Optional[WorkType]) -> str:
+        """Return a localized short label for a WorkType with safe fallback.
+
+        We purposefully do not change WorkType.work_type_short() to avoid affecting
+        system prompts; only UI/user-facing strings use this helper.
+        """
+        if work_type is None:
+            return ""
+        # Keys under: messages.experience.work_type.short.<enum_name_lower>
+        key = WorkType.work_type_short_i18n_key(work_type)
+        return t("messages",key)
+
+
+    @staticmethod
     def get_structured_summary(*, experience_title: str,
                                location: Optional[str] = None,
                                work_type: Optional[str] = None,
@@ -185,10 +200,18 @@ class ExperienceEntity(BaseModel, Generic[SkillEntityT]):
         if start_date is not None and start_date != "":
             date_part = f", {start_date}" + f" - {end_date}" if end_date is not None and end_date != "" else ""
         else:
-            date_part = f", until {end_date}" if end_date is not None and end_date != "" else ""
+            if end_date is not None and end_date != "":
+                # Localize "until {end_date}" pattern
+                _until = t("messages", "experience.until", f"until {end_date}", end_date=end_date)
+                date_part = f", {_until}"
+            else:
+                date_part = ""
         company_part = f", {company}" if company is not None and company != "" else ""
         location_part = f", {location}" if location is not None and location != "" else ""
         _work_type = WorkType.from_string_key(work_type)
-        work_type_part = f" ({WorkType.work_type_short(_work_type)})" if _work_type is not None else ""
-        experience_title_part = experience_title if experience_title is not None else "No title provided yet"
+        work_type_part = f" ({ExperienceEntity._tr_work_type_short(_work_type)})" if _work_type is not None else ""
+        if experience_title is not None:
+            experience_title_part = experience_title
+        else:
+            experience_title_part = t("messages", "experience.noTitleProvidedYet")
         return experience_title_part + work_type_part + date_part + company_part + location_part + "\n"

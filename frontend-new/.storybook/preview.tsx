@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import React, { Suspense, useEffect } from "react";
+import { I18nextProvider } from "react-i18next";
 import { HashRouter } from "react-router-dom";
 import { applicationTheme, ThemeMode } from "../src/theme/applicationTheme/applicationTheme";
 // Loading fonts:
@@ -18,14 +19,33 @@ import "./preview.css";
 //  the browser will use a default font.
 
 import type { Preview, StoryFn } from "@storybook/react";
-import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
-import { initSentry } from "../src/sentryInit";
-import { ChatProvider } from "../src/chat/ChatContext";
 import { IChatMessage } from "../src/chat/Chat.types";
+import { ChatProvider } from "../src/chat/ChatContext";
+import i18n from "../src/i18n/i18n";
+import { initSentry } from "../src/sentryInit";
+import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
+import { LocalesLabels, Locale } from "../src/i18n/constants";
+
+type StorybookSelectOption = {
+  value: string;
+  title: string;
+};
+
+/**
+ * A list of all the locales and their labels in the form of {StorybookSelectOption[]}:
+ */
+const localeOptions = Object.entries(LocalesLabels).reduce<StorybookSelectOption[]>((acc, [locale, label]) => {
+  acc.push({
+    value: locale,
+    title: label,
+  });
+  return acc;
+}, []);
 
 const preview: Preview = {
   parameters: {
+    i18n,
     actions: { argTypesRegex: "^on[A-Z].*" },
     controls: {
       matchers: {
@@ -73,6 +93,16 @@ const preview: Preview = {
         ],
       },
     },
+    locale: {
+      name: "Locale",
+      description: "Internationalization locale",
+      toolbar: {
+        icon: "globe",
+        items: localeOptions,
+        defaultValue: Locale.EN_US,
+        showName: true,
+      },
+    },
   },
   args: {
     online: true,
@@ -87,11 +117,13 @@ const ORIGINAL_SENTRY_DSN = window.tabiyaConfig.FRONTEND_SENTRY_DSN;
 let isSentryInitialized = true;
 
 export const decorators = [
-  (Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean } }) => {
+  (Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean; locale?: string } }) => {
     const isOnline = context.globals.online;
     const sentryEnabled = context.globals.sentryEnabled;
+    const locale = context.globals.locale;
     const prevSentryEnabled = React.useRef(sentryEnabled);
 
+    // Handle Sentry enable/disable
     useEffect(() => {
       if (prevSentryEnabled.current !== sentryEnabled) {
         // @ts-ignore
@@ -113,6 +145,20 @@ export const decorators = [
       }
     }, [sentryEnabled]);
 
+    // Handle language changes
+    useEffect(() => {
+      const handleLanguageChange = (newLocale: string) => {
+        document.dir = i18n.dir(newLocale);
+      };
+
+      i18n.changeLanguage(locale); // switch to toolbar-selected locale
+      i18n.on("languageChanged", handleLanguageChange);
+
+      return () => {
+        i18n.off("languageChanged", handleLanguageChange);
+      };
+    }, [locale]);
+
     return (
       <HashRouter>
         <IsOnlineContext.Provider value={isOnline}>
@@ -129,7 +175,11 @@ export const decorators = [
                     throw new Error("Function not implemented.");
                   }}
                 >
-                  <Story />
+                  <Suspense fallback={<div>loading translations...</div>}>
+                    <I18nextProvider i18n={i18n}>
+                      <Story />
+                    </I18nextProvider>
+                  </Suspense>
                 </ChatProvider>
               </div>
             </SnackbarProvider>

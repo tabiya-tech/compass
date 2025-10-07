@@ -3,7 +3,8 @@ import "src/_test_utilities/consoleMock";
 // standard sentry mock
 import "src/_test_utilities/sentryMock";
 
-import ChatHeader, { DATA_TEST_ID, FEEDBACK_FORM_TEXT, MENU_ITEM_ID } from "./ChatHeader";
+import ChatHeader, { DATA_TEST_ID, MENU_ITEM_ID } from "./ChatHeader";
+import i18n from "src/i18n/i18n";
 import { act, fireEvent, render, screen, userEvent, waitFor, within } from "src/_test_utilities/test-utils";
 import { routerPaths } from "src/app/routerPaths";
 import { testNavigateToPath } from "src/_test_utilities/routeNavigation";
@@ -226,7 +227,7 @@ describe("ChatHeader", () => {
         />
       </ChatProvider>
     );
-    testNavigateToPath(givenChatHeader, "Compass logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
+    testNavigateToPath(givenChatHeader, "Compass Logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
 
     test("should open the context menu when the user icon is clicked", async () => {
       // GIVEN a ChatHeader component
@@ -252,8 +253,9 @@ describe("ChatHeader", () => {
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
       await userEvent.click(userButton);
 
-      // THEN expect the context menu to be visible
-      expect(screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU)).toBeInTheDocument();
+      // THEN expect the context menus to be visible (language selector + user menu)
+      const contextMenus = screen.getAllByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
+      expect(contextMenus.length).toBeGreaterThanOrEqual(2);
       // AND the context menu to be open and anchored to the user button
       await waitFor(() => {
         expect(ContextMenu).toHaveBeenCalledWith(
@@ -564,10 +566,10 @@ describe("ChatHeader", () => {
 
       // THEN expect the create form to be called with the correct parameters
       expect(mockCreateForm).toHaveBeenCalledWith({
-        formTitle: FEEDBACK_FORM_TEXT.TITLE,
-        messagePlaceholder: FEEDBACK_FORM_TEXT.MESSAGE_PLACEHOLDER,
-        submitButtonLabel: FEEDBACK_FORM_TEXT.SUBMIT_BUTTON_LABEL,
-        successMessageText: FEEDBACK_FORM_TEXT.SUCCESS_MESSAGE,
+        formTitle: i18n.t("chat.chatHeader.giveGeneralFeedback"),
+        messagePlaceholder: i18n.t("chat.chatHeader.feedbackMessagePlaceholder"),
+        submitButtonLabel: i18n.t("chat.chatHeader.sendFeedback"),
+        successMessageText: i18n.t("chat.chatHeader.feedbackSuccessMessage"),
         enableScreenshot: false,
       });
       // AND the form should be appended to DOM and opened
@@ -579,7 +581,7 @@ describe("ChatHeader", () => {
   describe("context menu item tests", () => {
     test.each([
       ["online", true],
-      ["offline", false],
+      ["chat.chatMessageField.placeholders.offline", false],
     ])(
       "should render the context menu with the correct menu items when browser is %s",
       async (_description, browserIsOnline) => {
@@ -630,8 +632,10 @@ describe("ChatHeader", () => {
           );
         });
         // AND the context menu to contain the correct menu items
-        const contextMenu = screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
-        expect(contextMenu).toBeInTheDocument();
+        const contextMenus = screen.getAllByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
+        // User menu is the second context menu (index 1), language menu is the first (index 0)
+        const userContextMenu = contextMenus[1];
+        expect(userContextMenu).toBeInTheDocument();
         expect(screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION)).toBeInTheDocument();
         expect(screen.getByTestId(MENU_ITEM_ID.LOGOUT_BUTTON)).toBeInTheDocument();
       }

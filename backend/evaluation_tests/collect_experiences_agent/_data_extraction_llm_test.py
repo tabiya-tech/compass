@@ -16,7 +16,6 @@ from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 from evaluation_tests.matcher import check_actual_data_matches_expected, ContainsString, AnyOf, Matcher, match_expected
 
-
 class _TestCaseDataExtraction(CompassTestCase):
     # The GIVEN
     turns: list[tuple[str, str]]
@@ -1002,6 +1001,7 @@ test_cases_data_extraction = [
                          ids=[case.name for case in get_test_cases_to_run(test_cases_data_extraction)])
 async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytest.LogCaptureFixture):
     logger = logging.getLogger()
+       
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
 

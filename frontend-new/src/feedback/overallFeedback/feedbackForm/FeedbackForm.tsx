@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogTitle, Typography, useTheme } from "@mui/material";
 import FeedbackFormContent from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
@@ -39,6 +40,7 @@ export const DATA_TEST_ID = {
 
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const isSmallOrShortScreen = useIsSmallOrShortScreen();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -61,10 +63,10 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
       await overallFeedbackService.sendFeedback(sessionId, formData);
       console.info("Feedback submitted successfully for session", sessionId);
 
-      enqueueSnackbar("Feedback submitted successfully!", { variant: "success" });
+      enqueueSnackbar(t("feedback.overallFeedback.feedbackForm.submitSuccess"), { variant: "success" });
     } catch (error) {
       console.error(new FeedbackError("Failed to submit feedback", error));
-      enqueueSnackbar("Failed to submit feedback. Please try again later.", { variant: "error" });
+      enqueueSnackbar(t("feedback.overallFeedback.feedbackForm.submitError"), { variant: "error" });
     } finally {
       setIsSubmitting(false);
     }
@@ -103,11 +105,11 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
           }}
         >
           <Typography variant="h3" data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_TITLE}>
-            Help us improve!
+            {t("feedback.overallFeedback.feedbackForm.helpUsImprove")}
           </Typography>
           <PrimaryIconButton
             onClick={handleClose}
-            title="close feedback form"
+            title={t("feedback.overallFeedback.feedbackForm.closeForm")}
             sx={{ color: theme.palette.text.secondary }}
             data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_BUTTON}
           >
@@ -126,7 +128,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
           <FeedbackFormContent notifySubmit={handleFeedbackSubmit} />
         </DialogContent>
       </Dialog>
-      <Backdrop isShown={isSubmitting} message="Submitting feedback..." />
+      <Backdrop isShown={isSubmitting} message={t("feedback.overallFeedback.feedbackForm.submittingFeedback")} />
     </>
   );
 };

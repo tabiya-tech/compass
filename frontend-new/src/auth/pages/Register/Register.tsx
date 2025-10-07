@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Container, Divider, TextField, Typography, useTheme } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -44,6 +45,7 @@ export const DATA_TEST_ID = {
 const Register: React.FC = () => {
   const [registrationCode, setRegistrationCode] = useState<string>("");
   const theme = useTheme();
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -88,9 +90,9 @@ const Register: React.FC = () => {
         console.error(error);
         errorMessage = error.message;
       }
-      enqueueSnackbar(`Registration Failed: ${errorMessage}`, { variant: "error" });
+      enqueueSnackbar(t("auth.errors.registerFailedWithMessage", { message: errorMessage }), { variant: "error" });
     },
-    [enqueueSnackbar]
+    [enqueueSnackbar, t]
   );
 
   const applicationRegistrationCode = useMemo(() => {
@@ -119,8 +121,8 @@ const Register: React.FC = () => {
       if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
         navigate(routerPaths.CONSENT, { replace: true });
       } else {
-        navigate(routerPaths.ROOT, { replace: true });
-        enqueueSnackbar("Welcome back!", { variant: "success" });
+  navigate(routerPaths.ROOT, { replace: true });
+  enqueueSnackbar(t("auth.pages.login.welcomeBack"), { variant: "success" });
       }
     } catch (error) {
       const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
@@ -131,7 +133,7 @@ const Register: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [navigate, enqueueSnackbar, handleError]);
+  }, [navigate, enqueueSnackbar, handleError, t]);
 
   /* ------------
    * Actual registration handlers
@@ -149,8 +151,8 @@ const Register: React.FC = () => {
         // if the instance has application registration code set, we should use that instead of the one entered by the user.
         const registrationCodeToUse = registrationCode || applicationRegistrationCode;
         // We're using the mail as the username for now, since we don't have any use case in the app for it
-        await firebaseEmailAuthServiceInstance.register(email, password, email, registrationCodeToUse);
-        enqueueSnackbar("Verification Email Sent!", { variant: "success" });
+  await firebaseEmailAuthServiceInstance.register(email, password, email, registrationCodeToUse);
+  enqueueSnackbar(t("auth.verificationEmailSentShort"), { variant: "success" });
         // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
         // since if we don't do that, the user may be able to access the application without verifying their email
         // or accepting the dpa.
@@ -165,7 +167,7 @@ const Register: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [navigate, enqueueSnackbar, setIsLoading, registrationCode, handleError, applicationRegistrationCode]
+    [navigate, enqueueSnackbar, setIsLoading, registrationCode, handleError, applicationRegistrationCode, t]
   );
 
   /**
@@ -190,19 +192,19 @@ const Register: React.FC = () => {
         width={"100%"}
       >
         <AuthHeader
-          title={"Welcome to Compass!"}
+          title={t("auth.pages.login.welcomeTitle")}
           subtitle={
             <Typography variant="body2" gutterBottom>
-              We need some information to get started
+              {t("auth.pages.register.subtitle")}
             </Typography>
           }
         />
         {!applicationRegistrationCode && (
           <React.Fragment>
-            <Typography variant="subtitle2">Enter your registration code</Typography>
+            <Typography variant="subtitle2">{t("auth.pages.register.enterRegistrationCode")}</Typography>
             <TextField
               fullWidth
-              label="Registration code"
+              label={t("auth.pages.register.registrationCode")}
               variant="outlined"
               required
               value={registrationCode}
@@ -214,7 +216,7 @@ const Register: React.FC = () => {
         {!applicationRegistrationCode && (
           <Divider textAlign="center" style={{ width: "100%" }}>
             <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-              and either continue with
+              {t("auth.pages.register.andEitherContinueWith")}
             </Typography>
           </Divider>
         )}
@@ -228,18 +230,18 @@ const Register: React.FC = () => {
             postLoginHandler={handlePostLogin}
             isLoading={isLoading}
             disabled={!registrationCode && !applicationRegistrationCode}
-            label={"Register with Google"}
+            label={t("auth.pages.register.registerWithGoogle")}
             notifyOnLoading={notifyOnSocialLoading}
             registrationCode={registrationCode || applicationRegistrationCode}
           />
         )}
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          Already have an account? <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>Login</CustomLink>
+          {t("auth.pages.register.alreadyHaveAccount")} <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>{t("common.buttons.login")}</CustomLink>
         </Typography>
         {!applicationRegistrationCode && <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />}
       </Box>
       <BugReportButton bottomAlign={true} />
-      <Backdrop isShown={isLoading} message="Registering you..." />
+      <Backdrop isShown={isLoading} message={t("auth.pages.register.registeringYou")} />
     </Container>
   );
 };

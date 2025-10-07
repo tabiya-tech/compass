@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { useTranslation } from "react-i18next";
 import Typography from "@mui/material/Typography";
 import * as Sentry from "@sentry/react";
 import CustomLink from "src/theme/CustomLink/CustomLink";
@@ -23,6 +24,7 @@ export const UI_TEXT = {
 
 };
 const RequestInvitationCode = ({ invitationCodeType, notifyOnModalOpened }: Props) => {
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isOnline = useContext(IsOnlineContext);
 
@@ -38,13 +40,13 @@ const RequestInvitationCode = ({ invitationCodeType, notifyOnModalOpened }: Prop
   return (
     <>
       <Typography variant="caption" textAlign="center" gutterBottom>
-        {invitationCodeType === InvitationType.LOGIN ? UI_TEXT.REQUEST_LOGIN_CODE : UI_TEXT.REQUEST_REGISTRATION_CODE}
+        {invitationCodeType === InvitationType.LOGIN ? t("auth.components.requestInvitationCode.requestLoginCode") : t("auth.components.registrationCodeFormModal.noRegistrationCodePrompt")}
         &nbsp;
         <CustomLink
           disabled={!isOnline}
           onClick={handleModalOpen}
           data-testid={`${DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK}`}
-        >{UI_TEXT.REQUEST_INVITATION_CODE_LINK}</CustomLink>
+        >{t("auth.components.registrationCodeFormModal.reachOut")}</CustomLink>
       </Typography>
 
       <RequestInvitationCodeFormModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />

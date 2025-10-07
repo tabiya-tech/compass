@@ -1,6 +1,6 @@
 import { Box, TextField, useTheme } from "@mui/material";
 import React from "react";
-
+import { useTranslation } from "react-i18next";
 import PasswordInput from "src/theme/PasswordInput/PasswordInput";
 
 const uniqueId = "8ab76120-a0d3-47b1-aac0-42d0169e0a58";
@@ -26,6 +26,7 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
   isDisabled,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const handleEmailChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     event.preventDefault();
     notifyOnEmailChanged(event.target.value);
@@ -46,7 +47,7 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
     >
       <TextField
         fullWidth
-        label="Email"
+        label={t("common.fields.email")}
         type="email"
         variant="outlined"
         disabled={isDisabled}
@@ -56,7 +57,7 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
       />
       <PasswordInput
         fullWidth
-        label="Password"
+        label={t("common.fields.password")}
         variant="outlined"
         disabled={isDisabled}
         value={password}

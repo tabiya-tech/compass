@@ -2,6 +2,8 @@ from typing import Optional, Literal
 
 from pydantic import BaseModel
 
+from app.i18n.types import Locale
+
 
 class CompassTestCase(BaseModel):
     """
@@ -10,6 +12,11 @@ class CompassTestCase(BaseModel):
     name: str
     """
     The name of the test case.
+    """
+
+    locale: Locale = Locale.EN_US
+    """
+    The locale to be used for the test case.
     """
 
     skip_force: Optional[Literal['skip', 'force', '']] = None

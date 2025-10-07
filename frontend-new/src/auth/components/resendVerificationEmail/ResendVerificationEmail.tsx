@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Typography, styled } from "@mui/material";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -38,6 +39,8 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
   initialIsLoading = false,
   initialCooldownSeconds = 0 
 }) => {
+  
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(initialIsLoading);
   const [cooldownSeconds, setCooldownSeconds] = useState(initialCooldownSeconds);
   const { enqueueSnackbar } = useSnackbar();
@@ -62,7 +65,7 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
     try {
       const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
       await firebaseEmailAuthServiceInstance.resendVerificationEmail(email, password);
-      enqueueSnackbar("Verification email sent successfully", { variant: "success" });
+      enqueueSnackbar(t("auth.components.resendVerificationEmail.resendVerificationEmailSuccess"), { variant: "success" });
       setCooldownSeconds(COOLDOWN_SECONDS);
     } catch (error) {
       let errorMessage;
@@ -73,16 +76,16 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
         errorMessage = (error as Error).message;
         console.error("Failed to resend verification email (unknown error):", error);
       }
-      enqueueSnackbar(`Failed to send verification email: ${errorMessage}`, { variant: "error" });
+      enqueueSnackbar(t("auth.components.resendVerificationEmail.resendVerificationEmailFailedWithMessage", { message: errorMessage }), { variant: "error" });
     } finally {
       setIsLoading(false);
     }
-  }, [email, password, enqueueSnackbar]);
+  }, [email, password, enqueueSnackbar, t]);
 
   return (
     <StyledBox data-testid={DATA_TEST_ID.CONTAINER}>
       <Typography variant="body2" color="error">
-        Your email is not verified. Please check your inbox for the verification email.
+        {t("auth.components.resendVerificationEmail.emailNotVerified")}
       </Typography>
       <Box>
         <CustomLink
@@ -90,7 +93,7 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
           disabled={isLoading || cooldownSeconds > 0 || !isOnline}
           data-testid={DATA_TEST_ID.RESEND_LINK}
         >
-          Resend verification email
+          {t("auth.components.resendVerificationEmail.resendVerificationEmail")}
         </CustomLink>
         {cooldownSeconds > 0 && (
           <Typography

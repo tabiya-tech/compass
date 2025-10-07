@@ -38,6 +38,7 @@ class EvaluationType(Enum):
     FOCUS = "Focus"
     SUMMARY_CONSISTENCY = "Summary Consistency"
     SUMMARY_RELEVANCE = "Summary Relevance"
+    SINGLE_LANGUAGE = "Single Language"
 
 
 class EvaluationResult(BaseModel):

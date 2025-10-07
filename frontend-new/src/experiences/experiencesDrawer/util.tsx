@@ -16,14 +16,53 @@ import WorkIcon from "@mui/icons-material/Work";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import SchoolIcon from "@mui/icons-material/School";
 import QuizIcon from "@mui/icons-material/Quiz";
+import i18n from "src/i18n/i18n";
+
+
+/**
+ * Centralized error messages with i18n support
+ */
+export const ERROR_MESSAGES = {
+  get EXPERIENCE_TITLE() {
+    return i18n.t("errors.experienceTitleMaxLength", { max: EXPERIENCE_TITLE_MAX_LENGTH });
+  },
+  get COMPANY() {
+    return i18n.t("errors.companyMaxLength", { max: COMPANY_MAX_LENGTH });
+  },
+  get LOCATION() {
+    return i18n.t("errors.locationMaxLength", { max: LOCATION_MAX_LENGTH });
+  },
+  get SUMMARY() {
+    return i18n.t("errors.summaryMaxLength", { max: SUMMARY_MAX_LENGTH });
+  },
+  get TIMELINE_START() {
+    return i18n.t("errors.timelineMaxLength", { max: TIMELINE_MAX_LENGTH });
+  },
+  get TIMELINE_END() {
+    return i18n.t("errors.timelineMaxLength", { max: TIMELINE_MAX_LENGTH });
+  },
+} as const;
 
 export const WORK_TYPE_DESCRIPTIONS = {
-  SELF_EMPLOYMENT: "You work for yourself, run your own business, or take on freelance or contract jobs",
-  FORMAL_SECTOR_WAGED_EMPLOYMENT: "You have a paid job and work for an employer, company, or organization",
-  FORMAL_SECTOR_UNPAID_TRAINEE_WORK: "You're in a training or internship role to gain skills or experience",
-  UNSEEN_UNPAID: "You do unpaid work like caregiving, household tasks, or community volunteering",
-  UNCATEGORIZED: "Compass couldn't categorize this work type",
-};
+  get SELF_EMPLOYMENT() {
+    return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.selfEmployment");
+  },
+  get FORMAL_SECTOR_WAGED_EMPLOYMENT() {
+    return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.formalSectorWagedEmployment");
+  },
+  get FORMAL_SECTOR_UNPAID_TRAINEE_WORK() {
+    return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.formalSectorUnpaidTraineeWork");
+  },
+  get UNSEEN_UNPAID() {
+    return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.unseenUnpaid");
+  },
+  get UNCATEGORIZED() {
+    return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.uncategorized");
+  },
+} as const;
+
+
+
 
 export const getWorkTypeTitle = (workType: WorkType | null) => {
   switch (workType) {
@@ -86,24 +125,26 @@ export const sortSkillsByOrderIndex = <T extends Skill>(skills: T[]): T[] => {
  */
 export const checkInitialFieldErrors = (experience: Experience) => {
   const errors: { [key: string]: string } = {};
+
   if (experience.experience_title && experience.experience_title.length > EXPERIENCE_TITLE_MAX_LENGTH) {
-    errors.experience_title = `Maximum ${EXPERIENCE_TITLE_MAX_LENGTH} characters allowed.`;
+    errors.experience_title = ERROR_MESSAGES.EXPERIENCE_TITLE;
   }
   if (experience.company && experience.company.length > COMPANY_MAX_LENGTH) {
-    errors.company = `Maximum ${COMPANY_MAX_LENGTH} characters allowed.`;
+    errors.company = ERROR_MESSAGES.COMPANY;
   }
   if (experience.location && experience.location.length > LOCATION_MAX_LENGTH) {
-    errors.location = `Maximum ${LOCATION_MAX_LENGTH} characters allowed.`;
+    errors.location = ERROR_MESSAGES.LOCATION;
   }
   if (experience.summary && experience.summary.length > SUMMARY_MAX_LENGTH) {
-    errors.summary = `Maximum ${SUMMARY_MAX_LENGTH} characters allowed.`;
+    errors.summary = ERROR_MESSAGES.SUMMARY;
   }
   if (experience.timeline.start && experience.timeline.start.length > TIMELINE_MAX_LENGTH) {
-    errors.timeline_start = `Maximum ${TIMELINE_MAX_LENGTH} characters allowed.`;
+    errors.timeline_start = ERROR_MESSAGES.TIMELINE_START;
   }
   if (experience.timeline.end && experience.timeline.end.length > TIMELINE_MAX_LENGTH) {
-    errors.timeline_end = `Maximum ${TIMELINE_MAX_LENGTH} characters allowed.`;
+    errors.timeline_end = ERROR_MESSAGES.TIMELINE_END;
   }
+
   return errors;
 };
 

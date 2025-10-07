@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import SnackbarProvider, { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { FormLabel, MenuItem, Select, Stack } from "@mui/material";
 import ErrorConstants from "./RestAPIError.constants";
+import { translateUserFriendlyErrorMessage } from "src/error/restAPIError/RestAPIError";
 
 const meta: Meta<typeof SnackbarProvider> = {
   title: "Error/Error",
@@ -26,22 +27,23 @@ type Story = StoryObj<typeof SnackbarProvider>;
 
 const TestErrorDropdown = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const t = translateUserFriendlyErrorMessage;
 
   const handleSelect = (event: React.MouseEvent<HTMLLIElement>) => {
     // @ts-ignore
-    enqueueSnackbar(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES[event.currentTarget.textContent], { variant: "error" });
+    enqueueSnackbar(t(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS[event.currentTarget.textContent]), { variant: "error" });
   };
 
   return (
     <Stack width={"fit-content"}>
       <FormLabel> Choose an error message to display in a notification:</FormLabel>
       <Select
-        value={Object.values(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES)[0]}
+        value={t(Object.values(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS)[0])}
         placeholder={"Select an error message"}
       >
-        {Object.keys(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES).map((key: string) => (
+        {Object.keys(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS).map((key: string) => (
           // @ts-ignore
-          <MenuItem onClick={handleSelect} key={key} value={ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES[key]}>
+          <MenuItem onClick={handleSelect} key={key} value={t(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS[key])}>
             {key}
           </MenuItem>
         ))}
