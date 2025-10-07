@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import React, { Suspense, useEffect } from "react";
+import { I18nextProvider } from "react-i18next";
 import { HashRouter } from "react-router-dom";
 import { applicationTheme, ThemeMode } from "../src/theme/applicationTheme/applicationTheme";
 // Loading fonts:
@@ -18,14 +19,16 @@ import "./preview.css";
 //  the browser will use a default font.
 
 import type { Preview, StoryFn } from "@storybook/react";
-import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
-import { initSentry } from "../src/sentryInit";
-import { ChatProvider } from "../src/chat/ChatContext";
 import { IChatMessage } from "../src/chat/Chat.types";
+import { ChatProvider } from "../src/chat/ChatContext";
+import i18n from "../src/i18n/i18n";
+import { initSentry } from "../src/sentryInit";
+import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 
 const preview: Preview = {
   parameters: {
+    i18n,
     actions: { argTypesRegex: "^on[A-Z].*" },
     controls: {
       matchers: {
@@ -73,6 +76,19 @@ const preview: Preview = {
         ],
       },
     },
+    locale: {
+      name: 'Locale',
+      description: 'Internationalization locale',
+      toolbar: {
+        icon: 'globe',
+        items: [
+          { value: 'en', title: 'English' },
+          { value: 'es', title: 'Spanish' },
+          { value: 'fr-fr', title: 'French' },
+        ],
+        showName: true,
+      },
+    },
   },
   args: {
     online: true,
@@ -113,6 +129,12 @@ export const decorators = [
       }
     }, [sentryEnabled]);
 
+    // When The language changes, set the document direction
+    i18n.on('languageChanged', (locale) => {
+      const direction = i18n.dir(locale);
+      document.dir = direction;
+    });
+
     return (
       <HashRouter>
         <IsOnlineContext.Provider value={isOnline}>
@@ -129,7 +151,11 @@ export const decorators = [
                     throw new Error("Function not implemented.");
                   }}
                 >
-                  <Story />
+                  <Suspense fallback={<div>loading translations...</div>}>
+                    <I18nextProvider i18n={i18n}>
+                      <Story />
+                    </I18nextProvider>
+                  </Suspense>
                 </ChatProvider>
               </div>
             </SnackbarProvider>
