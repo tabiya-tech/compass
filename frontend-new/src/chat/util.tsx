@@ -10,17 +10,28 @@ import TypingChatMessage, { TypingChatMessageProps, TYPING_CHAT_MESSAGE_TYPE } f
 import ErrorChatMessage, { ErrorChatMessageProps, ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
 import CVTypingChatMessage, { CV_TYPING_CHAT_MESSAGE_TYPE, CVTypingChatMessageProps } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
 import CancellableTypingChatMessage, { CancellableTypingChatMessageProps } from "src/chat/chatMessage/cancellableTypingChatMessage/CancellableTypingChatMessage";
+import i18n from "src/i18n/i18n";
 
 const uniqueId = "cancellable-cv-typing-message-2a76494f-351d-409d-ba58-e1b2cfaf2a53";
 export const CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE = `cancellable-cv-typing-message-${uniqueId}`;
 
+// Translated messages (resolved at access-time to respect runtime language changes)
 export const FIXED_MESSAGES_TEXT = {
-  AI_IS_TYPING: "Typing...",
-  THANK_YOU_FOR_FEEDBACK: "Thank you for taking the time to share your valuable feedback.",
-  THANK_YOU_FOR_RATING: "Thank you for rating Compass.",
-  SOMETHING_WENT_WRONG:
-    "I'm sorry, something seems to have gone wrong on my end... Can you please refresh the page and try again?",
-  PLEASE_REPEAT: "I'm sorry, something seems to have gone wrong on my end... Can you please repeat that?",
+  get AI_IS_TYPING() {
+    return i18n.t("chat.chatMessage.typingChatMessage.typing");
+  },
+  get THANK_YOU_FOR_FEEDBACK() {
+    return i18n.t("chat.util.feedbackThankYou");
+  },
+  get THANK_YOU_FOR_RATING() {
+    return i18n.t("chat.util.ratingThankYou");
+  },
+  get SOMETHING_WENT_WRONG() {
+    return i18n.t("chat.util.errorSomethingWentWrong");
+  },
+  get PLEASE_REPEAT() {
+    return i18n.t("chat.util.errorPleaseRepeat");
+  },
 };
 
 export const generateUserMessage = (
@@ -112,28 +123,28 @@ export const generateCancellableCVTypingMessage = (
   uploadState?: string
 ): IChatMessage<CancellableTypingChatMessageProps> => {
   const getDisplayMessage = (): string => {
-    if (isCancelled) return "CV upload cancelled";
-    if (isUploaded) return "CV uploaded successfully";
+    if (isCancelled) return i18n.t("chat.cvUploadPolling.cancelled");
+    if (isUploaded) return i18n.t("chat.cvUploadPolling.uploadedSuccessfully");
 
     switch (uploadState) {
       case "CONVERTING":
-        return "Converting CV";
+        return i18n.t("chat.cvUploadPolling.converting");
       case "UPLOADING_TO_GCS":
-        return "Processing CV";
+        return i18n.t("chat.cvUploadPolling.processing");
       case "EXTRACTING":
-        return "Extracting experiences";
+        return i18n.t("chat.cvUploadPolling.extractingExperiences");
       case "SAVING":
-        return "Saving CV";
+        return i18n.t("chat.cvUploadPolling.savingCv");
       case "FAILED":
-        return "CV upload failed";
+        return i18n.t("chat.cvUploadPolling.failed");
       default:
-        return "Uploading CV";
+        return i18n.t("chat.cvUploadPolling.uploadingCv");
     }
   };
 
   const payload: CancellableTypingChatMessageProps = {
     message: getDisplayMessage(),
-    thinkingMessage: "Processing your CV, this might take a while...",
+    thinkingMessage: i18n.t("chat.cvUploadPolling.thinkingMessage"),
     waitBeforeThinking: 10000, // 10 seconds for CV processing
     disabled: isUploaded || isCancelled,
     onCancel: async () => await onCancel(uploadId),
@@ -212,7 +223,7 @@ export const parseConversationPhase = (newPhase: CurrentPhase, previousPhase?: C
 export const formatExperiencesToMessage = (experiences: string[] | null): string => {
   if (!Array.isArray(experiences) || experiences.length === 0) return "";
 
-  const intro = "These are my experiences:";
+  const intro = i18n.t("chat.util.messages.experiencesIntro");
   const bullets = experiences
     .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
     .filter(Boolean)

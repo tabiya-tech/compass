@@ -10,8 +10,8 @@ export enum QuestionType {
 }
 
 export enum YesNoEnum {
-  Yes = "yes",
-  No = "no",
+  Yes = "common.buttons.yes",
+  No = "common.buttons.no",
 }
 
 export interface BaseQuestion {

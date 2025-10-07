@@ -4,6 +4,10 @@ import "src/_test_utilities/consoleMock";
 import { render, screen, within } from "@testing-library/react";
 import { MAX_WAIT_TIME_FOR_ROOT_ELEMENT, ROOT_ELEMENT_POLL_INTERVAL } from "./index";
 
+
+
+
+
 // mock the react-dom/client
 // Using jest.doMock() so that the render function can be accessed from within the mock
 jest.doMock("react-dom/client", () => {

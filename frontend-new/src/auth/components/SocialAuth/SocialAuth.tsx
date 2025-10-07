@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { Box, Button, Divider, Typography, useTheme } from "@mui/material";
@@ -45,7 +46,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
                                                            notifyOnLoading,
                                                          }) => {
   const isOnline = useContext(IsOnlineContext);
-
+  const { t } = useTranslation();
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -78,9 +79,9 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       }
 
       console.error(error);
-      enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+      enqueueSnackbar(t("auth.components.socialAuth.socialFailedLoginWithMessage", { message: errorMessage }), { variant: "error" });
     },
-    [enqueueSnackbar, registrationCode],
+    [enqueueSnackbar, registrationCode, t],
   );
 
   const registerUser = useCallback(
@@ -128,7 +129,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       if (!prefs) {
         // if registration is disabled, show an error message
         if (registrationDisabled) {
-          enqueueSnackbar("This account isn’t registered. Please contact the provider of this link.", { variant: "error" });
+          enqueueSnackbar(t("auth.components.socialAuth.accountNotRegistered"), { variant: "error" });
           return;
         }
 
@@ -147,7 +148,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
     } finally {
       notifyOnLoading(false);
     }
-  }, [notifyOnLoading, postLoginHandler, _registrationCode, registerUser, enqueueSnackbar, handleError]);
+  }, [notifyOnLoading, postLoginHandler, _registrationCode, registerUser, enqueueSnackbar, handleError, t]);
 
   const handleRegistrationCodeSuccess = useCallback(
     async (registrationCode: string) => {
@@ -183,7 +184,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
           data-testid={DATA_TEST_ID.CONTINUE_WITH_GOOGLE}
         >
-          Or continue with
+          {t("auth.components.socialAuth.orContinueWith")}
         </Typography>
       </Divider>
       <Box width="100%">
@@ -208,7 +209,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
             <div style={{ display: "flex", alignItems: "center" }}>
               <GoogleIcon disabled={socialAuthLoading} />
             </div>
-            <Typography variant="body2">{label ?? "Login with Google"}</Typography>
+            <Typography variant="body2">{label ?? t("auth.components.socialAuth.loginWithGoogle")}</Typography>
           </Button>
           {!isOnline && (
             <Typography
@@ -216,7 +217,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
               sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
               data-testid={DATA_TEST_ID.FIREBASE_FALLBACK_TEXT}
             >
-              Google login is not available when offline.
+              {t("auth.components.socialAuth.googleLoginIsNotAvailableWhenOffline")}
             </Typography>
           )}
         </div>

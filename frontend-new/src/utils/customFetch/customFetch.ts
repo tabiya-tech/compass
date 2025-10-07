@@ -2,6 +2,7 @@ import { enqueueSnackbar } from "notistack";
 import { AuthenticationError, TokenError } from "src/error/commonErrors";
 import { getRestAPIErrorFactory, RestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
+import i18n from "src/i18n/i18n";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 
 import { calculateCompressionGainPercent, calculateTimeToTokenExpiry, getNextBackoff, sleep } from "./utils";
@@ -110,9 +111,11 @@ const refreshToken = async (
   const isProviderSessionValid = await authService.isProviderSessionValid();
 
   if (!isProviderSessionValid) {
-    const userFriendlyErrorMessage = ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.AUTHENTICATION_FAILURE;
+    const userFriendlyErrorMessage = i18n.t(
+      ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS.AUTHENTICATION_FAILURE,
+    );
     await authService.logout();
-    enqueueSnackbar(`${userFriendlyErrorMessage} We are logging you out ....`, {
+    enqueueSnackbar(`${userFriendlyErrorMessage} ${i18n.t("auth.loggingYouOutNotice")}`, {
       autoHideDuration: LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
       variant: "error",
     });
@@ -317,7 +320,10 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
               console.debug(
                 `Compressing request for ${serviceName}.${serviceFunction} with body size ${rawBytes.length}, gain: ${performanceGainPercent}`
               );
-              processedBody = new Blob([compressedBytes]);
+              // Copy to a fresh ArrayBuffer to satisfy BlobPart typing (avoid SharedArrayBuffer)
+              const ab = new ArrayBuffer(compressedBytes.byteLength);
+              new Uint8Array(ab).set(compressedBytes);
+              processedBody = new Blob([ab]);
               headers.set("Content-Encoding", "br");
             }
           } catch (error) {

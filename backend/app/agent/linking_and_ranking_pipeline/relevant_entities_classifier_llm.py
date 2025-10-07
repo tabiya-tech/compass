@@ -11,6 +11,7 @@ from app.agent.agent_types import LLMStats
 from app.agent.linking_and_ranking_pipeline.deduplicate_entities import deduplicate_entities
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty, get_penalty_for_multiple_errors
+from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.vector_search.esco_entities import BaseEntity
 from common_libs.llm.generative_models import GeminiGenerativeLLM
@@ -327,6 +328,8 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
             <System Instructions>
             You are an expert in the labour market.
             
+            {language_style}
+
             You will be given a list of job titles, a list of responsibilities/activities/skills/behaviours and a list of {entity_types_plural}.
             You will inspect the '{entity_type_singular} description' and '{entity_type_singular} title' of each {entity_type_singular} in the 'Given {entity_types_plural_capitalized}' 
             to evaluate in detail how relevant it is to all of the 'Given Responsibilities' and 'Given Job Titles' of the <Input> 
@@ -355,6 +358,7 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
 
         return replace_placeholders_with_indent(system_prompt_template,
                                                 entity_type_singular=entity_type_singular,
+                                                language_style=get_language_style(),
                                                 entity_types_plural=entity_types_plural,
                                                 entity_types_plural_capitalized=entity_types_plural_capitalized)
 

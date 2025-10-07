@@ -5,12 +5,12 @@ from pydantic import BaseModel, Field
 
 from app.agent.agent_types import LLMStats
 from app.agent.llm_caller import LLMCaller
-from app.agent.prompt_template import sanitize_input
+from app.agent.prompt_template import sanitize_input, get_language_style
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
 from ...conversation_memory.conversation_formatter import ConversationHistoryFormatter
-
+from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 
 class _SentenceDecompositionResponse(BaseModel):
     decomposed_and_dereferenced: list[str] = Field(default_factory=list)
@@ -126,6 +126,8 @@ class _SentenceDecompositionLLM:
         # Role
             You are a language expert that decomposes complex sentences into sub-sentences.
        
+        {language_style}
+                                              
         # Do not interpret
             Do not infer the my responsibilities, skills, duties, tasks, actions, behaviour, activities, competencies, or knowledge based on your prior knowledge about the experience.
             Do not infer the experience and do not use that information in your task.
@@ -183,7 +185,8 @@ class _SentenceDecompositionLLM:
         </System Instructions>
         """)
 
-        return system_instructions_template
+        return replace_placeholders_with_indent(system_instructions_template,
+                                                language_style=get_language_style())
 
     @staticmethod
     def _first_pass_prompt_template(context: ConversationContext, last_user_input: str) -> str:
@@ -222,6 +225,8 @@ class _SentenceDecompositionLLM:
             Both the input and the fixed sentence should be interpreted in a different way review independently. 
             Each sentence from the input must fixed and added to the output in the decomposed_and_dereferenced list.
         
+        {language_style}
+                                              
         # Input Structure
             The input structure is a list of sentences:
             "sentences": list of sentences 
@@ -236,7 +241,8 @@ class _SentenceDecompositionLLM:
         </System Instructions>
         """)
 
-        return system_instructions_template
+        return replace_placeholders_with_indent(system_instructions_template,
+                                                language_style=get_language_style())
 
     @staticmethod
     def _second_pass_prompt_template(sentences: list[str]) -> str:

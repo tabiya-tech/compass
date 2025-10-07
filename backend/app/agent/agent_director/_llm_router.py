@@ -8,6 +8,7 @@ from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentType, AgentInput
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
+from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
@@ -273,6 +274,7 @@ class LLMRouter:
                 """)
         instructions = replace_placeholders_with_indent(
             template_string=instructions,
+            language_style=get_language_style(),
             agent_responsible_for_phase_instructions=agent_responsible_for_phase_instructions,
             examples=examples,
             conversation_history=recent_conversation_history,

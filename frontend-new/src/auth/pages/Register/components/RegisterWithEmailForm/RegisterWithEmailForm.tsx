@@ -1,5 +1,6 @@
 import { Box, CircularProgress, TextField, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import { useTranslation } from "react-i18next";
 import React, { useState } from "react";
 import PasswordInput from "src/theme/PasswordInput/PasswordInput";
 
@@ -27,6 +28,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
   isRegistering,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
@@ -60,7 +62,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
     >
       <TextField
         fullWidth
-        label="Email"
+        label={t("common.fields.email")}
         type="email"
         disabled={isRegistering || disabled}
         variant="outlined"
@@ -70,7 +72,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
       />
       <PasswordInput
         fullWidth
-        label="Password"
+        label={t("common.fields.password")}
         disabled={isRegistering || disabled}
         variant="outlined"
         required
@@ -92,13 +94,13 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         {isRegistering ? (
           <CircularProgress
             color={"secondary"}
-            aria-label={"Registering"}
+            aria-label={t("auth.pages.register.components.registerWithEmailForm.registeringAria")}
             data-testid={DATA_TEST_ID.REGISTER_BUTTON_CIRCULAR_PROGRESS}
             size={16}
             sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
           />
         ) : (
-          "Register"
+          t("common.buttons.register")
         )}
       </PrimaryButton>
     </Box>

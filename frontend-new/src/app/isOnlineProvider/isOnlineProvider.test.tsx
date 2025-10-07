@@ -1,3 +1,6 @@
+// mute chatty console
+import "src/_test_utilities/consoleMock";
+
 import { IsOnlineContext, IsOnlineProvider } from "./IsOnlineProvider";
 import { screen, render, waitFor } from "@testing-library/react";
 import { useContext } from "react";

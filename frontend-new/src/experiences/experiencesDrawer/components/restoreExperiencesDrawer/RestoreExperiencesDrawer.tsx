@@ -11,6 +11,7 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Theme } from "@mui/material/styles";
 import { TabiyaIconStyles } from "src/theme/applicationTheme/applicationTheme";
 import { getWorkTypeIcon, getWorkTypeTitle } from "src/experiences/experiencesDrawer/util";
+import { useTranslation } from "react-i18next";
 
 const uniqueId = "086216b2-a180-4a13-ac3c-cfd23f46153f";
 
@@ -48,6 +49,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
   const [deletedExperiences, setDeletedExperiences] = useState<Experience[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -58,7 +60,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
         setDeletedExperiences(deletedExperiences);
       } catch (error) {
         console.error(new ExperienceError("Failed to fetch deleted experiences", error));
-        enqueueSnackbar("Failed to fetch deleted experiences. Please try again later.", {
+        enqueueSnackbar(t("experiences.experiencesDrawer.components.restoreExperiencesDrawer.fetchFailed"), {
           variant: "error",
         });
       } finally {
@@ -66,7 +68,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
       }
     };
     fetchDeletedExperiences().then();
-  }, [isOpen, sessionId, currentExperiences, enqueueSnackbar]);
+  }, [isOpen, sessionId, currentExperiences, enqueueSnackbar, t]);
 
   const handleRestore = async (experience: Experience) => {
     await onRestore(experience);
@@ -76,7 +78,10 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
 
   // Sort all experiences by title
   const sortedExperiences = useMemo(
-    () => deletedExperiences.toSorted((a, b) => (a.experience_title || "").localeCompare(b.experience_title || "")),
+    () =>
+      deletedExperiences.toSorted?.(
+        (a, b) => (a.experience_title || "").localeCompare(b.experience_title || "")
+      ) ?? [...deletedExperiences].sort((a, b) => (a.experience_title || "").localeCompare(b.experience_title || "")),
     [deletedExperiences]
   );
 
@@ -107,10 +112,10 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
             🤷‍♀️
           </Typography>
           <Typography data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES_EMPTY_MESSAGE}>
-            No deleted experiences found.
+            {t("experiences.experiencesDrawer.components.restoreExperiencesDrawer.empty")}
           </Typography>
           <PrimaryButton onClick={onClose} data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES_GO_BACK_BUTTON}>
-            Go Back
+            {t("common.buttons.goBack")}
           </PrimaryButton>
         </Box>
       );
@@ -133,7 +138,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
                     color={theme.palette.text.secondary}
                     data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_TITLE}
                   >
-                    {experience.experience_title ?? <i>Untitled!</i>}
+                    {experience.experience_title ?? <i>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.untitled")}</i>}
                   </Typography>
                   <Box
                     display="flex"
@@ -153,11 +158,11 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
                   <PrimaryButton
                     onClick={() => handleRestore(experience)}
                     disableWhenOffline
-                    title="Restore"
+                    title={t("common.buttons.restore")}
                     data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_BUTTON}
-                    startIcon={<img src={`${process.env.PUBLIC_URL}/restore-icon.svg`} alt="Restore" />}
+                    startIcon={<img src={`${process.env.PUBLIC_URL}/restore-icon.svg`} alt={t("common.buttons.restore")} />}
                   >
-                    Restore
+                    {t("common.buttons.restore")}
                   </PrimaryButton>
                 </Box>
               </Box>
@@ -196,7 +201,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
         height={"100%"}
         data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES}
       >
-        <ExperiencesDrawerHeader notifyOnClose={onClose} title={"Restore Experiences"} />
+        <ExperiencesDrawerHeader notifyOnClose={onClose} title={t("experiences.experiencesDrawer.components.restoreExperiencesDrawer.title")} />
         <Divider />
         {renderContent()}
       </Box>

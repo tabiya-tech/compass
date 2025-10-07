@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from "react-i18next";
 
 export interface ExperiencesDrawerHeaderProps {
   title: string;
@@ -18,6 +19,7 @@ export const DATA_TEST_ID = {
 
 const ExperiencesDrawerHeader: React.FC<ExperiencesDrawerHeaderProps> = (props) => {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   return (
     <Box
@@ -33,7 +35,7 @@ const ExperiencesDrawerHeader: React.FC<ExperiencesDrawerHeaderProps> = (props) 
           color: theme.palette.common.black,
           alignSelf: "center",
         }}
-        title="Close experiences"
+        title={t("experiences.experiencesDrawer.components.experiencesDrawerHeader.closeTitle")}
         onClick={props.notifyOnClose}
         data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_BUTTON}
       >

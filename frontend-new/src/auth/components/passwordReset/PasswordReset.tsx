@@ -9,6 +9,7 @@ import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from "react-i18next";
 
 const COOLDOWN_SECONDS = 60;
 
@@ -47,6 +48,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
    initialCooldownSeconds = 0,
  }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [emailInput, setEmailInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -69,7 +71,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
   const handleSendResetEmail = useCallback(async () => {
     setIsLoading(true);
     if(!emailInput) {
-      enqueueSnackbar("Please enter your email address", { variant: "warning" });
+      enqueueSnackbar(t("auth.components.passwordReset.pleaseEnterEmail"), { variant: "warning" });
       console.warn("Password reset attempt failed: email input missing.");
       setIsLoading(false);
       return;
@@ -77,24 +79,24 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
     try {
       const authService = FirebaseEmailAuthService.getInstance();
       await authService.resetPassword(emailInput);
-      enqueueSnackbar("Password reset email sent!", { variant: "success" });
+      enqueueSnackbar(t("auth.components.passwordReset.passwordResetEmailSent"), { variant: "success" });
       setCooldownSeconds(COOLDOWN_SECONDS);
     } catch (error) {
       const message = error instanceof FirebaseError ? getUserFriendlyFirebaseErrorMessage(error) : (error as Error).message;
       console.error("Password reset request failed:", message, error);
-      enqueueSnackbar(`Failed to send reset email: ${message}`, { variant: "error" });
+      enqueueSnackbar(`${t("auth.components.passwordReset.failedToSendResetEmail")}: ${message}`, { variant: "error" });
     } finally {
       setIsLoading(false);
       setDialogOpen(false);
     }
-  }, [emailInput, enqueueSnackbar]);
+  }, [emailInput, enqueueSnackbar, t]);
 
   return (
     <Box data-testid={DATA_TEST_ID.CONTAINER} sx={{
       display: "flex", flexDirection: "column", alignItems: "center", gap: theme.spacing(1), marginTop: theme.spacing(2),
     }}>
       {(cooldownSeconds !== initialCooldownSeconds) && <Typography variant="body2" color="info">
-        A password reset link has been sent to your email address.
+        {t("auth.components.passwordReset.passwordResetLinkSent")}
       </Typography>}
       <Box>
         <CustomLink
@@ -102,7 +104,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
           disabled={isLoading || cooldownSeconds > 0 || !isOnline}
           data-testid={DATA_TEST_ID.RESET_LINK}
         >
-          Forgot password?
+          {t("auth.components.passwordReset.forgotPassword")}
         </CustomLink>
         {cooldownSeconds > 0 && (
           <Typography
@@ -123,10 +125,10 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
         >
           <Box display="flex" justifyContent="space-between" alignItems="start" sx={{ mb: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}>
             <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.DIALOG_TITLE}>
-              Reset Password
+              {t("auth.components.passwordReset.resetPassword")}
             </Typography>
             <PrimaryIconButton
-              title="Close request invitation code form"
+              title={t("auth.components.passwordReset.closePasswordResetForm")}
               onClick={() => setDialogOpen(false)}
               sx={{
                 color: theme.palette.grey[500],
@@ -137,7 +139,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
             </PrimaryIconButton>
           </Box>
           <TextField
-            label="Email"
+            label={t("common.fields.email")}
             type="email"
             fullWidth
             value={emailInput}
@@ -154,7 +156,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
               data-testid={DATA_TEST_ID.SUBMIT}
               onClick={handleSendResetEmail}
             >
-              Submit
+              {t("common.buttons.submit")}
             </PrimaryButton>
           </DialogActions>
         </Box>

@@ -1,5 +1,7 @@
-// render test the Sloth
+// mute chatty console
+import "src/_test_utilities/consoleMock";
 
+// render test the Sloth
 import React from "react";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { Sloth, DATA_TEST_ID, SlothProps } from "./Sloth";

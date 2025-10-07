@@ -14,6 +14,7 @@ from app.agent.experience.timeline import Timeline
 from app.agent.experience.work_type import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.countries import Country
+from app.i18n.translation_service import t
 
 
 def _deserialize_work_types(value: list[str] | list[WorkType]) -> list[WorkType]:
@@ -185,9 +186,15 @@ class CollectExperiencesAgent(Agent):
             )
             transition_message: str
             if exploring_type is not None:
-                transition_message = f"{user_input.message}\nAsk me about experiences that include: {_get_experience_type(exploring_type)}"
+                transition_message = (
+                    f"{user_input.message}\n"
+                    f"{t('messages', 'collectExperiences.askAboutType', experience_type=_get_experience_type(exploring_type))}"
+                )
             else:
-                transition_message = f"{user_input.message}\nLet's recap, and give me a chance to correct any mistakes."
+                transition_message = (
+                    f"{user_input.message}\n"
+                    f"{t('messages', 'collectExperiences.recapPrompt')}"
+                )
             conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
                                                                    context=context,
                                                                    user_input=AgentInput(message=transition_message, is_artificial=True),

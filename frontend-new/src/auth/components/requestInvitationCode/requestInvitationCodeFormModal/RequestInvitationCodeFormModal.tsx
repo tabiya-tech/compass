@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box, Modal, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -41,6 +42,7 @@ const style = {
 
 const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> = ({ open, onClose }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -59,14 +61,11 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
         message,
       });
 
-      enqueueSnackbar(
-        "Your request for access to Compass has been submitted successfully. We will get back to you soon.",
-        {
-          variant: "success",
-        }
-      );
+      enqueueSnackbar(t("auth.components.requestInvitationCodeFormModal.invitationRequestSubmitSuccess"), {
+        variant: "success",
+      });
     } catch (e) {
-      enqueueSnackbar("Something went wrong while attempting to send your request", {
+      enqueueSnackbar(t("auth.components.requestInvitationCodeFormModal.invitationRequestSubmitError"), {
         variant: "error",
       });
       console.error(e);
@@ -90,10 +89,10 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
       >
         <Box display="flex" justifyContent="space-between" alignItems="start">
           <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.MODAL_TITLE}>
-            Request access to Compass
+            {t("auth.components.requestInvitationCodeFormModal.requestAccessTitle")}
           </Typography>
           <PrimaryIconButton
-            title="Close request invitation code form"
+            title={t("auth.components.requestInvitationCodeFormModal.closeRequestInvitationForm")}
             onClick={onClose}
             sx={{
               color: theme.palette.grey[500],
@@ -104,13 +103,13 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
           </PrimaryIconButton>
         </Box>
         <Typography variant="body2" data-testid={DATA_TEST_ID.MODAL_SUBTITLE}>
-          Please let us know how you plan to use Compass. We will carefully review your request and contact you shortly.
+          {t("auth.components.requestInvitationCodeFormModal.requestAccessSubtitle")}
         </Typography>
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label="Name"
-            placeholder="Name"
+            label={t("auth.components.requestInvitationCodeFormModal.name")}
+            placeholder={t("auth.components.requestInvitationCodeFormModal.name")}
             type="text"
             variant="outlined"
             margin="normal"
@@ -121,8 +120,8 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
           />
           <TextField
             fullWidth
-            label="Email"
-            placeholder="Email"
+            label={t("common.fields.email")}
+            placeholder={t("common.fields.email")}
             type="email"
             variant="outlined"
             margin="normal"
@@ -133,8 +132,8 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
           />
           <TextField
             fullWidth
-            label="Message"
-            placeholder="Please share how you plan to use Compass"
+            label={t("auth.components.requestInvitationCodeFormModal.message")}
+            placeholder={t("auth.components.requestInvitationCodeFormModal.messagePlaceholder")}
             variant="outlined"
             margin="normal"
             required
@@ -151,7 +150,7 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
             disabled={!name || !email || !message || !isOnline}
             data-testid={DATA_TEST_ID.SUBMIT_BUTTON}
           >
-            Submit
+            {t("common.buttons.submit")}
           </PrimaryButton>
         </Box>
       </Box>

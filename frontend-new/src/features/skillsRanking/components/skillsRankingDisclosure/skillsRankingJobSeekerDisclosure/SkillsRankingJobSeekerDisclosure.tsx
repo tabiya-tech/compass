@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Typography, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -35,6 +36,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
   skillsRankingState,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const selectedLabel = skillsRankingState.score.comparison_label;
   const selectedIndex = jobSeekerComparisonLabels.findIndex((label) => label === selectedLabel);
 
@@ -69,9 +71,9 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
       await onFinish(newSkillsRankingState);
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
-      enqueueSnackbar("Failed to update skills ranking state. Please try again later.", { variant: "error" });
+      enqueueSnackbar(t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.updateError"), { variant: "error" });
     }
-  }, [currentPhase, onFinish, enqueueSnackbar]);
+  }, [currentPhase, onFinish, enqueueSnackbar,t]);
 
   useEffect(() => {
     if (isReplay || hasFinished) return;
@@ -97,9 +99,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
         <ChatBubble
           sender={ConversationMessageSender.COMPASS}
           message={
-            <>
-              Thanks! We’re double-checking the latest {getJobPlatformUrl()} opportunities so the numbers are accurate. We’ll share your results soon or you can ask for them when we call you for the phone survey.
-            </>
+            t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.pendingMessage", { jobPlatformUrl: getJobPlatformUrl() })
           }
         />
       );
@@ -110,8 +110,25 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
         sender={ConversationMessageSender.COMPASS}
         message={
           <>
-            Moreover, <strong>Compared to other {getJobPlatformUrl()} users, you are in group [{jobSeekerComparisonLabels.indexOf(selectedLabel) + 1}] of {jobSeekerComparisonLabels.length}.</strong><br/>
-            Imagine lining up 100 {getJobPlatformUrl()} users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You’re in block <strong>[{jobSeekerComparisonLabels.indexOf(selectedLabel) + 1}]</strong>, which is the <strong>[{selectedLabel}]</strong> block.<br/>
+            {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart1_prefix")}
+            <strong>{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart1_main", {
+              jobPlatformUrl: getJobPlatformUrl(),
+              groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1,
+              groupTotal: jobSeekerComparisonLabels.length
+            })}</strong>
+            <br/>
+            {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_prefix", {
+              jobPlatformUrl: getJobPlatformUrl()
+            })}
+            <strong>{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_group", {
+              groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1
+            })}</strong>
+            {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_middle")}
+            <strong>{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_label", {
+              comparisonLabel: selectedLabel
+            })}</strong>
+            {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_suffix")}
+            <br/>
           </>
         }
       >

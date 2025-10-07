@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
@@ -53,6 +54,7 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
 
   const hasFinishedRef = useRef(false);
 
+  const { t } = useTranslation();
   const handleContinue = useCallback(async () => {
     if (hasFinishedRef.current) return;
     hasFinishedRef.current = true;
@@ -70,11 +72,11 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
       await onFinish(newState);
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
-      enqueueSnackbar("Failed to update skills ranking state. Please try again later.", {
+      enqueueSnackbar(t("common.errors.updateState"), {
         variant: "error",
       });
     }
-  }, [onFinish, enqueueSnackbar]);
+  }, [onFinish, enqueueSnackbar, t]);
 
   useEffect(() => {
     if (shouldSkip) {
@@ -116,7 +118,7 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
         <ChatBubble
           message={
             <>
-              You meet the key skills for <strong>{skillsRankingState.score.jobs_matching_rank}%</strong> of opportunities advertised on {getJobPlatformUrl()}. That’s a solid range of options!
+              {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message_1")}<strong>{skillsRankingState.score.jobs_matching_rank}%</strong>{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message_2")}{getJobPlatformUrl()}{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message_3")}
             </>
           }
           sender={ConversationMessageSender.COMPASS}

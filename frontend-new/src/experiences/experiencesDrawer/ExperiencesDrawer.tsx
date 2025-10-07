@@ -29,6 +29,7 @@ import CustomLink from "src/theme/CustomLink/CustomLink";
 import RestoreExperiencesDrawer from "src/experiences/experiencesDrawer/components/restoreExperiencesDrawer/RestoreExperiencesDrawer";
 import { ExperienceError } from "src/error/commonErrors";
 import RestoreIcon from "src/theme/Icons/RestoreIcon";
+import { useTranslation } from "react-i18next";
 
 const LazyLoadedDownloadDropdown = lazyWithPreload(
   () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown")
@@ -93,6 +94,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
 }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [personalInfo, setPersonalInfo] = useLocalStorage("personalInfo", {
@@ -187,9 +189,9 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       // Refresh the experiences
       await onExperiencesUpdated();
 
-      enqueueSnackbar("Experience deleted successfully!", { variant: "success" });
+      enqueueSnackbar(t("experiences.experiencesDrawer.deleteSuccess"), { variant: "success" });
     } catch (error) {
-      let errorMessage = "Failed to delete experience.";
+      let errorMessage = t("experiences.experiencesDrawer.deleteFailed");
 
       if (error instanceof RestAPIError) {
         errorMessage = getUserFriendlyErrorMessage(error);
@@ -218,7 +220,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     const sessionId = userPreferencesStateService.getActiveSessionId();
 
     if (!sessionId) {
-      enqueueSnackbar("User has no sessions", { variant: "error" });
+      enqueueSnackbar(t("experiences.experiencesDrawer.userHasNoSessions"), { variant: "error" });
       setIsRestoringExperience(false);
       return;
     }
@@ -244,11 +246,11 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         })),
       });
 
-      enqueueSnackbar("Experience restored successfully!", { variant: "success" });
+      enqueueSnackbar(t("experiences.experiencesDrawer.restoreSuccess"), { variant: "success" });
       await onExperiencesUpdated();
     } catch (error) {
       console.error(new ExperienceError("Failed to restore experience:", error));
-      enqueueSnackbar("Failed to restore experience.", { variant: "error" });
+      enqueueSnackbar(t("experiences.experiencesDrawer.restoreFailed"), { variant: "error" });
     } finally {
       setIsRestoringExperience(false);
       setExperienceToRestoreToOriginal(null);
@@ -266,24 +268,24 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     const experienceService = ExperienceService.getInstance();
     const userPreferences = userPreferencesStateService.getUserPreferences();
     if (!userPreferences?.sessions.length) {
-      enqueueSnackbar("User has no sessions", { variant: "error" });
+      enqueueSnackbar(t("experiences.experiencesDrawer.userHasNoSessions"), { variant: "error" });
       setIsRestoringExperience(false);
       return;
     }
     const sessionId = userPreferencesStateService.getActiveSessionId();
     if (!sessionId) {
-      enqueueSnackbar("No active session found", { variant: "error" });
+      enqueueSnackbar(t("experiences.experiencesDrawer.noActiveSession"), { variant: "error" });
       setIsRestoringExperience(false);
       return;
     }
     try {
       await experienceService.restoreDeletedExperience(sessionId, experience.UUID);
       console.info("Deleted experience restored successfully", { experienceId: experience.UUID });
-      enqueueSnackbar("Experience restored successfully!", { variant: "success" });
+      enqueueSnackbar(t("experiences.experiencesDrawer.restoreSuccess"), { variant: "success" });
       await onExperiencesUpdated();
     } catch (error) {
       console.error(new ExperienceError("Failed to restore experience:", error));
-      enqueueSnackbar("Failed to restore experience.", { variant: "error" });
+      enqueueSnackbar(t("experiences.experiencesDrawer.restoreFailed"), { variant: "error" });
     } finally {
       setIsRestoringExperience(false);
     }
@@ -297,8 +299,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     return sortedExperiences.filter((experience) => experience.exploration_phase === DiveInPhase.PROCESSED);
   }, [sortedExperiences]);
 
-  const tooltipText =
-    "The fields are prefilled with information you may have provided earlier and are stored securely on your device. Fill in missing details to personalize your CV.";
+  const tooltipText = t("experiences.experiencesDrawer.personalInfoTooltip");
 
   // Disable download button if no explored experiences are available
   const disableDownloadButton = useMemo(() => exploredExperiences.length < 1, [exploredExperiences.length]);
@@ -338,7 +339,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
           sx={{ minHeight: "100%" }}
         >
           <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-            <ExperiencesDrawerHeader notifyOnClose={handleClose} title={"Experiences and Skills"} />
+            <ExperiencesDrawerHeader notifyOnClose={handleClose} title={t("experiences.experiencesDrawer.andSkillsTitle")} />
             <Box display="flex" flexDirection="column" alignItems="end" justifyContent="flex-end">
               <Suspense
                 fallback={
@@ -358,31 +359,31 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
             </Box>
           </Box>
           <Box display="flex" flexDirection="column" gap={2}>
-            <CustomAccordion title="Personal Information" tooltipText={tooltipText}>
+            <CustomAccordion title={t("experiences.experiencesDrawer.personalInformationTitle")} tooltipText={tooltipText}>
               <Typography variant="h6" data-testid={DATA_TEST_ID.PERSONAL_INFORMATION_TITLE} sx={{ display: "none" }}>
-                Personal Information
+                {t("experiences.experiencesDrawer.personalInformationTitle")}
               </Typography>
               <CustomTextField
-                label="Name:"
-                placeholder="Enter your name here"
+                label={`${t("experiences.experiencesDrawer.personalInfo.nameLabel")}`}
+                placeholder={t("experiences.experiencesDrawer.personalInfo.namePlaceholder")}
                 value={personalInfo.fullName}
                 onChange={handleInputChange("fullName")}
               />
               <CustomTextField
-                label="Email:"
-                placeholder="Enter your email here"
+                label={`${t("experiences.experiencesDrawer.personalInfo.emailLabel")}`}
+                placeholder={t("experiences.experiencesDrawer.personalInfo.emailPlaceholder")}
                 value={personalInfo.contactEmail}
                 onChange={handleInputChange("contactEmail")}
               />
               <CustomTextField
-                label="Phone:"
-                placeholder="Enter your phone number here"
+                label={`${t("experiences.experiencesDrawer.personalInfo.phoneLabel")}`}
+                placeholder={t("experiences.experiencesDrawer.personalInfo.phonePlaceholder")}
                 value={personalInfo.phoneNumber}
                 onChange={handleInputChange("phoneNumber")}
               />
               <CustomTextField
-                label="Address:"
-                placeholder="Enter your address here"
+                label={`${t("experiences.experiencesDrawer.personalInfo.addressLabel")}`}
+                placeholder={t("experiences.experiencesDrawer.personalInfo.addressPlaceholder")}
                 value={personalInfo.address}
                 onChange={handleInputChange("address")}
               />
@@ -408,7 +409,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                   <Typography variant="h1" textAlign={"center"}>
                     🤷‍♀️
                   </Typography>
-                  <Typography>We haven't yet discovered any experiences so far, Let's continue chatting.</Typography>
+                  <Typography>{t("experiences.experiencesDrawer.emptyStateMessage")}</Typography>
                 </Box>
               )}
 
@@ -451,7 +452,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                     icon={<QuizIcon />}
                     title={ReportContent.UNCATEGORIZED_TITLE}
                     experiences={groupedExperiences.uncategorizedExperiences}
-                    tooltipText="Based on the conversation, these experiences couldn't be automatically categorized."
+                    tooltipText={t("experiences.experiencesDrawer.uncategorizedTooltip")}
                     onEditExperience={handleEditExperience}
                     onDeleteExperience={handleDeleteExperience}
                     onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
@@ -478,7 +479,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
               }}
             >
               <RestoreIcon color={theme.palette.text.primary} />
-              Restore deleted experiences
+              {t("experiences.experiencesDrawer.restoreDeletedLink")}
             </CustomLink>
           </Box>
         </Box>
@@ -502,48 +503,43 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         {renderDrawerContent()}
       </Drawer>
       <ConfirmModalDialog
-        title="Unsaved Changes"
-        content={<>You have unsaved changes. Are you sure you want to close without saving?</>}
+        title={t("experiences.experiencesDrawer.unsavedChanges.title")}
+        content={<>{t("experiences.experiencesDrawer.unsavedChanges.content")}</>}
         isOpen={showConfirmDialog}
         onCancel={handleConfirmClose}
         onConfirm={() => setShowConfirmDialog(false)}
         onDismiss={() => setShowConfirmDialog(false)}
-        cancelButtonText="Close"
-        confirmButtonText="Keep Editing"
+        cancelButtonText={t("experiences.experiencesDrawer.unsavedChanges.closeButton")}
+        confirmButtonText={t("experiences.experiencesDrawer.unsavedChanges.keepEditingButton")}
         showCloseIcon={true}
         data-testid={DATA_TEST_ID.UNSAVED_CHANGES_DIALOG}
       />
       <ConfirmModalDialog
         isOpen={showDeleteConfirmDialog}
-        title="Delete Experience"
-        content={<>Are you sure you want to delete this experience? This action cannot be undone.</>}
+        title={t("experiences.experiencesDrawer.delete.title")}
+        content={<>{t("experiences.experiencesDrawer.delete.content")}</>}
         onConfirm={confirmDeleteExperience}
         onDismiss={() => setShowDeleteConfirmDialog(false)}
         onCancel={() => setShowDeleteConfirmDialog(false)}
-        confirmButtonText="Delete"
-        cancelButtonText="Cancel"
+        confirmButtonText={t("experiences.experiencesDrawer.delete.confirmButton")}
+  cancelButtonText={t("common.buttons.cancel")}
         showCloseIcon
         data-testid={DATA_TEST_ID.DELETE_EXPERIENCE_DIALOG}
       />
       <ConfirmModalDialog
         isOpen={showRestoreToOriginalConfirmDialog}
-        title="Revert Experience"
-        content={
-          <>
-            Are you sure you want to revert this experience to its unedited version? This will overwrite any changes
-            you've made.
-          </>
-        }
+        title={t("experiences.experiencesDrawer.revert.title")}
+        content={<>{t("experiences.experiencesDrawer.revert.content")}</>}
         onConfirm={confirmRestoreToOriginalExperience}
         onDismiss={cancelRestoreToOriginalExperience}
         onCancel={cancelRestoreToOriginalExperience}
-        confirmButtonText="Revert"
-        cancelButtonText="Cancel"
+        confirmButtonText={t("experiences.experiencesDrawer.revert.confirmButton")}
+  cancelButtonText={t("common.buttons.cancel")}
         showCloseIcon
         data-testid={DATA_TEST_ID.RESTORE_TO_ORIGINAL_CONFIRM_DIALOG}
       />
-      <Backdrop isShown={isDeletingExperience} message="Deleting experience..." />
-      <Backdrop isShown={isRestoringExperience} message="Restoring experience..." />
+      <Backdrop isShown={isDeletingExperience} message={t("experiences.experiencesDrawer.deletingBackdrop")} />
+      <Backdrop isShown={isRestoringExperience} message={t("experiences.experiencesDrawer.restoringBackdrop")} />
     </>
   );
 };

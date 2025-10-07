@@ -4,8 +4,9 @@ import "src/_test_utilities/consoleMock";
 import { useNavigate } from "react-router-dom";
 import { render, screen, waitFor, userEvent, act } from "src/_test_utilities/test-utils";
 import { getRandomString, getTestString } from "src/_test_utilities/specialCharacters";
+import i18n from "src/i18n/i18n";
 
-import SensitiveDataForm, { DATA_TEST_ID, ERROR_MESSAGE } from "./SensitiveDataForm";
+import SensitiveDataForm, { DATA_TEST_ID } from "./SensitiveDataForm";
 import { DATA_TEST_ID as BACKDROP_DATA_TEST_IDS } from "src/theme/Backdrop/Backdrop";
 import { DATA_TEST_ID as CONFIRM_MODAL_DATA_TEST_IDS } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 
@@ -776,10 +777,13 @@ describe("Sensitive Data Form", () => {
       const submitButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON);
       await user.click(submitButton);
 
-      // THEN the specific error message for encrypted data too large should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(ERROR_MESSAGE.ENCRYPTED_DATA_TOO_LARGE, {
-        variant: "error",
-      });
+      // THEN the specific error message for encrypted data too large should be shown (via i18n)
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        i18n.t("sensitiveData.components.sensitiveDataForm.errorEncryptedDataTooLarge"),
+        {
+          variant: "error",
+        }
+      );
     });
 
     it("should handle missing user preferences error", async () => {
@@ -792,7 +796,10 @@ describe("Sensitive Data Form", () => {
       expect(() => componentRender()).toThrowError(new UserPreferenceError("User preferences not found"));
 
       // THEN an error message should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(ERROR_MESSAGE.DEFAULT, { variant: "error" });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        i18n.t("sensitiveData.components.sensitiveDataForm.errorDefault"),
+        { variant: "error" }
+      );
     });
 
     it("should handle logout error when rejecting sensitive data", async () => {

@@ -8,7 +8,7 @@ from app.agent.agent_types import LLMStats
 from app.agent.collect_experiences_agent.data_extraction_llm import clean_string_field
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
-from app.agent.prompt_template import sanitize_input
+from app.agent.prompt_template import sanitize_input, get_language_style
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
@@ -80,7 +80,7 @@ class EntityExtractionTool:
             temperature_config = {}
 
         return GeminiGenerativeLLM(
-            system_instructions=_SYSTEM_INSTRUCTIONS,
+            system_instructions=_SYSTEM_INSTRUCTIONS.format(language_style=get_language_style()),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000
@@ -118,7 +118,7 @@ class EntityExtractionTool:
 
             return data, penality, error
 
-        result, _result_penalty, _error = await Retry[str].call_with_penalty(callback=_callback, logger=self._logger)
+        result, _result_penalty, _error = await Retry[ExtractedData].call_with_penalty(callback=_callback, logger=self._logger)
 
         return result, _llm_stats
 
@@ -164,6 +164,8 @@ _SYSTEM_INSTRUCTIONS = """
 #Role
     You are an expert who extracts basic information regarding the job seeker's work experience Based on the questions asked and the answers provided.
     Do not over-suggest any information, only extract the ones provided explicitly by the user.
+    
+{language_style}
         
 #Extract data instructions
     Make sure you are extracting information about experiences that should be added to the 'experience_details' field.

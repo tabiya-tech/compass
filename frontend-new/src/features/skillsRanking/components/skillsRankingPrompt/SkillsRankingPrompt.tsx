@@ -11,6 +11,7 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "@mui/material/styles";
+import { useTranslation, Trans } from "react-i18next";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
@@ -42,6 +43,7 @@ export interface SkillsRankingPromptProps {
 const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onFinish, skillsRankingState }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
+  const { t } = useTranslation();
 
   const [step, setStep] = useState<PromptStep>(PromptStep.INITIAL_TYPING);
   const scrollRef = useAutoScrollOnChange(step);
@@ -65,11 +67,9 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
       await onFinish(newSkillsRankingState);
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
-      enqueueSnackbar("Failed to update skills ranking state. Please try again later.", {
-        variant: "error",
-      });
+      enqueueSnackbar(t("common.errors.updateState"), { variant: "error" });
     }
-  }, [isReplay, onFinish, enqueueSnackbar]);
+  }, [isReplay, onFinish, enqueueSnackbar, t]);
 
   useEffect(() => {
     if (isReplay) return;
@@ -90,19 +90,18 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
     return () => clearTimeout(timeoutId);
   }, [step, isReplay, handleAdvanceState]);
 
-  const PromptMessage = () => {
-    return (
-      <ChatBubble
-        message={
-          <>
-            <strong>Almost done!</strong> Answer a few more research questions and we’ll send you{" "}
-            <strong>{compensationAmount} </strong> airtime once you have completed all tasks.
-          </>
-        }
-        sender={ConversationMessageSender.COMPASS}
-      />
-    );
-  };
+  const PromptMessage = () => (
+    <ChatBubble
+      message={
+        <Trans
+          i18nKey="features.skillsRanking.components.skillsRankingPrompt.mainMessage"
+          components={[<strong />]}
+          values={{ compensationAmount }}
+        />
+      }
+      sender={ConversationMessageSender.COMPASS}
+    />
+  );
 
   return (
     <MessageContainer

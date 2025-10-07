@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import MobileStepper from "@mui/material/MobileStepper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import feedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
+import getFeedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
 import StepsComponent from "src/feedback/overallFeedback/feedbackForm/components/stepsComponent/StepsComponent";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
@@ -32,12 +33,17 @@ export const DATA_TEST_ID = {
 
 const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
+  
+  // Memoize the steps to avoid recreating on every render
+  const feedbackFormContentSteps = useMemo(() => getFeedbackFormContentSteps(t), [t]);
+  
   const [activeStep, setActiveStep] = useState(0);
   const [answers, setAnswers] = useState<FeedbackItem[]>(() => {
     return PersistentStorageService.getOverallFeedback();
   });
   // We want to know the previous step to know the direction of the swipe
-  // if the previous tep is greater than the active step, the swipe is to the left
+  // if the previous step is greater than the active step, the swipe is to the left
   // if the previous step is less than the active step, the swipe is to the right
   const [prevStep, setPrevStep] = useState(activeStep);
 
@@ -200,7 +206,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
             style={{ width: 100 }}
             data-testid={DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON}
           >
-            {activeStep === maxSteps - 1 ? "Submit" : "Next"}
+            {activeStep === maxSteps - 1 ? t("common.buttons.submit") : t("feedback.overallFeedback.feedbackForm.components.feedbackFormContent.next")}
           </PrimaryButton>
         }
         backButton={
@@ -209,7 +215,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
             disabled={activeStep === 0}
             data-testid={DATA_TEST_ID.FEEDBACK_FORM_BACK_BUTTON}
           >
-            Previous
+            {t("feedback.overallFeedback.feedbackForm.components.feedbackFormContent.previous")}
           </SecondaryButton>
         }
         sx={{ padding: 0 }}

@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from app.agent.experience import WorkType
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
+from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.countries import Country, get_country_glossary
 from app.vector_search.esco_entities import SkillEntity
@@ -59,6 +60,8 @@ class ExperienceSummarizer:
         <System Instructions>
             You are a CV summarization expert summarizing the work/livelihood experience of a user.
             
+            {language_style}
+                                                
             # Task
                 Your task is to generate a concise summary of the users experience in a short paragraph that will be used for the CV
                 of the user. Stay focused on the user's work experience and avoid mentioning personal details. 
@@ -84,6 +87,7 @@ class ExperienceSummarizer:
             """)
         return replace_placeholders_with_indent(
             _summarize_system_instructions,
+            language_style=get_language_style(),
             country_instructions=_country_instructions
         )
 

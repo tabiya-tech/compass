@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import * as Sentry from "@sentry/react";
 import { Box, styled, useMediaQuery, Theme } from "@mui/material";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
@@ -36,6 +37,7 @@ const StyledPrimaryIconButton = styled(PrimaryIconButton)(({ theme }) => ({
 }));
 
 const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, className }) => {
+  const { t } = useTranslation();
   const [bugReport, setBugReport] = useState<any>();
   const buttonRef = useRef<HTMLDivElement>(null);
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -72,17 +74,17 @@ const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, classNam
       >
         {" "}
         {isMobile ? (
-          <StyledPrimaryIconButton title={"Report a bug."} data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}>
+          <StyledPrimaryIconButton title={t("feedback.bugReport.reportBug")} data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}>
             <BugReport data-testid={DATA_TEST_ID.BUG_REPORT_ICON} />
           </StyledPrimaryIconButton>
         ) : (
           <PrimaryButton
             disableWhenOffline={true}
             startIcon={<BugReport data-testid={DATA_TEST_ID.BUG_REPORT_ICON} />}
-            title={"Report a bug."}
+            title={t("feedback.bugReport.reportBug")+"."}
             data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}
           >
-            Report a bug
+            {t("feedback.bugReport.reportBug")}
           </PrimaryButton>
         )}
       </Box>

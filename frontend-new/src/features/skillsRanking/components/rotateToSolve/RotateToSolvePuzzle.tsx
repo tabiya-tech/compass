@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, keyframes, Theme, Typography, useTheme, useMediaQuery } from "@mui/material";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import RotateRightIcon from "@mui/icons-material/RotateRight";
@@ -77,6 +78,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
   const [isCelebrating, setIsCelebrating] = useState(false);
   const [showCompletionMessage, setShowCompletionMessage] = useState(false);
   const [completionMessage, setCompletionMessage] = useState("");
+  const { t } = useTranslation();
   const [isAllComplete, setIsAllComplete] = useState(false);
   const [clicksCount, setClicksCount] = useState(initialClicksCount);
   const [correctRotations, setCorrectRotations] = useState(0);
@@ -184,7 +186,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
       const nextPuzzle = puzzleIndex + 1;
       const completedInSession = nextPuzzle - initialPuzzlesSolved;
       if (completedInSession >= puzzles) {
-        setCompletionMessage("All puzzles complete! Well done!");
+        setCompletionMessage(t("features.skillsRanking.components.rotateToSolve.allCompleteMessage"));
         setIsAllComplete(true);
         setShowCompletionMessage(true);
         // Don't hide the completion message for final puzzle
@@ -194,9 +196,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           onSuccess();
         }, PUZZLE_FEEDBACK_DURATION);
       } else {
-        setCompletionMessage(
-          "Puzzle complete! Please solve another one or cancel if you are not that interested in the information."
-        );
+        setCompletionMessage(t("features.skillsRanking.components.rotateToSolve.puzzleCompleteMessage"));
         setShowCompletionMessage(true);
         setTimeout(() => {
           setIsCelebrating(false);
@@ -232,9 +232,9 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
     if (isReplay && isReplayFinished) {
       setIsAllComplete(true);
       setShowCompletionMessage(true);
-      setCompletionMessage("All puzzles complete! Well done!");
+      setCompletionMessage(t("features.skillsRanking.components.rotateToSolve.allCompleteMessage"));
     }
-  }, [isReplay, isReplayFinished]);
+  }, [isReplay, isReplayFinished, t]);
 
   // No cleanup needed since we removed the activity timeout
 
@@ -246,12 +246,13 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
       data-testid={DATA_TEST_ID.CONTAINER}
     >
+  
       <Typography variant="body1" color="text.secondary" data-testid={DATA_TEST_ID.INSTRUCTION_TEXT}>
-        Rotate each letter until it’s upright. Select a letter by clicking on it, then rotate it clockwise with{" "}
-        <RotateRightIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} /> or counterclockwise with{" "}
+        {t("features.skillsRanking.components.rotateToSolve.instructions1")}{" "}
+        <RotateRightIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />{t("features.skillsRanking.components.rotateToSolve.instructions2")}{" "}
         <RotateLeftIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />.
       </Typography>
-
+      
       <Box
         display="flex"
         gap={1.5}
@@ -312,7 +313,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           onClick={() => updateCharacterRotation(-rotationStep)}
           disabled={disabled || isReplay || isAllComplete}
           sx={{ color: theme.palette.common.black }}
-          aria-label="Rotate character counterclockwise"
+          aria-label={t("features.skillsRanking.components.rotateToSolve.rotateLeftAria")}
           data-testid={DATA_TEST_ID.ROTATE_LEFT_BUTTON}
         >
           <RotateLeftIcon />
@@ -322,7 +323,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           onClick={() => updateCharacterRotation(rotationStep)}
           disabled={disabled || isReplay || isAllComplete}
           sx={{ color: theme.palette.common.black }}
-          aria-label="Rotate character clockwise"
+          aria-label={t("features.skillsRanking.components.rotateToSolve.rotateRightAria")}
           data-testid={DATA_TEST_ID.ROTATE_RIGHT_BUTTON}
         >
           <RotateRightIcon />
@@ -349,7 +350,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           sx={{ flexShrink: 0 }}
           data-testid={DATA_TEST_ID.CANCEL_BUTTON}
         >
-          Cancel
+          {t("common.buttons.cancel")}
         </PrimaryButton>
 
         {/* Status message on the left (appears second due to row-reverse) */}

@@ -22,6 +22,7 @@ import { TokenValidationFailureCause } from "src/auth/services/Authentication.se
 import { AuthenticationError } from "src/error/commonErrors";
 import { routerPaths } from "src/app/routerPaths";
 import brotliPromise from "brotli-wasm";
+import i18n from "src/i18n/i18n"; 
 
 // Mock the dynamic import
 jest.mock("src/auth/services/Authentication.service.factory", () => ({
@@ -881,9 +882,9 @@ describe("Api Service tests", () => {
       // AND logout should be called
       expect(mockAuthService.logout).toHaveBeenCalled();
 
-      // AND enqueueSnackbar should not be called with log out message.
+      // AND enqueueSnackbar should be called with i18n-based log out message
       expect(enqueueSnackbar).toHaveBeenCalledWith(
-        `${ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.AUTHENTICATION_FAILURE} We are logging you out ....`,
+        `${i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS.AUTHENTICATION_FAILURE)} ${i18n.t("auth.loggingYouOutNotice")}`,
         {
           autoHideDuration: LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
           variant: "error",

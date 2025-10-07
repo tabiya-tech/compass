@@ -1,0 +1,754 @@
+{
+  "common": {
+    "buttons": {
+      "login": "Iniciar sesión",
+      "logout": "Cerrar sesión",
+      "submit": "Enviar",
+      "register": "Registrarse",
+      "startNewConversation": "Iniciar nueva conversación",
+      "settings": "Configuración",
+      "cancel": "Cancelar",
+      "confirm": "Sí, estoy seguro",
+      "backToLogin": "Volver a iniciar sesión",
+      "save": "Guardar",
+      "goBack": "Volver",
+      "restore": "Restaurar",
+      "revert": "Revertir",
+      "continue": "Continuar",
+      "noThankYou": "No, gracias",
+      "iWantToStay": "Quiero quedarme",
+      "yes": "Sí",
+      "no": "No",
+      "skip": "Omitir",
+      "yesExit": "Sí, salir"
+    },
+    "fields": {
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirmEmail": "Confirmar correo"
+    },
+    "validation": {
+      "validEmailRequired": "Por favor ingresa una dirección de correo válida",
+      "emailsDoNotMatch": "Los correos no coinciden",
+      "passwordMinLength": "La contraseña debe tener al menos 8 caracteres.",
+      "passwordNeedLowercase": "La contraseña debe incluir al menos una letra minúscula.",
+      "passwordNeedUppercase": "La contraseña debe incluir al menos una letra mayúscula.",
+      "passwordNeedNumber": "La contraseña debe incluir al menos un número.",
+      "passwordNeedSpecialChar": "La contraseña debe incluir al menos un carácter especial como: !@#$%*& etc."
+    },
+    "chat": {
+      "errors": {
+        "messageLimit": "El límite del mensaje es de {{max}} caracteres.",
+        "invalidSpecialCharacters": "Caracteres especiales no válidos: {{chars}}"
+      }
+    },
+    "time": {
+      "onDate": "el {{date}}",
+      "yesterday": "ayer",
+      "daySingular": "día",
+      "dayPlural": "días",
+      "hourSingular": "hora",
+      "hourPlural": "horas",
+      "minuteSingular": "minuto",
+      "minutePlural": "minutos",
+      "ago": "hace {{time}}",
+      "justNow": "justo ahora"
+    },
+    "upload": {
+      "errors": {
+        "maxFileSize": "Selected file is too large. Maximum size is 3 MB.",
+        "tooDense": "The uploaded file content is too long to process. Please reduce its length and try again.",
+        "emptyParse": "We couldn't detect experiences in your CV. Please check the file and try again.",
+        "generic": "Failed to parse your CV. Please try again or use a different file.",
+        "rateLimit": "Too many uploads at once. Please wait one minute and try again.",
+        "maxUploadsReached": "You've reached the maximum number of CV uploads for this conversation. Further uploads aren't allowed.",
+        "duplicate": "This CV has already been uploaded. Select it from your previously uploaded CVs.",
+        "unsupportedFileType": "Unsupported file type. Allowed: PDF, DOCX, TXT.",
+        "timeout": "The upload timed out. Please try again.",
+        "unauthorized": "You are not authorized. Please sign in again.",
+        "uploadNotFound": "Upload not found. It may have failed to start.",
+        "cvMarkdownTooLong": "Your CV content is too long. Please shorten your CV and try again."
+      }
+    },
+    "errors": {
+      "updateState": "No se pudo actualizar el estado del ranking de habilidades. Por favor inténtalo más tarde.",
+      "generic": "Algo salió mal. Por favor inténtalo de nuevo.",
+      "api": {
+        "requestTooLong": "Los datos enviados al servicio parecen ser demasiado grandes. Intentá nuevamente con un contenido más pequeño. Si el problema persiste, limpiá la caché de tu navegador y actualizá la página.",
+        "tooManyRequests": "Parece que estás realizando demasiadas solicitudes. Intentá nuevamente más tarde.",
+        "unexpectedError": "Ocurrió un error inesperado. Intentá nuevamente más tarde.",
+        "serverConnectionError": "No se puede conectar con el servicio. Verificá tu conexión a Internet o intentá más tarde.",
+        "resourceNotFound": "El recurso solicitado no fue encontrado. Limpiá la caché de tu navegador y actualizá la página.",
+        "authenticationFailure": "Parece que no iniciaste sesión. Iniciá sesión para continuar.",
+        "permissionDenied": "Parece que no tenés los permisos necesarios. Cerrá sesión y volvé a iniciar sesión.",
+        "unableToProcessResponse": "Tuvimos un problema al procesar los datos. Limpiá la caché del navegador y actualizá la página o intentá más tarde.",
+        "serviceUnavailable": "El servicio no está disponible en este momento. Intentá nuevamente más tarde.",
+        "dataValidationError": "Parece haber un problema con tu solicitud. Si estás enviando datos, asegurate de que sean válidos e intentá nuevamente. Si el problema persiste, limpiá la caché de tu navegador y actualizá la página.",
+        "unableToProcessRequest": "Disculpas. Algo salió mal al procesar tu solicitud."
+      }
+    },
+    "status": {
+      "calculating": "Calculando",
+      "cancelling": "Cancelando",
+      "saving": "Guardando"
+    },
+    "backdrop": {
+      "loggingYouOut": "Cerrando sesión..."
+    },
+    "modal": {
+      "areYouSure": "¿Estás seguro?",
+      "areYouSureYouWantToExit": "¿Estás seguro de que quieres salir?"
+    }
+  },
+  "chat": {
+    "chatMessageField": {
+      "addActionAriaLabel": "añadir",
+      "moreActionsTooltip": "más acciones",
+      "sendMessageTooltip": "enviar mensaje",
+      "placeholders": {
+        "chatFinished": "La conversación ha finalizado. No puedes enviar más mensajes.",
+        "aiTyping": "La IA está escribiendo..., espera a que termine.",
+        "offline": "Estás desconectado. Conéctate a Internet para enviar un mensaje.",
+        "default": "Escribe tu mensaje...",
+        "uploading": "Subiendo CV..."
+      },
+      "uploadCvIntro": "You can upload your CV as soon as we start exploring your experiences",
+      "uploadCvCollectExperiences": "PDF, DOCX, TXT • Máximo {{MAX_FILE_SIZE_MB}} MB • {{MAX_MARKDOWN_CHARS}} caracteres como límite",
+      "uploadCvOtherPhase": "CV upload is only available during experience collection",
+      "uploadCvLabel": "Upload CV",
+      "viewUploadedLabel": "Previously uploaded CVs"
+    },
+    "chatMessage": {
+      "typingChatMessage": {
+        "typing": "Escribiendo",
+        "thinking": "La IA está pensando, por favor espera"
+      },
+      "conversationConclusionFooter": {
+        "youCanNow": "Ahora puedes",
+        "viewAndDownloadCv": "Ver y descargar tu CV",
+        "here": "aquí.",
+        "createAccountIntro": "Si te gustaría explorar tus habilidades y experiencias en el futuro, puedes",
+        "createAccount": "Crear una cuenta",
+        "verificationReminder": "Se ha enviado un correo de verificación a tu dirección de correo electrónico. Por favor verifica tu cuenta antes de iniciar sesión nuevamente.",
+        "feedbackWelcome": "Nos encantaría recibir más",
+        "feedbackLinkText": "comentarios",
+        "feedbackFromYouSuffix": "de tu parte. ¡Solo toma 5 minutos y nos ayuda a mejorar!",
+        "feedbackInProgressPrefix": "Por favor",
+        "feedbackInProgressLinkText": "Completa tus comentarios",
+        "feedbackInProgressSuffix": "para ayudarnos a mejorar tu experiencia!"
+      },
+      "sent": "enviado "
+    },
+    "chat": {
+      "notifications": {
+        "experiencesFetchFailed": "No se pudieron obtener las experiencias",
+        "logoutSuccess": "Sesión cerrada correctamente.",
+        "startConversationFailed": "Error al iniciar nueva conversación",
+        "startConversationSuccess": "Nueva conversación iniciada"
+      },
+      "backdrop": {
+        "loggingOut": "Cerrando tu sesión, espera un momento..."
+      },
+      "startNewConversationDialog": {
+        "title": "¿Iniciar nueva conversación?",
+        "content": "Una vez que inicies una nueva conversación, todos los mensajes de la conversación actual se perderán para siempre.",
+        "confirmation": "¿Estás seguro de que deseas iniciar una nueva conversación?"
+      }
+    },
+    "chatProgressbar": {
+      "labels": {
+        "workTypes": "tipos de trabajo",
+        "experiences": "experiencias"
+      },
+      "phases": {
+        "initializing": "Inicializando...",
+        "intro": "Introducción",
+        "collecting": "Recopilando",
+        "exploring": "Explorando",
+        "finished": "Conversación finalizada",
+        "unknown": "Fase desconocida"
+      }
+    },
+    "util": {
+      "feedbackThankYou": "Gracias por tomarte el tiempo de compartir tus valiosos comentarios.",
+      "ratingThankYou": "Gracias por calificar Compass.",
+      "errorSomethingWentWrong": "Lo siento, parece que algo salió mal de mi lado... ¿Puedes actualizar la página e intentarlo de nuevo?",
+      "errorPleaseRepeat": "Lo siento, parece que algo salió mal de mi lado... ¿Puedes repetir eso?",
+      "messages": {
+        "experiencesIntro": "Estas son mis experiencias:"
+      }
+    },
+    "reaction": {
+      "components": {
+        "dislikeReasonPopover": {
+          "title": "Por favor, dinos ¿cuál es el problema?",
+          "closeButton": "cerrar comentarios",
+          "reasons": {
+            "inappropriateTone": "Tono inapropiado",
+            "offensiveLanguage": "Lenguaje ofensivo",
+            "biased": "Parcial",
+            "incorrectInformation": "Información incorrecta",
+            "irrelevant": "Irrelevante",
+            "confusing": "Confuso"
+          }
+        },
+        "reactionButtons": {
+          "likeLabel": "me gusta",
+          "dislikeLabel": "no me gusta",
+          "errors": {
+            "submitLike": "No se pudo enviar la valoración positiva. Por favor, inténtalo de nuevo.",
+            "removeLike": "No se pudo eliminar la valoración positiva. Por favor, inténtalo de nuevo.",
+            "submitDislike": "No se pudo enviar la valoración negativa. Por favor, inténtalo de nuevo.",
+            "removeDislike": "No se pudo eliminar la valoración negativa. Por favor, inténtalo de nuevo."
+          }
+        }
+      }
+    },
+    "cvUploadPolling": {
+      "uploadingCv": "Uploading CV",
+      "cancelled": "CV upload cancelled",
+      "uploadedSuccessfully": "CV uploaded successfully",
+      "converting": "Converting CV",
+      "processing": "Processing CV",
+      "extractingExperiences": "Extracting experiences",
+      "savingCv": "Saving CV",
+      "failed": "CV upload failed",
+      "failedToStart": "Failed to start upload.",
+      "networkErrorStatus": "Network error while checking upload status.",
+      "failedToCancel": "Failed to cancel upload",
+      "uploadingFileNamed": "Uploading {{filename}}...",
+      "thinkingMessage": "Processing your CV, this might take a while..."
+    },
+    "chatHeader": {
+      "viewExperiences": "Ver experiencias",
+      "feedbackMessage": "¡Nos encantaría conocer tus comentarios sobre tu experiencia hasta ahora!",
+      "giveFeedback": "Dar comentarios",
+      "feedbackMessagePlaceholder": "¡Nos encantaría conocer tu opinión! Comparte cualquier comentario o sugerencia para mejorar Compass.",
+      "sendFeedback": "Enviar comentarios",
+      "feedbackSuccessMessage": "¡Gracias por tus comentarios!",
+      "formTitle": "Dar comentarios generales",
+      "giveGeneralFeedback": "Dar comentarios generales",
+      "userInfo": "Información del usuario",
+      "userIconAlt": "Icono de usuario",
+      "beforeYouGo": "Antes de irte",
+      "logoutConfirmationMessage": "¿Estás seguro de que deseas cerrar sesión?",
+      "anonymousAccountWarning": "Actualmente estás usando una cuenta anónima. Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
+      "logoutWarningAnonymous": "Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
+      "createAccountToSaveProgress": "Crea una cuenta para guardar tu progreso",
+      "continueYourJourneyLater": "y continuar tu experiencia más tarde.",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "emailLabel": "Correo electrónico",
+      "descriptionLabel": "Descripción",
+      "emailPlaceholder": "tu.correo@ejemplo.org",
+      "addScreenshot": "Agregar una captura de pantalla",
+      "requiredLabel": "(obligatorio)",
+      "cancelButton": "Cancelar"
+    }
+  },
+  "auth": {
+    "pages": {
+      "login": {
+        "welcomeTitle": "¡Bienvenido a Compass!",
+        "welcomeBack": "¡Bienvenido de nuevo!",
+        "loginToYourAccountToContinue": "Inicia sesión en tu cuenta para continuar",
+        "loginUsing": "Inicia sesión usando",
+        "loggingYouIn": "Iniciando sesión...",
+        "loggingInAria": "Iniciando sesión",
+        "dontHaveAnAccount": "¿No tienes una cuenta?",
+        "fillInEmailAndPassword": "Por favor, rellene los campos de correo electrónico y contraseña",
+        "orLoginToYourAccountToContinue": "O inicia sesión en tu cuenta para continuar",
+        "or": "o",
+        "components": {
+          "loginWithInviteCodeForm": {
+            "loginCode": "Código de inicio de sesión"
+          }
+        }
+      },
+      "register": {
+        "subtitle": "Necesitamos algo de información para comenzar",
+        "registerWithGoogle": "Registrarse con Google",
+        "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+        "registeringYou": "Registrándote...",
+        "enterRegistrationCode": "Ingresa tu código de registro",
+        "registrationCode": "Código de registro",
+        "andEitherContinueWith": "o continúa con",
+        "components": {
+          "registerWithEmailForm": {
+            "registeringAria": "Registrando"
+          }
+        }
+      },
+      "landing": {
+        "continueAsGuest": "Continuar como invitado",
+        "subtitleBold": "Descubre todo tu potencial",
+        "subtitleBody": "Descubre y expresa tus habilidades a través de conversaciones naturales guiadas por IA. Crea tu perfil de habilidades y descarga un CV para impulsar tu búsqueda de empleo. Crea una cuenta gratuita para guardar tu progreso y volver a consultar tu historial de conversaciones.",
+        "invitationCodeValid": "El código de invitación es válido",
+        "welcome": "¡Bienvenido!"
+      },
+      "verifyEmail": {
+        "registrationThankYou": "Gracias por registrarte en Compass.",
+        "verificationEmailSentMessage": "Se ha enviado un correo de verificación a tu dirección de correo electrónico. Para continuar, primero verifica tu correo electrónico."
+      }
+    },
+    "components": {
+      "anonymousAccountConversionDialog": {
+        "registerAccount": "Registrar cuenta",
+        "registrationInfo": "Por favor regístrate con un correo electrónico para mantener el acceso a esta conversación. Sin registrarte, no podrás iniciar sesión nuevamente ni regresar a esta conversación.",
+        "emailWarning": "Asegúrate de usar el correo correcto, ya que no se podrá cambiar más tarde y se te pedirá verificarlo.",
+        "closeRegistrationForm": "Cerrar formulario de registro",
+        "invalidEmail": "Por favor ingresa una dirección de correo válida",
+        "emailsMismatch": "Asegúrate de que ambas direcciones de correo coincidan",
+        "passwordRequirementsNotMet": "Asegúrate de que tu contraseña cumpla todos los requisitos",
+        "registrationSuccess": "¡Cuenta registrada con éxito!",
+        "verificationSentWithEmail": "Actualmente has iniciado sesión con el correo: {{email}}. Se ha enviado un correo de verificación a tu dirección. Verifica tu cuenta antes de volver a iniciar sesión.",
+        "registrationFailed": "Error al registrar la cuenta"
+      },
+      "passwordReset": {
+        "forgotPassword": "¿Olvidaste tu contraseña?",
+        "pleaseEnterEmail": "Por favor ingresa tu dirección de correo electrónico",
+        "passwordResetEmailSent": "¡Correo de restablecimiento de contraseña enviado!",
+        "failedToSendResetEmail": "Error al enviar el correo de restablecimiento",
+        "passwordResetLinkSent": "Se ha enviado un enlace de restablecimiento de contraseña a tu correo electrónico.",
+        "resetPassword": "Restablecer contraseña",
+        "closePasswordResetForm": "Cerrar formulario de restablecimiento"
+      },
+      "registrationCodeFormModal": {
+        "closeRegistrationCodeForm": "Cerrar formulario de código de registro",
+        "noRegistrationCodePrompt": "¿No tienes un código de registro?",
+        "reachOut": "Contáctanos"
+      },
+      "requestInvitationCodeFormModal": {
+        "requestAccessTitle": "Solicitar acceso a Compass",
+        "requestAccessSubtitle": "Por favor, cuéntanos cómo planeas usar Compass. Revisaremos tu solicitud cuidadosamente y nos pondremos en contacto contigo pronto.",
+        "closeRequestInvitationForm": "Cerrar formulario de solicitud de invitación",
+        "name": "Nombre",
+        "message": "Mensaje",
+        "messagePlaceholder": "Por favor comparte cómo planeas usar Compass",
+        "invitationRequestSubmitSuccess": "Tu solicitud de acceso a Compass se envió correctamente. Nos pondremos en contacto pronto.",
+        "invitationRequestSubmitError": "Ocurrió un error al enviar tu solicitud"
+      },
+      "requestInvitationCode": {
+        "requestLoginCode": "¿No tienes un código de inicio de sesión?"
+      },
+      "resendVerificationEmail": {
+        "emailNotVerified": "Tu correo electrónico no está verificado. Por favor revisa tu bandeja de entrada para el correo de verificación.",
+        "resendVerificationEmail": "Reenviar correo de verificación",
+        "resendVerificationEmailSuccess": "Correo de verificación enviado con éxito",
+        "resendVerificationEmailFailedWithMessage": "Error al enviar el correo de verificación: {{message}}"
+      },
+      "socialAuth": {
+        "orContinueWith": "O continúa con",
+        "loginWithGoogle": "Inicia sesión con Google",
+        "googleLoginIsNotAvailableWhenOffline": "El inicio de sesión con Google no funciona sin conexión a internet.",
+        "socialFailedLoginWithMessage": "No se pudo iniciar sesión: {{message}}",
+        "accountNotRegistered": "Esta cuenta no está registrada. Por favor, contacta al proveedor de este enlace."
+      }
+    },
+    "loggingYouOutNotice": "Cerrando tu sesión...",
+    "errors": {
+      "loginFailedWithMessage": "No se pudo iniciar sesión: {{message}}",
+      "registerFailedWithMessage": "Error de registro: {{message}}",
+      "preferencesFetchFailedWithMessage": "Se produjo un error al obtener tus preferencias: {{message}}",
+      "firebase": {
+        "emailAlreadyInUse": "La dirección de correo ya está en uso por otra cuenta.",
+        "emailNotVerified": "El correo que estás usando está registrado, pero aún no ha sido verificado. Por favor verifica tu correo para continuar.",
+        "invalidCredential": "El correo/contraseña proporcionados no son válidos.",
+        "invalidEmail": "La dirección de correo no es válida.",
+        "operationNotAllowed": "Las cuentas de correo/contraseña no están habilitadas.",
+        "weakPassword": "La contraseña es demasiado débil.",
+        "userDisabled": "La cuenta de usuario ha sido deshabilitada.",
+        "userNotFound": "No se encontró un usuario con las credenciales proporcionadas.",
+        "wrongPassword": "La contraseña no es válida.",
+        "tooManyRequests": "Hemos bloqueado todas las solicitudes desde este dispositivo debido a actividad inusual. Inténtalo de nuevo más tarde.",
+        "internalError": "Ha ocurrido un error interno.",
+        "tooManyUsers": "Hay demasiados usuarios en este proyecto de Firebase.",
+        "invalidRegistrationCode": "El código de registro ingresado no es válido. Verifica el código e inténtalo nuevamente.",
+        "invalidInvitationCode": "El código de invitación ingresado no es válido. Verifica el código e inténtalo nuevamente.",
+        "invalidInvitationType": "El código que usaste es para registro y no para inicio de sesión. Ve a la página de registro.",
+        "invalidRegistrationType": "El código que usaste es para inicio de sesión y no para registro. Ve a la página de inicio de sesión.",
+        "popupClosedByUser": "La ventana emergente de Google se cerró antes de completar el inicio de sesión.",
+        "invalidLoginMethod": "Esta operación no está permitida con el método de inicio de sesión actual.",
+        "emailAlreadyVerified": "La dirección de correo ya está verificada."
+      }
+    },
+    "verificationEmailSentShort": "¡Correo de verificación enviado!"
+  },
+  "cv": {
+    "cvTypingChatMessage": {
+      "uploading": "Please wait while I upload and parse your CV",
+      "uploadedReady": "Your CV content is in the text field. Review it and send when ready."
+    },
+    "uploadedCVsMenu": {
+      "backTitle": "Back to main menu",
+      "titleWithCount": "Previously uploaded CVs ({{count}})",
+      "helpCollect": "Tap a CV to load its content into the text field. Review and send when you're ready.",
+      "helpDisabled": "CV selection is only available during the experience collection phase.",
+      "empty": "No uploaded CVs found."
+    },
+    "cancellableTypingChatMessage": {
+      "typing": "Escribiendo",
+      "thinking": "Por favor, espera, esto podría tomar un momento",
+      "cancel": "Cancelar"
+    }
+  },
+  "experiences": {
+    "experiencesDrawer": {
+      "components": {
+        "experienceEditForm": {
+          "components": {
+            "summaryEditField": {
+              "summaryPlaceholder": "Resumen de la experiencia",
+              "restoreFailed": "No se pudo restaurar el resumen. Por favor, inténtalo más tarde.",
+              "restored": "Resumen restaurado."
+            }
+          },
+          "updateSuccess": "¡Experiencia actualizada con éxito!",
+          "updateFailed": "Error al actualizar la experiencia. Por favor, inténtalo más tarde.",
+          "skillsAddedSuccess": "¡Habilidades agregadas con éxito!",
+          "editTitle": "Editar experiencia",
+          "infoLabel": "Información de la experiencia",
+          "infoHelp": "Toca un campo para actualizar el tipo de trabajo, título, fechas, empresa, ubicación o resumen de tu experiencia.",
+          "field": {
+            "experienceTitlePlaceholder": "Título de la experiencia",
+            "experienceTitleRequired": "* Se requiere el título de la experiencia",
+            "startDatePlaceholder": "Fecha de inicio",
+            "endDatePlaceholder": "Fecha de finalización",
+            "companyPlaceholder": "Empresa",
+            "locationPlaceholder": "Ubicación"
+          },
+          "topSkillsHelpEdit": "Toca una habilidad para ver más detalles. Usa el menú para cambiar la etiqueta y el ícono de eliminar para quitarla. Toca el botón Agregar habilidad para añadir más.",
+          "addSkillButton": "Agregar habilidad",
+          "updatingBackdrop": "Actualizando experiencia...",
+          "maxCharsAllowed": "Máximo {{count}} caracteres permitidos."
+        },
+        "experiencesDrawerContent": {
+          "menu": {
+            "revert": "Revertir",
+            "edit": "Editar",
+            "delete": "Eliminar"
+          },
+          "actionsUnavailableUntilExplored": "Estas acciones estarán disponibles una vez que hayas discutido la experiencia en detalle con Compass.",
+          "moreOptionsTitle": "Más opciones",
+          "topSkillsLabel": "Habilidades principales",
+          "topSkillsHelp": "Toca una habilidad para ver más detalles.",
+          "noSkillsYet": "Aún no se han descubierto habilidades",
+          "untitled": "¡Sin título!"
+        },
+        "skillPopover": {
+          "alsoKnownAs": "También conocido como:"
+        },
+        "experiencesDrawerHeader": {
+          "closeTitle": "Cerrar experiencias"
+        },
+        "restoreExperiencesDrawer": {
+          "title": "Restaurar experiencias",
+          "fetchFailed": "Error al obtener experiencias eliminadas. Por favor, inténtalo más tarde.",
+          "empty": "No se encontraron experiencias eliminadas."
+        },
+        "downloadReportButton": {
+          "downloadCv": "Descargar CV",
+          "downloading": "Descargando",
+          "helpTipBlockedMessage": "No puedes descargar el informe hasta que termines de explorar al menos una experiencia."
+        }
+      },
+      "deleteSuccess": "¡Experiencia eliminada con éxito!",
+      "deleteFailed": "Error al eliminar la experiencia.",
+      "userHasNoSessions": "El usuario no tiene sesiones",
+      "noActiveSession": "No hay una sesión activa",
+      "restoreSuccess": "¡Experiencia restaurada con éxito!",
+      "restoreFailed": "Error al restaurar la experiencia.",
+      "personalInfoTooltip": "Los campos se completan con información que tal vez hayas proporcionado antes y se almacenan de forma segura en tu dispositivo. Completá los datos faltantes para personalizar tu CV.",
+      "andSkillsTitle": "Experiencias y habilidades",
+      "personalInformationTitle": "Información personal",
+      "personalInfo": {
+        "nameLabel": "Nombre:",
+        "namePlaceholder": "Ingresá tu nombre acá",
+        "emailLabel": "Correo:",
+        "emailPlaceholder": "Ingresá tu correo acá",
+        "phoneLabel": "Teléfono:",
+        "phonePlaceholder": "Ingresá tu número de teléfono acá",
+        "addressLabel": "Dirección:",
+        "addressPlaceholder": "Ingresá tu dirección acá"
+      },
+      "uncategorizedTooltip": "Según la conversación, estas experiencias no pudieron categorizarse automáticamente.",
+      "restoreDeletedLink": "Restaurar experiencias eliminadas",
+      "unsavedChanges": {
+        "title": "Cambios sin guardar",
+        "content": "Tenés cambios sin guardar. ¿Seguro que querés cerrar sin guardar?",
+        "closeButton": "Cerrar",
+        "keepEditingButton": "Seguir editando"
+      },
+      "delete": {
+        "title": "Eliminar experiencia",
+        "content": "¿Seguro que querés eliminar esta experiencia? Esta acción no se puede deshacer.",
+        "confirmButton": "Eliminar"
+      },
+      "revert": {
+        "title": "Revertir experiencia",
+        "content": "¿Seguro que querés revertir esta experiencia a su versión sin editar? Esto va a sobrescribir los cambios que hiciste.",
+        "confirmButton": "Revertir"
+      },
+      "deletingBackdrop": "Eliminando experiencia...",
+      "restoringBackdrop": "Restaurando experiencia...",
+      "emptyStateMessage": "Aún no hemos descubierto experiencias. Sigamos conversando.",
+      "util": {
+        "workTypeDescription": {
+          "selfEmployment": "Trabajas por tu cuenta, diriges tu propio negocio o realizas trabajos freelance o por contrato",
+          "formalSectorWagedEmployment": "Tienes un trabajo remunerado y trabajas para un empleador, empresa u organización",
+          "formalSectorUnpaidTraineeWork": "Estás en un rol de formación o pasantía para adquirir habilidades o experiencia",
+          "unseenUnpaid": "Realizas trabajo no remunerado como cuidado, tareas del hogar o voluntariado comunitario",
+          "uncategorized": "Compass no pudo categorizar este tipo de trabajo"
+        },
+        "errors": {
+          "experienceTitleMaxLength": "Máximo {{max}} de caracteres permitido.",
+          "companyMaxLength": "Máximo {{max}} de caracteres permitido.",
+          "locationMaxLength": "Máximo {{max}} de caracteres permitido.",
+          "summaryMaxLength": "Máximo {{max}} de caracteres permitido.",
+          "timelineMaxLength": "Máximo {{max}} de caracteres permitido."
+        }
+      }
+    },
+    "report": {
+      "skillsReportTitle": "Informe de habilidades",
+      "skillsDescriptionTitle": "Descripción de habilidades",
+      "experiencesTitle": "EXPERIENCIAS",
+      "selfEmploymentTitle": "Trabajo por cuenta propia",
+      "salaryWorkTitle": "Trabajo asalariado",
+      "unpaidWorkTitle": "Trabajo no remunerado",
+      "traineeWorkTitle": "Trabajo como aprendiz",
+      "uncategorizedTitle": "Sin categoría",
+      "topSkillsTitle": "Habilidades principales: ",
+      "skillsDescriptionText": "A continuación encontrarás una lista de las habilidades descubiertas durante tu conversación con Compass, junto con sus descripciones.",
+      "disclaimer": {
+        "part1": "Aviso: ",
+        "part2": "Las habilidades listadas se basan en una conversación con el candidato, no han sido verificadas o validadas por Tabiya y pueden ser inexactas. ",
+        "part3": "La información debe ser verificada antes de usarla para la búsqueda de empleo, entrevistas o para crear un CV. Para revisar esta información, vuelve a hablar con Compass o crea un CV completo basado en este informe."
+      },
+      "bodyText": "Este informe resume la información clave recopilada durante una conversación con Compass el {{date}}. Compass es un chatbot de IA que ayuda a los buscadores de empleo a explorar sus habilidades y experiencias. Este informe presenta la experiencia laboral del candidato y las habilidades identificadas en cada experiencia. Esta información puede usarse para guiar la búsqueda de empleo y resaltar sus habilidades al postular, especialmente durante entrevistas con posibles empleadores. Puede ser un buen punto de partida para crear un CV completo."
+    }
+  },
+  "features": {
+    "skillsRanking": {
+      "components": {
+        "skillsRankingPrompt": {
+          "mainMessage": "¡Casi terminamos! Responde unas pocas preguntas finales de investigación y te enviaremos <0>{{compensationAmount}}</0> de saldo una vez que completes todas las tareas."
+        },
+        "skillsRankingBriefing": {
+          "introWorkBased": "Si te interesa, puedo calcular qué porcentaje de las oportunidades en <0>{{jobPlatformUrl}}</0> coincide con tus habilidades y cómo te comparas con otros buscadores — solo necesitas mostrarme cuánto valor tiene esta información para ti.",
+          "introTimeBased": "Si te interesa, puedo calcular qué porcentaje de las oportunidades en <0>{{jobPlatformUrl}}</0> coincide con tus habilidades y cómo te comparas con otros buscadores. Esto puede tomar algo de tiempo — si no quieres esperar más, puedes hacer clic en <0>cancelar</0> en cualquier momento en el siguiente mensaje mientras calculo. Cuando estés listo haz clic en <1>continuar</1>.",
+          "puzzleInstructions": "Verás letras inclinadas en algunas pantallas. Gira cada letra hasta ponerla derecha utilizando los botones de rotación. Puedes cancelar en cualquier momento. En el 5% de los casos, <0>más letras corregidas = mayor probabilidad de recibir la información.</0> El resto del tiempo depende de mí.",
+          "failedToContinue": "No se pudo continuar. Por favor, inténtalo más tarde."
+        },
+        "skillsRankingProofOfValue": {
+          "waitingMessage": "Espera mientras realizo los cálculos, o haz clic en cancelar en cualquier momento si ya no quieres seguir esperando la información.",
+          "puzzleAutoCompleteMessage": "Completando automáticamente los rompecabezas restantes..."
+        },
+        "skillsRankingCompletionAdvice": {
+          "adviceMessage": "Un consejo: Estos números son para ti. ¿Cómo podrían cambiar la forma en que buscas puestos esta semana? Haz una pausa y considera dónde tu tiempo y energía se invierten mejor en tu estrategia para encontrar empleo."
+        },
+        "skillsRankingRetypedRank": {
+          "question_1": "Última pregunta: recordemos lo que te dije más arriba sobre tu propio encaje con las oportunidades:",
+          "question_2": "vuelve a revisar lo que dije tres mensajes atrás, qué porcentaje de oportunidades",
+          "question_3": " en",
+          "question_4": " cumples con las habilidades clave?",
+          "sliderAria": "Control deslizante percentil de rango reescrito"
+        },
+        "skillsRankingPerceivedRank": {
+          "questionWithDisclosure": "Ahora, piensa en estos 100 usuarios de <0>{{jobPlatformUrl}}</0>, que son mayormente buscadores de empleo de Sudáfrica de 18–34 años con un 'matric' de una escuela de township o rural. <0>¿Exactamente cuántos de esos 100</0> crees que encajarían con <0>menos oportunidades</0> en <0>{{jobPlatformUrl}}</0> <0>que tú</0>?",
+          "questionWithoutDisclosure": "Antes de terminar de verdad nuestra conversación, tengo solo una última pregunta relacionada con lo anterior — si piensas en 100 personas que son buscadores de empleo de Sudáfrica de 18–34 años con un 'matric' de una escuela de township o rural. ¿Cuántos de esos 100 crees que encajarían con <0>menos puestos</0> en <1>{{jobPlatformUrl}}</1> que tú?",
+          "sliderAria": "Control deslizante percentil de rango percibido"
+        },
+        "skillsRankingDisclosure": {
+          "skillsRankingMarketDisclosure": {
+            "message_1": "Cumples las habilidades clave para el ",
+            "message_2": " de las oportunidades publicadas en ",
+            "message_3": ". ¡Es un rango sólido de opciones!"
+          },
+          "skillsRankingJobSeekerDisclosure": {
+            "pendingMessage": "¡Gracias! Estamos verificando las últimas oportunidades de {{jobPlatformUrl}} para que los números sean precisos. Compartiremos tus resultados pronto o puedes preguntar por ellos cuando te llamemos para la encuesta telefónica.",
+            "comparisonPart1_prefix": "Además, ",
+            "comparisonPart1_main": "Comparado con otros usuarios de \n{{jobPlatformUrl}}\n, estás en el grupo [\n{{groupIndex}}\n] de \n{{groupTotal}}\n.",
+            "comparisonPart2_prefix": "Imagina alinear a 100 usuarios de \n{{jobPlatformUrl}}\n desde los que encajan con menos hasta los que encajan con más puestos. Dividimos la fila en cinco bloques de 20 personas. El bloque 1 (los 20 más altos) encaja con más puestos; el bloque 5 (los 20 más bajos) con menos. Estás en el bloque ",
+            "comparisonPart2_group": "[\n{{groupIndex}}\n]",
+            "comparisonPart2_middle": ", que es el bloque ",
+            "comparisonPart2_label": "[\n{{comparisonLabel}}\n]",
+            "comparisonPart2_suffix": ".",
+            "updateError": "No se pudo actualizar el estado de clasificación de habilidades. Por favor, inténtalo de nuevo más tarde."
+          }
+        },
+        "rotateToSolve": {
+          "instructions1": "Gira cada letra hasta que quede derecha. Selecciona una letra haciendo clic y luego gírala en sentido horario con",
+          "instructions2": " o antihorario con.",
+          "allCompleteMessage": "¡Todos los rompecabezas completados! ¡Bien hecho!",
+          "puzzleCompleteMessage": "¡Rompecabezas completado! Resuelve otro o cancela si no te interesa tanto la información.",
+          "rotateLeftAria": "Rotar carácter en sentido antihorario",
+          "rotateRightAria": "Rotar carácter en sentido horario"
+        }
+      }
+    }
+  },
+  "consent": {
+    "components": {
+      "consentPage": {
+        "beforeWeBeginTitle": "Antes de comenzar...",
+        "introPart1": "Creamos esta herramienta de IA con cuidado para ayudarte a ti y a otros jóvenes como tú a explorar sus habilidades y descubrir nuevas oportunidades.",
+        "introHighlightResponsibly": "¡Por favor usa la IA de manera responsable!",
+        "introPart2": "La tecnología de IA es nueva y está lejos de ser perfecta. No entiende el contexto como los humanos.",
+        "introPart3": "Verifica siempre los detalles importantes y evita compartir información personal sobre ti y otras personas con la IA durante la conversación.",
+        "introPart4": "¡Ayúdanos a mantener todas las interacciones con la IA seguras y positivas! 😊",
+        "termsAndConditions": "Términos y Condiciones",
+        "privacyPolicy": "Política de Privacidad",
+        "checkboxTermsAndConditions": "He leído y acepto los <0>{{terms_and_conditions}}</0> de Compass.",
+        "checkboxPrivacyPolicy": "He leído y acepto la <0>{{privacy_policy}}</0> de Compass.",
+        "areYouReady": "¿Estás listo para comenzar?",
+        "acceptButton": "Sí, estoy listo",
+        "withSupportFrom": "Con el apoyo de",
+        "modalApology": "Lamentamos que hayas decidido no aceptar los {{terms_and_conditions}} y la {{privacy_policy}}.",
+        "modalCannotProceed": "No podrás continuar y se cerrará tu sesión",
+        "modalLoggedOutHighlight": "cerrará tu sesión.",
+        "modalYesExit": "Sí, salir",
+        "snackbarAgreementAccepted": "Acuerdo aceptado",
+        "snackbarUserNotFound": "Usuario no encontrado",
+        "snackbarLoggedOutSuccess": "Sesión cerrada correctamente.",
+        "snackbarLoggedOutFailure": "Error al cerrar sesión.",
+        "snackbarFailedUpdatePreferences": "Error al actualizar las preferencias del usuario"
+      }
+    }
+  },
+  "sensitiveData": {
+    "components": {
+      "sensitiveDataForm": {
+        "title": "Proporciona tu información",
+        "subtitle": "Usamos tus datos para personalizar tu experiencia y podemos contactarte sobre Compass.",
+        "unskippableSubtitle": "Por favor proporciona la siguiente información para continuar.",
+        "skippableSubtitle": "Puedes omitir este paso.",
+        "helpTipText": "Tu información se cifra mediante un sistema de cifrado de extremo a extremo de última generación y se almacena de forma segura.",
+        "failedToLoadConfig": "Error al cargar la configuración del formulario",
+        "invalidForm": "Por favor corrige los errores en el formulario antes de enviarlo.",
+        "savedSuccess": "Datos personales guardados correctamente y de forma segura.",
+        "errorDefault": "No se pudieron guardar los datos personales. Inténtalo de nuevo y, si el problema persiste, limpia la caché del navegador y actualiza la página.",
+        "errorEncryptedDataTooLarge": "Los datos personales parecen demasiado grandes para guardarse. Intenta ingresar valores más pequeños en los campos. Si el problema persiste, limpia la caché del navegador y actualiza la página.",
+        "collectionSkipped": "Se omitió la recopilación de datos personales.",
+        "rejectParagraph1": "Lamentamos que hayas decidido no proporcionar tus datos. Proporcionar esta información ayuda a Compass a ofrecerte una experiencia más personalizada. No podrás continuar y se cerrará tu sesión.",
+        "skipParagraph1": "Lamentamos que prefieras no proporcionar tus datos. Proporcionar esta información ayuda a Compass a ofrecerte una experiencia más personalizada. Ten en cuenta que si omites este paso,",
+        "skipParagraph1Highlighted": " no podrás proporcionar esta información más adelante.",
+        "startConversation": "Iniciar conversación",
+        "areYouSureYouWantToSkip": "¿Estás seguro de que quieres omitirlo?",
+        "yesSkip": "Sí, omitir",
+        "shareData": "Compartir datos",
+        "skipping": "Omitiendo...",
+        "refreshPage": "Actualizar página"
+      },
+      "enumField": {
+        "pleaseSelectX": "Por favor, seleccione {{x}}",
+        "clearSelection": "Limpiar selección"
+      }
+    }
+  },
+  "feedback": {
+    "overallFeedback": {
+      "feedbackForm": {
+        "components": {
+          "customerSatisfactionRating": {
+            "questionText": "Por último, nos encantaría conocer tu opinión sobre tu experiencia hasta ahora. ",
+            "ratingLabelLow": "Insatisfecho",
+            "ratingLabelHigh": "Satisfecho",
+            "submitSuccess": "¡Calificación enviada con éxito!",
+            "submitError": "Error al enviar la calificación. Por favor, inténtalo más tarde."
+          },
+          "feedbackFormContent": {
+            "previous": "Anterior",
+            "next": "Siguiente"
+          }
+        },
+        "submitSuccess": "¡Comentarios enviados con éxito!",
+        "submitError": "Error al enviar los comentarios. Por favor, inténtalo más tarde.",
+        "helpUsImprove": "Ayúdanos a mejorar!",
+        "closeForm": "cerrar formulario de comentarios",
+        "submittingFeedback": "Enviando comentarios..."
+      }
+    },
+    "bugReport": {
+      "reportBug": "Reportar un error"
+    }
+  },
+  "error": {
+    "errorPage": {
+      "illustrationAlt": "ilustración de error",
+      "defaultMessage": "Algo salió mal con Compass. Intentá recargar la página...",
+      "notFound": "Error 404 - Página no encontrada"
+    },
+    "restAPIError": {
+      "storyChooseMessageLabel": "Elegí un mensaje de error para mostrar en una notificación:",
+      "storySelectPlaceholder": "Seleccioná un mensaje de error"
+    }
+  },
+  "app": {
+    "isOnlineProvider": {
+      "offline": "Estás sin conexión",
+      "backOnline": "Has vuelto a estar en línea"
+    },
+    "appName": "Compass",
+    "compassLogoAlt": "Logo de Compass"
+  },
+  "info": {
+    "infoDrawer": {
+      "frontendTitle": "Frontend",
+      "backendTitle": "Backend",
+      "applicationInformation": "Información de la aplicación",
+      "closeApplicationInformation": "Cerrar información de la aplicación",
+      "versionInfo": {
+        "date": "Fecha",
+        "version": "Versión",
+        "buildNumber": "Número de compilación",
+        "gitSha": "GIT SHA"
+      }
+    }
+  },
+  "theme": {
+    "confirmModalDialog": {
+      "closeConfirmModal": "Cerrar modal de confirmación"
+    },
+    "passwordInput": {
+      "togglePasswordVisibility": "Mostrar u ocultar contraseña"
+    },
+    "helpTip": {
+      "tooltip": "ayuda"
+    }
+  },
+  "i18n": {
+    "languageContextMenu": {
+      "selector": "Selector de idioma"
+    }
+  },
+  "_deprecated": {
+    "bias_experience_accuracy": "Sesgo y precisión de la experiencia",
+    "inaccurate": "Inexacto",
+    "very_accurate": "Muy preciso",
+    "skill_accuracy": "Precisión de habilidades",
+    "final_feedback": "Comentarios finales",
+    "difficult": "Difícil",
+    "easy": "Fácil",
+    "unlikely": "Poco probable",
+    "likely": "Probable"
+  },
+  "steps": {
+    "biasAndExperience": "Sesgo y Precisión de la Experiencia",
+    "skillAccuracy": "Precisión de Habilidades",
+    "finalFeedback": "Comentarios finales"
+  },
+  "labels": {
+    "inaccurate": "Inexacto",
+    "veryAccurate": "Muy preciso",
+    "difficult": "Difícil",
+    "easy": "Fácil",
+    "unlikely": "Improbable",
+    "likely": "Probable"
+  },
+  "buttons": {
+    "submit": "Enviar",
+    "next": "Siguiente",
+    "previous": "Anterior"
+  }
+}

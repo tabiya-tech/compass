@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
@@ -55,6 +56,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
   // Use the utility function instead of local variable
   const shouldNotShow = shouldSkipMarketDisclosure(skillsRankingState.experiment_group);
 
+  const { t } = useTranslation();
   const handleUpdateState = useCallback(async () => {
     if (!activeSessionId) {
       console.error(new SkillsRankingError("Active session ID is not available."));
@@ -78,9 +80,9 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
       }, getDefaultTypingDurationMs() + 300);
     } catch (err) {
       console.error("Failed to update state:", err);
-      enqueueSnackbar("Something went wrong. Please try again.", { variant: "error" });
+      enqueueSnackbar(t("common.errors.generic"), { variant: "error" });
     }
-  }, [activeSessionId, value, onFinish, enqueueSnackbar]);
+  }, [activeSessionId, value, onFinish, enqueueSnackbar, t]);
 
   const handleSubmit = async () => {
     if (!submitted && currentPhase === SkillsRankingPhase.RETYPED_RANK) {
@@ -118,13 +120,13 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           await onFinish(newState);
         } catch (err) {
           console.error("Failed to update state:", err);
-          enqueueSnackbar("Something went wrong. Please try again.", { variant: "error" });
+          enqueueSnackbar(t("common.errors.generic"), { variant: "error" });
         }
               }, getDefaultTypingDurationMs());
 
       return () => clearTimeout(typingTimer);
     }
-  }, [shouldNotShow, activeSessionId, currentPhase, value, onFinish, enqueueSnackbar]);
+  }, [shouldNotShow, activeSessionId, currentPhase, value, onFinish, enqueueSnackbar, t]);
 
   if (shouldNotShow) return <></>;
 
@@ -140,11 +142,10 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           <ChatBubble
             sender={ConversationMessageSender.COMPASS}
             message={
-              <>
-                As a last question, let's recall what I told you further above just regarding your own fit with
-                opportunities:{" "}
-                <strong>check again what I said three messages ago, how many percent of opportunities</strong> on{" "}
-                {getJobPlatformUrl()} do you meet the key skills for?
+                <>
+                {t("features.skillsRanking.components.skillsRankingRetypedRank.question_1")}{" "}
+                <strong>{t("features.skillsRanking.components.skillsRankingRetypedRank.question_2")}</strong>{t("features.skillsRanking.components.skillsRankingRetypedRank.question_3")}{" "}
+                {getJobPlatformUrl()}{t("features.skillsRanking.components.skillsRankingRetypedRank.question_4")}
               </>
             }
           >
@@ -157,7 +158,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
                 }}
                 disabled={submitted || !isOnline || currentPhase !== SkillsRankingPhase.RETYPED_RANK}
                 data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SLIDER}
-                aria-label="Retyped rank percentile slider"
+                aria-label={t("features.skillsRanking.components.skillsRankingRetypedRank.sliderAria")}
               />
 
               <Box mt={theme.spacing(2)} textAlign="right">
@@ -168,7 +169,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
                   }
                   data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SUBMIT_BUTTON}
                 >
-                  Submit
+                  {t("common.buttons.submit")}
                 </PrimaryButton>
               </Box>
             </Box>

@@ -5,7 +5,8 @@ from textwrap import dedent
 
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMStats
 from app.agent.experience.work_type import WorkType
-from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER, STD_LANGUAGE_STYLE
+from app.agent.prompt_template import get_language_style
+from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
@@ -13,8 +14,11 @@ from app.countries import Country
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
 from common_libs.retry import Retry
+from app.i18n.translation_service import t
 
-_FINAL_MESSAGE = "Thank you for sharing these details! I have all the information I need."
+
+# centralize use for skill_explorer_agent and conversation_llm_test
+_FINAL_MESSAGE_KEY = "exploreExperiences.noMoreExperiences"
 
 
 class _ConversationLLM:
@@ -131,21 +135,21 @@ class _ConversationLLM:
             logger.warning("LLM response is empty. "
                            "\n  - System instructions: %s"
                            "\n  - LLM input: %s",
-                           "\n".join(system_instructions),
+                           ("\n".join(system_instructions) if isinstance(system_instructions, list) else system_instructions),
                            llm_input)
 
             return AgentOutput(
-                message_for_user="Sorry, I didn't understand that. Can you please rephrase?",
+                message_for_user=t("messages", "collectExperiences.didNotUnderstand"),
                 finished=False,
                 agent_type=AgentType.EXPLORE_SKILLS_AGENT,
                 agent_response_time_in_sec=round(llm_end_time - llm_start_time, 2),
                 llm_stats=[llm_stats]), 100, ValueError("LLM response is empty")
 
         if llm_response.text == "<END_OF_CONVERSATION>":
-            llm_response.text = _FINAL_MESSAGE
+            llm_response.text = t("messages", "exploreSkills.finalMessage")
             finished = True
         if llm_response.text.find("<END_OF_CONVERSATION>") != -1:
-            llm_response.text = _FINAL_MESSAGE
+            llm_response.text = t("messages", "exploreSkills.finalMessage")
             finished = True
             logger.warning("The response contains '<END_OF_CONVERSATION>' and additional text: %s", llm_response.text)
 
@@ -252,7 +256,7 @@ class _ConversationLLM:
             get_question_c=_get_question_c(work_type),
             question_asked_until_now="\n".join(f"- \"{s}\"" for s in question_asked_until_now),
             agent_character=STD_AGENT_CHARACTER,
-            language_style=STD_LANGUAGE_STYLE,
+            language_style=get_language_style(),
             experience_title=f"'{experience_title}'",
             work_type=f" ({WorkType.work_type_short(work_type)})" if work_type is not None else ""
         )
@@ -268,6 +272,7 @@ class _ConversationLLM:
             You are an interviewer helping me, a young person{country_of_user_segment},
             reflect on my experience as {experience_title}{work_type}. I have already shared very basic information about this experience.
             {experiences_explored_instructions}
+                                 
             Let's now begin the process and help me reflect on the experience as {experience_title} in nore detail.
             
             Respond with something similar to this:
@@ -304,7 +309,7 @@ class _ConversationLLM:
                                                 experiences_explored_instructions=experiences_explored_instructions,
                                                 experience_title=f"'{experience_title}'",
                                                 work_type=f" ({WorkType.work_type_short(work_type)})" if work_type is not None else "",
-                                                language_style=STD_LANGUAGE_STYLE,
+                                                language_style=get_language_style(),
                                                 )
 
 
@@ -319,10 +324,10 @@ def _get_question_c(work_type: WorkType) -> str:
     Get the question for the specific work type
     """
     if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-        return "What do you think is important when working in such a company?"
+        return t("messages", "exploreSkills.question.formalWaged")
     elif work_type == WorkType.SELF_EMPLOYMENT:
-        return "What do you think is important when you are your own boss?"
+        return t("messages", "exploreSkills.question.selfEmployment")
     elif work_type == WorkType.UNSEEN_UNPAID:
-        return "What do you think is most important when helping out in the community or caring for others?"
+        return t("messages", "exploreSkills.question.unseenUnpaid")
     else:
         return ""

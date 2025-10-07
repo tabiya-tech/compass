@@ -14,6 +14,7 @@ import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import RestoreIcon from "@mui/icons-material/Restore";
 import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 import { deduplicateSkills } from "src/utils/skillsUtils";
+import { useTranslation } from "react-i18next";
 
 const uniqueId = "34a59a9e-e7f6-4a10-8b72-0fd401c727de";
 
@@ -38,9 +39,9 @@ export const MENU_ITEM_ID = {
 };
 
 export const MENU_ITEM_TEXT = {
-  EDIT: "Edit",
-  DELETE: "Delete",
-  REVERT: "Revert",
+  EDIT: "experiences.experiencesDrawer.components.experiencesDrawerContent.menu.edit",
+  DELETE: "experiences.experiencesDrawer.components.experiencesDrawerContent.menu.delete",
+  REVERT: "experiences.experiencesDrawer.components.experiencesDrawerContent.menu.revert",
 };
 
 interface ExperienceProps {
@@ -56,6 +57,7 @@ export const capitalizeFirstLetter = (string: string): string => {
 
 const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdit, onDelete, onRestoreToOriginal }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isOnline = useContext(IsOnlineContext);
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [selectedSkill, setSelectedSkill] = React.useState<Skill | null>(null);
@@ -91,7 +93,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
 
   const getContextMenuHeaderMessage = () => {
     if (!isExplored) {
-      return "These actions will become available once you have discussed the experience in detail with Compass.";
+      return t("experiences.experiencesDrawer.components.experiencesDrawerContent.actionsUnavailableUntilExplored");
     }
     return undefined;
   };
@@ -100,21 +102,21 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
     return [
       {
         id: MENU_ITEM_ID.EDIT,
-        text: MENU_ITEM_TEXT.EDIT,
+        text: t(MENU_ITEM_TEXT.EDIT),
         icon: <EditIcon />,
         disabled: !isExplored,
         action: handleEditClick,
       },
       {
         id: MENU_ITEM_ID.RESTORE_TO_ORIGINAL,
-        text: MENU_ITEM_TEXT.REVERT,
+        text: t(MENU_ITEM_TEXT.REVERT),
         icon: <RestoreIcon />,
         disabled: !isOnline || !isExplored,
         action: handleRestoreToOriginalClick,
       },
       {
         id: MENU_ITEM_ID.DELETE,
-        text: MENU_ITEM_TEXT.DELETE,
+        text: t(MENU_ITEM_TEXT.DELETE),
         icon: <DeleteIcon sx={{ color: theme.palette.error.main }} />,
         disabled: !isOnline || !isExplored,
         action: handleDeleteClick,
@@ -142,13 +144,17 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
             fontWeight="bold"
             data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_OCCUPATION}
           >
-            {experience.experience_title ? experience.experience_title : <i>Untitled!</i>}
+            {experience.experience_title ? (
+              experience.experience_title
+            ) : (
+              <i>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.untitled")}</i>
+            )}
           </Typography>
           <Box display="flex" alignItems="center" justifyContent="flex-end">
             <PrimaryIconButton
               onClick={handleMoreClick}
               sx={{ color: theme.palette.common.black }}
-              title="More options"
+              title={t("experiences.experiencesDrawer.components.experiencesDrawerContent.moreOptionsTitle")}
               data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_MORE_BUTTON}
             >
               <MoreVertIcon />
@@ -185,9 +191,11 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
           sx={{ wordBreak: "break-all" }}
           data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_SKILLS}
         >
-          <b>Top Skills</b>
+          <b>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.topSkillsLabel")}</b>
         </Typography>
-        <HelpTip icon={<InfoIcon sx={{ padding: 0.1 }} />}>Tap a skill to view more details.</HelpTip>
+        <HelpTip icon={<InfoIcon sx={{ padding: 0.1 }} />}>
+          {t("experiences.experiencesDrawer.components.experiencesDrawerContent.topSkillsHelp")}
+        </HelpTip>
       </Box>
       <Box
         display="flex"
@@ -198,7 +206,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
         data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_SKILLS_CONTAINER}
       >
         {formattedSkills.length === 0 ? (
-          <Typography>No skills discovered yet</Typography>
+          <Typography>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.noSkillsYet")}</Typography>
         ) : (
           formattedSkills.map((skill) => (
             <Chip

@@ -5,7 +5,6 @@ import ExperiencesDrawerContent, {
   DATA_TEST_ID,
   LoadingExperienceDrawerContent,
   MENU_ITEM_ID,
-  MENU_ITEM_TEXT,
 } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
@@ -361,7 +360,7 @@ describe("ReportDrawerContent", () => {
       fireEvent.click(moreButton);
 
       // THEN the restore to original menu item should be visible
-      expect(screen.getByText(MENU_ITEM_TEXT.REVERT)).toBeInTheDocument();
+      expect(screen.getByText("Revert")).toBeInTheDocument();
     });
 
     test("should call onRestoreToOriginal when restore to original menu item is clicked", () => {
@@ -384,7 +383,7 @@ describe("ReportDrawerContent", () => {
       fireEvent.click(moreButton);
 
       // AND the restore to original menu item is clicked
-      const restoreToOriginalMenuItem = screen.getByText(MENU_ITEM_TEXT.REVERT);
+  const restoreToOriginalMenuItem = screen.getByText("Revert");
       fireEvent.click(restoreToOriginalMenuItem);
 
       // THEN the onRestoreToOriginal handler should be called with the experience
