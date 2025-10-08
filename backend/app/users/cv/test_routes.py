@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import Optional
 
 import pytest
 import pytest_mock
@@ -13,11 +14,10 @@ from app.users.cv.routes import (
     ALLOWED_EXTENSIONS,
     MAX_CV_SIZE_BYTES,
 )
-from app.users.cv.service import ICVUploadService, ParsedCV
-from app.users.cv.errors import MarkdownTooLongError, MarkdownConversionTimeoutError, EmptyMarkdownError, \
-    CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError
+from app.users.cv.service import ICVUploadService
+from app.users.cv.errors import MarkdownTooLongError, EmptyMarkdownError, \
+    CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError, MarkdownConversionTimeoutError
 from common_libs.test_utilities.mock_auth import MockAuth
-
 
 TestClientWithMocks = tuple[TestClient, ICVUploadService, UserInfo]
 
@@ -25,8 +25,23 @@ TestClientWithMocks = tuple[TestClient, ICVUploadService, UserInfo]
 @pytest.fixture(scope='function')
 def client_with_mocks() -> TestClientWithMocks:
     class MockCVService(ICVUploadService):
-        async def parse_cv(self, *, user_id: str, file_bytes: bytes, filename: str) -> ParsedCV:
-            return ParsedCV(experiences_data=["parsed"])
+        async def parse_cv(self, *, user_id: str, file_bytes: bytes, filename: str):
+            # Service returns upload_id string per contract
+            return "test-upload-id"
+
+        async def cancel_upload(self, *, user_id: str, upload_id: str) -> bool:
+            return True
+
+        async def get_upload_status(self, *, user_id: str, upload_id: str) -> Optional[dict]:
+            return {
+                "upload_id": upload_id,
+                "user_id": user_id,
+                "filename": "test.pdf",
+                "upload_process_state": "COMPLETED",
+                "cancel_requested": False,
+                "created_at": "2025-01-01T00:00:00Z",
+                "last_activity_at": "2025-01-01T00:00:00Z",
+            }
 
     _instance_cv_service = MockCVService()
 
@@ -57,7 +72,7 @@ class TestUploadCV:
         given_ext = next(iter(ALLOWED_EXTENSIONS))
         given_file_content = b"hello"
         headers = {"Content-Type": given_mime, "x-filename": f"cv{given_ext}"}
-        expected_response = {"experiences_data": ["parsed"]}
+        expected_response = {"upload_id": "test-upload-id"}
 
         # WHEN uploading the CV via raw streaming body
         response = client.post(f"/{given_user_id}/cv", data=given_file_content, headers=headers)
@@ -76,7 +91,7 @@ class TestUploadCV:
         given_mime = next(iter(ALLOWED_MIME_TYPES))
         given_file_content = b"hello"
         headers = {"Content-Type": given_mime, "x-filename": f"cv{given_ext}"}
-        expected_response = {"experiences_data": ["parsed"]}
+        expected_response = {"upload_id": "test-upload-id"}
 
         # WHEN uploading the CV via raw streaming body
         response = client.post(f"/{given_user_id}/cv", data=given_file_content, headers=headers)
@@ -86,7 +101,8 @@ class TestUploadCV:
         assert response.json() == expected_response
 
     @pytest.mark.asyncio
-    async def test_forbidden_other_user(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_forbidden_other_user(self, client_with_mocks: TestClientWithMocks,
+                                        mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
         parse_spy = mocker.spy(mocked_service, "parse_cv")
         # GIVEN a different user id and a valid file
@@ -97,7 +113,8 @@ class TestUploadCV:
         headers = {"Content-Type": given_mime, "x-filename": f"cv{given_ext}"}
 
         # WHEN uploading the CV for another user
-        response = client.post(f"/{given_other_user_id}/cv", files={"file": ("cv" + given_ext, given_file_content, given_mime)}, headers=headers)
+        response = client.post(f"/{given_other_user_id}/cv",
+                               files={"file": ("cv" + given_ext, given_file_content, given_mime)}, headers=headers)
 
         # THEN the request is forbidden and the service is not called
         assert response.status_code == HTTPStatus.FORBIDDEN
@@ -156,7 +173,8 @@ class TestUploadCV:
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
     @pytest.mark.asyncio
-    async def test_service_markdown_too_long_maps_to_413(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_service_markdown_too_long_maps_to_413(self, client_with_mocks: TestClientWithMocks,
+                                                         mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
         # GIVEN service raises MarkdownTooLongError after conversion
         mocker.patch.object(mocked_service, "parse_cv", side_effect=MarkdownTooLongError(6000, 5000))
@@ -169,7 +187,8 @@ class TestUploadCV:
         assert response.status_code == HTTPStatus.REQUEST_ENTITY_TOO_LARGE
 
     @pytest.mark.asyncio
-    async def test_service_timeout_maps_to_408(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_service_timeout_maps_to_408(self, client_with_mocks: TestClientWithMocks,
+                                               mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
         # GIVEN service raises MarkdownConversionTimeoutError
         mocker.patch.object(mocked_service, "parse_cv", side_effect=MarkdownConversionTimeoutError(60))
@@ -182,7 +201,8 @@ class TestUploadCV:
         assert response.status_code == HTTPStatus.REQUEST_TIMEOUT
 
     @pytest.mark.asyncio
-    async def test_service_empty_markdown_maps_to_422(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_service_empty_markdown_maps_to_422(self, client_with_mocks: TestClientWithMocks,
+                                                      mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
         # GIVEN service raises EmptyMarkdownError
         mocker.patch.object(mocked_service, "parse_cv", side_effect=EmptyMarkdownError("cv.pdf"))
@@ -195,10 +215,12 @@ class TestUploadCV:
         assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
     @pytest.mark.asyncio
-    async def test_service_max_uploads_maps_to_403(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_service_max_uploads_maps_to_403(self, client_with_mocks: TestClientWithMocks,
+                                                   mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
         # GIVEN service raises CVLimitExceededError when user exceeds uploads
-        mocker.patch.object(mocked_service, "parse_cv", side_effect=CVLimitExceededError("Maximum number of CV uploads reached"))
+        mocker.patch.object(mocked_service, "parse_cv",
+                            side_effect=CVLimitExceededError("Maximum number of CV uploads reached"))
         given_mime = next(iter(ALLOWED_MIME_TYPES))
         given_ext = next(iter(ALLOWED_EXTENSIONS))
         headers = {"Content-Type": given_mime, "x-filename": f"cv{given_ext}"}
@@ -208,10 +230,12 @@ class TestUploadCV:
         assert response.status_code == HTTPStatus.FORBIDDEN
 
     @pytest.mark.asyncio
-    async def test_service_rate_limit_maps_to_429(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_service_rate_limit_maps_to_429(self, client_with_mocks: TestClientWithMocks,
+                                                  mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
         # GIVEN service raises CVUploadRateLimitExceededError when rate limit exceeded
-        mocker.patch.object(mocked_service, "parse_cv", side_effect=CVUploadRateLimitExceededError("Too many CV uploads, try again later"))
+        mocker.patch.object(mocked_service, "parse_cv",
+                            side_effect=CVUploadRateLimitExceededError("Too many CV uploads, try again later"))
         given_mime = next(iter(ALLOWED_MIME_TYPES))
         given_ext = next(iter(ALLOWED_EXTENSIONS))
         headers = {"Content-Type": given_mime, "x-filename": f"cv{given_ext}"}
@@ -221,7 +245,8 @@ class TestUploadCV:
         assert response.status_code == HTTPStatus.TOO_MANY_REQUESTS
 
     @pytest.mark.asyncio
-    async def test_service_duplicate_cv_maps_to_409(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_service_duplicate_cv_maps_to_409(self, client_with_mocks: TestClientWithMocks,
+                                                    mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
         # GIVEN service raises DuplicateCVUploadError when duplicate CV is uploaded
         mocker.patch.object(mocked_service, "parse_cv", side_effect=DuplicateCVUploadError("duplicate_hash_123"))
@@ -234,3 +259,107 @@ class TestUploadCV:
         assert response.status_code == HTTPStatus.CONFLICT
         assert "already been uploaded" in response.json()["detail"]
 
+
+class TestCancelCVUpload:
+    @pytest.mark.asyncio
+    async def test_cancel_upload_success(self, client_with_mocks: TestClientWithMocks,
+                                         mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service cancel returns True
+        mocker.patch.object(mocked_service, "cancel_upload", return_value=True)
+
+        # WHEN cancelling an upload
+        resp = client.post(f"/{mocked_user.user_id}/cv/test-upload-id/cancel")
+
+        # THEN 200 OK and payload echoed
+        assert resp.status_code == HTTPStatus.OK
+        body = resp.json()
+        assert body["upload_id"] == "test-upload-id"
+
+    @pytest.mark.asyncio
+    async def test_cancel_upload_not_found(self, client_with_mocks: TestClientWithMocks,
+                                           mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service cancel returns False (not found or already terminal)
+        mocker.patch.object(mocked_service, "cancel_upload", return_value=False)
+
+        # WHEN cancelling an upload
+        resp = client.post(f"/{mocked_user.user_id}/cv/missing-id/cancel")
+
+        # THEN 404 Not Found
+        assert resp.status_code == HTTPStatus.NOT_FOUND
+        assert "Upload not found" in resp.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_cancel_upload_forbidden_other_user(self, client_with_mocks: TestClientWithMocks):
+        client, _, mocked_user = client_with_mocks
+        # WHEN cancelling with mismatched user id
+        other_user = mocked_user.user_id + "_x"
+        resp = client.post(f"/{other_user}/cv/test-upload-id/cancel")
+        # THEN 403 Forbidden
+        assert resp.status_code == HTTPStatus.FORBIDDEN
+
+    @pytest.mark.asyncio
+    async def test_cancel_upload_service_exception_maps_to_500(self, client_with_mocks: TestClientWithMocks,
+                                                               mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service raises unexpected exception
+        mocker.patch.object(mocked_service, "cancel_upload", side_effect=Exception("boom"))
+
+        # WHEN cancelling the upload
+        resp = client.post(f"/{mocked_user.user_id}/cv/any-id/cancel")
+
+        # THEN 500 Internal Server Error
+        assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+class TestGetUploadStatus:
+    @pytest.mark.asyncio
+    async def test_get_upload_status_success(self, client_with_mocks: TestClientWithMocks):
+        client, _, mocked_user = client_with_mocks
+        # GIVEN a valid user and upload ID
+
+        # WHEN getting upload status
+        resp = client.get(f"/{mocked_user.user_id}/cv/test-upload-id")
+
+        # THEN 200 OK with status info
+        assert resp.status_code == HTTPStatus.OK
+        body = resp.json()
+        assert body["upload_id"] == "test-upload-id"
+        assert body["user_id"] == mocked_user.user_id
+        assert body["upload_process_state"] == "COMPLETED"
+        assert body["cancel_requested"] is False
+
+    @pytest.mark.asyncio
+    async def test_get_upload_status_forbidden_other_user(self, client_with_mocks: TestClientWithMocks):
+        client, _, mocked_user = client_with_mocks
+        # WHEN reading status with mismatched user id
+        other_user = mocked_user.user_id + "_x"
+        resp = client.get(f"/{other_user}/cv/test-upload-id")
+        # THEN 403 Forbidden
+        assert resp.status_code == HTTPStatus.FORBIDDEN
+
+    @pytest.mark.asyncio
+    async def test_get_upload_status_not_found(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service returns None (upload not found)
+        mocker.patch.object(mocked_service, "get_upload_status", return_value=None)
+
+        # WHEN getting status for non-existent upload
+        resp = client.get(f"/{mocked_user.user_id}/cv/missing-id")
+
+        # THEN 404 Not Found
+        assert resp.status_code == HTTPStatus.NOT_FOUND
+        assert "Upload not found" in resp.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_get_upload_status_service_exception_maps_to_500(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service raises unexpected exception
+        mocker.patch.object(mocked_service, "get_upload_status", side_effect=Exception("boom"))
+
+        # WHEN getting upload status
+        resp = client.get(f"/{mocked_user.user_id}/cv/any-id")
+
+        # THEN 500 Internal Server Error
+        assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR

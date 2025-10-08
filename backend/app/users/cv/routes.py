@@ -11,14 +11,14 @@ from app.users.cv.constants import (
     ALLOWED_MIME_TYPES,
     ALLOWED_EXTENSIONS,
 )
-from app.users.cv.errors import MarkdownTooLongError, PayloadTooLargeErrorResponse, MarkdownConversionTimeoutError, \
+from app.users.cv.errors import MarkdownConversionTimeoutError, MarkdownTooLongError, PayloadTooLargeErrorResponse, \
     EmptyMarkdownError, CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError
 from app.users.auth import Authentication, UserInfo
 from app.users.cv.service import CVUploadService, ICVUploadService
 from app.users.cv.get_repository import get_user_cv_repository
 from app.users.cv.repository import IUserCVRepository
 from app.users.cv.storage import _get_cv_storage_service, ICVCloudStorageService
-from app.users.cv.types import ParsedCV
+from app.users.cv.types import CVUploadStatusResponse
 
 
 logger = logging.getLogger(__name__)
@@ -101,7 +101,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
     @router.post(
         path="",
         status_code=HTTPStatus.OK,
-        response_model=ParsedCV,
+        response_model=dict,
         responses={
             HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
             HTTPStatus.UNSUPPORTED_MEDIA_TYPE: {"model": HTTPErrorResponse},
@@ -132,7 +132,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
         user_id: str = Path(description="the unique identifier of the user", examples=["1"]),
         user_info: UserInfo = Depends(auth.get_user_info()),
         service: ICVUploadService = Depends(_get_cv_service),
-    ) -> ParsedCV:
+    ) -> dict:
         # Validate size early using Content-Length (no multipart overhead for raw)
         _validate_request_size_header(request)
         content_length_header = request.headers.get("content-length")
@@ -197,31 +197,25 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
 
         try:
             logger.info("Processing CV {filename='%s', size_bytes=%s}", filename, len(file_bytes))
-            parsed = await service.parse_cv(
+            upload_id = await service.parse_cv(
                 user_id=user_id,
                 file_bytes=file_bytes,
                 filename=filename,
             )
-            items = getattr(parsed, "experiences_data", []) or []
-            if not items:
-                logger.error("No experiences extracted {filename='%s'}", filename)
-            else:
-                preview = "; ".join(items[:3])
-                logger.info("Parsing complete {items=%s}", len(items))
-                logger.debug("Extraction preview: %s", preview)
-            return parsed
+            logger.info("CV processed successfully {user_id=%s, upload_id=%s}", user_id, upload_id)
+            return {"upload_id": upload_id}
         except MarkdownTooLongError as e:
             # Map markdown length guard to 413 Payload Too Large
             length = getattr(e, "length", None)
             limit = getattr(e, "limit", None)
             logger.warning("413 via markdown-length: converted_len=%s limit=%s filename='%s'", length, limit, filename)
             raise HTTPException(status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE, detail=str(e))
-        except MarkdownConversionTimeoutError as e:
-            logger.warning("Markdown conversion timeout {timeout_sec=%s, filename='%s'}", getattr(e, 'timeout_seconds', None), filename)
-            raise HTTPException(status_code=HTTPStatus.REQUEST_TIMEOUT, detail=str(e))
         except EmptyMarkdownError as e:
             logger.warning("Markdown conversion returned empty content {filename='%s'}", filename)
             raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e))
+        except MarkdownConversionTimeoutError as e:
+            logger.error(str(e))
+            raise HTTPException(status_code=HTTPStatus.REQUEST_TIMEOUT, detail=str(e))
         except HTTPException:
             raise
         except CVLimitExceededError as e:
@@ -236,5 +230,73 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
         except Exception as e:
             logger.exception(e)
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")
+
+    @router.post("/{upload_id}/cancel", response_model=dict)
+    async def cancel_cv_upload(
+        user_id: str = Path(..., description="User ID"),
+        upload_id: str = Path(..., description="Upload ID to cancel"),
+        service: ICVUploadService = Depends(get_cv_service),
+        user_info: UserInfo = Depends(auth.get_user_info()),
+    ) -> dict:
+        """
+        Cancel an ongoing CV upload process.
+        """
+        try:
+            if user_info.user_id != user_id:
+                raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Cannot cancel CV for a different user")
+            # Request cancellation through the service
+            success = await service.cancel_upload(user_id=user_id, upload_id=upload_id)
+            
+            if not success:
+                raise HTTPException(
+                    status_code=HTTPStatus.NOT_FOUND, 
+                    detail="Upload not found or already completed/failed"
+                )
+            
+            return {"upload_id": upload_id}
+            
+        except HTTPException:
+            # Re-raise HTTP exceptions (like 404) as-is
+            raise
+        except Exception as e:
+            logger.exception(e)
+            raise HTTPException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR, 
+                detail="Failed to cancel upload"
+            )
+
+    @router.get("/{upload_id}", response_model=CVUploadStatusResponse)
+    async def get_upload_status(
+        user_id: str = Path(..., description="User ID"),
+        upload_id: str = Path(..., description="Upload ID to get status for"),
+        service: ICVUploadService = Depends(get_cv_service),
+        user_info: UserInfo = Depends(auth.get_user_info()),
+    ):
+        """
+        Get the status of an upload process.
+        """
+        try:
+            if user_info.user_id != user_id:
+                raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Cannot read CV status for a different user")
+            # Get upload status through the service
+            status_info = await service.get_upload_status(user_id=user_id, upload_id=upload_id)
+            
+            if not status_info:
+                raise HTTPException(
+                    status_code=HTTPStatus.NOT_FOUND,
+                    detail="Upload not found"
+                )
+            
+            return status_info
+            
+        except HTTPException:
+            # Re-raise HTTP exceptions (like 404) as-is
+            raise
+        except Exception as e:
+            logger.exception(e)
+            raise HTTPException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                detail="Failed to get upload status"
+            )
 
     users_router.include_router(router)

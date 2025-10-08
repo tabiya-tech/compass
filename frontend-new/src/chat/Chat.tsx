@@ -1,12 +1,12 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { StatusCodes } from "http-status-codes";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "src/chat/Chat.types";
 import {
+  CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE,
+  generateCancellableCVTypingMessage,
   generateCompassMessage,
   generateConversationConclusionMessage,
-  generateCVTypingMessage,
   generatePleaseRepeatMessage,
   generateSomethingWentWrongMessage,
   generateTypingMessage,
@@ -40,7 +40,13 @@ import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "./chatMessage/convers
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 import cvService from "src/CV/CVService/CVService";
-import { CV_UPLOADED_DISPLAY_TIME } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
+import {
+  getCvUploadDisplayMessage,
+  getUploadErrorMessage,
+  startUploadPolling,
+  stopUploadPolling,
+} from "./cvUploadPolling";
+import type { UploadStatus } from "./Chat.types";
 import { nanoid } from "nanoid";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
@@ -51,6 +57,7 @@ export const CHECK_INACTIVITY_INTERVAL = INACTIVITY_TIMEOUT + INACTIVITY_TIMEOUT
 export const FEEDBACK_NOTIFICATION_DELAY = 30 * 60 * 1000; // In milliseconds
 // Always add an artificial typing message for the conclusion message
 export const TYPING_BEFORE_CONCLUSION_MESSAGE_TIMEOUT = 3000; // In milliseconds
+export const MAX_UPLOAD_POLL_MS = 60 * 1000; // Abort polling after 1 minute
 const uniqueId = "b7ea1e82-0002-432d-a768-11bdcd186e1d";
 export const DATA_TEST_ID = {
   CONTAINER: `container-${uniqueId}`,
@@ -103,6 +110,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   const [aiIsTyping, setAiIsTyping] = useState<boolean>(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [experiences, setExperiences] = React.useState<Experience[]>([]);
+  const [prefillMessage, setPrefillMessage] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isLoggingOut, setIsLoggingOut] = React.useState<boolean>(false);
   const [showBackdrop, setShowBackdrop] = useState(showInactiveSessionAlert);
@@ -116,6 +124,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
   // CV upload states
   const [isUploadingCv, setIsUploadingCv] = useState<boolean>(false);
+  const [activeUploads, setActiveUploads] = useState<Map<string, { messageId: string; intervalId: NodeJS.Timeout; timeoutId: NodeJS.Timeout }>>(new Map());
 
   const navigate = useNavigate();
 
@@ -142,9 +151,6 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
 
   const { showSkillsRanking } = useSkillsRanking(addMessageToChat, removeMessageFromChat);
 
-  /**
-   * --- Utility functions ---
-   */
 
   // Depending on the typing state, add or remove the typing message from the messages list
   const addOrRemoveTypingMessage = (userIsTyping: boolean) => {
@@ -228,6 +234,181 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     setIsLoggingOut(false);
   }, [enqueueSnackbar, navigate]);
 
+  // Helper to stop polling and cleanup
+  const stopPollingForUpload = useCallback((uploadId: string, intervalId?: NodeJS.Timeout, timeoutId?: NodeJS.Timeout) => {
+    stopUploadPolling(intervalId && timeoutId ? { intervalId, timeoutId } : undefined);
+    setActiveUploads(prev => {
+      const newMap = new Map(prev);
+      const existing = newMap.get(uploadId);
+      if (existing) {
+        stopUploadPolling({ intervalId: existing.intervalId, timeoutId: existing.timeoutId });
+      }
+      newMap.delete(uploadId);
+      return newMap;
+    });
+  }, []);
+
+  // Compute display message from status
+  const getCvUploadDisplayMessageMemo = useCallback((status: UploadStatus): string => getCvUploadDisplayMessage(status), []);
+
+  // Helper function to start polling for upload status
+  const startPollingForUpload = useCallback((uploadId: string, messageId: string) => {
+    // Stop any existing polling for this uploadId first
+    const existing = activeUploads.get(uploadId);
+    if (existing) {
+      stopPollingForUpload(uploadId, existing.intervalId, existing.timeoutId);
+    }
+
+    // Safety timeout to abort stuck polling
+    const handles = startUploadPolling({
+      uploadId,
+      pollIntervalMs: 2000,
+      maxDurationMs: MAX_UPLOAD_POLL_MS,
+      getStatus: async (id: string): Promise<UploadStatus> => {
+        const currentUserId = authenticationStateService.getInstance().getUser()?.id;
+        if (!currentUserId) throw new Error("User ID missing");
+        const resp = await cvService.getInstance().getUploadStatus(currentUserId, id);
+        // Narrow to UploadStatus
+return {
+          upload_process_state: resp.upload_process_state as UploadStatus["upload_process_state"],
+          cancel_requested: resp.cancel_requested,
+          filename: resp.filename,
+          user_id: resp.user_id,
+          upload_id: resp.upload_id,
+          created_at: resp.created_at,
+          last_activity_at: resp.last_activity_at,
+          error_code: resp.error_code,
+          error_detail: resp.error_detail,
+          experience_bullets: resp.experience_bullets,
+        } as UploadStatus;
+      },
+      onStatus: (status: UploadStatus | null) => {
+        if (!status) return;
+        setMessages(prev => prev.map(msg => {
+          if (msg.message_id === messageId && msg.type === CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE) {
+            return {
+              ...msg,
+              payload: {
+                ...msg.payload,
+                message: getCvUploadDisplayMessageMemo(status),
+                disabled: status.upload_process_state === "COMPLETED" || status.upload_process_state === "CANCELLED" || status.cancel_requested,
+              }
+            };
+          }
+          return msg;
+        }));
+      },
+      onComplete: (status: UploadStatus) => {
+        stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
+        removeMessageFromChat(messageId);
+        const items: string[] | undefined = status.experience_bullets ?? undefined;
+        if (Array.isArray(items) && items.length > 0) {
+          const intro = "These are my experiences:";
+          const bullets = items
+            .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
+            .filter(Boolean)
+            .join("\n");
+          const composed = bullets ? `${intro}\n${bullets}` : intro;
+          setPrefillMessage(composed);
+        }
+        enqueueSnackbar("CV uploaded successfully", { variant: "success" });
+      },
+      onTerminal: (_status: UploadStatus) => {
+        stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
+        setTimeout(() => removeMessageFromChat(messageId), 3000);
+        // Ensure no stale prefill remains on cancel/fail
+        setPrefillMessage(null);
+        // Note: No snackbar here - handleCancelUpload already shows the cancellation message
+      },
+      onError: (error: unknown) => {
+        stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
+        // Ensure no stale prefill remains on errors
+        setPrefillMessage(null);
+        const err = error as { status?: number; response?: { status?: number; data?: { detail?: string } }; message?: string };
+        const statusCode = err?.status || err?.response?.status;
+        const detail = err?.response?.data?.detail || err?.message;
+        if (statusCode === 404 || err?.message === "timeout") {
+          removeMessageFromChat(messageId);
+          enqueueSnackbar(getUploadErrorMessage(404, detail), { variant: "warning" });
+          return;
+        }
+        if (statusCode === 409) {
+          removeMessageFromChat(messageId);
+          enqueueSnackbar(getUploadErrorMessage(409, detail), { variant: "warning" });
+          return;
+        }
+        if (statusCode === 429) {
+          enqueueSnackbar(getUploadErrorMessage(429, detail), { variant: "warning" });
+        } else if (statusCode) {
+          enqueueSnackbar(getUploadErrorMessage(statusCode, detail), { variant: "error" });
+        } else {
+          enqueueSnackbar("Network error while checking upload status.", { variant: "error" });
+        }
+        console.error("Error polling upload status:", error);
+      },
+      isCancelled: () => {
+        const currentMessage = messages.find(msg => msg.message_id === messageId);
+        return Boolean(currentMessage?.payload.disabled);
+      }
+    });
+    setActiveUploads(prev => new Map(prev).set(uploadId, { messageId, intervalId: handles.intervalId as any, timeoutId: handles.timeoutId as any }));
+  }, [activeUploads, enqueueSnackbar, removeMessageFromChat, messages, stopPollingForUpload, getCvUploadDisplayMessageMemo]);
+
+  // Helper function to cancel an upload
+  const handleCancelUpload = useCallback(async (uploadId: string) => {
+    try {
+      // If it's the temporary uploadId, just show cancelled state
+      if (uploadId === "uploading") {
+        setMessages(prev => prev.map(msg => {
+          if (msg.type === CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE && !msg.payload.disabled) {
+            return {
+              ...msg,
+              payload: {
+                ...msg.payload,
+                message: "CV upload cancelled",
+                disabled: true,
+              }
+            };
+          }
+          return msg;
+        }));
+        enqueueSnackbar("CV upload cancelled", { variant: "info" });
+        return;
+      }
+
+      const currentUserId = authenticationStateService.getInstance().getUser()?.id;
+      if (!currentUserId) return;
+
+      await cvService.getInstance().cancelUpload(currentUserId, uploadId);
+
+      // Update the message to show cancelled state
+      setMessages(prev => prev.map(msg => {
+        if (msg.message_id === activeUploads.get(uploadId)?.messageId) {
+          return {
+            ...msg,
+            payload: {
+              ...msg.payload,
+              message: "CV upload cancelled",
+              disabled: true,
+            }
+          };
+        }
+        return msg;
+      }));
+
+      // Stop polling
+      const uploadInfo = activeUploads.get(uploadId);
+      if (uploadInfo) {
+        stopPollingForUpload(uploadId, uploadInfo.intervalId, uploadInfo.timeoutId);
+      }
+
+      enqueueSnackbar("CV upload cancelled", { variant: "info" });
+    } catch (error) {
+      console.error("Error cancelling upload:", error);
+      enqueueSnackbar("Failed to cancel upload", { variant: "error" });
+    }
+  }, [activeUploads, enqueueSnackbar, stopPollingForUpload]);
+
   // Handles CV upload
   const handleUploadCv = useCallback(
     async (file: File) => {
@@ -236,53 +417,80 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
 
       setIsUploadingCv(true);
       const uploadingMessageId = nanoid();
-      try {
-        enqueueSnackbar(`Uploading ${file.name}...`, { variant: "info" });
 
-        // Add a CV typing message to indicate uploading
-        addMessageToChat({
-          ...generateCVTypingMessage(false),
-          message_id: uploadingMessageId,
-        });
+      try {
+        // Clear any previous prefill to avoid stale text on new uploads
+        setPrefillMessage(null);
+        enqueueSnackbar(`Uploading ${file.name}...`, { variant: "info" });
 
         const currentUserId = authenticationStateService.getInstance().getUser()?.id;
         if (!currentUserId) {
           throw new ChatError("User ID is not available");
         }
 
-        const response = await cvService.getInstance().uploadCV(currentUserId, file);
-
-        // Remove the uploading message
-        removeMessageFromChat(uploadingMessageId);
-
-        // Create a new ID for the success message
-        const successMessageId = nanoid();
+        // Show the cancellable message immediately
         addMessageToChat({
-          ...generateCVTypingMessage(true),
-          message_id: successMessageId,
+          ...generateCancellableCVTypingMessage(
+            "uploading", // temporary ID until we get the real one
+            handleCancelUpload,
+            false,
+            false,
+            "UPLOADING"
+          ),
+          message_id: uploadingMessageId,
         });
 
-        // Remove the "uploaded" message after display time
-        setTimeout(() => {
-          removeMessageFromChat(successMessageId);
-        }, CV_UPLOADED_DISPLAY_TIME);
+        // Start the upload asynchronously
+        const response = await cvService.getInstance().uploadCV(currentUserId, file);
 
-        enqueueSnackbar("CV uploaded", { variant: "success" });
-
-        return response;
-      } catch (e) {
-        removeMessageFromChat(uploadingMessageId);
-        const status = (e as any)?.statusCode as number | undefined;
-        if (status !== StatusCodes.FORBIDDEN) {
-          enqueueSnackbar("Failed to upload CV. Please try again.", { variant: "error" });
+        if (response.uploadId) {
+          // Update the message's cancel handler with real id and start polling immediately
+          setMessages(prev => prev.map(msg => {
+            if (msg.message_id === uploadingMessageId && msg.type === CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE) {
+              return {
+                ...msg,
+                payload: {
+                  ...msg.payload,
+                  onCancel: async () => await handleCancelUpload(response.uploadId!),
+                }
+              };
+            }
+            return msg;
+          }));
+          // Verify the status exists before starting interval polling
+          try {
+            const currentUserIdVerify = authenticationStateService.getInstance().getUser()?.id;
+            if (!currentUserIdVerify) throw new Error("User ID missing");
+            await cvService.getInstance().getUploadStatus(currentUserIdVerify, response.uploadId);
+            startPollingForUpload(response.uploadId, uploadingMessageId);
+          } catch (err: any) {
+            const statusCode = err?.status || err?.response?.status;
+            const detail = err?.response?.data?.detail || err?.message;
+            removeMessageFromChat(uploadingMessageId);
+            enqueueSnackbar(getUploadErrorMessage(statusCode, detail), { variant: statusCode && statusCode < 500 ? "warning" : "error" });
+            return [] as string[];
+          }
+        } else {
+          // No upload id – treat as immediate failure
+          removeMessageFromChat(uploadingMessageId);
+          enqueueSnackbar("Failed to start upload.", { variant: "error" });
+          return [] as string[];
         }
-        // Propagate the error so the input field can show the specific inline message
+
+        return [] as string[];
+      } catch (e: any) {
+        console.error(e);
+        // Ensure we remove the cancellable message on any failure
+        removeMessageFromChat(uploadingMessageId);
+        // Clear any prefill on failure
+        setPrefillMessage(null);
+        // Re-throw so ChatMessageField can surface the error inline
         throw e;
       } finally {
         setIsUploadingCv(false);
       }
     },
-    [enqueueSnackbar, isUploadingCv, addMessageToChat, removeMessageFromChat]
+    [isUploadingCv, enqueueSnackbar, addMessageToChat, handleCancelUpload, startPollingForUpload, removeMessageFromChat]
   );
 
   // Goes to the chat service to send a message
@@ -582,6 +790,15 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     }
   }, [activeSessionId, fetchExperiences, currentPhase.phase]);
 
+  // Cleanup polling intervals on unmount
+  useEffect(() => {
+    return () => {
+      activeUploads.forEach(({ intervalId }) => {
+        clearInterval(intervalId);
+      });
+    };
+  }, [activeUploads]);
+
   return (
     <Suspense fallback={<Backdrop isShown={true} transparent={true} />}>
       {isLoggingOut ? (
@@ -640,9 +857,10 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 handleSend={handleSend}
                 aiIsTyping={aiIsTyping}
                 isChatFinished={conversationCompleted}
-                isUploadingCv={isUploadingCv}
+                isUploadingCv={isUploadingCv || activeUploads.size > 0}
                 onUploadCv={handleUploadCv}
                 currentPhase={currentPhase.phase}
+                prefillMessage={prefillMessage}
               />
             </Box>
           </Box>

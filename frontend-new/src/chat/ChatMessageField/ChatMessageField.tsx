@@ -5,7 +5,6 @@ import AddIcon from "@mui/icons-material/Add";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { AnimatePresence, motion } from "framer-motion";
 import { StatusCodes } from "http-status-codes";
-import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
@@ -19,6 +18,7 @@ export interface ChatMessageFieldProps {
   isUploadingCv?: boolean;
   onUploadCv?: (file: File) => Promise<string[]>; // returns array of experience lines
   currentPhase?: ConversationPhase;
+  prefillMessage?: string | null; // optional prefill content for the input field
 }
 
 const uniqueId = "2a76494f-351d-409d-ba58-e1b2cfaf2a53";
@@ -60,6 +60,9 @@ export const ERROR_MESSAGES = {
   GENERIC_UPLOAD_ERROR: "Failed to parse your CV. Please try again or use a different file.",
   RATE_LIMIT_WAIT: "You're uploading too quickly. Please wait a bit and try again.",
   MAX_UPLOADS_REACHED: "You've reached the maximum CV uploads for this conversation.",
+  DUPLICATE_CV: "This CV has already been uploaded.",
+  UNSUPPORTED_FILE_TYPE: "Unsupported file type. Allowed: PDF, DOCX, TXT.",
+  UPLOAD_TIMEOUT: "The upload timed out. Please try again.",
 };
 
 // Define the max file size in bytes 3 MB
@@ -190,6 +193,16 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     inputElement.setSelectionRange(newCaretPosition, newCaretPosition);
   };
 
+  // Prefill message when provided from parent (e.g., after CV processing completes)
+  useEffect(() => {
+    if (props.prefillMessage) {
+      setMessage(props.prefillMessage);
+      if (errorMessage) {
+        setErrorMessage("");
+      }
+    }
+  }, [errorMessage, props.prefillMessage]);
+
   // Handle Enter key press to send message or add new line depending on the platform
   const handleKeyDown = (event: KeyboardEvent) => {
     const target = event.target as HTMLTextAreaElement;
@@ -278,39 +291,52 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     if (!props.onUploadCv) return;
     try {
       const experiences = await props.onUploadCv(file);
-      // Empty responses are treated as an error for the UX
-      if (!Array.isArray(experiences) || experiences.length === 0) {
-        setErrorMessage(ERROR_MESSAGES.EMPTY_CV_PARSE);
+      // With the asynchronous upload pipeline, the initial response may be empty (200 with background processing).
+      // Do not treat an empty experiences array as an error. Only compose the message when we actually receive items.
+      if (Array.isArray(experiences) && experiences.length > 0) {
+        const intro = "These are my experiences:";
+        const bullets = experiences
+          .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
+          .filter(Boolean)
+          .join("\n");
+        const composed = bullets ? `${intro}\n${bullets}` : intro;
+        setMessage(composed);
+        // Ensure any previous error is cleared on success
+        if (errorMessage) {
+          setErrorMessage("");
+        }
+      }
+    } catch (err: any) {
+      console.error("Error parsing CV file:", err);
+      const status = err?.statusCode || err?.status || err?.response?.status;
+      const detail = err?.response?.data?.detail;
+      // Map friendly, inline field errors
+      if (status === StatusCodes.CONFLICT) {
+        setErrorMessage(ERROR_MESSAGES.DUPLICATE_CV);
         return;
       }
-      // Only compose and set message on success
-      const intro = "These are my experiences:";
-      const bullets = Array.isArray(experiences)
-        ? experiences
-            .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
-            .filter(Boolean)
-            .join("\n")
-        : "";
-      const composed = bullets ? `${intro}\n${bullets}` : intro;
-      setMessage(composed);
-      // Ensure any previous error is cleared on success
-      if (errorMessage) {
-        setErrorMessage("");
+      if (status === StatusCodes.UNSUPPORTED_MEDIA_TYPE) {
+        setErrorMessage(ERROR_MESSAGES.UNSUPPORTED_FILE_TYPE);
+        return;
       }
-    } catch (err) {
-      console.error("Error parsing CV file:", err);
-      const maybeStatus = (err as any)?.statusCode;
-      const maybeCode = (err as any)?.errorCode;
-      if (maybeStatus === StatusCodes.REQUEST_TOO_LONG || maybeCode === ErrorConstants.ErrorCodes.TOO_LARGE_PAYLOAD) {
+      if (status === StatusCodes.REQUEST_TOO_LONG) {
         setErrorMessage(ERROR_MESSAGES.FILE_TOO_DENSE);
-      } else if (maybeStatus === StatusCodes.TOO_MANY_REQUESTS) {
-        setErrorMessage(ERROR_MESSAGES.RATE_LIMIT_WAIT);
-      } else if (maybeStatus === StatusCodes.FORBIDDEN) {
-        setErrorMessage(ERROR_MESSAGES.MAX_UPLOADS_REACHED);
-      } else {
-        setErrorMessage(ERROR_MESSAGES.GENERIC_UPLOAD_ERROR);
+        return;
       }
-      // Do not modify the text field message on failure
+      if (status === StatusCodes.TOO_MANY_REQUESTS) {
+        setErrorMessage(ERROR_MESSAGES.RATE_LIMIT_WAIT);
+        return;
+      }
+      if (status === StatusCodes.FORBIDDEN) {
+        setErrorMessage(ERROR_MESSAGES.MAX_UPLOADS_REACHED);
+        return;
+      }
+      if (status === StatusCodes.REQUEST_TIMEOUT || status === StatusCodes.GATEWAY_TIMEOUT) {
+        setErrorMessage(ERROR_MESSAGES.UPLOAD_TIMEOUT);
+        return;
+      }
+      // Fallback generic inline error
+      setErrorMessage(detail || ERROR_MESSAGES.GENERIC_UPLOAD_ERROR);
     }
   };
 

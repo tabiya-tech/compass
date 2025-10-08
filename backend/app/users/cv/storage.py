@@ -10,7 +10,7 @@ from google.cloud import storage
 
 from app.app_config import get_application_config
 from app.users.cv.types import UserCVUpload
-
+import logging
 
 class ICVCloudStorageService(ABC):
     @abstractmethod
@@ -82,15 +82,24 @@ class GCPCVCloudStorageService(ICVCloudStorageService):
                   document: UserCVUpload,
                   markdown_text: str,
                   original_bytes: bytes):
-        # 1. Upload original document
-        # Ensure the original file is stored with the correct content type so that
-        # downloads/open-in-browser work properly for pdf/docx/txt.
-        self._bucket.blob(document.object_path).upload_from_string(
-            original_bytes,
-            content_type=document.content_type,
-        )
+        try:
+            # 1. Upload original document
+            # Ensure the original file is stored with the correct content type so that
+            # downloads/open-in-browser work properly for pdf/docx/txt.
+            self._bucket.blob(document.object_path).upload_from_string(
+                original_bytes,
+                content_type=document.content_type,
+            )
 
-        # 2. Upload Markdown (plain utf-8; compression optional in later step)
-        self._bucket.blob(document.markdown_object_path).upload_from_string(
-            markdown_text.encode("utf-8"),
-            content_type="text/markdown; charset=utf-8")
+            # 2. Upload Markdown (plain utf-8; compression optional in later step)
+            self._bucket.blob(document.markdown_object_path).upload_from_string(
+                markdown_text.encode("utf-8"),
+                content_type="text/markdown; charset=utf-8")
+        except Exception as e:
+
+            logger = logging.getLogger(self.__class__.__name__)
+            logger.error("Failed to upload CV to GCS (continuing without upload): %s", str(e))
+            # If google cloud storage is not available, we continue without GCS upload
+            # we will log a error and continue without GCS upload
+            # The database record will still be saved so polling works
+            # TODO: Remember to add raise

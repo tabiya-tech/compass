@@ -25,7 +25,7 @@ export default class CVService {
     return CVService.instance;
   }
 
-  public async uploadCV(userId: string, file: File): Promise<string[]> {
+  public async uploadCV(userId: string, file: File): Promise<{ uploadId: string }> {
     const serviceName = "CVService";
     const serviceFunction = "uploadCV";
     const method = "POST";
@@ -62,7 +62,7 @@ export default class CVService {
 
     const responseText = await response.text();
 
-    let parseResponse: { experiences_data?: string[] };
+    let parseResponse: any;
     try {
       parseResponse = JSON.parse(responseText);
     } catch (e: any) {
@@ -77,7 +77,78 @@ export default class CVService {
       );
     }
 
-    const experiences = Array.isArray(parseResponse.experiences_data) ? parseResponse.experiences_data : [];
-    return experiences;
+    const uploadId: string | undefined = typeof parseResponse === "string" ? parseResponse : parseResponse?.upload_id;
+    if (!uploadId) {
+      throw errorFactory(
+        response.status,
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+        "Response did not contain required field 'upload_id'",
+        { responseText }
+      );
+    }
+    return { uploadId };
+  }
+
+  public async cancelUpload(userId: string, uploadId: string): Promise<void> {
+    const serviceName = "CVService";
+    const serviceFunction = "cancelUpload";
+    const method = "POST";
+    const constructedCancelUrl = `${this.cvEndpointUrl}/${userId}/cv/${uploadId}/cancel`;
+
+    await customFetch(constructedCancelUrl, {
+      method: method,
+      expectedStatusCode: StatusCodes.OK,
+      serviceName,
+      serviceFunction,
+      failureMessage: `Failed to cancel upload ${uploadId} for user ${userId}`,
+      expectedContentType: "application/json",
+    });
+  }
+
+  public async getUploadStatus(userId: string, uploadId: string): Promise<{
+    upload_id: string;
+    user_id: string;
+    filename: string;
+    upload_process_state: string;
+    cancel_requested: boolean;
+    created_at: string;
+    last_activity_at: string;
+    error_code?: string;
+    error_detail?: string;
+    experience_bullets?: string[];
+  }> {
+    const serviceName = "CVService";
+    const serviceFunction = "getUploadStatus";
+    const method = "GET";
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, this.cvEndpointUrl);
+    const constructedStatusUrl = `${this.cvEndpointUrl}/${userId}/cv/${uploadId}`;
+
+    const response = await customFetch(constructedStatusUrl, {
+      method: method,
+      expectedStatusCode: StatusCodes.OK,
+      serviceName,
+      serviceFunction,
+      failureMessage: `Failed to get status for upload ${uploadId} for user ${userId}`,
+      expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
+    });
+
+    const responseText = await response.text();
+    let statusResponse: any;
+    try {
+      statusResponse = JSON.parse(responseText);
+    } catch (e: any) {
+      throw errorFactory(
+        response.status,
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+        "Response did not contain valid JSON",
+        {
+          responseText,
+          error: e,
+        }
+      );
+    }
+
+    return statusResponse;
   }
 }

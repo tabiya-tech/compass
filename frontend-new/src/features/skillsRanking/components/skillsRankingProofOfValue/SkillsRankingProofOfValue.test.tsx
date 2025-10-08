@@ -11,7 +11,7 @@ import {
 } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { DATA_TEST_ID as CANCELLABLE_TYPING_IDS } from "src/features/skillsRanking/components/cancellableTypingChatMessage/CancellableTypingChatMessage";
+import { DATA_TEST_ID as CANCELLABLE_TYPING_IDS } from "src/chat/chatMessage/cancellableTypingChatMessage/CancellableTypingChatMessage";
 import { EFFORT_METRICS_UPDATE_INTERVAL } from "src/features/skillsRanking/constants";
 
 // Global mocks: animations only

@@ -48,10 +48,9 @@ describe("CVService", () => {
       // GIVEN some file to upload
       const givenFile = new File(["file content"], fileProps.name, { type: fileProps.type });
       const givenUserId = "user123";
-      // AND the upload CV REST API will respond with OK and some message response
+      // AND the upload CV REST API will respond with OK and the new schema
       const expectedResponse = {
-        message: "CV uploaded successfully",
-        experiences_data: ["Experience 1", "Experience 2", "Experience 3"],
+        upload_id: "test-upload-id",
       };
       const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, expectedResponse, "application/json;charset=UTF-8");
 
@@ -79,8 +78,8 @@ describe("CVService", () => {
         })
       );
 
-      // AND expect the response to be as expected
-      expect(actualResponse).toEqual(expectedResponse.experiences_data);
+      // AND expect the response to be mapped to the new return type
+      expect(actualResponse).toEqual({ uploadId: expectedResponse.upload_id });
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();

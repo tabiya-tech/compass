@@ -5,7 +5,7 @@ from typing import Awaitable
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.users.cv.repository import UserCVRepository
-from app.users.cv.types import UserCVUpload
+from app.users.cv.types import UserCVUpload, UploadProcessState
 from app.users.cv.errors import DuplicateCVUploadError
 from common_libs import time_utilities as time_utils
 
@@ -39,8 +39,11 @@ def _assert_upload_doc_matches(actual: dict, given: UserCVUpload) -> None:
     assert actual["markdown_object_path"] == given.markdown_object_path
     assert actual["markdown_char_len"] == given.markdown_char_len
     assert actual["md5_hash"] == given.md5_hash
-    # created_at is stored as Mongo date
     assert actual["created_at"] == time_utils.convert_python_datetime_to_mongo_datetime(given.created_at)
+    assert actual["upload_id"] == given.upload_id
+    assert actual["upload_process_state"] == given.upload_process_state
+    assert actual["cancel_requested"] == given.cancel_requested
+    assert actual["last_activity_at"] == time_utils.convert_python_datetime_to_mongo_datetime(given.last_activity_at)
 
 
 class TestUserCVRepository:
@@ -131,5 +134,183 @@ class TestUserCVRepository:
         assert id1 != id2
         assert isinstance(id1, str)
         assert isinstance(id2, str)
+
+    @pytest.mark.asyncio
+    async def test_get_upload_by_id_returns_upload(self, get_user_cv_repository: Awaitable[UserCVRepository]):
+        repository = await get_user_cv_repository
+        now = datetime.now(timezone.utc)
+        user_id = "user-1"
+        upload = _get_upload(user_id=user_id, created_at=now, suffix="1", md5_hash="test_hash_123")
+        
+        # GIVEN an uploaded document
+        await repository.insert_upload(upload)
+        
+        # WHEN getting by upload_id
+        result = await repository.get_upload_by_id(user_id, upload.upload_id)
+        
+        # THEN the document is returned
+        assert result is not None
+        assert result["upload_id"] == upload.upload_id
+        assert result["user_id"] == user_id
+
+    @pytest.mark.asyncio
+    async def test_get_upload_by_id_returns_none_for_nonexistent(self, get_user_cv_repository: Awaitable[UserCVRepository]):
+        repository = await get_user_cv_repository
+        
+        # WHEN getting non-existent upload
+        result = await repository.get_upload_by_id("user-1", "nonexistent-upload-id")
+        
+        # THEN None is returned
+        assert result is None
+
+    @pytest.mark.asyncio
+    async def test_request_cancellation_succeeds_for_active_upload(self, get_user_cv_repository: Awaitable[UserCVRepository]):
+        repository = await get_user_cv_repository
+        now = datetime.now(timezone.utc)
+        user_id = "user-1"
+        upload = _get_upload(user_id=user_id, created_at=now, suffix="1", md5_hash="test_hash_123")
+        upload.upload_process_state = UploadProcessState.UPLOADING
+        
+        # GIVEN an active upload
+        await repository.insert_upload(upload)
+        
+        # WHEN requesting cancellation
+        success = await repository.request_cancellation(user_id, upload.upload_id)
+        
+        # THEN cancellation succeeds
+        assert success is True
+        
+        # AND the document is updated
+        updated_doc = await repository.get_upload_by_id(user_id, upload.upload_id)
+        assert updated_doc["cancel_requested"] is True
+
+    @pytest.mark.asyncio
+    async def test_request_cancellation_fails_for_completed_upload(self, get_user_cv_repository: Awaitable[UserCVRepository]):
+        repository = await get_user_cv_repository
+        now = datetime.now(timezone.utc)
+        user_id = "user-1"
+        upload = _get_upload(user_id=user_id, created_at=now, suffix="1", md5_hash="test_hash_123")
+        upload.upload_process_state = UploadProcessState.COMPLETED
+        
+        # GIVEN a completed upload
+        await repository.insert_upload(upload)
+        
+        # WHEN requesting cancellation
+        success = await repository.request_cancellation(user_id, upload.upload_id)
+        
+        # THEN cancellation fails
+        assert success is False
+        
+        # AND the document is unchanged
+        updated_doc = await repository.get_upload_by_id(user_id, upload.upload_id)
+        assert updated_doc["cancel_requested"] is False
+
+    @pytest.mark.asyncio
+    async def test_atomic_state_transition_succeeds(self, get_user_cv_repository: Awaitable[UserCVRepository]):
+        repository = await get_user_cv_repository
+        now = datetime.now(timezone.utc)
+        user_id = "user-1"
+        upload = _get_upload(user_id=user_id, created_at=now, suffix="1", md5_hash="test_hash_123")
+        upload.upload_process_state = UploadProcessState.UPLOADING
+        
+        # GIVEN an upload in UPLOADING state
+        await repository.insert_upload(upload)
+        
+        # WHEN transitioning to CONVERTING
+        success = await repository.atomic_state_transition(
+            user_id, upload.upload_id,
+            from_states=[UploadProcessState.UPLOADING],
+            to_state=UploadProcessState.CONVERTING
+        )
+        
+        # THEN transition succeeds
+        assert success is True
+        
+        # AND the document is updated
+        updated_doc = await repository.get_upload_by_id(user_id, upload.upload_id)
+        assert updated_doc["upload_process_state"] == UploadProcessState.CONVERTING
+
+    @pytest.mark.asyncio
+    async def test_atomic_state_transition_fails_for_wrong_state(self, get_user_cv_repository: Awaitable[UserCVRepository]):
+        repository = await get_user_cv_repository
+        now = datetime.now(timezone.utc)
+        user_id = "user-1"
+        upload = _get_upload(user_id=user_id, created_at=now, suffix="1", md5_hash="test_hash_123")
+        upload.upload_process_state = UploadProcessState.CONVERTING
+        
+        # GIVEN an upload in CONVERTING state
+        await repository.insert_upload(upload)
+        
+        # WHEN trying to transition from UPLOADING (wrong state)
+        success = await repository.atomic_state_transition(
+            user_id, upload.upload_id,
+            from_states=[UploadProcessState.UPLOADING],
+            to_state=UploadProcessState.UPLOADING_TO_GCS
+        )
+        
+        # THEN transition fails
+        assert success is False
+        
+        # AND the document is unchanged
+        updated_doc = await repository.get_upload_by_id(user_id, upload.upload_id)
+        assert updated_doc["upload_process_state"] == UploadProcessState.CONVERTING
+
+    @pytest.mark.asyncio
+    async def test_atomic_state_transition_fails_for_cancelled_upload(self, get_user_cv_repository: Awaitable[UserCVRepository]):
+        repository = await get_user_cv_repository
+        now = datetime.now(timezone.utc)
+        user_id = "user-1"
+        upload = _get_upload(user_id=user_id, created_at=now, suffix="1", md5_hash="test_hash_123")
+        upload.upload_process_state = UploadProcessState.UPLOADING
+        upload.cancel_requested = True
+        
+        # GIVEN an upload with cancellation requested
+        await repository.insert_upload(upload)
+        
+        # WHEN trying to transition state
+        success = await repository.atomic_state_transition(
+            user_id, upload.upload_id,
+            from_states=[UploadProcessState.UPLOADING],
+            to_state=UploadProcessState.CONVERTING
+        )
+        
+        # THEN transition fails (cancellation takes precedence)
+        assert success is False
+        
+        # AND the document is unchanged
+        updated_doc = await repository.get_upload_by_id(user_id, upload.upload_id)
+        assert updated_doc["upload_process_state"] == UploadProcessState.UPLOADING
+
+    @pytest.mark.asyncio
+    async def test_atomic_state_transition_handles_concurrent_updates(self, get_user_cv_repository: Awaitable[UserCVRepository]):
+        repository = await get_user_cv_repository
+        now = datetime.now(timezone.utc)
+        user_id = "user-1"
+        upload = _get_upload(user_id=user_id, created_at=now, suffix="1", md5_hash="test_hash_123")
+        upload.upload_process_state = UploadProcessState.UPLOADING
+        
+        # GIVEN an upload in UPLOADING state
+        await repository.insert_upload(upload)
+        
+        # WHEN two concurrent transitions are attempted
+        # (simulating race condition)
+        success1 = await repository.atomic_state_transition(
+            user_id, upload.upload_id,
+            from_states=[UploadProcessState.UPLOADING],
+            to_state=UploadProcessState.CONVERTING
+        )
+        
+        success2 = await repository.atomic_state_transition(
+            user_id, upload.upload_id,
+            from_states=[UploadProcessState.UPLOADING],
+            to_state=UploadProcessState.CONVERTING
+        )
+        
+        # THEN only one should succeed
+        assert (success1 and not success2) or (not success1 and success2)
+        
+        # AND the final state should be CONVERTING
+        final_doc = await repository.get_upload_by_id(user_id, upload.upload_id)
+        assert final_doc["upload_process_state"] == UploadProcessState.CONVERTING
 
 
