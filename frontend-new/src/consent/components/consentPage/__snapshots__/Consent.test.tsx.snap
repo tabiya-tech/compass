@@ -288,16 +288,14 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
             class="MuiTypography-root MuiTypography-body2 css-1ndnk23-MuiTypography-root"
             data-testid="consent-accept-tc-text-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
           >
-            I have read and accept the
-             
+            I have read and accept the 
             <a
               aria-disabled="false"
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
             >
               Terms and Conditions
             </a>
-             
-            of Compass.
+             of Compass.
           </p>
         </label>
         <label
@@ -332,16 +330,14 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
             class="MuiTypography-root MuiTypography-body2 css-1ndnk23-MuiTypography-root"
             data-testid="consent-accept-consent-text-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
           >
-            I have read and accept the
-             
+            I have read and accept the 
             <a
               aria-disabled="false"
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
             >
               Privacy Policy
             </a>
-             
-            of Compass.
+             of Compass.
           </p>
         </label>
       </div>
