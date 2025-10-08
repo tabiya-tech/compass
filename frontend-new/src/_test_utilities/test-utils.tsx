@@ -2,6 +2,8 @@
 import React, { ReactElement, ReactNode } from "react";
 import { render, renderHook, RenderHookOptions, RenderOptions } from "@testing-library/react";
 import { ThemeProvider } from "@mui/material";
+// Ensure i18n is initialized for tests using translation hooks / Trans components
+import "src/i18n/i18n";
 import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicationTheme";
 
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
