@@ -115,7 +115,7 @@ const Consent: React.FC = () => {
       const user = authStateService.getInstance().getUser();
       if (!user) {
         console.warn("User preferences could not be persisted: user not found. Redirecting to landing page.");
-        enqueueSnackbar("User not found", { variant: "error" });
+        enqueueSnackbar(t("consent_snackbar_user_not_found"), { variant: "error" });
         navigate(routerPaths.LANDING);
         return;
       }
@@ -143,13 +143,13 @@ const Consent: React.FC = () => {
 
       sendMetricsEvent(prefs.user_id);
 
-      enqueueSnackbar("Agreement Accepted", { variant: "success" });
+  enqueueSnackbar(t("consent_snackbar_agreement_accepted"), { variant: "success" });
     } catch (e: unknown) {
       console.error(new AuthenticationError("Failed to update user preferences", e));
       if (e instanceof RestAPIError) {
         enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
       } else {
-        enqueueSnackbar(`Failed to update user preferences: ${(e as Error).message}`, { variant: "error" });
+        enqueueSnackbar(`${t("consent_snackbar_failed_update_preferences")}: ${(e as Error).message}` , { variant: "error" });
       }
     } finally {
       setIsAccepting(false);
@@ -177,10 +177,10 @@ const Consent: React.FC = () => {
       console.info("User rejected consent. Logging out user.");
 
       navigate(routerPaths.LANDING, { replace: true });
-      enqueueSnackbar("Successfully logged out.", { variant: "success" });
+      enqueueSnackbar(t("consent_snackbar_logged_out_success"), { variant: "success" });
     } catch (e) {
       console.error(new AuthenticationError("Failed to log out", e));
-      enqueueSnackbar("Failed to log out.", { variant: "error" });
+      enqueueSnackbar(t("consent_snackbar_logged_out_failure"), { variant: "error" });
     } finally {
       setIsRejecting(false);
     }
