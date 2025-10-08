@@ -59,7 +59,7 @@ describe("CVTypingChatMessage", () => {
     // AND expect the message bubble to be visible
     expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
     // AND expect the CV uploaded text to be displayed
-  expect(screen.getByText(t(UI_TEXT.CV_UPLOADED) as string)).toBeInTheDocument();
+    expect(screen.getByText(t(UI_TEXT.CV_UPLOADED) as string)).toBeInTheDocument();
     // AND the component to match the snapshot
     expect(cvTypingChatMessageContainer).toMatchSnapshot();
     // THEN expect no errors or warnings to have occurred

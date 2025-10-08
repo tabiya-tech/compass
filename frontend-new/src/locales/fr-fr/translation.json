@@ -153,5 +153,7 @@
   "consent_snackbar_logged_out_success": "Déconnexion réussie.",
   "consent_snackbar_logged_out_failure": "Échec de la déconnexion.",
   "consent_backdrop_logging_out": "Déconnexion en cours...",
-  "consent_snackbar_failed_update_preferences": "Échec de la mise à jour des préférences utilisateur"
+  "consent_snackbar_failed_update_preferences": "Échec de la mise à jour des préférences utilisateur",
+  "cv_typing_uploading": "Veuillez patienter pendant que je téléverse et analyse votre CV",
+  "cv_typing_uploaded_ready": "Le contenu de votre CV est dans le champ de texte. Relisez-le et envoyez-le quand vous êtes prêt."
 }
