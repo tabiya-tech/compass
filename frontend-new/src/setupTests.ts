@@ -47,7 +47,7 @@ Feature: Global Test Environment Setup
  * stableT: A simple translation function that returns the translation string if the key exists,
  *          otherwise it returns the key itself. This ensures tests have predictable translations.
  */
-const enTranslations = require("src/locales/en-gb/translation.json");
+const enTranslations = require("src/locales/en/translation.json");
 
 const stableT = (key: string, options?: Record<string, unknown>) => {
     let text = (enTranslations as Record<string, string>)[key] || key;
@@ -65,18 +65,9 @@ const stableT = (key: string, options?: Record<string, unknown>) => {
  * This replaces i18next's `t` function with our stableT function in the test environment.
  * It allows any code importing `i18next` to call `t(key)` without actually initializing the library.
  */
-jest.mock("i18next", () => {
-    const mock = {
-        use: jest.fn().mockReturnThis(),
-        init: jest.fn().mockReturnThis(),
-        t: (key: string, options?: Record<string, unknown>) => stableT(key, options),
-    };
-    return {
-        __esModule: true,
-        default: mock,
-        ...mock,
-    };
-});
+jest.mock("i18next", () => ({
+    t: stableT,
+}));
 
 
 jest.mock("react-i18next", () => {
