@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box, Modal, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -41,6 +42,7 @@ const style = {
 
 const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> = ({ open, onClose }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -90,10 +92,10 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
       >
         <Box display="flex" justifyContent="space-between" alignItems="start">
           <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.MODAL_TITLE}>
-            Request access to Compass
+            {t("request_access_title")}
           </Typography>
           <PrimaryIconButton
-            title="Close request invitation code form"
+            title={t("close_request_invitation_form")}
             onClick={onClose}
             sx={{
               color: theme.palette.grey[500],
@@ -104,13 +106,13 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
           </PrimaryIconButton>
         </Box>
         <Typography variant="body2" data-testid={DATA_TEST_ID.MODAL_SUBTITLE}>
-          Please let us know how you plan to use Compass. We will carefully review your request and contact you shortly.
+          {t("request_access_subtitle")}
         </Typography>
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label="Name"
-            placeholder="Name"
+            label={t("name")}
+            placeholder={t("name")}
             type="text"
             variant="outlined"
             margin="normal"
@@ -121,8 +123,8 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
           />
           <TextField
             fullWidth
-            label="Email"
-            placeholder="Email"
+            label={t("email")}
+            placeholder={t("email")}
             type="email"
             variant="outlined"
             margin="normal"
@@ -133,8 +135,8 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
           />
           <TextField
             fullWidth
-            label="Message"
-            placeholder="Please share how you plan to use Compass"
+            label={t("message")}
+            placeholder={t("message_placeholder")}
             variant="outlined"
             margin="normal"
             required
@@ -151,7 +153,7 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
             disabled={!name || !email || !message || !isOnline}
             data-testid={DATA_TEST_ID.SUBMIT_BUTTON}
           >
-            Submit
+            {t("submit")}
           </PrimaryButton>
         </Box>
       </Box>
