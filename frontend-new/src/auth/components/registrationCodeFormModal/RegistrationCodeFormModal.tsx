@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import * as Sentry from "@sentry/react";
 import Modal from "@mui/material/Modal";
 
@@ -64,6 +65,7 @@ const style = {
 
 const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ modalState, onSuccess, onClose }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [registrationCode, setRegistrationCode] = useState("");
   const [isInvitationCodeRequestModalOpen, setIsInvitationCodeRequestModalOpen] = useState<boolean>(false);
 
@@ -91,7 +93,7 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
         <Box sx={style}>
           <PrimaryIconButton
             data-testid={DATA_TEST_ID.CLOSE_ICON}
-            title="Close registration code form"
+            title={t("close_registration_code_form")}
             onClick={onClose}
             sx={{
               position: "absolute",
@@ -103,16 +105,16 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
             <CloseIcon />
           </PrimaryIconButton>
           <Typography variant="h4" data-testid={DATA_TEST_ID.MODAL_TITLE}>
-            Registration code
+            {t("registration_code")}
           </Typography>
           <Typography variant="body2" data-testid={DATA_TEST_ID.MODAL_SUBTITLE}>
-            Enter your registration code
+            {t("enter_registration_code")}
           </Typography>
           <TextField
             fullWidth
-            label="Registration code"
+            label={t("registration_code")}
             variant="outlined"
-            placeholder={"Enter your registration code"}
+            placeholder={t("enter_registration_code")}
             margin="normal"
             required
             onChange={(e) => setRegistrationCode(e.target.value)}
@@ -132,7 +134,7 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
                 data-testid={DATA_TEST_ID.PROGRESS_ELEMENT}
               />
             ) : (
-              "Submit"
+              t("submit")
             )}
           </PrimaryButton>
           { Sentry.isInitialized() && <Typography
@@ -142,9 +144,9 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
               marginTop: theme.fixedSpacing(theme.tabiyaSpacing.sm),
             }}
           >
-            Don't have a registration code?{" "}
+            {t("no_registration_code_prompt")}{" "}
             <CustomLink onClick={handleOpenRequestModal} data-testid={DATA_TEST_ID.REQUEST_REGISTRATION_CODE_LINK}>
-              Reach out
+              {t("reach_out")}
             </CustomLink>
           </Typography>
           }

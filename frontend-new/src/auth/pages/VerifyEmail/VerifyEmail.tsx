@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Container, Typography } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
@@ -18,6 +19,7 @@ export const DATA_TEST_ID = {
 };
 
 const VerifyEmail: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   /**
    * Handle when a user clicks back to login
@@ -37,11 +39,10 @@ const VerifyEmail: React.FC = () => {
         height={"80%"}
       >
         <AuthHeader
-          title={"Thank you for registering to Compass."}
+          title={t("registration_thank_you")}
           subtitle={
             <Typography variant="body2">
-              A verification email has been sent to your email address. To continue, please verify your email address
-              first.
+              {t("verification_email_sent_message")}
             </Typography>
           }
         />
@@ -53,7 +54,7 @@ const VerifyEmail: React.FC = () => {
           data-testid={DATA_TEST_ID.BACK_TO_LOGIN_BUTTON}
           onClick={handleBackToLogin}
         >
-          Back to Login
+          {t("back_to_login")}
         </PrimaryButton>
       </Box>
       <BugReportButton bottomAlign={true} />
