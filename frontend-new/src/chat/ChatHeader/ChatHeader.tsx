@@ -1,4 +1,5 @@
 import React, { SetStateAction, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Typography, useTheme } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -89,6 +90,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   collectedExperiences,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [showConversionDialog, setShowConversionDialog] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -217,7 +219,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       if (shouldPrompt && !notificationShownRef.current) {
         const snackbarKey = enqueueSnackbar(
           <Typography variant="body1">
-            We'd love to hear your feedback on your experience so far!{" "}
+            {t("feedback_message")}{" "}
             <CustomLink
               onClick={async () => {
                 closeSnackbar(snackbarKey);
@@ -225,7 +227,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
               }}
               data-testid={DATA_TEST_ID.CHAT_HEADER_FEEDBACK_LINK}
             >
-              Give Feedback
+              {t("give_feedback")}
             </CustomLink>
           </Typography>,
           {
@@ -253,19 +255,20 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     handleGiveFeedback,
     timeUntilNotification,
     progressPercentage,
+    t
   ]);
 
   const contextMenuItems: MenuItemConfig[] = useMemo(
     () => [
       {
         id: MENU_ITEM_ID.START_NEW_CONVERSATION,
-        text: MENU_ITEM_TEXT.START_NEW_CONVERSATION,
+        text: t("start_new_conversation").toLowerCase(),
         disabled: !isOnline,
         action: startNewConversation,
       },
       {
         id: MENU_ITEM_ID.SETTINGS_SELECTOR,
-        text: MENU_ITEM_TEXT.SETTINGS,
+        text: t("settings").toLowerCase(),
         disabled: !isOnline,
         action: () => setIsDrawerOpen(true),
       },
@@ -273,7 +276,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         ? [
             {
               id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
-              text: MENU_ITEM_TEXT.REPORT_BUG,
+              text: t("report_a_bug").toLowerCase(),
               disabled: !isOnline,
               action: () => {
                 const feedback = Sentry.getFeedback();
@@ -293,7 +296,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         ? [
             {
               id: MENU_ITEM_ID.REGISTER,
-              text: MENU_ITEM_TEXT.REGISTER,
+              text: t("register").toLowerCase(),
               disabled: !isOnline,
               action: () => setShowConversionDialog(true),
             },
@@ -301,12 +304,12 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         : []),
       {
         id: MENU_ITEM_ID.LOGOUT_BUTTON,
-        text: MENU_ITEM_TEXT.LOGOUT,
+        text: t("logout").toLowerCase(),
         disabled: false,
         action: handleLogout,
       },
     ],
-    [isAnonymous, isOnline, startNewConversation, sentryEnabled, handleLogout]
+    [isAnonymous, isOnline, startNewConversation, sentryEnabled, handleLogout,t]
   );
 
   return (
@@ -339,7 +342,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           }}
           onClick={handleViewExperiences}
           data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES}
-          title="view experiences"
+          title={t("view_experiences").toLowerCase()}
           disabled={!isOnline}
         >
           <AnimatedBadge
@@ -356,7 +359,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
             }}
             onClick={handleGiveFeedback}
             data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_FEEDBACK}
-            title="give feedback"
+            title={t("give_feedback").toLowerCase()}
             disabled={!isOnline}
           >
             <FeedbackOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_FEEDBACK} />
@@ -368,7 +371,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           }}
           onClick={(event) => setAnchorEl(event.currentTarget)}
           data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_USER}
-          title="user info"
+          title={t("user_info").toLowerCase()}
         >
           <img
             src={`${process.env.PUBLIC_URL}/user-icon.svg`}
@@ -396,23 +399,23 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         onCancel={handleConfirmLogout}
         onDismiss={() => setShowLogoutConfirmation(false)}
         onConfirm={handleRegister}
-        title="Before you go"
-        confirmButtonText="Register"
-        cancelButtonText="Logout"
+        title={t("before_you_go")}
+        confirmButtonText={t("register")}
+        cancelButtonText={t("logout")}
         showCloseIcon={true}
         textParagraphs={[
           {
             id: "1",
-            text: <>Are you sure you want to log out?</>,
+            text: <>{t("logout_confirmation_message")}</>,
           },
           {
             id: "2",
             text: (
               <>
-                You're currently using an anonymous account.
+                {t("anonymous_account_warning")}
                 <HighlightedSpan>
                   {" "}
-                  If you log out, you'll lose access to your conversation history and experiences
+                  {t("logout_warning_anonymous")}
                 </HighlightedSpan>
                 .
               </>
@@ -422,8 +425,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
             id: "3",
             text: (
               <>
-                <HighlightedSpan>Create an account to save your progress</HighlightedSpan> and continue your journey
-                later.
+                <HighlightedSpan>{t("create_an_account_to_save_progress")}</HighlightedSpan> {t("continue_your_journey_later")}
               </>
             ),
           },

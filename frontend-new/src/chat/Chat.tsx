@@ -1,4 +1,5 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "src/chat/Chat.types";
@@ -94,6 +95,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   disableInactivityCheck = false,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [messages, setMessages] = useState<IChatMessage<any>[]>([]);
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
@@ -582,7 +584,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   return (
     <Suspense fallback={<Backdrop isShown={true} transparent={true} />}>
       {isLoggingOut ? (
-        <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
+        <Backdrop isShown={isLoggingOut} message={t("logging_out")} />
       ) : (
         <ChatProvider
           handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}
@@ -657,17 +659,17 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
               title="Start New Conversation?"
               content={
                 <>
-                  Once you start a new conversation, all messages from the current conversation will be lost forever.
+                  {t("start_new_conversation_content")}
                   <br />
                   <br />
-                  Are you sure you want to start a new conversation?
+                  {t("are_you_sure_start_new_conversation_content")}
                 </>
               }
               onCancel={() => setNewConversationDialog(false)}
               onConfirm={handleConfirmNewConversation}
               onDismiss={() => setNewConversationDialog(false)}
-              cancelButtonText="Cancel"
-              confirmButtonText="Yes, I'm sure"
+              cancelButtonText={t("cancel_button")}
+              confirmButtonText={t("confirm_button")}
             />
           )}
         </ChatProvider>

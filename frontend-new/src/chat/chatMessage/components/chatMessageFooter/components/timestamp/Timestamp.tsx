@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Typography, styled } from "@mui/material";
 import { getDurationFromNow } from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/getDurationFromNow/getDurationFromNow";
 
@@ -19,16 +20,17 @@ const TimeStamp = styled(Typography)(({ theme }) => ({
 
 
 const Timestamp: React.FC<ChatMessageFooterProps> = ({ sentAt }) => {
+  const { t } = useTranslation();
   let duration;
   try {
-    duration = getDurationFromNow(new Date(sentAt));
+    duration = getDurationFromNow(new Date(sentAt),t);
   } catch (e) {
     console.error(new Error("Failed to get message duration", { cause: e }));
   }
 
   return (
     <TimeStamp data-testid={DATA_TEST_ID.TIMESTAMP} variant="caption">
-      sent {duration}
+      {t("sent")} {duration}
     </TimeStamp>
   )
 }

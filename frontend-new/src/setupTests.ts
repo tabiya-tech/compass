@@ -39,20 +39,40 @@ Feature: Global Test Environment Setup
     And the i18n.changeLanguage function should be mocked as resolved
 ──────────────────────────────────────────────────────────────
 */
+
+/**
+ * Load English translations and create a stable translation function.
+ * 
+ * enTranslations: Loads all English translation key-value pairs from a JSON file.
+ * stableT: A simple translation function that returns the translation string if the key exists,
+ *          otherwise it returns the key itself. This ensures tests have predictable translations.
+ */
+const enTranslations = require("src/locales/en/translation.json");
+
+const stableT = (key: string, options?: Record<string, unknown>) => {
+    let text = (enTranslations as Record<string, string>)[key] || key;
+    if (options) {
+        Object.entries(options).forEach(([k, v]) => {
+            text = text.replace(new RegExp(`{{${k}}}`, "g"), String(v));
+        });
+    }
+    return text;
+};
+
+/**
+ * Mock the i18next module.
+ * 
+ * This replaces i18next's `t` function with our stableT function in the test environment.
+ * It allows any code importing `i18next` to call `t(key)` without actually initializing the library.
+ */
+jest.mock("i18next", () => ({
+    t: stableT,
+}));
+
+
 jest.mock("react-i18next", () => {
     const React = require("react");
-    const enTranslations = require("src/locales/en/translation.json");
-
-    const stableT = (key: string, options?: Record<string, unknown>) => {
-        let text = (enTranslations as Record<string, string>)[key] || key;
-        if (options) {
-            Object.entries(options).forEach(([k, v]) => {
-                text = text.replace(new RegExp(`{{${k}}}`, "g"), String(v));
-            });
-        }
-        return text;
-    };
-
+   
     const Trans = ({ i18nKey, values, components }: any) => {
         let text = stableT(i18nKey, values);
         // Replace component markers <0>...</0> with children placeholder
