@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Typography, keyframes } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
@@ -11,9 +12,10 @@ export const DATA_TEST_ID = {
   CV_TYPING_CHAT_MESSAGE_CONTAINER: `cv-typing-chat-message-container-${uniqueId}`,
 };
 
+// Deprecated: UI_TEXT constants replaced by i18n keys. Keep for backwards compatibility in any legacy imports.
 export const UI_TEXT = {
-  UPLOADING_CV: "Please wait while I upload and parse your CV",
-  CV_UPLOADED: "Your CV content is in the text field. Review it and send when ready.",
+  UPLOADING_CV: "cv_typing_uploading", // use t("cv_typing_uploading")
+  CV_UPLOADED: "cv_typing_uploaded_ready",
 };
 
 export const CV_UPLOADED_DISPLAY_TIME = 30 * 1000;
@@ -41,7 +43,9 @@ const textVariants = {
 };
 
 const CVTypingChatMessage: React.FC<CVTypingChatMessageProps> = ({ isUploaded = false }) => {
-  const displayText = isUploaded ? UI_TEXT.CV_UPLOADED : UI_TEXT.UPLOADING_CV;
+  const { t } = useTranslation();
+  const displayTextKey = isUploaded ? UI_TEXT.CV_UPLOADED : UI_TEXT.UPLOADING_CV;
+  const displayText = t(displayTextKey);
   const showDots = !isUploaded;
 
   return (
