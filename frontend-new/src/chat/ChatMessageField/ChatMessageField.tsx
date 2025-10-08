@@ -1,4 +1,5 @@
 import React, { useEffect, useContext, useMemo, useState, MouseEvent, KeyboardEvent, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { IconButton, InputAdornment, TextField, styled, useTheme, Typography, Box } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import AddIcon from "@mui/icons-material/Add";
@@ -104,6 +105,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const theme = useTheme();
+  const { t } = useTranslation();
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [message, setMessage] = useState("");
   const [isMobile, setIsMobile] = useState(false);
@@ -412,18 +414,18 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   // Placeholder text based on the chat status
   const placeHolder = useMemo(() => {
     if (props.isChatFinished) {
-      return PLACEHOLDER_TEXTS.CHAT_FINISHED;
+      return t("chat_finished");
     }
     if (props.isUploadingCv) {
-      return PLACEHOLDER_TEXTS.UPLOADING;
+      return t("uploading");
     }
     if (props.aiIsTyping) {
-      return PLACEHOLDER_TEXTS.AI_TYPING;
+      return t("ai_typing");
     }
     if (!isOnline) {
-      return PLACEHOLDER_TEXTS.OFFLINE;
+      return t("offline");
     }
-    return PLACEHOLDER_TEXTS.DEFAULT;
+    return t("default");
   }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, isOnline]);
 
   // Check if the send button should be disabled
@@ -467,6 +469,11 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                 : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
                   ? `PDF, DOCX, TXT • Max ${MAX_FILE_SIZE_MB} MB • ${MAX_MARKDOWN_CHARS} chars max`
                   : "CV upload is only available during experience collection",
+                    // TODO: fix translation
+              // ? t("upload_cv_intro")
+                    // : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
+                    // ? t("upload_cv_collect_experiences")
+                    // : t("upload_cv_other_phase"),
             icon: <UploadFileIcon />,
             disabled: inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
             action: handleFileMenuItemClick,
@@ -541,7 +548,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                         onClick={handlePlusClick}
                         onKeyDown={(event) => event.stopPropagation()}
                         size="small"
-                        title="more actions"
+                        title={t("chat_message_more_actions")}
                         data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON}
                       >
                         <AnimatedDotBadge show={showPlusBadge}>
@@ -563,7 +570,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                   onClick={handleButtonClick}
                   onKeyDown={(event) => event.stopPropagation()}
                   disabled={sendIsDisabled()}
-                  title="send message"
+                  title={t("chat_message_send_message")}
                 >
                   <SendIcon
                     data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_ICON}
