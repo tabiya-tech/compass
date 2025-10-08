@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useContext, useMemo, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogTitle,
@@ -60,6 +61,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
   onSuccess,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isOnline = useContext(IsOnlineContext);
   const [email, setEmail] = useState("");
   const [emailConfirmation, setEmailConfirmation] = useState("");
@@ -136,7 +138,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
     >
       <PrimaryIconButton
         data-testid={DATA_TEST_ID.CLOSE_ICON}
-        title="Close registration form"
+        title={t("close_registration_form")}
         onClick={onClose}
         sx={{
           position: "absolute",
@@ -150,21 +152,21 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
       
       <DialogTitle>
         <Typography variant="h4" component="div" gutterBottom>
-          Register Account
+          {t("register_account")}
         </Typography>
       </DialogTitle>
       
       <DialogContent>
         <Typography variant="body2" gutterBottom>
-          Please register with an email to keep access to this conversation. Without registering, you won't be able to log in again or return to this conversation.
+           {t("registration_info")}
         </Typography>
         
-        <HighlightedSpan>Please make sure you use the correct email, as it cannot be changed later and you will be asked to verify it.</HighlightedSpan>
+        <HighlightedSpan>{t("email_warning")}</HighlightedSpan>
         <Box sx={{ mt: 2 }}>
           <TextField
             autoFocus
             fullWidth
-            label="Email"
+            label={t("email")}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -177,7 +179,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
           
           <TextField
             fullWidth
-            label="Confirm Email"
+            label={t("confirm_email")}
             type="email"
             value={emailConfirmation}
             onChange={(e) => setEmailConfirmation(e.target.value)}
@@ -190,7 +192,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
           
           <PasswordInput
             fullWidth
-            label="Password"
+            label={t("password")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             data-testid={DATA_TEST_ID.PASSWORD_INPUT}
@@ -214,7 +216,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
                 size={2 * theme.typography.fontSize}
               />
             ) : (
-              "Register"
+              t("register")
             )}
           </PrimaryButton>
         </Box>
