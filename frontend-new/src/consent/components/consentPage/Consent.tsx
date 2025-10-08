@@ -154,7 +154,7 @@ const Consent: React.FC = () => {
     } finally {
       setIsAccepting(false);
     }
-  }, [enqueueSnackbar, navigate, userPreferences]);
+  }, [enqueueSnackbar, navigate, userPreferences, t]);
 
   /**
    * Handle when a user accepts the agreements
@@ -184,7 +184,7 @@ const Consent: React.FC = () => {
     } finally {
       setIsRejecting(false);
     }
-  }, [enqueueSnackbar, navigate]);
+  }, [enqueueSnackbar, navigate, t]);
 
   /**
    * Handle when a user checks terms and conditions checkbox
