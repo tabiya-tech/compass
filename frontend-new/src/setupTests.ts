@@ -48,16 +48,8 @@ Feature: Global Test Environment Setup
  *          otherwise it returns the key itself. This ensures tests have predictable translations.
  */
 const enTranslations = require("src/locales/en/translation.json");
+const stableT = (key: string) => (enTranslations as Record<string, string>)[key] || key;
 
-const stableT = (key: string, options?: Record<string, unknown>) => {
-    let text = (enTranslations as Record<string, string>)[key] || key;
-    if (options) {
-        Object.entries(options).forEach(([k, v]) => {
-            text = text.replace(new RegExp(`{{${k}}}`, "g"), String(v));
-        });
-    }
-    return text;
-};
 
 /**
  * Mock the i18next module.
@@ -70,30 +62,18 @@ jest.mock("i18next", () => ({
 }));
 
 
+/**
+ * Mock react-i18next hooks for testing.
+ * 
+ * This replaces `useTranslation` hook in react-i18next with a test-friendly version:
+ * - `t`: uses our stable translation function.
+ * - `i18n.changeLanguage`: mocked as a resolved promise to simulate language switching.
+ * - `initReactI18next`: a stub object to satisfy imports; does nothing in tests.
+ * 
+ * This ensures components using `useTranslation` render predictable text in tests
+ * without requiring a full i18next setup.
+ */
 jest.mock("react-i18next", () => {
-    const React = require("react");
-   
-    const Trans = ({ i18nKey, values, components }: any) => {
-        let text = stableT(i18nKey, values);
-        // Replace component markers <0>...</0> with children placeholder
-        const match = text.match(/<0>(.*?)<\/0>/);
-        if (match && components && components[0]) {
-            const inner = match[1];
-            const Comp0 = components[0];
-            const replaced = text.replace(/<0>(.*?)<\/0>/, "__TRANS_COMPONENT__");
-            const parts = replaced.split("__TRANS_COMPONENT__");
-            return React.createElement(
-                React.Fragment,
-                null,
-                parts[0],
-                React.cloneElement(Comp0, {}, inner),
-                parts[1]
-            );
-        }
-        // No components provided; just return plain text
-        return React.createElement(React.Fragment, null, text.replace(/<\/?0>/g, ""));
-    };
-
     return {
         useTranslation: () => ({
             t: stableT,
