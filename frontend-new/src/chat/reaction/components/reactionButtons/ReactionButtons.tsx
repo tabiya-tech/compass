@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, useTheme } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { DislikeReason, DislikeReaction, LikeReaction, ReactionKind } from "src/chat/reaction/reaction.types";
@@ -33,6 +34,7 @@ export const DATA_TEST_ID = {
 
 export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, currentReaction }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const isOnline = useContext(IsOnlineContext);
 
@@ -150,7 +152,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
           }}
           onClick={handleLikeClick}
           data-testid={DATA_TEST_ID.BUTTON_LIKE}
-          title="like"
+          title={t("like")}
           disabled={!isOnline || isSubmitting}
         >
           {reaction === ReactionKind.LIKED ? (
@@ -175,7 +177,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
           }}
           onClick={handleDislikeClick}
           data-testid={DATA_TEST_ID.BUTTON_DISLIKE}
-          title="dislike"
+          title={t("dislike")}
           disabled={!isOnline || isSubmitting}
         >
           {reaction === ReactionKind.DISLIKED ? (
