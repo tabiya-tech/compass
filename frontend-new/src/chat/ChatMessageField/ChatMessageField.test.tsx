@@ -719,7 +719,7 @@ describe("ChatMessageField", () => {
         const givenPhase = ConversationPhase.INTRO;
         // AND a mock onUploadCv that rejects with a 413 error
         const tooLargeErrorAlt = new Error(ERROR_MESSAGES.FILE_TOO_DENSE);
-        (tooLargeErrorAlt as any).statusCode = StatusCodes.REQUEST_TOO_LONG;
+        (tooLargeErrorAlt as any).status = StatusCodes.REQUEST_TOO_LONG;
         (tooLargeErrorAlt as any).errorCode = ErrorConstants.ErrorCodes.TOO_LARGE_PAYLOAD;
 
         const mockOnUploadCv = jest.fn().mockRejectedValue(tooLargeErrorAlt);

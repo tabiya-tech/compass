@@ -143,6 +143,17 @@ class CompassDBProvider:
                 ("md5_hash", 1)
             ], unique=True)
 
+            # Ensure fast lookups by upload_id (used by status and cancellation routes)
+            await userdata_db.get_collection(Collections.USER_CV_UPLOADS).create_index([
+                ("upload_id", 1)
+            ], unique=True)
+
+            # Speed up rate-limit queries: count uploads in a time window per user
+            await userdata_db.get_collection(Collections.USER_CV_UPLOADS).create_index([
+                ("user_id", 1),
+                ("created_at", 1)
+            ])
+
             logger.info("Finished creating indexes for the userdata database")
         except Exception as e:
             logger.exception(e)

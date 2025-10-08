@@ -11,7 +11,7 @@ import {
   SkillsRankingPhase,
   SkillsRankingState,
 } from "src/features/skillsRanking/types";
-import CancellableTypingChatMessage from "src/features/skillsRanking/components/cancellableTypingChatMessage/CancellableTypingChatMessage";
+import CancellableTypingChatMessage from "src/chat/chatMessage/cancellableTypingChatMessage/CancellableTypingChatMessage";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import RotateToSolvePuzzle, {
   RotateToSolvePuzzleMetricsReport,

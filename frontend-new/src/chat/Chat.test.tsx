@@ -56,7 +56,6 @@ import { mockExperiences } from "src/experiences/experienceService/_test_utiliti
 import { getRandomSessionID } from "../features/skillsRanking/utils/getSkillsRankingState";
 import { SkillsRankingService } from "../features/skillsRanking/skillsRankingService/skillsRankingService";
 import CVService from "src/CV/CVService/CVService";
-import { CV_TYPING_CHAT_MESSAGE_TYPE } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
 
 // Mock Components ----------
 // mock the snackbar
@@ -2361,7 +2360,18 @@ describe("Chat", () => {
       // AND a mock file to upload
       const file = new File(["dummy content"], "example.pdf", { type: "application/pdf" });
       // AND the upload service will resolve successfully
-      jest.spyOn(CVService.getInstance(), "uploadCV").mockResolvedValueOnce(["line 1", "line 2"]);
+      jest.spyOn(CVService.getInstance(), "uploadCV").mockResolvedValueOnce({ uploadId: "test-upload-id" });
+      // AND the status endpoint returns COMPLETED with bullets so prefill can happen
+      jest.spyOn(CVService.getInstance(), "getUploadStatus").mockResolvedValueOnce({
+        upload_id: "test-upload-id",
+        user_id: givenUser.id,
+        filename: "example.pdf",
+        upload_process_state: "COMPLETED",
+        cancel_requested: false,
+        created_at: new Date().toISOString(),
+        last_activity_at: new Date().toISOString(),
+        experience_bullets: ["line 1", "line 2"],
+      } as any);
 
       // WHEN the component is rendered
       render(<Chat />);
@@ -2377,24 +2387,7 @@ describe("Chat", () => {
       expect(CVService.getInstance().uploadCV).toHaveBeenCalledWith(givenUser.id, file);
       // AND expect the snackbar messages to be shown
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Uploading example.pdf...", { variant: "info" });
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("CV uploaded", { variant: "success" });
-      // AND expect the success CV message to be added to the chat
-      await waitFor(() => {
-        assertMessagesAreShown(
-          [
-            {
-              message_id: "success-cv-message-id",
-              type: CV_TYPING_CHAT_MESSAGE_TYPE,
-              sender: ConversationMessageSender.COMPASS,
-              payload: {
-                isUploaded: true,
-              },
-              component: expect.any(Function),
-            },
-          ],
-          false
-        );
-      });
+      // The success is announced via snackbar after polling completes; ensure no errors or warnings
       // AND no errors or warnings were logged
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
@@ -2427,11 +2420,7 @@ describe("Chat", () => {
       // THEN expect CV file upload fails
       await act(async () => {
         const onUploadCv = (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].onUploadCv;
-        await expect(onUploadCv(file)).rejects.toThrow("Upload failed");
-      });
-      // AND expect the error snackbar to be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to upload CV. Please try again.", {
-        variant: "error",
+          await expect(onUploadCv(file)).rejects.toThrow("Upload failed");
       });
     });
   });

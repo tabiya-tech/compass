@@ -91,7 +91,7 @@ def test_upload_cv_uses_configured_bucket_name(mocker):
     assert dummy_client.bucket_names == ["expected-bucket"]
 
 
-def test_upload_cv_bubbles_gcp_errors(mocker):
+def test_upload_cv_logs_and_continues_on_gcp_errors(mocker, caplog):
     # GIVEN a client whose blob upload raises
     class FailingBlob:
         def upload_from_string(self, *_, **__):
@@ -109,9 +109,12 @@ def test_upload_cv_bubbles_gcp_errors(mocker):
     service = GCPCVCloudStorageService(bucket_name="b")
     record = build_user_cv_upload_record(user_id="u", filename="cv.pdf", markdown_text="md", file_bytes=b"pdf-bytes")
 
-    # WHEN/THEN the exception propagates to the caller
-    with pytest.raises(RuntimeError):
-        service.upload_cv(document=record, markdown_text="md", original_bytes=b"pdf")
+    # WHEN the upload fails, the service should log a warning and continue
+    service.upload_cv(document=record, markdown_text="md", original_bytes=b"pdf")
+
+    # THEN a warning was logged about the failure
+    errors = [r for r in caplog.records if r.levelname == "ERROR" and "Failed to upload CV to GCS" in r.getMessage()]
+    assert errors, "Expected a warning log when GCS upload fails"
 
 
 @pytest.mark.parametrize("filename,expected", [
@@ -145,8 +148,8 @@ async def test_get_cv_storage_service_is_singleton_and_uses_config(mocker):
     storage_mod._cv_storage_service_singleton = None
 
     # WHEN acquiring the service multiple times
-    s1 = await _get_cv_storage_service()  # type: ignore[arg-type]
-    s2 = await _get_cv_storage_service()  # type: ignore[arg-type]
+    s1 = await _get_cv_storage_service(cv_storage_bucket_name="cfg-bucket")
+    s2 = await _get_cv_storage_service(cv_storage_bucket_name="cfg-bucket")
 
     # THEN it is the same instance and bucket is used
     assert s1 is s2

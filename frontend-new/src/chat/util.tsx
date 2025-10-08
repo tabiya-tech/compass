@@ -9,6 +9,10 @@ import ConversationConclusionChatMessage, { ConversationConclusionChatMessagePro
 import TypingChatMessage, { TypingChatMessageProps, TYPING_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import ErrorChatMessage, { ErrorChatMessageProps, ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
 import CVTypingChatMessage, { CV_TYPING_CHAT_MESSAGE_TYPE, CVTypingChatMessageProps } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
+import CancellableTypingChatMessage, { CancellableTypingChatMessageProps } from "src/chat/chatMessage/cancellableTypingChatMessage/CancellableTypingChatMessage";
+
+const uniqueId = "cancellable-cv-typing-message-2a76494f-351d-409d-ba58-e1b2cfaf2a53";
+export const CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE = `cancellable-cv-typing-message-${uniqueId}`;
 
 export const FIXED_MESSAGES_TEXT = {
   AI_IS_TYPING: "Typing...",
@@ -92,6 +96,51 @@ export const generateCVTypingMessage = (isUploaded = false): IChatMessage<CVTypi
     payload: payload,
     sender: ConversationMessageSender.COMPASS,
     component: (prop: CVTypingChatMessageProps) => <CVTypingChatMessage {...prop} />,
+  };
+};
+
+// Generate a cancellable CV typing message
+export const generateCancellableCVTypingMessage = (
+  uploadId: string,
+  onCancel: (uploadId: string) => Promise<void>,
+  isUploaded = false,
+  isCancelled = false,
+  uploadState?: string
+): IChatMessage<CancellableTypingChatMessageProps> => {
+  const getDisplayMessage = (): string => {
+    if (isCancelled) return "CV upload cancelled";
+    if (isUploaded) return "CV uploaded successfully";
+    
+    switch (uploadState) {
+      case "CONVERTING":
+        return "Converting CV";
+      case "UPLOADING_TO_GCS":
+        return "Processing CV";
+      case "EXTRACTING":
+        return "Extracting experiences";
+      case "SAVING":
+        return "Saving CV";
+      case "FAILED":
+        return "CV upload failed";
+      default:
+        return "Uploading CV";
+    }
+  };
+
+  const payload: CancellableTypingChatMessageProps = {
+    message: getDisplayMessage(),
+    thinkingMessage: "Processing your CV, this might take a while...",
+    waitBeforeThinking: 10000, // 10 seconds for CV processing
+    disabled: isUploaded || isCancelled,
+    onCancel: async () => await onCancel(uploadId),
+  };
+
+  return {
+    type: CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE,
+    message_id: nanoid(),
+    payload: payload,
+    sender: ConversationMessageSender.COMPASS,
+    component: (prop: CancellableTypingChatMessageProps) => <CancellableTypingChatMessage {...prop} />,
   };
 };
 
