@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { Box, Typography, useTheme, Dialog, Divider, DialogContent, useMediaQuery } from "@mui/material";
@@ -31,6 +32,7 @@ export const DATA_TEST_ID = {
 
 const Landing: React.FC = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
@@ -104,7 +106,7 @@ const Landing: React.FC = () => {
     }
   }, [applicationLoginCode, handleError, handlePostLogin, enqueueSnackbar]);
 
-  return (
+ return (
     <>
       <Dialog
         open={true}
@@ -164,7 +166,7 @@ const Landing: React.FC = () => {
             }}
           >
             <AuthHeader
-              title="Welcome to Compass!"
+              title={t("welcome_back")} // Changed from "Welcome to Compass!" to t("welcome_back")
               subtitle={
                 <>
                   <Typography
@@ -173,12 +175,11 @@ const Landing: React.FC = () => {
                     textAlign="center"
                     paddingBottom={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
                   >
-                    Discover your Full Potential
+                    {t("landing_subtitle_bold")} {/* Changed from "Discover your Full Potential" */}
                   </Typography>
                   <Typography variant="body2" textAlign="center">
-                    Uncover and articulate your skills through natural AI-guided conversations. Build your skill profile
-                    and download a CV to kickstart your job search. Create a free account to save your progress and
-                    revisit your conversation history.
+                    {t("landing_subtitle_body")}
+                    {/* Changed from long marketing text */}
                   </Typography>
                 </>
               }
@@ -197,7 +198,7 @@ const Landing: React.FC = () => {
                   onClick={() => navigate(routerPaths.LOGIN)}
                   data-testid={DATA_TEST_ID.LANDING_LOGIN_BUTTON}
                 >
-                  Login
+                  {t("login")} {/* Changed from "Login" */}
                 </PrimaryButton>
                 {!registrationDisabled && (
                   <SecondaryButton
@@ -207,7 +208,7 @@ const Landing: React.FC = () => {
                     onClick={() => navigate(routerPaths.REGISTER)}
                     data-testid={DATA_TEST_ID.LANDING_SIGNUP_BUTTON}
                   >
-                    Register
+                    {t("register")} {/* Changed from "Register" */}
                   </SecondaryButton>
                 )}
               </Box>
@@ -215,7 +216,7 @@ const Landing: React.FC = () => {
                 <>
                   <Divider textAlign="center" style={{ width: "100%" }} data-testid={DATA_TEST_ID.LANDING_DIVIDER}>
                     <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-                      or
+                      {t("or")} {/* Changed from "or" */}
                     </Typography>
                   </Divider>
                   <CustomLink
@@ -224,7 +225,7 @@ const Landing: React.FC = () => {
                     disableWhenOffline={true}
                     data-testid={DATA_TEST_ID.LANDING_GUEST_BUTTON}
                   >
-                    Continue as Guest
+                    {t("continue_as_guest")} {/* Changed from "Continue as Guest" */}
                   </CustomLink>
                 </>
               )}
@@ -233,7 +234,7 @@ const Landing: React.FC = () => {
         </DialogContent>
       </Dialog>
       <BugReportButton bottomAlign={true} />
-      <Backdrop isShown={isLoading} message="Logging you in..." />
+      <Backdrop isShown={isLoading} message={t("logging_you_in")} /> {/* Changed from "Logging you in..." */}
     </>
   );
 };
