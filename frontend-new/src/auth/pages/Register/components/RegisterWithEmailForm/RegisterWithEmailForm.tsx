@@ -1,5 +1,6 @@
 import { Box, CircularProgress, TextField, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import { useTranslation } from "react-i18next";
 import React, { useState } from "react";
 import PasswordInput from "src/theme/PasswordInput/PasswordInput";
 
@@ -27,6 +28,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
   isRegistering,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
@@ -98,7 +100,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
             sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
           />
         ) : (
-          "Register"
+           t("register")
         )}
       </PrimaryButton>
     </Box>
