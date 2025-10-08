@@ -429,7 +429,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       return t("offline");
     }
     return t("default");
-  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, isOnline, t]);
+  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, isOnline]);
 
   // Check if the send button should be disabled
   const sendIsDisabled = useCallback(() => {
@@ -604,8 +604,21 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
             notifyOnClose={handleMenuClose}
             anchorOrigin={{ vertical: "top", horizontal: "left" }}
             transformOrigin={{ vertical: "bottom", horizontal: "left" }}
-            items={contextMenuItems}
-            paperSx={{ width: 420 }}
+            items={[
+              {
+                id: MENU_ITEM_ID.UPLOAD_CV,
+                text: MENU_ITEM_TEXT.UPLOAD_CV,
+                description: 
+                  props.currentPhase === ConversationPhase.INTRO
+                    ? t("upload_cv_intro")
+                    : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
+                    ? t("upload_cv_collect_experiences")
+                    : t("upload_cv_other_phase"),
+                icon: <UploadFileIcon />,
+                disabled: inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
+                action: handleFileMenuItemClick,
+              },
+            ]}
           />
         )}
         {showCharCounter && (
