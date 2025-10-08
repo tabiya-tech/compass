@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Typography, styled } from "@mui/material";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -38,6 +39,8 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
   initialIsLoading = false,
   initialCooldownSeconds = 0 
 }) => {
+  
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(initialIsLoading);
   const [cooldownSeconds, setCooldownSeconds] = useState(initialCooldownSeconds);
   const { enqueueSnackbar } = useSnackbar();
@@ -82,7 +85,7 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
   return (
     <StyledBox data-testid={DATA_TEST_ID.CONTAINER}>
       <Typography variant="body2" color="error">
-        Your email is not verified. Please check your inbox for the verification email.
+        {t("email_not_verified")}
       </Typography>
       <Box>
         <CustomLink
@@ -90,7 +93,7 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
           disabled={isLoading || cooldownSeconds > 0 || !isOnline}
           data-testid={DATA_TEST_ID.RESEND_LINK}
         >
-          Resend verification email
+          {t("resend_verification_email")}
         </CustomLink>
         {cooldownSeconds > 0 && (
           <Typography

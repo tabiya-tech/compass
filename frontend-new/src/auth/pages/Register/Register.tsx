@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Container, Divider, TextField, Typography, useTheme } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -44,6 +45,7 @@ export const DATA_TEST_ID = {
 const Register: React.FC = () => {
   const [registrationCode, setRegistrationCode] = useState<string>("");
   const theme = useTheme();
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -186,19 +188,19 @@ const Register: React.FC = () => {
         width={"100%"}
       >
         <AuthHeader
-          title={"Welcome to Compass!"}
+          title={t("welcome_to_compass")}
           subtitle={
             <Typography variant="body2" gutterBottom>
-              We need some information to get started
+              {t("register_subtitle")}
             </Typography>
           }
         />
         {!applicationRegistrationCode && (
           <React.Fragment>
-            <Typography variant="subtitle2">Enter your registration code</Typography>
+            <Typography variant="subtitle2">{t("enter_registration_code")}</Typography>
             <TextField
               fullWidth
-              label="Registration code"
+              label={t("registration_code")}
               variant="outlined"
               required
               value={registrationCode}
@@ -210,7 +212,7 @@ const Register: React.FC = () => {
         {!applicationRegistrationCode && (
           <Divider textAlign="center" style={{ width: "100%" }}>
             <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-              and either continue with
+              {t("and_either_continue_with")}
             </Typography>
           </Divider>
         )}
@@ -224,18 +226,18 @@ const Register: React.FC = () => {
             postLoginHandler={handlePostLogin}
             isLoading={isLoading}
             disabled={!registrationCode && !applicationRegistrationCode}
-            label={"Register with Google"}
+            label={t("register_with_google")}
             notifyOnLoading={notifyOnSocialLoading}
             registrationCode={registrationCode || applicationRegistrationCode}
           />
         )}
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          Already have an account? <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>Login</CustomLink>
+          {t("already_have_account")} <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>{t("login")}</CustomLink>
         </Typography>
         {!applicationRegistrationCode && <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />}
       </Box>
       <BugReportButton bottomAlign={true} />
-      <Backdrop isShown={isLoading} message="Registering you..." />
+      <Backdrop isShown={isLoading} message={t("registering_you")} />
     </Container>
   );
 };
