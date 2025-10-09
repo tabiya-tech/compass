@@ -12,9 +12,13 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
+
+
 import CustomerSatisfactionRating, {
   DATA_TEST_ID as CUSTOMER_SATISFACTION_RATING_DATA_TEST_ID,
 } from "src/feedback/overallFeedback/feedbackForm/components/customerSatisfactionRating/CustomerSatisfaction";
+
+
 
 // Mock external dependencies
 jest.mock("src/app/PersistentStorageService/PersistentStorageService");
@@ -34,6 +38,7 @@ jest.mock(
     };
   }
 );
+
 
 describe("ConversationConclusionFooter", () => {
   const givenMockHandleOpenExperiencesDrawer = jest.fn();
@@ -95,6 +100,7 @@ describe("ConversationConclusionFooter", () => {
       expect(actualFeedbackFormButtonContainer).toMatchSnapshot();
     });
   });
+
 
   describe("feedback", () => {
     test("should not show feedback request if rating is not submitted", () => {
