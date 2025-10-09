@@ -103,7 +103,7 @@ const ORIGINAL_SENTRY_DSN = window.tabiyaConfig.FRONTEND_SENTRY_DSN;
 let isSentryInitialized = true;
 
 export const decorators = [
-  (Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean; locale: string } }) => {
+  (Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean; locale?: string } }) => {
     const isOnline = context.globals.online;
     const sentryEnabled = context.globals.sentryEnabled;
     const locale = context.globals.locale || 'en';
