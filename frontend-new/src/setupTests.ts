@@ -99,6 +99,9 @@ jest.mock("react-i18next", () => {
             t: stableT,
             i18n: {
                 changeLanguage: jest.fn().mockResolvedValue(null),
+                 on: jest.fn(),
+                 off: jest.fn(),
+                 language: 'en', // Mock the current language
             },
         }),
         Trans,
