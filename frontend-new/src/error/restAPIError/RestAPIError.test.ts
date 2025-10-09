@@ -1,6 +1,7 @@
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
-import { getRestAPIErrorFactory, RestAPIError, getUserFriendlyErrorMessage } from "src/error/restAPIError/RestAPIError";
+import { getRestAPIErrorFactory, RestAPIError, getUserFriendlyErrorMessage, getUserFriendlyErrorMessageKey, translateUserFriendlyErrorMessage } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
+import i18n from "src/i18n/i18n";
 
 describe("Test the RestAPIError class", () => {
   it.each([
@@ -93,26 +94,27 @@ describe("Test the getUserFriendlyErrorMessage function", () => {
     // GIVEN a random error
     const error = new Error("Random error");
     // WHEN calling getUserFriendlyErrorMessage
-    const message = getUserFriendlyErrorMessage(error);
-    // THEN the function should return a generic error message
-    expect(message).toBe(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR);
+    const key = getUserFriendlyErrorMessageKey(error);
+    expect(key).toBe("UNEXPECTED_ERROR");
+    const message = translateUserFriendlyErrorMessage(key);
+    expect(message).toBe(i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS.UNEXPECTED_ERROR));
   });
 
   describe("ErrorConstants.ErrorCodes", () => {
     describe("should return correct message for 'API_ERROR' error code", () => {
       test.each([
-        [0, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR],
-        [StatusCodes.MULTIPLE_CHOICES, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE],
-        [StatusCodes.BAD_REQUEST, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.DATA_VALIDATION_ERROR],
-        [StatusCodes.UNAUTHORIZED, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.AUTHENTICATION_FAILURE],
-        [StatusCodes.FORBIDDEN, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.PERMISSION_DENIED],
-        [StatusCodes.NOT_FOUND, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.RESOURCE_NOT_FOUND],
-        [StatusCodes.REQUEST_TOO_LONG, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.REQUEST_TOO_LONG],
-        [StatusCodes.TOO_MANY_REQUESTS, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.TOO_MANY_REQUESTS],
-        [StatusCodes.INTERNAL_SERVER_ERROR, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR],
-        [StatusCodes.BAD_GATEWAY, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.SERVICE_UNAVAILABLE],
-        [StatusCodes.SERVICE_UNAVAILABLE, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.SERVICE_UNAVAILABLE],
-      ])("%s Status Code", (statusCode, expectedMessage) => {
+        [0, "UNEXPECTED_ERROR"],
+        [StatusCodes.MULTIPLE_CHOICES, "UNABLE_TO_PROCESS_RESPONSE"],
+        [StatusCodes.BAD_REQUEST, "DATA_VALIDATION_ERROR"],
+        [StatusCodes.UNAUTHORIZED, "AUTHENTICATION_FAILURE"],
+        [StatusCodes.FORBIDDEN, "PERMISSION_DENIED"],
+        [StatusCodes.NOT_FOUND, "RESOURCE_NOT_FOUND"],
+        [StatusCodes.REQUEST_TOO_LONG, "REQUEST_TOO_LONG"],
+        [StatusCodes.TOO_MANY_REQUESTS, "TOO_MANY_REQUESTS"],
+        [StatusCodes.INTERNAL_SERVER_ERROR, "UNEXPECTED_ERROR"],
+        [StatusCodes.BAD_GATEWAY, "SERVICE_UNAVAILABLE"],
+        [StatusCodes.SERVICE_UNAVAILABLE, "SERVICE_UNAVAILABLE"],
+      ])("%s Status Code", (statusCode, expectedKey) => {
         // GIVEN an API RestAPIError with the given error code
         const error = new RestAPIError(
           "service",
@@ -125,25 +127,20 @@ describe("Test the getUserFriendlyErrorMessage function", () => {
           "Failed to fetch models"
         );
         // WHEN calling getUserFriendlyErrorMessage
-        const message = getUserFriendlyErrorMessage(error);
-        // THEN the function should return the appropriate message
-        expect(message).toBe(expectedMessage);
+        const key = getUserFriendlyErrorMessageKey(error);
+        expect(key).toBe(expectedKey);
+        const message = translateUserFriendlyErrorMessage(key);
+        expect(message).toBe(i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS[expectedKey as keyof typeof ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS]));
       });
     });
 
     test.each([
-      [ErrorConstants.ErrorCodes.FAILED_TO_FETCH, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.SERVER_CONNECTION_ERROR],
-      [
-        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
-        ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE,
-      ],
-      [
-        ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER,
-        ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_RESPONSE,
-      ],
-      [ErrorConstants.ErrorCodes.FORBIDDEN, ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR],
-      ["(none of the above)", ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNEXPECTED_ERROR],
-    ])("Should return correct message for '%s' error code", (errorCode, errorMessage) => {
+      [ErrorConstants.ErrorCodes.FAILED_TO_FETCH, "SERVER_CONNECTION_ERROR"],
+      [ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY, "UNABLE_TO_PROCESS_RESPONSE"],
+      [ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER, "UNABLE_TO_PROCESS_RESPONSE"],
+      [ErrorConstants.ErrorCodes.FORBIDDEN, "UNEXPECTED_ERROR"],
+      ["(none of the above)", "UNEXPECTED_ERROR"],
+    ])("Should return correct message for '%s' error code", (errorCode, expectedKey) => {
       // GIVEN a RestAPIError with the given error code
       const error = new RestAPIError(
         "service",
@@ -156,9 +153,10 @@ describe("Test the getUserFriendlyErrorMessage function", () => {
         "Failed to fetch models"
       );
       // WHEN calling getUserFriendlyErrorMessage
-      const message = getUserFriendlyErrorMessage(error);
-      // THEN the function should return the appropriate message
-      expect(message).toBe(errorMessage);
+      const key = getUserFriendlyErrorMessageKey(error);
+      expect(key).toBe(expectedKey);
+      const message = translateUserFriendlyErrorMessage(key);
+      expect(message).toBe(i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS[expectedKey as keyof typeof ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS]));
     });
 
     test("Should return correct message for 'FORBIDDEN' error code and status is 422", () => {
@@ -175,10 +173,10 @@ describe("Test the getUserFriendlyErrorMessage function", () => {
       );
 
       // WHEN calling getUserFriendlyErrorMessage
-      const message = getUserFriendlyErrorMessage(error);
-
-      // THEN the function should return the appropriate message
-      expect(message).toBe(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.UNABLE_TO_PROCESS_REQUEST);
+      const key = getUserFriendlyErrorMessageKey(error);
+      expect(key).toBe("UNABLE_TO_PROCESS_REQUEST");
+      const message = translateUserFriendlyErrorMessage(key);
+      expect(message).toBe(i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS.UNABLE_TO_PROCESS_REQUEST));
     });
   });
 });

@@ -211,5 +211,18 @@
   "firebase_error_invalid_registration_type": "El código que usaste es para inicio de sesión y no para registro. Ve a la página de inicio de sesión.",
   "firebase_error_popup_closed_by_user": "La ventana emergente de Google se cerró antes de completar el inicio de sesión.",
   "firebase_error_invalid_login_method": "Esta operación no está permitida con el método de inicio de sesión actual.",
-  "firebase_error_email_already_verified": "La dirección de correo ya está verificada."
+  "firebase_error_email_already_verified": "La dirección de correo ya está verificada.",
+  "rest_api_error_request_too_long": "The data sent to the service seems to be too large. Please try again with a smaller payload. If the problem persists, clear your browser's cache and refresh the page.",
+  "rest_api_error_too_many_requests": "It looks like you are making too many requests. Please slow down and try again later.",
+  "rest_api_error_unexpected_error": "An unexpected error occurred. Please try again later.",
+  "rest_api_error_server_connection_error": "Cannot connect to the service. Please check your internet connection or try again later.",
+  "rest_api_error_resource_not_found": "The requested resource was not found. Please clear your browser's cache and refresh the page.",
+  "rest_api_error_authentication_failure": "It looks like you not logged in. Please log in to continue.",
+  "rest_api_error_permission_denied": "It looks like you do not have the necessary permissions. Please log out and log in again.",
+  "rest_api_error_unable_to_process_response": "We encountered an issue while processing data. Clear the browser's cache and refresh or try again later.",
+  "rest_api_error_service_unavailable": "The service is currently unavailable. Please try again later.",
+  "rest_api_error_data_validation_error": "There seems to be an issue with your request. If you're submitting data, please make sure they're valid and try again. If the problem persists, clear your browser's cache and refresh the page.",
+  "rest_api_error_unable_to_process_request": "Apologies. Something went wrong while processing your request.",
+  "rest_api_error_story_choose_message_label": "Choose an error message to display in a notification:",
+  "rest_api_error_story_select_placeholder": "Select an error message"
 }
