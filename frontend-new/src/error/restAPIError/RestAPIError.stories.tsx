@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import SnackbarProvider, { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { FormLabel, MenuItem, Select, Stack } from "@mui/material";
 import ErrorConstants from "./RestAPIError.constants";
+import i18n from "src/i18n/i18n";
 
 const meta: Meta<typeof SnackbarProvider> = {
   title: "Error/Error",
@@ -28,20 +29,18 @@ const TestErrorDropdown = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const handleSelect = (event: React.MouseEvent<HTMLLIElement>) => {
-    // @ts-ignore
-    enqueueSnackbar(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES[event.currentTarget.textContent], { variant: "error" });
+    const key = event.currentTarget.getAttribute("data-key") as keyof typeof ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS;
+    if (!key) return;
+    const message = i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS[key]);
+    enqueueSnackbar(message, { variant: "error" });
   };
 
   return (
     <Stack width={"fit-content"}>
-      <FormLabel> Choose an error message to display in a notification:</FormLabel>
-      <Select
-        value={Object.values(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES)[0]}
-        placeholder={"Select an error message"}
-      >
-        {Object.keys(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES).map((key: string) => (
-          // @ts-ignore
-          <MenuItem onClick={handleSelect} key={key} value={ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES[key]}>
+      <FormLabel>{i18n.t("rest_api_error_story_choose_message_label", { defaultValue: "Choose an error message to display in a notification:" })}</FormLabel>
+      <Select value={""} displayEmpty renderValue={() => i18n.t("rest_api_error_story_select_placeholder", { defaultValue: "Select an error message" })}>
+        {Object.keys(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS).map((key) => (
+          <MenuItem onClick={handleSelect} key={key} data-key={key} value={key}>
             {key}
           </MenuItem>
         ))}

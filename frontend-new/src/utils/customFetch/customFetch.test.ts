@@ -877,8 +877,9 @@ describe("Api Service tests", () => {
       expect(mockAuthService.logout).toHaveBeenCalled();
 
       // AND enqueueSnackbar should not be called with log out message.
+      const i18n = require("src/i18n/i18n").default;
       expect(enqueueSnackbar).toHaveBeenCalledWith(
-        `${ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.AUTHENTICATION_FAILURE} We are logging you out ....`,
+        `${i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS.AUTHENTICATION_FAILURE)} We are logging you out ....`,
         {
           autoHideDuration: LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
           variant: "error",
