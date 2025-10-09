@@ -195,7 +195,7 @@ class TestUploadCV:
         assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
     @pytest.mark.asyncio
-    async def test_service_max_uploads_maps_to_429(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_service_max_uploads_maps_to_403(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
         # GIVEN service raises CVLimitExceededError when user exceeds uploads
         mocker.patch.object(mocked_service, "parse_cv", side_effect=CVLimitExceededError("Maximum number of CV uploads reached"))
@@ -204,8 +204,8 @@ class TestUploadCV:
         headers = {"Content-Type": given_mime, "x-filename": f"cv{given_ext}"}
         # WHEN uploading the CV
         response = client.post(f"/{mocked_user.user_id}/cv", data=b"hello", headers=headers)
-        # THEN it maps to 429 Too Many Requests
-        assert response.status_code == HTTPStatus.TOO_MANY_REQUESTS
+        # THEN it maps to 403 Forbidden
+        assert response.status_code == HTTPStatus.FORBIDDEN
 
     @pytest.mark.asyncio
     async def test_service_rate_limit_maps_to_429(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):

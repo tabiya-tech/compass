@@ -225,7 +225,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
             raise
         except CVLimitExceededError as e:
             logger.warning("Max uploads per user exceeded {user_id=%s}", user_id)
-            raise HTTPException(status_code=HTTPStatus.TOO_MANY_REQUESTS, detail=str(e))
+            raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=str(e))
         except CVUploadRateLimitExceededError as e:
             logger.warning("Rate limit exceeded for user {user_id=%s}", user_id)
             raise HTTPException(status_code=HTTPStatus.TOO_MANY_REQUESTS, detail=str(e))

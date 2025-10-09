@@ -58,6 +58,8 @@ export const ERROR_MESSAGES = {
   FILE_TOO_DENSE: "The uploaded file content is too long to process. Please reduce its length and try again.",
   EMPTY_CV_PARSE: "We couldn't detect experiences in your CV. Please check the file and try again.",
   GENERIC_UPLOAD_ERROR: "Failed to parse your CV. Please try again or use a different file.",
+  RATE_LIMIT_WAIT: "You're uploading too quickly. Please wait a bit and try again.",
+  MAX_UPLOADS_REACHED: "You've reached the maximum CV uploads for this conversation.",
 };
 
 // Define the max file size in bytes 3 MB
@@ -299,11 +301,12 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       console.error("Error parsing CV file:", err);
       const maybeStatus = (err as any)?.statusCode;
       const maybeCode = (err as any)?.errorCode;
-      if (
-        maybeStatus === StatusCodes.REQUEST_TOO_LONG ||
-        maybeCode === ErrorConstants.ErrorCodes.TOO_LARGE_PAYLOAD
-      ) {
+      if (maybeStatus === StatusCodes.REQUEST_TOO_LONG || maybeCode === ErrorConstants.ErrorCodes.TOO_LARGE_PAYLOAD) {
         setErrorMessage(ERROR_MESSAGES.FILE_TOO_DENSE);
+      } else if (maybeStatus === StatusCodes.TOO_MANY_REQUESTS) {
+        setErrorMessage(ERROR_MESSAGES.RATE_LIMIT_WAIT);
+      } else if (maybeStatus === StatusCodes.FORBIDDEN) {
+        setErrorMessage(ERROR_MESSAGES.MAX_UPLOADS_REACHED);
       } else {
         setErrorMessage(ERROR_MESSAGES.GENERIC_UPLOAD_ERROR);
       }
@@ -382,7 +385,6 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const inputIsDisabled = useCallback(() => {
     return props.isChatFinished || props.aiIsTyping || props.isUploadingCv || !isOnline;
   }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline]);
-
 
   return (
     <Box
@@ -497,15 +499,14 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
               {
                 id: MENU_ITEM_ID.UPLOAD_CV,
                 text: MENU_ITEM_TEXT.UPLOAD_CV,
-                description: 
-                  props.currentPhase === ConversationPhase.INTRO 
+                description:
+                  props.currentPhase === ConversationPhase.INTRO
                     ? "You can upload your CV as soon as we start exploring your experiences"
                     : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
-                    ? "Attach your CV to the conversation"
-                    : "CV upload is only available during experience collection",
+                      ? "Attach your CV to the conversation"
+                      : "CV upload is only available during experience collection",
                 icon: <UploadFileIcon />,
-                disabled:
-                  inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
+                disabled: inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
                 action: handleFileMenuItemClick,
               },
             ]}

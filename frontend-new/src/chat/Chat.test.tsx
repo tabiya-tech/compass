@@ -2423,14 +2423,12 @@ describe("Chat", () => {
       render(<Chat />);
       // AND the Chat component is initialized
       await assertChatInitialized();
-      // AND the CV file upload fails
+
+      // THEN expect CV file upload fails
       await act(async () => {
         const onUploadCv = (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].onUploadCv;
-        await onUploadCv(file);
+        await expect(onUploadCv(file)).rejects.toThrow("Upload failed");
       });
-
-      // THEN expect the error to be logged
-      expect(console.error).toHaveBeenCalledWith(uploadError);
       // AND expect the error snackbar to be shown
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to upload CV. Please try again.", {
         variant: "error",
