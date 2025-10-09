@@ -225,9 +225,9 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
     await authenticationService!.logout();
     navigate(routerPaths.LANDING, { replace: true });
-    enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.SUCCESSFULLY_LOGGED_OUT, { variant: "success" });
+    enqueueSnackbar(t("successfully_logged_out"), { variant: "success" });
     setIsLoggingOut(false);
-  }, [enqueueSnackbar, navigate]);
+  }, [enqueueSnackbar, navigate,t]);
 
   // Handles CV upload
   const handleUploadCv = useCallback(
@@ -485,16 +485,16 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     setNewConversationDialog(false);
     setExploredExperiencesNotification(false);
     if (await initializeChat(currentUserId, null)) {
-      enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.NEW_CONVERSATION_STARTED, { variant: "success" });
+      enqueueSnackbar(t("new_conversation_started"), { variant: "success" });
     } else {
       // Add a message to the chat saying that something went wrong
       setMessages([generateSomethingWentWrongMessage()]);
       // Set the conversation as completed to prevent the user from sending any messages
       setConversationCompleted(true);
       // Notify the user that the chat failed to start
-      enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.FAILED_TO_START_CONVERSATION, { variant: "error" });
+      enqueueSnackbar(t("failed_to_start_conversation"), { variant: "error" });
     }
-  }, [enqueueSnackbar, initializeChat, currentUserId]);
+  }, [enqueueSnackbar, initializeChat, currentUserId,t]);
 
   /**
    * --- UseEffects ---
@@ -513,11 +513,11 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         // Set the conversation as completed to prevent the user from sending any messages
         setConversationCompleted(true);
         // Notify the user that the chat failed to start
-        enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.FAILED_TO_START_CONVERSATION, { variant: "error" });
+        enqueueSnackbar(t("failed_to_start_conversation"), { variant: "error" });
       }
       setInitialized(true);
     });
-  }, [enqueueSnackbar, initializeChat, activeSessionId, currentUserId]);
+  }, [enqueueSnackbar, initializeChat, activeSessionId, currentUserId,t]);
 
   // show the user backdrop when the user is inactive for INACTIVITY_TIMEOUT
   useEffect(() => {
@@ -656,7 +656,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
           {newConversationDialog && (
             <ConfirmModalDialog
               isOpen={newConversationDialog}
-              title="Start New Conversation?"
+              title={t("start_new_conversation_title")}
               content={
                 <>
                   {t("start_new_conversation_content")}

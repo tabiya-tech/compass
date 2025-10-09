@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   EnumFieldDefinition,
   FieldDefinition,
@@ -10,88 +11,84 @@ import { parse } from "yaml";
 import { ConfigurationError } from "src/error/commonErrors";
 import { customFetch } from "src/utils/customFetch/customFetch";
 
+// Base path for configs
+const CONFIG_BASE_PATH = "/data/config";
 export const CONFIG_PATH = "/data/config/fields.yaml";
 
-/**
- * React hook to load the fields configuration
- * @returns The loaded fields, loading state, and error state
- */
 export const useFieldsConfig = () => {
+  const { i18n } = useTranslation(); // i18n gives us the active language
   const [fields, setFields] = useState<FieldDefinition[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const fetchConfig = async () => {
-      // Load from the public directory
-      const response = await customFetch(CONFIG_PATH, {
-        expectedStatusCode: [200, 204],
-        serviceName: "SensitiveDataService",
-        serviceFunction: "useFieldsConfig",
-        failureMessage: `Failed to fetch fields configuration from ${CONFIG_PATH}`,
-        authRequired: false,
-        retryOnFailedToFetch: true,
-      });
+      try {
+        // Build localized path
+        // Example: /data/config/fields_en.yaml
+        const lang = i18n.language || "en";
+        const configPath = `${CONFIG_BASE_PATH}/fields-${lang}.yaml`;
 
-      const yamlText = await response.text();
-      const parsedDefinitions: FieldDefinition[] = parseYamlConfig(yamlText);
+        const response = await customFetch(configPath, {
+          expectedStatusCode: [200, 204],
+          serviceName: "SensitiveDataService",
+          serviceFunction: "useFieldsConfig",
+          failureMessage: `Failed to fetch fields configuration from ${configPath}`,
+          authRequired: false,
+          retryOnFailedToFetch: true,
+        });
 
-      setFields(parsedDefinitions);
-      setLoading(false);
+        const yamlText = await response.text();
+        const parsedDefinitions: FieldDefinition[] = parseYamlConfig(yamlText);
+
+        setFields(parsedDefinitions);
+      } catch (err) {
+        console.error(err);
+        setError(err instanceof Error ? err : new Error("Unknown error loading configuration"));
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchConfig().catch(error => {
-      console.error(error);
-      setError(error instanceof Error ? error : new Error("Unknown error loading configuration"));
-      setLoading(false);
-    });
-  }, []);
+
+    fetchConfig();
+  }, [i18n.language]); // re-run when the language changes
 
   return { fields, loading, error };
 };
 
 /**
  * Parses a YAML configuration string into a FieldsConfig object.
- *
- * @param yamlText - The YAML configuration string
- * @returns The parsed FieldsConfig object
  */
-
 export const parseYamlConfig = (yamlText: string): FieldDefinition[] => {
-  let fieldDefinitions: FieldDefinition[]
   try {
     const yamlJson = parse(yamlText) as Record<string, FieldDefinition>;
 
-    // Convert the YAML object into an array of FieldDefinition objects
-    // the yaml is setup in a way that the key is the name of the field
-    // and the value is the rest of the field definition, so we need to
-    // manually add the name to the field definition
-
-    // The class constructors will validate the field definitions (types and required fields)
-    fieldDefinitions = Object.entries(yamlJson).map(([name, field]: [string, FieldDefinition]) => {
-      switch (field.type) {
-        case FieldType.String:
-          return new StringFieldDefinition({ ...field, name });
-        case FieldType.Enum:
-          return new EnumFieldDefinition({ ...field, name });
-        case FieldType.MultipleSelect:
-          return new MultipleSelectFieldDefinition({ ...field, name });
-        default:
-          throw new Error('Invalid field type');
+    const fieldDefinitions = Object.entries(yamlJson).map(
+      ([name, field]: [string, FieldDefinition]) => {
+        switch (field.type) {
+          case FieldType.String:
+            return new StringFieldDefinition({ ...field, name });
+          case FieldType.Enum:
+            return new EnumFieldDefinition({ ...field, name });
+          case FieldType.MultipleSelect:
+            return new MultipleSelectFieldDefinition({ ...field, name });
+          default:
+            throw new Error("Invalid field type");
+        }
       }
-    });
+    );
 
-    // Validate duplicate dataKeys
     const dataKeys: Map<string, boolean> = new Map();
-    fieldDefinitions.forEach(field => {
+    fieldDefinitions.forEach((field) => {
       if (dataKeys.has(field.dataKey)) {
         throw new ConfigurationError(`Duplicate dataKey '${field.dataKey}'`);
       }
-      dataKeys.set(field.dataKey, true)
+      dataKeys.set(field.dataKey, true);
     });
 
     return fieldDefinitions;
   } catch (error) {
     console.error(error);
-    throw new Error('Failed to parse fields configuration');
+    throw new Error("Failed to parse fields configuration");
   }
 };
