@@ -1,9 +1,11 @@
 import {
-  FirebaseErrorCodes, isFirebaseErrorCode,
+  FirebaseErrorCodes,
+  isFirebaseErrorCode,
   USER_FRIENDLY_FIREBASE_ERROR_MESSAGES,
 } from "src/error/FirebaseError/firebaseError.constants";
 import { ServiceError } from "src/error/ServiceError";
 import { FirebaseError as _FirebaseError } from "@firebase/util";
+import i18n from "src/i18n/i18n";
 
 export class FirebaseError extends ServiceError {
   errorCode: FirebaseErrorCodes | string;
@@ -41,15 +43,13 @@ export function getFirebaseErrorFactory(
 }
 
 export const getUserFriendlyFirebaseErrorMessage = (firebaseError: FirebaseError): string => {
-
-  // if firebaseError.errorCode not in the USER_FRIENDLY_FIREBASE_ERROR_MESSAGES then return the internal error message
-  if (isFirebaseErrorCode(firebaseError.errorCode)) {
-    return (
-      USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[firebaseError.errorCode] ||
+  // Resolve to a translation key first, then translate
+  const key = isFirebaseErrorCode(firebaseError.errorCode)
+    ? USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[firebaseError.errorCode] ||
       USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR]
-    );
-  }
-  return USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR];
+    : USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR];
+
+  return i18n.t(key);
 };
 
 /**
