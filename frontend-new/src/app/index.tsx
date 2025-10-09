@@ -23,6 +23,7 @@ import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableCompo
 import { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
 import { AuthBroadcastChannel, AuthChannelMessage } from "src/auth/services/authBroadcastChannel/authBroadcastChannel";
 import { getRegistrationDisabled } from "src/envService";
+import { useTranslation } from "react-i18next";
 
 const LazyLoadedSensitiveDataForm = lazyWithPreload(
   () => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm")
@@ -50,6 +51,11 @@ const ProtectedRouteKeys = {
 };
 
 const App = () => {
+  const NotFound: React.FC = () => {
+    const { t } = useTranslation();
+    return <ErrorPage errorMessage={t("error_page_not_found")} />;
+  };
+
   const [loading, setLoading] = useState(true);
 
   const loadApplicationState = async () => {
@@ -301,7 +307,7 @@ const App = () => {
     },
     {
       path: "*",
-      element: <ErrorPage errorMessage={"404 Error - Page Not Found"} />,
+      element: <NotFound />,
     },
   ]);
   return <RouterProvider router={router} />;
