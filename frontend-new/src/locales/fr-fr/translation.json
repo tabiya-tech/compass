@@ -66,7 +66,7 @@
   "message_placeholder": "Veuillez partager comment vous prévoyez d'utiliser Compass",
   "feedback_message": "Nous serions ravis d’avoir vos retours sur votre expérience jusqu’à présent !",
   "give_feedback": "Donner un avis",
-   "view_experiences": "Voir les expériences",
+  "view_experiences": "Voir les expériences",
   "user_info": "Informations utilisateur",
   "before_you_go": "Avant de partir",
   "logout": "Se déconnecter",
@@ -124,7 +124,7 @@
   "logging_out": "Déconnexion en cours, veuillez patienter...",
   "start_new_conversation_title": "Commencer une nouvelle conversation ?",
   "start_new_conversation_content": "Une fois que vous commencez une nouvelle conversation, tous les messages de la conversation actuelle seront perdus à jamais.",
-  "are_you_sure_start_new_conversation_content":"Êtes-vous sûr de vouloir commencer une nouvelle conversation ?",
+  "are_you_sure_start_new_conversation_content": "Êtes-vous sûr de vouloir commencer une nouvelle conversation ?",
   "cancel_button": "Annuler",
   "confirm_button": "Oui, je suis sûr",
   "consent_before_we_begin_title": "Avant de commencer...",
@@ -190,7 +190,7 @@
   "sensitive_data_failed_to_load_config": "Échec du chargement de la configuration du formulaire",
   "sensitive_data_invalid_form": "Veuillez corriger les erreurs dans le formulaire avant de le soumettre.",
   "sensitive_data_help_tip_text": "Vos informations sont chiffrées à l'aide d'un système de chiffrement de bout en bout à la pointe de la technologie et stockées en toute sécurité.",
-  "new_conversation_started": "Nouvelle conversation commencée",
-  "successfully_logged_out": "Déconnexion réussie",
-  "failed_to_start_conversation": "Échec du démarrage d'une nouvelle conversation"
+  "error_page_illustration_alt": "illustration d'erreur",
+  "error_page_default_message": "Un problème est survenu avec Compass. Essayez de recharger la page...",
+  "error_page_not_found": "Erreur 404 - Page non trouvée"
 }
