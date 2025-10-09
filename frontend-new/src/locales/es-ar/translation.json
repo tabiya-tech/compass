@@ -189,5 +189,8 @@
   "sensitive_data_skippable_subtitle": "Puedes omitir este paso.",
   "sensitive_data_failed_to_load_config": "Error al cargar la configuración del formulario",
   "sensitive_data_invalid_form": "Por favor corrige los errores en el formulario antes de enviarlo.",
-  "sensitive_data_help_tip_text": "Tu información se cifra mediante un sistema de cifrado de extremo a extremo de última generación y se almacena de forma segura."
+  "sensitive_data_help_tip_text": "Tu información se cifra mediante un sistema de cifrado de extremo a extremo de última generación y se almacena de forma segura.",
+  "new_conversation_started": "Nueva conversación iniciada",
+  "successfully_logged_out": "Cierre de sesión exitoso",
+  "failed_to_start_conversation": "Error al iniciar una nueva conversación"
 }

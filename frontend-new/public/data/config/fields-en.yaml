@@ -1,0 +1,74 @@
+name:
+  dataKey: name
+  type: STRING
+  required: true
+  label: Name
+  validation:
+    # The pattern below allows for letters, spaces, and dots
+    # ^(?!\.) ensures that the name does not start with a dot
+    # (?!.*\.\.) ensures that the name does not contain two consecutive dots
+    # (?!.*(\..*){5,}) ensures that the name does not contain more than 4 dots
+    # [\p{L}\s\.]{2,50} ensures that the name contains only letters (Unicode), spaces, and dots and is between 2 and 50 characters long
+    # # Unicode letter characters REQUIRES the 'u' flag in the regex e.g. /pattern/u
+    pattern: ^(?!\.)(?!.*\.\.)(?!.*(\..*){5,})[\p{L}\s\.]{2,50}$
+    errorMessage: Name should contain only letters and be 2-50 characters long.
+contactEmail:
+  dataKey: contact_email
+  type: STRING
+  required: true
+  label: Contact email
+  validation:
+    # The limit for the length of an email is a maximum of 64 characters (octets)
+    #   in the "local part" (before the "@") and a maximum of 255 characters
+    #   (octets) in the domain part (after the "@") for a total length of 320
+    #   characters.
+    # We've gone for a more conservative limit of 256 characters
+    # for more info see: https://www.rfc-editor.org/errata_search.php?rfc=3696
+    pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,256}$
+    errorMessage: Please enter a valid email address.
+gender:
+  dataKey: gender
+  type: ENUM
+  required: true
+  label: Gender
+  values:
+    - Male
+    - Female
+age:
+  dataKey: age
+  type: STRING
+  required: true
+  label: Age
+  validation:
+    # 1[6-9] covers numbers between 16 and 19
+    # [2-9][0-9] covers numbers between 20 and 99
+    # 1[01][0-9] covers numbers between 100 and 119
+    # and 120 covers the number...120
+    pattern: ^(?:1[6-9]|[2-9][0-9]|1[01][0-9]|120)$
+    errorMessage: Please enter a valid age. You must be at 16 years old or older to participate.
+educationStatus:
+  dataKey: education_status
+  type: ENUM
+  required: true
+  label: Education
+  questionText: What is the highest level of education you have completed?
+  values:
+    - Less than primary / no formal education
+    - Primary
+    - Secondary
+    - College / Diploma
+    - University degree
+    - Postgraduate degree
+mainActivity:
+    dataKey: main_activity
+    type: ENUM
+    required: true
+    label: Main activity
+    questionText: In the last 30 days, what was your main activity in terms of time spent?
+    values:
+        - Worked for wages
+        - Worked for my own account (trader, shopkeeper, barber, dressmaker)
+        - Worked as a volunteer
+        - Worked as intern or apprentice
+        - In school, university, or training
+        - Unemployed
