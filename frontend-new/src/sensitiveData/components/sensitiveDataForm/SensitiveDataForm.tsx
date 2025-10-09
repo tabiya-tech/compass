@@ -1,6 +1,6 @@
 import { useCallback, useState, useEffect, Suspense } from "react";
 import { Box, CircularProgress, Container, useMediaQuery, useTheme, Typography } from "@mui/material";
-
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
@@ -192,6 +192,7 @@ const renderField = (
 
 const SensitiveDataForm: React.FC = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -407,10 +408,10 @@ const SensitiveDataForm: React.FC = () => {
               }}
             >
               <AuthHeader
-                title={SENSITIVE_DATA_FORM_FIXED_TEXT.TITLE}
+                title={t("sensitive_data_title")}
                 subtitle={
                   <>
-                    {SENSITIVE_DATA_FORM_FIXED_TEXT.SUBTITLE}
+                    {t("sensitive_data_subtitle")}
                     {isPIIRequired
                       ? " " + SENSITIVE_DATA_FORM_FIXED_TEXT.UNSKIPPABLE_SUBTITLE
                       : " " + SENSITIVE_DATA_FORM_FIXED_TEXT.SKIPPABLE_SUBTITLE}
@@ -447,7 +448,7 @@ const SensitiveDataForm: React.FC = () => {
                         setConfirmingReject(true);
                       }}
                     >
-                      No, thank you
+                      {t("no_thank_you")}
                     </CustomLink>
                   ) : (
                     <CustomLink
@@ -458,7 +459,7 @@ const SensitiveDataForm: React.FC = () => {
                         setConfirmingSkip(true);
                       }}
                     >
-                      Skip
+                      {t("skip")}
                     </CustomLink>
                   )}
 
@@ -481,7 +482,7 @@ const SensitiveDataForm: React.FC = () => {
                         data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS}
                       />
                     ) : (
-                      "Start conversation"
+                      t("start_conversation")
                     )}
                   </PrimaryButton>
                 </Box>
@@ -490,21 +491,20 @@ const SensitiveDataForm: React.FC = () => {
           </Container>
           <TextConfirmModalDialog
             isOpen={confirmingReject}
-            title="Are you sure?"
+            title={t("are_you_sure")}
             textParagraphs={[
               {
                 id: "1",
                 text: (
                   <>
-                    We're sorry that you chose not to provide your data. Providing this information helps Compass
-                    deliver a more personalized experience for you. You will not be able to proceed and will be{" "}
-                    <HighlightedSpan>logged out.</HighlightedSpan>
+                    {t("sensitive_data_reject_paragraph_1")}{" "}
+                    <HighlightedSpan>{t("logging_you_out")}</HighlightedSpan>
                   </>
                 ),
               },
               {
                 id: "2",
-                text: <>Are you sure you want to exit?</>,
+                text: <>{t("are_you_sure_you_want_to_exit")}</>,
               },
             ]}
             onCancel={handleRejectProvidingSensitiveData}
@@ -514,26 +514,25 @@ const SensitiveDataForm: React.FC = () => {
             onConfirm={() => {
               setConfirmingReject(false);
             }}
-            cancelButtonText="Yes, exit"
-            confirmButtonText="I want to stay"
+            cancelButtonText={t("yes_exit")}
+            confirmButtonText={t("i_want_to_stay")}
           />
           <TextConfirmModalDialog
             isOpen={confirmingSkip}
-            title="Are you sure?"
+            title={t("are_you_sure")}
             textParagraphs={[
               {
                 id: "1",
                 text: (
-                  <>
-                    We're sorry that you prefer not to provide your data. Providing this information helps Compass
-                    deliver a more personalized experience for you. Please note that if you skip this step,{" "}
-                    <HighlightedSpan>you won't be able to provide this information later.</HighlightedSpan>
+                  <>                  
+                    {t("sensitive_data_skip_paragraph_1")}{" "}
+                    <HighlightedSpan>{t("sensitive_data_skip_paragraph_1_highlighted")}</HighlightedSpan>
                   </>
                 ),
               },
               {
                 id: "2",
-                text: <>Are you sure you want to skip?</>,
+                text: <>{t("are_you_sure_you_want_to_skip")}</>,
               },
             ]}
             onCancel={handleSkipProvidingSensitiveData}
@@ -543,10 +542,10 @@ const SensitiveDataForm: React.FC = () => {
             onConfirm={() => {
               setConfirmingSkip(false);
             }}
-            cancelButtonText="Yes, skip"
-            confirmButtonText="Share data"
+            cancelButtonText={t("yes_skip")}
+            confirmButtonText={t("share_data")}
           />
-          <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? "Skipping..." : "Logging you out..."} />
+          <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? t("skipping") : t("logging_you_out")} />
         </>
       )}
     </Suspense>

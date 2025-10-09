@@ -208,7 +208,7 @@ const Consent: React.FC = () => {
       sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
       data-testid={DATA_TEST_ID.CONSENT_CONTAINER}
     >
-      <Backdrop isShown={isLoggingOut} message={t("consent_backdrop_logging_out")} />
+      <Backdrop isShown={isLoggingOut} message={t("logging_you_out")} />
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"}>
         <AuthHeader title={t("consent_before_we_begin_title")} subtitle={<></>} />
         <Box
@@ -311,7 +311,7 @@ const Consent: React.FC = () => {
           }}
         >
           <CustomLink data-testid={DATA_TEST_ID.REJECT_BUTTON} onClick={() => setShowRejectModal(true)}>
-            {t("consent_decline")}
+            {t("no_thank_you")}
           </CustomLink>
           <PrimaryButton
             fullWidth
@@ -346,7 +346,7 @@ const Consent: React.FC = () => {
       </Box>
       <ConfirmModalDialog
         isOpen={showRejectModal}
-        title={t("consent_modal_title")}
+        title={t("are_you_sure")}
         content={
           <Box
             display="flex"
@@ -359,7 +359,7 @@ const Consent: React.FC = () => {
                 privacy_policy: privacyPolicyLabel,
               })} {t("consent_modal_cannot_proceed")} <HighlightedSpan>{t("consent_modal_logged_out_highlight")}</HighlightedSpan>
             </Typography>
-            <Typography>{t("consent_modal_confirm_exit_question")}</Typography>
+            <Typography>{t("are_you_sure_you_want_to_exit")}</Typography>
           </Box>
         }
         onCancel={handleRejected}
@@ -370,7 +370,7 @@ const Consent: React.FC = () => {
           setShowRejectModal(false);
         }}
         cancelButtonText={t("consent_modal_yes_exit")}
-        confirmButtonText={t("consent_modal_i_want_to_stay")}
+        confirmButtonText={t("i_want_to_stay")}
       />
     </Container>
   );
