@@ -155,5 +155,21 @@
   "consent_backdrop_logging_out": "Cerrando tu sesión...",
   "consent_snackbar_failed_update_preferences": "Error al actualizar las preferencias del usuario",
   "cv_typing_uploading": "Por favor espera mientras subo y analizo tu CV",
-  "cv_typing_uploaded_ready": "El contenido de tu CV está en el campo de texto. Revísalo y envíalo cuando estés listo."
+  "cv_typing_uploaded_ready": "El contenido de tu CV está en el campo de texto. Revísalo y envíalo cuando estés listo.",
+  "help_us_improve":"Ayúdanos a mejorar!",
+  "previous":"Anterior",
+  "next":"Siguiente",
+  "submitting_feedback":"Enviando comentarios...",
+  "close_feedback_form": "cerrar formulario de comentarios",
+  "bias_experience_accuracy": "Sesgo y precisión de la experiencia",
+  "inaccurate": "Inexacto",
+  "very_accurate": "Muy preciso",
+  "skill_accuracy": "Precisión de habilidades",
+  "final_feedback": "Comentarios finales",
+  "difficult": "Difícil",
+  "easy": "Fácil",
+  "unlikely": "Poco probable",
+  "likely": "Probable",
+  "yes": "Sí",
+  "no": "No"
 }
