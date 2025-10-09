@@ -309,8 +309,10 @@ describe("Landing Page", () => {
       expect(console.warn).toHaveBeenCalledWith(error);
 
       // AND the error message to be shown
+      // message now comes from i18n translation keys; setupTests mocks i18next.t
+      const i18next = require("i18next");
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        `Failed to login: ${USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR]}`,
+        `Failed to login: ${i18next.t(USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR])}`,
         { variant: "error" }
       );
     });
