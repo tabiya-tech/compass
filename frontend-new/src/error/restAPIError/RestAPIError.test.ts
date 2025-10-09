@@ -1,5 +1,5 @@
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
-import { getRestAPIErrorFactory, RestAPIError, getUserFriendlyErrorMessage, getUserFriendlyErrorMessageKey, translateUserFriendlyErrorMessage } from "src/error/restAPIError/RestAPIError";
+import { getRestAPIErrorFactory, RestAPIError, getUserFriendlyErrorMessageKey, translateUserFriendlyErrorMessage } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 import i18n from "src/i18n/i18n";
 
