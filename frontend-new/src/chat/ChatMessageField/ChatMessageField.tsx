@@ -426,7 +426,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       return t("offline");
     }
     return t("default");
-  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, isOnline]);
+  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, isOnline, t]);
 
   // Check if the send button should be disabled
   const sendIsDisabled = useCallback(() => {
