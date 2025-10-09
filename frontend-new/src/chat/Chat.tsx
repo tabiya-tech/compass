@@ -1,4 +1,5 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { StatusCodes } from "http-status-codes";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "src/chat/Chat.types";
@@ -270,11 +271,13 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
 
         return response;
       } catch (e) {
-        console.error(e);
         removeMessageFromChat(uploadingMessageId);
-        enqueueSnackbar("Failed to upload CV. Please try again.", { variant: "error" });
-        // Return empty list on failure to avoid unhandled rejections in tests/UX
-        return [] as string[];
+        const status = (e as any)?.statusCode as number | undefined;
+        if (status !== StatusCodes.FORBIDDEN) {
+          enqueueSnackbar("Failed to upload CV. Please try again.", { variant: "error" });
+        }
+        // Propagate the error so the input field can show the specific inline message
+        throw e;
       } finally {
         setIsUploadingCv(false);
       }

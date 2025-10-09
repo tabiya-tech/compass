@@ -1023,5 +1023,45 @@ describe("ChatMessageField", () => {
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
     });
+
+    test("should show max uploads reached when user has reached max CV upload", async () => {
+      // GIVEN CV upload is enabled (default mocked in beforeEach) and COLLECT_EXPERIENCES phase
+      const currentPhase = ConversationPhase.COLLECT_EXPERIENCES;
+      // AND onUploadCv rejects with 403
+      const forbiddenErr = new Error("max uploads reached");
+      (forbiddenErr as any).statusCode = StatusCodes.FORBIDDEN;
+      const mockOnUploadCv = jest.fn().mockRejectedValue(forbiddenErr);
+
+      // WHEN ChatMessageField is rendered
+      render(
+        <ChatMessageField
+          aiIsTyping={false}
+          isChatFinished={false}
+          handleSend={jest.fn()}
+          currentPhase={currentPhase}
+          onUploadCv={mockOnUploadCv}
+        />
+      );
+      // AND the plus button is clicked
+      const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
+      await userEvent.click(plusButton);
+
+      // AND the user chooses an upload option and selects a valid file
+      const uploadFileOption = screen.getByTestId(MENU_ITEM_ID.UPLOAD_CV);
+      await userEvent.click(uploadFileOption);
+
+      const fileInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_HIDDEN_FILE_INPUT);
+      const file = new File(["dummy content"], "cv.pdf", { type: "application/pdf" });
+      await userEvent.upload(fileInput, file);
+
+      // THEN onUploadCv is called with the file
+      expect(mockOnUploadCv).toHaveBeenCalledWith(file);
+      // AND the specific max uploads reached error is shown
+      await waitFor(() => {
+        expect(screen.getByText(ERROR_MESSAGES.MAX_UPLOADS_REACHED)).toBeInTheDocument();
+      });
+      // AND no warnings to have occurred
+      expect(console.warn).not.toHaveBeenCalled();
+    });
   });
 });
