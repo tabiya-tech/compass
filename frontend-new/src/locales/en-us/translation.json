@@ -182,7 +182,7 @@
   "sensitive_data_reject_paragraph_1": "We're sorry that you chose not to provide your data. Providing this information helps Compass deliver a more personalized experience for you. You will not be able to proceed and will be logged out.",
   "sensitive_data_skip_paragraph_1": "We're sorry that you prefer not to provide your data. Providing this information helps Compass deliver a more personalized experience for you. Please note that if you skip this step,",
   "sensitive_data_skip_paragraph_1_highlighted": " you won't be able to provide this information later.",
-  "sensitive_data_skip_paragraph_2": "Are you sure you want to skip?",
+  "are_you_sure_you_want_to_skip": "Are you sure you want to skip?",
   "sensitive_data_title": "Provide Your Information",
   "sensitive_data_subtitle": "We use your data to personalize your experience and may contact you about Compass.",
   "sensitive_data_unskippable_subtitle": "Please provide the following information to continue.",
