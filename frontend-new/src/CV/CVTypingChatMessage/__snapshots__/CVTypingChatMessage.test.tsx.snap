@@ -15,7 +15,7 @@ exports[`CVTypingChatMessage should render the CV Typing Chat message correctly 
       <p
         class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
       >
-        Your CV content is in the text field. Review it and send when ready.
+        cv_typing_uploaded_ready
       </p>
     </div>
   </div>
@@ -37,7 +37,7 @@ exports[`CVTypingChatMessage should render the CV Typing Chat message correctly 
       <p
         class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
       >
-        Please wait while I upload and parse your CV
+        cv_typing_uploading
       </p>
       <span
         class="MuiBox-root css-sz63p1"
