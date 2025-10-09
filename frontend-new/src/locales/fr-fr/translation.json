@@ -182,7 +182,7 @@
   "sensitive_data_reject_paragraph_1": "Nous sommes désolés que vous ayez choisi de ne pas fournir vos données. Fournir ces informations aide Compass à vous offrir une expérience plus personnalisée. Vous ne pourrez pas continuer et vous serez déconnecté.",
   "sensitive_data_skip_paragraph_1": "Nous sommes désolés que vous préfériez ne pas fournir vos données. Fournir ces informations aide Compass à vous offrir une expérience plus personnalisée. Veuillez noter que si vous ignorez cette étape,",
   "sensitive_data_skip_paragraph_1_highlighted": " vous ne pourrez pas fournir ces informations plus tard.",
-  "sensitive_data_skip_paragraph_2": "Êtes-vous sûr de vouloir ignorer ?",
+  "are_you_sure_you_want_to_skip": "Êtes-vous sûr de vouloir ignorer ?",
   "sensitive_data_title": "Fournissez vos informations",
   "sensitive_data_subtitle": "Nous utilisons vos données pour personnaliser votre expérience et pouvons vous contacter à propos de Compass.",
   "sensitive_data_unskippable_subtitle": "Veuillez fournir les informations suivantes pour continuer.",
