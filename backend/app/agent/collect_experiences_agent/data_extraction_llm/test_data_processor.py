@@ -4,9 +4,10 @@ from unittest.mock import Mock
 
 import pytest
 
-from app.agent.collect_experiences_agent._data_processor import ExperienceDataProcessor, _DataOperation
 from app.agent.collect_experiences_agent._dataextraction_llm import _CollectedDataWithReasoning
 from app.agent.collect_experiences_agent._types import CollectedData
+from app.agent.collect_experiences_agent.data_extraction_llm._common import DataOperation
+from app.agent.collect_experiences_agent.data_extraction_llm._data_processor import ExperienceDataProcessor
 from app.agent.experience import WorkType
 
 
@@ -638,27 +639,27 @@ class TestDataOperation:
         # GIVEN valid operation strings
         # WHEN converting to operation
         # THEN should return correct operations
-        assert _DataOperation.from_string_key("ADD") == "ADD"
-        assert _DataOperation.from_string_key("UPDATE") == "UPDATE"
-        assert _DataOperation.from_string_key("DELETE") == "DELETE"
-        assert _DataOperation.from_string_key("NOOP") == "NOOP"
+        assert DataOperation.from_string_key("ADD").value == "ADD"
+        assert DataOperation.from_string_key("UPDATE").value == "UPDATE"
+        assert DataOperation.from_string_key("DELETE").value == "DELETE"
+        assert DataOperation.from_string_key("NOOP").value == "NOOP"
 
     def test_from_string_key_case_insensitive(self):
         """Should handle case insensitive operations."""
         # GIVEN mixed case operation strings
         # WHEN converting to operation
         # THEN should return correct operations
-        assert _DataOperation.from_string_key("add") == "ADD"
-        assert _DataOperation.from_string_key("Update") == "UPDATE"
-        assert _DataOperation.from_string_key("delete") == "DELETE"
-        assert _DataOperation.from_string_key("noop") == "NOOP"
+        assert DataOperation.from_string_key("add").value == "ADD"
+        assert DataOperation.from_string_key("Update").value == "UPDATE"
+        assert DataOperation.from_string_key("delete").value == "DELETE"
+        assert DataOperation.from_string_key("noop").value == "NOOP"
 
     def test_from_string_key_invalid_operations(self):
         """Should return None for invalid operations."""
         # GIVEN invalid operation strings
         # WHEN converting to operation
         # THEN should return None
-        assert _DataOperation.from_string_key("INVALID") is None
-        assert _DataOperation.from_string_key("") is None
-        assert _DataOperation.from_string_key(None) is None
-        assert _DataOperation.from_string_key("MODIFY") is None
+        assert DataOperation.from_string_key("INVALID") is None
+        assert DataOperation.from_string_key("") is None
+        assert DataOperation.from_string_key(None) is None
+        assert DataOperation.from_string_key("MODIFY") is None

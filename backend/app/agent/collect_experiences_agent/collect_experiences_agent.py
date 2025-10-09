@@ -3,9 +3,10 @@ from typing import Optional, Mapping, Any
 from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from app.agent.agent import Agent
-from app.agent.agent_types import AgentType
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.agent.collect_experiences_agent._conversation_llm import _ConversationLLM, ConversationLLMAgentOutput, _get_experience_type
+from app.agent.agent_types import AgentType
+from app.agent.collect_experiences_agent._conversation_llm import _ConversationLLM, ConversationLLMAgentOutput, \
+    _get_experience_type
 from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtractionLLM
 from app.agent.collect_experiences_agent._types import CollectedData
 from app.agent.experience.experience_entity import ExperienceEntity
@@ -156,18 +157,19 @@ class CollectExperiencesAgent(Agent):
         #   a) if the user has not finished with the previous one we should ask them to complete it first
         #   b) the model may have made a mistake interpreting the user input as we need to clarify
         exploring_type = self._state.unexplored_types[0] if len(self._state.unexplored_types) > 0 else None
-        conversation_llm_output: ConversationLLMAgentOutput = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
-                                                               context=context,
-                                                               user_input=user_input,
-                                                               country_of_user=self._state.country_of_user,
-                                                               collected_data=collected_data,
-                                                               last_referenced_experience_index=last_referenced_experience_index,
-                                                               exploring_type=exploring_type,
-                                                               unexplored_types=self._state.unexplored_types,
-                                                               explored_types=self._state.explored_types,
-                                                               logger=self.logger)
+        conversation_llm_output: ConversationLLMAgentOutput = await conversion_llm.execute(
+            first_time_visit=self._state.first_time_visit,
+            context=context,
+            user_input=user_input,
+            country_of_user=self._state.country_of_user,
+            collected_data=collected_data,
+            last_referenced_experience_index=last_referenced_experience_index,
+            exploring_type=exploring_type,
+            unexplored_types=self._state.unexplored_types,
+            explored_types=self._state.explored_types,
+            logger=self.logger)
         self._state.first_time_visit = False  # The first time visit is over
-        if conversation_llm_output.exploring_type_finished:
+        if conversation_llm_output.exploring_type_finished and self._state.unexplored_types:
             # The specific work type has already been explored, so we remove it from the list
             # and allow the conversation to continue
             explored_type = self._state.unexplored_types.pop(0)
