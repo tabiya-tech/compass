@@ -65,9 +65,18 @@ const stableT = (key: string, options?: Record<string, unknown>) => {
  * This replaces i18next's `t` function with our stableT function in the test environment.
  * It allows any code importing `i18next` to call `t(key)` without actually initializing the library.
  */
-jest.mock("i18next", () => ({
-    t: stableT,
-}));
+jest.mock("i18next", () => {
+    const mock = {
+        use: jest.fn().mockReturnThis(),
+        init: jest.fn().mockReturnThis(),
+        t: (key: string, options?: Record<string, unknown>) => stableT(key, options),
+    };
+    return {
+        __esModule: true,
+        default: mock,
+        ...mock,
+    };
+});
 
 
 jest.mock("react-i18next", () => {
@@ -109,5 +118,19 @@ jest.mock("react-i18next", () => {
             type: "3rdParty",
             init: jest.fn(),
         },
+    };
+});
+
+// Mock the initialized instance module so app code can import it without side effects
+jest.mock("src/i18n/i18n", () => {
+    const mock = {
+        t: (key: string, options?: Record<string, unknown>) => stableT(key, options),
+        use: jest.fn().mockReturnThis(),
+        init: jest.fn().mockReturnThis(),
+    };
+    return {
+        __esModule: true,
+        default: mock,
+        ...mock,
     };
 });
