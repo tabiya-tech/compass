@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, useTheme } from "@mui/material";
 import { BaseQuestion, YesNoEnum } from "src/feedback/overallFeedback/feedbackForm/feedbackForm.types";
 import QuestionText from "src/feedback/overallFeedback/feedbackForm/components/questionText/QuestionText";
@@ -39,6 +40,7 @@ const YesNoQuestion: React.FC<YesNoQuestionProps> = ({
   );
 
   const theme = useTheme();
+  const { t } = useTranslation();
   const [showComments, setShowComments] = useState(shouldShowComments(ratingValue));
   const [commentText, setCommentText] = useState(comments ?? "");
   const commentTextFieldRef = useRef<HTMLInputElement>(null);
@@ -91,14 +93,14 @@ const YesNoQuestion: React.FC<YesNoQuestionProps> = ({
         <FormControlLabel
           value="false"
           control={<Radio sx={{ padding: 0 }} />}
-          label="No"
+          label={t("no")}
           data-testid={DATA_TEST_ID.RADIO_NO}
           sx={{ margin: 0 }}
         />
         <FormControlLabel
           value="true"
           control={<Radio sx={{ padding: 0 }} />}
-          label="Yes"
+          label={t("yes")}
           data-testid={DATA_TEST_ID.RADIO_YES}
           sx={{ margin: 0 }}
         />
