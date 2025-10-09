@@ -275,8 +275,9 @@ describe("Landing Page", () => {
       expect(console.error).toHaveBeenCalledWith(error);
 
       // AND the error message to be shown
+      const i18n = require("src/i18n/i18n").default;
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        `Failed to login: ${ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.DATA_VALIDATION_ERROR}`,
+        `Failed to login: ${i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS.DATA_VALIDATION_ERROR)}`,
         { variant: "error" }
       );
     });
