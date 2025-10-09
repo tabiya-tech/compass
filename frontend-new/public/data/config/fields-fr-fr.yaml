@@ -1,0 +1,74 @@
+name:
+  dataKey: name
+  type: STRING
+  required: true
+  label: Nom
+  validation:
+    # The pattern below allows for letters, spaces, and dots
+    # ^(?!\.) ensures that the name does not start with a dot
+    # (?!.*\.\.) ensures that the name does not contain two consecutive dots
+    # (?!.*(\..*){5,}) ensures that the name does not contain more than 4 dots
+    # [\p{L}\s\.]{2,50} ensures that the name contains only letters (Unicode), spaces, and dots and is between 2 and 50 characters long
+    # # Unicode letter characters REQUIRES the 'u' flag in the regex e.g. /pattern/u
+    pattern: ^(?!\.)(?!.*\.\.)(?!.*(\..*){5,})[\p{L}\s\.]{2,50}$
+    errorMessage: Name should contain only letters and be 2-50 characters long.
+contactEmail:
+  dataKey: contact_email
+  type: STRING
+  required: true
+  label: Email de contact
+  validation:
+    # The limit for the length of an email is a maximum of 64 characters (octets)
+    #   in the "local part" (before the "@") and a maximum of 255 characters
+    #   (octets) in the domain part (after the "@") for a total length of 320
+    #   characters.
+    # We've gone for a more conservative limit of 256 characters
+    # for more info see: https://www.rfc-editor.org/errata_search.php?rfc=3696
+    pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,256}$
+    errorMessage: Please enter a valid email address.
+gender:
+  dataKey: gender
+  type: ENUM
+  required: true
+  label: Genre
+  values:
+    - Homme
+    - Femme
+age:
+  dataKey: age
+  type: STRING
+  required: true
+  label: Âge
+  validation:
+    # 1[6-9] covers numbers between 16 and 19
+    # [2-9][0-9] covers numbers between 20 and 99
+    # 1[01][0-9] covers numbers between 100 and 119
+    # and 120 covers the number...120
+    pattern: ^(?:1[6-9]|[2-9][0-9]|1[01][0-9]|120)$
+    errorMessage: Veuillez entrer un âge valide. Vous devez avoir au moins 16 ans pour participer.
+educationStatus:
+  dataKey: education_status
+  type: ENUM
+  required: true
+  label: Éducation
+  questionText: Quel est le niveau d'éducation le plus élevé que vous avez atteint ?
+  values:
+    - Moins que primaire / pas d'éducation formelle
+    - Primaire
+    - Secondaire
+    - Collège / Diplôme
+    - Diplôme universitaire
+    - Diplôme de troisième cycle
+mainActivity:
+  dataKey: main_activity
+  type: ENUM
+  required: true
+  label: Activité principale
+  questionText: Au cours des 30 derniers jours, quelle a été votre activité principale en termes de temps passé ?
+  values:
+    - Travaillé pour un salaire
+    - Travaillé pour mon compte propre (commerçant, marchand, coiffeur, couturier)
+    - Travaillé en tant que bénévole
+    - Travaillé comme stagiaire ou apprenti
+    - À l'école, à l'université ou en formation
+    - Sans emploi

@@ -103,11 +103,13 @@ const ORIGINAL_SENTRY_DSN = window.tabiyaConfig.FRONTEND_SENTRY_DSN;
 let isSentryInitialized = true;
 
 export const decorators = [
-  (Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean } }) => {
+  (Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean; locale: string } }) => {
     const isOnline = context.globals.online;
     const sentryEnabled = context.globals.sentryEnabled;
+    const locale = context.globals.locale || 'en';
     const prevSentryEnabled = React.useRef(sentryEnabled);
 
+    // Handle Sentry enable/disable
     useEffect(() => {
       if (prevSentryEnabled.current !== sentryEnabled) {
         // @ts-ignore
@@ -116,24 +118,28 @@ export const decorators = [
           // @ts-ignore
           window.tabiyaConfig.FRONTEND_SENTRY_DSN = ORIGINAL_SENTRY_DSN;
           initSentry();
-          isSentryInitialized = true;
         } else {
           // @ts-ignore
           window.tabiyaConfig.FRONTEND_SENTRY_DSN = undefined;
-          isSentryInitialized = false;
-          // we have to reload since there is no way to notify the components of this change
-          // it is not a provider and the init happens outside of even the react root.render()
           window.location.reload();
         }
         prevSentryEnabled.current = sentryEnabled;
       }
     }, [sentryEnabled]);
 
-    // When The language changes, set the document direction
-    i18n.on('languageChanged', (locale) => {
-      const direction = i18n.dir(locale);
-      document.dir = direction;
-    });
+    // Handle language changes
+    useEffect(() => {
+      const handleLanguageChange = (newLocale: string) => {
+        document.dir = i18n.dir(newLocale);
+      };
+
+      i18n.changeLanguage(locale); // switch to toolbar-selected locale
+      i18n.on('languageChanged', handleLanguageChange);
+
+      return () => {
+        i18n.off('languageChanged', handleLanguageChange);
+      };
+    }, [locale]);
 
     return (
       <HashRouter>
@@ -144,12 +150,8 @@ export const decorators = [
               <div style={{ height: "100vh" }}>
                 <ChatProvider
                   handleOpenExperiencesDrawer={() => {}}
-                  removeMessageFromChat={function (messageId: string): void {
-                    throw new Error("Function not implemented.");
-                  }}
-                  addMessageToChat={function (message: IChatMessage<any>): void {
-                    throw new Error("Function not implemented.");
-                  }}
+                  removeMessageFromChat={() => {}}
+                  addMessageToChat={() => {}}
                 >
                   <Suspense fallback={<div>loading translations...</div>}>
                     <I18nextProvider i18n={i18n}>
