@@ -189,5 +189,8 @@
   "sensitive_data_skippable_subtitle": "You can skip this step.",
   "sensitive_data_failed_to_load_config": "Failed to load form configuration",
   "sensitive_data_invalid_form": "Please correct the errors in the form before submitting.",
-  "sensitive_data_help_tip_text": "Your information is encrypted using state-of-the-art, end-to-end encryption and stored securely."
+  "sensitive_data_help_tip_text": "Your information is encrypted using state-of-the-art, end-to-end encryption and stored securely.",
+  "new_conversation_started": "New conversation started",
+  "successfully_logged_out": "Successfully logged out",
+  "failed_to_start_conversation": "Failed to start new conversation"
 }
