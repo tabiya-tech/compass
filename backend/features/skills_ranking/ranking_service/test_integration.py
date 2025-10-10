@@ -46,7 +46,7 @@ test_cases = [
         given_opportunities_skills_uuids=[
             {
                 "active": True,
-                "skillGroups": [{"UUID": "skill-group-uuid-1"}]
+                "skillGroups": [{"originUUID": "skill-group-uuid-1"}]
             }
         ],
         given_skills_data=[
