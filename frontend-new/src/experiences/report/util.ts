@@ -15,9 +15,26 @@ export const getUniqueSkills = (experiences: Experience[]): Skill[] => {
 };
 
 export const formatDate = (dateString: string | null): string => {
+  // Use UTC to avoid timezone differences in snapshots/tests
   const date = dateString ? new Date(dateString) : new Date();
-  const options: Intl.DateTimeFormatOptions = { month: "long", day: "2-digit", year: "numeric" };
-  return date.toLocaleDateString("en-US", options);
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const month = monthNames[date.getUTCMonth()];
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const year = date.getUTCFullYear();
+  return `${month} ${day}, ${year}`;
 };
 
 // Utility function to group experiences by work type
