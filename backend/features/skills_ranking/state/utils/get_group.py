@@ -1,4 +1,6 @@
 from enum import IntEnum
+from deprecated import deprecated
+
 import numpy as np
 
 from features.skills_ranking.state.services.type import SkillRankingExperimentGroup
@@ -20,11 +22,16 @@ def _get_random_group() -> TargetGroup:
     return _random_generator.choice([TargetGroup.HIGH_DIFFERENCE, TargetGroup.UNDERCONFIDENT])
 
 
+@deprecated("This function is deprecated. "
+            "Use the _get_group_based_on_randomization function instead. "
+            "Which only returns final groups (Group 2 and Group 3)")
 def _get_group_based_on_ranks(*,
                               self_estimated_rank: float,
                               actual_rank: float,
                               high_difference_threshold: float) -> SkillRankingExperimentGroup:
     """
+    DEPRECATED:
+
     Assigns participants to one of four experimental groups based on the difference between their self-assessed ranking (`prior_belief`),
     And the actual ranking (`actual_value`), and a `high_difference_threshold` value (`high_difference_threshold`).
 
@@ -80,8 +87,7 @@ def get_group_based_on_randomization() -> SkillRankingExperimentGroup:
     :return: A randomly assigned SkillRankingExperimentGroup.
     """
     return _random_generator.choice(
-        [SkillRankingExperimentGroup.GROUP_1, SkillRankingExperimentGroup.GROUP_2, SkillRankingExperimentGroup.GROUP_3,
-         SkillRankingExperimentGroup.GROUP_4])
+        [SkillRankingExperimentGroup.GROUP_2, SkillRankingExperimentGroup.GROUP_3])
 
 
 def get_group(*,

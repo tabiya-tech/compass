@@ -201,8 +201,7 @@ class TestGetGroupBasedOnRandomization:
 
         # AND random.generate.choice should be called with all four groups
         mock_generator.choice.assert_called_once_with(
-            [SkillRankingExperimentGroup.GROUP_1, SkillRankingExperimentGroup.GROUP_2,
-             SkillRankingExperimentGroup.GROUP_3, SkillRankingExperimentGroup.GROUP_4])
+            [SkillRankingExperimentGroup.GROUP_2, SkillRankingExperimentGroup.GROUP_3])
 
 
 
