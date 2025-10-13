@@ -16,14 +16,25 @@ import WorkIcon from "@mui/icons-material/Work";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import SchoolIcon from "@mui/icons-material/School";
 import QuizIcon from "@mui/icons-material/Quiz";
+import i18n from "src/i18n/i18n";
 
 export const WORK_TYPE_DESCRIPTIONS = {
-  SELF_EMPLOYMENT: "You work for yourself, run your own business, or take on freelance or contract jobs",
-  FORMAL_SECTOR_WAGED_EMPLOYMENT: "You have a paid job and work for an employer, company, or organization",
-  FORMAL_SECTOR_UNPAID_TRAINEE_WORK: "You're in a training or internship role to gain skills or experience",
-  UNSEEN_UNPAID: "You do unpaid work like caregiving, household tasks, or community volunteering",
-  UNCATEGORIZED: "Compass couldn't categorize this work type",
-};
+  get SELF_EMPLOYMENT() {
+    return i18n.t("experiences_work_type_description_self_employment");
+  },
+  get FORMAL_SECTOR_WAGED_EMPLOYMENT() {
+    return i18n.t("experiences_work_type_description_formal_sector_waged_employment");
+  },
+  get FORMAL_SECTOR_UNPAID_TRAINEE_WORK() {
+    return i18n.t("experiences_work_type_description_formal_sector_unpaid_trainee_work");
+  },
+  get UNSEEN_UNPAID() {
+    return i18n.t("experiences_work_type_description_unseen_unpaid");
+  },
+  get UNCATEGORIZED() {
+    return i18n.t("experiences_work_type_description_uncategorized");
+  },
+} as const;
 
 export const getWorkTypeTitle = (workType: WorkType | null) => {
   switch (workType) {
