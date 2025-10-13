@@ -15,6 +15,7 @@ export const DATA_TEST_ID = {
 };
 
 export const UI_TEXT = {
+  // TODO: i18n keys
   TYPING: "Typing",
   THINKING: "Please wait, this might take a while",
   CANCEL: "Cancel",
