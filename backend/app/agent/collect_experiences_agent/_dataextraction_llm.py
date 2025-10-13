@@ -1,45 +1,19 @@
-import json
+import asyncio
 import logging
-
-from datetime import datetime
-from enum import Enum
-from textwrap import dedent
 from typing import Optional
 
 from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, LLMStats
 from app.agent.collect_experiences_agent._types import CollectedData
-from app.agent.collect_experiences_agent._data_processor import ExperienceDataProcessor
-from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT, WorkType
+from app.agent.collect_experiences_agent.data_extraction_llm import DataOperation
+from app.agent.collect_experiences_agent.data_extraction_llm import EntityExtractionTool
+from app.agent.collect_experiences_agent.data_extraction_llm import IntentAnalyzerTool
+from app.agent.collect_experiences_agent.data_extraction_llm import OperationsProcessor
+from app.agent.collect_experiences_agent.data_extraction_llm import \
+    TemporalAndWorkTypeClassifierTool
 from app.agent.llm_caller import LLMCaller
-from app.agent.prompt_template import sanitize_input
-from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_AGENT_CHARACTER
-from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
-from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
-from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
-
-# The tags are part of the prompt template and should not be used as input data
-_TAGS_TO_FILTER = ["system instructions", "previously extracted experience data", "user's last input",
-                   "conversation history"]
-
-
-class _DataOperation(Enum):
-    """
-    The operation to be performed on the experience data.
-    """
-    ADD = "ADD"
-    UPDATE = "UPDATE"
-    DELETE = "DELETE"
-    NOOP = "NOOP"
-
-    @staticmethod
-    def from_string_key(key: str | None) -> Optional['_DataOperation']:
-        if key in _DataOperation.__members__:
-            return _DataOperation[key]
-        return None
 
 
 class _CollectedDataWithReasoning(CollectedData):
@@ -74,8 +48,53 @@ class _DataExtractionLLM:
         self._llm_caller = LLMCaller[_CollectedExperience](model_response_type=_CollectedExperience)
         self.logger = logger
 
-    async def execute(self, *, user_input: AgentInput, context: ConversationContext,
-                      collected_experience_data_so_far: list[CollectedData]) -> tuple[int, list[LLMStats]]:
+        # initialize tools used by the LLM
+        self._experience_data_processor = EntityExtractionTool(logger)
+        self._intent_analyzer_tool = IntentAnalyzerTool(logger)
+        self._temporal_classifier_tool = TemporalAndWorkTypeClassifierTool(logger)
+
+        self._operations_processor = OperationsProcessor(logger)
+
+    async def _get_extracted_experience_data(self,
+                                             *,
+                                             index: Optional[int],
+                                             data_operation: DataOperation,
+                                             turn_number: int,
+                                             experience_title: str,
+                                             conversation_context: ConversationContext,
+                                             user_statement: str) -> tuple[_CollectedDataWithReasoning, list[LLMStats]]:
+
+        [(experience_details, experience_llm_stats),
+         (timestamps_and_work_type, time_llm_stats)] = await asyncio.gather(
+            self._experience_data_processor.execute(
+                conversation_context=conversation_context,
+                users_last_input=user_statement
+            ),
+            self._temporal_classifier_tool.execute(
+                conversation_context=conversation_context,
+                users_last_input=user_statement,
+                experience_title=experience_title)
+        )
+
+        return _CollectedDataWithReasoning(
+            index=index,
+            data_operation=data_operation.value,
+            experience_title=experience_details.experience_title,
+            defined_at_turn_number=turn_number if data_operation == DataOperation.ADD else None,
+            company=experience_details.company,
+            location=experience_details.location,
+            paid_work=timestamps_and_work_type.paid_work,
+            work_type=timestamps_and_work_type.work_type,
+            start_date=timestamps_and_work_type.start_date,
+            end_date=timestamps_and_work_type.end_date
+        ), experience_llm_stats + time_llm_stats
+
+    async def execute(self,
+                      *,
+                      user_input: AgentInput,
+                      context: ConversationContext,
+                      collected_experience_data_so_far: list[CollectedData]
+                      ) -> tuple[int, list[LLMStats]]:
         """
         Given the last user input, a conversation history and the experience data collected so far.
         Extracts the experience data from the user input and conversation history and
@@ -87,336 +106,74 @@ class _DataExtractionLLM:
         :return: Tuple of the last referenced experience index and the LLM stats
         """
 
-        # collected_experience_data_so_far.sort(key=lambda x: x.index) # sort the collected experience data by index
-        # 1. remove the property defined_at_turn_number and de-serialize to json
-        cleaned_experience_dicts_for_prompt: list[dict] = []
-        for collected_item in collected_experience_data_so_far:
-            collected_item_dict = collected_item.model_dump(exclude={"defined_at_turn_number"})
-            cleaned_experience_dicts_for_prompt.append(collected_item_dict)
+        # 1. Get the list of operations from the user's input
+        commands, llm_stats = await self._intent_analyzer_tool.execute(
+            collected_experience_data_so_far=collected_experience_data_so_far,
+            conversation_context=context,
+            users_last_input=user_input)
 
-        # 2. Convert the cleaned experience dict to a JSON string with an indent of 2 spaces for LLM
-        json_data = json.dumps(cleaned_experience_dicts_for_prompt, indent=2)
+        # 2. Construct the list of operations with full details,
+        #    if missing data, we need to call respective tools to fill the operations.
+        operations: list[_CollectedDataWithReasoning] = []
+        update_tasks = []
+        ids_to_delete = []
+        new_experiences_counter = len(collected_experience_data_so_far) - 1  # start from the last index + 1
+        for command in commands:
+            if command.data_operation.lower() == DataOperation.DELETE.value.lower():
+                if command.index is None:
+                    self.logger.error(f"Invalid experience to delete, {command}")
+                    continue
 
-        # 3. Construct the system instructions based on the collected data so far.
-        llm = GeminiGenerativeLLM(
-            system_instructions=_DataExtractionLLM._create_extraction_system_instructions(json_data),
-            config=LLMConfig(
-                generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
-                    "max_output_tokens": 3000
-                    # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
-                }
-            ))
+                current_index = command.index
+                existing_experience = \
+                list(filter(lambda exp: exp.index == current_index, collected_experience_data_so_far))[0] or {}
+                operations.append(_CollectedDataWithReasoning(
+                    **existing_experience.model_dump(exclude={"index"}),
+                    data_operation=DataOperation.DELETE.value,
+                    index=command.index
+                ))
+                ids_to_delete.append(command.index)
+            else:
+                if command.data_operation.lower() == DataOperation.ADD.value.lower():
+                    new_experiences_counter += 1
 
-        response_data, llm_stats = await self._llm_caller.call_llm(llm=llm,
-                                                                   llm_input=_DataExtractionLLM._prompt_template(
-                                                                       collected_experience_data_so_far=collected_experience_data_so_far,
-                                                                       context=context,
-                                                                       user_message=user_input.message),
-                                                                   logger=self.logger)
+                update_tasks.append(self._get_extracted_experience_data(
+                    index=command.index if command.data_operation.lower() == DataOperation.UPDATE.value.lower() else new_experiences_counter,
+                    turn_number=len(context.all_history.turns),
+                    data_operation=DataOperation.from_string_key(command.data_operation),
+                    experience_title=command.potential_new_experience_title,
+                    conversation_context=context,
+                    user_statement=command.users_statement
+                ))
 
-        if not response_data:
-            # This may happen if the LLM fails to return a JSON object
-            # Instead of completely failing, we log a warning and return None
-            self.logger.warning("The LLM did not return any output and the extracted experience data will be None")
-            return -1, llm_stats
+        update_results = await asyncio.gather(*update_tasks)
+        for (result, _llm_stats) in update_results:
+            llm_stats.extend(_llm_stats)
 
-        if not response_data.collected_experience_data:
-            self.logger.debug("No experience data was extracted.")
-            return -1, llm_stats
+            operations.append(result)
 
-        experiences_data = response_data.collected_experience_data
-        logging.debug("Response data from LLM: %s", response_data.model_dump_json(indent=2))
-        self.logger.info("Reasoning:"
-                         "\n  - associations: %s"
-                         "\n  - ignored_experiences: %s"
-                         "\n  - processing %d experiences",
-                         response_data.associations,
-                         response_data.ignored_experiences,
-                         len(experiences_data))
+        valid_operations = []
+        for operation in operations:
+            # if an index is both in to delete and we have another operation with the same index, we skip it.
+            # And only prioritize the delete operations.
+            if operation.index in ids_to_delete and operation.data_operation != DataOperation.DELETE.value:
+                continue
+            else:
+                valid_operations.append(operation)
 
-        # Process experience data operations using the dedicated processor
-        current_turn_index = context.history.turns[-1].index + 1 if context.history.turns else 1
-        processor = ExperienceDataProcessor(self.logger)
-        last_processed_index, collected_experience_data_so_far = processor.process_experience_operations(
-            experiences_data, collected_experience_data_so_far, current_turn_index)
+        operations = valid_operations
 
-        # Reindex the items to start from 0 to N-1 since any deletes may have created gaps
-        self._make_indices_contiguous(collected_experience_data_so_far)
+        self.logger.debug(f"Operations= {operations}")
 
-        return last_processed_index, llm_stats
+        last_referenced_index, _ = self._operations_processor.process(
+            operations,
+            collected_experience_data_so_far=collected_experience_data_so_far,
+            current_conversation_turn_index=len(context.all_history.turns))
 
-    def _make_indices_contiguous(self, collected_experience_data_so_far: list[CollectedData]) -> None:
-        """
-        Reindex the collected experience data to have contiguous indices starting from 0.
-        we do this since delete operations may have created gaps in the indices.
-        i.e if we had items with indices 0,1,2,3 and we deleted item 1,
-        we would have items with indices 0,2,3. We want to reindex them to 0,1,2.
-        """
-        if not collected_experience_data_so_far:
-            return
+        # Re-index the experiences
+        index_counter = 0
+        for collected_data in collected_experience_data_so_far:
+            collected_data.index = index_counter
+            index_counter += 1
 
-        before_indices = [item.index for item in collected_experience_data_so_far]
-
-        for new_index, item in enumerate(collected_experience_data_so_far):
-            old_index = item.index
-            item.index = new_index
-            if old_index != new_index:
-                self.logger.info("Reindexing experience '%s': %s -> %s", item.experience_title, old_index, new_index)
-
-        # Log the reindexing operation summary
-        after_indices = [item.index for item in collected_experience_data_so_far]
-        if before_indices != after_indices:
-            self.logger.info("Made indices contiguous: %s -> %s", before_indices, after_indices)
-
-    @staticmethod
-    def _prompt_template(collected_experience_data_so_far: list[CollectedData], context: ConversationContext,
-                         user_message: str) -> str:
-
-        return dedent("""\
-            <Conversation History>
-            {conversation_history}
-            </Conversation History>
-            
-            <User's Last Input>
-            user: {user_message}
-            </User's Last Input>
-            """).format(conversation_history=format_history_for_prompt(collected_experience_data_so_far, context),
-                        user_message=sanitize_input(user_message.strip(), _TAGS_TO_FILTER))
-
-    @staticmethod
-    def _create_extraction_system_instructions(previously_extracted_data: str = "") -> str:
-        system_instructions_template = dedent("""\
-                <System Instructions>
-                #Role
-                    You are an expert who extracts information regarding the work experience of the user from the user's last input.
-                
-                #New Experience handling
-                    Set the 'data_operation' to 'ADD' to add new experiences
-                    - New experiences should get the next available indexes in the '<Previously Extracted Experience Data>' list. 
-                    - You can capture multiple new experiences at the same time.   
-                    - You can only capture new experiences that are mentioned in the '<User's Last Input>' 
-                      and are not included in the '<Previously Extracted Experience Data>'.
-                    - If '<User's Last Input>' mentions multiple new experiences, you will add ALL of them 
-                      to the 'collected_experience_data' field as separate entries. 
-                    - Experiences that are in the '<Conversation History>' but not in the '<User's Last Input>' 
-                      must be ignored and not added to the 'collected_experience_data' field.  
-                    - You can only capture experiences that the user has and not experiences they don't have, or they plan to have, 
-                    or they would like to have. Review the '<User's Last Input>' and use the '<Conversation History>' to understand 
-                      if the '<User's Last Input>' refers to an experience that the user has or not, or if it refers to something else. 
-                      If not then ignore it and do not add it to the 'collected_experience_data' field. 
-                    - If user refers to an experience in the '<User's Last Input>', review the '<Conversation History>' to find information
-                      about that experience before adding it to the 'collected_experience_data' field. 
-                    - Ignore information from the '<Conversation History>' if it does not directly relate to the '<User's Last Input>'.
-                #Update Experience handling 
-                    Set the 'data_operation' to 'UPDATE' to update experiences that are present in the '<Previously Extracted Experience Data>'.
-                    - You can update multiple experiences at the same time. 
-                    - If the data provided to you in the '<User's Last Input>' relates to experiences that are present in the
-                      '<Previously Extracted Experience Data>', you will update the existing experiences and copy them to the 
-                      'collected_experience_data' field of your output.    
-                    - You can only update experiences that are present in the '<Previously Extracted Experience Data>'
-                #Delete Experience handling 
-                    Set the 'data_operation' to 'DELETE' to delete experiences that are present in the '<Previously Extracted Experience Data>'.
-                    - You can delete multiple experiences at the same time.
-                    - To delete an experience the user must state in the '<User's Last Input>' that they what do not have, or want to remove or delete 
-                    the experience that is present in '<Previously Extracted Experience Data>'. In that case you will copy the experience to the 'collected_experience_data' field of your output 
-                      with the 'data_operation' field set to 'DELETE'.    
-                    - You can only delete experiences that are present in the '<Previously Extracted Experience Data>'.
-                #Missing/Incomplete Experience data handling    
-                    - Record the available details in the 'collected_experience_data' field, even if some of the fields are 
-                      not fully completed for an experience.     
-                #Irrelevant data handling 
-                    - If the data provided to you in the '<User's Last Input>' does not relate to an experience that the user has
-                      you will not add it to the 'collected_experience_data' field of your output.
-                #Extract data instructions
-                    Make sure you are extracting information about experiences that should be added to the 'collected_experience_data' 
-                    and not information that should be ignored.
-                    For each experience, you will collect information for the following fields:
-                    - experience_title
-                    - paid_work 
-                    - work_type
-                    - start_date
-                    - end_date
-                    - company
-                    - location
-                    You will collect and place them to the output as instructed below:
-                    ##'experience_title' instructions
-                        Extract the title of the experience from the '<User's Last Input>', but do not alter it.
-                        If the title is not provided, suggest a title based on the context.
-                        For unpaid work, use the kind of work done (e.g. "Helping Neighbors", "Volunteering" etc).
-                        Make sure that the user is actually referring to an experience they have have. 
-                        String value containing the title of the experience.
-                        `null` It was not provided by the user and the user was not explicitly asked for this information yet.
-                        Empty string if the user was asked and explicitly chose to not provide this information.    
-                    ##'paid_work' instructions
-                        Determine if the experience was for money or not.
-                        Boolean value indicating whether the work was paid or not.
-                        `null` It was not provided by the user and the user was not explicitly asked for this information yet.
-                        Empty string if the user was asked and explicitly chose to not provide this information. 
-                    ##'work_type' instructions
-                        Classify the type of work of the work experience.
-                        Use the '<User's Last Input>' and relate it to the'<Conversation History>' to determine the type of work.
-                        Choose one of the following values:
-                            {work_type_definitions}   
-                    ##Timeline instructions
-                        The user may provide the beginning and end of an experience at any order, 
-                        in a single input or in separate inputs, as a period or as a single date in relative or absolute terms.
-                        ###'dates_mentioned' instructions
-                            Contains the conversational date input e.g., "March 2021" or "last month", "since n months", 
-                            "the last M years" etc or whatever I provide that can be interpreted as start or end date of the experience. 
-                            Any dates I mention, either referring to the start or end date of the experience or a period.            
-                        ###'start_date' instructions
-                            If I provide a conversational date input for the start of an experience, you should accurately 
-                            calculate these based on my current date.
-                            String value containing the start date.
-                            `null` It was not provided by the user and the user was not explicitly asked for this information yet.
-                            Empty string if the user was asked and explicitly chose to not provide this information. 
-                            For reference, my current date is {current_date}        
-                        ###'end_date' instructions
-                            If I provide a conversational date input for the end of an experience, you should accurately 
-                            calculate these based on my current date. In case it is an ongoing experience, use the word "Present". 
-                            String value containing the end date.
-                            `null` It was not provided by the user and the user was not explicitly asked for this information yet.
-                            Empty string if the user was asked and explicitly chose to not provide this information. 
-                            For reference, my current date is {current_date}    
-                    ##'company' instructions
-                        What the company does or name of the company depending on the context.
-                        For unpaid work, use the receiver of the work (e.g. "My Family", "Community", "Self" etc).
-                        String value containing the type, or name of the company, or the receiver of the work.
-                        `null` It was not provided by the user and the user was not explicitly asked for this information yet.
-                        Empty string if the user was asked and explicitly chose to not provide this information. 
-                        Do not insist on the user providing this information if they do not provide it. 
-                    ##'location' instructions 
-                        The location (e.g City, Region, District) where the job was performed or the company is located any one of them. 
-                        In case of paid remote work or work from home use (Remote, Home Office etc) as the location.
-                        For unpaid work, use the receiver's location.
-                        String value containing the location.
-                        `null` It was not provided by the user and the user was not explicitly asked for this information yet.
-                        Empty string if the user was asked and explicitly chose to not provide this information.   
-                        Do not insist on the user providing this information if they do not provide it.
-                #JSON Output instructions
-                    Your response must always be a JSON object with the following schema:
-                    - associations: Generate a linear chain of associations in the form of ...-> ...->... that start from the User's Last Input 
-                                    and follow the relevant entries they refer to in the Conversation History until they terminate to the Previously Extracted Experience Data, if relevant. 
-                                    ///Skip unrelated or tangential turns to preserve a coherent causal chain of associations.
-                                    ///You are filtering for semantic lineage rather than strictly temporal proximity.
-                                    Once you reach the Previously Extracted Experience Data, you will not follow the associations anymore.
-                                    e.g. "user('...') -> model('...') -> ... -> user('...') -> model('...') -> Previously Extracted Experience Data(...)"
-                                    Each step in the sequence should be a summarized version of the actual user or model turn.
-                    - ignored_experiences: A detailed, step-by-step explanation in prose of the experiences referenced by the user that will not be added to the 
-                                           'collected_experience_data' and why. These are experiences that will be ignored.
-                                           Follow the instructions in '#New Experience handling', '#Update Experience handling' and '#Delete Experience handling' to determine which experience you will be ignoring.
-                                           An empty string "" if no experiences will be ignored. 
-                                           e.g. Experience was not referred in the '<User's Last Input>'.
-                                           Formatted as a json string.      
-                    - collected_experience_data: an array of dictionaries with the information about the experiences referenced by the user.
-                            Empty array `[]` if no experiences are referenced or they should be ignored. Otherwise, each dictionary in the array should contain the following fields:
-                            {{
-                                - data_extraction_references: a dictionary with short (up to 100 words) explanations in prose (not json) about 
-                                    what information you intend to collect based on the '<User's Last Input>' and the '<Conversation History>'.
-                                    You can collect multiple experiences at the same time.
-                                    Constrain the explanation to the data relevant for the fields 'experience_title', 
-                                    'dates_mentioned', 'company', 'location' and 'paid_work'. 
-                                    Make sure the user is actually referring to an experience they have.
-                                    Do not conduct date calculations, or work type classification. 
-                                    Explain where you found the information e.g in '<User's Last Input>'.
-                                    Formatted as a json string.
-                                    Example: ... the user responded in the '<...' to the model's question in '<...' ...
-                                    {{
-                                    - experience_title_references: 
-                                    - dates_mentioned_references:
-                                    - company_references:
-                                    - location_references:
-                                    - paid_work_references:
-                                    }}
-                                - data_operation_reasoning: A detailed, step-by-step explanation in prose of what data operation should be performed.
-                                    Consider the conversation context carefully - if the user is answering a question about existing work, 
-                                    this should be an UPDATE. If they are describing completely new work, this should be an ADD. 
-                                - data_operation: The operation that should be performed to the experience data, choose one of the following values:
-                                    'ADD', 'UPDATE', 'DELETE', 'NOOP'. The value 'NOOP' means that no operation should be performed.
-                                - index: For an experience that exists in the <Previously Extracted Experience Data>, the index of that experience. 
-                                         For a new experience, the next index in the <Previously Extracted Experience Data> list.
-                                         Formatted as a json integer.
-                                - experience_title: A title for the experience. Formatted as a json string.
-                                - company: The type of company and its name. Formatted as a json string.
-                                - location: The location in which the job was performed. Formatted as a json string.
-                                - paid_work: A boolean value indicating whether the work was paid or not. 
-                                             Formatted as a json boolean.
-                                - work_type_classification_reasoning: A detailed, step-by-step explanation of how the information collected 
-                                            until now, is evaluated based on the instructions of 'work_type', to classify the type of work of the experience.
-                                            Formatted as a JSON string.
-                                - work_type: type of work of the experience, 'FORMAL_SECTOR_WAGED_EMPLOYMENT', 
-                                             'FORMAL_SECTOR_UNPAID_TRAINEE_WORK', 'SELF_EMPLOYMENT', 'UNSEEN_UNPAID' or 'None'. 
-                                             Other values are not permitted.
-                                - dates_mentioned: The experience dates mentioned in the conversation. 
-                                                   Empty string "" If you could not find any.
-                                                   Formatted as a json string.                                    
-                                - dates_calculations: A detailed, step-by-step explanation of any date calculations done to 
-                                                    produce the start_date, and end_date values. 
-                                                    Empty string "" If you did not perform any calculations.
-                                                    Formatted as a json string.         
-                                - start_date: The start date in YYYY/MM/DD or YYYY/MM or YYYY 
-                                                    depending on what input was provided.
-                                                    Empty string "" If you did not calculate any.
-                                                    Formatted as a json string
-                                - end_date: The end date in YYYY/MM//DD or YYYY/MM or YYYY or 'Present'
-                                                    depending on what input was provided.
-                                                    Empty string "" If you did not calculate any.
-                                                    Formatted as a json string
-                            }}                            
-                 
-                Your response must always be a JSON object with the schema above.
-                </System Instructions>
-                <Previously Extracted Experience Data> 
-                    {previously_extracted_data} 
-                </Previously Extracted Experience Data>   
-                """)
-
-        return replace_placeholders_with_indent(system_instructions_template,
-                                                current_date=datetime.now().strftime("%Y/%m"),
-                                                agent_character=STD_AGENT_CHARACTER,
-                                                language_style=STD_LANGUAGE_STYLE,
-                                                previously_extracted_data=previously_extracted_data,
-                                                work_type_definitions=WORK_TYPE_DEFINITIONS_FOR_PROMPT
-                                                )
-
-
-def format_history_for_prompt(collected_experience_data_so_far: list[CollectedData],
-                              context: ConversationContext) -> str | None:
-    _output: str = ""
-    if context.summary != "":
-        _output += f"{ConversationHistoryFormatter.USER}: '{ConversationHistoryFormatter.SUMMARY_TITLE}\n{context.summary}'"
-
-    for turn in context.history.turns:
-        # If experience data was collected at this turn,
-        # add a reference to help the model associate the data with this specific turn.
-        # This helps the model connect the dots between the user's last input --> the conversation history --> and the relevant experience data,
-        # allowing it to follow associations inferred in previous turns.
-        _experience_ref = ""
-        for _data in collected_experience_data_so_far:
-            if _data.defined_at_turn_number == turn.index:
-                _experience_ref = f" (see <Previously Extracted Experience Data> index={_data.index})"
-                break
-
-        _output += (
-            f"{ConversationHistoryFormatter.USER}: '{sanitize_input(turn.input.message, _TAGS_TO_FILTER)}{_experience_ref}'\n"
-            f"{ConversationHistoryFormatter.MODEL}: '{sanitize_input(turn.output.message_for_user, _TAGS_TO_FILTER)}'\n")
-    return _output
-
-
-def dict_diff(old_dict: dict[str, str], new_dict: dict[str, str]) -> list[str]:
-    diff_logs = []
-
-    # Detect added keys
-    for key in new_dict.keys() - old_dict.keys():
-        diff_logs.append(f"+ {key}: {new_dict[key]}")
-
-    # Detect removed keys
-    for key in old_dict.keys() - new_dict.keys():
-        diff_logs.append(f"- {key}: {old_dict[key]}")
-
-    # Detect modified keys
-    for key in old_dict.keys() & new_dict.keys():
-        if old_dict[key] != new_dict[key]:
-            diff_logs.append(f"~ {key}: {old_dict[key]} -> {new_dict[key]}")
-
-    return diff_logs
+        return last_referenced_index, llm_stats

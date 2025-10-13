@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-from textwrap import dedent
-
-import pytest
-import json
+import argparse
 import csv
+import json
 import os
 import re
-import argparse
-import pandas as pd
 from datetime import datetime
+from textwrap import dedent
 from typing import List, Dict, Optional
+
+import pandas as pd
+import pytest
 
 # Directory setup for logs
 module_path = os.path.dirname(__file__)
