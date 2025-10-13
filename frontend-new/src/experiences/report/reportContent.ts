@@ -1,27 +1,48 @@
+import i18n from "src/i18n/i18n";
+
 export const ReportContent = {
-  SKILLS_REPORT_TITLE: "Skills Report",
-  SKILLS_DESCRIPTION_TITLE: "Skills Description",
-  EXPERIENCES_TITLE: "EXPERIENCES",
-  SELF_EMPLOYMENT_TITLE: "Self-Employment",
-  SALARY_WORK_TITLE: "Salary Work",
-  UNPAID_WORK_TITLE: "Unpaid Work",
-  TRAINEE_WORK_TITLE: "Trainee Work",
-  UNCATEGORIZED_TITLE: "Uncategorized",
-  TOP_SKILLS_TITLE: "Top Skills: ",
-  SKILLS_DESCRIPTION_TEXT:
-    "Below, you will find a list of the skills discovered during your conversation with Compass, along with their descriptions.",
-  DISCLAIMER_TEXT_PART1: "Disclaimer: ",
-  DISCLAIMER_TEXT_PART2:
-    "Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate. ",
-  DISCLAIMER_TEXT_PART3:
-    "Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with Compass again or create a complete CV based on this report.",
+  // Use i18n keys and resolve at call/render time
+  get SKILLS_REPORT_TITLE() {
+    return i18n.t("experiences_report_skills_report_title");
+  },
+  get SKILLS_DESCRIPTION_TITLE() {
+    return i18n.t("experiences_report_skills_description_title");
+  },
+  get EXPERIENCES_TITLE() {
+    return i18n.t("experiences_report_experiences_title");
+  },
+  get SELF_EMPLOYMENT_TITLE() {
+    return i18n.t("experiences_report_self_employment_title");
+  },
+  get SALARY_WORK_TITLE() {
+    return i18n.t("experiences_report_salary_work_title");
+  },
+  get UNPAID_WORK_TITLE() {
+    return i18n.t("experiences_report_unpaid_work_title");
+  },
+  get TRAINEE_WORK_TITLE() {
+    return i18n.t("experiences_report_trainee_work_title");
+  },
+  get UNCATEGORIZED_TITLE() {
+    return i18n.t("experiences_report_uncategorized_title");
+  },
+  get TOP_SKILLS_TITLE() {
+    return i18n.t("experiences_report_top_skills_title");
+  },
+  get SKILLS_DESCRIPTION_TEXT() {
+    return i18n.t("experiences_report_skills_description_text");
+  },
+  get DISCLAIMER_TEXT_PART1() {
+    return i18n.t("experiences_report_disclaimer_text_part1");
+  },
+  get DISCLAIMER_TEXT_PART2() {
+    return i18n.t("experiences_report_disclaimer_text_part2");
+  },
+  get DISCLAIMER_TEXT_PART3() {
+    return i18n.t("experiences_report_disclaimer_text_part3");
+  },
   REPORT_BODY_TEXT: (currentDate: string) =>
-    `This report summarizes the key information gathered during a conversation with Compass on
-  ${currentDate}. Compass is an AI chatbot that assists job-seekers in exploring their skills 
-  and experiences. This report presents the candidate’s work experience and the skills identified 
-  from each experience. This information can be used to guide job search and highlight their skills 
-  when applying for jobs, especially during interviews with potential employers. It can be a good
-  starting point for creating a complete CV.`,
+    i18n.t("experiences_report_body_text", { date: currentDate }),
   IMAGE_URLS: {
     COMPASS_LOGO: `${process.env.PUBLIC_URL}/logo.png`,
     OXFORD_LOGO: `${process.env.PUBLIC_URL}/oxford-logo.png`,

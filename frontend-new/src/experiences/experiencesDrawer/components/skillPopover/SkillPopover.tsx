@@ -2,6 +2,7 @@ import React from "react";
 import { Popover, Box, Typography, useTheme } from "@mui/material";
 import { Skill } from "src/experiences/experienceService/experiences.types";
 import { capitalizeFirstLetter } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
+import { useTranslation } from "react-i18next";
 
 const uniqueId = "0ee9a0ec-fd74-4628-9b77-0ed10d4413ae";
 
@@ -22,6 +23,7 @@ export interface SkillPopoverProps {
 
 const SkillPopover: React.FC<SkillPopoverProps> = ({ open, anchorEl, onClose, skill }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   return (
     <Popover
@@ -56,7 +58,7 @@ const SkillPopover: React.FC<SkillPopoverProps> = ({ open, anchorEl, onClose, sk
         </Box>
         <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
           <Typography variant="caption" fontWeight="bold" data-testid={DATA_TEST_ID.SKILL_POPOVER_ALT_LABELS_TITLE}>
-            Also known as:
+            {t("experiences_skill_also_known_as")}
           </Typography>
           <Typography
             variant="caption"

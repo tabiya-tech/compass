@@ -5,6 +5,7 @@ import { Experience } from "src/experiences/experienceService/experiences.types"
 import ExperiencesDrawerContent from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import InfoIcon from "@mui/icons-material/Info";
+import { useTranslation } from "react-i18next";
 
 interface ExperienceCategoryProps {
   icon: React.ReactNode;
@@ -27,6 +28,7 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
 }) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+  const { t } = useTranslation();
 
   if (experiences.length === 0) return null;
 
@@ -35,7 +37,7 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
       <Box display="flex" alignItems="center" gap={isSmallMobile ? 2 : 1}>
         {React.cloneElement(icon as React.ReactElement, { sx: { color: theme.palette.text.secondary } })}
         <Typography variant="subtitle1" fontWeight="bold" color={theme.palette.text.secondary}>
-          {title ?? <i>Untitled!</i>}
+          {title ?? <i>{t("experiences_untitled")}</i>}
         </Typography>
         {tooltipText && <HelpTip icon={<InfoIcon />}>{tooltipText}</HelpTip>}
       </Box>
