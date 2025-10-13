@@ -119,10 +119,8 @@ class InferOccupationTool:
         valid_occupation_lists = []
         for i, result in enumerate(list_of_occupation_list):
             if isinstance(result, Exception):
-                self._logger.error(
-                    "Failed to search occupations for title task %d. Error: %s",
-                    i, exc_info=result
-                )
+                _error = Exception(f"Failed to search occupations for title task {i}. Error: {str(result)}")
+                self._logger.exception(_error)
             else:
                 valid_occupation_lists.append(result)
         
