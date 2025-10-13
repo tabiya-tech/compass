@@ -5,7 +5,8 @@ from typing import Iterator
 
 import pytest
 
-from app.users.cv.service import CVUploadService
+from app.users.cv.utils.llm_extractor import CVExperienceExtractor
+from app.users.cv.utils.markdown_converter import convert_cv_bytes_to_markdown
 
 BASE_DIR = Path(__file__).parent
 TEST_INPUTS_DIR = BASE_DIR / "test_inputs"
@@ -44,14 +45,16 @@ async def test_parse_cv_on_real_files(input_path: Path | None, attempt: int):
         pytest.skip("No input files found under evaluation_tests/cv_parser/test_inputs; add files to run this test")
 
     logger = logging.getLogger("CVUploadServiceIntegrationTest")
-    service = CVUploadService(logger=logger)
+    extractor = CVExperienceExtractor(logger=logger)
 
     file_bytes = input_path.read_bytes()
     filename = input_path.name
 
     # WHEN parsing the CV
-    parsed = await service.parse_cv(user_id="evaluation", file_bytes=file_bytes, filename=filename)
-    experiences = parsed.experiences_data or []
+    mark_down = convert_cv_bytes_to_markdown(file_bytes=file_bytes, filename=filename, logger=logger)
+    experiences_data = await extractor.extract_experiences(mark_down)
+    logger.info("Parsed experiences: %s", experiences_data or "[]")
+    experiences = experiences_data or []
 
     # THEN the extracted experiences should match expectations (probabilistic: run multiple times)
     expectation = _load_expectation_for(input_path)

@@ -5,12 +5,11 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 from app.agent.llm_caller import LLMCaller
+from app.agent.penalty import get_penalty
 from app.agent.prompt_template import sanitize_input
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG, get_config_variation
+from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, get_config_variation
 from common_libs.retry import Retry
-from app.agent.penalty import get_penalty
-
 
 _TAGS_TO_FILTER = [
     "CV Markdown",
@@ -62,13 +61,15 @@ class CVExperienceExtractor:
             - Each item must be a single sentence describing a work/livelihood experience.
             - Each experience must be captured. Even if two experiences look similar, as long as they are 
               unique in role/title, location, company, or timeframe
-            - Skip any expeeriences that are completely duplicated
+            - Skip any experiences that are completely duplicated
             - Do not number items and do not add bullets or prefixes.
             - An experience typically includes a role/title and usually a company/organization or receiver of work, a timeframe (e.g., from X to Y, since X, Present) and a location.
             - Do NOT include standalone responsibilities/tasks unless they belong to a separate role in the same sentence.
             - Do NOT include personal data: no person names of the CV owner, no email addresses, no phone numbers,
               no street addresses, no personal websites or profile links (LinkedIn, GitHub, etc.). Company/organization names
               and city/country locations are allowed.
+            - Some CVs might have responsibilities linked to an experience, do not include the responsibilities in experiences ('experiences' field).
+            - Do not include only experience title without other details (at least one more detail).
             
             Examples (format to emulate; style guidance, not strict):
             Worked as a project manager at the University of Oxford, from 2018 to 2020. It was a paid job and you worked remotely.

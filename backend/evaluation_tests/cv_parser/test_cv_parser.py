@@ -1,13 +1,13 @@
-import pytest
 import os
 
-from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
-from evaluation_tests.matcher import ContainsString, match_expected, Matcher
+import pytest
 
 from app.users.cv.utils.llm_extractor import CVExperienceExtractor
-from evaluation_tests.cv_parser.test_cases import test_cases, CVParserTestCase
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationResult, EvaluationRecord
 from evaluation_tests.cv_parser.cv_parser_evaluator import CVParserEvaluator
+from evaluation_tests.cv_parser.test_cases import test_cases, CVParserTestCase
+from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
+from evaluation_tests.matcher import match_expected
 
 
 def write_to_file(folder: str, base_file_name: str, content: str) -> None:
@@ -15,6 +15,7 @@ def write_to_file(folder: str, base_file_name: str, content: str) -> None:
     file_path = os.path.join(folder, f"{base_file_name}.md")
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(content)
+
 
 class CVParserEvaluationRecord(EvaluationRecord):
     markdown_cv: str
@@ -27,9 +28,12 @@ class CVParserEvaluationRecord(EvaluationRecord):
                 f"## Extracted Items:\n{items}\n\n"
                 f"## Evaluations:\n{self._get_evaluations_str()}")
 
+
 # No helper matching logic – keep it simple and consistent with other eval tests using matchers
 
 test_cases_to_run = get_test_cases_to_run(test_cases)
+
+
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test("gemini-2.5-pro")
 @pytest.mark.repeat(3)
@@ -53,20 +57,14 @@ async def test_cv_parser(case: CVParserTestCase, common_folder_path: str):
     failures = []
 
     # Behavioral checks: each expected matcher can be a list (ALL must match within a single line) or a single matcher
-    for expected in case.expected_experiences:
-        found = False
+    for i, expected in enumerate(case.expected_experiences):
         # Normalize to list-of-matchers
         expected_list = expected if isinstance(expected, list) else [expected]
-        for actual in items:
-            if all(match_expected(actual, matcher)[0] for matcher in expected_list):
-                found = True
-                break
-        if not found:
-            failures.append(
-                "Did not find an extracted line matching expected constraints:\n"
-                f"expected={expected_list}\n"
-                f"extracted={items}"
-            )
+        experience_line = items[i]
+        for expectation in expected_list:
+            _is_valid, _reason = match_expected(experience_line, expectation)
+            if not _is_valid:
+                failures.append(f"Expected: {expectation}\nActual: {experience_line}\nReason: {_reason}")
 
     # If no items are expected, ensure none are returned
     expected_count = len(case.expected_experiences)
@@ -94,5 +92,3 @@ async def test_cv_parser(case: CVParserTestCase, common_folder_path: str):
     finally:
         out_folder = common_folder_path + f"cv_parser_{case.name}"
         record.save_data(folder=out_folder, base_file_name="evaluation_record")
-
-
