@@ -151,6 +151,8 @@
   "consent_snackbar_failed_update_preferences": "Error al actualizar las preferencias del usuario",
   "cv_typing_uploading": "Por favor espera mientras subo y analizo tu CV",
   "cv_typing_uploaded_ready": "El contenido de tu CV está en el campo de texto. Revísalo y envíalo cuando estés listo.",
+  "chat_typing": "Escribiendo",
+  "chat_thinking": "La IA está pensando, por favor esperá",
   "help_us_improve": "Ayúdanos a mejorar!",
   "previous": "Anterior",
   "next": "Siguiente",
