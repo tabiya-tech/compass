@@ -1,3 +1,4 @@
+import i18n from "src/i18n/i18n";
 // mute the console
 import "src/_test_utilities/consoleMock";
 
@@ -182,9 +183,7 @@ describe("ExperiencesDrawer", () => {
     render(givenExperiencesDrawer);
 
     // THEN expect the text to be in the document
-    const noExperiencesText = screen.getByText(
-      "We haven't yet discovered any experiences so far, Let's continue chatting."
-    );
+    const noExperiencesText = screen.getByText(i18n.t("experiences_empty_state_message"));
     expect(noExperiencesText).toBeInTheDocument();
   });
 
