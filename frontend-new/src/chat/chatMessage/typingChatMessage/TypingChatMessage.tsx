@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, keyframes } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
@@ -12,8 +13,9 @@ export const DATA_TEST_ID = {
 };
 
 export const UI_TEXT = {
-  TYPING: "Typing",
-  THINKING: "Please wait, I'm thinking",
+  // i18n keys
+  TYPING: "chat_typing",
+  THINKING: "chat_thinking",
 };
 
 export const WAIT_BEFORE_THINKING = 15000;
@@ -41,12 +43,13 @@ const textVariants = {
 };
 
 const TypingChatMessage: React.FC<TypingChatMessageProps> = ({ waitBeforeThinking = WAIT_BEFORE_THINKING }) => {
-  const [displayText, setDisplayText] = useState(UI_TEXT.TYPING);
+  const { t } = useTranslation();
+  const [isThinking, setIsThinking] = useState(false);
 
   useEffect(() => {
     // Change text after waitBeforeThinking duration
     const textChangeTimer = setTimeout(() => {
-      setDisplayText(UI_TEXT.THINKING);
+      setIsThinking(true);
     }, waitBeforeThinking);
 
     return () => {
@@ -54,10 +57,13 @@ const TypingChatMessage: React.FC<TypingChatMessageProps> = ({ waitBeforeThinkin
     };
   }, [waitBeforeThinking]);
 
+  const displayTextKey = isThinking ? UI_TEXT.THINKING : UI_TEXT.TYPING;
+  const displayText = t(displayTextKey);
+
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
-        key={displayText}
+        key={t(displayTextKey)}
         initial="hidden"
         animate="visible"
         exit="hidden"
