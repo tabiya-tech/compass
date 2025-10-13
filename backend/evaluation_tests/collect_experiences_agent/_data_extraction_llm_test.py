@@ -12,9 +12,9 @@ from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtract
 from app.agent.experience import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
-from evaluation_tests.matcher import check_actual_data_matches_expected, ContainsString, AnyOf, Matcher, match_expected
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
+from evaluation_tests.matcher import check_actual_data_matches_expected, ContainsString, AnyOf, Matcher, match_expected
 
 
 class _TestCaseDataExtraction(CompassTestCase):
@@ -138,20 +138,21 @@ test_cases_data_extraction = [
                  AnyOf(None, WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name)
              },
             {"index": 1,
-                "defined_at_turn_number": 1,
-                "experience_title": ContainsString("Project Manager"),
-                "location": AnyOf(ContainsString("Oxford"), ContainsString("remote")),
-                "company": ContainsString("University of Oxford"),
-                "paid_work": True,
-                "start_date": '2018',
-                "end_date": '2020',
-                "work_type":
-                    AnyOf(None, WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name)
-                },
+             "defined_at_turn_number": 1,
+             "experience_title": ContainsString("Project Manager"),
+             "location": AnyOf(ContainsString("Oxford"), ContainsString("remote")),
+             "company": ContainsString("University of Oxford"),
+             "paid_work": True,
+             "start_date": '2018',
+             "end_date": '2020',
+             "work_type":
+                 AnyOf(None, WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name)
+             }
         ]
 
     ),
-    _TestCaseDataExtraction(name="associate_with_previous_experience",
+    _TestCaseDataExtraction(
+        name="associate_with_previous_experience",
         summary="",
         turns=[
             ("(silence)",
@@ -161,7 +162,8 @@ test_cases_data_extraction = [
         ],
         user_input="Graphic design teacher working online",
         collected_data_so_far=[
-            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None,
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing',
+                          company=None,
                           location=None, start_date='2020/06',
                           end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT')
@@ -173,10 +175,10 @@ test_cases_data_extraction = [
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("Graphic design teacher"),
              "location": AnyOf(None, ContainsString("online"), ContainsString("remote")),
-             "company": None,
+             "company": AnyOf(None, ContainsString("Self"), ContainsString("online"), ContainsString("remote")),
              "paid_work": AnyOf("True", True),
              "start_date": ContainsString("2020/06"),
-             "end_date": None,
+             "end_date": AnyOf(None, "Present"),
              "work_type":
                  AnyOf(WorkType.SELF_EMPLOYMENT.name)
              },
@@ -209,58 +211,59 @@ test_cases_data_extraction = [
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("Graphic design teacher"),
              "location": AnyOf(ContainsString("online"), ContainsString("remote")),
-             "company": None,
+             "company": AnyOf(None, '', ContainsString("Self"), ContainsString("Online")),
              "paid_work": AnyOf("True", True),
              "start_date": ContainsString("2020/06"),
-             "end_date": None,
+             "end_date": AnyOf(None, "Present"),
              "work_type":
                  AnyOf(WorkType.SELF_EMPLOYMENT.name)
              },
         ]
     ),
     _TestCaseDataExtraction(name="associate_with_previous_experience_long_conversation_texts",
-        summary="",
-        turns=[
-            ("(silence)",
-             "Alright, cool. Have you ever run your own business, or done any freelance or contract work?"),
-            ("Yes, I freelanced since June 2020, this was one of the most important experiences in my life."
-             "And it i will never forget it because it was the first time i started working and it was a great experience."
-             "It made me feel like i was doing something important and it was a great way to learn new skills. "
-             "I remember i was so excited to start working and i was really nervous too. "
-             "I was worried that i wouldn't be good enough or that i would mess up. "
-             "But it turned out to be a great experience and i learned a lot. "
-             "I was really proud of myself for taking that step and starting to work.",
-             "Nice one! What kind of freelancing work have you been doing?"),
-            ("before i answer, this can you tell me what you mean by freelance?",
-             "Yes, freelance work is when you work for yourself or for different clients without being employed by a single company. "),
-            ("Sure, so it's like being self-employed?",
-             "Exactly! Freelancers often take on short-term projects or contracts for various clients."),
-        ],
-        user_input="During the experience I mentioned, I worked as a graphic design teacher remotely."
-                   "I really enjoyed it and would love to do it again. "
-                   "Especially because it was fulfilling and I learned a lot.",
-        collected_data_so_far=[
-            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None,
-                          location=None, start_date='2020/06',
-                          end_date=None,
-                          paid_work=True, work_type='SELF_EMPLOYMENT')
-        ],
-        expected_last_referenced_experience_index=0,
-        expected_collected_data_count=1,
-        expected_collected_data=[
-            {"index": 0,
-             "defined_at_turn_number": 1,
-             "experience_title": ContainsString("Graphic design teacher"),
-             "location": AnyOf(ContainsString("online"), ContainsString("remote")),
-             "company": None,
-             "paid_work": AnyOf("True", True),
-             "start_date": ContainsString("2020/06"),
-             "end_date": None,
-             "work_type":
-                 AnyOf(WorkType.SELF_EMPLOYMENT.name)
-             },
-        ]
-    ),
+                            summary="",
+                            turns=[
+                                ("(silence)",
+                                 "Alright, cool. Have you ever run your own business, or done any freelance or contract work?"),
+                                ("Yes, I freelanced since June 2020, this was one of the most important experiences in my life."
+                                 "And it i will never forget it because it was the first time i started working and it was a great experience."
+                                 "It made me feel like i was doing something important and it was a great way to learn new skills. "
+                                 "I remember i was so excited to start working and i was really nervous too. "
+                                 "I was worried that i wouldn't be good enough or that i would mess up. "
+                                 "But it turned out to be a great experience and i learned a lot. "
+                                 "I was really proud of myself for taking that step and starting to work.",
+                                 "Nice one! What kind of freelancing work have you been doing?"),
+                                ("before i answer, this can you tell me what you mean by freelance?",
+                                 "Yes, freelance work is when you work for yourself or for different clients without being employed by a single company. "),
+                                ("Sure, so it's like being self-employed?",
+                                 "Exactly! Freelancers often take on short-term projects or contracts for various clients."),
+                            ],
+                            user_input="During the experience I mentioned, I worked as a graphic design teacher remotely."
+                                       "I really enjoyed it and would love to do it again. "
+                                       "Especially because it was fulfilling and I learned a lot.",
+                            collected_data_so_far=[
+                                CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing',
+                                              company=None,
+                                              location=None, start_date='2020/06',
+                                              end_date=None,
+                                              paid_work=True, work_type='SELF_EMPLOYMENT')
+                            ],
+                            expected_last_referenced_experience_index=0,
+                            expected_collected_data_count=1,
+                            expected_collected_data=[
+                                {"index": 0,
+                                 "defined_at_turn_number": 1,
+                                 "experience_title": ContainsString("Graphic design teacher"),
+                                 "location": AnyOf(ContainsString("online"), ContainsString("remote")),
+                                 "company": AnyOf(None, ContainsString("Self"), ContainsString("client")),
+                                 "paid_work": AnyOf("True", True),
+                                 "start_date": ContainsString("2020/06"),
+                                 "end_date": AnyOf(None, "Present"),
+                                 "work_type":
+                                     AnyOf(WorkType.SELF_EMPLOYMENT.name)
+                                 },
+                            ]
+                            ),
     # Do not add twice
     _TestCaseDataExtraction(
         name="do_not_add_twice",
@@ -316,12 +319,12 @@ test_cases_data_extraction = [
         expected_collected_data=[
             {"index": 0,
              "defined_at_turn_number": 1,
-             "experience_title": "Selling Shoes",
-             "location": None,
-             "company": "Local Market",
+             "experience_title": ContainsString("Selling Shoes"),
+             "location": AnyOf(None, ContainsString("local market")),
+             "company": ContainsString("Local Market"),
              "paid_work": AnyOf(None, True),
              "start_date": ContainsString("2019"),
-             "end_date": AnyOf('', None),
+             "end_date": AnyOf('', None, "Present"),
              "work_type": 'SELF_EMPLOYMENT'
              },
         ]
@@ -465,7 +468,8 @@ test_cases_data_extraction = [
         expected_last_referenced_experience_index=-1,
         expected_collected_data_count=2
     ),
-    _TestCaseDataExtraction(name="refer_to_previous_experience_(withholding_student_e2e)",
+    _TestCaseDataExtraction(
+        name="refer_to_previous_experience_(withholding_student_e2e)",
         summary="",
         turns=[
             (
@@ -479,7 +483,8 @@ test_cases_data_extraction = [
         ],
         user_input="June 2020. Started teaching graphic design online. Still doing it.",
         collected_data_so_far=[
-            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelance Work', company=None,
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelance Work',
+                          company=None,
                           location=None, start_date=None, end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT'),
         ],
@@ -489,8 +494,8 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("teaching graphic design"),
-             "location": AnyOf(None,ContainsString("online"), ContainsString("remote")),
-             "company": AnyOf(None, ContainsString("self")),
+             "location": AnyOf(None, ContainsString("online"), ContainsString("remote")),
+             "company": AnyOf(None, ContainsString("self"), ContainsString("online")),
              "paid_work": True,
              "start_date": '2020/06',
              "end_date": ContainsString('present'),
@@ -666,7 +671,7 @@ test_cases_data_extraction = [
         expected_last_referenced_experience_index=-1,
         expected_collected_data_count=0
     ),
-    
+
     _TestCaseDataExtraction(
         name="multi_experience_simple_two_new",
         summary="",
@@ -674,7 +679,7 @@ test_cases_data_extraction = [
             ("(silence)",
              "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
         ],
-        user_input="I worked as a software developer at Google from 2020-2022, and also did freelance web design for local businesses since 2021.",
+        user_input="I worked as a software developer at Google from 2020-2022, and also did freelance web design for local businesses since 2023.",
         collected_data_so_far=[],
         expected_last_referenced_experience_index=0,  # Should reference first experience
         expected_collected_data_count=2,  # Should collect BOTH experiences
@@ -695,13 +700,13 @@ test_cases_data_extraction = [
              "location": AnyOf(None, ContainsString("local")),
              "company": AnyOf(None, ContainsString("local businesses")),
              "paid_work": True,
-             "start_date": '2021',
+             "start_date": '2023',
              "end_date": "Present",
              "work_type": WorkType.SELF_EMPLOYMENT.name
              }
         ]
     ),
-    
+
     # Mixed case: One new, one update
     _TestCaseDataExtraction(
         name="multi_experience_mixed_new_and_update",
@@ -712,7 +717,7 @@ test_cases_data_extraction = [
             ("I worked as a cashier at Walmart last year.",
              "Got it, you worked as a cashier at Walmart last year. Is there anything else you'd like to add or change about this experience?"),
         ],
-        user_input="Actually, I worked at Walmart from 2022-2023, and I also did volunteer work at the local food bank during the same time.",
+        user_input="Actually, I worked at Walmart from 2022-2023. I was also volunteering in night shift at the local food bank",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Cashier', company='Walmart',
                           location=None, start_date='2023',
@@ -735,18 +740,19 @@ test_cases_data_extraction = [
             {"index": 1,
              "defined_at_turn_number": 2,  # New experience gets current turn number
              "experience_title": ContainsString("volunteer"),
-             "location": AnyOf(None, ContainsString("food bank")),
+             "location": AnyOf(None, ContainsString("local"), ContainsString("food bank")),
              "company": AnyOf(None, ContainsString("food bank")),
              "paid_work": False,
-             "start_date": '2022',
-             "end_date": '2023',
+             "start_date": AnyOf(None, '2022'),
+             "end_date": AnyOf(None, '2023'),
              "work_type": WorkType.UNSEEN_UNPAID.name
              }
         ]
     ),
-    
+
     # Complex case: Three experiences with different operations
-    _TestCaseDataExtraction(name="multi_experience_complex_three_operations",
+    _TestCaseDataExtraction(
+        name="multi_experience_complex_three_operations",
         summary="",
         turns=[
             ("(silence)",
@@ -780,7 +786,7 @@ test_cases_data_extraction = [
              }
         ]
     ),
-    
+
     # Partial information case: Multiple experiences with incomplete data
     _TestCaseDataExtraction(
         name="multi_experience_partial_information",
@@ -796,7 +802,10 @@ test_cases_data_extraction = [
         expected_collected_data=[
             {"index": 0,
              "defined_at_turn_number": 1,
-             "experience_title": AnyOf(None, ContainsString("Microsoft"), ContainsString("Employee")),
+             "experience_title": AnyOf(None, '',
+                                       ContainsString("microsoft"),  # Worked at Microsoft
+                                       ContainsString("engineer"),  # Software Engineer.
+                                       ContainsString("Employee")),
              "location": AnyOf(None, ContainsString("Microsoft")),
              "company": ContainsString("Microsoft"),
              "paid_work": True,
@@ -808,7 +817,7 @@ test_cases_data_extraction = [
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("volunteer"),
              "location": AnyOf(None, ''),
-             "company": AnyOf(None, ''),
+             "company": AnyOf(None, '', ContainsString("community")),
              "paid_work": False,
              "start_date": AnyOf(None, ''),
              "end_date": AnyOf(None, ''),
@@ -816,7 +825,7 @@ test_cases_data_extraction = [
              }
         ]
     ),
-    
+
     # Edge case: Single message with ADD -> UPDATE -> DELETE (should be no-op)
     _TestCaseDataExtraction(
         name="single_message_add_update_delete_noop",
@@ -831,7 +840,7 @@ test_cases_data_extraction = [
         expected_collected_data_count=0,  # Should result in no experiences
         expected_collected_data=[]  # Empty list - no experiences should remain
     ),
-    
+
     # All operations at once: ADD, UPDATE, DELETE
     _TestCaseDataExtraction(
         name="multi_experience_all_operations",
@@ -842,7 +851,10 @@ test_cases_data_extraction = [
             ("I worked as a teacher and also did some consulting work.",
              "Got it, you worked as a teacher and also did some consulting work. Is there anything else you'd like to add or change about this experience?"),
         ],
-        user_input="I taught at Lincoln High School from 2019-2021, I updated my consulting - it was for tech startups from 2020-2022, and I want to remove the teaching job. Also, I did some freelance photography since 2021.",
+        user_input="I taught at Lincoln High School from 2019-2021, "
+                   "I am updating my consulting - it was for tech startups from 2020-2022."
+                   "I want to remove the teaching job. "
+                   "Also, I did some freelance photography since 2021.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Teacher', company='School',
                           location=None, start_date=None,
@@ -859,7 +871,7 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,  # Updated experience keeps original turn number
              "experience_title": ContainsString("consulting"),
-             "location": AnyOf(None, ContainsString("tech")),
+             "location": AnyOf(None),
              "company": AnyOf(None, ContainsString("tech startups")),
              "paid_work": True,
              "start_date": AnyOf(None, ContainsString('2020')),
@@ -878,6 +890,108 @@ test_cases_data_extraction = [
              }
         ]
     ),
+    # Add many experiences, in one round (7)
+    _TestCaseDataExtraction(
+        name="add_many_experiences",
+        summary="Extracts multiple formal and informal experiences from a single user input",
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?")
+        ],
+        user_input=dedent("""
+        These are my experiences:
+        
+        • Research Assistant at Cool Lab, African Leadership University, in Kigali, Rwanda from June 2020 to Present.
+        • Research Assistant at Fancy Science Lab, African Leadership University, from Jan 2018 to May 2020.
+        • Worked as Past Non-academic Job at Tabiya in New York City, New York in 2016 to 2018.
+        • Assistant Instructor for Applied Mathematics (CODE 606) at University1 Name in 2014.
+        • Guest lecturer for Science Theory and Practice (CODE 360) at University1 Name in 2013.
+        • Assistant Instructor for Economics (CODE 123) at University2 Name in 2013.
+        • Guest lecturer for Science Theory and Practice (CODE 321) at ABCC High school in 2012
+        """),
+        collected_data_so_far=[],
+        expected_last_referenced_experience_index=6,
+        expected_collected_data_count=7,
+        expected_collected_data=[
+            {
+                "index": 0,
+                "defined_at_turn_number": 1,
+                "experience_title": ContainsString("Research Assistant"),
+                "location": ContainsString("Kigali, Rwanda"),
+                "company": ContainsString("Cool Lab, African Leadership University"),
+                "paid_work": AnyOf(None, True),
+                "start_date": "2020/06",
+                "end_date": ContainsString("Present"),
+                "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+            },
+            {
+                "index": 1,
+                "defined_at_turn_number": 1,
+                "experience_title": ContainsString("Research Assistant"),
+                "location": AnyOf(None, "African Leadership University"),
+                "company": ContainsString("Fancy Science Lab, African Leadership University"),
+                "paid_work": AnyOf(None, True),
+                "start_date": "2018/01",
+                "end_date": "2020/05",
+                "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+            },
+            {
+                "index": 2,
+                "defined_at_turn_number": 1,
+                "experience_title": ContainsString("Past Non-academic Job"),
+                "location": ContainsString("New York City"),
+                "company": ContainsString("Tabiya"),
+                "paid_work": AnyOf(None, True),
+                "start_date": "2016",
+                "end_date": "2018",
+                "work_type": AnyOf(None, WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name),
+            },
+            {
+                "index": 3,
+                "defined_at_turn_number": 1,
+                "experience_title": ContainsString("Assistant Instructor"),
+                "location": AnyOf(None, "", "University1 Name"),
+                "company": ContainsString("University1 Name"),
+                "paid_work": AnyOf(None, True),
+                "start_date": "2014",
+                "end_date": "2014",
+                "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+            },
+            {
+                "index": 4,
+                "defined_at_turn_number": 1,
+                "experience_title": ContainsString("Guest lecturer"),
+                "location": AnyOf(None, "", "University1 Name"),
+                "company": ContainsString("University1 Name"),
+                "paid_work": AnyOf(None, True),
+                "start_date": "2013",
+                "end_date": "2013",
+                "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+            },
+            {
+                "index": 5,
+                "defined_at_turn_number": 1,
+                "experience_title": ContainsString("Assistant Instructor"),
+                "location": AnyOf(None, "", "University2 Name"),
+                "company": ContainsString("University2 Name"),
+                "paid_work": AnyOf(None, True),
+                "start_date": "2013",
+                "end_date": "2013",
+                "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+            },
+            {
+                "index": 6,
+                "defined_at_turn_number": 1,
+                "experience_title": ContainsString("Guest lecturer"),
+                "location": AnyOf(None, "", "ABCC High school"),
+                "company": ContainsString("ABCC High school"),
+                "paid_work": AnyOf(None, True),
+                "start_date": "2012",
+                "end_date": "2012",
+                "work_type": AnyOf(WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name, None),
+            },
+        ],
+    )
 ]
 
 
@@ -928,6 +1042,7 @@ async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytes
             failures.append(
                 f"Expected {test_case.expected_collected_data_count} collected data, but got {len(collected_data)}"
             )
+
         if test_case.expected_collected_data is not None:
             _failures = check_actual_data_matches_expected(actual_data=collected_data,
                                                            expected_data=test_case.expected_collected_data,

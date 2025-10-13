@@ -7,103 +7,94 @@ duplicate detection, and maintains data consistency.
 """
 
 import logging
-from typing import Optional
 
 from app.agent.collect_experiences_agent._types import CollectedData
 from app.agent.experience.work_type import WorkType
+from . import DataOperation
 
 
-class _DataOperation:
-    """Enum-like class for data operations."""
-    ADD = "ADD"
-    UPDATE = "UPDATE"
-    DELETE = "DELETE"
-    NOOP = "NOOP"
-
-    @staticmethod
-    def from_string_key(operation: Optional[str]) -> Optional['_DataOperation']:
-        """Convert string operation to enum value."""
-        if not operation:
-            return None
-        operation_upper = operation.upper()
-        if operation_upper in [_DataOperation.ADD, _DataOperation.UPDATE, _DataOperation.DELETE, _DataOperation.NOOP]:
-            return operation_upper
-        return None
+class Operation(CollectedData):
+    data_operation: str
 
 
-class ExperienceDataProcessor:
+class OperationsProcessor:
     """
     Handles the complex logic for processing experience data operations.
     
     This class manages index mapping, duplicate detection, and maintains
-    data consistency when applying ADD, UPDATE, and DELETE operations.
+    data consistency when applying to ADD, UPDATE, and DELETE operations.
     """
 
     def __init__(self, logger: logging.Logger):
         self.logger = logger
 
-    def process_experience_operations(self, 
-                                    experiences_data: list,
-                                    collected_experience_data_so_far: list[CollectedData],
-                                    current_turn_index: int) -> tuple[int, list[CollectedData]]:
+    def process(self,
+                operations: list[Operation],
+                collected_experience_data_so_far: list[CollectedData],
+                current_conversation_turn_index: int) -> tuple[int, list[CollectedData]]:
         """
-        Process all experience data operations and return the last processed index and updated data.
+        Processes all experience data operations and return the last processed index and updated data.
         
         Args:
-            experiences_data: List of experience data from LLM response
+            operations: List of operations to process against the collected data so far
             collected_experience_data_so_far: Current collected experience data
-            current_turn_index: Current turn index for new experiences
+            current_conversation_turn_index: Current conversation turn index to be added to the new experiences
             
         Returns:
             Tuple of (last_processed_index, updated_collected_data)
         """
+
         # Create mapping from original LLM indexes to current list positions
         index_mapping = {i: i for i in range(len(collected_experience_data_so_far))}
-        
+
         # Keep track of pending deletes and adds to apply them after the updates
         pending_delete_original_indexes: list[int] = []
         pending_add_payloads: list = []
-        
+
         last_processed_index = -1
-        
+
         # Process each experience in the array
-        for _data in experiences_data:
-            data_operation = _DataOperation.from_string_key(_data.data_operation)
-            
-            if data_operation is None or data_operation == _DataOperation.NOOP:
-                if data_operation is None:
-                    self.logger.error("Invalid data operation: %s", _data.data_operation)
-                else:
-                    self.logger.info("No operation to be performed on experience: %s", _data.experience_title)
+        for _data in operations:
+            data_operation = DataOperation.from_string_key(_data.data_operation)
+
+            if data_operation is None:
+                self.logger.error("Invalid data operation: %s", _data.data_operation)
                 continue
-            
-            if data_operation == _DataOperation.UPDATE:
+
+            if data_operation == DataOperation.NOOP:
+                self.logger.info("No operation to be performed on experience: %s", _data.experience_title)
+                continue
+
+            if data_operation == DataOperation.UPDATE:
                 last_processed_index = self._process_update_operation(
                     _data, collected_experience_data_so_far, index_mapping, pending_delete_original_indexes)
-            elif data_operation == _DataOperation.DELETE:
+
+            elif data_operation == DataOperation.DELETE:
                 pending_delete_original_indexes.append(_data.index)
-            elif data_operation == _DataOperation.ADD:
+
+            elif data_operation == DataOperation.ADD:
                 pending_add_payloads.append(_data)
+
             else:
                 self.logger.error("Invalid data operation: %s", _data.data_operation)
-        
+
         # Apply pending deletes
         self._apply_pending_deletes(pending_delete_original_indexes, collected_experience_data_so_far, index_mapping)
-        
+
         # Apply pending adds
-        self._apply_pending_adds(pending_add_payloads, collected_experience_data_so_far, current_turn_index)
-        
+        self._apply_pending_adds(pending_add_payloads, collected_experience_data_so_far, current_conversation_turn_index)
+
         return last_processed_index, collected_experience_data_so_far
 
-    def _process_update_operation(self, _data, collected_experience_data_so_far: list[CollectedData], 
-                                index_mapping: dict, pending_delete_original_indexes: list[int]) -> int:
+    def _process_update_operation(self, _data, collected_experience_data_so_far: list[CollectedData],
+                                  index_mapping: dict, pending_delete_original_indexes: list[int]) -> int:
         """Process an UPDATE operation."""
         current_index = index_mapping.get(_data.index, -1)
         if 0 <= current_index < len(collected_experience_data_so_far):
             to_update = collected_experience_data_so_far[current_index]
             before_update = to_update.model_dump()
             self.logger.info("Updating experience with index: %s", _data.index)
-            
+
             # Update fields if they are not None
             if _data.experience_title is not None:
                 to_update.experience_title = _data.experience_title
@@ -119,7 +110,7 @@ class ExperienceDataProcessor:
                 to_update.company = _data.company
             if _data.location is not None:
                 to_update.location = _data.location
-            
+
             # Resolve empties/duplicates inline to keep indexes consistent
             if self._is_experience_empty(to_update):
                 self.logger.warning("Updated experience became empty and will be removed: %s", to_update)
@@ -130,7 +121,8 @@ class ExperienceDataProcessor:
                     to_update, collected_experience_data_so_far, exclude_index=current_index)
                 if duplicate_index >= 0:
                     kept_index = duplicate_index
-                    self.logger.warning("Updated experience duplicates an existing one; removing updated: %s", to_update)
+                    self.logger.warning("Updated experience duplicates an existing one; removing updated: %s",
+                                        to_update)
                     pending_delete_original_indexes.append(_data.index)
                     return kept_index
                 else:
@@ -139,12 +131,12 @@ class ExperienceDataProcessor:
                                      _data.index, self._dict_diff(before_update, after_update))
                     return _data.index
         else:
-            self.logger.error("Invalid index:%s for updating experience", _data.index)
+            self.logger.warn("Invalid index:%s for updating experience", _data.index)
             return -1
 
-    def _apply_pending_deletes(self, pending_delete_original_indexes: list[int], 
-                             collected_experience_data_so_far: list[CollectedData], 
-                             index_mapping: dict):
+    def _apply_pending_deletes(self, pending_delete_original_indexes: list[int],
+                               collected_experience_data_so_far: list[CollectedData],
+                               index_mapping: dict):
         """Apply all pending delete operations."""
         for original_index in sorted(pending_delete_original_indexes):
             current_index = index_mapping.get(original_index, -1)
@@ -153,25 +145,25 @@ class ExperienceDataProcessor:
                 del collected_experience_data_so_far[current_index]
                 self._update_index_mapping_after_deletion(index_mapping, current_index)
             else:
-                self.logger.error("Invalid index:%s for deleting experience", original_index)
+                self.logger.warn("Invalid index:%s for deleting experience", original_index)
 
-    def _apply_pending_adds(self, pending_add_payloads: list, 
-                          collected_experience_data_so_far: list[CollectedData], 
-                          current_turn_index: int):
+    def _apply_pending_adds(self, pending_add_payloads: list,
+                            collected_experience_data_so_far: list[CollectedData],
+                            current_turn_index: int):
         """Apply all pending add operations."""
         next_available_index = (
-            max([existing_item.index for existing_item in collected_experience_data_so_far]) + 1
+                max([existing_item.index for existing_item in collected_experience_data_so_far]) + 1
         ) if collected_experience_data_so_far else 0
-        
+
         appended_add_count = 0
         for add_payload in pending_add_payloads:
             new_index = next_available_index + appended_add_count
             appended_add_count += 1
             self.logger.info("Adding new experience with index: %s", new_index)
-            
+
             work_type = WorkType.from_string_key(add_payload.work_type)
             work_type = work_type.name if work_type is not None else None
-            
+
             new_item = CollectedData(
                 index=new_index,
                 defined_at_turn_number=current_turn_index,
@@ -197,17 +189,17 @@ class ExperienceDataProcessor:
         )
 
     @staticmethod
-    def _find_duplicate_index(item: CollectedData, items: list[CollectedData], 
-                            exclude_index: int | None = None) -> int:
+    def _find_duplicate_index(item: CollectedData, items: list[CollectedData],
+                              exclude_index: int | None = None) -> int:
         """Find the index of a duplicate experience in the list."""
         for i, existing_item in enumerate(items):
             if exclude_index is not None and i == exclude_index:
                 continue
             if (item.experience_title == existing_item.experience_title and
-                item.start_date == existing_item.start_date and
-                item.end_date == existing_item.end_date and
-                item.company == existing_item.company and
-                item.location == existing_item.location):
+                    item.start_date == existing_item.start_date and
+                    item.end_date == existing_item.end_date and
+                    item.company == existing_item.company and
+                    item.location == existing_item.location):
                 return i
         return -1
 
@@ -229,5 +221,3 @@ class ExperienceDataProcessor:
             if old_value != new_value:
                 diff.append(f"{key}: {old_value} -> {new_value}")
         return diff
-
-

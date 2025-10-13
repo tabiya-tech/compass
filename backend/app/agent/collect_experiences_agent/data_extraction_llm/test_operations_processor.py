@@ -4,9 +4,10 @@ from unittest.mock import Mock
 
 import pytest
 
-from app.agent.collect_experiences_agent._data_processor import ExperienceDataProcessor, _DataOperation
 from app.agent.collect_experiences_agent._dataextraction_llm import _CollectedDataWithReasoning
 from app.agent.collect_experiences_agent._types import CollectedData
+from app.agent.collect_experiences_agent.data_extraction_llm import OperationsProcessor
+from app.agent.collect_experiences_agent.data_extraction_llm._common import DataOperation
 from app.agent.experience import WorkType
 
 
@@ -80,7 +81,7 @@ class TestExperienceDataProcessor:
     @pytest.fixture
     def processor(self, mock_logger):
         """Create an ExperienceDataProcessor instance with mocked logger."""
-        return ExperienceDataProcessor(mock_logger)
+        return OperationsProcessor(mock_logger)
 
     # ADD operation tests
     def test_add_single_new_experience(self, processor, mock_logger):
@@ -107,7 +108,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 2
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -168,7 +169,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 3
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -220,7 +221,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 2
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -272,7 +273,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 2
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -308,7 +309,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 2
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -320,7 +321,7 @@ class TestExperienceDataProcessor:
         assert actual_collected_data[0].experience_title == "Software Developer"
 
         # AND should log the error
-        mock_logger.error.assert_any_call("Invalid index:%s for updating experience", 5)
+        mock_logger.warn.assert_any_call("Invalid index:%s for updating experience", 5)
 
     # DELETE operation tests
     def test_delete_existing_experience(self, processor, mock_logger):
@@ -344,7 +345,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 2
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -381,7 +382,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 2
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -412,7 +413,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 2
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -421,7 +422,7 @@ class TestExperienceDataProcessor:
         assert actual_collected_data[0].experience_title == "Software Developer"
 
         # AND should log the error
-        mock_logger.error.assert_any_call("Invalid index:%s for deleting experience", 5)
+        mock_logger.warn.assert_any_call("Invalid index:%s for deleting experience", 5)
 
     # Mixed operations tests
     def test_mixed_add_update_delete_operations(self, processor, mock_logger):
@@ -449,7 +450,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 3
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -481,7 +482,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 2
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -511,7 +512,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 2
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -538,7 +539,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 2
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -575,7 +576,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 2
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -615,7 +616,7 @@ class TestExperienceDataProcessor:
         given_current_turn_index = 2
 
         # WHEN processing the experience operations
-        actual_last_processed_index, actual_collected_data = processor.process_experience_operations(
+        actual_last_processed_index, actual_collected_data = processor.process(
             given_experiences_data, given_collected_data, given_current_turn_index
         )
 
@@ -638,27 +639,27 @@ class TestDataOperation:
         # GIVEN valid operation strings
         # WHEN converting to operation
         # THEN should return correct operations
-        assert _DataOperation.from_string_key("ADD") == "ADD"
-        assert _DataOperation.from_string_key("UPDATE") == "UPDATE"
-        assert _DataOperation.from_string_key("DELETE") == "DELETE"
-        assert _DataOperation.from_string_key("NOOP") == "NOOP"
+        assert DataOperation.from_string_key("ADD").value == "ADD"
+        assert DataOperation.from_string_key("UPDATE").value == "UPDATE"
+        assert DataOperation.from_string_key("DELETE").value == "DELETE"
+        assert DataOperation.from_string_key("NOOP").value == "NOOP"
 
     def test_from_string_key_case_insensitive(self):
         """Should handle case insensitive operations."""
         # GIVEN mixed case operation strings
         # WHEN converting to operation
         # THEN should return correct operations
-        assert _DataOperation.from_string_key("add") == "ADD"
-        assert _DataOperation.from_string_key("Update") == "UPDATE"
-        assert _DataOperation.from_string_key("delete") == "DELETE"
-        assert _DataOperation.from_string_key("noop") == "NOOP"
+        assert DataOperation.from_string_key("add").value == "ADD"
+        assert DataOperation.from_string_key("Update").value == "UPDATE"
+        assert DataOperation.from_string_key("delete").value == "DELETE"
+        assert DataOperation.from_string_key("noop").value == "NOOP"
 
     def test_from_string_key_invalid_operations(self):
         """Should return None for invalid operations."""
         # GIVEN invalid operation strings
         # WHEN converting to operation
         # THEN should return None
-        assert _DataOperation.from_string_key("INVALID") is None
-        assert _DataOperation.from_string_key("") is None
-        assert _DataOperation.from_string_key(None) is None
-        assert _DataOperation.from_string_key("MODIFY") is None
+        assert DataOperation.from_string_key("INVALID") is None
+        assert DataOperation.from_string_key("") is None
+        assert DataOperation.from_string_key(None) is None
+        assert DataOperation.from_string_key("MODIFY") is None

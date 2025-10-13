@@ -3,14 +3,14 @@ from typing import Optional
 
 from pydantic import ConfigDict
 
-from app.agent.experience import WorkType
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.collect_experiences_agent._types import CollectedData
+from app.agent.experience import WorkType
 from app.countries import Country
-from evaluation_tests.discovered_experience_test_case import DiscoveredExperienceTestCase
-from evaluation_tests.matcher import AnyOf, ContainsString, NON_EMPTY_STRING_REGEX, DictContaining, AnyValue
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, Evaluation
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
+from evaluation_tests.discovered_experience_test_case import DiscoveredExperienceTestCase
+from evaluation_tests.matcher import AnyOf, ContainsString, NON_EMPTY_STRING_REGEX, DictContaining, AnyValue
 
 system_instruction_prompt = dedent("""
     You are going to be interacting with a GenAI-driven conversational agent to help you identify your past experiences. 
@@ -658,6 +658,7 @@ test_cases = [
             You will provide all this information at once when asked about your experiences. The information is intentionally incomplete - 
             you're missing company names, locations, specific dates, and other details. Expect the agent to ask follow-up questions 
             to get the complete information. You should provide the missing details when asked specific questions about them.
+            If asked other work types, kinds of work, Say you don't have any.
             
             #Follow-up Details (only provide when specifically asked):
             For Software Developer: Company was "TechCorp", located in "Cape Town", worked on web applications
