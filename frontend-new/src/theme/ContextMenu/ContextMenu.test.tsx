@@ -18,7 +18,7 @@ describe("ContextMenu", () => {
     test("renders correctly the menu open", () => {
       // GIVEN the following menu items
       const givenItems: MenuItemConfig[] = [
-        // an enabled  menu item with an icon
+        // an enabled menu item with an icon
         {
           id: "1",
           text: "foo",
@@ -40,6 +40,15 @@ describe("ContextMenu", () => {
           text: "baz",
           icon: <div />,
           disabled: true,
+          action: jest.fn(),
+        },
+        // a menu item with a trailing icon
+        {
+          id: "4",
+          text: "qux",
+          icon: <div />,
+          trailingIcon: <div />,
+          disabled: false,
           action: jest.fn(),
         },
       ];
@@ -75,7 +84,9 @@ describe("ContextMenu", () => {
       expect(actualMenuItems[0]).not.toHaveAttribute("aria-disabled", "true");
       // AND the menu item with the disabled state to be disabled
       expect(actualMenuItems[2]).toHaveAttribute("aria-disabled", "true");
-
+      // AND the menu item with the trailing icon to have a trailing icon
+      const actualTrailingIcon = within(actualMenuItems[3]).getByTestId(DATA_TEST_ID.MENU_ITEM_TRAILING_ICON);
+      expect(actualTrailingIcon).toBeInTheDocument();
       // AND to match the snapshot
       expect(actualMenu).toMatchSnapshot();
     });
@@ -103,7 +114,6 @@ describe("ContextMenu", () => {
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
-
     });
 
     test("renders correctly the menu closed", () => {
@@ -119,6 +129,40 @@ describe("ContextMenu", () => {
       // AND the ContextMenu to not be shown
       const actualMenu = screen.queryByTestId(DATA_TEST_ID.MENU);
       expect(actualMenu).not.toBeInTheDocument();
+    });
+
+    test("should render a custom menu item when customNode is provided", () => {
+      // GIVEN a custom node (any JSX)
+      const CustomContent = () => <div data-testid="custom-node">Custom Content</div>;
+      // AND a menu item that uses it
+      const givenItems: MenuItemConfig[] = [
+        {
+          id: "custom-1",
+          text: "",
+          icon: undefined,
+          trailingIcon: <div />,
+          disabled: false,
+          action: jest.fn(),
+          customNode: <CustomContent />,
+        },
+      ];
+
+      // WHEN the ContextMenu is rendered
+      render(<ContextMenu {...stdGivenProps} items={givenItems} />);
+
+      // THEN the menu should be in the document
+      const actualMenu = screen.getByTestId(DATA_TEST_ID.MENU);
+      expect(actualMenu).toBeInTheDocument();
+      // AND the custom MenuItem should be rendered
+      const actualMenuItem = screen.getByTestId(DATA_TEST_ID.CUSTOM_MENU_ITEM);
+      expect(actualMenuItem).toBeInTheDocument();
+      // AND the custom node content should appear inside
+      const customNode = screen.getByTestId("custom-node");
+      expect(customNode).toBeInTheDocument();
+      expect(customNode).toHaveTextContent("Custom Content");
+      // AND no errors or warnings should have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
     });
   });
 

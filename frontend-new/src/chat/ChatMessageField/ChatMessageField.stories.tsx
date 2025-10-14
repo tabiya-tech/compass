@@ -60,7 +60,6 @@ export const ChatIsClosed: Story = {
   },
 };
 
-
 export const PlusBadgeAppearsOnPhaseTransition: Story = {
   render: (args) => <ChatMessageFieldWrapper {...args} />,
   args: {
@@ -70,9 +69,9 @@ export const PlusBadgeAppearsOnPhaseTransition: Story = {
 };
 
 export const CVUploadDisabledInOtherPhases: Story = {
-    render: (args) => <ChatMessageFieldWrapper {...args} />,
-    args: {
-        handleSend: action("Message sent"),
-        currentPhase: ConversationPhase.INTRO,
-    },
-}
+  render: (args) => <ChatMessageFieldWrapper {...args} />,
+  args: {
+    handleSend: action("Message sent"),
+    currentPhase: ConversationPhase.INTRO,
+  },
+};

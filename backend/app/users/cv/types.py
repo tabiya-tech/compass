@@ -1,6 +1,6 @@
+import uuid
 from datetime import datetime, timezone
 from enum import Enum
-import uuid
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -38,6 +38,14 @@ class CVUploadStatusResponse(BaseModel):
     error_code: Optional['CVUploadErrorCode'] = None
     error_detail: str | None = None
     experience_bullets: list[str] | None = None
+
+
+class CVUploadResponseListItem(BaseModel):
+    upload_id: str
+    filename: str
+    uploaded_at: datetime
+    upload_process_state: UploadProcessState
+    experiences_data: Optional[list[str]] = None
 
 
 class CVUploadErrorCode(str, Enum):

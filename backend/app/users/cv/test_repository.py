@@ -313,4 +313,27 @@ class TestUserCVRepository:
         final_doc = await repository.get_upload_by_id(user_id, upload.upload_id)
         assert final_doc["upload_process_state"] == UploadProcessState.CONVERTING
 
+    @pytest.mark.asyncio
+    async def test_list_uploads_for_user_returns_all_uploads(self, get_user_cv_repository: Awaitable[UserCVRepository]):
+        repository = await get_user_cv_repository
+        now = datetime.now(timezone.utc)
+        user_id = "user-1"
 
+        # GIVEN multiple uploads for the user
+        uploads = [
+            _get_upload(user_id=user_id, created_at=now - timedelta(minutes=i), suffix=str(i), md5_hash=f"hash_{i}")
+            for i in range(5)
+        ]
+        for upload in uploads:
+            upload.upload_process_state = UploadProcessState.COMPLETED
+            await repository.insert_upload(upload)
+
+        # WHEN listing uploads
+        results = await repository.get_user_uploads(user_id=user_id)
+
+        # THEN all uploads are returned, sorted by created_at descending
+        assert len(results) == 5
+        sorted_uploads = sorted(uploads, key=lambda u: u.created_at, reverse=True)
+        for result, expected in zip(results, sorted_uploads):
+            assert result.upload_id == expected.upload_id
+            assert result.filename == expected.filename

@@ -3,6 +3,8 @@ import { getRestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { customFetch } from "src/utils/customFetch/customFetch";
+import { UploadProcessState } from "src/chat/Chat.types";
+import { CVListItem } from "src/CV/CVService/CVService.types";
 
 export default class CVService {
   private static instance: CVService;
@@ -105,11 +107,14 @@ export default class CVService {
     });
   }
 
-  public async getUploadStatus(userId: string, uploadId: string): Promise<{
+  public async getUploadStatus(
+    userId: string,
+    uploadId: string
+  ): Promise<{
     upload_id: string;
     user_id: string;
     filename: string;
-    upload_process_state: string;
+    upload_process_state: UploadProcessState;
     cancel_requested: boolean;
     created_at: string;
     last_activity_at: string;
@@ -150,5 +155,37 @@ export default class CVService {
     }
 
     return statusResponse;
+  }
+
+  public async getAllCVs(userId: string): Promise<CVListItem[]> {
+    const serviceName = "CVService";
+    const serviceFunction = "getAllCVs";
+    const method = "GET";
+    const constructedUrl = `${this.cvEndpointUrl}/${userId}/cv`;
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, constructedUrl);
+
+    const response = await customFetch(constructedUrl, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      expectedStatusCode: StatusCodes.OK,
+      serviceName,
+      serviceFunction,
+      failureMessage: `Failed to fetch CVs for user ${userId}`,
+      expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
+    });
+
+    try {
+      return await response.json();
+    } catch (error) {
+      throw errorFactory(
+        response.status,
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+        "Response did not contain valid JSON",
+        { error }
+      );
+    }
   }
 }

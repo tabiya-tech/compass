@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UploadedCVsMenuContent render tests should render the Uploaded CVs Menu Content component correctly 1`] = `
+<div
+  class="MuiBox-root css-1kkx4gx"
+  data-testid="uploaded-cvs-menu-content-e9b40dcc-8068-45ec-a96a-9feb823f1696"
+>
+  <div
+    class="MuiBox-root css-t5n7v9"
+  >
+    <button
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-pawek1-MuiButtonBase-root-MuiIconButton-root"
+      data-testid="uploaded-cvs-menu-arrow-back-icon-e9b40dcc-8068-45ec-a96a-9feb823f1696"
+      tabindex="0"
+      title="Back to main menu"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        data-testid="ArrowBackIcon"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"
+        />
+      </svg>
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <h6
+      class="MuiTypography-root MuiTypography-subtitle2 css-1rof9ss-MuiTypography-root"
+      data-testid="uploaded-cvs-menu-uploaded-text-e9b40dcc-8068-45ec-a96a-9feb823f1696"
+    >
+      Previously uploaded CVs (1)
+    </h6>
+    <div
+      data-testid="uploaded-cvs-menu-help-tip-e9b40dcc-8068-45ec-a96a-9feb823f1696"
+    />
+  </div>
+  <div
+    class="MuiBox-root css-1tkd0ut"
+  >
+    <div
+      class="MuiBox-root css-1unvmzf"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1de4ipc-MuiSvgIcon-root"
+        data-testid="uploaded-cvs-menu-description-icon-e9b40dcc-8068-45ec-a96a-9feb823f1696"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M8 16h8v2H8zm0-4h8v2H8zm6-10H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zm4 18H6V4h7v5h5z"
+        />
+      </svg>
+      <div
+        class="MuiBox-root css-j7qwjs"
+      >
+        <span
+          class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+          data-testid="uploaded-cvs-menu-file-name-e9b40dcc-8068-45ec-a96a-9feb823f1696"
+        >
+          foo_bar.pdf
+        </span>
+        <span
+          class="MuiTypography-root MuiTypography-caption css-a6pqw0-MuiTypography-root"
+          data-testid="uploaded-cvs-menu-upload-date-e9b40dcc-8068-45ec-a96a-9feb823f1696"
+        >
+          just now
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;

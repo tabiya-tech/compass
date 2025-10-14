@@ -1,14 +1,14 @@
 import logging
-from datetime import timedelta
 from abc import ABC, abstractmethod
+from datetime import timedelta
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 
 from app.server_dependencies.database_collections import Collections
-from app.users.cv.types import UserCVUpload, UploadProcessState
 from app.users.cv.errors import DuplicateCVUploadError
-from common_libs.time_utilities import get_now, datetime_to_mongo_date
+from app.users.cv.types import UserCVUpload, UploadProcessState
+from common_libs.time_utilities import get_now, datetime_to_mongo_date, mongo_date_to_datetime
 
 
 class IUserCVRepository(ABC):
@@ -61,6 +61,10 @@ class IUserCVRepository(ABC):
     async def mark_cancelled(self, user_id: str, upload_id: str) -> bool:
         raise NotImplementedError()
 
+    @abstractmethod
+    async def get_user_uploads(self, *, user_id: str) -> list[UserCVUpload]:
+        raise NotImplementedError()
+
 
 class UserCVRepository(IUserCVRepository):
     def __init__(self, db: AsyncIOMotorDatabase):
@@ -86,6 +90,26 @@ class UserCVRepository(IUserCVRepository):
             "error_detail": getattr(upload, "error_detail", None),
             "experience_bullets": getattr(upload, "experience_bullets", None),
         }
+
+    @staticmethod
+    def _from_db_doc(doc: dict) -> UserCVUpload:
+        return UserCVUpload(
+            user_id=doc.get("user_id"),
+            created_at=mongo_date_to_datetime(doc.get("created_at")),
+            filename=doc.get("filename"),
+            content_type=doc.get("content_type"),
+            object_path=doc.get("object_path"),
+            markdown_object_path=doc.get("markdown_object_path"),
+            markdown_char_len=doc.get("markdown_char_len"),
+            md5_hash=doc.get("md5_hash"),
+            upload_id=doc.get("upload_id"),
+            upload_process_state=doc.get("upload_process_state"),
+            cancel_requested=doc.get("cancel_requested"),
+            last_activity_at=mongo_date_to_datetime(doc.get("last_activity_at")),
+            error_code=doc.get("error_code"),
+            error_detail=doc.get("error_detail"),
+            experience_bullets=doc.get("experience_bullets"),
+        )
 
     async def insert_upload(self, upload: UserCVUpload) -> str:
         payload = self._to_db_doc(upload)
@@ -271,3 +295,23 @@ class UserCVRepository(IUserCVRepository):
             },
         )
         return res.modified_count > 0
+
+    async def get_user_uploads(self, *, user_id: str) -> list[UserCVUpload]:
+        """
+        Get all COMPLETED uploads for a specific user
+        """
+
+        query = {
+            "user_id": {"$eq": user_id},
+            "upload_process_state": {"$eq": UploadProcessState.COMPLETED},
+        }
+
+        cursor = self._collection.find(query, sort=[("created_at", -1)])  # Most recent first
+        docs = await cursor.to_list(length=None)
+
+        self._logger.debug(
+            "Fetched %d COMPLETED CV uploads for user_id=%s", len(docs), user_id
+        )
+
+        # Convert MongoDB documents to UserCVUpload objects
+        return [UserCVRepository._from_db_doc(doc) for doc in docs]

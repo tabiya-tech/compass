@@ -6,6 +6,7 @@ import { action } from "@storybook/addon-actions";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { SendOutlined } from "@mui/icons-material";
 import ContextMenu, { ContextMenuProps } from "./ContextMenu";
+import { Typography } from "@mui/material";
 
 const meta: Meta<typeof ContextMenu> = {
   title: "Components/ContextMenu",
@@ -121,6 +122,55 @@ export const Mixed: Story = {
         icon: <SendOutlined />,
         action: action("Item 3 clicked"),
         disabled: true,
+      },
+    ],
+  },
+};
+
+export const WithCustomItem: Story = {
+  render: (args) => <SetupComponent {...args} />,
+  args: {
+    items: [
+      {
+        id: "item-1",
+        text: "Regular Action",
+        icon: <SendOutlined />,
+        action: action("Regular Action clicked"),
+        disabled: false,
+      },
+      {
+        id: "item-3",
+        text: "Regular Action",
+        trailingIcon: <SendOutlined />,
+        icon: <SendOutlined />,
+        action: action("Regular Action clicked"),
+        disabled: false,
+      },
+      {
+        id: "custom-1",
+        text: "Custom Section",
+        disabled: false,
+        action: action("Custom container clicked"),
+        customNode: (
+          <Box sx={{ width: "100%", px: 2, py: 1 }}>
+            <Typography variant="caption" fontWeight="bold">
+              Custom Item Section
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                py: 0.5,
+                cursor: "pointer",
+              }}
+              onClick={action("Select Custom Item")}
+            >
+              <CloudDownloadIcon fontSize="small" color="action" />
+              <Typography variant="caption">Custom item</Typography>
+            </Box>
+          </Box>
+        ),
       },
     ],
   },
