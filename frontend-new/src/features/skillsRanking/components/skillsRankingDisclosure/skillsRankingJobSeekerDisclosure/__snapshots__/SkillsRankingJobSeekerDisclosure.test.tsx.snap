@@ -21,30 +21,14 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
         >
           Moreover, 
           <strong>
-            Compared to other 
-            x
-             users, you are in group [
-            3
-            ] of 
-            5
-            .
+            Compared to other x users, you are in group 3 of 5.
           </strong>
           <br />
-          Imagine lining up 100 
-          x
-           users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You’re in block 
+          Imagine lining up 100 x users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You’re in block 
           <strong>
-            [
             3
-            ]
           </strong>
-          , which is the 
-          <strong>
-            [
-            MIDDLE
-            ]
-          </strong>
-           block.
+          , which is the &lt;1&gt;MIDDLE&lt;/1&gt; block.
           <br />
         </p>
         <div

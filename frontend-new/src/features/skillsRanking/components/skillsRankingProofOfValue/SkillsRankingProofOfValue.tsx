@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { Box, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -140,12 +141,11 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
     }
   }, [currentPhase]);
 
+  const { t } = useTranslation();
+
   const effortMessage =
     effortType === EffortType.TIME_BASED ? (
-      <>
-        Please wait while I run the calculations, or click <strong>cancel</strong> at any time if you do not want to
-        wait any longer for the information.
-      </>
+      <Trans i18nKey="skillsRanking_proofOfValue_waiting_message" components={{ strong: <strong /> }} />
     ) : (
       ""
     );
@@ -252,7 +252,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
         await onFinish(newState);
       } catch (err) {
         console.error("Failed to update state", err);
-        enqueueSnackbar("Failed to update skills ranking state. Please try again later.", {
+        enqueueSnackbar(t("skillsRanking_common_error_update_state"), {
           variant: "error",
         });
         hasFinishedRef.current = false; // Reset on error
@@ -269,6 +269,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
       onFinish,
       enqueueSnackbar,
       skillsRankingState.experiment_group,
+      t,
     ]
   );
 
@@ -386,7 +387,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
           >
             {effortType === EffortType.TIME_BASED ? (
               <CancellableTypingChatMessage
-                message={isCancelling ? "Cancelling" : "Calculating"}
+                message={isCancelling ? t("skillsRanking_common_typing_cancelling") : t("skillsRanking_common_typing_calculating")}
                 onCancel={handleCancel}
                 disabled={isDisabled}
               />
