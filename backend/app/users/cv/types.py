@@ -40,6 +40,14 @@ class CVUploadStatusResponse(BaseModel):
     experience_bullets: list[str] | None = None
 
 
+class CVUploadListResponse(BaseModel):
+    upload_id: str
+    filename: str
+    uploaded_at: datetime
+    upload_process_state: str
+    experiences_data: Optional[list[str]] = None
+
+
 class CVUploadErrorCode(str, Enum):
     DUPLICATE_CV_UPLOAD = "DUPLICATE_CV_UPLOAD"
     MARKDOWN_TOO_LONG = "MARKDOWN_TOO_LONG"

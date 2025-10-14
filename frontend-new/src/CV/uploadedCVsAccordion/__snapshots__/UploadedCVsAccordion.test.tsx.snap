@@ -1,0 +1,124 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UploadedCVsAccordion should render the Uploaded CVs Accordion component correctly 1`] = `
+<div
+  class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiAccordion-root MuiAccordion-rounded MuiAccordion-gutters css-1lu2ztt-MuiPaper-root-MuiAccordion-root"
+  data-testid="uploaded-cvs-accordion-cc7f354e-8aae-443d-a616-1aeda5fd931c"
+>
+  <div
+    class="MuiBox-root css-yzsp1c"
+  >
+    <div
+      aria-controls="panel-content"
+      aria-expanded="false"
+      class="MuiButtonBase-root MuiAccordionSummary-root MuiAccordionSummary-gutters css-16newb5-MuiButtonBase-root-MuiAccordionSummary-root"
+      data-testid="uploaded-cvs-accordion-summary-cc7f354e-8aae-443d-a616-1aeda5fd931c"
+      id="panel-header"
+      role="button"
+      tabindex="0"
+    >
+      <div
+        class="MuiAccordionSummary-content MuiAccordionSummary-contentGutters css-eqpfi5-MuiAccordionSummary-content"
+      >
+        <span
+          class="MuiTypography-root MuiTypography-caption css-1rjgfbw-MuiTypography-root"
+        >
+          Previously uploaded CVs (1)
+        </span>
+      </div>
+      <div
+        class="MuiAccordionSummary-expandIconWrapper css-yw020d-MuiAccordionSummary-expandIconWrapper"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+          data-testid="ExpandMoreIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+          />
+        </svg>
+      </div>
+    </div>
+    <button
+      aria-label="help"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
+      data-mui-internal-clone-element="true"
+      data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
+      tabindex="0"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        data-testid="InfoIcon"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"
+        />
+      </svg>
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+  </div>
+  <div
+    class="MuiCollapse-root MuiCollapse-vertical MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+    style="min-height: 0px;"
+  >
+    <div
+      class="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+    >
+      <div
+        class="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+      >
+        <div
+          class="MuiAccordion-region"
+          role="region"
+        >
+          <div
+            class="MuiAccordionDetails-root css-1w3q3li-MuiAccordionDetails-root"
+          >
+            <div
+              class="MuiBox-root css-1bru1w4"
+              data-testid="uploaded-cvs-accordion-details-cc7f354e-8aae-443d-a616-1aeda5fd931c"
+            >
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1de4ipc-MuiSvgIcon-root"
+                data-testid="uploaded-cvs-description-icon-cc7f354e-8aae-443d-a616-1aeda5fd931c"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M8 16h8v2H8zm0-4h8v2H8zm6-10H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zm4 18H6V4h7v5h5z"
+                />
+              </svg>
+              <div
+                class="MuiBox-root css-j7qwjs"
+              >
+                <span
+                  class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+                  data-testid="uploaded-cvs-file-name-cc7f354e-8aae-443d-a616-1aeda5fd931c"
+                >
+                  John_Doe_CV.pdf
+                </span>
+                <span
+                  class="MuiTypography-root MuiTypography-caption css-a6pqw0-MuiTypography-root"
+                  data-testid="uploaded-cvs-upload-date-cc7f354e-8aae-443d-a616-1aeda5fd931c"
+                >
+                  just now
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

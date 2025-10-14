@@ -5,7 +5,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import PrivacyTipIcon from "@mui/icons-material/PrivacyTip";
 
-const StyledAccordion = styled(Accordion)({
+export const StyledAccordion = styled(Accordion)({
   "&.MuiAccordion-root": {
     border: "none",
     boxShadow: "none",

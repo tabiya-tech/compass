@@ -3,7 +3,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from app.users.cv.types import UploadProcessState, CVUploadErrorCode
+from app.users.cv.types import UploadProcessState, CVUploadErrorCode, CVUploadListResponse
 from app.users.cv.constants import MAX_MARKDOWN_CHARS, MARKDOWN_CONVERSION_TIMEOUT_SECONDS, RATE_LIMIT_WINDOW_MINUTES, \
     DEFAULT_MAX_UPLOADS_PER_USER, DEFAULT_RATE_LIMIT_PER_MINUTE
 from app.users.cv.errors import MarkdownTooLongError, EmptyMarkdownError, \
@@ -45,6 +45,16 @@ class ICVUploadService(ABC):
         Get the status of an upload process.
         Returns upload details if found, None if not found.
         """
+
+    @abstractmethod
+    async def get_user_cvs(self, *, user_id: str) -> list[dict]:  # pragma: no cover - interface
+        """
+        Get all CVs uploaded by a specific user.
+
+        :param user_id: The ID of the user.
+        :return: A list of CV summaries.
+        """
+
 
 
 class CVUploadService(ICVUploadService):
@@ -281,3 +291,32 @@ class CVUploadService(ICVUploadService):
         except Exception as e:
             self._logger.exception(e)
             return None
+
+    async def get_user_cvs(self, *, user_id: str) -> list[CVUploadListResponse]:
+        """
+        Get all CVs uploaded by a specific user.
+        """
+        try:
+            uploads = await self._repository.get_user_uploads(user_id=user_id)
+
+            if not uploads:
+                return []
+
+            # Transform database records to API response format
+            cv_uploads = []
+            for upload in uploads:
+                cv_upload = CVUploadListResponse(
+                    upload_id=upload.get("upload_id"),
+                    filename=upload.get("filename"),
+                    uploaded_at=upload.get("created_at"),
+                    upload_process_state=upload.get("upload_process_state"),
+                    experiences_data=upload.get("experience_bullets")
+                )
+                cv_uploads.append(cv_upload)
+
+            self._logger.debug("Retrieved %d CVs for user {user_id=%s}", len(cv_uploads), user_id)
+            return cv_uploads
+
+        except Exception as e:
+            self._logger.exception(e)
+            return []

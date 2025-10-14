@@ -61,6 +61,9 @@ class IUserCVRepository(ABC):
     async def mark_cancelled(self, user_id: str, upload_id: str) -> bool:
         raise NotImplementedError()
 
+    @abstractmethod
+    async def get_user_uploads(self, *, user_id: str) -> list[dict]:
+        raise NotImplementedError()
 
 class UserCVRepository(IUserCVRepository):
     def __init__(self, db: AsyncIOMotorDatabase):
@@ -271,3 +274,11 @@ class UserCVRepository(IUserCVRepository):
             },
         )
         return res.modified_count > 0
+
+    async def get_user_uploads(self, *, user_id: str) -> list[dict]:
+        """Get all CV uploads for a specific user."""
+        cursor = self._collection.find(
+            {"user_id": user_id},
+            sort=[("created_at", -1)]  # Most recent first
+        )
+        return await cursor.to_list(length=None)
