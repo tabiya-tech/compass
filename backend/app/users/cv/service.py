@@ -3,17 +3,17 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from app.users.cv.types import UploadProcessState, CVUploadErrorCode
+from app.app_config import get_application_config
 from app.users.cv.constants import MAX_MARKDOWN_CHARS, MARKDOWN_CONVERSION_TIMEOUT_SECONDS, RATE_LIMIT_WINDOW_MINUTES, \
     DEFAULT_MAX_UPLOADS_PER_USER, DEFAULT_RATE_LIMIT_PER_MINUTE
 from app.users.cv.errors import MarkdownTooLongError, EmptyMarkdownError, \
     CVUploadRateLimitExceededError, CVLimitExceededError, DuplicateCVUploadError, MarkdownConversionTimeoutError
+from app.users.cv.repository import IUserCVRepository
+from app.users.cv.storage import build_user_cv_upload_record, ICVCloudStorageService
+from app.users.cv.types import UploadProcessState, CVUploadErrorCode, UserCVUpload
+from app.users.cv.utils.llm_extractor import CVExperienceExtractor
 from app.users.cv.utils.markdown_converter import convert_cv_bytes_to_markdown
 from common_libs.call_with_timeout.call_with_timeout import call_with_timeout
-from app.users.cv.utils.llm_extractor import CVExperienceExtractor
-from app.users.cv.repository import IUserCVRepository
-from app.app_config import get_application_config
-from app.users.cv.storage import build_user_cv_upload_record, ICVCloudStorageService
 
 
 class ICVUploadService(ABC):
@@ -21,7 +21,7 @@ class ICVUploadService(ABC):
     async def parse_cv(self, *,
                        user_id: str,
                        file_bytes: bytes,
-                       filename: str) -> str:  # pragma: no cover - interface
+                       filename: str) -> str:
 
         """
         Schedule a CV upload and parsing process.
@@ -33,17 +33,26 @@ class ICVUploadService(ABC):
         """
     
     @abstractmethod
-    async def cancel_upload(self, *, user_id: str, upload_id: str) -> bool:  # pragma: no cover - interface
+    async def cancel_upload(self, *, user_id: str, upload_id: str) -> bool:
         """
         Cancel an ongoing CV upload process.
         Returns True if cancellation was successful, False if upload not found or already completed.
         """
     
     @abstractmethod
-    async def get_upload_status(self, *, user_id: str, upload_id: str) -> Optional[dict]:  # pragma: no cover - interface
+    async def get_upload_status(self, *, user_id: str, upload_id: str) -> Optional[dict]:
         """
         Get the status of an upload process.
         Returns upload details if found, None if not found.
+        """
+
+    @abstractmethod
+    async def get_user_cvs(self, *, user_id: str) -> list[UserCVUpload]:
+        """
+        Get all CVs uploaded by a specific user.
+
+        :param user_id: The ID of the user.
+        :return: A list of the user's CV uploads.
         """
 
 
@@ -281,3 +290,17 @@ class CVUploadService(ICVUploadService):
         except Exception as e:
             self._logger.exception(e)
             return None
+
+    async def get_user_cvs(self, *, user_id: str) -> list[UserCVUpload]:
+        """
+        Get all CVs uploaded by a specific user.
+        """
+        try:
+            uploads = await self._repository.get_user_uploads(user_id=user_id)
+
+            self._logger.debug("Retrieved %d CVs for user {user_id=%s}", len(uploads), user_id)
+            return uploads
+
+        except Exception as e:
+            self._logger.exception(e)
+            return []

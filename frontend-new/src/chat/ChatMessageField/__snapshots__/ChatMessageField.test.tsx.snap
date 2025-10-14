@@ -124,11 +124,15 @@ exports[`ChatMessageField should render correctly 1`] = `
       data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
     >
       <div
+        data-testid="view-uploaded-cvs-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
+      >
+        Previously uploaded CVs
+      </div>
+      <div
         data-testid="upload-cv-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
       >
         Upload CV
       </div>
-      ;
     </div>
   </div>
 </div>

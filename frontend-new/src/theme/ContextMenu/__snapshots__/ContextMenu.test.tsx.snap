@@ -23,7 +23,7 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
     <ul
       class="MuiList-root MuiList-padding MuiMenu-list css-6hp17o-MuiList-root-MuiMenu-list"
       role="menu"
-      tabindex="-1"
+      tabindex="0"
     >
       <li
         class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-f908r0-MuiButtonBase-root-MuiMenuItem-root"
@@ -116,6 +116,52 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
             </span>
           </span>
         </div>
+      </li>
+      <li
+        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-f908r0-MuiButtonBase-root-MuiMenuItem-root"
+        data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item"
+        role="menuitem"
+        tabindex="-1"
+      >
+        <div
+          class="MuiListItemIcon-root css-cveggr-MuiListItemIcon-root"
+          data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-icon"
+        >
+          <span
+            aria-hidden="true"
+            class="material-icons notranslate MuiIcon-root MuiIcon-fontSizeMedium css-1yuv9fp-MuiIcon-root"
+          >
+            <div />
+          </span>
+        </div>
+        <div
+          class="MuiListItemText-root css-tlelie-MuiListItemText-root"
+          data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-text"
+        >
+          <span
+            class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-1bcerjy-MuiTypography-root"
+          >
+            <span
+              class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+            >
+              qux
+            </span>
+          </span>
+        </div>
+        <div
+          class="MuiListItemIcon-root css-1fqgk7o-MuiListItemIcon-root"
+          data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-trailing-icon"
+        >
+          <span
+            aria-hidden="true"
+            class="material-icons notranslate MuiIcon-root MuiIcon-fontSizeMedium css-1yuv9fp-MuiIcon-root"
+          >
+            <div />
+          </span>
+        </div>
+        <span
+          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
       </li>
     </ul>
   </div>

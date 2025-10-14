@@ -1,13 +1,11 @@
 import asyncio
+import logging
 from typing import Optional
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
-from .database_collections import Collections
-
-import logging
-
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
+from .database_collections import Collections
 
 
 async def _get_database_connection_info(database: AsyncIOMotorDatabase) -> str:
@@ -133,15 +131,18 @@ class CompassDBProvider:
                 ("markdown_object_path", 1)
             ], unique=True)
 
-            await userdata_db.get_collection(Collections.USER_CV_UPLOADS).create_index([
-                ("user_id", 1)
-            ])
-
             # Create unique compound index on user_id and MD5 hash to prevent duplicate file uploads per user
             await userdata_db.get_collection(Collections.USER_CV_UPLOADS).create_index([
                 ("user_id", 1),
                 ("md5_hash", 1)
             ], unique=True)
+
+            # Create a sortable index because we are searching user's CV uploads frequently, and we are filtering by
+            #   user_id and upload_process_state. e.g.: finding successfully uploaded cvs.
+            await userdata_db.get_collection(Collections.USER_CV_UPLOADS).create_index([
+                ("user_id", 1),
+                ("upload_process_state", 1)
+            ])
 
             # Ensure fast lookups by upload_id (used by status and cancellation routes)
             await userdata_db.get_collection(Collections.USER_CV_UPLOADS).create_index([

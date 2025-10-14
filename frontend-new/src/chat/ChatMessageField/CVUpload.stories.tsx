@@ -5,19 +5,32 @@ import { action } from "@storybook/addon-actions";
 import { StatusCodes } from "http-status-codes";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import CVService from "src/CV/CVService/CVService";
+import type { CVListItem } from "src/CV/CVService/CVService.types";
 
 const meta: Meta<typeof ChatMessageField> = {
   title: "Chat/ChatMessageField/CV Upload",
   component: ChatMessageField,
   tags: ["autodocs"],
   decorators: [
-    (Story) => (
-      <IsOnlineContext.Provider value={true}>
-        <div style={{ padding: 24 }}>
-          <Story />
-        </div>
-      </IsOnlineContext.Provider>
-    ),
+    (Story) => {
+      // Mock AuthenticationStateService
+      const mockService = AuthenticationStateService.getInstance();
+      mockService.getUser = () => ({
+        id: "001",
+        name: "Test User",
+        email: "test@example.com",
+      });
+
+      return (
+        <IsOnlineContext.Provider value={true}>
+          <div style={{ padding: 24 }}>
+            <Story />
+          </div>
+        </IsOnlineContext.Provider>
+      );
+    },
   ],
 };
 
@@ -30,6 +43,37 @@ const ChatMessageFieldWrapper: React.FC<ChatMessageFieldProps> = (props) => {
     props.handleSend(message);
   };
   return <ChatMessageField {...props} handleSend={handleSend} />;
+};
+
+// create a list of mock, previously uploaded CVs (all in COMPLETED state)
+const createMockCvList = (count: number): CVListItem[] => {
+  const FILE_EXTENSIONS = ["pdf", "docx", "txt"] as const;
+  const BASE_NAMES = ["Resume", "CV", "Experience_Summary", "Profile", "Work_History", "Professional_Resume"] as const;
+
+  const pick = <T,>(arr: readonly T[]) => arr[Math.floor(Math.random() * arr.length)];
+  const makeRandomCvFilename = (idx: number) => `${pick(BASE_NAMES)}_John_Doe_${idx + 1}.${pick(FILE_EXTENSIONS)}`;
+
+  return Array.from({ length: count }).map((_, idx) => ({
+    upload_id: `cv-${idx + 1}`,
+    filename: makeRandomCvFilename(idx),
+    uploaded_at: new Date(Date.now() - idx * 3600_000).toISOString(),
+    upload_process_state: "COMPLETED",
+    experiences_data: ["Worked as an Accounting Assistant.", `Worked at Company ${idx + 1} from 2012 to Present.`],
+  }));
+};
+
+// temporarily mock CVService.getInstance().getAllCVs for this story instance
+const WithMockedCvService: React.FC<ChatMessageFieldProps & { items: CVListItem[] }> = (props) => {
+  React.useEffect(() => {
+    const originalGetInstance = (CVService as any).getInstance;
+    const mockInstance = { getAllCVs: async (_userId: string) => props.items };
+    (CVService as any).getInstance = () => mockInstance;
+    return () => {
+      (CVService as any).getInstance = originalGetInstance;
+    };
+  }, [props.items]);
+
+  return <ChatMessageFieldWrapper {...props} />;
 };
 
 // Mocked upload handlers to trigger inline errors
@@ -139,4 +183,26 @@ export const UploadingDisabledState: Story = {
   },
 };
 
+export const SinglePreviouslyUploadedCV: Story = {
+  render: (args) => <WithMockedCvService {...args} items={createMockCvList(1)} />,
+  args: {
+    handleSend: action("Message sent"),
+    currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
+  },
+};
 
+export const MultiplePreviouslyUploadedCVs: Story = {
+  render: (args) => <WithMockedCvService {...args} items={createMockCvList(3)} />,
+  args: {
+    handleSend: action("Message sent"),
+    currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
+  },
+};
+
+export const ManyPreviouslyUploadedCVs: Story = {
+  render: (args) => <WithMockedCvService {...args} items={createMockCvList(10)} />,
+  args: {
+    handleSend: action("Message sent"),
+    currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
+  },
+};
