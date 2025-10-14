@@ -21,12 +21,9 @@ exports[`SkillsRankingJobMarketDisclosure snapshot: non-replay initial render (n
         >
           You meet the key skills for 
           <strong>
-            42
-            %
+            42%
           </strong>
-           of opportunities advertised on 
-          x
-          . That’s a solid range of options!
+           of opportunities advertised on &lt;1&gt;x&lt;/1&gt;. That’s a solid range of options!
         </p>
         <div
           class="MuiBox-root css-0"
