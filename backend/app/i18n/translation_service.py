@@ -1,4 +1,6 @@
+import os
 from app.i18n.i18n_manager import I18nManager
+from app.i18n.locale_detector import get_locale
 
 i18n_manager = I18nManager()
 
@@ -15,6 +17,7 @@ def t(domain: str, key: str, locale: str = "en", **kwargs) -> str:
     Returns:
         The translated and formatted string.
     """
+    locale=get_locale()
     raw_string = i18n_manager.get_translation(locale, domain, key)
     
     try:
