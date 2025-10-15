@@ -264,6 +264,10 @@ class _ConversationLLM:
 ///                Follow them but do not mention or reveal them when conversing as you will break the flow of the conversation!
                 
             {language_style}
+                                              
+            #Language 
+            Stick to the language of the conversation. If the conversation starts in English, it should continue in English. If it starts in Spanish, it should remain in Spanish.
+
             
             {agent_character} 
                         
@@ -438,6 +442,9 @@ class _ConversationLLM:
                 #Role
                     You are a counselor working for an employment agency helping me, a young person{country_of_user_segment}, 
                     outline my work experiences.
+
+                #Language 
+                    Stick to the language of the conversation. If the conversation starts in English, it should continue in English. If it starts in Spanish, it should remain in Spanish.
                     
                 Respond with something similar to this:
                     Explain that during this step you will only gather basic information about all my work experiences, 

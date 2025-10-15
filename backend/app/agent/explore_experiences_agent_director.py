@@ -177,7 +177,8 @@ class ExploreExperiencesAgentDirector(Agent):
     async def _dive_into_experiences(self, *,
                                      user_input: AgentInput,
                                      context: ConversationContext,
-                                     state: ExploreExperiencesAgentDirectorState) -> AgentOutput:
+                                     state: ExploreExperiencesAgentDirectorState,
+                                     locale: str) -> AgentOutput:
 
         current_experience: ExperienceState
         if state.current_experience_uuid is None:
@@ -215,7 +216,7 @@ class ExploreExperiencesAgentDirector(Agent):
                 user_input = AgentInput(message="", is_artificial=True)
             # The agent will explore the skills for the experience and update the experience entity
             self._exploring_skills_agent.set_experience(current_experience.experience)
-            agent_output: AgentOutput = await self._exploring_skills_agent.execute(user_input=user_input, context=context)
+            agent_output: AgentOutput = await self._exploring_skills_agent.execute(user_input=user_input, context=context, locale=locale)
             # Update the conversation history
             await self._conversation_manager.update_history(user_input, agent_output)
             # get the context again after updating the history
@@ -281,12 +282,12 @@ class ExploreExperiencesAgentDirector(Agent):
                 )
 
             # Otherwise, we have more experiences to process
-            return await self._dive_into_experiences(user_input=user_input, context=context, state=state)
+            return await self._dive_into_experiences(user_input=user_input, context=context, state=state, locale=locale)
 
         # This should never happen, as the phase DiveInPhase.PROCESSED is handled directly after the LINKING_RANKING phase
         self.logger.warning("ExploreExperiencesAgentDirector: Unknown sub-phase")
 
-    async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
+    async def execute(self, user_input: AgentInput, context: ConversationContext, locale: str = "en") -> AgentOutput:
         if self._state is None:
             raise ValueError("ExperiencesExplorerAgentDirector: execute() called before state was initialized")
 
@@ -297,7 +298,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
         # First collect all the experiences from the user
         if state.conversation_phase == ConversationPhase.COLLECT_EXPERIENCES:
-            agent_output = await self._collect_experiences_agent.execute(user_input, context)
+            agent_output = await self._collect_experiences_agent.execute(user_input, context, locale=locale)
             await self._conversation_manager.update_history(user_input, agent_output)
             # get the context again after updating the history
             context = await self._conversation_manager.get_conversation_context()
@@ -328,7 +329,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
             # The conversation history is handled in dive_into_experiences method,
             # as there is another transition between sub-phases happening there
-            agent_output = await self._dive_into_experiences(user_input=user_input, context=context, state=state)
+            agent_output = await self._dive_into_experiences(user_input=user_input, context=context, state=state, locale=locale)
             return agent_output
 
         # Should never happen

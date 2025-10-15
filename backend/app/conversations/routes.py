@@ -30,6 +30,7 @@ from app.server_dependencies.application_state_dependencies import get_applicati
 from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo
+from app.i18n.locale_detector import get_locale
 
 
 async def get_conversation_service(agent_director: LLMAgentDirector = Depends(get_agent_director),
@@ -101,7 +102,10 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
             # set the client_id in the context variable.
             client_id_ctx_var.set(current_user_preferences.client_id)
 
-            return await service.send(user_id, session_id, user_input, clear_memory, filter_pii)
+            accept_language = request.headers.get("accept-language")
+            locale = get_locale(accept_language_header=accept_language)
+
+            return await service.send(user_id, session_id, user_input, clear_memory, filter_pii, locale)
         except ConversationAlreadyConcludedError as e:
             warning_msg = str(e)
             logger.warning(warning_msg)

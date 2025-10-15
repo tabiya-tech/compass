@@ -36,7 +36,7 @@ class IConversationService(ABC):
 
     @abstractmethod
     async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool,
-                   filter_pii: bool) -> ConversationResponse:
+                   filter_pii: bool, locale: str = "en") -> ConversationResponse:
         # TODO: discuss filter pii and clear_memory
         """
         Get a message from the user and return a response from Compass, save the message and response into the application state
@@ -75,7 +75,7 @@ class ConversationService(IConversationService):
         self._reaction_repository = reaction_repository
 
     async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool,
-                   filter_pii: bool) -> ConversationResponse:
+                   filter_pii: bool, locale: str = "en") -> ConversationResponse:
         if clear_memory:
             await self._application_state_metrics_recorder.delete_state(session_id)
         if filter_pii:
@@ -104,7 +104,7 @@ class ConversationService(IConversationService):
         context = await self._conversation_memory_manager.get_conversation_context()
         # get the current index in the conversation history, so that we can return only the new messages
         current_index = len(context.all_history.turns)
-        await self._agent_director.execute(user_input=user_input)
+        await self._agent_director.execute(user_input=user_input, locale=locale)
         # get the context again after updating the history
         context = await self._conversation_memory_manager.get_conversation_context()
         response = await get_messages_from_conversation_manager(context, from_index=current_index)

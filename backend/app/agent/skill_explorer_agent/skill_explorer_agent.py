@@ -129,7 +129,8 @@ class SkillsExplorerAgent(Agent):
 
     async def execute(self,
                       user_input: AgentInput,
-                      context: ConversationContext
+                      context: ConversationContext,
+                      locale: str = "en"
                       ) -> AgentOutput:
 
         if self.state is None:

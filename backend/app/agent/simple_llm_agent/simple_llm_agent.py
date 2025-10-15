@@ -8,6 +8,7 @@ from app.agent.simple_llm_agent.prompt_response_template import get_json_respons
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 
 from app.conversation_memory.conversation_memory_manager import ConversationContext
+from app.i18n.translation_service import t
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LOW_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG
 
@@ -31,7 +32,7 @@ class SimpleLLMAgent(Agent):
         self._llm = GeminiGenerativeLLM(system_instructions=system_instructions, config=config)
         self._llm_caller: LLMCaller[ModelResponse] = LLMCaller[ModelResponse](model_response_type=ModelResponse)
 
-    async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
+    async def execute(self, user_input: AgentInput, context: ConversationContext, locale: str = "en") -> AgentOutput:
         agent_start_time = time.time()
         if user_input.message == "":
             # If the user input is empty, set it to "(silence)"
@@ -58,8 +59,8 @@ class SimpleLLMAgent(Agent):
         # If it was not possible to get a model response, set the response to a default message
         if model_response is None:
             model_response = ModelResponse(
-                reasoning="Failed to get a response",
-                message="I am facing some difficulties right now, could you please repeat what you said?",
+                reasoning=t("prompts", "simple_agent_failed_reasoning", locale),
+                message=t("prompts", "simple_agent_failed_message", locale),
                 finished=False)
 
         agent_end_time = time.time()

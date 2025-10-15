@@ -109,7 +109,7 @@ class AbstractAgentDirector(ABC):
         self._state = state
 
     @abstractmethod
-    async def execute(self, user_input: AgentInput) -> AgentOutput:
+    async def execute(self, user_input: AgentInput, locale: str) -> AgentOutput:
         """
         Run the conversation task for the current user input and specific state.
         :param user_input:

@@ -125,6 +125,9 @@ class _SentenceDecompositionLLM:
         <System Instructions>
         # Role
             You are a language expert that decomposes complex sentences into sub-sentences.
+                                              
+        #Language 
+            Stick to the language of the conversation. If the conversation starts in English, it should continue in English. If it starts in Spanish, it should remain in Spanish.
        
         # Do not interpret
             Do not infer the my responsibilities, skills, duties, tasks, actions, behaviour, activities, competencies, or knowledge based on your prior knowledge about the experience.
@@ -221,6 +224,9 @@ class _SentenceDecompositionLLM:
             Do not change the meaning of the sentence or add any new information.
             Both the input and the fixed sentence should be interpreted in a different way review independently. 
             Each sentence from the input must fixed and added to the output in the decomposed_and_dereferenced list.
+                                              
+        #Language 
+            Stick to the language of the conversation. If the conversation starts in English, it should continue in English. If it starts in Spanish, it should remain in Spanish.
         
         # Input Structure
             The input structure is a list of sentences:

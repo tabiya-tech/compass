@@ -102,12 +102,13 @@ class LLMAgentDirector(AbstractAgentDirector):
 
         return current_phase
 
-    async def execute(self, user_input: AgentInput) -> AgentOutput:
+    async def execute(self, user_input: AgentInput, locale: str) -> AgentOutput:
         """
         Run the conversation task for the current user input.
         Progress the conversation phase based on the agent output and the current phase.
         When all agents are done, return a message to the user that the conversation is finished.
         :param user_input: The user input.
+        :param locale: The locale of the user.
         :return: The output from the agent
         """
         try:
@@ -140,7 +141,8 @@ class LLMAgentDirector(AbstractAgentDirector):
                 agent_for_task = self._agents[suitable_agent_type]
 
                 # Perform the task
-                agent_output = await agent_for_task.execute(clean_input, context)
+                agent_output = await agent_for_task.execute(clean_input, context, locale=locale)
+
                 if not agent_for_task.is_responsible_for_conversation_history():
                     await self._conversation_manager.update_history(clean_input, agent_output)
 

@@ -171,6 +171,10 @@ class _ConversationLLM:
             where you are helping me reflect on my experience in more detail.
             
         {language_style}
+                                              
+        #Language 
+            Stick to the language of the conversation. If the conversation starts in English, it should continue in English. If it starts in Spanish, it should remain in Spanish.
+                                              
         
         {agent_character}
 

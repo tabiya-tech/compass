@@ -132,7 +132,7 @@ class CollectExperiencesAgent(Agent):
         self._state = state
 
     async def execute(self, user_input: AgentInput,
-                      context: ConversationContext) -> AgentOutput:
+                      context: ConversationContext, locale: str = "en") -> AgentOutput:
 
         if self._state is None:
             raise ValueError("CollectExperiencesAgent: execute() called before state was initialized")
