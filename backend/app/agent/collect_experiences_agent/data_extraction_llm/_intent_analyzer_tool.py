@@ -17,6 +17,7 @@ from common_libs.retry import Retry
 from . import DataOperation
 from .._types import CollectedData
 from ...penalty import get_penalty, get_penalty_for_multiple_errors
+from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE
 
 _TAGS_TO_FILTER = [
     "system instructions",
@@ -70,7 +71,8 @@ class IntentAnalyzerTool:
             temperature_config = {}
 
         return GeminiGenerativeLLM(
-            system_instructions=_SYSTEM_INSTRUCTIONS.format(previously_extracted_data=previously_extracted_data),
+            system_instructions=_SYSTEM_INSTRUCTIONS.format(previously_extracted_data=previously_extracted_data,
+                                                            language_style=STD_LANGUAGE_STYLE),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000
@@ -122,7 +124,7 @@ class IntentAnalyzerTool:
 
             return data, penality, error
 
-        result, _result_penalty, _error = await Retry[str].call_with_penalty(callback=_callback, logger=self._logger)
+        result, _result_penalty, _error = await Retry[list[Operation]].call_with_penalty(callback=_callback, logger=self._logger)
 
         return result, _llm_stats
 
@@ -215,6 +217,8 @@ _SYSTEM_INSTRUCTIONS = """
 <System Instructions>
 #Role
     You are an expert who extracts information regarding the work experiences of the user from the user's last input.
+    
+{language_style}
         
 #New Experience handling
     Set the 'data_operation' to 'ADD' to add new experiences
