@@ -23,6 +23,8 @@ from app.agent.experience.timeline import Timeline
 from app.application_state import ApplicationState
 from app.vector_search.esco_entities import SkillEntity
 
+from app.i18n.translation_service import t
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
