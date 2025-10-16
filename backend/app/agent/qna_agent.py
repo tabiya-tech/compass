@@ -6,7 +6,7 @@ from app.agent.agent_types import AgentType, AgentInput, AgentOutput
 from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions, \
     get_conversation_finish_instructions
 from app.conversation_memory.conversation_memory_types import ConversationContext
-
+from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_AGENT_CHARACTER
 
 class QnaAgent(SimpleLLMAgent):
     """An agent used to answer questions from the user."""
@@ -25,7 +25,9 @@ class QnaAgent(SimpleLLMAgent):
         to your task and can't be found in the _ABOUT_ section, you will answer each time with a concise but 
         different variation of: "Sorry, I don't know how to help you with that." Be clear and concise in your 
         responses do not break character and do not make things up. Answer in no more than 100 words.
-   
+        
+        {language_style}
+                                              
         _ABOUT_:
             Your name is Compass.
             You are a tool that helps users explore their skills and generate a CV.
@@ -45,6 +47,7 @@ class QnaAgent(SimpleLLMAgent):
             finish_instructions=get_conversation_finish_instructions("When you have answered the user's question,"))
 
         super().__init__(agent_type=AgentType.QNA_AGENT,
+                         language_style=STD_LANGUAGE_STYLE,
                          system_instructions=system_instructions)
 
     async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:

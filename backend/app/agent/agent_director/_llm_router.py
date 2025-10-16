@@ -8,6 +8,7 @@ from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentType, AgentInput
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
+from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_AGENT_CHARACTER
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
@@ -249,6 +250,8 @@ class LLMRouter:
                 The Model Name and the tasks it is responsible for are as follows:
                 {agent_responsible_for_phase_instructions}
         
+                {language_style}
+                              
                 {examples}
                 
                 Your response must always be a JSON object with the following schema:
@@ -273,6 +276,7 @@ class LLMRouter:
                 """)
         instructions = replace_placeholders_with_indent(
             template_string=instructions,
+            language_style=STD_LANGUAGE_STYLE,
             agent_responsible_for_phase_instructions=agent_responsible_for_phase_instructions,
             examples=examples,
             conversation_history=recent_conversation_history,
