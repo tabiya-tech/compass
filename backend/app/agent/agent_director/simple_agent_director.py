@@ -7,6 +7,7 @@ from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import \
     ConversationMemoryManager
+from app.i18n.translation_service import t
 from app.vector_search.vector_search_dependencies import SearchServices
 
 
@@ -84,11 +85,11 @@ class SimpleAgentDirector(AbstractAgentDirector):
             else:
                 # No more agents to run
                 agent_output = AgentOutput(
-                    message_for_user="Conversation finished, all agents are done!",
+                    message_for_user=t("messages", "simple_agent_director_execute_conversation_finished"),
                     finished=True, agent_type=None)
             return agent_output
         # executing an agent can raise any number of unknown exceptions
         except Exception as e:  # pylint: disable=broad-except
             self._logger.error("Error while executing the agent director: %s", e, exc_info=True)
-            return AgentOutput(message_for_user="Conversation forcefully ended",
+            return AgentOutput(message_for_user=t("messages", "simple_agent_director_execute_conversation_forcefully_ended"),
                                finished=True, agent_type=None)

@@ -1,0 +1,9 @@
+{
+  "welcome_agent_empty_response_reasoning": "El modelo devolvió None o una respuesta vacía.",
+  "welcome_agent_empty_response_error": "El modelo devolvió None o una respuesta vacía.",
+  "simple_agent_failed_reasoning": "No se pudo obtener una respuesta.",
+  "explore_experiences_agent_director_execute_no_state": "ExperiencesExplorerAgentDirector: execute() fue llamado antes de que se inicializara el estado.",
+  "explore_experiences_agent_director_execute_unknown_phase": "ExperiencesExplorerAgentDirector: fase de conversación desconocida.",
+  "llm_router_execute_internal_no_response": "El modelo de enrutador no devolvió una respuesta",
+  "llm_router_execute_internal_invalid_agent_type": "El modelo de enrutador devolvió un tipo de agente no válido {selected_agent_type}"
+}

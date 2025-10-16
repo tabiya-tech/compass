@@ -1,0 +1,22 @@
+{
+  "welcome_message": "Bienvenido al agente Compass.",
+  "farewell_message": "Gracias por usar el agente Compass. ¡Adiós!",
+  "welcome_agent_first_encounter": "¡Bienvenido! Soy Compass, y estoy aquí para ayudarte a capturar y resaltar tus habilidades.\nAsí es como funciona este proceso:\n\n• Primero, te pediré una breve descripción de tu trabajo, incluyendo actividades no remuneradas como voluntariados o contribuciones familiares.\n• A medida que conversemos, tu CV tomará forma.\n• Una vez cubiertos los aspectos básicos, profundizaremos en cada experiencia para registrar los detalles clave.\n\nConcéntrate en lo que más te importa. Puedes dedicar entre 10 y 15 minutos por experiencia laboral, así que planea con tiempo.\nSi lo necesitas, puedes crear una cuenta y volver más tarde para continuar.\n\nSi tienes alguna pregunta, no dudes en hacerla.\n\n¿Listo para comenzar?",
+  "welcome_agent_empty_response_message": "Lo siento, no entendí eso. ¿Podrías reformularlo, por favor?",
+  "welcome_agent_json_message_my_name": "Mi nombre es Compass...",
+  "welcome_agent_json_message_do_start": "Genial, comencemos a explorar tus experiencias laborales.",
+  "welcome_agent_json_reasoning_no_start": "Hiciste una pregunta y no indicaste que estás listo para comenzar, por lo tanto estableceré el indicador finished en False, y responderé a tu pregunta si está en la sección <_ABOUT_>.",
+  "welcome_agent_json_reasoning_do_start": "Dejaste claro que estás listo para comenzar, por lo tanto estableceré el indicador finished en True y te dirigiré a la sesión de exploración.",
+  "welcome_agent_json_reasoning_can_answer": "Hiciste una pregunta que puede responderse con información de la sección <_ABOUT_>, por lo tanto estableceré el indicador finished en False y responderé a tu pregunta.",
+  "simple_agent_failed_message": "Estoy teniendo algunas dificultades en este momento, ¿podrías repetir lo que dijiste, por favor?",
+  "explore_experiences_agent_director_link_and_rank_no_skills": "• No se identificaron habilidades\n",
+  "explore_experiences_agent_director_link_and_rank_summary": "Según la información proporcionada sobre tu experiencia como '{experience_title}', aquí tienes un breve resumen:\n\n{summary}\n\nPrincipales {num_top_skills} habilidades demostradas:{skills_summary}",
+  "explore_experiences_agent_director_dive_into_experiences_no_more_experiences": "Parece que no hay más experiencias para analizar.",
+  "explore_experiences_agent_director_dive_into_experiences_skipped_experience": "He omitido tu experiencia como \"{experience_title}\" porque no compartiste suficientes detalles.",
+  "explore_experiences_agent_director_dive_into_experiences_finished_exploring": "He terminado de explorar todas tus experiencias.",
+  "explore_experiences_agent_director_execute_ready_to_dive": "Estoy listo para sumergirme en mis experiencias, no me saludes, entremos directamente en ello.",
+  "simple_agent_director_execute_conversation_finished": "¡Conversación terminada, todos los agentes han finalizado!",
+  "simple_agent_director_execute_conversation_forcefully_ended": "La conversación ha terminado forzosamente",
+  "llm_agent_director_execute_conversation_finished": "¡La conversación ha terminado!",
+  "llm_agent_director_execute_difficulties": "Estoy teniendo algunas dificultades en este momento, ¿podrías repetir lo que dijiste, por favor?"
+}

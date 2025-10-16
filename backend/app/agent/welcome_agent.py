@@ -205,11 +205,11 @@ class WelcomeAgent(Agent):
         # If it was not possible to get a model response, set the response to a default message
         if model_response is None or model_response.message.strip() == "":
             return (WelcomeAgentLLMResponseWithLLMStats(
-                reasoning=t("prompts", "welcome_agent_empty_response_reasoning", locale),
-                message=t("prompts", "welcome_agent_empty_response_message", locale),
+                reasoning=t("errors", "welcome_agent_empty_response_reasoning", locale),
+                message=t("messages", "welcome_agent_empty_response_message", locale),
                 user_indicated_start=False,
                 llm_stats=llm_stats_list),
-                    100, ValueError(t("prompts", "welcome_agent_empty_response_error", locale)))
+                    100, ValueError(t("errors", "welcome_agent_empty_response_error", locale)))
 
         return WelcomeAgentLLMResponseWithLLMStats(
             reasoning=model_response.reasoning,
@@ -220,7 +220,7 @@ class WelcomeAgent(Agent):
 
     @staticmethod
     async def get_first_encounter_message(locale: str):
-        return t("prompts", "welcome_agent_first_encounter", locale)
+        return t("messages", "welcome_agent_first_encounter", locale)
 
     @staticmethod
     def get_system_instructions(state: WelcomeAgentState, locale: str) -> str:
@@ -247,18 +247,18 @@ class WelcomeAgent(Agent):
         few_shot_examples = []
         if not state.user_started_discovery:
             few_shot_examples.append(WelcomeAgentLLMResponse(
-                reasoning=t("prompts", "welcome_agent_json_reasoning_no_start", locale),
+                reasoning=t("messages", "welcome_agent_json_reasoning_no_start", locale),
                 user_indicated_start=False,
-                message=t("prompts", "welcome_agent_json_message_my_name", locale),
+                message=t("messages", "welcome_agent_json_message_my_name", locale),
             ))
             few_shot_examples.append(WelcomeAgentLLMResponse(
-                reasoning=t("prompts", "welcome_agent_json_reasoning_do_start", locale),
+                reasoning=t("messages", "welcome_agent_json_reasoning_do_start", locale),
                 user_indicated_start=True,
-                message=t("prompts", "welcome_agent_json_message_do_start", locale),
+                message=t("messages", "welcome_agent_json_message_do_start", locale),
             ))
 
         few_shot_examples.append(WelcomeAgentLLMResponse(
-            reasoning=t("prompts", "welcome_agent_json_reasoning_can_answer", locale),
+            reasoning=t("messages", "welcome_agent_json_reasoning_can_answer", locale),
             user_indicated_start=False,
             message="...",
         ))

@@ -1,0 +1,22 @@
+{
+  "welcome_message": "Welcome to the Compass agent.",
+  "farewell_message": "Thank you for using the Compass agent. Goodbye.",
+  "welcome_agent_first_encounter": "Welcome! I’m Compass, here to guide you in capturing and highlighting your skills.\nHere’s how this process works:\n\n• First, I’ll ask for a quick overview of your work, including any unpaid activities like volunteering or family contributions.\n• As we chat, your CV will take shape.\n• Once the basics are covered, we’ll dive deeper into each experience to capture key details.\n\nFocus on what matters most to you. You might spend about 10 to 15 minutes per work experience, so plan accordingly.\nIf needed, you can create an account and come back later to pick up where you left off.\n\nIf you have any questions, feel free to ask.\n\nReady to get started?",
+  "welcome_agent_empty_response_message": "Sorry, I didn't understand that. Can you please rephrase?",
+  "welcome_agent_json_message_my_name": "My name is Compass ...",
+  "welcome_agent_json_message_do_start": "Great, let's start exploring your work experiences.",
+  "welcome_agent_json_reasoning_no_start": "You asked a question and did not indicate that you are ready to start, therefore I will set the finished flag to False, and I will answer your question if it is in the <_ABOUT_> section.",
+  "welcome_agent_json_reasoning_do_start": "You clearly indicated that you are ready to start, therefore I will set the finished flag to True, and I will direct you to the exploration session.",
+  "welcome_agent_json_reasoning_can_answer": "You asked a question that can be answered in the <_ABOUT_> section, in the following text ...therefore I will set the finished flag to False, and I will answer your question.",
+  "simple_agent_failed_message": "I am facing some difficulties right now, could you please repeat what you said?",
+  "explore_experiences_agent_director_link_and_rank_no_skills": "• No skills identified\n",
+  "explore_experiences_agent_director_link_and_rank_summary": "Based on the information provided about your experience as '{experience_title}', here’s a brief overview:\n\n{summary}\n\nTop {num_top_skills} skills demonstrated:{skills_summary}",
+  "explore_experiences_agent_director_dive_into_experiences_no_more_experiences": "It looks like, there are no experiences to discuss further.",
+  "explore_experiences_agent_director_dive_into_experiences_skipped_experience": "I have skipped your experience as \"{experience_title}\" because you did not share enough details",
+  "explore_experiences_agent_director_dive_into_experiences_finished_exploring": "I have finished exploring all your experiences.",
+  "explore_experiences_agent_director_execute_ready_to_dive": "I am ready to dive into my experiences, don't greet me, let's get into it immediately",
+  "simple_agent_director_execute_conversation_finished": "Conversation finished, all agents are done!",
+  "simple_agent_director_execute_conversation_forcefully_ended": "Conversation forcefully ended",
+  "llm_agent_director_execute_conversation_finished": "The conversation has finished!",
+  "llm_agent_director_execute_difficulties": "I am facing some difficulties right now, could you please repeat what you said?"
+}

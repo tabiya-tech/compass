@@ -17,6 +17,7 @@ from app.conversation_memory.conversation_memory_manager import ConversationMemo
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
 from app.countries import Country
+from app.i18n.translation_service import t
 from app.vector_search.esco_entities import SkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
 
@@ -190,7 +191,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
         if not current_experience:
             message = AgentOutput(
-                message_for_user="It looks like, there are no experiences to discuss further.",
+                message_for_user=t("messages", "explore_experiences_agent_director_dive_into_experiences_no_more_experiences", locale=locale),
                 finished=True,
                 agent_type=self._agent_type,
                 agent_response_time_in_sec=0,
@@ -233,7 +234,8 @@ class ExploreExperiencesAgentDirector(Agent):
                 # , then link the skills and rank them
                 agent_output = await self._link_and_rank(
                     country_of_user=state.country_of_user,
-                    current_experience=current_experience.experience)
+                    current_experience=current_experience.experience,
+                    locale=locale)
                 await self._conversation_manager.update_history(AgentInput(
                     message="(silence)",
                     is_artificial=True
@@ -249,8 +251,9 @@ class ExploreExperiencesAgentDirector(Agent):
                 current_experience.dive_in_phase = DiveInPhase.PROCESSED
                 state.current_experience_uuid = None
                 agent_output = AgentOutput(
-                    message_for_user=f'I have skipped your experience as "{current_experience.experience.experience_title}" '
-                                     f'because you did not share enough details',
+                    message_for_user=t("messages", "explore_experiences_agent_director_dive_into_experiences_skipped_experience", locale=locale).format(
+                        experience_title=current_experience.experience.experience_title
+                    ),
                     finished=False,
                     agent_type=self._agent_type,
                     agent_response_time_in_sec=0,
@@ -274,7 +277,7 @@ class ExploreExperiencesAgentDirector(Agent):
             if not _next_experience:
                 # No more experiences to process, we are done
                 return AgentOutput(
-                    message_for_user="I have finished exploring all your experiences.",
+                    message_for_user=t("messages", "explore_experiences_agent_director_dive_into_experiences_finished_exploring", locale=locale),
                     finished=True,
                     agent_type=self._agent_type,
                     agent_response_time_in_sec=0,
@@ -289,7 +292,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
     async def execute(self, user_input: AgentInput, context: ConversationContext, locale: str = "en") -> AgentOutput:
         if self._state is None:
-            raise ValueError("ExperiencesExplorerAgentDirector: execute() called before state was initialized")
+            raise ValueError(t("errors", "explore_experiences_agent_director_execute_no_state", locale=locale))
 
         state = self._state
 
@@ -324,7 +327,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
             if transitioned_between_states:  # TODO this is not needed anymore
                 user_input = AgentInput(
-                    message="I am ready to dive into my experiences, don't greet me, let's get into it immediately",
+                    message=t("messages", "explore_experiences_agent_director_execute_ready_to_dive", locale=locale),
                     is_artificial=True)
 
             # The conversation history is handled in dive_into_experiences method,
@@ -333,7 +336,7 @@ class ExploreExperiencesAgentDirector(Agent):
             return agent_output
 
         # Should never happen
-        raise ValueError("ExperiencesExplorerAgentDirector: Unknown conversation phase")
+        raise ValueError(t("errors", "explore_experiences_agent_director_execute_unknown_phase", locale=locale))
 
     def set_state(self, state: ExploreExperiencesAgentDirectorState):
         """
@@ -365,7 +368,7 @@ class ExploreExperiencesAgentDirector(Agent):
     async def _link_and_rank(self, *,
                              country_of_user: Country,
                              current_experience: ExperienceEntity,
-                             ) -> AgentOutput:
+                             locale: str) -> AgentOutput:
         start = time.time()
         pipeline = ExperiencePipeline(
             config=self._experience_pipeline_config,
@@ -387,7 +390,7 @@ class ExploreExperiencesAgentDirector(Agent):
         # construct a summary of the skills
         skills_summary = "\n"
         if len(current_experience.top_skills) == 0:
-            skills_summary += "• No skills identified\n"
+            skills_summary += t("messages", "explore_experiences_agent_director_link_and_rank_no_skills", locale=locale)
         else:
             for skill in current_experience.top_skills:
                 skills_summary += f"• {skill.preferredLabel}\n"
@@ -404,11 +407,12 @@ class ExploreExperiencesAgentDirector(Agent):
         )
 
         agent_output: AgentOutput = AgentOutput(
-            message_for_user=f"Based on the information provided about your experience as '{current_experience.experience_title}', "
-                             f"here’s a brief overview:\n\n"
-                             f"{current_experience.summary}\n\n"
-                             f"Top {len(current_experience.top_skills)} skills demonstrated:"
-                             f"{skills_summary}",
+            message_for_user=t("messages", "explore_experiences_agent_director_link_and_rank_summary", locale=locale).format(
+                experience_title=current_experience.experience_title,
+                summary=current_experience.summary,
+                num_top_skills=len(current_experience.top_skills),
+                skills_summary=skills_summary
+            ),
             finished=False,
             agent_type=self._agent_type,
             agent_response_time_in_sec=round(time.time() - start, 2),

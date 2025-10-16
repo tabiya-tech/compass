@@ -9,7 +9,7 @@ from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.vector_search.vector_search_dependencies import SearchServices
-
+from app.i18n.translation_service import t
 
 class LLMAgentDirector(AbstractAgentDirector):
     """
@@ -118,7 +118,7 @@ class LLMAgentDirector(AbstractAgentDirector):
             while first_call or transitioned_to_new_phase:
                 if self._state.current_phase == ConversationPhase.ENDED:
                     agent_output = AgentOutput(
-                        message_for_user="The conversation has finished!",
+                        message_for_user=t("messages", "llm_agent_director_execute_conversation_finished", locale=locale),
                         finished=True,
                         agent_type=None,
                         agent_response_time_in_sec=0,  # artificial value as there is no LLM call
@@ -165,7 +165,7 @@ class LLMAgentDirector(AbstractAgentDirector):
         except Exception as e:  # pylint: disable=broad-except
             self._logger.error("Error while executing the agent director: %s", e, exc_info=True)
             agent_output = AgentOutput(
-                message_for_user="I am facing some difficulties right now, could you please repeat what you said?",
+                message_for_user=t("messages", "llm_agent_director_execute_difficulties", locale=locale),
                 finished=True,
                 agent_type=None,
                 agent_response_time_in_sec=0,  # an artificial value, perhaps misleading, but could be improved later

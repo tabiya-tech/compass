@@ -1,0 +1,9 @@
+{
+  "welcome_agent_empty_response_reasoning": "The model returned None or an empty response",
+  "welcome_agent_empty_response_error": "The model returned None or an empty response",
+  "simple_agent_failed_reasoning": "Failed to get a response",
+  "explore_experiences_agent_director_execute_no_state": "ExperiencesExplorerAgentDirector: execute() called before state was initialized",
+  "explore_experiences_agent_director_execute_unknown_phase": "ExperiencesExplorerAgentDirector: Unknown conversation phase",
+  "llm_router_execute_internal_no_response": "Router model did not return a response",
+  "llm_router_execute_internal_invalid_agent_type": "Router model returned an invalid agent type {selected_agent_type}"
+}
