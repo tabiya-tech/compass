@@ -1,3 +1,21 @@
 {
-  "welcome_agent_first_encounter": "¡Bienvenido! Soy Compass, y estoy aquí para ayudarte a capturar y resaltar tus habilidades.\nAsí es como funciona este proceso:\n\n• Primero, te pediré una breve descripción de tu trabajo, incluyendo actividades no remuneradas como voluntariados o contribuciones familiares.\n• A medida que conversemos, tu CV tomará forma.\n• Una vez cubiertos los aspectos básicos, profundizaremos en cada experiencia para registrar los detalles clave.\n\nConcéntrate en lo que más te importa. Puedes dedicar entre 10 y 15 minutos por experiencia laboral, así que planea con tiempo.\nSi lo necesitas, puedes crear una cuenta y volver más tarde para continuar.\n\nSi tienes alguna pregunta, no dudes en hacerla.\n\n¿Listo para comenzar?"
+  "welcome_agent_first_encounter": "¡Bienvenido! Soy Compass, y estoy aquí para ayudarte a capturar y resaltar tus habilidades.\nAsí es como funciona este proceso:\n\n• Primero, te pediré una breve descripción de tu trabajo, incluyendo actividades no remuneradas como voluntariados o contribuciones familiares.\n• A medida que conversemos, tu CV tomará forma.\n• Una vez cubiertos los aspectos básicos, profundizaremos en cada experiencia para registrar los detalles clave.\n\nConcéntrate en lo que más te importa. Podés dedicar entre 10 y 15 minutos por experiencia laboral, así que planeá con tiempo.\nSi lo necesitás, podés crear una cuenta y volver más tarde para continuar.\n\nSi tenés alguna pregunta, no dudes en hacerla.\n\n¿Listo para empezar?",
+  "collect_experiences.did_not_understand": "Perdón, no entendí. ¿Podés decirlo de otra manera?",
+  "collect_experiences.move_to_other_experiences": "Sigamos con otras experiencias laborales.",
+  "collect_experiences.final_message": "Gracias por compartir tus experiencias. Sigamos con el próximo paso."
+  ,"collect_experiences.no_experience_collected": "Todavía no se recopilaron datos de experiencias.",
+  "collect_experiences.all_fields_filled": "Todos los campos están completos.",
+  "collect_experiences.all_fields_not_filled": "Todavía hay campos sin completar.",
+  "collect_experiences.work_type.formal_waged_description": "trabajar para una empresa o el negocio de otra persona por dinero",
+  "collect_experiences.work_type.unpaid_trainee_description": "trabajo no pago como aprendiz en una empresa u organización",
+  "collect_experiences.work_type.self_employment_description": "tener mi propio emprendimiento, hacer trabajos por cuenta propia o por contrato",
+  "collect_experiences.work_type.unseen_unpaid_description": "trabajo no pago como voluntariado comunitario, cuidados a mi familia u otra, ayuda en un hogar",
+  "collect_experiences.work_type.none_description": "sin experiencia laboral",
+  "collect_experiences.fields.experience_title": "título de la experiencia",
+  "collect_experiences.fields.paid_work": "trabajo pago",
+  "collect_experiences.fields.work_type": "tipo de trabajo",
+  "collect_experiences.fields.start_date": "fecha de inicio",
+  "collect_experiences.fields.end_date": "fecha de finalización",
+  "collect_experiences.fields.company": "empresa/receptor del trabajo",
+  "collect_experiences.fields.location": "ubicación"
 }

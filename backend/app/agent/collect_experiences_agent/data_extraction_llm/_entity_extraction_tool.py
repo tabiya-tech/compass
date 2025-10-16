@@ -15,6 +15,7 @@ from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG, \
     get_config_variation
 from common_libs.retry import Retry
+from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE
 
 _TAGS_TO_FILTER = [
     "system instructions",
@@ -80,7 +81,7 @@ class EntityExtractionTool:
             temperature_config = {}
 
         return GeminiGenerativeLLM(
-            system_instructions=_SYSTEM_INSTRUCTIONS,
+            system_instructions=_SYSTEM_INSTRUCTIONS.format(language_style=STD_LANGUAGE_STYLE),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000
@@ -118,7 +119,7 @@ class EntityExtractionTool:
 
             return data, penality, error
 
-        result, _result_penalty, _error = await Retry[str].call_with_penalty(callback=_callback, logger=self._logger)
+        result, _result_penalty, _error = await Retry[ExtractedData].call_with_penalty(callback=_callback, logger=self._logger)
 
         return result, _llm_stats
 
@@ -164,6 +165,8 @@ _SYSTEM_INSTRUCTIONS = """
 #Role
     You are an expert who extracts basic information regarding the job seeker's work experience Based on the questions asked and the answers provided.
     Do not over-suggest any information, only extract the ones provided explicitly by the user.
+    
+{language_style}
         
 #Extract data instructions
     Make sure you are extracting information about experiences that should be added to the 'experience_details' field.
