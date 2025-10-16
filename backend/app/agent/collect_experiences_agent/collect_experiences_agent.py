@@ -14,6 +14,7 @@ from app.agent.experience.timeline import Timeline
 from app.agent.experience.work_type import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.countries import Country
+from app.i18n.translation_service import t
 
 
 def _deserialize_work_types(value: list[str] | list[WorkType]) -> list[WorkType]:
@@ -167,7 +168,8 @@ class CollectExperiencesAgent(Agent):
             exploring_type=exploring_type,
             unexplored_types=self._state.unexplored_types,
             explored_types=self._state.explored_types,
-            logger=self.logger)
+            logger=self.logger,
+            locale=locale)
         self._state.first_time_visit = False  # The first time visit is over
         if conversation_llm_output.exploring_type_finished and self._state.unexplored_types:
             # The specific work type has already been explored, so we remove it from the list
@@ -185,9 +187,10 @@ class CollectExperiencesAgent(Agent):
             )
             transition_message: str
             if exploring_type is not None:
-                transition_message = f"{user_input.message}\nAsk me about experiences that include: {_get_experience_type(exploring_type)}"
+                transition_message = f"{user_input.message}\n" + \
+                    f"{t('prompts', 'collect_experiences_transition_ask_about_type', locale, type=_get_experience_type(exploring_type, locale))}"
             else:
-                transition_message = f"{user_input.message}\nLet's recap, and give me a chance to correct any mistakes."
+                transition_message = f"{user_input.message}\n" + t('prompts', 'collect_experiences_transition_recap', locale)
             conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
                                                                    context=context,
                                                                    user_input=AgentInput(message=transition_message, is_artificial=True),
@@ -197,7 +200,8 @@ class CollectExperiencesAgent(Agent):
                                                                    exploring_type=exploring_type,
                                                                    unexplored_types=self._state.unexplored_types,
                                                                    explored_types=self._state.explored_types,
-                                                                   logger=self.logger)
+                                                                   logger=self.logger,
+                                                                   locale=locale)
 
         conversation_llm_output.llm_stats = data_extraction_llm_stats + conversation_llm_output.llm_stats
         return conversation_llm_output
@@ -209,6 +213,8 @@ class CollectExperiencesAgent(Agent):
         :return:
         """
         experiences = []
+        if self._state is None:
+            return experiences
         # The conversation is completed when the LLM has finished and all work types have been explored
         for elem in self._state.collected_data:
             self.logger.debug("Experience data collected: %s", elem)

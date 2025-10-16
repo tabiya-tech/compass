@@ -11,12 +11,14 @@ from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
 from app.agent.prompt_template import sanitize_input
+from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG, \
     get_config_variation
 from common_libs.retry import Retry
+from app.i18n.translation_service import t
 
 _TAGS_TO_FILTER = [
     "system instructions",
@@ -71,9 +73,13 @@ class TemporalAndWorkTypeClassifierTool:
 
         self._logger = logger
         self._llm_caller = LLMCaller[_LLMOutput](model_response_type=_LLMOutput)
-        self._system_instructions = _SYSTEM_INSTRUCTIONS.format(
+        template = t("prompts", "collect_experiences_temporal_classifier_system_instructions")
+        self._system_instructions = replace_placeholders_with_indent(
+            template,
             work_type_definitions=WORK_TYPE_DEFINITIONS_FOR_PROMPT,
-            current_date=datetime.now().strftime("%Y/%m"))
+            current_date=datetime.now().strftime("%Y/%m"),
+            present_label=t("prompts", "collect_experiences_label_present"),
+        )
 
     def _get_llm(self, temperature_config: Optional[dict] = None) -> GeminiGenerativeLLM:
         # if no temperature configu provided, use the default one.
@@ -121,8 +127,9 @@ class TemporalAndWorkTypeClassifierTool:
 
             return data, penality, error
 
-        result, _result_penalty, _error = await Retry[str].call_with_penalty(callback=_callback, logger=self._logger)
+        result, _result_penalty, _error = await Retry[ExtractedData].call_with_penalty(callback=_callback, logger=self._logger)
         return result, _llm_stats
+        
 
     async def _internal_execute(self,
                                 *,
@@ -145,23 +152,33 @@ class TemporalAndWorkTypeClassifierTool:
         experience_details = response_data.experience_details
 
         # Debug information
-        self._logger.debug(dedent(f"""
-            Associations: {response_data.associations}
-            Experience Details: {experience_details.model_dump_json(indent=3)}
-        """))
+        if experience_details is not None:
+            self._logger.debug(dedent(f"""
+                Associations: {response_data.associations}
+                Experience Details: {experience_details.model_dump_json(indent=3)}
+            """))
+        else:
+            self._logger.debug(dedent(f"""
+                Associations: {response_data.associations}
+                Experience Details: null
+            """))
 
         # Constructed the extracted data without references.
-        extracted_data = ExtractedData(
-            paid_work=clean_string_field(experience_details.paid_work),
-            work_type=clean_string_field(experience_details.work_type),
-            start_date=clean_string_field(experience_details.start_date),
-            end_date=clean_string_field(experience_details.end_date),
-        )
+        if experience_details is not None:
+            extracted_data = ExtractedData(
+                paid_work=clean_string_field(experience_details.paid_work),
+                work_type=clean_string_field(experience_details.work_type),
+                start_date=clean_string_field(experience_details.start_date),
+                end_date=clean_string_field(experience_details.end_date),
+            )
+        else:
+            extracted_data = _EMPTY_EXTRACTED_DATA
 
         # Successful extraction, return 0 penalty.
         return extracted_data, _llm_stats, 0, None
 
-
+# this prompt was taken to the locale files
+# left as is for reference
 _SYSTEM_INSTRUCTIONS = """
 <System Instructions>
 #Role

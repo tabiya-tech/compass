@@ -9,12 +9,14 @@ from app.agent.collect_experiences_agent.data_extraction_llm import clean_string
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
 from app.agent.prompt_template import sanitize_input
+from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG, \
     get_config_variation
 from common_libs.retry import Retry
+from app.i18n.translation_service import t
 
 _TAGS_TO_FILTER = [
     "system instructions",
@@ -74,13 +76,29 @@ class EntityExtractionTool:
         self._llm_caller = LLMCaller[_LLMOutput](model_response_type=_LLMOutput)
 
     @staticmethod
+    def _get_system_instructions() -> str:
+        """
+        Build localized system instructions using i18n. We only influence user-visible labels produced by the model
+        (e.g., Remote/Home Office examples) while keeping schema/field names and tokens intact.
+        """
+        template = t("prompts", "collect_experiences_entity_extraction_system_instructions")
+        return replace_placeholders_with_indent(
+            template,
+            remote_label=t("prompts", "collect_experiences_label_remote"),
+            home_office_label=t("prompts", "collect_experiences_label_home_office"),
+            my_family_label=t("prompts", "collect_experiences_label_my_family"),
+            my_community_label=t("prompts", "collect_experiences_label_my_community"),
+            my_house_label=t("prompts", "collect_experiences_label_my_house"),
+        )
+
+    @staticmethod
     def _get_llm(temperature_config: Optional[dict] = None) -> GeminiGenerativeLLM:
         # if no temperature configu provided, use the default one.
         if temperature_config is None:
             temperature_config = {}
 
         return GeminiGenerativeLLM(
-            system_instructions=_SYSTEM_INSTRUCTIONS,
+            system_instructions=EntityExtractionTool._get_system_instructions(),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000
@@ -118,7 +136,7 @@ class EntityExtractionTool:
 
             return data, penality, error
 
-        result, _result_penalty, _error = await Retry[str].call_with_penalty(callback=_callback, logger=self._logger)
+        result, _result_penalty, _error = await Retry[ExtractedData].call_with_penalty(callback=_callback, logger=self._logger)
 
         return result, _llm_stats
 
@@ -159,6 +177,8 @@ class EntityExtractionTool:
         return extracted_data, _llm_stats, 0, None
 
 
+# this prompt was taken to the locale files
+# left as is for reference
 _SYSTEM_INSTRUCTIONS = """
 <System Instructions>
 #Role
