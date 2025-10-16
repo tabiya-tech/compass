@@ -19,6 +19,7 @@ from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import get_config_variation, LLMConfig, JSON_GENERATION_CONFIG
 from common_libs.retry import Retry
 
+from app.i18n.translation_service import t
 
 class WelcomeAgentState(BaseModel):
     """
@@ -102,7 +103,7 @@ class WelcomeAgent(Agent):
         """
         self._state = state
 
-    async def execute(self, user_input: AgentInput, context: ConversationContext) -> AgentOutput:
+    async def execute(self, user_input: AgentInput, context: ConversationContext, locale: str = "en") -> AgentOutput:
         """
         Execute the agent
         :param user_input: The user input
@@ -124,7 +125,7 @@ class WelcomeAgent(Agent):
         if self._state.is_first_encounter:
             self._state.is_first_encounter = False
             return AgentOutput(
-                message_for_user=await WelcomeAgent.get_first_encounter_message(),
+                message_for_user=await WelcomeAgent.get_first_encounter_message(locale),
                 finished=False,
                 agent_type=self.agent_type,
                 agent_response_time_in_sec=round(time.time() - agent_start_time, 2),
@@ -215,22 +216,8 @@ class WelcomeAgent(Agent):
         ), 0, None
 
     @staticmethod
-    async def get_first_encounter_message():
-        return dedent("""\
-                Welcome! I’m Compass, here to guide you in capturing and highlighting your skills.
-                Here’s how this process works:
-                
-                • First, I’ll ask for a quick overview of your work, including any unpaid activities like volunteering or family contributions.
-                • As we chat, your CV will take shape.
-                • Once the basics are covered, we’ll dive deeper into each experience to capture key details.
-                
-                Focus on what matters most to you. You might spend about 10 to 15 minutes per work experience, so plan accordingly.
-                If needed, you can create an account and come back later to pick up where you left off.
-                
-                If you have any questions, feel free to ask.
-                
-                Ready to get started?
-                """)
+    async def get_first_encounter_message(locale: str):
+        return t("messages", "welcome_agent_first_encounter", locale)
 
     @staticmethod
     def get_system_instructions(state: WelcomeAgentState) -> str:
