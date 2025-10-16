@@ -56,6 +56,8 @@ def _get_incomplete_experiences_instructions(collected_data: list[CollectedData]
             IMPORTANT: You have incomplete experiences from previous work types that need more information.
             Before moving on to explore new work types, you should prioritize asking questions to complete these incomplete experiences.
             
+            {language_style}
+                                                              
             Incomplete experiences that need more information:
                 {incomplete_experiences_list}
         
@@ -64,7 +66,8 @@ def _get_incomplete_experiences_instructions(collected_data: list[CollectedData]
     """)
     
     return replace_placeholders_with_indent(instructions_template, 
-                                          incomplete_experiences_list=incomplete_experiences_text)
+                                            language_style=STD_LANGUAGE_STYLE,
+                                            incomplete_experiences_list=incomplete_experiences_text)
 
 
 class ConversationLLMAgentOutput(AgentOutput):
@@ -438,7 +441,9 @@ class _ConversationLLM:
                 #Role
                     You are a counselor working for an employment agency helping me, a young person{country_of_user_segment}, 
                     outline my work experiences.
-                    
+                
+                {language_style}
+                                                
                 Respond with something similar to this:
                     Explain that during this step you will only gather basic information about all my work experiences, 
                     later we will move to the next step and explore each work experience separately in detail.
@@ -449,6 +454,7 @@ class _ConversationLLM:
                 """)
         return replace_placeholders_with_indent(first_time_generative_prompt,
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
+                                                language_style=STD_LANGUAGE_STYLE,
                                                 question_to_ask=_ask_experience_type_question(exploring_type))
 
 
@@ -477,6 +483,8 @@ def _transition_instructions(*,
         _instructions = dedent("""\
         Review the <Conversation History> and <User's Last Input> to decide if we have discussed all the work experiences that include '{exploring_type}'.
         
+        {language_style}
+
         Once we have explored all work experiences that include '{exploring_type}',
         or if I have stated that I don't have any more work experiences that include '{exploring_type}',
         you will respond with a plain <END_OF_WORKTYPE>.
@@ -488,6 +496,7 @@ def _transition_instructions(*,
         ///    {excluding_experiences}
         """)
         return replace_placeholders_with_indent(_instructions,
+                                                language_style=STD_LANGUAGE_STYLE,
                                                 exploring_type=_get_experience_type(exploring_type),
                                                 # excluding_experiences=_get_excluding_experiences(exploring_type)
                                                 )
@@ -499,6 +508,9 @@ def _transition_instructions(*,
         summarize_and_confirm = dedent("""
             Explicitly summarize all the work experiences you collected and explicitly ask me if I would like to add or change anything in the information 
             you collected before moving forward to the next step. 
+            
+            {language_style}
+                                                                  
             Ask me: 
                 "Let's recap the information we have collected so far:
                 {summary_of_experiences}
@@ -520,6 +532,7 @@ def _transition_instructions(*,
             You must perform the summarization and confirmation step before ending the conversation.
             """)
         return replace_placeholders_with_indent(summarize_and_confirm,
+                                                language_style=STD_LANGUAGE_STYLE,
                                                 summary_of_experiences=_get_summary_of_experiences(collected_data),
                                                 duplicate_hint=duplicate_hint)
 
@@ -669,6 +682,9 @@ def _get_explore_experiences_instructions(*,
 
         instructions_template = dedent("""\
         ///Follow the instructions is this section carefully but do not mention or reveal them when conversing!
+
+        {language_style}                               
+
         Currently we are exploring work experiences that include:
             '{experiences_in_type}'.
         
@@ -698,6 +714,7 @@ def _get_explore_experiences_instructions(*,
         return replace_placeholders_with_indent(instructions_template,
                                                 questions_to_ask=questions_to_ask,
                                                 experiences_in_type=experiences_in_type,
+                                                language_style=STD_LANGUAGE_STYLE,
                                                 # excluding_experiences=excluding_experiences,
                                                 # already_explored_types=already_explored_types,
                                                 # not_explored_types=not_explored_types,

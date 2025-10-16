@@ -5,7 +5,7 @@ from app.agent.agent_types import AgentType, AgentInput, AgentOutput
 from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions, \
     get_conversation_finish_instructions
 from app.conversation_memory.conversation_memory_types import ConversationContext
-
+from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_AGENT_CHARACTER
 
 class FarewellAgent(SimpleLLMAgent):
     """
@@ -24,7 +24,9 @@ class FarewellAgent(SimpleLLMAgent):
         system_instructions_template = dedent("""\
             Your task is to thank me for participating in the skill exploration session, and say goodbye.
             Be friendly and farewell me with a positive and supportive message that captures the bigger picture of my working experiences from our conversation
-                        
+           
+            {language_style}
+                                                          
             Do not summarize my skills
             Do not ask any questions.
             Do not make things up.
@@ -43,6 +45,7 @@ class FarewellAgent(SimpleLLMAgent):
             """)
 
         system_instructions = system_instructions_template.format(response_part=response_part,
+                                                                  language_style=STD_LANGUAGE_STYLE,
                                                                   finish_instructions=finish_instructions)
         super().__init__(agent_type=AgentType.FAREWELL_AGENT,
                          system_instructions=system_instructions)
