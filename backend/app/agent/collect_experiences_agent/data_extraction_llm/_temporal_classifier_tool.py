@@ -17,6 +17,7 @@ from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG, \
     get_config_variation
 from common_libs.retry import Retry
+from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE
 
 _TAGS_TO_FILTER = [
     "system instructions",
@@ -73,7 +74,8 @@ class TemporalAndWorkTypeClassifierTool:
         self._llm_caller = LLMCaller[_LLMOutput](model_response_type=_LLMOutput)
         self._system_instructions = _SYSTEM_INSTRUCTIONS.format(
             work_type_definitions=WORK_TYPE_DEFINITIONS_FOR_PROMPT,
-            current_date=datetime.now().strftime("%Y/%m"))
+            current_date=datetime.now().strftime("%Y/%m"),
+            language_style=STD_LANGUAGE_STYLE)
 
     def _get_llm(self, temperature_config: Optional[dict] = None) -> GeminiGenerativeLLM:
         # if no temperature configu provided, use the default one.
@@ -121,7 +123,7 @@ class TemporalAndWorkTypeClassifierTool:
 
             return data, penality, error
 
-        result, _result_penalty, _error = await Retry[str].call_with_penalty(callback=_callback, logger=self._logger)
+        result, _result_penalty, _error = await Retry[ExtractedData].call_with_penalty(callback=_callback, logger=self._logger)
         return result, _llm_stats
 
     async def _internal_execute(self,
@@ -145,18 +147,27 @@ class TemporalAndWorkTypeClassifierTool:
         experience_details = response_data.experience_details
 
         # Debug information
-        self._logger.debug(dedent(f"""
-            Associations: {response_data.associations}
-            Experience Details: {experience_details.model_dump_json(indent=3)}
-        """))
+        if experience_details is not None:
+            self._logger.debug(dedent(f"""
+                Associations: {response_data.associations}
+                Experience Details: {experience_details.model_dump_json(indent=3)}
+            """))
+        else:
+            self._logger.debug(dedent(f"""
+                Associations: {response_data.associations}
+                Experience Details: None
+            """))
 
         # Constructed the extracted data without references.
-        extracted_data = ExtractedData(
-            paid_work=clean_string_field(experience_details.paid_work),
-            work_type=clean_string_field(experience_details.work_type),
-            start_date=clean_string_field(experience_details.start_date),
-            end_date=clean_string_field(experience_details.end_date),
-        )
+        if experience_details is not None:
+            extracted_data = ExtractedData(
+                paid_work=clean_string_field(experience_details.paid_work),
+                work_type=clean_string_field(experience_details.work_type),
+                start_date=clean_string_field(experience_details.start_date),
+                end_date=clean_string_field(experience_details.end_date),
+            )
+        else:
+            extracted_data = _EMPTY_EXTRACTED_DATA
 
         # Successful extraction, return 0 penalty.
         return extracted_data, _llm_stats, 0, None
@@ -166,6 +177,8 @@ _SYSTEM_INSTRUCTIONS = """
 <System Instructions>
 #Role
     You are an expert who extracts dates and classifies experiences in work types based on user's last statement and conversation history.
+    
+{language_style}
         
 #Extract data instructions
     Make sure you are extracting information about experiences that should be added to the 'experience_details' field.
