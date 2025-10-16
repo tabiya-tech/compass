@@ -184,7 +184,7 @@ _SYSTEM_INSTRUCTIONS = """
         If it seems like a formal work experience the it should be marked as paid.
         
         `null` if the information was not provided by the user and the user was not explicitly asked for this information yet.
-        Use empty string if the user was asked and explicitly chose to not provide this information, or the user don't want us to store the information any more.
+        Use empty string if the user was asked and explicitly chose to not provide this information, or the user don't want us to store the information any more or the user doesn't remember.
     
     ##'work_type' instructions
         Classify the type of work of the work experience provided by the user in the '<User's Last Input>' and the '<Conversation History>'.
@@ -194,13 +194,14 @@ _SYSTEM_INSTRUCTIONS = """
             {work_type_definitions}   
         
         `null` if the information was not provided by the user and the user was not explicitly asked for this information yet.
-        Use empty string if the user was asked and explicitly chose to not provide this information, or the user don't want us to store the information any more.
+        Use empty string if the user was asked and explicitly chose to not provide this information, or the user don't want us to store the information any more or the user doesn't remember.
         
     ##Timeline instructions
         The user may provide the beginning and end of an experience at any order, 
         in a single input or in separate inputs, as a period or as a single date in relative or absolute terms.
         The user may mention only one date, you may consider it as the start and the end of the experience.
         The user may provide unstructured dates like I worked in the first four months of 2020, and we expect you to extract the dates in (YYYY-MM).
+        If the user provides only one date and no additional context, do not infer or assume a second date.
         For reference, my current date is {current_date}
         
         ###'dates_mentioned' instructions
@@ -214,7 +215,7 @@ _SYSTEM_INSTRUCTIONS = """
             Return a string value containing the start date.
             
             `null` It was not provided by the user and the user was not explicitly asked for this information yet.
-            Empty string if the user was asked and explicitly chose to not provide this information. 
+            Empty string if the user was asked and explicitly chose to not provide this information or the user doesn't remember the start date. 
             
         ###'end_date' instructions
             If I provide a conversational date input for the end of an experience, you should accurately 
@@ -222,7 +223,7 @@ _SYSTEM_INSTRUCTIONS = """
             Return a string value containing the end date.
             
             `null` It was not provided by the user and the user was not explicitly asked for this information yet.
-            Empty string if the user was asked and explicitly chose to not provide this information. 
+            Empty string if the user was asked and explicitly chose to not provide this information or the user doesn't remember the end date. 
             
 #JSON Output instructions
     - associations: Generate a linear chain of associations in the form of ...-> ...->... that start from the User's Last Input 
