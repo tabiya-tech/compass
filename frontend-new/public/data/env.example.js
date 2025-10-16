@@ -41,6 +41,8 @@ window.tabiyaConfig = {
   FRONTEND_LOGIN_CODE: btoa("login_code"),
   FRONTEND_REGISTRATION_CODE: btoa("registration_code"),
 
+  FRONTEND_SUPPORTED_LANGUAGES: btoa(JSON.stringify(["en-us","es-ar"])),
+
   FRONTEND_DISABLE_LOGIN_CODE: btoa("false"),
   FRONTEND_DISABLE_REGISTRATION: btoa("false"),
 
