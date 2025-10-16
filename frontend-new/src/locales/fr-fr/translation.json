@@ -341,5 +341,18 @@
   "skillsRanking_rotateToSolve_allComplete_message": "Tous les puzzles sont terminés ! Bravo !",
   "skillsRanking_rotateToSolve_puzzleComplete_message": "Puzzle terminé ! Résous-en un autre ou annule si l'information ne t'intéresse pas tant.",
   "skillsRanking_rotateToSolve_rotate_left_aria": "Faire pivoter le caractère dans le sens antihoraire",
-  "skillsRanking_rotateToSolve_rotate_right_aria": "Faire pivoter le caractère dans le sens horaire"
+  "skillsRanking_rotateToSolve_rotate_right_aria": "Faire pivoter le caractère dans le sens horaire",
+  "chat_feedback_thank_you_for_feedback": "Merci d'avoir pris le temps de partager vos précieux commentaires.",
+  "chat_feedback_thank_you_for_rating": "Merci d'avoir évalué Compass.",
+  "chat_error_something_went_wrong": "Désolé, il semble qu'un problème soit survenu de mon côté... Pouvez-vous actualiser la page et réessayer ?",
+  "chat_error_please_repeat": "Désolé, il semble qu'un problème soit survenu de mon côté... Pouvez-vous répéter cela ?",
+  "cv_upload_cancelled": "Téléversement du CV annulé",
+  "cv_upload_uploaded_successfully": "CV téléversé avec succès",
+  "cv_upload_converting": "Conversion du CV",
+  "cv_upload_processing": "Traitement du CV",
+  "cv_upload_extracting_experiences": "Extraction des expériences",
+  "cv_upload_saving_cv": "Enregistrement du CV",
+  "cv_upload_failed": "Échec du téléversement du CV",
+  "cv_upload_uploading_cv": "Téléversement du CV",
+  "cv_upload_thinking_message": "Traitement de votre CV, cela peut prendre un moment..."
 }
