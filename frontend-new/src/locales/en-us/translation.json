@@ -341,5 +341,18 @@
   "skillsRanking_rotateToSolve_allComplete_message": "All puzzles complete! Well done!",
   "skillsRanking_rotateToSolve_puzzleComplete_message": "Puzzle complete! Please solve another one or cancel if you are not that interested in the information.",
   "skillsRanking_rotateToSolve_rotate_left_aria": "Rotate character counterclockwise",
-  "skillsRanking_rotateToSolve_rotate_right_aria": "Rotate character clockwise"
+  "skillsRanking_rotateToSolve_rotate_right_aria": "Rotate character clockwise",
+  "chat_feedback_thank_you_for_feedback": "Thank you for taking the time to share your valuable feedback.",
+  "chat_feedback_thank_you_for_rating": "Thank you for rating Compass.",
+  "chat_error_something_went_wrong": "I'm sorry, Something seems to have gone wrong on my end... Can you please refresh the page and try again?",
+  "chat_error_please_repeat": "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
+  "cv_upload_cancelled": "CV upload cancelled",
+  "cv_upload_uploaded_successfully": "CV uploaded successfully",
+  "cv_upload_converting": "Converting CV",
+  "cv_upload_processing": "Processing CV",
+  "cv_upload_extracting_experiences": "Extracting experiences",
+  "cv_upload_saving_cv": "Saving CV",
+  "cv_upload_failed": "CV upload failed",
+  "cv_upload_uploading_cv": "Uploading CV",
+  "cv_upload_thinking_message": "Processing your CV, this might take a while..."
 }
