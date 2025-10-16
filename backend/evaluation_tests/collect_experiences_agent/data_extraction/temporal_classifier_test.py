@@ -61,8 +61,6 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
         expected_extracted_data={
             "end_date": "2020/06",
             "start_date": None,
-            "work_type": None,
-            "paid_work": None,
         }
     ),
     TemporalAndWorkTypeClassifierToolTestCase(
@@ -230,6 +228,36 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
             "work_type": None,
             "start_date": None,
             "end_date": None
+        }
+    ),
+
+    # only start date.
+    TemporalAndWorkTypeClassifierToolTestCase(
+        name="irrelevant_message",
+        turns=[
+            (SILENCE_MESSAGE, "Have you run any other businesses, done freelance or contract work?"),
+            ("yes, I didi freelance work", "Okay, I understand."
+                                           "Can you tell me when you started doing freelance work?"),
+        ],
+        users_input="in 2018",
+        expected_extracted_data={
+            "start_date": "2018",
+            "end_date": None
+        }
+    ),
+
+    # The user doesn't remember
+    TemporalAndWorkTypeClassifierToolTestCase(
+        name="user_doesnt_remember",
+        turns=[
+            (SILENCE_MESSAGE, "Have you run any other businesses, done freelance or contract work?"),
+            ("yes, I didi freelance work", "Okay, I understand."
+                                           "Can you tell me when you started doing freelance work?"),
+        ],
+        users_input="I don't remember.",
+        expected_extracted_data={
+            "start_date": '',  # The user doesn't remember.
+            "end_date": AnyOf(None, '')
         }
     ),
 ]
