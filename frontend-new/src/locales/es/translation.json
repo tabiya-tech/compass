@@ -341,5 +341,18 @@
   "skillsRanking_rotateToSolve_allComplete_message": "¡Todos los rompecabezas completados! ¡Bien hecho!",
   "skillsRanking_rotateToSolve_puzzleComplete_message": "¡Rompecabezas completado! Resuelve otro o cancela si no te interesa tanto la información.",
   "skillsRanking_rotateToSolve_rotate_left_aria": "Rotar carácter en sentido antihorario",
-  "skillsRanking_rotateToSolve_rotate_right_aria": "Rotar carácter en sentido horario"
+  "skillsRanking_rotateToSolve_rotate_right_aria": "Rotar carácter en sentido horario",
+  "chat_feedback_thank_you_for_feedback": "Gracias por tomarte el tiempo de compartir tus valiosos comentarios.",
+  "chat_feedback_thank_you_for_rating": "Gracias por calificar Compass.",
+  "chat_error_something_went_wrong": "Lo siento, parece que algo salió mal de mi lado... ¿Puedes actualizar la página e intentarlo de nuevo?",
+  "chat_error_please_repeat": "Lo siento, parece que algo salió mal de mi lado... ¿Puedes repetir eso?",
+  "cv_upload_cancelled": "Carga de CV cancelada",
+  "cv_upload_uploaded_successfully": "CV cargado con éxito",
+  "cv_upload_converting": "Convirtiendo CV",
+  "cv_upload_processing": "Procesando CV",
+  "cv_upload_extracting_experiences": "Extrayendo experiencias",
+  "cv_upload_saving_cv": "Guardando CV",
+  "cv_upload_failed": "Falló la carga del CV",
+  "cv_upload_uploading_cv": "Subiendo CV",
+  "cv_upload_thinking_message": "Procesando tu CV, esto puede tardar un poco..."
 }
