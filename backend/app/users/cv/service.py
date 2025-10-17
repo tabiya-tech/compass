@@ -3,17 +3,17 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from app.users.cv.types import UploadProcessState, CVUploadErrorCode
+from app.app_config import get_application_config
 from app.users.cv.constants import MAX_MARKDOWN_CHARS, MARKDOWN_CONVERSION_TIMEOUT_SECONDS, RATE_LIMIT_WINDOW_MINUTES, \
     DEFAULT_MAX_UPLOADS_PER_USER, DEFAULT_RATE_LIMIT_PER_MINUTE
 from app.users.cv.errors import MarkdownTooLongError, EmptyMarkdownError, \
     CVUploadRateLimitExceededError, CVLimitExceededError, DuplicateCVUploadError, MarkdownConversionTimeoutError
+from app.users.cv.repository import IUserCVRepository
+from app.users.cv.storage import build_user_cv_upload_record, ICVCloudStorageService
+from app.users.cv.types import UploadProcessState, CVUploadErrorCode, CVUploadListResponse
+from app.users.cv.utils.llm_extractor import CVExperienceExtractor
 from app.users.cv.utils.markdown_converter import convert_cv_bytes_to_markdown
 from common_libs.call_with_timeout.call_with_timeout import call_with_timeout
-from app.users.cv.utils.llm_extractor import CVExperienceExtractor
-from app.users.cv.repository import IUserCVRepository
-from app.app_config import get_application_config
-from app.users.cv.storage import build_user_cv_upload_record, ICVCloudStorageService
 
 
 class ICVUploadService(ABC):
@@ -44,6 +44,15 @@ class ICVUploadService(ABC):
         """
         Get the status of an upload process.
         Returns upload details if found, None if not found.
+        """
+
+    @abstractmethod
+    async def get_user_cvs(self, *, user_id: str) -> list[dict]:  # pragma: no cover - interface # REVIEW: do not use dict prefer UserCVUpload -> ie: list[UserCVUpload]
+        """
+        Get all CVs uploaded by a specific user.
+
+        :param user_id: The ID of the user.
+        :return: A list of CV summaries. # REVIEW: not a list of summarizes (but a list of user's CVs)
         """
 
 
@@ -281,3 +290,32 @@ class CVUploadService(ICVUploadService):
         except Exception as e:
             self._logger.exception(e)
             return None
+
+    async def get_user_cvs(self, *, user_id: str) -> list[CVUploadListResponse]:  # REVIEW: this should be returning Business Objects not HTTP Responses
+        """
+        Get all CVs uploaded by a specific user.
+        """
+        try:
+            uploads = await self._repository.get_user_uploads(user_id=user_id)
+
+            if not uploads:     # REVIEW: Why this check.
+                return []
+
+            # Transform database records to API response format
+            cv_uploads = []
+            for upload in uploads:
+                cv_upload = CVUploadListResponse(
+                    upload_id=upload.get("upload_id"),
+                    filename=upload.get("filename"),
+                    uploaded_at=upload.get("created_at"),
+                    upload_process_state=upload.get("upload_process_state"),
+                    experiences_data=upload.get("experience_bullets")
+                )
+                cv_uploads.append(cv_upload)
+
+            self._logger.debug("Retrieved %d CVs for user {user_id=%s}", len(cv_uploads), user_id)
+            return cv_uploads
+
+        except Exception as e:
+            self._logger.exception(e)
+            return []

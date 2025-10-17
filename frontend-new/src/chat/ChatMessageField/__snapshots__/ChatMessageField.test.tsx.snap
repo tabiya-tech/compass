@@ -128,7 +128,6 @@ exports[`ChatMessageField should render correctly 1`] = `
       >
         Upload CV
       </div>
-      ;
     </div>
   </div>
 </div>

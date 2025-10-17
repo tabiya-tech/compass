@@ -5,19 +5,30 @@ import { action } from "@storybook/addon-actions";
 import { StatusCodes } from "http-status-codes";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 
 const meta: Meta<typeof ChatMessageField> = {
   title: "Chat/ChatMessageField/CV Upload",
   component: ChatMessageField,
   tags: ["autodocs"],
   decorators: [
-    (Story) => (
-      <IsOnlineContext.Provider value={true}>
-        <div style={{ padding: 24 }}>
-          <Story />
-        </div>
-      </IsOnlineContext.Provider>
-    ),
+    (Story) => {
+      // Mock AuthenticationStateService
+      const mockService = AuthenticationStateService.getInstance();
+      mockService.getUser = () => ({
+        id: "001",
+        name: "Test User",
+        email: "test@example.com",
+      });
+
+      return (
+        <IsOnlineContext.Provider value={true}>
+          <div style={{ padding: 24 }}>
+            <Story />
+          </div>
+        </IsOnlineContext.Provider>
+      );
+    },
   ],
 };
 
@@ -140,3 +151,5 @@ export const UploadingDisabledState: Story = {
 };
 
 
+// REVIEW: With previously uploaded cvs.
+//         like 1, 3, and 10 how would that look like.

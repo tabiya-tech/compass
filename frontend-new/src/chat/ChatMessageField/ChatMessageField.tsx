@@ -1,15 +1,22 @@
 import React, { useEffect, useContext, useMemo, useState, MouseEvent, KeyboardEvent, useCallback } from "react";
-import { IconButton, InputAdornment, TextField, styled, useTheme, Typography, Box } from "@mui/material";
+import { IconButton, InputAdornment, TextField, styled, useTheme, Typography, Box, Skeleton } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import AddIcon from "@mui/icons-material/Add";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { AnimatePresence, motion } from "framer-motion";
 import { StatusCodes } from "http-status-codes";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
+import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
 import AnimatedDotBadge from "src/theme/AnimatedDotBadge/AnimatedDotBadge";
 import { getCvUploadEnabled } from "src/envService";
+import CVService from "src/CV/CVService/CVService";
+import { CVListItem } from "src/CV/CVService/CVService.types";
+import authenticationStateService from "src/auth/services/AuthenticationState.service";
+import { ChatError } from "src/error/commonErrors";
+import UploadedCVsAccordion from "src/CV/uploadedCVsAccordion/UploadedCVsAccordion";
+import { formatExperiencesToMessage } from "src/chat/util";
 
 export interface ChatMessageFieldProps {
   handleSend: (message: string) => void;
@@ -38,10 +45,12 @@ export const DATA_TEST_ID = {
 
 export const MENU_ITEM_ID = {
   UPLOAD_CV: `upload-cv-${uniqueId}`,
+  UPLOADED_CV_ACCORDION: `uploaded-cv-accordion-${uniqueId}`,
 };
 
 export const MENU_ITEM_TEXT = {
   UPLOAD_CV: "Upload CV",
+  UPLOADED_CV_ACCORDION: "Previously uploaded CVs",
 };
 
 export const PLACEHOLDER_TEXTS = {
@@ -58,9 +67,10 @@ export const ERROR_MESSAGES = {
   FILE_TOO_DENSE: "The uploaded file content is too long to process. Please reduce its length and try again.",
   EMPTY_CV_PARSE: "We couldn't detect experiences in your CV. Please check the file and try again.",
   GENERIC_UPLOAD_ERROR: "Failed to parse your CV. Please try again or use a different file.",
-  RATE_LIMIT_WAIT: "You're uploading too quickly. Please wait a bit and try again.",
-  MAX_UPLOADS_REACHED: "You've reached the maximum CV uploads for this conversation.",
-  DUPLICATE_CV: "This CV has already been uploaded.",
+  RATE_LIMIT_WAIT: "Too many uploads at once. Please wait one minute and try again.",
+  MAX_UPLOADS_REACHED:
+    "You've reached the maximum number of CV uploads for this conversation. Further uploads aren’t allowed.",
+  DUPLICATE_CV: "This CV has already been uploaded. Select it from your previously uploaded CVs.",
   UNSUPPORTED_FILE_TYPE: "Unsupported file type. Allowed: PDF, DOCX, TXT.",
   UPLOAD_TIMEOUT: "The upload timed out. Please try again.",
 };
@@ -91,6 +101,17 @@ const StyledTextField = styled(TextField)(({ theme, disabled }) => ({
   },
 }));
 
+const UploadedCVsMenuSkeleton: React.FC = () => {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", px: 2, py: 1.5, gap: 1.5 }}>
+      <Skeleton variant="circular" width={24} height={24} />
+      <Box sx={{ flexGrow: 1 }}>
+        <Skeleton variant="text" width="100%" />
+      </Box>
+    </Box>
+  );
+};
+
 const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -104,6 +125,9 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const isMenuOpen = Boolean(menuAnchorEl);
   const [showPlusBadge, setShowPlusBadge] = useState(false);
   const [badgeSeen, setBadgeSeen] = useState<boolean>(false);
+  const [uploadedCVs, setUploadedCVs] = useState<CVListItem[]>([]);
+  const [isLoadingCVs, setIsLoadingCVs] = useState(false);
+
   const isCvUploadEnabled = getCvUploadEnabled().toLowerCase() === "true";
 
   // Show the dot badge whenever in COLLECT_EXPERIENCES and not yet seen
@@ -247,7 +271,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     sendMessage();
   };
 
-  const handlePlusClick = (e: MouseEvent<HTMLButtonElement>) => {
+  const handlePlusClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     if (inputIsDisabled()) return;
     setMenuAnchorEl(e.currentTarget);
@@ -255,9 +279,31 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     if (!badgeSeen) {
       setBadgeSeen(true);
     }
+
+    const currentUserId = authenticationStateService.getInstance().getUser()?.id;
+    if (!currentUserId) {
+      throw new ChatError("User ID is not available");
+    }
+
+    // Load CVs when a menu is opened if not yet loaded
+    setIsLoadingCVs(true);
+    try {
+      const cvs = await CVService.getInstance().getAllCVs(currentUserId);
+      setUploadedCVs(cvs);
+    } catch (err) {
+      console.error("Failed to fetch CVs:", err);
+    } finally {
+      setIsLoadingCVs(false);
+    }
   };
 
   const handleMenuClose = () => setMenuAnchorEl(null);
+
+  const handleSelectCV = (cv: CVListItem) => {
+    const composed = formatExperiencesToMessage(cv.experiences_data);
+    setMessage(composed);
+    setMenuAnchorEl(null);
+  };
 
   const handleFileMenuItemClick = () => {
     handleMenuClose();
@@ -294,12 +340,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       // With the asynchronous upload pipeline, the initial response may be empty (200 with background processing).
       // Do not treat an empty experiences array as an error. Only compose the message when we actually receive items.
       if (Array.isArray(experiences) && experiences.length > 0) {
-        const intro = "These are my experiences:";
-        const bullets = experiences
-          .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
-          .filter(Boolean)
-          .join("\n");
-        const composed = bullets ? `${intro}\n${bullets}` : intro;
+        const composed = formatExperiencesToMessage(experiences);
         setMessage(composed);
         // Ensure any previous error is cleared on success
         if (errorMessage) {
@@ -412,6 +453,52 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     return props.isChatFinished || props.aiIsTyping || props.isUploadingCv || !isOnline;
   }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline]);
 
+  const contextMenuItems: MenuItemConfig[] = [
+    // Show skeleton while loading
+    ...(isLoadingCVs && uploadedCVs.length === 0
+      ? [
+          {
+            id: "uploaded-cv-loading-skeleton",
+            text: "",
+            disabled: true,
+            action: () => {},
+            isCustom: true,
+            customNode: <UploadedCVsMenuSkeleton />,
+          },
+        ]
+      : []),
+
+    // Show the accordion only when there are uploaded CVs
+    ...(uploadedCVs.length > 0
+      ? [
+          {
+            id: MENU_ITEM_ID.UPLOADED_CV_ACCORDION,
+            text: MENU_ITEM_TEXT.UPLOADED_CV_ACCORDION,
+            disabled: false,
+            action: () => {},
+            isCustom: true,
+            customNode: (
+              <UploadedCVsAccordion items={uploadedCVs} onSelect={handleSelectCV} currentPhase={props.currentPhase} />
+            ),
+          },
+        ]
+      : []),
+
+    {
+      id: MENU_ITEM_ID.UPLOAD_CV,
+      text: MENU_ITEM_TEXT.UPLOAD_CV,
+      description:
+        props.currentPhase === ConversationPhase.INTRO
+          ? "You can upload your CV as soon as we start exploring your experiences"
+          : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
+            ? "Attach your CV to the conversation"
+            : "CV upload is only available during experience collection",
+      icon: <UploadFileIcon />,
+      disabled: inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
+      action: handleFileMenuItemClick,
+    },
+  ];
+
   return (
     <Box
       position="relative"
@@ -521,21 +608,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
             notifyOnClose={handleMenuClose}
             anchorOrigin={{ vertical: "top", horizontal: "left" }}
             transformOrigin={{ vertical: "bottom", horizontal: "left" }}
-            items={[
-              {
-                id: MENU_ITEM_ID.UPLOAD_CV,
-                text: MENU_ITEM_TEXT.UPLOAD_CV,
-                description:
-                  props.currentPhase === ConversationPhase.INTRO
-                    ? "You can upload your CV as soon as we start exploring your experiences"
-                    : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
-                      ? "Attach your CV to the conversation"
-                      : "CV upload is only available during experience collection",
-                icon: <UploadFileIcon />,
-                disabled: inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
-                action: handleFileMenuItemClick,
-              },
-            ]}
+            items={contextMenuItems}
           />
         )}
         {showCharCounter && (

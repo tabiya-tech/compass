@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import {
   FIXED_MESSAGES_TEXT,
+  formatExperiencesToMessage,
   generateCompassMessage,
   generateCVTypingMessage,
   generatePleaseRepeatMessage,
@@ -372,6 +373,39 @@ describe("Chat Utils", () => {
       // AND expect no errors or warnings to have been logged
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("formatExperiencesToMessage", () => {
+    test("should format experiences array into a bulleted list message", () => {
+      // GIVEN an array of experiences
+      const experiences = [
+        "Led a team of 5 engineers to develop a new feature.",
+        "Improved system performance by 30% through optimization.",
+        "Collaborated with cross-functional teams to deliver projects on time.",
+      ];
+
+      // WHEN formatting the experiences to a message
+      const result = formatExperiencesToMessage(experiences);
+
+      // THEN expect the result to be a bulleted list message
+      expect(result).toBe(
+        "These are my experiences:\n" +
+          "• Led a team of 5 engineers to develop a new feature.\n" +
+          "• Improved system performance by 30% through optimization.\n" +
+          "• Collaborated with cross-functional teams to deliver projects on time."
+      );
+    });
+
+    test("should return empty string if experiences array is empty", () => {
+      // GIVEN an empty array of experiences
+      const experiences: string[] = [];
+
+      // WHEN formatting the experiences to a message
+      const result = formatExperiencesToMessage(experiences);
+
+      // THEN expect the result to be an empty string
+      expect(result).toBe("");
     });
   });
 });

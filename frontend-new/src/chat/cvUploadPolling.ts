@@ -1,10 +1,12 @@
+import { UploadProcessState } from "src/chat/Chat.types";
+
 export type UploadPollingHandles = {
   intervalId: ReturnType<typeof setInterval>;
   timeoutId: ReturnType<typeof setTimeout>;
 };
 
 export interface UploadStatus {
-  upload_process_state: "PENDING_UPLOAD" | "UPLOADING" | "CONVERTING" | "UPLOADING_TO_GCS" | "EXTRACTING" | "SAVING" | "COMPLETED" | "FAILED" | "CANCELLED";
+  upload_process_state: UploadProcessState;
   cancel_requested?: boolean;
   filename?: string;
   user_id?: string;
@@ -18,7 +20,7 @@ export interface UploadStatus {
 
 export function stopUploadPolling(handles?: UploadPollingHandles): void {
   if (!handles) return;
-  clearInterval(handles.intervalId)
+  clearInterval(handles.intervalId);
   clearTimeout(handles.timeoutId);
 }
 
@@ -96,7 +98,6 @@ export function startUploadPolling(options: {
   handles = { intervalId, timeoutId };
   return handles;
 }
-
 
 export const getUploadErrorMessage = (status: number, detail?: string): string => {
   switch (status) {

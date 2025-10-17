@@ -1,8 +1,10 @@
+from datetime import datetime, timezone
+
 import pytest
 
 import asyncio
 from app.users.cv.service import CVUploadService
-from app.users.cv.types import CVUploadErrorCode, UserCVUpload
+from app.users.cv.types import CVUploadErrorCode, UserCVUpload, CVUploadListResponse
 from app.users.cv.errors import CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError
 from app.users.cv.repository import IUserCVRepository
 from app.users.cv.storage import ICVCloudStorageService
@@ -45,6 +47,9 @@ class MockCVRepository(IUserCVRepository):
 
     async def store_experiences(self, user_id: str, upload_id: str, *, experiences: list[str]) -> bool:
         return True
+
+    async def get_user_uploads(self, *, user_id: str) -> list[CVUploadListResponse]:
+        return []
 
 
 class MockCVCloudStorageService(ICVCloudStorageService):
@@ -294,3 +299,37 @@ class TestCVUploadService:
         # THEN it returns False and calls the repository
         assert result is False
         mock_cancel.assert_called_once_with("user123", "upload456")
+
+
+    @pytest.mark.asyncio
+    async def test_list_user_uploads_returns_multiple_uploads(self, mocker):
+        # GIVEN a repository instance
+        repo = MockCVRepository()
+        # AND mocked get_user_uploads to return uploads
+        uploaded1 = {
+            "upload_id": "upload1",
+            "filename": "cv1.pdf",
+            "created_at": datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+            "upload_process_state": "COMPLETED",
+            "experience_bullets": ["Experience 1", "Experience 2"]
+        }
+        uploaded2 = {
+            "upload_id": "upload2",
+            "filename": "cv2.pdf",
+            "created_at": datetime(2024, 5, 1, 12, 0, 0, tzinfo=timezone.utc),
+            "upload_process_state": "COMPLETED",
+            "experience_bullets": ["Experience 1"]
+        }
+        mocker.patch.object(repo, "get_user_uploads", return_value=[uploaded1, uploaded2])
+        service = CVUploadService(repository=repo, cv_cloud_storage_service=MockCVCloudStorageService())
+
+        # WHEN listing uploads for a user
+        result = await service.get_user_cvs(user_id="user123")
+
+        # THEN it returns the expected uploads
+        assert isinstance(result, list)
+        assert len(result) == 2
+        assert result[0].upload_id == "upload1"
+        assert result[1].upload_id == "upload2"
+        assert result[0].experiences_data == ["Experience 1", "Experience 2"]
+        assert result[1].experiences_data == ["Experience 1"]

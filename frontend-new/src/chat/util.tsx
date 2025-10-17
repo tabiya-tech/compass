@@ -23,7 +23,11 @@ export const FIXED_MESSAGES_TEXT = {
   PLEASE_REPEAT: "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
 };
 
-export const generateUserMessage = (message: string, sent_at: string, message_id?: string): IChatMessage<UserChatMessageProps> => {
+export const generateUserMessage = (
+  message: string,
+  sent_at: string,
+  message_id?: string
+): IChatMessage<UserChatMessageProps> => {
   const payload: UserChatMessageProps = {
     message: message,
     sent_at: sent_at,
@@ -33,7 +37,7 @@ export const generateUserMessage = (message: string, sent_at: string, message_id
     message_id: message_id ? message_id : nanoid(),
     sender: ConversationMessageSender.USER,
     payload: payload,
-    component: (prop: UserChatMessageProps) => <UserChatMessage {...prop}/>,
+    component: (prop: UserChatMessageProps) => <UserChatMessage {...prop} />,
   };
 };
 
@@ -54,7 +58,7 @@ export const generateCompassMessage = (
     message_id: message_id,
     sender: ConversationMessageSender.COMPASS,
     payload: payload,
-    component: (prop: CompassChatMessageProps) => <CompassChatMessage {...prop}/>,
+    component: (prop: CompassChatMessageProps) => <CompassChatMessage {...prop} />,
   };
 };
 
@@ -80,7 +84,7 @@ export const generateTypingMessage = (waitBeforeThinking?: number): IChatMessage
     message_id: nanoid(),
     sender: ConversationMessageSender.COMPASS,
     payload: payload,
-    component: (prop: TypingChatMessageProps) => <TypingChatMessage {...prop}/>,
+    component: (prop: TypingChatMessageProps) => <TypingChatMessage {...prop} />,
   };
 };
 
@@ -110,7 +114,7 @@ export const generateCancellableCVTypingMessage = (
   const getDisplayMessage = (): string => {
     if (isCancelled) return "CV upload cancelled";
     if (isUploaded) return "CV uploaded successfully";
-    
+
     switch (uploadState) {
       case "CONVERTING":
         return "Converting CV";
@@ -146,7 +150,7 @@ export const generateCancellableCVTypingMessage = (
 
 export const generateConversationConclusionMessage = (
   message_id: string,
-  message: string,
+  message: string
 ): IChatMessage<ConversationConclusionChatMessageProps> => {
   const payload: ConversationConclusionChatMessageProps = {
     message: message,
@@ -156,7 +160,7 @@ export const generateConversationConclusionMessage = (
     message_id: message_id,
     sender: ConversationMessageSender.COMPASS,
     payload: payload,
-    component: (prop: ConversationConclusionChatMessageProps) => <ConversationConclusionChatMessage {...prop}/>,
+    component: (prop: ConversationConclusionChatMessageProps) => <ConversationConclusionChatMessage {...prop} />,
   };
 };
 
@@ -167,7 +171,6 @@ export const generateSomethingWentWrongMessage = () => {
 export const generatePleaseRepeatMessage = () => {
   return generateErrorMessage(FIXED_MESSAGES_TEXT.PLEASE_REPEAT);
 };
-
 
 /**
  * Parses the conversation phase and ensures that the percentage is valid, if not valid
@@ -182,10 +185,15 @@ export const parseConversationPhase = (newPhase: CurrentPhase, previousPhase?: C
     percentage: newPhase.percentage,
     current: newPhase.current,
     total: newPhase.total,
-  }
+  };
 
   if (previousPhase && newPhase.percentage < previousPhase.percentage) {
-    console.error(new InvalidConversationPhasePercentage(newPhase.percentage, `less than previous percentage ${previousPhase.percentage}`));
+    console.error(
+      new InvalidConversationPhasePercentage(
+        newPhase.percentage,
+        `less than previous percentage ${previousPhase.percentage}`
+      )
+    );
   }
 
   if (newPhase.percentage > 100) {
@@ -198,5 +206,16 @@ export const parseConversationPhase = (newPhase: CurrentPhase, previousPhase?: C
     validPhase.percentage = 0;
   }
 
-  return validPhase
-}
+  return validPhase;
+};
+
+export const formatExperiencesToMessage = (experiences: string[] | null): string => {
+  if (!Array.isArray(experiences) || experiences.length === 0) return "";
+
+  const intro = "These are my experiences:";
+  const bullets = experiences
+    .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
+    .filter(Boolean)
+    .join("\n");
+  return bullets ? `${intro}\n${bullets}` : intro;
+};

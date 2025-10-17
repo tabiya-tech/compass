@@ -120,6 +120,41 @@ describe("ContextMenu", () => {
       const actualMenu = screen.queryByTestId(DATA_TEST_ID.MENU);
       expect(actualMenu).not.toBeInTheDocument();
     });
+
+    test("should render a custom menu item when isCustom and customNode are provided", () => {
+      // GIVEN a custom node (any JSX)
+      const CustomContent = () => <div data-testid="custom-node">Custom Content</div>;
+      // AND a menu item that uses it
+      const givenItems: MenuItemConfig[] = [
+        {
+          id: "custom-1",
+          text: "",
+          icon: undefined,
+          disabled: false,
+          action: jest.fn(),
+          isCustom: true,
+          customNode: <CustomContent />,
+        },
+      ];
+
+      // WHEN the ContextMenu is rendered
+      render(<ContextMenu {...stdGivenProps} items={givenItems} />);
+
+      // THEN the menu should be in the document
+      const actualMenu = screen.getByTestId(DATA_TEST_ID.MENU);
+      expect(actualMenu).toBeInTheDocument();
+      // AND the custom MenuItem should be rendered
+      const actualMenuItem = screen.getByTestId(DATA_TEST_ID.CUSTOM_MENU_ITEM);
+      expect(actualMenuItem).toBeInTheDocument();
+      // AND the custom node content should appear inside
+      const customNode = screen.getByTestId("custom-node");
+      expect(customNode).toBeInTheDocument();
+      expect(customNode).toHaveTextContent("Custom Content");
+      // AND no errors or warnings should have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
   });
 
   describe("action tests", () => {

@@ -43,6 +43,18 @@ def client_with_mocks() -> TestClientWithMocks:
                 "last_activity_at": "2025-01-01T00:00:00Z",
             }
 
+        async def get_user_cvs(self, *, user_id: str) -> list[dict]:
+            return [
+                {
+                    "upload_id": "upload-1",
+                    "filename": "cv1.pdf",
+                    "uploaded_at": "2025-01-01T00:00:00Z",
+                    "upload_process_state": "COMPLETED",
+                    "experiences_data": ["Experience 1", "Experience 2"],
+                },
+
+            ]
+
     _instance_cv_service = MockCVService()
 
     def _mocked_get_cv_service() -> ICVUploadService:
@@ -360,6 +372,67 @@ class TestGetUploadStatus:
 
         # WHEN getting upload status
         resp = client.get(f"/{mocked_user.user_id}/cv/any-id")
+
+        # THEN 500 Internal Server Error
+        assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+
+class TestGetUploadedCVs:
+    @pytest.mark.asyncio
+    async def test_get_uploaded_cvs_success(self, client_with_mocks: TestClientWithMocks,
+                                            mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service returns a list of uploads
+        expected_uploads = [
+            {
+                "upload_id": "upload-1",
+                "filename": "cv1.pdf",
+                "uploaded_at": "2025-01-01T00:00:00Z",
+                "upload_process_state": "COMPLETED",
+                "experiences_data": ["Experience 1", "Experience 2"],
+            },
+            {
+                "upload_id": "upload-2",
+                "filename": "cv2.docx",
+                "uploaded_at": "2025-01-02T00:00:00Z",
+                "upload_process_state": "COMPLETED",
+                "experiences_data": ["Experience 1"],
+            },
+        ]
+        mocker.patch.object(mocked_service, "get_user_cvs", mocker.AsyncMock(return_value=expected_uploads))
+
+        # WHEN getting uploaded CVs
+        resp = client.get(f"/{mocked_user.user_id}/cv")
+
+        # THEN 200 OK with a list of uploads
+        assert resp.status_code == HTTPStatus.OK
+        body = resp.json()
+        assert isinstance(body, list)
+        assert len(body) == 2
+        assert body == expected_uploads
+
+    @pytest.mark.asyncio
+    async def test_get_uploaded_cvs_forbidden_other_user(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN a mocked service
+        get_user_cvs_mock = mocker.patch.object(mocked_service, "get_user_cvs", mocker.AsyncMock())
+
+        # WHEN reading uploads with mismatched user id
+        other_user = mocked_user.user_id + "_x"
+        resp = client.get(f"/{other_user}/cv")
+
+        # THEN 403 Forbidden and service not called
+        assert resp.status_code == HTTPStatus.FORBIDDEN
+        get_user_cvs_mock.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_get_uploaded_cvs_service_exception_maps_to_500(self, client_with_mocks: TestClientWithMocks,
+                                                                 mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        # GIVEN service raises unexpected exception
+        mocker.patch.object(mocked_service, "get_user_cvs", side_effect=Exception("boom"))
+
+        # WHEN getting uploaded CVs
+        resp = client.get(f"/{mocked_user.user_id}/cv")
 
         # THEN 500 Internal Server Error
         assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR

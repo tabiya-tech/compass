@@ -1,13 +1,13 @@
 import logging
-from datetime import timedelta
 from abc import ABC, abstractmethod
+from datetime import timedelta
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 
 from app.server_dependencies.database_collections import Collections
-from app.users.cv.types import UserCVUpload, UploadProcessState
 from app.users.cv.errors import DuplicateCVUploadError
+from app.users.cv.types import UserCVUpload, UploadProcessState
 from common_libs.time_utilities import get_now, datetime_to_mongo_date
 
 
@@ -59,6 +59,11 @@ class IUserCVRepository(ABC):
 
     @abstractmethod
     async def mark_cancelled(self, user_id: str, upload_id: str) -> bool:
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_user_uploads(self, *, user_id: str) -> list[dict]:  # REVIEW: do not use dict prefer UserCVUpload -> ie: list[UserCVUpload]
+                                                                      #         create a task to refactor this repository to not use dicts when returning BOs
         raise NotImplementedError()
 
 
@@ -271,3 +276,18 @@ class UserCVRepository(IUserCVRepository):
             },
         )
         return res.modified_count > 0
+
+    async def get_user_uploads(self, *, user_id: str) -> list[dict]:
+        """
+        Get all CV uploads for a specific user.
+        """
+
+        cursor = self._collection.find(
+            {"user_id": user_id},   # REVIEW: use $eq to avoid NoSQL injection
+            # REVIEW: filter where only the upload_process_state is COMPLETE
+            #         Even add the respective index (for user_id and upload_process_state)
+            sort=[("created_at", -1)]  # Most recent first
+        )
+        # REVIEW: transform the value that is returned from the database to the Business Object
+        #           If the transformation fails, skip only that record and go to the next one. So that we can only return valid records that can be constructed.
+        return await cursor.to_list(length=None)

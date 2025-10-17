@@ -8,4 +8,6 @@ export type MenuItemConfig = {
   disabled: boolean;
   action: () => void;
   textColor?: string;
+  isCustom?: boolean;
+  customNode?: ReactNode;
 };

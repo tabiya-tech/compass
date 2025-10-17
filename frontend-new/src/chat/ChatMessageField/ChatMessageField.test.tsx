@@ -18,6 +18,9 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { getCvUploadEnabled } from "src/envService";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import CVService from "src/CV/CVService/CVService";
+import { DATA_TEST_ID as UPLOADED_CVS_DATA_TEST_ID } from "src/CV/uploadedCVsAccordion/UploadedCVsAccordion";
 
 // mock the getCvUploadEnabled function
 jest.mock("src/envService", () => ({
@@ -34,12 +37,22 @@ jest.mock("src/theme/ContextMenu/ContextMenu", () => {
     __esModule: true,
     default: jest.fn(({ items }: { items: MenuItemConfig[] }) => (
       <div data-testid={actual.DATA_TEST_ID.MENU}>
-        {items.map((item) => (
-          <div key={item.id} data-testid={item.id} onClick={item.action}>
-            {item.text}
-          </div>
-        ))}
-        ;
+        {items.map((item) => {
+          // Render custom menu items (like the CV accordion) so tests can interact with them
+          if ((item as any).isCustom && (item as any).customNode) {
+            return (
+              <div key={item.id} data-testid={item.id}>
+                {(item as any).customNode}
+              </div>
+            );
+          }
+          // Fallback to original simple text item rendering
+          return (
+            <div key={item.id} data-testid={item.id} onClick={item.action}>
+              {item.text}
+            </div>
+          );
+        })}
       </div>
     )),
     DATA_TEST_ID: actual.DATA_TEST_ID,
@@ -564,6 +577,19 @@ describe("ChatMessageField", () => {
     });
 
     describe("Plus button", () => {
+      let mockCVServiceInstance: { getAllCVs: jest.Mock };
+
+      beforeEach(() => {
+        // Mock user to be logged in by default
+        const givenUser = { id: "fooUser", name: "Foo User", email: "foo@bar" };
+        AuthenticationStateService.getInstance().setUser(givenUser);
+
+        mockCVServiceInstance = {
+          getAllCVs: jest.fn().mockResolvedValue([]),
+        };
+        jest.spyOn(CVService, "getInstance").mockReturnValue(mockCVServiceInstance as any);
+      });
+
       test("should open file picker and handle file upload when plus button is clicked", async () => {
         // GIVEN an INTRO phase and a mock onUploadCv
         const mockOnUploadCv = jest.fn().mockResolvedValue(["parsed CV content"]);
@@ -759,10 +785,100 @@ describe("ChatMessageField", () => {
         // AND console.error should be called for logging the error
         expect(console.error).toHaveBeenCalled();
       });
+
+      test("should show uploaded CVs when plus button is clicked and load content to the field when one is selected", async () => {
+        // GIVEN COLLECT_EXPERIENCES phase
+        const givenPhase = ConversationPhase.COLLECT_EXPERIENCES;
+        // AND a mock onUploadCv
+        const mockOnUploadCv = jest.fn().mockResolvedValue(["parsed CV content"]);
+        // AND mock CVs returned from the service (with the correct CVListItem shape)
+        const mockCvs = [
+          {
+            upload_id: "cv1",
+            filename: "CV-one.pdf",
+            uploaded_at: new Date().toISOString(),
+            upload_process_state: "COMPLETED",
+            experiences_data: ["parsed CV 1 content"],
+          },
+          {
+            upload_id: "cv2",
+            filename: "CV-two.pdf",
+            uploaded_at: new Date().toISOString(),
+            upload_process_state: "COMPLETED",
+            experiences_data: ["parsed CV 2 content"],
+          },
+        ];
+        mockCVServiceInstance.getAllCVs.mockResolvedValue(mockCvs);
+        // AND ChatMessageField is rendered
+        render(
+          <ChatMessageField
+            aiIsTyping={false}
+            isChatFinished={false}
+            handleSend={jest.fn()}
+            currentPhase={givenPhase}
+            onUploadCv={mockOnUploadCv}
+          />
+        );
+
+        // WHEN the plus button is clicked
+        const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
+        await userEvent.click(plusButton);
+
+        // THEN the context menu opens
+        await waitFor(() => {
+          expect(ContextMenu).toHaveBeenCalledWith(
+            expect.objectContaining({
+              anchorEl: plusButton,
+              open: true,
+            }),
+            {}
+          );
+        });
+        // AND CVs are fetched
+        await waitFor(() => {
+          expect(mockCVServiceInstance.getAllCVs).toHaveBeenCalled();
+        });
+        // AND the accordion (custom node) is rendered in the menu
+        const accordion = await screen.findByTestId(UPLOADED_CVS_DATA_TEST_ID.UPLOADED_CVS_ACCORDION);
+        expect(accordion).toBeInTheDocument();
+
+        // WHEN the user expands the accordion
+        const summary = screen.getByTestId(UPLOADED_CVS_DATA_TEST_ID.UPLOADED_CVS_ACCORDION_SUMMARY);
+        await userEvent.click(summary);
+
+        // THEN the list items become interactable
+        const cvItems = await screen.findAllByTestId(UPLOADED_CVS_DATA_TEST_ID.UPLOADED_CVS_ACCORDION_DETAILS);
+        expect(cvItems.length).toBe(2);
+
+        // WHEN the user selects the second CV
+        await userEvent.click(cvItems[1]);
+
+        // THEN the composed content should be added to the input field
+        const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+        await waitFor(() => {
+          expect(chatMessageField).toHaveValue("These are my experiences:\n• parsed CV 2 content");
+        });
+        // AND no errors or warnings to have occurred
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+      });
     });
   });
 
   describe("CV Upload Feature Flag", () => {
+    let mockCVServiceInstance: { getAllCVs: jest.Mock };
+
+    beforeEach(() => {
+      // Mock user to be logged in by default
+      const givenUser = { id: "foo01", name: "Foo bar", email: "foo@bar" };
+      AuthenticationStateService.getInstance().setUser(givenUser);
+
+      mockCVServiceInstance = {
+        getAllCVs: jest.fn().mockResolvedValue([]),
+      };
+      jest.spyOn(CVService, "getInstance").mockReturnValue(mockCVServiceInstance as any);
+    });
+
     test("should show plus button and context menu when CV upload is enabled", () => {
       // GIVEN CV upload is enabled
       mockGetCvUploadEnabled.mockReturnValue("true");

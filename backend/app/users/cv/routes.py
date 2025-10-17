@@ -5,6 +5,7 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException, Path, Request
 
 from app.constants.errors import HTTPErrorResponse
+from app.users.auth import Authentication, UserInfo
 from app.users.cv.constants import (
     MAX_CV_SIZE_BYTES,
     MAX_MULTIPART_OVERHEAD_BYTES,
@@ -13,13 +14,11 @@ from app.users.cv.constants import (
 )
 from app.users.cv.errors import MarkdownConversionTimeoutError, MarkdownTooLongError, PayloadTooLargeErrorResponse, \
     EmptyMarkdownError, CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError
-from app.users.auth import Authentication, UserInfo
-from app.users.cv.service import CVUploadService, ICVUploadService
 from app.users.cv.get_repository import get_user_cv_repository
 from app.users.cv.repository import IUserCVRepository
+from app.users.cv.service import CVUploadService, ICVUploadService
 from app.users.cv.storage import _get_cv_storage_service, ICVCloudStorageService
-from app.users.cv.types import CVUploadStatusResponse
-
+from app.users.cv.types import CVUploadStatusResponse, CVUploadListResponse
 
 logger = logging.getLogger(__name__)
 
@@ -297,6 +296,43 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
             raise HTTPException(
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                 detail="Failed to get upload status"
+            )
+
+    @router.get(
+        path="",
+        status_code=HTTPStatus.OK,
+        response_model=list[CVUploadListResponse],
+        responses={
+            HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
+            HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse},
+        },
+        description="Retrieve all CVs uploaded by the user",
+    )
+    async def get_user_cvs(
+        user_id: str = Path(description="the unique identifier of the user", examples=["1"]),
+        user_info: UserInfo = Depends(auth.get_user_info()),
+        service: ICVUploadService = Depends(_get_cv_service),
+    ) -> list:
+        try:
+            if user_info.user_id != user_id:
+                raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Cannot access CVs for a different user")
+
+            # Get user CVs through the service
+            cvs = await service.get_user_cvs(user_id=user_id)
+
+            if not cvs:     # REVIEW: Why this check?
+                # Return an empty list
+                return []
+
+            return cvs
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.exception(e)
+            raise HTTPException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                detail="Failed to retrieve user CVs"
             )
 
     users_router.include_router(router)
