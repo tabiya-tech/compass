@@ -56,14 +56,16 @@ class SimpleAgentDirector(AbstractAgentDirector):
         Get the current agent for a specific state.
         :return: The current agent for the state, or None if conversation has ended
         """
-        assert self._state is not None, "AgentDirectorState must be set before getting current agent"
+        if self._state is None:
+            raise RuntimeError("AgentDirectorState must be set before getting current agent")
         return self._agents.get(self._state.current_phase, None)
 
     def _transition_to_next_phase(self):
         """
         Transition to the next phase of the conversation.
         """
-        assert self._state is not None, "AgentDirectorState must be set before transitioning phase"
+        if self._state is None:
+            raise RuntimeError("AgentDirectorState must be set before transitioning phase")
         if self._state.current_phase != ConversationPhase.ENDED:
             self._state.current_phase = ConversationPhase(self._state.current_phase.value + 1)
 
@@ -76,7 +78,8 @@ class SimpleAgentDirector(AbstractAgentDirector):
         """
 
         try:
-            assert self._state is not None, "AgentDirectorState must be set before executing"
+            if self._state is None:
+                raise RuntimeError("AgentDirectorState must be set before executing")
             current_agent = self._get_current_agent()
             if current_agent:
                 context = await self._conversation_manager.get_conversation_context()
