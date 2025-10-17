@@ -77,7 +77,8 @@ class LLMAgentDirector(AbstractAgentDirector):
         """
         Get the new conversation phase based on the agent output and the current phase.
         """
-        assert self._state is not None, "AgentDirectorState must be set before computing the new phase"
+        if self._state is None:
+            raise RuntimeError("AgentDirectorState must be set before computing the new phase")
         current_phase = self._state.current_phase
 
         # ConversationPhase.ENDED is the final phase
@@ -113,7 +114,8 @@ class LLMAgentDirector(AbstractAgentDirector):
         :return: The output from the agent
         """
         try:
-            assert self._state is not None, "AgentDirectorState must be set before executing"
+            if self._state is None:
+                raise RuntimeError("AgentDirectorState must be set before executing")
             first_call: bool = True
             transitioned_to_new_phase: bool = False
             agent_output: AgentOutput | None = None
