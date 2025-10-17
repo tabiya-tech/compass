@@ -22,5 +22,11 @@
   "agent_director.final_message": "¡La conversación terminó!",
   "agent_director.error_retry": "Estoy teniendo algunas dificultades ahora, ¿podés repetir lo que dijiste?",
   "agent_director.all_agents_done": "¡Conversación finalizada, todos los agentes terminaron!",
-  "agent_director.forcefully_ended": "La conversación se terminó de forma forzada"
+  "agent_director.forcefully_ended": "La conversación se terminó de forma forzada",
+  "experience.until": "hasta {end_date}",
+  "experience.no_title_provided_yet": "Sin título aún",
+  "experience.work_type.short.formal_sector_waged_employment": "Trabajo asalariado",
+  "experience.work_type.short.formal_sector_unpaid_trainee_work": "Pasantía no paga",
+  "experience.work_type.short.self_employment": "Trabajo por cuenta propia",
+  "experience.work_type.short.unseen_unpaid": "Voluntariado/No pago"
 }
