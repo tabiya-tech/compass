@@ -22,5 +22,11 @@
   "agent_director.final_message": "The conversation has finished!",
   "agent_director.error_retry": "I am facing some difficulties right now, could you please repeat what you said?",
   "agent_director.all_agents_done": "Conversation finished, all agents are done!",
-  "agent_director.forcefully_ended": "Conversation forcefully ended"
+  "agent_director.forcefully_ended": "Conversation forcefully ended",
+  "experience.until": "until {end_date}",
+  "experience.no_title_provided_yet": "No title provided yet",
+  "experience.work_type.short.formal_sector_waged_employment": "Waged Employment",
+  "experience.work_type.short.formal_sector_unpaid_trainee_work": "Trainee",
+  "experience.work_type.short.self_employment": "Self-Employed",
+  "experience.work_type.short.unseen_unpaid": "Volunteer/Unpaid"
 }
