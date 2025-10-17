@@ -8,6 +8,7 @@ from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import \
     ConversationMemoryManager
 from app.vector_search.vector_search_dependencies import SearchServices
+from app.i18n.translation_service import t
 
 
 class SimpleAgentDirector(AbstractAgentDirector):
@@ -55,12 +56,14 @@ class SimpleAgentDirector(AbstractAgentDirector):
         Get the current agent for a specific state.
         :return: The current agent for the state, or None if conversation has ended
         """
+        assert self._state is not None, "AgentDirectorState must be set before getting current agent"
         return self._agents.get(self._state.current_phase, None)
 
     def _transition_to_next_phase(self):
         """
         Transition to the next phase of the conversation.
         """
+        assert self._state is not None, "AgentDirectorState must be set before transitioning phase"
         if self._state.current_phase != ConversationPhase.ENDED:
             self._state.current_phase = ConversationPhase(self._state.current_phase.value + 1)
 
@@ -73,6 +76,7 @@ class SimpleAgentDirector(AbstractAgentDirector):
         """
 
         try:
+            assert self._state is not None, "AgentDirectorState must be set before executing"
             current_agent = self._get_current_agent()
             if current_agent:
                 context = await self._conversation_manager.get_conversation_context()
@@ -83,12 +87,20 @@ class SimpleAgentDirector(AbstractAgentDirector):
                 await self._conversation_manager.update_history(user_input, agent_output)
             else:
                 # No more agents to run
+                try:
+                    done_msg = t("messages", "agent_director.all_agents_done")
+                except Exception:
+                    done_msg = "Conversation finished, all agents are done!"
                 agent_output = AgentOutput(
-                    message_for_user="Conversation finished, all agents are done!",
+                    message_for_user=done_msg,
                     finished=True, agent_type=None)
             return agent_output
         # executing an agent can raise any number of unknown exceptions
         except Exception as e:  # pylint: disable=broad-except
             self._logger.error("Error while executing the agent director: %s", e, exc_info=True)
-            return AgentOutput(message_for_user="Conversation forcefully ended",
+            try:
+                end_msg = t("messages", "agent_director.forcefully_ended")
+            except Exception:
+                end_msg = "Conversation forcefully ended"
+            return AgentOutput(message_for_user=end_msg,
                                finished=True, agent_type=None)
