@@ -18,4 +18,9 @@
   "collect_experiences.fields.end_date": "fecha de finalización",
   "collect_experiences.fields.company": "empresa/receptor del trabajo",
   "collect_experiences.fields.location": "ubicación"
+  ,
+  "agent_director.final_message": "¡La conversación ha finalizado!",
+  "agent_director.error_retry": "Estoy teniendo algunas dificultades en este momento, ¿podrías repetir lo que dijiste?",
+  "agent_director.all_agents_done": "¡Conversación finalizada, todos los agentes han terminado!",
+  "agent_director.forcefully_ended": "La conversación se terminó de manera forzada"
 }

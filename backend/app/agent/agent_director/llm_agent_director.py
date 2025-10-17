@@ -9,6 +9,7 @@ from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.vector_search.vector_search_dependencies import SearchServices
+from app.i18n.translation_service import t
 
 
 class LLMAgentDirector(AbstractAgentDirector):
@@ -76,6 +77,7 @@ class LLMAgentDirector(AbstractAgentDirector):
         """
         Get the new conversation phase based on the agent output and the current phase.
         """
+        assert self._state is not None, "AgentDirectorState must be set before computing the new phase"
         current_phase = self._state.current_phase
 
         # ConversationPhase.ENDED is the final phase
@@ -111,13 +113,18 @@ class LLMAgentDirector(AbstractAgentDirector):
         :return: The output from the agent
         """
         try:
+            assert self._state is not None, "AgentDirectorState must be set before executing"
             first_call: bool = True
             transitioned_to_new_phase: bool = False
             agent_output: AgentOutput | None = None
             while first_call or transitioned_to_new_phase:
                 if self._state.current_phase == ConversationPhase.ENDED:
+                    try:
+                        finished_msg = t("messages", "agent_director.final_message")
+                    except Exception:
+                        finished_msg = "The conversation has finished!"
                     agent_output = AgentOutput(
-                        message_for_user="The conversation has finished!",
+                        message_for_user=finished_msg,
                         finished=True,
                         agent_type=None,
                         agent_response_time_in_sec=0,  # artificial value as there is no LLM call
@@ -162,8 +169,12 @@ class LLMAgentDirector(AbstractAgentDirector):
         # executing an agent can raise any number of unknown exceptions
         except Exception as e:  # pylint: disable=broad-except
             self._logger.error("Error while executing the agent director: %s", e, exc_info=True)
+            try:
+                err_msg = t("messages", "agent_director.error_retry")
+            except Exception:
+                err_msg = "I am facing some difficulties right now, could you please repeat what you said?"
             agent_output = AgentOutput(
-                message_for_user="I am facing some difficulties right now, could you please repeat what you said?",
+                message_for_user=err_msg,
                 finished=True,
                 agent_type=None,
                 agent_response_time_in_sec=0,  # an artificial value, perhaps misleading, but could be improved later
