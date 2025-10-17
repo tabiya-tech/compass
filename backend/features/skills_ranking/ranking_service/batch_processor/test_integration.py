@@ -25,7 +25,7 @@ async def test_batch_processor_integration(in_memory_job_seekers_db, in_memory_o
         "opportunities_data_1",
     )
     await opportunities_data_repository._collection.insert_one(
-        {"active": True, "skillGroups": [{"UUID": "skill-uuid-1"}]})
+        {"active": True, "skillGroups": [{"originUUID": "skill-uuid-1"}]})
 
     # AND the opportunity data service is constructed
     opportunities_data_service = OpportunitiesDataService(
