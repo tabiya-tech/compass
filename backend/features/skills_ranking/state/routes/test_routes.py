@@ -1,3 +1,7 @@
+from features.skills_ranking.services.errors import (
+    SkillsRankingGenericError,
+)
+
 from datetime import datetime
 from http import HTTPStatus
 from typing import Generator, Tuple
@@ -451,3 +455,25 @@ class TestSkillsRankingRoutes:
             assert response.json()["detail"] == "Oops! Something went wrong."
             # AND the service upsert_state is called
             mocked_service.upsert_state.assert_called_once()
+
+        @pytest.mark.asyncio
+        async def test_upsert_maps_generic_error_to_500(
+                self,
+                client_with_mocks: TestClientWithMocks,
+                setup_application_config: ApplicationConfig
+        ):
+            client, mocked_service, mocked_repository, mocked_preferences, _ = client_with_mocks
+
+            # GIVEN no existing state and a valid session
+            mocked_repository.get_by_session_id = AsyncMock(return_value=None)
+            mocked_preferences.get_user_preference_by_user_id = AsyncMock(
+                return_value=get_mock_user_preferences(1, {}))
+            # AND the service raises a generic error
+            mocked_service.upsert_state = AsyncMock(side_effect=SkillsRankingGenericError("Skills ranking service error"))
+
+            # WHEN upserting INITIAL phase
+            response = client.patch("/conversations/1/skills-ranking/state", json={"phase": "INITIAL"})
+
+            # THEN a 500 is returned
+            assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+            assert response.json()["detail"] == "Skills ranking service error"

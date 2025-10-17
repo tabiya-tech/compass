@@ -17,6 +17,9 @@ from features.skills_ranking.state.repositories.get_skills_ranking_state_reposit
 from features.skills_ranking.state.repositories.skills_ranking_state_repository import ISkillsRankingStateRepository
 from features.skills_ranking.state.routes.type import UpsertSkillsRankingRequest, SkillsRankingStateResponse
 from features.skills_ranking.state.services.get_skills_ranking_state_service import get_skills_ranking_state_service
+from features.skills_ranking.services.errors import (
+    SkillsRankingGenericError,
+)
 from features.skills_ranking.state.services.skills_ranking_state_service import ISkillsRankingStateService
 from features.skills_ranking.state.services.type import UpdateSkillsRankingRequest
 from features.skills_ranking.errors import SkillsRankingStateNotFound
@@ -128,6 +131,8 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
         except InvalidFieldsForPhaseError as e:
             logger.warning(f"Invalid fields for phase: {e}")
             raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Invalid fields for the current phase.") from e
+        except SkillsRankingGenericError as e:
+            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Skills ranking service error") from e
         except Exception as e:
             logger.exception(e)
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")

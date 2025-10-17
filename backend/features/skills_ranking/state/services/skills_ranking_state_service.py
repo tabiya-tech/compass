@@ -1,8 +1,10 @@
 import asyncio
+import logging
 from abc import ABC, abstractmethod
 from typing import Tuple, cast
 import random
 
+from app.app_config import get_application_config
 from app.application_state import IApplicationStateManager
 from app.users.repositories import IUserPreferenceRepository
 from common_libs.time_utilities import get_now
@@ -13,7 +15,14 @@ from features.skills_ranking.state.repositories.types import IRegistrationDataRe
 from features.skills_ranking.state.services.type import SkillsRankingState, SkillRankingExperimentGroup, \
     SkillsRankingScore, \
     SkillsRankingPhase, UpdateSkillsRankingRequest, SkillsRankingPhaseName
-from features.skills_ranking.ranking_service.services.ranking_service import IRankingService
+from features.skills_ranking.services.skills_ranking_service import SkillsRankingService
+from features.skills_ranking.services.errors import (
+    SkillsRankingServiceHTTPError,
+    SkillsRankingServiceTimeoutError,
+    SkillsRankingServiceRequestError,
+    SkillsRankingServiceError,
+    SkillsRankingGenericError,
+)
 from features.skills_ranking.state.utils.get_group import get_group
 from features.skills_ranking.state.utils.phase_utils import get_possible_next_phase
 
@@ -63,7 +72,7 @@ class SkillsRankingStateService(ISkillsRankingStateService):
                  user_preferences_repository: IUserPreferenceRepository,
                  registration_data_repository: IRegistrationDataRepository,
                  application_state_manager: IApplicationStateManager,
-                 ranking_service: IRankingService,
+                 skills_ranking_service: SkillsRankingService,
                  high_difference_threshold: float,
                  correct_rotations_threshold_for_group_switch: int):
         # repositories
@@ -72,12 +81,15 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         self._registration_data_repository = registration_data_repository
 
         # services
-        self._ranking_service = ranking_service
+        self._http_client = skills_ranking_service
         self._application_state_manager = application_state_manager
 
         # Configurations
         self._high_difference_threshold = high_difference_threshold
         self._correct_rotations_threshold_for_group_switch = correct_rotations_threshold_for_group_switch
+        
+        # Logger
+        self._logger = logging.getLogger(self.__class__.__name__)
 
     def _get_switched_update_request(self,
                                      update_request: UpdateSkillsRankingRequest,
@@ -262,11 +274,27 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         participant_skills_uuids: set[str] = {skill.originUUID for skill in participant_skills}
 
         # 3. Compute the ranking score for this participant
-        score = await self._ranking_service.get_participant_ranking(
-            user_id=user_id,
-            prior_beliefs=prior_beliefs,
-            participants_skills_uuids=participant_skills_uuids
-        )
+        taxonomy_model_id = get_application_config().taxonomy_model_id
+        
+        try:
+            score = await self._http_client.get_participant_ranking(
+                user_id=user_id,
+                prior_beliefs=prior_beliefs,
+                participants_skills_uuids=participant_skills_uuids,
+                taxonomy_model_id=taxonomy_model_id
+            )
+        except SkillsRankingServiceHTTPError as e:
+            self._logger.error(f"HTTP error from skills ranking service: {e.status_code} - {e.body}")
+            raise SkillsRankingGenericError("Skills ranking service HTTP error")
+        except SkillsRankingServiceTimeoutError as e:
+            self._logger.error(f"Timeout from skills ranking service: {e.details}")
+            raise SkillsRankingGenericError("Skills ranking service timeout")
+        except SkillsRankingServiceRequestError as e:
+            self._logger.error(f"Request error from skills ranking service: {e.details}")
+            raise SkillsRankingGenericError("Skills ranking service request error")
+        except SkillsRankingServiceError as e:
+            self._logger.error(f"Generic error from skills ranking service: {e.message}")
+            raise SkillsRankingGenericError("Skills ranking service error")
 
         # 4. Because the ranking service returns scores between 0 and 1,
         #    we need to convert it to a values between 0 and 100 and round to 2 decimal places

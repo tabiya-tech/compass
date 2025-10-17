@@ -1,18 +1,29 @@
 import logging
 from pydantic import BaseModel, Field
 
-from features.skills_ranking.ranking_service.services.config import RankingServiceConfig, OpportunitiesDataServiceConfig
 from features.skills_ranking.state.repositories.default_collections import DefaultCollections as DefaultCollections
-from features.skills_ranking.ranking_service.repositories.default_collections import DefaultCollections as RankingDefaultCollections
 
 _logger = logging.getLogger(__name__)
 
 
-class SkillsRankingConfig(RankingServiceConfig, OpportunitiesDataServiceConfig, BaseModel):
+class SkillsRankingConfig(BaseModel):
     """
     Typed Configuration for the skill ranking feature.
+    Now uses external skills-ranking-service instead of internal implementation.
     """
 
+    # External service configuration
+    skills_ranking_service_url: str
+    """
+    The base URL of the external skills-ranking-service.
+    """
+
+    skills_ranking_service_api_key: str
+    """
+    The API key for authenticating with the external skills-ranking-service.
+    """
+
+    # State management (still needed for compass experiment state)
     skills_ranking_state_mongodb_uri: str
     """
     The URI of the skills ranking state MongoDB instance.
@@ -26,26 +37,6 @@ class SkillsRankingConfig(RankingServiceConfig, OpportunitiesDataServiceConfig, 
     skills_ranking_state_collection_name: str = DefaultCollections.SKILLS_RANKING_STATE
     """
     The collection name for the skills ranking state.
-    """
-
-    opportunity_data_mongodb_uri: str
-    """
-    The URI of the opportunity data MongoDB instance.
-    """
-
-    opportunity_data_database_name: str
-    """
-    The name of the opportunity data database.
-    """
-
-    opportunity_data_collection_name: str = RankingDefaultCollections.OPPORTUNITIES_DATA
-    """
-    The collection name for the opportunity data.
-    """
-
-    skills_collection_name: str = RankingDefaultCollections.SKILLS
-    """
-    The collection name for the skills.
     """
 
     registration_data_mongodb_uri: str
@@ -62,22 +53,6 @@ class SkillsRankingConfig(RankingServiceConfig, OpportunitiesDataServiceConfig, 
     """
     The registration data collection name.
     """
-
-    job_seekers_mongodb_uri: str
-    """
-    The URI of the job seekers MongoDB instance.
-    """
-
-    job_seekers_database_name: str
-    """
-    The name of the job seekers database.
-    """
-
-    job_seekers_collection_name: str = RankingDefaultCollections.JOB_SEEKERS_DATA
-    """
-    The collection name for the job seekers data.
-    """
-
 
     high_difference_threshold: float = Field(gt=0)
     """
@@ -106,6 +81,7 @@ class SkillsRankingConfig(RankingServiceConfig, OpportunitiesDataServiceConfig, 
 ################
 
 _config: SkillsRankingConfig | None = None
+
 
 def set_skills_ranking_config(config: SkillsRankingConfig):
     """
