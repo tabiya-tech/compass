@@ -1,8 +1,9 @@
 import logging
+
+import brotli
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-import brotli
 
 logger = logging.getLogger(__name__)
 
@@ -17,17 +18,17 @@ class BrotliRequestMiddleware(BaseHTTPMiddleware):
 
         # Only process brotli-compressed requests
         if not content_encoding == "br":
-            logger.info("Request without brotli compression, passing through",
-                        extra={"content_encoding": content_encoding})
+            logger.debug("Request without brotli compression, passing through. %s",
+                         {"content_encoding": content_encoding})
             return await call_next(request)
         try:
             body = await request.body()
             if body:
                 # Decompress the brotli-compressed body
                 decompressed_body = brotli.decompress(body)
-                logger.info("Decompressed brotli-compressed request body",
-                            extra={"body_length": len(body), "decompressed_length": len(decompressed_body),
-                                   "content_encoding": content_encoding})
+                logger.debug("Decompressed brotli-compressed request body. %s",
+                             {"body_length": len(body), "decompressed_length": len(decompressed_body),
+                              "content_encoding": content_encoding})
 
                 # Replace the request body with the decompressed content
                 request._body = decompressed_body

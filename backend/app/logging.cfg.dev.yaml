@@ -27,6 +27,7 @@ loggers:
   #WelcomeAgent: *template_logger
   #SkillExplorerAgent: *template_logger
   #FarewellAgent: *template_logger
+  #app.middleware.brotli_request: *template_logger
 filters:
   session_filter:
     (): app.logger.SessionIdLogFilter
