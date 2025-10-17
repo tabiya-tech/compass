@@ -6,9 +6,9 @@ import {
   ListItemText,
   Menu,
   MenuItem,
+  PopoverOrigin,
   Typography,
   useTheme,
-  PopoverOrigin,
 } from "@mui/material";
 import { MenuItemConfig } from "./menuItemConfig.types";
 
@@ -46,6 +46,7 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
       transformOrigin={props.transformOrigin ?? { vertical: "top", horizontal: "right" }}
       anchorEl={props.anchorEl}
       open={props.open}
+      disableAutoFocusItem
       onClose={props.notifyOnClose}
       data-testid={DATA_TEST_ID.MENU}
       slotProps={{

@@ -126,6 +126,8 @@ export const Mixed: Story = {
   },
 };
 
+// REVIEW: Optional[Story] With custom Item.
+
 function SetupComponent(props: Readonly<ContextMenuProps>) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   useEffect(() => {

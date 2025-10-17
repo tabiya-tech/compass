@@ -149,3 +149,7 @@ export const UploadingDisabledState: Story = {
     currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
   },
 };
+
+
+// REVIEW: With previously uploaded cvs.
+//         like 1, 3, and 10 how would that look like.

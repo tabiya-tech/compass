@@ -1,10 +1,12 @@
 import React from "react";
-import { Box, Divider, Typography, useTheme, AccordionSummary, AccordionDetails } from "@mui/material";
+import { AccordionDetails, AccordionSummary, Box, Divider, Typography, useTheme } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import InfoIcon from "@mui/icons-material/Info";
 import HelpTip from "src/theme/HelpTip/HelpTip";
-import { getDurationFromNow } from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/getDurationFromNow/getDurationFromNow";
+import {
+  getDurationFromNow,
+} from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/getDurationFromNow/getDurationFromNow";
 import { StyledAccordion } from "src/theme/CustomAccordion/CustomAccordion";
 import { CVListItem } from "src/CV/CVService/CVService.types";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
@@ -38,7 +40,10 @@ const UploadedCVsAccordion: React.FC<UploadedCVsAccordionProps> = ({ items, onSe
 
   return (
     <Box display="flex" flexDirection="column" rowGap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
-      <StyledAccordion data-testid={DATA_TEST_ID.UPLOADED_CVS_ACCORDION}>
+      <StyledAccordion data-testid={DATA_TEST_ID.UPLOADED_CVS_ACCORDION} disableGutters  sx={{
+        display: 'flex',
+        flexDirection: 'column-reverse', // This reverses the visual order
+      }}>
         <Box
           sx={{
             display: "flex",

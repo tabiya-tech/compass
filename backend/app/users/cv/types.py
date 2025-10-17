@@ -1,6 +1,6 @@
+import uuid
 from datetime import datetime, timezone
 from enum import Enum
-import uuid
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -40,8 +40,8 @@ class CVUploadStatusResponse(BaseModel):
     experience_bullets: list[str] | None = None
 
 
-class CVUploadListResponse(BaseModel):
-    upload_id: str
+class CVUploadListResponse(BaseModel):  # REVIEW: Optional rename it to CVUploadResponseListItem or CVListItem (like on the frontend)
+    upload_id: str  # REVIEW: [Optional] Perhaps add some documentation for the fields here. explaining the above fields.
     filename: str
     uploaded_at: datetime
     upload_process_state: str

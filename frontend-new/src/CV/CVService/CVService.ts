@@ -161,8 +161,9 @@ export default class CVService {
     const serviceName = "CVService";
     const serviceFunction = "getAllCVs";
     const method = "GET";
-    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, this.cvEndpointUrl);
     const constructedUrl = `${this.cvEndpointUrl}/${userId}/cv`;
+    // REVIEW: the url should be the constructed URL.
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, constructedUrl);
 
     const response = await customFetch(constructedUrl, {
       method: method,
@@ -174,6 +175,7 @@ export default class CVService {
       serviceFunction,
       failureMessage: `Failed to fetch CVs for user ${userId}`,
       expectedContentType: "application/json",
+      // REVIEW: retryOnFailedToFetch: true,
     });
 
     try {
