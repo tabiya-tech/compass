@@ -17,12 +17,17 @@ from features.skills_ranking.state._test_utilities import get_skills_ranking_sta
 from features.skills_ranking.state.repositories.skills_ranking_state_repository import ISkillsRankingStateRepository
 from features.skills_ranking.state.services.skills_ranking_state_service import SkillsRankingStateService, \
     CORRECT_ROTATIONS_THRESHOLD_FOR_GROUP_SWITCH
-from features.skills_ranking.state.services.test_types import get_test_ranking_service, \
+from features.skills_ranking.state.services.test_types import get_test_http_client, \
     get_test_application_state_manager, get_test_registration_data_repository
 from features.skills_ranking.state.services.type import SkillsRankingState, SkillsRankingPhaseName, \
     SkillRankingExperimentGroup, \
     SkillsRankingPhase, UpdateSkillsRankingRequest
 from features.skills_ranking.types import PriorBeliefs, SkillsRankingScore
+from features.skills_ranking.services.errors import (
+    SkillsRankingServiceHTTPError,
+    SkillsRankingServiceTimeoutError,
+    SkillsRankingGenericError,
+)
 
 
 @pytest.fixture(scope="function")
@@ -74,7 +79,8 @@ class TestSkillsRankingService:
         @pytest.mark.asyncio
         async def test_upsert_state_create(self,
                                            _mock_skills_ranking_state_repository: ISkillsRankingStateRepository,
-                                           _mock_user_preference_repository: IUserPreferenceRepository):
+                                           _mock_user_preference_repository: IUserPreferenceRepository,
+                                           setup_application_config: ApplicationConfig):
             # GIVEN a state to create
             given_state = get_skills_ranking_state()
 
@@ -94,7 +100,7 @@ class TestSkillsRankingService:
                 _mock_user_preference_repository,
                 get_test_registration_data_repository(),
                 get_test_application_state_manager(),
-                get_test_ranking_service(),
+                get_test_http_client(),
                 given_high_difference_threshold,
                 given_correct_rotations_threshold_for_group_switch
             )
@@ -121,7 +127,7 @@ class TestSkillsRankingService:
         async def test_upsert_state_update_valid_transition(
                 self,
                 _mock_skills_ranking_state_repository: ISkillsRankingStateRepository,
-                _mock_user_preference_repository: IUserPreferenceRepository):
+                _mock_user_preference_repository: IUserPreferenceRepository, setup_application_config: ApplicationConfig):
             # GIVEN an existing state
             existing_state = get_skills_ranking_state(phase="INITIAL")
 
@@ -148,7 +154,7 @@ class TestSkillsRankingService:
                 _mock_user_preference_repository,
                 get_test_registration_data_repository(),
                 get_test_application_state_manager(),
-                get_test_ranking_service(),
+                get_test_http_client(),
                 given_high_difference_threshold,
                 given_correct_rotations_threshold_for_group_switch
             )
@@ -200,12 +206,12 @@ class TestSkillsRankingService:
                 _mock_user_preference_repository,
                 get_test_registration_data_repository(),
                 get_test_application_state_manager(),
-                get_test_ranking_service(),
+                get_test_http_client(),
                 given_high_difference_threshold,
                 given_correct_rotations_threshold_for_group_switch
             )
 
-            # WHEN upserting the state
+            # WHEN upserting the state (app config ensures taxonomy_model_id is available)
             # THEN an InvalidNewPhaseError is raised because we can't go from 'BRIEFING' to 'COMPLETED'
             with pytest.raises(InvalidNewPhaseError) as throw_exception:
                 await service.upsert_state(
@@ -250,7 +256,7 @@ class TestSkillsRankingService:
                 _mock_user_preference_repository,
                 get_test_registration_data_repository(),
                 get_test_application_state_manager(),
-                get_test_ranking_service(),
+                get_test_http_client(),
                 given_high_difference_threshold,
                 given_correct_rotations_threshold_for_group_switch
             )
@@ -305,7 +311,7 @@ class TestSkillsRankingService:
                 _mock_user_preference_repository,
                 get_test_registration_data_repository(),
                 get_test_application_state_manager(),
-                get_test_ranking_service(),
+                get_test_http_client(),
                 given_high_difference_threshold,
                 given_correct_rotations_threshold_for_group_switch
             )
@@ -347,7 +353,7 @@ class TestSkillsRankingService:
                 _mock_user_preference_repository,
                 get_test_registration_data_repository(),
                 get_test_application_state_manager(),
-                get_test_ranking_service(),
+                get_test_http_client(),
                 given_high_difference_threshold,
                 given_correct_rotations_threshold_for_group_switch
             )
@@ -390,7 +396,7 @@ class TestSkillsRankingService:
                 _mock_user_preference_repository,
                 get_test_registration_data_repository(),
                 get_test_application_state_manager(),
-                get_test_ranking_service(),
+                get_test_http_client(),
                 given_high_difference_threshold,
                 given_correct_rotations_threshold_for_group_switch
             )
@@ -423,7 +429,7 @@ class TestSkillsRankingService:
 
         @pytest.mark.asyncio
         async def test_success(self, _mock_skills_ranking_state_repository, _mock_user_preference_repository,
-                               mocker: pytest_mock.MockFixture):
+                               mocker: pytest_mock.MockFixture, setup_application_config: ApplicationConfig):
             # GIVEN a random user id
             given_user_id = get_random_user_id()
 
@@ -469,7 +475,7 @@ class TestSkillsRankingService:
             #
             #       Ranking Service
             #
-            ranking_service = get_test_ranking_service()
+            ranking_service = get_test_http_client()
             given_participant_ranks = SkillsRankingScore(
                 comparison_rank=random.random(),  # nosec used for testing purposes
                 jobs_matching_rank=random.random(),  # nosec used for testing purposes
@@ -477,7 +483,7 @@ class TestSkillsRankingService:
                 calculated_at=datetime.datetime.now()
             )
 
-            ranking_service_get_participant_ranking_spy = mocker.patch.object(
+            http_client_get_participant_ranking_spy = mocker.patch.object(
                 ranking_service,
                 "get_participant_ranking",
                 AsyncMock(return_value=given_participant_ranks)  # Mocking the return value for simplicity
@@ -521,9 +527,9 @@ class TestSkillsRankingService:
             assert application_state_manager_get_state_spy.call_count == 1
             assert application_state_manager_get_state_spy.call_args.kwargs.get("session_id") == given_session_id
 
-            # AND the ranking service.get_participant_ranking should be called with the correct parameters
-            assert ranking_service_get_participant_ranking_spy.call_count == 1
-            call_args = ranking_service_get_participant_ranking_spy.call_args
+            # AND the http client.get_participant_ranking should be called with the correct parameters
+            assert http_client_get_participant_ranking_spy.call_count == 1
+            call_args = http_client_get_participant_ranking_spy.call_args
             assert call_args.kwargs.get("user_id") == given_user_id
             assert call_args.kwargs.get("prior_beliefs") == given_prior_beliefs
             assert call_args.kwargs.get("participants_skills_uuids") == expected_skills_uuids
@@ -534,3 +540,100 @@ class TestSkillsRankingService:
             assert call_args.kwargs.get("self_estimated_rank") == given_prior_beliefs.opportunity_rank_prior_belief
             # AND the actual rank should match the jobs_matching_rank from the actual_ranks but normalized to 100
             assert round(call_args.kwargs.get("actual_rank") * 100, 2) == actual_ranks.jobs_matching_rank
+
+    class TestErrorHandling:
+        """Test error handling in the state service."""
+
+        @pytest.mark.asyncio
+        async def test_calculate_ranking_and_groups_http_error(
+                self,
+                _mock_skills_ranking_state_repository: ISkillsRankingStateRepository,
+                _mock_user_preference_repository: IUserPreferenceRepository,
+                setup_application_config: ApplicationConfig,
+                mocker: pytest_mock.MockFixture
+        ):
+            # GIVEN a user and session
+            given_user_id = get_random_user_id()
+            given_session_id = get_random_session_id()
+
+            # AND mocked dependencies
+            registration_data_repository = get_test_registration_data_repository()
+            application_state_manager = get_test_application_state_manager()
+            given_application_state = get_test_application_state(given_session_id)
+            
+            mocker.patch.object(registration_data_repository, "get_prior_beliefs", AsyncMock(return_value=PriorBeliefs(
+                external_user_id=get_random_user_id(),
+                compare_to_others_prior_belief=0.5,
+                opportunity_rank_prior_belief=0.6,
+            )))
+            mocker.patch.object(application_state_manager, "get_state", AsyncMock(return_value=given_application_state))
+
+            # AND the HTTP client raises an HTTP error
+            ranking_service = get_test_http_client()
+            mocker.patch.object(ranking_service, "get_participant_ranking", 
+                              AsyncMock(side_effect=SkillsRankingServiceHTTPError(500, "Internal server error")))
+
+            service = SkillsRankingStateService(
+                _mock_skills_ranking_state_repository,
+                _mock_user_preference_repository,
+                registration_data_repository,
+                application_state_manager,
+                ranking_service,
+                0.5,
+                30
+            )
+
+            # WHEN calling calculate_ranking_and_groups
+            # THEN a generic error is raised
+            with pytest.raises(SkillsRankingGenericError) as exc_info:
+                await service.calculate_ranking_and_groups(given_user_id, given_session_id)
+
+            # AND the error message is generic
+            assert "Skills ranking service HTTP error" in str(exc_info.value)
+
+        @pytest.mark.asyncio
+        async def test_calculate_ranking_and_groups_timeout_error(
+                self,
+                _mock_skills_ranking_state_repository: ISkillsRankingStateRepository,
+                _mock_user_preference_repository: IUserPreferenceRepository,
+                setup_application_config: ApplicationConfig,
+                mocker: pytest_mock.MockFixture
+        ):
+            # GIVEN a user and session
+            given_user_id = get_random_user_id()
+            given_session_id = get_random_session_id()
+
+            # AND mocked dependencies
+            registration_data_repository = get_test_registration_data_repository()
+            application_state_manager = get_test_application_state_manager()
+            given_application_state = get_test_application_state(given_session_id)
+            
+            mocker.patch.object(registration_data_repository, "get_prior_beliefs", AsyncMock(return_value=PriorBeliefs(
+                external_user_id=get_random_user_id(),
+                compare_to_others_prior_belief=0.5,
+                opportunity_rank_prior_belief=0.6,
+            )))
+            mocker.patch.object(application_state_manager, "get_state", AsyncMock(return_value=given_application_state))
+
+            # AND the HTTP client raises a timeout error
+            ranking_service = get_test_http_client()
+            mocker.patch.object(ranking_service, "get_participant_ranking", 
+                              AsyncMock(side_effect=SkillsRankingServiceTimeoutError("Request timed out")))
+
+            service = SkillsRankingStateService(
+                _mock_skills_ranking_state_repository,
+                _mock_user_preference_repository,
+                registration_data_repository,
+                application_state_manager,
+                ranking_service,
+                0.5,
+                30
+            )
+
+            # WHEN calling calculate_ranking_and_groups
+            # THEN a generic error is raised
+            with pytest.raises(SkillsRankingGenericError) as exc_info:
+                await service.calculate_ranking_and_groups(given_user_id, given_session_id)
+
+            # AND the error message is generic
+            assert "Skills ranking service timeout" in str(exc_info.value)

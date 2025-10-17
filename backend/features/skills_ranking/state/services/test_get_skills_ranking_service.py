@@ -13,7 +13,7 @@ class TestGetSkillsRankingService:
         import features.skills_ranking.state.services.get_skills_ranking_state_service
         features.skills_ranking.state.services.get_skills_ranking_state_service._skills_ranking_service_singleton = None
 
-    async def test_get_skills_ranking_service_concurrent_calls(self, mocker: pytest_mock.MockFixture):
+    async def test_get_skills_ranking_service_concurrent_calls(self, mocker: pytest_mock.MockFixture, setup_skills_ranking_feature_config):
         # GIVEN a mocked repository
         mock_repository = mocker.MagicMock(spec=ISkillsRankingStateRepository)
 
@@ -33,7 +33,7 @@ class TestGetSkillsRankingService:
         # AND it should use the right repository
         assert service_instance_1._repository == mock_repository  # type: ignore
 
-    async def test_get_skills_ranking_service_subsequent_calls(self, mocker: pytest_mock.MockFixture):
+    async def test_get_skills_ranking_service_subsequent_calls(self, mocker: pytest_mock.MockFixture, setup_skills_ranking_feature_config):
         # GIVEN a mocked repository
         mock_repository = mocker.MagicMock(spec=ISkillsRankingStateRepository)
 

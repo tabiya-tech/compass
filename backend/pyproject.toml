@@ -28,12 +28,12 @@ pympler="^1.1"
 scipy = "^1.16.1"
 markitdown = {extras = ["pdf", "docx"], version = "^0.1.2"}
 brotli = "^1.1.0"
+httpx = "^0.28.1"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
 pytest-asyncio = "^0.23.6"
 pytest-mock = "^3.14.0"
 tqdm="^4.66"
-httpx = "^0.28.1"
 bandit = "^1.7.8"
 pylint = "^3.1.0"
 pylint-pydantic="^0.3.2"

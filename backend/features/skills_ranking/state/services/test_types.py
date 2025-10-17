@@ -3,20 +3,23 @@ from typing import AsyncIterator
 
 from app.application_state import IApplicationStateManager, ApplicationState
 from common_libs.test_utilities import get_random_session_id
-from features.skills_ranking.ranking_service.services.ranking_service import IRankingService
+from features.skills_ranking.services.skills_ranking_service import SkillsRankingService
 from app.store.database_application_state_store_test import get_test_application_state
 from features.skills_ranking.state.repositories.types import IRegistrationDataRepository
 from features.skills_ranking.types import SkillsRankingScore, PriorBeliefs
 
 
-def get_test_ranking_service():
-    class TestRankingService(IRankingService):
+def get_test_http_client():
+    class TestHttpClient(SkillsRankingService):
+        def __init__(self):
+            # Don't call super().__init__ since we don't need real HTTP client
+            pass
+
         async def get_participant_ranking(self,
-                                          *,
                                           user_id: str,
                                           prior_beliefs: PriorBeliefs,
-                                          participants_skills_uuids: set[str]):
-
+                                          participants_skills_uuids: set[str],
+                                          taxonomy_model_id: str):
             return SkillsRankingScore(
                 comparison_rank=0,
                 jobs_matching_rank=0,
@@ -24,7 +27,7 @@ def get_test_ranking_service():
                 calculated_at=datetime.datetime.now()
             )
 
-    return TestRankingService()
+    return TestHttpClient()
 
 
 def get_test_application_state_manager():
@@ -34,15 +37,19 @@ def get_test_application_state_manager():
             return get_test_application_state(get_random_session_id())
 
         async def save_state(self, state: ApplicationState):
+            # left empty for testing purposes
             pass
 
         async def delete_state(self, session_id: int) -> None:
+            # left empty for testing purposes
             pass
 
         async def get_all_session_ids(self) -> AsyncIterator[int]:
+            # left empty for testing purposes
             pass
 
     return TestApplicationStateManager()
+
 
 def get_test_registration_data_repository():
     class TestRegistrationDataRepository(IRegistrationDataRepository):
