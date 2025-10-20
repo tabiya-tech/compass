@@ -9,7 +9,7 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import CustomRating from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
-import questions from "src/feedback/overallFeedback/feedbackForm/questions-en.json";
+import questions from "src/feedback/overallFeedback/feedbackForm/questions-en-gb.json";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { FeedbackError } from "src/error/commonErrors";
@@ -24,8 +24,14 @@ export const DATA_TEST_ID = {
   CUSTOMER_SATISFACTION_RATING_CONTAINER: `customer-satisfaction-rating-container-${uniqueId}`,
 };
 
+// Provide a flexible typing for questions to allow indexing with our string keys
+type QuestionEntry = { question_text: string; description?: string; comment_placeholder?: string; options?: Record<string, string> };
+const QUESTIONS = questions as unknown as Record<string, QuestionEntry>;
+
 export const UI_TEXT = {
-  CUSTOMER_SATISFACTION_QUESTION_TEXT: "Finally, we'd love to hear your thoughts on your experience so far! " + questions[QUESTION_KEYS.CUSTOMER_SATISFACTION].question_text,
+  CUSTOMER_SATISFACTION_QUESTION_TEXT:
+    "Finally, we'd love to hear your thoughts on your experience so far! " +
+    (QUESTIONS[QUESTION_KEYS.CUSTOMER_SATISFACTION]?.question_text ?? ""),
   RATING_LABEL_LOW: "Unsatisfied",
   RATING_LABEL_HIGH: "Satisfied",
 };
