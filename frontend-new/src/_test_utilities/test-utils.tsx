@@ -1,8 +1,5 @@
 // Based on https://testing-library.com/docs/react-testing-library/setup/
 import React, { ReactElement, ReactNode } from "react";
-// Ensure i18n is initialized for all component tests that rely on translations.
-// This avoids individual test suites racing the async init sequence and leaking timers.
-import "src/i18n/i18n";
 import { render, renderHook, RenderHookOptions, RenderOptions } from "@testing-library/react";
 import { ThemeProvider } from "@mui/material";
 import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicationTheme";
