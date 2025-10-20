@@ -64,9 +64,11 @@ export default class UserPreferencesStateService {
       return false;
     }
 
-    return answered_questions[activeSessionId].some(
-      (question) => question !== QUESTION_KEYS.CUSTOMER_SATISFACTION
-    );
+    // Keys of answered_questions are serialized session IDs; ensure robust lookup
+    const answeredForSession = answered_questions[activeSessionId] ?? answered_questions[String(activeSessionId) as unknown as keyof typeof answered_questions];
+    return Array.isArray(answeredForSession)
+      ? answeredForSession.some((question: string) => question !== QUESTION_KEYS.CUSTOMER_SATISFACTION)
+      : false;
   }
   
   public activeSessionHasCustomerSatisfactionRating(): boolean {
@@ -88,7 +90,10 @@ export default class UserPreferencesStateService {
       return false;
     }
 
-    return answered_questions[activeSessionId].includes(QUESTION_KEYS.CUSTOMER_SATISFACTION)
+    const answeredForSession = answered_questions[activeSessionId] ?? answered_questions[String(activeSessionId) as unknown as keyof typeof answered_questions];
+    return Array.isArray(answeredForSession)
+      ? answeredForSession.includes(QUESTION_KEYS.CUSTOMER_SATISFACTION)
+      : false;
   }
 
   private cloneUserPreferences(preferences: UserPreference | null): UserPreference | null {

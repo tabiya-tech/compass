@@ -12,25 +12,25 @@ Feature: Consistency of i18n Translation Keys
   So that users experience consistent UI text across all languages
 
   Background:
-    Given the reference language is "en"
+    Given the reference language is "en-gb"
     And the locales directory is located at "../locales"
 
   Scenario Outline: Verify translation key consistency across locales
-    Given the reference translation file "locales/en/translation.json"
+  Given the reference translation file "locales/en-gb/translation.json"
     When reading the translation file for "<language>"
     Then it should contain the same keys as the English reference file
 
     Examples:
       | language |
       | en-us    |
-      | es       |
+      | es-es    |
       | es-ar    |
       | fr-fr    |
 ──────────────────────────────────────────────────────────────
 */
 
 const localesDir = path.join(__dirname, '../locales');
-const referenceLanguage = 'en';
+const referenceLanguage = 'en-gb';
 
 describe('Feature: i18n locales consistency', () => {
   const referenceTranslationsPath = path.join(localesDir, referenceLanguage, 'translation.json');

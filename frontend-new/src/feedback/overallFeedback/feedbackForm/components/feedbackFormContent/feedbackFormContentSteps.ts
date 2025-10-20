@@ -48,14 +48,14 @@ export const useFeedbackFormContentSteps = () => {
         } catch (error) {
             console.error(`Failed to load questions for locale ${locale}.`, error);
 
-            // Fallback: If the specific locale file fails, try to load a default (e.g., 'en')
-            if (locale !== 'en') {
-                console.info("Attempting to load fallback 'en' locale.");
-                loadQuestions('en'); // Recursive call for fallback
+            // Fallback: If the specific locale file fails, try to load a default (e.g., 'en-gb')
+            if (locale !== 'en-gb') {
+                console.info("Attempting to load fallback 'en-gb' locale.");
+                loadQuestions('en-gb'); // Recursive call for fallback
                 return;
             }
             // If fallback also fails, set to empty object
-            console.error("Fallback 'en' locale also failed to load.");
+            console.error("Fallback 'en-gb' locale also failed to load.");
             setQuestionsData({});
         } finally {
             setLoading(false);

@@ -82,8 +82,8 @@ const preview: Preview = {
       toolbar: {
         icon: 'globe',
         items: [
-          { value: 'en', title: 'English' },
-          { value: 'es', title: 'Spanish' },
+          { value: 'en-gb', title: 'English' },
+          { value: 'es-es', title: 'Spanish' },
           { value: 'fr-fr', title: 'French' },
         ],
         showName: true,
@@ -106,7 +106,7 @@ export const decorators = [
   (Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean; locale?: string } }) => {
     const isOnline = context.globals.online;
     const sentryEnabled = context.globals.sentryEnabled;
-    const locale = context.globals.locale || 'en';
+    const locale = context.globals.locale || 'en-gb';
     const prevSentryEnabled = React.useRef(sentryEnabled);
 
     // Handle Sentry enable/disable

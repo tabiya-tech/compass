@@ -96,7 +96,7 @@ jest.mock("./sentryInit", () => {
 jest.mock("i18next", () => ({
   use: jest.fn().mockReturnThis(),
   init: jest.fn().mockReturnThis(),
-  changeLanguage: jest.fn().mockResolvedValue("en"),
+  changeLanguage: jest.fn().mockResolvedValue("en-gb"),
 }));
 
 describe("test the application bootstrapping", () => {

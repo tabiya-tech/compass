@@ -63,7 +63,7 @@ const StorybookWrapper = ({
         } as TabiyaUser)
   );
 
-  const answeredQuestions = [];
+  const answeredQuestions: string[] = [];
   if (hasSubmittedFeedback) {
     answeredQuestions.push(QUESTION_KEYS.OVERALL_SATISFACTION);
   }
