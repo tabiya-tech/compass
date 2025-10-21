@@ -110,7 +110,7 @@ export const decorators = [
     const prevSentryEnabled = React.useRef(sentryEnabled);
 
     // Handle Sentry enable/disable
-    useEffect(() => {
+     useEffect(() => {
       if (prevSentryEnabled.current !== sentryEnabled) {
         // @ts-ignore
         window.tabiyaConfig.FRONTEND_ENABLE_SENTRY = btoa(sentryEnabled);
