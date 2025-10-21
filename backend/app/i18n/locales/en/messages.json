@@ -19,6 +19,13 @@
   "collect_experiences.fields.company": "company/receiver of work",
   "collect_experiences.fields.location": "location"
   ,
+  "collect_experiences.ask_about_type": "Ask me about experiences that include: {experience_type}",
+  "collect_experiences.recap_prompt": "Let's recap, and give me a chance to correct any mistakes.",
+  "explore_experiences.no_more_experiences": "It looks like, there are no experiences to discuss further.",
+  "explore_experiences.skipped_experience_missing_details": "I have skipped your experience \"{experience_title}\" because you did not share enough details",
+  "explore_experiences.finished_all": "I have finished exploring all your experiences.",
+  "explore_experiences.no_skills_identified": "No skills identified",
+  "explore_experiences.link_and_rank.summary_message": "Based on the information provided about your experience as '{experience_title}', here’s a brief overview:\n\n{summary}\n\nTop {top_count} skills demonstrated:{skills_summary}",
   "agent_director.final_message": "The conversation has finished!",
   "agent_director.error_retry": "I am facing some difficulties right now, could you please repeat what you said?",
   "agent_director.all_agents_done": "Conversation finished, all agents are done!",
