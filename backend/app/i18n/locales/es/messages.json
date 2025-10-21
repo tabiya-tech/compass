@@ -19,6 +19,13 @@
   "collect_experiences.fields.company": "empresa/receptor del trabajo",
   "collect_experiences.fields.location": "ubicación"
   ,
+  "collect_experiences.ask_about_type": "Preguntame sobre experiencias que incluyan: {experience_type}",
+  "collect_experiences.recap_prompt": "Hagamos un repaso y dame la oportunidad de corregir cualquier error.",
+  "explore_experiences.no_more_experiences": "Parece que no hay más experiencias para conversar.",
+  "explore_experiences.skipped_experience_missing_details": "He omitido tu experiencia \"{experience_title}\" porque no compartiste suficientes detalles",
+  "explore_experiences.finished_all": "He terminado de explorar todas tus experiencias.",
+  "explore_experiences.no_skills_identified": "No se identificaron habilidades",
+  "explore_experiences.link_and_rank.summary_message": "Según la información proporcionada sobre tu experiencia como '{experience_title}', aquí tienes un breve resumen:\n\n{summary}\n\nPrincipales {top_count} habilidades demostradas:{skills_summary}",
   "agent_director.final_message": "¡La conversación ha finalizado!",
   "agent_director.error_retry": "Estoy teniendo algunas dificultades en este momento, ¿podrías repetir lo que dijiste?",
   "agent_director.all_agents_done": "¡Conversación finalizada, todos los agentes han terminado!",
