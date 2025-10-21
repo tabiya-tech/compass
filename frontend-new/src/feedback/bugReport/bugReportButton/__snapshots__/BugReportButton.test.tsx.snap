@@ -10,7 +10,7 @@ exports[`BugReportButton component should render the bugReport button 1`] = `
     class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
     data-testid="bug-report-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
     tabindex="0"
-    title="report_a_bugg"
+    title="Report a bug"
     type="button"
   >
     <span
