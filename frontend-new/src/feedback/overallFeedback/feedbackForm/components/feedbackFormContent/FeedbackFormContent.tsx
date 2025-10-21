@@ -234,7 +234,7 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
             style={{ width: 100 }}
             data-testid={DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON}
           >
-            {activeStep === maxSteps - 1 ? t("bubmit") : t("next")}
+            {activeStep === maxSteps - 1 ? t("submit") : t("next")}
           </PrimaryButton>
         }
         backButton={

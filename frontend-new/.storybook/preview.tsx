@@ -118,9 +118,13 @@ export const decorators = [
           // @ts-ignore
           window.tabiyaConfig.FRONTEND_SENTRY_DSN = ORIGINAL_SENTRY_DSN;
           initSentry();
+          isSentryInitialized = true;
         } else {
           // @ts-ignore
           window.tabiyaConfig.FRONTEND_SENTRY_DSN = undefined;
+          isSentryInitialized = false;
+          // we have to reload since there is no way to notify the components of this change
+          // it is not a provider and the init happens outside of even the react root.render()
           window.location.reload();
         }
         prevSentryEnabled.current = sentryEnabled;
@@ -150,8 +154,12 @@ export const decorators = [
               <div style={{ height: "100vh" }}>
                 <ChatProvider
                   handleOpenExperiencesDrawer={() => {}}
-                  removeMessageFromChat={() => {}}
-                  addMessageToChat={() => {}}
+                    removeMessageFromChat={function (messageId: string): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                  addMessageToChat={function (message: IChatMessage<any>): void {
+                    throw new Error("Function not implemented.");
+                  }}
                 >
                   <Suspense fallback={<div>loading translations...</div>}>
                     <I18nextProvider i18n={i18n}>
