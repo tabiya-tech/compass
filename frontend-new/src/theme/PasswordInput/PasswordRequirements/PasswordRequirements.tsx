@@ -31,7 +31,7 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({ validationR
       label: t("password_need_special_char"),
       isValid: validationResults.hasSpecialChar,
     },
-  ], [validationResults,t]);
+  ], [validationResults, t]);
 
   return (
     // we have to use a component that can be a child of a <p>

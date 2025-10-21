@@ -47,16 +47,6 @@ type DataTestIdType = {
   [key: string]: string; // Allow for dynamic keys
 };
 
-export const SENSITIVE_DATA_FORM_FIXED_TEXT = {
-  TITLE: "Provide Your Information",
-  SUBTITLE: "We use your data to personalize your experience and may contact you about Compass.",
-  UNSKIPPABLE_SUBTITLE: "Please provide the following information to continue.",
-  SKIPPABLE_SUBTITLE: "You can skip this step.",
-  FAILED_TO_LOAD_CONFIG: "Failed to load form configuration",
-  INVALID_FORM: "Please correct the errors in the form before submitting.",
-  HELP_TIP_TEXT: "Your information is encrypted using state-of-the-art, end-to-end encryption and stored securely.",
-};
-
 // Create a function to generate the DATA_TEST_ID object
 const createDataTestId = (fields: FieldDefinition[]): DataTestIdType => {
   const baseIds = {
@@ -267,7 +257,7 @@ const SensitiveDataForm: React.FC = () => {
 
     // Check if the form is valid based on current validation state
     if (!isFormValid(validationErrors)) {
-      enqueueSnackbar("Please correct the errors in the form before submitting.", { variant: "error" });
+      enqueueSnackbar(t("sensitive_data_invalid_form"), { variant: "error" });
       return;
     }
 
@@ -307,7 +297,7 @@ const SensitiveDataForm: React.FC = () => {
       setIsSavingSensitiveData(false);
       setIsSubmitButtonEnabled(true);
     }
-  }, [configLoading, configError, validationErrors, enqueueSnackbar, sensitiveData, fields, userPreferences, navigate]);
+  }, [configLoading, configError, validationErrors, enqueueSnackbar, sensitiveData, fields, userPreferences, navigate, t]);
 
   const handleRejectProvidingSensitiveData = useCallback(async () => {
     setIsRejecting(true);
@@ -373,7 +363,7 @@ const SensitiveDataForm: React.FC = () => {
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100%">
           <Box color="error.main" mb={2}>
             <Typography data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_ERROR_MESSAGE}>
-              {SENSITIVE_DATA_FORM_FIXED_TEXT.FAILED_TO_LOAD_CONFIG}
+              {t("sensitive_data_failed_to_load_config")}
             </Typography>
           </Box>
           <PrimaryButton
@@ -413,9 +403,9 @@ const SensitiveDataForm: React.FC = () => {
                   <>
                     {t("sensitive_data_subtitle")}
                     {isPIIRequired
-                      ? " " + SENSITIVE_DATA_FORM_FIXED_TEXT.UNSKIPPABLE_SUBTITLE
-                      : " " + SENSITIVE_DATA_FORM_FIXED_TEXT.SKIPPABLE_SUBTITLE}
-                    <HelpTip icon={<PrivacyTipIcon />}>{SENSITIVE_DATA_FORM_FIXED_TEXT.HELP_TIP_TEXT}</HelpTip>
+                      ? " " + t("sensitive_data_unskippable_subtitle")
+                      : " " + t("sensitive_data_skippable_subtitle")}
+                    <HelpTip icon={<PrivacyTipIcon />}>{t("sensitive_data_help_tip_text")}</HelpTip>
                   </>
                 }
               />
