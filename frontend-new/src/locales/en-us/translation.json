@@ -368,7 +368,7 @@
   "cv_upload_uploading_cv": "Uploading CV",
   "cv_upload_thinking_message": "Processing your CV, this might take a while..."
   ,
-  "customerSatisfactionRating_question_text": "Finally, we'd love to hear your thoughts on your experience so far! {{question}}",
+  "customerSatisfactionRating_question_text": "Finally, we'd love to hear your thoughts on your experience so far! ",
   "customerSatisfactionRating_rating_label_low": "Unsatisfied",
   "customerSatisfactionRating_rating_label_high": "Satisfied",
   "customerSatisfactionRating_submit_success": "Rating Feedback submitted successfully!",

@@ -367,7 +367,7 @@
   "cv_upload_failed": "Échec du téléversement du CV",
   "cv_upload_uploading_cv": "Téléversement du CV",
   "cv_upload_thinking_message": "Traitement de votre CV, cela peut prendre un moment...",
-  "customerSatisfactionRating_question_text": "Enfin, nous aimerions avoir votre avis sur votre expérience jusqu'à présent ! {{question}}",
+  "customerSatisfactionRating_question_text": "Enfin, nous aimerions avoir votre avis sur votre expérience jusqu'à présent ! ",
   "customerSatisfactionRating_rating_label_low": "Insatisfait",
   "customerSatisfactionRating_rating_label_high": "Satisfait",
   "customerSatisfactionRating_submit_success": "Évaluation envoyée avec succès !",
