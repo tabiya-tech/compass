@@ -8,7 +8,7 @@ exports[`ConversationConclusionFooter render tests should render component succe
   <p
     class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
   >
-    View and
+    You can now
      
      
     <a
@@ -39,8 +39,7 @@ exports[`ConversationConclusionFooter render tests should render component succe
           d="M11.08 16.18c-.64-.28-1.34-.43-2.08-.43s-1.44.15-2.08.43c-.56.24-.92.78-.92 1.39V18h6v-.43c0-.61-.36-1.15-.92-1.39"
         />
       </svg>
-      View and
-      Download your CV
+      View and Download your CV
     </a>
      
     here.
