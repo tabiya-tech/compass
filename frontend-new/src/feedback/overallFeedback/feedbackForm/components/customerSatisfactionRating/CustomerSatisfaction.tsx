@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   QUESTION_KEYS,
   FeedbackItem,
@@ -29,17 +30,18 @@ type QuestionEntry = { question_text: string; description?: string; comment_plac
 const QUESTIONS = questions as unknown as Record<string, QuestionEntry>;
 
 export const UI_TEXT = {
-  CUSTOMER_SATISFACTION_QUESTION_TEXT:
-    "Finally, we'd love to hear your thoughts on your experience so far! " +
-    (QUESTIONS[QUESTION_KEYS.CUSTOMER_SATISFACTION]?.question_text ?? ""),
-  RATING_LABEL_LOW: "Unsatisfied",
-  RATING_LABEL_HIGH: "Satisfied",
+  // NOTE: These values are kept for backward-compat in tests that import the symbol,
+  // but they're no longer used directly. Translations come from i18n at render time.
+  CUSTOMER_SATISFACTION_QUESTION_TEXT: "",
+  RATING_LABEL_LOW: "",
+  RATING_LABEL_HIGH: "",
 };
 const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
                                                                                  notifyOnCustomerSatisfactionRatingSubmitted,
                                                                                }) => {
   const { enqueueSnackbar } = useSnackbar();
   const isOnline = useContext(IsOnlineContext);
+  const { t } = useTranslation();
 
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [isSubmittingRating, setIsSubmittingRating] = useState<boolean>(false);
@@ -62,10 +64,10 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       await feedbackService.sendFeedback(sessionId, [formattedData]);
 
       notifyOnCustomerSatisfactionRatingSubmitted();
-      enqueueSnackbar("Rating Feedback submitted successfully!", { variant: "success" });
+      enqueueSnackbar(t("customerSatisfactionRating_submit_success", { defaultValue: "Rating Feedback submitted successfully!" }), { variant: "success" });
     } catch (error) {
       console.error(new FeedbackError("Feedback submission failed:", error));
-      enqueueSnackbar("Failed to submit feedback. Please try again later.", { variant: "error" });
+      enqueueSnackbar(t("customerSatisfactionRating_submit_error", { defaultValue: "Failed to submit feedback. Please try again later." }), { variant: "error" });
     } finally {
       setIsSubmittingRating(false);
       setSelectedRating(null);
@@ -78,13 +80,17 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       <CustomRating
         type={QuestionType.Rating}
         questionId={QUESTION_KEYS.CUSTOMER_SATISFACTION}
-        questionText={UI_TEXT.CUSTOMER_SATISFACTION_QUESTION_TEXT}
+        questionText={t("customerSatisfactionRating_question_text", {
+          question: QUESTIONS[QUESTION_KEYS.CUSTOMER_SATISFACTION]?.question_text ?? "",
+          defaultValue:
+            "Finally, we'd love to hear your thoughts on your experience so far! {{question}}",
+        })}
         ratingValue={selectedRating}
         notifyChange={(value, comments) =>
           handleInputChange(QUESTION_KEYS.CUSTOMER_SATISFACTION, { rating_numeric: value, comment: comments })
         }
-        lowRatingLabel={UI_TEXT.RATING_LABEL_LOW}
-        highRatingLabel={UI_TEXT.RATING_LABEL_HIGH}
+        lowRatingLabel={t("customerSatisfactionRating_rating_label_low", { defaultValue: "Unsatisfied" })}
+        highRatingLabel={t("customerSatisfactionRating_rating_label_high", { defaultValue: "Satisfied" })}
         maxRating={5}
         disabled={!isOnline || isSubmittingRating}
       />
