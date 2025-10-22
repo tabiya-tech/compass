@@ -13,6 +13,7 @@ from app.countries import Country
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
 from common_libs.retry import Retry
+from app.i18n.translation_service import t
 
 _FINAL_MESSAGE = "Thank you for sharing these details! I have all the information I need."
 
@@ -131,21 +132,21 @@ class _ConversationLLM:
             logger.warning("LLM response is empty. "
                            "\n  - System instructions: %s"
                            "\n  - LLM input: %s",
-                           "\n".join(system_instructions),
+                           ("\n".join(system_instructions) if isinstance(system_instructions, list) else system_instructions),
                            llm_input)
 
             return AgentOutput(
-                message_for_user="Sorry, I didn't understand that. Can you please rephrase?",
+                message_for_user=t("messages", "collect_experiences.did_not_understand"),
                 finished=False,
                 agent_type=AgentType.EXPLORE_SKILLS_AGENT,
                 agent_response_time_in_sec=round(llm_end_time - llm_start_time, 2),
                 llm_stats=[llm_stats]), 100, ValueError("LLM response is empty")
 
         if llm_response.text == "<END_OF_CONVERSATION>":
-            llm_response.text = _FINAL_MESSAGE
+            llm_response.text = t("messages", "explore_skills.final_message")
             finished = True
         if llm_response.text.find("<END_OF_CONVERSATION>") != -1:
-            llm_response.text = _FINAL_MESSAGE
+            llm_response.text = t("messages", "explore_skills.final_message")
             finished = True
             logger.warning("The response contains '<END_OF_CONVERSATION>' and additional text: %s", llm_response.text)
 
@@ -320,10 +321,10 @@ def _get_question_c(work_type: WorkType) -> str:
     Get the question for the specific work type
     """
     if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-        return "What do you think is important when working in such a company?"
+        return t("messages", "explore_skills.question.formal_waged")
     elif work_type == WorkType.SELF_EMPLOYMENT:
-        return "What do you think is important when you are your own boss?"
+        return t("messages", "explore_skills.question.self_employment")
     elif work_type == WorkType.UNSEEN_UNPAID:
-        return "What do you think is most important when helping out in the community or caring for others?"
+        return t("messages", "explore_skills.question.unseen_unpaid")
     else:
         return ""
