@@ -98,7 +98,7 @@ describe("CustomerSatisfactionRating", () => {
     // AND the custom rating component should be called with the correct props
     const expectedQuestion = i18n.t("customerSatisfactionRating_question_text", {
       question: (questions as any)[QUESTION_KEYS.CUSTOMER_SATISFACTION]?.question_text ?? "",
-      defaultValue: "Finally, we'd love to hear your thoughts on your experience so far! {{question}}",
+      defaultValue: "Finally, we'd love to hear your thoughts on your experience so far! ",
     });
 
     expect(CustomRating).toHaveBeenCalledWith({
