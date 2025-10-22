@@ -543,7 +543,7 @@ def _transition_instructions(*,
             
             {language_style}
                                                                   
-            Ask me (in the language of the user): 
+            Ask me: 
                 "Let's recap the information we have collected so far: 
                 {summary_of_experiences}
                 Is there anything you would like to add or change?"
