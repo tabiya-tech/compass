@@ -367,7 +367,7 @@
   "cv_upload_failed": "Falló la carga del CV",
   "cv_upload_uploading_cv": "Subiendo CV",
   "cv_upload_thinking_message": "Procesando tu CV, esto puede tardar un poco...",
-  "customerSatisfactionRating_question_text": "Por último, nos encantaría conocer tu opinión sobre tu experiencia hasta ahora. {{question}}",
+  "customerSatisfactionRating_question_text": "Por último, nos encantaría conocer tu opinión sobre tu experiencia hasta ahora. ",
   "customerSatisfactionRating_rating_label_low": "Insatisfecho",
   "customerSatisfactionRating_rating_label_high": "Satisfecho",
   "customerSatisfactionRating_submit_success": "¡Calificación enviada con éxito!",
