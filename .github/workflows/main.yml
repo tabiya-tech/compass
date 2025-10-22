@@ -31,30 +31,25 @@ jobs:
     with:
       # only upload artifacts if
       #  a) event is push
-      #    -> to main
-      #    -> with a commit message containing '[pulumi up]'
-      #    -> a tag
-      #  b) a release has been created.
+      #    -> to harambee-main
+      #    -> with a commit message containing '[pulumi harambee up]'
 
-      upload-artifacts: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))) || (github.event_name == 'release') }}
+      upload-artifacts: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/harambee-main' || contains(github.event.head_commit.message, '[pulumi harambee up]'))) }}
 
   backend-ci:
     uses: ./.github/workflows/backend-ci.yml
     secrets: inherit
     with:
-      # only upload artifacts if:
+      # only upload artifacts if
       #  a) event is push
-      #    -> to main
-      #    -> with a commit message containing '[pulumi up]'
-      #    -> a tag
-      #  b) a release has been created.
-
-      upload-artifacts: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))) || github.event_name == 'release'}}
+      #    -> to harambee-main
+      #    -> with a commit message containing '[pulumi harambee up]'
+      upload-artifacts: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/harambee-main' || contains(github.event.head_commit.message, '[pulumi harambee up]'))) }}
 
   config-ci:
     uses: ./.github/workflows/config-ci.yml
     secrets: inherit
-    if: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))) || github.event_name == 'release' }}
+    if: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/harambee-main' || contains(github.event.head_commit.message, '[pulumi harambee up]'))) }}
 
 
   deploy:
