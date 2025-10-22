@@ -25,7 +25,8 @@ export const DATA_TEST_ID = {
 };
 
 export const UI_TEXT = {
-   RATING_LABEL_LOW: "Unsatisfied",
+  CUSTOMER_SATISFACTION_QUESTION_TEXT: "Finally, we'd love to hear your thoughts on your experience so far! How satisfied are you with Compass?",
+  RATING_LABEL_LOW: "Unsatisfied",
   RATING_LABEL_HIGH: "Satisfied",
 };
 const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
