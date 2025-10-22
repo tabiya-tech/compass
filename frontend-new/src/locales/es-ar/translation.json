@@ -366,5 +366,10 @@
   "cv_upload_saving_cv": "Guardando CV",
   "cv_upload_failed": "Falló la carga del CV",
   "cv_upload_uploading_cv": "Subiendo CV",
-  "cv_upload_thinking_message": "Procesando tu CV, esto puede tardar un rato..."
+  "cv_upload_thinking_message": "Procesando tu CV, esto puede tardar un rato...",
+  "customerSatisfactionRating_question_text": "Por último, nos encantaría conocer tu opinión sobre tu experiencia hasta ahora. {{question}}",
+  "customerSatisfactionRating_rating_label_low": "Insatisfecho",
+  "customerSatisfactionRating_rating_label_high": "Satisfecho",
+  "customerSatisfactionRating_submit_success": "¡Calificación enviada con éxito!",
+  "customerSatisfactionRating_submit_error": "Error al enviar la calificación. Por favor, intentá más tarde."
 }
