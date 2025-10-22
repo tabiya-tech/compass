@@ -35,5 +35,9 @@
   "experience.work_type.short.formal_sector_waged_employment": "Waged Employment",
   "experience.work_type.short.formal_sector_unpaid_trainee_work": "Trainee",
   "experience.work_type.short.self_employment": "Self-Employed",
-  "experience.work_type.short.unseen_unpaid": "Volunteer/Unpaid"
+  "experience.work_type.short.unseen_unpaid": "Volunteer/Unpaid",
+  "explore_skills.final_message": "Thank you for sharing these details! I have all the information I need.",
+  "explore_skills.question.formal_waged": "What do you think is important when working in such a company?",
+  "explore_skills.question.self_employment": "What do you think is important when you are your own boss?",
+  "explore_skills.question.unseen_unpaid": "What do you think is most important when helping out in the community or caring for others?"
 }
