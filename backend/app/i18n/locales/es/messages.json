@@ -35,5 +35,9 @@
   "experience.work_type.short.formal_sector_waged_employment": "Trabajo asalariado",
   "experience.work_type.short.formal_sector_unpaid_trainee_work": "Práctica no remunerada",
   "experience.work_type.short.self_employment": "Autoempleo",
-  "experience.work_type.short.unseen_unpaid": "Voluntariado/No remunerado"
+  "experience.work_type.short.unseen_unpaid": "Voluntariado/No remunerado",
+  "explore_skills.final_message": "¡Gracias por compartir estos detalles! Tengo toda la información que necesito.",
+  "explore_skills.question.formal_waged": "¿Qué creés que es importante al trabajar en una empresa así?",
+  "explore_skills.question.self_employment": "¿Qué creés que es importante cuando sos tu propio jefe?",
+  "explore_skills.question.unseen_unpaid": "¿Qué creés que es más importante al ayudar en la comunidad o cuidar a otras personas?"
 }
