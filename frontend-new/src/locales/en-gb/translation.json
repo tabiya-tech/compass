@@ -366,5 +366,10 @@
   "cv_upload_saving_cv": "Saving CV",
   "cv_upload_failed": "CV upload failed",
   "cv_upload_uploading_cv": "Uploading CV",
-  "cv_upload_thinking_message": "Processing your CV, this might take a while..."
+  "cv_upload_thinking_message": "Processing your CV, this might take a while...",
+  "customerSatisfactionRating_question_text": "Finally, we'd love to hear your thoughts on your experience so far! {{question}}",
+  "customerSatisfactionRating_rating_label_low": "Unsatisfied",
+  "customerSatisfactionRating_rating_label_high": "Satisfied",
+  "customerSatisfactionRating_submit_success": "Rating Feedback submitted successfully!",
+  "customerSatisfactionRating_submit_error": "Failed to submit feedback. Please try again later."
 }
