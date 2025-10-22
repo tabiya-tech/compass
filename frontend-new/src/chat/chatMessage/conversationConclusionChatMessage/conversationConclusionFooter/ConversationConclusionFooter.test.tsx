@@ -259,7 +259,7 @@ describe("ConversationConclusionFooter", () => {
       expect(screen.queryByTestId(DATA_TEST_ID.CREATE_ACCOUNT_LINK)).not.toBeInTheDocument();
       // AND expect the verification message not to be displayed
       expect(
-        screen.queryByText("Don't forget to verify your account before logging in again!")
+        screen.queryByTestId(DATA_TEST_ID.VERIFICATION_REMINDER_MESSAGE)
       ).not.toBeInTheDocument();
     });
 
@@ -279,7 +279,7 @@ describe("ConversationConclusionFooter", () => {
       expect(screen.getByTestId(DATA_TEST_ID.CREATE_ACCOUNT_LINK)).toBeInTheDocument();
       // AND expect the verification message not to be displayed
       expect(
-        screen.queryByText("Don't forget to verify your account before logging in again!")
+        screen.queryByTestId(DATA_TEST_ID.VERIFICATION_REMINDER_MESSAGE)
       ).not.toBeInTheDocument();
     });
 
