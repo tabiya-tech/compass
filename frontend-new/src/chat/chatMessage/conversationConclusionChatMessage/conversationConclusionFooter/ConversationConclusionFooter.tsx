@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { FIXED_MESSAGES_TEXT } from "src/chat/util";
 import FeedbackForm, {
@@ -51,6 +52,7 @@ export const DATA_TEST_ID = {
 
 const ConversationConclusionFooter: React.FC = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { feedbackStatus, setFeedbackStatus, handleOpenExperiencesDrawer } = useChatContext();
 
   const [feedbackData, setFeedbackData] = useState<FeedbackItem[]>(PersistentStorageService.getOverallFeedback());
@@ -118,36 +120,34 @@ const ConversationConclusionFooter: React.FC = () => {
         data-testid={DATA_TEST_ID.CONVERSATION_CONCLUSION_FOOTER_CONTAINER}
       >
         <Typography variant="body1">
-          You can now{" "}
+          {t("conversation_conclusion_footer_you_can_now")} {" "}
           <StyledCustomLink
             onClick={handleOpenExperiencesDrawer}
             disableWhenOffline
             data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_BUTTON}
           >
             <BadgeOutlinedIcon />
-            View and
-            Download your CV
+            {t("conversation_conclusion_footer_view_and_download_cv")}
           </StyledCustomLink>{" "}
-          here.
+          {t("conversation_conclusion_footer_here")}
           {/* Show anonymous user registration link if the user is anonymous and hasn't already converted */}
           {isAnonymous && !isAccountConverted && (
             <span data-testid={DATA_TEST_ID.CREATE_ACCOUNT_MESSAGE}>
-              If you would like to explore your skills and experiences in the future, you can{" "}
+              {t("conversation_conclusion_footer_create_account_intro")} {" "}
               <StyledCustomLink
                 onClick={() => setShowConversionDialog(true)}
                 disableWhenOffline
                 data-testid={DATA_TEST_ID.CREATE_ACCOUNT_LINK}
               >
                 <PermIdentityIcon />
-                Create an Account
+                {t("conversation_conclusion_footer_create_account")}
               </StyledCustomLink>
             </span>
           )}
           {/* Show the verification reminder if the user has already converted their account */}
           {isAccountConverted && (
             <span data-testid={DATA_TEST_ID.VERIFICATION_REMINDER_MESSAGE}>
-              A verification email has been sent to your email address. Please verify your account before logging in
-              again.
+              {t("conversation_conclusion_footer_verification_reminder")}
             </span>
           )}
         </Typography>
@@ -167,33 +167,33 @@ const ConversationConclusionFooter: React.FC = () => {
             </span>
           )}
           {/* Show feedback form if the rating has been submitted */}
-          {hasSubmittedCustomerSatisfactionRating &&
-            feedbackStatus === FeedbackStatus.NOT_STARTED &&
-              <span data-testid={DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT}>{" "}We'd love to get more{" "}
-                <StyledCustomLink
-                  onClick={() => setIsFeedbackFormOpen(true)}
-                  disableWhenOffline
-                  data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON}
-                >
-                  <FeedbackOutlinedIcon />
-                Feedback
+          {hasSubmittedCustomerSatisfactionRating && feedbackStatus === FeedbackStatus.NOT_STARTED && (
+            <span data-testid={DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT}>{" "}
+              {t("conversation_conclusion_footer_feedback_welcome")} {" "}
+              <StyledCustomLink
+                onClick={() => setIsFeedbackFormOpen(true)}
+                disableWhenOffline
+                data-testid={DATA_TEST_ID.FEEDBACK_FORM_BUTTON}
+              >
+                <FeedbackOutlinedIcon />
+                {t("conversation_conclusion_footer_feedback_link_text")}
               </StyledCustomLink>{" "}
-                from you. It only takes 5 minutes and helps us improve!
+              {t("conversation_conclusion_footer_feedback_from_you_suffix")}
             </span>
-          }
+          )}
           {/* Show continue feedback if the status is already started */}
           {hasSubmittedCustomerSatisfactionRating && feedbackStatus === FeedbackStatus.STARTED && (
             <span data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_MESSAGE}>
-              Please{" "}
+              {t("conversation_conclusion_footer_feedback_in_progress_prefix")} {" "}
               <StyledCustomLink
                 onClick={() => setIsFeedbackFormOpen(true)}
                 disableWhenOffline
                 data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_BUTTON}
               >
                 <FeedbackOutlinedIcon />
-                Complete your Feedback
+                {t("conversation_conclusion_footer_feedback_in_progress_link_text")}
               </StyledCustomLink>{" "}
-              to help us improve your experience!
+              {t("conversation_conclusion_footer_feedback_in_progress_suffix")}
             </span>
           )}
           {feedbackSubmitted && hasSubmittedCustomerSatisfactionRating && (
