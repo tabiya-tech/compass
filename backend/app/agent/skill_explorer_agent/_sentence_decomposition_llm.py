@@ -11,6 +11,7 @@ from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
 from ...conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE
+from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 
 class _SentenceDecompositionResponse(BaseModel):
     decomposed_and_dereferenced: list[str] = Field(default_factory=list)
@@ -185,7 +186,8 @@ class _SentenceDecompositionLLM:
         </System Instructions>
         """)
 
-        return system_instructions_template.format(language_style=STD_LANGUAGE_STYLE)
+        return replace_placeholders_with_indent(system_instructions_template,
+                        language_style=STD_LANGUAGE_STYLE)
 
     @staticmethod
     def _first_pass_prompt_template(context: ConversationContext, last_user_input: str) -> str:
@@ -240,7 +242,8 @@ class _SentenceDecompositionLLM:
         </System Instructions>
         """)
 
-        return system_instructions_template.format(language_style=STD_LANGUAGE_STYLE)
+        return replace_placeholders_with_indent(system_instructions_template,
+                                                language_style=STD_LANGUAGE_STYLE)
 
     @staticmethod
     def _second_pass_prompt_template(sentences: list[str]) -> str:
