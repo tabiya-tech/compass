@@ -61,29 +61,15 @@ jobs:
     needs: [ frontend-ci, backend-ci, config-ci ]
     # only deploy if:
     #  a) event is push
-    #    -> to main
-    #    -> with a commit message containing '[pulumi up]'
-    #    -> a tag
-    #  b) a release has been created.
+    #    -> to harambee-main
+    #    -> with a commit message containing '[pulumi harambee up]'
 
-    if: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.event.head_commit.message, '[pulumi up]'))) || github.event_name == 'release' }}
+    if: ${{ (github.event_name == 'push' && (github.ref == 'refs/heads/harambee-main' || contains(github.event.head_commit.message, '[pulumi harambee up]'))) }}
     uses: ./.github/workflows/deploy.yml
     secrets: inherit
     with:
       # if the event is a release, the env-type is testing environment, otherwise it is dev environment.
-      env-type: ${{ (github.event_name == 'release' && 'test') || 'dev'  }}
-      target-git-sha: ${{ github.sha }}
-      target-git-branch: ${{ github.ref_name }}
-
-
-  deploy-prod:
-    needs: [ deploy ]
-    # only deploy to production if:
-    #  a) a release has been created and deployment to test was finished.
-    if: ${{ github.event_name == 'release' }}
-    uses: ./.github/workflows/deploy.yml
-    secrets: inherit
-    with:
-      env-type: prod
+      env-name: dev-harambee
+      env-type: dev
       target-git-sha: ${{ github.sha }}
       target-git-branch: ${{ github.ref_name }}
