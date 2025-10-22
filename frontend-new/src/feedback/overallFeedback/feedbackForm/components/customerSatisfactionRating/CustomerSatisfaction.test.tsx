@@ -3,7 +3,7 @@ import "src/_test_utilities/consoleMock";
 
 import React from "react";
 import { render, screen, act, waitFor} from "src/_test_utilities/test-utils";
-import CustomerSatisfactionRating, { UI_TEXT, DATA_TEST_ID } from "./CustomerSatisfaction";
+import CustomerSatisfactionRating, { DATA_TEST_ID } from "./CustomerSatisfaction";
 import CustomRating, { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
 import { DATA_TEST_ID as BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/Backdrop";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -19,6 +19,8 @@ import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { FeedbackResponse, QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import { QuestionType } from "src/feedback/overallFeedback/feedbackForm/feedbackForm.types";
 import { FeedbackError } from "src/error/commonErrors";
+import i18n from "src/i18n/i18n";
+import questions from "src/feedback/overallFeedback/feedbackForm/questions-en-gb.json";
 
 // mock the snackbar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
@@ -95,13 +97,18 @@ describe("CustomerSatisfactionRating", () => {
     expect(screen.getByTestId(DATA_TEST_ID.CUSTOMER_SATISFACTION_RATING_CONTAINER)).toBeInTheDocument();
 
     // AND the custom rating component should be called with the correct props
+    const expectedQuestion = i18n.t("customerSatisfactionRating_question_text", {
+      question: (questions as any)[QUESTION_KEYS.CUSTOMER_SATISFACTION]?.question_text ?? "",
+      defaultValue: "Finally, we'd love to hear your thoughts on your experience so far! {{question}}",
+    });
+
     expect(CustomRating).toHaveBeenCalledWith({
       questionId: QUESTION_KEYS.CUSTOMER_SATISFACTION,
-      questionText: UI_TEXT.CUSTOMER_SATISFACTION_QUESTION_TEXT,
+      questionText: expectedQuestion,
       ratingValue: null,
       notifyChange: expect.any(Function),
-      lowRatingLabel: UI_TEXT.RATING_LABEL_LOW,
-      highRatingLabel: UI_TEXT.RATING_LABEL_HIGH,
+      lowRatingLabel: i18n.t("customerSatisfactionRating_rating_label_low", { defaultValue: "Unsatisfied" }),
+      highRatingLabel: i18n.t("customerSatisfactionRating_rating_label_high", { defaultValue: "Satisfied" }),
       maxRating: 5,
       disabled: false,
       type: QuestionType.Rating
@@ -138,7 +145,8 @@ describe("CustomerSatisfactionRating", () => {
     // AND a backdrop to have been shown while the rating is being submitted
     expect(screen.getByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
     // AND the success snackbar to be shown
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Rating Feedback submitted successfully!", {
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+      i18n.t("customerSatisfactionRating_submit_success", { defaultValue: "Rating Feedback submitted successfully!" }), {
       variant: "success",
     });
     // AND expect no errors or warning to have occurred
@@ -164,9 +172,12 @@ describe("CustomerSatisfactionRating", () => {
 
     // THEN expect the error snackbar to be shown
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit feedback. Please try again later.", {
-        variant: "error",
-      });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        i18n.t("customerSatisfactionRating_submit_error", { defaultValue: "Failed to submit feedback. Please try again later." }),
+        {
+          variant: "error",
+        }
+      );
     });
     // AND the given callback to not have been called
     expect(givenNotifyOnSubmitted).not.toHaveBeenCalled();
@@ -194,9 +205,12 @@ describe("CustomerSatisfactionRating", () => {
 
     // THEN expect the error snackbar to be shown
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit feedback. Please try again later.", {
-        variant: "error",
-      });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        i18n.t("customerSatisfactionRating_submit_error", { defaultValue: "Failed to submit feedback. Please try again later." }),
+        {
+          variant: "error",
+        }
+      );
     });
     // AND the given callback to not have been called
     expect(givenNotifyOnSubmitted).not.toHaveBeenCalled();
