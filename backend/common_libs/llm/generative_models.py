@@ -19,13 +19,15 @@ class GeminiGenerativeLLM(BasicLLM):
 
         # Agregar instrucción obligatoria en español
         locale = get_locale()
-        mandatory_instruction = f"Super important!! Please, produce the response in this locale {locale}"
+        mandatory_instruction = f"Super important! Please produce all responses in the locale {locale}. Do not mix languages under any circumstances. Keep the entire conversation strictly in {locale}."
         if system_instructions is None:
             system_instructions = [mandatory_instruction]
         elif isinstance(system_instructions, str):
-            system_instructions = [system_instructions, mandatory_instruction]
+            system_instructions = [mandatory_instruction, system_instructions]
         elif isinstance(system_instructions, list):
-            system_instructions.append(mandatory_instruction)
+            system_instructions.insert(0,mandatory_instruction)
+            system_instructions.append("You always must handle the dates with this pattern  MM/YYYY, for example 03/2022")
+            
 
         self._model = GenerativeModel(
             model_name=config.language_model_name,

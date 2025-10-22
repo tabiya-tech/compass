@@ -46,11 +46,47 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [isSubmittingRating, setIsSubmittingRating] = useState<boolean>(false);
 
+  const [questionsData, setQuestionsData] = useState<Record<string, any>>({});
+  const [loading, setLoading] = useState<boolean>(true);
+
+  /**
+   * Function to dynamically import the correct questions file according to locale.
+   */
+  const loadQuestions = useCallback(
+    async (locale: string) => {
+      setLoading(true);
+      try {
+        const module = await import(
+          /* @vite-ignore */ `src/feedback/overallFeedback/feedbackForm/questions-${locale}.json`
+        );
+        setQuestionsData(module.default || module);
+      } catch (error) {
+        console.error(`❌ Failed to load questions for locale '${locale}'.`, error);
+
+        if (locale !== "en") {
+          console.info("Attempting fallback to 'en' locale...");
+          await loadQuestions("en");
+          return;
+        }
+        console.error("Fallback 'en' locale also failed to load.");
+        setQuestionsData({});
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  // Load locale-specific questions on mount and when locale changes
+  useEffect(() => {
+    loadQuestions(i18n.language.toLocaleLowerCase());
+  }, [i18n.language, loadQuestions]);
+
   const handleInputChange = async (questionId: string, value: SimplifiedAnswer) => {
     const formattedData: FeedbackItem = {
       question_id: questionId,
       simplified_answer: value,
-    };
+    }; 
 
     setSelectedRating(value.rating_numeric ?? null);
     setIsSubmittingRating(true);
@@ -73,6 +109,10 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       setSelectedRating(null);
     }
   };
+
+  const customerSatisfactionText = t("customer_satisfaction_question").concat(
+    questionsData?.[QUESTION_KEYS.CUSTOMER_SATISFACTION]?.question_text ??
+    "How satisfied are you with Compass?");    
 
   return (
     <div data-testid={DATA_TEST_ID.CUSTOMER_SATISFACTION_RATING_CONTAINER}>

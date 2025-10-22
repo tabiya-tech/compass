@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { Box, Typography, useTheme } from "@mui/material";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { FIXED_MESSAGES_TEXT } from "src/chat/util";
 import FeedbackForm, {
