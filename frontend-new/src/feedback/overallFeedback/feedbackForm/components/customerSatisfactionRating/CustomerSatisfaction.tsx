@@ -39,14 +39,13 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
   const [isSubmittingRating, setIsSubmittingRating] = useState<boolean>(false);
 
   const [questionsData, setQuestionsData] = useState<Record<string, any>>({});
-  const [loading, setLoading] = useState<boolean>(true);
 
   /**
    * Function to dynamically import the correct questions file according to locale.
    */
   const loadQuestions = useCallback(
     async (locale: string) => {
-      setLoading(true);
+      
       try {
         const module = await import(
           /* @vite-ignore */ `src/feedback/overallFeedback/feedbackForm/questions-${locale}.json`
@@ -63,7 +62,7 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
         console.error("Fallback 'en' locale also failed to load.");
         setQuestionsData({});
       } finally {
-        setLoading(false);
+      
       }
     },
     []

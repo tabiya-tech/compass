@@ -64,7 +64,7 @@ export const useFeedbackFormContentSteps = () => {
 
     useEffect(() => {
         // Initial load based on current language
-        loadQuestions(i18n.language);
+        loadQuestions(i18n.language.toLowerCase());
 
         // Listen for language changes and reload questions
         i18n.on('languageChanged', loadQuestions);
