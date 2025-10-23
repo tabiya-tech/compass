@@ -1,5 +1,4 @@
 import React, { useEffect, useContext, useMemo, useState, MouseEvent, KeyboardEvent, useCallback } from "react";
-import { useTranslation } from "react-i18next";
 import { IconButton, InputAdornment, TextField, styled, useTheme, Typography, Box } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import AddIcon from "@mui/icons-material/Add";
@@ -20,6 +19,7 @@ import { formatExperiencesToMessage } from "src/chat/util";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import UploadedCVsMenu from "src/CV/uploadedCVsMenu/UploadedCVsMenu";
+import { useTranslation } from "react-i18next";
 
 export interface ChatMessageFieldProps {
   handleSend: (message: string) => void;
@@ -56,22 +56,30 @@ export const MENU_ITEM_ID = {
 };
 
 export const MENU_ITEM_TEXT = {
-  UPLOAD_CV: "Upload CV",
-  UPLOADED_CV_ACCORDION: "Previously uploaded CVs",
-  VIEW_UPLOADED_CVS: "Previously uploaded CVs",
+  UPLOAD_CV: "upload_cv_upload_label",
+  UPLOADED_CV_ACCORDION: "upload_cv_view_uploaded_label",
+  VIEW_UPLOADED_CVS: "upload_cv_view_uploaded_label",
 };
 
 export const PLACEHOLDER_TEXTS = {
-  CHAT_FINISHED: "Conversation has been completed. You can't send any more messages.",
-  AI_TYPING: "AI is typing..., wait for it to finish.",
-  OFFLINE: "You are offline. Please connect to the internet to send a message.",
-  DEFAULT: "Type your message...",
-  UPLOADING: "Uploading CV...",
+  CHAT_FINISHED: "chat_finished",
+  AI_TYPING: "ai_typing",
+  OFFLINE: "offline",
+  DEFAULT: "default",
+  UPLOADING: "uploading",
 };
-// Character limit error messages (specific to ChatMessageField)
 export const CHARACTER_LIMIT_ERROR_MESSAGES = {
-  MESSAGE_LIMIT: `Message limit is ${CHAT_MESSAGE_MAX_LENGTH} characters.`,
-  INVALID_SPECIAL_CHARACTERS: `Invalid special characters: `,
+  MESSAGE_LIMIT: "chat_message_error_limit",
+  INVALID_SPECIAL_CHARACTERS: "chat_message_error_invalid_chars",
+  MAX_FILE_SIZE: "chat_message_cv_error_max_file_size",
+  FILE_TOO_DENSE: "chat_message_cv_error_too_dense",
+  EMPTY_CV_PARSE: "chat_message_cv_error_empty_parse",
+  GENERIC_UPLOAD_ERROR: "chat_message_cv_error_generic",
+  RATE_LIMIT_WAIT: "chat_message_cv_error_rate_limit",
+  MAX_UPLOADS_REACHED: "chat_message_cv_error_max_uploads_reached",
+  DUPLICATE_CV: "chat_message_cv_error_duplicate",
+  UNSUPPORTED_FILE_TYPE: "chat_message_cv_error_unsupported_file_type",
+  UPLOAD_TIMEOUT: "chat_message_cv_error_timeout",
 };
 
 // Define the max file size in bytes 3 MB
@@ -102,10 +110,10 @@ const StyledTextField = styled(TextField)(({ theme, disabled }) => ({
 }));
 
 const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
+  const { t } = useTranslation();
   const inputRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const theme = useTheme();
-  const { t } = useTranslation();
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [message, setMessage] = useState("");
   const [isMobile, setIsMobile] = useState(false);
@@ -185,7 +193,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
 
     // Check for character limit - truncate if over limit but allow deletion
     if (filteredValue.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
-      errorMessage = CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT;
+      errorMessage = t(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT, { max: CHAT_MESSAGE_MAX_LENGTH });
       // Only truncate if the user is adding characters (not deleting)
       // This allows deletion when over the limit
       const currentMessageLength = message.trim().length;
@@ -199,8 +207,9 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       }
       // If user is deleting characters, allow it by keeping the filteredValue as is
     } else if (inputValue !== filteredValue) {
-      // Check for special characters only if we're not over the character limit
-      errorMessage = `${CHARACTER_LIMIT_ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS} ${invalidChar}`;
+      // Check for special characters in original input
+      const chars = invalidChar.join(",");
+      errorMessage = t(CHARACTER_LIMIT_ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS, { chars });
     }
 
     setErrorMessage(errorMessage);
@@ -414,19 +423,19 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   // Placeholder text based on the chat status
   const placeHolder = useMemo(() => {
     if (props.isChatFinished) {
-      return t("chat_finished");
+      return t(PLACEHOLDER_TEXTS.CHAT_FINISHED);
     }
     if (props.isUploadingCv) {
-      return t("uploading");
+      return t(PLACEHOLDER_TEXTS.UPLOADING);
     }
     if (props.aiIsTyping) {
-      return t("ai_typing");
+      return t(PLACEHOLDER_TEXTS.AI_TYPING);
     }
     if (!isOnline) {
-      return t("offline");
+      return t(PLACEHOLDER_TEXTS.OFFLINE);
     }
-    return t("default");
-  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, isOnline]);
+    return t(PLACEHOLDER_TEXTS.DEFAULT);
+  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, isOnline, t]);
 
   // Check if the send button should be disabled
   const sendIsDisabled = useCallback(() => {
@@ -450,10 +459,12 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       ? [
           {
             id: MENU_ITEM_ID.VIEW_UPLOADED_CVS,
-            text: MENU_ITEM_TEXT.VIEW_UPLOADED_CVS,
+            text: t(MENU_ITEM_TEXT.VIEW_UPLOADED_CVS),
             icon: <DescriptionOutlinedIcon />,
             trailingIcon: <ChevronRightIcon />,
+            // description: t("upload_cv_view_uploaded_description"),
             description: "",
+              //TODO: check if empty is correct
             disabled: inputIsDisabled(),
             action: () => {
               void handleViewUploadedCVs();
@@ -462,7 +473,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           },
           {
             id: MENU_ITEM_ID.UPLOAD_CV,
-            text: MENU_ITEM_TEXT.UPLOAD_CV,
+            text: t(MENU_ITEM_TEXT.UPLOAD_CV),
             description:
               props.currentPhase === ConversationPhase.INTRO
                 ? "You can upload your CV as soon as we start exploring your experiences"
@@ -470,10 +481,10 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                   ? `PDF, DOCX, TXT • Max ${MAX_FILE_SIZE_MB} MB • ${MAX_MARKDOWN_CHARS} chars max`
                   : "CV upload is only available during experience collection",
                     // TODO: fix translation
-              // ? t("upload_cv_intro")
-                    // : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
-                    // ? t("upload_cv_collect_experiences")
-                    // : t("upload_cv_other_phase"),
+              // ?t("upload_cv_intro")
+                //: props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
+                  //? t("upload_cv_collect_experiences")
+                  // : t("upload_cv_other_phase"),
             icon: <UploadFileIcon />,
             disabled: inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
             action: handleFileMenuItemClick,
@@ -531,7 +542,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           onKeyDown={handleKeyDown}
           inputRef={inputRef}
           error={!!errorMessage}
-          helperText={errorMessage}
+          helperText={errorMessage ? t(errorMessage) : ""}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -544,7 +555,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                       transition={{ duration: 0.2 }}
                     >
                       <IconButton
-                        aria-label="add"
+                        aria-label={t("chat_message_add_action")}
                         onClick={handlePlusClick}
                         onKeyDown={(event) => event.stopPropagation()}
                         size="small"
@@ -606,21 +617,8 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
             notifyOnClose={handleMenuClose}
             anchorOrigin={{ vertical: "top", horizontal: "left" }}
             transformOrigin={{ vertical: "bottom", horizontal: "left" }}
-            items={[
-              {
-                id: MENU_ITEM_ID.UPLOAD_CV,
-                text: MENU_ITEM_TEXT.UPLOAD_CV,
-                description: 
-                  props.currentPhase === ConversationPhase.INTRO
-                    ? t("upload_cv_intro")
-                    : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
-                    ? t("upload_cv_collect_experiences")
-                    : t("upload_cv_other_phase"),
-                icon: <UploadFileIcon />,
-                disabled: inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
-                action: handleFileMenuItemClick,
-              },
-            ]}
+            items={contextMenuItems}
+            paperSx={{ width: 420 }}
           />
         )}
         {showCharCounter && (
