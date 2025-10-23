@@ -112,7 +112,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       );
     } catch (err) {
       console.error(err);
-      enqueueSnackbar("Failed to continue. Please try again later.", { variant: "error" });
+      enqueueSnackbar(t("skillsRanking_briefing_failed_to_continue"), { variant: "error" });
       setSubmitted(false);
       setIsTypingVisible(false);
       return;
@@ -125,7 +125,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       setIsTypingVisible(false);
       newSkillsRankingState && onFinish(newSkillsRankingState);
     }, remaining);
-  }, [onFinish, enqueueSnackbar]);
+  }, [onFinish, enqueueSnackbar, t]);
 
   return (
     <MessageContainer

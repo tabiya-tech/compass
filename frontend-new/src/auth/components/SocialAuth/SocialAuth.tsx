@@ -77,9 +77,9 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
         errorMessage = error.message;
         console.error(error);
       }
-      enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+      enqueueSnackbar(t("auth_social_failed_login_with_message", { message: errorMessage }), { variant: "error" });
     },
-    [enqueueSnackbar, registrationCode],
+    [enqueueSnackbar, registrationCode, t],
   );
 
   const registerUser = useCallback(
@@ -126,7 +126,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       if (!prefs) {
         // if registration is disabled, show an error message
         if(registrationDisabled) {
-          enqueueSnackbar("This account isn’t registered. Please contact the provider of this link.", { variant: "error" });
+          enqueueSnackbar(t("auth_social_account_not_registered"), { variant: "error" });
           return;
         }
 
@@ -145,7 +145,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
     } finally {
       notifyOnLoading(false);
     }
-  }, [notifyOnLoading, postLoginHandler, _registrationCode, registerUser, enqueueSnackbar, handleError]);
+  }, [notifyOnLoading, postLoginHandler, _registrationCode, registerUser, enqueueSnackbar, handleError, t]);
 
   const handleRegistrationCodeSuccess = useCallback(
     async (registrationCode: string) => {

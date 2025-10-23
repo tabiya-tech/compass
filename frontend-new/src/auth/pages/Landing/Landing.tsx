@@ -63,9 +63,9 @@ const Landing: React.FC = () => {
         errorMessage = error.message;
         console.error(error);
       }
-      enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+      enqueueSnackbar(t("auth_login_failed_with_message", { message: errorMessage }), { variant: "error" });
     },
-    [enqueueSnackbar]
+    [enqueueSnackbar, t]
   );
 
   const handlePostLogin = useCallback(async () => {
@@ -75,7 +75,7 @@ const Landing: React.FC = () => {
         navigate(routerPaths.CONSENT, { replace: true });
       } else {
         navigate(routerPaths.ROOT, { replace: true });
-        enqueueSnackbar("Welcome!", { variant: "success" });
+        enqueueSnackbar(t("welcome_back"), { variant: "success" });
       }
     } catch (error: unknown) {
       console.error(new AuthenticationError("An error occurred while trying to get your preferences", error));
@@ -85,25 +85,25 @@ const Landing: React.FC = () => {
       } else {
         errorMessage = (error as Error).message;
       }
-      enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
+      enqueueSnackbar(t("auth_preferences_fetch_failed_with_message", { message: errorMessage }), {
         variant: "error",
       });
     }
-  }, [navigate, enqueueSnackbar]);
+  }, [navigate, enqueueSnackbar, t]);
 
   const handleContinueAsGuest = useCallback(async () => {
     try {
       setIsLoading(true);
       const firebaseInvitationAuthServiceInstance = FirebaseInvitationCodeAuthenticationService.getInstance();
       await firebaseInvitationAuthServiceInstance.login(applicationLoginCode);
-      enqueueSnackbar("Invitation code is valid", { variant: "success" });
+      enqueueSnackbar(t("invitation_code_valid"), { variant: "success" });
       await handlePostLogin();
     } catch (error) {
       await handleError(error as Error);
     } finally {
       setIsLoading(false);
     }
-  }, [applicationLoginCode, handleError, handlePostLogin, enqueueSnackbar]);
+  }, [applicationLoginCode, handleError, handlePostLogin, enqueueSnackbar, t]);
 
  return (
     <>

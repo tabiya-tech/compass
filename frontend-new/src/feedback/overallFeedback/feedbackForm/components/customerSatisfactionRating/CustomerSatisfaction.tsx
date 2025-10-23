@@ -91,10 +91,10 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       await feedbackService.sendFeedback(sessionId, [formattedData]);
 
       notifyOnCustomerSatisfactionRatingSubmitted();
-      enqueueSnackbar("Rating Feedback submitted successfully!", { variant: "success" });
+      enqueueSnackbar(t("customerSatisfactionRating_submit_success"), { variant: "success" });
     } catch (error) {
       console.error("Feedback submission failed:", error);
-      enqueueSnackbar("Failed to submit feedback. Please try again later.", { variant: "error" });
+      enqueueSnackbar(t("customerSatisfactionRating_submit_error"), { variant: "error" });
     } finally {
       setIsSubmittingRating(false);
       setSelectedRating(null);

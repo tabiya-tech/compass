@@ -47,7 +47,7 @@ Feature: Global Test Environment Setup
  * stableT: A simple translation function that returns the translation string if the key exists,
  *          otherwise it returns the key itself. This ensures tests have predictable translations.
  */
-const enTranslations = require("src/locales/en/translation.json");
+const enTranslations = require("src/locales/en-gb/translation.json");
 
 const stableT = (key: string, options?: Record<string, unknown>) => {
     let text = (enTranslations as Record<string, string>)[key] || key;

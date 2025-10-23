@@ -61,14 +61,11 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
         message,
       });
 
-      enqueueSnackbar(
-        "Your request for access to Compass has been submitted successfully. We will get back to you soon.",
-        {
-          variant: "success",
-        }
-      );
+      enqueueSnackbar(t("invitation_request_submit_success"), {
+        variant: "success",
+      });
     } catch (e) {
-      enqueueSnackbar("Something went wrong while attempting to send your request", {
+      enqueueSnackbar(t("invitation_request_submit_error"), {
         variant: "error",
       });
       console.error(e);

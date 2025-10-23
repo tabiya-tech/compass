@@ -13,12 +13,9 @@ jest.mock("react-i18next", () => ({
 
 // mute the console
 import "src/_test_utilities/consoleMock";
-import { useTranslation } from "react-i18next";
 import { render, screen } from "src/_test_utilities/test-utils";
 import CVTypingChatMessage, { DATA_TEST_ID, UI_TEXT } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
 import { DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
-
-const { t } = useTranslation();
 
 // mock chat bubble component
 jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
@@ -45,9 +42,8 @@ describe("CVTypingChatMessage", () => {
     expect(cvTypingChatMessageContainer).toBeInTheDocument();
     // AND expect the message bubble to be visible
     expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
-    // AND expect the uploading CV text to be displayed
-    expect(screen.getByText(t(UI_TEXT.UPLOADING_CV) as string)).toBeInTheDocument();
-    expect(screen.getByText(t(UI_TEXT.UPLOADING_CV) as string)).toBeInTheDocument();
+    // AND expect the uploading CV text to be displayed (mocked t returns the key itself)
+    expect(screen.getByText(UI_TEXT.UPLOADING_CV)).toBeInTheDocument();
     // AND expect to find 3 dots (periods)
     const dots = screen.getAllByText(".");
     expect(dots).toHaveLength(3);
@@ -72,8 +68,8 @@ describe("CVTypingChatMessage", () => {
     expect(cvTypingChatMessageContainer).toBeInTheDocument();
     // AND expect the message bubble to be visible
     expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
-    // AND expect the CV uploaded text to be displayed
-  expect(screen.getByText(t(UI_TEXT.CV_UPLOADED) as string)).toBeInTheDocument();
+    // AND expect the CV uploaded text to be displayed (mocked t returns the key itself)
+    expect(screen.getByText(UI_TEXT.CV_UPLOADED)).toBeInTheDocument();
     // AND the component to match the snapshot
     expect(cvTypingChatMessageContainer).toMatchSnapshot();
     // THEN expect no errors or warnings to have occurred
