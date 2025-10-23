@@ -2,6 +2,7 @@
 import "src/_test_utilities/consoleMock";
 
 import FeedbackForm, { DATA_TEST_ID, FeedbackCloseEvent } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
+import i18n from "src/i18n/i18n";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { act, fireEvent, waitFor } from "@testing-library/react";
 import FeedbackFormContent from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
@@ -138,7 +139,7 @@ describe("FeedbackForm", () => {
       expect(mockSendFeedback).toHaveBeenCalled();
       // AND the snackbar to have been called
       await waitFor(() =>
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Feedback submitted successfully!", {
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("feedback_overall_submit_success"), {
           variant: "success",
         })
       );
@@ -184,7 +185,7 @@ describe("FeedbackForm", () => {
       // AND the snackbar to have been called
       await waitFor(() =>
         expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-          "Failed to submit feedback. Please try again later.",
+          i18n.t("feedback_overall_submit_error"),
           { variant: "error" }
         )
       );

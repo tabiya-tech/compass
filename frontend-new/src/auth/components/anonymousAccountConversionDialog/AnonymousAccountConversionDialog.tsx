@@ -90,17 +90,17 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
 
   const handleSubmit = useCallback(async () => {
     if (!validateEmail(email)) {
-      enqueueSnackbar("Please enter a valid email address", { variant: "error" });
+      enqueueSnackbar(t("auth_anonymousConversion_invalid_email"), { variant: "error" });
       return;
     }
 
     if (!isEmailValid) {
-      enqueueSnackbar("Please ensure both email addresses match", { variant: "error" });
+      enqueueSnackbar(t("auth_anonymousConversion_emails_mismatch"), { variant: "error" });
       return;
     }
 
     if (!isPasswordValid) {
-      enqueueSnackbar("Please ensure your password meets all requirements", { variant: "error" });
+      enqueueSnackbar(t("auth_anonymousConversion_password_requirements_not_met"), { variant: "error" });
       return;
     }
 
@@ -109,22 +109,25 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
       const authService = FirebaseEmailAuthenticationService.getInstance();
       await authService.linkAnonymousAccount(email, password, email);
       console.info("Anonymous account successfully linked to a registered account.");
-      enqueueSnackbar("Account successfully registered!", { variant: "success" });
-      enqueueSnackbar(`Currently logged in with the email: ${email}. A verification email has been sent to your email address. Please verify your account before logging in again.`, {
+      enqueueSnackbar(t("auth_anonymousConversion_registration_success"), { variant: "success" });
+      enqueueSnackbar(
+        t("auth_anonymousConversion_verification_sent_with_email", { email }),
+        {
         variant: "info",
         persist: true,
         autoHideDuration: null
-      });
+      }
+      );
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error(new Error("Failed to link anonymous account"), { cause: error });
 
-      enqueueSnackbar(error.message || "Failed to register account", { variant: "error" });
+      enqueueSnackbar(error.message || t("auth_anonymousConversion_registration_failed"), { variant: "error" });
     } finally {
       setIsLoading(false);
     }
-  }, [email, password, onSuccess, onClose, enqueueSnackbar, isEmailValid, isPasswordValid]);
+  }, [email, password, onSuccess, onClose, enqueueSnackbar, isEmailValid, isPasswordValid, t]);
 
   return (
     <Dialog
@@ -174,7 +177,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
             margin="normal"
             required
             error={email !== "" && !validateEmail(email)}
-            helperText={email !== "" && !validateEmail(email) ? "Please enter a valid email address" : ""}
+            helperText={email !== "" && !validateEmail(email) ? t("valid_email_required") : ""}
           />
           
           <TextField
@@ -187,7 +190,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
             margin="normal"
             required
             error={emailConfirmation !== "" && email !== emailConfirmation}
-            helperText={emailConfirmation !== "" && email !== emailConfirmation ? "Emails do not match" : ""}
+            helperText={emailConfirmation !== "" && email !== emailConfirmation ? t("emails_do_not_match") : ""}
           />
           
           <PasswordInput

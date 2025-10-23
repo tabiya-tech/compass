@@ -4,6 +4,7 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, act, waitFor} from "src/_test_utilities/test-utils";
 import CustomerSatisfactionRating, { UI_TEXT, DATA_TEST_ID } from "./CustomerSatisfaction";
+import i18n from "src/i18n/i18n";
 import CustomRating, { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
 import { DATA_TEST_ID as BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/Backdrop";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -137,7 +138,7 @@ describe("CustomerSatisfactionRating", () => {
     // AND a backdrop to have been shown while the rating is being submitted
     expect(screen.getByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
     // AND the success snackbar to be shown
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Rating Feedback submitted successfully!", {
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("customerSatisfactionRating_submit_success"), {
       variant: "success",
     });
     // AND expect no errors or warning to have occurred
@@ -163,7 +164,7 @@ describe("CustomerSatisfactionRating", () => {
 
     // THEN expect the error snackbar to be shown
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit feedback. Please try again later.", {
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("customerSatisfactionRating_submit_error"), {
         variant: "error",
       });
     });
@@ -193,7 +194,7 @@ describe("CustomerSatisfactionRating", () => {
 
     // THEN expect the error snackbar to be shown
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit feedback. Please try again later.", {
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("customerSatisfactionRating_submit_error"), {
         variant: "error",
       });
     });

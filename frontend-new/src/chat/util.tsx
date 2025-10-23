@@ -223,7 +223,7 @@ export const parseConversationPhase = (newPhase: CurrentPhase, previousPhase?: C
 export const formatExperiencesToMessage = (experiences: string[] | null): string => {
   if (!Array.isArray(experiences) || experiences.length === 0) return "";
 
-  const intro = "These are my experiences:";
+  const intro = i18n.t("chat_message_experiences_intro");
   const bullets = experiences
     .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
     .filter(Boolean)

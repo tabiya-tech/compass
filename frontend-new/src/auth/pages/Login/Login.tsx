@@ -109,14 +109,14 @@ const Login: React.FC = () => {
         console.error(error);
         setShowResendVerification(false);
       }
-      enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
+      enqueueSnackbar(t("auth_login_failed_with_message", { message: errorMessage }), { variant: "error" });
 
       // if something goes wrong, log the user out
       const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
       await firebaseEmailAuthServiceInstance.logout();
       console.info("Login failed. Logging out user.");
     },
-    [enqueueSnackbar]
+    [enqueueSnackbar, t]
   );
 
   /* ------------------
@@ -226,7 +226,7 @@ const Login: React.FC = () => {
       } else {
         errorMessage = (error as Error).message;
       }
-      enqueueSnackbar(`An error occurred while trying to get your preferences: ${errorMessage}`, {
+      enqueueSnackbar(t("auth_preferences_fetch_failed_with_message", { message: errorMessage }), {
         variant: "error",
       });
     }
