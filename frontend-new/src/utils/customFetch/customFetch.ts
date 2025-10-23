@@ -110,7 +110,7 @@ const refreshToken = async (
       ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS.AUTHENTICATION_FAILURE,
     );
     await authService.logout();
-    enqueueSnackbar(`${userFriendlyErrorMessage} We are logging you out ....`, {
+    enqueueSnackbar(`${userFriendlyErrorMessage} ${i18n.t("auth_logging_you_out_notice")}`, {
       autoHideDuration: LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
       variant: "error",
     });

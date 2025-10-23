@@ -21,6 +21,7 @@ import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { getCvUploadEnabled } from "src/envService";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import CVService from "src/CV/CVService/CVService";
+import i18n from "src/i18n/i18n";
 
 // mock the getCvUploadEnabled function
 jest.mock("src/envService", () => ({
@@ -107,7 +108,9 @@ describe("ChatMessageField", () => {
     fireEvent.change(ChatMessageFieldInput, { target: { value: message } });
 
     // THEN expect the error message to be in the document
-    expect(screen.getByText(`Message limit is ${CHAT_MESSAGE_MAX_LENGTH} characters.`)).toBeInTheDocument();
+    expect(
+      screen.getByText(i18n.t("chat_message_error_limit", { max: CHAT_MESSAGE_MAX_LENGTH }))
+    ).toBeInTheDocument();
     // AND the send button to be disabled
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeDisabled();
     // AND the input field should be enabled
@@ -130,7 +133,7 @@ describe("ChatMessageField", () => {
 
     // THEN expect the error message to be in the document
     expect(
-      screen.getByText(`${CHARACTER_LIMIT_ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS}${invalidChar}`)
+      screen.getByText(i18n.t("chat_message_error_invalid_chars", { chars: invalidChar.join(",") }))
     ).toBeInTheDocument();
     // AND the send button should be enabled
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeEnabled();
@@ -152,8 +155,9 @@ describe("ChatMessageField", () => {
     fireEvent.change(ChatMessageFieldInput, { target: { value: validMessage } });
 
     // THEN expect no error message to be in the document
-    expect(screen.queryByText(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT)).toBeNull();
-    expect(screen.queryByText(CHARACTER_LIMIT_ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS)).toBeNull();
+    expect(screen.queryByText(i18n.t("chat_message_error_limit", { max: CHAT_MESSAGE_MAX_LENGTH }))).toBeNull();
+    // The exact invalid chars message depends on input, we just ensure no generic prefix is shown without chars
+    expect(screen.queryByText(/Invalid special characters/)).toBeNull();
     // AND the send button should be enabled
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeEnabled();
     // AND the input field should be enabled
@@ -373,7 +377,7 @@ describe("ChatMessageField", () => {
         const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
         expect(chatMessageField).toBeDisabled();
         // AND the placeholder should have specific text
-        expect(chatMessageField).toHaveAttribute("placeholder", PLACEHOLDER_TEXTS.AI_TYPING);
+        expect(chatMessageField).toHaveAttribute("placeholder", i18n.t("ai_typing"));
         // AND the handleSend not to be called
         expect(handleSend).not.toHaveBeenCalled();
         // AND no errors or warnings to have occurred
@@ -397,7 +401,7 @@ describe("ChatMessageField", () => {
         const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
         expect(chatMessageField).toBeDisabled();
         // AND the placeholder should have specific text
-        expect(chatMessageField).toHaveAttribute("placeholder", PLACEHOLDER_TEXTS.CHAT_FINISHED);
+        expect(chatMessageField).toHaveAttribute("placeholder", i18n.t("chat_finished"));
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
@@ -419,7 +423,7 @@ describe("ChatMessageField", () => {
         const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
         expect(chatMessageField).toBeDisabled();
         // AND the placeholder should have specific text
-        expect(chatMessageField).toHaveAttribute("placeholder", PLACEHOLDER_TEXTS.OFFLINE);
+        expect(chatMessageField).toHaveAttribute("placeholder", i18n.t("offline"));
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
@@ -518,7 +522,9 @@ describe("ChatMessageField", () => {
         const sendButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON);
         expect(sendButton).toBeEnabled();
         // AND there should be no error message
-        expect(screen.queryByText(`Message limit is ${CHAT_MESSAGE_MAX_LENGTH} characters.`)).not.toBeInTheDocument();
+        expect(
+          screen.queryByText(i18n.t("chat_message_error_limit", { max: CHAT_MESSAGE_MAX_LENGTH }))
+        ).not.toBeInTheDocument();
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
@@ -711,7 +717,7 @@ describe("ChatMessageField", () => {
         // AND the composed content (intro + bullets) should be added to the input field
         const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
         await waitFor(() => {
-          expect(chatMessageField).toHaveValue("These are my experiences:\n• parsed CV content");
+          expect(chatMessageField).toHaveValue(`${i18n.t("chat_message_experiences_intro")}\n• parsed CV content`);
         });
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
@@ -761,7 +767,7 @@ describe("ChatMessageField", () => {
         expect(mockOnUploadCv).not.toHaveBeenCalled();
         // AND expect an error message to be shown
         await waitFor(() => {
-          expect(screen.getByText(CV_UPLOAD_ERROR_MESSAGES.MAX_FILE_SIZE)).toBeInTheDocument();
+          expect(screen.getByText(i18n.t("chat_message_cv_error_max_file_size"))).toBeInTheDocument();
         });
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
@@ -790,7 +796,7 @@ describe("ChatMessageField", () => {
         const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
         expect(chatMessageField).toBeDisabled();
         // AND the placeholder should indicate uploading
-        expect(chatMessageField).toHaveAttribute("placeholder", PLACEHOLDER_TEXTS.UPLOADING);
+        expect(chatMessageField).toHaveAttribute("placeholder", i18n.t("uploading"));
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
@@ -823,7 +829,7 @@ describe("ChatMessageField", () => {
         // GIVEN an INTRO phase
         const givenPhase = ConversationPhase.INTRO;
         // AND a mock onUploadCv that rejects with a 413 error
-        const tooLargeErrorAlt = new Error(CV_UPLOAD_ERROR_MESSAGES.FILE_TOO_DENSE);
+        const tooLargeErrorAlt = new Error(i18n.t("chat_message_cv_error_too_dense"));
         (tooLargeErrorAlt as any).status = StatusCodes.REQUEST_TOO_LONG;
         (tooLargeErrorAlt as any).errorCode = ErrorConstants.ErrorCodes.TOO_LARGE_PAYLOAD;
 
@@ -858,7 +864,7 @@ describe("ChatMessageField", () => {
 
         // AND the specific error message for too dense content to be shown
         await waitFor(() => {
-          expect(screen.getByText(CV_UPLOAD_ERROR_MESSAGES.FILE_TOO_DENSE)).toBeInTheDocument();
+          expect(screen.getByText(i18n.t("chat_message_cv_error_too_dense"))).toBeInTheDocument();
         });
 
         // AND console.error should be called for logging the error
@@ -922,7 +928,7 @@ describe("ChatMessageField", () => {
         // THEN expect the composed content from the selected CV to be added to the input field
         const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
         await waitFor(() => {
-          expect(chatMessageField).toHaveValue("These are my experiences:\n• foo");
+          expect(chatMessageField).toHaveValue(`${i18n.t("chat_message_experiences_intro")}\n• foo`);
         });
         // AND the menu should close
         expect(screen.queryByTestId(MENU_ITEM_ID.VIEW_UPLOADED_CVS)).not.toBeInTheDocument();
@@ -1242,7 +1248,7 @@ describe("ChatMessageField", () => {
       expect(mockOnUploadCv).toHaveBeenCalledWith(file);
       // AND the specific max uploads reached error is shown
       await waitFor(() => {
-        expect(screen.getByText(CV_UPLOAD_ERROR_MESSAGES.MAX_UPLOADS_REACHED)).toBeInTheDocument();
+        expect(screen.getByText(i18n.t("chat_message_cv_error_max_uploads_reached"))).toBeInTheDocument();
       });
       // AND no warnings to have occurred
       expect(console.warn).not.toHaveBeenCalled();
