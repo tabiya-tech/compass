@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Typography, Skeleton, useTheme } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import InfoIcon from "@mui/icons-material/Info";
@@ -38,6 +39,7 @@ const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
   isLoading,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isCollectPhase = currentPhase === ConversationPhase.COLLECT_EXPERIENCES;
 
   const helpTipText = isCollectPhase
@@ -156,7 +158,7 @@ const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
                     sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.3) }}
                     data-testid={DATA_TEST_ID.UPLOADED_CVS_MENU_UPLOAD_DATE}
                   >
-                    {getDurationFromNow(new Date(cv.uploaded_at))}
+                    {getDurationFromNow(new Date(cv.uploaded_at), t)}
                   </Typography>
                 </Box>
               </Box>
