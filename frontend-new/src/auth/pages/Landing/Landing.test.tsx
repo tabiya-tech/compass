@@ -157,7 +157,8 @@ describe("Landing Page", () => {
       });
 
       // AND welcome message
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Welcome!", { variant: "success" });
+      const i18n = require("src/i18n/i18n").default;
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("welcome_back"), { variant: "success" });
 
       // AND no errors or warnings to have occurred
       expect(console.error).not.toHaveBeenCalled();

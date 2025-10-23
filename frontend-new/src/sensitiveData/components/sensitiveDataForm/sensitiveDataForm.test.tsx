@@ -776,10 +776,14 @@ describe("Sensitive Data Form", () => {
       const submitButton = screen.getByTestId(DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON);
       await user.click(submitButton);
 
-      // THEN the specific error message for encrypted data too large should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(ERROR_MESSAGE.ENCRYPTED_DATA_TOO_LARGE, {
-        variant: "error",
-      });
+      // THEN the specific error message for encrypted data too large should be shown (via i18n)
+      const i18n = require("src/i18n/i18n").default;
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        i18n.t("sensitive_data_error_encrypted_data_too_large"),
+        {
+          variant: "error",
+        }
+      );
     });
 
     it("should handle missing user preferences error", async () => {
