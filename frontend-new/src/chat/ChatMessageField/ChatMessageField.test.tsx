@@ -913,14 +913,12 @@ describe("ChatMessageField", () => {
           expect(mockCVServiceInstance.getAllCVs).toHaveBeenCalled();
         });
 
-        // AND the uploaded CVs should be displayed
-        // await waitFor(() => {
-        expect(screen.getByText("foo_bar.pdf")).toBeInTheDocument();
-        expect(screen.getByText("foo_baz.pdf")).toBeInTheDocument();
-        // });
+        // AND the uploaded CVs should be displayed (after async fetch + render)
+        expect(await screen.findByText("foo_bar.pdf")).toBeInTheDocument();
+        expect(await screen.findByText("foo_baz.pdf")).toBeInTheDocument();
 
         // WHEN a CV is selected from the list
-        const firstCVItem = screen.getByText("foo_bar.pdf");
+        const firstCVItem = await screen.findByText("foo_bar.pdf");
         await userEvent.click(firstCVItem);
 
         // THEN expect the composed content from the selected CV to be added to the input field

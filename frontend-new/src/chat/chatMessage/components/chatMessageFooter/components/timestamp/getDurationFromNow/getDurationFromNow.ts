@@ -17,7 +17,10 @@
  * getDurationFromNow("2021-10-10", t);
  * // => "on 10/10/2021"
  */
-export function getDurationFromNow(givenDate: Date | string, t: any): string {
+export function getDurationFromNow(
+  givenDate: Date | string,
+  t?: ((key: string, opts?: any) => string) | unknown
+): string {
   const now = getSafeDate(new Date());
   const given = getSafeDate(givenDate);
   const duration = now.getTime() - given.getTime();
@@ -33,21 +36,48 @@ export function getDurationFromNow(givenDate: Date | string, t: any): string {
   const hours = Math.floor((duration % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
 
+  // Provide a safe translation fallback when `t` is missing or not a function (e.g., in tests)
+  const safeT = (key: string, opts?: any): string => {
+    if (typeof t === "function") return (t as (k: string, o?: any) => string)(key, opts);
+    switch (key) {
+      case "yesterday":
+        return "yesterday";
+      case "ago":
+        return `${opts?.time ?? ""} ago`;
+      case "just_now":
+        return "just now";
+      case "day":
+        return "day";
+      case "days":
+        return "days";
+      case "hour":
+        return "hour";
+      case "hours":
+        return "hours";
+      case "minute":
+        return "minute";
+      case "minutes":
+        return "minutes";
+      default:
+        return key;
+    }
+  };
+
   // More than a week → format date
   if (days > 7) {
     return `on ${given.toLocaleDateString("en-GB", { timeZone: "UTC" })}`;
   }
 
   // Handle special and pluralized cases
-  if (days === 1) return t("yesterday");
+  if (days === 1) return safeT("yesterday");
   if (days > 1)
-    return t("ago", { time: `${days} ${pluralize(days, t(days === 1 ? "day" : "days"))}` });
+    return safeT("ago", { time: `${days} ${pluralize(days, safeT(days === 1 ? "day" : "days"))}` });
   if (hours > 0)
-    return t("ago", { time: `${hours} ${pluralize(hours, t(hours === 1 ? "hour" : "hours"))}` });
+    return safeT("ago", { time: `${hours} ${pluralize(hours, safeT(hours === 1 ? "hour" : "hours"))}` });
   if (minutes > 0)
-    return t("ago", { time: `${minutes} ${pluralize(minutes, t(minutes === 1 ? "minute" : "minutes"))}` });
+    return safeT("ago", { time: `${minutes} ${pluralize(minutes, safeT(minutes === 1 ? "minute" : "minutes"))}` });
 
-  return t("just_now");
+  return safeT("just_now");
 }
 
 /**
