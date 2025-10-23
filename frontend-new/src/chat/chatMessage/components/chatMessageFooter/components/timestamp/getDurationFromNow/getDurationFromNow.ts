@@ -23,11 +23,11 @@ export function getDurationFromNow(givenDate: Date | string, t: any): string {
   const duration = now.getTime() - given.getTime();
 
   if (duration < 0) {
-  if (duration < 0) {
     console.warn("Invalid date range: First date must be before second date", {
       now: now.toISOString(),
       given: given.toISOString(),
     });
+    return t("just_now");
   }
 
   const days = Math.floor(duration / (1000 * 60 * 60 * 24));
