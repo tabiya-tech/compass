@@ -183,6 +183,17 @@ export const UploadingDisabledState: Story = {
   },
 };
 
+export const CharacterLimitWithCVResponse: Story = {
+  render: (args) => <ChatMessageFieldWrapper {...args} />,
+  args: {
+    handleSend: action("Message sent"),
+    currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
+    prefillMessage: `I have extensive experience in software development with expertise in React, TypeScript, Node.js, Python, and cloud technologies. I've worked on multiple projects including e-commerce platforms, data analytics systems, and mobile applications. My key achievements include leading a team of 5 developers to deliver a high-traffic web application serving over 100,000 users, implementing microservices architecture that improved system performance by 40%, and developing automated testing frameworks that reduced deployment time by 60%. I have strong problem-solving skills, excellent communication abilities, and a passion for continuous learning. I'm proficient in agile methodologies, version control with Git, CI/CD pipelines, and have experience with AWS, Docker, and Kubernetes. I've also contributed to open-source projects and have published technical articles on software architecture best practices. My educational background includes a Bachelor's degree in Computer Science and several professional certifications in cloud computing and project management. I'm looking for opportunities to work on challenging projects that allow me to grow as a developer and contribute to innovative solutions. I believe my technical skills combined with my leadership experience make me a valuable addition to any development team. I'm particularly interested in roles that involve full-stack development, system design, and mentoring junior developers. I'm excited about the possibility of joining your team and contributing to your mission of creating impactful software solutions.`, // Long CV response that exceeds limit
+  },
+};
+
+
+
 export const SinglePreviouslyUploadedCV: Story = {
   render: (args) => <WithMockedCvService {...args} items={createMockCvList(1)} />,
   args: {
