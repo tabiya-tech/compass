@@ -4,7 +4,7 @@ import SendIcon from "@mui/icons-material/Send";
 import AddIcon from "@mui/icons-material/Add";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { AnimatePresence, motion } from "framer-motion";
-import { StatusCodes } from "http-status-codes";
+import { CV_UPLOAD_ERROR_MESSAGES, getCvUploadErrorMessageFromHttpStatus } from "../CVUploadErrorHandling";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
@@ -28,6 +28,7 @@ export interface ChatMessageFieldProps {
   onUploadCv?: (file: File) => Promise<string[]>; // returns array of experience lines
   currentPhase?: ConversationPhase;
   prefillMessage?: string | null; // optional prefill content for the input field
+  cvUploadError?: string | null; // CV upload error message from polling process
 }
 
 const uniqueId = "2a76494f-351d-409d-ba58-e1b2cfaf2a53";
@@ -65,19 +66,10 @@ export const PLACEHOLDER_TEXTS = {
   DEFAULT: "Type your message...",
   UPLOADING: "Uploading CV...",
 };
-export const ERROR_MESSAGES = {
+// Character limit error messages (specific to ChatMessageField)
+export const CHARACTER_LIMIT_ERROR_MESSAGES = {
   MESSAGE_LIMIT: `Message limit is ${CHAT_MESSAGE_MAX_LENGTH} characters.`,
   INVALID_SPECIAL_CHARACTERS: `Invalid special characters: `,
-  MAX_FILE_SIZE: "Selected file is too large. Maximum size is 3 MB.",
-  FILE_TOO_DENSE: "The uploaded file content is too long to process. Please reduce its length and try again.",
-  EMPTY_CV_PARSE: "We couldn't detect experiences in your CV. Please check the file and try again.",
-  GENERIC_UPLOAD_ERROR: "Failed to parse your CV. Please try again or use a different file.",
-  RATE_LIMIT_WAIT: "Too many uploads at once. Please wait one minute and try again.",
-  MAX_UPLOADS_REACHED:
-    "You've reached the maximum number of CV uploads for this conversation. Further uploads aren’t allowed.",
-  DUPLICATE_CV: "This CV has already been uploaded. Select it from your previously uploaded CVs.",
-  UNSUPPORTED_FILE_TYPE: "Unsupported file type. Allowed: PDF, DOCX, TXT.",
-  UPLOAD_TIMEOUT: "The upload timed out. Please try again.",
 };
 
 // Define the max file size in bytes 3 MB
@@ -187,9 +179,9 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     let filteredValue = inputValue.replace(DISALLOWED_CHARACTERS, "");
     const invalidChar = inputValue.split("").filter((char) => DISALLOWED_CHARACTERS.test(char));
 
-    // Check for character limit - truncate if over limit but allow deletion
-    if (filteredValue.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
-      errorMessage = ERROR_MESSAGES.MESSAGE_LIMIT;
+            // Check for character limit - truncate if over limit but allow deletion
+            if (filteredValue.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
+                errorMessage = CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT;
       // Only truncate if the user is adding characters (not deleting)
       // This allows deletion when over the limit
       const currentMessageLength = message.trim().length;
@@ -202,10 +194,10 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
         filteredValue = filteredValue.substring(0, CHAT_MESSAGE_MAX_LENGTH);
       }
       // If user is deleting characters, allow it by keeping the filteredValue as is
-    } else if (inputValue !== filteredValue) {
-      // Check for special characters only if we're not over the character limit
-      errorMessage = `${ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS} ${invalidChar}`;
-    }
+      } else if (inputValue !== filteredValue) {
+          // Check for special characters only if we're not over the character limit
+          errorMessage = `${CHARACTER_LIMIT_ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS} ${invalidChar}`;
+      }
 
     setErrorMessage(errorMessage);
 
@@ -226,14 +218,24 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   useEffect(() => {
     if (props.prefillMessage) {
       setMessage(props.prefillMessage);
-      // Set appropriate error message if prefill exceeds limit
-      if (props.prefillMessage.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
-        setErrorMessage(ERROR_MESSAGES.MESSAGE_LIMIT);
+        // Set appropriate error message if prefill exceeds limit
+        if (props.prefillMessage.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
+            setErrorMessage(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT);
       } else if (errorMessage) {
         setErrorMessage("");
       }
     }
   }, [errorMessage, props.prefillMessage]);
+
+  // Handle CV upload errors from polling process
+  useEffect(() => {
+    if (props.cvUploadError) {
+      setErrorMessage(props.cvUploadError);
+    } else if (props.cvUploadError === null) {
+      // Clear error message when cvUploadError is explicitly set to null
+      setErrorMessage("");
+    }
+  }, [props.cvUploadError]);
 
   // Handle Enter key press to send message or add new line depending on the platform
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -330,13 +332,13 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       setErrorMessage("");
     }
 
-    if (file.size > MAX_FILE_SIZE_BYTES) {
-      setErrorMessage(ERROR_MESSAGES.MAX_FILE_SIZE);
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        setErrorMessage(CV_UPLOAD_ERROR_MESSAGES.MAX_FILE_SIZE);
       return;
     }
 
     // Clear size error specifically if previously set
-    if (errorMessage === ERROR_MESSAGES.MAX_FILE_SIZE) {
+    if (errorMessage === CV_UPLOAD_ERROR_MESSAGES.MAX_FILE_SIZE) {
       setErrorMessage("");
     }
 
@@ -357,33 +359,9 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       console.error("Error parsing CV file:", err);
       const status = err?.statusCode || err?.status || err?.response?.status;
       const detail = err?.response?.data?.detail;
-      // Map friendly, inline field errors
-      if (status === StatusCodes.CONFLICT) {
-        setErrorMessage(ERROR_MESSAGES.DUPLICATE_CV);
-        return;
-      }
-      if (status === StatusCodes.UNSUPPORTED_MEDIA_TYPE) {
-        setErrorMessage(ERROR_MESSAGES.UNSUPPORTED_FILE_TYPE);
-        return;
-      }
-      if (status === StatusCodes.REQUEST_TOO_LONG) {
-        setErrorMessage(ERROR_MESSAGES.FILE_TOO_DENSE);
-        return;
-      }
-      if (status === StatusCodes.TOO_MANY_REQUESTS) {
-        setErrorMessage(ERROR_MESSAGES.RATE_LIMIT_WAIT);
-        return;
-      }
-      if (status === StatusCodes.FORBIDDEN) {
-        setErrorMessage(ERROR_MESSAGES.MAX_UPLOADS_REACHED);
-        return;
-      }
-      if (status === StatusCodes.REQUEST_TIMEOUT || status === StatusCodes.GATEWAY_TIMEOUT) {
-        setErrorMessage(ERROR_MESSAGES.UPLOAD_TIMEOUT);
-        return;
-      }
-      // Fallback generic inline error
-      setErrorMessage(detail || ERROR_MESSAGES.GENERIC_UPLOAD_ERROR);
+      // Use centralized error message mapping
+      const errorMessage = getCvUploadErrorMessageFromHttpStatus(status, detail);
+      setErrorMessage(errorMessage);
     }
   };
 
@@ -450,7 +428,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       props.isUploadingCv ||
       !isOnline ||
       message.trim().length === 0 ||
-      errorMessage === ERROR_MESSAGES.MESSAGE_LIMIT // Only disable send button for character limit errors
+                errorMessage === CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT // Only disable send button for character limit errors
     );
   }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline, message, errorMessage]);
 
