@@ -192,6 +192,15 @@ export const CharacterLimitWithCVResponse: Story = {
   },
 };
 
+export const CVMarkdownTooLong: Story = {
+  render: (args) => <ChatMessageFieldWrapper {...args} />,
+  args: {
+    handleSend: action("Message sent"),
+    currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
+    cvUploadError: "Your CV content is too long. Please shorten your CV and try again.",
+  },
+};
+
 
 
 export const SinglePreviouslyUploadedCV: Story = {

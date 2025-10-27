@@ -1,22 +1,10 @@
-import { UploadProcessState } from "src/chat/Chat.types";
+import { UploadStatus } from "src/chat/Chat.types";
+import { getUploadErrorMessage as getCentralizedUploadErrorMessage } from "./CVUploadErrorHandling";
 
 export type UploadPollingHandles = {
   intervalId: ReturnType<typeof setInterval>;
   timeoutId: ReturnType<typeof setTimeout>;
 };
-
-export interface UploadStatus {
-  upload_process_state: UploadProcessState;
-  cancel_requested?: boolean;
-  filename?: string;
-  user_id?: string;
-  upload_id?: string;
-  created_at?: string;
-  last_activity_at?: string;
-  error_code?: string | null;
-  error_detail?: string | null;
-  experience_bullets?: string[] | null;
-}
 
 export function stopUploadPolling(handles?: UploadPollingHandles): void {
   if (!handles) return;
@@ -99,26 +87,5 @@ export function startUploadPolling(options: {
   return handles;
 }
 
-export const getUploadErrorMessage = (status: number, detail?: string): string => {
-  switch (status) {
-    case 401:
-    case 403:
-      return "You are not authorized. Please sign in again.";
-    case 404:
-      return "Upload not found. It may have failed to start.";
-    case 413:
-      return "File too large. Please upload a smaller CV.";
-    case 415:
-      return "Unsupported file type. Allowed: PDF, DOCX, TXT.";
-    case 429:
-      return "You are uploading too fast. Please wait and try again.";
-    case 408:
-    case 504:
-      return "The upload timed out. Please try again.";
-    case 409:
-      return "This CV seems to have been uploaded already.";
-    case 500:
-    default:
-      return detail || "We couldn't process your CV right now. Please try again.";
-  }
-};
+// Re-export the centralized function for backward compatibility
+export const getUploadErrorMessage = getCentralizedUploadErrorMessage;

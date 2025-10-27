@@ -46,6 +46,7 @@ import {
   startUploadPolling,
   stopUploadPolling,
 } from "./cvUploadPolling";
+import { getCvUploadErrorMessageFromErrorCode } from "./CVUploadErrorHandling";
 import type { UploadStatus } from "./Chat.types";
 import { nanoid } from "nanoid";
 
@@ -124,6 +125,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
   // CV upload states
   const [isUploadingCv, setIsUploadingCv] = useState<boolean>(false);
+  const [cvUploadError, setCvUploadError] = useState<string | null>(null);
   const [activeUploads, setActiveUploads] = useState<Map<string, { messageId: string; intervalId: NodeJS.Timeout; timeoutId: NodeJS.Timeout }>>(new Map());
 
   const navigate = useNavigate();
@@ -318,6 +320,9 @@ return {
         setTimeout(() => removeMessageFromChat(messageId), 3000);
         // Ensure no stale prefill remains on cancel/fail
         setPrefillMessage(null);
+        // Set CV upload error for inline display in ChatMessageField
+        const errorMessage = getCvUploadErrorMessageFromErrorCode(_status);
+        setCvUploadError(errorMessage);
         // Note: No snackbar here - handleCancelUpload already shows the cancellation message
       },
       onError: (error: unknown) => {
@@ -419,8 +424,9 @@ return {
       const uploadingMessageId = nanoid();
 
       try {
-        // Clear any previous prefill to avoid stale text on new uploads
+        // Clear any previous prefill and CV upload errors to avoid stale text on new uploads
         setPrefillMessage(null);
+        setCvUploadError(null);
         enqueueSnackbar(`Uploading ${file.name}...`, { variant: "info" });
 
         const currentUserId = authenticationStateService.getInstance().getUser()?.id;
@@ -861,6 +867,7 @@ return {
                 onUploadCv={handleUploadCv}
                 currentPhase={currentPhase.phase}
                 prefillMessage={prefillMessage}
+                cvUploadError={cvUploadError}
               />
             </Box>
           </Box>

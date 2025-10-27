@@ -5,11 +5,12 @@ import ChatMessageField, {
   DATA_TEST_ID,
   CHAT_MESSAGE_MAX_LENGTH,
   DISALLOWED_CHARACTERS,
-  ERROR_MESSAGES,
   PLACEHOLDER_TEXTS,
   MENU_ITEM_ID,
   MAX_FILE_SIZE_BYTES,
+  CHARACTER_LIMIT_ERROR_MESSAGES,
 } from "./ChatMessageField";
+import { CV_UPLOAD_ERROR_MESSAGES } from "../CVUploadErrorHandling";
 import { render, screen, fireEvent, act, userEvent, waitFor } from "src/_test_utilities/test-utils";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
@@ -128,7 +129,7 @@ describe("ChatMessageField", () => {
     fireEvent.change(ChatMessageFieldInput, { target: { value: invalidMessage } });
 
     // THEN expect the error message to be in the document
-    expect(screen.getByText(`${ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS}${invalidChar}`)).toBeInTheDocument();
+    expect(screen.getByText(`${CHARACTER_LIMIT_ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS}${invalidChar}`)).toBeInTheDocument();
     // AND the send button should be enabled
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeEnabled();
     // AND the input field should be enabled
@@ -149,8 +150,8 @@ describe("ChatMessageField", () => {
     fireEvent.change(ChatMessageFieldInput, { target: { value: validMessage } });
 
     // THEN expect no error message to be in the document
-    expect(screen.queryByText(ERROR_MESSAGES.MESSAGE_LIMIT)).toBeNull();
-    expect(screen.queryByText(ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS)).toBeNull();
+    expect(screen.queryByText(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT)).toBeNull();
+    expect(screen.queryByText(CHARACTER_LIMIT_ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS)).toBeNull();
     // AND the send button should be enabled
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeEnabled();
     // AND the input field should be enabled
@@ -680,7 +681,7 @@ describe("ChatMessageField", () => {
         expect(mockOnUploadCv).not.toHaveBeenCalled();
         // AND expect an error message to be shown
         await waitFor(() => {
-          expect(screen.getByText(ERROR_MESSAGES.MAX_FILE_SIZE)).toBeInTheDocument();
+          expect(screen.getByText(CV_UPLOAD_ERROR_MESSAGES.MAX_FILE_SIZE)).toBeInTheDocument();
         });
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
@@ -742,7 +743,7 @@ describe("ChatMessageField", () => {
         // GIVEN an INTRO phase
         const givenPhase = ConversationPhase.INTRO;
         // AND a mock onUploadCv that rejects with a 413 error
-        const tooLargeErrorAlt = new Error(ERROR_MESSAGES.FILE_TOO_DENSE);
+        const tooLargeErrorAlt = new Error(CV_UPLOAD_ERROR_MESSAGES.FILE_TOO_DENSE);
         (tooLargeErrorAlt as any).status = StatusCodes.REQUEST_TOO_LONG;
         (tooLargeErrorAlt as any).errorCode = ErrorConstants.ErrorCodes.TOO_LARGE_PAYLOAD;
 
@@ -777,7 +778,7 @@ describe("ChatMessageField", () => {
 
         // AND the specific error message for too dense content to be shown
         await waitFor(() => {
-          expect(screen.getByText(ERROR_MESSAGES.FILE_TOO_DENSE)).toBeInTheDocument();
+          expect(screen.getByText(CV_UPLOAD_ERROR_MESSAGES.FILE_TOO_DENSE)).toBeInTheDocument();
         });
 
         // AND console.error should be called for logging the error
@@ -1163,10 +1164,70 @@ describe("ChatMessageField", () => {
       expect(mockOnUploadCv).toHaveBeenCalledWith(file);
       // AND the specific max uploads reached error is shown
       await waitFor(() => {
-        expect(screen.getByText(ERROR_MESSAGES.MAX_UPLOADS_REACHED)).toBeInTheDocument();
+        expect(screen.getByText(CV_UPLOAD_ERROR_MESSAGES.MAX_UPLOADS_REACHED)).toBeInTheDocument();
       });
       // AND no warnings to have occurred
       expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("CV Upload Error Handling", () => {
+    test("should display CV upload error when cvUploadError prop is provided", () => {
+      // GIVEN a ChatMessageField with a CV upload error
+      const cvUploadError = "Your CV content is too long. Please shorten your CV and try again.";
+      
+      render(
+        <ChatMessageField
+          handleSend={jest.fn()}
+          aiIsTyping={false}
+          isChatFinished={false}
+          isUploadingCv={false}
+          currentPhase={ConversationPhase.COLLECT_EXPERIENCES}
+          cvUploadError={cvUploadError}
+        />
+      );
+
+      // THEN the error message should be displayed
+      expect(screen.getByText(cvUploadError)).toBeInTheDocument();
+      // AND the input field should show error state
+      const inputField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+      expect(inputField).toHaveAttribute("aria-invalid", "true");
+    });
+
+    test("should clear CV upload error when cvUploadError prop becomes null", () => {
+      // GIVEN a ChatMessageField with a CV upload error
+      const cvUploadError = "Your CV content is too long. Please shorten your CV and try again.";
+      const { rerender } = render(
+        <ChatMessageField
+          handleSend={jest.fn()}
+          aiIsTyping={false}
+          isChatFinished={false}
+          isUploadingCv={false}
+          currentPhase={ConversationPhase.COLLECT_EXPERIENCES}
+          cvUploadError={cvUploadError}
+        />
+      );
+
+      // THEN the error message should be displayed
+      expect(screen.getByText(cvUploadError)).toBeInTheDocument();
+
+      // WHEN the cvUploadError prop is cleared
+      rerender(
+        <ChatMessageField
+          handleSend={jest.fn()}
+          aiIsTyping={false}
+          isChatFinished={false}
+          isUploadingCv={false}
+          currentPhase={ConversationPhase.COLLECT_EXPERIENCES}
+          cvUploadError={null}
+        />
+      );
+
+      // THEN the error message should be cleared
+      expect(screen.queryByText(cvUploadError)).toBeNull();
+      // AND the input field should not show error state
+      const inputField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+      expect(inputField).not.toHaveAttribute("aria-invalid", "true");
     });
   });
 });
