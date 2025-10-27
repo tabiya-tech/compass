@@ -69,9 +69,28 @@ export const PlusBadgeAppearsOnPhaseTransition: Story = {
 };
 
 export const CVUploadDisabledInOtherPhases: Story = {
+    render: (args) => <ChatMessageFieldWrapper {...args} />,
+    args: {
+        handleSend: action("Message sent"),
+        currentPhase: ConversationPhase.INTRO,
+    },
+}
+
+// Character Limit Stories
+export const CharacterLimitWarning: Story = {
   render: (args) => <ChatMessageFieldWrapper {...args} />,
   args: {
     handleSend: action("Message sent"),
-    currentPhase: ConversationPhase.INTRO,
+    currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
+    prefillMessage: "a".repeat(800), // 80% of 1000 character limit - shows warning counter
+  },
+};
+
+export const CharacterLimitExceeded: Story = {
+  render: (args) => <ChatMessageFieldWrapper {...args} />,
+  args: {
+    handleSend: action("Message sent"),
+    currentPhase: ConversationPhase.COLLECT_EXPERIENCES,
+    prefillMessage: "a".repeat(1002), // Over 1000 character limit - shows error and disabled send button
   },
 };

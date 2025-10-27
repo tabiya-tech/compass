@@ -187,13 +187,23 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     let filteredValue = inputValue.replace(DISALLOWED_CHARACTERS, "");
     const invalidChar = inputValue.split("").filter((char) => DISALLOWED_CHARACTERS.test(char));
 
-    // Check for character limit
+    // Check for character limit - truncate if over limit but allow deletion
     if (filteredValue.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
       errorMessage = ERROR_MESSAGES.MESSAGE_LIMIT;
-    }
-
-    // Check for special characters in original input
-    if (inputValue !== filteredValue) {
+      // Only truncate if the user is adding characters (not deleting)
+      // This allows deletion when over the limit
+      const currentMessageLength = message.trim().length;
+      const newValueLength = filteredValue.trim().length;
+      
+      // If the new value is longer than the current message, user is adding characters
+      // If the new value is shorter than the current message, user is deleting characters
+      if (newValueLength > currentMessageLength) {
+        // User is adding characters, truncate to limit
+        filteredValue = filteredValue.substring(0, CHAT_MESSAGE_MAX_LENGTH);
+      }
+      // If user is deleting characters, allow it by keeping the filteredValue as is
+    } else if (inputValue !== filteredValue) {
+      // Check for special characters only if we're not over the character limit
       errorMessage = `${ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS} ${invalidChar}`;
     }
 
@@ -216,7 +226,10 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   useEffect(() => {
     if (props.prefillMessage) {
       setMessage(props.prefillMessage);
-      if (errorMessage) {
+      // Set appropriate error message if prefill exceeds limit
+      if (props.prefillMessage.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
+        setErrorMessage(ERROR_MESSAGES.MESSAGE_LIMIT);
+      } else if (errorMessage) {
         setErrorMessage("");
       }
     }
@@ -437,9 +450,9 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       props.isUploadingCv ||
       !isOnline ||
       message.trim().length === 0 ||
-      message.trim().length > CHAT_MESSAGE_MAX_LENGTH
+      errorMessage === ERROR_MESSAGES.MESSAGE_LIMIT // Only disable send button for character limit errors
     );
-  }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline, message]);
+  }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline, message, errorMessage]);
 
   // Check if the input field should be disabled
   const inputIsDisabled = useCallback(() => {
