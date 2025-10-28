@@ -129,7 +129,9 @@ describe("ChatMessageField", () => {
     fireEvent.change(ChatMessageFieldInput, { target: { value: invalidMessage } });
 
     // THEN expect the error message to be in the document
-    expect(screen.getByText(`${CHARACTER_LIMIT_ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS}${invalidChar}`)).toBeInTheDocument();
+    expect(
+      screen.getByText(`${CHARACTER_LIMIT_ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS}${invalidChar}`)
+    ).toBeInTheDocument();
     // AND the send button should be enabled
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeEnabled();
     // AND the input field should be enabled
@@ -161,34 +163,92 @@ describe("ChatMessageField", () => {
     expect(console.warn).not.toHaveBeenCalled();
   });
 
-  test("should maintain caret position when adding invalid characters in the middle of the message", async () => {
-    // GIVEN the ChatMessageField is rendered
-    render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} />);
-    // AND the chat message field
-    const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD) as HTMLInputElement;
+  test("should render correctly with error message when prefillMessage exceeds character limit", () => {
+    // GIVEN a prefillMessage that exceeds the character limit
+    const longPrefillMessage = "a".repeat(CHAT_MESSAGE_MAX_LENGTH + 10);
 
-    // WHEN the user types a valid message
-    await userEvent.type(chatMessageField, "Hello");
-    // AND user moves caret to the middle of the text (after "Hello")
-    chatMessageField.setSelectionRange(2, 2);
+    // WHEN ChatMessageField is rendered with the prefillMessage
+    render(
+      <ChatMessageField
+        aiIsTyping={false}
+        isChatFinished={false}
+        handleSend={jest.fn()}
+        prefillMessage={longPrefillMessage}
+      />
+    );
+    // AND the input field has prefillMessage
+    const chatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+    expect(chatMessageFieldInput).toHaveValue(longPrefillMessage);
 
-    // THEN except the caret position to be at 2
-    expect(chatMessageField.selectionStart).toBe(2);
-
-    // WHEN user types an invalid character at that position
-    // We need to use act to make sure the input updates and caret position are handled before the test checks them.
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    act(() => {
-      userEvent.type(chatMessageField, "*");
-    });
-
-    // THEN expect the invalid characters to be removed
-    expect(chatMessageField).toHaveValue("Hello");
-    // AND expect the caret to be at the correct position
-    expect(chatMessageField.selectionStart).toBe(2);
+    // THEN expect the error message to be in the document
+    expect(screen.getByText(`Message limit is ${CHAT_MESSAGE_MAX_LENGTH} characters.`)).toBeInTheDocument();
+    // AND the send button to be disabled
+    expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeDisabled();
     // AND no errors or warnings to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
+  });
+
+  describe("caret position behavior", () => {
+    test("should maintain caret position and not allow adding characters to the message that exceed the character limit", async () => {
+      // GIVEN ChatMessageField rendered
+      render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} />);
+
+      // AND the input at the exact max length
+      const input = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD) as HTMLTextAreaElement;
+      const atLimit = "a".repeat(CHAT_MESSAGE_MAX_LENGTH);
+      fireEvent.change(input, { target: { value: atLimit } });
+      await waitFor(() => expect(input).toHaveValue(atLimit));
+
+      // AND the caret positioned in the middle (ensure focus before typing)
+      const mid = Math.floor(atLimit.length / 2);
+      input.focus();
+      input.setSelectionRange(mid, mid);
+      expect(input.selectionStart).toBe(mid);
+
+      // WHEN a user tries to add one more character at that position,
+      await userEvent.type(input, "x", { skipClick: true });
+
+      // THEN the input value remains unchanged (over-limit addition rejected)
+      expect(input).toHaveValue(atLimit);
+      // AND the caret remains at the same position
+      expect(input.selectionStart).toBe(mid);
+      // AND the character limit error is shown
+      expect(screen.getByText(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT)).toBeInTheDocument();
+      // AND no unexpected console noise
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should maintain caret position when adding invalid characters in the middle of the message", async () => {
+      // GIVEN the ChatMessageField is rendered
+      render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={jest.fn()} />);
+      // AND the chat message field
+      const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD) as HTMLInputElement;
+
+      // WHEN the user types a valid message
+      await userEvent.type(chatMessageField, "Hello");
+      // AND user moves caret to the middle of the text (after "Hello")
+      chatMessageField.setSelectionRange(2, 2);
+
+      // THEN except the caret position to be at 2
+      expect(chatMessageField.selectionStart).toBe(2);
+
+      // WHEN user types an invalid character at that position
+      // We need to use act to make sure the input updates and caret position are handled before the test checks them.
+      // eslint-disable-next-line testing-library/no-unnecessary-act
+      act(() => {
+        userEvent.type(chatMessageField, "*");
+      });
+
+      // THEN expect the invalid characters to be removed
+      expect(chatMessageField).toHaveValue("Hello");
+      // AND expect the caret to be at the correct position
+      expect(chatMessageField.selectionStart).toBe(2);
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
   });
 
   describe("character counter", () => {
@@ -569,6 +629,26 @@ describe("ChatMessageField", () => {
         });
         // AND remove the event listener after the test
         chatMessageField.removeEventListener("keydown", handleKeyDown);
+        // AND no errors or warnings to have occurred
+        expect(console.error).not.toHaveBeenCalled();
+        expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      test("should disable Enter keypress when chat message exceeds character limit", async () => {
+        // GIVEN a long message
+        const message = "a".repeat(CHAT_MESSAGE_MAX_LENGTH + 2);
+        // AND the component is rendered
+        const handleSend = jest.fn();
+        render(<ChatMessageField aiIsTyping={false} isChatFinished={false} handleSend={handleSend} />);
+
+        // WHEN the user enters a message that exceeds the character limit
+        const ChatMessageFieldInput = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+        fireEvent.change(ChatMessageFieldInput, { target: { value: message } });
+        // AND the user presses Enter
+        await userEvent.keyboard("{Enter}");
+
+        // THEN expect handleSend not to be called
+        expect(handleSend).not.toHaveBeenCalled();
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
@@ -1175,7 +1255,7 @@ describe("ChatMessageField", () => {
     test("should display CV upload error when cvUploadError prop is provided", () => {
       // GIVEN a ChatMessageField with a CV upload error
       const cvUploadError = "Your CV content is too long. Please shorten your CV and try again.";
-      
+
       render(
         <ChatMessageField
           handleSend={jest.fn()}
