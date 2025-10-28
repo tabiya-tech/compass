@@ -179,25 +179,25 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     let filteredValue = inputValue.replace(DISALLOWED_CHARACTERS, "");
     const invalidChar = inputValue.split("").filter((char) => DISALLOWED_CHARACTERS.test(char));
 
-            // Check for character limit - truncate if over limit but allow deletion
-            if (filteredValue.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
-                errorMessage = CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT;
+    // Check for character limit - truncate if over limit but allow deletion
+    if (filteredValue.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
+      errorMessage = CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT;
       // Only truncate if the user is adding characters (not deleting)
       // This allows deletion when over the limit
       const currentMessageLength = message.trim().length;
       const newValueLength = filteredValue.trim().length;
-      
+
       // If the new value is longer than the current message, user is adding characters
       // If the new value is shorter than the current message, user is deleting characters
       if (newValueLength > currentMessageLength) {
-        // User is adding characters, truncate to limit
-        filteredValue = filteredValue.substring(0, CHAT_MESSAGE_MAX_LENGTH);
+        // User is adding characters, reject the change by keeping current message
+        filteredValue = message;
       }
       // If user is deleting characters, allow it by keeping the filteredValue as is
-      } else if (inputValue !== filteredValue) {
-          // Check for special characters only if we're not over the character limit
-          errorMessage = `${CHARACTER_LIMIT_ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS} ${invalidChar}`;
-      }
+    } else if (inputValue !== filteredValue) {
+      // Check for special characters only if we're not over the character limit
+      errorMessage = `${CHARACTER_LIMIT_ERROR_MESSAGES.INVALID_SPECIAL_CHARACTERS} ${invalidChar}`;
+    }
 
     setErrorMessage(errorMessage);
 
@@ -214,18 +214,18 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     inputElement.setSelectionRange(newCaretPosition, newCaretPosition);
   };
 
-  // Prefill message when provided from parent (e.g., after CV processing completes)
+  // Prefill message when provided from the parent (e.g., after CV processing completes)
   useEffect(() => {
-    if (props.prefillMessage) {
-      setMessage(props.prefillMessage);
-        // Set appropriate error message if prefill exceeds limit
-        if (props.prefillMessage.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
-            setErrorMessage(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT);
-      } else if (errorMessage) {
-        setErrorMessage("");
-      }
+    if (!props.prefillMessage) return;
+    setMessage(props.prefillMessage);
+
+    // Set appropriate error message if prefill exceeds limit
+    if (props.prefillMessage.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
+      setErrorMessage(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT);
+    } else {
+      setErrorMessage("");
     }
-  }, [errorMessage, props.prefillMessage]);
+  }, [props.prefillMessage]);
 
   // Handle CV upload errors from polling process
   useEffect(() => {
@@ -254,6 +254,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       } else {
         // On desktop, Enter sends the message
         event.preventDefault();
+        if (sendIsDisabled()) return;
         sendMessage();
       }
     }
@@ -311,6 +312,9 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     const composed = formatExperiencesToMessage(cv.experiences_data);
     setMessage(composed);
     setMenuAnchorEl(null);
+    if (composed.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
+      setErrorMessage(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT);
+    }
   };
 
   const handleFileMenuItemClick = () => {
@@ -332,8 +336,8 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       setErrorMessage("");
     }
 
-      if (file.size > MAX_FILE_SIZE_BYTES) {
-        setErrorMessage(CV_UPLOAD_ERROR_MESSAGES.MAX_FILE_SIZE);
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      setErrorMessage(CV_UPLOAD_ERROR_MESSAGES.MAX_FILE_SIZE);
       return;
     }
 
@@ -428,9 +432,9 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       props.isUploadingCv ||
       !isOnline ||
       message.trim().length === 0 ||
-                errorMessage === CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT // Only disable send button for character limit errors
+      message.trim().length > CHAT_MESSAGE_MAX_LENGTH // Only disable the send button when over the limit
     );
-  }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline, message, errorMessage]);
+  }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline, message]);
 
   // Check if the input field should be disabled
   const inputIsDisabled = useCallback(() => {
