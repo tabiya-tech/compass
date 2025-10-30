@@ -85,7 +85,6 @@ test_cases_data_extraction = [
     # Add new experience
      _TestCaseDataExtraction(
         name="add_new_experience",
-        skip_force="force",
         summary="",
         turns=t("add_new_experience.turns"),
         user_input=t("add_new_experience.user_input"),
