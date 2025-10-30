@@ -415,5 +415,8 @@
   "chat_message_experiences_intro": "Voici mes expériences :",
   "upload_cv_upload_label": "Téléverser un CV",
   "upload_cv_view_uploaded_label": "CV téléversés précédemment",
-  "upload_cv_view_uploaded_description": "Joignez votre CV déjà téléversé à la conversation"
+  "upload_cv_view_uploaded_description": "Joignez votre CV déjà téléversé à la conversation",
+  "experiences_downloadReportButton_download_cv": "Télécharger le CV",
+  "experiences_downloadReportButton_downloading": "Téléchargement en cours",
+  "experiences_downloadReportButton_help_tip_blocked_message": "Vous ne pouvez pas télécharger le rapport tant que vous n'avez pas terminé d'explorer au moins une expérience."
 }

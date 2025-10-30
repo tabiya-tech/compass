@@ -418,5 +418,8 @@
   "chat_message_experiences_intro": "These are my experiences:",
   "upload_cv_upload_label": "Upload CV",
   "upload_cv_view_uploaded_label": "Previously uploaded CVs",
-  "upload_cv_view_uploaded_description": "Attach your uploaded CV to the conversation"
+  "upload_cv_view_uploaded_description": "Attach your uploaded CV to the conversation",
+  "experiences_downloadReportButton_download_cv": "Download CV",
+  "experiences_downloadReportButton_downloading": "Downloading",
+  "experiences_downloadReportButton_help_tip_blocked_message": "You cannot download the report until you finish exploring at least one experience."
 }
