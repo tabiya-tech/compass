@@ -4,6 +4,7 @@ from typing import Any
 from evaluation_tests.i18n.i18n_loader import get_translation
 from evaluation_tests.i18n.locale_detector import get_locale
 
+
 def convert_lists_to_tuples(value: Any) -> Any:
     """
     Recursively converts lists of lists (from JSON) into lists of tuples.
@@ -35,7 +36,7 @@ def t(key: str, **kwargs: Any) -> Any:
 
     # Build translation file path
     base_path, _ = os.path.splitext(caller_filename)
-    base_path = base_path.replace("evaluation_tests", "evaluation_tests\\i18n\\locales")
+    base_path = base_path.replace("evaluation_tests", "evaluation_tests/i18n/locales")
     translation_file_path = f"{base_path}/{locale}.json"
 
     raw_value = get_translation(translation_file_path, key)
