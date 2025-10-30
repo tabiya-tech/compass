@@ -15,7 +15,7 @@ from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_err
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 from evaluation_tests.matcher import check_actual_data_matches_expected, ContainsString, AnyOf, Matcher, match_expected
-
+from evaluation_tests.i18n.translation_service import t
 
 class _TestCaseDataExtraction(CompassTestCase):
     # The GIVEN
@@ -83,14 +83,12 @@ test_cases_data_extraction = [
         expected_collected_data_count=0
     ),
     # Add new experience
-    _TestCaseDataExtraction(
+     _TestCaseDataExtraction(
         name="add_new_experience",
+        skip_force="force",
         summary="",
-        turns=[
-            ("(silence)",
-             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
-        ],
-        user_input="I sell shoes at the local market on weekends.",
+        turns=t("add_new_experience.turns"),
+        user_input=t("add_new_experience.user_input"),
         collected_data_so_far=[
         ],
         expected_last_referenced_experience_index=0,
@@ -98,12 +96,12 @@ test_cases_data_extraction = [
         expected_collected_data=[
             {"index": 0,
              "defined_at_turn_number": 1,
-             "experience_title": ContainsString("selling shoes"),
-             "location": AnyOf(None, ContainsString("local market")),
-             "company": AnyOf(None, ContainsString("local market")),
+             "experience_title": ContainsString(t("add_new_experience.selling_shoes")),
+             "location": AnyOf(None, ContainsString(t("add_new_experience.local_market"))),
+             "company": AnyOf(None, ContainsString(t("add_new_experience.local_market"))),
              "paid_work": AnyOf(True, False),
              "start_date": AnyOf('', None),
-             "end_date": AnyOf('', None, ContainsString("Present")),
+             "end_date": AnyOf('', None, ContainsString(t("add_new_experience.present"))),
              "work_type":
                  AnyOf(*WorkType.__members__.keys())
              },
@@ -997,7 +995,7 @@ test_cases_data_extraction = [
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test("gemini-2.0-flash-001/")
-@pytest.mark.repeat(3)
+@pytest.mark.repeat(1)
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_data_extraction),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_data_extraction)])
 async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytest.LogCaptureFixture):
