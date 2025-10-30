@@ -4,6 +4,7 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import InfoIcon from "@mui/icons-material/Info";
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import { useTranslation } from "react-i18next";
 
 const uniqueId = "f5553dac-adb7-440f-9549-c3567b22dc76";
 export const DATA_TEST_ID = {
@@ -22,11 +23,12 @@ export interface DownloadReportButtonProps {
 
 const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({ disabled, isLoading, notifyOnDownloadPdf }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   return (
     <Box data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER}>
       <PrimaryButton
-        title="Download CV"
+        title={t("experiences_downloadReportButton_download_cv")}
         disabled={disabled || isLoading}
         disableWhenOffline
         startIcon={
@@ -43,11 +45,11 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({ disabled, i
         onClick={notifyOnDownloadPdf}
         data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON}
       >
-        {isLoading ? "Downloading" : "Download CV"}
+        {isLoading ? t("experiences_downloadReportButton_downloading") : t("experiences_downloadReportButton_download_cv")}
       </PrimaryButton>
       {disabled && (
         <HelpTip icon={<InfoIcon />} data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_HELP_TIP}>
-          You cannot download the report until you finish exploring at least one experience.
+          {t("experiences_downloadReportButton_help_tip_blocked_message")}
         </HelpTip>
       )}
     </Box>

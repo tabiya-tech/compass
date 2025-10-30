@@ -416,5 +416,8 @@
   "chat_message_experiences_intro": "Estas son mis experiencias:",
   "upload_cv_upload_label": "Subir CV",
   "upload_cv_view_uploaded_label": "CV subidos anteriormente",
-  "upload_cv_view_uploaded_description": "Adjuntá tu CV subido a la conversación"
+  "upload_cv_view_uploaded_description": "Adjuntá tu CV subido a la conversación",
+  "experiences_downloadReportButton_download_cv": "Descargar CV",
+  "experiences_downloadReportButton_downloading": "Descargando",
+  "experiences_downloadReportButton_help_tip_blocked_message": "No podés descargar el informe hasta que termines de explorar al menos una experiencia."
 }
