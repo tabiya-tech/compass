@@ -1,0 +1,14 @@
+{
+  "add_new_experience": {
+    "turns": [
+      [
+        "(silence)",
+        "¿Alguna vez has trabajado para una empresa o el negocio de otra persona a cambio de dinero?"
+      ]
+    ],
+    "user_input": "Vendo zapatos en el mercado los fines de semana.",
+    "selling_shoes":"vendiendo zapatos",
+    "local_market":"el mercado",
+    "present":"Presente"
+  }
+}
