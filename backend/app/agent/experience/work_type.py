@@ -33,7 +33,7 @@ class WorkType(Enum):
     @staticmethod
     def work_type_short(work_type: WorkType) -> str:
         if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-            return "Waged Employment"
+            return "Wage Employment"
         elif work_type == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
             return "Trainee"
         elif work_type == WorkType.SELF_EMPLOYMENT:

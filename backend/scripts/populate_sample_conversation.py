@@ -512,7 +512,7 @@ def create_sample_conversation_history() -> ConversationHistory:
             output=AgentOutput(
                 message_id=str(ObjectId()),
                 message_for_user="Let's recap the information we have collected so far:\n\n"
-                                 "• Baker (Waged Employment), 2019/01 - 2021/12, Sweet Delights Bakery, Cape Town\n"
+                                 "• Baker (Wage Employment), 2019/01 - 2021/12, Sweet Delights Bakery, Cape Town\n"
                                  "• Freelance Cake Designer (Self-Employment), 2022/01 - Present, Self-employed, Johannesburg\n\n"
                                  "Is there anything you would like to add or change? If one of the experiences seems to be duplicated, "
                                  "you can ask me to remove it.",

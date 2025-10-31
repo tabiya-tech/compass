@@ -626,13 +626,13 @@ def _get_excluding_experiences(work_type: WorkType) -> str:
         #  return "unpaid trainee work, self-employment, or unpaid work such as community volunteering work etc."
     elif work_type == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
         excluding_experience_types = [WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT, WorkType.SELF_EMPLOYMENT, WorkType.UNSEEN_UNPAID]
-        #  return "waged employment, self-employment, or unpaid work such as community volunteering work etc."
+        #  return "wage employment, self-employment, or unpaid work such as community volunteering work etc."
     elif work_type == WorkType.SELF_EMPLOYMENT:
         excluding_experience_types = [WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT, WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK, WorkType.UNSEEN_UNPAID]
-        #  return "waged employment, unpaid trainee work, or unpaid work such as community volunteering work etc."
+        #  return "wage employment, unpaid trainee work, or unpaid work such as community volunteering work etc."
     elif work_type == WorkType.UNSEEN_UNPAID:
         excluding_experience_types = [WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT, WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK, WorkType.SELF_EMPLOYMENT]
-        #  return "waged employment, unpaid trainee work, or self-employment"
+        #  return "wage employment, unpaid trainee work, or self-employment"
     else:
         raise ValueError("The work type is not supported")
 
