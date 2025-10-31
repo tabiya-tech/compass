@@ -61,22 +61,6 @@ export const MENU_ITEM_ID = {
   REGISTER: `register-${uniqueId}`,
 };
 
-export const MENU_ITEM_TEXT = {
-  SETTINGS: "settings",
-  LOGOUT: "logout",
-  START_NEW_CONVERSATION: "start new conversation",
-  REPORT_BUG: "report a bug",
-  REGISTER: "register",
-};
-
-export const FEEDBACK_FORM_TEXT = {
-  TITLE: "Give general feedback",
-  MESSAGE_PLACEHOLDER:
-    "We'd love to hear your thoughts! Please share any feedback or suggestions you have for improving Compass.",
-  SUBMIT_BUTTON_LABEL: "Send Feedback",
-  SUCCESS_MESSAGE: "Thank you for your feedback!",
-};
-
 const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   notifyOnLogout,
   startNewConversation,
@@ -322,12 +306,12 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       <NavLink style={{ lineHeight: 0 }} to={routerPaths.ROOT} data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO_LINK}>
         <img
           src={`${process.env.PUBLIC_URL}/compass.svg`}
-          alt="Compass Logo"
+          alt={t("compass_logo_alt")}
           height={12 * theme.tabiyaSpacing.xl} // xl wasn't quite big enough, we're going for ~48px
           data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO}
         />
       </NavLink>
-      <Typography variant="h1">Compass</Typography>
+      <Typography variant="h1">{t("compass")}</Typography>
       <Box
         sx={{
           display: "flex",
@@ -375,7 +359,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         >
           <img
             src={`${process.env.PUBLIC_URL}/user-icon.svg`}
-            alt="User Icon"
+            alt={t("user_icon_alt")}
             data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_USER}
           />
         </PrimaryIconButton>
