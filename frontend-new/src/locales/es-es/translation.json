@@ -419,5 +419,11 @@
   "upload_cv_view_uploaded_description": "Adjunta tu CV subido a la conversación",
   "experiences_downloadReportButton_download_cv": "Descargar CV",
   "experiences_downloadReportButton_downloading": "Descargando",
-  "experiences_downloadReportButton_help_tip_blocked_message": "No puedes descargar el informe hasta que termines de explorar al menos una experiencia."
+  "experiences_downloadReportButton_help_tip_blocked_message": "No puedes descargar el informe hasta que termines de explorar al menos una experiencia.",
+  
+  "uploadedCVsMenu_back_title": "Volver al menú principal",
+  "uploadedCVsMenu_title_with_count": "CVs cargados previamente ({{count}})",
+  "uploadedCVsMenu_help_collect": "Toca un CV para cargar su contenido en el campo de texto. Revísalo y envíalo cuando estés listo.",
+  "uploadedCVsMenu_help_disabled": "La selección de CV solo está disponible durante la fase de recopilación de experiencias.",
+  "uploadedCVsMenu_empty": "No se encontraron CVs cargados."
 }
