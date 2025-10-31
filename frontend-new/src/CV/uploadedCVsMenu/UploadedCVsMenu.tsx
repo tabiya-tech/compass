@@ -43,8 +43,8 @@ const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
   const isCollectPhase = currentPhase === ConversationPhase.COLLECT_EXPERIENCES;
 
   const helpTipText = isCollectPhase
-    ? "Tap a CV to load its content into the text field. Review and send when you're ready."
-    : "CV selection is only available during the experience collection phase.";
+    ? t("uploadedCVsMenu_help_collect")
+    : t("uploadedCVsMenu_help_disabled");
 
   return (
     <Box
@@ -60,7 +60,7 @@ const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
         }}
       >
         <PrimaryIconButton
-          title="Back to main menu"
+          title={t("uploadedCVsMenu_back_title")}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -77,7 +77,7 @@ const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
           color="text.primary"
           data-testid={DATA_TEST_ID.UPLOADED_CVS_MENU_UPLOADED_TEXT}
         >
-          {`Previously uploaded CVs (${uploadedCVs.length})`}
+          {t("uploadedCVsMenu_title_with_count", { count: uploadedCVs.length })}
         </Typography>
         <HelpTip icon={<InfoIcon />} data-testid={DATA_TEST_ID.UPLOADED_CVS_MENU_HELP_TIP}>
           {helpTipText}
@@ -116,7 +116,7 @@ const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
 
         {!isLoading && uploadedCVs.length === 0 && (
           <Typography variant="caption" color="secondary">
-            No uploaded CVs found.
+            {t("uploadedCVsMenu_empty")}
           </Typography>
         )}
 

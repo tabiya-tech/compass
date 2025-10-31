@@ -421,5 +421,11 @@
   "upload_cv_view_uploaded_description": "Attach your uploaded CV to the conversation",
   "experiences_downloadReportButton_download_cv": "Download CV",
   "experiences_downloadReportButton_downloading": "Downloading",
-  "experiences_downloadReportButton_help_tip_blocked_message": "You cannot download the report until you finish exploring at least one experience."
+  "experiences_downloadReportButton_help_tip_blocked_message": "You cannot download the report until you finish exploring at least one experience.",
+  
+  "uploadedCVsMenu_back_title": "Back to main menu",
+  "uploadedCVsMenu_title_with_count": "Previously uploaded CVs ({{count}})",
+  "uploadedCVsMenu_help_collect": "Tap a CV to load its content into the text field. Review it and send when you're ready.",
+  "uploadedCVsMenu_help_disabled": "CV selection is only available during the experience collection phase.",
+  "uploadedCVsMenu_empty": "No uploaded CVs found."
 }

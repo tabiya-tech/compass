@@ -418,5 +418,11 @@
   "upload_cv_view_uploaded_description": "Joignez votre CV déjà téléversé à la conversation",
   "experiences_downloadReportButton_download_cv": "Télécharger le CV",
   "experiences_downloadReportButton_downloading": "Téléchargement en cours",
-  "experiences_downloadReportButton_help_tip_blocked_message": "Vous ne pouvez pas télécharger le rapport tant que vous n'avez pas terminé d'explorer au moins une expérience."
+  "experiences_downloadReportButton_help_tip_blocked_message": "Vous ne pouvez pas télécharger le rapport tant que vous n'avez pas terminé d'explorer au moins une expérience.",
+  
+  "uploadedCVsMenu_back_title": "Retour au menu principal",
+  "uploadedCVsMenu_title_with_count": "CV précédemment téléversés ({{count}})",
+  "uploadedCVsMenu_help_collect": "Touchez un CV pour charger son contenu dans le champ de texte. Relisez-le et envoyez-le quand vous êtes prêt.",
+  "uploadedCVsMenu_help_disabled": "La sélection de CV est uniquement disponible pendant la phase de collecte des expériences.",
+  "uploadedCVsMenu_empty": "Aucun CV téléversé trouvé."
 }
