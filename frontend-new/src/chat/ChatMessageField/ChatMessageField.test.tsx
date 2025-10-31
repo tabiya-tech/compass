@@ -5,12 +5,10 @@ import ChatMessageField, {
   DATA_TEST_ID,
   CHAT_MESSAGE_MAX_LENGTH,
   DISALLOWED_CHARACTERS,
-  PLACEHOLDER_TEXTS,
   MENU_ITEM_ID,
   MAX_FILE_SIZE_BYTES,
   CHARACTER_LIMIT_ERROR_MESSAGES,
 } from "./ChatMessageField";
-import { CV_UPLOAD_ERROR_MESSAGES } from "../CVUploadErrorHandling";
 import { render, screen, fireEvent, act, userEvent, waitFor } from "src/_test_utilities/test-utils";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
