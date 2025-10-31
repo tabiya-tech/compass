@@ -76,7 +76,7 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
 
     # Test cases related to work types.
     TemporalAndWorkTypeClassifierToolTestCase(
-        name="waged_employment_work_type",
+        name="wage_employment_work_type",
         turns=[
             (SILENCE_MESSAGE, "Have you ever worked for a company or someone else's business for money?"),
         ],
