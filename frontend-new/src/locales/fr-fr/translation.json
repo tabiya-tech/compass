@@ -92,6 +92,8 @@
   "send_feedback": "Envoyer un avis",
   "feedback_success_message": "Merci pour vos commentaires !",
   "compass": "Compass",
+  "compass_logo_alt": "Logo Compass",
+  "user_icon_alt": "Icône utilisateur",
   "logout_warning_anonymous": "Si vous vous déconnectez, vous perdrez l'accès à votre historique de conversations et d'expériences.",
   "create_an_account_to_save_progress": "Créez un compte pour sauvegarder votre progression",
   "continue_your_journey_later": "et poursuivre votre parcours plus tard.",
