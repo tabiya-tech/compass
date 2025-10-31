@@ -3,7 +3,8 @@ import "src/_test_utilities/consoleMock";
 // standard sentry mock
 import "src/_test_utilities/sentryMock";
 
-import ChatHeader, { DATA_TEST_ID, FEEDBACK_FORM_TEXT, MENU_ITEM_ID } from "./ChatHeader";
+import ChatHeader, { DATA_TEST_ID, MENU_ITEM_ID } from "./ChatHeader";
+import i18n from "src/i18n/i18n";
 import { act, fireEvent, render, screen, userEvent, waitFor, within } from "src/_test_utilities/test-utils";
 import { routerPaths } from "src/app/routerPaths";
 import { testNavigateToPath } from "src/_test_utilities/routeNavigation";
@@ -564,10 +565,10 @@ describe("ChatHeader", () => {
 
       // THEN expect the create form to be called with the correct parameters
       expect(mockCreateForm).toHaveBeenCalledWith({
-        formTitle: FEEDBACK_FORM_TEXT.TITLE,
-        messagePlaceholder: FEEDBACK_FORM_TEXT.MESSAGE_PLACEHOLDER,
-        submitButtonLabel: FEEDBACK_FORM_TEXT.SUBMIT_BUTTON_LABEL,
-        successMessageText: FEEDBACK_FORM_TEXT.SUCCESS_MESSAGE,
+        formTitle: i18n.t("give_general_feedback"),
+        messagePlaceholder: i18n.t("feedback_message_placeholder"),
+        submitButtonLabel: i18n.t("send_feedback"),
+        successMessageText: i18n.t("feedback_success_message"),
         enableScreenshot: false,
       });
       // AND the form should be appended to DOM and opened

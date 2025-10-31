@@ -92,6 +92,8 @@
   "send_feedback": "Enviar comentarios",
   "feedback_success_message": "¡Gracias por tus comentarios!",
   "compass": "Compass",
+  "compass_logo_alt": "Logo de Compass",
+  "user_icon_alt": "Ícono de usuario",
   "logout_warning_anonymous": "Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
   "create_an_account_to_save_progress": "Crea una cuenta para guardar tu progreso",
   "continue_your_journey_later": "y continuar tu experiencia más tarde.",

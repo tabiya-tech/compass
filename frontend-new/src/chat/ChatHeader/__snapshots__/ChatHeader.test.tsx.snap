@@ -13,7 +13,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     style="line-height: 0;"
   >
     <img
-      alt="Compass Logo"
+      alt="Compass logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
       height="48"
       src="/compass.svg"
@@ -76,7 +76,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       type="button"
     >
       <img
-        alt="User Icon"
+        alt="User icon"
         data-testid="chat-header-icon-user-7413b63a-887b-4f41-b930-89e9770db12b"
         src="/user-icon.svg"
       />
@@ -119,7 +119,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     style="line-height: 0;"
   >
     <img
-      alt="Compass Logo"
+      alt="Compass logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
       height="48"
       src="/compass.svg"
@@ -188,7 +188,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       type="button"
     >
       <img
-        alt="User Icon"
+        alt="User icon"
         data-testid="chat-header-icon-user-7413b63a-887b-4f41-b930-89e9770db12b"
         src="/user-icon.svg"
       />
@@ -231,7 +231,7 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
     style="line-height: 0;"
   >
     <img
-      alt="Compass Logo"
+      alt="Compass logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
       height="48"
       src="/compass.svg"
@@ -322,7 +322,7 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
       type="button"
     >
       <img
-        alt="User Icon"
+        alt="User icon"
         data-testid="chat-header-icon-user-7413b63a-887b-4f41-b930-89e9770db12b"
         src="/user-icon.svg"
       />
