@@ -7,7 +7,6 @@ import ChatMessageField, {
   DISALLOWED_CHARACTERS,
   MENU_ITEM_ID,
   MAX_FILE_SIZE_BYTES,
-  CHARACTER_LIMIT_ERROR_MESSAGES,
 } from "./ChatMessageField";
 import { render, screen, fireEvent, act, userEvent, waitFor } from "src/_test_utilities/test-utils";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
@@ -183,7 +182,7 @@ describe("ChatMessageField", () => {
     expect(chatMessageFieldInput).toHaveValue(longPrefillMessage);
 
     // THEN expect the error message to be in the document
-    expect(screen.getByText(`Message limit is ${CHAT_MESSAGE_MAX_LENGTH} characters.`)).toBeInTheDocument();
+    expect(screen.getByText(i18n.t("chat_message_error_limit", { max: CHAT_MESSAGE_MAX_LENGTH })) ).toBeInTheDocument();
     // AND the send button to be disabled
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeDisabled();
     // AND no errors or warnings to have occurred
@@ -215,8 +214,10 @@ describe("ChatMessageField", () => {
       expect(input).toHaveValue(atLimit);
       // AND the caret remains at the same position
       expect(input.selectionStart).toBe(mid);
-      // AND the character limit error is shown
-      expect(screen.getByText(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT)).toBeInTheDocument();
+      // AND the character limit error is shown (translated)
+      expect(
+        screen.getByText(i18n.t("chat_message_error_limit", { max: CHAT_MESSAGE_MAX_LENGTH }))
+      ).toBeInTheDocument();
       // AND no unexpected console noise
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
