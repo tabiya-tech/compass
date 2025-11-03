@@ -1,4 +1,5 @@
 import { UploadStatus } from "src/chat/Chat.types";
+import i18n from "src/i18n/i18n";
 import { getUploadErrorMessage as getCentralizedUploadErrorMessage } from "./CVUploadErrorHandling";
 
 export type UploadPollingHandles = {
@@ -13,22 +14,22 @@ export function stopUploadPolling(handles?: UploadPollingHandles): void {
 }
 
 export function getCvUploadDisplayMessage(status: UploadStatus): string {
-  if (!status) return "Uploading CV";
-  if (status.upload_process_state === "CANCELLED" || status.cancel_requested) return "CV upload cancelled";
-  if (status.upload_process_state === "COMPLETED") return "CV uploaded successfully";
+  if (!status) return i18n.t("cv_upload_uploading_cv");
+  if (status.upload_process_state === "CANCELLED" || status.cancel_requested) return i18n.t("cv_upload_cancelled");
+  if (status.upload_process_state === "COMPLETED") return i18n.t("cv_upload_uploaded_successfully");
   switch (status.upload_process_state) {
     case "CONVERTING":
-      return "Converting CV";
+      return i18n.t("cv_upload_converting");
     case "UPLOADING_TO_GCS":
-      return "Processing CV";
+      return i18n.t("cv_upload_processing");
     case "EXTRACTING":
-      return "Extracting experiences";
+      return i18n.t("cv_upload_extracting_experiences");
     case "SAVING":
-      return "Saving CV";
+      return i18n.t("cv_upload_saving_cv");
     case "FAILED":
-      return "CV upload failed";
+      return i18n.t("cv_upload_failed");
     default:
-      return "Uploading CV";
+      return i18n.t("cv_upload_uploading_cv");
   }
 }
 
