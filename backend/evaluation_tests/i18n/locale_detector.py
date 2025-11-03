@@ -14,7 +14,7 @@ def get_locale(
     4. The default application locale.
     """
 
-    supported_languages_str = os.environ.get("BACKEND_SUPPORTED_LANGUAGES", '["en"]')
+    supported_languages_str = os.environ.get("BACKEND_SUPPORTED_LANGUAGES", '["en-gb"]')
 
     # Parse supported languages from environment variable
     try:
