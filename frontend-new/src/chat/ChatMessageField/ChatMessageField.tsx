@@ -234,11 +234,12 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
 
     // Set appropriate error message if prefill exceeds limit
     if (props.prefillMessage.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
-      setErrorMessage(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT);
+      // Translate with interpolation to avoid rendering un-interpolated placeholders
+      setErrorMessage(t(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT, { max: CHAT_MESSAGE_MAX_LENGTH }));
     } else {
       setErrorMessage("");
     }
-  }, [props.prefillMessage]);
+  }, [props.prefillMessage, t]);
 
   // Handle CV upload errors from polling process
   useEffect(() => {
@@ -326,7 +327,8 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     setMessage(composed);
     setMenuAnchorEl(null);
     if (composed.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
-      setErrorMessage(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT);
+      // Translate with interpolation to avoid rendering un-interpolated placeholders
+      setErrorMessage(t(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT, { max: CHAT_MESSAGE_MAX_LENGTH }));
     }
   };
 
