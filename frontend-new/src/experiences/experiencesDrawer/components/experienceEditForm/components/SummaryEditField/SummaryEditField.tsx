@@ -154,7 +154,7 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
               >
                 {/* We wanted to have an icon of 20*20; By default, material icon sizes are 24*24
                     We went with using md(16) * 1.25 = 20 */}
-                <RestoreIcon sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md * 1.25) }} /> Revert
+                <RestoreIcon sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md * 1.25) }} /> {t("revert")}
               </StyledCustomLink>
               {/* Other buttons */}
             </Stack>
@@ -167,7 +167,7 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
             }}
           >
             <InlineEditField
-              placeholder="Summary of experience"
+              placeholder={t("summary_of_experience")}
               value={summaryValue}
               onChange={handleInputChange}
               multiline
