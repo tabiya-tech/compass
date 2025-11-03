@@ -305,6 +305,8 @@
   "experiences_updating_backdrop": "Mise à jour de l'expérience...",
   "experiences_skill_also_known_as": "Aussi connu sous le nom :",
   "go_back": "Retour",
+  "revert": "Rétablir",
+  "summary_of_experience": "Résumé de l'expérience",
   "restore_button": "Restaurer",
   "experiences_restore_title": "Restaurer les expériences",
   "experiences_restore_fetch_failed": "Échec de la récupération des expériences supprimées. Veuillez réessayer plus tard.",
