@@ -431,4 +431,7 @@
   "uploadedCVsMenu_help_collect": "Toca un CV para cargar su contenido en el campo de texto. Revísalo y envíalo cuando estés listo.",
   "uploadedCVsMenu_help_disabled": "La selección de CV solo está disponible durante la fase de recopilación de experiencias.",
   "uploadedCVsMenu_empty": "No se encontraron CVs cargados."
-}
+    ,
+    "please_select_x": "Por favor, seleccione {{x}}",
+    "clear_selection": "Limpiar selección"
+  }

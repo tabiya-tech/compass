@@ -430,4 +430,7 @@
   "uploadedCVsMenu_help_collect": "Touchez un CV pour charger son contenu dans le champ de texte. Relisez-le et envoyez-le quand vous êtes prêt.",
   "uploadedCVsMenu_help_disabled": "La sélection de CV est uniquement disponible pendant la phase de collecte des expériences.",
   "uploadedCVsMenu_empty": "Aucun CV téléversé trouvé."
+  ,
+  "please_select_x": "Veuillez sélectionner {{x}}",
+  "clear_selection": "Effacer la sélection"
 }
