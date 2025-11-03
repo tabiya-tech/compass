@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { 
   FormControl, 
   InputLabel, 
@@ -39,6 +40,7 @@ interface EnumFieldProps {
 const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue = "", onChange }) => {
   const [value, setValue] = useState(initialValue);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   // Simple validation function
   const validate = useCallback((selectedValue: string): { isValid: boolean; errorMessage: string | null } => {
@@ -46,12 +48,12 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
     if (field.required && (!selectedValue || selectedValue === '')) {
       return { 
         isValid: false, 
-        errorMessage: `Please select a ${field.label.toLowerCase()}`
+        errorMessage: t("please_select_x", { x: field.label.toLowerCase() })
       };
     }
     
     return { isValid: true, errorMessage: null };
-  }, [field.label, field.required]);
+  }, [field.label, field.required, t]);
 
   // Handle selection change
   const handleChange = (event: SelectChangeEvent<string>) => {
@@ -124,7 +126,7 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
                 size="small" 
                 sx={{ padding: 0 }}
                 onClick={handleClear}
-                aria-label="clear selection"
+                aria-label={t("clear_selection")}
                 data-testid={DATA_TEST_ID.ENUM_FIELD_CLEAR_BUTTON}
               >
                 <ClearIcon fontSize="small" />

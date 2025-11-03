@@ -433,4 +433,7 @@
   "uploadedCVsMenu_help_collect": "Tap a CV to load its content into the text field. Review it and send when you're ready.",
   "uploadedCVsMenu_help_disabled": "CV selection is only available during the experience collection phase.",
   "uploadedCVsMenu_empty": "No uploaded CVs found."
+  ,
+  "please_select_x": "Please select a {{x}}",
+  "clear_selection": "Clear selection"
 }
