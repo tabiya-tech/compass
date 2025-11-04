@@ -5,6 +5,7 @@ import en from "../locales/en-us/translation.json";
 import es from "../locales/es-es/translation.json";
 import ar from "../locales/es-ar/translation.json";
 import fr from "../locales/fr-fr/translation.json";
+import { DEFAULT_LOCALE } from "./constants";
 
 i18n
   .use(LanguageDetector)
@@ -34,8 +35,11 @@ i18n
       "fr-FR": {
         translation: fr,
       },
+      "fr-fr": {
+        translation: fr,
+      },
     },
-    fallbackLng: "en-GB",
+  fallbackLng: DEFAULT_LOCALE,
     interpolation: {
       escapeValue: false, // react already safes from xss
     },
@@ -47,7 +51,7 @@ export default i18n;
 try {
   const current = i18n.language;
   if (current === 'en') {
-    i18n.changeLanguage('en-gb');
+    i18n.changeLanguage(DEFAULT_LOCALE);
   } else if (current === 'es') {
     i18n.changeLanguage('es-es');
   }

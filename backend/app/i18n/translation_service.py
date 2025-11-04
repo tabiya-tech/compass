@@ -1,4 +1,3 @@
-import os
 from app.i18n.i18n_manager import I18nManager
 from app.i18n.locale_detector import get_locale
 

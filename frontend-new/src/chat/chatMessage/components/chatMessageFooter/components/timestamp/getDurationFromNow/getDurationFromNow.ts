@@ -42,7 +42,7 @@ export function getDurationFromNow(givenDate: Date | string, t: any): string {
   // Handle special and pluralized cases
   if (days === 1) return t("yesterday");
   if (days > 1)
-    return t("ago", { time: `${days} ${pluralize(days, t(days === 1 ? "day" : "days"))}` });
+    return t("ago", { time: `${days} ${t("days")}` });
   if (hours > 0)
     return t("ago", { time: `${hours} ${pluralize(hours, t(hours === 1 ? "hour" : "hours"))}` });
   if (minutes > 0)

@@ -260,8 +260,8 @@ describe("UserPreferencesStateService", () => {
         // GIVEN user preferences with customer satisfaction rating for the active session are set
         const givenPreferences: UserPreference = getMockUserPreference();
         givenPreferences.user_feedback_answered_questions = {
-          [String(givenPreferences.sessions[0])]: [QUESTION_KEYS.CUSTOMER_SATISFACTION]
-        } as any;
+          [givenPreferences.sessions[0]]: [QUESTION_KEYS.CUSTOMER_SATISFACTION]
+        };
         service.setUserPreferences(givenPreferences);
 
         // WHEN activeSessionHasCustomerSatisfactionRating is called
