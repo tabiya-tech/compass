@@ -64,8 +64,8 @@ export default class UserPreferencesStateService {
       return false;
     }
 
-    // Keys of answered_questions are serialized session IDs; ensure robust lookup
-    const answeredForSession = answered_questions[activeSessionId] ?? answered_questions[String(activeSessionId) as unknown as keyof typeof answered_questions];
+  // Keys of answered_questions are serialized session IDs; bracket access coerces number to string at runtime
+  const answeredForSession = answered_questions[activeSessionId];
     return Array.isArray(answeredForSession)
       ? answeredForSession.some((question: string) => question !== QUESTION_KEYS.CUSTOMER_SATISFACTION)
       : false;

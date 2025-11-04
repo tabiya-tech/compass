@@ -15,8 +15,6 @@ from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_vari
 from common_libs.retry import Retry
 from app.i18n.translation_service import t
 
-_FINAL_MESSAGE = t("messages", "explore_experiences.no_more_experiences")
-
 
 class _ConversationLLM:
 
