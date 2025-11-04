@@ -12,6 +12,7 @@ import CustomRating from "src/feedback/overallFeedback/feedbackForm/components/c
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { DEFAULT_LOCALE } from "src/i18n/constants";
 
 interface CustomerSatisfactionRatingProps {
   notifyOnCustomerSatisfactionRatingSubmitted: () => void;
@@ -54,12 +55,12 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       } catch (error) {
         console.error(`❌ Failed to load questions for locale '${locale}'.`, error);
 
-        if (locale !== "en") {
-          console.info("Attempting fallback to 'en' locale...");
-          await loadQuestions("en");
+        if (locale !== DEFAULT_LOCALE) {
+          console.info(`Attempting fallback to '${DEFAULT_LOCALE}' locale...`);
+          await loadQuestions(DEFAULT_LOCALE);
           return;
         }
-        console.error("Fallback 'en' locale also failed to load.");
+        console.error(`Fallback '${DEFAULT_LOCALE}' locale also failed to load.`);
         setQuestionsData({});
       } finally {
       
@@ -70,7 +71,7 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
 
   // Load locale-specific questions on mount and when locale changes
   useEffect(() => {
-    loadQuestions(i18n.language.toLocaleLowerCase());
+    loadQuestions(i18n.language.toLowerCase());
   }, [i18n.language, loadQuestions]);
 
   const handleInputChange = async (questionId: string, value: SimplifiedAnswer) => {
