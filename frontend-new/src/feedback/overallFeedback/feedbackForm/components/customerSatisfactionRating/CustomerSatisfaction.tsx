@@ -1,4 +1,5 @@
-import { useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   QUESTION_KEYS,
   FeedbackItem,
@@ -9,9 +10,9 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import CustomRating from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
-import questions from "src/feedback/overallFeedback/feedbackForm/questions-en.json";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { DEFAULT_LOCALE } from "src/i18n/constants";
 
 interface CustomerSatisfactionRatingProps {
   notifyOnCustomerSatisfactionRatingSubmitted: () => void;
@@ -24,7 +25,7 @@ export const DATA_TEST_ID = {
 };
 
 export const UI_TEXT = {
-  CUSTOMER_SATISFACTION_QUESTION_TEXT: "Finally, we'd love to hear your thoughts on your experience so far! " + questions[QUESTION_KEYS.CUSTOMER_SATISFACTION].question_text,
+  CUSTOMER_SATISFACTION_QUESTION_TEXT: "Finally, we'd love to hear your thoughts on your experience so far! How satisfied are you with Compass?",
   RATING_LABEL_LOW: "Unsatisfied",
   RATING_LABEL_HIGH: "Satisfied",
 };
@@ -33,15 +34,51 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
                                                                                }) => {
   const { enqueueSnackbar } = useSnackbar();
   const isOnline = useContext(IsOnlineContext);
-
+  const { i18n } = useTranslation();
+  const { t } = useTranslation();
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [isSubmittingRating, setIsSubmittingRating] = useState<boolean>(false);
+
+  const [questionsData, setQuestionsData] = useState<Record<string, any>>({});
+
+  /**
+   * Function to dynamically import the correct questions file according to locale.
+   */
+  const loadQuestions = useCallback(
+    async (locale: string) => {
+      
+      try {
+        const module = await import(
+          /* @vite-ignore */ `src/feedback/overallFeedback/feedbackForm/questions-${locale}.json`
+        );
+        setQuestionsData(module.default || module);
+      } catch (error) {
+        console.error(`❌ Failed to load questions for locale '${locale}'.`, error);
+
+        if (locale !== DEFAULT_LOCALE) {
+          console.info(`Attempting fallback to '${DEFAULT_LOCALE}' locale...`);
+          await loadQuestions(DEFAULT_LOCALE);
+          return;
+        }
+        console.error(`Fallback '${DEFAULT_LOCALE}' locale also failed to load.`);
+        setQuestionsData({});
+      } finally {
+      
+      }
+    },
+    []
+  );
+
+  // Load locale-specific questions on mount and when locale changes
+  useEffect(() => {
+    loadQuestions(i18n.language.toLowerCase());
+  }, [i18n.language, loadQuestions]);
 
   const handleInputChange = async (questionId: string, value: SimplifiedAnswer) => {
     const formattedData: FeedbackItem = {
       question_id: questionId,
       simplified_answer: value,
-    };
+    }; 
 
     setSelectedRating(value.rating_numeric ?? null);
     setIsSubmittingRating(true);
@@ -55,15 +92,19 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       await feedbackService.sendFeedback(sessionId, [formattedData]);
 
       notifyOnCustomerSatisfactionRatingSubmitted();
-      enqueueSnackbar("Rating Feedback submitted successfully!", { variant: "success" });
+      enqueueSnackbar(t("customerSatisfactionRating_submit_success"), { variant: "success" });
     } catch (error) {
       console.error("Feedback submission failed:", error);
-      enqueueSnackbar("Failed to submit feedback. Please try again later.", { variant: "error" });
+      enqueueSnackbar(t("customerSatisfactionRating_submit_error"), { variant: "error" });
     } finally {
       setIsSubmittingRating(false);
       setSelectedRating(null);
     }
   };
+
+  const customerSatisfactionText = t("customerSatisfactionRating_question_text").concat(
+    questionsData?.[QUESTION_KEYS.CUSTOMER_SATISFACTION]?.question_text ??
+    "How satisfied are you with Compass?");    
 
   return (
     <div data-testid={DATA_TEST_ID.CUSTOMER_SATISFACTION_RATING_CONTAINER}>
@@ -71,13 +112,13 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       <CustomRating
         type={QuestionType.Rating}
         questionId={QUESTION_KEYS.CUSTOMER_SATISFACTION}
-        questionText={UI_TEXT.CUSTOMER_SATISFACTION_QUESTION_TEXT}
+        questionText={customerSatisfactionText}
         ratingValue={selectedRating}
         notifyChange={(value, comments) =>
           handleInputChange(QUESTION_KEYS.CUSTOMER_SATISFACTION, { rating_numeric: value, comment: comments })
         }
-        lowRatingLabel={UI_TEXT.RATING_LABEL_LOW}
-        highRatingLabel={UI_TEXT.RATING_LABEL_HIGH}
+        lowRatingLabel={t("customerSatisfactionRating_rating_label_low")}
+        highRatingLabel={t("customerSatisfactionRating_rating_label_high")}
         maxRating={5}
         disabled={!isOnline || isSubmittingRating}
       />

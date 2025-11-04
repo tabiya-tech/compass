@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { Box, Typography, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -46,6 +47,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
   const [hasFinished, setHasFinished] = useState(false);
   const scrollRef = useAutoScrollOnChange(showTyping);
 
+  const { t } = useTranslation();
   const handleContinue = useCallback(async () => {
     if (currentPhase !== SkillsRankingPhase.JOB_SEEKER_DISCLOSURE) {
       console.error(
@@ -69,9 +71,9 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
       await onFinish(newSkillsRankingState);
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
-      enqueueSnackbar("Failed to update skills ranking state. Please try again later.", { variant: "error" });
+      enqueueSnackbar(t("skillsRanking_common_error_update_state"), { variant: "error" });
     }
-  }, [currentPhase, onFinish, enqueueSnackbar]);
+  }, [currentPhase, onFinish, enqueueSnackbar, t]);
 
   useEffect(() => {
     if (isReplay || hasFinished) return;
@@ -97,9 +99,11 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
         <ChatBubble
           sender={ConversationMessageSender.COMPASS}
           message={
-            <>
-              Thanks! We’re double-checking the latest {getJobPlatformUrl()} opportunities so the numbers are accurate. We’ll share your results soon or you can ask for them when we call you for the phone survey.
-            </>
+            <Trans
+              i18nKey="skillsRanking_jobSeekerDisclosure_pending_message"
+              values={{ jobPlatformUrl: getJobPlatformUrl() }}
+              components={{ 0: <strong /> }}
+            />
           }
         />
       );
@@ -110,8 +114,26 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
         sender={ConversationMessageSender.COMPASS}
         message={
           <>
-            Moreover, <strong>Compared to other {getJobPlatformUrl()} users, you are in group [{jobSeekerComparisonLabels.indexOf(selectedLabel) + 1}] of {jobSeekerComparisonLabels.length}.</strong><br/>
-            Imagine lining up 100 {getJobPlatformUrl()} users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You’re in block <strong>[{jobSeekerComparisonLabels.indexOf(selectedLabel) + 1}]</strong>, which is the <strong>[{selectedLabel}]</strong> block.<br/>
+            <Trans
+              i18nKey="skillsRanking_jobSeekerDisclosure_comparison_part1"
+              components={{ 0: <strong /> }}
+              values={{
+                jobPlatformUrl: getJobPlatformUrl(),
+                groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1,
+                groupTotal: jobSeekerComparisonLabels.length,
+              }}
+            />
+            <br />
+            <Trans
+              i18nKey="skillsRanking_jobSeekerDisclosure_comparison_part2"
+              components={{ 0: <strong />, 1: <strong /> }}
+              values={{
+                jobPlatformUrl: getJobPlatformUrl(),
+                groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1,
+                comparisonLabel: selectedLabel,
+              }}
+            />
+            <br />
           </>
         }
       >

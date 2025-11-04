@@ -1,4 +1,3 @@
-import questions from "src/feedback/overallFeedback/feedbackForm/questions-en.json";
 export interface FeedbackResponse {
   id: string;
   version: {
@@ -28,7 +27,7 @@ export interface FeedbackItem {
   simplified_answer: SimplifiedAnswer;
 }
 
-export const QUESTION_KEYS: Record<string, keyof typeof questions> = {
+export const QUESTION_KEYS: Record<string, string> = {
   CUSTOMER_SATISFACTION: "satisfaction_with_compass",
   OVERALL_SATISFACTION: "satisfaction_with_compass",
 };

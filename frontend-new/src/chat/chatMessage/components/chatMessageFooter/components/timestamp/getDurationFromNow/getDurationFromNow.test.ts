@@ -8,6 +8,26 @@ function timeAgo({ days = 0, hours = 0, minutes = 0, seconds = 0 }) {
   return new Date(now - totalMilliseconds);
 }
 
+
+const t = (key: string, opts?: any) => {
+  const translations : any = {
+    ago: "{{time}} ago",
+    just_now: "just now",
+    yesterday: "yesterday",
+    day: "day",
+    days: "days",
+    hour: "hour",
+    hours: "hours",
+    minute: "minute",
+    minutes: "minutes"
+  };
+  let value = translations[key] || key;
+  if (opts && opts.time) {
+    value = value.replace("{{time}}", opts.time);
+  }
+  return value;
+};
+
 describe("getDurationFromNow", () => {
   describe("durations below a week", () => {
     test("should return the expected duration in days", () => {
@@ -15,7 +35,7 @@ describe("getDurationFromNow", () => {
       const givenDate = timeAgo({ days: 5 });
 
       // WHEN getDurationFromNow is called with the given date
-      const result = getDurationFromNow(givenDate);
+      const result = getDurationFromNow(givenDate,t);
 
       // THEN expect the expected duration to be returned
       expect(result).toBe("5 days ago");
@@ -26,7 +46,7 @@ describe("getDurationFromNow", () => {
       const givenDate = timeAgo({ hours: 10 });
 
       // WHEN getDurationFromNow is called with the given date
-      const result = getDurationFromNow(givenDate);
+      const result = getDurationFromNow(givenDate,t);
 
       // THEN expect the expected duration to be returned
       expect(result).toBe("10 hours ago");
@@ -37,7 +57,7 @@ describe("getDurationFromNow", () => {
       const givenDate = timeAgo({ minutes: 10 });
 
       // WHEN getDurationFromNow is called with the given date
-      const result = getDurationFromNow(givenDate);
+      const result = getDurationFromNow(givenDate,t);
 
       // THEN expect the expected duration to be returned
       expect(result).toBe("10 minutes ago");
@@ -48,7 +68,7 @@ describe("getDurationFromNow", () => {
       const givenDate = timeAgo({ days: 5, hours: 10, minutes: 10 });
 
       // WHEN getDurationFromNow is called with the given date
-      const result = getDurationFromNow(givenDate);
+      const result = getDurationFromNow(givenDate,t);
 
       // THEN expect the expected duration to be returned
       expect(result).toBe("5 days ago");
@@ -59,7 +79,7 @@ describe("getDurationFromNow", () => {
       const givenDate = timeAgo({ hours: 24 });
 
       // WHEN getDurationFromNow is called with the given date
-      const result = getDurationFromNow(givenDate);
+      const result = getDurationFromNow(givenDate,t);
 
       // THEN expect the expected duration to be returned
       expect(result).toBe("yesterday");
@@ -70,7 +90,7 @@ describe("getDurationFromNow", () => {
       const givenDate = timeAgo({ hours: 1 });
 
       // WHEN getDurationFromNow is called with the given date
-      const result = getDurationFromNow(givenDate);
+      const result = getDurationFromNow(givenDate,t);
 
       // THEN expect the expected duration to be returned
       expect(result).toBe("1 hour ago");
@@ -81,7 +101,7 @@ describe("getDurationFromNow", () => {
       const givenDate = timeAgo({ minutes: 1 });
 
       // WHEN getDurationFromNow is called with the given date
-      const result = getDurationFromNow(givenDate);
+      const result = getDurationFromNow(givenDate,t);
 
       // THEN expect the expected duration to be returned
       expect(result).toBe("1 minute ago");
@@ -94,7 +114,7 @@ describe("getDurationFromNow", () => {
       const givenDate = timeAgo({ days: 10 });
 
       // WHEN getDurationFromNow is called with the given date
-      const result = getDurationFromNow(givenDate);
+      const result = getDurationFromNow(givenDate,t);
 
       // THEN expect the expected duration to be returned
       expect(result).toBe(`on ${givenDate.toLocaleDateString("en-GB", { timeZone: "UTC" })}`);
@@ -105,7 +125,7 @@ describe("getDurationFromNow", () => {
       const givenDate = timeAgo({ days: 30 });
 
       // WHEN getDurationFromNow is called with the given date
-      const result = getDurationFromNow(givenDate);
+      const result = getDurationFromNow(givenDate,t);
 
       // THEN expect the expected duration to be returned
       expect(result).toBe(`on ${givenDate.toLocaleDateString("en-GB", { timeZone: "UTC" })}`);
@@ -118,7 +138,7 @@ describe("getDurationFromNow", () => {
       const givenDate = new Date();
 
       // WHEN getDurationFromNow is called with the given date
-      const result = getDurationFromNow(givenDate);
+      const result = getDurationFromNow(givenDate,t);
 
       // THEN expect the expected duration to be returned
       expect(result).toBe("just now");
@@ -129,7 +149,7 @@ describe("getDurationFromNow", () => {
       const givenDate = new Date(new Date().getTime() + 10000);
 
       // WHEN getDurationFromNow is called with the given date
-      getDurationFromNow(givenDate);
+      getDurationFromNow(givenDate,t);
       // THEN expect a warning to be logged to the console
       expect(console.warn).toHaveBeenCalledWith("Invalid date range: First date must be before second date", {
         now: expect.any(String),
@@ -143,7 +163,7 @@ describe("getDurationFromNow", () => {
 
       // WHEN getDurationFromNow is called with the given date
       // @ts-ignore
-      const result = getDurationFromNow(givenDate);
+      const result = getDurationFromNow(givenDate,t);
 
       // THEN expect the expected duration to be returned
       expect(result).toBe("on 10/10/2021");

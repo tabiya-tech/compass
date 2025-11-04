@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { useTranslation, Trans } from "react-i18next";
 import { Box, Container, Checkbox, styled, Typography, useTheme, FormControlLabel, useMediaQuery } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Language, UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
@@ -48,6 +49,7 @@ export const DATA_TEST_ID = {
 
 const Consent: React.FC = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const navigate = useNavigate();
   const [isAccepting, setIsAccepting] = useState(false);
@@ -112,7 +114,7 @@ const Consent: React.FC = () => {
     try {
       const user = authStateService.getInstance().getUser();
       if (!user) {
-        enqueueSnackbar("User not found", { variant: "error" });
+        enqueueSnackbar(t("consent_snackbar_user_not_found"), { variant: "error" });
         navigate(routerPaths.LANDING);
         return;
       }
@@ -138,18 +140,18 @@ const Consent: React.FC = () => {
 
       sendMetricsEvent(prefs.user_id);
 
-      enqueueSnackbar("Agreement Accepted", { variant: "success" });
+  enqueueSnackbar(t("consent_snackbar_agreement_accepted"), { variant: "success" });
     } catch (e: unknown) {
       console.error(new AuthenticationError("Failed to update user preferences", e));
       if (e instanceof RestAPIError) {
         enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
       } else {
-        enqueueSnackbar(`Failed to update user preferences: ${(e as Error).message}`, { variant: "error" });
+        enqueueSnackbar(`${t("consent_snackbar_failed_update_preferences")}: ${(e as Error).message}` , { variant: "error" });
       }
     } finally {
       setIsAccepting(false);
     }
-  }, [enqueueSnackbar, navigate, userPreferences]);
+  }, [enqueueSnackbar, navigate, userPreferences, t]);
 
   /**
    * Handle when a user accepts the agreements
@@ -170,14 +172,14 @@ const Consent: React.FC = () => {
       const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
       await authenticationService!.logout();
       navigate(routerPaths.LANDING, { replace: true });
-      enqueueSnackbar("Successfully logged out.", { variant: "success" });
+      enqueueSnackbar(t("consent_snackbar_logged_out_success"), { variant: "success" });
     } catch (e) {
       console.error(new AuthenticationError("Failed to log out", e));
-      enqueueSnackbar("Failed to log out.", { variant: "error" });
+      enqueueSnackbar(t("consent_snackbar_logged_out_failure"), { variant: "error" });
     } finally {
       setIsRejecting(false);
     }
-  }, [enqueueSnackbar, navigate]);
+  }, [enqueueSnackbar, navigate, t]);
 
   /**
    * Handle when a user checks terms and conditions checkbox
@@ -193,8 +195,8 @@ const Consent: React.FC = () => {
     setIsDPAccepted(event.target.checked);
   };
 
-  const termsAndConditionsLabel = "Terms and Conditions";
-  const privacyPolicyLabel = "Privacy Policy";
+  const termsAndConditionsLabel = t("consent_terms_and_conditions");
+  const privacyPolicyLabel = t("consent_privacy_policy");
 
   const handleExternalNavigationOnNewTab = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
@@ -206,9 +208,9 @@ const Consent: React.FC = () => {
       sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
       data-testid={DATA_TEST_ID.CONSENT_CONTAINER}
     >
-      <Backdrop isShown={isLoggingOut} message={"Logging you out..."} />
+      <Backdrop isShown={isLoggingOut} message={t("logging_you_out")} />
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"}>
-        <AuthHeader title={"Before we begin..."} subtitle={<></>} />
+        <AuthHeader title={t("consent_before_we_begin_title")} subtitle={<></>} />
         <Box
           display={"flex"}
           flexDirection={"column"}
@@ -217,21 +219,19 @@ const Consent: React.FC = () => {
           gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
         >
           <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AGREEMENT_BODY}>
-            We created this AI tool for you with care to help you and other young people like you explore their skills
-            and discover new opportunities.
+            {t("consent_intro_part1")}
             <br />
             <br />
-            <HighlightedSpan>Please use AI responsibly!</HighlightedSpan>
+            <HighlightedSpan>{t("consent_intro_highlight_responsibly")}</HighlightedSpan>
             <br />
             <br />
-            AI technology is new and far from perfect. It doesn't understand context like humans do.
+            {t("consent_intro_part2")}
             <br />
             <br />
-            Always double-check important details and avoid sharing personal information about yourself and others with
-            the AI during the conversation.
+            {t("consent_intro_part3")}
             <br />
             <br />
-            Help us keep all AI interactions safe and positive! 😊
+            {t("consent_intro_part4")}
           </Typography>
           <Box display={"flex"} flexDirection={"column"} gap={theme.tabiyaSpacing.lg}>
             <FormControlLabel
@@ -248,13 +248,17 @@ const Consent: React.FC = () => {
               sx={{ alignItems: "flex-start" }}
               label={
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT}>
-                  I have read and accept the{" "}
-                  <CustomLink
-                    onClick={() => handleExternalNavigationOnNewTab("https://www.tabiya.org/compass-terms-privacy")}
-                  >
-                    {termsAndConditionsLabel}
-                  </CustomLink>{" "}
-                  of Compass.
+                  <Trans
+                    i18nKey="consent_checkbox_tc"
+                    values={{ terms_and_conditions: termsAndConditionsLabel }}
+                    components={[
+                      <CustomLink
+                        onClick={() =>
+                          handleExternalNavigationOnNewTab("https://www.tabiya.org/compass-terms-privacy")
+                        }
+                      />,
+                    ]}
+                  />
                 </Typography>
               }
             />
@@ -273,21 +277,25 @@ const Consent: React.FC = () => {
               sx={{ alignItems: "flex-start" }}
               label={
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_CHECKBOX_TEXT}>
-                  I have read and accept the{" "}
-                  <CustomLink
-                    onClick={() =>
-                      handleExternalNavigationOnNewTab("https://tabiya.org/compass-terms-privacy/#privacy-policy")
-                    }
-                  >
-                    {privacyPolicyLabel}
-                  </CustomLink>{" "}
-                  of Compass.
+                  <Trans
+                    i18nKey="consent_checkbox_privacy"
+                    values={{ privacy_policy: privacyPolicyLabel }}
+                    components={[
+                      <CustomLink
+                        onClick={() =>
+                          handleExternalNavigationOnNewTab(
+                            "https://tabiya.org/compass-terms-privacy/#privacy-policy"
+                          )
+                        }
+                      />,
+                    ]}
+                  />
                 </Typography>
               }
             />
           </Box>
           <Typography>
-            Are you ready to start?
+            {t("consent_are_you_ready")}
             <br />
           </Typography>
         </Box>
@@ -303,7 +311,7 @@ const Consent: React.FC = () => {
           }}
         >
           <CustomLink data-testid={DATA_TEST_ID.REJECT_BUTTON} onClick={() => setShowRejectModal(true)}>
-            No, thank you
+            {t("no_thank_you")}
           </CustomLink>
           <PrimaryButton
             fullWidth
@@ -314,7 +322,7 @@ const Consent: React.FC = () => {
             data-testid={DATA_TEST_ID.ACCEPT_BUTTON}
             onClick={handleAcceptedDPA}
           >
-            Sure, I am ready
+            {t("consent_accept")}
           </PrimaryButton>
         </Box>
         <Box
@@ -327,7 +335,7 @@ const Consent: React.FC = () => {
           }}
           data-testid={DATA_TEST_ID.SUPPORT_CONTAINER}
         >
-          <Typography typography="body1">With support from</Typography>
+          <Typography typography="body1">{t("consent_with_support_from")}</Typography>
           <img
             src={`${process.env.PUBLIC_URL}/google-logo.svg`}
             alt="Google.org Logo"
@@ -338,7 +346,7 @@ const Consent: React.FC = () => {
       </Box>
       <ConfirmModalDialog
         isOpen={showRejectModal}
-        title="Are you sure?"
+        title={t("are_you_sure")}
         content={
           <Box
             display="flex"
@@ -346,10 +354,12 @@ const Consent: React.FC = () => {
             gap={isSmallMobile ? theme.tabiyaSpacing.xl : theme.tabiyaSpacing.md}
           >
             <Typography>
-              We're sorry that you choose not to agree to the {termsAndConditionsLabel} and the {privacyPolicyLabel}.
-              You will not be able to proceed and will be <HighlightedSpan>logged out.</HighlightedSpan>
+              {t("consent_modal_apology", {
+                terms_and_conditions: termsAndConditionsLabel,
+                privacy_policy: privacyPolicyLabel,
+              })} {t("consent_modal_cannot_proceed")} <HighlightedSpan>{t("consent_modal_logged_out_highlight")}</HighlightedSpan>
             </Typography>
-            <Typography>Are you sure you want to exit?</Typography>
+            <Typography>{t("are_you_sure_you_want_to_exit")}</Typography>
           </Box>
         }
         onCancel={handleRejected}
@@ -359,8 +369,8 @@ const Consent: React.FC = () => {
         onDismiss={() => {
           setShowRejectModal(false);
         }}
-        cancelButtonText="Yes, exit"
-        confirmButtonText="I want to stay"
+        cancelButtonText={t("consent_modal_yes_exit")}
+        confirmButtonText={t("i_want_to_stay")}
       />
     </Container>
   );

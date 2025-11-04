@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Popover, Typography, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
@@ -29,6 +30,7 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
   onClose,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isOnline = useContext(IsOnlineContext)
 
   const handleReasonClick = (reason: DislikeReason) => {
@@ -61,7 +63,7 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
       >
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="subtitle1" color={theme.palette.text.secondary} data-testid={DATA_TEST_ID.TITLE}>
-            Please tell us what the issue is?
+            {t("tell_us_what_the_issue_is")}
           </Typography>
           <PrimaryIconButton
             onClick={() => onClose([])} // close without selecting a reason
@@ -77,12 +79,12 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
             <PrimaryButton
               key={enumValue}
               onClick={() => handleReasonClick(enumValue as DislikeReason)}
-              title={message}
+              title={t(enumValue.toLowerCase())}
               style={{ color: theme.palette.text.secondary }}
               data-testid={DATA_TEST_ID.BUTTON}
               disabled={!isOnline}
             >
-              {message}
+              {t(enumValue.toLowerCase())}
             </PrimaryButton>
           ))}
         </Box>

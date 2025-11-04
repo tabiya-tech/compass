@@ -1,17 +1,18 @@
 import { startUploadPolling, stopUploadPolling, getCvUploadDisplayMessage } from "./cvUploadPolling";
+import i18n from "src/i18n/i18n";
 
 // Use real timers for these tests since the async nature of setInterval is complex with fake timers
 
 describe("cvUploadPolling", () => {
   test("getCvUploadDisplayMessage maps states", () => {
-    expect(getCvUploadDisplayMessage({ upload_process_state: "CONVERTING" })).toBe("Converting CV");
-    expect(getCvUploadDisplayMessage({ upload_process_state: "UPLOADING_TO_GCS" })).toBe("Processing CV");
-    expect(getCvUploadDisplayMessage({ upload_process_state: "EXTRACTING" })).toBe("Extracting experiences");
-    expect(getCvUploadDisplayMessage({ upload_process_state: "SAVING" })).toBe("Saving CV");
-    expect(getCvUploadDisplayMessage({ upload_process_state: "FAILED" })).toBe("CV upload failed");
-    expect(getCvUploadDisplayMessage({ upload_process_state: "COMPLETED" })).toBe("CV uploaded successfully");
-    expect(getCvUploadDisplayMessage({ upload_process_state: "CANCELLED" })).toBe("CV upload cancelled");
-    expect(getCvUploadDisplayMessage({ upload_process_state: "PENDING_UPLOAD" })).toBe("Uploading CV");
+    expect(getCvUploadDisplayMessage({ upload_process_state: "CONVERTING" })).toBe(i18n.t("cv_upload_converting"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "UPLOADING_TO_GCS" })).toBe(i18n.t("cv_upload_processing"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "EXTRACTING" })).toBe(i18n.t("cv_upload_extracting_experiences"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "SAVING" })).toBe(i18n.t("cv_upload_saving_cv"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "FAILED" })).toBe(i18n.t("cv_upload_failed"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "COMPLETED" })).toBe(i18n.t("cv_upload_uploaded_successfully"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "CANCELLED" })).toBe(i18n.t("cv_upload_cancelled"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "PENDING_UPLOAD" })).toBe(i18n.t("cv_upload_uploading_cv"));
   });
 
   test("polling calls onStatus and completes", async () => {

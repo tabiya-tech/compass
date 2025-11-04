@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useContext, useMemo, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogTitle,
@@ -60,6 +61,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
   onSuccess,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isOnline = useContext(IsOnlineContext);
   const [email, setEmail] = useState("");
   const [emailConfirmation, setEmailConfirmation] = useState("");
@@ -88,17 +90,17 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
 
   const handleSubmit = useCallback(async () => {
     if (!validateEmail(email)) {
-      enqueueSnackbar("Please enter a valid email address", { variant: "error" });
+      enqueueSnackbar(t("auth_anonymousConversion_invalid_email"), { variant: "error" });
       return;
     }
 
     if (!isEmailValid) {
-      enqueueSnackbar("Please ensure both email addresses match", { variant: "error" });
+      enqueueSnackbar(t("auth_anonymousConversion_emails_mismatch"), { variant: "error" });
       return;
     }
 
     if (!isPasswordValid) {
-      enqueueSnackbar("Please ensure your password meets all requirements", { variant: "error" });
+      enqueueSnackbar(t("auth_anonymousConversion_password_requirements_not_met"), { variant: "error" });
       return;
     }
 
@@ -106,20 +108,23 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
     try {
       const authService = FirebaseEmailAuthenticationService.getInstance();
       await authService.linkAnonymousAccount(email, password, email);
-      enqueueSnackbar("Account successfully registered!", { variant: "success" });
-      enqueueSnackbar(`Currently logged in with the email: ${email}. A verification email has been sent to your email address. Please verify your account before logging in again.`, {
+      enqueueSnackbar(t("auth_anonymousConversion_registration_success"), { variant: "success" });
+      enqueueSnackbar(
+        t("auth_anonymousConversion_verification_sent_with_email", { email }),
+        {
         variant: "info",
         persist: true,
         autoHideDuration: null
-      });
+      }
+      );
       onSuccess();
       onClose();
     } catch (error: any) {
-      enqueueSnackbar(error.message || "Failed to register account", { variant: "error" });
+      enqueueSnackbar(error.message || t("auth_anonymousConversion_registration_failed"), { variant: "error" });
     } finally {
       setIsLoading(false);
     }
-  }, [email, password, onSuccess, onClose, enqueueSnackbar, isEmailValid, isPasswordValid]);
+  }, [email, password, onSuccess, onClose, enqueueSnackbar, isEmailValid, isPasswordValid, t]);
 
   return (
     <Dialog
@@ -133,7 +138,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
     >
       <PrimaryIconButton
         data-testid={DATA_TEST_ID.CLOSE_ICON}
-        title="Close registration form"
+        title={t("close_registration_form")}
         onClick={onClose}
         sx={{
           position: "absolute",
@@ -147,21 +152,21 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
       
       <DialogTitle>
         <Typography variant="h4" component="div" gutterBottom>
-          Register Account
+          {t("register_account")}
         </Typography>
       </DialogTitle>
       
       <DialogContent>
         <Typography variant="body2" gutterBottom>
-          Please register with an email to keep access to this conversation. Without registering, you won't be able to log in again or return to this conversation.
+           {t("registration_info")}
         </Typography>
         
-        <HighlightedSpan>Please make sure you use the correct email, as it cannot be changed later and you will be asked to verify it.</HighlightedSpan>
+        <HighlightedSpan>{t("email_warning")}</HighlightedSpan>
         <Box sx={{ mt: 2 }}>
           <TextField
             autoFocus
             fullWidth
-            label="Email"
+            label={t("email")}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -169,12 +174,12 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
             margin="normal"
             required
             error={email !== "" && !validateEmail(email)}
-            helperText={email !== "" && !validateEmail(email) ? "Please enter a valid email address" : ""}
+            helperText={email !== "" && !validateEmail(email) ? t("valid_email_required") : ""}
           />
           
           <TextField
             fullWidth
-            label="Confirm Email"
+            label={t("confirm_email")}
             type="email"
             value={emailConfirmation}
             onChange={(e) => setEmailConfirmation(e.target.value)}
@@ -182,12 +187,12 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
             margin="normal"
             required
             error={emailConfirmation !== "" && email !== emailConfirmation}
-            helperText={emailConfirmation !== "" && email !== emailConfirmation ? "Emails do not match" : ""}
+            helperText={emailConfirmation !== "" && email !== emailConfirmation ? t("emails_do_not_match") : ""}
           />
           
           <PasswordInput
             fullWidth
-            label="Password"
+            label={t("password")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             data-testid={DATA_TEST_ID.PASSWORD_INPUT}
@@ -211,7 +216,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
                 size={2 * theme.typography.fontSize}
               />
             ) : (
-              "Register"
+              t("register")
             )}
           </PrimaryButton>
         </Box>

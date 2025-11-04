@@ -1,6 +1,18 @@
+// MOCK the useTranslation hook before other imports if possible, or just before use.
+jest.mock("react-i18next", () => ({
+  // The 't' function will simply return the key passed to it, which is standard for i18n mocks.
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: {
+      changeLanguage: () => new Promise(() => {}),
+    },
+  }),
+  // Mock the Trans component if you use it anywhere else in your tests
+  Trans: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 // mute the console
 import "src/_test_utilities/consoleMock";
-
 import { render, screen } from "src/_test_utilities/test-utils";
 import CVTypingChatMessage, { DATA_TEST_ID, UI_TEXT } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
 import { DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
@@ -30,7 +42,7 @@ describe("CVTypingChatMessage", () => {
     expect(cvTypingChatMessageContainer).toBeInTheDocument();
     // AND expect the message bubble to be visible
     expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
-    // AND expect the uploading CV text to be displayed
+    // AND expect the uploading CV text to be displayed (mocked t returns the key itself)
     expect(screen.getByText(UI_TEXT.UPLOADING_CV)).toBeInTheDocument();
     // AND expect to find 3 dots (periods)
     const dots = screen.getAllByText(".");
@@ -56,7 +68,7 @@ describe("CVTypingChatMessage", () => {
     expect(cvTypingChatMessageContainer).toBeInTheDocument();
     // AND expect the message bubble to be visible
     expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
-    // AND expect the CV uploaded text to be displayed
+    // AND expect the CV uploaded text to be displayed (mocked t returns the key itself)
     expect(screen.getByText(UI_TEXT.CV_UPLOADED)).toBeInTheDocument();
     // AND the component to match the snapshot
     expect(cvTypingChatMessageContainer).toMatchSnapshot();

@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Experience, SUMMARY_MAX_LENGTH } from "src/experiences/experienceService/experiences.types";
 import { Badge, Box, Stack, Typography, useTheme } from "@mui/material";
 import InlineEditField from "src/theme/InlineEditField/InlineEditField";
@@ -60,6 +61,7 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
   const theme = useTheme();
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
+  const { t } = useTranslation();
 
   const [summaryValue, setSummaryValue] = useState(summary);
   const [isRestoring, setIsRestoring] = useState(false);
@@ -78,7 +80,7 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
       const experienceService = ExperienceService.getInstance();
       const originalExperience = await experienceService.getUneditedExperience(sessionId, experience_uuid);
       setSummaryValue(originalExperience.summary ?? "");
-      setSuccessText("Summary restored.");
+      setSuccessText(t("experiences_summary_restored"));
       notifyOnChange(
         { target: { value: originalExperience.summary ?? "" } } as React.ChangeEvent<HTMLTextAreaElement>,
         SUMMARY_FIELD_NAME,
@@ -89,7 +91,7 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
       }, 3000); // Clear message after 3 seconds
     } catch (err) {
       console.error(new ExperienceError("Failed to restore summary:", err));
-      enqueueSnackbar("Failed to restore summary. Please try again later.", { variant: "error" });
+      enqueueSnackbar(t("experiences_summary_restore_failed"), { variant: "error" });
     } finally {
       setIsRestoring(false);
     }
@@ -152,7 +154,7 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
               >
                 {/* We wanted to have an icon of 20*20; By default, material icon sizes are 24*24
                     We went with using md(16) * 1.25 = 20 */}
-                <RestoreIcon sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md * 1.25) }} /> Revert
+                <RestoreIcon sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md * 1.25) }} /> {t("revert")}
               </StyledCustomLink>
               {/* Other buttons */}
             </Stack>
@@ -165,7 +167,7 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
             }}
           >
             <InlineEditField
-              placeholder="Summary of experience"
+              placeholder={t("summary_of_experience")}
               value={summaryValue}
               onChange={handleInputChange}
               multiline

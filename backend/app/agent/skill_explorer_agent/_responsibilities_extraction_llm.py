@@ -12,6 +12,7 @@ from app.agent.prompt_template import sanitize_input
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
+from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE
 
 _TAGS_TO_FILTER = ["system instructions", "user's last input", "conversation history"]
 
@@ -74,6 +75,8 @@ class _ResponsibilitiesExtractionLLM:
         # Role
             You are an expert who extracts name entities for the user's experience and classifies them.
         
+        {language_style}
+                                              
         # Name Entity Extraction instructions         
              Extract the following Named Entities:
                  - responsibilities: What is part of a job or role.
@@ -148,7 +151,7 @@ class _ResponsibilitiesExtractionLLM:
         </System Instructions>
         """)
 
-        return system_instructions_template
+        return system_instructions_template.format(language_style=STD_LANGUAGE_STYLE)
 
     @staticmethod
     def _extraction_prompt_template(context: ConversationContext, last_user_input: str) -> str:

@@ -107,7 +107,10 @@ describe("SummaryEditField", () => {
       expect(within(summaryContainer).getByRole("textbox")).toHaveValue(uneditedSummary);
     });
     // AND success message is shown
-    expect(screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY_HELPER)).toHaveTextContent("Summary restored.");
+    const i18n = require("src/i18n/i18n").default;
+    expect(screen.getByTestId(DATA_TEST_ID.FORM_SUMMARY_HELPER)).toHaveTextContent(
+      i18n.t("experiences_summary_restored")
+    );
     // AND notifyOnChange is called with unedited summary
     expect(mockNotifyOnChange).toHaveBeenCalledWith(
       expect.objectContaining({ target: { value: uneditedSummary } }),
@@ -135,7 +138,8 @@ describe("SummaryEditField", () => {
     await waitFor(() => {
       expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to restore summary:", givenError));
     });
-    expect(mockEnqueueSnackbar).toHaveBeenCalledWith("Failed to restore summary. Please try again later.", {
+    const i18n = require("src/i18n/i18n").default;
+    expect(mockEnqueueSnackbar).toHaveBeenCalledWith(i18n.t("experiences_summary_restore_failed"), {
       variant: "error",
     });
     // AND the notifyOnChange function is not called

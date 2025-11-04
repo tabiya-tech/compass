@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import React, { Suspense, useEffect } from "react";
+import { I18nextProvider } from "react-i18next";
 import { HashRouter } from "react-router-dom";
 import { applicationTheme, ThemeMode } from "../src/theme/applicationTheme/applicationTheme";
 // Loading fonts:
@@ -18,14 +19,16 @@ import "./preview.css";
 //  the browser will use a default font.
 
 import type { Preview, StoryFn } from "@storybook/react";
-import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
-import { initSentry } from "../src/sentryInit";
-import { ChatProvider } from "../src/chat/ChatContext";
 import { IChatMessage } from "../src/chat/Chat.types";
+import { ChatProvider } from "../src/chat/ChatContext";
+import i18n from "../src/i18n/i18n";
+import { initSentry } from "../src/sentryInit";
+import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 
 const preview: Preview = {
   parameters: {
+    i18n,
     actions: { argTypesRegex: "^on[A-Z].*" },
     controls: {
       matchers: {
@@ -73,6 +76,19 @@ const preview: Preview = {
         ],
       },
     },
+    locale: {
+      name: 'Locale',
+      description: 'Internationalization locale',
+      toolbar: {
+        icon: 'globe',
+        items: [
+          { value: 'en-gb', title: 'English' },
+          { value: 'es-es', title: 'Spanish' },
+          { value: 'fr-fr', title: 'French' },
+        ],
+        showName: true,
+      },
+    },
   },
   args: {
     online: true,
@@ -87,12 +103,14 @@ const ORIGINAL_SENTRY_DSN = window.tabiyaConfig.FRONTEND_SENTRY_DSN;
 let isSentryInitialized = true;
 
 export const decorators = [
-  (Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean } }) => {
+  (Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean; locale?: string } }) => {
     const isOnline = context.globals.online;
     const sentryEnabled = context.globals.sentryEnabled;
+    const locale = context.globals.locale || 'en-gb';
     const prevSentryEnabled = React.useRef(sentryEnabled);
 
-    useEffect(() => {
+    // Handle Sentry enable/disable
+     useEffect(() => {
       if (prevSentryEnabled.current !== sentryEnabled) {
         // @ts-ignore
         window.tabiyaConfig.FRONTEND_ENABLE_SENTRY = btoa(sentryEnabled);
@@ -113,6 +131,20 @@ export const decorators = [
       }
     }, [sentryEnabled]);
 
+    // Handle language changes
+    useEffect(() => {
+      const handleLanguageChange = (newLocale: string) => {
+        document.dir = i18n.dir(newLocale);
+      };
+
+      i18n.changeLanguage(locale); // switch to toolbar-selected locale
+      i18n.on('languageChanged', handleLanguageChange);
+
+      return () => {
+        i18n.off('languageChanged', handleLanguageChange);
+      };
+    }, [locale]);
+
     return (
       <HashRouter>
         <IsOnlineContext.Provider value={isOnline}>
@@ -122,14 +154,18 @@ export const decorators = [
               <div style={{ height: "100vh" }}>
                 <ChatProvider
                   handleOpenExperiencesDrawer={() => {}}
-                  removeMessageFromChat={function (messageId: string): void {
+                    removeMessageFromChat={function (messageId: string): void {
                     throw new Error("Function not implemented.");
                   }}
                   addMessageToChat={function (message: IChatMessage<any>): void {
                     throw new Error("Function not implemented.");
                   }}
                 >
-                  <Story />
+                  <Suspense fallback={<div>loading translations...</div>}>
+                    <I18nextProvider i18n={i18n}>
+                      <Story />
+                    </I18nextProvider>
+                  </Suspense>
                 </ChatProvider>
               </div>
             </SnackbarProvider>

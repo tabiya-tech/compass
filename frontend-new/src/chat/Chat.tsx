@@ -1,4 +1,5 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "src/chat/Chat.types";
@@ -103,6 +104,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   disableInactivityCheck = false,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [messages, setMessages] = useState<IChatMessage<any>[]>([]);
   const [conversationCompleted, setConversationCompleted] = useState<boolean>(false);
@@ -232,9 +234,9 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
     await authenticationService!.logout();
     navigate(routerPaths.LANDING, { replace: true });
-    enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.SUCCESSFULLY_LOGGED_OUT, { variant: "success" });
+    enqueueSnackbar(t("successfully_logged_out"), { variant: "success" });
     setIsLoggingOut(false);
-  }, [enqueueSnackbar, navigate]);
+  }, [enqueueSnackbar, navigate,t]);
 
   // Helper to stop polling and cleanup
   const stopPollingForUpload = useCallback((uploadId: string, intervalId?: NodeJS.Timeout, timeoutId?: NodeJS.Timeout) => {
@@ -700,16 +702,16 @@ return {
     setNewConversationDialog(false);
     setExploredExperiencesNotification(false);
     if (await initializeChat(currentUserId, null)) {
-      enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.NEW_CONVERSATION_STARTED, { variant: "success" });
+      enqueueSnackbar(t("new_conversation_started"), { variant: "success" });
     } else {
       // Add a message to the chat saying that something went wrong
       setMessages([generateSomethingWentWrongMessage()]);
       // Set the conversation as completed to prevent the user from sending any messages
       setConversationCompleted(true);
       // Notify the user that the chat failed to start
-      enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.FAILED_TO_START_CONVERSATION, { variant: "error" });
+      enqueueSnackbar(t("failed_to_start_conversation"), { variant: "error" });
     }
-  }, [enqueueSnackbar, initializeChat, currentUserId]);
+  }, [enqueueSnackbar, initializeChat, currentUserId,t]);
 
   /**
    * --- UseEffects ---
@@ -728,11 +730,11 @@ return {
         // Set the conversation as completed to prevent the user from sending any messages
         setConversationCompleted(true);
         // Notify the user that the chat failed to start
-        enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.FAILED_TO_START_CONVERSATION, { variant: "error" });
+        enqueueSnackbar(t("failed_to_start_conversation"), { variant: "error" });
       }
       setInitialized(true);
     });
-  }, [enqueueSnackbar, initializeChat, activeSessionId, currentUserId]);
+  }, [enqueueSnackbar, initializeChat, activeSessionId, currentUserId,t]);
 
   // show the user backdrop when the user is inactive for INACTIVITY_TIMEOUT
   useEffect(() => {
@@ -808,7 +810,7 @@ return {
   return (
     <Suspense fallback={<Backdrop isShown={true} transparent={true} />}>
       {isLoggingOut ? (
-        <Backdrop isShown={isLoggingOut} message={"Logging you out, wait a moment..."} />
+        <Backdrop isShown={isLoggingOut} message={t("logging_out")} />
       ) : (
         <ChatProvider
           handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}
@@ -882,20 +884,20 @@ return {
           {newConversationDialog && (
             <ConfirmModalDialog
               isOpen={newConversationDialog}
-              title="Start New Conversation?"
+              title={t("start_new_conversation_title")}
               content={
                 <>
-                  Once you start a new conversation, all messages from the current conversation will be lost forever.
+                  {t("start_new_conversation_content")}
                   <br />
                   <br />
-                  Are you sure you want to start a new conversation?
+                  {t("are_you_sure_start_new_conversation_content")}
                 </>
               }
               onCancel={() => setNewConversationDialog(false)}
               onConfirm={handleConfirmNewConversation}
               onDismiss={() => setNewConversationDialog(false)}
-              cancelButtonText="Cancel"
-              confirmButtonText="Yes, I'm sure"
+              cancelButtonText={t("cancel_button")}
+              confirmButtonText={t("confirm_button")}
             />
           )}
         </ChatProvider>

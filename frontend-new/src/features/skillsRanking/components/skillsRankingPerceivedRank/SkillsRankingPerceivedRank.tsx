@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { Box, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
@@ -59,6 +60,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
     setValue(newValue as number);
   };
 
+  const { t } = useTranslation();
   const handleSubmit = async () => {
     if (submitted || !startedEditing || !isOnline || currentPhase !== SkillsRankingPhase.PERCEIVED_RANK) {
       return;
@@ -92,7 +94,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
       }, getDefaultTypingDurationMs());
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
-      enqueueSnackbar("Failed to update skills ranking state. Please try again later.", {
+      enqueueSnackbar(t("skillsRanking_common_error_update_state"), {
         variant: "error",
       });
       setShowTyping(false);
@@ -117,17 +119,19 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
         <ChatBubble
           sender={ConversationMessageSender.COMPASS}
           message={
-            <>
-              {shouldShowMarketDisclosure ? (
-                <>
-                  Now, think of these 100 {getJobPlatformUrl()} users, who are mostly jobseekers from South Africa aged 18-34 with a matric from a township or rural school. <strong>Exactly how many of those 100</strong> do you believe would be a fit for <strong>fewer opportunities</strong> on {getJobPlatformUrl()} <strong>than you</strong>?
-                </>
-              ) : (
-                <>
-                  Before we really finish our conversation, I just have one last question related to the above —  if you think of 100 people who are jobseekers from South Africa aged 18-34 with a matric from a township or rural school. How many of these 100 job seekers do you believe would be a fit for <strong>fewer positions</strong> on {getJobPlatformUrl()} than you?
-                </>
-              )}
-            </>
+            shouldShowMarketDisclosure ? (
+              <Trans
+                i18nKey="skillsRanking_perceivedRank_question_with_disclosure"
+                components={{ 0: <strong />, 1: <strong />, 2: <strong />, 3: <strong />, 4: <strong /> }}
+                values={{ jobPlatformUrl: getJobPlatformUrl() }}
+              />
+            ) : (
+              <Trans
+                i18nKey="skillsRanking_perceivedRank_question_without_disclosure"
+                components={{ 0: <strong />, 1: <strong /> }}
+                values={{ jobPlatformUrl: getJobPlatformUrl() }}
+              />
+            )
           }
         >
           <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
@@ -136,7 +140,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
               onChange={handleChange}
               disabled={submitted || !isOnline || currentPhase !== SkillsRankingPhase.PERCEIVED_RANK}
               data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SLIDER}
-              aria-label="Perceived rank percentile slider"
+              aria-label={t("skillsRanking_perceivedRank_slider_aria")}
             />
 
             <Box mt={theme.spacing(2)} textAlign="right">
@@ -147,7 +151,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
                 }
                 data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SUBMIT_BUTTON}
               >
-                Submit
+                {t("skillsRanking_common_submit_button")}
               </PrimaryButton>
             </Box>
           </Box>

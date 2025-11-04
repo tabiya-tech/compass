@@ -157,7 +157,8 @@ describe("Landing Page", () => {
       });
 
       // AND welcome message
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Welcome!", { variant: "success" });
+      const i18n = require("src/i18n/i18n").default;
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("welcome_back"), { variant: "success" });
 
       // AND no errors or warnings to have occurred
       expect(console.error).not.toHaveBeenCalled();
@@ -275,8 +276,9 @@ describe("Landing Page", () => {
       expect(console.error).toHaveBeenCalledWith(error);
 
       // AND the error message to be shown
+      const i18n = require("src/i18n/i18n").default;
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        `Failed to login: ${ErrorConstants.USER_FRIENDLY_ERROR_MESSAGES.DATA_VALIDATION_ERROR}`,
+        `Failed to login: ${i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS.DATA_VALIDATION_ERROR)}`,
         { variant: "error" }
       );
     });
@@ -309,8 +311,10 @@ describe("Landing Page", () => {
       expect(console.warn).toHaveBeenCalledWith(error);
 
       // AND the error message to be shown
+      // message now comes from i18n translation keys; setupTests mocks i18next.t
+      const i18next = require("i18next");
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        `Failed to login: ${USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR]}`,
+        `Failed to login: ${i18next.t(USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR])}`,
         { variant: "error" }
       );
     });

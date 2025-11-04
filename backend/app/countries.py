@@ -6,6 +6,7 @@ class Country(Enum):
     SOUTH_AFRICA = "South Africa"
     KENYA = "Kenya"
     FRANCE = "France"
+    ARGENTINA = "Argentina"
     UNSPECIFIED = "Unspecified"
 
 
@@ -88,5 +89,20 @@ _GLOSSARY = {
         Mtaa - Neighbourhood, refers to a specific area in the city.
         Mtumba - Second hand clothes.
         Wathii - Market.
+        """),
+    Country.ARGENTINA:
+        dedent("""\
+        Changas - Small jobs, gigs, tasks
+        Mozo/a - Waiter/Waitress
+        En negro - Informal work, often without contracts
+        Bachero/a - Cleans dishes in a kitchen
+        Kiosco/Kiosquero - Kiosk/Shopkeeper
+        YPF - Argentine oil energy company
+        TecnoMorris - Technology company
+        Fiambrería - Deli
+        Pasantía - Internship
+        Remisería/Remisera - Remisero (private hire car driver)
+        Parrilla - Grill
+        Verdulería - Green grocery
         """),
 }

@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DEFAULT_SNACKBAR_AUTO_HIDE_DURATION, useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { SNACKBAR_KEYS } from "src/app";
 
@@ -12,6 +13,7 @@ export const IsOnlineProvider: React.FC<IsOnlineProviderProps> = ({ children }) 
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const renderCount = useRef(0);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handleOnline = () => {
@@ -47,7 +49,7 @@ export const IsOnlineProvider: React.FC<IsOnlineProviderProps> = ({ children }) 
     if (!isOnline) {
       setWasOffline(true);
       closeSnackbar(SNACKBAR_KEYS.ONLINE_SUCCESS);
-      enqueueSnackbar(`You are offline`, {
+      enqueueSnackbar(t("app_isOnline_offline"), {
         variant: "offline",
         key: SNACKBAR_KEYS.OFFLINE_ERROR,
         preventDuplicate: true,
@@ -61,7 +63,7 @@ export const IsOnlineProvider: React.FC<IsOnlineProviderProps> = ({ children }) 
       });
     } else {
       if (wasOffline) {
-        enqueueSnackbar(`You are back online`, {
+        enqueueSnackbar(t("app_isOnline_back_online"), {
           variant: "success",
           key: SNACKBAR_KEYS.ONLINE_SUCCESS,
           preventDuplicate: true,
@@ -71,7 +73,7 @@ export const IsOnlineProvider: React.FC<IsOnlineProviderProps> = ({ children }) 
       setWasOffline(false);
       closeSnackbar(SNACKBAR_KEYS.OFFLINE_ERROR);
     }
-  }, [isOnline, closeSnackbar, enqueueSnackbar, wasOffline]);
+  }, [isOnline, closeSnackbar, enqueueSnackbar, wasOffline, t]);
 
   return <IsOnlineContext.Provider value={isOnline}>{children}</IsOnlineContext.Provider>;
 };

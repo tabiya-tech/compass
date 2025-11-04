@@ -18,6 +18,7 @@ from app.conversation_memory.conversation_memory_types import \
     ConversationContext
 from app.countries import Country
 from app.vector_search.esco_entities import SkillEntity
+from app.i18n.translation_service import t
 from app.vector_search.vector_search_dependencies import SearchServices
 
 
@@ -189,7 +190,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
         if not current_experience:
             message = AgentOutput(
-                message_for_user="It looks like, there are no experiences to discuss further.",
+                message_for_user=t("messages", "explore_experiences.no_more_experiences"),
                 finished=True,
                 agent_type=self._agent_type,
                 agent_response_time_in_sec=0,
@@ -248,8 +249,11 @@ class ExploreExperiencesAgentDirector(Agent):
                 current_experience.dive_in_phase = DiveInPhase.PROCESSED
                 state.current_experience_uuid = None
                 agent_output = AgentOutput(
-                    message_for_user=f'I have skipped your experience as "{current_experience.experience.experience_title}" '
-                                     f'because you did not share enough details',
+                    message_for_user=t(
+                        "messages",
+                        "explore_experiences.skipped_experience_missing_details",
+                        experience_title=current_experience.experience.experience_title,
+                    ),
                     finished=False,
                     agent_type=self._agent_type,
                     agent_response_time_in_sec=0,
@@ -273,7 +277,7 @@ class ExploreExperiencesAgentDirector(Agent):
             if not _next_experience:
                 # No more experiences to process, we are done
                 return AgentOutput(
-                    message_for_user="I have finished exploring all your experiences.",
+                    message_for_user=t("messages", "explore_experiences.finished_all"),
                     finished=True,
                     agent_type=self._agent_type,
                     agent_response_time_in_sec=0,
@@ -386,7 +390,7 @@ class ExploreExperiencesAgentDirector(Agent):
         # construct a summary of the skills
         skills_summary = "\n"
         if len(current_experience.top_skills) == 0:
-            skills_summary += "• No skills identified\n"
+            skills_summary += f"• {t('messages', 'explore_experiences.no_skills_identified')}\n"
         else:
             for skill in current_experience.top_skills:
                 skills_summary += f"• {skill.preferredLabel}\n"
@@ -403,11 +407,14 @@ class ExploreExperiencesAgentDirector(Agent):
         )
 
         agent_output: AgentOutput = AgentOutput(
-            message_for_user=f"Based on the information provided about your experience as '{current_experience.experience_title}', "
-                             f"here’s a brief overview:\n\n"
-                             f"{current_experience.summary}\n\n"
-                             f"Top {len(current_experience.top_skills)} skills demonstrated:"
-                             f"{skills_summary}",
+            message_for_user=t(
+                "messages",
+                "explore_experiences.link_and_rank.summary_message",
+                experience_title=current_experience.experience_title,
+                summary=current_experience.summary,
+                top_count=len(current_experience.top_skills),
+                skills_summary=skills_summary,
+            ),
             finished=False,
             agent_type=self._agent_type,
             agent_response_time_in_sec=round(time.time() - start, 2),

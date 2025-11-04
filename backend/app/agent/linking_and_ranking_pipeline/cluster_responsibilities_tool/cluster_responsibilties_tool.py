@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from app.agent.agent_types import LLMStats
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty, get_penalty_for_multiple_errors
+from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_AGENT_CHARACTER
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, get_config_variation
