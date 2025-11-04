@@ -16,6 +16,10 @@ from common_libs.retry import Retry
 from app.i18n.translation_service import t
 
 
+# centralize use for skill_explorer_agent and conversation_llm_test
+_FINAL_MESSAGE = t("messages", "explore_experiences.no_more_experiences")
+
+
 class _ConversationLLM:
 
     @staticmethod
