@@ -154,7 +154,19 @@ class _ConversationLLM:
         llm_response: LLMResponse
         llm_input: LLMInput | str
         system_instructions: list[str] | str | None = None
-        if first_time_visit:
+        
+        # If we have collected_data (e.g., from CV injection), treat it as NOT first_time_visit
+        # so the agent can reference the injected experiences
+        has_collected_data = len(collected_data) > 0
+        effective_first_time_visit = first_time_visit and not has_collected_data
+        
+        if has_collected_data and first_time_visit:
+            logger.info(
+                "CV-injected experiences detected (%d items). Overriding first_time_visit to reference existing experiences.",
+                len(collected_data)
+            )
+        
+        if effective_first_time_visit:
             # If this is the first time the user has visited the agent, the agent should get to the point
             # and not introduce itself or ask how the user is doing.
             llm = GeminiGenerativeLLM(
@@ -378,7 +390,11 @@ class _ConversationLLM:
                 Inspect the above data and our conversation history to identify what information is mentioned in the conversation history 
                 but not in the above data so that you can ask me about it.
                 Keep in mind that you only see part of the conversation history and not the entire conversation, so it's ok if 
-                some information above in not in the conversation history.        
+                some information above in not in the conversation history.
+                
+                IMPORTANT: If there are already experiences listed above (e.g., from a CV upload), you should reference them 
+                in your response rather than starting with a generic greeting. Acknowledge the existing experiences and continue 
+                from there, asking about missing information or confirming details.        
                 
                 {incomplete_experiences_instructions}
                 
