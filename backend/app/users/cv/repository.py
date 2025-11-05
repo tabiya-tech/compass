@@ -61,8 +61,16 @@ class IUserCVRepository(ABC):
     async def mark_cancelled(self, user_id: str, upload_id: str) -> bool:
         raise NotImplementedError()
 
-    @abstractmethod
     async def get_user_uploads(self, *, user_id: str) -> list[UserCVUpload]:
+        """Optional extension point: return completed uploads for a user."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def mark_state_injected(self, user_id: str, upload_id: str) -> bool:
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def mark_injection_failed(self, user_id: str, upload_id: str, *, error: str) -> bool:
         raise NotImplementedError()
 
 
@@ -88,6 +96,8 @@ class UserCVRepository(IUserCVRepository):
             "last_activity_at": datetime_to_mongo_date(upload.last_activity_at or get_now()),
             "error_code": getattr(upload, "error_code", None),
             "error_detail": getattr(upload, "error_detail", None),
+            "state_injected": getattr(upload, "state_injected", False),
+            "injection_error": getattr(upload, "injection_error", None),
             "experience_bullets": getattr(upload, "experience_bullets", None),
         }
 
@@ -108,6 +118,8 @@ class UserCVRepository(IUserCVRepository):
             last_activity_at=mongo_date_to_datetime(doc.get("last_activity_at")),
             error_code=doc.get("error_code"),
             error_detail=doc.get("error_detail"),
+            state_injected=doc.get("state_injected", False),
+            injection_error=doc.get("injection_error"),
             experience_bullets=doc.get("experience_bullets"),
         )
 
@@ -290,6 +302,38 @@ class UserCVRepository(IUserCVRepository):
                 "$set": {
                     "upload_process_state": UploadProcessState.CANCELLED,
                     "cancel_requested": True,
+                    "last_activity_at": datetime_to_mongo_date(get_now()),
+                },
+            },
+        )
+        return res.modified_count > 0
+
+    async def mark_state_injected(self, user_id: str, upload_id: str) -> bool:
+        res = await self._collection.update_one(
+            {
+                "user_id": user_id,
+                "upload_id": upload_id,
+            },
+            {
+                "$set": {
+                    "state_injected": True,
+                    "injection_error": None,
+                    "last_activity_at": datetime_to_mongo_date(get_now()),
+                },
+            },
+        )
+        return res.modified_count > 0
+
+    async def mark_injection_failed(self, user_id: str, upload_id: str, *, error: str) -> bool:
+        res = await self._collection.update_one(
+            {
+                "user_id": user_id,
+                "upload_id": upload_id,
+            },
+            {
+                "$set": {
+                    "state_injected": False,
+                    "injection_error": error,
                     "last_activity_at": datetime_to_mongo_date(get_now()),
                 },
             },

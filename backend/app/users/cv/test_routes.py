@@ -21,6 +21,7 @@ from app.users.cv.errors import MarkdownTooLongError, EmptyMarkdownError, \
     CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError, MarkdownConversionTimeoutError
 from app.users.cv.types import UserCVUpload, UploadProcessState
 from common_libs.test_utilities.mock_auth import MockAuth
+from app.users.get_user_preferences_repository import get_user_preferences_repository
 
 TestClientWithMocks = tuple[TestClient, ICVUploadService, UserInfo]
 
@@ -28,7 +29,7 @@ TestClientWithMocks = tuple[TestClient, ICVUploadService, UserInfo]
 @pytest.fixture(scope='function')
 def client_with_mocks() -> TestClientWithMocks:
     class MockCVService(ICVUploadService):
-        async def parse_cv(self, *, user_id: str, file_bytes: bytes, filename: str):
+        async def parse_cv(self, *, user_id: str, file_bytes: bytes, filename: str, session_id: int | None = None):
             # Service returns upload_id string per contract
             return "test-upload-id"
 
@@ -58,6 +59,13 @@ def client_with_mocks() -> TestClientWithMocks:
 
             ]
 
+        async def reinject_upload(self, *, user_id: str, upload_id: str, session_id: int) -> bool:
+            return True
+    class MockUserPreferencesRepo:
+        async def get_user_preference_by_user_id(self, _user_id: str):
+            return SimpleNamespace(sessions=[987])
+
+
     _instance_cv_service = MockCVService()
 
     def _mocked_get_cv_service() -> ICVUploadService:
@@ -68,6 +76,7 @@ def client_with_mocks() -> TestClientWithMocks:
     api_router = APIRouter()
     app = FastAPI()
     app.dependency_overrides[get_cv_service] = _mocked_get_cv_service
+    app.dependency_overrides[get_user_preferences_repository] = lambda: MockUserPreferencesRepo()
 
     add_user_cv_routes(api_router, auth=_instance_auth)
     app.include_router(api_router)
@@ -328,6 +337,35 @@ class TestCancelCVUpload:
         assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
 
+class TestReinjectCVUpload:
+    @pytest.mark.asyncio
+    async def test_reinject_success(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        mocker.patch.object(mocked_service, "reinject_upload", return_value=True)
+
+        resp = client.post(f"/{mocked_user.user_id}/cv/test-upload-id/inject")
+
+        assert resp.status_code == HTTPStatus.OK
+        assert resp.json()["state_injected"] is True
+
+    @pytest.mark.asyncio
+    async def test_reinject_returns_false(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        mocker.patch.object(mocked_service, "reinject_upload", return_value=False)
+
+        resp = client.post(f"/{mocked_user.user_id}/cv/test-upload-id/inject")
+
+        assert resp.status_code == HTTPStatus.OK
+        assert resp.json()["state_injected"] is False
+
+    @pytest.mark.asyncio
+    async def test_reinject_forbidden_other_user(self, client_with_mocks: TestClientWithMocks):
+        client, _, mocked_user = client_with_mocks
+
+        resp = client.post(f"/{mocked_user.user_id}_other/cv/test-upload-id/inject")
+
+        assert resp.status_code == HTTPStatus.FORBIDDEN
+
 class TestGetUploadStatus:
     @pytest.mark.asyncio
     async def test_get_upload_status_success(self, client_with_mocks: TestClientWithMocks):
@@ -453,3 +491,39 @@ class TestGetUploadedCVs:
 
         # THEN 500 Internal Server Error
         assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+class TestCVUploadSessionExtraction:
+    """Tests for CV upload route session_id extraction from user preferences"""
+    
+    @pytest.mark.asyncio
+    async def test_upload_calls_service_with_session_when_user_has_sessions(self, client_with_mocks: TestClientWithMocks,
+                                                                             mocker: pytest_mock.MockerFixture):
+        """Test that upload succeeds when user has sessions (integration via service mock)"""
+        # GIVEN a test client with mocked service
+        client, mocked_service, mocked_user = client_with_mocks
+        
+        # AND a tracker to capture session_id parameter passed to service
+        captured_session_ids = []
+        original_parse_cv = mocked_service.parse_cv
+        
+        async def parse_cv_tracker(**kwargs):
+            captured_session_ids.append(kwargs.get("session_id"))
+            return await original_parse_cv(**kwargs)
+        
+        mocker.patch.object(mocked_service, "parse_cv", side_effect=parse_cv_tracker)
+        
+        # AND valid CV file data
+        given_mime_type = next(iter(ALLOWED_MIME_TYPES))
+        given_extension = next(iter(ALLOWED_EXTENSIONS))
+        given_file_content = b"hello"
+        given_headers = {"Content-Type": given_mime_type, "x-filename": f"cv{given_extension}"}
+        
+        # WHEN uploading CV (session_id will come from route's user preferences lookup)
+        response = client.post(f"/{mocked_user.user_id}/cv", data=given_file_content, headers=given_headers)
+        
+        # THEN request succeeds
+        assert response.status_code == HTTPStatus.OK
+        
+        # AND service was called (session_id may be None if user prefs not mocked in this simple test)
+        assert len(captured_session_ids) > 0

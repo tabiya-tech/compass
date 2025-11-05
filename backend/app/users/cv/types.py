@@ -1,9 +1,11 @@
-import uuid
 from datetime import datetime, timezone
 from enum import Enum
+import uuid
 from typing import Optional
 
 from pydantic import BaseModel, Field
+from app.agent.collect_experiences_agent._types import CollectedData
+from app.agent.experience.experience_entity import ExperienceEntity
 
 
 class CVUploadStateResponse(BaseModel):
@@ -37,15 +39,9 @@ class CVUploadStatusResponse(BaseModel):
     last_activity_at: datetime
     error_code: Optional['CVUploadErrorCode'] = None
     error_detail: str | None = None
+    state_injected: bool | None = None
+    injection_error: str | None = None
     experience_bullets: list[str] | None = None
-
-
-class CVUploadResponseListItem(BaseModel):
-    upload_id: str
-    filename: str
-    uploaded_at: datetime
-    upload_process_state: UploadProcessState
-    experiences_data: Optional[list[str]] = None
 
 
 class CVUploadErrorCode(str, Enum):
@@ -81,6 +77,16 @@ class UserCVUpload(BaseModel):
     # Optional error fields populated when FAILED
     error_code: str | None = Field(default=None, description="Machine-readable error code for failed uploads")
     error_detail: str | None = Field(default=None, description="Human-readable error detail for failed uploads")
-    # Optional experiences populated when COMPLETED
+    # State injection reporting
+    state_injected: bool = Field(default=False, description="Whether state was successfully injected")
+    injection_error: str | None = Field(default=None, description="Error message if injection failed")
+    # Optional experiences populated when COMPLETED (kept for backward compatibility)
     experience_bullets: list[str] | None = Field(default=None,
                                                  description="Extracted experiences bullets when available")
+
+
+class CVStructuredExtraction(BaseModel):
+    """Structured extraction result compatible with agent states"""
+    collected_data: list[CollectedData]
+    experience_entities: list[ExperienceEntity]
+    extraction_metadata: dict

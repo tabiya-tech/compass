@@ -203,9 +203,15 @@ class ExploreExperiencesAgentDirector(Agent):
         picked_new_experience = False
 
         if current_experience.dive_in_phase == DiveInPhase.NOT_STARTED:
-            # Start the first sub-phase
-            current_experience.dive_in_phase = DiveInPhase.EXPLORING_SKILLS
-            picked_new_experience = True
+            has_responsibilities = bool(
+                getattr(current_experience.experience, "responsibilities", None)
+                and current_experience.experience.responsibilities.responsibilities
+            )
+            if has_responsibilities:
+                current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
+            else:
+                current_experience.dive_in_phase = DiveInPhase.EXPLORING_SKILLS
+                picked_new_experience = True
 
         # Sub-phase 2
         if current_experience.dive_in_phase == DiveInPhase.EXPLORING_SKILLS:
@@ -306,9 +312,39 @@ class ExploreExperiencesAgentDirector(Agent):
             # present them to the user even if data collection has not finished.
             # The experiences will be overwritten every time
             experiences = self._collect_experiences_agent.get_experiences()
-            state.experiences_state.clear()
+            # Merge new collects with any pre-seeded experiences (e.g., from CV injection)
+            existing_states = state.experiences_state.copy()
+            merged: dict[str, ExperienceState] = {}
+
+            def _find_match_by_metadata(e) -> ExperienceState | None:
+                for prev_state in existing_states.values():
+                    pe = prev_state.experience
+                    if (
+                        getattr(pe, "experience_title", None) == getattr(e, "experience_title", None)
+                        and getattr(pe, "company", None) == getattr(e, "company", None)
+                        and getattr(pe, "location", None) == getattr(e, "location", None)
+                    ):
+                        return prev_state
+                return None
+
+            used_prev_keys: set[str] = set()
             for exp in experiences:
-                state.experiences_state[exp.uuid] = ExperienceState(experience=exp)
+                prev = existing_states.get(exp.uuid)
+                if prev is None:
+                    prev = _find_match_by_metadata(exp)
+                if prev is not None:
+                    # Preserve responsibilities and Q&A if already present
+                    exp.responsibilities = prev.experience.responsibilities or exp.responsibilities
+                    exp.questions_and_answers = prev.experience.questions_and_answers or exp.questions_and_answers
+                    used_prev_keys.add(prev.experience.uuid)
+                merged[exp.uuid] = ExperienceState(experience=exp)
+
+            # Carry over any injected experiences that were not matched to a collected one
+            for key, prev in existing_states.items():
+                if key not in merged and key not in used_prev_keys:
+                    merged[key] = prev
+
+            state.experiences_state = merged
 
             # If collecting is not finished then return the output to the user to continue collecting
             if not agent_output.finished:

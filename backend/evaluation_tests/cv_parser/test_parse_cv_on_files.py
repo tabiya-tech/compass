@@ -5,7 +5,7 @@ from typing import Iterator
 
 import pytest
 
-from app.users.cv.utils.llm_extractor import CVExperienceExtractor
+from app.users.cv.utils.cv_structured_extractor import CVStructuredExperienceExtractor
 from app.users.cv.utils.markdown_converter import convert_cv_bytes_to_markdown
 
 BASE_DIR = Path(__file__).parent
@@ -45,16 +45,20 @@ async def test_parse_cv_on_real_files(input_path: Path | None, attempt: int):
         pytest.skip("No input files found under evaluation_tests/cv_parser/test_inputs; add files to run this test")
 
     logger = logging.getLogger("CVUploadServiceIntegrationTest")
-    extractor = CVExperienceExtractor(logger=logger)
+    extractor = CVStructuredExperienceExtractor(logger)
 
     file_bytes = input_path.read_bytes()
     filename = input_path.name
 
     # WHEN parsing the CV
     mark_down = convert_cv_bytes_to_markdown(file_bytes=file_bytes, filename=filename, logger=logger)
-    experiences_data = await extractor.extract_experiences(mark_down)
-    logger.info("Parsed experiences: %s", experiences_data or "[]")
-    experiences = experiences_data or []
+    structured = await extractor.extract_structured_experiences(mark_down)
+    # Convert structured experiences to simple lines for backward-compatible keyword checks
+    experiences = [
+        f"{e.experience_title} at {e.company}".strip()
+        for e in structured.experience_entities
+    ]
+    logger.info("Parsed experiences: %s", experiences or "[]")
 
     # THEN the extracted experiences should match expectations (probabilistic: run multiple times)
     expectation = _load_expectation_for(input_path)

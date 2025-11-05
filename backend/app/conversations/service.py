@@ -36,7 +36,7 @@ class IConversationService(ABC):
 
     @abstractmethod
     async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool,
-                   filter_pii: bool) -> ConversationResponse:
+                   filter_pii: bool, is_artificial: bool = False) -> ConversationResponse:
         # TODO: discuss filter pii and clear_memory
         """
         Get a message from the user and return a response from Compass, save the message and response into the application state
@@ -75,14 +75,14 @@ class ConversationService(IConversationService):
         self._reaction_repository = reaction_repository
 
     async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool,
-                   filter_pii: bool) -> ConversationResponse:
+                   filter_pii: bool, is_artificial: bool = False) -> ConversationResponse:
         if clear_memory:
             await self._application_state_metrics_recorder.delete_state(session_id)
         if filter_pii:
             user_input = await sensitive_filter.obfuscate(user_input)
 
-        # set the sent_at for the user input
-        user_input = AgentInput(message=user_input, sent_at=datetime.now(timezone.utc))
+        # set the sent_at for the user input and propagate artificial flag
+        user_input = AgentInput(message=user_input, sent_at=datetime.now(timezone.utc), is_artificial=is_artificial)
 
         # set the state of the agent director, the conversation memory manager and all the agents
         state = await self._application_state_metrics_recorder.get_state(session_id)

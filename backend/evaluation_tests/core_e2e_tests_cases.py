@@ -354,3 +354,40 @@ test_cases = [
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)]
     )
 ]
+ 
+class CVUploadE2ETestCase(E2ETestCase):
+    """
+    E2E test case that includes CV upload before conversation starts.
+    """
+    cv_file_path: str = None
+    """
+    Path to the CV file to upload (relative to evaluation_tests/cv_parser/test_inputs/)
+    If None, test will skip CV upload
+    """
+    model_config = ConfigDict(extra="forbid")
+
+
+cv_upload_test_cases = [
+    CVUploadE2ETestCase(
+        country_of_user=Country.UNSPECIFIED,
+        conversation_rounds=50,
+        name='cv_upload_state_injection_e2e',
+        cv_file_path="simple-timeline.docx",  # Use existing test CV file
+        simulated_user_prompt=dedent("""
+            You are a professional who has uploaded your CV. 
+            If asked if you want to start the conversation, agree to start without mentioning your CV upload.
+            
+            You have already uploaded your CV with your experiences:
+            - Software Developer at TechCorp from 2020 to 2022
+            - Web Designer (Freelance) since 2022
+            
+            When the agent asks about your experiences, DO NOT repeat all the information you already provided in your CV.
+            Instead, acknowledge that you've uploaded your CV and ask if they can see it. If they confirm they can see it,
+            just provide additional details or clarifications when asked. If they say they don't have access to it,
+            then provide the information naturally.
+            
+            Be concise and don't repeat information unnecessarily.
+            """) + system_instruction_prompt,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)]
+    ),
+]

@@ -2,7 +2,8 @@ import os
 
 import pytest
 
-from app.users.cv.utils.llm_extractor import CVExperienceExtractor
+import logging
+from app.users.cv.utils.cv_structured_extractor import CVStructuredExperienceExtractor
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationResult, EvaluationRecord
 from evaluation_tests.cv_parser.cv_parser_evaluator import CVParserEvaluator
 from evaluation_tests.cv_parser.test_cases import test_cases, CVParserTestCase
@@ -39,8 +40,14 @@ test_cases_to_run = get_test_cases_to_run(test_cases)
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize("case", test_cases_to_run, ids=[c.name for c in test_cases_to_run])
 async def test_cv_parser(case: CVParserTestCase, common_folder_path: str):
-    extractor = CVExperienceExtractor()
-    items = await extractor.extract_experiences(case.markdown_cv)
+    logger = logging.getLogger("CVStructuredExtractorEval")
+    extractor = CVStructuredExperienceExtractor(logger)
+    structured = await extractor.extract_structured_experiences(case.markdown_cv)
+    # Convert structured experiences to simple lines for backward-compatible evaluation
+    items = [
+        f"{e.experience_title} at {e.company}".strip()
+        for e in structured.experience_entities
+    ]
 
     # write to an output file for manual inspection
     write_to_file(folder=common_folder_path + f"cv_parser_{case.name}",

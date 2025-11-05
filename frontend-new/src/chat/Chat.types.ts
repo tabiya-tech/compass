@@ -31,4 +31,6 @@ export interface UploadStatus {
   error_code?: string | null;
   error_detail?: string | null;
   experience_bullets?: string[] | null;
+  state_injected?: boolean;
+  injection_error?: string | null;
 }

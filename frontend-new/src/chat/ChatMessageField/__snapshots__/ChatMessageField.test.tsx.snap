@@ -49,8 +49,12 @@ exports[`ChatMessageField should render correctly 1`] = `
                   />
                 </svg>
                 <span
-                  class="MuiBadge-badge MuiBadge-standard MuiBadge-invisible MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightCircular MuiBadge-overlapCircular css-1n89elg-MuiBadge-badge"
-                />
+                  class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightCircular MuiBadge-overlapCircular css-1xtbg9s-MuiBadge-badge"
+                >
+                  <span
+                    class="css-1pmps24"
+                  />
+                </span>
               </span>
               <span
                 class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"

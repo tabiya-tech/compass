@@ -133,7 +133,7 @@ export const generateCancellableCVTypingMessage = (
 
   const payload: CancellableTypingChatMessageProps = {
     message: getDisplayMessage(),
-    thinkingMessage: "Processing your CV, this might take a while...",
+    thinkingMessage: "Processing your CV, this might take a minute",
     waitBeforeThinking: 10000, // 10 seconds for CV processing
     disabled: isUploaded || isCancelled,
     onCancel: async () => await onCancel(uploadId),
