@@ -188,6 +188,12 @@ class ExploreExperiencesAgentDirector(Agent):
         if state.current_experience_uuid is None:
             # Pick the next experience to process
             current_experience = _pick_next_experience_to_process(state.experiences_state)
+            if current_experience:
+                self.logger.info(
+                    "Transitioning to next experience: '%s' (uuid=%s)",
+                    getattr(current_experience.experience, "experience_title", "Unknown"),
+                    getattr(current_experience.experience, "uuid", None)
+                )
         else:
             # Get the current experience from the state
             current_experience = state.experiences_state.get(state.current_experience_uuid, None)
@@ -351,8 +357,7 @@ class ExploreExperiencesAgentDirector(Agent):
                 explored_experience = get_editable_experience(current_experience.experience)
                 state.explored_experiences.append(explored_experience)
 
-            # If the agent has finished exploring the skills, then if there are no more experiences to process,
-            # then we are done
+            # Check if there are more experiences to process
             _next_experience = _pick_next_experience_to_process(state.experiences_state)
             if not _next_experience:
                 # No more experiences to process, we are done
@@ -364,8 +369,23 @@ class ExploreExperiencesAgentDirector(Agent):
                     llm_stats=[]
                 )
 
-            # Otherwise, we have more experiences to process
-            return await self._dive_into_experiences(user_input=user_input, context=context, state=state)
+            # There are more experiences to process - ask user if they want to continue
+            next_experience_title = getattr(_next_experience.experience, "experience_title", "the next experience")
+            continuation_message = (
+                f"\n\nWould you like to continue to the next experience: '{next_experience_title}'? "
+            )
+            
+            # Append the continuation question to the agent output
+            agent_output.message_for_user += continuation_message
+            agent_output.finished = False  # Wait for user confirmation
+            
+            self.logger.info(
+                "Completed processing experience '%s'. Asking user to confirm before proceeding to '%s'",
+                getattr(current_experience.experience, "experience_title", "Unknown"),
+                next_experience_title
+            )
+            
+            return agent_output
 
         # This should never happen, as the phase DiveInPhase.PROCESSED is handled directly after the LINKING_RANKING phase
         self.logger.warning("ExploreExperiencesAgentDirector: Unknown sub-phase")
