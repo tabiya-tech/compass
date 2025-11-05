@@ -343,8 +343,10 @@ class _ConversationLLM:
 ///                    In case the of unpaid work, especially when helping family members, adjust your questions to reflect the nature of the work.
 ///  
 ///                ##'work_type' instructions
-///                    It can have one of the following values:
+///                    CRITICAL: The 'work_type' can ONLY have one of the following 4 values (WorkType enum):
 ///                        {work_type_definitions}
+///                    These are the ONLY valid work types. You MUST NOT classify or ask about any other types of experiences 
+///                    (such as academic projects, entrepreneurial activities, etc.) that are not in the above list.
 ///                    Infer the 'work_type' from the information I provided in our conversation.
 ///                    If it is not possible to infer it, it is ambiguous or it was classified as 'None', ask further questions to clarify the work type.
 ///                    Here are some example questions you can ask depending on the work type you want to verify, adjust as you see fit:
