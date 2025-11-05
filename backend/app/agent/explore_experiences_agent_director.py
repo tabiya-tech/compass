@@ -8,6 +8,7 @@ from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.agent_types import AgentType
 from app.agent.collect_experiences_agent import CollectExperiencesAgent
+from app.agent.collect_experiences_agent._types import CollectedData
 from app.agent.experience._experience_summarizer import ExperienceSummarizer
 from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.experience.upgrade_experience import get_editable_experience
@@ -19,6 +20,10 @@ from app.conversation_memory.conversation_memory_types import \
 from app.countries import Country
 from app.vector_search.esco_entities import SkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
+
+
+MIN_RESPONSIBILITIES_FOR_AUTO_LINKING = 5
+"""Minimum number of responsibilities required to skip exploratory questioning."""
 
 
 class ConversationPhase(Enum):
@@ -203,13 +208,42 @@ class ExploreExperiencesAgentDirector(Agent):
         picked_new_experience = False
 
         if current_experience.dive_in_phase == DiveInPhase.NOT_STARTED:
-            has_responsibilities = bool(
-                getattr(current_experience.experience, "responsibilities", None)
-                and current_experience.experience.responsibilities.responsibilities
-            )
-            if has_responsibilities:
+            # Check if we already have enough responsibilities (e.g., from CV injection)
+            # If so, skip exploratory questioning and go straight to linking/ranking
+            responsibilities_data = getattr(current_experience.experience, "responsibilities", None)
+            normalized_responsibilities = []
+            if responsibilities_data and getattr(responsibilities_data, "responsibilities", None):
+                normalized_responsibilities = [
+                    resp.strip()
+                    for resp in responsibilities_data.responsibilities
+                    if isinstance(resp, str) and resp.strip()
+                ]
+            responsibilities_count = len(normalized_responsibilities)
+            has_enough_responsibilities = responsibilities_count >= MIN_RESPONSIBILITIES_FOR_AUTO_LINKING
+            
+            experience_title = getattr(current_experience.experience, "experience_title", "Unknown")
+            experience_uuid = getattr(current_experience.experience, "uuid", None)
+            
+            if has_enough_responsibilities:
+                self.logger.info(
+                    "Agent director decision: Experience '%s' (uuid=%s) has %d responsibilities (threshold=%d) - "
+                    "SKIPPING exploratory questioning and proceeding to LINKING_RANKING",
+                    experience_title,
+                    experience_uuid,
+                    responsibilities_count,
+                    MIN_RESPONSIBILITIES_FOR_AUTO_LINKING,
+                )
                 current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
             else:
+                self.logger.info(
+                    "Agent director decision: Experience '%s' (uuid=%s) has %d responsibilities (threshold=%d) - "
+                    "NOT ENOUGH, proceeding to EXPLORING_SKILLS phase",
+                    experience_title,
+                    experience_uuid,
+                    responsibilities_count,
+                    MIN_RESPONSIBILITIES_FOR_AUTO_LINKING,
+                )
+                # Not enough responsibilities yet, proceed with exploratory questioning
                 current_experience.dive_in_phase = DiveInPhase.EXPLORING_SKILLS
                 picked_new_experience = True
 
@@ -226,11 +260,55 @@ class ExploreExperiencesAgentDirector(Agent):
             await self._conversation_manager.update_history(user_input, agent_output)
             # get the context again after updating the history
             context = await self._conversation_manager.get_conversation_context()
-            if not agent_output.finished:
+            
+            # Check if we have enough responsibilities to skip further exploratory questioning
+            responsibilities_data = getattr(current_experience.experience, "responsibilities", None)
+            normalized_responsibilities = []
+            if responsibilities_data and getattr(responsibilities_data, "responsibilities", None):
+                normalized_responsibilities = [
+                    resp.strip()
+                    for resp in responsibilities_data.responsibilities
+                    if isinstance(resp, str) and resp.strip()
+                ]
+            responsibilities_count = len(normalized_responsibilities)
+            has_enough_responsibilities = responsibilities_count >= MIN_RESPONSIBILITIES_FOR_AUTO_LINKING
+            
+            experience_title = getattr(current_experience.experience, "experience_title", "Unknown")
+            experience_uuid = getattr(current_experience.experience, "uuid", None)
+            
+            if has_enough_responsibilities and not agent_output.finished:
+                # We've collected enough responsibilities during conversation, skip further questioning
+                self.logger.info(
+                    "Agent director decision: Experience '%s' (uuid=%s) now has %d responsibilities (threshold=%d) - "
+                    "SUFFICIENT collected during conversation, SKIPPING remaining exploratory questioning and proceeding to LINKING_RANKING",
+                    experience_title,
+                    experience_uuid,
+                    responsibilities_count,
+                    MIN_RESPONSIBILITIES_FOR_AUTO_LINKING,
+                )
+                # Mark as finished and advance to the next sub-phase
+                agent_output.finished = True
+                current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
+            elif agent_output.finished:
+                # Agent finished naturally, advance to the next sub-phase
+                self.logger.info(
+                    "Agent director decision: Experience '%s' (uuid=%s) - SkillsExplorerAgent finished naturally with %d responsibilities, proceeding to LINKING_RANKING",
+                    experience_title,
+                    experience_uuid,
+                    responsibilities_count,
+                )
+                current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
+            else:
+                # Not enough responsibilities yet and agent hasn't finished, continue questioning
+                self.logger.debug(
+                    "Agent director decision: Experience '%s' (uuid=%s) has %d responsibilities (threshold=%d) - "
+                    "NOT ENOUGH yet, continuing EXPLORING_SKILLS phase",
+                    experience_title,
+                    experience_uuid,
+                    responsibilities_count,
+                    MIN_RESPONSIBILITIES_FOR_AUTO_LINKING,
+                )
                 return agent_output
-
-            # advance to the next sub-phase
-            current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
 
         if current_experience.dive_in_phase == DiveInPhase.LINKING_RANKING:
             if current_experience.experience.responsibilities.responsibilities:
@@ -343,6 +421,29 @@ class ExploreExperiencesAgentDirector(Agent):
             for key, prev in existing_states.items():
                 if key not in merged and key not in used_prev_keys:
                     merged[key] = prev
+                    # Also ensure CV-injected experiences are in collected_data so they're visible to CollectExperiencesAgent
+                    exp = prev.experience
+                    # Access collected_data through the CollectExperiencesAgent's state
+                    collect_agent_state = self._collect_experiences_agent._state
+                    if collect_agent_state is not None:
+                        # Check if this experience is already in collected_data
+                        existing_in_collected = any(
+                            cd.uuid == exp.uuid for cd in collect_agent_state.collected_data
+                        )
+                        if not existing_in_collected:
+                            # Convert ExperienceEntity back to CollectedData for CollectExperiencesAgent compatibility
+                            collected_item = CollectedData(
+                                uuid=exp.uuid,
+                                index=len(collect_agent_state.collected_data),
+                                experience_title=exp.experience_title,
+                                company=exp.company,
+                                location=exp.location,
+                                start_date=exp.timeline.start if exp.timeline else None,
+                                end_date=exp.timeline.end if exp.timeline else None,
+                                paid_work=None,
+                                work_type=exp.work_type.name if exp.work_type else None
+                            )
+                            collect_agent_state.collected_data.append(collected_item)
 
             state.experiences_state = merged
 

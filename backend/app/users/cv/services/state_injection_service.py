@@ -2,7 +2,10 @@ import logging
 
 from app.agent.collect_experiences_agent._types import CollectedData
 from app.agent.experience.experience_entity import ExperienceEntity
-from app.agent.explore_experiences_agent_director import ExperienceState, DiveInPhase, ConversationPhase
+from app.agent.explore_experiences_agent_director import (
+    ExperienceState,
+    DiveInPhase,
+)
 from app.application_state import ApplicationState, IApplicationStateManager
 from app.users.cv.types import CVStructuredExtraction
 
@@ -29,6 +32,18 @@ class IStateInjectionService:
 
 
 class StateInjectionService(IStateInjectionService):
+    @staticmethod
+    def _count_responsibilities(experience: ExperienceEntity) -> int:
+        responsibilities_data = getattr(experience, "responsibilities", None)
+        if not responsibilities_data or not getattr(responsibilities_data, "responsibilities", None):
+            return 0
+
+        return len([
+            resp.strip()
+            for resp in responsibilities_data.responsibilities
+            if isinstance(resp, str) and resp.strip()
+        ])
+
     """
     Service for injecting CV structured extraction data into agent states.
     
@@ -110,20 +125,14 @@ class StateInjectionService(IStateInjectionService):
         
         # Add experiences to the experiences_state dict
         for experience in experience_entities:
-            has_responsibilities = bool(
-                experience.responsibilities
-                and experience.responsibilities.responsibilities
-            )
+            responsibilities_count = self._count_responsibilities(experience)
+            has_responsibilities = responsibilities_count > 0
 
-            try:
-                resp_count = len(experience.responsibilities.responsibilities) if experience.responsibilities else 0
-            except Exception:  # defensive
-                resp_count = 0
             self._logger.info(
                 "Injection check for experience {title=%s, uuid=%s, responsibilities=%d}",
                 getattr(experience, "experience_title", None),
                 getattr(experience, "uuid", None),
-                resp_count,
+                responsibilities_count,
             )
 
             _existing_key, existing_state = self._find_existing_experience(state, experience)
@@ -141,9 +150,11 @@ class StateInjectionService(IStateInjectionService):
                         existing_state.experience.questions_and_answers = list(existing_state.experience.questions_and_answers)
                         if (justification_question, justification_answer) not in existing_state.experience.questions_and_answers:
                             existing_state.experience.questions_and_answers.append((justification_question, justification_answer))
-                    # Update responsibilities if previously missing
-                    if not existing_state.experience.responsibilities.responsibilities:
-                        existing_state.experience.responsibilities = experience.responsibilities
+                    # Update responsibilities from CV extraction (CV is the authoritative source)
+                    existing_state.experience.responsibilities = experience.responsibilities
+                    # Reset to NOT_STARTED so agent director can decide the flow based on responsibilities
+                    if existing_state.dive_in_phase != DiveInPhase.PROCESSED:
+                        existing_state.dive_in_phase = DiveInPhase.NOT_STARTED
                 continue
 
             # Ensure questions_and_answers captures CV-derived responsibilities as justification
@@ -177,35 +188,28 @@ class StateInjectionService(IStateInjectionService):
         """
         Inject experience entities into SkillsExplorerAgent state.
         
-        This ensures that the Skills Explorer Agent knows about the experiences
-        that were injected from the CV and that they have responsibilities data.
+        Agent director will decide the flow based on responsibilities, so we treat
+        all CV-injected experiences as fresh (first-time) for the SkillsExplorerAgent.
         """
         
-        # Add experiences to the experiences_explored list
         for experience in experience_entities:
-            has_responsibilities = bool(
-                experience.responsibilities
-                and experience.responsibilities.responsibilities
+            # Treat CV-injected experiences as fresh - agent director will decide flow
+            state.skills_explorer_agent_state.first_time_for_experience.pop(experience.uuid, None)
+            
+            structured_summary = ExperienceEntity.get_structured_summary(
+                experience_title=experience.experience_title,
+                company=experience.company,
+                location=experience.location,
+                work_type=experience.work_type.name if experience.work_type else None,
+                start_date=experience.timeline.start if experience.timeline else None,
+                end_date=experience.timeline.end if experience.timeline else None
             )
-
-            if has_responsibilities:
-                # These experiences can skip the exploratory questioning phase and go straight to linking/ranking
-                structured_summary = ExperienceEntity.get_structured_summary(
-                    experience_title=experience.experience_title,
-                    company=experience.company,
-                    location=experience.location,
-                    work_type=experience.work_type.name if experience.work_type else None,
-                    start_date=experience.timeline.start if experience.timeline else None,
-                    end_date=experience.timeline.end if experience.timeline else None
-                )
-
-                if structured_summary not in state.skills_explorer_agent_state.experiences_explored:
-                    state.skills_explorer_agent_state.experiences_explored.append(structured_summary)
-
-                state.skills_explorer_agent_state.first_time_for_experience[experience.uuid] = False
-            else:
-                # Allow the skill explorer to treat this as a fresh experience (retain first-time behaviour)
-                state.skills_explorer_agent_state.first_time_for_experience.pop(experience.uuid, None)
+            
+            # Remove from experiences_explored if present, so it's treated as fresh
+            try:
+                state.skills_explorer_agent_state.experiences_explored.remove(structured_summary)
+            except ValueError:
+                pass
         
         self._logger.debug("Injected %d experience entities into SkillsExplorerAgent state", len(experience_entities))
 

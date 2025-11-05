@@ -155,7 +155,11 @@ class TestCVStateInjectionIntegration:
                     location=given_location,
                     timeline=Timeline(start=given_start_date, end=given_end_date),
                     work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
-                    responsibilities=ResponsibilitiesData(responsibilities=["Test responsibility"])
+                    responsibilities=ResponsibilitiesData(responsibilities=[
+                        "Coordinated cross-functional planning",
+                        "Implemented monitoring dashboards",
+                        "Facilitated weekly stakeholder reviews",
+                    ])
                 )
             ],
             extraction_metadata={"total_experiences": 1}
@@ -201,10 +205,13 @@ class TestCVStateInjectionIntegration:
         assert len(actual_application_state.explore_experiences_director_state.experiences_state) > 0
         assert any(given_experience_uuid in key for key in actual_application_state.explore_experiences_director_state.experiences_state.keys())
         
-        # AND SkillsExplorerAgent state should have experiences explored
-        assert len(actual_application_state.skills_explorer_agent_state.experiences_explored) > 0
-        assert any(given_experience_title in summary for summary in actual_application_state.skills_explorer_agent_state.experiences_explored)
-        assert actual_application_state.skills_explorer_agent_state.first_time_for_experience.get(given_experience_uuid) is False
+        # AND SkillsExplorerAgent state should treat CV-injected experiences as fresh
+        # (They will be added to experiences_explored after going through the normal flow)
+        # The experience should NOT be in experiences_explored yet since it needs to go through exploration
+        # The first_time_for_experience entry should be removed (or not present) so it's treated as fresh
+        assert given_experience_uuid not in actual_application_state.skills_explorer_agent_state.first_time_for_experience
+        # The experience should be in the director's state ready to be processed
+        assert given_experience_uuid in actual_application_state.explore_experiences_director_state.experiences_state
     
     @pytest.mark.asyncio
     async def test_pipeline_handles_injection_failure_gracefully(self, mocker):

@@ -183,21 +183,38 @@ class CollectExperiencesAgent(Agent):
                 self._state.unexplored_types,
                 self._state.collected_data
             )
-            transition_message: str
-            if exploring_type is not None:
-                transition_message = f"{user_input.message}\nAsk me about experiences that include: {_get_experience_type(exploring_type)}"
+            
+            # Check if all types have been explored
+            if len(self._state.unexplored_types) == 0:
+                # All work types have been explored, mark as finished
+                self.logger.info(
+                    "All work types explored. CollectExperiencesAgent finishing."
+                )
+                conversation_llm_output.finished = True
             else:
-                transition_message = f"{user_input.message}\nLet's recap, and give me a chance to correct any mistakes."
-            conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
-                                                                   context=context,
-                                                                   user_input=AgentInput(message=transition_message, is_artificial=True),
-                                                                   country_of_user=self._state.country_of_user,
-                                                                   collected_data=collected_data,
-                                                                   last_referenced_experience_index=last_referenced_experience_index,
-                                                                   exploring_type=exploring_type,
-                                                                   unexplored_types=self._state.unexplored_types,
-                                                                   explored_types=self._state.explored_types,
-                                                                   logger=self.logger)
+                # More types to explore, continue with transition
+                transition_message: str
+                if exploring_type is not None:
+                    transition_message = f"{user_input.message}\nAsk me about experiences that include: {_get_experience_type(exploring_type)}"
+                else:
+                    transition_message = f"{user_input.message}\nLet's recap, and give me a chance to correct any mistakes."
+                conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
+                                                                       context=context,
+                                                                       user_input=AgentInput(message=transition_message, is_artificial=True),
+                                                                       country_of_user=self._state.country_of_user,
+                                                                       collected_data=collected_data,
+                                                                       last_referenced_experience_index=last_referenced_experience_index,
+                                                                       exploring_type=exploring_type,
+                                                                       unexplored_types=self._state.unexplored_types,
+                                                                       explored_types=self._state.explored_types,
+                                                                       logger=self.logger)
+        
+        # Final check: if all types are explored, mark as finished
+        if len(self._state.unexplored_types) == 0 and not conversation_llm_output.finished:
+            self.logger.info(
+                "All work types already explored. CollectExperiencesAgent finishing."
+            )
+            conversation_llm_output.finished = True
 
         conversation_llm_output.llm_stats = data_extraction_llm_stats + conversation_llm_output.llm_stats
         return conversation_llm_output
