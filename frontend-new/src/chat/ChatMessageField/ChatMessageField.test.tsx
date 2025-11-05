@@ -9,6 +9,8 @@ import ChatMessageField, {
   MENU_ITEM_ID,
   MAX_FILE_SIZE_BYTES,
   CHARACTER_LIMIT_ERROR_MESSAGES,
+  MAX_FILE_SIZE_MB,
+  MAX_MARKDOWN_CHARS,
 } from "./ChatMessageField";
 import { CV_UPLOAD_ERROR_MESSAGES } from "../CVUploadErrorHandling";
 import { render, screen, fireEvent, act, userEvent, waitFor } from "src/_test_utilities/test-utils";
@@ -1156,7 +1158,7 @@ describe("ChatMessageField", () => {
             open: true,
             items: expect.arrayContaining([
               expect.objectContaining({
-                description: "Attach your CV to the conversation",
+                description: `PDF, DOCX, TXT • Max ${MAX_FILE_SIZE_MB} MB • ${MAX_MARKDOWN_CHARS} chars max`,
                 disabled: false, // Should be enabled in COLLECT_EXPERIENCES phase
               }),
             ]),
