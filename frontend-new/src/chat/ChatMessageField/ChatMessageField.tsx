@@ -34,6 +34,7 @@ export interface ChatMessageFieldProps {
 const uniqueId = "2a76494f-351d-409d-ba58-e1b2cfaf2a53";
 export const CHAT_MESSAGE_MAX_LENGTH = 1000;
 export const DISALLOWED_CHARACTERS = /["\\{}[\]*_#`<>~|]/g; // avoid special characters that could lead to a potential prompt injection
+export const MAX_MARKDOWN_CHARS = 5000; // Maximum number of Markdown characters allowed
 
 export const DATA_TEST_ID = {
   CHAT_MESSAGE_FIELD_CONTAINER: `chat-message-field-container-${uniqueId}`,
@@ -74,6 +75,7 @@ export const CHARACTER_LIMIT_ERROR_MESSAGES = {
 
 // Define the max file size in bytes 3 MB
 export const MAX_FILE_SIZE_BYTES = 3 * 1024 * 1024;
+export const MAX_FILE_SIZE_MB = MAX_FILE_SIZE_BYTES / (1024 * 1024);
 
 const StyledTextField = styled(TextField)(({ theme, disabled }) => ({
   "& .MuiOutlinedInput-root": {
@@ -449,7 +451,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
             text: MENU_ITEM_TEXT.VIEW_UPLOADED_CVS,
             icon: <DescriptionOutlinedIcon />,
             trailingIcon: <ChevronRightIcon />,
-            description: "Attach your uploaded CV to the conversation",
+            description: "",
             disabled: inputIsDisabled(),
             action: () => {
               void handleViewUploadedCVs();
@@ -463,7 +465,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
               props.currentPhase === ConversationPhase.INTRO
                 ? "You can upload your CV as soon as we start exploring your experiences"
                 : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
-                  ? "Attach your CV to the conversation"
+                  ? `PDF, DOCX, TXT • Max ${MAX_FILE_SIZE_MB} MB • ${MAX_MARKDOWN_CHARS} chars max`
                   : "CV upload is only available during experience collection",
             icon: <UploadFileIcon />,
             disabled: inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
