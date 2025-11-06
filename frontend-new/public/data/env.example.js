@@ -42,6 +42,8 @@ window.tabiyaConfig = {
   FRONTEND_REGISTRATION_CODE: btoa("registration_code"),
 
   FRONTEND_SUPPORTED_LANGUAGES: btoa(JSON.stringify(["en-us","es-ar"])),
+  // Default locale (used as initial UI language if user preference not set)
+  FRONTEND_DEFAULT_LOCALE: btoa("en-gb"),
 
   FRONTEND_DISABLE_LOGIN_CODE: btoa("false"),
   FRONTEND_DISABLE_REGISTRATION: btoa("false"),

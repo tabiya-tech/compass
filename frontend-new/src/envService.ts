@@ -20,6 +20,7 @@ export enum EnvVariables {
   FRONTEND_FEATURES = "FRONTEND_FEATURES",
   FRONTEND_DISABLE_SOCIAL_AUTH = "FRONTEND_DISABLE_SOCIAL_AUTH",
   FRONTEND_SUPPORTED_LANGUAGES = "FRONTEND_SUPPORTED_LANGUAGES",
+  FRONTEND_DEFAULT_LOCALE = "FRONTEND_DEFAULT_LOCALE",
 }
 
 export const requiredEnvVariables = [
@@ -173,6 +174,10 @@ export const getSocialAuthDisabled = () => {
 
 export const getSupportedLanguages = () => {
   return getEnv(EnvVariables.FRONTEND_SUPPORTED_LANGUAGES);
+};
+
+export const getDefaultLocale = () => {
+  return getEnv(EnvVariables.FRONTEND_DEFAULT_LOCALE);
 };
 
 
