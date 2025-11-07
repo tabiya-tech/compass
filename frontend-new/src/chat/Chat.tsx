@@ -68,11 +68,12 @@ export const DATA_TEST_ID = {
   CHAT_CONTAINER: `chat-container-${uniqueId}`,
 };
 
+// i18n notification message keys (tests/components should resolve via t(<key>))
 export const NOTIFICATION_MESSAGES_TEXT = {
-  NEW_CONVERSATION_STARTED: "New conversation started",
-  SUCCESSFULLY_LOGGED_OUT: "Successfully logged out",
-  FAILED_TO_START_CONVERSATION: "Failed to start new conversation",
-};
+  NEW_CONVERSATION_STARTED: "new_conversation_started",
+  SUCCESSFULLY_LOGGED_OUT: "successfully_logged_out",
+  FAILED_TO_START_CONVERSATION: "failed_to_start_conversation",
+} as const;
 
 interface ChatProps {
   showInactiveSessionAlert?: boolean;
@@ -216,11 +217,11 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
       setExperiences(data);
     } catch (error) {
       console.error(new ChatError("Failed to retrieve experiences", error));
-      enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
+      enqueueSnackbar(t("experiences_fetch_failed"), { variant: "error" });
     } finally {
       setIsLoading(false);
     }
-  }, [enqueueSnackbar, activeSessionId]);
+  }, [enqueueSnackbar, activeSessionId, t]);
 
   // Opens the experiences drawer and get experiences if needed
   const handleOpenExperiencesDrawer = useCallback(async () => {
@@ -303,12 +304,12 @@ return {
           return msg;
         }));
       },
-      onComplete: (status: UploadStatus) => {
+  onComplete: (status: UploadStatus) => {
         stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
         removeMessageFromChat(messageId);
         const items: string[] | undefined = status.experience_bullets ?? undefined;
         if (Array.isArray(items) && items.length > 0) {
-          const intro = "These are my experiences:";
+          const intro = t("chat_message_experiences_intro");
           const bullets = items
             .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
             .filter(Boolean)
@@ -316,7 +317,7 @@ return {
           const composed = bullets ? `${intro}\n${bullets}` : intro;
           setPrefillMessage(composed);
         }
-        enqueueSnackbar("CV uploaded successfully", { variant: "success" });
+        enqueueSnackbar(t("cv_upload_uploaded_successfully"), { variant: "success" });
       },
       onTerminal: (_status: UploadStatus) => {
         stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
@@ -350,7 +351,7 @@ return {
         } else if (statusCode) {
           enqueueSnackbar(getUploadErrorMessage(statusCode, detail), { variant: "error" });
         } else {
-          enqueueSnackbar("Network error while checking upload status.", { variant: "error" });
+          enqueueSnackbar(t("cv_upload_network_error_status"), { variant: "error" });
         }
         console.error("Error polling upload status:", error);
       },
@@ -360,7 +361,7 @@ return {
       }
     });
     setActiveUploads(prev => new Map(prev).set(uploadId, { messageId, intervalId: handles.intervalId as any, timeoutId: handles.timeoutId as any }));
-  }, [activeUploads, enqueueSnackbar, removeMessageFromChat, messages, stopPollingForUpload, getCvUploadDisplayMessageMemo]);
+  }, [activeUploads, enqueueSnackbar, removeMessageFromChat, messages, stopPollingForUpload, getCvUploadDisplayMessageMemo, t]);
 
   // Helper function to cancel an upload
   const handleCancelUpload = useCallback(async (uploadId: string) => {
@@ -373,14 +374,14 @@ return {
               ...msg,
               payload: {
                 ...msg.payload,
-                message: "CV upload cancelled",
+                message: t("cv_upload_cancelled"),
                 disabled: true,
               }
             };
           }
           return msg;
         }));
-        enqueueSnackbar("CV upload cancelled", { variant: "info" });
+        enqueueSnackbar(t("cv_upload_cancelled"), { variant: "info" });
         return;
       }
 
@@ -396,7 +397,7 @@ return {
             ...msg,
             payload: {
               ...msg.payload,
-              message: "CV upload cancelled",
+              message: t("cv_upload_cancelled"),
               disabled: true,
             }
           };
@@ -410,12 +411,12 @@ return {
         stopPollingForUpload(uploadId, uploadInfo.intervalId, uploadInfo.timeoutId);
       }
 
-      enqueueSnackbar("CV upload cancelled", { variant: "info" });
+      enqueueSnackbar(t("cv_upload_cancelled"), { variant: "info" });
     } catch (error) {
       console.error("Error cancelling upload:", error);
-      enqueueSnackbar("Failed to cancel upload", { variant: "error" });
+      enqueueSnackbar(t("cv_upload_failed_to_cancel"), { variant: "error" });
     }
-  }, [activeUploads, enqueueSnackbar, stopPollingForUpload]);
+  }, [activeUploads, enqueueSnackbar, stopPollingForUpload, t]);
 
   // Handles CV upload
   const handleUploadCv = useCallback(
@@ -430,7 +431,7 @@ return {
         // Clear any previous prefill and CV upload errors to avoid stale text on new uploads
         setPrefillMessage(null);
         setCvUploadError(null);
-        enqueueSnackbar(`Uploading ${file.name}...`, { variant: "info" });
+  enqueueSnackbar(t("cv_upload_uploading_file_named", { filename: file.name }), { variant: "info" });
 
         const currentUserId = authenticationStateService.getInstance().getUser()?.id;
         if (!currentUserId) {
@@ -484,7 +485,7 @@ return {
           // No upload id – treat as immediate failure
           removeMessageFromChat(uploadingMessageId);
           console.log("Failed to start upload. Backend did not return uploadId ", response)
-          enqueueSnackbar("Failed to start upload.", { variant: "error" });
+          enqueueSnackbar(t("cv_upload_failed_to_start"), { variant: "error" });
           return [] as string[];
         }
 
@@ -501,7 +502,7 @@ return {
         setIsUploadingCv(false);
       }
     },
-    [isUploadingCv, enqueueSnackbar, addMessageToChat, handleCancelUpload, startPollingForUpload, removeMessageFromChat]
+    [isUploadingCv, enqueueSnackbar, addMessageToChat, handleCancelUpload, startPollingForUpload, removeMessageFromChat, t]
   );
 
   // Goes to the chat service to send a message
