@@ -8,6 +8,7 @@ import Chat, {
   INACTIVITY_TIMEOUT,
   NOTIFICATION_MESSAGES_TEXT,
 } from "src/chat/Chat";
+import i18n from "src/i18n/i18n";
 import ChatHeader, { DATA_TEST_ID as CHAT_HEADER_TEST_ID } from "src/chat/ChatHeader/ChatHeader";
 import ChatList, { DATA_TEST_ID as CHAT_LIST_TEST_ID } from "src/chat/chatList/ChatList";
 import ChatMessageField, {
@@ -696,7 +697,7 @@ describe("Chat", () => {
         // AND expect a snackbar notification to be an error
         await waitFor(() => {
           expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-            NOTIFICATION_MESSAGES_TEXT.FAILED_TO_START_CONVERSATION,
+            i18n.t(NOTIFICATION_MESSAGES_TEXT.FAILED_TO_START_CONVERSATION),
             { variant: "error" }
           );
         });
@@ -1810,7 +1811,7 @@ describe("Chat", () => {
       });
       expect(console.error).toHaveBeenCalledTimes(1);
       // AND expect a snackbar notification
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to retrieve experiences", {
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("experiences_fetch_failed"), {
         variant: "error",
       });
     });
