@@ -10,19 +10,19 @@ import AnimatedBadge from "src/theme/AnimatedBadge/AnimatedBadge";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import * as Sentry from "@sentry/react";
-import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
+import AnonymousAccountConversionDialog
+  from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { useChatContext } from "src/chat/ChatContext";
 import InfoDrawer from "src/info/Info";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { SessionError } from "src/error/commonErrors";
+import { MetricsError, SessionError } from "src/error/commonErrors";
 import TextConfirmModalDialog from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
 import { HighlightedSpan } from "src/consent/components/consentPage/Consent";
 import MetricsService from "src/metrics/metricsService";
 import { EventType } from "src/metrics/types";
-import { MetricsError } from "src/error/commonErrors";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
 
 export type ChatHeaderProps = {
@@ -155,7 +155,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
 
   const handleGiveFeedback = useCallback(async () => {
     if (!sentryEnabled) {
-      console.warn("Sentry is not initialized, feedback form cannot be created.");
+      console.debug("Sentry is not initialized, feedback form cannot be created.");
       return;
     }
     try {

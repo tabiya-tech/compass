@@ -112,6 +112,7 @@ const Login: React.FC = () => {
       // if something goes wrong, log the user out
       const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
       await firebaseEmailAuthServiceInstance.logout();
+      console.info("Login failed. Logging out user.");
     },
     [enqueueSnackbar]
   );
@@ -243,6 +244,7 @@ const Login: React.FC = () => {
       try {
         const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
         await firebaseEmailAuthServiceInstance.login(email, password);
+        console.info("User logged in via email.");
         await handlePostLogin();
       } catch (error) {
         // Store the credentials before handling the error
@@ -267,6 +269,7 @@ const Login: React.FC = () => {
         setIsLoading(true);
         const firebaseInvitationAuthServiceInstance = FirebaseInvitationCodeAuthenticationService.getInstance();
         await firebaseInvitationAuthServiceInstance.login(code);
+        console.info("User logged in via invitation code.");
         enqueueSnackbar("Invitation code is valid", { variant: "success" });
         await handlePostLogin();
       } catch (error) {

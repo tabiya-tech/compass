@@ -4,14 +4,14 @@ This module contains functions to add metrics routes to the app router.
 import logging
 from http import HTTPStatus
 
-from app.constants.errors import HTTPErrorResponse
-from fastapi import Request, HTTPException
-from app.metrics.services.get_metrics_service import get_metrics_service
-from app.metrics.services.service import IMetricsService
 from fastapi import APIRouter, Depends, FastAPI
+from fastapi import Request, HTTPException
 from pydantic import BaseModel, Field
 
+from app.constants.errors import HTTPErrorResponse
 from app.metrics.constants import EventType
+from app.metrics.services.get_metrics_service import get_metrics_service
+from app.metrics.services.service import IMetricsService
 from app.metrics.types import AbstractCompassMetricEvent, CVDownloadedEvent, DeviceSpecificationEvent, \
     DemographicsEvent, UserLocationEvent, NetworkInformationEvent, UIInteractionEvent
 
@@ -94,6 +94,7 @@ def add_metrics_routes(app_router: FastAPI):
         :return: None
         """
         if len(await request.body()) > MAX_PAYLOAD_SIZE:
+            logger.warning("Metrics payload exceeds maximum allowed size of %d characters", MAX_PAYLOAD_SIZE)
             raise HTTPException(status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE, detail=f"Payload size exceeds {MAX_PAYLOAD_SIZE} characters")
         
         events: list[AbstractCompassMetricEvent] = []
@@ -109,16 +110,12 @@ def add_metrics_routes(app_router: FastAPI):
                 construction_errors.append(str(e))
         
         # record successfully constructed events
-        for event in events:
-            try:
-                await metrics_service.record_event(event)
-            except Exception as e:
-                # we dont respond to the user with any HTTP error code as this endpoint should be
-                # fire-and-forget, we simply log the error and move on
-                logger.exception(e)
+        if events:
+            await metrics_service.bulk_record_events(events)
         
         # for the events that failed to construct, raise an HTTP exception
         if construction_errors:
+            logger.error("Failed to construct the following metric events: %s", "; ".join(construction_errors))
             raise HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,
                 detail=f"Failed to construct events: {'; '.join(construction_errors)}"

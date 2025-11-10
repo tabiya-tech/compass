@@ -36,7 +36,9 @@ import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableCompo
 import ChatProgressBar from "./chatProgressbar/ChatProgressBar";
 import { ConversationPhase, CurrentPhase, defaultCurrentPhase } from "./chatProgressbar/types";
 import { CompassChatMessageProps } from "./chatMessage/compassChatMessage/CompassChatMessage";
-import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import {
+  CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
+} from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 import cvService from "src/CV/CVService/CVService";
@@ -227,7 +229,6 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   // Goes to the authentication service to log the user out
   // Navigates to the login page
   const handleLogout = useCallback(async () => {
-    console.debug("Logging out the user.....");
     setIsLoggingOut(true);
     const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
     await authenticationService!.logout();
@@ -470,6 +471,7 @@ return {
             await cvService.getInstance().getUploadStatus(currentUserIdVerify, response.uploadId);
             startPollingForUpload(response.uploadId, uploadingMessageId);
           } catch (err: any) {
+            console.error("Failed to verify upload status", err);
             const statusCode = err?.status || err?.response?.status;
             const detail = err?.response?.data?.detail || err?.message;
             removeMessageFromChat(uploadingMessageId);
@@ -479,13 +481,14 @@ return {
         } else {
           // No upload id – treat as immediate failure
           removeMessageFromChat(uploadingMessageId);
+          console.log("Failed to start upload. Backend did not return uploadId ", response)
           enqueueSnackbar("Failed to start upload.", { variant: "error" });
           return [] as string[];
         }
 
         return [] as string[];
       } catch (e: any) {
-        console.error(e);
+        console.error(new ChatError("CV upload failed", e));
         // Ensure we remove the cancellable message on any failure
         removeMessageFromChat(uploadingMessageId);
         // Clear any prefill on failure
@@ -597,7 +600,8 @@ return {
             // AND clear the current phase
             setCurrentPhase(defaultCurrentPhase);
           } else {
-            console.debug("Failed to issue new session");
+            // NOTE: We are not logging here because issueNewSession
+            //       already logs the error and returns null in the case
             return false;
           }
         }
@@ -771,7 +775,6 @@ return {
   // If the component is not loaded for any reason, the user will have to wait for it.
   useEffect(() => {
     if (exploredExperiencesNotification) {
-      console.debug("Preloading DownloadReportDropdown");
       const LazyDownloadReportDropdown = lazyWithPreload(
         () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown")
       );

@@ -17,7 +17,9 @@ import AnonymousAccountConversionDialog, {
   DATA_TEST_ID as ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID,
 } from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
 import { DATA_TEST_ID as CONFIRM_MODAL_DATA_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
-import { DATA_TEST_ID as TEXT_CONFIRM_MODAL_DIALOG_DATA_TEST_ID } from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
+import {
+  DATA_TEST_ID as TEXT_CONFIRM_MODAL_DIALOG_DATA_TEST_ID,
+} from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
 import { DATA_TEST_ID as INFO_DRAWER_DATA_TEST_ID } from "src/info/Info";
 import { ChatProvider } from "src/chat/ChatContext";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
@@ -953,7 +955,7 @@ describe("ChatHeader", () => {
       jest.useRealTimers();
     });
 
-    test("should log an error and exit if no current user exists", () => {
+    test("should log an warning and exit if no current user exists", () => {
       // GIVEN no active user
       jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue(null);
       // AND experiences explored
@@ -979,7 +981,7 @@ describe("ChatHeader", () => {
       jest.advanceTimersByTime(givenTimeUntilNotification);
       // THEN expect no feedback notification to be shown
       expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
-      // AND expect an error to be logged
+      // AND expect a warning to be logged
       expect(console.error).toHaveBeenCalledWith(new SessionError("User is not available"));
     });
 
