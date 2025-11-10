@@ -70,6 +70,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
     setIsLoading(true);
     if(!emailInput) {
       enqueueSnackbar("Please enter your email address", { variant: "warning" });
+      console.warn("Password reset attempt failed: email input missing.");
       setIsLoading(false);
       return;
     }
@@ -80,6 +81,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
       setCooldownSeconds(COOLDOWN_SECONDS);
     } catch (error) {
       const message = error instanceof FirebaseError ? getUserFriendlyFirebaseErrorMessage(error) : (error as Error).message;
+      console.error("Password reset request failed:", message);
       enqueueSnackbar(`Failed to send reset email: ${message}`, { variant: "error" });
     } finally {
       setIsLoading(false);

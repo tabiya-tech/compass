@@ -59,6 +59,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
       const sessionId = userPreferences.sessions[0];
       const overallFeedbackService = OverallFeedbackService.getInstance();
       await overallFeedbackService.sendFeedback(sessionId, formData);
+      console.info("Feedback submitted successfully for session", sessionId);
 
       enqueueSnackbar("Feedback submitted successfully!", { variant: "success" });
     } catch (error) {

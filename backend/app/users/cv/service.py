@@ -203,22 +203,22 @@ class CVUploadService(ICVUploadService):
                     # Persist extracted experiences, then mark completed
                     try:
                         await self._repository.store_experiences(user_id, upload_id, experiences=bullets_local)
-                    except Exception:
-                        self._logger.warning("[Upload %s] Failed to persist experiences_data", upload_id)
+                    except Exception as e_store:
+                        self._logger.warning("[Upload %s] Failed to persist experiences_data", upload_id, str(e_store), exc_info=True)
                     await self._repository.update_state(user_id, upload_id, to_state=UploadProcessState.COMPLETED)
                     self._logger.info("[Upload %s] Pipeline completed successfully", upload_id)
                 except asyncio.CancelledError:
                     await self._repository.mark_cancelled(user_id, upload_id)
                     self._logger.info("[Upload %s] Pipeline cancelled", upload_id)
-                except Exception as e:
-                    self._logger.exception(e)
+                except Exception as e_pipeline:
+                    self._logger.exception(e_pipeline)
                     # Persist failure info for polling
-                    error_code = self._map_error_code(e).value
-                    error_detail = str(e)
+                    error_code = self._map_error_code(e_pipeline).value
+                    error_detail = str(e_pipeline)
                     try:
                         await self._repository.mark_failed(user_id, upload_id, error_code=error_code, error_detail=error_detail)
-                    except Exception:
-                        self._logger.warning("[Upload %s] Failed to persist FAILED state", upload_id)
+                    except Exception as e_mark_failed:
+                        self._logger.warning("[Upload %s] Failed to persist FAILED state", upload_id, str(e_mark_failed), exc_info=True)
 
             # Keep a strong reference to avoid GC of background task
             if not hasattr(self, "_background_tasks"):

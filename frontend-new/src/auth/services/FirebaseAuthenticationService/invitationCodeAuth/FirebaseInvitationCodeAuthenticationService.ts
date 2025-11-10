@@ -116,6 +116,11 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
    * Logout the current user
    */
   async logout(): Promise<void> {
+    const firebaseUser = firebaseAuth.currentUser;
+    if (firebaseUser?.isAnonymous) {
+      console.info("Logging out anonymous user.");
+    }
+
     await this.stdFirebaseAuthServiceInstance.logout();
     // Clear feedback notification on logout since anonymous users can't log in with the same user id again.
     const user = this.authenticationStateService.getUser();

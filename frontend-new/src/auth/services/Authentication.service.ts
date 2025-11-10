@@ -222,7 +222,6 @@ abstract class AuthenticationService {
           },
         );
       }
-      console.debug("Token checked. Token is valid");
       return { isValid: true, decodedToken: decodedToken };
     } catch (error) {
       return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.ERROR_DECODING_TOKEN };

@@ -187,14 +187,14 @@ describe("AuthenticationStateService", () => {
 
       it.each(
         [null, undefined, ""]
-      )("should warn when setting %s token", (givenToken) => {
+      )("should debug when setting %s token", (givenToken) => {
         // GIVEN a null token
         // WHEN setToken is called with an empty token
         // @ts-ignore
         service.setToken(givenToken);
 
-        // THEN expect a warning to be logged
-        expect(console.warn).toHaveBeenCalledWith("AuthenticationStateService: Attempted to set an empty token");
+        // THEN expect a debug to be logged
+        expect(console.debug).toHaveBeenCalledWith("AuthenticationStateService: Attempted to set an empty token");
       });
     });
 

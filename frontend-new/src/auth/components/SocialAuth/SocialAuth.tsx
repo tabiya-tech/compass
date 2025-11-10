@@ -63,6 +63,8 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       // if the registration code is not valid or something goes wrong, log the user out
       const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
       await firebaseSocialAuthServiceInstance.logout();
+      console.info("Social login failed or registration code invalid. Logging out user.")
+
       // clear the registration code from the state
       setRegistrationCode(registrationCode);
       let errorMessage;
@@ -119,6 +121,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       // first login with Google
       const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
       await firebaseSocialAuthServiceInstance.loginWithGoogle();
+      console.info("User logged in via Google.");
       // check if the user is already registered
       const prefs = UserPreferencesStateService.getInstance().getUserPreferences();
       // if the user is not registered, create user preferences for the first time

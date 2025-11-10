@@ -18,6 +18,7 @@ import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { FeedbackResponse, QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import { QuestionType } from "src/feedback/overallFeedback/feedbackForm/feedbackForm.types";
+import { FeedbackError } from "src/error/commonErrors";
 
 // mock the snackbar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
@@ -170,7 +171,7 @@ describe("CustomerSatisfactionRating", () => {
     // AND the given callback to not have been called
     expect(givenNotifyOnSubmitted).not.toHaveBeenCalled();
     // AND the error to be logged
-    expect(console.error).toHaveBeenCalledWith("Feedback submission failed:", expect.any(Error));
+    expect(console.error).toHaveBeenCalledWith(new FeedbackError("Feedback submission failed:", expect.any(Error)));
     // AND expect no warning to have occurred
     expect(console.warn).not.toHaveBeenCalled();
   });
@@ -200,7 +201,7 @@ describe("CustomerSatisfactionRating", () => {
     // AND the given callback to not have been called
     expect(givenNotifyOnSubmitted).not.toHaveBeenCalled();
     // AND the error to be logged
-    expect(console.error).toHaveBeenCalledWith("Feedback submission failed:", expect.any(Error));
+    expect(console.error).toHaveBeenCalledWith(new FeedbackError("Feedback submission failed:", expect.any(Error)));
     // AND expect no warning to have occurred
     expect(console.warn).not.toHaveBeenCalled();
   });

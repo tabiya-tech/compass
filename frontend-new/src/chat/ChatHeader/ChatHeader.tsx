@@ -127,7 +127,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     try {
       const user_id = authenticationStateService.getInstance().getUser()?.id;
       if (!user_id) {
-        console.error(new MetricsError("Unable to send Experiences and Skills view metrics: user id is missing"));
+        console.warn(new MetricsError("Unable to send Experiences and Skills view metrics: user id is missing"));
         return;
       }
 
@@ -155,7 +155,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
 
   const handleGiveFeedback = useCallback(async () => {
     if (!sentryEnabled) {
-      console.warn("Sentry is not initialized, feedback form cannot be created.");
+      console.debug("Sentry is not initialized, feedback form cannot be created.");
       return;
     }
     try {
@@ -185,7 +185,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   useEffect(() => {
     const user = authenticationStateService.getInstance().getUser();
     if (!user) {
-      console.error(new SessionError("User is not available"));
+      console.warn(new SessionError("User is not available"));
       return;
     }
 
