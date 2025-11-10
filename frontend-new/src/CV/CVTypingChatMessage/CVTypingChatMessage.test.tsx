@@ -1,16 +1,3 @@
-// MOCK the useTranslation hook before other imports if possible, or just before use.
-jest.mock("react-i18next", () => ({
-  // The 't' function will simply return the key passed to it, which is standard for i18n mocks.
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: {
-      changeLanguage: () => new Promise(() => {}),
-    },
-  }),
-  // Mock the Trans component if you use it anywhere else in your tests
-  Trans: ({ children }: { children: React.ReactNode }) => children,
-}));
-
 // mute the console
 import "src/_test_utilities/consoleMock";
 import { render, screen } from "src/_test_utilities/test-utils";

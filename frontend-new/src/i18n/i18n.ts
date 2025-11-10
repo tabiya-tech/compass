@@ -5,7 +5,104 @@ import en from "../locales/en-us/translation.json";
 import es from "../locales/es-es/translation.json";
 import ar from "../locales/es-ar/translation.json";
 import fr from "../locales/fr-fr/translation.json";
-import { DEFAULT_LOCALE } from "./constants";
+
+// Import feedback questions for each language
+import questionsEnGb from "src/feedback/overallFeedback/feedbackForm/questions-en-gb.json";
+import questionsEsAr from "src/feedback/overallFeedback/feedbackForm/questions-es-ar.json";
+import questionsEsEs from "src/feedback/overallFeedback/feedbackForm/questions-es-es.json";
+import questionsFrFr from "src/feedback/overallFeedback/feedbackForm/questions-fr-fr.json";
+
+// Additional feedback form translations
+const feedbackTranslations = {
+  "en-US": {
+    yes: "Yes",
+    no: "No",
+    steps: {
+      biasAndExperience: "Bias & Experience Accuracy",
+      skillAccuracy: "Skill Accuracy",
+      finalFeedback: "Final feedback",
+    },
+    labels: {
+      inaccurate: "Inaccurate",
+      veryAccurate: "Very accurate",
+      difficult: "Difficult",
+      easy: "Easy",
+      unlikely: "Unlikely",
+      likely: "Likely",
+    },
+    buttons: {
+      submit: "Submit",
+      next: "Next",
+      previous: "Previous",
+    },
+  },
+  "es-AR": {
+    yes: "Sí",
+    no: "No",
+    steps: {
+      biasAndExperience: "Sesgo y Precisión de la Experiencia",
+      skillAccuracy: "Precisión de Habilidades",
+      finalFeedback: "Comentarios finales",
+    },
+    labels: {
+      inaccurate: "Inexacto",
+      veryAccurate: "Muy preciso",
+      difficult: "Difícil",
+      easy: "Fácil",
+      unlikely: "Improbable",
+      likely: "Probable",
+    },
+    buttons: {
+      submit: "Enviar",
+      next: "Siguiente",
+      previous: "Anterior",
+    },
+  },
+  "es-ES": {
+    yes: "Sí",
+    no: "No",
+    steps: {
+      biasAndExperience: "Sesgo y Precisión de la Experiencia",
+      skillAccuracy: "Precisión de Habilidades",
+      finalFeedback: "Comentarios finales",
+    },
+    labels: {
+      inaccurate: "Inexacto",
+      veryAccurate: "Muy preciso",
+      difficult: "Difícil",
+      easy: "Fácil",
+      unlikely: "Improbable",
+      likely: "Probable",
+    },
+    buttons: {
+      submit: "Enviar",
+      next: "Siguiente",
+      previous: "Anterior",
+    },
+  },
+  "fr-FR": {
+    yes: "Oui",
+    no: "Non",
+    steps: {
+      biasAndExperience: "Biais et Précision de l'Expérience",
+      skillAccuracy: "Précision des Compétences",
+      finalFeedback: "Commentaires finaux",
+    },
+    labels: {
+      inaccurate: "Inexact",
+      veryAccurate: "Très précis",
+      difficult: "Difficile",
+      easy: "Facile",
+      unlikely: "Improbable",
+      likely: "Probable",
+    },
+    buttons: {
+      submit: "Soumettre",
+      next: "Suivant",
+      previous: "Précédent",
+    },
+  },
+};
 
 i18n
   .use(LanguageDetector)
@@ -13,33 +110,58 @@ i18n
   .init({
     resources: {
       "en-US": {
-        translation: en,
+        translation: {
+          ...en,
+          questions: questionsEnGb,
+          ...feedbackTranslations["en-US"],
+        },
       },
       "en-GB": {
-        translation: en,
+        translation: {
+          ...en,
+          questions: questionsEnGb,
+          ...feedbackTranslations["en-US"],
+        },
       },
       // Support lowercase variant to be lenient with detectors/storage
       "en-gb": {
-        translation: en,
+        translation: {
+          ...en,
+          questions: questionsEnGb,
+          ...feedbackTranslations["en-US"],
+        },
       },
       "es-AR": {
-        translation: ar,
+        translation: {
+          ...ar,
+          questions: questionsEsAr,
+          ...feedbackTranslations["es-AR"],
+        },
       },
       "es-ES": {
-        translation: es,
+        translation: {
+          ...es,
+          questions: questionsEsEs,
+          ...feedbackTranslations["es-ES"],
+        },
       },
       // Support lowercase variant
       "es-es": {
-        translation: es,
+        translation: {
+          ...es,
+          questions: questionsEsEs,
+          ...feedbackTranslations["es-ES"],
+        },
       },
       "fr-FR": {
-        translation: fr,
-      },
-      "fr-fr": {
-        translation: fr,
+        translation: {
+          ...fr,
+          questions: questionsFrFr,
+          ...feedbackTranslations["fr-FR"],
+        },
       },
     },
-  fallbackLng: DEFAULT_LOCALE,
+    fallbackLng: "en-GB",
     interpolation: {
       escapeValue: false, // react already safes from xss
     },
@@ -51,7 +173,7 @@ export default i18n;
 try {
   const current = i18n.language;
   if (current === 'en') {
-    i18n.changeLanguage(DEFAULT_LOCALE);
+    i18n.changeLanguage('en-gb');
   } else if (current === 'es') {
     i18n.changeLanguage('es-es');
   }
