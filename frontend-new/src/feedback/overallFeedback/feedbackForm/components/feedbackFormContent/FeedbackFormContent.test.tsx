@@ -1,19 +1,5 @@
-// mute the console
-import "src/_test_utilities/consoleMock";
-
-import React from "react";
-import { render, screen, act, fireEvent } from "src/_test_utilities/test-utils";
-import { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
-import { DATA_TEST_ID as YES_NO_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/yesNoQuestion/YesNoQuestion";
-import FeedbackFormContent, {
-  DATA_TEST_ID,
-} from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
-import { DATA_TEST_ID as CHECKBOX_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/checkboxQuestion/CheckboxQuestion";
-import getFeedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
-import { DATA_TEST_ID as COMMENT_TEXT_FIELD_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/commentTextField/CommentTextField";
-import { useSwipeable } from "react-swipeable";
-import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
-import questionsEnGb from "src/feedback/overallFeedback/feedbackForm/questions-en-gb.json";
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 
 // mock the swipeable hook
 jest.mock("react-swipeable");
@@ -26,83 +12,7 @@ jest.mock("framer-motion", () => ({
   AnimatePresence: ({ children }: { children: React.ReactElement }) => <>{children}</>,
 }));
 
-// Mock translation data structure
-const mockTranslations = {
-  questions: questionsEnGb,
-  steps: {
-    biasAndExperience: "Bias & Experience Accuracy",
-    skillAccuracy: "Skill Accuracy",
-    finalFeedback: "Final feedback",
-  },
-  labels: {
-    inaccurate: "Inaccurate",
-    veryAccurate: "Very accurate",
-    difficult: "Difficult",
-    easy: "Easy",
-    unlikely: "Unlikely",
-    likely: "Likely",
-  },
-  submit: "Submit",
-  next: "Next",
-  previous: "Previous",
-  yes: "Yes",
-  no: "No",
-};
-
-// Mock i18next
-jest.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string, options?: any) => {
-      // Handle returnObjects option for questions namespace
-      if (options?.returnObjects && key === "questions") {
-        return mockTranslations.questions;
-      }
-      
-      // Handle direct keys first (like "yes", "no")
-      if (mockTranslations.hasOwnProperty(key)) {
-        return (mockTranslations as any)[key];
-      }
-      
-      // Handle nested keys like "steps.biasAndExperience"
-      const keys = key.split(".");
-      let value: any = mockTranslations;
-      
-      for (const k of keys) {
-        value = value?.[k];
-        if (value === undefined) break;
-      }
-      
-      return value !== undefined ? value : key;
-    },
-    i18n: {
-      language: "en-GB",
-    },
-  }),
-}));
-
-// Create a mock t function for use in tests
-const mockT = (key: string, options?: any) => {
-  if (options?.returnObjects && key === "questions") {
-    return mockTranslations.questions;
-  }
-  
-  // Handle direct keys first
-  if (mockTranslations.hasOwnProperty(key)) {
-    return (mockTranslations as any)[key];
-  }
-  
-  const keys = key.split(".");
-  let value: any = mockTranslations;
-  
-  for (const k of keys) {
-    value = value?.[k];
-    if (value === undefined) break;
-  }
-  
-  return value !== undefined ? value : key;
-};
-
-const feedbackFormContentSteps = getFeedbackFormContentSteps(mockT as any);
+const feedbackFormContentSteps = getFeedbackFormContentSteps(i18next.t);
 
 describe("FeedbackFormContent", () => {
   beforeEach(() => {

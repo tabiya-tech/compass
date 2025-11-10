@@ -48,15 +48,60 @@ Feature: Global Test Environment Setup
  *          otherwise it returns the key itself. This ensures tests have predictable translations.
  */
 const enTranslations = require("src/locales/en-gb/translation.json");
+const questionsEnGb = require("src/feedback/overallFeedback/feedbackForm/questions-en-gb.json");
 
-const stableT = (key: string, options?: Record<string, unknown>) => {
-    let text = (enTranslations as Record<string, string>)[key] || key;
-    if (options) {
-        Object.entries(options).forEach(([k, v]) => {
-            text = text.replace(new RegExp(`{{${k}}}`, "g"), String(v));
-        });
+const feedbackTranslations = {
+  questions: questionsEnGb,
+  steps: {
+    biasAndExperience: "Bias & Experience Accuracy",
+    skillAccuracy: "Skill Accuracy",
+    finalFeedback: "Final feedback",
+  },
+  labels: {
+    inaccurate: "Inaccurate",
+    veryAccurate: "Very accurate",
+    difficult: "Difficult",
+    easy: "Easy",
+    unlikely: "Unlikely",
+    likely: "Likely",
+  },
+  submit: "Submit",
+  next: "Next",
+  previous: "Previous",
+  yes: "Yes",
+  no: "No",
+};
+
+const mockTranslations = { ...enTranslations, ...feedbackTranslations };
+
+const stableT = (key: string, options?: any) => {
+  const keys = key.split(".");
+  let value: any = mockTranslations;
+  for (const k of keys) {
+    if (value === undefined || value === null) {
+      value = undefined;
+      break;
     }
-    return text;
+    value = value[k];
+  }
+
+  if (options?.returnObjects) {
+    if (value !== undefined && typeof value === "object") {
+      return value;
+    }
+  }
+
+  let text = value !== undefined ? value : key;
+
+  if (typeof text === "string" && options) {
+    Object.entries(options).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) {
+        text = text.replace(new RegExp(`{{${k}}}`, "g"), String(v));
+      }
+    });
+  }
+
+  return text;
 };
 
 /**
