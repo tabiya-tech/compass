@@ -119,15 +119,15 @@ const ConversationConclusionFooter: React.FC = () => {
         marginTop={theme.fixedSpacing(theme.tabiyaSpacing.md)}
         data-testid={DATA_TEST_ID.CONVERSATION_CONCLUSION_FOOTER_CONTAINER}
       >
-        <Typography variant="body1">
-          {t("conversation_conclusion_footer_you_can_now")} {" "}
+        <Typography variant="body1">          
+  {t("conversation_conclusion_footer_you_can_now")} {" "}                  
           <StyledCustomLink
             onClick={handleOpenExperiencesDrawer}
             disableWhenOffline
             data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_BUTTON}
           >
             <BadgeOutlinedIcon />
-            {t("conversation_conclusion_footer_view_and_download_cv")}
+          {t("conversation_conclusion_footer_view_and_download_cv")}
           </StyledCustomLink>{" "}
           {t("conversation_conclusion_footer_here")}
           {/* Show anonymous user registration link if the user is anonymous and hasn't already converted */}
