@@ -246,17 +246,13 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
       data-testid={DATA_TEST_ID.CONTAINER}
     >
+  
       <Typography variant="body1" color="text.secondary" data-testid={DATA_TEST_ID.INSTRUCTION_TEXT}>
-        {/* react-i18next Trans expects an array of components when using numeric <0/> <1/> placeholders */}
-        <Trans
-          i18nKey="skillsRanking_rotateToSolve_instructions"
-          components={[
-            <RotateRightIcon key="rotate-right-icon" fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />,
-            <RotateLeftIcon key="rotate-left-icon" fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />,
-          ]}
-        />
+        {t("skillsRanking_rotateToSolve_instructions_1")}{" "}
+        <RotateRightIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />{t("skillsRanking_rotateToSolve_instructions_2")}{" "}
+        <RotateLeftIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />.
       </Typography>
-
+      
       <Box
         display="flex"
         gap={1.5}

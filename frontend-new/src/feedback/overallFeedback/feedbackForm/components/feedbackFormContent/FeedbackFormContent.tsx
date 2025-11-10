@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Divider, CircularProgress } from "@mui/material";
+import { Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import MobileStepper from "@mui/material/MobileStepper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import { useFeedbackFormContentSteps } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
+import getFeedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
 import StepsComponent from "src/feedback/overallFeedback/feedbackForm/components/stepsComponent/StepsComponent";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { FeedbackItem } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
@@ -32,17 +32,21 @@ export const DATA_TEST_ID = {
 };
 
 const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit }) => {
-  // 1. ALL HOOK CALLS MUST BE AT THE TOP AND UNCONDITIONAL
   const theme = useTheme();
   const { t } = useTranslation();
-  const { feedbackFormContentSteps, loading } = useFeedbackFormContentSteps();
+  
+  // Memoize the steps to avoid recreating on every render
+  const feedbackFormContentSteps = useMemo(() => getFeedbackFormContentSteps(t), [t]);
+  
   const [activeStep, setActiveStep] = useState(0);
   const [answers, setAnswers] = useState<FeedbackItem[]>(() => {
     return PersistentStorageService.getOverallFeedback();
   });
+  // We want to know the previous step to know the direction of the swipe
+  // if the previous step is greater than the active step, the swipe is to the left
+  // if the previous step is less than the active step, the swipe is to the right
   const [prevStep, setPrevStep] = useState(activeStep);
 
-  // Helper functions defined before the swipeHandlers hook
   const maxSteps = feedbackFormContentSteps.length;
 
   const handleNext = () => {
@@ -60,17 +64,16 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
     setPrevStep(activeStep);
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
-  
-  // useSwipeable is a hook and must be called before conditional rendering
+
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
-      // Must check if steps are loaded or array is empty before accessing maxSteps
-      if (maxSteps === 0 || activeStep === maxSteps - 1) return; 
+      const isLastStep = activeStep === maxSteps - 1;
+      if (isLastStep) return; // Do not allow to swipe forward from the last step
       handleNext();
     },
     onSwipedRight: () => {
       const isFirstStep = activeStep === 0;
-      if (isFirstStep) return;
+      if (isFirstStep) return; // Do not allow to swipe back from the first step
       handlePrevious();
     },
     trackMouse: true,
@@ -96,42 +99,6 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
     });
   };
 
-  // 2. CONDITIONAL EARLY RETURN
-  if (loading) {
-    return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
-        height="100%"
-        minHeight="200px" 
-        data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT}
-      >
-        <CircularProgress color="primary" />
-        <Typography sx={{ mt: 2 }}>{t("loading", "Loading feedback form...")}</Typography>
-      </Box>
-    );
-  }
-
-  // Guard against empty form content after loading failed
-  if (maxSteps === 0) {
-    return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
-        height="100%"
-        data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT}
-      >
-        <Typography color="error">
-            {t("error.formNotAvailable", "Feedback form content is not available.")}
-        </Typography>
-      </Box>
-    );
-  }
-
-  // 3. MAIN RENDER LOGIC (now safe to access feedbackFormContentSteps[activeStep])
-  
   // Check if there is at least one answer
   const hasAnswers = Object.keys(answers).length > 0;
 
@@ -140,6 +107,11 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
   const CONTENT_GAP = 80; // content gap in px
 
   const variants = {
+    // Animation variants for sliding content:
+    // - When entering: content slides in from left/right with CONTENT_GAP spacing
+    // - When centered: content is at x=0 position
+    // - When exiting: content slides out in opposite direction with CONTENT_GAP spacing
+    // The content gap is used to create a gap between the steps depending on the animation state
     enter: (direction: number) => ({
       x: direction > 0 ? `calc(100% + ${CONTENT_GAP}px)` : `calc(-100% - ${CONTENT_GAP}px)`,
       opacity: 1,

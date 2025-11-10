@@ -89,8 +89,7 @@ exports[`Testing Login component Render tests should hide login code related ele
         class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
         data-testid="login-register-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
       >
-        Don't have an account?
-         
+        Don't have an account? 
         <a
           aria-disabled="false"
           class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
@@ -368,8 +367,7 @@ exports[`Testing Login component Render tests should hide login code related ele
         class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
         data-testid="login-register-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
       >
-        Don't have an account?
-         
+        Don't have an account? 
         <a
           aria-disabled="false"
           class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
@@ -663,8 +661,7 @@ exports[`Testing Login component Render tests should show continue as guest if l
         class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
         data-testid="login-register-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
       >
-        Don't have an account?
-         
+        Don't have an account? 
         <a
           aria-disabled="false"
           class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
@@ -960,8 +957,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
       class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
       data-testid="login-register-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
     >
-      Don't have an account?
-       
+      Don't have an account? 
       <a
         aria-disabled="false"
         class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
@@ -1256,8 +1252,7 @@ exports[`Testing Login component should handle application login code 1`] = `
       class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
       data-testid="login-register-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
     >
-      Don't have an account?
-       
+      Don't have an account? 
       <a
         aria-disabled="false"
         class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"

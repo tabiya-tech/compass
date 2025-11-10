@@ -27,10 +27,11 @@ const Timestamp: React.FC<ChatMessageFooterProps> = ({ sentAt }) => {
   } catch (e) {
     console.error(new Error("Failed to get message duration", { cause: e }));
   }
+  let sentText = "sent \n          "+duration ;
 
   return (
     <TimeStamp data-testid={DATA_TEST_ID.TIMESTAMP} variant="caption">
-      {t("sent")} {duration}
+     {sentText}
     </TimeStamp>
   )
 }
