@@ -21,6 +21,8 @@ export enum EnvVariables {
   FRONTEND_DISABLE_SOCIAL_AUTH = "FRONTEND_DISABLE_SOCIAL_AUTH",
   FRONTEND_SUPPORTED_LANGUAGES = "FRONTEND_SUPPORTED_LANGUAGES",
   FRONTEND_DEFAULT_LOCALE = "FRONTEND_DEFAULT_LOCALE",
+  FRONTEND_DATE_PATTERN = "FRONTEND_DATE_PATTERN",
+  FRONTEND_DATE_SPLITTER = "FRONTEND_DATE_SPLITTER",
 }
 
 export const requiredEnvVariables = [
@@ -179,6 +181,17 @@ export const getSupportedLanguages = () => {
 export const getDefaultLocale = () => {
   return getEnv(EnvVariables.FRONTEND_DEFAULT_LOCALE);
 };
+
+
+export const getDatePattern = () => {
+  return getEnv(EnvVariables.FRONTEND_DATE_PATTERN);
+};
+
+export const getDateSplitter = () => {
+  return getEnv(EnvVariables.FRONTEND_DATE_SPLITTER);
+};
+
+
 
 
 export const ensureRequiredEnvVars = () => {

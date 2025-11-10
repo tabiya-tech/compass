@@ -45,6 +45,13 @@ window.tabiyaConfig = {
   // Default locale (used as initial UI language if user preference not set)
   FRONTEND_DEFAULT_LOCALE: btoa("en-gb"),
 
+  // Format for displaying dates target pattern (e.g., "YYYY-MM", "YYYY/MM", "MM-YYYY").
+  FRONTEND_DATE_PATTERN: btoa("YYYY-MM"),
+
+  // Visual separator used in the date pattern source(e.g., "-", "/", ".").
+  FRONTEND_DATE_SPLITTER: btoa("/"),
+
+
   FRONTEND_DISABLE_LOGIN_CODE: btoa("false"),
   FRONTEND_DISABLE_REGISTRATION: btoa("false"),
 
