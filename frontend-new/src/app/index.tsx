@@ -94,14 +94,14 @@ const App = () => {
 
       // the token may be null if something went wrong during the refresh.
       if (!token) {
-        console.warn("Token could not be refreshed. User is not logged in");
+        console.debug("Token could not be refreshed. User is not logged in");
         return;
       }
 
       // get the user from the token (validating again internally)
       const user = authenticationServiceInstance.getUser(token);
       if (!user) {
-        console.debug("Authentication token is not valid or user could not be extracted from token");
+        console.debug("Authentication token is not valid or user could not be extracted from token. Logging out the user.");
         await authenticationServiceInstance.logout();
         return;
       }
@@ -111,35 +111,37 @@ const App = () => {
       authenticationStateService.setUser(user);
       authenticationStateService.setToken(token);
 
-      const preferences = await UserPreferencesService.getInstance()
-        .getUserPreferences(user.id)
-        .catch((error) => {
-          console.log(error, "init");
-          if (error instanceof RestAPIError) {
-            // if the user is not registered, but has a valid token, log an error and continue log the user out
-            if (
-              error.serviceName === UserPreferencesService.serviceName &&
-              error.statusCode === StatusCodes.NOT_FOUND &&
-              error.method === "GET"
-            ) {
-              console.error(
-                new AuthenticationError(
-                  `User has not registered! Preferences could not be found for userId: ${user.id}`,
-                  error
-                )
-              );
-            }
-          }
-        });
+      let preferences = null;
+      try {
+        preferences = await UserPreferencesService.getInstance().getUserPreferences(user.id);
+      } catch (error) {
+        if (
+          error instanceof RestAPIError &&
+          error.serviceName === UserPreferencesService.serviceName &&
+          error.statusCode === StatusCodes.NOT_FOUND &&
+          error.method === "GET"
+        ) {
+          // User is not registered but has a valid token
+          console.warn("User has not registered but has a valid token. Logging out user.");
+        } else {
+          // Unexpected error while retrieving user preferences
+          console.error(
+            new AuthenticationError("Error retrieving user preferences. Logging out user.", error)
+          );
+        }
+
+        // Log out in both cases
+        await authenticationServiceInstance.logout();
+        return;
+      }
+
       if (!preferences) {
-        console.debug("User has not registered !", user.id);
+        console.debug("User has not registered! logging them out", user.id);
         await authenticationServiceInstance.logout();
         return;
       }
 
       UserPreferencesStateService.getInstance().setUserPreferences(preferences);
-
-      console.debug("User preferences loaded", preferences);
     } catch (error) {
       console.error(new AuthenticationError("Error initializing authentication and user preferences state", error));
       await AuthenticationServiceFactory.resetAuthenticationState();

@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState, useContext } from "react";
-import { Box, Typography, Modal, Theme, useTheme, useMediaQuery, TextField, DialogActions } from "@mui/material";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { Box, DialogActions, Modal, TextField, Theme, Typography, useMediaQuery, useTheme } from "@mui/material";
 import FirebaseEmailAuthService
   from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -70,6 +70,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
     setIsLoading(true);
     if(!emailInput) {
       enqueueSnackbar("Please enter your email address", { variant: "warning" });
+      console.warn("Password reset attempt failed: email input missing.");
       setIsLoading(false);
       return;
     }
@@ -80,6 +81,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
       setCooldownSeconds(COOLDOWN_SECONDS);
     } catch (error) {
       const message = error instanceof FirebaseError ? getUserFriendlyFirebaseErrorMessage(error) : (error as Error).message;
+      console.error("Password reset request failed:", message, error);
       enqueueSnackbar(`Failed to send reset email: ${message}`, { variant: "error" });
     } finally {
       setIsLoading(false);

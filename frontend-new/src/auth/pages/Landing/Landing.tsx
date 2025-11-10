@@ -94,6 +94,7 @@ const Landing: React.FC = () => {
       setIsLoading(true);
       const firebaseInvitationAuthServiceInstance = FirebaseInvitationCodeAuthenticationService.getInstance();
       await firebaseInvitationAuthServiceInstance.login(applicationLoginCode);
+      console.info("User logged in as guest.");
       enqueueSnackbar("Invitation code is valid", { variant: "success" });
       await handlePostLogin();
     } catch (error) {

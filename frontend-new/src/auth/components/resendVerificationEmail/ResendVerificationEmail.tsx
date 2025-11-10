@@ -68,10 +68,10 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
       let errorMessage;
       if (error instanceof FirebaseError) {
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-        console.warn(error);
+        console.warn("Failed to resend verification email (Firebase error):", error);
       } else {
         errorMessage = (error as Error).message;
-        console.error(error);
+        console.error("Failed to resend verification email (unknown error):", error);
       }
       enqueueSnackbar(`Failed to send verification email: ${errorMessage}`, { variant: "error" });
     } finally {
@@ -108,4 +108,4 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
   );
 };
 
-export default ResendVerificationEmail; 
+export default ResendVerificationEmail;

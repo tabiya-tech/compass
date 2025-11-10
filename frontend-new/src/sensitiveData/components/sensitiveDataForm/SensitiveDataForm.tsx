@@ -1,5 +1,5 @@
-import { useCallback, useState, useEffect, Suspense } from "react";
-import { Box, CircularProgress, Container, useMediaQuery, useTheme, Typography } from "@mui/material";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { Box, CircularProgress, Container, Typography, useMediaQuery, useTheme } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -12,9 +12,11 @@ import AuthenticationServiceFactory from "src/auth/services/Authentication.servi
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePersonalDataService/errors";
-import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
+import {
+  sensitivePersonalDataService,
+} from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 import TextConfirmModalDialog from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
-import { FieldType, FieldDefinition } from "src/sensitiveData/components/sensitiveDataForm/config/types";
+import { FieldDefinition, FieldType } from "src/sensitiveData/components/sensitiveDataForm/config/types";
 import { useFieldsConfig } from "src/sensitiveData/components/sensitiveDataForm/config/useFieldsConfig";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import {
@@ -260,12 +262,19 @@ const SensitiveDataForm: React.FC = () => {
 
   const handleSaveSensitivePersonalData = useCallback(async () => {
     if (configLoading || configError) {
+      console.warn("Config is still loading or an there is a config loading error", {
+        details: {
+          configLoading,
+          configError,
+        },
+      });
       enqueueSnackbar(ERROR_MESSAGE.CONFIG_LOADING_ERROR, { variant: "error" });
       return;
     }
 
     // Check if the form is valid based on current validation state
     if (!isFormValid(validationErrors)) {
+      console.warn("User attempted to submit invalid sensitive data form.");
       enqueueSnackbar("Please correct the errors in the form before submitting.", { variant: "error" });
       return;
     }
@@ -290,6 +299,7 @@ const SensitiveDataForm: React.FC = () => {
 
       // Store personal info for local use using our utility function
       PersistentStorageService.setPersonalInfo(extractPersonalInfo(sensitiveData, fields));
+      console.info("User confirmed providing personal data and saved successfully.");
 
       enqueueSnackbar("Personal data saved successfully and securely.", { variant: "success" });
       navigate(routerPaths.ROOT);
@@ -315,6 +325,8 @@ const SensitiveDataForm: React.FC = () => {
     try {
       const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
       await authenticationService!.logout();
+      console.info("User rejected providing sensitive data. Logging out user.");
+
       navigate(routerPaths.LANDING, { replace: true });
       enqueueSnackbar("Successfully logged out.", { variant: "success" });
     } catch (e) {
@@ -337,6 +349,7 @@ const SensitiveDataForm: React.FC = () => {
         ...userPreferences!,
         has_sensitive_personal_data: true,
       });
+      console.info("User skipped providing sensitive data.");
 
       enqueueSnackbar("Personal data collection skipped.", { variant: "success" });
       navigate(routerPaths.ROOT);

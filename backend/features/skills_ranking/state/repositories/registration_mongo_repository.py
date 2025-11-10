@@ -32,6 +32,10 @@ class RegistrationMongoRepository(IRegistrationDataRepository):
                 raise RegistrationDataNotFoundError(user_id)
 
             if "opportunityRankPriorBelief" not in doc:
+                self._logger.error(
+                    f"opportunityRankPriorBelief not found for user {user_id}. "
+                    f"Document retrieved: {doc}"
+                )
                 raise RegistrationDataNotFoundError(user_id)
 
             if "compareToOthersPriorBelief" not in doc:

@@ -122,6 +122,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   }, [experiences]);
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.debug("Personal info updated", { field, value: e.target.value });
     setPersonalInfo({ ...personalInfo, [field]: e.target.value });
   };
 
@@ -181,6 +182,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
 
       // Delete the experience
       await experienceService.deleteExperience(sessionId, experienceToDelete.UUID);
+      console.info("Experience deleted successfully", { experienceId: experienceToDelete.UUID });
 
       // Refresh the experiences
       await onExperiencesUpdated();
@@ -276,6 +278,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     }
     try {
       await experienceService.restoreDeletedExperience(sessionId, experience.UUID);
+      console.info("Deleted experience restored successfully", { experienceId: experience.UUID });
       enqueueSnackbar("Experience restored successfully!", { variant: "success" });
       await onExperiencesUpdated();
     } catch (error) {

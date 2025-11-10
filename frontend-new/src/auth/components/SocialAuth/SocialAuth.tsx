@@ -2,7 +2,8 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { Box, Button, Divider, Typography, useTheme } from "@mui/material";
-import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
+import FirebaseSocialAuthenticationService
+  from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { GoogleIcon } from "src/theme/Icons/GoogleIcon";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
@@ -63,19 +64,20 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       // if the registration code is not valid or something goes wrong, log the user out
       const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
       await firebaseSocialAuthServiceInstance.logout();
+      console.info("Social login failed or registration code invalid. Logging out user.");
+
       // clear the registration code from the state
       setRegistrationCode(registrationCode);
       let errorMessage;
       if (error instanceof RestAPIError) {
         errorMessage = getUserFriendlyErrorMessage(error);
-        console.error(error);
       } else if (error instanceof FirebaseError) {
         errorMessage = getUserFriendlyFirebaseErrorMessage(error);
-        console.warn(error);
       } else {
         errorMessage = error.message;
-        console.error(error);
       }
+
+      console.error(error);
       enqueueSnackbar(`Failed to login: ${errorMessage}`, { variant: "error" });
     },
     [enqueueSnackbar, registrationCode],
@@ -119,12 +121,13 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       // first login with Google
       const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
       await firebaseSocialAuthServiceInstance.loginWithGoogle();
+      console.info("User logged in via Google.");
       // check if the user is already registered
       const prefs = UserPreferencesStateService.getInstance().getUserPreferences();
       // if the user is not registered, create user preferences for the first time
       if (!prefs) {
         // if registration is disabled, show an error message
-        if(registrationDisabled) {
+        if (registrationDisabled) {
           enqueueSnackbar("This account isn’t registered. Please contact the provider of this link.", { variant: "error" });
           return;
         }

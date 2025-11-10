@@ -142,6 +142,9 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
         async def record_event(self, event: AbstractCompassMetricEvent) -> None:
             raise NotImplementedError()
 
+        async def bulk_record_events(self, events: list[AbstractCompassMetricEvent]) -> None:
+            raise NotImplementedError()
+
     mocked_metrics_service = MockedMetricsService()
 
     # Set up the FastAPI app with the mocked dependencies
@@ -154,7 +157,7 @@ def _create_test_client_with_mocks() -> TestClientWithMocks:
     add_metrics_routes(app)
 
     # Create a test client
-    client = TestClient(app)
+    client = TestClient(app, raise_server_exceptions=False)
 
     return client, mocked_metrics_service
 
@@ -202,8 +205,8 @@ class TestMetricsRoutes:
         # GIVEN a valid metric request
         given_metric_request = request_factory()
 
-        # AND the service's record_event method is mocked to succeed
-        mocked_service.record_event = AsyncMock()
+        # AND the service's bulk_record_event method is mocked to succeed
+        mocked_service.bulk_record_events = AsyncMock()
 
         # WHEN a POST request is made with the metric request
         response = client.post(
@@ -213,10 +216,12 @@ class TestMetricsRoutes:
 
         # THEN the response is ACCEPTED
         assert response.status_code == HTTPStatus.ACCEPTED
-        # AND the service's record_event method was called with the constructed event
-        mocked_service.record_event.assert_called_once()
+        # AND the service's bulk_record_events method was called with the constructed event
+        mocked_service.bulk_record_events.assert_called_once()
         # AND the event has the correct type and data
-        event = mocked_service.record_event.call_args[0][0]
+        events_arg = mocked_service.bulk_record_events.call_args[0][0]
+        assert len(events_arg) == 1
+        event = events_arg[0]
         assert isinstance(event, event_class)
         assert event.event_type == event_type
         assert_event_fields_match(event, given_metric_request)
@@ -237,8 +242,8 @@ class TestMetricsRoutes:
             get_ui_interaction_request()
         ]
 
-        # AND the service's record_event method is mocked to succeed
-        mocked_service.record_event = AsyncMock()
+        # AND the service's bulk_record_events method is mocked to succeed
+        mocked_service.bulk_record_events = AsyncMock()
 
         # WHEN a POST request is made with the metric requests
         response = client.post(
@@ -248,10 +253,11 @@ class TestMetricsRoutes:
 
         # THEN the response is ACCEPTED
         assert response.status_code == HTTPStatus.ACCEPTED
-        # AND the service's record_event method was called with the constructed events
-        assert mocked_service.record_event.call_count == len(given_metric_requests)
-        for event, request in zip(mocked_service.record_event.call_args_list, given_metric_requests):
-            assert_event_fields_match(event[0][0], request)
+        # AND the service's bulk_record_events method was called with the constructed events
+        events_arg = mocked_service.bulk_record_events.call_args[0][0]
+        assert len(events_arg) == len(given_metric_requests)
+        for event, request in zip(events_arg, given_metric_requests):
+            assert_event_fields_match(event, request)
 
     @pytest.mark.parametrize(
         "request_factory,event_class,event_type",
@@ -283,8 +289,8 @@ class TestMetricsRoutes:
         # GIVEN a valid metric request
         given_metric_request = request_factory()
 
-        # AND the service's record_event method is mocked to fail
-        mocked_service.record_event = AsyncMock(side_effect=Exception("Service error"))
+        # AND the service's bulk_record_events method is mocked to fail
+        mocked_service.bulk_record_events = AsyncMock(side_effect=Exception("Service error"))
 
         # WHEN a POST request is made with the metric request
         response = client.post(
@@ -292,12 +298,14 @@ class TestMetricsRoutes:
             json=[given_metric_request],
         )
 
-        # THEN the response is still ACCEPTED despite service failure
-        assert response.status_code == HTTPStatus.ACCEPTED
-        # AND the service's record_event method was called with the constructed event
-        mocked_service.record_event.assert_called_once()
+        # THEN the response is INTERNAL_SERVER_ERROR
+        assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+        # AND the service's bulk_record_events method was called with the constructed event
+        mocked_service.bulk_record_events.assert_called_once()
         # AND the event has the correct type and data
-        event = mocked_service.record_event.call_args[0][0]
+        events_arg = mocked_service.bulk_record_events.call_args[0][0]
+        assert len(events_arg) == 1
+        event = events_arg[0]
         assert isinstance(event, event_class)
         assert event.event_type == event_type
         assert_event_fields_match(event, given_metric_request)
@@ -313,8 +321,8 @@ class TestMetricsRoutes:
         # GIVEN a metric request with a payload that exceeds the maximum size
         given_metric_request = get_cv_downloaded_request()
         given_metric_request['user_id'] = get_random_printable_string(MAX_PAYLOAD_SIZE + 1)
-        # AND the service's record_event method is mocked to succeed
-        mocked_service.record_event = AsyncMock()
+        # AND the service's bulk_record_events method is mocked to succeed
+        mocked_service.bulk_record_events = AsyncMock()
 
         # WHEN a POST request is made with the metric request
         response = client.post(
@@ -325,6 +333,6 @@ class TestMetricsRoutes:
         # THEN the response should be REQUEST_ENTITY_TOO_LARGE
         assert response.status_code == HTTPStatus.REQUEST_ENTITY_TOO_LARGE
         # AND the service's record_event method was not called
-        mocked_service.record_event.assert_not_called()
+        mocked_service.bulk_record_events.assert_not_called()
         # AND the error is logged
-        assert "Total payload size exceeds %s characters", MAX_PAYLOAD_SIZE in caplog.text
+        assert "Metrics payload exceeds maximum allowed size of", MAX_PAYLOAD_SIZE in caplog.text
