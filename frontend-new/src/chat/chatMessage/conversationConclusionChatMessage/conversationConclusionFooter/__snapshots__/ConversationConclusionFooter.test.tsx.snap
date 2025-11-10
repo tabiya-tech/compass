@@ -10,7 +10,6 @@ exports[`ConversationConclusionFooter render tests should render component succe
   >
     You can now
      
-     
     <a
       aria-disabled="false"
       class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
