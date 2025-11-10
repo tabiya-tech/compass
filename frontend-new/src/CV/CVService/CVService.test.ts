@@ -206,7 +206,6 @@ describe("CVService", () => {
         filename: "file.pdf",
         uploaded_at: new Date().toISOString(),
         upload_process_state: "COMPLETED",
-        experiences_data: [],
       };
       const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, expectedResponse, "application/json;charset=UTF-8");
 
@@ -303,14 +302,12 @@ describe("CVService", () => {
           filename: "file1.pdf",
           uploaded_at: new Date().toISOString(),
           upload_process_state: "COMPLETED",
-          experiences_data: [],
         },
         {
           upload_id: "cv2",
           filename: "file2.docx",
           uploaded_at: new Date().toISOString(),
           upload_process_state: "PROCESSING",
-          experiences_data: [],
         },
       ];
       const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, expectedResponse, "application/json;charset=UTF-8");

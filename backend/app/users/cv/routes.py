@@ -5,7 +5,6 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException, Path, Request
 
 from app.constants.errors import HTTPErrorResponse
-from app.users.auth import Authentication, UserInfo
 from app.users.cv.constants import (
     MAX_CV_SIZE_BYTES,
     MAX_MULTIPART_OVERHEAD_BYTES,
@@ -14,11 +13,19 @@ from app.users.cv.constants import (
 )
 from app.users.cv.errors import MarkdownConversionTimeoutError, MarkdownTooLongError, PayloadTooLargeErrorResponse, \
     EmptyMarkdownError, CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError
+from app.users.auth import Authentication, UserInfo
+from app.users.cv.service import CVUploadService, ICVUploadService
+from app.users.cv.utils.cv_structured_extractor import CVStructuredExperienceExtractor
+from app.users.cv.utils.cv_responsibilities_extractor import CVResponsibilitiesExtractor
+from app.agent.skill_explorer_agent._responsibilities_extraction_tool import _ResponsibilitiesExtractionTool
 from app.users.cv.get_repository import get_user_cv_repository
 from app.users.cv.repository import IUserCVRepository
-from app.users.cv.service import CVUploadService, ICVUploadService
 from app.users.cv.storage import _get_cv_storage_service, ICVCloudStorageService
-from app.users.cv.types import CVUploadStatusResponse, CVUploadResponseListItem
+from app.server_dependencies.application_state_dependencies import get_application_state_manager
+from app.users.cv.types import CVUploadStatusResponse, CVUploadListItemResponse
+from app.users.get_user_preferences_repository import get_user_preferences_repository
+from app.users.repositories import UserPreferenceRepository
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,13 +40,24 @@ _cv_service_singleton: ICVUploadService | None = None
 
 async def _get_cv_service(
         repository: IUserCVRepository = Depends(get_user_cv_repository),
-        cv_storage_service: ICVCloudStorageService = Depends(_get_cv_storage_service)) -> ICVUploadService:
+        cv_storage_service: ICVCloudStorageService = Depends(_get_cv_storage_service),
+        application_state_manager=Depends(get_application_state_manager),
+        user_preferences_repository: UserPreferenceRepository = Depends(get_user_preferences_repository)) -> ICVUploadService:
 
     global _cv_service_singleton
     if _cv_service_singleton is None:
         async with _cv_service_lock:
             if _cv_service_singleton is None:
-                _cv_service_singleton = CVUploadService(repository=repository, cv_cloud_storage_service=cv_storage_service)
+                _tool = _ResponsibilitiesExtractionTool(logger)
+                _resp_extractor = CVResponsibilitiesExtractor(logger, _tool)
+                _structured_extractor = CVStructuredExperienceExtractor(logger, _resp_extractor)
+                _cv_service_singleton = CVUploadService(
+                    repository=repository,
+                    cv_cloud_storage_service=cv_storage_service,
+                    structured_extractor=_structured_extractor,
+                    application_state_manager=application_state_manager,
+                    user_preferences_repository=user_preferences_repository,
+                )
     return _cv_service_singleton
 
 
@@ -97,6 +115,37 @@ def _get_filename_from_headers(request: Request) -> str | None:
 def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
     router = APIRouter(prefix="/{user_id}/cv", tags=["users-cv"])
 
+    @router.get(
+        path="",
+        status_code=HTTPStatus.OK,
+        response_model=list[CVUploadListItemResponse],
+        responses={
+            HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
+            HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse},
+        },
+        name="list user uploaded CVs",
+        description=(
+            "List previously uploaded CVs for a user (COMPLETED uploads only)."
+        ),
+    )
+    async def _get_uploaded_cvs(
+        user_id: str = Path(description="the unique identifier of the user", examples=["1"]),
+        user_info: UserInfo = Depends(auth.get_user_info()),
+        service: ICVUploadService = Depends(_get_cv_service),
+    ) -> list[CVUploadListItemResponse]:
+        """
+        List previously uploaded CVs for a user (COMPLETED uploads only).
+        """
+        try:
+            if user_info.user_id != user_id:
+                raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Cannot list CVs for a different user")
+            return await service.get_user_cvs(user_id=user_id)
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.exception(e)
+            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")
+
     @router.post(
         path="",
         status_code=HTTPStatus.OK,
@@ -132,6 +181,9 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
         user_info: UserInfo = Depends(auth.get_user_info()),
         service: ICVUploadService = Depends(_get_cv_service),
     ) -> dict:
+        """
+        Upload a CV file by streaming the raw request body.
+        """
         # Validate size early using Content-Length (no multipart overhead for raw)
         _validate_request_size_header(request)
         content_length_header = request.headers.get("content-length")
@@ -200,6 +252,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
                 user_id=user_id,
                 file_bytes=file_bytes,
                 filename=filename,
+                session_id=None,  # Service will fetch it internally
             )
             logger.info("CV processed successfully {user_id=%s, upload_id=%s}", user_id, upload_id)
             return {"upload_id": upload_id}
@@ -232,7 +285,7 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
 
     @router.post("/{upload_id}/cancel", response_model=dict)
     async def cancel_cv_upload(
-        user_id: str = Path(..., description="User ID"),
+        user_id: str = Path(..., description="User's ID"),
         upload_id: str = Path(..., description="Upload ID to cancel"),
         service: ICVUploadService = Depends(get_cv_service),
         user_info: UserInfo = Depends(auth.get_user_info()),
@@ -263,6 +316,25 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR, 
                 detail="Failed to cancel upload"
             )
+
+    @router.post("/{upload_id}/inject", status_code=HTTPStatus.OK)
+    async def _reinject_cv(
+        user_id: str = Path(..., description="User ID"),
+        upload_id: str = Path(..., description="Upload ID to reinject"),
+        user_info: UserInfo = Depends(auth.get_user_info()),
+        service: ICVUploadService = Depends(_get_cv_service),
+    ) -> dict:
+        """
+        Reinject CV state into the user's current session.
+        """
+        if user_info.user_id != user_id:
+            raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Cannot reinject CV for a different user")
+
+        # Service will fetch the most recent session internally
+        success = await service.reinject_upload(user_id=user_id, upload_id=upload_id, session_id=None)
+        if not success:
+            return {"state_injected": False, "error": "NO_SESSION"}
+        return {"state_injected": success}
 
     @router.get("/{upload_id}", response_model=CVUploadStatusResponse)
     async def get_upload_status(
@@ -296,48 +368,6 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
             raise HTTPException(
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                 detail="Failed to get upload status"
-            )
-
-    @router.get(
-        path="",
-        status_code=HTTPStatus.OK,
-        response_model=list[CVUploadResponseListItem],
-        responses={
-            HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
-            HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse},
-        },
-        description="Retrieve all CVs uploaded by the user",
-    )
-    async def get_user_cvs(
-        user_id: str = Path(description="the unique identifier of the user", examples=["1"]),
-        user_info: UserInfo = Depends(auth.get_user_info()),
-        service: ICVUploadService = Depends(_get_cv_service),
-    ) -> list[CVUploadResponseListItem]:
-        try:
-            if user_info.user_id != user_id:
-                raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Cannot access CVs for a different user")
-
-            # Get user CVs through the service
-            uploads = await service.get_user_cvs(user_id=user_id)
-
-            return [
-                CVUploadResponseListItem(
-                    upload_id=upload.upload_id,
-                    filename=upload.filename,
-                    uploaded_at=upload.created_at,
-                    upload_process_state=upload.upload_process_state,
-                    experiences_data=upload.experience_bullets
-                )
-                for upload in uploads
-            ]
-
-        except HTTPException:
-            raise
-        except Exception as e:
-            logger.exception(e)
-            raise HTTPException(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                detail="Failed to retrieve user CVs"
             )
 
     users_router.include_router(router)

@@ -120,7 +120,8 @@ export default class CVService {
     last_activity_at: string;
     error_code?: string;
     error_detail?: string;
-    experience_bullets?: string[];
+    state_injected?: boolean;
+    injection_error?: string | null;
   }> {
     const serviceName = "CVService";
     const serviceFunction = "getUploadStatus";
@@ -187,5 +188,32 @@ export default class CVService {
         { error }
       );
     }
+  }
+
+  public async reinjectFromUpload(userId: string, uploadId: string): Promise<{ success: boolean; error?: string }>{
+    const serviceName = "CVService";
+    const serviceFunction = "reinjectFromUpload";
+    const method = "POST";
+    const constructedUrl = `${this.cvEndpointUrl}/${userId}/cv/${uploadId}/inject`;
+
+    const response = await customFetch(constructedUrl, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      expectedStatusCode: StatusCodes.OK,
+      serviceName,
+      serviceFunction,
+      failureMessage: `Failed to reinject CV ${uploadId} for user ${userId}`,
+      expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
+    });
+
+    const payload = (await response.json().catch(() => ({}))) as { state_injected?: boolean; error?: string };
+    return { 
+      success: Boolean(payload.state_injected),
+      error: payload.error || (payload.state_injected === false ? "Reinjection failed" : undefined)
+    };
   }
 }

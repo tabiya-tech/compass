@@ -58,7 +58,6 @@ const createMockCvList = (count: number): CVListItem[] => {
     filename: makeRandomCvFilename(idx),
     uploaded_at: new Date(Date.now() - idx * 3600_000).toISOString(),
     upload_process_state: "COMPLETED",
-    experiences_data: ["Worked as an Accounting Assistant.", `Worked at Company ${idx + 1} from 2012 to Present.`],
   }));
 };
 

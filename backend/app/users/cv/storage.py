@@ -21,6 +21,11 @@ class ICVCloudStorageService(ABC):
                   original_bytes: bytes) -> None:
         raise NotImplementedError()
 
+    @abstractmethod
+    def download_markdown(self, *, object_path: str) -> str:
+        """Retrieve the stored markdown text for a previously uploaded CV."""
+        raise NotImplementedError()
+
 
 _cv_storage_service_lock = asyncio.Lock()
 _cv_storage_service_singleton: ICVCloudStorageService | None = None
@@ -103,3 +108,7 @@ class GCPCVCloudStorageService(ICVCloudStorageService):
             # we will log a error and continue without GCS upload
             # The database record will still be saved so polling works
             # TODO: Remember to add raise
+
+    def download_markdown(self, *, object_path: str) -> str:
+        blob = self._bucket.blob(object_path)
+        return blob.download_as_text(encoding="utf-8")

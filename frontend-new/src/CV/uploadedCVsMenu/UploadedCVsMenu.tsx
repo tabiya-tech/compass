@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Skeleton, useTheme } from "@mui/material";
+import { Box, Typography, Skeleton, useTheme, CircularProgress } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import InfoIcon from "@mui/icons-material/Info";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
@@ -20,6 +20,7 @@ export const DATA_TEST_ID = {
   UPLOADED_CVS_MENU_FILE_NAME: `uploaded-cvs-menu-file-name-${uniqueId}`,
   UPLOADED_CVS_MENU_UPLOAD_DATE: `uploaded-cvs-menu-upload-date-${uniqueId}`,
   UPLOADED_CVS_MENU_SKELETON: `uploaded-cvs-menu-skeleton-${uniqueId}`,
+  UPLOADED_CVS_MENU_PROGRESS: `uploaded-cvs-menu-progress-${uniqueId}`,
 };
 
 interface UploadedCVsMenuContentProps {
@@ -28,6 +29,7 @@ interface UploadedCVsMenuContentProps {
   onBack: () => void;
   isLoading: boolean;
   currentPhase?: ConversationPhase;
+  isReinjecting?: boolean;
 }
 
 const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
@@ -36,13 +38,10 @@ const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
   onSelect,
   uploadedCVs,
   isLoading,
+  isReinjecting = false,
 }) => {
   const theme = useTheme();
-  const isCollectPhase = currentPhase === ConversationPhase.COLLECT_EXPERIENCES;
-
-  const helpTipText = isCollectPhase
-    ? "Tap a CV to load its content into the text field. Review and send when you're ready."
-    : "CV selection is only available during the experience collection phase.";
+  const helpTipText = "Select a CV to inject its experiences into this conversation.";
 
   return (
     <Box
@@ -80,6 +79,14 @@ const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
         <HelpTip icon={<InfoIcon />} data-testid={DATA_TEST_ID.UPLOADED_CVS_MENU_HELP_TIP}>
           {helpTipText}
         </HelpTip>
+        {isReinjecting && (
+          <CircularProgress
+            size={16}
+            thickness={6}
+            sx={{ color: theme.palette.text.secondary }}
+            data-testid={DATA_TEST_ID.UPLOADED_CVS_MENU_PROGRESS}
+          />
+        )}
       </Box>
       <Box
         sx={{
@@ -120,7 +127,7 @@ const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
 
         {!isLoading &&
           uploadedCVs.map((cv) => {
-            const disabled = !isCollectPhase;
+            const disabled = isReinjecting;
             return (
               <Box
                 key={cv.upload_id}

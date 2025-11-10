@@ -6,11 +6,12 @@ from pydantic import BaseModel, field_serializer, field_validator, Field
 
 from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.agent.agent_types import AgentType
+from app.agent.agent_types import AgentType, LLMStats
 from app.agent.collect_experiences_agent import CollectExperiencesAgent
 from app.agent.experience._experience_summarizer import ExperienceSummarizer
 from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.experience.upgrade_experience import get_editable_experience
+from app.agent._readiness_assessment_llm import _ReadinessAssessmentLLM, MIN_RESPONSIBILITIES_FOR_AUTO_LINKING
 from app.agent.linking_and_ranking_pipeline import ExperiencePipeline, ExperiencePipelineConfig
 from app.agent.skill_explorer_agent import SkillsExplorerAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
@@ -19,6 +20,122 @@ from app.conversation_memory.conversation_memory_types import \
 from app.countries import Country
 from app.vector_search.esco_entities import SkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
+
+def _format_responsibilities_for_display(responsibilities: list[str]) -> str:
+    """
+    Format responsibilities list for display to the user.
+    
+    Args:
+        responsibilities: List of responsibility strings
+        
+    Returns:
+        Formatted string showing the responsibilities
+    """
+    if not responsibilities:
+        return "No responsibilities have been collected yet."
+
+    formatted = "Here are the responsibilities we've gathered so far:\n\n"
+    for i, resp in enumerate(responsibilities, 1):
+        formatted += f"{i}. {resp}\n"
+
+    return formatted
+
+
+async def _check_and_prompt_for_linking(*,
+                                        logger,
+                                        current_experience: "ExperienceState",
+                                        user_input: AgentInput,
+                                        context: ConversationContext,
+                                        conversation_manager: ConversationMemoryManager) -> tuple[
+    AgentOutput | None, bool, list[LLMStats]]:
+    """
+    Check if we should prompt the user to continue to linking/ranking phase.
+    
+    Returns:
+        A tuple of (AgentOutput | None, should_continue_to_linking, llm_stats)
+    """
+    # Check if we're in EXPLORING_SKILLS phase
+    if current_experience.dive_in_phase != DiveInPhase.EXPLORING_SKILLS:
+        return None, False, []
+
+    # Check if we have enough responsibilities using the LLM's heuristic check
+    responsibilities_count = len(current_experience.experience.responsibilities.responsibilities)
+    if not _ReadinessAssessmentLLM.has_enough_responsibilities(responsibilities_count):
+        logger.info(
+            "Responsibilities Check: Not enough responsibilities (%d) to prompt for linking, need at least %d",
+            responsibilities_count,
+            MIN_RESPONSIBILITIES_FOR_AUTO_LINKING
+        )
+        return None, False, []
+
+    # Create the prompt message (we'll use this for both initial prompt and LLM parsing)
+    responsibilities_text = _format_responsibilities_for_display(
+        current_experience.experience.responsibilities.responsibilities
+    )
+    prompt_message = (
+        f"{responsibilities_text}\n\n"
+        f"We've collected {responsibilities_count} responsibilities so far. "
+        f"Would you like to continue to the next step, or would you like to add more responsibilities? "
+    )
+
+    # Check if we've already asked
+    if current_experience.asked_to_continue_to_linking:
+        # We've already asked, so parse the user's response using LLM
+        if user_input.is_artificial:
+            # This is an artificial input (like when transitioning), don't process it
+            logger.info("Responsibilities Check: Artificial input, not processing")
+            return None, False, []
+
+        # Use LLM to parse the user's response
+        llm_parser = _ReadinessAssessmentLLM(logger)
+        user_wants_to_continue, clarification_message, llm_stats = await llm_parser.execute(
+            responsibilities=current_experience.experience.responsibilities.responsibilities,
+            responsibilities_count=responsibilities_count,
+            user_input=user_input.message,
+            context=context
+        )
+
+        if user_wants_to_continue:
+            # User wants to continue to linking
+            logger.info("Responsibilities Check: User wants to continue to linking (LLM parsed)")
+            return None, True, llm_stats
+        else:
+            # User wants to add more responsibilities
+            current_experience.asked_to_continue_to_linking = False  # Reset so we can ask again later
+            logger.info("Responsibilities Check: User wants to add more responsibilities (LLM parsed)")
+
+            # If there's a clarification message, return it
+            if clarification_message:
+                clarification_output = AgentOutput(
+                    message_for_user=clarification_message,
+                    finished=False,
+                    agent_type=AgentType.EXPLORE_EXPERIENCES_AGENT,
+                    agent_response_time_in_sec=0,
+                    llm_stats=llm_stats
+                )
+                # Record the user's input and clarification in conversation history
+                await conversation_manager.update_history(user_input, clarification_output)
+                return clarification_output, False, llm_stats
+
+            return None, False, llm_stats
+
+    # We haven't asked yet, so show responsibilities and ask
+    # Mark that we've asked
+    current_experience.asked_to_continue_to_linking = True
+
+    # Create and return the prompt
+    agent_output = AgentOutput(
+        message_for_user=prompt_message,
+        finished=False,
+        agent_type=AgentType.EXPLORE_EXPERIENCES_AGENT,
+        agent_response_time_in_sec=0,
+        llm_stats=[]
+    )
+
+    # Update conversation history
+    await conversation_manager.update_history(user_input, agent_output)
+
+    return agent_output, False, []
 
 
 class ConversationPhase(Enum):
@@ -53,6 +170,12 @@ class ExperienceState(BaseModel):
     experience: ExperienceEntity
     """
     The experience entity that is being explored.
+    """
+
+    asked_to_continue_to_linking: bool = False
+    """
+    Flag to track if we've already asked the user if they want to continue to linking/ranking.
+    This prevents asking multiple times.
     """
 
     class Config:
@@ -213,18 +336,66 @@ class ExploreExperiencesAgentDirector(Agent):
             if picked_new_experience:
                 # When transitioning between states set this message to "" and handle it in the execute method of the agent
                 user_input = AgentInput(message="", is_artificial=True)
-            # The agent will explore the skills for the experience and update the experience entity
-            self._exploring_skills_agent.set_experience(current_experience.experience)
-            agent_output: AgentOutput = await self._exploring_skills_agent.execute(user_input=user_input, context=context)
-            # Update the conversation history
-            await self._conversation_manager.update_history(user_input, agent_output)
-            # get the context again after updating the history
-            context = await self._conversation_manager.get_conversation_context()
-            if not agent_output.finished:
-                return agent_output
 
-            # advance to the next sub-phase
-            current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
+            # Check if we should prompt the user to continue to linking/ranking
+            prompt_output, should_continue_to_linking, llm_stats = await _check_and_prompt_for_linking(
+                logger=self.logger,
+                current_experience=current_experience,
+                user_input=user_input,
+                context=context,
+                conversation_manager=self._conversation_manager
+            )
+
+            # If we need to show a prompt, return it
+            # Note: If prompt_output is a clarification message (user gave unclear response),
+            # the user's input has already been recorded in _check_and_prompt_for_linking
+            # If prompt_output is the initial prompt, it was also recorded there
+            if prompt_output is not None:
+                return prompt_output
+
+            # If user said yes, advance to linking/ranking phase
+            if should_continue_to_linking:
+                # Record the user's response in conversation history
+                confirmation_output = AgentOutput(
+                    message_for_user="Great! Let's continue to the next step.",
+                    finished=False,
+                    agent_type=self._agent_type,
+                    agent_response_time_in_sec=0,
+                    llm_stats=llm_stats
+                )
+                await self._conversation_manager.update_history(user_input, confirmation_output)
+                # get the context again after updating the history
+                context = await self._conversation_manager.get_conversation_context()
+
+                current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
+                # Reset the flag for future use
+                current_experience.asked_to_continue_to_linking = False
+            else:
+                # Continue with the skills explorer agent
+                # The agent will explore the skills for the experience and update the experience entity
+                self._exploring_skills_agent.set_experience(current_experience.experience)
+                agent_output: AgentOutput = await self._exploring_skills_agent.execute(user_input=user_input,
+                                                                                       context=context)
+                # Update the conversation history
+                await self._conversation_manager.update_history(user_input, agent_output)
+
+                # After the agent executes, check again if we should prompt (in case more responsibilities were added)
+                # Only check if we haven't already asked and we have enough responsibilities
+                if not agent_output.finished:
+                    # Check if we should prompt (but don't try to parse response from artificial input)
+                    # We'll check again on the next user input
+                    responsibilities_count = len(current_experience.experience.responsibilities.responsibilities)
+                    if (_ReadinessAssessmentLLM.has_enough_responsibilities(responsibilities_count) and
+                        not current_experience.asked_to_continue_to_linking):
+                        # We have enough responsibilities and haven't asked yet
+                        # We'll prompt on the next turn, for now return the agent output
+                        pass
+
+                    # Agent is not finished, return its output
+                    return agent_output
+
+                # Agent finished, advance to the next sub-phase
+                current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
 
         if current_experience.dive_in_phase == DiveInPhase.LINKING_RANKING:
             if current_experience.experience.responsibilities.responsibilities:
@@ -304,11 +475,61 @@ class ExploreExperiencesAgentDirector(Agent):
 
             # The experiences are still being collected, but we can already store them so that we can
             # present them to the user even if data collection has not finished.
-            # The experiences will be overwritten every time
+            # The experiences will be overwritten every time, but we preserve responsibilities from CV injection
             experiences = self._collect_experiences_agent.get_experiences()
-            state.experiences_state.clear()
+
+            # Helper function to normalize strings for matching
+            def _normalize(value: str | None) -> str:
+                return (value or "").strip().lower()
+
+            # Create a new dict to store updated experiences, preserving existing ones with responsibilities
+            new_experiences_state = {}
             for exp in experiences:
-                state.experiences_state[exp.uuid] = ExperienceState(experience=exp)
+                # Try to find existing experience by UUID first (fast path)
+                existing_state = state.experiences_state.get(exp.uuid)
+
+                # If not found by UUID, try matching by title/company/location (for CV-injected experiences)
+                matched_uuid = exp.uuid  # Default to new experience's UUID
+                if not existing_state:
+                    exp_key = (
+                        _normalize(exp.experience_title),
+                        _normalize(exp.company),
+                        _normalize(exp.location),
+                    )
+                    for existing_uuid, existing in state.experiences_state.items():
+                        existing_key = (
+                            _normalize(existing.experience.experience_title),
+                            _normalize(existing.experience.company),
+                            _normalize(existing.experience.location),
+                        )
+                        if existing_key == exp_key:
+                            existing_state = existing
+                            matched_uuid = existing_uuid  # Use the existing UUID
+                            break
+
+                if existing_state and existing_state.experience.responsibilities.responsibilities:
+                    # Preserve the existing experience with its responsibilities
+                    # Update only the basic fields that might have changed
+                    responsibilities_count = len(existing_state.experience.responsibilities.responsibilities)
+                    self.logger.debug(
+                        "Preserving responsibilities for experience {title=%s, uuid=%s, responsibilities=%d}",
+                        exp.experience_title,
+                        matched_uuid,
+                        responsibilities_count
+                    )
+                    existing_state.experience.experience_title = exp.experience_title
+                    existing_state.experience.company = exp.company
+                    existing_state.experience.location = exp.location
+                    existing_state.experience.timeline = exp.timeline
+                    existing_state.experience.work_type = exp.work_type
+                    # Use the matched UUID (preserves CV-injected UUID if matched)
+                    new_experiences_state[matched_uuid] = existing_state
+                else:
+                    # Create a new experience state (no existing one or no responsibilities to preserve)
+                    new_experiences_state[exp.uuid] = ExperienceState(experience=exp)
+
+            # Replace the old state with the new one
+            state.experiences_state = new_experiences_state
 
             # If collecting is not finished then return the output to the user to continue collecting
             if not agent_output.finished:

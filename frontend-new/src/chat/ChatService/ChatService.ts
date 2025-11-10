@@ -67,6 +67,48 @@ export default class ChatService {
     return messageResponse;
   }
 
+  /**
+   * Send an artificial (hidden) user message that should not appear in history.
+   */
+  public async sendArtificialMessage(sessionId: number, message: string): Promise<ConversationResponse> {
+    const serviceName = "ChatService";
+    const serviceFunction = "sendArtificialMessage";
+    const method = "POST";
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, this.chatEndpointUrl);
+    const constructedSendMessageURL = `${this.chatEndpointUrl}/${sessionId}/messages`;
+
+    const response = await customFetch(constructedSendMessageURL, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_input: message,
+        is_artificial: true,
+      }),
+      expectedStatusCode: StatusCodes.CREATED,
+      serviceName,
+      serviceFunction,
+      failureMessage: `Failed to send artificial message with session id ${sessionId}`,
+      expectedContentType: "application/json",
+    });
+
+    const responseBody = await response.text();
+    try {
+      return JSON.parse(responseBody);
+    } catch (e: any) {
+      throw errorFactory(
+        response.status,
+        ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
+        "Response did not contain valid JSON",
+        {
+          responseBody,
+          error: e,
+        }
+      );
+    }
+  }
+
   public async getChatHistory(sessionId: number): Promise<ConversationResponse> {
     const serviceName = "ChatService";
     const serviceFunction = "getChatHistory";

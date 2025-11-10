@@ -26,7 +26,6 @@ describe("UploadedCVsMenuContent", () => {
               filename: "foo_bar.pdf",
               uploaded_at: new Date().toISOString(),
               upload_process_state: "COMPLETED",
-              experiences_data: [],
             },
           ]}
           onSelect={jest.fn()}
@@ -85,6 +84,28 @@ describe("UploadedCVsMenuContent", () => {
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
     });
+
+    test("should show reinjection progress indicator when reinjecting", () => {
+      render(
+        <UploadedCVsMenu
+          uploadedCVs={[
+            {
+              upload_id: "1",
+              filename: "foo_bar.pdf",
+              uploaded_at: new Date().toISOString(),
+              upload_process_state: "COMPLETED",
+            },
+          ]}
+          onSelect={jest.fn()}
+          onBack={jest.fn()}
+          currentPhase={ConversationPhase.COLLECT_EXPERIENCES}
+          isLoading={false}
+          isReinjecting
+        />
+      );
+
+      expect(screen.getByTestId(DATA_TEST_ID.UPLOADED_CVS_MENU_PROGRESS)).toBeInTheDocument();
+    });
   });
 
   describe("action tests", () => {
@@ -97,7 +118,6 @@ describe("UploadedCVsMenuContent", () => {
         filename: "foo_bar.pdf",
         uploaded_at: new Date().toISOString(),
         upload_process_state: "COMPLETED",
-        experiences_data: ["foo", "bar"],
       };
       // AND the component is rendered
       render(

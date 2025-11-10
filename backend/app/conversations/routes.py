@@ -32,15 +32,15 @@ from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo
 
 
-async def get_conversation_service(agent_director: LLMAgentDirector = Depends(get_agent_director),
-                                   application_state_manager: ApplicationStateManager = Depends(
-                                       get_application_state_manager),
-                                   conversation_memory_manager: ConversationMemoryManager = Depends(
-                                       get_conversation_memory_manager),
-                                   db: AsyncIOMotorDatabase = Depends(
-                                       CompassDBProvider.get_application_db),
-                                   metrics_service: IMetricsService = Depends(
-                                       get_metrics_service)) -> IConversationService:
+def get_conversation_service(agent_director: LLMAgentDirector = Depends(get_agent_director),
+                             application_state_manager: ApplicationStateManager = Depends(
+                                 get_application_state_manager),
+                             conversation_memory_manager: ConversationMemoryManager = Depends(
+                                 get_conversation_memory_manager),
+                             db: AsyncIOMotorDatabase = Depends(
+                                 CompassDBProvider.get_application_db),
+                             metrics_service: IMetricsService = Depends(
+                                 get_metrics_service)) -> IConversationService:
     return ConversationService(agent_director=agent_director,
                                application_state_metrics_recorder=ApplicationStateMetricsRecorder(
                                    application_state_manager=application_state_manager,
@@ -101,6 +101,8 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
             # set the client_id in the context variable.
             client_id_ctx_var.set(current_user_preferences.client_id)
 
+            if getattr(body, "is_artificial", False):
+                return await service.send(user_id, session_id, user_input, clear_memory, filter_pii, is_artificial=True)
             return await service.send(user_id, session_id, user_input, clear_memory, filter_pii)
         except ConversationAlreadyConcludedError as e:
             warning_msg = str(e)

@@ -1,5 +1,7 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
+import MetricsService from "src/metrics/metricsService";
+import { EventType } from "src/metrics/types";
 import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "src/chat/Chat.types";
 import {
@@ -253,6 +255,76 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   // Compute display message from status
   const getCvUploadDisplayMessageMemo = useCallback((status: UploadStatus): string => getCvUploadDisplayMessage(status), []);
 
+  // Centralized hidden artificial message sender (toggles typing, updates chat state)
+  const lastHiddenSendRef = useRef<number>(0);
+  const HIDDEN_SEND_COOLDOWN_MS = 2500;
+  const sendHiddenArtificialMessage = useCallback(async () => {
+    // Debounce to avoid double fires
+    const now = Date.now();
+    if (now - lastHiddenSendRef.current < HIDDEN_SEND_COOLDOWN_MS) {
+      return;
+    }
+    lastHiddenSendRef.current = now;
+    try {
+      if (activeSessionId != null) {
+        setAiIsTyping(true);
+        const response = await ChatService.getInstance().sendArtificialMessage(
+          activeSessionId,
+          "Please use the experiences I've shared to continue. Ask for any missing details."
+        );
+
+        setExploredExperiences(response.experiences_explored);
+        if (response.experiences_explored > exploredExperiences) {
+          setExploredExperiencesNotification(true);
+          await fetchExperiences();
+        }
+
+        response.messages.forEach((messageItem, idx) => {
+          const isConclusionMessage = response.conversation_completed && idx === response.messages.length - 1;
+          if (!isConclusionMessage) {
+            addMessageToChat(
+              generateCompassMessage(
+                messageItem.message_id,
+                messageItem.message,
+                messageItem.sent_at,
+                messageItem.reaction
+              )
+            );
+          }
+        });
+
+        if (response.conversation_completed && response.messages.length) {
+          const lastMessage = response.messages[response.messages.length - 1];
+          if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
+            const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(activeSessionId);
+            const isAlreadyCompleted = skillsRankingState?.completed_at !== undefined;
+            const showConclusionMessage = createShowConclusionMessage(
+              lastMessage,
+              addMessageToChat,
+              setAiIsTyping,
+              isAlreadyCompleted
+            );
+            await showSkillsRanking(showConclusionMessage);
+          } else {
+            const conclusionMessage = generateConversationConclusionMessage(
+              lastMessage.message_id,
+              lastMessage.message
+            );
+            addMessageToChat(conclusionMessage);
+          }
+        }
+
+        setConversationCompleted(response.conversation_completed);
+        setConversationConductedAt(response.conversation_conducted_at);
+        setCurrentPhase((_previousCurrentPhase) => parseConversationPhase(response.current_phase, _previousCurrentPhase));
+      }
+    } catch (e) {
+      console.error("Failed to send artificial message after CV action:", e);
+    } finally {
+      setAiIsTyping(false);
+    }
+  }, [activeSessionId, exploredExperiences, fetchExperiences, addMessageToChat, showSkillsRanking]);
+
   // Helper function to start polling for upload status
   const startPollingForUpload = useCallback((uploadId: string, messageId: string) => {
     // Stop any existing polling for this uploadId first
@@ -272,7 +344,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         const resp = await cvService.getInstance().getUploadStatus(currentUserId, id);
         // Narrow to UploadStatus
 return {
-          upload_process_state: resp.upload_process_state as UploadStatus["upload_process_state"],
+          upload_process_state: resp.upload_process_state,
           cancel_requested: resp.cancel_requested,
           filename: resp.filename,
           user_id: resp.user_id,
@@ -281,7 +353,8 @@ return {
           last_activity_at: resp.last_activity_at,
           error_code: resp.error_code,
           error_detail: resp.error_detail,
-          experience_bullets: resp.experience_bullets,
+          state_injected: resp.state_injected,
+          injection_error: resp.injection_error,
         } as UploadStatus;
       },
       onStatus: (status: UploadStatus | null) => {
@@ -303,17 +376,28 @@ return {
       onComplete: (status: UploadStatus) => {
         stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
         removeMessageFromChat(messageId);
-        const items: string[] | undefined = status.experience_bullets ?? undefined;
-        if (Array.isArray(items) && items.length > 0) {
-          const intro = "These are my experiences:";
-          const bullets = items
-            .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
-            .filter(Boolean)
-            .join("\n");
-          const composed = bullets ? `${intro}\n${bullets}` : intro;
-          setPrefillMessage(composed);
+        enqueueSnackbar("CV processed and loaded", { variant: "success" });
+        // Frontend metric: auto advance after CV upload completes
+        try {
+          const userId = authenticationStateService.getInstance().getUser()?.id;
+          if (userId && activeSessionId != null) {
+            MetricsService.getInstance().sendMetricsEvent({
+              event_type: EventType.UI_INTERACTION,
+              user_id: userId,
+              actions: ["cv_upload_auto_advance"],
+              element_id: "cv_upload_auto_advance",
+              timestamp: new Date().toISOString(),
+              relevant_experiments: {},
+              details: {
+                session_id: activeSessionId,
+                state_injected: Boolean((status as any).state_injected),
+              },
+            });
+          }
+        } catch (metricErr) {
+          console.error("Failed to send cv_upload_auto_advance metric", metricErr);
         }
-        enqueueSnackbar("CV uploaded successfully", { variant: "success" });
+        void sendHiddenArtificialMessage();
       },
       onTerminal: (_status: UploadStatus) => {
         stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
@@ -357,7 +441,7 @@ return {
       }
     });
     setActiveUploads(prev => new Map(prev).set(uploadId, { messageId, intervalId: handles.intervalId as any, timeoutId: handles.timeoutId as any }));
-  }, [activeUploads, enqueueSnackbar, removeMessageFromChat, messages, stopPollingForUpload, getCvUploadDisplayMessageMemo]);
+  }, [activeUploads, stopPollingForUpload, getCvUploadDisplayMessageMemo, removeMessageFromChat, enqueueSnackbar, sendHiddenArtificialMessage, messages, activeSessionId]);
 
   // Helper function to cancel an upload
   const handleCancelUpload = useCallback(async (uploadId: string) => {
@@ -457,7 +541,7 @@ return {
                 ...msg,
                 payload: {
                   ...msg.payload,
-                  onCancel: async () => await handleCancelUpload(response.uploadId!),
+                  onCancel: async () => await handleCancelUpload(response.uploadId),
                 }
               };
             }
@@ -596,6 +680,8 @@ return {
             setMessages([generateTypingMessage()]);
             // AND clear the current phase
             setCurrentPhase(defaultCurrentPhase);
+            // AND clear CV upload errors
+            setCvUploadError(null);
           } else {
             console.debug("Failed to issue new session");
             return false;
@@ -699,6 +785,8 @@ return {
   const handleConfirmNewConversation = useCallback(async () => {
     setNewConversationDialog(false);
     setExploredExperiencesNotification(false);
+    // Clear CV upload errors when starting a new conversation
+    setCvUploadError(null);
     if (await initializeChat(currentUserId, null)) {
       enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.NEW_CONVERSATION_STARTED, { variant: "success" });
     } else {
@@ -868,6 +956,8 @@ return {
                 currentPhase={currentPhase.phase}
                 prefillMessage={prefillMessage}
                 cvUploadError={cvUploadError}
+                activeSessionId={activeSessionId}
+                onAfterCvInjected={() => sendHiddenArtificialMessage()}
               />
             </Box>
           </Box>

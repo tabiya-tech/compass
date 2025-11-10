@@ -5,7 +5,9 @@ from typing import Iterator
 
 import pytest
 
-from app.users.cv.utils.llm_extractor import CVExperienceExtractor
+from app.users.cv.utils.cv_structured_extractor import CVStructuredExperienceExtractor
+from app.users.cv.utils.cv_responsibilities_extractor import CVResponsibilitiesExtractor
+from app.agent.skill_explorer_agent._responsibilities_extraction_tool import _ResponsibilitiesExtractionTool
 from app.users.cv.utils.markdown_converter import convert_cv_bytes_to_markdown
 
 BASE_DIR = Path(__file__).parent
@@ -45,16 +47,44 @@ async def test_parse_cv_on_real_files(input_path: Path | None, attempt: int):
         pytest.skip("No input files found under evaluation_tests/cv_parser/test_inputs; add files to run this test")
 
     logger = logging.getLogger("CVUploadServiceIntegrationTest")
-    extractor = CVExperienceExtractor(logger=logger)
+    tool = _ResponsibilitiesExtractionTool(logger)
+    resp_extractor = CVResponsibilitiesExtractor(logger, tool)
+    extractor = CVStructuredExperienceExtractor(logger, resp_extractor)
 
     file_bytes = input_path.read_bytes()
     filename = input_path.name
 
     # WHEN parsing the CV
     mark_down = convert_cv_bytes_to_markdown(file_bytes=file_bytes, filename=filename, logger=logger)
-    experiences_data = await extractor.extract_experiences(mark_down)
-    logger.info("Parsed experiences: %s", experiences_data or "[]")
-    experiences = experiences_data or []
+    structured = await extractor.extract_structured_experiences(mark_down)
+    # Convert structured experiences to simple lines for backward-compatible keyword checks
+    def _extract_year(date_str: str | None) -> str | None:
+        """Extract year from date string (handles formats like '2019', '09/2019', '2019-09', etc.)"""
+        if not date_str:
+            return None
+        # Try to extract year (last 4 digits or first 4 digits if it looks like YYYY-MM-DD)
+        import re
+        # Match 4-digit year
+        year_match = re.search(r'\b(19|20)\d{2}\b', date_str)
+        return year_match.group(0) if year_match else date_str
+    
+    experiences = []
+    for e in structured.experience_entities:
+        parts = [e.experience_title]
+        if e.company:
+            parts.append(f"at {e.company}")
+        if e.location:
+            parts.append(e.location)
+        if e.timeline and e.timeline.start:
+            year = _extract_year(e.timeline.start)
+            if year:
+                parts.append(year)
+        if e.timeline and e.timeline.end:
+            year = _extract_year(e.timeline.end)
+            if year:
+                parts.append(year)
+        experiences.append(" ".join(parts).strip())
+    logger.info("Parsed experiences: %s", experiences or "[]")
 
     # THEN the extracted experiences should match expectations (probabilistic: run multiple times)
     expectation = _load_expectation_for(input_path)

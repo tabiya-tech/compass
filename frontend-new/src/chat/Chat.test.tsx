@@ -2370,7 +2370,6 @@ describe("Chat", () => {
         cancel_requested: false,
         created_at: new Date().toISOString(),
         last_activity_at: new Date().toISOString(),
-        experience_bullets: ["line 1", "line 2"],
       } as any);
 
       // WHEN the component is rendered
