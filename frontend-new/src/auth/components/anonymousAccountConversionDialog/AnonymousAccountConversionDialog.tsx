@@ -106,6 +106,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
     try {
       const authService = FirebaseEmailAuthenticationService.getInstance();
       await authService.linkAnonymousAccount(email, password, email);
+      console.info("Anonymous account successfully linked to a registered account.");
       enqueueSnackbar("Account successfully registered!", { variant: "success" });
       enqueueSnackbar(`Currently logged in with the email: ${email}. A verification email has been sent to your email address. Please verify your account before logging in again.`, {
         variant: "info",
@@ -115,6 +116,8 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
       onSuccess();
       onClose();
     } catch (error: any) {
+      console.error(new Error("Failed to link anonymous account"), { cause: error });
+
       enqueueSnackbar(error.message || "Failed to register account", { variant: "error" });
     } finally {
       setIsLoading(false);
@@ -220,4 +223,4 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
   );
 };
 
-export default AnonymousAccountConversionDialog; 
+export default AnonymousAccountConversionDialog;

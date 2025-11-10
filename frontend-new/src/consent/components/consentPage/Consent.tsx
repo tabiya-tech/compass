@@ -78,7 +78,7 @@ const Consent: React.FC = () => {
         };
         MetricsService.getInstance().sendMetricsEvent(deviceEvent);
       } catch (error) {
-        console.error("An error occurred while trying to send metrics events", error);
+        console.error("Failed to send device specification metrics:", error);
       }
 
       try {
@@ -99,7 +99,7 @@ const Consent: React.FC = () => {
         if (err instanceof GeolocationPositionError) {
           console.warn("Location could not be retrieved", err);
         } else {
-          console.error("An error occurred while trying to get user's location", err);
+          console.error("Failed to send user location metrics:", err);
         }
       }
     });
@@ -112,6 +112,7 @@ const Consent: React.FC = () => {
     try {
       const user = authStateService.getInstance().getUser();
       if (!user) {
+        console.warn("User preferences could not be persisted: user not found. Redirecting to landing page.");
         enqueueSnackbar("User not found", { variant: "error" });
         navigate(routerPaths.LANDING);
         return;
@@ -124,6 +125,7 @@ const Consent: React.FC = () => {
       };
       setIsAccepting(true);
       const prefs = await UserPreferencesService.getInstance().updateUserPreferences(newUserPreferenceSpecs);
+      console.info("User preferences saved successfully and consent recorded.");
 
       UserPreferencesStateService.getInstance().setUserPreferences({
         ...prefs,
@@ -131,6 +133,7 @@ const Consent: React.FC = () => {
       });
 
       if (!isSensitiveDataValid(userPreferences!)) {
+        console.info("User preferences incomplete. Redirecting to sensitive data page.");
         navigate(routerPaths.SENSITIVE_DATA, { replace: true });
       } else {
         navigate(routerPaths.ROOT, { replace: true });
@@ -169,6 +172,8 @@ const Consent: React.FC = () => {
     try {
       const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
       await authenticationService!.logout();
+      console.info("User rejected consent. Logging out user.");
+
       navigate(routerPaths.LANDING, { replace: true });
       enqueueSnackbar("Successfully logged out.", { variant: "success" });
     } catch (e) {

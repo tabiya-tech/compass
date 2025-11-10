@@ -1,4 +1,4 @@
-import random
+import logging
 
 from fastapi import HTTPException
 
@@ -6,6 +6,9 @@ from app.constants.errors import ErrorService
 from app.users.generate_session_id import generate_new_session_id
 from app.users.repositories import UserPreferenceRepository
 from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest
+
+
+logger = logging.getLogger(__name__)
 
 
 class SessionsService:
@@ -26,6 +29,7 @@ class SessionsService:
 
             # If the user does not exist, raise an HTTPException
             if user_preferences is None:
+                logger.info("User preferences not found. user_id=%s", user_id)
                 raise HTTPException(status_code=404, detail="User not found")
 
             # Add the new session to the user preferences

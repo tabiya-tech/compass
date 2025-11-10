@@ -125,6 +125,8 @@ const Register: React.FC = () => {
     } catch (error) {
       const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
       await firebaseSocialAuthServiceInstance.logout(); // this does not throw an error, at least in the current implementation
+      console.info("Social registration failed. Logging out user.");
+
       await handleError(error as Error);
     } finally {
       setIsLoading(false);
@@ -153,6 +155,8 @@ const Register: React.FC = () => {
         // since if we don't do that, the user may be able to access the application without verifying their email
         // or accepting the dpa.
         await firebaseEmailAuthServiceInstance.logout();
+        console.info("Registration requires email verification. Logging out user.");
+
         // navigate to the verify email page
         navigate(routerPaths.VERIFY_EMAIL, { replace: true });
       } catch (e) {

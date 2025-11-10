@@ -106,6 +106,7 @@ def add_user_feedback_routes(users_router: APIRouter, auth: Authentication):
         user_id_ctx_var.set(user_info.user_id)
 
         if len(await request.body()) > MAX_PAYLOAD_SIZE:
+            logger.warning(f"Payload size exceeds {MAX_PAYLOAD_SIZE} characters")
             raise HTTPException(
                 status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
                 detail=f"Total payload size exceeds {MAX_PAYLOAD_SIZE} characters"

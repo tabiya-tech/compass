@@ -736,6 +736,11 @@ describe("Api Service tests", () => {
             isValid: true,
             decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid
             failureCause: null,
+          })
+          .mockReturnValue({
+            isValid: true,
+            decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 },
+            failureCause: null,
           }),
         refreshToken: jest.fn().mockResolvedValue(undefined),
         isProviderSessionValid: jest.fn().mockResolvedValue(true),
