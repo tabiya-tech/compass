@@ -228,7 +228,7 @@ describe("ChatHeader", () => {
         />
       </ChatProvider>
     );
-    testNavigateToPath(givenChatHeader, "Compass logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
+    testNavigateToPath(givenChatHeader, "Compass Logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
 
     test("should open the context menu when the user icon is clicked", async () => {
       // GIVEN a ChatHeader component

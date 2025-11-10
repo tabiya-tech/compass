@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, keyframes } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
@@ -14,9 +14,10 @@ export const DATA_TEST_ID = {
 
 // Deprecated: UI_TEXT constants replaced by i18n keys. Keep for backwards compatibility in any legacy imports.
 export const UI_TEXT = {
-  UPLOADING_CV: "cv_typing_uploading", // use t("cv_typing_uploading")
-  CV_UPLOADED: "cv_typing_uploaded_ready",
+  UPLOADING_CV: "Please wait while I upload and parse your CV",
+  CV_UPLOADED: "Your CV content is in the text field. Review it and send when ready.",
 };
+
 
 export const CV_UPLOADED_DISPLAY_TIME = 30 * 1000;
 
@@ -43,9 +44,15 @@ const textVariants = {
 };
 
 const CVTypingChatMessage: React.FC<CVTypingChatMessageProps> = ({ isUploaded = false }) => {
-  const { t } = useTranslation();
-  const displayTextKey = isUploaded ? UI_TEXT.CV_UPLOADED : UI_TEXT.UPLOADING_CV;
-  const displayText = t(displayTextKey);
+  const { t, i18n } = useTranslation();
+  const displayTextKey = isUploaded ?  "cv_typing_uploaded_ready" : "cv_typing_uploading";
+  const [displayText, setDisplayText] = useState(t(displayTextKey));
+
+  useEffect(() => {
+    // Update text when language or key changes
+    setDisplayText(t(displayTextKey));
+  }, [displayTextKey, i18n.language, t]);
+
   const showDots = !isUploaded;
 
   return (
