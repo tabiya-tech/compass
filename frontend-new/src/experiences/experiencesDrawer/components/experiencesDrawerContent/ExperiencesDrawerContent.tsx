@@ -15,6 +15,8 @@ import RestoreIcon from "@mui/icons-material/Restore";
 import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 import { deduplicateSkills } from "src/utils/skillsUtils";
 import { useTranslation } from "react-i18next";
+import { cvFormatDate } from "src/utils/dateUtils";
+
 
 const uniqueId = "34a59a9e-e7f6-4a10-8b72-0fd401c727de";
 
@@ -164,8 +166,8 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
         >
           {/* display the start and end dates */}
           {experience.timeline.end && experience.timeline.start
-            ? `${experience.timeline.start} — ${experience.timeline.end}`
-            : experience.timeline.start || experience.timeline.end}
+            ? `${cvFormatDate(experience.timeline.start)} — ${cvFormatDate(experience.timeline.end)}`
+            : cvFormatDate(experience.timeline.start) || cvFormatDate(experience.timeline.end)}  
 
           {(experience.timeline.start || experience.timeline.end) && experience.company && ", "}
 
