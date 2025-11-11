@@ -41,58 +41,7 @@
       "justNow": "justo ahora"
     }
   },
-  "welcome_to_compass": "¡Bienvenido a Compass!",
-  "login_to_your_account_to_continue": "Inicia sesión en tu cuenta para continuar",
-  "login_using": "Inicia sesión usando",
-  "dont_have_an_account": "¿No tienes una cuenta?",
-  "logging_you_in": "Iniciando sesión...",
-  "registering_aria": "Registrando",
-  "continue_as_guest": "Continuar como invitado",
-  "or_login_to_your_account_to_continue": "O inicia sesión en tu cuenta para continuar",
-  "or": "o",
-  "fill_in_email_and_password": "Por favor, rellene los campos de correo electrónico y contraseña",
-  "invitation_code_valid": "El código de invitación es válido",
-  "welcome_back": "¡Bienvenido de nuevo!",
-  "logging_in_aria": "Iniciando sesión",
   "language_selector": "Selector de idioma",
-  "forgot_password": "¿Olvidaste tu contraseña?",
-  "please_enter_email": "Por favor ingresa tu dirección de correo electrónico",
-  "password_reset_email_sent": "¡Correo de restablecimiento de contraseña enviado!",
-  "failed_to_send_reset_email": "Error al enviar el correo de restablecimiento",
-  "password_reset_link_sent": "Se ha enviado un enlace de restablecimiento de contraseña a tu correo electrónico.",
-  "reset_password": "Restablecer contraseña",
-  "close_password_reset_form": "Cerrar formulario de restablecimiento",
-  "or_continue_with": "O continúa con",
-  "google_login_is_not_available_when_offline": "El inicio de sesión con Google no funciona sin conexión a internet.",
-  "login_with_google": "Inicia sesión con Google",
-  "landing_subtitle_bold": "Descubre todo tu potencial",
-  "landing_subtitle_body": "Descubre y expresa tus habilidades a través de conversaciones naturales guiadas por IA. Crea tu perfil de habilidades y descarga un CV para impulsar tu búsqueda de empleo. Crea una cuenta gratuita para guardar tu progreso y volver a consultar tu historial de conversaciones.",
-  "register_subtitle": "Necesitamos algo de información para comenzar",
-  "enter_registration_code": "Ingresa tu código de registro",
-  "registration_code": "Código de registro",
-  "and_either_continue_with": "o continúa con",
-  "register_with_google": "Registrarse con Google",
-  "already_have_account": "¿Ya tienes una cuenta?",
-  "registering_you": "Registrándote...",
-  "registration_thank_you": "Gracias por registrarte en Compass.",
-  "verification_email_sent_message": "Se ha enviado un correo de verificación a tu dirección de correo electrónico. Para continuar, primero verifica tu correo electrónico.",
-  "login_code": "Código de inicio de sesión",
-  "close_registration_form": "Cerrar formulario de registro",
-  "register_account": "Registrar cuenta",
-  "registration_info": "Por favor regístrate con un correo electrónico para mantener el acceso a esta conversación. Sin registrarte, no podrás iniciar sesión nuevamente ni regresar a esta conversación.",
-  "email_warning": "Asegúrate de usar el correo correcto, ya que no se podrá cambiar más tarde y se te pedirá verificarlo.",
-  "close_registration_code_form": "Cerrar formulario de código de registro",
-  "no_registration_code_prompt": "¿No tienes un código de registro?",
-  "reach_out": "Contáctanos",
-  "request_login_code": "¿No tienes un código de inicio de sesión?",
-  "email_not_verified": "Tu correo electrónico no está verificado. Por favor revisa tu bandeja de entrada para el correo de verificación.",
-  "resend_verification_email": "Reenviar correo de verificación",
-  "request_access_title": "Solicitar acceso a Compass",
-  "close_request_invitation_form": "Cerrar formulario de solicitud de invitación",
-  "request_access_subtitle": "Por favor, cuéntanos cómo planeas usar Compass. Revisaremos tu solicitud cuidadosamente y nos pondremos en contacto contigo pronto.",
-  "name": "Nombre",
-  "message": "Mensaje",
-  "message_placeholder": "Por favor comparte cómo planeas usar Compass",
   "feedback_message": "¡Nos encantaría conocer tus comentarios sobre tu experiencia hasta ahora!",
   "give_feedback": "Dar comentarios",
   "view_experiences": "Ver experiencias",
@@ -226,25 +175,6 @@
   "error_page_illustration_alt": "ilustración de error",
   "error_page_default_message": "Algo salió mal con Compass. Intentá recargar la página...",
   "error_page_not_found": "Error 404 - Página no encontrada",
-  "firebase_error_email_already_in_use": "La dirección de correo ya está en uso por otra cuenta.",
-  "firebase_error_email_not_verified": "El correo que estás usando está registrado, pero aún no ha sido verificado. Por favor verificá tu correo para continuar.",
-  "firebase_error_invalid_credential": "El correo/contraseña proporcionados no son válidos.",
-  "firebase_error_invalid_email": "La dirección de correo no es válida.",
-  "firebase_error_operation_not_allowed": "Las cuentas de correo/contraseña no están habilitadas.",
-  "firebase_error_weak_password": "La contraseña es demasiado débil.",
-  "firebase_error_user_disabled": "La cuenta de usuario ha sido deshabilitada.",
-  "firebase_error_user_not_found": "No se encontró un usuario con las credenciales proporcionadas.",
-  "firebase_error_wrong_password": "La contraseña no es válida.",
-  "firebase_error_too_many_requests": "Bloqueamos todas las solicitudes desde este dispositivo por actividad inusual. Intentá más tarde.",
-  "firebase_error_internal_error": "Ocurrió un error interno.",
-  "firebase_error_too_many_users": "Hay demasiados usuarios en este proyecto de Firebase.",
-  "firebase_error_invalid_registration_code": "El código de registro ingresado no es válido. Verificá el código e intentá nuevamente.",
-  "firebase_error_invalid_invitation_code": "El código de invitación ingresado no es válido. Verificá el código e intentá nuevamente.",
-  "firebase_error_invalid_invitation_type": "El código que usaste es para registro y no para inicio de sesión. Andá a la página de registro.",
-  "firebase_error_invalid_registration_type": "El código que usaste es para inicio de sesión y no para registro. Andá a la página de inicio de sesión.",
-  "firebase_error_popup_closed_by_user": "La ventana emergente de Google se cerró antes de completar el inicio de sesión.",
-  "firebase_error_invalid_login_method": "Esta operación no está permitida con el método de inicio de sesión actual.",
-  "firebase_error_email_already_verified": "La dirección de correo ya está verificada.",
   "rest_api_error_request_too_long": "Los datos enviados al servicio parecen ser demasiado grandes. Intentá nuevamente con un contenido más pequeño. Si el problema persiste, limpiá la caché de tu navegador y actualizá la página.",
   "rest_api_error_too_many_requests": "Parece que estás realizando demasiadas solicitudes. Intentá nuevamente más tarde.",
   "rest_api_error_unexpected_error": "Ocurrió un error inesperado. Intentá nuevamente más tarde.",
@@ -392,26 +322,9 @@
   "customerSatisfactionRating_rating_label_high": "Satisfecho",
   "customerSatisfactionRating_submit_success": "¡Calificación enviada con éxito!",
   "customerSatisfactionRating_submit_error": "Error al enviar la calificación. Por favor, intentá más tarde.",
-  "auth_anonymousConversion_invalid_email": "Por favor ingresa una dirección de correo válida",
-  "auth_anonymousConversion_emails_mismatch": "Asegúrate de que ambas direcciones de correo coincidan",
-  "auth_anonymousConversion_password_requirements_not_met": "Asegúrate de que tu contraseña cumpla todos los requisitos",
-  "auth_anonymousConversion_registration_success": "¡Cuenta registrada con éxito!",
-  "auth_anonymousConversion_verification_sent_with_email": "Actualmente has iniciado sesión con el correo: {{email}}. Se ha enviado un correo de verificación a tu dirección. Verifica tu cuenta antes de volver a iniciar sesión.",
-  "auth_anonymousConversion_registration_failed": "Error al registrar la cuenta",
   "feedback_overall_submit_success": "¡Comentarios enviados con éxito!",
   "feedback_overall_submit_error": "Error al enviar los comentarios. Por favor, inténtalo más tarde.",
-  "auth_social_failed_login_with_message": "No se pudo iniciar sesión: {{message}}",
-  "auth_social_account_not_registered": "Esta cuenta no está registrada. Por favor, contacta al proveedor de este enlace.",
-  "auth_resend_verification_email_success": "Correo de verificación enviado con éxito",
-  "auth_resend_verification_email_failed_with_message": "Error al enviar el correo de verificación: {{message}}",
-  "auth_logging_you_out_notice": "Cerrando tu sesión...",
   "skillsRanking_briefing_failed_to_continue": "No se pudo continuar. Por favor, inténtalo más tarde.",
-  "invitation_request_submit_success": "Tu solicitud de acceso a Compass se envió correctamente. Nos pondremos en contacto pronto.",
-  "invitation_request_submit_error": "Ocurrió un error al enviar tu solicitud",
-  "auth_register_failed_with_message": "Error de registro: {{message}}",
-  "auth_login_failed_with_message": "No se pudo iniciar sesión: {{message}}",
-  "auth_preferences_fetch_failed_with_message": "Se produjo un error al obtener tus preferencias: {{message}}",
-  "auth_verification_email_sent_short": "¡Correo de verificación enviado!",
   "experiences_summary_restore_failed": "No se pudo restaurar el resumen. Por favor, inténtalo más tarde.",
   "experiences_summary_restored": "Resumen restaurado.",
   "app_isOnline_offline": "Estás sin conexión",
@@ -419,8 +332,7 @@
   "sensitive_data_saved_success": "Datos personales guardados correctamente y de forma segura.",
   "sensitive_data_collection_skipped": "Se omitió la recopilación de datos personales.",
   "sensitive_data_error_default": "No se pudieron guardar los datos personales. Inténtalo de nuevo y, si el problema persiste, limpia la caché del navegador y actualiza la página.",
-  "sensitive_data_error_encrypted_data_too_large": "Los datos personales parecen demasiado grandes para guardarse. Intenta ingresar valores más pequeños en los campos. Si el problema persiste, limpia la caché del navegador y actualiza la página."
-  ,
+  "sensitive_data_error_encrypted_data_too_large": "Los datos personales parecen demasiado grandes para guardarse. Intenta ingresar valores más pequeños en los campos. Si el problema persiste, limpia la caché del navegador y actualiza la página.",
   "chat_message_add_action": "agregar",
   "chat_message_error_limit": "El límite del mensaje es de {{max}} caracteres.",
   "chat_message_error_invalid_chars": "Caracteres especiales no válidos: {{chars}}",
@@ -444,13 +356,138 @@
   "experiences_downloadReportButton_download_cv": "Descargar CV",
   "experiences_downloadReportButton_downloading": "Descargando",
   "experiences_downloadReportButton_help_tip_blocked_message": "No podés descargar el informe hasta que termines de explorar al menos una experiencia.",
-  
   "uploadedCVsMenu_back_title": "Volver al menú principal",
   "uploadedCVsMenu_title_with_count": "CVs cargados previamente ({{count}})",
   "uploadedCVsMenu_help_collect": "Tocá un CV para cargar su contenido en el campo de texto. Revísalo y enviá cuando estés listo.",
   "uploadedCVsMenu_help_disabled": "La selección de CV solo está disponible durante la fase de recolección de experiencias.",
-  "uploadedCVsMenu_empty": "No se encontraron CVs cargados."
-    ,
-    "please_select_x": "Por favor, seleccioná {{x}}",
-    "clear_selection": "Limpiar selección"
+  "uploadedCVsMenu_empty": "No se encontraron CVs cargados.",
+  "please_select_x": "Por favor, seleccioná {{x}}",
+  "clear_selection": "Limpiar selección",
+  "auth": {
+    "pages": {
+      "login": {
+        "welcomeTitle": "¡Bienvenido a Compass!",
+        "welcomeBack": "¡Bienvenido de nuevo!",
+        "loginToYourAccountToContinue": "Inicia sesión en tu cuenta para continuar",
+        "loginUsing": "Inicia sesión usando",
+        "loggingYouIn": "Iniciando sesión...",
+        "loggingInAria": "Iniciando sesión",
+        "dontHaveAnAccount": "¿No tienes una cuenta?",
+        "fillInEmailAndPassword": "Por favor, rellene los campos de correo electrónico y contraseña",
+        "orLoginToYourAccountToContinue": "O inicia sesión en tu cuenta para continuar",
+        "or": "o",
+        "components": {
+          "loginWithInviteCodeForm": {
+            "loginCode": "Código de inicio de sesión"
+          }
+        }
+      },
+      "register": {
+        "subtitle": "Necesitamos algo de información para comenzar",
+        "registerWithGoogle": "Registrarse con Google",
+        "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+        "registeringYou": "Registrándote...",
+        "enterRegistrationCode": "Ingresa tu código de registro",
+        "registrationCode": "Código de registro",
+        "andEitherContinueWith": "o continúa con",
+        "components": {
+          "registerWithEmailForm": {
+            "registeringAria": "Registrando"
+          }
+        }
+      },
+      "landing": {
+        "continueAsGuest": "Continuar como invitado",
+        "subtitleBold": "Descubre todo tu potencial",
+        "subtitleBody": "Descubre y expresa tus habilidades a través de conversaciones naturales guiadas por IA. Crea tu perfil de habilidades y descarga un CV para impulsar tu búsqueda de empleo. Crea una cuenta gratuita para guardar tu progreso y volver a consultar tu historial de conversaciones.",
+        "invitationCodeValid": "El código de invitación es válido"
+      },
+      "verifyEmail": {
+        "registrationThankYou": "Gracias por registrarte en Compass.",
+        "verificationEmailSentMessage": "Se ha enviado un correo de verificación a tu dirección de correo electrónico. Para continuar, primero verifica tu correo electrónico."
+      }
+    },
+    "components": {
+      "anonymousAccountConversionDialog": {
+        "registerAccount": "Registrar cuenta",
+        "registrationInfo": "Por favor regístrate con un correo electrónico para mantener el acceso a esta conversación. Sin registrarte, no podrás iniciar sesión nuevamente ni regresar a esta conversación.",
+        "emailWarning": "Asegúrate de usar el correo correcto, ya que no se podrá cambiar más tarde y se te pedirá verificarlo.",
+        "closeRegistrationForm": "Cerrar formulario de registro",
+        "invalidEmail": "Por favor ingresa una dirección de correo válida",
+        "emailsMismatch": "Asegúrate de que ambas direcciones de correo coincidan",
+        "passwordRequirementsNotMet": "Asegúrate de que tu contraseña cumpla todos los requisitos",
+        "registrationSuccess": "¡Cuenta registrada con éxito!",
+        "verificationSentWithEmail": "Actualmente has iniciado sesión con el correo: {{email}}. Se ha enviado un correo de verificación a tu dirección. Verifica tu cuenta antes de volver a iniciar sesión.",
+        "registrationFailed": "Error al registrar la cuenta"
+      },
+      "passwordReset": {
+        "forgotPassword": "¿Olvidaste tu contraseña?",
+        "pleaseEnterEmail": "Por favor ingresa tu dirección de correo electrónico",
+        "passwordResetEmailSent": "¡Correo de restablecimiento de contraseña enviado!",
+        "failedToSendResetEmail": "Error al enviar el correo de restablecimiento",
+        "passwordResetLinkSent": "Se ha enviado un enlace de restablecimiento de contraseña a tu correo electrónico.",
+        "resetPassword": "Restablecer contraseña",
+        "closePasswordResetForm": "Cerrar formulario de restablecimiento"
+      },
+      "registrationCodeFormModal": {
+        "closeRegistrationCodeForm": "Cerrar formulario de código de registro",
+        "noRegistrationCodePrompt": "¿No tienes un código de registro?",
+        "reachOut": "Contáctanos"
+      },
+      "requestInvitationCodeFormModal": {
+        "requestAccessTitle": "Solicitar acceso a Compass",
+        "requestAccessSubtitle": "Por favor, cuéntanos cómo planeas usar Compass. Revisaremos tu solicitud cuidadosamente y nos pondremos en contacto contigo pronto.",
+        "closeRequestInvitationForm": "Cerrar formulario de solicitud de invitación",
+        "name": "Nombre",
+        "message": "Mensaje",
+        "messagePlaceholder": "Por favor comparte cómo planeas usar Compass",
+        "invitationRequestSubmitSuccess": "Tu solicitud de acceso a Compass se envió correctamente. Nos pondremos en contacto pronto.",
+        "invitationRequestSubmitError": "Ocurrió un error al enviar tu solicitud"
+      },
+      "requestInvitationCode": {
+        "requestLoginCode": "¿No tienes un código de inicio de sesión?"
+      },
+      "resendVerificationEmail": {
+        "emailNotVerified": "Tu correo electrónico no está verificado. Por favor revisa tu bandeja de entrada para el correo de verificación.",
+        "resendVerificationEmail": "Reenviar correo de verificación",
+        "resendVerificationEmailSuccess": "Correo de verificación enviado con éxito",
+        "resendVerificationEmailFailedWithMessage": "Error al enviar el correo de verificación: {{message}}"
+      },
+      "socialAuth": {
+        "orContinueWith": "O continúa con",
+        "loginWithGoogle": "Inicia sesión con Google",
+        "googleLoginIsNotAvailableWhenOffline": "El inicio de sesión con Google no funciona sin conexión a internet.",
+        "socialFailedLoginWithMessage": "No se pudo iniciar sesión: {{message}}",
+        "accountNotRegistered": "Esta cuenta no está registrada. Por favor, contacta al proveedor de este enlace."
+      }
+    },
+    "loggingYouOutNotice": "Cerrando tu sesión...",
+    "errors": {
+      "loginFailedWithMessage": "No se pudo iniciar sesión: {{message}}",
+      "registerFailedWithMessage": "Error de registro: {{message}}",
+      "preferencesFetchFailedWithMessage": "Se produjo un error al obtener tus preferencias: {{message}}",
+      "firebase": {
+        "emailAlreadyInUse": "La dirección de correo ya está en uso por otra cuenta.",
+        "emailNotVerified": "El correo que estás usando está registrado, pero aún no ha sido verificado. Por favor verificá tu correo para continuar.",
+        "invalidCredential": "El correo/contraseña proporcionados no son válidos.",
+        "invalidEmail": "La dirección de correo no es válida.",
+        "operationNotAllowed": "Las cuentas de correo/contraseña no están habilitadas.",
+        "weakPassword": "La contraseña es demasiado débil.",
+        "userDisabled": "La cuenta de usuario ha sido deshabilitada.",
+        "userNotFound": "No se encontró un usuario con las credenciales proporcionadas.",
+        "wrongPassword": "La contraseña no es válida.",
+        "tooManyRequests": "Bloqueamos todas las solicitudes desde este dispositivo por actividad inusual. Intentá más tarde.",
+        "internalError": "Ocurrió un error interno.",
+        "tooManyUsers": "Hay demasiados usuarios en este proyecto de Firebase.",
+        "invalidRegistrationCode": "El código de registro ingresado no es válido. Verificá el código e intentá nuevamente.",
+        "invalidInvitationCode": "El código de invitación ingresado no es válido. Verificá el código e intentá nuevamente.",
+        "invalidInvitationType": "El código que usaste es para registro y no para inicio de sesión. Andá a la página de registro.",
+        "invalidRegistrationType": "El código que usaste es para inicio de sesión y no para registro. Andá a la página de inicio de sesión.",
+        "popupClosedByUser": "La ventana emergente de Google se cerró antes de completar el inicio de sesión.",
+        "invalidLoginMethod": "Esta operación no está permitida con el método de inicio de sesión actual.",
+        "emailAlreadyVerified": "La dirección de correo ya está verificada."
+      }
+    },
+    "verificationEmailSentShort": "¡Correo de verificación enviado!"
   }
+}

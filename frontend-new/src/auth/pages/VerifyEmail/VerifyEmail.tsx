@@ -39,10 +39,10 @@ const VerifyEmail: React.FC = () => {
         height={"80%"}
       >
         <AuthHeader
-          title={t("registration_thank_you")}
+          title={t("auth.pages.verifyEmail.registrationThankYou")}
           subtitle={
             <Typography variant="body2">
-              {t("verification_email_sent_message")}
+              {t("auth.pages.verifyEmail.verificationEmailSentMessage")}
             </Typography>
           }
         />

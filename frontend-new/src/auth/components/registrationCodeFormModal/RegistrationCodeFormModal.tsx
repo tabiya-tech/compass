@@ -93,7 +93,7 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
         <Box sx={style}>
           <PrimaryIconButton
             data-testid={DATA_TEST_ID.CLOSE_ICON}
-            title={t("close_registration_code_form")}
+            title={t("auth.components.registrationCodeFormModal.closeRegistrationCodeForm")}
             onClick={onClose}
             sx={{
               position: "absolute",
@@ -105,16 +105,16 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
             <CloseIcon />
           </PrimaryIconButton>
           <Typography variant="h4" data-testid={DATA_TEST_ID.MODAL_TITLE}>
-            {t("registration_code")}
+            {t("auth.pages.register.registrationCode")}
           </Typography>
           <Typography variant="body2" data-testid={DATA_TEST_ID.MODAL_SUBTITLE}>
-            {t("enter_registration_code")}
+            {t("auth.pages.register.enterRegistrationCode")}
           </Typography>
           <TextField
             fullWidth
-            label={t("registration_code")}
+            label={t("auth.pages.register.registrationCode")}
             variant="outlined"
-            placeholder={t("enter_registration_code")}
+            placeholder={t("auth.pages.register.enterRegistrationCode")}
             margin="normal"
             required
             onChange={(e) => setRegistrationCode(e.target.value)}
@@ -144,9 +144,9 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
               marginTop: theme.fixedSpacing(theme.tabiyaSpacing.sm),
             }}
           >
-            {t("no_registration_code_prompt")}{" "}
+            {t("auth.components.registrationCodeFormModal.noRegistrationCodePrompt")}{" "}
             <CustomLink onClick={handleOpenRequestModal} data-testid={DATA_TEST_ID.REQUEST_REGISTRATION_CODE_LINK}>
-              {t("reach_out")}
+              {t("auth.components.registrationCodeFormModal.reachOut")}
             </CustomLink>
           </Typography>
           }

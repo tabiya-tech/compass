@@ -65,7 +65,7 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
     try {
       const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
       await firebaseEmailAuthServiceInstance.resendVerificationEmail(email, password);
-      enqueueSnackbar(t("auth_resend_verification_email_success"), { variant: "success" });
+      enqueueSnackbar(t("auth.components.resendVerificationEmail.resendVerificationEmailSuccess"), { variant: "success" });
       setCooldownSeconds(COOLDOWN_SECONDS);
     } catch (error) {
       let errorMessage;
@@ -76,7 +76,7 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
         errorMessage = (error as Error).message;
         console.error("Failed to resend verification email (unknown error):", error);
       }
-      enqueueSnackbar(t("auth_resend_verification_email_failed_with_message", { message: errorMessage }), { variant: "error" });
+      enqueueSnackbar(t("auth.components.resendVerificationEmail.resendVerificationEmailFailedWithMessage", { message: errorMessage }), { variant: "error" });
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +85,7 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
   return (
     <StyledBox data-testid={DATA_TEST_ID.CONTAINER}>
       <Typography variant="body2" color="error">
-        {t("email_not_verified")}
+        {t("auth.components.resendVerificationEmail.emailNotVerified")}
       </Typography>
       <Box>
         <CustomLink
@@ -93,7 +93,7 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
           disabled={isLoading || cooldownSeconds > 0 || !isOnline}
           data-testid={DATA_TEST_ID.RESEND_LINK}
         >
-          {t("resend_verification_email")}
+          {t("auth.components.resendVerificationEmail.resendVerificationEmail")}
         </CustomLink>
         {cooldownSeconds > 0 && (
           <Typography
