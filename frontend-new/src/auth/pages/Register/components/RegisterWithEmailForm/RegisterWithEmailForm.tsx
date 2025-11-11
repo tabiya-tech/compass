@@ -94,7 +94,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         {isRegistering ? (
           <CircularProgress
             color={"secondary"}
-            aria-label={t("registering_aria")}
+            aria-label={t("auth.pages.register.components.registerWithEmailForm.registeringAria")}
             data-testid={DATA_TEST_ID.REGISTER_BUTTON_CIRCULAR_PROGRESS}
             size={16}
             sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}

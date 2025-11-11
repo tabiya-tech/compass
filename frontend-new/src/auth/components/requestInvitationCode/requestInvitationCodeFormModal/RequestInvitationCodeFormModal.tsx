@@ -61,11 +61,11 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
         message,
       });
 
-      enqueueSnackbar(t("invitation_request_submit_success"), {
+      enqueueSnackbar(t("auth.components.requestInvitationCodeFormModal.invitationRequestSubmitSuccess"), {
         variant: "success",
       });
     } catch (e) {
-      enqueueSnackbar(t("invitation_request_submit_error"), {
+      enqueueSnackbar(t("auth.components.requestInvitationCodeFormModal.invitationRequestSubmitError"), {
         variant: "error",
       });
       console.error(e);
@@ -89,10 +89,10 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
       >
         <Box display="flex" justifyContent="space-between" alignItems="start">
           <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.MODAL_TITLE}>
-            {t("request_access_title")}
+            {t("auth.components.requestInvitationCodeFormModal.requestAccessTitle")}
           </Typography>
           <PrimaryIconButton
-            title={t("close_request_invitation_form")}
+            title={t("auth.components.requestInvitationCodeFormModal.closeRequestInvitationForm")}
             onClick={onClose}
             sx={{
               color: theme.palette.grey[500],
@@ -103,13 +103,13 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
           </PrimaryIconButton>
         </Box>
         <Typography variant="body2" data-testid={DATA_TEST_ID.MODAL_SUBTITLE}>
-          {t("request_access_subtitle")}
+          {t("auth.components.requestInvitationCodeFormModal.requestAccessSubtitle")}
         </Typography>
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label={t("name")}
-            placeholder={t("name")}
+            label={t("auth.components.requestInvitationCodeFormModal.name")}
+            placeholder={t("auth.components.requestInvitationCodeFormModal.name")}
             type="text"
             variant="outlined"
             margin="normal"
@@ -132,8 +132,8 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
           />
           <TextField
             fullWidth
-            label={t("message")}
-            placeholder={t("message_placeholder")}
+            label={t("auth.components.requestInvitationCodeFormModal.message")}
+            placeholder={t("auth.components.requestInvitationCodeFormModal.messagePlaceholder")}
             variant="outlined"
             margin="normal"
             required

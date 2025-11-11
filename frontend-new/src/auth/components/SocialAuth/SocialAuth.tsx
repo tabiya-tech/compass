@@ -79,7 +79,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       }
 
       console.error(error);
-      enqueueSnackbar(t("auth_social_failed_login_with_message", { message: errorMessage }), { variant: "error" });
+      enqueueSnackbar(t("auth.components.socialAuth.socialFailedLoginWithMessage", { message: errorMessage }), { variant: "error" });
     },
     [enqueueSnackbar, registrationCode, t],
   );
@@ -129,7 +129,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       if (!prefs) {
         // if registration is disabled, show an error message
         if (registrationDisabled) {
-          enqueueSnackbar(t("auth_social_account_not_registered"), { variant: "error" });
+          enqueueSnackbar(t("auth.components.socialAuth.accountNotRegistered"), { variant: "error" });
           return;
         }
 
@@ -184,7 +184,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
           data-testid={DATA_TEST_ID.CONTINUE_WITH_GOOGLE}
         >
-          {t("or_continue_with")}
+          {t("auth.components.socialAuth.orContinueWith")}
         </Typography>
       </Divider>
       <Box width="100%">
@@ -209,7 +209,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
             <div style={{ display: "flex", alignItems: "center" }}>
               <GoogleIcon disabled={socialAuthLoading} />
             </div>
-            <Typography variant="body2">{label ?? t("login_with_google")}</Typography>
+            <Typography variant="body2">{label ?? t("auth.components.socialAuth.loginWithGoogle")}</Typography>
           </Button>
           {!isOnline && (
             <Typography
@@ -217,7 +217,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
               sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
               data-testid={DATA_TEST_ID.FIREBASE_FALLBACK_TEXT}
             >
-              {t("google_login_is_not_available_when_offline")}
+              {t("auth.components.socialAuth.googleLoginIsNotAvailableWhenOffline")}
             </Typography>
           )}
         </div>

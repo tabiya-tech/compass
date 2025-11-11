@@ -63,7 +63,7 @@ const Landing: React.FC = () => {
         errorMessage = error.message;
         console.error(error);
       }
-      enqueueSnackbar(t("auth_login_failed_with_message", { message: errorMessage }), { variant: "error" });
+      enqueueSnackbar(t("auth.errors.loginFailedWithMessage", { message: errorMessage }), { variant: "error" });
     },
     [enqueueSnackbar, t]
   );
@@ -75,7 +75,7 @@ const Landing: React.FC = () => {
         navigate(routerPaths.CONSENT, { replace: true });
       } else {
         navigate(routerPaths.ROOT, { replace: true });
-        enqueueSnackbar(t("welcome_back"), { variant: "success" });
+        enqueueSnackbar(t("auth.pages.login.welcomeBack"), { variant: "success" });
       }
     } catch (error: unknown) {
       console.error(new AuthenticationError("An error occurred while trying to get your preferences", error));
@@ -85,7 +85,7 @@ const Landing: React.FC = () => {
       } else {
         errorMessage = (error as Error).message;
       }
-      enqueueSnackbar(t("auth_preferences_fetch_failed_with_message", { message: errorMessage }), {
+      enqueueSnackbar(t("auth.errors.preferencesFetchFailedWithMessage", { message: errorMessage }), {
         variant: "error",
       });
     }
@@ -97,7 +97,7 @@ const Landing: React.FC = () => {
       const firebaseInvitationAuthServiceInstance = FirebaseInvitationCodeAuthenticationService.getInstance();
       await firebaseInvitationAuthServiceInstance.login(applicationLoginCode);
       console.info("User logged in as guest.");
-      enqueueSnackbar(t("invitation_code_valid"), { variant: "success" });
+      enqueueSnackbar(t("auth.pages.landing.invitationCodeValid"), { variant: "success" });
       await handlePostLogin();
     } catch (error) {
       await handleError(error as Error);
@@ -166,7 +166,7 @@ const Landing: React.FC = () => {
             }}
           >
             <AuthHeader
-              title={t("welcome_back")} // Changed from "Welcome to Compass!" to t("welcome_back")
+              title={t("auth.pages.login.welcomeBack")} // Changed from "Welcome to Compass!" to t("auth.pages.login.welcomeBack")
               subtitle={
                 <>
                   <Typography
@@ -175,10 +175,10 @@ const Landing: React.FC = () => {
                     textAlign="center"
                     paddingBottom={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
                   >
-                    {t("landing_subtitle_bold")} {/* Changed from "Discover your Full Potential" */}
+                    {t("auth.pages.landing.subtitleBold")} {/* Changed from "Discover your Full Potential" */}
                   </Typography>
                   <Typography variant="body2" textAlign="center">
-                    {t("landing_subtitle_body")}
+                    {t("auth.pages.landing.subtitleBody")}
                     {/* Changed from long marketing text */}
                   </Typography>
                 </>
@@ -216,7 +216,7 @@ const Landing: React.FC = () => {
                 <>
                   <Divider textAlign="center" style={{ width: "100%" }} data-testid={DATA_TEST_ID.LANDING_DIVIDER}>
                     <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-                      {t("or")} {/* Changed from "or" */}
+                      {t("auth.pages.login.or")} {/* Changed from "auth.pages.login.or" */}
                     </Typography>
                   </Divider>
                   <CustomLink
@@ -225,7 +225,7 @@ const Landing: React.FC = () => {
                     disableWhenOffline={true}
                     data-testid={DATA_TEST_ID.LANDING_GUEST_BUTTON}
                   >
-                    {t("continue_as_guest")} {/* Changed from "Continue as Guest" */}
+                    {t("auth.pages.landing.continueAsGuest")} {/* Changed from "Continue as Guest" */}
                   </CustomLink>
                 </>
               )}
@@ -234,7 +234,7 @@ const Landing: React.FC = () => {
         </DialogContent>
       </Dialog>
       <BugReportButton bottomAlign={true} />
-      <Backdrop isShown={isLoading} message={t("logging_you_in")} /> {/* Changed from "Logging you in..." */}
+      <Backdrop isShown={isLoading} message={t("auth.pages.login.loggingYouIn")} /> {/* Changed from "Logging you in..." */}
     </>
   );
 };

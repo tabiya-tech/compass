@@ -90,7 +90,7 @@ const Register: React.FC = () => {
         console.error(error);
         errorMessage = error.message;
       }
-      enqueueSnackbar(t("auth_register_failed_with_message", { message: errorMessage }), { variant: "error" });
+      enqueueSnackbar(t("auth.errors.registerFailedWithMessage", { message: errorMessage }), { variant: "error" });
     },
     [enqueueSnackbar, t]
   );
@@ -122,7 +122,7 @@ const Register: React.FC = () => {
         navigate(routerPaths.CONSENT, { replace: true });
       } else {
   navigate(routerPaths.ROOT, { replace: true });
-  enqueueSnackbar(t("welcome_back"), { variant: "success" });
+  enqueueSnackbar(t("auth.pages.login.welcomeBack"), { variant: "success" });
       }
     } catch (error) {
       const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
@@ -152,7 +152,7 @@ const Register: React.FC = () => {
         const registrationCodeToUse = registrationCode || applicationRegistrationCode;
         // We're using the mail as the username for now, since we don't have any use case in the app for it
   await firebaseEmailAuthServiceInstance.register(email, password, email, registrationCodeToUse);
-  enqueueSnackbar(t("auth_verification_email_sent_short"), { variant: "success" });
+  enqueueSnackbar(t("auth.verificationEmailSentShort"), { variant: "success" });
         // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
         // since if we don't do that, the user may be able to access the application without verifying their email
         // or accepting the dpa.
@@ -192,19 +192,19 @@ const Register: React.FC = () => {
         width={"100%"}
       >
         <AuthHeader
-          title={t("welcome_to_compass")}
+          title={t("auth.pages.login.welcomeTitle")}
           subtitle={
             <Typography variant="body2" gutterBottom>
-              {t("register_subtitle")}
+              {t("auth.pages.register.subtitle")}
             </Typography>
           }
         />
         {!applicationRegistrationCode && (
           <React.Fragment>
-            <Typography variant="subtitle2">{t("enter_registration_code")}</Typography>
+            <Typography variant="subtitle2">{t("auth.pages.register.enterRegistrationCode")}</Typography>
             <TextField
               fullWidth
-              label={t("registration_code")}
+              label={t("auth.pages.register.registrationCode")}
               variant="outlined"
               required
               value={registrationCode}
@@ -216,7 +216,7 @@ const Register: React.FC = () => {
         {!applicationRegistrationCode && (
           <Divider textAlign="center" style={{ width: "100%" }}>
             <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-              {t("and_either_continue_with")}
+              {t("auth.pages.register.andEitherContinueWith")}
             </Typography>
           </Divider>
         )}
@@ -230,18 +230,18 @@ const Register: React.FC = () => {
             postLoginHandler={handlePostLogin}
             isLoading={isLoading}
             disabled={!registrationCode && !applicationRegistrationCode}
-            label={t("register_with_google")}
+            label={t("auth.pages.register.registerWithGoogle")}
             notifyOnLoading={notifyOnSocialLoading}
             registrationCode={registrationCode || applicationRegistrationCode}
           />
         )}
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          {t("already_have_account")} <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>{t("common.buttons.login")}</CustomLink>
+          {t("auth.pages.register.alreadyHaveAccount")} <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>{t("common.buttons.login")}</CustomLink>
         </Typography>
         {!applicationRegistrationCode && <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />}
       </Box>
       <BugReportButton bottomAlign={true} />
-      <Backdrop isShown={isLoading} message={t("registering_you")} />
+      <Backdrop isShown={isLoading} message={t("auth.pages.register.registeringYou")} />
     </Container>
   );
 };
