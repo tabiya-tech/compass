@@ -17,12 +17,15 @@ logger = logging.getLogger(__name__)
 class BackendSentryConfig(TypedDict, total=False):
     """
     Configuration for backend Sentry initialization.
-    Mirrors the frontend structure where applicable.
+    Mirrors the frontend configuration structure where applicable.
 
-    tracesSampleRate: float -> maps to traces_sample_rate
-    enableLogs: bool -> when true, logging integration is enabled
-    logLevel: str -> capture Python logs at/above this level into Sentry logging integration
-    eventLevel: str -> send logs at/above this level to Sentry as events
+    Attributes:
+        tracesSampleRate: float -> Sampling rate for performance tracing (0.0 to 1.0).
+            Maps to `traces_sample_rate` in the Sentry SDK.
+            See: https://docs.sentry.io/platforms/python/performance/
+        enableLogs: bool -> Enables Sentry’s logging integration.
+        logLevel: str -> Log level to capture and send to Sentry as breadcrumbs ("debug", "info", "warn", "error", "critical").
+        eventLevel: str -> Log level that triggers full Sentry events ("debug", "info", "warn", "error", "critical").
     """
 
     tracesSampleRate: float
