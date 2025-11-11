@@ -90,17 +90,17 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
 
   const handleSubmit = useCallback(async () => {
     if (!validateEmail(email)) {
-      enqueueSnackbar(t("auth_anonymousConversion_invalid_email"), { variant: "error" });
+      enqueueSnackbar(t("auth.components.anonymousAccountConversionDialog.invalidEmail"), { variant: "error" });
       return;
     }
 
     if (!isEmailValid) {
-      enqueueSnackbar(t("auth_anonymousConversion_emails_mismatch"), { variant: "error" });
+      enqueueSnackbar(t("auth.components.anonymousAccountConversionDialog.emailsMismatch"), { variant: "error" });
       return;
     }
 
     if (!isPasswordValid) {
-      enqueueSnackbar(t("auth_anonymousConversion_password_requirements_not_met"), { variant: "error" });
+      enqueueSnackbar(t("auth.components.anonymousAccountConversionDialog.passwordRequirementsNotMet"), { variant: "error" });
       return;
     }
 
@@ -108,9 +108,9 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
     try {
       const authService = FirebaseEmailAuthenticationService.getInstance();
       await authService.linkAnonymousAccount(email, password, email);
-      enqueueSnackbar(t("auth_anonymousConversion_registration_success"), { variant: "success" });
+      enqueueSnackbar(t("auth.components.anonymousAccountConversionDialog.registrationSuccess"), { variant: "success" });
       enqueueSnackbar(
-        t("auth_anonymousConversion_verification_sent_with_email", { email }),
+        t("auth.components.anonymousAccountConversionDialog.verificationSentWithEmail", { email }),
         {
         variant: "info",
         persist: true,
@@ -120,7 +120,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
       onSuccess();
       onClose();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t("auth_anonymousConversion_registration_failed"), { variant: "error" });
+      enqueueSnackbar(error.message || t("auth.components.anonymousAccountConversionDialog.registrationFailed"), { variant: "error" });
     } finally {
       setIsLoading(false);
     }
@@ -138,7 +138,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
     >
       <PrimaryIconButton
         data-testid={DATA_TEST_ID.CLOSE_ICON}
-        title={t("close_registration_form")}
+        title={t("auth.components.anonymousAccountConversionDialog.closeRegistrationForm")}
         onClick={onClose}
         sx={{
           position: "absolute",
@@ -152,16 +152,16 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
       
       <DialogTitle>
         <Typography variant="h4" component="div" gutterBottom>
-          {t("register_account")}
+          {t("auth.components.anonymousAccountConversionDialog.registerAccount")}
         </Typography>
       </DialogTitle>
       
       <DialogContent>
         <Typography variant="body2" gutterBottom>
-           {t("registration_info")}
+           {t("auth.components.anonymousAccountConversionDialog.registrationInfo")}
         </Typography>
         
-        <HighlightedSpan>{t("email_warning")}</HighlightedSpan>
+        <HighlightedSpan>{t("auth.components.anonymousAccountConversionDialog.emailWarning")}</HighlightedSpan>
         <Box sx={{ mt: 2 }}>
           <TextField
             autoFocus

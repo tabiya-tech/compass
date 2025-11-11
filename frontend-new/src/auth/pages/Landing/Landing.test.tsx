@@ -158,7 +158,7 @@ describe("Landing Page", () => {
 
       // AND welcome message
       const i18n = require("src/i18n/i18n").default;
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("welcome_back"), { variant: "success" });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("auth.pages.login.welcomeBack"), { variant: "success" });
 
       // AND no errors or warnings to have occurred
       expect(console.error).not.toHaveBeenCalled();

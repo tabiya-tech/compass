@@ -41,58 +41,7 @@
       "justNow": "just now"
     }
   },
-  "welcome_to_compass": "Welcome to Compass!",
-  "login_to_your_account_to_continue": "Login to your account to continue",
-  "login_using": "Login using",
-  "dont_have_an_account": "Don't have an account? ",
-  "logging_you_in": "Logging you in...",
-  "registering_aria": "Registering",
-  "continue_as_guest": "Continue as Guest",
-  "or_login_to_your_account_to_continue": "Or login to your account to continue",
-  "or": "or",
-  "fill_in_email_and_password": "Please fill in the email and password fields",
-  "invitation_code_valid": "Invitation code is valid",
-  "welcome_back": "Welcome back!",
-  "logging_in_aria": "Logging in",
   "language_selector": "Language Selector",
-  "forgot_password": "Forgot password?",
-  "please_enter_email": "Please enter your email address",
-  "password_reset_email_sent": "Password reset email sent!",
-  "failed_to_send_reset_email": "Failed to send reset email",
-  "password_reset_link_sent": "A password reset link has been sent to your email address.",
-  "reset_password": "Reset Password",
-  "close_password_reset_form": "Close password reset form",
-  "or_continue_with": "Or continue with",
-  "google_login_is_not_available_when_offline": "Google login is not available when offline.",
-  "login_with_google": "Login with Google",
-  "landing_subtitle_bold": "Discover your Full Potential",
-  "landing_subtitle_body": "Uncover and articulate your skills through natural AI-guided conversations. Build your skill profile and download a CV to kickstart your job search. Create a free account to save your progress and revisit your conversation history.",
-  "register_subtitle": "We need some information to get started",
-  "enter_registration_code": "Enter your registration code",
-  "registration_code": "Registration code",
-  "and_either_continue_with": "and either continue with",
-  "register_with_google": "Register with Google",
-  "already_have_account": "Already have an account?",
-  "registering_you": "Registering you...",
-  "registration_thank_you": "Thank you for registering to Compass.",
-  "verification_email_sent_message": "A verification email has been sent to your email address. To continue, please verify your email address first.",
-  "login_code": "Login Code",
-  "close_registration_form": "Close registration form",
-  "register_account": "Register Account",
-  "registration_info": "Please register with an email to keep access to this conversation. Without registering, you won't be able to log in again or return to this conversation.",
-  "email_warning": "Please make sure you use the correct email, as it cannot be changed later and you will be asked to verify it.",
-  "close_registration_code_form": "Close registration code form",
-  "no_registration_code_prompt": "Don't have a registration code?",
-  "reach_out": "Reach out",
-  "request_login_code": "Don't have a login code?",
-  "email_not_verified": "Your email is not verified. Please check your inbox for the verification email.",
-  "resend_verification_email": "Resend verification email",
-  "request_access_title": "Request access to Compass",
-  "close_request_invitation_form": "Close request invitation code form",
-  "request_access_subtitle": "Please let us know how you plan to use Compass. We will carefully review your request and contact you shortly.",
-  "name": "Name",
-  "message": "Message",
-  "message_placeholder": "Please share how you plan to use Compass",
   "feedback_message": "We'd love to hear your feedback on your experience so far!",
   "give_feedback": "Give Feedback",
   "view_experiences": "View experiences",
@@ -226,25 +175,6 @@
   "error_page_illustration_alt": "error illustration",
   "error_page_default_message": "Something went wrong with Compass. Try reloading the page...",
   "error_page_not_found": "404 Error - Page Not Found",
-  "firebase_error_email_already_in_use": "The email address is already in use by another account.",
-  "firebase_error_email_not_verified": "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
-  "firebase_error_invalid_credential": "The email/password provided is invalid.",
-  "firebase_error_invalid_email": "The email address is not valid.",
-  "firebase_error_operation_not_allowed": "Email/password accounts are not enabled.",
-  "firebase_error_weak_password": "The password is too weak.",
-  "firebase_error_user_disabled": "The user account has been disabled.",
-  "firebase_error_user_not_found": "No user was found for the given credentials.",
-  "firebase_error_wrong_password": "The password is invalid.",
-  "firebase_error_too_many_requests": "We have blocked all requests from this device due to unusual activity. Try again later.",
-  "firebase_error_internal_error": "An internal error has occurred.",
-  "firebase_error_too_many_users": "There are too many users on this Firebase project.",
-  "firebase_error_invalid_registration_code": "The registration code you entered is invalid. Please check the code and try again.",
-  "firebase_error_invalid_invitation_code": "The invitation code you entered is invalid. Please check the code and try again.",
-  "firebase_error_invalid_invitation_type": "The code you used is for registration and not for login. Please go to the register page.",
-  "firebase_error_invalid_registration_type": "The code you used is for login and not for registration. Please go to the login page.",
-  "firebase_error_popup_closed_by_user": "The Google sign-in popup was closed before completing the sign-in process.",
-  "firebase_error_invalid_login_method": "This operation is not allowed with the current login method.",
-  "firebase_error_email_already_verified": "The email address is already verified.",
   "rest_api_error_request_too_long": "The data sent to the service seems to be too large. Please try again with a smaller payload. If the problem persists, clear your browser's cache and refresh the page.",
   "rest_api_error_too_many_requests": "It looks like you are making too many requests. Please slow down and try again later.",
   "rest_api_error_unexpected_error": "An unexpected error occurred. Please try again later.",
@@ -391,38 +321,18 @@
   "customerSatisfactionRating_rating_label_low": "Unsatisfied",
   "customerSatisfactionRating_rating_label_high": "Satisfied",
   "customerSatisfactionRating_submit_success": "Rating Feedback submitted successfully!",
-  "customerSatisfactionRating_submit_error": "Failed to submit feedback. Please try again later."
-  ,
-  "auth_anonymousConversion_invalid_email": "Please enter a valid email address",
-  "auth_anonymousConversion_emails_mismatch": "Please ensure both email addresses match",
-  "auth_anonymousConversion_password_requirements_not_met": "Please ensure your password meets all requirements",
-  "auth_anonymousConversion_registration_success": "Account successfully registered!",
-  "auth_anonymousConversion_verification_sent_with_email": "Currently logged in with the email: {{email}}. A verification email has been sent to your email address. Please verify your account before logging in again.",
-  "auth_anonymousConversion_registration_failed": "Failed to register account",
+  "customerSatisfactionRating_submit_error": "Failed to submit feedback. Please try again later.",
   "feedback_overall_submit_success": "Feedback submitted successfully!",
   "feedback_overall_submit_error": "Failed to submit feedback. Please try again later.",
-  "auth_social_failed_login_with_message": "Failed to login: {{message}}",
-  "auth_social_account_not_registered": "This account isn’t registered. Please contact the provider of this link.",
-  "auth_resend_verification_email_success": "Verification email sent successfully",
-  "auth_resend_verification_email_failed_with_message": "Failed to send verification email: {{message}}",
-  "auth_logging_you_out_notice": "We are logging you out...",
   "skillsRanking_briefing_failed_to_continue": "Failed to continue. Please try again later.",
-  "invitation_request_submit_success": "Your request for access to Compass has been submitted successfully. We will get back to you soon.",
-  "invitation_request_submit_error": "Something went wrong while attempting to send your request",
-  "auth_register_failed_with_message": "Registration Failed: {{message}}",
-  "auth_login_failed_with_message": "Failed to login: {{message}}",
-  "auth_preferences_fetch_failed_with_message": "An error occurred while trying to get your preferences: {{message}}",
-  "auth_verification_email_sent_short": "Verification Email Sent!",
   "experiences_summary_restore_failed": "Failed to restore summary. Please try again later.",
   "experiences_summary_restored": "Summary restored.",
   "app_isOnline_offline": "You are offline",
-  "app_isOnline_back_online": "You are back online"
-  ,
+  "app_isOnline_back_online": "You are back online",
   "sensitive_data_saved_success": "Personal data saved successfully and securely.",
   "sensitive_data_collection_skipped": "Personal data collection skipped.",
   "sensitive_data_error_default": "The personal data could not be saved. Please try again and if the problem persists, clear your browser's cache and refresh the page.",
-  "sensitive_data_error_encrypted_data_too_large": "The personal data seems to be too large to be saved. Please try again by entering smaller values for the fields. If the problem persists, clear your browser's cache and refresh the page."
-  ,
+  "sensitive_data_error_encrypted_data_too_large": "The personal data seems to be too large to be saved. Please try again by entering smaller values for the fields. If the problem persists, clear your browser's cache and refresh the page.",
   "chat_message_add_action": "add",
   "chat_message_error_limit": "Message limit is {{max}} characters.",
   "chat_message_error_invalid_chars": "Invalid special characters: {{chars}}",
@@ -446,13 +356,138 @@
   "experiences_downloadReportButton_download_cv": "Download CV",
   "experiences_downloadReportButton_downloading": "Downloading",
   "experiences_downloadReportButton_help_tip_blocked_message": "You cannot download the report until you finish exploring at least one experience.",
-  
   "uploadedCVsMenu_back_title": "Back to main menu",
   "uploadedCVsMenu_title_with_count": "Previously uploaded CVs ({{count}})",
   "uploadedCVsMenu_help_collect": "Tap a CV to load its content into the text field. Review it and send when you're ready.",
   "uploadedCVsMenu_help_disabled": "CV selection is only available during the experience collection phase.",
-  "uploadedCVsMenu_empty": "No uploaded CVs found."
-  ,
+  "uploadedCVsMenu_empty": "No uploaded CVs found.",
   "please_select_x": "Please select a {{x}}",
-  "clear_selection": "Clear selection"
+  "clear_selection": "Clear selection",
+  "auth": {
+    "pages": {
+      "login": {
+        "welcomeTitle": "Welcome to Compass!",
+        "welcomeBack": "Welcome back!",
+        "loginToYourAccountToContinue": "Login to your account to continue",
+        "loginUsing": "Login using",
+        "loggingYouIn": "Logging you in...",
+        "loggingInAria": "Logging in",
+        "dontHaveAnAccount": "Don't have an account? ",
+        "fillInEmailAndPassword": "Please fill in the email and password fields",
+        "orLoginToYourAccountToContinue": "Or login to your account to continue",
+        "or": "or",
+        "components": {
+          "loginWithInviteCodeForm": {
+            "loginCode": "Login Code"
+          }
+        }
+      },
+      "register": {
+        "subtitle": "We need some information to get started",
+        "registerWithGoogle": "Register with Google",
+        "alreadyHaveAccount": "Already have an account?",
+        "registeringYou": "Registering you...",
+        "enterRegistrationCode": "Enter your registration code",
+        "registrationCode": "Registration code",
+        "andEitherContinueWith": "and either continue with",
+        "components": {
+          "registerWithEmailForm": {
+            "registeringAria": "Registering"
+          }
+        }
+      },
+      "landing": {
+        "continueAsGuest": "Continue as Guest",
+        "subtitleBold": "Discover your Full Potential",
+        "subtitleBody": "Uncover and articulate your skills through natural AI-guided conversations. Build your skill profile and download a CV to kickstart your job search. Create a free account to save your progress and revisit your conversation history.",
+        "invitationCodeValid": "Invitation code is valid"
+      },
+      "verifyEmail": {
+        "registrationThankYou": "Thank you for registering to Compass.",
+        "verificationEmailSentMessage": "A verification email has been sent to your email address. To continue, please verify your email address first."
+      }
+    },
+    "components": {
+      "anonymousAccountConversionDialog": {
+        "registerAccount": "Register Account",
+        "registrationInfo": "Please register with an email to keep access to this conversation. Without registering, you won't be able to log in again or return to this conversation.",
+        "emailWarning": "Please make sure you use the correct email, as it cannot be changed later and you will be asked to verify it.",
+        "closeRegistrationForm": "Close registration form",
+        "invalidEmail": "Please enter a valid email address",
+        "emailsMismatch": "Please ensure both email addresses match",
+        "passwordRequirementsNotMet": "Please ensure your password meets all requirements",
+        "registrationSuccess": "Account successfully registered!",
+        "verificationSentWithEmail": "Currently logged in with the email: {{email}}. A verification email has been sent to your email address. Please verify your account before logging in again.",
+        "registrationFailed": "Failed to register account"
+      },
+      "passwordReset": {
+        "forgotPassword": "Forgot password?",
+        "pleaseEnterEmail": "Please enter your email address",
+        "passwordResetEmailSent": "Password reset email sent!",
+        "failedToSendResetEmail": "Failed to send reset email",
+        "passwordResetLinkSent": "A password reset link has been sent to your email address.",
+        "resetPassword": "Reset Password",
+        "closePasswordResetForm": "Close password reset form"
+      },
+      "registrationCodeFormModal": {
+        "closeRegistrationCodeForm": "Close registration code form",
+        "noRegistrationCodePrompt": "Don't have a registration code?",
+        "reachOut": "Reach out"
+      },
+      "requestInvitationCodeFormModal": {
+        "requestAccessTitle": "Request access to Compass",
+        "requestAccessSubtitle": "Please let us know how you plan to use Compass. We will carefully review your request and contact you shortly.",
+        "closeRequestInvitationForm": "Close request invitation code form",
+        "name": "Name",
+        "message": "Message",
+        "messagePlaceholder": "Please share how you plan to use Compass",
+        "invitationRequestSubmitSuccess": "Your request for access to Compass has been submitted successfully. We will get back to you soon.",
+        "invitationRequestSubmitError": "Something went wrong while attempting to send your request"
+      },
+      "requestInvitationCode": {
+        "requestLoginCode": "Don't have a login code?"
+      },
+      "resendVerificationEmail": {
+        "emailNotVerified": "Your email is not verified. Please check your inbox for the verification email.",
+        "resendVerificationEmail": "Resend verification email",
+        "resendVerificationEmailSuccess": "Verification email sent successfully",
+        "resendVerificationEmailFailedWithMessage": "Failed to send verification email: {{message}}"
+      },
+      "socialAuth": {
+        "orContinueWith": "Or continue with",
+        "loginWithGoogle": "Login with Google",
+        "googleLoginIsNotAvailableWhenOffline": "Google login is not available when offline.",
+        "socialFailedLoginWithMessage": "Failed to login: {{message}}",
+        "accountNotRegistered": "This account isn’t registered. Please contact the provider of this link."
+      }
+    },
+    "loggingYouOutNotice": "We are logging you out...",
+    "errors": {
+      "loginFailedWithMessage": "Failed to login: {{message}}",
+      "registerFailedWithMessage": "Registration Failed: {{message}}",
+      "preferencesFetchFailedWithMessage": "An error occurred while trying to get your preferences: {{message}}",
+      "firebase": {
+        "emailAlreadyInUse": "The email address is already in use by another account.",
+        "emailNotVerified": "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
+        "invalidCredential": "The email/password provided is invalid.",
+        "invalidEmail": "The email address is not valid.",
+        "operationNotAllowed": "Email/password accounts are not enabled.",
+        "weakPassword": "The password is too weak.",
+        "userDisabled": "The user account has been disabled.",
+        "userNotFound": "No user was found for the given credentials.",
+        "wrongPassword": "The password is invalid.",
+        "tooManyRequests": "We have blocked all requests from this device due to unusual activity. Try again later.",
+        "internalError": "An internal error has occurred.",
+        "tooManyUsers": "There are too many users on this Firebase project.",
+        "invalidRegistrationCode": "The registration code you entered is invalid. Please check the code and try again.",
+        "invalidInvitationCode": "The invitation code you entered is invalid. Please check the code and try again.",
+        "invalidInvitationType": "The code you used is for registration and not for login. Please go to the register page.",
+        "invalidRegistrationType": "The code you used is for login and not for registration. Please go to the login page.",
+        "popupClosedByUser": "The Google sign-in popup was closed before completing the sign-in process.",
+        "invalidLoginMethod": "This operation is not allowed with the current login method.",
+        "emailAlreadyVerified": "The email address is already verified."
+      }
+    },
+    "verificationEmailSentShort": "Verification Email Sent!"
+  }
 }
