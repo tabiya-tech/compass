@@ -139,7 +139,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
             </PrimaryIconButton>
           </Box>
           <TextField
-            label={t("email")}
+            label={t("common.fields.email")}
             type="email"
             fullWidth
             value={emailInput}
@@ -156,7 +156,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
               data-testid={DATA_TEST_ID.SUBMIT}
               onClick={handleSendResetEmail}
             >
-              {t("submit")}
+              {t("common.buttons.submit")}
             </PrimaryButton>
           </DialogActions>
         </Box>

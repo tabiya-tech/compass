@@ -120,8 +120,8 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
           />
           <TextField
             fullWidth
-            label={t("email")}
-            placeholder={t("email")}
+            label={t("common.fields.email")}
+            placeholder={t("common.fields.email")}
             type="email"
             variant="outlined"
             margin="normal"
@@ -150,7 +150,7 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
             disabled={!name || !email || !message || !isOnline}
             data-testid={DATA_TEST_ID.SUBMIT_BUTTON}
           >
-            {t("submit")}
+            {t("common.buttons.submit")}
           </PrimaryButton>
         </Box>
       </Box>

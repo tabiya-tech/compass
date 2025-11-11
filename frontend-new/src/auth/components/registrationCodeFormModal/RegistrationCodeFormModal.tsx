@@ -134,7 +134,7 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
                 data-testid={DATA_TEST_ID.PROGRESS_ELEMENT}
               />
             ) : (
-              t("submit")
+              t("common.buttons.submit")
             )}
           </PrimaryButton>
           { Sentry.isInitialized() && <Typography

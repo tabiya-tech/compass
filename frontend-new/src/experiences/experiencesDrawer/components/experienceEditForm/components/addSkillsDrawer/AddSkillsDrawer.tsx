@@ -11,6 +11,7 @@ import { capitalizeFirstLetter } from "src/experiences/experiencesDrawer/compone
 import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import { deduplicateSkills } from "src/utils/skillsUtils";
+import { useTranslation } from "react-i18next";
 
 const uniqueId = "82681361-b582-4dc3-8129-63f3f0f66eee";
 
@@ -36,6 +37,7 @@ interface AddSkillsDrawerProps {
 const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAddSkill }) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+  const { t } = useTranslation();
   const [selectedSkillIds, setSelectedSkillIds] = React.useState<string[]>([]);
   const [popoverAnchorEl, setPopoverAnchorEl] = React.useState<HTMLElement | null>(null);
   const [popoverSkill, setPopoverSkill] = useState<Skill | null>(null);
@@ -170,7 +172,7 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
             paddingY={theme.fixedSpacing(theme.tabiyaSpacing.md)}
           >
             <SecondaryButton onClick={handleCancel} data-testid={DATA_TEST_ID.SKILL_DRAWER_CANCEL_BUTTON}>
-              Cancel
+              {t("common.buttons.cancel")}
             </SecondaryButton>
             <PrimaryButton
               onClick={handleOk}
