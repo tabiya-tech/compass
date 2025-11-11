@@ -166,7 +166,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
           <TextField
             autoFocus
             fullWidth
-            label={t("email")}
+            label={t("common.fields.email")}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -174,12 +174,12 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
             margin="normal"
             required
             error={email !== "" && !validateEmail(email)}
-            helperText={email !== "" && !validateEmail(email) ? t("valid_email_required") : ""}
+            helperText={email !== "" && !validateEmail(email) ? t("common.validation.validEmailRequired") : ""}
           />
           
           <TextField
             fullWidth
-            label={t("confirm_email")}
+            label={t("common.fields.confirmEmail")}
             type="email"
             value={emailConfirmation}
             onChange={(e) => setEmailConfirmation(e.target.value)}
@@ -187,12 +187,12 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
             margin="normal"
             required
             error={emailConfirmation !== "" && email !== emailConfirmation}
-            helperText={emailConfirmation !== "" && email !== emailConfirmation ? t("emails_do_not_match") : ""}
+            helperText={emailConfirmation !== "" && email !== emailConfirmation ? t("common.validation.emailsDoNotMatch") : ""}
           />
           
           <PasswordInput
             fullWidth
-            label={t("password")}
+            label={t("common.fields.password")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             data-testid={DATA_TEST_ID.PASSWORD_INPUT}
@@ -216,7 +216,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
                 size={2 * theme.typography.fontSize}
               />
             ) : (
-              t("register")
+              t("common.buttons.register")
             )}
           </PrimaryButton>
         </Box>

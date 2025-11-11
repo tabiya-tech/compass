@@ -897,8 +897,8 @@ return {
               onCancel={() => setNewConversationDialog(false)}
               onConfirm={handleConfirmNewConversation}
               onDismiss={() => setNewConversationDialog(false)}
-              cancelButtonText={t("cancel_button")}
-              confirmButtonText={t("confirm_button")}
+              cancelButtonText={t("common.buttons.cancel")}
+              confirmButtonText={t("common.buttons.confirm")}
             />
           )}
         </ChatProvider>

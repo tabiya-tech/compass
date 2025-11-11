@@ -54,7 +54,7 @@ const VerifyEmail: React.FC = () => {
           data-testid={DATA_TEST_ID.BACK_TO_LOGIN_BUTTON}
           onClick={handleBackToLogin}
         >
-          {t("back_to_login")}
+          {t("common.buttons.backToLogin")}
         </PrimaryButton>
       </Box>
       <BugReportButton bottomAlign={true} />

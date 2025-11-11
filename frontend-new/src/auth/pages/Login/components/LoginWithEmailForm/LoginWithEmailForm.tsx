@@ -47,7 +47,7 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
     >
       <TextField
         fullWidth
-        label={t("email")}
+        label={t("common.fields.email")}
         type="email"
         variant="outlined"
         disabled={isDisabled}
@@ -57,7 +57,7 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
       />
       <PasswordInput
         fullWidth
-        label={t("password")}
+        label={t("common.fields.password")}
         variant="outlined"
         disabled={isDisabled}
         value={password}

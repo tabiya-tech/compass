@@ -232,7 +232,7 @@ const Register: React.FC = () => {
           />
         )}
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          {t("already_have_account")} <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>{t("login")}</CustomLink>
+          {t("already_have_account")} <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>{t("common.buttons.login")}</CustomLink>
         </Typography>
         {!applicationRegistrationCode && <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />}
       </Box>

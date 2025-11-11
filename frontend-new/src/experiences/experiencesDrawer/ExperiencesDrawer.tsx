@@ -519,7 +519,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         onDismiss={() => setShowDeleteConfirmDialog(false)}
         onCancel={() => setShowDeleteConfirmDialog(false)}
         confirmButtonText={t("experiences_delete_confirm_button")}
-        cancelButtonText={t("cancel_button")}
+  cancelButtonText={t("common.buttons.cancel")}
         showCloseIcon
         data-testid={DATA_TEST_ID.DELETE_EXPERIENCE_DIALOG}
       />
@@ -531,7 +531,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         onDismiss={cancelRestoreToOriginalExperience}
         onCancel={cancelRestoreToOriginalExperience}
         confirmButtonText={t("experiences_revert_confirm_button")}
-        cancelButtonText={t("cancel_button")}
+  cancelButtonText={t("common.buttons.cancel")}
         showCloseIcon
         data-testid={DATA_TEST_ID.RESTORE_TO_ORIGINAL_CONFIRM_DIALOG}
       />

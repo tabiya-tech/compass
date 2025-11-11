@@ -246,13 +246,13 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     () => [
       {
         id: MENU_ITEM_ID.START_NEW_CONVERSATION,
-        text: t("start_new_conversation").toLowerCase(),
+        text: t("common.buttons.startNewConversation").toLowerCase(),
         disabled: !isOnline,
         action: startNewConversation,
       },
       {
         id: MENU_ITEM_ID.SETTINGS_SELECTOR,
-        text: t("settings").toLowerCase(),
+        text: t("common.buttons.settings").toLowerCase(),
         disabled: !isOnline,
         action: () => setIsDrawerOpen(true),
       },
@@ -280,7 +280,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         ? [
             {
               id: MENU_ITEM_ID.REGISTER,
-              text: t("register").toLowerCase(),
+              text: t("common.buttons.register").toLowerCase(),
               disabled: !isOnline,
               action: () => setShowConversionDialog(true),
             },
@@ -288,7 +288,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         : []),
       {
         id: MENU_ITEM_ID.LOGOUT_BUTTON,
-        text: t("logout").toLowerCase(),
+        text: t("common.buttons.logout").toLowerCase(),
         disabled: false,
         action: handleLogout,
       },
@@ -383,9 +383,9 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         onCancel={handleConfirmLogout}
         onDismiss={() => setShowLogoutConfirmation(false)}
         onConfirm={handleRegister}
-        title={t("before_you_go")}
-        confirmButtonText={t("register")}
-        cancelButtonText={t("logout")}
+    title={t("before_you_go")}
+    confirmButtonText={t("common.buttons.register")}
+    cancelButtonText={t("common.buttons.logout")}
         showCloseIcon={true}
         textParagraphs={[
           {
