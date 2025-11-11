@@ -497,7 +497,7 @@ const Login: React.FC = () => {
                 sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
               />
             ) : (
-              t("login")
+              t("common.buttons.login")
             )}
           </PrimaryButton>
         </Box>
@@ -512,7 +512,10 @@ const Login: React.FC = () => {
         )}
         {!registrationDisabled && (
           <Typography variant="caption" data-testid={DATA_TEST_ID.REGISTER_LINK}>
-          {t("dont_have_an_account")}<CustomLink onClick={() => navigate(routerPaths.REGISTER)}>{t("register")}</CustomLink>   
+            {t("dont_have_an_account")}
+            <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>
+              {t("common.buttons.register")}
+            </CustomLink>
           </Typography>
         )}
         {showRequestLoginCode && <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />}

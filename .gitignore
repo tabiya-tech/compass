@@ -4,3 +4,7 @@
 
 credentials*.json
 .run/
+.github/instructions/
+.github/copilot-instructions.md
+.vscode/tasks.json
+frontend-new/i18n-refactor/

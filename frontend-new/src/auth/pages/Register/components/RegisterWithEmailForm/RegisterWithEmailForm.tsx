@@ -62,7 +62,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
     >
       <TextField
         fullWidth
-        label={t("email")}
+        label={t("common.fields.email")}
         type="email"
         disabled={isRegistering || disabled}
         variant="outlined"
@@ -72,7 +72,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
       />
       <PasswordInput
         fullWidth
-        label={t("password")}
+        label={t("common.fields.password")}
         disabled={isRegistering || disabled}
         variant="outlined"
         required
@@ -100,7 +100,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
             sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
           />
         ) : (
-           t("register")
+          t("common.buttons.register")
         )}
       </PrimaryButton>
     </Box>

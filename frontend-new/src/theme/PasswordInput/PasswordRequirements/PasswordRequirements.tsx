@@ -23,12 +23,12 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({ validationR
   const { t } = useTranslation();
 
   const validationCriteria = useMemo(() => [
-    { label: t("password_min_length"), isValid: validationResults.isLongEnough },
-    { label: t("password_need_lowercase"), isValid: validationResults.hasLowercase },
-    { label: t("password_need_uppercase"), isValid: validationResults.hasUppercase },
-    { label: t("password_need_number"), isValid: validationResults.hasNumber },
+    { label: t("common.validation.passwordMinLength"), isValid: validationResults.isLongEnough },
+    { label: t("common.validation.passwordNeedLowercase"), isValid: validationResults.hasLowercase },
+    { label: t("common.validation.passwordNeedUppercase"), isValid: validationResults.hasUppercase },
+    { label: t("common.validation.passwordNeedNumber"), isValid: validationResults.hasNumber },
     {
-      label: t("password_need_special_char"),
+      label: t("common.validation.passwordNeedSpecialChar"),
       isValid: validationResults.hasSpecialChar,
     },
   ], [validationResults, t]);

@@ -434,7 +434,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             <Typography variant="h5">{t("experiences_edit_title")}</Typography>
             <Box display="flex" justifyContent="flex-end" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
               <SecondaryButton onClick={notifyOnCancel} data-testid={DATA_TEST_ID.FORM_CANCEL_BUTTON}>
-                {t("cancel_button")}
+                {t("common.buttons.cancel")}
               </SecondaryButton>
               <PrimaryButton
                 onClick={handleSave}
@@ -442,7 +442,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                 disableWhenOffline
                 data-testid={DATA_TEST_ID.FORM_SAVE_BUTTON}
               >
-                {t("save_button")}
+                {t("common.buttons.save")}
               </PrimaryButton>
             </Box>
           </Box>

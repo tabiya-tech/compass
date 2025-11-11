@@ -115,7 +115,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
             {t("experiences_restore_empty")}
           </Typography>
           <PrimaryButton onClick={onClose} data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES_GO_BACK_BUTTON}>
-            {t("go_back")}
+            {t("common.buttons.goBack")}
           </PrimaryButton>
         </Box>
       );
@@ -158,11 +158,11 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
                   <PrimaryButton
                     onClick={() => handleRestore(experience)}
                     disableWhenOffline
-                    title={t("restore_button")}
+                    title={t("common.buttons.restore")}
                     data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_BUTTON}
-                    startIcon={<img src={`${process.env.PUBLIC_URL}/restore-icon.svg`} alt={t("restore_button")} />}
+                    startIcon={<img src={`${process.env.PUBLIC_URL}/restore-icon.svg`} alt={t("common.buttons.restore")} />}
                   >
-                    {t("restore_button")}
+                    {t("common.buttons.restore")}
                   </PrimaryButton>
                 </Box>
               </Box>
