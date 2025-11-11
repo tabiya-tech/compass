@@ -447,10 +447,8 @@ BACKEND_SENTRY_DSN=<backend-sentry-dsn>
 FRONTEND_SENTRY_CONFIG='{"tracesSampleRate": 0.2, "replaysSessionSampleRate": 0, "replaysOnErrorSampleRate": 1.0, "replayIntegration": false, "enableLogs": false, "levels": ["error"]}'
 
 # Optional: Backend Sentry JSON config
-# Fields: tracesSampleRate, enableLogs, levels
-# - enableLogs=false forces event level to ERROR even if levels are broader
-# - levels accepted: debug, info, warning, error (maps to event threshold)
-BACKEND_SENTRY_CONFIG='{"tracesSampleRate": 0.2, "enableLogs": false, "levels": ["error"]}'
+# For supported options see: backend.app.sentry_init.BackendSentryConfig 
+BACKEND_SENTRY_CONFIG='{"tracesSampleRate": 0.2, "enableLogs": false, "logLevel": "info, "levels": ["error"]}'
 
 # Enable or Disable Metrics for this environment.
 BACKEND_ENABLE_METRICS=<True/False>
