@@ -37,7 +37,7 @@ describe("DownloadReportButton", () => {
     // AND the download report icon to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.DOWNLOAD_REPORT_ICON)).toBeInTheDocument();
   // AND the text "Download CV" to be in the document
-  expect(screen.getByText(i18n.t("experiences_downloadReportButton_download_cv"))).toBeInTheDocument();
+  expect(screen.getByText(i18n.t("experiences.experiencesDrawer.components.downloadReportButton.downloadCv"))).toBeInTheDocument();
     // AND the download report help tip to not be in the document
     expect(screen.queryByTestId(DATA_TEST_ID.DOWNLOAD_REPORT_HELP_TIP)).not.toBeInTheDocument();
     // AND to match the snapshot
@@ -62,7 +62,7 @@ describe("DownloadReportButton", () => {
     // AND the download report icon to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.DOWNLOAD_REPORT_ICON)).toBeInTheDocument();
   // AND the text "Download CV" to be in the document
-  expect(screen.getByText(i18n.t("experiences_downloadReportButton_download_cv"))).toBeInTheDocument();
+  expect(screen.getByText(i18n.t("experiences.experiencesDrawer.components.downloadReportButton.downloadCv"))).toBeInTheDocument();
     // AND the download report help tip to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.DOWNLOAD_REPORT_HELP_TIP)).toBeInTheDocument();
     // AND to match the snapshot
@@ -85,7 +85,7 @@ describe("DownloadReportButton", () => {
     // AND expect the download report progress icon to be in the document
     expect(screen.getByTestId(DATA_TEST_ID.DOWNLOAD_REPORT_PROGRESS_ICON)).toBeInTheDocument();
   // AND the downloading text to be in the document
-  expect(screen.getByText(i18n.t("experiences_downloadReportButton_downloading"))).toBeInTheDocument();
+  expect(screen.getByText(i18n.t("experiences.experiencesDrawer.components.downloadReportButton.downloading"))).toBeInTheDocument();
     // AND expect no errors or warning to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();

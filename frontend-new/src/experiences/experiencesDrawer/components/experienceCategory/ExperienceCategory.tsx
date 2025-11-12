@@ -37,7 +37,7 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
       <Box display="flex" alignItems="center" gap={isSmallMobile ? 2 : 1}>
         {React.cloneElement(icon as React.ReactElement, { sx: { color: theme.palette.text.secondary } })}
         <Typography variant="subtitle1" fontWeight="bold" color={theme.palette.text.secondary}>
-          {title ?? <i>{t("experiences_untitled")}</i>}
+          {title ?? <i>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.untitled")}</i>}
         </Typography>
         {tooltipText && <HelpTip icon={<InfoIcon />}>{tooltipText}</HelpTip>}
       </Box>

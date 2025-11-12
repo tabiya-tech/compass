@@ -183,7 +183,7 @@ describe("ExperiencesDrawer", () => {
     render(givenExperiencesDrawer);
 
     // THEN expect the text to be in the document
-    const noExperiencesText = screen.getByText(i18n.t("experiences_empty_state_message"));
+    const noExperiencesText = screen.getByText(i18n.t("experiences.experiencesDrawer.emptyStateMessage"));
     expect(noExperiencesText).toBeInTheDocument();
   });
 
