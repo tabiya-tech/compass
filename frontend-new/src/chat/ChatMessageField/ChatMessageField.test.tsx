@@ -766,7 +766,7 @@ describe("ChatMessageField", () => {
         expect(mockOnUploadCv).not.toHaveBeenCalled();
         // AND expect an error message to be shown
         await waitFor(() => {
-          expect(screen.getByText(i18n.t("chat_message_cv_error_max_file_size"))).toBeInTheDocument();
+          expect(screen.getByText(i18n.t("common.upload.errors.maxFileSize"))).toBeInTheDocument();
         });
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
@@ -828,7 +828,7 @@ describe("ChatMessageField", () => {
         // GIVEN an INTRO phase
         const givenPhase = ConversationPhase.INTRO;
         // AND a mock onUploadCv that rejects with a 413 error
-        const tooLargeErrorAlt = new Error(i18n.t("chat_message_cv_error_too_dense"));
+        const tooLargeErrorAlt = new Error(i18n.t("common.upload.errors.tooDense"));
         (tooLargeErrorAlt as any).status = StatusCodes.REQUEST_TOO_LONG;
         (tooLargeErrorAlt as any).errorCode = ErrorConstants.ErrorCodes.TOO_LARGE_PAYLOAD;
 
@@ -863,7 +863,7 @@ describe("ChatMessageField", () => {
 
         // AND the specific error message for too dense content to be shown
         await waitFor(() => {
-          expect(screen.getByText(i18n.t("chat_message_cv_error_too_dense"))).toBeInTheDocument();
+          expect(screen.getByText(i18n.t("common.upload.errors.tooDense"))).toBeInTheDocument();
         });
 
         // AND console.error should be called for logging the error
@@ -1247,7 +1247,7 @@ describe("ChatMessageField", () => {
       expect(mockOnUploadCv).toHaveBeenCalledWith(file);
       // AND the specific max uploads reached error is shown
       await waitFor(() => {
-        expect(screen.getByText(i18n.t("chat_message_cv_error_max_uploads_reached"))).toBeInTheDocument();
+        expect(screen.getByText(i18n.t("common.upload.errors.maxUploadsReached"))).toBeInTheDocument();
       });
       // AND no warnings to have occurred
       expect(console.warn).not.toHaveBeenCalled();

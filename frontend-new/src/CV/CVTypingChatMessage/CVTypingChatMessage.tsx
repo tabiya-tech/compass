@@ -45,7 +45,7 @@ const textVariants = {
 
 const CVTypingChatMessage: React.FC<CVTypingChatMessageProps> = ({ isUploaded = false }) => {
   const { t, i18n } = useTranslation();
-  const displayTextKey = isUploaded ?  "cv_typing_uploaded_ready" : "cv_typing_uploading";
+  const displayTextKey = isUploaded ?  "cv.cvTypingChatMessage.uploadedReady" : "cv.cvTypingChatMessage.uploading";
   const [displayText, setDisplayText] = useState(t(displayTextKey));
 
   useEffect(() => {

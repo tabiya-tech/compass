@@ -45,6 +45,22 @@
       "minutePlural": "minutos",
       "ago": "hace {{time}}",
       "justNow": "justo ahora"
+    },
+    "upload": {
+      "errors": {
+        "maxFileSize": "Selected file is too large. Maximum size is 3 MB.",
+        "tooDense": "The uploaded file content is too long to process. Please reduce its length and try again.",
+        "emptyParse": "We couldn't detect experiences in your CV. Please check the file and try again.",
+        "generic": "Failed to parse your CV. Please try again or use a different file.",
+        "rateLimit": "Too many uploads at once. Please wait one minute and try again.",
+        "maxUploadsReached": "You've reached the maximum number of CV uploads for this conversation. Further uploads aren't allowed.",
+        "duplicate": "This CV has already been uploaded. Select it from your previously uploaded CVs.",
+        "unsupportedFileType": "Unsupported file type. Allowed: PDF, DOCX, TXT.",
+        "timeout": "The upload timed out. Please try again.",
+        "unauthorized": "You are not authorized. Please sign in again.",
+        "uploadNotFound": "Upload not found. It may have failed to start.",
+        "cvMarkdownTooLong": "Your CV content is too long. Please shorten your CV and try again."
+      }
     }
   },
   "language_selector": "Selector de idioma",
@@ -90,7 +106,13 @@
         "offline": "Estás desconectado. Conéctate a Internet para enviar un mensaje.",
         "default": "Escribe tu mensaje...",
         "uploading": "Subiendo CV..."
-      }
+      },
+      "uploadCvIntro": "You can upload your CV as soon as we start exploring your experiences",
+      "uploadCvCollectExperiences": "Attach your CV to the conversation",
+      "uploadCvOtherPhase": "CV upload is only available during experience collection",
+      "uploadCvLabel": "Upload CV",
+      "viewUploadedLabel": "Previously uploaded CVs",
+      "viewUploadedDescription": "Attach your uploaded CV to the conversation"
     },
     "chatMessage": {
       "typingChatMessage": {
@@ -155,11 +177,23 @@
           "dislikeLabel": "no me gusta"
         }
       }
+    },
+    "cvUploadPolling": {
+      "uploadingCv": "Uploading CV",
+      "cancelled": "CV upload cancelled",
+      "uploadedSuccessfully": "CV uploaded successfully",
+      "converting": "Converting CV",
+      "processing": "Processing CV",
+      "extractingExperiences": "Extracting experiences",
+      "savingCv": "Saving CV",
+      "failed": "CV upload failed",
+      "failedToStart": "Failed to start upload.",
+      "networkErrorStatus": "Network error while checking upload status.",
+      "failedToCancel": "Failed to cancel upload",
+      "uploadingFileNamed": "Uploading {{filename}}...",
+      "thinkingMessage": "Processing your CV, this might take a while..."
     }
   },
-  "upload_cv_intro": "Puedes subir tu currículum tan pronto como empecemos a explorar tus experiencias",
-  "upload_cv_collect_experiences": "Adjunta tu currículum a la conversación",
-  "upload_cv_other_phase": "La carga del currículum solo está disponible durante la recopilación de experiencias",
   "consent_before_we_begin_title": "Antes de comenzar...",
   "consent_intro_part1": "Creamos esta herramienta de IA con cuidado para ayudarte a ti y a otros jóvenes como tú a explorar sus habilidades y descubrir nuevas oportunidades.",
   "consent_intro_highlight_responsibly": "¡Por favor usa la IA de manera responsable!",
@@ -182,8 +216,6 @@
   "consent_snackbar_logged_out_success": "Sesión cerrada correctamente.",
   "consent_snackbar_logged_out_failure": "Error al cerrar sesión.",
   "consent_snackbar_failed_update_preferences": "Error al actualizar las preferencias del usuario",
-  "cv_typing_uploading": "Por favor espera mientras subo y analizo tu CV",
-  "cv_typing_uploaded_ready": "El contenido de tu CV está en el campo de texto. Revísalo y envíalo cuando estés listo.",
   "help_us_improve": "Ayúdanos a mejorar!",
   "previous": "Anterior",
   "next": "Siguiente",
@@ -351,19 +383,6 @@
   "skillsRanking_rotateToSolve_puzzleComplete_message": "¡Rompecabezas completo! Resolvé otro o cancelá si no te interesa tanto la información.",
   "skillsRanking_rotateToSolve_rotate_left_aria": "Rotar carácter en sentido antihorario",
   "skillsRanking_rotateToSolve_rotate_right_aria": "Rotar carácter en sentido horario",
-  "cv_upload_cancelled": "Carga de CV cancelada",
-  "cv_upload_uploaded_successfully": "CV cargado con éxito",
-  "cv_upload_failed_to_start": "No se pudo iniciar la carga.",
-  "cv_upload_network_error_status": "Error de red al comprobar el estado de la carga.",
-  "cv_upload_failed_to_cancel": "No se pudo cancelar la carga",
-  "cv_upload_uploading_file_named": "Cargando {{filename}}...",
-  "cv_upload_converting": "Convirtiendo CV",
-  "cv_upload_processing": "Procesando CV",
-  "cv_upload_extracting_experiences": "Extrayendo experiencias",
-  "cv_upload_saving_cv": "Guardando CV",
-  "cv_upload_failed": "Falló la carga del CV",
-  "cv_upload_uploading_cv": "Subiendo CV",
-  "cv_upload_thinking_message": "Procesando tu CV, esto puede tardar un rato...",
   "customerSatisfactionRating_question_text": "Por último, nos encantaría conocer tu opinión sobre tu experiencia hasta ahora. ",
   "customerSatisfactionRating_rating_label_low": "Insatisfecho",
   "customerSatisfactionRating_rating_label_high": "Satisfecho",
@@ -380,29 +399,9 @@
   "sensitive_data_collection_skipped": "Se omitió la recopilación de datos personales.",
   "sensitive_data_error_default": "No se pudieron guardar los datos personales. Inténtalo de nuevo y, si el problema persiste, limpia la caché del navegador y actualiza la página.",
   "sensitive_data_error_encrypted_data_too_large": "Los datos personales parecen demasiado grandes para guardarse. Intenta ingresar valores más pequeños en los campos. Si el problema persiste, limpia la caché del navegador y actualiza la página.",
-  "chat_message_cv_error_max_file_size": "El archivo seleccionado es demasiado grande. El tamaño máximo es de 3 MB.",
-  "chat_message_cv_error_too_dense": "El contenido del archivo subido es demasiado largo para procesarlo. Reducí su longitud e intentá de nuevo.",
-  "chat_message_cv_error_empty_parse": "No pudimos detectar experiencias en tu CV. Verificá el archivo e intentá de nuevo.",
-  "chat_message_cv_error_generic": "No se pudo analizar tu CV. Intentá de nuevo o usá otro archivo.",
-  "chat_message_cv_error_rate_limit": "Demasiadas cargas a la vez. Esperá un minuto e intentá de nuevo.",
-  "chat_message_cv_error_max_uploads_reached": "Alcanzaste el número máximo de cargas de CV para esta conversación. No se permiten más cargas.",
-  "chat_message_cv_error_duplicate": "Este CV ya fue subido. Seleccioná el CV desde los subidos anteriormente.",
-  "chat_message_cv_error_unsupported_file_type": "Tipo de archivo no compatible. Permitidos: PDF, DOCX, TXT.",
-  "chat_message_cv_error_timeout": "La carga superó el tiempo de espera. Intentá de nuevo.",
-  "chat_message_cv_error_unauthorized": "No estás autorizado. Por favor, volvé a iniciar sesión.",
-  "chat_message_cv_error_upload_not_found": "No se encontró la carga. Es posible que no se haya iniciado.",
-  "chat_message_cv_error_cv_markdown_too_long": "El contenido de tu CV es demasiado largo. Por favor, acortalo e intentá de nuevo.",
-  "upload_cv_upload_label": "Subir CV",
-  "upload_cv_view_uploaded_label": "CV subidos anteriormente",
-  "upload_cv_view_uploaded_description": "Adjuntá tu CV subido a la conversación",
   "experiences_downloadReportButton_download_cv": "Descargar CV",
   "experiences_downloadReportButton_downloading": "Descargando",
   "experiences_downloadReportButton_help_tip_blocked_message": "No podés descargar el informe hasta que termines de explorar al menos una experiencia.",
-  "uploadedCVsMenu_back_title": "Volver al menú principal",
-  "uploadedCVsMenu_title_with_count": "CVs cargados previamente ({{count}})",
-  "uploadedCVsMenu_help_collect": "Tocá un CV para cargar su contenido en el campo de texto. Revísalo y enviá cuando estés listo.",
-  "uploadedCVsMenu_help_disabled": "La selección de CV solo está disponible durante la fase de recolección de experiencias.",
-  "uploadedCVsMenu_empty": "No se encontraron CVs cargados.",
   "please_select_x": "Por favor, seleccioná {{x}}",
   "clear_selection": "Limpiar selección",
   "auth": {
@@ -531,5 +530,18 @@
       }
     },
     "verificationEmailSentShort": "¡Correo de verificación enviado!"
+  },
+  "cv": {
+    "cvTypingChatMessage": {
+      "uploading": "Please wait while I upload and parse your CV",
+      "uploadedReady": "Your CV content is in the text field. Review it and send when ready."
+    },
+    "uploadedCVsMenu": {
+      "backTitle": "Back to main menu",
+      "titleWithCount": "Previously uploaded CVs ({{count}})",
+      "helpCollect": "Tap a CV to load its content into the text field. Review and send when you're ready.",
+      "helpDisabled": "CV selection is only available during the experience collection phase.",
+      "empty": "No uploaded CVs found."
+    }
   }
 }

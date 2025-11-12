@@ -123,28 +123,28 @@ export const generateCancellableCVTypingMessage = (
   uploadState?: string
 ): IChatMessage<CancellableTypingChatMessageProps> => {
   const getDisplayMessage = (): string => {
-    if (isCancelled) return i18n.t("cv_upload_cancelled");
-    if (isUploaded) return i18n.t("cv_upload_uploaded_successfully");
+    if (isCancelled) return i18n.t("chat.cvUploadPolling.cancelled");
+    if (isUploaded) return i18n.t("chat.cvUploadPolling.uploadedSuccessfully");
 
     switch (uploadState) {
       case "CONVERTING":
-        return i18n.t("cv_upload_converting");
+        return i18n.t("chat.cvUploadPolling.converting");
       case "UPLOADING_TO_GCS":
-        return i18n.t("cv_upload_processing");
+        return i18n.t("chat.cvUploadPolling.processing");
       case "EXTRACTING":
-        return i18n.t("cv_upload_extracting_experiences");
+        return i18n.t("chat.cvUploadPolling.extractingExperiences");
       case "SAVING":
-        return i18n.t("cv_upload_saving_cv");
+        return i18n.t("chat.cvUploadPolling.savingCv");
       case "FAILED":
-        return i18n.t("cv_upload_failed");
+        return i18n.t("chat.cvUploadPolling.failed");
       default:
-        return i18n.t("cv_upload_uploading_cv");
+        return i18n.t("chat.cvUploadPolling.uploadingCv");
     }
   };
 
   const payload: CancellableTypingChatMessageProps = {
     message: getDisplayMessage(),
-    thinkingMessage: i18n.t("cv_upload_thinking_message"),
+    thinkingMessage: i18n.t("chat.cvUploadPolling.thinkingMessage"),
     waitBeforeThinking: 10000, // 10 seconds for CV processing
     disabled: isUploaded || isCancelled,
     onCancel: async () => await onCancel(uploadId),

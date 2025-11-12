@@ -14,22 +14,22 @@ export function stopUploadPolling(handles?: UploadPollingHandles): void {
 }
 
 export function getCvUploadDisplayMessage(status: UploadStatus): string {
-  if (!status) return i18n.t("cv_upload_uploading_cv");
-  if (status.upload_process_state === "CANCELLED" || status.cancel_requested) return i18n.t("cv_upload_cancelled");
-  if (status.upload_process_state === "COMPLETED") return i18n.t("cv_upload_uploaded_successfully");
+  if (!status) return i18n.t("chat.cvUploadPolling.uploadingCv");
+  if (status.upload_process_state === "CANCELLED" || status.cancel_requested) return i18n.t("chat.cvUploadPolling.cancelled");
+  if (status.upload_process_state === "COMPLETED") return i18n.t("chat.cvUploadPolling.uploadedSuccessfully");
   switch (status.upload_process_state) {
     case "CONVERTING":
-      return i18n.t("cv_upload_converting");
+      return i18n.t("chat.cvUploadPolling.converting");
     case "UPLOADING_TO_GCS":
-      return i18n.t("cv_upload_processing");
+      return i18n.t("chat.cvUploadPolling.processing");
     case "EXTRACTING":
-      return i18n.t("cv_upload_extracting_experiences");
+      return i18n.t("chat.cvUploadPolling.extractingExperiences");
     case "SAVING":
-      return i18n.t("cv_upload_saving_cv");
+      return i18n.t("chat.cvUploadPolling.savingCv");
     case "FAILED":
-      return i18n.t("cv_upload_failed");
+      return i18n.t("chat.cvUploadPolling.failed");
     default:
-      return i18n.t("cv_upload_uploading_cv");
+      return i18n.t("chat.cvUploadPolling.uploadingCv");
   }
 }
 

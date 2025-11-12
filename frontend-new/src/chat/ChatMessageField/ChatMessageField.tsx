@@ -56,9 +56,9 @@ export const MENU_ITEM_ID = {
 };
 
 export const MENU_ITEM_TEXT = {
-  UPLOAD_CV: "upload_cv_upload_label",
-  UPLOADED_CV_ACCORDION: "upload_cv_view_uploaded_label",
-  VIEW_UPLOADED_CVS: "upload_cv_view_uploaded_label",
+  UPLOAD_CV: "chat.chatMessageField.uploadCvLabel",
+  UPLOADED_CV_ACCORDION: "chat.chatMessageField.viewUploadedLabel",
+  VIEW_UPLOADED_CVS: "chat.chatMessageField.viewUploadedLabel",
 };
 
 export const PLACEHOLDER_TEXTS = {
@@ -71,15 +71,15 @@ export const PLACEHOLDER_TEXTS = {
 export const CHARACTER_LIMIT_ERROR_MESSAGES = {
   MESSAGE_LIMIT: "common.chat.errors.messageLimit",
   INVALID_SPECIAL_CHARACTERS: "common.chat.errors.invalidSpecialCharacters",
-  MAX_FILE_SIZE: "chat_message_cv_error_max_file_size",
-  FILE_TOO_DENSE: "chat_message_cv_error_too_dense",
-  EMPTY_CV_PARSE: "chat_message_cv_error_empty_parse",
-  GENERIC_UPLOAD_ERROR: "chat_message_cv_error_generic",
-  RATE_LIMIT_WAIT: "chat_message_cv_error_rate_limit",
-  MAX_UPLOADS_REACHED: "chat_message_cv_error_max_uploads_reached",
-  DUPLICATE_CV: "chat_message_cv_error_duplicate",
-  UNSUPPORTED_FILE_TYPE: "chat_message_cv_error_unsupported_file_type",
-  UPLOAD_TIMEOUT: "chat_message_cv_error_timeout",
+  MAX_FILE_SIZE: "common.upload.errors.maxFileSize",
+  FILE_TOO_DENSE: "common.upload.errors.tooDense",
+  EMPTY_CV_PARSE: "common.upload.errors.emptyParse",
+  GENERIC_UPLOAD_ERROR: "common.upload.errors.generic",
+  RATE_LIMIT_WAIT: "common.upload.errors.rateLimit",
+  MAX_UPLOADS_REACHED: "common.upload.errors.maxUploadsReached",
+  DUPLICATE_CV: "common.upload.errors.duplicate",
+  UNSUPPORTED_FILE_TYPE: "common.upload.errors.unsupportedFileType",
+  UPLOAD_TIMEOUT: "common.upload.errors.timeout",
 };
 
 // Define the max file size in bytes 3 MB
@@ -464,7 +464,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
             text: t(MENU_ITEM_TEXT.VIEW_UPLOADED_CVS),
             icon: <DescriptionOutlinedIcon />,
             trailingIcon: <ChevronRightIcon />,
-            description: t("upload_cv_view_uploaded_description"),
+            description: t("chat.chatMessageField.viewUploadedDescription"),
             disabled: inputIsDisabled(),
             action: () => {
               void handleViewUploadedCVs();
@@ -476,10 +476,10 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
             text: t(MENU_ITEM_TEXT.UPLOAD_CV),
             description:
               props.currentPhase === ConversationPhase.INTRO
-                ? t("upload_cv_intro")
+                ? t("chat.chatMessageField.uploadCvIntro")
                 : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
-                  ? t("upload_cv_collect_experiences")
-                  : t("upload_cv_other_phase"),
+                  ? t("chat.chatMessageField.uploadCvCollectExperiences")
+                  : t("chat.chatMessageField.uploadCvOtherPhase"),
             icon: <UploadFileIcon />,
             disabled: inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
             action: handleFileMenuItemClick,
