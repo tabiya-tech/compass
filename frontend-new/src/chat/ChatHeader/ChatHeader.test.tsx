@@ -580,7 +580,7 @@ describe("ChatHeader", () => {
   describe("context menu item tests", () => {
     test.each([
       ["online", true],
-      ["offline", false],
+      ["chat.chatMessageField.placeholders.offline", false],
     ])(
       "should render the context menu with the correct menu items when browser is %s",
       async (_description, browserIsOnline) => {

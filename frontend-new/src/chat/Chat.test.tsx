@@ -1811,7 +1811,7 @@ describe("Chat", () => {
       });
       expect(console.error).toHaveBeenCalledTimes(1);
       // AND expect a snackbar notification
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("experiences_fetch_failed"), {
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("chat.chat.notifications.experiencesFetchFailed"), {
         variant: "error",
       });
     });

@@ -18,19 +18,19 @@ export const CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE = `cancellable-cv-typing-me
 // Translated messages (resolved at access-time to respect runtime language changes)
 export const FIXED_MESSAGES_TEXT = {
   get AI_IS_TYPING() {
-    return i18n.t("chat_typing");
+    return i18n.t("chat.chatMessage.typingChatMessage.typing");
   },
   get THANK_YOU_FOR_FEEDBACK() {
-    return i18n.t("chat_feedback_thank_you_for_feedback");
+    return i18n.t("chat.util.feedbackThankYou");
   },
   get THANK_YOU_FOR_RATING() {
-    return i18n.t("chat_feedback_thank_you_for_rating");
+    return i18n.t("chat.util.ratingThankYou");
   },
   get SOMETHING_WENT_WRONG() {
-    return i18n.t("chat_error_something_went_wrong");
+    return i18n.t("chat.util.errorSomethingWentWrong");
   },
   get PLEASE_REPEAT() {
-    return i18n.t("chat_error_please_repeat");
+    return i18n.t("chat.util.errorPleaseRepeat");
   },
 };
 
@@ -223,7 +223,7 @@ export const parseConversationPhase = (newPhase: CurrentPhase, previousPhase?: C
 export const formatExperiencesToMessage = (experiences: string[] | null): string => {
   if (!Array.isArray(experiences) || experiences.length === 0) return "";
 
-  const intro = i18n.t("chat_message_experiences_intro");
+  const intro = i18n.t("chat.util.messages.experiencesIntro");
   const bullets = experiences
     .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
     .filter(Boolean)

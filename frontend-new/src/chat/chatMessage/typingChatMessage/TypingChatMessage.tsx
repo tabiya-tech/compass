@@ -14,8 +14,8 @@ export const DATA_TEST_ID = {
 
 export const UI_TEXT = {
   // i18n keys
-  TYPING: "chat_typing",
-  THINKING: "chat_thinking",
+  TYPING: "chat.chatMessage.typingChatMessage.typing",
+  THINKING: "chat.chatMessage.typingChatMessage.thinking",
 };
 
 export const WAIT_BEFORE_THINKING = 15000;
