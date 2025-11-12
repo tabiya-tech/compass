@@ -5,14 +5,14 @@ import i18n from "src/i18n/i18n";
 
 describe("cvUploadPolling", () => {
   test("getCvUploadDisplayMessage maps states", () => {
-    expect(getCvUploadDisplayMessage({ upload_process_state: "CONVERTING" })).toBe(i18n.t("cv_upload_converting"));
-    expect(getCvUploadDisplayMessage({ upload_process_state: "UPLOADING_TO_GCS" })).toBe(i18n.t("cv_upload_processing"));
-    expect(getCvUploadDisplayMessage({ upload_process_state: "EXTRACTING" })).toBe(i18n.t("cv_upload_extracting_experiences"));
-    expect(getCvUploadDisplayMessage({ upload_process_state: "SAVING" })).toBe(i18n.t("cv_upload_saving_cv"));
-    expect(getCvUploadDisplayMessage({ upload_process_state: "FAILED" })).toBe(i18n.t("cv_upload_failed"));
-    expect(getCvUploadDisplayMessage({ upload_process_state: "COMPLETED" })).toBe(i18n.t("cv_upload_uploaded_successfully"));
-    expect(getCvUploadDisplayMessage({ upload_process_state: "CANCELLED" })).toBe(i18n.t("cv_upload_cancelled"));
-    expect(getCvUploadDisplayMessage({ upload_process_state: "PENDING_UPLOAD" })).toBe(i18n.t("cv_upload_uploading_cv"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "CONVERTING" })).toBe(i18n.t("chat.cvUploadPolling.converting"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "UPLOADING_TO_GCS" })).toBe(i18n.t("chat.cvUploadPolling.processing"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "EXTRACTING" })).toBe(i18n.t("chat.cvUploadPolling.extractingExperiences"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "SAVING" })).toBe(i18n.t("chat.cvUploadPolling.savingCv"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "FAILED" })).toBe(i18n.t("chat.cvUploadPolling.failed"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "COMPLETED" })).toBe(i18n.t("chat.cvUploadPolling.uploadedSuccessfully"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "CANCELLED" })).toBe(i18n.t("chat.cvUploadPolling.cancelled"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "PENDING_UPLOAD" })).toBe(i18n.t("chat.cvUploadPolling.uploadingCv"));
   });
 
   test("polling calls onStatus and completes", async () => {

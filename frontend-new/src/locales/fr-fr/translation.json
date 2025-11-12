@@ -45,6 +45,22 @@
       "minutePlural": "minutes",
       "ago": "il y a {{time}}",
       "justNow": "à l’instant"
+    },
+    "upload": {
+      "errors": {
+        "maxFileSize": "Selected file is too large. Maximum size is 3 MB.",
+        "tooDense": "The uploaded file content is too long to process. Please reduce its length and try again.",
+        "emptyParse": "We couldn't detect experiences in your CV. Please check the file and try again.",
+        "generic": "Failed to parse your CV. Please try again or use a different file.",
+        "rateLimit": "Too many uploads at once. Please wait one minute and try again.",
+        "maxUploadsReached": "You've reached the maximum number of CV uploads for this conversation. Further uploads aren't allowed.",
+        "duplicate": "This CV has already been uploaded. Select it from your previously uploaded CVs.",
+        "unsupportedFileType": "Unsupported file type. Allowed: PDF, DOCX, TXT.",
+        "timeout": "The upload timed out. Please try again.",
+        "unauthorized": "You are not authorized. Please sign in again.",
+        "uploadNotFound": "Upload not found. It may have failed to start.",
+        "cvMarkdownTooLong": "Your CV content is too long. Please shorten your CV and try again."
+      }
     }
   },
   "language_selector": "Sélecteur de langue",
@@ -90,7 +106,13 @@
         "offline": "Vous êtes hors ligne. Veuillez vous connecter à Internet pour envoyer un message.",
         "default": "Tapez votre message...",
         "uploading": "Téléversement du CV..."
-      }
+      },
+      "uploadCvIntro": "You can upload your CV as soon as we start exploring your experiences",
+      "uploadCvCollectExperiences": "Attach your CV to the conversation",
+      "uploadCvOtherPhase": "CV upload is only available during experience collection",
+      "uploadCvLabel": "Upload CV",
+      "viewUploadedLabel": "Previously uploaded CVs",
+      "viewUploadedDescription": "Attach your uploaded CV to the conversation"
     },
     "chatMessage": {
       "typingChatMessage": {
@@ -155,11 +177,23 @@
           "dislikeLabel": "je n'aime pas"
         }
       }
+    },
+    "cvUploadPolling": {
+      "uploadingCv": "Uploading CV",
+      "cancelled": "CV upload cancelled",
+      "uploadedSuccessfully": "CV uploaded successfully",
+      "converting": "Converting CV",
+      "processing": "Processing CV",
+      "extractingExperiences": "Extracting experiences",
+      "savingCv": "Saving CV",
+      "failed": "CV upload failed",
+      "failedToStart": "Failed to start upload.",
+      "networkErrorStatus": "Network error while checking upload status.",
+      "failedToCancel": "Failed to cancel upload",
+      "uploadingFileNamed": "Uploading {{filename}}...",
+      "thinkingMessage": "Processing your CV, this might take a while..."
     }
   },
-  "upload_cv_intro": "Vous pouvez télécharger votre CV dès que nous commençons à explorer vos expériences",
-  "upload_cv_collect_experiences": "Joignez votre CV à la conversation",
-  "upload_cv_other_phase": "Le téléchargement du CV est uniquement disponible pendant la collecte d’expériences",
   "consent_before_we_begin_title": "Avant de commencer...",
   "consent_intro_part1": "Nous avons créé cet outil d'IA avec soin pour vous aider, vous et d'autres jeunes comme vous, à explorer vos compétences et à découvrir de nouvelles opportunités.",
   "consent_intro_highlight_responsibly": "Veuillez utiliser l'IA de manière responsable !",
@@ -182,8 +216,6 @@
   "consent_snackbar_logged_out_success": "Déconnexion réussie.",
   "consent_snackbar_logged_out_failure": "Échec de la déconnexion.",
   "consent_snackbar_failed_update_preferences": "Échec de la mise à jour des préférences utilisateur",
-  "cv_typing_uploading": "Veuillez patienter pendant que je téléverse et analyse votre CV",
-  "cv_typing_uploaded_ready": "Le contenu de votre CV est dans le champ de texte. Relisez-le et envoyez-le quand vous êtes prêt.",
   "help_us_improve": "Aidez-nous à nous améliorer !",
   "previous": "Précédent",
   "next": "Suivant",
@@ -351,19 +383,6 @@
   "skillsRanking_rotateToSolve_puzzleComplete_message": "Puzzle terminé ! Résous-en un autre ou annule si l'information ne t'intéresse pas tant.",
   "skillsRanking_rotateToSolve_rotate_left_aria": "Faire pivoter le caractère dans le sens antihoraire",
   "skillsRanking_rotateToSolve_rotate_right_aria": "Faire pivoter le caractère dans le sens horaire",
-  "cv_upload_cancelled": "Téléversement du CV annulé",
-  "cv_upload_uploaded_successfully": "CV téléversé avec succès",
-  "cv_upload_failed_to_start": "Échec du démarrage du téléversement.",
-  "cv_upload_network_error_status": "Erreur réseau lors de la vérification de l'état du téléversement.",
-  "cv_upload_failed_to_cancel": "Échec de l'annulation du téléversement",
-  "cv_upload_uploading_file_named": "Téléversement de {{filename}}...",
-  "cv_upload_converting": "Conversion du CV",
-  "cv_upload_processing": "Traitement du CV",
-  "cv_upload_extracting_experiences": "Extraction des expériences",
-  "cv_upload_saving_cv": "Enregistrement du CV",
-  "cv_upload_failed": "Échec du téléversement du CV",
-  "cv_upload_uploading_cv": "Téléversement du CV",
-  "cv_upload_thinking_message": "Traitement de votre CV, cela peut prendre un moment...",
   "customerSatisfactionRating_question_text": "Enfin, nous aimerions avoir votre avis sur votre expérience jusqu'à présent ! ",
   "customerSatisfactionRating_rating_label_low": "Insatisfait",
   "customerSatisfactionRating_rating_label_high": "Satisfait",
@@ -380,31 +399,11 @@
   "sensitive_data_collection_skipped": "Collecte des données personnelles ignorée.",
   "sensitive_data_error_default": "Les données personnelles n’ont pas pu être enregistrées. Réessayez et, si le problème persiste, videz le cache du navigateur puis actualisez la page.",
   "sensitive_data_error_encrypted_data_too_large": "Les données personnelles semblent trop volumineuses pour être enregistrées. Saisissez des valeurs plus courtes. Si le problème persiste, videz le cache du navigateur puis actualisez la page.",
-  "chat_message_cv_error_max_file_size": "Le fichier sélectionné est trop volumineux. Taille maximale : 3 Mo.",
-  "chat_message_cv_error_too_dense": "Le contenu du fichier téléversé est trop long pour être traité. Réduisez sa longueur puis réessayez.",
-  "chat_message_cv_error_empty_parse": "Nous n’avons pas pu détecter d’expériences dans votre CV. Veuillez vérifier le fichier puis réessayer.",
-  "chat_message_cv_error_generic": "Échec de l’analyse de votre CV. Réessayez ou utilisez un autre fichier.",
-  "chat_message_cv_error_rate_limit": "Trop de téléversements en même temps. Veuillez attendre une minute puis réessayer.",
-  "chat_message_cv_error_max_uploads_reached": "Vous avez atteint le nombre maximal de téléversements de CV pour cette conversation. D’autres téléversements ne sont pas autorisés.",
-  "chat_message_cv_error_duplicate": "Ce CV a déjà été téléversé. Sélectionnez-le parmi vos CV déjà téléversés.",
-  "chat_message_cv_error_unsupported_file_type": "Type de fichier non pris en charge. Autorisés : PDF, DOCX, TXT.",
-  "chat_message_cv_error_timeout": "Le téléversement a expiré. Veuillez réessayer.",
-  "chat_message_cv_error_unauthorized": "Vous n'êtes pas autorisé. Veuillez vous reconnecter.",
-  "chat_message_cv_error_upload_not_found": "Téléversement introuvable. Il se peut qu'il n'ait pas démarré.",
-  "chat_message_cv_error_cv_markdown_too_long": "Le contenu de votre CV est trop long. Veuillez le raccourcir puis réessayer.",
   "chat_message_experiences_intro": "Voici mes expériences :",
   "experiences_fetch_failed": "Échec de la récupération des expériences",
-  "upload_cv_upload_label": "Téléverser un CV",
-  "upload_cv_view_uploaded_label": "CV téléversés précédemment",
-  "upload_cv_view_uploaded_description": "Joignez votre CV déjà téléversé à la conversation",
   "experiences_downloadReportButton_download_cv": "Télécharger le CV",
   "experiences_downloadReportButton_downloading": "Téléchargement en cours",
   "experiences_downloadReportButton_help_tip_blocked_message": "Vous ne pouvez pas télécharger le rapport tant que vous n'avez pas terminé d'explorer au moins une expérience.",
-  "uploadedCVsMenu_back_title": "Retour au menu principal",
-  "uploadedCVsMenu_title_with_count": "CV précédemment téléversés ({{count}})",
-  "uploadedCVsMenu_help_collect": "Touchez un CV pour charger son contenu dans le champ de texte. Relisez-le et envoyez-le quand vous êtes prêt.",
-  "uploadedCVsMenu_help_disabled": "La sélection de CV est uniquement disponible pendant la phase de collecte des expériences.",
-  "uploadedCVsMenu_empty": "Aucun CV téléversé trouvé.",
   "please_select_x": "Veuillez sélectionner {{x}}",
   "clear_selection": "Effacer la sélection",
   "auth": {
@@ -533,5 +532,18 @@
       }
     },
     "verificationEmailSentShort": "E‑mail de vérification envoyé !"
+  },
+  "cv": {
+    "cvTypingChatMessage": {
+      "uploading": "Please wait while I upload and parse your CV",
+      "uploadedReady": "Your CV content is in the text field. Review it and send when ready."
+    },
+    "uploadedCVsMenu": {
+      "backTitle": "Back to main menu",
+      "titleWithCount": "Previously uploaded CVs ({{count}})",
+      "helpCollect": "Tap a CV to load its content into the text field. Review and send when you're ready.",
+      "helpDisabled": "CV selection is only available during the experience collection phase.",
+      "empty": "No uploaded CVs found."
+    }
   }
 }
