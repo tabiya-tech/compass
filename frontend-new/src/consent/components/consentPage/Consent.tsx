@@ -114,7 +114,7 @@ const Consent: React.FC = () => {
     try {
       const user = authStateService.getInstance().getUser();
       if (!user) {
-        enqueueSnackbar(t("consent_snackbar_user_not_found"), { variant: "error" });
+        enqueueSnackbar(t("consent.components.consentPage.snackbarUserNotFound"), { variant: "error" });
         navigate(routerPaths.LANDING);
         return;
       }
@@ -140,13 +140,13 @@ const Consent: React.FC = () => {
 
       sendMetricsEvent(prefs.user_id);
 
-  enqueueSnackbar(t("consent_snackbar_agreement_accepted"), { variant: "success" });
+  enqueueSnackbar(t("consent.components.consentPage.snackbarAgreementAccepted"), { variant: "success" });
     } catch (e: unknown) {
       console.error(new AuthenticationError("Failed to update user preferences", e));
       if (e instanceof RestAPIError) {
         enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
       } else {
-        enqueueSnackbar(`${t("consent_snackbar_failed_update_preferences")}: ${(e as Error).message}` , { variant: "error" });
+        enqueueSnackbar(`${t("consent.components.consentPage.snackbarFailedUpdatePreferences")}: ${(e as Error).message}` , { variant: "error" });
       }
     } finally {
       setIsAccepting(false);
@@ -172,10 +172,10 @@ const Consent: React.FC = () => {
       const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
       await authenticationService!.logout();
       navigate(routerPaths.LANDING, { replace: true });
-      enqueueSnackbar(t("consent_snackbar_logged_out_success"), { variant: "success" });
+      enqueueSnackbar(t("consent.components.consentPage.snackbarLoggedOutSuccess"), { variant: "success" });
     } catch (e) {
       console.error(new AuthenticationError("Failed to log out", e));
-      enqueueSnackbar(t("consent_snackbar_logged_out_failure"), { variant: "error" });
+      enqueueSnackbar(t("consent.components.consentPage.snackbarLoggedOutFailure"), { variant: "error" });
     } finally {
       setIsRejecting(false);
     }
@@ -195,8 +195,8 @@ const Consent: React.FC = () => {
     setIsDPAccepted(event.target.checked);
   };
 
-  const termsAndConditionsLabel = t("consent_terms_and_conditions");
-  const privacyPolicyLabel = t("consent_privacy_policy");
+  const termsAndConditionsLabel = t("consent.components.consentPage.termsAndConditions");
+  const privacyPolicyLabel = t("consent.components.consentPage.privacyPolicy");
 
   const handleExternalNavigationOnNewTab = (url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
@@ -208,9 +208,9 @@ const Consent: React.FC = () => {
       sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
       data-testid={DATA_TEST_ID.CONSENT_CONTAINER}
     >
-      <Backdrop isShown={isLoggingOut} message={t("logging_you_out")} />
+      <Backdrop isShown={isLoggingOut} message={t("common.backdrop.loggingYouOut")} />
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"}>
-        <AuthHeader title={t("consent_before_we_begin_title")} subtitle={<></>} />
+        <AuthHeader title={t("consent.components.consentPage.beforeWeBeginTitle")} subtitle={<></>} />
         <Box
           display={"flex"}
           flexDirection={"column"}
@@ -219,19 +219,19 @@ const Consent: React.FC = () => {
           gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
         >
           <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AGREEMENT_BODY}>
-            {t("consent_intro_part1")}
+            {t("consent.components.consentPage.introPart1")}
             <br />
             <br />
-            <HighlightedSpan>{t("consent_intro_highlight_responsibly")}</HighlightedSpan>
+            <HighlightedSpan>{t("consent.components.consentPage.introHighlightResponsibly")}</HighlightedSpan>
             <br />
             <br />
-            {t("consent_intro_part2")}
+            {t("consent.components.consentPage.introPart2")}
             <br />
             <br />
-            {t("consent_intro_part3")}
+            {t("consent.components.consentPage.introPart3")}
             <br />
             <br />
-            {t("consent_intro_part4")}
+            {t("consent.components.consentPage.introPart4")}
           </Typography>
           <Box display={"flex"} flexDirection={"column"} gap={theme.tabiyaSpacing.lg}>
             <FormControlLabel
@@ -249,7 +249,7 @@ const Consent: React.FC = () => {
               label={
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT}>
                   <Trans
-                    i18nKey="consent_checkbox_tc"
+                    i18nKey="consent.components.consentPage.checkboxTermsAndConditions"
                     values={{ terms_and_conditions: termsAndConditionsLabel }}
                     components={[
                       <CustomLink
@@ -278,7 +278,7 @@ const Consent: React.FC = () => {
               label={
                 <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_CHECKBOX_TEXT}>
                   <Trans
-                    i18nKey="consent_checkbox_privacy"
+                    i18nKey="consent.components.consentPage.checkboxPrivacyPolicy"
                     values={{ privacy_policy: privacyPolicyLabel }}
                     components={[
                       <CustomLink
@@ -295,7 +295,7 @@ const Consent: React.FC = () => {
             />
           </Box>
           <Typography>
-            {t("consent_are_you_ready")}
+            {t("consent.components.consentPage.areYouReady")}
             <br />
           </Typography>
         </Box>
@@ -311,7 +311,7 @@ const Consent: React.FC = () => {
           }}
         >
           <CustomLink data-testid={DATA_TEST_ID.REJECT_BUTTON} onClick={() => setShowRejectModal(true)}>
-            {t("no_thank_you")}
+            {t("common.buttons.noThankYou")}
           </CustomLink>
           <PrimaryButton
             fullWidth
@@ -322,7 +322,7 @@ const Consent: React.FC = () => {
             data-testid={DATA_TEST_ID.ACCEPT_BUTTON}
             onClick={handleAcceptedDPA}
           >
-            {t("consent_accept")}
+            {t("consent.components.consentPage.acceptButton")}
           </PrimaryButton>
         </Box>
         <Box
@@ -335,7 +335,7 @@ const Consent: React.FC = () => {
           }}
           data-testid={DATA_TEST_ID.SUPPORT_CONTAINER}
         >
-          <Typography typography="body1">{t("consent_with_support_from")}</Typography>
+          <Typography typography="body1">{t("consent.components.consentPage.withSupportFrom")}</Typography>
           <img
             src={`${process.env.PUBLIC_URL}/google-logo.svg`}
             alt="Google.org Logo"
@@ -346,7 +346,7 @@ const Consent: React.FC = () => {
       </Box>
       <ConfirmModalDialog
         isOpen={showRejectModal}
-        title={t("are_you_sure")}
+        title={t("common.modal.areYouSure")}
         content={
           <Box
             display="flex"
@@ -354,12 +354,12 @@ const Consent: React.FC = () => {
             gap={isSmallMobile ? theme.tabiyaSpacing.xl : theme.tabiyaSpacing.md}
           >
             <Typography>
-              {t("consent_modal_apology", {
+              {t("consent.components.consentPage.modalApology", {
                 terms_and_conditions: termsAndConditionsLabel,
                 privacy_policy: privacyPolicyLabel,
-              })} {t("consent_modal_cannot_proceed")} <HighlightedSpan>{t("consent_modal_logged_out_highlight")}</HighlightedSpan>
+              })} {t("consent.components.consentPage.modalCannotProceed")} <HighlightedSpan>{t("consent.components.consentPage.modalLoggedOutHighlight")}</HighlightedSpan>
             </Typography>
-            <Typography>{t("are_you_sure_you_want_to_exit")}</Typography>
+            <Typography>{t("common.modal.areYouSureYouWantToExit")}</Typography>
           </Box>
         }
         onCancel={handleRejected}
@@ -369,8 +369,8 @@ const Consent: React.FC = () => {
         onDismiss={() => {
           setShowRejectModal(false);
         }}
-        cancelButtonText={t("consent_modal_yes_exit")}
-        confirmButtonText={t("i_want_to_stay")}
+        cancelButtonText={t("consent.components.consentPage.modalYesExit")}
+        confirmButtonText={t("common.buttons.iWantToStay")}
       />
     </Container>
   );

@@ -307,10 +307,10 @@ const SensitiveDataForm: React.FC = () => {
       const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
       await authenticationService!.logout();
       navigate(routerPaths.LANDING, { replace: true });
-      enqueueSnackbar(t("consent_snackbar_logged_out_success"), { variant: "success" });
+      enqueueSnackbar(t("consent.components.consentPage.snackbarLoggedOutSuccess"), { variant: "success" });
     } catch (e) {
       console.error("Failed to log out", e);
-      enqueueSnackbar(t("consent_snackbar_logged_out_failure"), { variant: "error" });
+      enqueueSnackbar(t("consent.components.consentPage.snackbarLoggedOutFailure"), { variant: "error" });
     } finally {
       setIsSubmitButtonEnabled(true);
       setIsRejecting(false);
@@ -438,7 +438,7 @@ const SensitiveDataForm: React.FC = () => {
                         setConfirmingReject(true);
                       }}
                     >
-                      {t("no_thank_you")}
+                      {t("common.buttons.noThankYou")}
                     </CustomLink>
                   ) : (
                     <CustomLink
@@ -481,20 +481,20 @@ const SensitiveDataForm: React.FC = () => {
           </Container>
           <TextConfirmModalDialog
             isOpen={confirmingReject}
-            title={t("are_you_sure")}
+            title={t("common.modal.areYouSure")}
             textParagraphs={[
               {
                 id: "1",
                 text: (
                   <>
                     {t("sensitive_data_reject_paragraph_1")}{" "}
-                    <HighlightedSpan>{t("logging_you_out")}</HighlightedSpan>
+                    <HighlightedSpan>{t("common.backdrop.loggingYouOut")}</HighlightedSpan>
                   </>
                 ),
               },
               {
                 id: "2",
-                text: <>{t("are_you_sure_you_want_to_exit")}</>,
+                text: <>{t("common.modal.areYouSureYouWantToExit")}</>,
               },
             ]}
             onCancel={handleRejectProvidingSensitiveData}
@@ -505,11 +505,11 @@ const SensitiveDataForm: React.FC = () => {
               setConfirmingReject(false);
             }}
             cancelButtonText={t("yes_exit")}
-            confirmButtonText={t("i_want_to_stay")}
+            confirmButtonText={t("common.buttons.iWantToStay")}
           />
           <TextConfirmModalDialog
             isOpen={confirmingSkip}
-            title={t("are_you_sure")}
+            title={t("common.modal.areYouSure")}
             textParagraphs={[
               {
                 id: "1",
@@ -535,7 +535,7 @@ const SensitiveDataForm: React.FC = () => {
             cancelButtonText={t("yes_skip")}
             confirmButtonText={t("share_data")}
           />
-          <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? t("skipping") : t("logging_you_out")} />
+          <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? t("skipping") : t("common.backdrop.loggingYouOut")} />
         </>
       )}
     </Suspense>
