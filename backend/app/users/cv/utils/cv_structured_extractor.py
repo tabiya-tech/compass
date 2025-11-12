@@ -284,7 +284,7 @@ Respond with JSON only.
             # Skills will be populated by existing skills processing pipeline
             top_skills=[],
             remaining_skills=[],
-            summary=experience.description
+            summary=None
         )
     
     def _determine_work_type(self, work_type_str: str | None) -> WorkType | None:
