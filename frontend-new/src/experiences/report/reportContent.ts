@@ -3,46 +3,46 @@ import i18n from "src/i18n/i18n";
 export const ReportContent = {
   // Use i18n keys and resolve at call/render time
   get SKILLS_REPORT_TITLE() {
-    return i18n.t("experiences_report_skills_report_title");
+    return i18n.t("experiences.report.skillsReportTitle");
   },
   get SKILLS_DESCRIPTION_TITLE() {
-    return i18n.t("experiences_report_skills_description_title");
+    return i18n.t("experiences.report.skillsDescriptionTitle");
   },
   get EXPERIENCES_TITLE() {
-    return i18n.t("experiences_report_experiences_title");
+    return i18n.t("experiences.report.experiencesTitle");
   },
   get SELF_EMPLOYMENT_TITLE() {
-    return i18n.t("experiences_report_self_employment_title");
+    return i18n.t("experiences.report.selfEmploymentTitle");
   },
   get SALARY_WORK_TITLE() {
-    return i18n.t("experiences_report_salary_work_title");
+    return i18n.t("experiences.report.salaryWorkTitle");
   },
   get UNPAID_WORK_TITLE() {
-    return i18n.t("experiences_report_unpaid_work_title");
+    return i18n.t("experiences.report.unpaidWorkTitle");
   },
   get TRAINEE_WORK_TITLE() {
-    return i18n.t("experiences_report_trainee_work_title");
+    return i18n.t("experiences.report.traineeWorkTitle");
   },
   get UNCATEGORIZED_TITLE() {
-    return i18n.t("experiences_report_uncategorized_title");
+    return i18n.t("experiences.report.uncategorizedTitle");
   },
   get TOP_SKILLS_TITLE() {
-    return i18n.t("experiences_report_top_skills_title");
+    return i18n.t("experiences.report.topSkillsTitle");
   },
   get SKILLS_DESCRIPTION_TEXT() {
-    return i18n.t("experiences_report_skills_description_text");
+    return i18n.t("experiences.report.skillsDescriptionText");
   },
   get DISCLAIMER_TEXT_PART1() {
-    return i18n.t("experiences_report_disclaimer_text_part1");
+    return i18n.t("experiences.report.disclaimer.part1");
   },
   get DISCLAIMER_TEXT_PART2() {
-    return i18n.t("experiences_report_disclaimer_text_part2");
+    return i18n.t("experiences.report.disclaimer.part2");
   },
   get DISCLAIMER_TEXT_PART3() {
-    return i18n.t("experiences_report_disclaimer_text_part3");
+    return i18n.t("experiences.report.disclaimer.part3");
   },
   REPORT_BODY_TEXT: (currentDate: string) =>
-    i18n.t("experiences_report_body_text", { date: currentDate }),
+    i18n.t("experiences.report.bodyText", { date: currentDate }),
   IMAGE_URLS: {
     COMPASS_LOGO: `${process.env.PUBLIC_URL}/logo.png`,
     OXFORD_LOGO: `${process.env.PUBLIC_URL}/oxford-logo.png`,

@@ -20,19 +20,19 @@ import i18n from "src/i18n/i18n";
 
 export const WORK_TYPE_DESCRIPTIONS = {
   get SELF_EMPLOYMENT() {
-    return i18n.t("experiences_work_type_description_self_employment");
+    return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.selfEmployment");
   },
   get FORMAL_SECTOR_WAGED_EMPLOYMENT() {
-    return i18n.t("experiences_work_type_description_formal_sector_waged_employment");
+    return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.formalSectorWagedEmployment");
   },
   get FORMAL_SECTOR_UNPAID_TRAINEE_WORK() {
-    return i18n.t("experiences_work_type_description_formal_sector_unpaid_trainee_work");
+    return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.formalSectorUnpaidTraineeWork");
   },
   get UNSEEN_UNPAID() {
-    return i18n.t("experiences_work_type_description_unseen_unpaid");
+    return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.unseenUnpaid");
   },
   get UNCATEGORIZED() {
-    return i18n.t("experiences_work_type_description_uncategorized");
+    return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.uncategorized");
   },
 } as const;
 

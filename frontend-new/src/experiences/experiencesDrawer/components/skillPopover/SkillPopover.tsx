@@ -58,7 +58,7 @@ const SkillPopover: React.FC<SkillPopoverProps> = ({ open, anchorEl, onClose, sk
         </Box>
         <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
           <Typography variant="caption" fontWeight="bold" data-testid={DATA_TEST_ID.SKILL_POPOVER_ALT_LABELS_TITLE}>
-            {t("experiences_skill_also_known_as")}
+            {t("experiences.experiencesDrawer.components.skillPopover.alsoKnownAs")}
           </Typography>
           <Typography
             variant="caption"

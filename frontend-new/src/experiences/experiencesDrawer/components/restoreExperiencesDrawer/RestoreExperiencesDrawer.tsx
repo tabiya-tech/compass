@@ -60,7 +60,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
         setDeletedExperiences(deletedExperiences);
       } catch (error) {
         console.error(new ExperienceError("Failed to fetch deleted experiences", error));
-        enqueueSnackbar(t("experiences_restore_fetch_failed"), {
+        enqueueSnackbar(t("experiences.experiencesDrawer.components.restoreExperiencesDrawer.fetchFailed"), {
           variant: "error",
         });
       } finally {
@@ -112,7 +112,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
             🤷‍♀️
           </Typography>
           <Typography data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES_EMPTY_MESSAGE}>
-            {t("experiences_restore_empty")}
+            {t("experiences.experiencesDrawer.components.restoreExperiencesDrawer.empty")}
           </Typography>
           <PrimaryButton onClick={onClose} data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES_GO_BACK_BUTTON}>
             {t("common.buttons.goBack")}
@@ -138,7 +138,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
                     color={theme.palette.text.secondary}
                     data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_TITLE}
                   >
-                    {experience.experience_title ?? <i>{t("experiences_untitled")}</i>}
+                    {experience.experience_title ?? <i>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.untitled")}</i>}
                   </Typography>
                   <Box
                     display="flex"
@@ -201,7 +201,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
         height={"100%"}
         data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES}
       >
-        <ExperiencesDrawerHeader notifyOnClose={onClose} title={t("experiences_restore_title")} />
+        <ExperiencesDrawerHeader notifyOnClose={onClose} title={t("experiences.experiencesDrawer.components.restoreExperiencesDrawer.title")} />
         <Divider />
         {renderContent()}
       </Box>
