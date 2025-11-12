@@ -438,7 +438,7 @@ const SensitiveDataForm: React.FC = () => {
                         setConfirmingSkip(true);
                       }}
                     >
-                      {t("skip")}
+                      {t("common.buttons.skip")}
                     </CustomLink>
                   )}
 
@@ -493,7 +493,7 @@ const SensitiveDataForm: React.FC = () => {
             onConfirm={() => {
               setConfirmingReject(false);
             }}
-            cancelButtonText={t("yes_exit")}
+            cancelButtonText={t("common.buttons.yesExit")}
             confirmButtonText={t("common.buttons.iWantToStay")}
           />
           <TextConfirmModalDialog

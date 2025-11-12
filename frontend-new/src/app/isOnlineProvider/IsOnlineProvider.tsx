@@ -49,7 +49,7 @@ export const IsOnlineProvider: React.FC<IsOnlineProviderProps> = ({ children }) 
     if (!isOnline) {
       setWasOffline(true);
       closeSnackbar(SNACKBAR_KEYS.ONLINE_SUCCESS);
-      enqueueSnackbar(t("app_isOnline_offline"), {
+      enqueueSnackbar(t("app.isOnlineProvider.offline"), {
         variant: "offline",
         key: SNACKBAR_KEYS.OFFLINE_ERROR,
         preventDuplicate: true,
@@ -63,7 +63,7 @@ export const IsOnlineProvider: React.FC<IsOnlineProviderProps> = ({ children }) 
       });
     } else {
       if (wasOffline) {
-        enqueueSnackbar(t("app_isOnline_back_online"), {
+        enqueueSnackbar(t("app.isOnlineProvider.backOnline"), {
           variant: "success",
           key: SNACKBAR_KEYS.ONLINE_SUCCESS,
           preventDuplicate: true,

@@ -16,7 +16,11 @@
       "revert": "Revert",
       "continue": "Continue",
       "noThankYou": "No, thank you",
-      "iWantToStay": "I want to stay"
+      "iWantToStay": "I want to stay",
+      "yes": "Yes",
+      "no": "No",
+      "skip": "Skip",
+      "yesExit": "Yes, exit"
     },
     "fields": {
       "email": "Email",
@@ -85,7 +89,8 @@
     },
     "status": {
       "calculating": "Calculating",
-      "cancelling": "Cancelling"
+      "cancelling": "Cancelling",
+      "saving": "Saving"
     },
     "backdrop": {
       "loggingYouOut": "Logging you out..."
@@ -95,29 +100,6 @@
       "areYouSureYouWantToExit": "Are you sure you want to exit?"
     }
   },
-  "language_selector": "Language Selector",
-  "conversation_conclusion_footer_you_can_now": "You can now",
-  "conversation_conclusion_footer_view_and_download_cv": "View and Download your CV",
-  "conversation_conclusion_footer_here": "here.",
-  "conversation_conclusion_footer_create_account_intro": "If you would like to explore your skills and experiences in the future, you can",
-  "conversation_conclusion_footer_create_account": "Create an Account",
-  "conversation_conclusion_footer_verification_reminder": "A verification email has been sent to your email address. Please verify your account before logging in again.",
-  "conversation_conclusion_footer_feedback_welcome": "We'd love to get more",
-  "conversation_conclusion_footer_feedback_link_text": "Feedback",
-  "conversation_conclusion_footer_feedback_from_you_suffix": "from you. It only takes 5 minutes and helps us improve!",
-  "conversation_conclusion_footer_feedback_in_progress_prefix": "Please",
-  "conversation_conclusion_footer_feedback_in_progress_link_text": "Complete your Feedback",
-  "conversation_conclusion_footer_feedback_in_progress_suffix": "to help us improve your experience!",
-  "before_you_go": "Before you go",
-  "logout_confirmation_message": "Are you sure you want to log out?",
-  "anonymous_account_warning": "You're currently using an anonymous account. If you log out, you'll lose access to your conversation history and experiences.",
-  "compass": "Compass",
-  "compass_logo_alt": "Compass Logo",
-  "user_icon_alt": "User Icon",
-  "logout_warning_anonymous": "If you log out, you'll lose access to your conversation history and experiences.",
-  "create_an_account_to_save_progress": "Create an account to save your progress",
-  "continue_your_journey_later": "and continue your journey later.",
-  "sent": "sent",
   "chat": {
     "chatMessageField": {
       "addActionAriaLabel": "add",
@@ -141,7 +123,22 @@
       "typingChatMessage": {
         "typing": "Typing",
         "thinking": "Please wait, I'm thinking"
-      }
+      },
+      "conversationConclusionFooter": {
+        "youCanNow": "You can now",
+        "viewAndDownloadCv": "View and Download your CV",
+        "here": "here.",
+        "createAccountIntro": "If you would like to explore your skills and experiences in the future, you can",
+        "createAccount": "Create an Account",
+        "verificationReminder": "A verification email has been sent to your email address. Please verify your account before logging in again.",
+        "feedbackWelcome": "We'd love to get more",
+        "feedbackLinkText": "Feedback",
+        "feedbackFromYouSuffix": "from you. It only takes 5 minutes and helps us improve!",
+        "feedbackInProgressPrefix": "Please",
+        "feedbackInProgressLinkText": "Complete your Feedback",
+        "feedbackInProgressSuffix": "to help us improve your experience!"
+      },
+      "sent": "sent"
     },
     "chat": {
       "notifications": {
@@ -224,29 +221,16 @@
       "sendFeedback": "Send Feedback",
       "feedbackSuccessMessage": "Thank you for your feedback!",
       "giveGeneralFeedback": "Give general feedback",
-      "userInfo": "User info"
+      "userInfo": "User info",
+      "userIconAlt": "User Icon",
+      "beforeYouGo": "Before you go",
+      "logoutConfirmationMessage": "Are you sure you want to log out?",
+      "anonymousAccountWarning": "You're currently using an anonymous account. If you log out, you'll lose access to your conversation history and experiences.",
+      "logoutWarningAnonymous": "If you log out, you'll lose access to your conversation history and experiences.",
+      "createAccountToSaveProgress": "Create an account to save your progress",
+      "continueYourJourneyLater": "and continue your journey later."
     }
   },
-  "previous": "Previous",
-  "next": "Next",
-  "bias_experience_accuracy": "Bias & Experience Accuracy",
-  "inaccurate": "Inaccurate",
-  "very_accurate": "Very accurate",
-  "skill_accuracy": "Skill Accuracy",
-  "final_feedback": "Final feedback",
-  "difficult": "Difficult",
-  "easy": "Easy",
-  "unlikely": "Unlikely",
-  "likely": "Likely",
-  "yes": "Yes",
-  "no": "No",
-  "skip": "Skip",
-  "saving": "Saving",
-  "yes_exit": "Yes, exit",
-  "app_isOnline_offline": "You are offline",
-  "app_isOnline_back_online": "You are back online",
-  "please_select_x": "Please select a {{x}}",
-  "clear_selection": "Clear selection",
   "auth": {
     "pages": {
       "login": {
@@ -616,6 +600,10 @@
         "shareData": "Share data",
         "skipping": "Skipping...",
         "refreshPage": "Refresh Page"
+      },
+      "enumField": {
+        "pleaseSelectX": "Please select a {{x}}",
+        "clearSelection": "Clear selection"
       }
     }
   },
@@ -629,6 +617,10 @@
             "ratingLabelHigh": "Satisfied",
             "submitSuccess": "Rating Feedback submitted successfully!",
             "submitError": "Failed to submit feedback. Please try again later."
+          },
+          "feedbackFormContent": {
+            "previous": "Previous",
+            "next": "Next"
           }
         },
         "submitSuccess": "Feedback submitted successfully!",
@@ -652,5 +644,29 @@
       "storyChooseMessageLabel": "Choose an error message to display in a notification:",
       "storySelectPlaceholder": "Select an error message"
     }
+  },
+  "app": {
+    "isOnlineProvider": {
+      "offline": "You are offline",
+      "backOnline": "You are back online"
+    },
+    "appName": "Compass",
+    "compassLogoAlt": "Compass Logo"
+  },
+  "i18n": {
+    "languageContextMenu": {
+      "selector": "Language Selector"
+    }
+  },
+  "_deprecated": {
+    "bias_experience_accuracy": "Bias & Experience Accuracy",
+    "inaccurate": "Inaccurate",
+    "very_accurate": "Very accurate",
+    "skill_accuracy": "Skill Accuracy",
+    "final_feedback": "Final feedback",
+    "difficult": "Difficult",
+    "easy": "Easy",
+    "unlikely": "Unlikely",
+    "likely": "Likely"
   }
 }
