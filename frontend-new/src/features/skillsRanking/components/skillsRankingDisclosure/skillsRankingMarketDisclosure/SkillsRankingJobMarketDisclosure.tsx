@@ -72,7 +72,7 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
       await onFinish(newState);
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
-      enqueueSnackbar(t("skillsRanking_common_error_update_state"), {
+      enqueueSnackbar(t("common.errors.updateState"), {
         variant: "error",
       });
     }
@@ -118,7 +118,7 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
         <ChatBubble
           message={
             <Trans
-              i18nKey="skillsRanking_marketDisclosure_message"
+              i18nKey="features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message"
               components={{ 0: <strong /> }}
               values={{
                 jobsMatchingRank: skillsRankingState.score.jobs_matching_rank,

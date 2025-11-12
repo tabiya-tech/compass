@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { Box, Typography, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -35,6 +36,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
   skillsRankingState,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const selectedLabel = skillsRankingState.score.comparison_label;
   const selectedIndex = jobSeekerComparisonLabels.findIndex((label) => label === selectedLabel);
 
@@ -97,9 +99,11 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
         <ChatBubble
           sender={ConversationMessageSender.COMPASS}
           message={
-            <>
-              Thanks! We’re double-checking the latest {getJobPlatformUrl()} opportunities so the numbers are accurate. We’ll share your results soon or you can ask for them when we call you for the phone survey.
-            </>
+            <Trans
+              i18nKey="features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.pendingMessage"
+              components={[<strong />]}
+              values={{ jobPlatformUrl: getJobPlatformUrl() }}
+            />
           }
         />
       );
@@ -110,8 +114,26 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
         sender={ConversationMessageSender.COMPASS}
         message={
           <>
-            Moreover, <strong>Compared to other {getJobPlatformUrl()} users, you are in group [{jobSeekerComparisonLabels.indexOf(selectedLabel) + 1}] of {jobSeekerComparisonLabels.length}.</strong><br/>
-            Imagine lining up 100 {getJobPlatformUrl()} users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You’re in block <strong>[{jobSeekerComparisonLabels.indexOf(selectedLabel) + 1}]</strong>, which is the <strong>[{selectedLabel}]</strong> block.<br/>
+            <Trans
+              i18nKey="features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart1"
+              components={[<strong />]}
+              values={{
+                jobPlatformUrl: getJobPlatformUrl(),
+                groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1,
+                groupTotal: jobSeekerComparisonLabels.length
+              }}
+            />
+            <br/>
+            <Trans
+              i18nKey="features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2"
+              components={[<strong />, <strong />]}
+              values={{
+                jobPlatformUrl: getJobPlatformUrl(),
+                groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1,
+                comparisonLabel: selectedLabel
+              }}
+            />
+            <br/>
           </>
         }
       >
