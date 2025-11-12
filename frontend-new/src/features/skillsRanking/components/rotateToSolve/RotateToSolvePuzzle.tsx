@@ -186,7 +186,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
       const nextPuzzle = puzzleIndex + 1;
       const completedInSession = nextPuzzle - initialPuzzlesSolved;
       if (completedInSession >= puzzles) {
-  setCompletionMessage(t("skillsRanking_rotateToSolve_allComplete_message"));
+        setCompletionMessage(t("features.skillsRanking.components.rotateToSolve.allCompleteMessage"));
         setIsAllComplete(true);
         setShowCompletionMessage(true);
         // Don't hide the completion message for final puzzle
@@ -196,7 +196,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           onSuccess();
         }, PUZZLE_FEEDBACK_DURATION);
       } else {
-        setCompletionMessage(t("skillsRanking_rotateToSolve_puzzleComplete_message"));
+        setCompletionMessage(t("features.skillsRanking.components.rotateToSolve.puzzleCompleteMessage"));
         setShowCompletionMessage(true);
         setTimeout(() => {
           setIsCelebrating(false);
@@ -232,7 +232,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
     if (isReplay && isReplayFinished) {
       setIsAllComplete(true);
       setShowCompletionMessage(true);
-      setCompletionMessage(t("skillsRanking_rotateToSolve_allComplete_message"));
+      setCompletionMessage(t("features.skillsRanking.components.rotateToSolve.allCompleteMessage"));
     }
   }, [isReplay, isReplayFinished, t]);
 
@@ -248,8 +248,8 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
     >
   
       <Typography variant="body1" color="text.secondary" data-testid={DATA_TEST_ID.INSTRUCTION_TEXT}>
-        {t("skillsRanking_rotateToSolve_instructions_1")}{" "}
-        <RotateRightIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />{t("skillsRanking_rotateToSolve_instructions_2")}{" "}
+        {t("features.skillsRanking.components.rotateToSolve.instructions1")}{" "}
+        <RotateRightIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />{t("features.skillsRanking.components.rotateToSolve.instructions2")}{" "}
         <RotateLeftIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />.
       </Typography>
       
@@ -313,7 +313,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           onClick={() => updateCharacterRotation(-rotationStep)}
           disabled={disabled || isReplay || isAllComplete}
           sx={{ color: theme.palette.common.black }}
-          aria-label={t("skillsRanking_rotateToSolve_rotate_left_aria")}
+          aria-label={t("features.skillsRanking.components.rotateToSolve.rotateLeftAria")}
           data-testid={DATA_TEST_ID.ROTATE_LEFT_BUTTON}
         >
           <RotateLeftIcon />
@@ -323,7 +323,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           onClick={() => updateCharacterRotation(rotationStep)}
           disabled={disabled || isReplay || isAllComplete}
           sx={{ color: theme.palette.common.black }}
-          aria-label={t("skillsRanking_rotateToSolve_rotate_right_aria")}
+          aria-label={t("features.skillsRanking.components.rotateToSolve.rotateRightAria")}
           data-testid={DATA_TEST_ID.ROTATE_RIGHT_BUTTON}
         >
           <RotateRightIcon />
@@ -350,7 +350,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
           sx={{ flexShrink: 0 }}
           data-testid={DATA_TEST_ID.CANCEL_BUTTON}
         >
-          {t("skillsRanking_common_cancel_button")}
+          {t("common.buttons.cancel")}
         </PrimaryButton>
 
         {/* Status message on the left (appears second due to row-reverse) */}
