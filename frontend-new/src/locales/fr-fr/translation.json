@@ -233,22 +233,7 @@
   "no": "Non",
   "skip": "Ignorer",
   "saving": "Enregistrement",
-  "start_conversation": "Commencer la conversation",
   "yes_exit": "Oui, quitter",
-  "yes_skip": "Oui, ignorer",
-  "share_data": "Partager les données",
-  "skipping": "Ignorer...",
-  "sensitive_data_reject_paragraph_1": "Nous sommes désolés que vous ayez choisi de ne pas fournir vos données. Fournir ces informations aide Compass à vous offrir une expérience plus personnalisée. Vous ne pourrez pas continuer et vous serez déconnecté.",
-  "sensitive_data_skip_paragraph_1": "Nous sommes désolés que vous préfériez ne pas fournir vos données. Fournir ces informations aide Compass à vous offrir une expérience plus personnalisée. Veuillez noter que si vous ignorez cette étape,",
-  "sensitive_data_skip_paragraph_1_highlighted": " vous ne pourrez pas fournir ces informations plus tard.",
-  "are_you_sure_you_want_to_skip": "Êtes-vous sûr de vouloir ignorer ?",
-  "sensitive_data_title": "Fournissez vos informations",
-  "sensitive_data_subtitle": "Nous utilisons vos données pour personnaliser votre expérience et pouvons vous contacter à propos de Compass.",
-  "sensitive_data_unskippable_subtitle": "Veuillez fournir les informations suivantes pour continuer.",
-  "sensitive_data_skippable_subtitle": "Vous pouvez passer cette étape.",
-  "sensitive_data_failed_to_load_config": "Échec du chargement de la configuration du formulaire",
-  "sensitive_data_invalid_form": "Veuillez corriger les erreurs dans le formulaire avant de le soumettre.",
-  "sensitive_data_help_tip_text": "Vos informations sont chiffrées à l'aide d'un système de chiffrement de bout en bout à la pointe de la technologie et stockées en toute sécurité.",
   "error_page_illustration_alt": "illustration d'erreur",
   "error_page_default_message": "Un problème est survenu avec Compass. Essayez de recharger la page...",
   "error_page_not_found": "Erreur 404 - Page non trouvée",
@@ -274,10 +259,6 @@
   "feedback_overall_submit_error": "Échec de l’envoi des commentaires. Veuillez réessayer plus tard.",
   "app_isOnline_offline": "Vous êtes hors ligne",
   "app_isOnline_back_online": "Vous êtes de nouveau en ligne",
-  "sensitive_data_saved_success": "Données personnelles enregistrées avec succès et en toute sécurité.",
-  "sensitive_data_collection_skipped": "Collecte des données personnelles ignorée.",
-  "sensitive_data_error_default": "Les données personnelles n’ont pas pu être enregistrées. Réessayez et, si le problème persiste, videz le cache du navigateur puis actualisez la page.",
-  "sensitive_data_error_encrypted_data_too_large": "Les données personnelles semblent trop volumineuses pour être enregistrées. Saisissez des valeurs plus courtes. Si le problème persiste, videz le cache du navigateur puis actualisez la page.",
   "chat_message_experiences_intro": "Voici mes expériences :",
   "experiences_fetch_failed": "Échec de la récupération des expériences",
   "please_select_x": "Veuillez sélectionner {{x}}",
@@ -625,6 +606,32 @@
         "snackbarLoggedOutSuccess": "Déconnexion réussie.",
         "snackbarLoggedOutFailure": "Échec de la déconnexion.",
         "snackbarFailedUpdatePreferences": "Échec de la mise à jour des préférences utilisateur"
+      }
+    }
+  },
+  "sensitiveData": {
+    "components": {
+      "sensitiveDataForm": {
+        "title": "Fournissez vos informations",
+        "subtitle": "Nous utilisons vos données pour personnaliser votre expérience et pouvons vous contacter à propos de Compass.",
+        "unskippableSubtitle": "Veuillez fournir les informations suivantes pour continuer.",
+        "skippableSubtitle": "Vous pouvez passer cette étape.",
+        "helpTipText": "Vos informations sont chiffrées à l'aide d'un système de chiffrement de bout en bout à la pointe de la technologie et stockées en toute sécurité.",
+        "failedToLoadConfig": "Échec du chargement de la configuration du formulaire",
+        "invalidForm": "Veuillez corriger les erreurs dans le formulaire avant de le soumettre.",
+        "savedSuccess": "Données personnelles enregistrées avec succès et en toute sécurité.",
+        "errorDefault": "Les données personnelles n’ont pas pu être enregistrées. Réessayez et, si le problème persiste, videz le cache du navigateur puis actualisez la page.",
+        "errorEncryptedDataTooLarge": "Les données personnelles semblent trop volumineuses pour être enregistrées. Saisissez des valeurs plus courtes. Si le problème persiste, videz le cache du navigateur puis actualisez la page.",
+        "collectionSkipped": "Collecte des données personnelles ignorée.",
+        "rejectParagraph1": "Nous sommes désolés que vous ayez choisi de ne pas fournir vos données. Fournir ces informations aide Compass à vous offrir une expérience plus personnalisée. Vous ne pourrez pas continuer et vous serez déconnecté.",
+        "skipParagraph1": "Nous sommes désolés que vous préfériez ne pas fournir vos données. Fournir ces informations aide Compass à vous offrir une expérience plus personnalisée. Veuillez noter que si vous ignorez cette étape,",
+        "skipParagraph1Highlighted": " vous ne pourrez pas fournir ces informations plus tard.",
+        "startConversation": "Commencer la conversation",
+        "areYouSureYouWantToSkip": "Êtes-vous sûr de vouloir ignorer ?",
+        "yesSkip": "Oui, ignorer",
+        "shareData": "Partager les données",
+        "skipping": "Ignorer...",
+        "refreshPage": "Actualiser la page"
       }
     }
   }
