@@ -145,7 +145,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
 
   const effortMessage =
     effortType === EffortType.TIME_BASED ? (
-      <Trans i18nKey="skillsRanking_proofOfValue_waiting_message" components={{ strong: <strong /> }} />
+      <Trans i18nKey="features.skillsRanking.components.skillsRankingProofOfValue.waitingMessage" components={{ strong: <strong /> }} />
     ) : (
       ""
     );
@@ -252,7 +252,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
         await onFinish(newState);
       } catch (err) {
         console.error("Failed to update state", err);
-        enqueueSnackbar(t("skillsRanking_common_error_update_state"), {
+        enqueueSnackbar(t("common.errors.updateState"), {
           variant: "error",
         });
         hasFinishedRef.current = false; // Reset on error
@@ -387,7 +387,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
           >
             {effortType === EffortType.TIME_BASED ? (
               <CancellableTypingChatMessage
-                message={isCancelling ? t("skillsRanking_common_typing_cancelling") : t("skillsRanking_common_typing_calculating")}
+                message={isCancelling ? t("common.status.cancelling") : t("common.status.calculating")}
                 onCancel={handleCancel}
                 disabled={isDisabled}
               />

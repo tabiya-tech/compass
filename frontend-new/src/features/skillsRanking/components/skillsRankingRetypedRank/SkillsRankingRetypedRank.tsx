@@ -80,7 +80,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
       }, getDefaultTypingDurationMs() + 300);
     } catch (err) {
       console.error("Failed to update state:", err);
-      enqueueSnackbar(t("skillsRanking_common_error_generic"), { variant: "error" });
+      enqueueSnackbar(t("common.errors.generic"), { variant: "error" });
     }
   }, [activeSessionId, value, onFinish, enqueueSnackbar, t]);
 
@@ -120,7 +120,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           await onFinish(newState);
         } catch (err) {
           console.error("Failed to update state:", err);
-          enqueueSnackbar(t("skillsRanking_common_error_generic"), { variant: "error" });
+          enqueueSnackbar(t("common.errors.generic"), { variant: "error" });
         }
               }, getDefaultTypingDurationMs());
 
@@ -143,7 +143,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
             sender={ConversationMessageSender.COMPASS}
             message={
               <Trans
-                i18nKey="skillsRanking_retypedRank_question"
+                i18nKey="features.skillsRanking.components.skillsRankingRetypedRank.question"
                 components={{ 0: <strong />, 1: <strong /> }}
                 values={{ jobPlatformUrl: getJobPlatformUrl() }}
               />
@@ -158,7 +158,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
                 }}
                 disabled={submitted || !isOnline || currentPhase !== SkillsRankingPhase.RETYPED_RANK}
                 data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SLIDER}
-                aria-label={t("skillsRanking_retypedRank_slider_aria")}
+                aria-label={t("features.skillsRanking.components.skillsRankingRetypedRank.sliderAria")}
               />
 
               <Box mt={theme.spacing(2)} textAlign="right">
@@ -169,7 +169,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
                   }
                   data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SUBMIT_BUTTON}
                 >
-                  {t("skillsRanking_common_submit_button")}
+                  {t("common.buttons.submit")}
                 </PrimaryButton>
               </Box>
             </Box>

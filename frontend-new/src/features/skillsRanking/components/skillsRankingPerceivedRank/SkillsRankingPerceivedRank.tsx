@@ -94,7 +94,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
       }, getDefaultTypingDurationMs());
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
-      enqueueSnackbar(t("skillsRanking_common_error_update_state"), {
+      enqueueSnackbar(t("common.errors.updateState"), {
         variant: "error",
       });
       setShowTyping(false);
@@ -121,13 +121,13 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
           message={
             shouldShowMarketDisclosure ? (
               <Trans
-                i18nKey="skillsRanking_perceivedRank_question_with_disclosure"
+                i18nKey="features.skillsRanking.components.skillsRankingPerceivedRank.questionWithDisclosure"
                 components={{ 0: <strong />, 1: <strong />, 2: <strong />, 3: <strong />, 4: <strong /> }}
                 values={{ jobPlatformUrl: getJobPlatformUrl() }}
               />
             ) : (
               <Trans
-                i18nKey="skillsRanking_perceivedRank_question_without_disclosure"
+                i18nKey="features.skillsRanking.components.skillsRankingPerceivedRank.questionWithoutDisclosure"
                 components={{ 0: <strong />, 1: <strong /> }}
                 values={{ jobPlatformUrl: getJobPlatformUrl() }}
               />
@@ -140,7 +140,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
               onChange={handleChange}
               disabled={submitted || !isOnline || currentPhase !== SkillsRankingPhase.PERCEIVED_RANK}
               data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SLIDER}
-              aria-label={t("skillsRanking_perceivedRank_slider_aria")}
+              aria-label={t("features.skillsRanking.components.skillsRankingPerceivedRank.sliderAria")}
             />
 
             <Box mt={theme.spacing(2)} textAlign="right">
@@ -151,7 +151,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
                 }
                 data-testid={DATA_TEST_ID.SKILLS_RANKING_PERCEIVED_RANK_SUBMIT_BUTTON}
               >
-                {t("skillsRanking_common_submit_button")}
+                {t("common.buttons.submit")}
               </PrimaryButton>
             </Box>
           </Box>

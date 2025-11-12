@@ -67,7 +67,7 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
       await onFinish(newSkillsRankingState);
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
-      enqueueSnackbar(t("skillsRanking_common_error_update_state"), { variant: "error" });
+      enqueueSnackbar(t("common.errors.updateState"), { variant: "error" });
     }
   }, [isReplay, onFinish, enqueueSnackbar, t]);
 
@@ -94,7 +94,7 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
     <ChatBubble
       message={
         <Trans
-          i18nKey="skillsRanking_prompt_main_message"
+          i18nKey="features.skillsRanking.components.skillsRankingPrompt.mainMessage"
           components={[<strong />]}
           values={{ compensationAmount }}
         />

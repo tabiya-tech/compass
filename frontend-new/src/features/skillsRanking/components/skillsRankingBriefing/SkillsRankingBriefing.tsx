@@ -112,7 +112,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       );
     } catch (err) {
       console.error(err);
-      enqueueSnackbar(t("skillsRanking_briefing_failed_to_continue"), { variant: "error" });
+      enqueueSnackbar(t("features.skillsRanking.components.skillsRankingBriefing.failedToContinue"), { variant: "error" });
       setSubmitted(false);
       setIsTypingVisible(false);
       return;
@@ -140,13 +140,13 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
           message={
             effortType === EffortType.WORK_BASED ? (
               <Trans
-                i18nKey="skillsRanking_briefing_intro_work_based"
+                i18nKey="features.skillsRanking.components.skillsRankingBriefing.introWorkBased"
                 components={[<strong />]}
                 values={{ jobPlatformUrl: getJobPlatformUrl() }}
               />
             ) : (
               <Trans
-                i18nKey="skillsRanking_briefing_intro_time_based"
+                i18nKey="features.skillsRanking.components.skillsRankingBriefing.introTimeBased"
                 components={[<strong />, <strong />]}
                 values={{ jobPlatformUrl: getJobPlatformUrl() }}
               />
@@ -167,7 +167,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
                 disabled={isReplay || !isOnline || submitted || isTypingVisible}
                 data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON}
               >
-                {t("skillsRanking_common_continue_button")}
+                {t("common.buttons.continue")}
               </PrimaryButton>
             </Box>
           )}
@@ -203,7 +203,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
           <ChatBubble
             message={
               <Trans
-                i18nKey="skillsRanking_briefing_puzzle_instructions"
+                i18nKey="features.skillsRanking.components.skillsRankingBriefing.puzzleInstructions"
                 components={[<strong />]}
               />
             }
@@ -220,7 +220,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
                 disabled={isReplay || !isOnline || submitted || isTypingVisible}
                 data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON}
               >
-                {t("skillsRanking_common_continue_button")}
+                {t("common.buttons.continue")}
               </PrimaryButton>
             </Box>
           </ChatBubble>

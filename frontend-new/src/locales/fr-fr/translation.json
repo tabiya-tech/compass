@@ -13,7 +13,8 @@
       "save": "Enregistrer",
       "goBack": "Retour",
       "restore": "Restaurer",
-      "revert": "Rétablir"
+      "revert": "Rétablir",
+      "continue": "Continuer"
     },
     "fields": {
       "email": "E-mail",
@@ -62,6 +63,14 @@
         "uploadNotFound": "Upload not found. It may have failed to start.",
         "cvMarkdownTooLong": "Your CV content is too long. Please shorten your CV and try again."
       }
+    },
+    "errors": {
+      "updateState": "Échec de la mise à jour de l’état du classement des compétences. Réessaie plus tard, s’il te plaît.",
+      "generic": "Une erreur est survenue. Réessaie, s’il te plaît."
+    },
+    "status": {
+      "calculating": "Calcul en cours",
+      "cancelling": "Annulation"
     }
   },
   "language_selector": "Sélecteur de langue",
@@ -274,35 +283,6 @@
   "rest_api_error_unable_to_process_request": "Désolé. Une erreur s'est produite lors du traitement de votre requête.",
   "rest_api_error_story_choose_message_label": "Choisissez un message d'erreur à afficher dans une notification :",
   "rest_api_error_story_select_placeholder": "Sélectionnez un message d'erreur",
-  "skillsRanking_prompt_main_message": "Presque fini ! Réponds à quelques dernières questions de recherche et nous t’enverrons <0>{{compensationAmount}}</0> de crédit une fois que tu auras terminé toutes les tâches.",
-  "skillsRanking_common_error_update_state": "Échec de la mise à jour de l’état du classement des compétences. Réessaie plus tard, s’il te plaît.",
-  "skillsRanking_briefing_intro_work_based": "Si cela t’intéresse, je peux calculer quelle part des opportunités sur <0>{{jobPlatformUrl}}</0> correspond à tes compétences et comment tu te compares aux autres chercheurs — tu dois simplement me montrer à quel point cette information est précieuse pour toi.",
-  "skillsRanking_briefing_intro_time_based": "Si cela t’intéresse, je peux calculer quelle part des opportunités sur <0>{{jobPlatformUrl}}</0> correspond à tes compétences et comment tu te compares aux autres. Cela peut prendre un peu de temps — si tu ne veux plus attendre, tu peux cliquer sur <0>annuler</0> à tout moment dans le prochain message pendant que je calcule. Quand tu es prêt, clique sur <1>continuer</1>.",
-  "skillsRanking_briefing_puzzle_instructions": "Tu verras des lettres inclinées sur quelques écrans. Redresse chaque lettre avec les boutons de rotation. Tu peux annuler à tout moment. Dans 5 % des cas, <0>plus de lettres corrigées = plus de chances de recevoir l’information.</0> Le reste du temps cela dépend de moi.",
-  "skillsRanking_common_continue_button": "Continuer",
-  "skillsRanking_common_cancel_button": "Annuler",
-  "skillsRanking_common_submit_button": "Envoyer",
-  "skillsRanking_proofOfValue_waiting_message": "Patiente pendant que j’effectue les calculs, ou clique sur annuler à tout moment si tu ne souhaites plus attendre l’information.",
-  "skillsRanking_common_typing_calculating": "Calcul en cours",
-  "skillsRanking_common_typing_cancelling": "Annulation",
-  "skillsRanking_completion_advice_message": "Un conseil : Ces chiffres sont pour toi. Comment pourraient-ils changer ta façon de rechercher des postes cette semaine ? Fais une pause et réfléchis à l’endroit où ton temps et ton énergie sont le mieux investis dans ta stratégie de recherche d’emploi.",
-  "skillsRanking_retypedRank_question": "Dernière question : rappelons ce que je t’ai dit plus haut sur ton adéquation avec les opportunités : <0>revois ce que j’ai dit trois messages plus tôt, pour quel pourcentage d’opportunités</0> sur <1>{{jobPlatformUrl}}</1> réponds-tu aux compétences clés ?",
-  "skillsRanking_retypedRank_slider_aria": "Curseur du centile de rang réévalué",
-  "skillsRanking_common_error_generic": "Une erreur est survenue. Réessaie, s’il te plaît.",
-  "skillsRanking_perceivedRank_question_with_disclosure": "Maintenant, pense à ces 100 utilisateurs de <0>{{jobPlatformUrl}}</0>, principalement des chercheurs d’emploi sud-africains âgés de 18–34 ans avec un 'matric' d’un lycée de township ou rural. <0>Combien exactement parmi ces 100</0> crois-tu qu’ils conviendraient à <0>moins d’opportunités</0> sur <0>{{jobPlatformUrl}}</0> <0>que toi</0> ?",
-  "skillsRanking_perceivedRank_question_without_disclosure": "Avant de clore réellement notre conversation, j’ai une dernière question liée à ce qui précède — si tu penses à 100 personnes qui cherchent un emploi en Afrique du Sud âgées de 18–34 ans avec un 'matric' d’un lycée de township ou rural. Combien de ces 100 chercheurs crois-tu qu’ils conviendraient à <0>moins de postes</0> sur <1>{{jobPlatformUrl}}</1> que toi ?",
-  "skillsRanking_perceivedRank_slider_aria": "Curseur du centile de rang perçu",
-  "skillsRanking_marketDisclosure_message": "Tu réponds aux compétences clés pour <0>{{jobsMatchingRank}}%</0> des opportunités publiées sur <1>{{jobPlatformUrl}}</1>. C’est une belle amplitude de possibilités !",
-  "skillsRanking_jobSeekerDisclosure_pending_message": "Merci ! Nous vérifions à nouveau les dernières opportunités sur <0>{{jobPlatformUrl}}</0> pour garantir l’exactitude des chiffres. Nous partagerons bientôt tes résultats ou tu pourras les demander lors de l’enquête téléphonique.",
-  "skillsRanking_jobSeekerDisclosure_comparison_part1": "De plus, <0>Comparé aux autres utilisateurs de {{jobPlatformUrl}}, tu es dans le groupe {{groupIndex}} sur {{groupTotal}}.</0>",
-  "skillsRanking_jobSeekerDisclosure_comparison_part2": "Imagine aligner 100 utilisateurs de {{jobPlatformUrl}} du plus faible au plus grand nombre de postes auxquels ils correspondent. Nous divisons la file en cinq blocs de 20 personnes. Le bloc 1 (les 20 plus élevés) correspond au plus de postes ; le bloc 5 (les 20 plus bas) au moins. Tu es dans le bloc <0>{{groupIndex}}</0>, qui est le bloc <1>{{comparisonLabel}}</1>.",
-  "skillsRanking_proofOfValue_puzzle_auto_complete_message": "Fin automatique des puzzles restants...",
-  "skillsRanking_rotateToSolve_instructions_1": "Fais pivoter chaque lettre jusqu'à ce qu'elle soit droite. Sélectionne une lettre en cliquant dessus, puis fais-la tourner dans le sens horaire avec",
-  "skillsRanking_rotateToSolve_instructions_2": " ou antihoraire avec.",
-  "skillsRanking_rotateToSolve_allComplete_message": "Tous les puzzles sont terminés ! Bravo !",
-  "skillsRanking_rotateToSolve_puzzleComplete_message": "Puzzle terminé ! Résous-en un autre ou annule si l'information ne t'intéresse pas tant.",
-  "skillsRanking_rotateToSolve_rotate_left_aria": "Faire pivoter le caractère dans le sens antihoraire",
-  "skillsRanking_rotateToSolve_rotate_right_aria": "Faire pivoter le caractère dans le sens horaire",
   "customerSatisfactionRating_question_text": "Enfin, nous aimerions avoir votre avis sur votre expérience jusqu'à présent ! ",
   "customerSatisfactionRating_rating_label_low": "Insatisfait",
   "customerSatisfactionRating_rating_label_high": "Satisfait",
@@ -310,7 +290,6 @@
   "customerSatisfactionRating_submit_error": "Échec de l'envoi de l'évaluation. Veuillez réessayer plus tard.",
   "feedback_overall_submit_success": "Commentaires envoyés avec succès !",
   "feedback_overall_submit_error": "Échec de l’envoi des commentaires. Veuillez réessayer plus tard.",
-  "skillsRanking_briefing_failed_to_continue": "Impossible de continuer. Veuillez réessayer plus tard.",
   "app_isOnline_offline": "Vous êtes hors ligne",
   "app_isOnline_back_online": "Vous êtes de nouveau en ligne",
   "sensitive_data_saved_success": "Données personnelles enregistrées avec succès et en toute sécurité.",
@@ -588,6 +567,55 @@
         "part3": "Les informations doivent être vérifiées avant utilisation pour la recherche d'emploi, les entretiens ou la création d'un CV. Pour réviser ces informations, reparlez à Compass ou créez un CV complet basé sur ce rapport."
       },
       "bodyText": "Ce rapport résume les informations clés recueillies lors d'une conversation avec Compass le {{date}}. Compass est un chatbot IA qui aide les chercheurs d'emploi à explorer leurs compétences et expériences. Ce rapport présente l'expérience professionnelle du candidat et les compétences identifiées pour chaque expérience. Ces informations peuvent être utilisées pour guider la recherche d'emploi et mettre en valeur leurs compétences lors des candidatures, notamment pendant les entretiens avec des employeurs potentiels. C'est un bon point de départ pour créer un CV complet."
+    }
+  },
+  "features": {
+    "skillsRanking": {
+      "components": {
+        "skillsRankingPrompt": {
+          "mainMessage": "Presque fini ! Réponds à quelques dernières questions de recherche et nous t’enverrons <0>{{compensationAmount}}</0> de crédit une fois que tu auras terminé toutes les tâches."
+        },
+        "skillsRankingBriefing": {
+          "introWorkBased": "Si cela t’intéresse, je peux calculer quelle part des opportunités sur <0>{{jobPlatformUrl}}</0> correspond à tes compétences et comment tu te compares aux autres chercheurs — tu dois simplement me montrer à quel point cette information est précieuse pour toi.",
+          "introTimeBased": "Si cela t’intéresse, je peux calculer quelle part des opportunités sur <0>{{jobPlatformUrl}}</0> correspond à tes compétences et comment tu te compares aux autres. Cela peut prendre un peu de temps — si tu ne veux plus attendre, tu peux cliquer sur <0>annuler</0> à tout moment dans le prochain message pendant que je calcule. Quand tu es prêt, clique sur <1>continuer</1>.",
+          "puzzleInstructions": "Tu verras des lettres inclinées sur quelques écrans. Redresse chaque lettre avec les boutons de rotation. Tu peux annuler à tout moment. Dans 5 % des cas, <0>plus de lettres corrigées = plus de chances de recevoir l’information.</0> Le reste du temps cela dépend de moi.",
+          "failedToContinue": "Impossible de continuer. Veuillez réessayer plus tard."
+        },
+        "skillsRankingProofOfValue": {
+          "waitingMessage": "Patiente pendant que j’effectue les calculs, ou clique sur annuler à tout moment si tu ne souhaites plus attendre l’information.",
+          "puzzleAutoCompleteMessage": "Fin automatique des puzzles restants..."
+        },
+        "skillsRankingCompletionAdvice": {
+          "adviceMessage": "Un conseil : Ces chiffres sont pour toi. Comment pourraient-ils changer ta façon de rechercher des postes cette semaine ? Fais une pause et réfléchis à l’endroit où ton temps et ton énergie sont le mieux investis dans ta stratégie de recherche d’emploi."
+        },
+        "skillsRankingRetypedRank": {
+          "question": "Dernière question : rappelons ce que je t’ai dit plus haut sur ton adéquation avec les opportunités : <0>revois ce que j’ai dit trois messages plus tôt, pour quel pourcentage d’opportunités</0> sur <1>{{jobPlatformUrl}}</1> réponds-tu aux compétences clés ?",
+          "sliderAria": "Curseur du centile de rang réévalué"
+        },
+        "skillsRankingPerceivedRank": {
+          "questionWithDisclosure": "Maintenant, pense à ces 100 utilisateurs de <0>{{jobPlatformUrl}}</0>, principalement des chercheurs d’emploi sud-africains âgés de 18–34 ans avec un 'matric' d’un lycée de township ou rural. <0>Combien exactement parmi ces 100</0> crois-tu qu’ils conviendraient à <0>moins d’opportunités</0> sur <0>{{jobPlatformUrl}}</0> <0>que toi</0> ?",
+          "questionWithoutDisclosure": "Avant de clore réellement notre conversation, j’ai une dernière question liée à ce qui précède — si tu penses à 100 personnes qui cherchent un emploi en Afrique du Sud âgées de 18–34 ans avec un 'matric' d’un lycée de township ou rural. Combien de ces 100 chercheurs crois-tu qu’ils conviendraient à <0>moins de postes</0> sur <1>{{jobPlatformUrl}}</1> que toi ?",
+          "sliderAria": "Curseur du centile de rang perçu"
+        },
+        "skillsRankingDisclosure": {
+          "skillsRankingMarketDisclosure": {
+            "message": "Tu réponds aux compétences clés pour <0>{{jobsMatchingRank}}%</0> des opportunités publiées sur <1>{{jobPlatformUrl}}</1>. C’est une belle amplitude de possibilités !"
+          },
+          "skillsRankingJobSeekerDisclosure": {
+            "pendingMessage": "Merci ! Nous vérifions à nouveau les dernières opportunités sur <0>{{jobPlatformUrl}}</0> pour garantir l’exactitude des chiffres. Nous partagerons bientôt tes résultats ou tu pourras les demander lors de l’enquête téléphonique.",
+            "comparisonPart1": "De plus, <0>Comparé aux autres utilisateurs de {{jobPlatformUrl}}, tu es dans le groupe {{groupIndex}} sur {{groupTotal}}.</0>",
+            "comparisonPart2": "Imagine aligner 100 utilisateurs de {{jobPlatformUrl}} du plus faible au plus grand nombre de postes auxquels ils correspondent. Nous divisons la file en cinq blocs de 20 personnes. Le bloc 1 (les 20 plus élevés) correspond au plus de postes ; le bloc 5 (les 20 plus bas) au moins. Tu es dans le bloc <0>{{groupIndex}}</0>, qui est le bloc <1>{{comparisonLabel}}</1>."
+          }
+        },
+        "rotateToSolve": {
+          "instructions1": "Fais pivoter chaque lettre jusqu'à ce qu'elle soit droite. Sélectionne une lettre en cliquant dessus, puis fais-la tourner dans le sens horaire avec",
+          "instructions2": " ou antihoraire avec.",
+          "allCompleteMessage": "Tous les puzzles sont terminés ! Bravo !",
+          "puzzleCompleteMessage": "Puzzle terminé ! Résous-en un autre ou annule si l'information ne t'intéresse pas tant.",
+          "rotateLeftAria": "Faire pivoter le caractère dans le sens antihoraire",
+          "rotateRightAria": "Faire pivoter le caractère dans le sens horaire"
+        }
+      }
     }
   }
 }
