@@ -233,22 +233,7 @@
   "no": "No",
   "skip": "Omitir",
   "saving": "Guardando",
-  "start_conversation": "Iniciar conversación",
   "yes_exit": "Sí, salir",
-  "yes_skip": "Sí, omitir",
-  "share_data": "Compartir datos",
-  "skipping": "Omitiendo...",
-  "sensitive_data_reject_paragraph_1": "Lamentamos que hayas decidido no proporcionar tus datos. Proporcionar esta información ayuda a Compass a ofrecerte una experiencia más personalizada. No podrás continuar y se cerrará tu sesión.",
-  "sensitive_data_skip_paragraph_1": "Lamentamos que prefieras no proporcionar tus datos. Proporcionar esta información ayuda a Compass a ofrecerte una experiencia más personalizada. Ten en cuenta que si omites este paso,",
-  "sensitive_data_skip_paragraph_1_highlighted": " no podrás proporcionar esta información más adelante.",
-  "are_you_sure_you_want_to_skip": "¿Estás seguro de que quieres omitirlo?",
-  "sensitive_data_title": "Proporciona tu información",
-  "sensitive_data_subtitle": "Usamos tus datos para personalizar tu experiencia y podemos contactarte sobre Compass.",
-  "sensitive_data_unskippable_subtitle": "Por favor proporciona la siguiente información para continuar.",
-  "sensitive_data_skippable_subtitle": "Puedes omitir este paso.",
-  "sensitive_data_failed_to_load_config": "Error al cargar la configuración del formulario",
-  "sensitive_data_invalid_form": "Por favor corrige los errores en el formulario antes de enviarlo.",
-  "sensitive_data_help_tip_text": "Tu información se cifra mediante un sistema de cifrado de extremo a extremo de última generación y se almacena de forma segura.",
   "customerSatisfactionRating_question_text": "Por último, nos encantaría conocer tu opinión sobre tu experiencia hasta ahora. ",
   "customerSatisfactionRating_rating_label_low": "Insatisfecho",
   "customerSatisfactionRating_rating_label_high": "Satisfecho",
@@ -258,10 +243,6 @@
   "feedback_overall_submit_error": "Error al enviar los comentarios. Por favor, inténtalo más tarde.",
   "app_isOnline_offline": "Estás sin conexión",
   "app_isOnline_back_online": "Has vuelto a estar en línea",
-  "sensitive_data_saved_success": "Datos personales guardados correctamente y de forma segura.",
-  "sensitive_data_collection_skipped": "Se omitió la recopilación de datos personales.",
-  "sensitive_data_error_default": "No se pudieron guardar los datos personales. Inténtalo de nuevo y, si el problema persiste, limpia la caché del navegador y actualiza la página.",
-  "sensitive_data_error_encrypted_data_too_large": "Los datos personales parecen demasiado grandes para guardarse. Intenta ingresar valores más pequeños en los campos. Si el problema persiste, limpia la caché del navegador y actualiza la página.",
   "please_select_x": "Por favor, seleccione {{x}}",
   "clear_selection": "Limpiar selección",
   "auth": {
@@ -563,6 +544,32 @@
         "snackbarLoggedOutSuccess": "Sesión cerrada correctamente.",
         "snackbarLoggedOutFailure": "Error al cerrar sesión.",
         "snackbarFailedUpdatePreferences": "Error al actualizar las preferencias del usuario"
+      }
+    }
+  },
+  "sensitiveData": {
+    "components": {
+      "sensitiveDataForm": {
+        "title": "Proporciona tu información",
+        "subtitle": "Usamos tus datos para personalizar tu experiencia y podemos contactarte sobre Compass.",
+        "unskippableSubtitle": "Por favor proporciona la siguiente información para continuar.",
+        "skippableSubtitle": "Puedes omitir este paso.",
+        "helpTipText": "Tu información se cifra mediante un sistema de cifrado de extremo a extremo de última generación y se almacena de forma segura.",
+        "failedToLoadConfig": "Error al cargar la configuración del formulario",
+        "invalidForm": "Por favor corrige los errores en el formulario antes de enviarlo.",
+        "savedSuccess": "Datos personales guardados correctamente y de forma segura.",
+        "errorDefault": "No se pudieron guardar los datos personales. Inténtalo de nuevo y, si el problema persiste, limpia la caché del navegador y actualiza la página.",
+        "errorEncryptedDataTooLarge": "Los datos personales parecen demasiado grandes para guardarse. Intenta ingresar valores más pequeños en los campos. Si el problema persiste, limpia la caché del navegador y actualiza la página.",
+        "collectionSkipped": "Se omitió la recopilación de datos personales.",
+        "rejectParagraph1": "Lamentamos que hayas decidido no proporcionar tus datos. Proporcionar esta información ayuda a Compass a ofrecerte una experiencia más personalizada. No podrás continuar y se cerrará tu sesión.",
+        "skipParagraph1": "Lamentamos que prefieras no proporcionar tus datos. Proporcionar esta información ayuda a Compass a ofrecerte una experiencia más personalizada. Ten en cuenta que si omites este paso,",
+        "skipParagraph1Highlighted": " no podrás proporcionar esta información más adelante.",
+        "startConversation": "Iniciar conversación",
+        "areYouSureYouWantToSkip": "¿Estás seguro de que quieres omitirlo?",
+        "yesSkip": "Sí, omitir",
+        "shareData": "Compartir datos",
+        "skipping": "Omitiendo...",
+        "refreshPage": "Actualizar página"
       }
     }
   }
