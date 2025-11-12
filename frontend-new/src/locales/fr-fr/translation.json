@@ -12,7 +12,8 @@
       "backToLogin": "Retour à la connexion",
       "save": "Enregistrer",
       "goBack": "Retour",
-      "restore": "Restaurer"
+      "restore": "Restaurer",
+      "revert": "Rétablir"
     },
     "fields": {
       "email": "E-mail",
@@ -66,7 +67,6 @@
   "language_selector": "Sélecteur de langue",
   "feedback_message": "Nous serions ravis d’avoir vos retours sur votre expérience jusqu’à présent !",
   "give_feedback": "Donner un avis",
-  "view_experiences": "Voir les expériences",
   "conversation_conclusion_footer_you_can_now": "Vous pouvez maintenant",
   "conversation_conclusion_footer_view_and_download_cv": "Voir et télécharger votre CV",
   "conversation_conclusion_footer_here": "ici.",
@@ -192,6 +192,9 @@
       "failedToCancel": "Failed to cancel upload",
       "uploadingFileNamed": "Uploading {{filename}}...",
       "thinkingMessage": "Processing your CV, this might take a while..."
+    },
+    "chatHeader": {
+      "viewExperiences": "Voir les expériences"
     }
   },
   "consent_before_we_begin_title": "Avant de commencer...",
@@ -271,89 +274,6 @@
   "rest_api_error_unable_to_process_request": "Désolé. Une erreur s'est produite lors du traitement de votre requête.",
   "rest_api_error_story_choose_message_label": "Choisissez un message d'erreur à afficher dans une notification :",
   "rest_api_error_story_select_placeholder": "Sélectionnez un message d'erreur",
-  "experiences_empty_state_message": "Nous n'avons pas encore découvert d'expériences. Continuons la conversation.",
-  "experiences_header_close_title": "Fermer les expériences",
-  "experiences_delete_success": "Expérience supprimée avec succès !",
-  "experiences_delete_failed": "Échec de la suppression de l'expérience.",
-  "experiences_user_has_no_sessions": "L'utilisateur n'a pas de sessions",
-  "experiences_no_active_session": "Aucune session active",
-  "experiences_restore_success": "Expérience restaurée avec succès !",
-  "experiences_restore_failed": "Échec de la restauration de l'expérience.",
-  "experiences_personal_info_tooltip": "Les champs sont préremplis avec des informations que vous avez peut-être fournies précédemment et sont stockés en toute sécurité sur votre appareil. Renseignez les détails manquants pour personnaliser votre CV.",
-  "experiences_and_skills_title": "Expériences et compétences",
-  "experiences_personal_information_title": "Informations personnelles",
-  "experiences_personal_info_name_label": "Nom:",
-  "experiences_personal_info_name_placeholder": "Entrez votre nom ici",
-  "experiences_personal_info_email_label": "Email:",
-  "experiences_personal_info_email_placeholder": "Entrez votre email ici",
-  "experiences_personal_info_phone_label": "Téléphone:",
-  "experiences_personal_info_phone_placeholder": "Entrez votre numéro de téléphone ici",
-  "experiences_personal_info_address_label": "Adresse:",
-  "experiences_personal_info_address_placeholder": "Entrez votre adresse ici",
-  "experiences_uncategorized_tooltip": "D'après la conversation, ces expériences n'ont pas pu être automatiquement classées.",
-  "experiences_restore_deleted_link": "Restaurer les expériences supprimées",
-  "experiences_unsaved_changes_title": "Modifications non enregistrées",
-  "experiences_unsaved_changes_content": "Vous avez des modifications non enregistrées. Voulez-vous vraiment fermer sans enregistrer ?",
-  "experiences_unsaved_changes_close_button": "Fermer",
-  "experiences_unsaved_changes_keep_editing_button": "Continuer à modifier",
-  "experiences_delete_title": "Supprimer l'expérience",
-  "experiences_delete_content": "Voulez-vous vraiment supprimer cette expérience ? Cette action est irréversible.",
-  "experiences_delete_confirm_button": "Supprimer",
-  "experiences_revert_title": "Rétablir l'expérience",
-  "experiences_revert_content": "Voulez-vous vraiment rétablir cette expérience à sa version non modifiée ? Cela écrasera vos modifications.",
-  "experiences_revert_confirm_button": "Rétablir",
-  "experiences_deleting_backdrop": "Suppression de l'expérience...",
-  "experiences_restoring_backdrop": "Restauration de l'expérience...",
-  "experiences_menu_edit": "Modifier",
-  "experiences_menu_delete": "Supprimer",
-  "experiences_menu_revert": "Rétablir",
-  "experiences_actions_unavailable_until_explored": "Ces actions seront disponibles une fois que vous aurez discuté de l'expérience en détail avec Compass.",
-  "experiences_more_options_title": "Plus d'options",
-  "experiences_top_skills_label": "Compétences principales",
-  "experiences_top_skills_help": "Appuyez sur une compétence pour voir plus de détails.",
-  "experiences_no_skills_yet": "Aucune compétence découverte pour le moment",
-  "experiences_untitled": "Sans titre !",
-  "experiences_update_success": "Expérience mise à jour avec succès !",
-  "experiences_update_failed": "Échec de la mise à jour de l'expérience. Veuillez réessayer plus tard.",
-  "experiences_skills_added_success": "Compétences ajoutées avec succès !",
-  "experiences_edit_title": "Modifier l'expérience",
-  "experiences_info_label": "Informations sur l'expérience",
-  "experiences_info_help": "Appuyez sur un champ pour mettre à jour le type de travail, le titre, les dates, l'entreprise, l'emplacement ou le résumé de votre expérience.",
-  "experiences_field_experience_title_placeholder": "Titre de l'expérience",
-  "experiences_field_experience_title_required": "* Le titre de l'expérience est requis",
-  "experiences_field_start_date_placeholder": "Date de début",
-  "experiences_field_end_date_placeholder": "Date de fin",
-  "experiences_field_company_placeholder": "Entreprise",
-  "experiences_field_location_placeholder": "Lieu",
-  "experiences_top_skills_help_edit": "Appuyez sur une compétence pour voir plus de détails. Utilisez le menu déroulant pour changer l'étiquette et l'icône de suppression pour l'enlever. Appuyez sur le bouton Ajouter une compétence pour en ajouter d'autres.",
-  "experiences_add_skill_button": "Ajouter une compétence",
-  "experiences_updating_backdrop": "Mise à jour de l'expérience...",
-  "experiences_skill_also_known_as": "Aussi connu sous le nom :",
-  "revert": "Rétablir",
-  "summary_of_experience": "Résumé de l'expérience",
-  "experiences_restore_title": "Restaurer les expériences",
-  "experiences_restore_fetch_failed": "Échec de la récupération des expériences supprimées. Veuillez réessayer plus tard.",
-  "experiences_restore_empty": "Aucune expérience supprimée trouvée.",
-  "experiences_work_type_description_self_employment": "Vous travaillez à votre compte, gérez votre propre entreprise ou effectuez des missions freelance/contrat",
-  "experiences_work_type_description_formal_sector_waged_employment": "Vous avez un emploi rémunéré pour un employeur, une entreprise ou une organisation",
-  "experiences_work_type_description_formal_sector_unpaid_trainee_work": "Vous êtes dans un rôle de formation ou de stage pour acquérir des compétences ou de l'expérience",
-  "experiences_work_type_description_unseen_unpaid": "Vous effectuez du travail non rémunéré comme la garde, les tâches ménagères ou le bénévolat",
-  "experiences_work_type_description_uncategorized": "Compass n'a pas pu catégoriser ce type de travail",
-  "experiences_report_skills_report_title": "Rapport de compétences",
-  "experiences_report_skills_description_title": "Description des compétences",
-  "experiences_report_experiences_title": "EXPÉRIENCES",
-  "experiences_report_self_employment_title": "Travail indépendant",
-  "experiences_report_salary_work_title": "Travail salarié",
-  "experiences_report_unpaid_work_title": "Travail non rémunéré",
-  "experiences_report_trainee_work_title": "Travail en tant que stagiaire",
-  "experiences_report_uncategorized_title": "Non classé",
-  "experiences_report_top_skills_title": "Compétences principales : ",
-  "experiences_report_skills_description_text": "Ci-dessous, vous trouverez une liste des compétences découvertes lors de votre conversation avec Compass, ainsi que leurs descriptions.",
-  "experiences_report_disclaimer_text_part1": "Avertissement : ",
-  "experiences_report_disclaimer_text_part2": "Les compétences listées sont basées sur une conversation avec le candidat, ne sont pas vérifiées ou validées par Tabiya et peuvent être inexactes. ",
-  "experiences_report_disclaimer_text_part3": "Les informations doivent être vérifiées avant utilisation pour la recherche d'emploi, les entretiens ou la création d'un CV. Pour réviser ces informations, reparlez à Compass ou créez un CV complet basé sur ce rapport.",
-  "experiences_report_body_text": "Ce rapport résume les informations clés recueillies lors d'une conversation avec Compass le {{date}}. Compass est un chatbot IA qui aide les chercheurs d'emploi à explorer leurs compétences et expériences. Ce rapport présente l'expérience professionnelle du candidat et les compétences identifiées pour chaque expérience. Ces informations peuvent être utilisées pour guider la recherche d'emploi et mettre en valeur leurs compétences lors des candidatures, notamment pendant les entretiens avec des employeurs potentiels. C'est un bon point de départ pour créer un CV complet.",
-  "experiences_max_chars_allowed": "Maximum {{count}} caractères autorisés.",
   "skillsRanking_prompt_main_message": "Presque fini ! Réponds à quelques dernières questions de recherche et nous t’enverrons <0>{{compensationAmount}}</0> de crédit une fois que tu auras terminé toutes les tâches.",
   "skillsRanking_common_error_update_state": "Échec de la mise à jour de l’état du classement des compétences. Réessaie plus tard, s’il te plaît.",
   "skillsRanking_briefing_intro_work_based": "Si cela t’intéresse, je peux calculer quelle part des opportunités sur <0>{{jobPlatformUrl}}</0> correspond à tes compétences et comment tu te compares aux autres chercheurs — tu dois simplement me montrer à quel point cette information est précieuse pour toi.",
@@ -391,8 +311,6 @@
   "feedback_overall_submit_success": "Commentaires envoyés avec succès !",
   "feedback_overall_submit_error": "Échec de l’envoi des commentaires. Veuillez réessayer plus tard.",
   "skillsRanking_briefing_failed_to_continue": "Impossible de continuer. Veuillez réessayer plus tard.",
-  "experiences_summary_restore_failed": "Impossible de restaurer le résumé. Veuillez réessayer plus tard.",
-  "experiences_summary_restored": "Résumé restauré.",
   "app_isOnline_offline": "Vous êtes hors ligne",
   "app_isOnline_back_online": "Vous êtes de nouveau en ligne",
   "sensitive_data_saved_success": "Données personnelles enregistrées avec succès et en toute sécurité.",
@@ -401,9 +319,6 @@
   "sensitive_data_error_encrypted_data_too_large": "Les données personnelles semblent trop volumineuses pour être enregistrées. Saisissez des valeurs plus courtes. Si le problème persiste, videz le cache du navigateur puis actualisez la page.",
   "chat_message_experiences_intro": "Voici mes expériences :",
   "experiences_fetch_failed": "Échec de la récupération des expériences",
-  "experiences_downloadReportButton_download_cv": "Télécharger le CV",
-  "experiences_downloadReportButton_downloading": "Téléchargement en cours",
-  "experiences_downloadReportButton_help_tip_blocked_message": "Vous ne pouvez pas télécharger le rapport tant que vous n'avez pas terminé d'explorer au moins une expérience.",
   "please_select_x": "Veuillez sélectionner {{x}}",
   "clear_selection": "Effacer la sélection",
   "auth": {
@@ -544,6 +459,135 @@
       "helpCollect": "Tap a CV to load its content into the text field. Review and send when you're ready.",
       "helpDisabled": "CV selection is only available during the experience collection phase.",
       "empty": "No uploaded CVs found."
+    }
+  },
+  "experiences": {
+    "experiencesDrawer": {
+      "components": {
+        "experienceEditForm": {
+          "components": {
+            "summaryEditField": {
+              "summaryPlaceholder": "Résumé de l'expérience",
+              "restoreFailed": "Impossible de restaurer le résumé. Veuillez réessayer plus tard.",
+              "restored": "Résumé restauré."
+            }
+          },
+          "updateSuccess": "Expérience mise à jour avec succès !",
+          "updateFailed": "Échec de la mise à jour de l'expérience. Veuillez réessayer plus tard.",
+          "skillsAddedSuccess": "Compétences ajoutées avec succès !",
+          "editTitle": "Modifier l'expérience",
+          "infoLabel": "Informations sur l'expérience",
+          "infoHelp": "Appuyez sur un champ pour mettre à jour le type de travail, le titre, les dates, l'entreprise, l'emplacement ou le résumé de votre expérience.",
+          "field": {
+            "experienceTitlePlaceholder": "Titre de l'expérience",
+            "experienceTitleRequired": "* Le titre de l'expérience est requis",
+            "startDatePlaceholder": "Date de début",
+            "endDatePlaceholder": "Date de fin",
+            "companyPlaceholder": "Entreprise",
+            "locationPlaceholder": "Lieu"
+          },
+          "topSkillsHelpEdit": "Appuyez sur une compétence pour voir plus de détails. Utilisez le menu déroulant pour changer l'étiquette et l'icône de suppression pour l'enlever. Appuyez sur le bouton Ajouter une compétence pour en ajouter d'autres.",
+          "addSkillButton": "Ajouter une compétence",
+          "updatingBackdrop": "Mise à jour de l'expérience...",
+          "maxCharsAllowed": "Maximum {{count}} caractères autorisés."
+        },
+        "experiencesDrawerHeader": {
+          "closeTitle": "Fermer les expériences"
+        },
+        "experiencesDrawerContent": {
+          "menu": {
+            "edit": "Modifier",
+            "delete": "Supprimer",
+            "revert": "Rétablir"
+          },
+          "actionsUnavailableUntilExplored": "Ces actions seront disponibles une fois que vous aurez discuté de l'expérience en détail avec Compass.",
+          "moreOptionsTitle": "Plus d'options",
+          "topSkillsLabel": "Compétences principales",
+          "topSkillsHelp": "Appuyez sur une compétence pour voir plus de détails.",
+          "noSkillsYet": "Aucune compétence découverte pour le moment",
+          "untitled": "Sans titre !"
+        },
+        "skillPopover": {
+          "alsoKnownAs": "Aussi connu sous le nom :"
+        },
+        "restoreExperiencesDrawer": {
+          "title": "Restaurer les expériences",
+          "fetchFailed": "Échec de la récupération des expériences supprimées. Veuillez réessayer plus tard.",
+          "empty": "Aucune expérience supprimée trouvée."
+        },
+        "downloadReportButton": {
+          "downloadCv": "Télécharger le CV",
+          "downloading": "Téléchargement en cours",
+          "helpTipBlockedMessage": "Vous ne pouvez pas télécharger le rapport tant que vous n'avez pas terminé d'explorer au moins une expérience."
+        }
+      },
+      "deleteSuccess": "Expérience supprimée avec succès !",
+      "deleteFailed": "Échec de la suppression de l'expérience.",
+      "userHasNoSessions": "L'utilisateur n'a pas de sessions",
+      "noActiveSession": "Aucune session active",
+      "restoreSuccess": "Expérience restaurée avec succès !",
+      "restoreFailed": "Échec de la restauration de l'expérience.",
+      "personalInfoTooltip": "Les champs sont préremplis avec des informations que vous avez peut-être fournies précédemment et sont stockés en toute sécurité sur votre appareil. Renseignez les détails manquants pour personnaliser votre CV.",
+      "andSkillsTitle": "Expériences et compétences",
+      "personalInformationTitle": "Informations personnelles",
+      "personalInfo": {
+        "nameLabel": "Nom:",
+        "namePlaceholder": "Entrez votre nom ici",
+        "emailLabel": "Email:",
+        "emailPlaceholder": "Entrez votre email ici",
+        "phoneLabel": "Téléphone:",
+        "phonePlaceholder": "Entrez votre numéro de téléphone ici",
+        "addressLabel": "Adresse:",
+        "addressPlaceholder": "Entrez votre adresse ici"
+      },
+      "uncategorizedTooltip": "D'après la conversation, ces expériences n'ont pas pu être automatiquement classées.",
+      "restoreDeletedLink": "Restaurer les expériences supprimées",
+      "unsavedChanges": {
+        "title": "Modifications non enregistrées",
+        "content": "Vous avez des modifications non enregistrées. Voulez-vous vraiment fermer sans enregistrer ?",
+        "closeButton": "Fermer",
+        "keepEditingButton": "Continuer à modifier"
+      },
+      "delete": {
+        "title": "Supprimer l'expérience",
+        "content": "Voulez-vous vraiment supprimer cette expérience ? Cette action est irréversible.",
+        "confirmButton": "Supprimer"
+      },
+      "revert": {
+        "title": "Rétablir l'expérience",
+        "content": "Voulez-vous vraiment rétablir cette expérience à sa version non modifiée ? Cela écrasera vos modifications.",
+        "confirmButton": "Rétablir"
+      },
+      "deletingBackdrop": "Suppression de l'expérience...",
+      "restoringBackdrop": "Restauration de l'expérience...",
+      "emptyStateMessage": "Nous n'avons pas encore découvert d'expériences. Continuons la conversation.",
+      "util": {
+        "workTypeDescription": {
+          "selfEmployment": "Vous travaillez à votre compte, gérez votre propre entreprise ou effectuez des missions freelance/contrat",
+          "formalSectorWagedEmployment": "Vous avez un emploi rémunéré pour un employeur, une entreprise ou une organisation",
+          "formalSectorUnpaidTraineeWork": "Vous êtes dans un rôle de formation ou de stage pour acquérir des compétences ou de l'expérience",
+          "unseenUnpaid": "Vous effectuez du travail non rémunéré comme la garde, les tâches ménagères ou le bénévolat",
+          "uncategorized": "Compass n'a pas pu catégoriser ce type de travail"
+        }
+      }
+    },
+    "report": {
+      "skillsReportTitle": "Rapport de compétences",
+      "skillsDescriptionTitle": "Description des compétences",
+      "experiencesTitle": "EXPÉRIENCES",
+      "selfEmploymentTitle": "Travail indépendant",
+      "salaryWorkTitle": "Travail salarié",
+      "unpaidWorkTitle": "Travail non rémunéré",
+      "traineeWorkTitle": "Travail en tant que stagiaire",
+      "uncategorizedTitle": "Non classé",
+      "topSkillsTitle": "Compétences principales : ",
+      "skillsDescriptionText": "Ci-dessous, vous trouverez une liste des compétences découvertes lors de votre conversation avec Compass, ainsi que leurs descriptions.",
+      "disclaimer": {
+        "part1": "Avertissement : ",
+        "part2": "Les compétences listées sont basées sur une conversation avec le candidat, ne sont pas vérifiées ou validées par Tabiya et peuvent être inexactes. ",
+        "part3": "Les informations doivent être vérifiées avant utilisation pour la recherche d'emploi, les entretiens ou la création d'un CV. Pour réviser ces informations, reparlez à Compass ou créez un CV complet basé sur ce rapport."
+      },
+      "bodyText": "Ce rapport résume les informations clés recueillies lors d'une conversation avec Compass le {{date}}. Compass est un chatbot IA qui aide les chercheurs d'emploi à explorer leurs compétences et expériences. Ce rapport présente l'expérience professionnelle du candidat et les compétences identifiées pour chaque expérience. Ces informations peuvent être utilisées pour guider la recherche d'emploi et mettre en valeur leurs compétences lors des candidatures, notamment pendant les entretiens avec des employeurs potentiels. C'est un bon point de départ pour créer un CV complet."
     }
   }
 }

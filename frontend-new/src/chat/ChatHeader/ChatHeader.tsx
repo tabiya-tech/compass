@@ -326,7 +326,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           }}
           onClick={handleViewExperiences}
           data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_EXPERIENCES}
-          title={t("view_experiences").toLowerCase()}
+          title={t("chat.chatHeader.viewExperiences").toLowerCase()}
           disabled={!isOnline}
         >
           <AnimatedBadge

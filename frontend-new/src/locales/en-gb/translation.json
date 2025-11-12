@@ -12,7 +12,8 @@
       "backToLogin": "Back to Login",
       "save": "Save",
       "goBack": "Go Back",
-      "restore": "Restore"
+      "restore": "Restore",
+      "revert": "Revert"
     },
     "fields": {
       "email": "Email",
@@ -66,7 +67,6 @@
   "language_selector": "Language Selector",
   "feedback_message": "We'd love to hear your feedback on your experience so far!",
   "give_feedback": "Give Feedback",
-  "view_experiences": "View experiences",
   "conversation_conclusion_footer_you_can_now": "You can now",
   "conversation_conclusion_footer_view_and_download_cv": "View and Download your CV",
   "conversation_conclusion_footer_here": "here.",
@@ -192,6 +192,9 @@
       "failedToCancel": "Failed to cancel upload",
       "uploadingFileNamed": "Uploading {{filename}}...",
       "thinkingMessage": "Processing your CV, this might take a while..."
+    },
+    "chatHeader": {
+      "viewExperiences": "View experiences"
     }
   },
   "consent_before_we_begin_title": "Before we begin...",
@@ -271,89 +274,6 @@
   "rest_api_error_unable_to_process_request": "Apologies. Something went wrong while processing your request.",
   "rest_api_error_story_choose_message_label": "Choose an error message to display in a notification:",
   "rest_api_error_story_select_placeholder": "Select an error message",
-  "experiences_header_close_title": "Close experiences",
-  "experiences_delete_success": "Experience deleted successfully!",
-  "experiences_delete_failed": "Failed to delete experience.",
-  "experiences_user_has_no_sessions": "User has no sessions",
-  "experiences_no_active_session": "No active session found",
-  "experiences_restore_success": "Experience restored successfully!",
-  "experiences_restore_failed": "Failed to restore experience.",
-  "experiences_personal_info_tooltip": "The fields are prefilled with information you may have provided earlier and are stored securely on your device. Fill in missing details to personalize your CV.",
-  "experiences_and_skills_title": "Experiences and Skills",
-  "experiences_personal_information_title": "Personal Information",
-  "experiences_personal_info_name_label": "Name:",
-  "experiences_personal_info_name_placeholder": "Enter your name here",
-  "experiences_personal_info_email_label": "Email:",
-  "experiences_personal_info_email_placeholder": "Enter your email here",
-  "experiences_personal_info_phone_label": "Phone:",
-  "experiences_personal_info_phone_placeholder": "Enter your phone number here",
-  "experiences_personal_info_address_label": "Address:",
-  "experiences_personal_info_address_placeholder": "Enter your address here",
-  "experiences_uncategorized_tooltip": "Based on the conversation, these experiences couldn't be automatically categorized.",
-  "experiences_restore_deleted_link": "Restore deleted experiences",
-  "experiences_unsaved_changes_title": "Unsaved Changes",
-  "experiences_unsaved_changes_content": "You have unsaved changes. Are you sure you want to close without saving?",
-  "experiences_unsaved_changes_close_button": "Close",
-  "experiences_unsaved_changes_keep_editing_button": "Keep Editing",
-  "experiences_delete_title": "Delete Experience",
-  "experiences_delete_content": "Are you sure you want to delete this experience? This action cannot be undone.",
-  "experiences_delete_confirm_button": "Delete",
-  "experiences_revert_title": "Revert Experience",
-  "experiences_revert_content": "Are you sure you want to revert this experience to its unedited version? This will overwrite any changes you've made.",
-  "experiences_revert_confirm_button": "Revert",
-  "experiences_deleting_backdrop": "Deleting experience...",
-  "experiences_restoring_backdrop": "Restoring experience...",
-  "experiences_menu_edit": "Edit",
-  "experiences_menu_delete": "Delete",
-  "experiences_menu_revert": "Revert",
-  "experiences_actions_unavailable_until_explored": "These actions will become available once you have discussed the experience in detail with Compass.",
-  "experiences_more_options_title": "More options",
-  "experiences_top_skills_label": "Top Skills",
-  "experiences_top_skills_help": "Tap a skill to view more details.",
-  "experiences_no_skills_yet": "No skills discovered yet",
-  "experiences_untitled": "Untitled!",
-  "experiences_update_success": "Experience updated successfully!",
-  "experiences_update_failed": "Failed to update experience. Please try again later.",
-  "experiences_skills_added_success": "Skills added successfully!",
-  "experiences_edit_title": "Edit Experience",
-  "experiences_info_label": "Experience info",
-  "experiences_info_help": "Tap a field to update the work type, title, dates, company, location, or summary of your experience.",
-  "experiences_field_experience_title_placeholder": "Experience title",
-  "experiences_field_experience_title_required": "* Experience title is required",
-  "experiences_field_start_date_placeholder": "Start date",
-  "experiences_field_end_date_placeholder": "End date",
-  "experiences_field_company_placeholder": "Company",
-  "experiences_field_location_placeholder": "Location",
-  "experiences_top_skills_help_edit": "Tap a skill to view more details. Use the dropdown to change the skill label and the delete icon to remove it. Tap the Add Skill button to add more.",
-  "experiences_add_skill_button": "Add skill",
-  "experiences_updating_backdrop": "Updating experience...",
-  "experiences_skill_also_known_as": "Also known as:",
-  "revert": "Revert",
-  "summary_of_experience": "Summary of experience",
-  "experiences_restore_title": "Restore Experiences",
-  "experiences_restore_fetch_failed": "Failed to fetch deleted experiences. Please try again later.",
-  "experiences_restore_empty": "No deleted experiences found.",
-  "experiences_work_type_description_self_employment": "You work for yourself, run your own business, or take on freelance or contract jobs",
-  "experiences_work_type_description_formal_sector_waged_employment": "You have a paid job and work for an employer, company, or organization",
-  "experiences_work_type_description_formal_sector_unpaid_trainee_work": "You're in a training or internship role to gain skills or experience",
-  "experiences_work_type_description_unseen_unpaid": "You do unpaid work like caregiving, household tasks, or community volunteering",
-  "experiences_work_type_description_uncategorized": "Compass couldn't categorize this work type",
-  "experiences_report_skills_report_title": "Skills Report",
-  "experiences_report_skills_description_title": "Skills Description",
-  "experiences_report_experiences_title": "EXPERIENCES",
-  "experiences_report_self_employment_title": "Self-Employment",
-  "experiences_report_salary_work_title": "Salary Work",
-  "experiences_report_unpaid_work_title": "Unpaid Work",
-  "experiences_report_trainee_work_title": "Trainee Work",
-  "experiences_report_uncategorized_title": "Uncategorized",
-  "experiences_report_top_skills_title": "Top Skills: ",
-  "experiences_report_skills_description_text": "Below, you will find a list of the skills discovered during your conversation with Compass, along with their descriptions.",
-  "experiences_report_disclaimer_text_part1": "Disclaimer: ",
-  "experiences_report_disclaimer_text_part2": "Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate. ",
-  "experiences_report_disclaimer_text_part3": "Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with Compass again or create a complete CV based on this report.",
-  "experiences_report_body_text": "This report summarizes the key information gathered during a conversation with Compass on {{date}}. Compass is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV.",
-  "experiences_max_chars_allowed": "Maximum {{count}} characters allowed.",
-  "experiences_empty_state_message": "We haven't yet discovered any experiences so far. Let's continue chatting.",
   "skillsRanking_prompt_main_message": "Almost done! Answer a few more research questions and we’ll send you <0>{{compensationAmount}}</0> airtime once you have completed all tasks.",
   "skillsRanking_common_error_update_state": "Failed to update skills ranking state. Please try again later.",
   "skillsRanking_briefing_intro_work_based": "If you are interested, I can calculate what share of <0>{{jobPlatformUrl}}</0> opportunities match your skills and how you compare with other seekers — you just need to show me how valuable this information is to you.",
@@ -391,17 +311,12 @@
   "feedback_overall_submit_success": "Feedback submitted successfully!",
   "feedback_overall_submit_error": "Failed to submit feedback. Please try again later.",
   "skillsRanking_briefing_failed_to_continue": "Failed to continue. Please try again later.",
-  "experiences_summary_restore_failed": "Failed to restore summary. Please try again later.",
-  "experiences_summary_restored": "Summary restored.",
   "app_isOnline_offline": "You are offline",
   "app_isOnline_back_online": "You are back online",
   "sensitive_data_saved_success": "Personal data saved successfully and securely.",
   "sensitive_data_collection_skipped": "Personal data collection skipped.",
   "sensitive_data_error_default": "The personal data could not be saved. Please try again and if the problem persists, clear your browser's cache and refresh the page.",
   "sensitive_data_error_encrypted_data_too_large": "The personal data seems to be too large to be saved. Please try again by entering smaller values for the fields. If the problem persists, clear your browser's cache and refresh the page.",
-  "experiences_downloadReportButton_download_cv": "Download CV",
-  "experiences_downloadReportButton_downloading": "Downloading",
-  "experiences_downloadReportButton_help_tip_blocked_message": "You cannot download the report until you finish exploring at least one experience.",
   "please_select_x": "Please select a {{x}}",
   "clear_selection": "Clear selection",
   "auth": {
@@ -542,6 +457,135 @@
       "helpCollect": "Tap a CV to load its content into the text field. Review and send when you're ready.",
       "helpDisabled": "CV selection is only available during the experience collection phase.",
       "empty": "No uploaded CVs found."
+    }
+  },
+  "experiences": {
+    "experiencesDrawer": {
+      "components": {
+        "experienceEditForm": {
+          "components": {
+            "summaryEditField": {
+              "summaryPlaceholder": "Summary of experience",
+              "restoreFailed": "Failed to restore summary. Please try again later.",
+              "restored": "Summary restored."
+            }
+          },
+          "updateSuccess": "Experience updated successfully!",
+          "updateFailed": "Failed to update experience. Please try again later.",
+          "skillsAddedSuccess": "Skills added successfully!",
+          "editTitle": "Edit Experience",
+          "infoLabel": "Experience info",
+          "infoHelp": "Tap a field to update the work type, title, dates, company, location, or summary of your experience.",
+          "field": {
+            "experienceTitlePlaceholder": "Experience title",
+            "experienceTitleRequired": "* Experience title is required",
+            "startDatePlaceholder": "Start date",
+            "endDatePlaceholder": "End date",
+            "companyPlaceholder": "Company",
+            "locationPlaceholder": "Location"
+          },
+          "topSkillsHelpEdit": "Tap a skill to view more details. Use the dropdown to change the skill label and the delete icon to remove it. Tap the Add Skill button to add more.",
+          "addSkillButton": "Add skill",
+          "updatingBackdrop": "Updating experience...",
+          "maxCharsAllowed": "Maximum {{count}} characters allowed."
+        },
+        "experiencesDrawerHeader": {
+          "closeTitle": "Close experiences"
+        },
+        "experiencesDrawerContent": {
+          "menu": {
+            "edit": "Edit",
+            "delete": "Delete",
+            "revert": "Revert"
+          },
+          "actionsUnavailableUntilExplored": "These actions will become available once you have discussed the experience in detail with Compass.",
+          "moreOptionsTitle": "More options",
+          "topSkillsLabel": "Top Skills",
+          "topSkillsHelp": "Tap a skill to view more details.",
+          "noSkillsYet": "No skills discovered yet",
+          "untitled": "Untitled!"
+        },
+        "skillPopover": {
+          "alsoKnownAs": "Also known as:"
+        },
+        "restoreExperiencesDrawer": {
+          "title": "Restore Experiences",
+          "fetchFailed": "Failed to fetch deleted experiences. Please try again later.",
+          "empty": "No deleted experiences found."
+        },
+        "downloadReportButton": {
+          "downloadCv": "Download CV",
+          "downloading": "Downloading",
+          "helpTipBlockedMessage": "You cannot download the report until you finish exploring at least one experience."
+        }
+      },
+      "deleteSuccess": "Experience deleted successfully!",
+      "deleteFailed": "Failed to delete experience.",
+      "userHasNoSessions": "User has no sessions",
+      "noActiveSession": "No active session found",
+      "restoreSuccess": "Experience restored successfully!",
+      "restoreFailed": "Failed to restore experience.",
+      "personalInfoTooltip": "The fields are prefilled with information you may have provided earlier and are stored securely on your device. Fill in missing details to personalize your CV.",
+      "andSkillsTitle": "Experiences and Skills",
+      "personalInformationTitle": "Personal Information",
+      "personalInfo": {
+        "nameLabel": "Name:",
+        "namePlaceholder": "Enter your name here",
+        "emailLabel": "Email:",
+        "emailPlaceholder": "Enter your email here",
+        "phoneLabel": "Phone:",
+        "phonePlaceholder": "Enter your phone number here",
+        "addressLabel": "Address:",
+        "addressPlaceholder": "Enter your address here"
+      },
+      "uncategorizedTooltip": "Based on the conversation, these experiences couldn't be automatically categorized.",
+      "restoreDeletedLink": "Restore deleted experiences",
+      "unsavedChanges": {
+        "title": "Unsaved Changes",
+        "content": "You have unsaved changes. Are you sure you want to close without saving?",
+        "closeButton": "Close",
+        "keepEditingButton": "Keep Editing"
+      },
+      "delete": {
+        "title": "Delete Experience",
+        "content": "Are you sure you want to delete this experience? This action cannot be undone.",
+        "confirmButton": "Delete"
+      },
+      "revert": {
+        "title": "Revert Experience",
+        "content": "Are you sure you want to revert this experience to its unedited version? This will overwrite any changes you've made.",
+        "confirmButton": "Revert"
+      },
+      "deletingBackdrop": "Deleting experience...",
+      "restoringBackdrop": "Restoring experience...",
+      "emptyStateMessage": "We haven't yet discovered any experiences so far. Let's continue chatting.",
+      "util": {
+        "workTypeDescription": {
+          "selfEmployment": "You work for yourself, run your own business, or take on freelance or contract jobs",
+          "formalSectorWagedEmployment": "You have a paid job and work for an employer, company, or organization",
+          "formalSectorUnpaidTraineeWork": "You're in a training or internship role to gain skills or experience",
+          "unseenUnpaid": "You do unpaid work like caregiving, household tasks, or community volunteering",
+          "uncategorized": "Compass couldn't categorize this work type"
+        }
+      }
+    },
+    "report": {
+      "skillsReportTitle": "Skills Report",
+      "skillsDescriptionTitle": "Skills Description",
+      "experiencesTitle": "EXPERIENCES",
+      "selfEmploymentTitle": "Self-Employment",
+      "salaryWorkTitle": "Salary Work",
+      "unpaidWorkTitle": "Unpaid Work",
+      "traineeWorkTitle": "Trainee Work",
+      "uncategorizedTitle": "Uncategorized",
+      "topSkillsTitle": "Top Skills: ",
+      "skillsDescriptionText": "Below, you will find a list of the skills discovered during your conversation with Compass, along with their descriptions.",
+      "disclaimer": {
+        "part1": "Disclaimer: ",
+        "part2": "Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate. ",
+        "part3": "Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with Compass again or create a complete CV based on this report."
+      },
+      "bodyText": "This report summarizes the key information gathered during a conversation with Compass on {{date}}. Compass is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV."
     }
   }
 }

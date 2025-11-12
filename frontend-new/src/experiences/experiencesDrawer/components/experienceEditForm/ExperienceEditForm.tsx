@@ -129,7 +129,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
   }, [experience.remaining_skills]);
 
   const getFieldError = (value: string, maxLength: number): string | null => {
-    return value.length > maxLength ? t("experiences_max_chars_allowed", { count: maxLength }) : null;
+    return value.length > maxLength ? t("experiences.experiencesDrawer.components.experienceEditForm.maxCharsAllowed", { count: maxLength }) : null;
   };
 
   const updateFieldError = debounce((field: string, value: string, maxLength: number) => {
@@ -293,10 +293,10 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
       const result = await experienceService.updateExperience(sessionId, experience.UUID, updateExperienceRequest);
 
       notifyOnSave(result);
-      enqueueSnackbar(t("experiences_update_success"), { variant: "success" });
+      enqueueSnackbar(t("experiences.experiencesDrawer.components.experienceEditForm.updateSuccess"), { variant: "success" });
     } catch (error) {
       console.error(new ExperienceError("Failed to update experience:", error));
-      enqueueSnackbar(t("experiences_update_failed"), { variant: "error" });
+      enqueueSnackbar(t("experiences.experiencesDrawer.components.experienceEditForm.updateFailed"), { variant: "error" });
     } finally {
       setIsSubmitting(false);
     }
@@ -355,7 +355,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
 
     notifyOnUnsavedChange?.(true);
     setShowAddSkillsDrawer(false);
-    enqueueSnackbar(t("experiences_skills_added_success"), { variant: "success" });
+    enqueueSnackbar(t("experiences.experiencesDrawer.components.experienceEditForm.skillsAddedSuccess"), { variant: "success" });
   };
 
   const getWorkTypeMenuItems = (): MenuItemConfig[] => {
@@ -431,7 +431,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
             padding={isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : theme.tabiyaSpacing.xl}
           >
-            <Typography variant="h5">{t("experiences_edit_title")}</Typography>
+            <Typography variant="h5">{t("experiences.experiencesDrawer.components.experienceEditForm.editTitle")}</Typography>
             <Box display="flex" justifyContent="flex-end" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
               <SecondaryButton onClick={notifyOnCancel} data-testid={DATA_TEST_ID.FORM_CANCEL_BUTTON}>
                 {t("common.buttons.cancel")}
@@ -454,9 +454,9 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
           >
             <Box display="flex" alignItems="center">
               <Typography variant="body1" sx={{ wordBreak: "break-all" }}>
-                <b>{t("experiences_info_label")}</b>
+                <b>{t("experiences.experiencesDrawer.components.experienceEditForm.infoLabel")}</b>
               </Typography>
-              <HelpTip icon={<InfoIcon />}>{t("experiences_info_help")}</HelpTip>
+              <HelpTip icon={<InfoIcon />}>{t("experiences.experiencesDrawer.components.experienceEditForm.infoHelp")}</HelpTip>
             </Box>
             <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
               <Badge
@@ -501,7 +501,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
               </Badge>
               <Box display="flex" flexDirection="column" alignItems="flex-start">
                 <InlineEditField
-                  placeholder={t("experiences_field_experience_title_placeholder")}
+                  placeholder={t("experiences.experiencesDrawer.components.experienceEditForm.field.experienceTitlePlaceholder")}
                   value={formValues.experience_title}
                   onChange={(event) => handleInputChange(event, "experience_title", EXPERIENCE_TITLE_MAX_LENGTH)}
                   autoFocus
@@ -526,14 +526,14 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                 )}
                 {isExperienceTitleEmpty && (
                   <Typography variant="caption" color={theme.palette.error.main}>
-                    {t("experiences_field_experience_title_required")}
+                    {t("experiences.experiencesDrawer.components.experienceEditForm.field.experienceTitleRequired")}
                   </Typography>
                 )}
               </Box>
               <Box display="flex" justifyContent="space-between" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
                 <Box flexGrow={1}>
                   <InlineEditField
-                    placeholder={t("experiences_field_start_date_placeholder")}
+                    placeholder={t("experiences.experiencesDrawer.components.experienceEditForm.field.startDatePlaceholder")}
                     value={formValues.timeline.start}
                     onChange={(event) => handleTimelineChange(event, "start")}
                     data-testid={DATA_TEST_ID.FORM_START_DATE}
@@ -552,7 +552,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                 </Box>
                 <Box flexGrow={1}>
                   <InlineEditField
-                    placeholder={t("experiences_field_end_date_placeholder")}
+                    placeholder={t("experiences.experiencesDrawer.components.experienceEditForm.field.endDatePlaceholder")}
                     value={formValues.timeline.end}
                     onChange={(event) => handleTimelineChange(event, "end")}
                     data-testid={DATA_TEST_ID.FORM_END_DATE}
@@ -573,7 +573,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
               <Box display="flex" justifyContent="space-between" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
                 <Box width="100%">
                   <InlineEditField
-                    placeholder={t("experiences_field_company_placeholder")}
+                    placeholder={t("experiences.experiencesDrawer.components.experienceEditForm.field.companyPlaceholder")}
                     value={formValues.company}
                     onChange={(event) => handleInputChange(event, "company", COMPANY_MAX_LENGTH)}
                     data-testid={DATA_TEST_ID.FORM_COMPANY}
@@ -592,7 +592,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                 </Box>
                 <Box width="100%">
                   <InlineEditField
-                    placeholder={t("experiences_field_location_placeholder")}
+                    placeholder={t("experiences.experiencesDrawer.components.experienceEditForm.field.locationPlaceholder")}
                     value={formValues.location}
                     onChange={(event) => handleInputChange(event, "location", LOCATION_MAX_LENGTH)}
                     data-testid={DATA_TEST_ID.FORM_LOCATION}
@@ -619,9 +619,9 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
               />
               <Box display="flex" alignItems="center">
                 <Typography variant="body1" sx={{ wordBreak: "break-all" }}>
-                  <b>{t("experiences_top_skills_label")}</b>
+                  <b>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.topSkillsLabel")}</b>
                 </Typography>
-                <HelpTip icon={<InfoIcon />}>{t("experiences_top_skills_help_edit")}</HelpTip>
+                <HelpTip icon={<InfoIcon />}>{t("experiences.experiencesDrawer.components.experienceEditForm.topSkillsHelpEdit")}</HelpTip>
               </Box>
               <Box
                 ref={topSkillsRef}
@@ -720,7 +720,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                       sx={{ fontSize: theme.tabiyaSpacing.xl * 5 }} // MUI's default icon sizes are either too small or too large for this specific icon, so we use a custom size (~20px)
                     />
                   }
-                  label={t("experiences_add_skill_button")}
+                  label={t("experiences.experiencesDrawer.components.experienceEditForm.addSkillButton")}
                   onClick={() => setShowAddSkillsDrawer(true)}
                   data-testid={DATA_TEST_ID.FORM_ADD_SKILL_BUTTON}
                   disabled={!isOnline || filteredRemainingSkills.length === 0}
@@ -761,7 +761,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
             onClose={() => setPopoverAnchorEl(null)}
             skill={popoverSkill}
           />
-          <Backdrop isShown={isSubmitting} message={t("experiences_updating_backdrop")} />
+          <Backdrop isShown={isSubmitting} message={t("experiences.experiencesDrawer.components.experienceEditForm.updatingBackdrop")} />
         </Box>
       )}
     </>
