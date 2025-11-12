@@ -16,7 +16,7 @@ import CVService from "src/CV/CVService/CVService";
 import { CVListItem } from "src/CV/CVService/CVService.types";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { ChatError } from "src/error/commonErrors";
-import { formatExperiencesToMessage } from "src/chat/util";
+import { formatExperiencesToMessage, formatCvExperienceBulletsMessage } from "src/chat/util";
 import ChatService from "src/chat/ChatService/ChatService";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -342,8 +342,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       if (props.activeSessionId != null) {
         try {
           if (reinjectResult.experience_bullets && reinjectResult.experience_bullets.length > 0) {
-            const bulletsText = reinjectResult.experience_bullets.map(b => `• ${b}`).join("\n");
-            const message = `I have these experiences:\n\n${bulletsText}`;
+            const message = formatCvExperienceBulletsMessage(reinjectResult.experience_bullets);
             // Show typing indicator while waiting for backend response
             if (props.setAiIsTyping) {
               props.setAiIsTyping(true);

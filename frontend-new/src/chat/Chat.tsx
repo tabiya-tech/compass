@@ -42,6 +42,7 @@ import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "./chatMessage/convers
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 import cvService from "src/CV/CVService/CVService";
+import { useCvBulletsHandler } from "./hooks/useCvBulletsHandler";
 import {
   getCvUploadDisplayMessage,
   getUploadErrorMessage,
@@ -238,32 +239,45 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
       }
 
       // Process messages (skip conclusion message and optionally skip matching user messages)
-      response.messages.forEach((messageItem: ConversationMessage, idx: number) => {
-        const isConclusionMessage = response.conversation_completed && idx === response.messages.length - 1;
-        if (!isConclusionMessage) {
-          // Skip user messages that match the one we already added optimistically
-          if (
-            messageItem.sender === ConversationMessageSender.USER &&
-            skipUserMessage &&
-            messageItem.message === skipUserMessage
-          ) {
-            return;
-          }
+      // Use functional update to check for existing messages and avoid duplicates
+      setMessages((prevMessages) => {
+        const existingMessageIds = new Set(prevMessages.map((msg) => msg.message_id));
+        const newMessages: IChatMessage<any>[] = [];
 
-          // Add all other messages
-          if (messageItem.sender === ConversationMessageSender.USER) {
-            addMessageToChat(generateUserMessage(messageItem.message, messageItem.sent_at, messageItem.message_id));
-          } else {
-            addMessageToChat(
-              generateCompassMessage(
-                messageItem.message_id,
-                messageItem.message,
-                messageItem.sent_at,
-                messageItem.reaction
-              )
-            );
+        response.messages.forEach((messageItem: ConversationMessage, idx: number) => {
+          const isConclusionMessage = response.conversation_completed && idx === response.messages.length - 1;
+          if (!isConclusionMessage) {
+            // Skip if message already exists
+            if (existingMessageIds.has(messageItem.message_id)) {
+              return;
+            }
+
+            // Skip user messages that match the one we already added optimistically
+            if (
+              messageItem.sender === ConversationMessageSender.USER &&
+              skipUserMessage &&
+              messageItem.message === skipUserMessage
+            ) {
+              return;
+            }
+
+            // Add all other messages
+            if (messageItem.sender === ConversationMessageSender.USER) {
+              newMessages.push(generateUserMessage(messageItem.message, messageItem.sent_at, messageItem.message_id));
+            } else {
+              newMessages.push(
+                generateCompassMessage(
+                  messageItem.message_id,
+                  messageItem.message,
+                  messageItem.sent_at,
+                  messageItem.reaction
+                )
+              );
+            }
           }
-        }
+        });
+
+        return [...prevMessages, ...newMessages];
       });
 
       // Handle conclusion message and skills ranking flow
@@ -295,7 +309,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
       setConversationConductedAt(response.conversation_conducted_at);
       setCurrentPhase((_previousCurrentPhase) => parseConversationPhase(response.current_phase, _previousCurrentPhase));
     },
-    [exploredExperiences, fetchExperiences, addMessageToChat, showSkillsRanking, setAiIsTyping]
+    [exploredExperiences, fetchExperiences, showSkillsRanking, setAiIsTyping]
   );
 
   // Opens the experiences drawer and get experiences if needed
@@ -333,129 +347,13 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   // Compute display message from status
   const getCvUploadDisplayMessageMemo = useCallback((status: UploadStatus): string => getCvUploadDisplayMessage(status), []);
 
-  // Helper function to send CV experience bullets as a user message
-  const handleCvBulletsMessage = useCallback(
-    async (bullets: string[], sessionId: number) => {
-      const bulletsText = bullets.map(b => `• ${b}`).join("\n");
-      const message = `I have these experiences:\n\n${bulletsText} \n\nLet's start with these.`;
-      
-      // Show the user message immediately before sending
-      addMessageToChat(generateUserMessage(message, new Date().toISOString()));
-      // Show typing indicator while waiting for backend response
-      setAiIsTyping(true);
-      
-      try {
-        // Send to server - the response contains only new messages, not the full history
-        const response = await ChatService.getInstance().sendMessage(sessionId, message);
-        await processChatHistoryResponse(response, { skipUserMessage: message, sessionId });
-      } catch (err) {
-        console.error(new ChatError("Failed to send experience bullets message:", err));
-        throw err;
-      } finally {
-        setAiIsTyping(false);
-      }
-    },
-    [addMessageToChat, setAiIsTyping, processChatHistoryResponse]
-  );
-
-  // Helper function to refresh chat after CV bullets are sent (for reinjection flow)
-  // Note: This is called after the message was already sent from ChatMessageField,
-  // so we need to fetch history to get the response. We only process new messages.
-  const handleCvBulletsSent = useCallback(
-    async (bulletsMessage?: string, sendMessageResponse?: ConversationResponse) => {
-      if (activeSessionId == null) return;
-      
-      try {
-        // Show the user message immediately if provided
-        if (bulletsMessage) {
-          addMessageToChat(generateUserMessage(bulletsMessage, new Date().toISOString()));
-        }
-        
-        // Use the response from sendMessage if provided (contains only new messages),
-        // otherwise fetch history (but this will include all messages, so we need to filter)
-        const response = sendMessageResponse || await ChatService.getInstance().getChatHistory(activeSessionId);
-        
-        // If we got the response from sendMessage, it only contains new messages
-        // If we fetched history, we need to only process messages we don't already have
-        if (sendMessageResponse) {
-          await processChatHistoryResponse(response, { skipUserMessage: bulletsMessage, sessionId: activeSessionId });
-        } else {
-          // When fetching full history, only process messages that are newer than what we have
-          // We'll identify new messages by checking if they exist in current messages
-          setMessages((prevMessages) => {
-            const existingMessageIds = new Set(prevMessages.map((msg) => msg.message_id));
-            const newMessages: IChatMessage<any>[] = [];
-            
-            response.messages.forEach((messageItem: ConversationMessage, idx: number) => {
-              const isConclusionMessage = response.conversation_completed && idx === response.messages.length - 1;
-              if (!isConclusionMessage && !existingMessageIds.has(messageItem.message_id)) {
-                // Skip user messages that match the one we already added optimistically
-                if (
-                  messageItem.sender === ConversationMessageSender.USER &&
-                  bulletsMessage &&
-                  messageItem.message === bulletsMessage
-                ) {
-                  return;
-                }
-                
-                // Add new messages
-                if (messageItem.sender === ConversationMessageSender.USER) {
-                  newMessages.push(generateUserMessage(messageItem.message, messageItem.sent_at, messageItem.message_id));
-                } else {
-                  newMessages.push(
-                    generateCompassMessage(
-                      messageItem.message_id,
-                      messageItem.message,
-                      messageItem.sent_at,
-                      messageItem.reaction
-                    )
-                  );
-                }
-              }
-            });
-            
-            return [...prevMessages, ...newMessages];
-          });
-          
-          // Still need to update state from response
-          setExploredExperiences(response.experiences_explored);
-          if (response.experiences_explored > exploredExperiences) {
-            setExploredExperiencesNotification(true);
-            await fetchExperiences();
-          }
-          
-          // Handle conclusion message and skills ranking flow
-          if (response.conversation_completed && response.messages.length) {
-            const lastMessage = response.messages[response.messages.length - 1];
-            if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
-              const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(activeSessionId);
-              const isAlreadyCompleted = skillsRankingState?.completed_at !== undefined;
-              const showConclusionMessage = createShowConclusionMessage(
-                lastMessage,
-                addMessageToChat,
-                setAiIsTyping,
-                isAlreadyCompleted
-              );
-              await showSkillsRanking(showConclusionMessage);
-            } else {
-              const conclusionMessage = generateConversationConclusionMessage(
-                lastMessage.message_id,
-                lastMessage.message
-              );
-              addMessageToChat(conclusionMessage);
-            }
-          }
-          
-          setConversationCompleted(response.conversation_completed);
-          setConversationConductedAt(response.conversation_conducted_at);
-          setCurrentPhase((_previousCurrentPhase) => parseConversationPhase(response.current_phase, _previousCurrentPhase));
-        }
-      } catch (e) {
-        console.error(new ChatError("Failed to refresh chat after CV bullets sent:", e));
-      }
-    },
-    [activeSessionId, addMessageToChat, processChatHistoryResponse, exploredExperiences, fetchExperiences, showSkillsRanking, setAiIsTyping]
-  );
+  // Use the CV bullets handler hook to consolidate upload and reinjection logic
+  const cvBulletsHandler = useCvBulletsHandler({
+    sessionId: activeSessionId,
+    addMessageToChat,
+    setAiIsTyping,
+    processChatHistoryResponse,
+  });
 
   // Helper function to start polling for upload status
   const startPollingForUpload = useCallback((uploadId: string, messageId: string) => {
@@ -533,9 +431,9 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         // Send experience bullets as a real message if available
         if (status.experience_bullets && status.experience_bullets.length > 0 && activeSessionId != null) {
           try {
-            await handleCvBulletsMessage(status.experience_bullets, activeSessionId);
+            await cvBulletsHandler.handleBullets(status.experience_bullets);
           } catch (err) {
-            // Error already logged in handleCvBulletsMessage
+            // Error already logged in handleBullets
           }
         } else {
           // If no bullets, show a message to the user that no experiences were found
@@ -587,7 +485,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
       }
     });
     setActiveUploads(prev => new Map(prev).set(uploadId, { messageId, intervalId: handles.intervalId as any, timeoutId: handles.timeoutId as any }));
-  }, [activeUploads, stopPollingForUpload, getCvUploadDisplayMessageMemo, removeMessageFromChat, enqueueSnackbar, messages, activeSessionId, handleCvBulletsMessage]);
+  }, [activeUploads, stopPollingForUpload, getCvUploadDisplayMessageMemo, removeMessageFromChat, enqueueSnackbar, messages, activeSessionId, cvBulletsHandler]);
 
   // Helper function to cancel an upload
   const handleCancelUpload = useCallback(async (uploadId: string) => {
@@ -1051,7 +949,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 prefillMessage={prefillMessage}
                 cvUploadError={cvUploadError}
                 activeSessionId={activeSessionId}
-                onCvBulletsSent={handleCvBulletsSent}
+                onCvBulletsSent={cvBulletsHandler.handleBulletsSent}
               />
             </Box>
           </Box>
