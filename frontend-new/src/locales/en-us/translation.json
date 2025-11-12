@@ -68,7 +68,20 @@
     },
     "errors": {
       "updateState": "Failed to update skills ranking state. Please try again later.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "api": {
+        "requestTooLong": "The data sent to the service seems to be too large. Please try again with a smaller payload. If the problem persists, clear your browser's cache and refresh the page.",
+        "tooManyRequests": "It looks like you are making too many requests. Please slow down and try again later.",
+        "unexpectedError": "An unexpected error occurred. Please try again later.",
+        "serverConnectionError": "Cannot connect to the service. Please check your internet connection or try again later.",
+        "resourceNotFound": "The requested resource was not found. Please clear your browser's cache and refresh the page.",
+        "authenticationFailure": "It looks like you not logged in. Please log in to continue.",
+        "permissionDenied": "It looks like you do not have the necessary permissions. Please log out and log in again.",
+        "unableToProcessResponse": "We encountered an issue while processing data. Clear the browser's cache and refresh or try again later.",
+        "serviceUnavailable": "The service is currently unavailable. Please try again later.",
+        "dataValidationError": "There seems to be an issue with your request. If you're submitting data, please make sure they're valid and try again. If the problem persists, clear your browser's cache and refresh the page.",
+        "unableToProcessRequest": "Apologies. Something went wrong while processing your request."
+      }
     },
     "status": {
       "calculating": "Calculating",
@@ -83,8 +96,6 @@
     }
   },
   "language_selector": "Language Selector",
-  "feedback_message": "We'd love to hear your feedback on your experience so far!",
-  "give_feedback": "Give Feedback",
   "conversation_conclusion_footer_you_can_now": "You can now",
   "conversation_conclusion_footer_view_and_download_cv": "View and Download your CV",
   "conversation_conclusion_footer_here": "here.",
@@ -97,15 +108,9 @@
   "conversation_conclusion_footer_feedback_in_progress_prefix": "Please",
   "conversation_conclusion_footer_feedback_in_progress_link_text": "Complete your Feedback",
   "conversation_conclusion_footer_feedback_in_progress_suffix": "to help us improve your experience!",
-  "user_info": "User info",
   "before_you_go": "Before you go",
   "logout_confirmation_message": "Are you sure you want to log out?",
   "anonymous_account_warning": "You're currently using an anonymous account. If you log out, you'll lose access to your conversation history and experiences.",
-  "report_a_bug": "Report a bug",
-  "give_general_feedback": "Give general feedback",
-  "feedback_message_placeholder": "We'd love to hear your thoughts! Please share any feedback or suggestions you have for improving Compass.",
-  "send_feedback": "Send Feedback",
-  "feedback_success_message": "Thank you for your feedback!",
   "compass": "Compass",
   "compass_logo_alt": "Compass Logo",
   "user_icon_alt": "User Icon",
@@ -115,7 +120,14 @@
   "sent": "sent",
   "chat": {
     "chatHeader": {
-      "viewExperiences": "View experiences"
+      "viewExperiences": "View experiences",
+      "feedbackMessage": "We'd love to hear your feedback on your experience so far!",
+      "giveFeedback": "Give Feedback",
+      "feedbackMessagePlaceholder": "We'd love to hear your thoughts! Please share any feedback or suggestions you have for improving Compass.",
+      "sendFeedback": "Send Feedback",
+      "feedbackSuccessMessage": "Thank you for your feedback!",
+      "giveGeneralFeedback": "Give general feedback",
+      "userInfo": "User info"
     },
     "cvUploadPolling": {
       "uploadingCv": "Uploading CV",
@@ -215,11 +227,8 @@
       }
     }
   },
-  "help_us_improve": "Help us improve!",
   "previous": "Previous",
   "next": "Next",
-  "submitting_feedback": "Submitting feedback...",
-  "close_feedback_form": "close feedback form",
   "bias_experience_accuracy": "Bias & Experience Accuracy",
   "inaccurate": "Inaccurate",
   "very_accurate": "Very accurate",
@@ -234,29 +243,6 @@
   "skip": "Skip",
   "saving": "Saving",
   "yes_exit": "Yes, exit",
-  "error_page_illustration_alt": "error illustration",
-  "error_page_default_message": "Something went wrong with Compass. Try reloading the page...",
-  "error_page_not_found": "404 Error - Page Not Found",
-  "rest_api_error_request_too_long": "The data sent to the service seems to be too large. Please try again with a smaller payload. If the problem persists, clear your browser's cache and refresh the page.",
-  "rest_api_error_too_many_requests": "It looks like you are making too many requests. Please slow down and try again later.",
-  "rest_api_error_unexpected_error": "An unexpected error occurred. Please try again later.",
-  "rest_api_error_server_connection_error": "Cannot connect to the service. Please check your internet connection or try again later.",
-  "rest_api_error_resource_not_found": "The requested resource was not found. Please clear your browser's cache and refresh the page.",
-  "rest_api_error_authentication_failure": "It looks like you not logged in. Please log in to continue.",
-  "rest_api_error_permission_denied": "It looks like you do not have the necessary permissions. Please log out and log in again.",
-  "rest_api_error_unable_to_process_response": "We encountered an issue while processing data. Clear the browser's cache and refresh or try again later.",
-  "rest_api_error_service_unavailable": "The service is currently unavailable. Please try again later.",
-  "rest_api_error_data_validation_error": "There seems to be an issue with your request. If you're submitting data, please make sure they're valid and try again. If the problem persists, clear your browser's cache and refresh the page.",
-  "rest_api_error_unable_to_process_request": "Apologies. Something went wrong while processing your request.",
-  "rest_api_error_story_choose_message_label": "Choose an error message to display in a notification:",
-  "rest_api_error_story_select_placeholder": "Select an error message",
-  "customerSatisfactionRating_question_text": "Finally, we'd love to hear your thoughts on your experience so far! ",
-  "customerSatisfactionRating_rating_label_low": "Unsatisfied",
-  "customerSatisfactionRating_rating_label_high": "Satisfied",
-  "customerSatisfactionRating_submit_success": "Rating Feedback submitted successfully!",
-  "customerSatisfactionRating_submit_error": "Failed to submit feedback. Please try again later.",
-  "feedback_overall_submit_success": "Feedback submitted successfully!",
-  "feedback_overall_submit_error": "Failed to submit feedback. Please try again later.",
   "app_isOnline_offline": "You are offline",
   "app_isOnline_back_online": "You are back online",
   "please_select_x": "Please select a {{x}}",
@@ -631,6 +617,40 @@
         "skipping": "Skipping...",
         "refreshPage": "Refresh Page"
       }
+    }
+  },
+  "feedback": {
+    "overallFeedback": {
+      "feedbackForm": {
+        "components": {
+          "customerSatisfactionRating": {
+            "questionText": "Finally, we'd love to hear your thoughts on your experience so far! ",
+            "ratingLabelLow": "Unsatisfied",
+            "ratingLabelHigh": "Satisfied",
+            "submitSuccess": "Rating Feedback submitted successfully!",
+            "submitError": "Failed to submit feedback. Please try again later."
+          }
+        },
+        "submitSuccess": "Feedback submitted successfully!",
+        "submitError": "Failed to submit feedback. Please try again later.",
+        "helpUsImprove": "Help us improve!",
+        "closeForm": "close feedback form",
+        "submittingFeedback": "Submitting feedback..."
+      }
+    },
+    "bugReport": {
+      "reportBug": "Report a bug"
+    }
+  },
+  "error": {
+    "errorPage": {
+      "illustrationAlt": "error illustration",
+      "defaultMessage": "Something went wrong with Compass. Try reloading the page...",
+      "notFound": "404 Error - Page Not Found"
+    },
+    "restAPIError": {
+      "storyChooseMessageLabel": "Choose an error message to display in a notification:",
+      "storySelectPlaceholder": "Select an error message"
     }
   }
 }

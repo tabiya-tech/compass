@@ -146,10 +146,10 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       const feedback = Sentry.getFeedback();
       if (feedback) {
         const form = await feedback.createForm({
-          formTitle: t("give_general_feedback"),
-          messagePlaceholder: t("feedback_message_placeholder"),
-          submitButtonLabel: t("send_feedback"),
-          successMessageText: t("feedback_success_message"),
+          formTitle: t("chat.chatHeader.giveGeneralFeedback"),
+          messagePlaceholder: t("chat.chatHeader.feedbackMessagePlaceholder"),
+          submitButtonLabel: t("chat.chatHeader.sendFeedback"),
+          successMessageText: t("chat.chatHeader.feedbackSuccessMessage"),
           enableScreenshot: false,
         });
         form.appendToDom();
@@ -201,7 +201,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       if (shouldPrompt && !notificationShownRef.current) {
         const snackbarKey = enqueueSnackbar(
           <Typography variant="body1">
-            {t("feedback_message")}{" "}
+            {t("chat.chatHeader.feedbackMessage")}{" "}
             <CustomLink
               onClick={async () => {
                 closeSnackbar(snackbarKey);
@@ -209,7 +209,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
               }}
               data-testid={DATA_TEST_ID.CHAT_HEADER_FEEDBACK_LINK}
             >
-              {t("give_feedback")}
+              {t("chat.chatHeader.giveFeedback")}
             </CustomLink>
           </Typography>,
           {
@@ -260,7 +260,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         ? [
             {
               id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
-              text: t("report_a_bug").toLowerCase(),
+              text: t("feedback.bugReport.reportBug").toLowerCase(),
               disabled: !isOnline,
               action: () => {
                 const feedback = Sentry.getFeedback();
@@ -343,7 +343,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
             }}
             onClick={handleGiveFeedback}
             data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_FEEDBACK}
-            title={t("give_feedback").toLowerCase()}
+            title={t("chat.chatHeader.giveFeedback").toLowerCase()}
             disabled={!isOnline}
           >
             <FeedbackOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_FEEDBACK} />
@@ -355,7 +355,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           }}
           onClick={(event) => setAnchorEl(event.currentTarget)}
           data-testid={DATA_TEST_ID.CHAT_HEADER_BUTTON_USER}
-          title={t("user_info").toLowerCase()}
+          title={t("chat.chatHeader.userInfo").toLowerCase()}
         >
           <img
             src={`${process.env.PUBLIC_URL}/user-icon.svg`}

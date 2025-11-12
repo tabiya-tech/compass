@@ -139,7 +139,7 @@ describe("FeedbackForm", () => {
       expect(mockSendFeedback).toHaveBeenCalled();
       // AND the snackbar to have been called
       await waitFor(() =>
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("feedback_overall_submit_success"), {
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("feedback.overallFeedback.feedbackForm.submitSuccess"), {
           variant: "success",
         })
       );
@@ -185,7 +185,7 @@ describe("FeedbackForm", () => {
       // AND the snackbar to have been called
       await waitFor(() =>
         expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-          i18n.t("feedback_overall_submit_error"),
+          i18n.t("feedback.overallFeedback.feedbackForm.submitError"),
           { variant: "error" }
         )
       );

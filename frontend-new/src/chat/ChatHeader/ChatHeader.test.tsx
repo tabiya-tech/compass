@@ -565,10 +565,10 @@ describe("ChatHeader", () => {
 
       // THEN expect the create form to be called with the correct parameters
       expect(mockCreateForm).toHaveBeenCalledWith({
-        formTitle: i18n.t("give_general_feedback"),
-        messagePlaceholder: i18n.t("feedback_message_placeholder"),
-        submitButtonLabel: i18n.t("send_feedback"),
-        successMessageText: i18n.t("feedback_success_message"),
+        formTitle: i18n.t("chat.chatHeader.giveGeneralFeedback"),
+        messagePlaceholder: i18n.t("chat.chatHeader.feedbackMessagePlaceholder"),
+        submitButtonLabel: i18n.t("chat.chatHeader.sendFeedback"),
+        successMessageText: i18n.t("chat.chatHeader.feedbackSuccessMessage"),
         enableScreenshot: false,
       });
       // AND the form should be appended to DOM and opened

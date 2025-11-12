@@ -93,17 +93,17 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       await feedbackService.sendFeedback(sessionId, [formattedData]);
 
       notifyOnCustomerSatisfactionRatingSubmitted();
-      enqueueSnackbar(t("customerSatisfactionRating_submit_success"), { variant: "success" });
+      enqueueSnackbar(t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.submitSuccess"), { variant: "success" });
     } catch (error) {
       console.error(new FeedbackError("Feedback submission failed:", error));
-      enqueueSnackbar(t("customerSatisfactionRating_submit_error"), { variant: "error" });
+      enqueueSnackbar(t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.submitError"), { variant: "error" });
     } finally {
       setIsSubmittingRating(false);
       setSelectedRating(null);
     }
   };
 
-  const customerSatisfactionText = t("customerSatisfactionRating_question_text").concat(
+  const customerSatisfactionText = t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.questionText").concat(
     questionsData?.[QUESTION_KEYS.CUSTOMER_SATISFACTION]?.question_text ??
     "How satisfied are you with Compass?");    
 
@@ -118,8 +118,8 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
         notifyChange={(value, comments) =>
           handleInputChange(QUESTION_KEYS.CUSTOMER_SATISFACTION, { rating_numeric: value, comment: comments })
         }
-        lowRatingLabel={t("customerSatisfactionRating_rating_label_low")}
-        highRatingLabel={t("customerSatisfactionRating_rating_label_high")}
+        lowRatingLabel={t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.ratingLabelLow")}
+        highRatingLabel={t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.ratingLabelHigh")}
         maxRating={5}
         disabled={!isOnline || isSubmittingRating}
       />

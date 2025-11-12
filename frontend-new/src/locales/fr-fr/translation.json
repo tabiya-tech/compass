@@ -68,7 +68,20 @@
     },
     "errors": {
       "updateState": "Échec de la mise à jour de l’état du classement des compétences. Réessaie plus tard, s’il te plaît.",
-      "generic": "Une erreur est survenue. Réessaie, s’il te plaît."
+      "generic": "Une erreur est survenue. Réessaie, s’il te plaît.",
+      "api": {
+        "requestTooLong": "Les données envoyées au service semblent être trop volumineuses. Veuillez réessayer avec un volume de données plus réduit. Si le problème persiste, videz le cache de votre navigateur et actualisez la page.",
+        "tooManyRequests": "Il semble que vous envoyiez trop de requêtes. Veuillez ralentir et réessayer plus tard.",
+        "unexpectedError": "Une erreur inattendue s'est produite. Veuillez réessayer plus tard.",
+        "serverConnectionError": "Impossible de se connecter au service. Veuillez vérifier votre connexion Internet ou réessayer plus tard.",
+        "resourceNotFound": "La ressource demandée est introuvable. Veuillez vider le cache de votre navigateur et actualiser la page.",
+        "authenticationFailure": "Il semble que vous ne soyez pas connecté. Veuillez vous connecter pour continuer.",
+        "permissionDenied": "Il semble que vous n'ayez pas les autorisations nécessaires. Veuillez vous déconnecter puis vous reconnecter.",
+        "unableToProcessResponse": "Nous avons rencontré un problème lors du traitement des données. Videz le cache de votre navigateur et actualisez la page ou réessayez plus tard.",
+        "serviceUnavailable": "Le service est actuellement indisponible. Veuillez réessayer plus tard.",
+        "dataValidationError": "Il semble y avoir un problème avec votre requête. Si vous soumettez des données, assurez-vous qu'elles sont valides puis réessayez. Si le problème persiste, videz le cache de votre navigateur et actualisez la page.",
+        "unableToProcessRequest": "Désolé. Une erreur s'est produite lors du traitement de votre requête."
+      }
     },
     "status": {
       "calculating": "Calcul en cours",
@@ -83,8 +96,6 @@
     }
   },
   "language_selector": "Sélecteur de langue",
-  "feedback_message": "Nous serions ravis d’avoir vos retours sur votre expérience jusqu’à présent !",
-  "give_feedback": "Donner un avis",
   "conversation_conclusion_footer_you_can_now": "Vous pouvez maintenant",
   "conversation_conclusion_footer_view_and_download_cv": "Voir et télécharger votre CV",
   "conversation_conclusion_footer_here": "ici.",
@@ -97,15 +108,9 @@
   "conversation_conclusion_footer_feedback_in_progress_prefix": "Veuillez",
   "conversation_conclusion_footer_feedback_in_progress_link_text": "soumettre vos retours",
   "conversation_conclusion_footer_feedback_in_progress_suffix": "pour nous aider à améliorer votre expérience!",
-  "user_info": "Informations utilisateur",
   "before_you_go": "Avant de partir",
   "logout_confirmation_message": "Êtes-vous sûr de vouloir vous déconnecter ?",
   "anonymous_account_warning": "Vous utilisez actuellement un compte anonyme. Si vous vous déconnectez, vous perdrez l'accès à votre historique de conversations et d'expériences.",
-  "report_a_bug": "Signaler un bug",
-  "give_general_feedback": "Donner un avis général",
-  "feedback_message_placeholder": "Nous serions ravis d'entendre vos impressions ! Partagez vos commentaires ou suggestions pour améliorer Compass.",
-  "send_feedback": "Envoyer un avis",
-  "feedback_success_message": "Merci pour vos commentaires !",
   "compass": "Compass",
   "compass_logo_alt": "Logo Compass",
   "user_icon_alt": "Icône utilisateur",
@@ -212,14 +217,18 @@
       "thinkingMessage": "Processing your CV, this might take a while..."
     },
     "chatHeader": {
-      "viewExperiences": "Voir les expériences"
+      "viewExperiences": "Voir les expériences",
+      "feedbackMessage": "Nous serions ravis d’avoir vos retours sur votre expérience jusqu’à présent !",
+      "giveFeedback": "Donner un avis",
+      "feedbackMessagePlaceholder": "Nous serions ravis d'entendre vos impressions ! Partagez vos commentaires ou suggestions pour améliorer Compass.",
+      "sendFeedback": "Envoyer un avis",
+      "feedbackSuccessMessage": "Merci pour vos commentaires !",
+      "giveGeneralFeedback": "Donner un avis général",
+      "userInfo": "Informations utilisateur"
     }
   },
-  "help_us_improve": "Aidez-nous à nous améliorer !",
   "previous": "Précédent",
   "next": "Suivant",
-  "submitting_feedback": "Envoi des commentaires...",
-  "close_feedback_form": "fermer le formulaire de commentaires",
   "bias_experience_accuracy": "Biais et précision de l'expérience",
   "inaccurate": "Inexact",
   "very_accurate": "Très précis",
@@ -234,29 +243,6 @@
   "skip": "Ignorer",
   "saving": "Enregistrement",
   "yes_exit": "Oui, quitter",
-  "error_page_illustration_alt": "illustration d'erreur",
-  "error_page_default_message": "Un problème est survenu avec Compass. Essayez de recharger la page...",
-  "error_page_not_found": "Erreur 404 - Page non trouvée",
-  "rest_api_error_request_too_long": "Les données envoyées au service semblent être trop volumineuses. Veuillez réessayer avec un volume de données plus réduit. Si le problème persiste, videz le cache de votre navigateur et actualisez la page.",
-  "rest_api_error_too_many_requests": "Il semble que vous envoyiez trop de requêtes. Veuillez ralentir et réessayer plus tard.",
-  "rest_api_error_unexpected_error": "Une erreur inattendue s'est produite. Veuillez réessayer plus tard.",
-  "rest_api_error_server_connection_error": "Impossible de se connecter au service. Veuillez vérifier votre connexion Internet ou réessayer plus tard.",
-  "rest_api_error_resource_not_found": "La ressource demandée est introuvable. Veuillez vider le cache de votre navigateur et actualiser la page.",
-  "rest_api_error_authentication_failure": "Il semble que vous ne soyez pas connecté. Veuillez vous connecter pour continuer.",
-  "rest_api_error_permission_denied": "Il semble que vous n'ayez pas les autorisations nécessaires. Veuillez vous déconnecter puis vous reconnecter.",
-  "rest_api_error_unable_to_process_response": "Nous avons rencontré un problème lors du traitement des données. Videz le cache de votre navigateur et actualisez la page ou réessayez plus tard.",
-  "rest_api_error_service_unavailable": "Le service est actuellement indisponible. Veuillez réessayer plus tard.",
-  "rest_api_error_data_validation_error": "Il semble y avoir un problème avec votre requête. Si vous soumettez des données, assurez-vous qu'elles sont valides puis réessayez. Si le problème persiste, videz le cache de votre navigateur et actualisez la page.",
-  "rest_api_error_unable_to_process_request": "Désolé. Une erreur s'est produite lors du traitement de votre requête.",
-  "rest_api_error_story_choose_message_label": "Choisissez un message d'erreur à afficher dans une notification :",
-  "rest_api_error_story_select_placeholder": "Sélectionnez un message d'erreur",
-  "customerSatisfactionRating_question_text": "Enfin, nous aimerions avoir votre avis sur votre expérience jusqu'à présent ! ",
-  "customerSatisfactionRating_rating_label_low": "Insatisfait",
-  "customerSatisfactionRating_rating_label_high": "Satisfait",
-  "customerSatisfactionRating_submit_success": "Évaluation envoyée avec succès !",
-  "customerSatisfactionRating_submit_error": "Échec de l'envoi de l'évaluation. Veuillez réessayer plus tard.",
-  "feedback_overall_submit_success": "Commentaires envoyés avec succès !",
-  "feedback_overall_submit_error": "Échec de l’envoi des commentaires. Veuillez réessayer plus tard.",
   "app_isOnline_offline": "Vous êtes hors ligne",
   "app_isOnline_back_online": "Vous êtes de nouveau en ligne",
   "chat_message_experiences_intro": "Voici mes expériences :",
@@ -633,6 +619,40 @@
         "skipping": "Ignorer...",
         "refreshPage": "Actualiser la page"
       }
+    }
+  },
+  "feedback": {
+    "overallFeedback": {
+      "feedbackForm": {
+        "components": {
+          "customerSatisfactionRating": {
+            "questionText": "Enfin, nous aimerions avoir votre avis sur votre expérience jusqu'à présent ! ",
+            "ratingLabelLow": "Insatisfait",
+            "ratingLabelHigh": "Satisfait",
+            "submitSuccess": "Évaluation envoyée avec succès !",
+            "submitError": "Échec de l'envoi de l'évaluation. Veuillez réessayer plus tard."
+          }
+        },
+        "submitSuccess": "Commentaires envoyés avec succès !",
+        "submitError": "Échec de l’envoi des commentaires. Veuillez réessayer plus tard.",
+        "helpUsImprove": "Aidez-nous à nous améliorer !",
+        "closeForm": "fermer le formulaire de commentaires",
+        "submittingFeedback": "Envoi des commentaires..."
+      }
+    },
+    "bugReport": {
+      "reportBug": "Signaler un bug"
+    }
+  },
+  "error": {
+    "errorPage": {
+      "illustrationAlt": "illustration d'erreur",
+      "defaultMessage": "Un problème est survenu avec Compass. Essayez de recharger la page...",
+      "notFound": "Erreur 404 - Page non trouvée"
+    },
+    "restAPIError": {
+      "storyChooseMessageLabel": "Choisissez un message d'erreur à afficher dans une notification :",
+      "storySelectPlaceholder": "Sélectionnez un message d'erreur"
     }
   }
 }

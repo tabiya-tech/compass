@@ -63,10 +63,10 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
       await overallFeedbackService.sendFeedback(sessionId, formData);
       console.info("Feedback submitted successfully for session", sessionId);
 
-      enqueueSnackbar(t("feedback_overall_submit_success"), { variant: "success" });
+      enqueueSnackbar(t("feedback.overallFeedback.feedbackForm.submitSuccess"), { variant: "success" });
     } catch (error) {
       console.error(new FeedbackError("Failed to submit feedback", error));
-      enqueueSnackbar(t("feedback_overall_submit_error"), { variant: "error" });
+      enqueueSnackbar(t("feedback.overallFeedback.feedbackForm.submitError"), { variant: "error" });
     } finally {
       setIsSubmitting(false);
     }
@@ -105,11 +105,11 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
           }}
         >
           <Typography variant="h3" data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_TITLE}>
-            {t("help_us_improve")}
+            {t("feedback.overallFeedback.feedbackForm.helpUsImprove")}
           </Typography>
           <PrimaryIconButton
             onClick={handleClose}
-            title={t("close_feedback_form")}
+            title={t("feedback.overallFeedback.feedbackForm.closeForm")}
             sx={{ color: theme.palette.text.secondary }}
             data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_BUTTON}
           >
@@ -128,7 +128,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
           <FeedbackFormContent notifySubmit={handleFeedbackSubmit} />
         </DialogContent>
       </Dialog>
-      <Backdrop isShown={isSubmitting} message={t("submitting_feedback")} />
+      <Backdrop isShown={isSubmitting} message={t("feedback.overallFeedback.feedbackForm.submittingFeedback")} />
     </>
   );
 };
