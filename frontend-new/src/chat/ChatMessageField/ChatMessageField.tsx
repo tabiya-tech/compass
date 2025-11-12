@@ -25,6 +25,7 @@ import UploadedCVsMenu from "src/CV/uploadedCVsMenu/UploadedCVsMenu";
 export interface ChatMessageFieldProps {
   handleSend: (message: string) => void;
   aiIsTyping: boolean;
+  setAiIsTyping?: (isTyping: boolean) => void; // Optional: for managing typing indicator when sending CV bullets
   isChatFinished: boolean;
   isUploadingCv?: boolean;
   onUploadCv?: (file: File) => Promise<string[]>; // returns array of experience lines
@@ -32,7 +33,7 @@ export interface ChatMessageFieldProps {
   prefillMessage?: string | null; // optional prefill content for the input field
   cvUploadError?: string | null; // CV upload error message from polling process
   activeSessionId?: number | null;
-  onAfterCvInjected?: () => void; // triggers hidden artificial message with typing
+  onCvBulletsSent?: (bulletsMessage?: string, sendMessageResponse?: any) => Promise<void>; // refreshes chat after bullets are sent (without sending another message)
 }
 
 const uniqueId = "2a76494f-351d-409d-ba58-e1b2cfaf2a53";
@@ -337,18 +338,35 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       setIsReinjectingCv(false);
       setMenuAnchorEl(null);
       setMenuView("main");
-      // Auto-advance conversation: prefer parent callback if provided; otherwise send hidden artificial message here
-      if (props.onAfterCvInjected) {
-        props.onAfterCvInjected();
-      } else if (props.activeSessionId != null) {
+      // Send experience bullets as a real message if available
+      if (props.activeSessionId != null) {
         try {
-          await ChatService.getInstance().sendArtificialMessage(
-            props.activeSessionId,
-            "Please use the experiences I've shared to continue. Ask for any missing details."
-          );
+          if (reinjectResult.experience_bullets && reinjectResult.experience_bullets.length > 0) {
+            const bulletsText = reinjectResult.experience_bullets.map(b => `• ${b}`).join("\n");
+            const message = `I have these experiences:\n\n${bulletsText}`;
+            // Show typing indicator while waiting for backend response
+            if (props.setAiIsTyping) {
+              props.setAiIsTyping(true);
+            }
+            // Send to server - use the response directly to avoid fetching full history
+            const sendResponse = await ChatService.getInstance().sendMessage(props.activeSessionId, message);
+            // Refresh chat to show the response (pass the message and response so we don't need to fetch history)
+            if (props.onCvBulletsSent) {
+              await props.onCvBulletsSent(message, sendResponse);
+            }
+          } else {
+            // If no bullets, show a message to the user that no experiences were found
+            enqueueSnackbar("No work experience data found in your CV", { variant: "info" });
+            // Don't send the generic message - the state is already injected, just no experiences to display
+          }
         } catch (err) {
           // silently ignore in UI; parent Chat handles visible errors
-          console.error("Failed to send artificial message after CV reinjection:", err);
+          console.error("Failed to send message after CV reinjection:", err);
+        } finally {
+          // Hide typing indicator
+          if (props.setAiIsTyping) {
+            props.setAiIsTyping(false);
+          }
         }
       }
     } catch (err: any) {

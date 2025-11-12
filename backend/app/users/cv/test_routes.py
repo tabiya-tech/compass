@@ -19,7 +19,7 @@ from app.users.cv.routes import (
 from app.users.cv.service import ICVUploadService
 from app.users.cv.errors import MarkdownTooLongError, EmptyMarkdownError, \
     CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError, MarkdownConversionTimeoutError
-from app.users.cv.types import UploadProcessState, CVUploadListItemResponse
+from app.users.cv.types import UploadProcessState, CVUploadListItemResponse, CVUploadStatus
 from common_libs.test_utilities.mock_auth import MockAuth
 from app.users.get_user_preferences_repository import get_user_preferences_repository
 
@@ -36,16 +36,17 @@ def client_with_mocks() -> TestClientWithMocks:
         async def cancel_upload(self, *, user_id: str, upload_id: str) -> bool:
             return True
 
-        async def get_upload_status(self, *, user_id: str, upload_id: str) -> Optional[dict]:
-            return {
-                "upload_id": upload_id,
-                "user_id": user_id,
-                "filename": "test.pdf",
-                "upload_process_state": "COMPLETED",
-                "cancel_requested": False,
-                "created_at": "2025-01-01T00:00:00Z",
-                "last_activity_at": "2025-01-01T00:00:00Z",
-            }
+        async def get_upload_status(self, *, user_id: str, upload_id: str) -> Optional[CVUploadStatus]:
+            return CVUploadStatus(
+                upload_id=upload_id,
+                user_id=user_id,
+                filename="test.pdf",
+                upload_process_state=UploadProcessState.COMPLETED,
+                cancel_requested=False,
+                created_at=datetime.fromisoformat("2025-01-01T00:00:00+00:00"),
+                last_activity_at=datetime.fromisoformat("2025-01-01T00:00:00+00:00"),
+                experience_bullets=None,
+            )
 
         async def get_user_cvs(self, *, user_id: str) -> list[CVUploadListItemResponse]:
             return [
@@ -57,8 +58,8 @@ def client_with_mocks() -> TestClientWithMocks:
                 ),
             ]
 
-        async def reinject_upload(self, *, user_id: str, upload_id: str, session_id: int | None = None) -> bool:
-            return True
+        async def reinject_upload(self, *, user_id: str, upload_id: str, session_id: int | None = None) -> dict:
+            return {"state_injected": True, "experience_bullets": None}
 
     class MockUserPreferencesRepo:
         def get_user_preference_by_user_id(self, _user_id: str):
@@ -339,7 +340,7 @@ class TestReinjectCVUpload:
     @pytest.mark.asyncio
     async def test_reinject_success(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
-        mocker.patch.object(mocked_service, "reinject_upload", return_value=True)
+        mocker.patch.object(mocked_service, "reinject_upload", return_value={"state_injected": True, "experience_bullets": None})
 
         resp = client.post(f"/{mocked_user.user_id}/cv/test-upload-id/inject")
 
@@ -350,7 +351,7 @@ class TestReinjectCVUpload:
     async def test_reinject_returns_false(self, client_with_mocks: TestClientWithMocks,
                                           mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
-        mocker.patch.object(mocked_service, "reinject_upload", return_value=False)
+        mocker.patch.object(mocked_service, "reinject_upload", return_value={"state_injected": False, "experience_bullets": None})
 
         resp = client.post(f"/{mocked_user.user_id}/cv/test-upload-id/inject")
 

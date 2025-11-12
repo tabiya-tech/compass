@@ -138,12 +138,6 @@ class ConversationInput(BaseModel):
     user_input: str
     """The user input"""
 
-    is_artificial: bool = False
-    """
-    Whether the message is artificial (system-generated) and should not be shown to the user in history.
-    Hidden in history by `filter_conversation_history` which excludes artificial user inputs.
-    """
-
     class Config:
         extra = "forbid"
 

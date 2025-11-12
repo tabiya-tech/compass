@@ -114,36 +114,6 @@ describe("ChatService", () => {
     );
   });
 
-  describe("ChatService.sendArtificialMessage", () => {
-    const givenApiServerUrl = "/path/to/api";
-    beforeEach(() => {
-      jest.spyOn(require("src/envService"), "getBackendUrl").mockReturnValue(givenApiServerUrl);
-    });
-    test("should POST with is_artificial=true and return parsed JSON", async () => {
-      const expectedResponse = { messages: [] };
-      const fetchSpy = setupAPIServiceSpy(StatusCodes.CREATED, expectedResponse, "application/json;charset=UTF-8");
-
-      const svc = ChatService.getInstance();
-      const result = await svc.sendArtificialMessage(123, "hidden msg");
-
-      expectCorrectFetchRequest(
-        fetchSpy,
-        "/path/to/api/conversations/123/messages",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_input: "hidden msg", is_artificial: true }),
-          expectedStatusCode: StatusCodes.CREATED,
-          serviceName: "ChatService",
-          serviceFunction: "sendArtificialMessage",
-          failureMessage: `Failed to send artificial message with session id 123`,
-          expectedContentType: "application/json",
-        }
-      );
-      expect(result).toEqual(expectedResponse);
-    });
-  });
-
   describe("getChatHistory", () => {
     test("should fetch the correct URL, with GET and the correct headers and payload successfully", async () => {
       const givenTestHistoryResponse = generateTestHistory();

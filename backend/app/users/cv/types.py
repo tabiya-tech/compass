@@ -37,7 +37,7 @@ class CVUploadListItemResponse(BaseModel):
     upload_process_state: UploadProcessState
 
 
-class CVUploadStatusResponse(BaseModel):
+class CVUploadStatus(BaseModel):
     upload_id: str
     user_id: str
     filename: str
@@ -49,6 +49,7 @@ class CVUploadStatusResponse(BaseModel):
     error_detail: str | None = None
     state_injected: bool | None = None
     injection_error: str | None = None
+    experience_bullets: list[str] | None = None
 
 
 class CVUploadErrorCode(str, Enum):

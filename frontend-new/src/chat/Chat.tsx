@@ -22,7 +22,7 @@ import ChatMessageField from "./ChatMessageField/ChatMessageField";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
+import { ConversationMessage, ConversationMessageSender, ConversationResponse } from "./ChatService/ChatService.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/experiences/experiencesDrawer/ExperiencesDrawer";
 import { DiveInPhase, Experience } from "src/experiences/experienceService/experiences.types";
@@ -30,7 +30,7 @@ import ExperienceService from "src/experiences/experienceService/experienceServi
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
-import { ChatError } from "src/error/commonErrors";
+import { AuthenticationError, ChatError } from "src/error/commonErrors";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { issueNewSession } from "./issueNewSession";
 import { ChatProvider } from "src/chat/ChatContext";
@@ -155,7 +155,6 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
 
   const { showSkillsRanking } = useSkillsRanking(addMessageToChat, removeMessageFromChat);
 
-
   // Depending on the typing state, add or remove the typing message from the messages list
   const addOrRemoveTypingMessage = (userIsTyping: boolean) => {
     if (userIsTyping) {
@@ -220,6 +219,85 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     }
   }, [enqueueSnackbar, activeSessionId]);
 
+  // Helper function to process chat history response and update state
+  const processChatHistoryResponse = useCallback(
+    async (
+      response: ConversationResponse,
+      options: {
+        skipUserMessage?: string; // Skip user messages matching this text (for optimistic updates)
+        sessionId: number;
+      }
+    ) => {
+      const { skipUserMessage, sessionId } = options;
+
+      // Update explored experiences
+      setExploredExperiences(response.experiences_explored);
+      if (response.experiences_explored > exploredExperiences) {
+        setExploredExperiencesNotification(true);
+        await fetchExperiences();
+      }
+
+      // Process messages (skip conclusion message and optionally skip matching user messages)
+      response.messages.forEach((messageItem: ConversationMessage, idx: number) => {
+        const isConclusionMessage = response.conversation_completed && idx === response.messages.length - 1;
+        if (!isConclusionMessage) {
+          // Skip user messages that match the one we already added optimistically
+          if (
+            messageItem.sender === ConversationMessageSender.USER &&
+            skipUserMessage &&
+            messageItem.message === skipUserMessage
+          ) {
+            return;
+          }
+
+          // Add all other messages
+          if (messageItem.sender === ConversationMessageSender.USER) {
+            addMessageToChat(generateUserMessage(messageItem.message, messageItem.sent_at, messageItem.message_id));
+          } else {
+            addMessageToChat(
+              generateCompassMessage(
+                messageItem.message_id,
+                messageItem.message,
+                messageItem.sent_at,
+                messageItem.reaction
+              )
+            );
+          }
+        }
+      });
+
+      // Handle conclusion message and skills ranking flow
+      if (response.conversation_completed && response.messages.length) {
+        const lastMessage = response.messages[response.messages.length - 1];
+
+        if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
+          const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(sessionId);
+          const isAlreadyCompleted = skillsRankingState?.completed_at !== undefined;
+
+          const showConclusionMessage = createShowConclusionMessage(
+            lastMessage,
+            addMessageToChat,
+            setAiIsTyping,
+            isAlreadyCompleted
+          );
+          await showSkillsRanking(showConclusionMessage);
+        } else {
+          const conclusionMessage = generateConversationConclusionMessage(
+            lastMessage.message_id,
+            lastMessage.message
+          );
+          addMessageToChat(conclusionMessage);
+        }
+      }
+
+      // Update conversation state
+      setConversationCompleted(response.conversation_completed);
+      setConversationConductedAt(response.conversation_conducted_at);
+      setCurrentPhase((_previousCurrentPhase) => parseConversationPhase(response.current_phase, _previousCurrentPhase));
+    },
+    [exploredExperiences, fetchExperiences, addMessageToChat, showSkillsRanking, setAiIsTyping]
+  );
+
   // Opens the experiences drawer and get experiences if needed
   const handleOpenExperiencesDrawer = useCallback(async () => {
     setIsDrawerOpen(true);
@@ -255,75 +333,129 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   // Compute display message from status
   const getCvUploadDisplayMessageMemo = useCallback((status: UploadStatus): string => getCvUploadDisplayMessage(status), []);
 
-  // Centralized hidden artificial message sender (toggles typing, updates chat state)
-  const lastHiddenSendRef = useRef<number>(0);
-  const HIDDEN_SEND_COOLDOWN_MS = 2500;
-  const sendHiddenArtificialMessage = useCallback(async () => {
-    // Debounce to avoid double fires
-    const now = Date.now();
-    if (now - lastHiddenSendRef.current < HIDDEN_SEND_COOLDOWN_MS) {
-      return;
-    }
-    lastHiddenSendRef.current = now;
-    try {
-      if (activeSessionId != null) {
-        setAiIsTyping(true);
-        const response = await ChatService.getInstance().sendArtificialMessage(
-          activeSessionId,
-          "Please use the experiences I've shared to continue. Ask for any missing details."
-        );
-
-        setExploredExperiences(response.experiences_explored);
-        if (response.experiences_explored > exploredExperiences) {
-          setExploredExperiencesNotification(true);
-          await fetchExperiences();
-        }
-
-        response.messages.forEach((messageItem, idx) => {
-          const isConclusionMessage = response.conversation_completed && idx === response.messages.length - 1;
-          if (!isConclusionMessage) {
-            addMessageToChat(
-              generateCompassMessage(
-                messageItem.message_id,
-                messageItem.message,
-                messageItem.sent_at,
-                messageItem.reaction
-              )
-            );
-          }
-        });
-
-        if (response.conversation_completed && response.messages.length) {
-          const lastMessage = response.messages[response.messages.length - 1];
-          if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
-            const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(activeSessionId);
-            const isAlreadyCompleted = skillsRankingState?.completed_at !== undefined;
-            const showConclusionMessage = createShowConclusionMessage(
-              lastMessage,
-              addMessageToChat,
-              setAiIsTyping,
-              isAlreadyCompleted
-            );
-            await showSkillsRanking(showConclusionMessage);
-          } else {
-            const conclusionMessage = generateConversationConclusionMessage(
-              lastMessage.message_id,
-              lastMessage.message
-            );
-            addMessageToChat(conclusionMessage);
-          }
-        }
-
-        setConversationCompleted(response.conversation_completed);
-        setConversationConductedAt(response.conversation_conducted_at);
-        setCurrentPhase((_previousCurrentPhase) => parseConversationPhase(response.current_phase, _previousCurrentPhase));
+  // Helper function to send CV experience bullets as a user message
+  const handleCvBulletsMessage = useCallback(
+    async (bullets: string[], sessionId: number) => {
+      const bulletsText = bullets.map(b => `• ${b}`).join("\n");
+      const message = `I have these experiences:\n\n${bulletsText} \n\nLet's start with these.`;
+      
+      // Show the user message immediately before sending
+      addMessageToChat(generateUserMessage(message, new Date().toISOString()));
+      // Show typing indicator while waiting for backend response
+      setAiIsTyping(true);
+      
+      try {
+        // Send to server - the response contains only new messages, not the full history
+        const response = await ChatService.getInstance().sendMessage(sessionId, message);
+        await processChatHistoryResponse(response, { skipUserMessage: message, sessionId });
+      } catch (err) {
+        console.error(new ChatError("Failed to send experience bullets message:", err));
+        throw err;
+      } finally {
+        setAiIsTyping(false);
       }
-    } catch (e) {
-      console.error("Failed to send artificial message after CV action:", e);
-    } finally {
-      setAiIsTyping(false);
-    }
-  }, [activeSessionId, exploredExperiences, fetchExperiences, addMessageToChat, showSkillsRanking]);
+    },
+    [addMessageToChat, setAiIsTyping, processChatHistoryResponse]
+  );
+
+  // Helper function to refresh chat after CV bullets are sent (for reinjection flow)
+  // Note: This is called after the message was already sent from ChatMessageField,
+  // so we need to fetch history to get the response. We only process new messages.
+  const handleCvBulletsSent = useCallback(
+    async (bulletsMessage?: string, sendMessageResponse?: ConversationResponse) => {
+      if (activeSessionId == null) return;
+      
+      try {
+        // Show the user message immediately if provided
+        if (bulletsMessage) {
+          addMessageToChat(generateUserMessage(bulletsMessage, new Date().toISOString()));
+        }
+        
+        // Use the response from sendMessage if provided (contains only new messages),
+        // otherwise fetch history (but this will include all messages, so we need to filter)
+        const response = sendMessageResponse || await ChatService.getInstance().getChatHistory(activeSessionId);
+        
+        // If we got the response from sendMessage, it only contains new messages
+        // If we fetched history, we need to only process messages we don't already have
+        if (sendMessageResponse) {
+          await processChatHistoryResponse(response, { skipUserMessage: bulletsMessage, sessionId: activeSessionId });
+        } else {
+          // When fetching full history, only process messages that are newer than what we have
+          // We'll identify new messages by checking if they exist in current messages
+          setMessages((prevMessages) => {
+            const existingMessageIds = new Set(prevMessages.map((msg) => msg.message_id));
+            const newMessages: IChatMessage<any>[] = [];
+            
+            response.messages.forEach((messageItem: ConversationMessage, idx: number) => {
+              const isConclusionMessage = response.conversation_completed && idx === response.messages.length - 1;
+              if (!isConclusionMessage && !existingMessageIds.has(messageItem.message_id)) {
+                // Skip user messages that match the one we already added optimistically
+                if (
+                  messageItem.sender === ConversationMessageSender.USER &&
+                  bulletsMessage &&
+                  messageItem.message === bulletsMessage
+                ) {
+                  return;
+                }
+                
+                // Add new messages
+                if (messageItem.sender === ConversationMessageSender.USER) {
+                  newMessages.push(generateUserMessage(messageItem.message, messageItem.sent_at, messageItem.message_id));
+                } else {
+                  newMessages.push(
+                    generateCompassMessage(
+                      messageItem.message_id,
+                      messageItem.message,
+                      messageItem.sent_at,
+                      messageItem.reaction
+                    )
+                  );
+                }
+              }
+            });
+            
+            return [...prevMessages, ...newMessages];
+          });
+          
+          // Still need to update state from response
+          setExploredExperiences(response.experiences_explored);
+          if (response.experiences_explored > exploredExperiences) {
+            setExploredExperiencesNotification(true);
+            await fetchExperiences();
+          }
+          
+          // Handle conclusion message and skills ranking flow
+          if (response.conversation_completed && response.messages.length) {
+            const lastMessage = response.messages[response.messages.length - 1];
+            if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
+              const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(activeSessionId);
+              const isAlreadyCompleted = skillsRankingState?.completed_at !== undefined;
+              const showConclusionMessage = createShowConclusionMessage(
+                lastMessage,
+                addMessageToChat,
+                setAiIsTyping,
+                isAlreadyCompleted
+              );
+              await showSkillsRanking(showConclusionMessage);
+            } else {
+              const conclusionMessage = generateConversationConclusionMessage(
+                lastMessage.message_id,
+                lastMessage.message
+              );
+              addMessageToChat(conclusionMessage);
+            }
+          }
+          
+          setConversationCompleted(response.conversation_completed);
+          setConversationConductedAt(response.conversation_conducted_at);
+          setCurrentPhase((_previousCurrentPhase) => parseConversationPhase(response.current_phase, _previousCurrentPhase));
+        }
+      } catch (e) {
+        console.error(new ChatError("Failed to refresh chat after CV bullets sent:", e));
+      }
+    },
+    [activeSessionId, addMessageToChat, processChatHistoryResponse, exploredExperiences, fetchExperiences, showSkillsRanking, setAiIsTyping]
+  );
 
   // Helper function to start polling for upload status
   const startPollingForUpload = useCallback((uploadId: string, messageId: string) => {
@@ -340,10 +472,9 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
       maxDurationMs: MAX_UPLOAD_POLL_MS,
       getStatus: async (id: string): Promise<UploadStatus> => {
         const currentUserId = authenticationStateService.getInstance().getUser()?.id;
-        if (!currentUserId) throw new Error("User ID missing");
+        if (!currentUserId) throw new AuthenticationError("User ID missing");
         const resp = await cvService.getInstance().getUploadStatus(currentUserId, id);
-        // Narrow to UploadStatus
-return {
+        return {
           upload_process_state: resp.upload_process_state,
           cancel_requested: resp.cancel_requested,
           filename: resp.filename,
@@ -355,6 +486,7 @@ return {
           error_detail: resp.error_detail,
           state_injected: resp.state_injected,
           injection_error: resp.injection_error,
+          experience_bullets: resp.experience_bullets,
         } as UploadStatus;
       },
       onStatus: (status: UploadStatus | null) => {
@@ -373,7 +505,7 @@ return {
           return msg;
         }));
       },
-      onComplete: (status: UploadStatus) => {
+      onComplete: async (status: UploadStatus) => {
         stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
         removeMessageFromChat(messageId);
         enqueueSnackbar("CV processed and loaded", { variant: "success" });
@@ -397,7 +529,21 @@ return {
         } catch (metricErr) {
           console.error("Failed to send cv_upload_auto_advance metric", metricErr);
         }
-        void sendHiddenArtificialMessage();
+        
+        // Send experience bullets as a real message if available
+        if (status.experience_bullets && status.experience_bullets.length > 0 && activeSessionId != null) {
+          try {
+            await handleCvBulletsMessage(status.experience_bullets, activeSessionId);
+          } catch (err) {
+            // Error already logged in handleCvBulletsMessage
+          }
+        } else {
+          // If no bullets, show a message to the user that no experiences were found
+          // Keep the typing message visible longer so user can see the "No work experience data found" message
+          setTimeout(() => removeMessageFromChat(messageId), 3000);
+          enqueueSnackbar("No work experience data found in your CV", { variant: "info" });
+          // Don't send the generic message - the state is already injected, just no experiences to display
+        }
       },
       onTerminal: (_status: UploadStatus) => {
         stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
@@ -441,7 +587,7 @@ return {
       }
     });
     setActiveUploads(prev => new Map(prev).set(uploadId, { messageId, intervalId: handles.intervalId as any, timeoutId: handles.timeoutId as any }));
-  }, [activeUploads, stopPollingForUpload, getCvUploadDisplayMessageMemo, removeMessageFromChat, enqueueSnackbar, sendHiddenArtificialMessage, messages, activeSessionId]);
+  }, [activeUploads, stopPollingForUpload, getCvUploadDisplayMessageMemo, removeMessageFromChat, enqueueSnackbar, messages, activeSessionId, handleCvBulletsMessage]);
 
   // Helper function to cancel an upload
   const handleCancelUpload = useCallback(async (uploadId: string) => {
@@ -596,60 +742,7 @@ return {
       try {
         // Send the user's message
         const response = await ChatService.getInstance().sendMessage(sessionId, userMessage);
-
-        setExploredExperiences(response.experiences_explored);
-
-        if (response.experiences_explored > exploredExperiences) {
-          setExploredExperiencesNotification(true);
-          await fetchExperiences();
-        }
-
-        response.messages.forEach((messageItem, idx) => {
-          const isConclusionMessage = response.conversation_completed && idx === response.messages.length - 1;
-          if (!isConclusionMessage) {
-            addMessageToChat(
-              generateCompassMessage(
-                messageItem.message_id,
-                messageItem.message,
-                messageItem.sent_at,
-                messageItem.reaction
-              )
-            );
-          }
-        });
-        // Handle the conclusion message and skills ranking flow for new messages
-        if (response.conversation_completed && response.messages.length) {
-          const lastMessage = response.messages[response.messages.length - 1];
-
-          if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
-            // Check if skill ranking is already completed
-            const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(activeSessionId!);
-            const isAlreadyCompleted = skillsRankingState?.completed_at !== undefined;
-
-            const showConclusionMessage = createShowConclusionMessage(
-              lastMessage,
-              addMessageToChat,
-              setAiIsTyping,
-              isAlreadyCompleted
-            );
-            await showSkillsRanking(showConclusionMessage);
-          } else {
-            const conclusionMessage = generateConversationConclusionMessage(
-              lastMessage.message_id,
-              lastMessage.message
-            );
-
-            addMessageToChat(conclusionMessage);
-          }
-        }
-
-        setConversationCompleted(response.conversation_completed);
-        setConversationConductedAt(response.conversation_conducted_at);
-
-        // Set the current conversation phase
-        setCurrentPhase((_previousCurrentPhase) => {
-          return parseConversationPhase(response.current_phase, _previousCurrentPhase);
-        });
+        await processChatHistoryResponse(response, { sessionId });
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error));
         addMessageToChat(generatePleaseRepeatMessage());
@@ -657,7 +750,7 @@ return {
         setAiIsTyping(false);
       }
     },
-    [addMessageToChat, exploredExperiences, fetchExperiences, activeSessionId, showSkillsRanking]
+    [addMessageToChat, processChatHistoryResponse]
   );
 
   const initializeChat = useCallback(
@@ -950,6 +1043,7 @@ return {
               <ChatMessageField
                 handleSend={handleSend}
                 aiIsTyping={aiIsTyping}
+                setAiIsTyping={setAiIsTyping}
                 isChatFinished={conversationCompleted}
                 isUploadingCv={isUploadingCv || activeUploads.size > 0}
                 onUploadCv={handleUploadCv}
@@ -957,7 +1051,7 @@ return {
                 prefillMessage={prefillMessage}
                 cvUploadError={cvUploadError}
                 activeSessionId={activeSessionId}
-                onAfterCvInjected={() => sendHiddenArtificialMessage()}
+                onCvBulletsSent={handleCvBulletsSent}
               />
             </Box>
           </Box>

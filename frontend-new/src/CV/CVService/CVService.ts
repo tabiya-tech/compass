@@ -122,6 +122,7 @@ export default class CVService {
     error_detail?: string;
     state_injected?: boolean;
     injection_error?: string | null;
+    experience_bullets?: string[] | null;
   }> {
     const serviceName = "CVService";
     const serviceFunction = "getUploadStatus";
@@ -190,7 +191,7 @@ export default class CVService {
     }
   }
 
-  public async reinjectFromUpload(userId: string, uploadId: string): Promise<{ success: boolean; error?: string }>{
+  public async reinjectFromUpload(userId: string, uploadId: string): Promise<{ success: boolean; error?: string; experience_bullets?: string[] | null }>{
     const serviceName = "CVService";
     const serviceFunction = "reinjectFromUpload";
     const method = "POST";
@@ -210,10 +211,11 @@ export default class CVService {
       retryOnFailedToFetch: true,
     });
 
-    const payload = (await response.json().catch(() => ({}))) as { state_injected?: boolean; error?: string };
+    const payload = (await response.json().catch(() => ({}))) as { state_injected?: boolean; error?: string; experience_bullets?: string[] | null };
     return { 
       success: Boolean(payload.state_injected),
-      error: payload.error || (payload.state_injected === false ? "Reinjection failed" : undefined)
+      error: payload.error || (payload.state_injected === false ? "Reinjection failed" : undefined),
+      experience_bullets: payload.experience_bullets
     };
   }
 }

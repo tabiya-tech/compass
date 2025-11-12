@@ -956,6 +956,8 @@ describe("ChatMessageField", () => {
       test("should disable chat input while reinjecting a CV and show a notification when completed", async () => {
         const givenPhase = ConversationPhase.COLLECT_EXPERIENCES;
         const mockOnUploadCv = jest.fn();
+        const mockSetAiIsTyping = jest.fn();
+        const mockOnCvBulletsSent = jest.fn().mockResolvedValue(undefined);
         const mockCvs = [
           {
             upload_id: "cv1",
@@ -966,14 +968,14 @@ describe("ChatMessageField", () => {
         ];
         mockCVServiceInstance.getAllCVs.mockResolvedValue(mockCvs);
 
-        let resolveReinject: (value: { success: boolean }) => void = () => {};
-        const reinjectPromise = new Promise<{ success: boolean }>((resolve) => {
+        let resolveReinject: (value: { success: boolean; experience_bullets?: string[] }) => void = () => {};
+        const reinjectPromise = new Promise<{ success: boolean; experience_bullets?: string[] }>((resolve) => {
           resolveReinject = resolve;
         });
         mockCVServiceInstance.reinjectFromUpload.mockImplementationOnce(() => reinjectPromise);
 
         const mockChatServiceInstance = {
-          sendArtificialMessage: jest.fn().mockResolvedValue({
+          sendMessage: jest.fn().mockResolvedValue({
             experiences_explored: 0,
             messages: [],
             conversation_completed: false,
@@ -985,10 +987,12 @@ describe("ChatMessageField", () => {
           <ChatMessageField
             handleSend={jest.fn()}
             aiIsTyping={false}
+            setAiIsTyping={mockSetAiIsTyping}
             isChatFinished={false}
             onUploadCv={mockOnUploadCv}
             currentPhase={givenPhase}
             activeSessionId={987}
+            onCvBulletsSent={mockOnCvBulletsSent}
           />
         );
 
@@ -1010,7 +1014,10 @@ describe("ChatMessageField", () => {
         expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeDisabled();
 
         await act(async () => {
-          resolveReinject({ success: true });
+          resolveReinject({ 
+            success: true, 
+            experience_bullets: ["Software Engineer at Company A", "Data Scientist at Company B"] 
+          });
         });
 
         await waitFor(() => {
@@ -1020,10 +1027,19 @@ describe("ChatMessageField", () => {
           expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("CV processed and loaded", expect.objectContaining({ variant: "success" }));
         });
         await waitFor(() => {
-          expect(mockChatServiceInstance.sendArtificialMessage).toHaveBeenCalledWith(
+          expect(mockSetAiIsTyping).toHaveBeenCalledWith(true);
+        });
+        await waitFor(() => {
+          expect(mockChatServiceInstance.sendMessage).toHaveBeenCalledWith(
             987,
-            "Please use the experiences I've shared to continue. Ask for any missing details."
+            "I have these experiences:\n\n• Software Engineer at Company A\n• Data Scientist at Company B"
           );
+        });
+        await waitFor(() => {
+          expect(mockOnCvBulletsSent).toHaveBeenCalledWith("I have these experiences:\n\n• Software Engineer at Company A\n• Data Scientist at Company B");
+        });
+        await waitFor(() => {
+          expect(mockSetAiIsTyping).toHaveBeenCalledWith(false);
         });
 
         chatServiceSpy.mockRestore();

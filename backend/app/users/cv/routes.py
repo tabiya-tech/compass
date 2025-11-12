@@ -22,7 +22,7 @@ from app.users.cv.get_repository import get_user_cv_repository
 from app.users.cv.repository import IUserCVRepository
 from app.users.cv.storage import _get_cv_storage_service, ICVCloudStorageService
 from app.server_dependencies.application_state_dependencies import get_application_state_manager
-from app.users.cv.types import CVUploadStatusResponse, CVUploadListItemResponse
+from app.users.cv.types import CVUploadStatus, CVUploadListItemResponse
 from app.users.get_user_preferences_repository import get_user_preferences_repository
 from app.users.repositories import UserPreferenceRepository
 
@@ -331,12 +331,10 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Cannot reinject CV for a different user")
 
         # Service will fetch the most recent session internally
-        success = await service.reinject_upload(user_id=user_id, upload_id=upload_id, session_id=None)
-        if not success:
-            return {"state_injected": False, "error": "NO_SESSION"}
-        return {"state_injected": success}
+        result = await service.reinject_upload(user_id=user_id, upload_id=upload_id, session_id=None)
+        return result
 
-    @router.get("/{upload_id}", response_model=CVUploadStatusResponse)
+    @router.get("/{upload_id}", response_model=CVUploadStatus)
     async def get_upload_status(
         user_id: str = Path(..., description="User ID"),
         upload_id: str = Path(..., description="Upload ID to get status for"),

@@ -3,7 +3,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from app.users.cv.types import UploadProcessState, CVUploadErrorCode, CVUploadListItemResponse, CVStructuredExtraction
+from app.users.cv.types import UploadProcessState, CVUploadErrorCode, CVUploadListItemResponse, CVStructuredExtraction, CVUploadStatus
 from app.users.cv.constants import MAX_MARKDOWN_CHARS, MARKDOWN_CONVERSION_TIMEOUT_SECONDS, RATE_LIMIT_WINDOW_MINUTES, \
     DEFAULT_MAX_UPLOADS_PER_USER, DEFAULT_RATE_LIMIT_PER_MINUTE
 from app.users.cv.errors import MarkdownTooLongError, EmptyMarkdownError, \
@@ -47,7 +47,7 @@ class ICVUploadService(ABC):
         raise NotImplementedError()
     
     @abstractmethod
-    async def get_upload_status(self, *, user_id: str, upload_id: str) -> Optional[dict]:
+    async def get_upload_status(self, *, user_id: str, upload_id: str) -> Optional[CVUploadStatus]:
         """
         Get the status of an upload process.
         Returns upload details if found, None if not found.
@@ -60,8 +60,11 @@ class ICVUploadService(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def reinject_upload(self, *, user_id: str, upload_id: str, session_id: int | None = None) -> bool:
-        """Re-run state injection for a previously uploaded CV. If session_id is None, will fetch the most recent session."""
+    async def reinject_upload(self, *, user_id: str, upload_id: str, session_id: int | None = None) -> dict:
+        """
+        Re-run state injection for a previously uploaded CV. If session_id is None, will fetch the most recent session.
+        Returns a dict with 'state_injected' (bool) and 'experience_bullets' (list[str] | None).
+        """
         raise NotImplementedError()
 
 
@@ -328,7 +331,60 @@ class CVUploadService(ICVUploadService):
             self._logger.exception(e)
             return False
     
-    async def get_upload_status(self, *, user_id: str, upload_id: str) -> Optional[dict]:
+    @staticmethod
+    def _derive_experience_bullets(structured_extraction: CVStructuredExtraction | None) -> list[str] | None:
+        """
+        Derive experience bullets from structured extraction data.
+        Returns a list of formatted bullet strings, or None if no structured extraction available.
+        """
+        if not structured_extraction:
+            return None
+        
+        bullets = []
+        
+        # Prefer experience_entities if available (more complete data)
+        if structured_extraction.experience_entities:
+            for entity in structured_extraction.experience_entities:
+                parts = [entity.experience_title]
+                
+                if entity.company:
+                    parts.append(f"at {entity.company}")
+                
+                if entity.location:
+                    parts.append(entity.location)
+                
+                if entity.timeline:
+                    if entity.timeline.start:
+                        parts.append(entity.timeline.start)
+                    if entity.timeline.end:
+                        parts.append(entity.timeline.end)
+                
+                bullets.append(" ".join(parts).strip())
+        
+        # Fall back to collected_data if no experience_entities
+        elif structured_extraction.collected_data:
+            for data in structured_extraction.collected_data:
+                parts = []
+                if data.experience_title:
+                    parts.append(data.experience_title)
+                
+                if data.company:
+                    parts.append(f"at {data.company}")
+                
+                if data.location:
+                    parts.append(data.location)
+                
+                if data.start_date:
+                    parts.append(data.start_date)
+                if data.end_date:
+                    parts.append(data.end_date)
+                
+                if parts:
+                    bullets.append(" ".join(parts).strip())
+        
+        return bullets if bullets else None
+
+    async def get_upload_status(self, *, user_id: str, upload_id: str) -> Optional[CVUploadStatus]:
         """
         Get the status of an upload process.
         Returns upload details if found, None if not found.
@@ -340,26 +396,39 @@ class CVUploadService(ICVUploadService):
                 self._logger.debug("Upload not found {user_id=%s, upload_id=%s}", user_id, upload_id)
                 return None
             
-            # Convert MongoDB document to a clean dict for API response
-            status_info = {
-                "upload_id": upload_record.get("upload_id"),
-                "user_id": upload_record.get("user_id"),
-                "filename": upload_record.get("filename"),
-                "upload_process_state": upload_record.get("upload_process_state"),
-                "cancel_requested": upload_record.get("cancel_requested", False),
-                "created_at": upload_record.get("created_at"),
-                "last_activity_at": upload_record.get("last_activity_at"),
-                "error_code": upload_record.get("error_code"),
-                "error_detail": upload_record.get("error_detail"),
-                # State injection reporting
-                "state_injected": upload_record.get("state_injected"),
-                "injection_error": upload_record.get("injection_error"),
-            }
+            # Parse structured extraction if available
+            structured_extraction = None
+            structured_extraction_data = upload_record.get("structured_extraction")
+            if structured_extraction_data:
+                try:
+                    structured_extraction = CVStructuredExtraction.model_validate(structured_extraction_data)
+                except Exception as e:
+                    self._logger.warning("Failed to parse structured_extraction for upload {upload_id=%s}: %s", upload_id, e)
+            
+            # Derive experience bullets if structured extraction exists and upload is completed
+            experience_bullets = None
+            if upload_record.get("upload_process_state") == UploadProcessState.COMPLETED.value and structured_extraction:
+                experience_bullets = self._derive_experience_bullets(structured_extraction)
+            
+            status = CVUploadStatus(
+                upload_id=upload_record.get("upload_id"),
+                user_id=upload_record.get("user_id"),
+                filename=upload_record.get("filename"),
+                upload_process_state=UploadProcessState(upload_record.get("upload_process_state")),
+                cancel_requested=upload_record.get("cancel_requested", False),
+                created_at=upload_record.get("created_at"),
+                last_activity_at=upload_record.get("last_activity_at"),
+                error_code=upload_record.get("error_code"),
+                error_detail=upload_record.get("error_detail"),
+                state_injected=upload_record.get("state_injected"),
+                injection_error=upload_record.get("injection_error"),
+                experience_bullets=experience_bullets,
+            )
             
             self._logger.debug("Retrieved upload status {user_id=%s, upload_id=%s, state=%s}", 
-                             user_id, upload_id, status_info.get("upload_process_state"))
+                             user_id, upload_id, status.upload_process_state)
             
-            return status_info
+            return status
             
         except Exception as e:
             self._logger.exception(e)
@@ -382,12 +451,12 @@ class CVUploadService(ICVUploadService):
             self._logger.exception(e)
             raise
 
-    async def reinject_upload(self, *, user_id: str, upload_id: str, session_id: int | None = None) -> bool:
+    async def reinject_upload(self, *, user_id: str, upload_id: str, session_id: int | None = None) -> dict:
         if not self._injection_service:
             self._logger.info(
                 "[Upload %s] Reinjection skipped: injection service not configured", upload_id
             )
-            return False
+            return {"state_injected": False, "experience_bullets": None}
 
         # If session_id not provided, try to get the most recent session from user preferences
         if session_id is None:
@@ -396,7 +465,7 @@ class CVUploadService(ICVUploadService):
                 self._logger.warning(
                     "[Upload %s] Reinjection failed: no session_id available", upload_id
                 )
-                return False
+                return {"state_injected": False, "experience_bullets": None, "error": "NO_SESSION"}
 
         try:
             record = await self._repository.get_upload_by_id(user_id, upload_id)
@@ -406,7 +475,7 @@ class CVUploadService(ICVUploadService):
                     upload_id,
                     user_id,
                 )
-                return False
+                return {"state_injected": False, "experience_bullets": None}
 
             # Get structured extraction from database
             structured_extraction_dict = record.get("structured_extraction")
@@ -414,7 +483,7 @@ class CVUploadService(ICVUploadService):
                 self._logger.warning(
                     "[Upload %s] Reinjection failed: no stored structured extraction", upload_id
                 )
-                return False
+                return {"state_injected": False, "experience_bullets": None}
 
             # Deserialize structured extraction from database
             try:
@@ -425,7 +494,10 @@ class CVUploadService(ICVUploadService):
                     upload_id,
                     validation_error,
                 )
-                return False
+                return {"state_injected": False, "experience_bullets": None}
+
+            # Derive experience bullets
+            experience_bullets = self._derive_experience_bullets(structured)
 
             success = await self._injection_service.inject_cv_data(
                 user_id=user_id,
@@ -437,7 +509,8 @@ class CVUploadService(ICVUploadService):
                 await self._repository.mark_state_injected(user_id, upload_id)
             else:
                 await self._repository.mark_injection_failed(user_id, upload_id, error="Reinjection failed")
-            return success
+            
+            return {"state_injected": success, "experience_bullets": experience_bullets}
 
         except Exception as exc:
             self._logger.error(
@@ -449,4 +522,4 @@ class CVUploadService(ICVUploadService):
                 self._logger.warning(
                     "[Upload %s] Failed to persist reinjection failure", upload_id
                 )
-            return False
+            return {"state_injected": False, "experience_bullets": None, "error": str(exc)}
