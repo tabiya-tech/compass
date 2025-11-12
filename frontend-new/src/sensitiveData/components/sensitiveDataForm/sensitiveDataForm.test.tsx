@@ -838,7 +838,7 @@ describe("Sensitive Data Form", () => {
       // GIVEN skip operation fails
       const user = userEvent.setup();
       const mockError = new RestAPIError("mockedService", "mockedFunction", "GET", "/", 400, "foo", "");
-      jest.spyOn(sensitivePersonalDataService, "skip").mockRejectedValue(mockError);
+      jest.spyOn(sensitivePersonalDataService, "common.buttons.skip").mockRejectedValue(mockError);
 
       jest.spyOn(RestAPIErrorModule, "getUserFriendlyErrorMessage").mockReturnValue("User-friendly error message");
 
@@ -990,7 +990,7 @@ describe("Sensitive Data Form", () => {
     it("should mark sensitive data as skipped when the user skips providing it", async () => {
       // GIVEN skip is successful
       const user = userEvent.setup();
-      const skipSpy = jest.spyOn(sensitivePersonalDataService, "skip").mockResolvedValue(undefined);
+      const skipSpy = jest.spyOn(sensitivePersonalDataService, "common.buttons.skip").mockResolvedValue(undefined);
 
       // WHEN the form is rendered
       componentRender();
@@ -1041,7 +1041,7 @@ describe("Sensitive Data Form", () => {
       };
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(givenUserPreferences);
       // AND skipping sensitive personal data method
-      const skipSpy = jest.spyOn(sensitivePersonalDataService, "skip");
+      const skipSpy = jest.spyOn(sensitivePersonalDataService, "common.buttons.skip");
 
       // WHEN the component is rendered
       componentRender();

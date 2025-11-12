@@ -111,7 +111,7 @@ class SensitivePersonalDataService {
       // the frontend failed to process the response and the user tries to provide it again
       expectedStatusCode: [StatusCodes.CREATED, StatusCodes.CONFLICT],
       serviceName: "SensitivePersonalData",
-      serviceFunction: "skip",
+      serviceFunction: "common.buttons.skip",
       failureMessage: `Failed to skip sensitive personal data for user with id ${user_id}`,
       body: JSON.stringify({}),
       expectedContentType: "application/json",

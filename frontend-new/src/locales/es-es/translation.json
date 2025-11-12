@@ -16,7 +16,11 @@
       "revert": "Revertir",
       "continue": "Continuar",
       "noThankYou": "No, gracias",
-      "iWantToStay": "Quiero quedarme"
+      "iWantToStay": "Quiero quedarme",
+      "yes": "Sí",
+      "no": "No",
+      "skip": "Omitir",
+      "yesExit": "Sí, salir"
     },
     "fields": {
       "email": "Correo electrónico",
@@ -72,7 +76,8 @@
     },
     "status": {
       "calculating": "Calculando",
-      "cancelling": "Cancelando"
+      "cancelling": "Cancelando",
+      "saving": "Guardando"
     },
     "backdrop": {
       "loggingYouOut": "Cerrando sesión..."
@@ -82,29 +87,6 @@
       "areYouSureYouWantToExit": "¿Estás seguro de que quieres salir?"
     }
   },
-  "language_selector": "Selector de idioma",
-  "conversation_conclusion_footer_you_can_now": "Ahora puedes",
-  "conversation_conclusion_footer_view_and_download_cv": "Ver y descargar tu CV",
-  "conversation_conclusion_footer_here": "aquí.",
-  "conversation_conclusion_footer_create_account_intro": "Si te gustaría explorar tus habilidades y experiencias en el futuro, puedes",
-  "conversation_conclusion_footer_create_account": "Crear una cuenta",
-  "conversation_conclusion_footer_verification_reminder": "Se ha enviado un correo de verificación a tu dirección de correo electrónico. Por favor verifica tu cuenta antes de iniciar sesión nuevamente.",
-  "conversation_conclusion_footer_feedback_welcome": "Nos encantaría recibir más",
-  "conversation_conclusion_footer_feedback_link_text": "comentarios",
-  "conversation_conclusion_footer_feedback_from_you_suffix": "de tu parte. ¡Solo toma 5 minutos y nos ayuda a mejorar!",
-  "conversation_conclusion_footer_feedback_in_progress_prefix": "Por favor",
-  "conversation_conclusion_footer_feedback_in_progress_link_text": "Completa tus comentarios",
-  "conversation_conclusion_footer_feedback_in_progress_suffix": "para ayudarnos a mejorar tu experiencia!",
-  "before_you_go": "Antes de irte",
-  "logout_confirmation_message": "¿Estás seguro de que deseas cerrar sesión?",
-  "anonymous_account_warning": "Actualmente estás usando una cuenta anónima. Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
-  "compass": "Compass",
-  "compass_logo_alt": "Logo de Compass",
-  "user_icon_alt": "Icono de usuario",
-  "logout_warning_anonymous": "Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
-  "create_an_account_to_save_progress": "Crea una cuenta para guardar tu progreso",
-  "continue_your_journey_later": "y continuar tu experiencia más tarde.",
-  "sent": "enviado",
   "chat": {
     "chatMessageField": {
       "addActionAriaLabel": "añadir",
@@ -128,7 +110,22 @@
       "typingChatMessage": {
         "typing": "Escribiendo",
         "thinking": "La IA está pensando, por favor espera"
-      }
+      },
+      "conversationConclusionFooter": {
+        "youCanNow": "Ahora puedes",
+        "viewAndDownloadCv": "Ver y descargar tu CV",
+        "here": "aquí.",
+        "createAccountIntro": "Si te gustaría explorar tus habilidades y experiencias en el futuro, puedes",
+        "createAccount": "Crear una cuenta",
+        "verificationReminder": "Se ha enviado un correo de verificación a tu dirección de correo electrónico. Por favor verifica tu cuenta antes de iniciar sesión nuevamente.",
+        "feedbackWelcome": "Nos encantaría recibir más",
+        "feedbackLinkText": "comentarios",
+        "feedbackFromYouSuffix": "de tu parte. ¡Solo toma 5 minutos y nos ayuda a mejorar!",
+        "feedbackInProgressPrefix": "Por favor",
+        "feedbackInProgressLinkText": "Completa tus comentarios",
+        "feedbackInProgressSuffix": "para ayudarnos a mejorar tu experiencia!"
+      },
+      "sent": "enviado"
     },
     "chat": {
       "notifications": {
@@ -211,29 +208,16 @@
       "sendFeedback": "Enviar comentarios",
       "feedbackSuccessMessage": "¡Gracias por tus comentarios!",
       "giveGeneralFeedback": "Dar comentarios generales",
-      "userInfo": "Información del usuario"
+      "userInfo": "Información del usuario",
+      "userIconAlt": "Icono de usuario",
+      "beforeYouGo": "Antes de irte",
+      "logoutConfirmationMessage": "¿Estás seguro de que deseas cerrar sesión?",
+      "anonymousAccountWarning": "Actualmente estás usando una cuenta anónima. Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
+      "logoutWarningAnonymous": "Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
+      "createAccountToSaveProgress": "Crea una cuenta para guardar tu progreso",
+      "continueYourJourneyLater": "y continuar tu experiencia más tarde."
     }
   },
-  "previous": "Anterior",
-  "next": "Siguiente",
-  "bias_experience_accuracy": "Sesgo y precisión de la experiencia",
-  "inaccurate": "Inexacto",
-  "very_accurate": "Muy preciso",
-  "skill_accuracy": "Precisión de habilidades",
-  "final_feedback": "Comentarios finales",
-  "difficult": "Difícil",
-  "easy": "Fácil",
-  "unlikely": "Poco probable",
-  "likely": "Probable",
-  "yes": "Sí",
-  "no": "No",
-  "skip": "Omitir",
-  "saving": "Guardando",
-  "yes_exit": "Sí, salir",
-  "app_isOnline_offline": "Estás sin conexión",
-  "app_isOnline_back_online": "Has vuelto a estar en línea",
-  "please_select_x": "Por favor, seleccione {{x}}",
-  "clear_selection": "Limpiar selección",
   "auth": {
     "pages": {
       "login": {
@@ -559,6 +543,10 @@
         "shareData": "Compartir datos",
         "skipping": "Omitiendo...",
         "refreshPage": "Actualizar página"
+      },
+      "enumField": {
+        "pleaseSelectX": "Por favor, seleccione {{x}}",
+        "clearSelection": "Limpiar selección"
       }
     }
   },
@@ -572,6 +560,10 @@
             "ratingLabelHigh": "Satisfecho",
             "submitSuccess": "¡Calificación enviada con éxito!",
             "submitError": "Error al enviar la calificación. Por favor, inténtalo más tarde."
+          },
+          "feedbackFormContent": {
+            "previous": "Anterior",
+            "next": "Siguiente"
           }
         },
         "submitSuccess": "¡Comentarios enviados con éxito!",
@@ -584,5 +576,29 @@
     "bugReport": {
       "reportBug": "Reportar un error"
     }
+  },
+  "app": {
+    "isOnlineProvider": {
+      "offline": "Estás sin conexión",
+      "backOnline": "Has vuelto a estar en línea"
+    },
+    "appName": "Compass",
+    "compassLogoAlt": "Logo de Compass"
+  },
+  "i18n": {
+    "languageContextMenu": {
+      "selector": "Selector de idioma"
+    }
+  },
+  "_deprecated": {
+    "bias_experience_accuracy": "Sesgo y precisión de la experiencia",
+    "inaccurate": "Inexacto",
+    "very_accurate": "Muy preciso",
+    "skill_accuracy": "Precisión de habilidades",
+    "final_feedback": "Comentarios finales",
+    "difficult": "Difícil",
+    "easy": "Fácil",
+    "unlikely": "Poco probable",
+    "likely": "Probable"
   }
 }

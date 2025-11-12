@@ -16,7 +16,11 @@
       "revert": "Rétablir",
       "continue": "Continuer",
       "noThankYou": "Non, merci",
-      "iWantToStay": "Je veux rester"
+      "iWantToStay": "Je veux rester",
+      "yes": "Oui",
+      "no": "Non",
+      "skip": "Ignorer",
+      "yesExit": "Oui, quitter"
     },
     "fields": {
       "email": "E-mail",
@@ -85,7 +89,8 @@
     },
     "status": {
       "calculating": "Calcul en cours",
-      "cancelling": "Annulation"
+      "cancelling": "Annulation",
+      "saving": "Enregistrement"
     },
     "backdrop": {
       "loggingYouOut": "Déconnexion..."
@@ -95,29 +100,6 @@
       "areYouSureYouWantToExit": "Êtes-vous sûr de vouloir quitter ?"
     }
   },
-  "language_selector": "Sélecteur de langue",
-  "conversation_conclusion_footer_you_can_now": "Vous pouvez maintenant",
-  "conversation_conclusion_footer_view_and_download_cv": "Voir et télécharger votre CV",
-  "conversation_conclusion_footer_here": "ici.",
-  "conversation_conclusion_footer_create_account_intro": "Si vous souhaitez explorer vos compétences et expériences à l'avenir, vous pouvez",
-  "conversation_conclusion_footer_create_account": "Créer un compte",
-  "conversation_conclusion_footer_verification_reminder": "Un e-mail de vérification a été envoyé à votre adresse e-mail. Veuillez vérifier votre compte avant de vous reconnecter.",
-  "conversation_conclusion_footer_feedback_welcome": "Nous serions ravis de recevoir plus de",
-  "conversation_conclusion_footer_feedback_link_text": "retours",
-  "conversation_conclusion_footer_feedback_from_you_suffix": "de votre part. Cela prend seulement 5 minutes et nous aide à nous améliorer !",
-  "conversation_conclusion_footer_feedback_in_progress_prefix": "Veuillez",
-  "conversation_conclusion_footer_feedback_in_progress_link_text": "soumettre vos retours",
-  "conversation_conclusion_footer_feedback_in_progress_suffix": "pour nous aider à améliorer votre expérience!",
-  "before_you_go": "Avant de partir",
-  "logout_confirmation_message": "Êtes-vous sûr de vouloir vous déconnecter ?",
-  "anonymous_account_warning": "Vous utilisez actuellement un compte anonyme. Si vous vous déconnectez, vous perdrez l'accès à votre historique de conversations et d'expériences.",
-  "compass": "Compass",
-  "compass_logo_alt": "Logo Compass",
-  "user_icon_alt": "Icône utilisateur",
-  "logout_warning_anonymous": "Si vous vous déconnectez, vous perdrez l'accès à votre historique de conversations et d'expériences.",
-  "create_an_account_to_save_progress": "Créez un compte pour sauvegarder votre progression",
-  "continue_your_journey_later": "et poursuivre votre parcours plus tard.",
-  "sent": "envoyé",
   "chat": {
     "chatMessageField": {
       "addActionAriaLabel": "ajouter",
@@ -141,7 +123,22 @@
       "typingChatMessage": {
         "typing": "Saisie en cours",
         "thinking": "Veuillez patienter, je réfléchis"
-      }
+      },
+      "conversationConclusionFooter": {
+        "youCanNow": "Vous pouvez maintenant",
+        "viewAndDownloadCv": "Voir et télécharger votre CV",
+        "here": "ici.",
+        "createAccountIntro": "Si vous souhaitez explorer vos compétences et expériences à l'avenir, vous pouvez",
+        "createAccount": "Créer un compte",
+        "verificationReminder": "Un e-mail de vérification a été envoyé à votre adresse e-mail. Veuillez vérifier votre compte avant de vous reconnecter.",
+        "feedbackWelcome": "Nous serions ravis de recevoir plus de",
+        "feedbackLinkText": "retours",
+        "feedbackFromYouSuffix": "de votre part. Cela prend seulement 5 minutes et nous aide à nous améliorer !",
+        "feedbackInProgressPrefix": "Veuillez",
+        "feedbackInProgressLinkText": "soumettre vos retours",
+        "feedbackInProgressSuffix": "pour nous aider à améliorer votre expérience!"
+      },
+      "sent": "envoyé"
     },
     "chat": {
       "notifications": {
@@ -224,31 +221,18 @@
       "sendFeedback": "Envoyer un avis",
       "feedbackSuccessMessage": "Merci pour vos commentaires !",
       "giveGeneralFeedback": "Donner un avis général",
-      "userInfo": "Informations utilisateur"
+      "userInfo": "Informations utilisateur",
+      "userIconAlt": "Icône utilisateur",
+      "beforeYouGo": "Avant de partir",
+      "logoutConfirmationMessage": "Êtes-vous sûr de vouloir vous déconnecter ?",
+      "anonymousAccountWarning": "Vous utilisez actuellement un compte anonyme. Si vous vous déconnectez, vous perdrez l'accès à votre historique de conversations et d'expériences.",
+      "logoutWarningAnonymous": "Si vous vous déconnectez, vous perdrez l'accès à votre historique de conversations et d'expériences.",
+      "createAccountToSaveProgress": "Créez un compte pour sauvegarder votre progression",
+      "continueYourJourneyLater": "et poursuivre votre parcours plus tard."
     }
   },
-  "previous": "Précédent",
-  "next": "Suivant",
-  "bias_experience_accuracy": "Biais et précision de l'expérience",
-  "inaccurate": "Inexact",
-  "very_accurate": "Très précis",
-  "skill_accuracy": "Précision des compétences",
-  "final_feedback": "Retour final",
-  "difficult": "Difficile",
-  "easy": "Facile",
-  "unlikely": "Peu probable",
-  "likely": "Probable",
-  "yes": "Oui",
-  "no": "Non",
-  "skip": "Ignorer",
-  "saving": "Enregistrement",
-  "yes_exit": "Oui, quitter",
-  "app_isOnline_offline": "Vous êtes hors ligne",
-  "app_isOnline_back_online": "Vous êtes de nouveau en ligne",
   "chat_message_experiences_intro": "Voici mes expériences :",
   "experiences_fetch_failed": "Échec de la récupération des expériences",
-  "please_select_x": "Veuillez sélectionner {{x}}",
-  "clear_selection": "Effacer la sélection",
   "auth": {
     "pages": {
       "login": {
@@ -618,6 +602,10 @@
         "shareData": "Partager les données",
         "skipping": "Ignorer...",
         "refreshPage": "Actualiser la page"
+      },
+      "enumField": {
+        "pleaseSelectX": "Veuillez sélectionner {{x}}",
+        "clearSelection": "Effacer la sélection"
       }
     }
   },
@@ -631,6 +619,10 @@
             "ratingLabelHigh": "Satisfait",
             "submitSuccess": "Évaluation envoyée avec succès !",
             "submitError": "Échec de l'envoi de l'évaluation. Veuillez réessayer plus tard."
+          },
+          "feedbackFormContent": {
+            "previous": "Précédent",
+            "next": "Suivant"
           }
         },
         "submitSuccess": "Commentaires envoyés avec succès !",
@@ -654,5 +646,29 @@
       "storyChooseMessageLabel": "Choisissez un message d'erreur à afficher dans une notification :",
       "storySelectPlaceholder": "Sélectionnez un message d'erreur"
     }
+  },
+  "app": {
+    "isOnlineProvider": {
+      "offline": "Vous êtes hors ligne",
+      "backOnline": "Vous êtes de nouveau en ligne"
+    },
+    "appName": "Compass",
+    "compassLogoAlt": "Logo Compass"
+  },
+  "i18n": {
+    "languageContextMenu": {
+      "selector": "Sélecteur de langue"
+    }
+  },
+  "_deprecated": {
+    "bias_experience_accuracy": "Biais et précision de l'expérience",
+    "inaccurate": "Inexact",
+    "very_accurate": "Très précis",
+    "skill_accuracy": "Précision des compétences",
+    "final_feedback": "Retour final",
+    "difficult": "Difficile",
+    "easy": "Facile",
+    "unlikely": "Peu probable",
+    "likely": "Probable"
   }
 }

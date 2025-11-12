@@ -106,7 +106,7 @@ const LanguageContextMenu = () => {
         }}
         onClick={(event) => setAnchorEl(event.currentTarget)}
         data-testid={DATA_TEST_ID.AUTH_LANGUAGE_SELECTOR_BUTTON}
-        title={t("language_selector")}
+        title={t("i18n.languageContextMenu.selector")}
       >
         <LanguageOutlined />
       </PrimaryIconButton>

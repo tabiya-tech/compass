@@ -48,7 +48,7 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
     if (field.required && (!selectedValue || selectedValue === '')) {
       return { 
         isValid: false, 
-        errorMessage: t("please_select_x", { x: field.label.toLowerCase() })
+        errorMessage: t("sensitiveData.components.enumField.pleaseSelectX", { x: field.label.toLowerCase() })
       };
     }
     
@@ -126,7 +126,7 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
                 size="small" 
                 sx={{ padding: 0 }}
                 onClick={handleClear}
-                aria-label={t("clear_selection")}
+                aria-label={t("sensitiveData.components.enumField.clearSelection")}
                 data-testid={DATA_TEST_ID.ENUM_FIELD_CLEAR_BUTTON}
               >
                 <ClearIcon fontSize="small" />
