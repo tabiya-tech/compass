@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { Trans } from "react-i18next";
 import { Box, Typography, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -36,7 +36,6 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
   skillsRankingState,
 }) => {
   const theme = useTheme();
-  const { t } = useTranslation();
   const selectedLabel = skillsRankingState.score.comparison_label;
   const selectedIndex = jobSeekerComparisonLabels.findIndex((label) => label === selectedLabel);
 
