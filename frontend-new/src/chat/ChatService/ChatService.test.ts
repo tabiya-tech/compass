@@ -1,7 +1,7 @@
 import "src/_test_utilities/consoleMock";
 import { StatusCodes } from "http-status-codes";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
-import { expectCorrectFetchRequest, setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
+import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import "src/_test_utilities/envServiceMock";
 import {

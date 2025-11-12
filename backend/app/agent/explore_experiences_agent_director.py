@@ -34,9 +34,9 @@ def _format_responsibilities_for_display(responsibilities: list[str]) -> str:
     if not responsibilities:
         return "No responsibilities have been collected yet."
 
-    formatted = "Here are the responsibilities we've gathered so far:\n\n"
-    for i, resp in enumerate(responsibilities, 1):
-        formatted += f"{i}. {resp}\n"
+    formatted = "Here's what we've got so far:\n\n"
+    for resp in responsibilities:
+        formatted += f"- {resp}\n"
 
     return formatted
 
@@ -74,8 +74,7 @@ async def _check_and_prompt_for_linking(*,
     )
     prompt_message = (
         f"{responsibilities_text}\n\n"
-        f"We've collected {responsibilities_count} responsibilities so far. "
-        f"Would you like to continue to the next step, or would you like to add more responsibilities? "
+        f"Are you sure this is all you did, or is there more you would like to add? "
     )
 
     # Check if we've already asked

@@ -1032,11 +1032,18 @@ describe("ChatMessageField", () => {
         await waitFor(() => {
           expect(mockChatServiceInstance.sendMessage).toHaveBeenCalledWith(
             987,
-            "I have these experiences:\n\n• Software Engineer at Company A\n• Data Scientist at Company B"
+            "I have these experiences:\n\n• Software Engineer at Company A\n• Data Scientist at Company B \n\nLet's start with these."
           );
         });
         await waitFor(() => {
-          expect(mockOnCvBulletsSent).toHaveBeenCalledWith("I have these experiences:\n\n• Software Engineer at Company A\n• Data Scientist at Company B");
+          expect(mockOnCvBulletsSent).toHaveBeenCalledWith(
+            "I have these experiences:\n\n• Software Engineer at Company A\n• Data Scientist at Company B \n\nLet's start with these.",
+            expect.objectContaining({
+              experiences_explored: 0,
+              messages: [],
+              conversation_completed: false,
+            })
+          );
         });
         await waitFor(() => {
           expect(mockSetAiIsTyping).toHaveBeenCalledWith(false);

@@ -9,7 +9,8 @@ describe("cvUploadPolling", () => {
     expect(getCvUploadDisplayMessage({ upload_process_state: "EXTRACTING" })).toBe("Extracting experiences");
     expect(getCvUploadDisplayMessage({ upload_process_state: "SAVING" })).toBe("Saving CV");
     expect(getCvUploadDisplayMessage({ upload_process_state: "FAILED" })).toBe("CV upload failed");
-    expect(getCvUploadDisplayMessage({ upload_process_state: "COMPLETED" })).toBe("CV uploaded successfully");
+    expect(getCvUploadDisplayMessage({ upload_process_state: "COMPLETED", experience_bullets: ["bullet"] })).toBe("CV uploaded successfully");
+    expect(getCvUploadDisplayMessage({ upload_process_state: "COMPLETED" })).toBe("No work experience data found in your CV");
     expect(getCvUploadDisplayMessage({ upload_process_state: "CANCELLED" })).toBe("CV upload cancelled");
     expect(getCvUploadDisplayMessage({ upload_process_state: "PENDING_UPLOAD" })).toBe("Uploading CV");
   });

@@ -309,7 +309,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
       setConversationConductedAt(response.conversation_conducted_at);
       setCurrentPhase((_previousCurrentPhase) => parseConversationPhase(response.current_phase, _previousCurrentPhase));
     },
-    [exploredExperiences, fetchExperiences, showSkillsRanking, setAiIsTyping]
+    [exploredExperiences, fetchExperiences, addMessageToChat, showSkillsRanking]
   );
 
   // Opens the experiences drawer and get experiences if needed
