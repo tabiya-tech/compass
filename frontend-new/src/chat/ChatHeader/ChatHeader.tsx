@@ -306,12 +306,12 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       <NavLink style={{ lineHeight: 0 }} to={routerPaths.ROOT} data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO_LINK}>
         <img
           src={`${process.env.PUBLIC_URL}/compass.svg`}
-          alt={t("compass_logo_alt")}
+          alt={t("app.compassLogoAlt")}
           height={12 * theme.tabiyaSpacing.xl} // xl wasn't quite big enough, we're going for ~48px
           data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO}
         />
       </NavLink>
-      <Typography variant="h1">{t("compass")}</Typography>
+      <Typography variant="h1">{t("app.appName")}</Typography>
       <Box
         sx={{
           display: "flex",
@@ -359,7 +359,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         >
           <img
             src={`${process.env.PUBLIC_URL}/user-icon.svg`}
-            alt={t("user_icon_alt")}
+            alt={t("chat.chatHeader.userIconAlt")}
             data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_USER}
           />
         </PrimaryIconButton>
@@ -382,23 +382,23 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         onCancel={handleConfirmLogout}
         onDismiss={() => setShowLogoutConfirmation(false)}
         onConfirm={handleRegister}
-    title={t("before_you_go")}
+    title={t("chat.chatHeader.beforeYouGo")}
     confirmButtonText={t("common.buttons.register")}
     cancelButtonText={t("common.buttons.logout")}
         showCloseIcon={true}
         textParagraphs={[
           {
             id: "1",
-            text: <>{t("logout_confirmation_message")}</>,
+            text: <>{t("chat.chatHeader.logoutConfirmationMessage")}</>,
           },
           {
             id: "2",
             text: (
               <>
-                {t("anonymous_account_warning")}
+                {t("chat.chatHeader.anonymousAccountWarning")}
                 <HighlightedSpan>
                   {" "}
-                  {t("logout_warning_anonymous")}
+                  {t("chat.chatHeader.logoutWarningAnonymous")}
                 </HighlightedSpan>
                 .
               </>
@@ -408,7 +408,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
             id: "3",
             text: (
               <>
-                <HighlightedSpan>{t("create_an_account_to_save_progress")}</HighlightedSpan> {t("continue_your_journey_later")}
+                <HighlightedSpan>{t("chat.chatHeader.createAccountToSaveProgress")}</HighlightedSpan> {t("chat.chatHeader.continueYourJourneyLater")}
               </>
             ),
           },
