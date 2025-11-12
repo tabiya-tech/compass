@@ -63,7 +63,7 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
       >
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="subtitle1" color={theme.palette.text.secondary} data-testid={DATA_TEST_ID.TITLE}>
-            {t("tell_us_what_the_issue_is")}
+            {t("chat.reaction.components.dislikeReasonPopover.title")}
           </Typography>
           <PrimaryIconButton
             onClick={() => onClose([])} // close without selecting a reason

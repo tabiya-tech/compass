@@ -68,9 +68,9 @@ export const DATA_TEST_ID = {
 
 // i18n notification message keys (tests/components should resolve via t(<key>))
 export const NOTIFICATION_MESSAGES_TEXT = {
-  NEW_CONVERSATION_STARTED: "new_conversation_started",
-  SUCCESSFULLY_LOGGED_OUT: "successfully_logged_out",
-  FAILED_TO_START_CONVERSATION: "failed_to_start_conversation",
+  NEW_CONVERSATION_STARTED: "chat.chat.notifications.startConversationSuccess",
+  SUCCESSFULLY_LOGGED_OUT: "chat.chat.notifications.logoutSuccess",
+  FAILED_TO_START_CONVERSATION: "chat.chat.notifications.startConversationFailed",
 } as const;
 
 interface ChatProps {
@@ -215,7 +215,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
       setExperiences(data);
     } catch (error) {
       console.error(new ChatError("Failed to retrieve experiences", error));
-      enqueueSnackbar(t("experiences_fetch_failed"), { variant: "error" });
+      enqueueSnackbar(t("chat.chat.notifications.experiencesFetchFailed"), { variant: "error" });
     } finally {
       setIsLoading(false);
     }
@@ -235,7 +235,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
     await authenticationService!.logout();
     navigate(routerPaths.LANDING, { replace: true });
-    enqueueSnackbar(t("successfully_logged_out"), { variant: "success" });
+    enqueueSnackbar(t("chat.chat.notifications.logoutSuccess"), { variant: "success" });
     setIsLoggingOut(false);
   }, [enqueueSnackbar, navigate,t]);
 
@@ -308,7 +308,7 @@ return {
         removeMessageFromChat(messageId);
         const items: string[] | undefined = status.experience_bullets ?? undefined;
         if (Array.isArray(items) && items.length > 0) {
-          const intro = t("chat_message_experiences_intro");
+          const intro = t("chat.util.messages.experiencesIntro");
           const bullets = items
             .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
             .filter(Boolean)
@@ -366,7 +366,7 @@ return {
   const handleCancelUpload = useCallback(async (uploadId: string) => {
     try {
       // If it's the temporary uploadId, just show cancelled state
-      if (uploadId === "uploading") {
+      if (uploadId === "chat.chatMessageField.placeholders.uploading") {
         setMessages(prev => prev.map(msg => {
           if (msg.type === CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE && !msg.payload.disabled) {
             return {
@@ -440,7 +440,7 @@ return {
         // Show the cancellable message immediately
         addMessageToChat({
           ...generateCancellableCVTypingMessage(
-            "uploading", // temporary ID until we get the real one
+            "chat.chatMessageField.placeholders.uploading", // temporary ID until we get the real one
             handleCancelUpload,
             false,
             false,
@@ -703,14 +703,14 @@ return {
     setNewConversationDialog(false);
     setExploredExperiencesNotification(false);
     if (await initializeChat(currentUserId, null)) {
-      enqueueSnackbar(t("new_conversation_started"), { variant: "success" });
+      enqueueSnackbar(t("chat.chat.notifications.startConversationSuccess"), { variant: "success" });
     } else {
       // Add a message to the chat saying that something went wrong
       setMessages([generateSomethingWentWrongMessage()]);
       // Set the conversation as completed to prevent the user from sending any messages
       setConversationCompleted(true);
       // Notify the user that the chat failed to start
-      enqueueSnackbar(t("failed_to_start_conversation"), { variant: "error" });
+      enqueueSnackbar(t("chat.chat.notifications.startConversationFailed"), { variant: "error" });
     }
   }, [enqueueSnackbar, initializeChat, currentUserId,t]);
 
@@ -731,7 +731,7 @@ return {
         // Set the conversation as completed to prevent the user from sending any messages
         setConversationCompleted(true);
         // Notify the user that the chat failed to start
-        enqueueSnackbar(t("failed_to_start_conversation"), { variant: "error" });
+        enqueueSnackbar(t("chat.chat.notifications.startConversationFailed"), { variant: "error" });
       }
       setInitialized(true);
     });
@@ -811,7 +811,7 @@ return {
   return (
     <Suspense fallback={<Backdrop isShown={true} transparent={true} />}>
       {isLoggingOut ? (
-        <Backdrop isShown={isLoggingOut} message={t("logging_out")} />
+        <Backdrop isShown={isLoggingOut} message={t("chat.chat.backdrop.loggingOut")} />
       ) : (
         <ChatProvider
           handleOpenExperiencesDrawer={handleOpenExperiencesDrawer}
@@ -885,13 +885,13 @@ return {
           {newConversationDialog && (
             <ConfirmModalDialog
               isOpen={newConversationDialog}
-              title={t("start_new_conversation_title")}
+              title={t("chat.chat.startNewConversationDialog.title")}
               content={
                 <>
-                  {t("start_new_conversation_content")}
+                  {t("chat.chat.startNewConversationDialog.content")}
                   <br />
                   <br />
-                  {t("are_you_sure_start_new_conversation_content")}
+                  {t("chat.chat.startNewConversationDialog.confirmation")}
                 </>
               }
               onCancel={() => setNewConversationDialog(false)}
