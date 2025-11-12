@@ -138,7 +138,7 @@ describe("CustomerSatisfactionRating", () => {
     // AND a backdrop to have been shown while the rating is being submitted
     expect(screen.getByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).toBeInTheDocument();
     // AND the success snackbar to be shown
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("customerSatisfactionRating_submit_success"), {
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.submitSuccess"), {
       variant: "success",
     });
     // AND expect no errors or warning to have occurred
@@ -164,7 +164,7 @@ describe("CustomerSatisfactionRating", () => {
 
     // THEN expect the error snackbar to be shown
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("customerSatisfactionRating_submit_error"), {
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.submitError"), {
         variant: "error",
       });
     });
@@ -194,7 +194,7 @@ describe("CustomerSatisfactionRating", () => {
 
     // THEN expect the error snackbar to be shown
     await waitFor(() => {
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("customerSatisfactionRating_submit_error"), {
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.submitError"), {
         variant: "error",
       });
     });

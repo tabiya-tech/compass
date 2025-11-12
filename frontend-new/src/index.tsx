@@ -20,7 +20,7 @@ import "./i18n/i18n";
 // Error boundary fallback that uses i18n like the rest of the app
 const ErrorBoundaryFallback: React.FC = () => {
   const { t } = useTranslation();
-  return <ErrorPage errorMessage={t("error_page_default_message")} />;
+  return <ErrorPage errorMessage={t("error.errorPage.defaultMessage")} />;
 };
 
 // initialize react sentry for log aggregation

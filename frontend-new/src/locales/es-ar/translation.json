@@ -68,7 +68,20 @@
     },
     "errors": {
       "updateState": "No se pudo actualizar el estado del ranking de habilidades. Probá de nuevo más tarde.",
-      "generic": "Algo salió mal. Probá de nuevo."
+      "generic": "Algo salió mal. Probá de nuevo.",
+      "api": {
+        "requestTooLong": "Los datos enviados al servicio parecen ser demasiado grandes. Intentá nuevamente con un contenido más pequeño. Si el problema persiste, limpiá la caché de tu navegador y actualizá la página.",
+        "tooManyRequests": "Parece que estás realizando demasiadas solicitudes. Intentá nuevamente más tarde.",
+        "unexpectedError": "Ocurrió un error inesperado. Intentá nuevamente más tarde.",
+        "serverConnectionError": "No se puede conectar con el servicio. Verificá tu conexión a Internet o intentá más tarde.",
+        "resourceNotFound": "El recurso solicitado no fue encontrado. Limpiá la caché de tu navegador y actualizá la página.",
+        "authenticationFailure": "Parece que no iniciaste sesión. Iniciá sesión para continuar.",
+        "permissionDenied": "Parece que no tenés los permisos necesarios. Cerrá sesión y volvé a iniciar sesión.",
+        "unableToProcessResponse": "Tuvimos un problema al procesar los datos. Limpiá la caché del navegador y actualizá la página o intentá más tarde.",
+        "serviceUnavailable": "El servicio no está disponible en este momento. Intentá nuevamente más tarde.",
+        "dataValidationError": "Parece haber un problema con tu solicitud. Si estás enviando datos, asegurate de que sean válidos e intentá nuevamente. Si el problema persiste, limpiá la caché de tu navegador y actualizá la página.",
+        "unableToProcessRequest": "Disculpas. Algo salió mal al procesar tu solicitud."
+      }
     },
     "status": {
       "calculating": "Calculando",
@@ -83,8 +96,6 @@
     }
   },
   "language_selector": "Selector de idioma",
-  "feedback_message": "¡Nos encantaría conocer tus comentarios sobre tu experiencia hasta ahora!",
-  "give_feedback": "Dar comentarios",
   "conversation_conclusion_footer_you_can_now": "Ahora puedes",
   "conversation_conclusion_footer_view_and_download_cv": "Ver y descargar tu CV",
   "conversation_conclusion_footer_here": "aquí.",
@@ -97,15 +108,9 @@
   "conversation_conclusion_footer_feedback_in_progress_prefix": "Por favor",
   "conversation_conclusion_footer_feedback_in_progress_link_text": "Completa tus comentarios",
   "conversation_conclusion_footer_feedback_in_progress_suffix": "para ayudarnos a mejorar tu experiencia!",
-  "user_info": "Información del usuario",
   "before_you_go": "Antes de irte",
   "logout_confirmation_message": "¿Estás seguro de que deseas cerrar sesión?",
   "anonymous_account_warning": "Actualmente estás usando una cuenta anónima. Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
-  "report_a_bug": "Reportar un error",
-  "give_general_feedback": "Dar comentarios generales",
-  "feedback_message_placeholder": "¡Nos encantaría conocer tu opinión! Comparte cualquier comentario o sugerencia para mejorar Compass.",
-  "send_feedback": "Enviar comentarios",
-  "feedback_success_message": "¡Gracias por tus comentarios!",
   "compass": "Compass",
   "compass_logo_alt": "Logo de Compass",
   "user_icon_alt": "Ícono de usuario",
@@ -212,14 +217,18 @@
       "thinkingMessage": "Processing your CV, this might take a while..."
     },
     "chatHeader": {
-      "viewExperiences": "Ver experiencias"
+      "viewExperiences": "Ver experiencias",
+      "feedbackMessage": "¡Nos encantaría conocer tus comentarios sobre tu experiencia hasta ahora!",
+      "giveFeedback": "Dar comentarios",
+      "feedbackMessagePlaceholder": "¡Nos encantaría conocer tu opinión! Comparte cualquier comentario o sugerencia para mejorar Compass.",
+      "sendFeedback": "Enviar comentarios",
+      "feedbackSuccessMessage": "¡Gracias por tus comentarios!",
+      "giveGeneralFeedback": "Dar comentarios generales",
+      "userInfo": "Información del usuario"
     }
   },
-  "help_us_improve": "Ayúdanos a mejorar!",
   "previous": "Anterior",
   "next": "Siguiente",
-  "submitting_feedback": "Enviando comentarios...",
-  "close_feedback_form": "cerrar formulario de comentarios",
   "bias_experience_accuracy": "Sesgo y precisión de la experiencia",
   "inaccurate": "Inexacto",
   "very_accurate": "Muy preciso",
@@ -234,29 +243,6 @@
   "skip": "Omitir",
   "saving": "Guardando",
   "yes_exit": "Sí, salir",
-  "error_page_illustration_alt": "ilustración de error",
-  "error_page_default_message": "Algo salió mal con Compass. Intentá recargar la página...",
-  "error_page_not_found": "Error 404 - Página no encontrada",
-  "rest_api_error_request_too_long": "Los datos enviados al servicio parecen ser demasiado grandes. Intentá nuevamente con un contenido más pequeño. Si el problema persiste, limpiá la caché de tu navegador y actualizá la página.",
-  "rest_api_error_too_many_requests": "Parece que estás realizando demasiadas solicitudes. Intentá nuevamente más tarde.",
-  "rest_api_error_unexpected_error": "Ocurrió un error inesperado. Intentá nuevamente más tarde.",
-  "rest_api_error_server_connection_error": "No se puede conectar con el servicio. Verificá tu conexión a Internet o intentá más tarde.",
-  "rest_api_error_resource_not_found": "El recurso solicitado no fue encontrado. Limpiá la caché de tu navegador y actualizá la página.",
-  "rest_api_error_authentication_failure": "Parece que no iniciaste sesión. Iniciá sesión para continuar.",
-  "rest_api_error_permission_denied": "Parece que no tenés los permisos necesarios. Cerrá sesión y volvé a iniciar sesión.",
-  "rest_api_error_unable_to_process_response": "Tuvimos un problema al procesar los datos. Limpiá la caché del navegador y actualizá la página o intentá más tarde.",
-  "rest_api_error_service_unavailable": "El servicio no está disponible en este momento. Intentá nuevamente más tarde.",
-  "rest_api_error_data_validation_error": "Parece haber un problema con tu solicitud. Si estás enviando datos, asegurate de que sean válidos e intentá nuevamente. Si el problema persiste, limpiá la caché de tu navegador y actualizá la página.",
-  "rest_api_error_unable_to_process_request": "Disculpas. Algo salió mal al procesar tu solicitud.",
-  "rest_api_error_story_choose_message_label": "Elegí un mensaje de error para mostrar en una notificación:",
-  "rest_api_error_story_select_placeholder": "Seleccioná un mensaje de error",
-  "customerSatisfactionRating_question_text": "Por último, nos encantaría conocer tu opinión sobre tu experiencia hasta ahora. ",
-  "customerSatisfactionRating_rating_label_low": "Insatisfecho",
-  "customerSatisfactionRating_rating_label_high": "Satisfecho",
-  "customerSatisfactionRating_submit_success": "¡Calificación enviada con éxito!",
-  "customerSatisfactionRating_submit_error": "Error al enviar la calificación. Por favor, intentá más tarde.",
-  "feedback_overall_submit_success": "¡Comentarios enviados con éxito!",
-  "feedback_overall_submit_error": "Error al enviar los comentarios. Por favor, inténtalo más tarde.",
   "app_isOnline_offline": "Estás sin conexión",
   "app_isOnline_back_online": "Has vuelto a estar en línea",
   "please_select_x": "Por favor, seleccioná {{x}}",
@@ -631,6 +617,40 @@
         "skipping": "Omitiendo...",
         "refreshPage": "Actualizar página"
       }
+    }
+  },
+  "feedback": {
+    "overallFeedback": {
+      "feedbackForm": {
+        "components": {
+          "customerSatisfactionRating": {
+            "questionText": "Por último, nos encantaría conocer tu opinión sobre tu experiencia hasta ahora. ",
+            "ratingLabelLow": "Insatisfecho",
+            "ratingLabelHigh": "Satisfecho",
+            "submitSuccess": "¡Calificación enviada con éxito!",
+            "submitError": "Error al enviar la calificación. Por favor, intentá más tarde."
+          }
+        },
+        "submitSuccess": "¡Comentarios enviados con éxito!",
+        "submitError": "Error al enviar los comentarios. Por favor, inténtalo más tarde.",
+        "helpUsImprove": "Ayúdanos a mejorar!",
+        "closeForm": "cerrar formulario de comentarios",
+        "submittingFeedback": "Enviando comentarios..."
+      }
+    },
+    "bugReport": {
+      "reportBug": "Reportar un error"
+    }
+  },
+  "error": {
+    "errorPage": {
+      "illustrationAlt": "ilustración de error",
+      "defaultMessage": "Algo salió mal con Compass. Intentá recargar la página...",
+      "notFound": "Error 404 - Página no encontrada"
+    },
+    "restAPIError": {
+      "storyChooseMessageLabel": "Elegí un mensaje de error para mostrar en una notificación:",
+      "storySelectPlaceholder": "Seleccioná un mensaje de error"
     }
   }
 }
