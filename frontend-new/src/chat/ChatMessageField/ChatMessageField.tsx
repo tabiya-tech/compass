@@ -62,15 +62,15 @@ export const MENU_ITEM_TEXT = {
 };
 
 export const PLACEHOLDER_TEXTS = {
-  CHAT_FINISHED: "chat_finished",
-  AI_TYPING: "ai_typing",
-  OFFLINE: "offline",
-  DEFAULT: "default",
-  UPLOADING: "uploading",
+  CHAT_FINISHED: "chat.chatMessageField.placeholders.chatFinished",
+  AI_TYPING: "chat.chatMessageField.placeholders.aiTyping",
+  OFFLINE: "chat.chatMessageField.placeholders.offline",
+  DEFAULT: "chat.chatMessageField.placeholders.default",
+  UPLOADING: "chat.chatMessageField.placeholders.uploading",
 };
 export const CHARACTER_LIMIT_ERROR_MESSAGES = {
-  MESSAGE_LIMIT: "chat_message_error_limit",
-  INVALID_SPECIAL_CHARACTERS: "chat_message_error_invalid_chars",
+  MESSAGE_LIMIT: "common.chat.errors.messageLimit",
+  INVALID_SPECIAL_CHARACTERS: "common.chat.errors.invalidSpecialCharacters",
   MAX_FILE_SIZE: "chat_message_cv_error_max_file_size",
   FILE_TOO_DENSE: "chat_message_cv_error_too_dense",
   EMPTY_CV_PARSE: "chat_message_cv_error_empty_parse",
@@ -550,11 +550,11 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                       transition={{ duration: 0.2 }}
                     >
                       <IconButton
-                        aria-label={t("chat_message_add_action")}
+                        aria-label={t("chat.chatMessageField.addActionAriaLabel")}
                         onClick={handlePlusClick}
                         onKeyDown={(event) => event.stopPropagation()}
                         size="small"
-                        title={t("chat_message_more_actions")}
+                        title={t("chat.chatMessageField.moreActionsTooltip")}
                         data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON}
                       >
                         <AnimatedDotBadge show={showPlusBadge}>
@@ -576,7 +576,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                   onClick={handleButtonClick}
                   onKeyDown={(event) => event.stopPropagation()}
                   disabled={sendIsDisabled()}
-                  title={t("chat_message_send_message")}
+                  title={t("chat.chatMessageField.sendMessageTooltip")}
                 >
                   <SendIcon
                     data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_ICON}

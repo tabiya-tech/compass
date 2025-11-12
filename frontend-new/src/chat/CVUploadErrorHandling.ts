@@ -8,8 +8,8 @@ import i18n from "src/i18n/i18n";
  */
 export const CV_UPLOAD_ERROR_MESSAGES = {
   // Character limit errors
-  MESSAGE_LIMIT: "chat_message_error_limit",
-  INVALID_SPECIAL_CHARACTERS: "chat_message_error_invalid_chars",
+  MESSAGE_LIMIT: "common.chat.errors.messageLimit",
+  INVALID_SPECIAL_CHARACTERS: "common.chat.errors.invalidSpecialCharacters",
 
   // File size and type errors
   MAX_FILE_SIZE: "chat_message_cv_error_max_file_size",

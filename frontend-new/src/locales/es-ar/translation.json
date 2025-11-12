@@ -28,6 +28,12 @@
       "passwordNeedNumber": "La contraseña debe incluir al menos un número.",
       "passwordNeedSpecialChar": "La contraseña debe incluir al menos un carácter especial como: !@#$%*& etc."
     },
+    "chat": {
+      "errors": {
+        "messageLimit": "El límite del mensaje es de {{max}} caracteres.",
+        "invalidSpecialCharacters": "Caracteres especiales no válidos: {{chars}}"
+      }
+    },
     "time": {
       "onDate": "el {{date}}",
       "yesterday": "ayer",
@@ -73,37 +79,87 @@
   "create_an_account_to_save_progress": "Crea una cuenta para guardar tu progreso",
   "continue_your_journey_later": "y continuar tu experiencia más tarde.",
   "sent": "enviado",
-  "chat_message_more_actions": "más acciones",
-  "chat_message_send_message": "enviar mensaje",
+  "chat": {
+    "chatMessageField": {
+      "addActionAriaLabel": "agregar",
+      "moreActionsTooltip": "más acciones",
+      "sendMessageTooltip": "enviar mensaje",
+      "placeholders": {
+        "chatFinished": "La conversación ha finalizado. No puedes enviar más mensajes.",
+        "aiTyping": "La IA está escribiendo..., espera a que termine.",
+        "offline": "Estás desconectado. Conéctate a Internet para enviar un mensaje.",
+        "default": "Escribe tu mensaje...",
+        "uploading": "Subiendo CV..."
+      }
+    },
+    "chatMessage": {
+      "typingChatMessage": {
+        "typing": "Escribiendo",
+        "thinking": "La IA está pensando, por favor esperá"
+      }
+    },
+    "chat": {
+      "notifications": {
+        "experiencesFetchFailed": "No se pudieron obtener las experiencias",
+        "logoutSuccess": "Sesión cerrada correctamente.",
+        "startConversationFailed": "Error al iniciar nueva conversación",
+        "startConversationSuccess": "Nueva conversación iniciada"
+      },
+      "backdrop": {
+        "loggingOut": "Cerrando tu sesión, espera un momento..."
+      },
+      "startNewConversationDialog": {
+        "title": "¿Iniciar nueva conversación?",
+        "content": "Una vez que inicies una nueva conversación, todos los mensajes de la conversación actual se perderán para siempre.",
+        "confirmation": "¿Estás seguro de que deseas iniciar una nueva conversación?"
+      }
+    },
+    "chatProgressbar": {
+      "labels": {
+        "workTypes": "tipos de trabajo",
+        "experiences": "experiencias"
+      },
+      "phases": {
+        "initializing": "Inicializando...",
+        "intro": "Introducción",
+        "collecting": "Recopilando",
+        "exploring": "Explorando",
+        "finished": "Conversación finalizada",
+        "unknown": "Fase desconocida"
+      }
+    },
+    "util": {
+      "feedbackThankYou": "Gracias por tomarte el tiempo de compartir tus comentarios.",
+      "ratingThankYou": "Gracias por calificar Compass.",
+      "errorSomethingWentWrong": "Perdón, parece que algo salió mal de mi lado... ¿Podés actualizar la página e intentarlo de nuevo?",
+      "errorPleaseRepeat": "Perdón, parece que algo salió mal de mi lado... ¿Podés repetir eso?",
+      "messages": {
+        "experiencesIntro": "Estas son mis experiencias:"
+      }
+    },
+    "reaction": {
+      "components": {
+        "dislikeReasonPopover": {
+          "title": "Por favor, dinos ¿cuál es el problema?",
+          "reasons": {
+            "inappropriateTone": "Tono inapropiado",
+            "offensiveLanguage": "Lenguaje ofensivo",
+            "biased": "Parcial",
+            "incorrectInformation": "Información incorrecta",
+            "irrelevant": "Irrelevante",
+            "confusing": "Confuso"
+          }
+        },
+        "reactionButtons": {
+          "likeLabel": "me gusta",
+          "dislikeLabel": "no me gusta"
+        }
+      }
+    }
+  },
   "upload_cv_intro": "Puedes subir tu currículum tan pronto como empecemos a explorar tus experiencias",
   "upload_cv_collect_experiences": "Adjunta tu currículum a la conversación",
   "upload_cv_other_phase": "La carga del currículum solo está disponible durante la recopilación de experiencias",
-  "phase_initializing": "Inicializando...",
-  "phase_intro": "Introducción",
-  "phase_collecting": "Recopilando",
-  "phase_exploring": "Explorando",
-  "phase_finished": "Conversación finalizada",
-  "phase_unknown": "Fase desconocida",
-  "work_types": "tipos de trabajo",
-  "experiences": "experiencias",
-  "inappropriate_tone": "Tono inapropiado",
-  "offensive_language": "Lenguaje ofensivo",
-  "biased": "Parcial",
-  "incorrect_information": "Información incorrecta",
-  "irrelevant": "Irrelevante",
-  "confusing": "Confuso",
-  "tell_us_what_the_issue_is": "Por favor, dinos ¿cuál es el problema?",
-  "like": "me gusta",
-  "dislike": "no me gusta",
-  "chat_finished": "La conversación ha finalizado. No puedes enviar más mensajes.",
-  "ai_typing": "La IA está escribiendo..., espera a que termine.",
-  "offline": "Estás desconectado. Conéctate a Internet para enviar un mensaje.",
-  "default": "Escribe tu mensaje...",
-  "uploading": "Subiendo CV...",
-  "logging_out": "Cerrando tu sesión, espera un momento...",
-  "start_new_conversation_title": "¿Iniciar nueva conversación?",
-  "start_new_conversation_content": "Una vez que inicies una nueva conversación, todos los mensajes de la conversación actual se perderán para siempre.",
-  "are_you_sure_start_new_conversation_content": "¿Estás seguro de que deseas iniciar una nueva conversación?",
   "consent_before_we_begin_title": "Antes de comenzar...",
   "consent_intro_part1": "Creamos esta herramienta de IA con cuidado para ayudarte a ti y a otros jóvenes como tú a explorar sus habilidades y descubrir nuevas oportunidades.",
   "consent_intro_highlight_responsibly": "¡Por favor usa la IA de manera responsable!",
@@ -128,8 +184,6 @@
   "consent_snackbar_failed_update_preferences": "Error al actualizar las preferencias del usuario",
   "cv_typing_uploading": "Por favor espera mientras subo y analizo tu CV",
   "cv_typing_uploaded_ready": "El contenido de tu CV está en el campo de texto. Revísalo y envíalo cuando estés listo.",
-  "chat_typing": "Escribiendo",
-  "chat_thinking": "La IA está pensando, por favor esperá",
   "help_us_improve": "Ayúdanos a mejorar!",
   "previous": "Anterior",
   "next": "Siguiente",
@@ -169,9 +223,6 @@
   "sensitive_data_failed_to_load_config": "Error al cargar la configuración del formulario",
   "sensitive_data_invalid_form": "Por favor corrige los errores en el formulario antes de enviarlo.",
   "sensitive_data_help_tip_text": "Tu información se cifra mediante un sistema de cifrado de extremo a extremo de última generación y se almacena de forma segura.",
-  "new_conversation_started": "Nueva conversación iniciada",
-  "successfully_logged_out": "Sesión cerrada correctamente.",
-  "failed_to_start_conversation": "Error al iniciar nueva conversación",
   "error_page_illustration_alt": "ilustración de error",
   "error_page_default_message": "Algo salió mal con Compass. Intentá recargar la página...",
   "error_page_not_found": "Error 404 - Página no encontrada",
@@ -300,10 +351,6 @@
   "skillsRanking_rotateToSolve_puzzleComplete_message": "¡Rompecabezas completo! Resolvé otro o cancelá si no te interesa tanto la información.",
   "skillsRanking_rotateToSolve_rotate_left_aria": "Rotar carácter en sentido antihorario",
   "skillsRanking_rotateToSolve_rotate_right_aria": "Rotar carácter en sentido horario",
-  "chat_feedback_thank_you_for_feedback": "Gracias por tomarte el tiempo de compartir tus comentarios.",
-  "chat_feedback_thank_you_for_rating": "Gracias por calificar Compass.",
-  "chat_error_something_went_wrong": "Perdón, parece que algo salió mal de mi lado... ¿Podés actualizar la página e intentarlo de nuevo?",
-  "chat_error_please_repeat": "Perdón, parece que algo salió mal de mi lado... ¿Podés repetir eso?",
   "cv_upload_cancelled": "Carga de CV cancelada",
   "cv_upload_uploaded_successfully": "CV cargado con éxito",
   "cv_upload_failed_to_start": "No se pudo iniciar la carga.",
@@ -333,9 +380,6 @@
   "sensitive_data_collection_skipped": "Se omitió la recopilación de datos personales.",
   "sensitive_data_error_default": "No se pudieron guardar los datos personales. Inténtalo de nuevo y, si el problema persiste, limpia la caché del navegador y actualiza la página.",
   "sensitive_data_error_encrypted_data_too_large": "Los datos personales parecen demasiado grandes para guardarse. Intenta ingresar valores más pequeños en los campos. Si el problema persiste, limpia la caché del navegador y actualiza la página.",
-  "chat_message_add_action": "agregar",
-  "chat_message_error_limit": "El límite del mensaje es de {{max}} caracteres.",
-  "chat_message_error_invalid_chars": "Caracteres especiales no válidos: {{chars}}",
   "chat_message_cv_error_max_file_size": "El archivo seleccionado es demasiado grande. El tamaño máximo es de 3 MB.",
   "chat_message_cv_error_too_dense": "El contenido del archivo subido es demasiado largo para procesarlo. Reducí su longitud e intentá de nuevo.",
   "chat_message_cv_error_empty_parse": "No pudimos detectar experiencias en tu CV. Verificá el archivo e intentá de nuevo.",
@@ -348,8 +392,6 @@
   "chat_message_cv_error_unauthorized": "No estás autorizado. Por favor, volvé a iniciar sesión.",
   "chat_message_cv_error_upload_not_found": "No se encontró la carga. Es posible que no se haya iniciado.",
   "chat_message_cv_error_cv_markdown_too_long": "El contenido de tu CV es demasiado largo. Por favor, acortalo e intentá de nuevo.",
-  "chat_message_experiences_intro": "Estas son mis experiencias:",
-  "experiences_fetch_failed": "No se pudieron obtener las experiencias",
   "upload_cv_upload_label": "Subir CV",
   "upload_cv_view_uploaded_label": "CV subidos anteriormente",
   "upload_cv_view_uploaded_description": "Adjuntá tu CV subido a la conversación",
