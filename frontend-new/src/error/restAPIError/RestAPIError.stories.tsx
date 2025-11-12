@@ -37,8 +37,8 @@ const TestErrorDropdown = () => {
 
   return (
     <Stack width={"fit-content"}>
-      <FormLabel>{i18n.t("rest_api_error_story_choose_message_label", { defaultValue: "Choose an error message to display in a notification:" })}</FormLabel>
-      <Select value={""} displayEmpty renderValue={() => i18n.t("rest_api_error_story_select_placeholder", { defaultValue: "Select an error message" })}>
+      <FormLabel>{i18n.t("error.restAPIError.storyChooseMessageLabel", { defaultValue: "Choose an error message to display in a notification:" })}</FormLabel>
+      <Select value={""} displayEmpty renderValue={() => i18n.t("error.restAPIError.storySelectPlaceholder", { defaultValue: "Select an error message" })}>
         {Object.keys(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS).map((key) => (
           <MenuItem onClick={handleSelect} key={key} data-key={key} value={key}>
             {key}

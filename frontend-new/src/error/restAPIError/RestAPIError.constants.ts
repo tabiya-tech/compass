@@ -19,17 +19,17 @@ namespace ErrorConstants {
   // Map of user-friendly message identifiers to i18n translation keys.
   // These keys are resolved at call/render time using the app's initialized i18n instance.
   export const USER_FRIENDLY_ERROR_MESSAGE_KEYS = {
-    REQUEST_TOO_LONG: "rest_api_error_request_too_long",
-    TOO_MANY_REQUESTS: "rest_api_error_too_many_requests",
-    UNEXPECTED_ERROR: "rest_api_error_unexpected_error",
-    SERVER_CONNECTION_ERROR: "rest_api_error_server_connection_error",
-    RESOURCE_NOT_FOUND: "rest_api_error_resource_not_found",
-    AUTHENTICATION_FAILURE: "rest_api_error_authentication_failure",
-    PERMISSION_DENIED: "rest_api_error_permission_denied",
-    UNABLE_TO_PROCESS_RESPONSE: "rest_api_error_unable_to_process_response",
-    SERVICE_UNAVAILABLE: "rest_api_error_service_unavailable",
-    DATA_VALIDATION_ERROR: "rest_api_error_data_validation_error",
-    UNABLE_TO_PROCESS_REQUEST: "rest_api_error_unable_to_process_request",
+    REQUEST_TOO_LONG: "common.errors.api.requestTooLong",
+    TOO_MANY_REQUESTS: "common.errors.api.tooManyRequests",
+    UNEXPECTED_ERROR: "common.errors.api.unexpectedError",
+    SERVER_CONNECTION_ERROR: "common.errors.api.serverConnectionError",
+    RESOURCE_NOT_FOUND: "common.errors.api.resourceNotFound",
+    AUTHENTICATION_FAILURE: "common.errors.api.authenticationFailure",
+    PERMISSION_DENIED: "common.errors.api.permissionDenied",
+    UNABLE_TO_PROCESS_RESPONSE: "common.errors.api.unableToProcessResponse",
+    SERVICE_UNAVAILABLE: "common.errors.api.serviceUnavailable",
+    DATA_VALIDATION_ERROR: "common.errors.api.dataValidationError",
+    UNABLE_TO_PROCESS_REQUEST: "common.errors.api.unableToProcessRequest",
   } as const;
 }
 export default ErrorConstants;

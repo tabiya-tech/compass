@@ -31,7 +31,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({ errorMessage }) => {
     >
       <img
         src="/logo.svg"
-        alt={t("error_page_illustration_alt")}
+        alt={t("error.errorPage.illustrationAlt")}
         width="250px"
         data-testid={DATA_TEST_ID.ERROR_ILLUSTRATION}
         style={{ marginBottom: "2rem" }}

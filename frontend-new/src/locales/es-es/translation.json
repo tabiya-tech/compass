@@ -83,8 +83,6 @@
     }
   },
   "language_selector": "Selector de idioma",
-  "feedback_message": "¡Nos encantaría conocer tus comentarios sobre tu experiencia hasta ahora!",
-  "give_feedback": "Dar comentarios",
   "conversation_conclusion_footer_you_can_now": "Ahora puedes",
   "conversation_conclusion_footer_view_and_download_cv": "Ver y descargar tu CV",
   "conversation_conclusion_footer_here": "aquí.",
@@ -97,15 +95,9 @@
   "conversation_conclusion_footer_feedback_in_progress_prefix": "Por favor",
   "conversation_conclusion_footer_feedback_in_progress_link_text": "Completa tus comentarios",
   "conversation_conclusion_footer_feedback_in_progress_suffix": "para ayudarnos a mejorar tu experiencia!",
-  "user_info": "Información del usuario",
   "before_you_go": "Antes de irte",
   "logout_confirmation_message": "¿Estás seguro de que deseas cerrar sesión?",
   "anonymous_account_warning": "Actualmente estás usando una cuenta anónima. Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
-  "report_a_bug": "Reportar un error",
-  "give_general_feedback": "Dar comentarios generales",
-  "feedback_message_placeholder": "¡Nos encantaría conocer tu opinión! Comparte cualquier comentario o sugerencia para mejorar Compass.",
-  "send_feedback": "Enviar comentarios",
-  "feedback_success_message": "¡Gracias por tus comentarios!",
   "compass": "Compass",
   "compass_logo_alt": "Logo de Compass",
   "user_icon_alt": "Icono de usuario",
@@ -212,14 +204,18 @@
       "thinkingMessage": "Processing your CV, this might take a while..."
     },
     "chatHeader": {
-      "viewExperiences": "Ver experiencias"
+      "viewExperiences": "Ver experiencias",
+      "feedbackMessage": "¡Nos encantaría conocer tus comentarios sobre tu experiencia hasta ahora!",
+      "giveFeedback": "Dar comentarios",
+      "feedbackMessagePlaceholder": "¡Nos encantaría conocer tu opinión! Comparte cualquier comentario o sugerencia para mejorar Compass.",
+      "sendFeedback": "Enviar comentarios",
+      "feedbackSuccessMessage": "¡Gracias por tus comentarios!",
+      "giveGeneralFeedback": "Dar comentarios generales",
+      "userInfo": "Información del usuario"
     }
   },
-  "help_us_improve": "Ayúdanos a mejorar!",
   "previous": "Anterior",
   "next": "Siguiente",
-  "submitting_feedback": "Enviando comentarios...",
-  "close_feedback_form": "cerrar formulario de comentarios",
   "bias_experience_accuracy": "Sesgo y precisión de la experiencia",
   "inaccurate": "Inexacto",
   "very_accurate": "Muy preciso",
@@ -234,13 +230,6 @@
   "skip": "Omitir",
   "saving": "Guardando",
   "yes_exit": "Sí, salir",
-  "customerSatisfactionRating_question_text": "Por último, nos encantaría conocer tu opinión sobre tu experiencia hasta ahora. ",
-  "customerSatisfactionRating_rating_label_low": "Insatisfecho",
-  "customerSatisfactionRating_rating_label_high": "Satisfecho",
-  "customerSatisfactionRating_submit_success": "¡Calificación enviada con éxito!",
-  "customerSatisfactionRating_submit_error": "Error al enviar la calificación. Por favor, inténtalo más tarde.",
-  "feedback_overall_submit_success": "¡Comentarios enviados con éxito!",
-  "feedback_overall_submit_error": "Error al enviar los comentarios. Por favor, inténtalo más tarde.",
   "app_isOnline_offline": "Estás sin conexión",
   "app_isOnline_back_online": "Has vuelto a estar en línea",
   "please_select_x": "Por favor, seleccione {{x}}",
@@ -571,6 +560,29 @@
         "skipping": "Omitiendo...",
         "refreshPage": "Actualizar página"
       }
+    }
+  },
+  "feedback": {
+    "overallFeedback": {
+      "feedbackForm": {
+        "components": {
+          "customerSatisfactionRating": {
+            "questionText": "Por último, nos encantaría conocer tu opinión sobre tu experiencia hasta ahora. ",
+            "ratingLabelLow": "Insatisfecho",
+            "ratingLabelHigh": "Satisfecho",
+            "submitSuccess": "¡Calificación enviada con éxito!",
+            "submitError": "Error al enviar la calificación. Por favor, inténtalo más tarde."
+          }
+        },
+        "submitSuccess": "¡Comentarios enviados con éxito!",
+        "submitError": "Error al enviar los comentarios. Por favor, inténtalo más tarde.",
+        "helpUsImprove": "Ayúdanos a mejorar!",
+        "closeForm": "cerrar formulario de comentarios",
+        "submittingFeedback": "Enviando comentarios..."
+      }
+    },
+    "bugReport": {
+      "reportBug": "Reportar un error"
     }
   }
 }

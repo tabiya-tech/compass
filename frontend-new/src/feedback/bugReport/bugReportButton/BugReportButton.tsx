@@ -74,17 +74,17 @@ const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, classNam
       >
         {" "}
         {isMobile ? (
-          <StyledPrimaryIconButton title={t("report_a_bug")} data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}>
+          <StyledPrimaryIconButton title={t("feedback.bugReport.reportBug")} data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}>
             <BugReport data-testid={DATA_TEST_ID.BUG_REPORT_ICON} />
           </StyledPrimaryIconButton>
         ) : (
           <PrimaryButton
             disableWhenOffline={true}
             startIcon={<BugReport data-testid={DATA_TEST_ID.BUG_REPORT_ICON} />}
-            title={t("report_a_bug")}
+            title={t("feedback.bugReport.reportBug")}
             data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}
           >
-            {t("report_a_bug")}
+            {t("feedback.bugReport.reportBug")}
           </PrimaryButton>
         )}
       </Box>
