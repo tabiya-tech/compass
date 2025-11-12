@@ -14,7 +14,9 @@
       "goBack": "Retour",
       "restore": "Restaurer",
       "revert": "Rétablir",
-      "continue": "Continuer"
+      "continue": "Continuer",
+      "noThankYou": "Non, merci",
+      "iWantToStay": "Je veux rester"
     },
     "fields": {
       "email": "E-mail",
@@ -71,6 +73,13 @@
     "status": {
       "calculating": "Calcul en cours",
       "cancelling": "Annulation"
+    },
+    "backdrop": {
+      "loggingYouOut": "Déconnexion..."
+    },
+    "modal": {
+      "areYouSure": "Êtes-vous sûr ?",
+      "areYouSureYouWantToExit": "Êtes-vous sûr de vouloir quitter ?"
     }
   },
   "language_selector": "Sélecteur de langue",
@@ -206,28 +215,6 @@
       "viewExperiences": "Voir les expériences"
     }
   },
-  "consent_before_we_begin_title": "Avant de commencer...",
-  "consent_intro_part1": "Nous avons créé cet outil d'IA avec soin pour vous aider, vous et d'autres jeunes comme vous, à explorer vos compétences et à découvrir de nouvelles opportunités.",
-  "consent_intro_highlight_responsibly": "Veuillez utiliser l'IA de manière responsable !",
-  "consent_intro_part2": "La technologie de l'IA est nouvelle et loin d'être parfaite. Elle ne comprend pas le contexte comme les humains.",
-  "consent_intro_part3": "Vérifiez toujours les informations importantes et évitez de partager des informations personnelles sur vous ou sur d'autres personnes avec l'IA pendant la conversation.",
-  "consent_intro_part4": "Aidez-nous à garder toutes les interactions avec l'IA sûres et positives ! 😊",
-  "consent_terms_and_conditions": "Conditions générales",
-  "consent_privacy_policy": "Politique de confidentialité",
-  "consent_checkbox_tc": "J'ai lu et j'accepte les <0>{{terms_and_conditions}}</0> de Compass.",
-  "consent_checkbox_privacy": "J'ai lu et j'accepte la <0>{{privacy_policy}}</0> de Compass.",
-  "consent_are_you_ready": "Êtes-vous prêt à commencer ?",
-  "consent_accept": "Oui, je suis prêt",
-  "consent_with_support_from": "Avec le soutien de",
-  "consent_modal_apology": "Nous sommes désolés que vous choisissiez de ne pas accepter les {{terms_and_conditions}} et la {{privacy_policy}}.",
-  "consent_modal_cannot_proceed": "Vous ne pourrez pas continuer et serez",
-  "consent_modal_logged_out_highlight": "déconnecté.",
-  "consent_modal_yes_exit": "Oui, quitter",
-  "consent_snackbar_agreement_accepted": "Accord accepté",
-  "consent_snackbar_user_not_found": "Utilisateur introuvable",
-  "consent_snackbar_logged_out_success": "Déconnexion réussie.",
-  "consent_snackbar_logged_out_failure": "Échec de la déconnexion.",
-  "consent_snackbar_failed_update_preferences": "Échec de la mise à jour des préférences utilisateur",
   "help_us_improve": "Aidez-nous à nous améliorer !",
   "previous": "Précédent",
   "next": "Suivant",
@@ -251,11 +238,6 @@
   "yes_skip": "Oui, ignorer",
   "share_data": "Partager les données",
   "skipping": "Ignorer...",
-  "no_thank_you": "Non, merci",
-  "are_you_sure": "Êtes-vous sûr ?",
-  "are_you_sure_you_want_to_exit": "Êtes-vous sûr de vouloir quitter ?",
-  "i_want_to_stay": "Je veux rester",
-  "logging_you_out": "Déconnexion...",
   "sensitive_data_reject_paragraph_1": "Nous sommes désolés que vous ayez choisi de ne pas fournir vos données. Fournir ces informations aide Compass à vous offrir une expérience plus personnalisée. Vous ne pourrez pas continuer et vous serez déconnecté.",
   "sensitive_data_skip_paragraph_1": "Nous sommes désolés que vous préfériez ne pas fournir vos données. Fournir ces informations aide Compass à vous offrir une expérience plus personnalisée. Veuillez noter que si vous ignorez cette étape,",
   "sensitive_data_skip_paragraph_1_highlighted": " vous ne pourrez pas fournir ces informations plus tard.",
@@ -615,6 +597,34 @@
           "rotateLeftAria": "Faire pivoter le caractère dans le sens antihoraire",
           "rotateRightAria": "Faire pivoter le caractère dans le sens horaire"
         }
+      }
+    }
+  },
+  "consent": {
+    "components": {
+      "consentPage": {
+        "beforeWeBeginTitle": "Avant de commencer...",
+        "introPart1": "Nous avons créé cet outil d'IA avec soin pour vous aider, vous et d'autres jeunes comme vous, à explorer vos compétences et à découvrir de nouvelles opportunités.",
+        "introHighlightResponsibly": "Veuillez utiliser l'IA de manière responsable !",
+        "introPart2": "La technologie de l'IA est nouvelle et loin d'être parfaite. Elle ne comprend pas le contexte comme les humains.",
+        "introPart3": "Vérifiez toujours les informations importantes et évitez de partager des informations personnelles sur vous ou sur d'autres personnes avec l'IA pendant la conversation.",
+        "introPart4": "Aidez-nous à garder toutes les interactions avec l'IA sûres et positives ! 😊",
+        "termsAndConditions": "Conditions générales",
+        "privacyPolicy": "Politique de confidentialité",
+        "checkboxTermsAndConditions": "J'ai lu et j'accepte les <0>{{terms_and_conditions}}</0> de Compass.",
+        "checkboxPrivacyPolicy": "J'ai lu et j'accepte la <0>{{privacy_policy}}</0> de Compass.",
+        "areYouReady": "Êtes-vous prêt à commencer ?",
+        "acceptButton": "Oui, je suis prêt",
+        "withSupportFrom": "Avec le soutien de",
+        "modalApology": "Nous sommes désolés que vous choisissiez de ne pas accepter les {{terms_and_conditions}} et la {{privacy_policy}}.",
+        "modalCannotProceed": "Vous ne pourrez pas continuer et serez",
+        "modalLoggedOutHighlight": "déconnecté.",
+        "modalYesExit": "Oui, quitter",
+        "snackbarAgreementAccepted": "Accord accepté",
+        "snackbarUserNotFound": "Utilisateur introuvable",
+        "snackbarLoggedOutSuccess": "Déconnexion réussie.",
+        "snackbarLoggedOutFailure": "Échec de la déconnexion.",
+        "snackbarFailedUpdatePreferences": "Échec de la mise à jour des préférences utilisateur"
       }
     }
   }
