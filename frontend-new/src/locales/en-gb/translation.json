@@ -183,6 +183,7 @@
       "components": {
         "dislikeReasonPopover": {
           "title": "Please tell us what the issue is?",
+          "closeButton": "close feedback",
           "reasons": {
             "inappropriateTone": "Inappropriate Tone",
             "offensiveLanguage": "Offensive Language",

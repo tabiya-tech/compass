@@ -183,6 +183,7 @@
       "components": {
         "dislikeReasonPopover": {
           "title": "Veuillez nous dire quel est le problème",
+          "closeButton": "fermer les commentaires",
           "reasons": {
             "inappropriateTone": "Ton inapproprié",
             "offensiveLanguage": "Langage offensant",
