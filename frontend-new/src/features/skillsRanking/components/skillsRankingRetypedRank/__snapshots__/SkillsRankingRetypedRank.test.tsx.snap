@@ -19,11 +19,15 @@ exports[`SkillsRankingRetypedRank snapshot: initial render in RETYPED_RANK (non-
           class="MuiTypography-root MuiTypography-body1 css-13zm2uq-MuiTypography-root"
           data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
         >
-          As a last question, let's recall what I told you further above just regarding your own fit with opportunities: 
+          As a last question, let's recall what I told you further above just regarding your own fit with opportunities:
+           
           <strong>
             check again what I said three messages ago, how many percent of opportunities
           </strong>
-           on &lt;1&gt;x&lt;/1&gt; do you meet the key skills for?
+           on
+           
+          x
+           do you meet the key skills for?
         </p>
         <div
           class="MuiBox-root css-0"
@@ -62,8 +66,7 @@ exports[`SkillsRankingRetypedRank snapshot: initial render in RETYPED_RANK (non-
           class="MuiTypography-root MuiTypography-caption css-1l3yql3-MuiTypography-root"
           data-testid="chat-message-timestamp-c9253326-05ee-4bff-9d43-7852ca78a033"
         >
-          sent
-           
+          sent 
           just now
         </span>
       </div>

@@ -523,7 +523,10 @@
           "adviceMessage": "Un conseil : Ces chiffres sont pour toi. Comment pourraient-ils changer ta façon de rechercher des postes cette semaine ? Fais une pause et réfléchis à l’endroit où ton temps et ton énergie sont le mieux investis dans ta stratégie de recherche d’emploi."
         },
         "skillsRankingRetypedRank": {
-          "question": "Dernière question : rappelons ce que je t’ai dit plus haut sur ton adéquation avec les opportunités : <0>revois ce que j’ai dit trois messages plus tôt, pour quel pourcentage d’opportunités</0> sur <1>{{jobPlatformUrl}}</1> réponds-tu aux compétences clés ?",
+          "question_1": "Dernière question : rappelons ce que je t’ai dit plus haut sur ton adéquation avec les opportunités :",
+          "question_2": "revois ce que j’ai dit trois messages plus tôt, pour quel pourcentage d’opportunités",
+          "question_3": " sur ",
+          "question_4": "réponds-tu aux compétences clés ?",
           "sliderAria": "Curseur du centile de rang réévalué"
         },
         "skillsRankingPerceivedRank": {
