@@ -530,7 +530,9 @@
         },
         "skillsRankingDisclosure": {
           "skillsRankingMarketDisclosure": {
-            "message": "You meet the key skills for <0>{{jobsMatchingRank}}%</0> of opportunities advertised on <1>{{jobPlatformUrl}}</1>. That’s a solid range of options!"
+            "message_1": "You meet the key skills for ",
+            "message_2": " of opportunities advertised on ",
+            "message_3": ". That’s a solid range of options!"
           },
           "skillsRankingJobSeekerDisclosure": {
             "pendingMessage": "Thanks! We’re double-checking the latest <0>{{jobPlatformUrl}}</0> opportunities so the numbers are accurate. We’ll share your results soon or you can ask for them when we call you for the phone survey.",
