@@ -523,8 +523,8 @@
         "skillsRankingRetypedRank": {
           "question_1": "Última pregunta: recordemos lo que te dije más arriba sobre tu encaje con las oportunidades:",
           "question_2": "volvé a mirar lo que dije tres mensajes atrás, qué porcentaje de oportunidades",
-          "question_3": " en ",
-          "question_4": "cumplís con las habilidades clave?",
+          "question_3": " en",
+          "question_4": " cumplís con las habilidades clave?",
           "sliderAria": "Slider percentil de rango reescrito"
         },
         "skillsRankingPerceivedRank": {

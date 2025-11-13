@@ -523,8 +523,8 @@
         "skillsRankingRetypedRank": {
           "question_1": "As a last question, let's recall what I told you further above just regarding your own fit with opportunities:",
           "question_2": "check again what I said three messages ago, how many percent of opportunities",
-          "question_3": " on ",
-          "question_4": "do you meet the key skills for?",
+          "question_3": " on",
+          "question_4": " do you meet the key skills for?",
           "sliderAria": "Retyped rank percentile slider"
         },
         "skillsRankingPerceivedRank": {
