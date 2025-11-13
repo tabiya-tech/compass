@@ -1,3 +1,4 @@
+import "src/_test_utilities/consoleMock";
 import { render, screen, fireEvent, act } from "src/_test_utilities/test-utils";
 import FeedbackFormContent, { DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import getFeedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
