@@ -21,12 +21,13 @@ from app.countries import Country
 from app.vector_search.esco_entities import SkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
 
-def _format_responsibilities_for_display(responsibilities: list[str]) -> str:
+def _format_responsibilities_for_display(responsibilities: list[str], experience_title: str = None) -> str:
     """
     Format responsibilities list for display to the user.
     
     Args:
         responsibilities: List of responsibility strings
+        experience_title: Title of the experience to include in the message
         
     Returns:
         Formatted string showing the responsibilities
@@ -34,7 +35,8 @@ def _format_responsibilities_for_display(responsibilities: list[str]) -> str:
     if not responsibilities:
         return "No responsibilities have been collected yet."
 
-    formatted = "Here's what we've got so far:\n\n"
+    formatted = f"Great, here's what we have for your experience as '{experience_title}':\n\n"
+    
     for resp in responsibilities:
         formatted += f"- {resp}\n"
 
@@ -70,7 +72,8 @@ async def _check_and_prompt_for_linking(*,
 
     # Create the prompt message (we'll use this for both initial prompt and LLM parsing)
     responsibilities_text = _format_responsibilities_for_display(
-        current_experience.experience.responsibilities.responsibilities
+        current_experience.experience.responsibilities.responsibilities,
+        experience_title=current_experience.experience.experience_title
     )
     prompt_message = (
         f"{responsibilities_text}\n\n"
@@ -364,7 +367,7 @@ class ExploreExperiencesAgentDirector(Agent):
                 )
                 await self._conversation_manager.update_history(user_input, confirmation_output)
                 # get the context again after updating the history
-                context = await self._conversation_manager.get_conversation_context()
+                await self._conversation_manager.get_conversation_context()
 
                 current_experience.dive_in_phase = DiveInPhase.LINKING_RANKING
                 # Reset the flag for future use
