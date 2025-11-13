@@ -120,14 +120,14 @@ const ConversationConclusionFooter: React.FC = () => {
         data-testid={DATA_TEST_ID.CONVERSATION_CONCLUSION_FOOTER_CONTAINER}
       >
         <Typography variant="body1">          
-  {t("chat.chatMessage.conversationConclusionFooter.youCanNow")} {" "}                  
+           {t("chat.chatMessage.conversationConclusionFooter.youCanNow")}{" "}                                   
           <StyledCustomLink
             onClick={handleOpenExperiencesDrawer}
             disableWhenOffline
             data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_BUTTON}
           >
-            <BadgeOutlinedIcon />
-          {t("chat.chatMessage.conversationConclusionFooter.viewAndDownloadCv")}
+           <BadgeOutlinedIcon />
+            {t("chat.chatMessage.conversationConclusionFooter.viewAndDownloadCv")}
           </StyledCustomLink>{" "}
           {t("chat.chatMessage.conversationConclusionFooter.here")}
           {/* Show anonymous user registration link if the user is anonymous and hasn't already converted */}
