@@ -55,8 +55,7 @@ exports[`SkillsRankingProofOfValue snapshot: work-based initial render (non-repl
           class="MuiTypography-root MuiTypography-caption css-1l3yql3-MuiTypography-root"
           data-testid="chat-message-timestamp-c9253326-05ee-4bff-9d43-7852ca78a033"
         >
-          sent
-           
+          sent 
           just now
         </span>
       </div>
