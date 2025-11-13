@@ -67,7 +67,7 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
           </Typography>
           <PrimaryIconButton
             onClick={() => onClose([])} // close without selecting a reason
-            title="close feedback"
+            title={t("chat.reaction.components.dislikeReasonPopover.closeButton")}
             sx={{ color: theme.palette.text.secondary }}
             data-testid={DATA_TEST_ID.CLOSE_ICON_BUTTON}
           >

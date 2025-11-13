@@ -183,6 +183,7 @@
       "components": {
         "dislikeReasonPopover": {
           "title": "Por favor, dinos ¿cuál es el problema?",
+          "closeButton": "cerrar comentarios",
           "reasons": {
             "inappropriateTone": "Tono inapropiado",
             "offensiveLanguage": "Lenguaje ofensivo",
