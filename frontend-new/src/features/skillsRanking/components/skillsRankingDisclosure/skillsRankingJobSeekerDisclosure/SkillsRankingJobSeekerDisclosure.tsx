@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Trans } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { Box, Typography, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -36,6 +36,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
   skillsRankingState,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const selectedLabel = skillsRankingState.score.comparison_label;
   const selectedIndex = jobSeekerComparisonLabels.findIndex((label) => label === selectedLabel);
 
@@ -98,11 +99,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
         <ChatBubble
           sender={ConversationMessageSender.COMPASS}
           message={
-            <Trans
-              i18nKey="features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.pendingMessage"
-              components={[<strong />]}
-              values={{ jobPlatformUrl: getJobPlatformUrl() }}
-            />
+            t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.pendingMessage", { jobPlatformUrl: getJobPlatformUrl() })
           }
         />
       );
@@ -113,25 +110,24 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
         sender={ConversationMessageSender.COMPASS}
         message={
           <>
-            <Trans
-              i18nKey="features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart1"
-              components={[<strong />]}
-              values={{
-                jobPlatformUrl: getJobPlatformUrl(),
-                groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1,
-                groupTotal: jobSeekerComparisonLabels.length
-              }}
-            />
+            {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart1_prefix")}
+            <strong>{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart1_main", {
+              jobPlatformUrl: getJobPlatformUrl(),
+              groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1,
+              groupTotal: jobSeekerComparisonLabels.length
+            })}</strong>
             <br/>
-            <Trans
-              i18nKey="features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2"
-              components={[<strong />, <strong />]}
-              values={{
-                jobPlatformUrl: getJobPlatformUrl(),
-                groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1,
-                comparisonLabel: selectedLabel
-              }}
-            />
+            {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_prefix", {
+              jobPlatformUrl: getJobPlatformUrl()
+            })}
+            <strong>{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_group", {
+              groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1
+            })}</strong>
+            {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_middle")}
+            <strong>{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_label", {
+              comparisonLabel: selectedLabel
+            })}</strong>
+            {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_suffix")}
             <br/>
           </>
         }

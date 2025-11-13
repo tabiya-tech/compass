@@ -539,9 +539,14 @@
             "message_3": ". C’est une belle amplitude de possibilités!"
           },          
           "skillsRankingJobSeekerDisclosure": {
-            "pendingMessage": "Merci ! Nous vérifions à nouveau les dernières opportunités sur <0>{{jobPlatformUrl}}</0> pour garantir l’exactitude des chiffres. Nous partagerons bientôt tes résultats ou tu pourras les demander lors de l’enquête téléphonique.",
-            "comparisonPart1": "De plus, <0>Comparé aux autres utilisateurs de {{jobPlatformUrl}}, tu es dans le groupe {{groupIndex}} sur {{groupTotal}}.</0>",
-            "comparisonPart2": "Imagine aligner 100 utilisateurs de {{jobPlatformUrl}} du plus faible au plus grand nombre de postes auxquels ils correspondent. Nous divisons la file en cinq blocs de 20 personnes. Le bloc 1 (les 20 plus élevés) correspond au plus de postes ; le bloc 5 (les 20 plus bas) au moins. Tu es dans le bloc <0>{{groupIndex}}</0>, qui est le bloc <1>{{comparisonLabel}}</1>."
+            "pendingMessage": "Merci ! Nous vérifions à nouveau les dernières opportunités sur {{jobPlatformUrl}} pour que les chiffres soient précis. Nous partagerons vos résultats bientôt ou vous pourrez les demander quand nous vous appellerons pour l'enquête téléphonique.",
+            "comparisonPart1_prefix": "De plus, ",
+            "comparisonPart1_main": "Comparé à d'autres utilisateurs de \n{{jobPlatformUrl}}\n, tu es dans le groupe [\n{{groupIndex}}\n] sur \n{{groupTotal}}\n.",
+            "comparisonPart2_prefix": "Imagine aligner 100 utilisateurs de \n{{jobPlatformUrl}}\n du plus faible au plus grand nombre de postes auxquels ils correspondent. Nous divisons la file en cinq blocs de 20 personnes. Le bloc 1 (les 20 plus élevés) correspond au plus de postes ; le bloc 5 (les 20 plus bas) au moins. Tu es dans le bloc ",
+            "comparisonPart2_group": "[\n{{groupIndex}}\n]",
+            "comparisonPart2_middle": ", qui est le bloc ",
+            "comparisonPart2_label": "[\n{{comparisonLabel}}\n]",
+            "comparisonPart2_suffix": "."
           }
         },
         "rotateToSolve": {
