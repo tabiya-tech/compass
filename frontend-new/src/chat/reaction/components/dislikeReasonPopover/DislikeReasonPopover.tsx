@@ -75,18 +75,27 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
           </PrimaryIconButton>
         </Box>
         <Box display="flex" flexDirection="row" flexWrap="wrap" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-          {Object.entries(DislikeReasonMessages).map(([enumValue, message]) => (
-            <PrimaryButton
-              key={enumValue}
-              onClick={() => handleReasonClick(enumValue as DislikeReason)}
-              title={t(enumValue.toLowerCase())}
-              style={{ color: theme.palette.text.secondary }}
-              data-testid={DATA_TEST_ID.BUTTON}
-              disabled={!isOnline}
-            >
-              {t(enumValue.toLowerCase())}
-            </PrimaryButton>
-          ))}
+          {Object.entries(DislikeReasonMessages).map(([enumValue, message]) => {
+            // Convert SNAKE_CASE to camelCase (e.g., INAPPROPRIATE_TONE -> inappropriateTone)
+            const camelCaseKey = enumValue.split('_').map((word, index) => {
+              const lower = word.toLowerCase();
+              return index === 0 ? lower : lower.charAt(0).toUpperCase() + lower.slice(1);
+            }).join('');
+            const translationKey = `chat.reaction.components.dislikeReasonPopover.reasons.${camelCaseKey}`;
+            
+            return (
+              <PrimaryButton
+                key={enumValue}
+                onClick={() => handleReasonClick(enumValue as DislikeReason)}
+                title={t(translationKey)}
+                style={{ color: theme.palette.text.secondary }}
+                data-testid={DATA_TEST_ID.BUTTON}
+                disabled={!isOnline}
+              >
+                {t(translationKey)}
+              </PrimaryButton>
+            );
+          })}
         </Box>
       </Box>
     </Popover>
