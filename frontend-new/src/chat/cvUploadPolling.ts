@@ -15,7 +15,13 @@ export function stopUploadPolling(handles?: UploadPollingHandles): void {
 export function getCvUploadDisplayMessage(status: UploadStatus): string {
   if (!status) return "Uploading CV";
   if (status.upload_process_state === "CANCELLED" || status.cancel_requested) return "CV upload cancelled";
-  if (status.upload_process_state === "COMPLETED") return "CV uploaded successfully";
+  if (status.upload_process_state === "COMPLETED") {
+    // If upload is successful but no experience bullets, show a message indicating no data was found
+    if (!status.experience_bullets || status.experience_bullets.length === 0) {
+      return "No work experience data found in your CV";
+    }
+    return "CV uploaded successfully";
+  }
   switch (status.upload_process_state) {
     case "CONVERTING":
       return "Converting CV";

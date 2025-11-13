@@ -81,8 +81,7 @@ class ConversationService(IConversationService):
         if filter_pii:
             user_input = await sensitive_filter.obfuscate(user_input)
 
-        # set the sent_at for the user input
-        user_input = AgentInput(message=user_input, sent_at=datetime.now(timezone.utc))
+        user_input = AgentInput(message=user_input, sent_at=datetime.now(timezone.utc), is_artificial=False)
 
         # set the state of the agent director, the conversation memory manager and all the agents
         state = await self._application_state_metrics_recorder.get_state(session_id)

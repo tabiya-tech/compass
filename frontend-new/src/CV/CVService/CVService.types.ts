@@ -5,5 +5,4 @@ export type CVListItem = {
   filename: string;
   uploaded_at: string;
   upload_process_state: UploadProcessState;
-  experiences_data: string[] | null;
 };

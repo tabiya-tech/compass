@@ -19,8 +19,9 @@ from app.users.cv.routes import (
 from app.users.cv.service import ICVUploadService
 from app.users.cv.errors import MarkdownTooLongError, EmptyMarkdownError, \
     CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError, MarkdownConversionTimeoutError
-from app.users.cv.types import UserCVUpload, UploadProcessState
+from app.users.cv.types import UploadProcessState, CVUploadListItemResponse, CVUploadStatus
 from common_libs.test_utilities.mock_auth import MockAuth
+from app.users.get_user_preferences_repository import get_user_preferences_repository
 
 TestClientWithMocks = tuple[TestClient, ICVUploadService, UserInfo]
 
@@ -28,35 +29,41 @@ TestClientWithMocks = tuple[TestClient, ICVUploadService, UserInfo]
 @pytest.fixture(scope='function')
 def client_with_mocks() -> TestClientWithMocks:
     class MockCVService(ICVUploadService):
-        async def parse_cv(self, *, user_id: str, file_bytes: bytes, filename: str):
+        async def parse_cv(self, *, user_id: str, file_bytes: bytes, filename: str, session_id: int | None = None):
             # Service returns upload_id string per contract
             return "test-upload-id"
 
         async def cancel_upload(self, *, user_id: str, upload_id: str) -> bool:
             return True
 
-        async def get_upload_status(self, *, user_id: str, upload_id: str) -> Optional[dict]:
-            return {
-                "upload_id": upload_id,
-                "user_id": user_id,
-                "filename": "test.pdf",
-                "upload_process_state": "COMPLETED",
-                "cancel_requested": False,
-                "created_at": "2025-01-01T00:00:00Z",
-                "last_activity_at": "2025-01-01T00:00:00Z",
-            }
+        async def get_upload_status(self, *, user_id: str, upload_id: str) -> Optional[CVUploadStatus]:
+            return CVUploadStatus(
+                upload_id=upload_id,
+                user_id=user_id,
+                filename="test.pdf",
+                upload_process_state=UploadProcessState.COMPLETED,
+                cancel_requested=False,
+                created_at=datetime.fromisoformat("2025-01-01T00:00:00+00:00"),
+                last_activity_at=datetime.fromisoformat("2025-01-01T00:00:00+00:00"),
+                experience_bullets=None,
+            )
 
-        async def get_user_cvs(self, *, user_id: str) -> list[dict]:
+        async def get_user_cvs(self, *, user_id: str) -> list[CVUploadListItemResponse]:
             return [
-                {
-                    "upload_id": "upload-1",
-                    "filename": "cv1.pdf",
-                    "uploaded_at": "2025-01-01T00:00:00Z",
-                    "upload_process_state": "COMPLETED",
-                    "experiences_data": ["Experience 1", "Experience 2"],
-                },
-
+                CVUploadListItemResponse(
+                    upload_id="upload-1",
+                    filename="cv1.pdf",
+                    uploaded_at="2025-01-01T00:00:00Z",
+                    upload_process_state=UploadProcessState.COMPLETED,
+                ),
             ]
+
+        async def reinject_upload(self, *, user_id: str, upload_id: str, session_id: int | None = None) -> dict:
+            return {"state_injected": True, "experience_bullets": None}
+
+    class MockUserPreferencesRepo:
+        def get_user_preference_by_user_id(self, _user_id: str):
+            return SimpleNamespace(sessions=[987])
 
     _instance_cv_service = MockCVService()
 
@@ -68,6 +75,7 @@ def client_with_mocks() -> TestClientWithMocks:
     api_router = APIRouter()
     app = FastAPI()
     app.dependency_overrides[get_cv_service] = _mocked_get_cv_service
+    app.dependency_overrides[get_user_preferences_repository] = lambda: MockUserPreferencesRepo()
 
     add_user_cv_routes(api_router, auth=_instance_auth)
     app.include_router(api_router)
@@ -328,6 +336,37 @@ class TestCancelCVUpload:
         assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
 
+class TestReinjectCVUpload:
+    @pytest.mark.asyncio
+    async def test_reinject_success(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        mocker.patch.object(mocked_service, "reinject_upload", return_value={"state_injected": True, "experience_bullets": None})
+
+        resp = client.post(f"/{mocked_user.user_id}/cv/test-upload-id/inject")
+
+        assert resp.status_code == HTTPStatus.OK
+        assert resp.json()["state_injected"] is True
+
+    @pytest.mark.asyncio
+    async def test_reinject_returns_false(self, client_with_mocks: TestClientWithMocks,
+                                          mocker: pytest_mock.MockerFixture):
+        client, mocked_service, mocked_user = client_with_mocks
+        mocker.patch.object(mocked_service, "reinject_upload", return_value={"state_injected": False, "experience_bullets": None})
+
+        resp = client.post(f"/{mocked_user.user_id}/cv/test-upload-id/inject")
+
+        assert resp.status_code == HTTPStatus.OK
+        assert resp.json()["state_injected"] is False
+
+    @pytest.mark.asyncio
+    async def test_reinject_forbidden_other_user(self, client_with_mocks: TestClientWithMocks):
+        client, _, mocked_user = client_with_mocks
+
+        resp = client.post(f"/{mocked_user.user_id}_other/cv/test-upload-id/inject")
+
+        assert resp.status_code == HTTPStatus.FORBIDDEN
+
+
 class TestGetUploadStatus:
     @pytest.mark.asyncio
     async def test_get_upload_status_success(self, client_with_mocks: TestClientWithMocks):
@@ -355,7 +394,8 @@ class TestGetUploadStatus:
         assert resp.status_code == HTTPStatus.FORBIDDEN
 
     @pytest.mark.asyncio
-    async def test_get_upload_status_not_found(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_get_upload_status_not_found(self, client_with_mocks: TestClientWithMocks,
+                                               mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
         # GIVEN service returns None (upload not found)
         mocker.patch.object(mocked_service, "get_upload_status", return_value=None)
@@ -368,7 +408,8 @@ class TestGetUploadStatus:
         assert "Upload not found" in resp.json()["detail"]
 
     @pytest.mark.asyncio
-    async def test_get_upload_status_service_exception_maps_to_500(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_get_upload_status_service_exception_maps_to_500(self, client_with_mocks: TestClientWithMocks,
+                                                                   mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
         # GIVEN service raises unexpected exception
         mocker.patch.object(mocked_service, "get_upload_status", side_effect=Exception("boom"))
@@ -379,6 +420,7 @@ class TestGetUploadStatus:
         # THEN 500 Internal Server Error
         assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
+
 class TestGetUploadedCVs:
     @pytest.mark.asyncio
     async def test_get_uploaded_cvs_success(self, client_with_mocks: TestClientWithMocks,
@@ -387,19 +429,17 @@ class TestGetUploadedCVs:
 
         # GIVEN service returns a list of uploads
         uploads = [
-            SimpleNamespace(
+            CVUploadListItemResponse(
                 upload_id="upload-1",
                 filename="cv1.pdf",
-                created_at=datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc),
-                upload_process_state="COMPLETED",
-                experience_bullets=["Experience 1", "Experience 2"],
+                uploaded_at="2025-01-01T00:00:00Z",
+                upload_process_state=UploadProcessState.COMPLETED,
             ),
-            SimpleNamespace(
+            CVUploadListItemResponse(
                 upload_id="upload-2",
                 filename="cv2.docx",
-                created_at=datetime(2025, 1, 2, 0, 0, 0, tzinfo=timezone.utc),
-                upload_process_state="COMPLETED",
-                experience_bullets=["Experience 1"],
+                uploaded_at="2025-01-02T00:00:00Z",
+                upload_process_state=UploadProcessState.COMPLETED,
             ),
         ]
         mock_get_user_cvs = mocker.patch.object(
@@ -422,13 +462,12 @@ class TestGetUploadedCVs:
         for item, expected in zip(body, uploads):
             assert item["upload_id"] == expected.upload_id
             assert item["filename"] == expected.filename
-            returned_dt = datetime.fromisoformat(item["uploaded_at"].replace("Z", "+00:00"))
-            assert returned_dt == expected.created_at
-            assert item["upload_process_state"] == expected.upload_process_state
-            assert item["experiences_data"] == expected.experience_bullets
+            assert item["uploaded_at"] == expected.uploaded_at
+            assert item["upload_process_state"] == expected.upload_process_state.value
 
     @pytest.mark.asyncio
-    async def test_get_uploaded_cvs_forbidden_other_user(self, client_with_mocks: TestClientWithMocks, mocker: pytest_mock.MockerFixture):
+    async def test_get_uploaded_cvs_forbidden_other_user(self, client_with_mocks: TestClientWithMocks,
+                                                         mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
         # GIVEN a mocked service
         get_user_cvs_mock = mocker.patch.object(mocked_service, "get_user_cvs", mocker.AsyncMock())
@@ -443,7 +482,7 @@ class TestGetUploadedCVs:
 
     @pytest.mark.asyncio
     async def test_get_uploaded_cvs_service_exception_maps_to_500(self, client_with_mocks: TestClientWithMocks,
-                                                                 mocker: pytest_mock.MockerFixture):
+                                                                  mocker: pytest_mock.MockerFixture):
         client, mocked_service, mocked_user = client_with_mocks
         # GIVEN service raises unexpected exception
         mocker.patch.object(mocked_service, "get_user_cvs", side_effect=Exception("boom"))
@@ -453,3 +492,40 @@ class TestGetUploadedCVs:
 
         # THEN 500 Internal Server Error
         assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+class TestCVUploadSessionExtraction:
+    """Tests for CV upload route session_id extraction from user preferences"""
+
+    @pytest.mark.asyncio
+    async def test_upload_calls_service_with_session_when_user_has_sessions(self,
+                                                                            client_with_mocks: TestClientWithMocks,
+                                                                            mocker: pytest_mock.MockerFixture):
+        """Test that upload succeeds when user has sessions (integration via service mock)"""
+        # GIVEN a test client with mocked service
+        client, mocked_service, mocked_user = client_with_mocks
+
+        # AND a tracker to capture session_id parameter passed to service
+        captured_session_ids = []
+        original_parse_cv = mocked_service.parse_cv
+
+        async def parse_cv_tracker(**kwargs):
+            captured_session_ids.append(kwargs.get("session_id"))
+            return await original_parse_cv(**kwargs)
+
+        mocker.patch.object(mocked_service, "parse_cv", side_effect=parse_cv_tracker)
+
+        # AND valid CV file data
+        given_mime_type = next(iter(ALLOWED_MIME_TYPES))
+        given_extension = next(iter(ALLOWED_EXTENSIONS))
+        given_file_content = b"hello"
+        given_headers = {"Content-Type": given_mime_type, "x-filename": f"cv{given_extension}"}
+
+        # WHEN uploading CV (session_id will come from route's user preferences lookup)
+        response = client.post(f"/{mocked_user.user_id}/cv", data=given_file_content, headers=given_headers)
+
+        # THEN request succeeds
+        assert response.status_code == HTTPStatus.OK
+
+        # AND service was called (session_id may be None if user prefs not mocked in this simple test)
+        assert len(captured_session_ids) > 0

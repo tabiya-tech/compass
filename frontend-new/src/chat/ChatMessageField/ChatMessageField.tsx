@@ -4,6 +4,7 @@ import SendIcon from "@mui/icons-material/Send";
 import AddIcon from "@mui/icons-material/Add";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { AnimatePresence, motion } from "framer-motion";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { CV_UPLOAD_ERROR_MESSAGES, getCvUploadErrorMessageFromHttpStatus } from "../CVUploadErrorHandling";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
@@ -15,7 +16,8 @@ import CVService from "src/CV/CVService/CVService";
 import { CVListItem } from "src/CV/CVService/CVService.types";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { ChatError } from "src/error/commonErrors";
-import { formatExperiencesToMessage } from "src/chat/util";
+import { formatExperiencesToMessage, formatCvExperienceBulletsMessage } from "src/chat/util";
+import ChatService from "src/chat/ChatService/ChatService";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import UploadedCVsMenu from "src/CV/uploadedCVsMenu/UploadedCVsMenu";
@@ -23,12 +25,15 @@ import UploadedCVsMenu from "src/CV/uploadedCVsMenu/UploadedCVsMenu";
 export interface ChatMessageFieldProps {
   handleSend: (message: string) => void;
   aiIsTyping: boolean;
+  setAiIsTyping?: (isTyping: boolean) => void; // Optional: for managing typing indicator when sending CV bullets
   isChatFinished: boolean;
   isUploadingCv?: boolean;
   onUploadCv?: (file: File) => Promise<string[]>; // returns array of experience lines
   currentPhase?: ConversationPhase;
   prefillMessage?: string | null; // optional prefill content for the input field
   cvUploadError?: string | null; // CV upload error message from polling process
+  activeSessionId?: number | null;
+  onCvBulletsSent?: (bulletsMessage?: string, sendMessageResponse?: any) => Promise<void>; // refreshes chat after bullets are sent (without sending another message)
 }
 
 const uniqueId = "2a76494f-351d-409d-ba58-e1b2cfaf2a53";
@@ -66,6 +71,7 @@ export const PLACEHOLDER_TEXTS = {
   OFFLINE: "You are offline. Please connect to the internet to send a message.",
   DEFAULT: "Type your message...",
   UPLOADING: "Uploading CV...",
+  REINJECTING: "Loading CV...",
 };
 // Character limit error messages (specific to ChatMessageField)
 export const CHARACTER_LIMIT_ERROR_MESSAGES = {
@@ -116,12 +122,14 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const [uploadedCVs, setUploadedCVs] = useState<CVListItem[]>([]);
   const [isLoadingCVs, setIsLoadingCVs] = useState(false);
   const [menuView, setMenuView] = useState<"main" | "cvList">("main");
+  const [isReinjectingCv, setIsReinjectingCv] = useState(false);
 
   const isCvUploadEnabled = getCvUploadEnabled().toLowerCase() === "true";
+  const { enqueueSnackbar } = useSnackbar();
 
-  // Show the dot badge whenever in COLLECT_EXPERIENCES and not yet seen
+  // Show the dot badge when menu not yet seen and closed
   useEffect(() => {
-    const shouldShow = props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES && !badgeSeen && !isMenuOpen;
+    const shouldShow = !badgeSeen && !isMenuOpen;
     setShowPlusBadge(shouldShow);
   }, [props.currentPhase, badgeSeen, isMenuOpen]);
 
@@ -310,12 +318,62 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
 
   const handleMenuClose = () => setMenuAnchorEl(null);
 
-  const handleSelectCV = (cv: CVListItem) => {
-    const composed = formatExperiencesToMessage(cv.experiences_data);
-    setMessage(composed);
-    setMenuAnchorEl(null);
-    if (composed.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
-      setErrorMessage(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT);
+  const handleSelectCV = async (cv: CVListItem) => {
+    if (isReinjectingCv) {
+      return;
+    }
+    try {
+      setIsReinjectingCv(true);
+      const currentUserId = authenticationStateService.getInstance().getUser()?.id;
+      if (!currentUserId) throw new ChatError("User ID is not available");
+      const reinjectResult = await CVService.getInstance().reinjectFromUpload(currentUserId, cv.upload_id);
+      if (!reinjectResult.success) {
+        const errorMessage = reinjectResult.error || "Failed to load CV. Please try again.";
+        enqueueSnackbar(errorMessage, { variant: "error" });
+        setIsReinjectingCv(false);
+        return;
+      }
+      enqueueSnackbar("CV processed and loaded", { variant: "success" });
+      // Re-enable input immediately after injection completes
+      setIsReinjectingCv(false);
+      setMenuAnchorEl(null);
+      setMenuView("main");
+      // Send experience bullets as a real message if available
+      if (props.activeSessionId != null) {
+        try {
+          if (reinjectResult.experience_bullets && reinjectResult.experience_bullets.length > 0) {
+            const message = formatCvExperienceBulletsMessage(reinjectResult.experience_bullets);
+            // Show typing indicator while waiting for backend response
+            if (props.setAiIsTyping) {
+              props.setAiIsTyping(true);
+            }
+            // Send to server - use the response directly to avoid fetching full history
+            const sendResponse = await ChatService.getInstance().sendMessage(props.activeSessionId, message);
+            // Refresh chat to show the response (pass the message and response so we don't need to fetch history)
+            if (props.onCvBulletsSent) {
+              await props.onCvBulletsSent(message, sendResponse);
+            }
+          } else {
+            // If no bullets, show a message to the user that no experiences were found
+            enqueueSnackbar("No work experience data found in your CV", { variant: "info" });
+            // Don't send the generic message - the state is already injected, just no experiences to display
+          }
+        } catch (err) {
+          // silently ignore in UI; parent Chat handles visible errors
+          console.error("Failed to send message after CV reinjection:", err);
+        } finally {
+          // Hide typing indicator
+          if (props.setAiIsTyping) {
+            props.setAiIsTyping(false);
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error("Failed to reinject from uploaded CV:", err);
+      const errorMessage = err?.response?.data?.detail || err?.message || "Failed to load CV. Please try again.";
+      enqueueSnackbar(errorMessage, { variant: "error" });
+      setIsReinjectingCv(false);
+      // Keep menu open for retry, but ensure anchor is preserved
     }
   };
 
@@ -414,6 +472,9 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     if (props.isChatFinished) {
       return PLACEHOLDER_TEXTS.CHAT_FINISHED;
     }
+    if (isReinjectingCv) {
+      return PLACEHOLDER_TEXTS.REINJECTING;
+    }
     if (props.isUploadingCv) {
       return PLACEHOLDER_TEXTS.UPLOADING;
     }
@@ -424,7 +485,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       return PLACEHOLDER_TEXTS.OFFLINE;
     }
     return PLACEHOLDER_TEXTS.DEFAULT;
-  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, isOnline]);
+  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, isOnline, isReinjectingCv]);
 
   // Check if the send button should be disabled
   const sendIsDisabled = useCallback(() => {
@@ -432,16 +493,17 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       props.isChatFinished ||
       props.aiIsTyping ||
       props.isUploadingCv ||
+      isReinjectingCv ||
       !isOnline ||
       message.trim().length === 0 ||
       message.trim().length > CHAT_MESSAGE_MAX_LENGTH // Only disable the send button when over the limit
     );
-  }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline, message]);
+  }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline, message, isReinjectingCv]);
 
   // Check if the input field should be disabled
   const inputIsDisabled = useCallback(() => {
-    return props.isChatFinished || props.aiIsTyping || props.isUploadingCv || !isOnline;
-  }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline]);
+    return props.isChatFinished || props.aiIsTyping || props.isUploadingCv || isReinjectingCv || !isOnline;
+  }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isReinjectingCv, isOnline]);
 
   const contextMenuItems: MenuItemConfig[] =
     menuView === "main"
@@ -461,14 +523,9 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           {
             id: MENU_ITEM_ID.UPLOAD_CV,
             text: MENU_ITEM_TEXT.UPLOAD_CV,
-            description:
-              props.currentPhase === ConversationPhase.INTRO
-                ? "You can upload your CV as soon as we start exploring your experiences"
-                : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
-                  ? `PDF, DOCX, TXT • Max ${MAX_FILE_SIZE_MB} MB • ${MAX_MARKDOWN_CHARS} chars max`
-                  : "CV upload is only available during experience collection",
+            description: `PDF, DOCX, TXT • Max ${MAX_FILE_SIZE_MB} MB • ${MAX_MARKDOWN_CHARS} chars max`,
             icon: <UploadFileIcon />,
-            disabled: inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
+            disabled: inputIsDisabled(),
             action: handleFileMenuItemClick,
           },
         ]
@@ -485,6 +542,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                 onSelect={handleSelectCV}
                 isLoading={isLoadingCVs}
                 uploadedCVs={uploadedCVs}
+                isReinjecting={isReinjectingCv}
               />
             ),
           },

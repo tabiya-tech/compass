@@ -23,14 +23,12 @@ export const Shown: Story = {
         filename: "John_Doe_CV.pdf",
         uploaded_at: new Date().toISOString(),
         upload_process_state: "COMPLETED",
-        experiences_data: [],
       },
       {
         upload_id: "2",
         filename: "Jane_Smith_Resume.docx",
         uploaded_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
         upload_process_state: "COMPLETED",
-        experiences_data: [],
       },
     ],
     isLoading: false,
@@ -53,7 +51,6 @@ export const Disabled: Story = {
         filename: "John_Doe_CV.pdf",
         uploaded_at: new Date().toISOString(),
         upload_process_state: "COMPLETED",
-        experiences_data: [],
       },
     ],
     isLoading: false,

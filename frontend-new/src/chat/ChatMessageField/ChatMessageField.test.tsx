@@ -23,6 +23,21 @@ import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { getCvUploadEnabled } from "src/envService";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import CVService from "src/CV/CVService/CVService";
+import ChatService from "src/chat/ChatService/ChatService";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
+
+// mock the snackbar
+jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
+  const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
+  return {
+    ...actual,
+    __esModule: true,
+    useSnackbar: jest.fn().mockReturnValue({
+      enqueueSnackbar: jest.fn(),
+      closeSnackbar: jest.fn(),
+    }),
+  };
+});
 
 // mock the getCvUploadEnabled function
 jest.mock("src/envService", () => ({
@@ -658,7 +673,7 @@ describe("ChatMessageField", () => {
     });
 
     describe("Plus button", () => {
-      let mockCVServiceInstance: { getAllCVs: jest.Mock };
+      let mockCVServiceInstance: { getAllCVs: jest.Mock; reinjectFromUpload: jest.Mock };
 
       beforeEach(() => {
         // Mock user to be logged in by default
@@ -667,6 +682,7 @@ describe("ChatMessageField", () => {
 
         mockCVServiceInstance = {
           getAllCVs: jest.fn().mockResolvedValue([]),
+          reinjectFromUpload: jest.fn().mockResolvedValue({ success: true }),
         };
         jest.spyOn(CVService, "getInstance").mockReturnValue(mockCVServiceInstance as any);
       });
@@ -690,7 +706,7 @@ describe("ChatMessageField", () => {
 
         // AND the context menu is opened
         await waitFor(() => {
-          expect(ContextMenu).toHaveBeenCalledWith(
+          expect(ContextMenu).toHaveBeenLastCalledWith(
             expect.objectContaining({
               anchorEl: plusButton,
               open: true,
@@ -739,7 +755,7 @@ describe("ChatMessageField", () => {
 
         // AND the context menu is opened
         await waitFor(() => {
-          expect(ContextMenu).toHaveBeenCalledWith(
+          expect(ContextMenu).toHaveBeenLastCalledWith(
             expect.objectContaining({
               anchorEl: plusButton,
               open: true,
@@ -879,14 +895,12 @@ describe("ChatMessageField", () => {
             filename: "foo_bar.pdf",
             uploaded_at: new Date().toISOString(),
             upload_process_state: "COMPLETED",
-            experiences_data: ["foo"],
           },
           {
             upload_id: "cv2",
             filename: "foo_baz.pdf",
             uploaded_at: new Date().toISOString(),
             upload_process_state: "COMPLETED",
-            experiences_data: ["foo", "bar"],
           },
         ];
         mockCVServiceInstance.getAllCVs.mockResolvedValue(mockCvs);
@@ -923,22 +937,125 @@ describe("ChatMessageField", () => {
         const firstCVItem = screen.getByText("foo_bar.pdf");
         await userEvent.click(firstCVItem);
 
-        // THEN expect the composed content from the selected CV to be added to the input field
-        const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+        // THEN expect reinjection call and a success notification; the menu should close
         await waitFor(() => {
-          expect(chatMessageField).toHaveValue("These are my experiences:\n• foo");
+          expect(mockCVServiceInstance.reinjectFromUpload).toHaveBeenCalledWith("fooUser", "cv1");
         });
-        // AND the menu should close
-        expect(screen.queryByTestId(MENU_ITEM_ID.VIEW_UPLOADED_CVS)).not.toBeInTheDocument();
+        await waitFor(() => {
+          expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+            "CV processed and loaded",
+            expect.objectContaining({ variant: "success" })
+          );
+        });
+        // Menu may remain mounted by ContextMenu wrapper; focus on reinjection + snackbar
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
+      });
+
+      test("should disable chat input while reinjecting a CV and show a notification when completed", async () => {
+        const givenPhase = ConversationPhase.COLLECT_EXPERIENCES;
+        const mockOnUploadCv = jest.fn();
+        const mockSetAiIsTyping = jest.fn();
+        const mockOnCvBulletsSent = jest.fn().mockResolvedValue(undefined);
+        const mockCvs = [
+          {
+            upload_id: "cv1",
+            filename: "foo_bar.pdf",
+            uploaded_at: new Date().toISOString(),
+            upload_process_state: "COMPLETED",
+          },
+        ];
+        mockCVServiceInstance.getAllCVs.mockResolvedValue(mockCvs);
+
+        let resolveReinject: (value: { success: boolean; experience_bullets?: string[] }) => void = () => {};
+        const reinjectPromise = new Promise<{ success: boolean; experience_bullets?: string[] }>((resolve) => {
+          resolveReinject = resolve;
+        });
+        mockCVServiceInstance.reinjectFromUpload.mockImplementationOnce(() => reinjectPromise);
+
+        const mockChatServiceInstance = {
+          sendMessage: jest.fn().mockResolvedValue({
+            experiences_explored: 0,
+            messages: [],
+            conversation_completed: false,
+          }),
+        };
+        const chatServiceSpy = jest.spyOn(ChatService, "getInstance").mockReturnValue(mockChatServiceInstance as any);
+
+        render(
+          <ChatMessageField
+            handleSend={jest.fn()}
+            aiIsTyping={false}
+            setAiIsTyping={mockSetAiIsTyping}
+            isChatFinished={false}
+            onUploadCv={mockOnUploadCv}
+            currentPhase={givenPhase}
+            activeSessionId={987}
+            onCvBulletsSent={mockOnCvBulletsSent}
+          />
+        );
+
+        const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
+        await userEvent.click(plusButton);
+        const viewUploadedCvsOption = screen.getByTestId(MENU_ITEM_ID.VIEW_UPLOADED_CVS);
+        await userEvent.click(viewUploadedCvsOption);
+
+        const firstCVItem = await screen.findByText("foo_bar.pdf");
+        await userEvent.click(firstCVItem);
+
+        await waitFor(() => {
+          expect(mockCVServiceInstance.reinjectFromUpload).toHaveBeenCalledWith("fooUser", "cv1");
+        });
+
+        await waitFor(() => {
+          expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD)).toBeDisabled();
+        });
+        expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_SEND_BUTTON)).toBeDisabled();
+
+        await act(async () => {
+          resolveReinject({ 
+            success: true, 
+            experience_bullets: ["Software Engineer at Company A", "Data Scientist at Company B"] 
+          });
+        });
+
+        await waitFor(() => {
+          expect(screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD)).toBeEnabled();
+        });
+        await waitFor(() => {
+          expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("CV processed and loaded", expect.objectContaining({ variant: "success" }));
+        });
+        await waitFor(() => {
+          expect(mockSetAiIsTyping).toHaveBeenCalledWith(true);
+        });
+        await waitFor(() => {
+          expect(mockChatServiceInstance.sendMessage).toHaveBeenCalledWith(
+            987,
+            "I have these experiences:\n\n• Software Engineer at Company A\n• Data Scientist at Company B \n\nLet's start with these."
+          );
+        });
+        await waitFor(() => {
+          expect(mockOnCvBulletsSent).toHaveBeenCalledWith(
+            "I have these experiences:\n\n• Software Engineer at Company A\n• Data Scientist at Company B \n\nLet's start with these.",
+            expect.objectContaining({
+              experiences_explored: 0,
+              messages: [],
+              conversation_completed: false,
+            })
+          );
+        });
+        await waitFor(() => {
+          expect(mockSetAiIsTyping).toHaveBeenCalledWith(false);
+        });
+
+        chatServiceSpy.mockRestore();
       });
     });
   });
 
   describe("CV Upload Feature Flag", () => {
-    let mockCVServiceInstance: { getAllCVs: jest.Mock };
+    let mockCVServiceInstance: { getAllCVs: jest.Mock; reinjectFromUpload: jest.Mock };
 
     beforeEach(() => {
       // Mock user to be logged in by default
@@ -947,6 +1064,7 @@ describe("ChatMessageField", () => {
 
       mockCVServiceInstance = {
         getAllCVs: jest.fn().mockResolvedValue([]),
+        reinjectFromUpload: jest.fn().mockResolvedValue({ success: true }),
       };
       jest.spyOn(CVService, "getInstance").mockReturnValue(mockCVServiceInstance as any);
     });
@@ -1076,7 +1194,7 @@ describe("ChatMessageField", () => {
 
       // THEN expect the context menu to be rendered
       await waitFor(() => {
-        expect(ContextMenu).toHaveBeenCalledWith(
+        expect(ContextMenu).toHaveBeenLastCalledWith(
           expect.objectContaining({
             anchorEl: plusButton,
             open: true,
@@ -1109,16 +1227,16 @@ describe("ChatMessageField", () => {
       const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
       await userEvent.click(plusButton);
 
-      // THEN expect the context menu to be rendered with the correct description
+      // THEN expect the context menu to be rendered with the correct description and enabled
       await waitFor(() => {
-        expect(ContextMenu).toHaveBeenCalledWith(
+        expect(ContextMenu).toHaveBeenLastCalledWith(
           expect.objectContaining({
             anchorEl: plusButton,
             open: true,
             items: expect.arrayContaining([
               expect.objectContaining({
-                description: "You can upload your CV as soon as we start exploring your experiences",
-                disabled: true, // Should be disabled in INTRO phase
+                description: `PDF, DOCX, TXT • Max ${MAX_FILE_SIZE_MB} MB • ${MAX_MARKDOWN_CHARS} chars max`,
+                disabled: false,
               }),
             ]),
           }),
@@ -1150,16 +1268,16 @@ describe("ChatMessageField", () => {
       const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
       await userEvent.click(plusButton);
 
-      // THEN expect the context menu to be rendered with the correct description
+      // THEN expect the context menu to be rendered with the correct description and enabled
       await waitFor(() => {
-        expect(ContextMenu).toHaveBeenCalledWith(
+        expect(ContextMenu).toHaveBeenLastCalledWith(
           expect.objectContaining({
             anchorEl: plusButton,
             open: true,
             items: expect.arrayContaining([
               expect.objectContaining({
                 description: `PDF, DOCX, TXT • Max ${MAX_FILE_SIZE_MB} MB • ${MAX_MARKDOWN_CHARS} chars max`,
-                disabled: false, // Should be enabled in COLLECT_EXPERIENCES phase
+                disabled: false,
               }),
             ]),
           }),
@@ -1191,16 +1309,16 @@ describe("ChatMessageField", () => {
       const plusButton = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON);
       await userEvent.click(plusButton);
 
-      // THEN expect the context menu to be rendered with the correct description
+      // THEN expect the context menu to be rendered with the correct description and enabled
       await waitFor(() => {
-        expect(ContextMenu).toHaveBeenCalledWith(
+        expect(ContextMenu).toHaveBeenLastCalledWith(
           expect.objectContaining({
             anchorEl: plusButton,
             open: true,
             items: expect.arrayContaining([
               expect.objectContaining({
-                description: "CV upload is only available during experience collection",
-                disabled: true, // Should be disabled after COLLECT_EXPERIENCES phase
+                description: `PDF, DOCX, TXT • Max ${MAX_FILE_SIZE_MB} MB • ${MAX_MARKDOWN_CHARS} chars max`,
+                disabled: false,
               }),
             ]),
           }),

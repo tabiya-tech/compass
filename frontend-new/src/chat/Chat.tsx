@@ -1,5 +1,7 @@
 import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChatService from "src/chat/ChatService/ChatService";
+import MetricsService from "src/metrics/metricsService";
+import { EventType } from "src/metrics/types";
 import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "src/chat/Chat.types";
 import {
@@ -20,7 +22,7 @@ import ChatMessageField from "./ChatMessageField/ChatMessageField";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
+import { ConversationMessage, ConversationMessageSender, ConversationResponse } from "./ChatService/ChatService.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/experiences/experiencesDrawer/ExperiencesDrawer";
 import { DiveInPhase, Experience } from "src/experiences/experienceService/experiences.types";
@@ -28,7 +30,7 @@ import ExperienceService from "src/experiences/experienceService/experienceServi
 import InactiveBackdrop from "src/theme/Backdrop/InactiveBackdrop";
 import ConfirmModalDialog from "src/theme/confirmModalDialog/ConfirmModalDialog";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
-import { ChatError } from "src/error/commonErrors";
+import { AuthenticationError, ChatError } from "src/error/commonErrors";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { issueNewSession } from "./issueNewSession";
 import { ChatProvider } from "src/chat/ChatContext";
@@ -40,6 +42,7 @@ import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "./chatMessage/convers
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 import cvService from "src/CV/CVService/CVService";
+import { useCvBulletsHandler } from "./hooks/useCvBulletsHandler";
 import {
   getCvUploadDisplayMessage,
   getUploadErrorMessage,
@@ -153,7 +156,6 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
 
   const { showSkillsRanking } = useSkillsRanking(addMessageToChat, removeMessageFromChat);
 
-
   // Depending on the typing state, add or remove the typing message from the messages list
   const addOrRemoveTypingMessage = (userIsTyping: boolean) => {
     if (userIsTyping) {
@@ -218,6 +220,98 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     }
   }, [enqueueSnackbar, activeSessionId]);
 
+  // Helper function to process chat history response and update state
+  const processChatHistoryResponse = useCallback(
+    async (
+      response: ConversationResponse,
+      options: {
+        skipUserMessage?: string; // Skip user messages matching this text (for optimistic updates)
+        sessionId: number;
+      }
+    ) => {
+      const { skipUserMessage, sessionId } = options;
+
+      // Update explored experiences
+      setExploredExperiences(response.experiences_explored);
+      if (response.experiences_explored > exploredExperiences) {
+        setExploredExperiencesNotification(true);
+        await fetchExperiences();
+      }
+
+      // Process messages (skip conclusion message and optionally skip matching user messages)
+      // Use functional update to check for existing messages and avoid duplicates
+      setMessages((prevMessages) => {
+        const existingMessageIds = new Set(prevMessages.map((msg) => msg.message_id));
+        const newMessages: IChatMessage<any>[] = [];
+
+        response.messages.forEach((messageItem: ConversationMessage, idx: number) => {
+          const isConclusionMessage = response.conversation_completed && idx === response.messages.length - 1;
+          if (!isConclusionMessage) {
+            // Skip if message already exists
+            if (existingMessageIds.has(messageItem.message_id)) {
+              return;
+            }
+
+            // Skip user messages that match the one we already added optimistically
+            if (
+              messageItem.sender === ConversationMessageSender.USER &&
+              skipUserMessage &&
+              messageItem.message === skipUserMessage
+            ) {
+              return;
+            }
+
+            // Add all other messages
+            if (messageItem.sender === ConversationMessageSender.USER) {
+              newMessages.push(generateUserMessage(messageItem.message, messageItem.sent_at, messageItem.message_id));
+            } else {
+              newMessages.push(
+                generateCompassMessage(
+                  messageItem.message_id,
+                  messageItem.message,
+                  messageItem.sent_at,
+                  messageItem.reaction
+                )
+              );
+            }
+          }
+        });
+
+        return [...prevMessages, ...newMessages];
+      });
+
+      // Handle conclusion message and skills ranking flow
+      if (response.conversation_completed && response.messages.length) {
+        const lastMessage = response.messages[response.messages.length - 1];
+
+        if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
+          const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(sessionId);
+          const isAlreadyCompleted = skillsRankingState?.completed_at !== undefined;
+
+          const showConclusionMessage = createShowConclusionMessage(
+            lastMessage,
+            addMessageToChat,
+            setAiIsTyping,
+            isAlreadyCompleted
+          );
+          await showSkillsRanking(showConclusionMessage);
+        } else {
+          const conclusionMessage = generateConversationConclusionMessage(
+            lastMessage.message_id,
+            lastMessage.message
+          );
+          addMessageToChat(conclusionMessage);
+        }
+      }
+
+      // Update conversation state
+      setConversationCompleted(response.conversation_completed);
+      setConversationConductedAt(response.conversation_conducted_at);
+      setCurrentPhase((_previousCurrentPhase) => parseConversationPhase(response.current_phase, _previousCurrentPhase));
+    },
+    [exploredExperiences, fetchExperiences, addMessageToChat, showSkillsRanking]
+  );
+
   // Opens the experiences drawer and get experiences if needed
   const handleOpenExperiencesDrawer = useCallback(async () => {
     setIsDrawerOpen(true);
@@ -253,6 +347,14 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   // Compute display message from status
   const getCvUploadDisplayMessageMemo = useCallback((status: UploadStatus): string => getCvUploadDisplayMessage(status), []);
 
+  // Use the CV bullets handler hook to consolidate upload and reinjection logic
+  const cvBulletsHandler = useCvBulletsHandler({
+    sessionId: activeSessionId,
+    addMessageToChat,
+    setAiIsTyping,
+    processChatHistoryResponse,
+  });
+
   // Helper function to start polling for upload status
   const startPollingForUpload = useCallback((uploadId: string, messageId: string) => {
     // Stop any existing polling for this uploadId first
@@ -268,11 +370,10 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
       maxDurationMs: MAX_UPLOAD_POLL_MS,
       getStatus: async (id: string): Promise<UploadStatus> => {
         const currentUserId = authenticationStateService.getInstance().getUser()?.id;
-        if (!currentUserId) throw new Error("User ID missing");
+        if (!currentUserId) throw new AuthenticationError("User ID missing");
         const resp = await cvService.getInstance().getUploadStatus(currentUserId, id);
-        // Narrow to UploadStatus
-return {
-          upload_process_state: resp.upload_process_state as UploadStatus["upload_process_state"],
+        return {
+          upload_process_state: resp.upload_process_state,
           cancel_requested: resp.cancel_requested,
           filename: resp.filename,
           user_id: resp.user_id,
@@ -281,6 +382,8 @@ return {
           last_activity_at: resp.last_activity_at,
           error_code: resp.error_code,
           error_detail: resp.error_detail,
+          state_injected: resp.state_injected,
+          injection_error: resp.injection_error,
           experience_bullets: resp.experience_bullets,
         } as UploadStatus;
       },
@@ -300,20 +403,45 @@ return {
           return msg;
         }));
       },
-      onComplete: (status: UploadStatus) => {
+      onComplete: async (status: UploadStatus) => {
         stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
         removeMessageFromChat(messageId);
-        const items: string[] | undefined = status.experience_bullets ?? undefined;
-        if (Array.isArray(items) && items.length > 0) {
-          const intro = "These are my experiences:";
-          const bullets = items
-            .map((s) => (s?.trim()?.length ? `• ${s.trim()}` : ""))
-            .filter(Boolean)
-            .join("\n");
-          const composed = bullets ? `${intro}\n${bullets}` : intro;
-          setPrefillMessage(composed);
+        enqueueSnackbar("CV processed and loaded", { variant: "success" });
+        // Frontend metric: auto advance after CV upload completes
+        try {
+          const userId = authenticationStateService.getInstance().getUser()?.id;
+          if (userId && activeSessionId != null) {
+            MetricsService.getInstance().sendMetricsEvent({
+              event_type: EventType.UI_INTERACTION,
+              user_id: userId,
+              actions: ["cv_upload_auto_advance"],
+              element_id: "cv_upload_auto_advance",
+              timestamp: new Date().toISOString(),
+              relevant_experiments: {},
+              details: {
+                session_id: activeSessionId,
+                state_injected: Boolean((status as any).state_injected),
+              },
+            });
+          }
+        } catch (metricErr) {
+          console.error("Failed to send cv_upload_auto_advance metric", metricErr);
         }
-        enqueueSnackbar("CV uploaded successfully", { variant: "success" });
+        
+        // Send experience bullets as a real message if available
+        if (status.experience_bullets && status.experience_bullets.length > 0 && activeSessionId != null) {
+          try {
+            await cvBulletsHandler.handleBullets(status.experience_bullets);
+          } catch (err) {
+            // Error already logged in handleBullets
+          }
+        } else {
+          // If no bullets, show a message to the user that no experiences were found
+          // Keep the typing message visible longer so user can see the "No work experience data found" message
+          setTimeout(() => removeMessageFromChat(messageId), 3000);
+          enqueueSnackbar("No work experience data found in your CV", { variant: "info" });
+          // Don't send the generic message - the state is already injected, just no experiences to display
+        }
       },
       onTerminal: (_status: UploadStatus) => {
         stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
@@ -357,7 +485,7 @@ return {
       }
     });
     setActiveUploads(prev => new Map(prev).set(uploadId, { messageId, intervalId: handles.intervalId as any, timeoutId: handles.timeoutId as any }));
-  }, [activeUploads, enqueueSnackbar, removeMessageFromChat, messages, stopPollingForUpload, getCvUploadDisplayMessageMemo]);
+  }, [activeUploads, stopPollingForUpload, getCvUploadDisplayMessageMemo, removeMessageFromChat, enqueueSnackbar, messages, activeSessionId, cvBulletsHandler]);
 
   // Helper function to cancel an upload
   const handleCancelUpload = useCallback(async (uploadId: string) => {
@@ -457,7 +585,7 @@ return {
                 ...msg,
                 payload: {
                   ...msg.payload,
-                  onCancel: async () => await handleCancelUpload(response.uploadId!),
+                  onCancel: async () => await handleCancelUpload(response.uploadId),
                 }
               };
             }
@@ -512,60 +640,7 @@ return {
       try {
         // Send the user's message
         const response = await ChatService.getInstance().sendMessage(sessionId, userMessage);
-
-        setExploredExperiences(response.experiences_explored);
-
-        if (response.experiences_explored > exploredExperiences) {
-          setExploredExperiencesNotification(true);
-          await fetchExperiences();
-        }
-
-        response.messages.forEach((messageItem, idx) => {
-          const isConclusionMessage = response.conversation_completed && idx === response.messages.length - 1;
-          if (!isConclusionMessage) {
-            addMessageToChat(
-              generateCompassMessage(
-                messageItem.message_id,
-                messageItem.message,
-                messageItem.sent_at,
-                messageItem.reaction
-              )
-            );
-          }
-        });
-        // Handle the conclusion message and skills ranking flow for new messages
-        if (response.conversation_completed && response.messages.length) {
-          const lastMessage = response.messages[response.messages.length - 1];
-
-          if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
-            // Check if skill ranking is already completed
-            const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(activeSessionId!);
-            const isAlreadyCompleted = skillsRankingState?.completed_at !== undefined;
-
-            const showConclusionMessage = createShowConclusionMessage(
-              lastMessage,
-              addMessageToChat,
-              setAiIsTyping,
-              isAlreadyCompleted
-            );
-            await showSkillsRanking(showConclusionMessage);
-          } else {
-            const conclusionMessage = generateConversationConclusionMessage(
-              lastMessage.message_id,
-              lastMessage.message
-            );
-
-            addMessageToChat(conclusionMessage);
-          }
-        }
-
-        setConversationCompleted(response.conversation_completed);
-        setConversationConductedAt(response.conversation_conducted_at);
-
-        // Set the current conversation phase
-        setCurrentPhase((_previousCurrentPhase) => {
-          return parseConversationPhase(response.current_phase, _previousCurrentPhase);
-        });
+        await processChatHistoryResponse(response, { sessionId });
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error));
         addMessageToChat(generatePleaseRepeatMessage());
@@ -573,7 +648,7 @@ return {
         setAiIsTyping(false);
       }
     },
-    [addMessageToChat, exploredExperiences, fetchExperiences, activeSessionId, showSkillsRanking]
+    [addMessageToChat, processChatHistoryResponse]
   );
 
   const initializeChat = useCallback(
@@ -596,6 +671,8 @@ return {
             setMessages([generateTypingMessage()]);
             // AND clear the current phase
             setCurrentPhase(defaultCurrentPhase);
+            // AND clear CV upload errors
+            setCvUploadError(null);
           } else {
             console.debug("Failed to issue new session");
             return false;
@@ -699,6 +776,8 @@ return {
   const handleConfirmNewConversation = useCallback(async () => {
     setNewConversationDialog(false);
     setExploredExperiencesNotification(false);
+    // Clear CV upload errors when starting a new conversation
+    setCvUploadError(null);
     if (await initializeChat(currentUserId, null)) {
       enqueueSnackbar(NOTIFICATION_MESSAGES_TEXT.NEW_CONVERSATION_STARTED, { variant: "success" });
     } else {
@@ -862,12 +941,15 @@ return {
               <ChatMessageField
                 handleSend={handleSend}
                 aiIsTyping={aiIsTyping}
+                setAiIsTyping={setAiIsTyping}
                 isChatFinished={conversationCompleted}
                 isUploadingCv={isUploadingCv || activeUploads.size > 0}
                 onUploadCv={handleUploadCv}
                 currentPhase={currentPhase.phase}
                 prefillMessage={prefillMessage}
                 cvUploadError={cvUploadError}
+                activeSessionId={activeSessionId}
+                onCvBulletsSent={cvBulletsHandler.handleBulletsSent}
               />
             </Box>
           </Box>

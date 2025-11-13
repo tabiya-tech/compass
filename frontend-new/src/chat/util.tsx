@@ -23,6 +23,16 @@ export const FIXED_MESSAGES_TEXT = {
   PLEASE_REPEAT: "I'm sorry, something seems to have gone wrong on my end... Can you please repeat that?",
 };
 
+/**
+ * Formats experience bullets into a user message string for CV upload/reinjection.
+ * @param bullets - Array of experience bullet strings
+ * @returns Formatted message string
+ */
+export const formatCvExperienceBulletsMessage = (bullets: string[]): string => {
+  const bulletsText = bullets.map(b => `• ${b}`).join("\n");
+  return `I have these experiences:\n\n${bulletsText} \n\nLet's start with these.`;
+};
+
 export const generateUserMessage = (
   message: string,
   sent_at: string,
@@ -133,7 +143,7 @@ export const generateCancellableCVTypingMessage = (
 
   const payload: CancellableTypingChatMessageProps = {
     message: getDisplayMessage(),
-    thinkingMessage: "Processing your CV, this might take a while...",
+    thinkingMessage: "Processing your CV, this might take a minute",
     waitBeforeThinking: 10000, // 10 seconds for CV processing
     disabled: isUploaded || isCancelled,
     onCancel: async () => await onCancel(uploadId),

@@ -30,5 +30,7 @@ export interface UploadStatus {
   last_activity_at?: string;
   error_code?: string | null;
   error_detail?: string | null;
+  state_injected?: boolean;
+  injection_error?: string | null;
   experience_bullets?: string[] | null;
 }

@@ -313,27 +313,31 @@ class TestUserCVRepository:
         final_doc = await repository.get_upload_by_id(user_id, upload.upload_id)
         assert final_doc["upload_process_state"] == UploadProcessState.CONVERTING
 
+
     @pytest.mark.asyncio
-    async def test_list_uploads_for_user_returns_all_uploads(self, get_user_cv_repository: Awaitable[UserCVRepository]):
+    async def test_get_user_uploads_returns_only_completed_sorted(self, get_user_cv_repository: Awaitable[UserCVRepository]):
         repository = await get_user_cv_repository
+        user_id = "user-list"
         now = datetime.now(timezone.utc)
-        user_id = "user-1"
 
-        # GIVEN multiple uploads for the user
-        uploads = [
-            _get_upload(user_id=user_id, created_at=now - timedelta(minutes=i), suffix=str(i), md5_hash=f"hash_{i}")
-            for i in range(5)
-        ]
-        for upload in uploads:
-            upload.upload_process_state = UploadProcessState.COMPLETED
-            await repository.insert_upload(upload)
+        # GIVEN uploads in different states and times
+        u_old_completed = _get_upload(user_id=user_id, created_at=now - timedelta(minutes=10), suffix="a", md5_hash="h1")
+        u_old_completed.upload_process_state = UploadProcessState.COMPLETED
 
-        # WHEN listing uploads
-        results = await repository.get_user_uploads(user_id=user_id)
+        u_recent_completed = _get_upload(user_id=user_id, created_at=now - timedelta(minutes=1), suffix="b", md5_hash="h2")
+        u_recent_completed.upload_process_state = UploadProcessState.COMPLETED
 
-        # THEN all uploads are returned, sorted by created_at descending
-        assert len(results) == 5
-        sorted_uploads = sorted(uploads, key=lambda u: u.created_at, reverse=True)
-        for result, expected in zip(results, sorted_uploads):
-            assert result.upload_id == expected.upload_id
-            assert result.filename == expected.filename
+        u_recent_failed = _get_upload(user_id=user_id, created_at=now - timedelta(minutes=2), suffix="c", md5_hash="h3")
+        u_recent_failed.upload_process_state = UploadProcessState.FAILED
+
+        await repository.insert_upload(u_old_completed)
+        await repository.insert_upload(u_recent_completed)
+        await repository.insert_upload(u_recent_failed)
+
+        # WHEN getting user uploads (completed only)
+        items = await repository.get_user_uploads(user_id=user_id)
+
+        # THEN only completed uploads are returned, newest first
+        assert [it.filename for it in items] == [u_recent_completed.filename, u_old_completed.filename]
+
+

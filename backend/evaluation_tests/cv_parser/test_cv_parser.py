@@ -2,7 +2,10 @@ import os
 
 import pytest
 
-from app.users.cv.utils.llm_extractor import CVExperienceExtractor
+import logging
+from app.users.cv.utils.cv_structured_extractor import CVStructuredExperienceExtractor
+from app.users.cv.utils.cv_responsibilities_extractor import CVResponsibilitiesExtractor
+from app.agent.skill_explorer_agent._responsibilities_extraction_tool import _ResponsibilitiesExtractionTool
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationResult, EvaluationRecord
 from evaluation_tests.cv_parser.cv_parser_evaluator import CVParserEvaluator
 from evaluation_tests.cv_parser.test_cases import test_cases, CVParserTestCase
@@ -39,8 +42,24 @@ test_cases_to_run = get_test_cases_to_run(test_cases)
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize("case", test_cases_to_run, ids=[c.name for c in test_cases_to_run])
 async def test_cv_parser(case: CVParserTestCase, common_folder_path: str):
-    extractor = CVExperienceExtractor()
-    items = await extractor.extract_experiences(case.markdown_cv)
+    logger = logging.getLogger("CVStructuredExtractorEval")
+    tool = _ResponsibilitiesExtractionTool(logger)
+    resp_extractor = CVResponsibilitiesExtractor(logger, tool)
+    extractor = CVStructuredExperienceExtractor(logger, resp_extractor)
+    structured = await extractor.extract_structured_experiences(case.markdown_cv)
+    # Convert structured experiences to simple lines for backward-compatible evaluation
+    items = []
+    for e in structured.experience_entities:
+        parts = [e.experience_title]
+        if e.company:
+            parts.append(f"at {e.company}")
+        if e.location:
+            parts.append(e.location)
+        if e.timeline and e.timeline.start:
+            parts.append(e.timeline.start)
+        if e.timeline and e.timeline.end:
+            parts.append(e.timeline.end)
+        items.append(" ".join(parts).strip())
 
     # write to an output file for manual inspection
     write_to_file(folder=common_folder_path + f"cv_parser_{case.name}",

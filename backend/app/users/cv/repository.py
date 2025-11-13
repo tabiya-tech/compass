@@ -7,7 +7,7 @@ from pymongo.errors import DuplicateKeyError
 
 from app.server_dependencies.database_collections import Collections
 from app.users.cv.errors import DuplicateCVUploadError
-from app.users.cv.types import UserCVUpload, UploadProcessState
+from app.users.cv.types import UserCVUpload, UploadProcessState, CVStructuredExtraction
 from common_libs.time_utilities import get_now, datetime_to_mongo_date, mongo_date_to_datetime
 
 
@@ -54,15 +54,23 @@ class IUserCVRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def store_experiences(self, user_id: str, upload_id: str, *, experiences: list[str]) -> bool:
+    async def store_structured_extraction(self, user_id: str, upload_id: str, *, structured_extraction: CVStructuredExtraction) -> bool:
         raise NotImplementedError()
 
     @abstractmethod
     async def mark_cancelled(self, user_id: str, upload_id: str) -> bool:
         raise NotImplementedError()
 
-    @abstractmethod
     async def get_user_uploads(self, *, user_id: str) -> list[UserCVUpload]:
+        """Optional extension point: return completed uploads for a user."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def mark_state_injected(self, user_id: str, upload_id: str) -> bool:
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def mark_injection_failed(self, user_id: str, upload_id: str, *, error: str) -> bool:
         raise NotImplementedError()
 
 
@@ -88,7 +96,11 @@ class UserCVRepository(IUserCVRepository):
             "last_activity_at": datetime_to_mongo_date(upload.last_activity_at or get_now()),
             "error_code": getattr(upload, "error_code", None),
             "error_detail": getattr(upload, "error_detail", None),
-            "experience_bullets": getattr(upload, "experience_bullets", None),
+            "state_injected": getattr(upload, "state_injected", False),
+            "injection_error": getattr(upload, "injection_error", None),
+            "structured_extraction": (
+                upload.structured_extraction.model_dump() if upload.structured_extraction else None
+            ),
         }
 
     @staticmethod
@@ -108,7 +120,12 @@ class UserCVRepository(IUserCVRepository):
             last_activity_at=mongo_date_to_datetime(doc.get("last_activity_at")),
             error_code=doc.get("error_code"),
             error_detail=doc.get("error_detail"),
-            experience_bullets=doc.get("experience_bullets"),
+            state_injected=doc.get("state_injected", False),
+            injection_error=doc.get("injection_error"),
+            structured_extraction=(
+                CVStructuredExtraction.model_validate(doc.get("structured_extraction"))
+                if doc.get("structured_extraction") else None
+            ),
         )
 
     async def insert_upload(self, upload: UserCVUpload) -> str:
@@ -151,7 +168,7 @@ class UserCVRepository(IUserCVRepository):
                     reset_payload["cancel_requested"] = False
                     reset_payload["error_code"] = None
                     reset_payload["error_detail"] = None
-                    reset_payload["experience_bullets"] = None
+                    reset_payload["structured_extraction"] = None
                     await self._collection.update_one(
                         {"_id": existing["_id"]}, {"$set": reset_payload}
                     )
@@ -247,7 +264,7 @@ class UserCVRepository(IUserCVRepository):
         )
         return res.modified_count > 0
 
-    async def store_experiences(self, user_id: str, upload_id: str, *, experiences: list[str]) -> bool:
+    async def store_structured_extraction(self, user_id: str, upload_id: str, *, structured_extraction: CVStructuredExtraction) -> bool:
         res = await self._collection.update_one(
             {
                 "user_id": user_id,
@@ -256,7 +273,7 @@ class UserCVRepository(IUserCVRepository):
             },
             {
                 "$set": {
-                    "experience_bullets": experiences,
+                    "structured_extraction": structured_extraction.model_dump(),
                     "last_activity_at": datetime_to_mongo_date(get_now()),
                 },
             },
@@ -290,6 +307,38 @@ class UserCVRepository(IUserCVRepository):
                 "$set": {
                     "upload_process_state": UploadProcessState.CANCELLED,
                     "cancel_requested": True,
+                    "last_activity_at": datetime_to_mongo_date(get_now()),
+                },
+            },
+        )
+        return res.modified_count > 0
+
+    async def mark_state_injected(self, user_id: str, upload_id: str) -> bool:
+        res = await self._collection.update_one(
+            {
+                "user_id": user_id,
+                "upload_id": upload_id,
+            },
+            {
+                "$set": {
+                    "state_injected": True,
+                    "injection_error": None,
+                    "last_activity_at": datetime_to_mongo_date(get_now()),
+                },
+            },
+        )
+        return res.modified_count > 0
+
+    async def mark_injection_failed(self, user_id: str, upload_id: str, *, error: str) -> bool:
+        res = await self._collection.update_one(
+            {
+                "user_id": user_id,
+                "upload_id": upload_id,
+            },
+            {
+                "$set": {
+                    "state_injected": False,
+                    "injection_error": error,
                     "last_activity_at": datetime_to_mongo_date(get_now()),
                 },
             },

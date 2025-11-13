@@ -151,8 +151,8 @@ class ExperienceSummarizerEvaluator:
             responsibilities=', '.join(responsibilities) if responsibilities else "N/A",
             skills=_skills,
             questions_and_answers=_questions_and_answers,
-            llm_summary=llm_summary,
-            llm_summary_length=str(len(llm_summary.split()))  # Count words for length
+            llm_summary=llm_summary or "",
+            llm_summary_length=str(len((llm_summary or "").split()))  # Count words for length
         )
 
     async def evaluate(

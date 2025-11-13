@@ -1,10 +1,8 @@
-from datetime import datetime, timezone
-
 import pytest
 
 import asyncio
 from app.users.cv.service import CVUploadService
-from app.users.cv.types import CVUploadErrorCode, CVUploadResponseListItem, UploadProcessState
+from app.users.cv.types import CVUploadErrorCode, UserCVUpload, CVStructuredExtraction
 from app.users.cv.errors import CVLimitExceededError, CVUploadRateLimitExceededError, DuplicateCVUploadError
 from app.users.cv.repository import IUserCVRepository
 from app.users.cv.storage import ICVCloudStorageService
@@ -45,11 +43,14 @@ class MockCVRepository(IUserCVRepository):
     async def mark_failed(self, user_id: str, upload_id: str, *, error_code: str, error_detail: str) -> bool:
         return True
 
-    async def store_experiences(self, user_id: str, upload_id: str, *, experiences: list[str]) -> bool:
+    async def store_structured_extraction(self, user_id: str, upload_id: str, *, structured_extraction: CVStructuredExtraction) -> bool:
         return True
 
-    async def get_user_uploads(self, *, user_id: str) -> list[CVUploadResponseListItem]:
-        return []
+    async def mark_state_injected(self, user_id: str, upload_id: str) -> bool:
+        return True
+
+    async def mark_injection_failed(self, user_id: str, upload_id: str, *, error: str) -> bool:
+        return True
 
 
 class MockCVCloudStorageService(ICVCloudStorageService):
@@ -58,6 +59,14 @@ class MockCVCloudStorageService(ICVCloudStorageService):
     def upload_cv(self, *, document: UserCVUpload, markdown_text: str,
                   original_bytes: bytes) -> None:  # Noncompliant - we keep this method empty cause its a mock for a test
         pass
+
+    def download_markdown(self, *, object_path: str) -> str:  # pragma: no cover - test helper
+        return "# mock markdown"
+
+
+class DummyStructuredExtractor:
+    def extract_structured_experiences(self, markdown_cv: str) -> CVStructuredExtraction:
+        return CVStructuredExtraction(collected_data=[], experience_entities=[], extraction_metadata={})
 
 
 class TestCVUploadService:
@@ -68,7 +77,8 @@ class TestCVUploadService:
         given_filename = "resume.pdf"
 
         # WHEN parsing the CV in the service (immediate response design)
-        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService())
+        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_max_uploads_per_user": 999,
             "cv_rate_limit_per_minute": 999,
@@ -89,7 +99,8 @@ class TestCVUploadService:
             pass
 
         repo = RepoSpy()
-        service = CVUploadService(repository=repo, cv_cloud_storage_service=MockCVCloudStorageService())
+        service = CVUploadService(repository=repo, cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_max_uploads_per_user": 999,
             "cv_rate_limit_per_minute": 999,
@@ -104,7 +115,6 @@ class TestCVUploadService:
         assert isinstance(res, str)
         # Let the background task run
         await asyncio.sleep(0.1)
-
         # THEN
         assert mark_failed_spy.called
         _, kwargs = mark_failed_spy.call_args
@@ -113,7 +123,8 @@ class TestCVUploadService:
     @pytest.mark.asyncio
     async def test_parse_cv_does_not_validate_markdown_immediately(self, mocker):
         # GIVEN service under test
-        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService())
+        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_max_uploads_per_user": 999,
             "cv_rate_limit_per_minute": 999,
@@ -125,7 +136,8 @@ class TestCVUploadService:
 
     @pytest.mark.asyncio
     async def test_parse_cv_returns_empty_experiences_immediately(self, mocker):
-        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService())
+        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_max_uploads_per_user": 999,
             "cv_rate_limit_per_minute": 999,
@@ -135,7 +147,8 @@ class TestCVUploadService:
 
     @pytest.mark.asyncio
     async def test_parse_cv_does_not_raise_on_empty_markdown_immediately(self, mocker):
-        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService())
+        service = CVUploadService(repository=MockCVRepository(), cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_max_uploads_per_user": 999,
             "cv_rate_limit_per_minute": 999,
@@ -148,8 +161,10 @@ class TestCVUploadService:
         # GIVEN converter returns valid markdown
         mocker.patch("app.users.cv.service.convert_cv_bytes_to_markdown", mocker.Mock(return_value="# md"))
         extractor_instance = mocker.Mock()
-        extractor_instance.extract_experiences = mocker.AsyncMock(return_value=["x"])
-        mocker.patch("app.users.cv.service.CVExperienceExtractor", mocker.Mock(return_value=extractor_instance))
+        extractor_instance.extract_structured_experiences = mocker.AsyncMock(
+            return_value=mocker.Mock(extraction_metadata={"total_experiences": 1}))
+        mocker.patch("app.users.cv.service.CVStructuredExperienceExtractor",
+                     mocker.Mock(return_value=extractor_instance))
 
         # AND a custom repository that returns count of 3 (exceeds limit)
         class CustomRepoMock(MockCVRepository):
@@ -157,7 +172,8 @@ class TestCVUploadService:
                 return 3
 
         # AND application config with max uploads limit of 3
-        service = CVUploadService(repository=CustomRepoMock(), cv_cloud_storage_service=MockCVCloudStorageService())
+        service = CVUploadService(repository=CustomRepoMock(), cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_storage_bucket": "bucket",
             "cv_max_uploads_per_user": 3,
@@ -174,8 +190,10 @@ class TestCVUploadService:
         # GIVEN converter returns valid markdown
         mocker.patch("app.users.cv.service.convert_cv_bytes_to_markdown", mocker.Mock(return_value="# md"))
         extractor_instance = mocker.Mock()
-        extractor_instance.extract_experiences = mocker.AsyncMock(return_value=["x"])
-        mocker.patch("app.users.cv.service.CVExperienceExtractor", mocker.Mock(return_value=extractor_instance))
+        extractor_instance.extract_structured_experiences = mocker.AsyncMock(
+            return_value=mocker.Mock(extraction_metadata={"total_experiences": 1}))
+        mocker.patch("app.users.cv.service.CVStructuredExperienceExtractor",
+                     mocker.Mock(return_value=extractor_instance))
 
         # AND a custom repository that returns rate limit count of 5 (exceeds limit)
         class CustomRepoMock(MockCVRepository):
@@ -183,7 +201,8 @@ class TestCVUploadService:
                 return 5
 
         # AND application config with rate limit of 5 per minute
-        service = CVUploadService(repository=CustomRepoMock(), cv_cloud_storage_service=MockCVCloudStorageService())
+        service = CVUploadService(repository=CustomRepoMock(), cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_storage_bucket": "bucket",
             "cv_max_uploads_per_user": 100,
@@ -200,8 +219,10 @@ class TestCVUploadService:
         # GIVEN converter returns valid markdown
         mocker.patch("app.users.cv.service.convert_cv_bytes_to_markdown", mocker.Mock(return_value="# md"))
         extractor_instance = mocker.Mock()
-        extractor_instance.extract_experiences = mocker.AsyncMock(return_value=["x"])
-        mocker.patch("app.users.cv.service.CVExperienceExtractor", mocker.Mock(return_value=extractor_instance))
+        extractor_instance.extract_structured_experiences = mocker.AsyncMock(
+            return_value=mocker.Mock(extraction_metadata={"total_experiences": 1}))
+        mocker.patch("app.users.cv.service.CVStructuredExperienceExtractor",
+                     mocker.Mock(return_value=extractor_instance))
 
         # AND a custom repository that returns count of 1 (under limit)
         class CustomRepoMock(MockCVRepository):
@@ -209,7 +230,8 @@ class TestCVUploadService:
                 return 1
 
         # AND application config with limits that allow the upload
-        service = CVUploadService(repository=CustomRepoMock(), cv_cloud_storage_service=MockCVCloudStorageService())
+        service = CVUploadService(repository=CustomRepoMock(), cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_storage_bucket": "bucket",
             "cv_max_uploads_per_user": 3,
@@ -227,8 +249,10 @@ class TestCVUploadService:
         # GIVEN converter returns valid markdown
         mocker.patch("app.users.cv.service.convert_cv_bytes_to_markdown", mocker.Mock(return_value="# md"))
         extractor_instance = mocker.Mock()
-        extractor_instance.extract_experiences = mocker.AsyncMock(return_value=["x"])
-        mocker.patch("app.users.cv.service.CVExperienceExtractor", mocker.Mock(return_value=extractor_instance))
+        extractor_instance.extract_structured_experiences = mocker.AsyncMock(
+            return_value=mocker.Mock(extraction_metadata={"total_experiences": 1}))
+        mocker.patch("app.users.cv.service.CVStructuredExperienceExtractor",
+                     mocker.Mock(return_value=extractor_instance))
 
         # AND a custom repository that raises DuplicateCVUploadError
         class CustomRepoMock(MockCVRepository):
@@ -237,7 +261,8 @@ class TestCVUploadService:
                 raise DuplicateCVUploadError("duplicate_hash_123")
 
         # AND application config with limits that allow the upload
-        service = CVUploadService(repository=CustomRepoMock(), cv_cloud_storage_service=MockCVCloudStorageService())
+        service = CVUploadService(repository=CustomRepoMock(), cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor())
         mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
             "cv_storage_bucket": "bucket",
             "cv_max_uploads_per_user": 3,
@@ -255,7 +280,8 @@ class TestCVUploadService:
     async def test_cancel_upload_success(self, mocker):
         # GIVEN a service with a mock repository
         mock_repository = MockCVRepository()
-        service = CVUploadService(repository=mock_repository, cv_cloud_storage_service=MockCVCloudStorageService())
+        service = CVUploadService(repository=mock_repository, cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor())
 
         # AND the repository returns True for successful cancellation
         mock_cancel = mocker.patch.object(mock_repository, "request_cancellation", return_value=True)
@@ -271,7 +297,8 @@ class TestCVUploadService:
     async def test_cancel_upload_not_found(self, mocker):
         # GIVEN a service with a mock repository
         mock_repository = MockCVRepository()
-        service = CVUploadService(repository=mock_repository, cv_cloud_storage_service=MockCVCloudStorageService())
+        service = CVUploadService(repository=mock_repository, cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor())
 
         # AND the repository returns False (upload not found)
         mock_cancel = mocker.patch.object(mock_repository, "request_cancellation", return_value=False)
@@ -287,7 +314,8 @@ class TestCVUploadService:
     async def test_cancel_upload_repository_exception(self, mocker):
         # GIVEN a service with a mock repository
         mock_repository = MockCVRepository()
-        service = CVUploadService(repository=mock_repository, cv_cloud_storage_service=MockCVCloudStorageService())
+        service = CVUploadService(repository=mock_repository, cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor())
 
         # AND the repository raises an exception
         mock_cancel = mocker.patch.object(mock_repository, "request_cancellation",
@@ -300,53 +328,156 @@ class TestCVUploadService:
         assert result is False
         mock_cancel.assert_called_once_with("user123", "upload456")
 
+    @pytest.mark.asyncio
+    async def test_pipeline_injects_state_when_session_id_provided(self, mocker):
+        # GIVEN a repo we can spy on
+        class RepoSpy(MockCVRepository):
+            pass
+
+        repo = RepoSpy()
+        mark_injected_spy = mocker.spy(repo, "mark_state_injected")
+
+        # AND a minimal application state manager
+        class _InMemoryStateManager:
+            def get_state(self, session_id: int):
+                from app.application_state import ApplicationState
+                return ApplicationState.new_state(session_id=session_id)
+
+            def save_state(self, state):
+                return None
+
+            def delete_state(self, session_id: int):
+                return None
+
+            def get_all_session_ids(self):
+                return None
+
+        # AND a service with the manager
+        service = CVUploadService(repository=repo, cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor(),
+                                  application_state_manager=_InMemoryStateManager())
+        mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
+            "cv_max_uploads_per_user": 999,
+            "cv_rate_limit_per_minute": 999,
+        })()))
+        # AND stub structured extractor to return minimal structured data
+        mocker.patch.object(service._structured_extractor, "extract_structured_experiences",
+                            mocker.AsyncMock(
+                                return_value=CVStructuredExtraction(collected_data=[], experience_entities=[],
+                                                                    extraction_metadata={})))
+        # AND stub storage upload (called via to_thread) by patching method to no-op
+        mocker.patch.object(service._cv_cloud_storage_service, "upload_cv", return_value=None)
+        # AND spy on injection service to verify it is invoked
+        inj_spy = mocker.patch("app.users.cv.service.StateInjectionService.inject_cv_data",
+                               new=mocker.AsyncMock(return_value=True))
+
+        # WHEN the parsing is run with a session_id
+        upload_id = await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf", session_id=123)
+        assert isinstance(upload_id, str)
+        await asyncio.sleep(0.1)
+
+        # THEN injection is attempted and success is recorded
+        assert mark_injected_spy.called
+        inj_spy.assert_called()
 
     @pytest.mark.asyncio
-    async def test_list_user_uploads_returns_multiple_uploads(self, mocker):
-        # GIVEN a repository instance
-        repo = MockCVRepository()
-        # AND mocked get_user_uploads to return uploads
-        uploaded1 = UserCVUpload(
-            user_id="user123",
-            upload_id="upload1",
-            filename="cv1.pdf",
-            created_at=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
-            content_type="application/pdf",
-            object_path="path/to/cv1.pdf",
-            markdown_object_path="path/to/cv1.md",
-            markdown_char_len=10,
-            md5_hash="hash1",
-            upload_process_state=UploadProcessState.COMPLETED,
-            experience_bullets=["Experience 1", "Experience 2"]
-        )
-        uploaded2 = UserCVUpload(
-            user_id="user123",
-            upload_id="upload2",
-            filename="cv2.pdf",
-            created_at=datetime(2024, 5, 1, 12, 0, 0, tzinfo=timezone.utc),
-            content_type="application/pdf",
-            object_path="path/to/cv2.pdf",
-            markdown_object_path="path/to/cv2.md",
-            markdown_char_len=20,
-            md5_hash="hash2",
-            upload_process_state=UploadProcessState.COMPLETED,
-            experience_bullets=["Experience 1"]
-        )
-        mock_get_user_uploads = mocker.patch.object(
-            repo, "get_user_uploads", mocker.AsyncMock(return_value=[uploaded1, uploaded2])
-        )
-        service = CVUploadService(repository=repo, cv_cloud_storage_service=MockCVCloudStorageService())
+    async def test_pipeline_marks_injection_failed_when_injection_returns_false(self, mocker):
+        # GIVEN a repo we can spy on
+        class RepoSpy(MockCVRepository):
+            pass
 
-        # WHEN listing uploads for a user
-        result = await service.get_user_cvs(user_id="user123")
+        repo = RepoSpy()
+        mark_injected_spy = mocker.spy(repo, "mark_state_injected")
+        mark_injection_failed_spy = mocker.spy(repo, "mark_injection_failed")
 
-        # THEN repository is called with correct user_id
-        mock_get_user_uploads.assert_called_once_with(user_id="user123")
+        # AND a minimal application state manager
+        class _InMemoryStateManager:
+            def get_state(self, session_id: int):
+                from app.application_state import ApplicationState
+                return ApplicationState.new_state(session_id=session_id)
 
-        # AND it returns the expected uploads
-        assert isinstance(result, list)
-        assert len(result) == 2
-        assert result[0].upload_id == "upload1"
-        assert result[1].upload_id == "upload2"
-        assert result[0].experience_bullets == ["Experience 1", "Experience 2"]
-        assert result[1].experience_bullets == ["Experience 1"]
+            def save_state(self, state):
+                return None
+
+            def delete_state(self, session_id: int):
+                return None
+
+            def get_all_session_ids(self):
+                return None
+
+        service = CVUploadService(repository=repo, cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor(),
+                                  application_state_manager=_InMemoryStateManager())
+        mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
+            "cv_max_uploads_per_user": 999,
+            "cv_rate_limit_per_minute": 999,
+        })()))
+        # Stub extractor and storage
+        mocker.patch.object(service._structured_extractor, "extract_structured_experiences",
+                            mocker.AsyncMock(
+                                return_value=CVStructuredExtraction(collected_data=[], experience_entities=[],
+                                                                    extraction_metadata={})))
+        mocker.patch.object(service._cv_cloud_storage_service, "upload_cv", return_value=None)
+        # Force injection to return False
+        inj_spy = mocker.patch("app.users.cv.service.StateInjectionService.inject_cv_data",
+                               new=mocker.AsyncMock(return_value=False))
+
+        # WHEN
+        upload_id = await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf", session_id=456)
+        assert isinstance(upload_id, str)
+        await asyncio.sleep(0.1)
+
+        # THEN injection attempted but mark_injection_failed called, not mark_state_injected
+        inj_spy.assert_called()
+        assert mark_injected_spy.called is False
+        assert mark_injection_failed_spy.called is True
+
+    @pytest.mark.asyncio
+    async def test_pipeline_handles_cancel_request_without_marking_injected(self, mocker):
+        # GIVEN a repo where cancellation can be requested
+        class RepoSpy(MockCVRepository):
+            def __init__(self):
+                self._cancel_requested = False
+
+            async def request_cancellation(self, user_id: str, upload_id: str) -> bool:
+                self._cancel_requested = True
+                return True
+
+        repo = RepoSpy()
+        mocker.spy(repo, "mark_state_injected")
+
+        class _InMemoryStateManager:
+            def get_state(self, session_id: int):
+                from app.application_state import ApplicationState
+                return ApplicationState.new_state(session_id=session_id)
+
+            def save_state(self, state):
+                return None
+
+            def delete_state(self, session_id: int):
+                return None
+
+            def get_all_session_ids(self):
+                return None
+
+        service = CVUploadService(repository=repo, cv_cloud_storage_service=MockCVCloudStorageService(),
+                                  structured_extractor=DummyStructuredExtractor(),
+                                  application_state_manager=_InMemoryStateManager())
+        mocker.patch("app.users.cv.service.get_application_config", mocker.Mock(return_value=type("C", (), {
+            "cv_max_uploads_per_user": 999,
+            "cv_rate_limit_per_minute": 999,
+        })()))
+
+        # Slow extractor so we can cancel during pipeline
+        async def slow_extract(*args, **kwargs):
+            await asyncio.sleep(0.05)
+            return CVStructuredExtraction(collected_data=[], experience_entities=[], extraction_metadata={})
+
+        mocker.patch.object(service._structured_extractor, "extract_structured_experiences",
+                            mocker.AsyncMock(side_effect=slow_extract))
+        mocker.patch.object(service._cv_cloud_storage_service, "upload_cv", return_value=None)
+
+        # WHEN start parse to get upload id, then immediately cancel
+        upload_id = await service.parse_cv(user_id="u", file_bytes=b"x", filename="cv.pdf", session_id=789)
+        await service.cancel_upload(user_id="u", upload_id=upload_id)
+        await asyncio.sleep(0.1)
