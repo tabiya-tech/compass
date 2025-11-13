@@ -523,8 +523,8 @@
         "skillsRankingRetypedRank": {
           "question_1": "Dernière question : rappelons ce que je t’ai dit plus haut sur ton adéquation avec les opportunités :",
           "question_2": "revois ce que j’ai dit trois messages plus tôt, pour quel pourcentage d’opportunités",
-          "question_3": " sur ",
-          "question_4": "réponds-tu aux compétences clés ?",
+          "question_3": " sur",
+          "question_4": " réponds-tu aux compétences clés ?",
           "sliderAria": "Curseur du centile de rang réévalué"
         },
         "skillsRankingPerceivedRank": {
