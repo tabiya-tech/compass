@@ -539,9 +539,14 @@
             "message_3": ". That’s a solid range of options!"
           },
           "skillsRankingJobSeekerDisclosure": {
-            "pendingMessage": "Thanks! We’re double-checking the latest <0>{{jobPlatformUrl}}</0> opportunities so the numbers are accurate. We’ll share your results soon or you can ask for them when we call you for the phone survey.",
-            "comparisonPart1": "Moreover, <0>Compared to other {{jobPlatformUrl}} users, you are in group {{groupIndex}} of {{groupTotal}}.</0>",
-            "comparisonPart2": "Imagine lining up 100 {{jobPlatformUrl}} users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You’re in block <0>{{groupIndex}}</0>, which is the <1>{{comparisonLabel}}</1> block."
+            "pendingMessage": "Thanks! We're double-checking the latest {{jobPlatformUrl}} opportunities so the numbers are accurate. We'll share your results soon or you can ask for them when we call you for the phone survey.",
+            "comparisonPart1_prefix": "Moreover, ",
+            "comparisonPart1_main": "Compared to other \n            {{jobPlatformUrl}}\n             users, you are in group [\n            {{groupIndex}}\n            ] of \n            {{groupTotal}}\n            .",
+            "comparisonPart2_prefix": "Imagine lining up 100 \n          {{jobPlatformUrl}}\n           users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You’re in block ",
+            "comparisonPart2_group": "[\n            {{groupIndex}}\n            ]",
+            "comparisonPart2_middle": ", which is the ",
+            "comparisonPart2_label": "[\n            {{comparisonLabel}}\n            ]",
+            "comparisonPart2_suffix": " block."
           }
         },
         "rotateToSolve": {

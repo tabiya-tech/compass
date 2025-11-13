@@ -539,9 +539,14 @@
             "message_3": ". ¡Es un buen rango de opciones!"
           },
           "skillsRankingJobSeekerDisclosure": {
-            "pendingMessage": "¡Gracias! Estamos revisando de nuevo las últimas oportunidades en <0>{{jobPlatformUrl}}</0> para que los números sean precisos. Te vamos a compartir los resultados pronto o podés pedirlos cuando te llamemos para la encuesta telefónica.",
-            "comparisonPart1": "Además, <0>Comparado con otras personas usuarias de {{jobPlatformUrl}}, estás en el grupo {{groupIndex}} de {{groupTotal}}.</0>",
-            "comparisonPart2": "Imaginá alinear a 100 usuarios de {{jobPlatformUrl}} desde quienes encajan con menos hasta quienes encajan con más puestos. Dividimos la fila en cinco bloques de 20. El bloque 1 (los 20 más altos) encaja con más puestos; el bloque 5 (los 20 más bajos) con menos. Estás en el bloque <0>{{groupIndex}}</0>, que es el bloque <1>{{comparisonLabel}}</1>."
+            "pendingMessage": "¡Gracias! Estamos verificando las últimas oportunidades de {{jobPlatformUrl}} para que los números sean precisos. Compartiremos tus resultados pronto o podés preguntar por ellos cuando te llamemos para la encuesta telefónica.",
+            "comparisonPart1_prefix": "Además, ",
+            "comparisonPart1_main": "Comparado con otros usuarios de \n{{jobPlatformUrl}}\n, estás en el grupo [\n{{groupIndex}}\n] de \n{{groupTotal}}\n.",
+            "comparisonPart2_prefix": "Imaginá alinear a 100 usuarios de \n{{jobPlatformUrl}}\n desde quienes encajan con menos hasta quienes encajan con más puestos. Dividimos la fila en cinco bloques de 20. El bloque 1 (los 20 más altos) encaja con más puestos; el bloque 5 (los 20 más bajos) con menos. Estás en el bloque ",
+            "comparisonPart2_group": "[\n{{groupIndex}}\n]",
+            "comparisonPart2_middle": ", que es el bloque ",
+            "comparisonPart2_label": "[\n{{comparisonLabel}}\n]",
+            "comparisonPart2_suffix": "."
           }
         },
         "rotateToSolve": {
