@@ -1,5 +1,5 @@
 import { UploadStatus } from "src/chat/Chat.types";
-import { useTranslation } from "react-i18next";
+import i18n from "src/i18n/i18n";
 import { getUploadErrorMessage as getCentralizedUploadErrorMessage } from "./CVUploadErrorHandling";
 
 export type UploadPollingHandles = {
@@ -14,23 +14,22 @@ export function stopUploadPolling(handles?: UploadPollingHandles): void {
 }
 
 export function getCvUploadDisplayMessage(status: UploadStatus): string {
-  const { t } = useTranslation();
-  if (!status) return t("chat.cvUploadPolling.uploadingCv");
-  if (status.upload_process_state === "CANCELLED" || status.cancel_requested) return t("chat.cvUploadPolling.cancelled");
-  if (status.upload_process_state === "COMPLETED") return t("chat.cvUploadPolling.uploadedSuccessfully");
+  if (!status) return i18n.t("chat.cvUploadPolling.uploadingCv");
+  if (status.upload_process_state === "CANCELLED" || status.cancel_requested) return i18n.t("chat.cvUploadPolling.cancelled");
+  if (status.upload_process_state === "COMPLETED") return i18n.t("chat.cvUploadPolling.uploadedSuccessfully");
   switch (status.upload_process_state) {
     case "CONVERTING":
-      return t("chat.cvUploadPolling.converting");
+      return i18n.t("chat.cvUploadPolling.converting");
     case "UPLOADING_TO_GCS":
-      return t("chat.cvUploadPolling.processing");
+      return i18n.t("chat.cvUploadPolling.processing");
     case "EXTRACTING":
-      return t("chat.cvUploadPolling.extractingExperiences");
+      return i18n.t("chat.cvUploadPolling.extractingExperiences");
     case "SAVING":
-      return t("chat.cvUploadPolling.savingCv");
+      return i18n.t("chat.cvUploadPolling.savingCv");
     case "FAILED":
-      return t("chat.cvUploadPolling.failed");
+      return i18n.t("chat.cvUploadPolling.failed");
     default:
-      return t("chat.cvUploadPolling.uploadingCv");
+      return i18n.t("chat.cvUploadPolling.uploadingCv");
   }
 }
 
