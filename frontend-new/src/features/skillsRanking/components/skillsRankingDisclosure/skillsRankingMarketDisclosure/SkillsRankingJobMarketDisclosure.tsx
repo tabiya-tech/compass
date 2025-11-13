@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
