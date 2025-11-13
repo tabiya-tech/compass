@@ -72,7 +72,20 @@
     },
     "errors": {
       "updateState": "No se pudo actualizar el estado del ranking de habilidades. Por favor inténtalo más tarde.",
-      "generic": "Algo salió mal. Por favor inténtalo de nuevo."
+      "generic": "Algo salió mal. Por favor inténtalo de nuevo.",
+      "api": {
+        "requestTooLong": "Los datos enviados al servicio parecen ser demasiado grandes. Intentá nuevamente con un contenido más pequeño. Si el problema persiste, limpiá la caché de tu navegador y actualizá la página.",
+        "tooManyRequests": "Parece que estás realizando demasiadas solicitudes. Intentá nuevamente más tarde.",
+        "unexpectedError": "Ocurrió un error inesperado. Intentá nuevamente más tarde.",
+        "serverConnectionError": "No se puede conectar con el servicio. Verificá tu conexión a Internet o intentá más tarde.",
+        "resourceNotFound": "El recurso solicitado no fue encontrado. Limpiá la caché de tu navegador y actualizá la página.",
+        "authenticationFailure": "Parece que no iniciaste sesión. Iniciá sesión para continuar.",
+        "permissionDenied": "Parece que no tenés los permisos necesarios. Cerrá sesión y volvé a iniciar sesión.",
+        "unableToProcessResponse": "Tuvimos un problema al procesar los datos. Limpiá la caché del navegador y actualizá la página o intentá más tarde.",
+        "serviceUnavailable": "El servicio no está disponible en este momento. Intentá nuevamente más tarde.",
+        "dataValidationError": "Parece haber un problema con tu solicitud. Si estás enviando datos, asegurate de que sean válidos e intentá nuevamente. Si el problema persiste, limpiá la caché de tu navegador y actualizá la página.",
+        "unableToProcessRequest": "Disculpas. Algo salió mal al procesar tu solicitud."
+      }
     },
     "status": {
       "calculating": "Calculando",
@@ -414,6 +427,45 @@
           "helpTipBlockedMessage": "No puedes descargar el informe hasta que termines de explorar al menos una experiencia."
         }
       },
+      "deleteSuccess": "¡Experiencia eliminada con éxito!",
+      "deleteFailed": "Error al eliminar la experiencia.",
+      "userHasNoSessions": "El usuario no tiene sesiones",
+      "noActiveSession": "No hay una sesión activa",
+      "restoreSuccess": "¡Experiencia restaurada con éxito!",
+      "restoreFailed": "Error al restaurar la experiencia.",
+      "personalInfoTooltip": "Los campos se completan con información que tal vez hayas proporcionado antes y se almacenan de forma segura en tu dispositivo. Completá los datos faltantes para personalizar tu CV.",
+      "andSkillsTitle": "Experiencias y habilidades",
+      "personalInformationTitle": "Información personal",
+      "personalInfo": {
+        "nameLabel": "Nombre:",
+        "namePlaceholder": "Ingresá tu nombre acá",
+        "emailLabel": "Correo:",
+        "emailPlaceholder": "Ingresá tu correo acá",
+        "phoneLabel": "Teléfono:",
+        "phonePlaceholder": "Ingresá tu número de teléfono acá",
+        "addressLabel": "Dirección:",
+        "addressPlaceholder": "Ingresá tu dirección acá"
+      },
+      "uncategorizedTooltip": "Según la conversación, estas experiencias no pudieron categorizarse automáticamente.",
+      "restoreDeletedLink": "Restaurar experiencias eliminadas",
+      "unsavedChanges": {
+        "title": "Cambios sin guardar",
+        "content": "Tenés cambios sin guardar. ¿Seguro que querés cerrar sin guardar?",
+        "closeButton": "Cerrar",
+        "keepEditingButton": "Seguir editando"
+      },
+      "delete": {
+        "title": "Eliminar experiencia",
+        "content": "¿Seguro que querés eliminar esta experiencia? Esta acción no se puede deshacer.",
+        "confirmButton": "Eliminar"
+      },
+      "revert": {
+        "title": "Revertir experiencia",
+        "content": "¿Seguro que querés revertir esta experiencia a su versión sin editar? Esto va a sobrescribir los cambios que hiciste.",
+        "confirmButton": "Revertir"
+      },
+      "deletingBackdrop": "Eliminando experiencia...",
+      "restoringBackdrop": "Restaurando experiencia...",
       "emptyStateMessage": "Aún no hemos descubierto experiencias. Sigamos conversando.",
       "util": {
         "workTypeDescription": {
@@ -581,6 +633,17 @@
     },
     "bugReport": {
       "reportBug": "Reportar un error"
+    }
+  },
+  "error": {
+    "errorPage": {
+      "illustrationAlt": "ilustración de error",
+      "defaultMessage": "Algo salió mal con Compass. Intentá recargar la página...",
+      "notFound": "Error 404 - Página no encontrada"
+    },
+    "restAPIError": {
+      "storyChooseMessageLabel": "Elegí un mensaje de error para mostrar en una notificación:",
+      "storySelectPlaceholder": "Seleccioná un mensaje de error"
     }
   },
   "app": {

@@ -232,8 +232,6 @@
       "continueYourJourneyLater": "et poursuivre votre parcours plus tard."
     }
   },
-  "chat_message_experiences_intro": "Voici mes expériences :",
-  "experiences_fetch_failed": "Échec de la récupération des expériences",
   "auth": {
     "pages": {
       "login": {
