@@ -26,6 +26,9 @@ const t = (key: string, opts?: any) => {
   if (opts && opts.time) {
     value = value.replace("{{time}}", opts.time);
   }
+  if (opts && opts.date) {
+    value = value.replace("{{date}}", opts.date);
+  }
   return value;
 };
 
