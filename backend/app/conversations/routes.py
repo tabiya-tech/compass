@@ -91,6 +91,7 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.
         if len(user_input) > MAX_MESSAGE_LENGTH:
+            logger.warning("User input exceeded maximum length of %d characters", MAX_MESSAGE_LENGTH)
             raise HTTPException(status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE, detail="Too long user input")
         try:
             # check that the user making the request has the session_id in their user preferences

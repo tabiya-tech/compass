@@ -181,13 +181,17 @@ describe("AnonymousAccountConversionDialog", () => {
     // THEN an error message should be shown
     expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(errorMessage, { variant: "error" })
 
+    // AND an error should be logged
+    expect(console.error).toHaveBeenCalledWith(
+      new Error("Failed to link anonymous account"), { cause: expect.any(Error) }
+    );
+
     // AND the callbacks should not be called
     expect(defaultProps.onSuccess).not.toHaveBeenCalled();
     expect(defaultProps.onClose).not.toHaveBeenCalled();
 
-    // AND no errors or warnings are shown
+    // AND no warnings are shown
     expect(console.warn).not.toHaveBeenCalled();
-    expect(console.error).not.toHaveBeenCalled();
   });
 
   test("should disable submit when password is invalid", () => {

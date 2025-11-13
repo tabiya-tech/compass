@@ -227,7 +227,6 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   // Goes to the authentication service to log the user out
   // Navigates to the login page
   const handleLogout = useCallback(async () => {
-    console.debug("Logging out the user.....");
     setIsLoggingOut(true);
     const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
     await authenticationService!.logout();
@@ -485,7 +484,7 @@ return {
 
         return [] as string[];
       } catch (e: any) {
-        console.error(e);
+        console.error(new ChatError("CV upload failed", e));
         // Ensure we remove the cancellable message on any failure
         removeMessageFromChat(uploadingMessageId);
         // Clear any prefill on failure
@@ -580,7 +579,7 @@ return {
     async (userId: string | null, currentSessionId: number | null) => {
       if (userId === null) {
         // If the user id is not available, then the chat cannot be initialized
-        console.error(new ChatError("Chat cannot be initialized, there is not User id  not available"));
+        console.warn(new ChatError("Chat cannot be initialized, there is not User id  not available"));
         return false;
       }
 
@@ -771,7 +770,6 @@ return {
   // If the component is not loaded for any reason, the user will have to wait for it.
   useEffect(() => {
     if (exploredExperiencesNotification) {
-      console.debug("Preloading DownloadReportDropdown");
       const LazyDownloadReportDropdown = lazyWithPreload(
         () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown")
       );

@@ -77,7 +77,11 @@ export const defaultInit: ExtendedRequestInit = {
 };
 
 class CustomFetchError extends Error {
-  constructor(message: string, public attempt: number, cause: unknown = null) {
+  constructor(
+    message: string,
+    public attempt: number,
+    cause: unknown = null
+  ) {
     super(message, { cause });
     this.name = "CustomFetchError";
   }
@@ -91,7 +95,7 @@ const refreshToken = async (
   serviceName: string,
   serviceFunction: string,
   failureMessage: string,
-  errorFactory: RestAPIErrorFactory,
+  errorFactory: RestAPIErrorFactory
 ): Promise<string> => {
   // import the Authentication service factory dynamically to avoid circular dependencies.
   // If the response status is 401 Unauthorized, try to refresh the token.
@@ -99,7 +103,8 @@ const refreshToken = async (
   const authService = authServiceFactory.default.getCurrentAuthenticationService();
   if (!authService) {
     throw new AuthenticationError(
-      `customFetch: No authentication service available for (${serviceName}.${serviceFunction}) on attempt: ${attempt}.`);
+      `customFetch: No authentication service available for (${serviceName}.${serviceFunction}) on attempt: ${attempt}.`
+    );
   }
 
   const isProviderSessionValid = await authService.isProviderSessionValid();
@@ -125,19 +130,25 @@ const refreshToken = async (
 
   try {
     await authService.refreshToken();
-    console.debug(
-      `customFetch: Token refreshed successfully for ${serviceName}.${serviceFunction} on attempt ${attempt}.`,
-    );
     const newToken = AuthenticationStateService.getInstance().getToken();
+    if (newToken && authService.isTokenValid(newToken).isValid) {
+      console.info(`customFetch: Token refreshed successfully for ${serviceName}.${serviceFunction} on attempt ${attempt}.`);
+    }
+
     if (!newToken) {
       throw new AuthenticationError(
-        `customFetch: No token available after refreshing for ${serviceName}.${serviceFunction} on attempt ${attempt}.`);
+        `customFetch: No token available after refreshing for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
+      );
     }
 
     return newToken;
   } catch (e: any) {
     const error = new CustomFetchError(
-      `customFetch: Failed to refresh token for ${serviceName}.${serviceFunction}.`, attempt, e);
+      `customFetch: Failed to refresh token for ${serviceName}.${serviceFunction}.`,
+      attempt,
+      e
+    );
+
     throw errorFactory(0, ErrorConstants.ErrorCodes.API_ERROR, failureMessage, error);
   }
 };
@@ -152,10 +163,13 @@ const checkToken = async (
   attempt: number,
   serviceName: string,
   serviceFunction: string,
-  errorFactory: RestAPIErrorFactory,
+  errorFactory: RestAPIErrorFactory
 ) => {
   if (!token) {
-    const cause = new CustomFetchError(`customFetch: No token available for ${serviceName}.${serviceFunction}.`, attempt);
+    const cause = new CustomFetchError(
+      `customFetch: No token available for ${serviceName}.${serviceFunction}.`,
+      attempt
+    );
     throw errorFactory(0, ErrorConstants.ErrorCodes.API_ERROR, "No token available for authentication", cause);
   }
 
@@ -164,7 +178,10 @@ const checkToken = async (
   const authServiceFactory = await import("src/auth/services/Authentication.service.factory");
   const authService = authServiceFactory.default.getCurrentAuthenticationService();
   if (!authService) {
-    const cause = new CustomFetchError(`customFetch: No authentication service available for ${serviceName}.${serviceFunction}.`, attempt);
+    const cause = new CustomFetchError(
+      `customFetch: No authentication service available for ${serviceName}.${serviceFunction}.`,
+      attempt
+    );
     throw new AuthenticationError("No authentication service available for authentication", cause);
   }
 
@@ -176,7 +193,7 @@ const checkToken = async (
     console.debug(
       "customFetch: Token is valid but about to expire, refreshing token for",
       serviceName,
-      serviceFunction,
+      serviceFunction
     );
     throw new TokenError(TokenValidationFailureCause.TOKEN_EXPIRED);
   }
@@ -194,7 +211,10 @@ const checkToken = async (
   }
 
   // Otherwise, if the token is invalid for any other reason, throw an error.
-  const cause = new CustomFetchError(`customFetch: Token is invalid for ${serviceName}.${serviceFunction}. Failure cause: ${failureCause}`, attempt);
+  const cause = new CustomFetchError(
+    `customFetch: Token is invalid for ${serviceName}.${serviceFunction}. Failure cause: ${failureCause}`,
+    attempt
+  );
   throw new AuthenticationError(`Token is invalid: ${failureCause}`, cause);
 };
 
@@ -265,7 +285,9 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
         const isMultipart = contentType.includes("multipart/");
 
         if (isFormData || isFile || isMultipart) {
-          console.debug(`Skipping compression for ${serviceName}.${serviceFunction} because the body is a FormData, File, or multipart content type`);
+          console.debug(
+            `Skipping compression for ${serviceName}.${serviceFunction} because the body is a FormData, File, or multipart content type`
+          );
           processedBody = options.body;
         } else {
           // Convert body to string if needed
@@ -286,11 +308,15 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
             // This is to avoid the CPU overhead of compressing and decompressing small payloads.
             const performanceGainPercent = calculateCompressionGainPercent(rawBytes.length, compressedBytes.length);
             if (performanceGainPercent < MIN_PERFORMANCE_GAIN_PERCENT) {
-              console.debug(`Skipping compression for ${serviceName}.${serviceFunction} because the gain is below the threshold. Body size: ${rawBytes.length}, gain: ${performanceGainPercent}`);
+              console.debug(
+                `Skipping compression for ${serviceName}.${serviceFunction} because the gain is below the threshold. Body size: ${rawBytes.length}, gain: ${performanceGainPercent}`
+              );
               processedBody = bodyString;
               headers.delete("Content-Encoding");
             } else {
-              console.debug(`Compressing request for ${serviceName}.${serviceFunction} with body size ${rawBytes.length}, gain: ${performanceGainPercent}`);
+              console.debug(
+                `Compressing request for ${serviceName}.${serviceFunction} with body size ${rawBytes.length}, gain: ${performanceGainPercent}`
+              );
               processedBody = new Blob([compressedBytes]);
               headers.set("Content-Encoding", "br");
             }
@@ -314,12 +340,24 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
       // We should sleep for some time and retry the request.
       if (retryOnFailedToFetch) {
         // Instead of logging immediately, add to grouped attemptErrors
-        const error = new CustomFetchError(`Attempt ${attempt}: Failed to fetch ${serviceName}.${serviceFunction}`, attempt, e);
+        const error = new CustomFetchError(
+          `Attempt ${attempt}: Failed to fetch ${serviceName}.${serviceFunction}`,
+          attempt,
+          e
+        );
         console.debug(error);
         attemptErrors.push(error);
 
         const backOffMs = getNextBackoff(INITIAL_BACKOFF_MS, attempt + 1);
-        console.debug("sleeping for", backOffMs, "ms before retrying", serviceName, serviceFunction, "attempt", attempt);
+        console.debug(
+          "sleeping for",
+          backOffMs,
+          "ms before retrying",
+          serviceName,
+          serviceFunction,
+          "attempt",
+          attempt
+        );
         await sleep(backOffMs);
 
         continue; // Retry the request
@@ -344,16 +382,19 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
           response.status,
           ErrorConstants.ErrorCodes.INVALID_RESPONSE_HEADER,
           `Response Content-Type should be '${init.expectedContentType}'`,
-          `Content-Type header was ${responseContentType}`,
+          `Content-Type header was ${responseContentType}`
         );
       }
 
       // if there were any warnings, we log them grouped together
       if (attemptErrors.length > 0) {
-        console.warn(new CustomFetchError(
-          `customFetch: ${serviceName}.${serviceFunction} succeeded after ${attempt} attempts.`,
-          attempt,
-          attemptErrors));
+        console.warn(
+          new CustomFetchError(
+            `customFetch: ${serviceName}.${serviceFunction} succeeded after ${attempt} attempts.`,
+            attempt,
+            attemptErrors
+          )
+        );
       }
 
       return response;
@@ -375,7 +416,10 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
       }
     } else if (combinedRetriableStatusCodes.includes(response.status)) {
       // Instead of logging immediately, add to grouped attemptErrors
-      const error = new CustomFetchError(`Attempt ${attempt}: Got retriable status ${response.status} from ${serviceName}.${serviceFunction}`, attempt);
+      const error = new CustomFetchError(
+        `Attempt ${attempt}: Got retriable status ${response.status} from ${serviceName}.${serviceFunction}`,
+        attempt
+      );
       console.debug(error);
       attemptErrors.push(error);
 
@@ -398,6 +442,7 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
   const cause = new CustomFetchError(
     `customFetch: Reached max attempts (${MAX_ATTEMPTS}) for ${serviceName}.${serviceFunction} without success.`,
     MAX_ATTEMPTS,
-    attemptErrors);
+    attemptErrors
+  );
   throw errorFactory(0, ErrorConstants.ErrorCodes.API_ERROR, failureMessage, cause);
 };

@@ -108,7 +108,6 @@ class StdFirebaseAuthenticationService {
       };
 
       DBDeleteRequest.onsuccess = (_event) => {
-        console.debug("Firebase IndexedDB deleted successfully");
         clearTimeout(timeoutId);
         resolve();
       };

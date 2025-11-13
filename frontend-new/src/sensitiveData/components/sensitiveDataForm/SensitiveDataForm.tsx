@@ -266,6 +266,7 @@ const SensitiveDataForm: React.FC = () => {
 
     // Check if the form is valid based on current validation state
     if (!isFormValid(validationErrors)) {
+      console.warn("User attempted to submit invalid sensitive data form.");
       enqueueSnackbar("Please correct the errors in the form before submitting.", { variant: "error" });
       return;
     }
@@ -290,6 +291,7 @@ const SensitiveDataForm: React.FC = () => {
 
       // Store personal info for local use using our utility function
       PersistentStorageService.setPersonalInfo(extractPersonalInfo(sensitiveData, fields));
+      console.info("User confirmed providing personal data and saved successfully.");
 
       enqueueSnackbar("Personal data saved successfully and securely.", { variant: "success" });
       navigate(routerPaths.ROOT);
@@ -315,6 +317,8 @@ const SensitiveDataForm: React.FC = () => {
     try {
       const authenticationService = AuthenticationServiceFactory.getCurrentAuthenticationService();
       await authenticationService!.logout();
+      console.info("User rejected providing sensitive data. Logging out user.");
+
       navigate(routerPaths.LANDING, { replace: true });
       enqueueSnackbar("Successfully logged out.", { variant: "success" });
     } catch (e) {
@@ -337,6 +341,7 @@ const SensitiveDataForm: React.FC = () => {
         ...userPreferences!,
         has_sensitive_personal_data: true,
       });
+      console.info("User skipped providing sensitive data.");
 
       enqueueSnackbar("Personal data collection skipped.", { variant: "success" });
       navigate(routerPaths.ROOT);

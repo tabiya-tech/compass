@@ -93,7 +93,7 @@ export default class AuthenticationStateService {
   public loadToken(): void {
     this.token = PersistentStorageService.getToken();
     if (!this.token) {
-      console.warn("AuthenticationStateService: No token found in persistent storage");
+      console.debug("AuthenticationStateService: No token found in persistent storage");
     }
   }
 
@@ -105,7 +105,7 @@ export default class AuthenticationStateService {
    */
   public setToken(token: string): void {
     if (!token) {
-      console.warn("AuthenticationStateService: Attempted to set an empty token");
+      console.debug("AuthenticationStateService: Attempted to set an empty token");
     }
 
     this.token = token;
