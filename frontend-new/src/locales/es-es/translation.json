@@ -534,9 +534,14 @@
             "message_3": ". ¡Es un rango sólido de opciones!"
           },
           "skillsRankingJobSeekerDisclosure": {
-            "pendingMessage": "¡Gracias! Estamos volviendo a comprobar las últimas oportunidades en <0>{{jobPlatformUrl}}</0> para que las cifras sean precisas. Compartiremos tus resultados pronto o podrás pedirlos cuando te llamemos para la encuesta telefónica.",
-            "comparisonPart1": "Además, <0>Comparado con otros usuarios de {{jobPlatformUrl}}, estás en el grupo {{groupIndex}} de {{groupTotal}}.</0>",
-            "comparisonPart2": "Imagina alinear a 100 usuarios de {{jobPlatformUrl}} desde los que encajan con menos hasta los que encajan con más puestos. Dividimos la fila en cinco bloques de 20 personas. El bloque 1 (los 20 más altos) encaja con más puestos; el bloque 5 (los 20 más bajos) con menos. Estás en el bloque <0>{{groupIndex}}</0>, que es el bloque <1>{{comparisonLabel}}</1>."
+            "pendingMessage": "¡Gracias! Estamos verificando las últimas oportunidades de {{jobPlatformUrl}} para que los números sean precisos. Compartiremos tus resultados pronto o puedes preguntar por ellos cuando te llamemos para la encuesta telefónica.",
+            "comparisonPart1_prefix": "Además, ",
+            "comparisonPart1_main": "Comparado con otros usuarios de \n{{jobPlatformUrl}}\n, estás en el grupo [\n{{groupIndex}}\n] de \n{{groupTotal}}\n.",
+            "comparisonPart2_prefix": "Imagina alinear a 100 usuarios de \n{{jobPlatformUrl}}\n desde los que encajan con menos hasta los que encajan con más puestos. Dividimos la fila en cinco bloques de 20 personas. El bloque 1 (los 20 más altos) encaja con más puestos; el bloque 5 (los 20 más bajos) con menos. Estás en el bloque ",
+            "comparisonPart2_group": "[\n{{groupIndex}}\n]",
+            "comparisonPart2_middle": ", que es el bloque ",
+            "comparisonPart2_label": "[\n{{comparisonLabel}}\n]",
+            "comparisonPart2_suffix": "."
           }
         },
         "rotateToSolve": {
