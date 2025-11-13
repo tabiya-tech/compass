@@ -521,7 +521,10 @@
           "adviceMessage": "Some advice: These numbers are for you. How might these numbers change the way you look for roles this week? Pause and consider where your time and energy now feel best spent in your strategy to find a job."
         },
         "skillsRankingRetypedRank": {
-          "question": "As a last question, let's recall what I told you further above just regarding your own fit with opportunities: <0>check again what I said three messages ago, how many percent of opportunities</0> on <1>{{jobPlatformUrl}}</1> do you meet the key skills for?",
+          "question_1": "As a last question, let's recall what I told you further above just regarding your own fit with opportunities:",
+          "question_2": "check again what I said three messages ago, how many percent of opportunities",
+          "question_3": " on ",
+          "question_4": "do you meet the key skills for?",
           "sliderAria": "Retyped rank percentile slider"
         },
         "skillsRankingPerceivedRank": {
