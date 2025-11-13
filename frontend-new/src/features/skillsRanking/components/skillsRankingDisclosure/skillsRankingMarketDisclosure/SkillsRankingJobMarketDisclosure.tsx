@@ -117,14 +117,9 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
       <Box sx={{ width: "100%" }}>
         <ChatBubble
           message={
-            <Trans
-              i18nKey="features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message"
-              components={{ 0: <strong /> }}
-              values={{
-                jobsMatchingRank: skillsRankingState.score.jobs_matching_rank,
-                jobPlatformUrl: getJobPlatformUrl(),
-              }}
-            />
+            <>
+              {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message_1")}<strong>{skillsRankingState.score.jobs_matching_rank}%</strong>{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message_2")}{getJobPlatformUrl()}{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message_3")}
+            </>
           }
           sender={ConversationMessageSender.COMPASS}
         />

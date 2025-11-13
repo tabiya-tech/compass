@@ -473,7 +473,9 @@
         },
         "skillsRankingDisclosure": {
           "skillsRankingMarketDisclosure": {
-            "message": "Cumples las habilidades clave para el <0>{{jobsMatchingRank}}%</0> de las oportunidades publicadas en <1>{{jobPlatformUrl}}</1>. ¡Es un rango sólido de opciones!"
+            "message_1": "Cumples las habilidades clave para el ",
+            "message_2": " de las oportunidades publicadas en ",
+            "message_3": ". ¡Es un rango sólido de opciones!"
           },
           "skillsRankingJobSeekerDisclosure": {
             "pendingMessage": "¡Gracias! Estamos volviendo a comprobar las últimas oportunidades en <0>{{jobPlatformUrl}}</0> para que las cifras sean precisas. Compartiremos tus resultados pronto o podrás pedirlos cuando te llamemos para la encuesta telefónica.",

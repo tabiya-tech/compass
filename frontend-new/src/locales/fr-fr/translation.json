@@ -532,8 +532,10 @@
         },
         "skillsRankingDisclosure": {
           "skillsRankingMarketDisclosure": {
-            "message": "Tu réponds aux compétences clés pour <0>{{jobsMatchingRank}}%</0> des opportunités publiées sur <1>{{jobPlatformUrl}}</1>. C’est une belle amplitude de possibilités !"
-          },
+            "message_1": "Tu réponds aux compétences clés pour ",
+            "message_2": " des opportunités publiées sur ",
+            "message_3": ". C’est une belle amplitude de possibilités!"
+          },          
           "skillsRankingJobSeekerDisclosure": {
             "pendingMessage": "Merci ! Nous vérifions à nouveau les dernières opportunités sur <0>{{jobPlatformUrl}}</0> pour garantir l’exactitude des chiffres. Nous partagerons bientôt tes résultats ou tu pourras les demander lors de l’enquête téléphonique.",
             "comparisonPart1": "De plus, <0>Comparé aux autres utilisateurs de {{jobPlatformUrl}}, tu es dans le groupe {{groupIndex}} sur {{groupTotal}}.</0>",
