@@ -521,7 +521,10 @@
           "adviceMessage": "Un consejo: Estos números son para vos. ¿Cómo podrían cambiar la forma en que buscás puestos esta semana? Hacé una pausa y pensá dónde conviene más poner tu tiempo y tu energía en tu estrategia para encontrar trabajo."
         },
         "skillsRankingRetypedRank": {
-          "question": "Última pregunta: recordemos lo que te dije más arriba sobre tu encaje con las oportunidades: <0>volvé a mirar lo que dije tres mensajes atrás, qué porcentaje de oportunidades</0> en <1>{{jobPlatformUrl}}</1> cumplís con las habilidades clave?",
+          "question_1": "Última pregunta: recordemos lo que te dije más arriba sobre tu encaje con las oportunidades:",
+          "question_2": "volvé a mirar lo que dije tres mensajes atrás, qué porcentaje de oportunidades",
+          "question_3": " en ",
+          "question_4": "cumplís con las habilidades clave?",
           "sliderAria": "Slider percentil de rango reescrito"
         },
         "skillsRankingPerceivedRank": {

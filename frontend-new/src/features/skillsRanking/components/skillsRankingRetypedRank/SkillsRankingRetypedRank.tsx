@@ -142,11 +142,11 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           <ChatBubble
             sender={ConversationMessageSender.COMPASS}
             message={
-              <Trans
-                i18nKey="features.skillsRanking.components.skillsRankingRetypedRank.question"
-                components={{ 0: <strong />, 1: <strong /> }}
-                values={{ jobPlatformUrl: getJobPlatformUrl() }}
-              />
+                <>
+                {t("features.skillsRanking.components.skillsRankingRetypedRank.question_1")}{" "}
+                <strong>{t("features.skillsRanking.components.skillsRankingRetypedRank.question_2")}</strong>{t("features.skillsRanking.components.skillsRankingRetypedRank.question_3")}
+                {getJobPlatformUrl()}{t("features.skillsRanking.components.skillsRankingRetypedRank.question_4")}
+              </>
             }
           >
             <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
