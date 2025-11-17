@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
-import os
-import json
-from textwrap import dedent
-
-import requests
 import argparse
 import datetime
+import json
+import os
+from textwrap import dedent
 from typing import Any
+
 import pulumi.automation as auto
+import requests
 from google.cloud.secretmanager import SecretManagerServiceClient
 
 from _common import get_environments_in_realm
@@ -118,20 +118,23 @@ def _prepare_and_download_cfgs(*,
 
     summaries: list[dict[str, Any]] = []
     for environment in environments:
-        environment_output_dir = os.path.join(output_dir, environment.environment_name)
-        os.makedirs(environment_output_dir, exist_ok=True)
+        try:
+            environment_output_dir = os.path.join(output_dir, environment.environment_name)
+            os.makedirs(environment_output_dir, exist_ok=True)
 
-        environment_deployment_info = _construct_environment_info(
-            environment=environment, output_dir=environment_output_dir)
+            environment_deployment_info = _construct_environment_info(
+                environment=environment, output_dir=environment_output_dir)
 
-        summaries.append(dict(
-            env_name=environment_deployment_info.get("name"),
-            target_git_sha=environment_deployment_info.get("target_git_sha"),
-            target_branch_name=environment_deployment_info.get("target_git_branch"),
-            dot_env_file=environment_deployment_info.get("env_vars_secret_local_path"),
-            stack_config_file=environment_deployment_info.get("stack_config_local_path"),
-            version_file=os.path.join(output_dir, environment_deployment_info.get("name") + ".version.json")
-        ))
+            summaries.append(dict(
+                env_name=environment_deployment_info.get("name"),
+                target_git_sha=environment_deployment_info.get("target_git_sha"),
+                target_branch_name=environment_deployment_info.get("target_git_branch"),
+                dot_env_file=environment_deployment_info.get("env_vars_secret_local_path"),
+                stack_config_file=environment_deployment_info.get("stack_config_local_path"),
+                version_file=os.path.join(output_dir, environment_deployment_info.get("name") + ".version.json")
+            ))
+        except Exception as setup_error:
+            print(f"error: failed to download configurations for the environment: {environment.environment_name}. Cause: {setup_error}")
 
     # save the summary of the deployment infos.
     summary = dict(realm_name=realm_name,
