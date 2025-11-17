@@ -32,7 +32,7 @@ class I18nManager:
                         except (json.JSONDecodeError, IOError) as e:
                             print(f"Warning: Could not load {file_path}. Error: {e}")
 
-    def get_translation(self, locale: str, domain: str, key: str, fallback_locale: str = "en") -> str:
+    def get_translation(self, locale: str, domain: str, key: str, fallback_message: str = "", fallback_locale: str = "en") -> str:
         """
         Retrieves a translation for a given locale, domain, and key.
         Falls back to the default locale if the key is not found or the locale/domain doesn't exist.
@@ -45,6 +45,10 @@ class I18nManager:
         fallback_translation = self.translations.get(fallback_locale, {}).get(domain, {}).get(key)
         if fallback_translation is not None:
             return fallback_translation
+        
+            # fallback_default takes priority over returning the key
+        if fallback_message:
+            return fallback_message
 
         return key
 
