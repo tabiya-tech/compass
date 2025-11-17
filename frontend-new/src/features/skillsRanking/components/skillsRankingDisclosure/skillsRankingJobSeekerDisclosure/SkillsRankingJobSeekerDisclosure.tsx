@@ -71,7 +71,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
       await onFinish(newSkillsRankingState);
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
-      enqueueSnackbar("Failed to update skills ranking state. Please try again later.", { variant: "error" });
+      enqueueSnackbar(t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.updateError"), { variant: "error" });
     }
   }, [currentPhase, onFinish, enqueueSnackbar]);
 

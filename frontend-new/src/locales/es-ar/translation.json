@@ -195,7 +195,13 @@
         },
         "reactionButtons": {
           "likeLabel": "me gusta",
-          "dislikeLabel": "no me gusta"
+          "dislikeLabel": "no me gusta",
+          "errors": {
+            "submitLike": "No se pudo enviar la valoración positiva. Por favor, inténtalo de nuevo.",
+            "removeLike": "No se pudo eliminar la valoración positiva. Por favor, inténtalo de nuevo.",
+            "submitDislike": "No se pudo enviar la valoración negativa. Por favor, inténtalo de nuevo.",
+            "removeDislike": "No se pudo eliminar la valoración negativa. Por favor, inténtalo de nuevo."
+          }
         }
       }
     },
@@ -546,7 +552,8 @@
             "comparisonPart2_group": "[\n{{groupIndex}}\n]",
             "comparisonPart2_middle": ", que es el bloque ",
             "comparisonPart2_label": "[\n{{comparisonLabel}}\n]",
-            "comparisonPart2_suffix": "."
+            "comparisonPart2_suffix": ".",
+            "updateError": "No se pudo actualizar el estado de clasificación de habilidades. Por favor, inténtalo de nuevo más tarde."
           }
         },
         "rotateToSolve": {

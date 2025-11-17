@@ -1,7 +1,15 @@
+from functools import lru_cache
 from app.i18n.i18n_manager import I18nManager
 from app.i18n.locale_detector import get_locale
 
-i18n_manager = I18nManager()
+
+@lru_cache(maxsize=1)
+def get_i18n_manager() -> I18nManager:
+    """
+    Lazily loads and caches a single I18nManager instance.
+    Translations are loaded only once and reused at runtime.
+    """
+    return I18nManager()
 
 def t(domain: str, key: str, locale: str = "en", **kwargs) -> str:
     """
@@ -16,6 +24,7 @@ def t(domain: str, key: str, locale: str = "en", **kwargs) -> str:
     Returns:
         The translated and formatted string.
     """
+    i18n_manager = get_i18n_manager()
     locale=get_locale()
     raw_string = i18n_manager.get_translation(locale, domain, key)
     

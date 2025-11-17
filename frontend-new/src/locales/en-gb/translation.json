@@ -195,7 +195,13 @@
         },
         "reactionButtons": {
           "likeLabel": "like",
-          "dislikeLabel": "dislike"
+          "dislikeLabel": "dislike",
+          "errors": {
+            "submitLike": "Failed to submit the like feedback. Please try again.",
+            "removeLike": "Failed to remove the like feedback. Please try again.",
+            "submitDislike": "Failed to submit the dislike feedback. Please try again.",
+            "removeDislike": "Failed to remove the dislike feedback. Please try again."
+          }
         }
       }
     },
@@ -546,7 +552,8 @@
             "comparisonPart2_group": "[\n            {{groupIndex}}\n            ]",
             "comparisonPart2_middle": ", which is the ",
             "comparisonPart2_label": "[\n            {{comparisonLabel}}\n            ]",
-            "comparisonPart2_suffix": " block."
+            "comparisonPart2_suffix": " block.",
+            "updateError": "Failed to update skills ranking state. Please try again later."
           }
         },
         "rotateToSolve": {
