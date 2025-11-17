@@ -195,7 +195,13 @@
         },
         "reactionButtons": {
           "likeLabel": "j'aime",
-          "dislikeLabel": "je n'aime pas"
+          "dislikeLabel": "je n'aime pas",
+          "errors": {
+            "submitLike": "Échec de l'envoi de la réaction positive. Veuillez réessayer.",
+            "removeLike": "Échec de la suppression de la réaction positive. Veuillez réessayer.",
+            "submitDislike": "Échec de l'envoi de la réaction négative. Veuillez réessayer.",
+            "removeDislike": "Échec de la suppression de la réaction négative. Veuillez réessayer."
+          }
         }
       }
     },
@@ -546,7 +552,8 @@
             "comparisonPart2_group": "[\n{{groupIndex}}\n]",
             "comparisonPart2_middle": ", qui est le bloc ",
             "comparisonPart2_label": "[\n{{comparisonLabel}}\n]",
-            "comparisonPart2_suffix": "."
+            "comparisonPart2_suffix": ".",
+            "updateError": "Échec de la mise à jour de l'état du classement des compétences. Veuillez réessayer plus tard."
           }
         },
         "rotateToSolve": {

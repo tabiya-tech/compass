@@ -1,6 +1,11 @@
 import os
 import json
 from typing import Optional
+from contextvars import ContextVar
+
+# Global context variable for locale
+current_locale: ContextVar[str] = ContextVar("current_locale", default="en")
+
 
 class ConversationContext:
     def __init__(self, locale: Optional[str] = None):
@@ -20,38 +25,52 @@ def get_locale(
     2. Locale set in the ConversationContext.
     3. Best match between 'Accept-Language' header and supported languages.
     4. The default application locale.
+
+    Result is stored in a ContextVar (`current_locale`) so any module
+    can retrieve it without passing parameters.
     """
 
+    # Load supported languages from env
     supported_languages_str = os.environ.get("BACKEND_SUPPORTED_LANGUAGES", '["en"]')
 
-    # Parse supported languages from environment variable
     try:
         supported_languages = json.loads(supported_languages_str)
-        # Normalize to lowercase for case-insensitive matching
         supported_languages = [lang.lower() for lang in supported_languages]
     except (json.JSONDecodeError, TypeError):
         supported_languages = ["en"]
 
-    # 1. Return the first language from the environment variable
+    chosen_locale: Optional[str] = None
+
+    # 1. First language from env var takes highest priority
     if supported_languages:
-        return supported_languages[0]
+        chosen_locale = supported_languages[0]
 
-    # 2. Check for locale in the conversation context
+    # 2. Locale from conversation context
     if context and context.locale:
-        return context.locale.lower()
+        chosen_locale = context.locale.lower()
 
-    # 3. Parse the Accept-Language header and find the best match
-    if accept_language_header:
+    # 3. Check Accept-Language header if we still have no locale
+    if not chosen_locale and accept_language_header:
         languages = accept_language_header.split(',')
         for lang_part in languages:
             lang = lang_part.split(';')[0].strip().lower()
+
             # Exact match
             if lang in supported_languages:
-                return lang
-            # Match primary language (e.g., 'en' from 'en-us')
+                chosen_locale = lang
+                break
+
+            # Primary language (e.g. "en" from "en-US")
             primary_lang = lang.split('-')[0]
             if primary_lang in supported_languages:
-                return primary_lang
+                chosen_locale = primary_lang
+                break
 
-    # 4. Fallback to the default
-    return default_locale
+    # 4. Default fallback
+    if not chosen_locale:
+        chosen_locale = default_locale
+
+    # Store locale in ContextVar so other parts of the system can access it
+    current_locale.set(chosen_locale)
+
+    return chosen_locale
