@@ -35,6 +35,10 @@ import SkillsRankingCompletionAdvice, {
   SkillsRankingCompletionAdviceProps,
 } from "src/features/skillsRanking/components/skillsRankingCompletionAdvice/SkillsRankingCompletionAdvice";
 import { SkillsRankingState, SkillsRankingExperimentGroups } from "src/features/skillsRanking/types";
+import SkillsRankingDisclosure, {
+  SKILLS_RANKING_DISCLOSURE_MESSAGE_ID,
+  SkillsRankingDisclosureProps,
+} from "src/features/skillsRanking/components/skillsRankingDisclosure/SkillsRankingDisclosure";
 
 // Utility function to check if a group should skip market disclosure (and consequently retyped rank)
 export const shouldSkipMarketDisclosure = (experimentGroup: SkillsRankingExperimentGroups): boolean => {
@@ -86,6 +90,20 @@ export const createJobMarketDisclosureMessage = (
   sender: ConversationMessageSender.COMPASS,
   component: (props: SkillsRankingJobMarketDisclosureProps) =>
     React.createElement(SkillsRankingJobMarketDisclosure, props),
+});
+
+export const createDisclosureMessage = (
+  skillsRankingState: SkillsRankingState,
+  onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>
+): IChatMessage<SkillsRankingDisclosureProps> => ({
+  message_id: SKILLS_RANKING_DISCLOSURE_MESSAGE_ID,
+  type: SKILLS_RANKING_DISCLOSURE_MESSAGE_ID,
+  payload: {
+    skillsRankingState,
+    onFinish,
+  },
+ sender: ConversationMessageSender.COMPASS,
+  component: (props: SkillsRankingDisclosureProps) => React.createElement(SkillsRankingDisclosure, props),
 });
 
 export const createPromptMessage = (

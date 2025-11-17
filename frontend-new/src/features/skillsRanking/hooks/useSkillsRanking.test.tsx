@@ -241,6 +241,7 @@ describe("useSkillsRanking", () => {
           [SkillsRankingPhase.INITIAL]: "prompt",
           [SkillsRankingPhase.BRIEFING]: "brief",
           [SkillsRankingPhase.PROOF_OF_VALUE]: "effort",
+          [SkillsRankingPhase.DISCLOSURE]: "disclosure",
           [SkillsRankingPhase.MARKET_DISCLOSURE]: "market",
           [SkillsRankingPhase.JOB_SEEKER_DISCLOSURE]: "jobseeker",
           [SkillsRankingPhase.PERCEIVED_RANK]: "perceived",

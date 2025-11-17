@@ -12,7 +12,7 @@ import {
 import { getFlowPathForGroup, skillsRankingHappyPathFull } from "./skillsRankingFlowGraph";
 import {
   createBriefingMessage,
-  createCompletionAdviceMessage,
+  createCompletionAdviceMessage, createDisclosureMessage,
   createEffortMessage,
   createJobMarketDisclosureMessage,
   createJobSeekerDisclosureMessage,
@@ -26,6 +26,7 @@ const phaseToMessageFactory = {
   [SkillsRankingPhase.INITIAL]: createPromptMessage,
   [SkillsRankingPhase.BRIEFING]: createBriefingMessage,
   [SkillsRankingPhase.PROOF_OF_VALUE]: createEffortMessage,
+  [SkillsRankingPhase.DISCLOSURE]: createDisclosureMessage,
   [SkillsRankingPhase.MARKET_DISCLOSURE]: createJobMarketDisclosureMessage,
   [SkillsRankingPhase.JOB_SEEKER_DISCLOSURE]: createJobSeekerDisclosureMessage,
   [SkillsRankingPhase.PERCEIVED_RANK]: createPerceivedRankMessage,
