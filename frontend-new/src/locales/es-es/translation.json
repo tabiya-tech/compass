@@ -683,6 +683,12 @@
   "theme":{
     "confirmModalDialog":{
         "closeConfirmModal": "Cerrar modal de confirmación"
+    },
+    "passwordInput": {
+      "togglePasswordVisibility": "Mostrar u ocultar contraseña"
+    },
+    "helpTip":{
+      "tooltip": "ayuda"
     }
   }, 
   "i18n": {

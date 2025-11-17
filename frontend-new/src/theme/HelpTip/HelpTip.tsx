@@ -1,5 +1,5 @@
 import React from "react";
-
+import { useTranslation } from "react-i18next";
 import { Box, IconButton, Tooltip, useTheme } from "@mui/material";
 
 export interface HelpTipProps {
@@ -22,6 +22,7 @@ export const DATA_TEST_ID = {
 
 const HelpTip: React.FC<HelpTipProps> = (props: Readonly<HelpTipProps>) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
 
   const handleClose = () => setOpen(false);
@@ -31,7 +32,7 @@ const HelpTip: React.FC<HelpTipProps> = (props: Readonly<HelpTipProps>) => {
   return (
     <Tooltip
       open={open}
-      aria-label="help"
+      aria-label={t("theme.helpTip.tooltip")}
       data-testid={props["data-testid"]}
       describeChild
       disableTouchListener

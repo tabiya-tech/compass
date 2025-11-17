@@ -688,6 +688,12 @@
   "theme":{
     "confirmModalDialog":{
         "closeConfirmModal": "close confirm modal"
+    },
+    "passwordInput":{
+      "togglePasswordVisibility": "toggle password visibility"
+    },
+    "helpTip":{
+      "tooltip": "help"
     }
   },
   "i18n": {

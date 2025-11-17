@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-
+import { useTranslation } from "react-i18next";
 import { IconButton, InputAdornment, TextField, TextFieldProps } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { validatePassword } from "src/theme/PasswordInput/utils/validatePassword";
@@ -27,6 +27,7 @@ const PasswordInput: React.FC<Readonly<PasswordInputProps>> = ({
   value,
   ...props
 }) => {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(_showPassword);
 
   const handleClickShowPassword = () => {
@@ -78,7 +79,7 @@ const PasswordInput: React.FC<Readonly<PasswordInputProps>> = ({
         endAdornment: (
           <InputAdornment position="end">
             <IconButton
-              aria-label="toggle password visibility"
+              aria-label={t("theme.passwordInput.togglePasswordVisibility")}
               edge="end"
               data-testid={DATA_TEST_ID.ICON_BUTTON}
               onClick={handleClickShowPassword}
