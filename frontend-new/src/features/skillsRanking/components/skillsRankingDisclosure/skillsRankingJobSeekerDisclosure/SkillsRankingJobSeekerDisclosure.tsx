@@ -73,7 +73,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
       console.error("Error updating skills ranking state:", error);
       enqueueSnackbar(t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.updateError"), { variant: "error" });
     }
-  }, [currentPhase, onFinish, enqueueSnackbar]);
+  }, [currentPhase, onFinish, enqueueSnackbar,t]);
 
   useEffect(() => {
     if (isReplay || hasFinished) return;

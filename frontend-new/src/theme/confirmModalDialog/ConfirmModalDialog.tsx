@@ -2,6 +2,7 @@ import React from "react";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
+import { useTranslation } from "react-i18next";
 import Typography from "@mui/material/Typography";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
 import CloseIcon from "@mui/icons-material/Close";
@@ -33,6 +34,7 @@ export const DATA_TEST_ID = {
 
 const ConfirmModalDialog: React.FC<ConfirmModalDialogProps> = (props) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const customTestId = props["data-testid"] || DATA_TEST_ID.CONFIRM_MODAL;
 
@@ -67,7 +69,7 @@ const ConfirmModalDialog: React.FC<ConfirmModalDialogProps> = (props) => {
         </Typography>
         {props.showCloseIcon && (
           <PrimaryIconButton
-            title="close confirm modal"
+            title={t("theme.confirmModalDialog.closeConfirmModal")}
             onClick={props.onDismiss}
             data-testid={DATA_TEST_ID.CONFIRM_MODAL_CLOSE}
             sx={{ color: theme.palette.common.black }}

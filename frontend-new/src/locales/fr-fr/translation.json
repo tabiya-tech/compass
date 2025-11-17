@@ -671,6 +671,25 @@
     "appName": "Compass",
     "compassLogoAlt": "Logo Compass"
   },
+  "info": {
+    "infoDrawer": {
+      "frontendTitle": "Frontend",
+      "backendTitle": "Backend",
+      "applicationInformation": "Informations de l'application",
+      "closeApplicationInformation": "Fermer les informations de l'application",
+      "versionInfo": {
+        "date": "Date",
+        "version": "Version",
+        "buildNumber": "Numéro de build",
+        "gitSha": "GIT SHA"
+      }
+    }
+  },  
+  "theme":{
+    "confirmModalDialog":{
+        "closeConfirmModal": "Fermer la fenêtre de confirmation"
+    }
+  }, 
   "i18n": {
     "languageContextMenu": {
       "selector": "Sélecteur de langue"
