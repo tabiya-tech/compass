@@ -11,13 +11,14 @@ def get_i18n_manager() -> I18nManager:
     """
     return I18nManager()
 
-def t(domain: str, key: str, locale: str = "en", **kwargs) -> str:
+def t(domain: str, key: str, locale: str = "en", fallback_message: str = "", **kwargs) -> str:
     """
     Retrieves a translated and formatted string.
 
     Args:
         domain: The translation domain (e.g., 'prompts', 'errors').
         key: The translation key.
+        fallback_message: The default message.
         locale: The target locale.
         **kwargs: Values to format into the translated string.
 
@@ -26,7 +27,7 @@ def t(domain: str, key: str, locale: str = "en", **kwargs) -> str:
     """
     i18n_manager = get_i18n_manager()
     locale=get_locale()
-    raw_string = i18n_manager.get_translation(locale, domain, key)
+    raw_string = i18n_manager.get_translation(locale, domain, key,fallback_message=fallback_message)
     
     try:
         return raw_string.format(**kwargs)

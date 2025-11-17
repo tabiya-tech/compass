@@ -17,8 +17,7 @@
   "collect_experiences.fields.start_date": "start date",
   "collect_experiences.fields.end_date": "end date",
   "collect_experiences.fields.company": "company/receiver of work",
-  "collect_experiences.fields.location": "location"
-  ,
+  "collect_experiences.fields.location": "location",
   "collect_experiences.ask_about_type": "Ask me about experiences that include: {experience_type}",
   "collect_experiences.recap_prompt": "Let's recap, and give me a chance to correct any mistakes.",
   "explore_experiences.no_more_experiences": "It looks like, there are no experiences to discuss further.",
