@@ -60,7 +60,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
   const handlePopoverClose = async (reasons: DislikeReason[]) => {
     setIsPopoverOpen(false);
     setAnchorEl(null);
-    
+
     if (!reasons.length) {
       setIsSubmitting(false);
       return;
@@ -75,8 +75,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
     } catch (error) {
       setReaction(currentReaction); // Rollback to previous state
       console.error(new Error("Failed to submit the dislike feedback", { cause: error }));
-      enqueueSnackbar("Failed to submit the feedback. Please try again.", { variant: "error" });
-
+      enqueueSnackbar(t("chat.reaction.components.reactionButtons.errors.submitDislike"), { variant: "error" });
       // if it fails to submit the dislike reaction, we should revert to the previous reaction
       setReaction(currentReaction);
     } finally {
@@ -99,7 +98,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
       } catch (error) {
         setReaction(ReactionKind.LIKED); // Rollback to previous state
         console.error(new Error("Failed to remove the like feedback", { cause: error }));
-        enqueueSnackbar("Failed to remove the feedback. Please try again.", { variant: "error" });
+        enqueueSnackbar(t("chat.reaction.components.reactionButtons.errors.removeLike"), { variant: "error" });
       } finally {
         setIsSubmitting(false);
       }
@@ -112,7 +111,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
     } catch (error) {
       setReaction(currentReaction); // Rollback to previous state
       console.error(new Error("Failed to submit the like feedback", { cause: error }));
-      enqueueSnackbar("Failed to submit the feedback. Please try again.", { variant: "error" });
+      enqueueSnackbar(t("chat.reaction.components.reactionButtons.errors.submitLike"), { variant: "error" });
     } finally {
       setIsSubmitting(false);
     }
@@ -130,7 +129,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
       } catch (error) {
         setReaction(ReactionKind.DISLIKED); // Rollback to previous state
         console.error(new Error("Failed to remove the dislike feedback", { cause: error }));
-        enqueueSnackbar("Failed to remove the feedback. Please try again.", { variant: "error" });
+        enqueueSnackbar(t("chat.reaction.components.reactionButtons.errors.removeDislike"), { variant: "error" });
       } finally {
         setIsSubmitting(false);
       }
@@ -152,7 +151,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
           }}
           onClick={handleLikeClick}
           data-testid={DATA_TEST_ID.BUTTON_LIKE}
-          title={t("chat.reaction.components.reactionButtons.likeLabel")}
+          title={t("chat.reaction.components.reactionButtons.components.reactionButtons.likeLabel")}
           disabled={!isOnline || isSubmitting}
         >
           {reaction === ReactionKind.LIKED ? (
@@ -177,7 +176,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
           }}
           onClick={handleDislikeClick}
           data-testid={DATA_TEST_ID.BUTTON_DISLIKE}
-          title={t("chat.reaction.components.reactionButtons.dislikeLabel")}
+          title={t("chat.reaction.components.reactionButtons.components.reactionButtons.dislikeLabel")}
           disabled={!isOnline || isSubmitting}
         >
           {reaction === ReactionKind.DISLIKED ? (
