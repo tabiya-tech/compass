@@ -4,7 +4,7 @@ import { Box, Popover, Typography, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import { DislikeReason, DislikeReasonMessages } from "src/chat/reaction/reaction.types";
+import { DislikeReason, DislikeReasonTransalationKey } from "src/chat/reaction/reaction.types";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 export interface DislikeReasonPopoverProps {
@@ -24,6 +24,7 @@ export const DATA_TEST_ID = {
   CLOSE_ICON_BUTTON: `dislike-reason-popover-close-icon-button-${uniqueId}`,
 };
 
+
 export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
   anchorEl,
   open,
@@ -32,6 +33,9 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
   const theme = useTheme();
   const { t } = useTranslation();
   const isOnline = useContext(IsOnlineContext)
+
+  const getDislikeReasonLabel = (reason: DislikeReason) =>
+    t(`${DislikeReasonTransalationKey[reason]}`);
 
   const handleReasonClick = (reason: DislikeReason) => {
     // for now, our ui only allows selecting one reason
@@ -75,24 +79,19 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
           </PrimaryIconButton>
         </Box>
         <Box display="flex" flexDirection="row" flexWrap="wrap" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-          {Object.entries(DislikeReasonMessages).map(([enumValue, message]) => {
-            // Convert SNAKE_CASE to camelCase (e.g., INAPPROPRIATE_TONE -> inappropriateTone)
-            const camelCaseKey = enumValue.split('_').map((word, index) => {
-              const lower = word.toLowerCase();
-              return index === 0 ? lower : lower.charAt(0).toUpperCase() + lower.slice(1);
-            }).join('');
-            const translationKey = `chat.reaction.components.dislikeReasonPopover.reasons.${camelCaseKey}`;
-            
+          {Object.values(DislikeReason).map((reason) => {
+            const label = getDislikeReasonLabel(reason);
+
             return (
               <PrimaryButton
-                key={enumValue}
-                onClick={() => handleReasonClick(enumValue as DislikeReason)}
-                title={t(translationKey)}
+                key={reason}
+                onClick={() => handleReasonClick(reason)}
+                title={label}
                 style={{ color: theme.palette.text.secondary }}
                 data-testid={DATA_TEST_ID.BUTTON}
                 disabled={!isOnline}
               >
-                {t(translationKey)}
+                {label}
               </PrimaryButton>
             );
           })}
