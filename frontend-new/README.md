@@ -66,6 +66,8 @@ To develop this application locally, follow these steps:
      - `FRONTEND_DISABLE_REGISTRATION`: (**Optional**) A boolean value to disable the registration entirely.
      - `FRONTEND_DISABLE_SOCIAL_AUTH`: (**Optional**) A boolean value to disable social authentication options on the login and registration pages.
      - `FRONTEND_FEATURES`: (**optional**) A JSON like dictionary with the features enabled status and configurations specific to each feature.
+     - `FRONTEND_SUPPORTED_LANGUAGES`:(**Mandatory**)  A JSON array of enabled locale codes (e.g., ["en-gb", "en-us","es-es","es-ar", "fr-fr"]).
+    - `FRONTEND_DEFAULT_LOCALE`:(**Mandatory**)  Default UI language to use if the user preference is not set.
 
    Please request the necessary environment variable values from the project team.
    
