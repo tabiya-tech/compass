@@ -56,39 +56,50 @@ export const useFieldsConfig = () => {
   return { fields, loading, error };
 };
 
+
 /**
  * Parses a YAML configuration string into a FieldsConfig object.
+ *
+ * @param yamlText - The YAML configuration string
+ * @returns The parsed FieldsConfig object
  */
+
 export const parseYamlConfig = (yamlText: string): FieldDefinition[] => {
+  let fieldDefinitions: FieldDefinition[]
   try {
     const yamlJson = parse(yamlText) as Record<string, FieldDefinition>;
 
-    const fieldDefinitions = Object.entries(yamlJson).map(
-      ([name, field]: [string, FieldDefinition]) => {
-        switch (field.type) {
-          case FieldType.String:
-            return new StringFieldDefinition({ ...field, name });
-          case FieldType.Enum:
-            return new EnumFieldDefinition({ ...field, name });
-          case FieldType.MultipleSelect:
-            return new MultipleSelectFieldDefinition({ ...field, name });
-          default:
-            throw new Error("Invalid field type");
-        }
-      }
-    );
+    // Convert the YAML object into an array of FieldDefinition objects
+    // the yaml is setup in a way that the key is the name of the field
+    // and the value is the rest of the field definition, so we need to
+    // manually add the name to the field definition
 
+    // The class constructors will validate the field definitions (types and required fields)
+    fieldDefinitions = Object.entries(yamlJson).map(([name, field]: [string, FieldDefinition]) => {
+      switch (field.type) {
+        case FieldType.String:
+          return new StringFieldDefinition({ ...field, name });
+        case FieldType.Enum:
+          return new EnumFieldDefinition({ ...field, name });
+        case FieldType.MultipleSelect:
+          return new MultipleSelectFieldDefinition({ ...field, name });
+        default:
+          throw new Error('Invalid field type');
+      }
+    });
+
+    // Validate duplicate dataKeys
     const dataKeys: Map<string, boolean> = new Map();
-    fieldDefinitions.forEach((field) => {
+    fieldDefinitions.forEach(field => {
       if (dataKeys.has(field.dataKey)) {
         throw new ConfigurationError(`Duplicate dataKey '${field.dataKey}'`);
       }
-      dataKeys.set(field.dataKey, true);
+      dataKeys.set(field.dataKey, true)
     });
 
     return fieldDefinitions;
   } catch (error) {
     console.error(error);
-    throw new Error("Failed to parse fields configuration");
+    throw new Error('Failed to parse fields configuration');
   }
 };
