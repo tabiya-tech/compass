@@ -11,7 +11,7 @@ name:
     # [\p{L}\s\.]{2,50} ensures that the name contains only letters (Unicode), spaces, and dots and is between 2 and 50 characters long
     # # Unicode letter characters REQUIRES the 'u' flag in the regex e.g. /pattern/u
     pattern: ^(?!\.)(?!.*\.\.)(?!.*(\..*){5,})[\p{L}\s\.]{2,50}$
-    errorMessage: Name should contain only letters and be 2-50 characters long.
+    errorMessage: El nombre debe contener solo letras y tener entre 2 y 50 caracteres.
 contactEmail:
   dataKey: contact_email
   type: STRING
@@ -25,7 +25,7 @@ contactEmail:
     # We've gone for a more conservative limit of 256 characters
     # for more info see: https://www.rfc-editor.org/errata_search.php?rfc=3696
     pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,256}$
-    errorMessage: Please enter a valid email address.
+    errorMessage: Por favor, ingrese una dirección de correo electrónico válida.
 gender:
   dataKey: gender
   type: ENUM

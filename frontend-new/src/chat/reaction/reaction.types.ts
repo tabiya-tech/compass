@@ -14,6 +14,16 @@ export enum DislikeReason {
   CONFUSING = "CONFUSING",
 }
 
+
+export const DislikeReasonTransalationKey = {
+  [DislikeReason.INAPPROPRIATE_TONE]: "chat.reaction.components.dislikeReasonPopover.reasons.inappropriateTone",
+  [DislikeReason.OFFENSIVE_LANGUAGE]: "chat.reaction.components.dislikeReasonPopover.reasons.offensiveLanguage",
+  [DislikeReason.BIASED]: "chat.reaction.components.dislikeReasonPopover.reasons.biased",
+  [DislikeReason.INCORRECT_INFORMATION]: "chat.reaction.components.dislikeReasonPopover.reasons.incorrectInformation",
+  [DislikeReason.IRRELEVANT]: "chat.reaction.components.dislikeReasonPopover.reasons.irrelevant",
+  [DislikeReason.CONFUSING]: "chat.reaction.components.dislikeReasonPopover.reasons.confusing",
+};
+
 export const DislikeReasonMessages = {
   [DislikeReason.INAPPROPRIATE_TONE]: "Inappropriate Tone",
   [DislikeReason.OFFENSIVE_LANGUAGE]: "Offensive Language",
