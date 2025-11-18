@@ -1,10 +1,10 @@
 import logging
 from abc import ABC, abstractmethod
 from typing import Set
-from datetime import datetime
+from datetime import datetime, timezone
 
 import httpx
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from features.skills_ranking.types import SkillsRankingScore, PriorBeliefs
 from features.skills_ranking.services.errors import (
@@ -28,10 +28,17 @@ class SkillsRankingRequest(BaseModel):
 
 class SkillsRankingResponse(BaseModel):
     """Response model for skills ranking calculation."""
-    jobs_matching_rank: float
-    comparison_rank: float
-    comparison_label: str
-    calculated_at: datetime
+    calculated_at: datetime | None = None
+    above_average_labels: list[str] = Field(default_factory=list)
+    below_average_labels: list[str] = Field(default_factory=list)
+    most_demanded_label: str
+    most_demanded_percent: float
+    least_demanded_label: str
+    least_demanded_percent: float
+    average_percent_for_jobseeker_skillgroups: float
+    average_count_for_jobseeker_skillgroups: float
+    province_used: str
+    matched_skillgroups: int
 
 
 class ISkillsRankingService(ABC):
@@ -64,12 +71,12 @@ class SkillsRankingService(ISkillsRankingService):
         taxonomy_model_id: str,
     ) -> SkillsRankingScore:
         """
-        Call the external skills-ranking-service to calculate participant ranking.
+        Call the external skills-ranking-service to fetch demand insights for a participant's skills.
         :param user_id : The user ID of the participant.
         :param prior_beliefs: The prior beliefs of the participant.
-        :param participants_skills_uuids: The set of skill UUIDs for the participant
+        :param participants_skills_uuids: The set of skill UUIDs for the participant.
         :param taxonomy_model_id: The taxonomy model ID to use for ranking.
-        :return: SkillsRankingScore containing the ranking results.
+        :return: SkillsRankingScore containing demand-oriented labels and percentages.
         """
         request_data = SkillsRankingRequest(
             user_id=user_id,
@@ -100,10 +107,17 @@ class SkillsRankingService(ISkillsRankingService):
                 
                 # Convert the response to SkillsRankingScore
                 score = SkillsRankingScore(
-                    jobs_matching_rank=response_data.jobs_matching_rank,
-                    comparison_rank=response_data.comparison_rank,
-                    comparison_label=response_data.comparison_label,
-                    calculated_at=response_data.calculated_at
+                    calculated_at=response_data.calculated_at or datetime.now(timezone.utc),
+                    above_average_labels=response_data.above_average_labels,
+                    below_average_labels=response_data.below_average_labels,
+                    most_demanded_label=response_data.most_demanded_label,
+                    most_demanded_percent=response_data.most_demanded_percent,
+                    least_demanded_label=response_data.least_demanded_label,
+                    least_demanded_percent=response_data.least_demanded_percent,
+                    average_percent_for_jobseeker_skillgroups=response_data.average_percent_for_jobseeker_skillgroups,
+                    average_count_for_jobseeker_skillgroups=response_data.average_count_for_jobseeker_skillgroups,
+                    province_used=response_data.province_used,
+                    matched_skillgroups=response_data.matched_skillgroups
                 )
                 
                 self._logger.info(f"Successfully calculated ranking for user {user_id}")

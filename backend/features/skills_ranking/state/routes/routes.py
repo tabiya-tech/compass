@@ -56,8 +56,7 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
                 # return None if no state exists
                 return None
 
-            # Return the full phase array
-            return SkillsRankingStateResponse(**state.model_dump())
+            return SkillsRankingStateResponse(**state.model_dump(mode="json"))
         except UnauthorizedSessionAccessError:
             logger.warning(f"Unauthorized access to session_id: {session_id} by user_id: {user_info.user_id}")
             raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=NO_PERMISSION_FOR_SESSION)
@@ -101,23 +100,20 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
                 if request.phase != "INITIAL":
                     raise SkillsRankingStateNotFound(session_id=session_id)
 
+            metadata_dict = request.metadata.model_dump(exclude_none=True) if request.metadata else None
+            user_responses_dict = request.user_responses.model_dump(exclude_none=True) if request.user_responses else None
+
             new_state = await skills_ranking_service.upsert_state(
                 user_id=user_info.user_id,
                 session_id=session_id,
                 update_request=UpdateSkillsRankingRequest(
                     phase=request.phase,
-                    cancelled_after=request.cancelled_after,
-                    succeeded_after=request.succeeded_after,
-                    puzzles_solved=request.puzzles_solved,
-                    correct_rotations=request.correct_rotations,
-                    clicks_count=request.clicks_count,
-                    perceived_rank_percentile=request.perceived_rank_percentile,
-                    retyped_rank_percentile=request.retyped_rank_percentile,
+                    metadata=metadata_dict if metadata_dict else None,
+                    user_responses=user_responses_dict if user_responses_dict else None,
                 )
             )
 
-            # Convert the state to response format, using the latest phase
-            return SkillsRankingStateResponse(**new_state.model_dump())
+            return SkillsRankingStateResponse(**new_state.model_dump(mode="json"))
 
         except InvalidNewPhaseError as e:
             logger.error("Invalid new phase error occurred.")

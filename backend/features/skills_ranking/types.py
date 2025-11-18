@@ -1,31 +1,70 @@
 """
 Common Types shared by the ranking service and state manager
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class SkillsRankingScore(BaseModel):
-    jobs_matching_rank: float
     """
-    The rank of the user as compared to the job market.
-    """
-
-    comparison_rank: float
-    """
-    The rank of the user as compared to other job seekers.
+    Demand-focused skill insights returned by the external skills-ranking-service.
     """
 
-    comparison_label: str
+    calculated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     """
-    The label of the comparison rank, LOWEST, SECOND_LOWEST, MIDDLE, SECOND_HIGHEST, HIGHEST.
+    Timestamp (UTC) for when the demand calculation was performed.
     """
 
-    calculated_at: datetime
+    above_average_labels: list[str] = Field(default_factory=list)
     """
-    The time the score was calculated, in ISO format, in UTC.
+    Skill groups where the participant outperforms the regional/job-market average.
+    """
+
+    below_average_labels: list[str] = Field(default_factory=list)
+    """
+    Skill groups where the participant underperforms relative to the market average.
+    """
+
+    most_demanded_label: str
+    """
+    The participant's most demanded skill group.
+    """
+
+    most_demanded_percent: float
+    """
+    Demand percentage associated with the `most_demanded_label`.
+    """
+
+    least_demanded_label: str
+    """
+    The participant's least demanded skill group.
+    """
+
+    least_demanded_percent: float
+    """
+    Demand percentage associated with the `least_demanded_label`.
+    """
+
+    average_percent_for_jobseeker_skillgroups: float
+    """
+    Average demand percentage across the participant's matched skill groups.
+    """
+
+    average_count_for_jobseeker_skillgroups: float
+    """
+    Average job count across the participant's matched skill groups.
+    """
+
+    province_used: str
+    """
+    Province reference used for aggregating labour market demand.
+    """
+
+    matched_skillgroups: int
+    """
+    Number of skill groups matched between the participant and the market data.
     """
 
     class Config:

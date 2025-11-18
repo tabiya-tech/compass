@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, patch
 import httpx
 import pytest
 
+from common_libs.test_utilities import get_random_printable_string
 from features.skills_ranking.services.skills_ranking_service import (
     SkillsRankingService,
 )
@@ -47,10 +48,17 @@ def given_test_taxonomy_model_id():
 def given_test_ranking_score():
     """Fixture to create test ranking score response."""
     return SkillsRankingScore(
-        jobs_matching_rank=0.8,
-        comparison_rank=0.7,
-        comparison_label="high",
         calculated_at=datetime.datetime.now(datetime.timezone.utc),
+        above_average_labels=[get_random_printable_string(10)],
+        below_average_labels=[get_random_printable_string(10)],
+        most_demanded_label=get_random_printable_string(10),
+        most_demanded_percent=65.0,
+        least_demanded_label=get_random_printable_string(10),
+        least_demanded_percent=10.0,
+        average_percent_for_jobseeker_skillgroups=45.0,
+        average_count_for_jobseeker_skillgroups=418.0,
+        province_used=get_random_printable_string(10),
+        matched_skillgroups=5,
     )
 
 
