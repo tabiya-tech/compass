@@ -30,7 +30,6 @@ export const getFlowPathForGroup = (experimentGroup: SkillsRankingExperimentGrou
     case SkillsRankingExperimentGroups.GROUP_3:
       return skillsRankingHappyPathFull;
     case SkillsRankingExperimentGroups.GROUP_2:
-    case SkillsRankingExperimentGroups.GROUP_4:
       return skillsRankingHappyPathSkipped;
     default:
       console.error(new SkillsRankingError("Invalid experiment group." + experimentGroup));

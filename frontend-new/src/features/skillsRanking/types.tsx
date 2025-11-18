@@ -2,47 +2,27 @@ import { FeatureConfig } from "src/features/featuresService/FeaturesService";
 
 export enum SkillsRankingExperimentGroups {
   /**
-   * Group 1: High Difference/Greater
-   * - time based effort task
-   * - see ranking results.
-   * - confirm they've seen the ranking results
+   * Group 1:
+   * - User receives NO skill-demand disclosure.
+   * - No information about above-average, below-average,
+   *   most-demanded, or least-demanded skills is shown.
    */
-  GROUP_1 = "Group 1: High Difference/Greater",
+  GROUP_1 = "Group 1: No Skill-Demand Disclosure (Control)",
+
   /**
-   * Group 2: High Difference/Smaller
-   * - work based effort task
-   *
-   *  Note: original: not see ranking results.
-   *
-   *  95%
-   *    not see ranking results.
-   *  5%
-   *    if solved _30_ characters:-
-   *       - see the result
-   *    else:
-   *      - not see the result
+   * Group 2:
+   * - User sees only which of their skills are above-average in demand.
+   * - Also includes identification of the single most-demanded skill.
    */
-  GROUP_2 = "Group 2: High Difference/Smaller",
+  GROUP_2 = "Group 2: Above-Average and Most-Demanded Skills",
+
   /**
-   * Group 3: Underconfidence/Yes
-   * - work based effort task
-   *
-   * Note: original: see ranking results.
-   *  95%
-   *    see ranking results.
-   *  5%
-   *    if solved _30_ characters:-
-   *       - see the result
-   *    else:
-   *      - not see the result
+   * Group 3:
+   * - User sees above-average AND below-average skill demand.
+   * - Includes both the most-demanded and least-demanded skills.
+   * - This group receives the full disclosure.
    */
-  GROUP_3 = "Group 3: Underconfidence/Yes",
-  /**
-   * Group 4: Underconfidence/No
-   * - time based effort task
-   * - not see ranking results.
-   */
-  GROUP_4 = "Group 4: Underconfidence/No",
+  GROUP_3 = "Group 3: Full Skill-Demand Disclosure",
 }
 
 /**
@@ -134,14 +114,14 @@ export interface SkillsRankingState {
 
   /**
    * The number of characters the user rotated correctly for the proof_of_value task during the skills ranking process.
-   * Only relevant for the time-based proof_of_value task (GROUP_1 and GROUP_4).
+   * Only relevant for the time-based proof_of_value task (GROUP_1).
    */
   correct_rotations?: number;
 
   /**
    * The number of clicks the user made during the proof_of_value task.
    * Includes character selection and rotation [clockwise/counter-clockwise].
-   * Only relevant for the time-based proof_of_value task (GROUP_1 and GROUP_4).
+   * Only relevant for the time-based proof_of_value task (GROUP_1).
    */
   clicks_count?: number;
 

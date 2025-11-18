@@ -28,7 +28,6 @@ const getPhaseFlowForGroup = (experimentGroup: SkillsRankingExperimentGroups): S
         SkillsRankingPhase.COMPLETED,
       ];
     case SkillsRankingExperimentGroups.GROUP_2:
-    case SkillsRankingExperimentGroups.GROUP_4:
       // Same flow but market disclosure auto-skips internally
       return [
         SkillsRankingPhase.INITIAL,
@@ -89,8 +88,7 @@ class MockSkillsRankingService {
     // If ProofOfValue is transitioning to MARKET_DISCLOSURE, check if we should skip to JOB_SEEKER_DISCLOSURE
     if (
       phase === SkillsRankingPhase.MARKET_DISCLOSURE &&
-      (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2 ||
-        this.experimentGroup === SkillsRankingExperimentGroups.GROUP_4)
+      (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2)
     ) {
       targetPhase = SkillsRankingPhase.JOB_SEEKER_DISCLOSURE;
       console.log(
@@ -101,8 +99,7 @@ class MockSkillsRankingService {
     // If PerceivedRank is transitioning to RETYPED_RANK, check if we should skip to COMPLETED
     if (
       phase === SkillsRankingPhase.RETYPED_RANK &&
-      (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2 ||
-        this.experimentGroup === SkillsRankingExperimentGroups.GROUP_4)
+      (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2)
     ) {
       targetPhase = SkillsRankingPhase.COMPLETED;
       console.log(`[Mock] Skipping RETYPED_RANK for group ${this.experimentGroup}, going to COMPLETED`);
@@ -327,9 +324,3 @@ export const Group3_WorkBased: Story = {
   render: (args) => <SkillsRankingFlowTester {...args} onFinishFlow={action("Group 3 flow finished")} />,
 };
 
-export const Group4_TimeBased: Story = {
-  args: {
-    experimentGroup: SkillsRankingExperimentGroups.GROUP_4,
-  },
-  render: (args) => <SkillsRankingFlowTester {...args} onFinishFlow={action("Group 4 flow finished")} />,
-};

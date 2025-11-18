@@ -104,13 +104,3 @@ export const Group3_Disclosed: Story = {
   },
 };
 
-// GROUP 4: Undisclosed
-export const Group4_Undisclosed: Story = {
-  args: {
-    ...BaseArgs,
-    skillsRankingState: {
-      ...BaseArgs.skillsRankingState,
-      experiment_group: SkillsRankingExperimentGroups.GROUP_4,
-    },
-  },
-};

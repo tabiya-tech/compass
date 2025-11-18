@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SkillsRankingProofOfValue snapshot: work-based initial render (non-replay) 1`] = `
+exports[`SkillsRankingProofOfValue snapshot: initial render (non-replay) 1`] = `
 <div>
   <div
     class="MuiBox-root css-1s6oyup"

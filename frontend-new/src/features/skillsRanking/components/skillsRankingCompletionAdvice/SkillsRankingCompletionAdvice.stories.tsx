@@ -110,24 +110,6 @@ export const Group3_WorkBased: Story = {
   },
 };
 
-// GROUP 4: TIME_BASED - Should NOT show advice (has NOT seen market disclosure)
-export const Group4_TimeBased: Story = {
-  args: {
-    ...BaseArgs,
-    skillsRankingState: {
-      ...BaseArgs.skillsRankingState,
-      experiment_group: SkillsRankingExperimentGroups.GROUP_4,
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Group 4 (TIME_BASED) - Should NOT show completion advice because user has NOT seen market disclosure",
-      },
-    },
-  },
-};
-
 // Helper story to show which groups should/shouldn't see the advice
 export const MarketDisclosureGroups: Story = {
   args: {
@@ -147,7 +129,6 @@ export const MarketDisclosureGroups: Story = {
 
 **Groups that should NOT see completion advice (have NOT seen market disclosure):**
 - Group 2 (WORK_BASED): ${shouldSkipMarketDisclosure(SkillsRankingExperimentGroups.GROUP_2) ? "❌ No advice" : "✅ Shows advice"}
-- Group 4 (TIME_BASED): ${shouldSkipMarketDisclosure(SkillsRankingExperimentGroups.GROUP_4) ? "❌ No advice" : "✅ Shows advice"}
         `,
       },
     },

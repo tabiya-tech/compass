@@ -10,6 +10,8 @@ describe("skillsRankingFlowGraph", () => {
       SkillsRankingPhase.INITIAL,
       SkillsRankingPhase.BRIEFING,
       SkillsRankingPhase.PROOF_OF_VALUE,
+      SkillsRankingPhase.PRIOR_BELIEF,
+      SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,
       SkillsRankingPhase.MARKET_DISCLOSURE,
       SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
       SkillsRankingPhase.PERCEIVED_RANK,
@@ -20,6 +22,8 @@ describe("skillsRankingFlowGraph", () => {
       SkillsRankingPhase.INITIAL,
       SkillsRankingPhase.BRIEFING,
       SkillsRankingPhase.PROOF_OF_VALUE,
+      SkillsRankingPhase.PRIOR_BELIEF,
+      SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,
       SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
       SkillsRankingPhase.PERCEIVED_RANK,
       SkillsRankingPhase.COMPLETED,
@@ -28,9 +32,8 @@ describe("skillsRankingFlowGraph", () => {
 
   test.each([
     [SkillsRankingExperimentGroups.GROUP_1, skillsRankingHappyPathFull],
-    [SkillsRankingExperimentGroups.GROUP_3, skillsRankingHappyPathFull],
+    [SkillsRankingExperimentGroups.GROUP_3, skillsRankingHappyPathSkipped],
     [SkillsRankingExperimentGroups.GROUP_2, skillsRankingHappyPathSkipped],
-    [SkillsRankingExperimentGroups.GROUP_4, skillsRankingHappyPathSkipped],
   ])("getFlowPathForGroup(%s) returns expected path", (group, expected) => {
     expect(getFlowPathForGroup(group)).toBe(expected);
   });

@@ -39,8 +39,7 @@ import { SkillsRankingState, SkillsRankingExperimentGroups } from "src/features/
 // Utility function to check if a group should skip market disclosure (and consequently retyped rank)
 export const shouldSkipMarketDisclosure = (experimentGroup: SkillsRankingExperimentGroups): boolean => {
   return (
-    experimentGroup === SkillsRankingExperimentGroups.GROUP_2 ||
-    experimentGroup === SkillsRankingExperimentGroups.GROUP_4
+    experimentGroup === SkillsRankingExperimentGroups.GROUP_2
   );
 };
 

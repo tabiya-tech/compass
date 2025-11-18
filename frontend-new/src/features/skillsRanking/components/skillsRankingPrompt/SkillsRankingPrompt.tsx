@@ -95,8 +95,8 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
       <ChatBubble
         message={
           <>
-            <strong>Almost done!</strong> Answer a few more research questions and we’ll send you{" "}
-            <strong>{compensationAmount} </strong> airtime once you have completed all tasks.
+            You are almost there! Remember that if you completely finish this conversation with me you will receive <strong>{compensationAmount} Rand in airtime.</strong><br/>
+            Whether you receive 20 or 30 depends on your responses below, so please read carefully.
           </>
         }
         sender={ConversationMessageSender.COMPASS}

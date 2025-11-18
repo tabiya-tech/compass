@@ -1,10 +1,9 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useContext, useMemo, useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import {
-  EffortType,
   SkillsRankingExperimentGroups,
   SkillsRankingPhase,
   SkillsRankingState,
@@ -27,7 +26,8 @@ const uniqueId = "0e95404a-2044-4634-a6e8-29cc7b2d754e";
 
 export const DATA_TEST_ID = {
   SKILLS_RANKING_BRIEFING_CONTAINER: `skills-ranking-briefing-container-${uniqueId}`,
-  SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON: `skills-ranking-briefing-continue-button-${uniqueId}`,
+  SKILLS_RANKING_BRIEFING_FIRST_CONTINUE_BUTTON: `skills-ranking-briefing-first-continue-button-${uniqueId}`,
+  SKILLS_RANKING_BRIEFING_SECOND_CONTINUE_BUTTON: `skills-ranking-briefing-second-continue-button-${uniqueId}`,
 };
 
 enum ScrollStep {
@@ -36,14 +36,64 @@ enum ScrollStep {
   SECOND_MESSAGE = 2,
 }
 
-const getEffortTypeForGroup = (group: SkillsRankingExperimentGroups): EffortType => {
+const getBriefingMessage = (group: SkillsRankingExperimentGroups): JSX.Element => {
+  const jobPlatform = getJobPlatformUrl();
+
   switch (group) {
     case SkillsRankingExperimentGroups.GROUP_1:
-    case SkillsRankingExperimentGroups.GROUP_4:
-      return EffortType.TIME_BASED;
+      return (
+        <>
+          If you are interested,{" "}
+          <strong>I can show you information on which skill areas employers ask for on {jobPlatform}.</strong> Here is
+          what I mean with this:
+          <br />
+          <br /> On {jobPlatform}, some skill areas are asked for in many opportunities, and some are asked for in few.
+          I can give you some information on these trends. <br />
+          <br />
+          Calculating this will take some time. When you are ready please click continue. If you are not interested, you
+          will be given a chance to cancel.
+        </>
+      );
+
     case SkillsRankingExperimentGroups.GROUP_2:
+      return (
+        <>
+          If you are interested,{" "}
+          <strong>
+            I can show you information about which of your skill areas are 'above average' in demand on {jobPlatform}.
+          </strong>{" "}
+          Here is what I mean with this:
+          <br />
+          <br /> On {jobPlatform}, some skill areas are asked for in many opportunities, and some are asked for in few.
+          I calculate the average demand for the skill areas you have. A skill area is 'above average' in demand if it
+          is asked for in more opportunities than the average skill area.
+          <br />
+          <br />
+          Calculating this will take some time. When you are ready please click continue. If you are not interested, you
+          will be given a chance to cancel.
+        </>
+      );
+
     case SkillsRankingExperimentGroups.GROUP_3:
-      return EffortType.WORK_BASED;
+      return (
+        <>
+          If you are interested,{" "}
+          <strong>
+            I can show you information about which of your skill areas are 'above average' in demand on {jobPlatform}.
+          </strong>{" "}
+          Here is what I mean with this:
+          <br />
+          <br /> On {jobPlatform}, some skill areas are asked for in many opportunities, and some are asked for in few.
+          I calculate the average demand for the skill areas you have. A skill area is 'below average' in demand if it
+          is asked for in fewer opportunities than the average skill area. It is 'above average' if it is asked for in
+          more opportunities than average.
+          <br />
+          <br />
+          Calculating this will take some time. When you are ready please click continue. If you are not interested, you
+          will be given a chance to cancel.
+        </>
+      );
+
     default:
       throw new SkillsRankingError("Invalid experiment group.");
   }
@@ -66,13 +116,10 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
 
   const isReplay = currentPhase !== SkillsRankingPhase.BRIEFING;
 
-  const effortType = getEffortTypeForGroup(skillsRankingState.experiment_group);
-
-  const [submitted, setSubmitted] = useState(false);
+  const [firstButtonSubmitted, setFirstButtonSubmitted] = useState(false);
+  const [secondButtonSubmitted, setSecondButtonSubmitted] = useState(false);
   const [isTypingVisible, setIsTypingVisible] = useState(false);
-  const [showSecondMessage, setShowSecondMessage] = useState(
-    effortType === EffortType.TIME_BASED || (effortType === EffortType.WORK_BASED && isReplay)
-  );
+  const [showSecondMessage, setShowSecondMessage] = useState(isReplay);
 
   const currentScrollStep = useMemo(() => {
     if (isTypingVisible) return ScrollStep.TYPING;
@@ -82,15 +129,18 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
 
   const scrollRef = useAutoScrollOnChange(currentScrollStep);
 
-  useEffect(() => {
-    if (effortType === EffortType.WORK_BASED && !isReplay) {
-      const timeout = setTimeout(() => setShowSecondMessage(true), getDefaultTypingDurationMs());
-      return () => clearTimeout(timeout);
-    }
-  }, [effortType, isReplay]);
+  const handleFirstContinue = useCallback(() => {
+    setFirstButtonSubmitted(true);
+    setIsTypingVisible(true);
 
-  const handleContinue = useCallback(async () => {
-    setSubmitted(true);
+    setTimeout(() => {
+      setIsTypingVisible(false);
+      setShowSecondMessage(true);
+    }, getDefaultTypingDurationMs());
+  }, []);
+
+  const handleSecondContinue = useCallback(async () => {
+    setSecondButtonSubmitted(true);
     setIsTypingVisible(true);
 
     const start = Date.now();
@@ -111,7 +161,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
     } catch (err) {
       console.error(err);
       enqueueSnackbar("Failed to continue. Please try again later.", { variant: "error" });
-      setSubmitted(false);
+      setSecondButtonSubmitted(false);
       setIsTypingVisible(false);
       return;
     }
@@ -133,43 +183,24 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
       <Box sx={{ width: "100%" }}>
-        {/* TIME_BASED or first WORK_BASED message */}
         <ChatBubble
-          message={
-            effortType === EffortType.WORK_BASED ? (
-              <>
-                If you are interested,  <strong>I can calculate what share of </strong>{getJobPlatformUrl()}{" "}
-                <strong>opportunities match your skills and how you compare with other seekers</strong> — you just need to show me how
-                valuable this information is to you.
-              </>
-            ) : (
-              <>
-                If you are interested,  <strong>I can calculate what share of </strong>{getJobPlatformUrl()}{" "}
-                <strong>opportunities match your skills and how you compare with other seekers</strong> This might take
-                some time — if you are not interested in waiting any longer, you can click <strong>cancel</strong> at any time in the next message,
-                while I calculate. <br/><br/>When you are ready please click <strong>continue</strong>.
-              </>
-            )
-          }
+          message={getBriefingMessage(skillsRankingState.experiment_group)}
           sender={ConversationMessageSender.COMPASS}
         >
-          {/* Only show button here for TIME_BASED */}
-          {effortType === EffortType.TIME_BASED && (
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="flex-end"
-              padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+          <Box
+            display="flex"
+            flexDirection="row"
+            justifyContent="flex-end"
+            padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+          >
+            <PrimaryButton
+              onClick={handleFirstContinue}
+              disabled={isReplay || !isOnline || firstButtonSubmitted || isTypingVisible || showSecondMessage}
+              data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_FIRST_CONTINUE_BUTTON}
             >
-              <PrimaryButton
-                onClick={handleContinue}
-                disabled={isReplay || !isOnline || submitted || isTypingVisible}
-                data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON}
-              >
-                Continue
-              </PrimaryButton>
-            </Box>
-          )}
+              Continue
+            </PrimaryButton>
+          </Box>
         </ChatBubble>
 
         <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
@@ -181,28 +212,17 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
         </ChatMessageFooterLayout>
       </Box>
 
-      {/* Typing between WORK_BASED messages */}
-      <AnimatePresence mode="wait">
-        {effortType === EffortType.WORK_BASED && !isReplay && !showSecondMessage && (
-          <motion.div
-            key="typing-transition"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <TypingChatMessage />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Second WORK_BASED message + button */}
-      {effortType === EffortType.WORK_BASED && showSecondMessage && (
+      {showSecondMessage && (
         <Box sx={{ width: "100%" }}>
           <ChatBubble
-            message={<>
-              You'll see tilted letters on a few screens. Turn each letter upright using the rotation buttons. You can cancel anytime. In 5% of cases, <strong>more letters fixed = higher chance of receiving the information.</strong> The rest of the time it depends on me.
-            </>}
+            message={
+              <>
+                You'll see tilted letters on a few screens. Turn each letter upright using the rotation buttons. You can
+                cancel anytime. In 5% of cases,{" "}
+                <strong>more letters fixed = higher chance of receiving the information.</strong> The rest of the time
+                it depends on me.
+              </>
+            }
             sender={ConversationMessageSender.COMPASS}
           >
             <Box
@@ -212,9 +232,9 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
               padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
             >
               <PrimaryButton
-                onClick={handleContinue}
-                disabled={isReplay || !isOnline || submitted || isTypingVisible}
-                data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON}
+                onClick={handleSecondContinue}
+                disabled={isReplay || !isOnline || secondButtonSubmitted || isTypingVisible}
+                data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_SECOND_CONTINUE_BUTTON}
               >
                 Continue
               </PrimaryButton>
@@ -231,7 +251,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
         </Box>
       )}
 
-      {/* Final typing shown after clicking continue */}
+      {/* Typing shown after clicking continue */}
       <AnimatePresence mode="wait">
         {isTypingVisible && (
           <motion.div

@@ -115,23 +115,13 @@ describe("SkillsRankingJobMarketDisclosure", () => {
     const actualOnFinish = jest.fn().mockResolvedValue(undefined);
 
     // WHEN render with group 2 (skip)
-    const { rerender } = render(
+    render(
       <SkillsRankingJobMarketDisclosure
         onFinish={actualOnFinish}
         skillsRankingState={createState(SkillsRankingExperimentGroups.GROUP_2, SkillsRankingPhase.MARKET_DISCLOSURE)}
       />
     );
     // component returns null but should still call update via effect
-    await flush();
-    expect(mockUpdate).toHaveBeenCalledWith(givenSessionId, SkillsRankingPhase.JOB_SEEKER_DISCLOSURE);
-
-    // WHEN render with group 4 (skip)
-    rerender(
-      <SkillsRankingJobMarketDisclosure
-        onFinish={actualOnFinish}
-        skillsRankingState={createState(SkillsRankingExperimentGroups.GROUP_4, SkillsRankingPhase.MARKET_DISCLOSURE)}
-      />
-    );
     await flush();
     expect(mockUpdate).toHaveBeenCalledWith(givenSessionId, SkillsRankingPhase.JOB_SEEKER_DISCLOSURE);
   });
