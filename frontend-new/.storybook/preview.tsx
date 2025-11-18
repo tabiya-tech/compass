@@ -82,8 +82,10 @@ const preview: Preview = {
       toolbar: {
         icon: 'globe',
         items: [
-          { value: 'en-gb', title: 'English' },
-          { value: 'es-es', title: 'Spanish' },
+          { value: 'en-gb', title: 'English (UK)' },
+          { value: 'en-us', title: 'English (US)' },
+          { value: 'es-es', title: 'Spanish (Spain)' },
+          { value: 'es-ar', title: 'Spanish (Argentina)' },
           { value: 'fr-fr', title: 'French' },
         ],
         showName: true,
