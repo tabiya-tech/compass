@@ -1,0 +1,12 @@
+<svg viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="120" fill="#ffffff"/>
+  
+  <!-- Border -->
+  <rect x="5" y="5" width="390" height="110" fill="none" stroke="#002147" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- Text -->
+  <text x="200" y="70" font-family="Arial, sans-serif" font-size="28" font-weight="300" fill="#002147" text-anchor="middle">
+    Acá podría estar su logo
+  </text>
+</svg>

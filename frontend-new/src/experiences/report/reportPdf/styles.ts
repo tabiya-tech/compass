@@ -161,10 +161,13 @@ const styles = StyleSheet.create({
     gap: 26,
   },
   image: {
-    height: 42,
+    height: 20,
   },
   compassImage: {
-    height: 46,
+    height: 20,
+  },
+  placeholderImage: {
+    height: 30,
   },
   infoIcons: {
     width: 14,

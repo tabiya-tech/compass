@@ -101,6 +101,9 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
               source={undefined}
             />
             <Image src={getBase64Image(ReportContent.IMAGE_URLS.OXFORD_LOGO)} style={styles.image} source={undefined} />
+            <Image src={getBase64Image(ReportContent.IMAGE_URLS.YOUTH_INNOVATION_FUND_LOGO)} style={styles.image} source={undefined} />
+            <Image src={getBase64Image(ReportContent.IMAGE_URLS.EMPUJAR_LOGO)} style={styles.image} source={undefined} />
+            <Image src={getBase64Image(ReportContent.IMAGE_URLS.PLACEHOLDER_LOGO)} style={styles.placeholderImage} source={undefined} />
           </View>
           <Text x={0} y={0} style={styles.title} data-testid={DATA_TEST_ID.SKILL_REPORT_TITLE}>
             {ReportContent.SKILLS_REPORT_TITLE}

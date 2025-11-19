@@ -46,6 +46,9 @@ export const ReportContent = {
   IMAGE_URLS: {
     COMPASS_LOGO: `${process.env.PUBLIC_URL}/logo.png`,
     OXFORD_LOGO: `${process.env.PUBLIC_URL}/oxford-logo.png`,
+    YOUTH_INNOVATION_FUND_LOGO: `${process.env.PUBLIC_URL}/yif.png`,
+    EMPUJAR_LOGO: `${process.env.PUBLIC_URL}/empujar-logo.png`,
+    PLACEHOLDER_LOGO: `${process.env.PUBLIC_URL}/placeholder-logo.png`,
     LOCATION_ICON: `${process.env.PUBLIC_URL}/location.png`,
     PHONE_ICON: `${process.env.PUBLIC_URL}/phone.png`,
     EMAIL_ICON: `${process.env.PUBLIC_URL}/email.png`,
