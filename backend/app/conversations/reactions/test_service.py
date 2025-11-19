@@ -34,7 +34,7 @@ def get_mock_conversation_context(message_id: str) -> ConversationContext:
                     ),
                     output=AgentOutput(
                         message_id=message_id,
-                        message_for_user="Hi, I'm compass.",
+                        message_for_user="Hi, I'm brujula.",
                         finished=False,
                         agent_response_time_in_sec=0.1,
                         llm_stats=[]

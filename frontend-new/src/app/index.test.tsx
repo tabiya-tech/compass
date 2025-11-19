@@ -107,7 +107,7 @@ describe("index", () => {
     // since we clean up on application startup
     jest.spyOn(AuthenticationFactoryModule.default, "resetAuthenticationState").mockResolvedValue();
   });
-  describe("main compass app test", () => {
+  describe("main brujula app test", () => {
     test("should render app successfully", async () => {
       // GIVEN AuthenticationStateService.loadToken will successfully load the token
       jest.spyOn(AuthenticationStateService.prototype, "loadToken").mockImplementation(() => {});

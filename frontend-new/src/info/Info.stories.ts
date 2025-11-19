@@ -14,7 +14,7 @@ const meta: Meta<typeof Info> = {
 export default meta;
 type Story = StoryObj<typeof Info>;
 
-const API_URL = "http://dev.compass.tabiya.tech/api/version";
+const API_URL = "http://dev.brujula.tabiya.tech/api/version";
 
 export const Shown: Story = {
   args: { isOpen: true },

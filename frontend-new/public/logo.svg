@@ -29,7 +29,7 @@
         format('woff2');
         }
 
-        .compass {
+        .brujula {
         font-family: 'InterDisplay-SemiBold', sans-serif;
         font-weight: 600;
         font-size: 194px;
@@ -50,9 +50,9 @@
         fill: #247066 ;
         }
     </style>
-    <text x="324" y="152" class="compass">compass</text>
+    <text x="324" y="152" class="brujula">brujula</text>
     <text x="334" y="235">
         <tspan class="by">by</tspan>
-        <tspan class="tabiya" fill="red">&#160;tabiya</tspan>
+        <tspan class="tabiya" fill="red">&#160;Fundacion Empujar</tspan>
     </text>
 </svg>

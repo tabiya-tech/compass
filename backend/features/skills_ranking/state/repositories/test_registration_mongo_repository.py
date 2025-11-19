@@ -8,7 +8,7 @@ from features.skills_ranking.state.repositories.registration_mongo_repository im
 class TestGetPriorBeliefs:
     @pytest.mark.asyncio
     async def test_get_prior_beliefs_success(self, in_memory_registration_data_db):
-        # GIVEN a compass user id
+        # GIVEN a brujula user id
         given_user_id = get_random_user_id()
         given_external_user_id = get_random_user_id()
 
@@ -38,7 +38,7 @@ class TestGetPriorBeliefs:
 
     @pytest.mark.asyncio
     async def test_get_prior_beliefs_not_found(self, in_memory_registration_data_db):
-        # GIVEN a compass user id that does not exist in the database
+        # GIVEN a brujula user id that does not exist in the database
         given_user_id = get_random_user_id()
 
         # AND a registration mongo repository initialized with an in-memory database
@@ -52,7 +52,7 @@ class TestGetPriorBeliefs:
 
     @pytest.mark.asyncio
     async def test_get_prior_beliefs_opportunity_rank_prior_belief_not_in_doc(self, in_memory_registration_data_db):
-        # GIVEN a compass user id
+        # GIVEN a brujula user id
         given_user_id = get_random_user_id()
 
         # AND a collection name, and a document without opportunityRankPriorBelief
@@ -76,7 +76,7 @@ class TestGetPriorBeliefs:
 
     @pytest.mark.asyncio
     async def test_get_prior_beliefs_compare_to_others_prior_belief_not_in_doc(self, in_memory_registration_data_db, caplog):
-        # GIVEN a compass user id
+        # GIVEN a brujula user id
         given_user_id = get_random_user_id()
 
         # AND a collection name, and a document without compareToOthersPriorBelief
@@ -105,7 +105,7 @@ class TestGetPriorBeliefs:
 
     @pytest.mark.asyncio
     async def test_get_prior_beliefs_database_error(self, in_memory_registration_data_db, mocker):
-        # GIVEN a compass user id
+        # GIVEN a brujula user id
         given_user_id = get_random_user_id()
 
         # AND a collection name, and a document with all the fields

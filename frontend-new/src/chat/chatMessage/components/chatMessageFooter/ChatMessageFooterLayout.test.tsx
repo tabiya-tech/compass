@@ -26,7 +26,7 @@ describe("render tests", () => {
       children: [Child("foo-child-1"), Child("foo-child-2")],
       expectedTestIds: ["foo-child-1", "foo-child-2"]
     }
-  ])("should render a compass chat message footer %s", ({ children, expectedTestIds }) => {
+  ])("should render a brujula chat message footer %s", ({ children, expectedTestIds }) => {
     // WHEN the component is rendered
     render(<ChatMessageFooter sender={ConversationMessageSender.COMPASS}>{children}</ChatMessageFooter>);
 

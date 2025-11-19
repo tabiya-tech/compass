@@ -183,14 +183,14 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     // If there are no messages, we can't calculate the time
     if (messages.length === 0) return null;
 
-    // Get timestamp from the first compass message in the conversation
+    // Get timestamp from the first brujula message in the conversation
     const firstCompassMessage = messages.find((message) =>
-      message.type.startsWith("compass-message-")
+      message.type.startsWith("brujula-message-")
     ) as IChatMessage<CompassChatMessageProps>;
-    // If there is no compass message, we can't calculate the time
+    // If there is no brujula message, we can't calculate the time
     if (!firstCompassMessage) return null;
 
-    // Get the timestamp from the compass message
+    // Get the timestamp from the brujula message
     const firstCompassMessageTimestamp = firstCompassMessage.payload.sent_at;
     // If there is no timestamp, we can't calculate the time
     if (!firstCompassMessageTimestamp) return null;
@@ -787,7 +787,7 @@ return {
     }
   }, [exploredExperiencesNotification]);
 
-  // add a message when the compass is typing
+  // add a message when the brujula is typing
   useEffect(() => {
     addOrRemoveTypingMessage(aiIsTyping);
   }, [aiIsTyping]);

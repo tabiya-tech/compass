@@ -529,7 +529,7 @@ class TestRecordEvent:
             ):
                 # GIVEN a conversation turn event
                 given_event = get_conversation_turn_event(user_count=random.randint(1, 10),  # nosec B311 # random is used for testing purposes
-                                                        compass_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes for user and compass count
+                                                        compass_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes for user and brujula count
                 repository = await get_metrics_repository
 
                 # WHEN the event is recorded
@@ -546,7 +546,7 @@ class TestRecordEvent:
 
                 # WHEN the event is recorded again for the same user
                 given_second_event = get_conversation_turn_event(user_count=random.randint(1, 10),  # nosec B311 # random is used for testing purposes
-                                                                compass_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes for user and compass count
+                                                                compass_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes for user and brujula count
                 given_second_event.anonymized_user_id = given_event.anonymized_user_id
                 given_second_event.anonymized_session_id = given_event.anonymized_session_id
 
@@ -573,8 +573,8 @@ class TestRecordEvent:
             ):
                 # GIVEN a list of message reaction created events for different users
                 given_events = [
-                    get_conversation_turn_event(user_count=random.randint(1, 10), compass_count=random.randint(1, 10)),  # nosec B311 # random is used for testing purposes for user and compass count
-                    get_conversation_turn_event(user_count=random.randint(1, 10), compass_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes for user and compass count
+                    get_conversation_turn_event(user_count=random.randint(1, 10), compass_count=random.randint(1, 10)),  # nosec B311 # random is used for testing purposes for user and brujula count
+                    get_conversation_turn_event(user_count=random.randint(1, 10), compass_count=random.randint(1, 10))  # nosec B311 # random is used for testing purposes for user and brujula count
                 ]
                 repository = await get_metrics_repository
 

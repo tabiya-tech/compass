@@ -37,8 +37,8 @@ def _get_group_based_on_ranks(*,
         If the user is underconfident (self-estimated rank is higher than actual rank), they are assigned to `GROUP_3`.
         If the user is not underconfident, they are assigned to `GROUP_4`.
 
-    :param self_estimated_rank: The belief the user has about their skills ranks before the compass experiment.
-    :param actual_rank: The actual ranking of the user as determined by the compass experiment.
+    :param self_estimated_rank: The belief the user has about their skills ranks before the brujula experiment.
+    :param actual_rank: The actual ranking of the user as determined by the brujula experiment.
     :param high_difference_threshold: The threshold value to determine the group assignment, especially when computing the high difference.
     """
 

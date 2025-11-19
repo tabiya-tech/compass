@@ -147,7 +147,7 @@ async def test_qna_agent_responds_to_multiple_questions_in_a_row(fake_conversati
                                                                  common_folder_path: str):
     """ Tests the QnA agent with multiple questions in a row. """
     qna_agent = QnaAgent()
-    prompt = "You are a student from Kenya. You are just starting the process with the tabiya compass. " \
+    prompt = "You are a student from Kenya. You are just starting the process with the tabiya brujula. " \
              "You are asking generic questions about the process. Ask only one question at a time, be concise."
     fake_conversation_context.set_summary("The user is asking generic questions about the process.")
     simulated_user = LLMSimulatedUser(system_instructions=prompt)

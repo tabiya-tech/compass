@@ -64,7 +64,7 @@ def _get_counseling_phase(state: ApplicationState) -> _CounselingPhaseLiteral:
 
 
 def _get_compass_message_count(state: ApplicationState) -> int:
-    """Get the current number of compass messages (outputs)"""
+    """Get the current number of brujula messages (outputs)"""
     return sum(1 for turn in state.conversation_memory_manager_state.all_history.turns
                if turn.output)
 

@@ -1,6 +1,6 @@
 ## README
 
-The purpose of our study has been to evaluate linking models to the Occupation and Skill ESCO taxonomies to choose how to do so as effectively as possible for our compass application. 
+The purpose of our study has been to evaluate linking models to the Occupation and Skill ESCO taxonomies to choose how to do so as effectively as possible for our brujula application. 
 
 The evaluation was run on synthetic queries based on a dataset of 542 job descriptions with the corresponding ESCO code for the occupations and of 1054 sentences containing 2013 skills with the corresponding Tabiya UUID. Those synthetic queries are assumed to be similar to the input that an hypothetical user of the Brujula platform would submit. We also fixed the embedding model to be VertexAI's Gecko003.
 

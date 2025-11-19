@@ -2,8 +2,8 @@
 
 exports[`test the application bootstrapping should render the app when root element is immediately available 1`] = `
 <div
-  data-testid="compass-app-id"
-  id="compass-app-id"
+  data-testid="brujula-app-id"
+  id="brujula-app-id"
 >
   Mock CompassApp
 </div>

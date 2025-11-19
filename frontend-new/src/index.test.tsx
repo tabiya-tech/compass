@@ -30,7 +30,7 @@ jest.doMock("react-dom/client", () => {
 // mock CompassApp
 jest.mock("./app", () => {
   const mCompassApp = () => (
-    <div id="compass-app-id" data-testid="compass-app-id">
+    <div id="brujula-app-id" data-testid="brujula-app-id">
       Mock CompassApp
     </div>
   );
@@ -157,13 +157,13 @@ describe("test the application bootstrapping", () => {
     const snackbarProviderElement = within(themeProviderElement).getByTestId("snackbar-provider-id");
     expect(snackbarProviderElement).toBeInTheDocument();
 
-    // AND expect the compass app to be in the DOM and to be a child of the theme provider
-    const compassAppElement = within(themeProviderElement).getByTestId("compass-app-id");
+    // AND expect the brujula app to be in the DOM and to be a child of the theme provider
+    const compassAppElement = within(themeProviderElement).getByTestId("brujula-app-id");
     expect(compassAppElement).toBeInTheDocument();
 
     // AND expect the ensureRequiredEnvVars function to have been called
     expect(ensureRequiredEnvVarsMock).toHaveBeenCalled();
-    // AND expect the compass app to match the snapshot
+    // AND expect the brujula app to match the snapshot
     expect(compassAppElement).toMatchSnapshot();
   });
 
@@ -224,8 +224,8 @@ describe("test the application bootstrapping", () => {
     const snackbarProviderElement = within(themeProviderElement).getByTestId("snackbar-provider-id");
     expect(snackbarProviderElement).toBeInTheDocument();
 
-    // AND expect the compass app to be in the DOM and to be a child of the theme provider
-    const compassAppElement = within(themeProviderElement).getByTestId("compass-app-id");
+    // AND expect the brujula app to be in the DOM and to be a child of the theme provider
+    const compassAppElement = within(themeProviderElement).getByTestId("brujula-app-id");
     expect(compassAppElement).toBeInTheDocument();
 
     // AND expect the ensureRequiredEnvVars function to have been called

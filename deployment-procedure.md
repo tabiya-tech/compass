@@ -135,7 +135,7 @@ Create a service account that will be used to set up the realm:
 
 - Create a new Pulumi stack in the `realm` folder:
   ```shell
-  # Use the realm name as the stack name (e.g., "compass")
+  # Use the realm name as the stack name (e.g., "brujula")
   pulumi stack init <REALM_NAME>
   ```
 

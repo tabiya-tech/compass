@@ -14,7 +14,7 @@ _demographics = None
 
 def _get_compass_version(date_input: Optional[Any]) -> Optional[str]:
     """
-    Get the compass version based on the deployment date.
+    Get the brujula version based on the deployment date.
     """
     global _versions
     

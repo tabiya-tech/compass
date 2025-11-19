@@ -50,7 +50,7 @@ test_cases_router = [
         summary="",
         turns=[
             ("(silence)",
-             "Welcome to compass! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
+             "Welcome to brujula! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
         ],
         user_input="Let's start.",
         conversation_phase=ConversationPhase.INTRO,
@@ -61,7 +61,7 @@ test_cases_router = [
         summary="",
         turns=[
             ("(silence)",
-             "Welcome to compass! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
+             "Welcome to brujula! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
             ("Let's start.",
                 "Great! Let's start by exploring your work experiences. Please tell me about your first work experience."),
         ],
@@ -74,7 +74,7 @@ test_cases_router = [
         summary="",
         turns=[
             ("(silence)",
-             "Welcome to compass! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
+             "Welcome to brujula! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
         ],
         user_input="the weather is nice today",
         conversation_phase=ConversationPhase.INTRO,
@@ -85,7 +85,7 @@ test_cases_router = [
         summary="",
         turns=[
             ("(silence)",
-             "Welcome to compass! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
+             "Welcome to brujula! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
             ("Let's start.",
              "Great! Let's start by exploring your work experiences. Please tell me about your first work experience."),
         ],
@@ -98,7 +98,7 @@ test_cases_router = [
         summary="",
         turns=[
             ("(silence)",
-             "Welcome to compass! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
+             "Welcome to brujula! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
             ("Let's start.",
              "Great! Let's start by exploring your work experiences. Please tell me about your first work experience."),
         ],
@@ -111,7 +111,7 @@ test_cases_router = [
         summary="",
         turns=[
             ("(silence)",
-             "Welcome to compass! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
+             "Welcome to brujula! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
             ("Let's start.",
              "Great! Let's start by exploring your work experiences. Please tell me about your first work experience."),
             ("i worked as a baker", "When did you start working as a baker?"),
@@ -129,7 +129,7 @@ test_cases_router = [
         summary="",
         turns=[
             ("(silence)",
-             "Welcome to compass! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
+             "Welcome to brujula! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
             ("Let's start.",
              "Great! Let's start by exploring your work experiences. Please tell me about your first work experience."),
             ("i worked as a baker", "When did you start working as a baker?"),
@@ -147,7 +147,7 @@ test_cases_router = [
         summary="",
         turns=[
             ("(silence)",
-             "Welcome to compass! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
+             "Welcome to brujula! We will start by exploring your work experiences. When you are ready, let me know by saying 'start'."),
             ("Let's start.",
              "Great! Let's start by exploring your work experiences. Please tell me about your first work experience."),
             ("i worked as a baker", "When did you start working as a baker?"),

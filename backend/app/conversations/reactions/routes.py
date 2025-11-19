@@ -135,7 +135,7 @@ def add_reaction_routes(conversation_router: APIRouter, auth: Authentication):
         description="saves user's reaction to a message",
         responses={
             HTTPStatus.BAD_REQUEST: {"model": HTTPErrorResponse},
-            # user is not allowed to react to messages sent by the user, only messages from compass
+            # user is not allowed to react to messages sent by the user, only messages from brujula
             HTTPStatus.FORBIDDEN: {"model": HTTPErrorResponse},
             # user is not allowed to react to messages in another user's session
             HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse},  # Internal server error, any server error

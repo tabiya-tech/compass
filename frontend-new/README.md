@@ -1,6 +1,6 @@
 # Brujula Frontend
 
-The deployed version can be found here: [Frontend URL](https://dev.compass.tabiya.tech)
+The deployed version can be found here: [Frontend URL](https://dev.brujula.tabiya.tech)
 ## Prerequisites
 
 To develop the frontend locally, you must install the following:

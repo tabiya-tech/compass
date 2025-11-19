@@ -20,7 +20,7 @@ export const MessageContainer = styled(Box)<{ origin: ConversationMessageSender 
   width: "100%",
 }));
 
-export const COMPASS_CHAT_MESSAGE_TYPE = `compass-message-${uniqueId}`;
+export const COMPASS_CHAT_MESSAGE_TYPE = `brujula-message-${uniqueId}`;
 
 export interface CompassChatMessageProps {
     message_id: string;

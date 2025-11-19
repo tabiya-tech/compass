@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "compass backend"
+name = "brujula backend"
 version = "0.0.0"
 description = ""
 authors = ["Tabiya <tabiya@tabiya.org>"]

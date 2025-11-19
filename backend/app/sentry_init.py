@@ -59,7 +59,7 @@ def init_sentry(dsn: str, environment: str | None = None, config: Optional[Backe
 
     def record_factory(*args, **kwargs):
         record = old_factory(*args, **kwargs)
-        record.component_name = "compass-backend"
+        record.component_name = "brujula-backend"
         return record
 
     logging.setLogRecordFactory(record_factory)

@@ -200,7 +200,7 @@ class ConversationTurnEventExporter(EventExporter):
                 user_artificial_messages += 1
             else:
                 user_message_count += 1
-            # count compass messages regardless
+            # count brujula messages regardless
             compass_message_count += 1
 
         # we need to add all the turn events because the conversation turn metric has an auto-incrementing counter for turn_count

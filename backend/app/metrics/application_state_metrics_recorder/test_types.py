@@ -50,7 +50,7 @@ class TestMessageCounting:
         # GIVEN a state with multiple message types
         state = get_empty_state()
         
-        # Regular user message with compass response
+        # Regular user message with brujula response
         state.conversation_memory_manager_state.all_history.turns.append(
             ConversationTurn(
                 index=0,
@@ -60,7 +60,7 @@ class TestMessageCounting:
                     sent_at=datetime.now(timezone.utc)
                 ),
                 output=AgentOutput(
-                    message_for_user="Hi there",  # Valid compass message
+                    message_for_user="Hi there",  # Valid brujula message
                     finished=True,
                     agent_response_time_in_sec=1.0,
                     llm_stats=[],
@@ -69,7 +69,7 @@ class TestMessageCounting:
             )
         )
 
-        # Empty user message with compass response
+        # Empty user message with brujula response
         state.conversation_memory_manager_state.all_history.turns.append(
             ConversationTurn(
                 index=1,
@@ -79,7 +79,7 @@ class TestMessageCounting:
                     sent_at=datetime.now(timezone.utc)
                 ),
                 output=AgentOutput(
-                    message_for_user="Welcome!",  # Valid compass message
+                    message_for_user="Welcome!",  # Valid brujula message
                     finished=True,
                     agent_response_time_in_sec=1.0,
                     llm_stats=[],
@@ -88,7 +88,7 @@ class TestMessageCounting:
             )
         )
 
-        # Artificial user message with compass response
+        # Artificial user message with brujula response
         state.conversation_memory_manager_state.all_history.turns.append(
             ConversationTurn(
                 index=2,
@@ -98,7 +98,7 @@ class TestMessageCounting:
                     sent_at=datetime.now(timezone.utc)
                 ),
                 output=AgentOutput(
-                    message_for_user="Response to artificial",  # Valid compass message
+                    message_for_user="Response to artificial",  # Valid brujula message
                     finished=True,
                     agent_response_time_in_sec=1.0,
                     llm_stats=[],
@@ -112,7 +112,7 @@ class TestMessageCounting:
         
         # THEN only valid messages should be counted
         # - Only 1 valid user message (the "Hello" message)
-        # - 3 valid compass messages (one for each turn)
+        # - 3 valid brujula messages (one for each turn)
         assert result.user_message_count == 1
         assert result.compass_message_count == 3
 

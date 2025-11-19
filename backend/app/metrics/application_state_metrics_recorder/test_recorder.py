@@ -160,7 +160,7 @@ class TestRecorderFlow:
 
         # AND a save state happens with multiple changes
         given_new_state = ApplicationState.new_state(given_session_id)
-        # Add a message turn with a user and compass message
+        # Add a message turn with a user and brujula message
         given_new_state.conversation_memory_manager_state.all_history.turns.append(
             ConversationTurn(
                 index=0,
@@ -376,7 +376,7 @@ class TestRecordMetricEventsFunction:
         # AND a user_id
         user_id = get_random_user_id()
 
-        # AND a previous state with 1 user message and 1 compass message
+        # AND a previous state with 1 user message and 1 brujula message
         given_previous_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
@@ -386,7 +386,7 @@ class TestRecordMetricEventsFunction:
             experiences_discovered_count=0,
             experiences_by_work_type={}
         )
-        # AND a current state with 2 user messages and 2 compass messages
+        # AND a current state with 2 user messages and 2 brujula messages
         given_current_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
@@ -407,7 +407,7 @@ class TestRecordMetricEventsFunction:
         events = mock_metrics_service.bulk_record_events.call_args[0][0]
         # AND there should be 1 conversation turn event
         assert len(events) == 1
-        # AND the conversation turn event should have 2 user messages and 2 compass messages
+        # AND the conversation turn event should have 2 user messages and 2 brujula messages
         assert events[0].compass_message_count == 3
         assert events[0].user_message_count == 4
 
@@ -425,7 +425,7 @@ class TestRecordMetricEventsFunction:
         # AND a user_id
         user_id = get_random_user_id()
 
-        # AND a previous state with 1 user message and 1 compass message
+        # AND a previous state with 1 user message and 1 brujula message
         given_previous_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",
@@ -435,7 +435,7 @@ class TestRecordMetricEventsFunction:
             experiences_discovered_count=0,
             experiences_by_work_type={}
         )
-        # AND a current state with 1 user message and 1 compass message
+        # AND a current state with 1 user message and 1 brujula message
         given_current_state = _get_mock_application_states_of_interest(
             conversation_phase="NOT_STARTED",
             counseling_phase="NOT_STARTED",

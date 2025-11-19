@@ -314,7 +314,7 @@ class FeedbackRatingValueEvent(AbstractConversationEvent):
 
 class ConversationTurnEvent(AbstractConversationEvent):
     """
-    A metric event representing the counts of user and compass turns in a conversation
+    A metric event representing the counts of user and brujula turns in a conversation
     """
     compass_message_count: int
     user_message_count: int

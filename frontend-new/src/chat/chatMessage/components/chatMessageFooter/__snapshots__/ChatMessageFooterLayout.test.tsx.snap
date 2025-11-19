@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`render tests should render a compass chat message footer {
+exports[`render tests should render a brujula chat message footer {
   name: 'with a single child',
   children: [Array],
   expectedTestIds: [Array]
@@ -18,7 +18,7 @@ exports[`render tests should render a compass chat message footer {
 </div>
 `;
 
-exports[`render tests should render a compass chat message footer {
+exports[`render tests should render a brujula chat message footer {
   name: 'with multiple children',
   children: [Array],
   expectedTestIds: [Array]
@@ -42,7 +42,7 @@ exports[`render tests should render a compass chat message footer {
 </div>
 `;
 
-exports[`render tests should render a compass chat message footer { name: 'without children', children: [], expectedTestIds: [] } 1`] = `
+exports[`render tests should render a brujula chat message footer { name: 'without children', children: [], expectedTestIds: [] } 1`] = `
 <div
   class="MuiBox-root css-1qcd69q"
   data-testid="chat-message-footer-layout-container-7772f20a-9d0c-4072-b24f-97eca2f43d7b"

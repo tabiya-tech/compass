@@ -305,7 +305,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     >
       <NavLink style={{ lineHeight: 0 }} to={routerPaths.ROOT} data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO_LINK}>
         <img
-          src={`${process.env.PUBLIC_URL}/compass.svg`}
+          src={`${process.env.PUBLIC_URL}/brujula.svg`}
           alt={t("app.compassLogoAlt")}
           height={12 * theme.tabiyaSpacing.xl} // xl wasn't quite big enough, we're going for ~48px
           data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO}

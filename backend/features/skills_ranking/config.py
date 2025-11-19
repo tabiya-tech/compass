@@ -23,7 +23,7 @@ class SkillsRankingConfig(BaseModel):
     The API key for authenticating with the external skills-ranking-service.
     """
 
-    # State management (still needed for compass experiment state)
+    # State management (still needed for brujula experiment state)
     skills_ranking_state_mongodb_uri: str
     """
     The URI of the skills ranking state MongoDB instance.

@@ -7,7 +7,7 @@ import { saveAs } from "src/experiences/saveAs";
 export class PDFReportDownloadProvider implements IReportFormatProvider {
   async download(props: ReportProps) {
     try {
-      const fileName = "compass-cv.pdf";
+      const fileName = "brujula-cv.pdf";
       const report = pdf(
         <SkillReportPDF
           name={props.name}

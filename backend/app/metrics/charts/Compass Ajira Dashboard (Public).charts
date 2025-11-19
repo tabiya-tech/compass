@@ -4250,7 +4250,7 @@
     "data-source-1": {
       "alias": "metric_events",
       "collection": "metric_events",
-      "database": "compass-application-ajira",
+      "database": "brujula-application-ajira",
       "deployment": "Ajira",
       "sourceType": "cluster"
     }

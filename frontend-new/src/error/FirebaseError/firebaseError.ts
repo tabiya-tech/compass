@@ -53,12 +53,12 @@ export const getUserFriendlyFirebaseErrorMessage = (firebaseError: FirebaseError
 };
 
 /**
- *  Cast a FirebaseError from '@firebase/util' to a compass FirebaseError in a safe way.
+ *  Cast a FirebaseError from '@firebase/util' to a brujula FirebaseError in a safe way.
  *  The error is expected to have the following properties:
  *  - code: string
  *  - message: string
  *  If the error does not have these properties,
- *  a compass FirebaseError with errorCode FirebaseErrorCodes.INTERNAL_ERROR is returned
+ *  a brujula FirebaseError with errorCode FirebaseErrorCodes.INTERNAL_ERROR is returned
  *
  *  It's intended use is in catch block
  *  try {

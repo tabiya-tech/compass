@@ -303,7 +303,7 @@ async def _copy_model_info(*, hot_run: bool, embeddings_service: EmbeddingServic
 
 async def copy_relations_collection(*, hot_run: bool = False):
     """
-    Copy the relations collection from the platform database to the compass database
+    Copy the relations collection from the platform database to the brujula database
     :return:
     """
 

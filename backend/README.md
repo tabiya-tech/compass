@@ -140,7 +140,7 @@ environment variable.
 We also expose port 8080 with the `-p 8080:8080` option.
 
 ```shell
-docker run -v ~/.config/gcloud/:/root/.config/gcloud/ -e GCLOUD_PROJECT="$(gcloud config get project)" -p 8080:8080 compass-backend
+docker run -v ~/.config/gcloud/:/root/.config/gcloud/ -e GCLOUD_PROJECT="$(gcloud config get project)" -p 8080:8080 brujula-backend
 ```
 
 ### Environment Variables & Configuration
@@ -150,7 +150,7 @@ The backend uses the following environment variables:
 - `GOOGLE_APPLICATION_CREDENTIALS`: The path to the service account key file.
 - `TAXONOMY_MONGODB_URI`: The URI of the MongoDB Atlas instance where the ESCO taxonomy data is stored.
 - `TAXONOMY_DATABASE_NAME`: The name of mongo db database where the ESCO taxonomy data with the embeddings is stored.
-- `TAXONOMY_MODEL_ID`: The model ID of the ESCO model in the compass taxonomy database.
+- `TAXONOMY_MODEL_ID`: The model ID of the ESCO model in the brujula taxonomy database.
 - `APPLICATION_MONGODB_URI`: The URI of the MongoDB Atlas instance for the application database.
 - `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
 - `USERDATA_MONGODB_URI`: The URI of the MongoDB instance for the user data database.
@@ -255,7 +255,7 @@ python server.py
 To build the image:
 
 ```shell
-docker build . -t compass-backend
+docker build . -t brujula-backend
 ```
 
 #### Running the Image Locally
@@ -264,7 +264,7 @@ To run the image, you'll need to mount a volume with the service account key and
 the container:
 
 ```shell
-docker run -v "<PATH_TO_KEY_FILE>:/code/credentials.json" -e GOOGLE_APPLICATION_CREDENTIALS="/code/credentials.json" -e MONGODB_URI="<URI_TO_MONGODB>" -e VERTEX_API_REGION="<REGION>" -p 8080:8080 compass-backend
+docker run -v "<PATH_TO_KEY_FILE>:/code/credentials.json" -e GOOGLE_APPLICATION_CREDENTIALS="/code/credentials.json" -e MONGODB_URI="<URI_TO_MONGODB>" -e VERTEX_API_REGION="<REGION>" -p 8080:8080 brujula-backend
 ```
 
 If you have set up the `.env` file, you can run the image using the `--env-file` option.
@@ -276,7 +276,7 @@ named `credentials.json` is in a folder named `keys` in the root directory and a
 
 ```dotenv
 TAXONOMY_MONGODB_URI=mongodb+srv://<USERNAME>:<PASSORD>@<CLUSTER>/?retryWrites=true&w=majority&appName=Brujula-Dev
-TAXONOMY_DATABASE_NAME=compass-taxonomy-dev
+TAXONOMY_DATABASE_NAME=brujula-taxonomy-dev
 TAXONOMY_MODEL_ID=<MODEL_ID>
 APPLICATION_MONGODB_URI=mongodb://localhost:27017
 APPLICATION_DATABASE_NAME=_compass-application-local
@@ -305,7 +305,7 @@ BACKEND_EXPERIENCE_PIPELINE_CONFIG='{}'
 Run the image using the following command:
 
 ```shell
- docker run -v "$(pwd)/keys/credentials.json:/code/keys/credentials.json" -v "$(pwd)/logs/:/code/logs/" --env-file .env -p 8080:8080 compass-backend
+ docker run -v "$(pwd)/keys/credentials.json:/code/keys/credentials.json" -v "$(pwd)/logs/:/code/logs/" --env-file .env -p 8080:8080 brujula-backend
 ```
 
 > Note: The `-v "$(pwd)/logs/:/code/logs/"` option is used to mount a volume to store the logs specified in `logging.cfg.dev.yaml`

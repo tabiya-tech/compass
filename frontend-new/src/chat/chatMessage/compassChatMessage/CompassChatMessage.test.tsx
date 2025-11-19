@@ -34,7 +34,7 @@ jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
 
 describe("render tests", () => {
   test("should render the Brujula Chat message with a timestamp", () => {
-    // GIVEN a compass chat message sent at a given time
+    // GIVEN a brujula chat message sent at a given time
     const givenDate = new Date(2024, 6, 25).toISOString();
     const messageData = {
       message_id: nanoid(),

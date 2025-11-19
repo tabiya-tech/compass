@@ -74,7 +74,7 @@ ICATUS_CODE_TO_KEY = {
 }
 OCCUPATION_DATA_PATH = "https://raw.githubusercontent.com/tabiya-tech/taxonomy-model-application/refs/heads/amend-tabiya-v1/data-sets/csv/tabiya-esco-1.1.1%20v1.0.0/occupations.csv"
 OCCUPATION_TO_SKILLS_DATA_PATH = "https://raw.githubusercontent.com/tabiya-tech/taxonomy-model-application/refs/heads/amend-tabiya-v1/data-sets/csv/tabiya-esco-1.1.1%20v1.0.0/occupation_to_skill_relations.csv"
-OUTPUT_PATH = "/Users/francescopreta/coding/compass/tabiya1.1.1/merged_skills_12_11v3.csv" #modify to proper output path
+OUTPUT_PATH = "/Users/francescopreta/coding/brujula/tabiya1.1.1/merged_skills_12_11v3.csv" #modify to proper output path
 
 def find_occupation_keys(df: pd.DataFrame, code: str, is_south_africa: bool = IS_SOUTH_AFRICA) -> List[str]:
     filtered_df = df[df["OCCUPATIONGROUPCODE"]==code]

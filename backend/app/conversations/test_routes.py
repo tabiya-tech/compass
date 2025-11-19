@@ -140,7 +140,7 @@ class TestConversationsRoutes:
                 ),
                 ConversationMessage(
                     message_id="bar_id",
-                    message="Hello, I'm compass",
+                    message="Hello, I'm brujula",
                     sender=ConversationMessageSender.COMPASS,
                     sent_at=datetime.now().isoformat()
                 ),

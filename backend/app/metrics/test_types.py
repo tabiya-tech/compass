@@ -409,7 +409,7 @@ class TestConversationTurnEvent:
         given_session_id = get_random_session_id()
         given_user_id = get_random_user_id()
 
-        # AND a random compass message count and user message count
+        # AND a random brujula message count and user message count
         given_compass_message_count = random.randint(1, 10)  # nosec B311 # random is used for testing purposes
         given_user_message_count = random.randint(1, 10)  # nosec B311 # random is used for testing purposes
 
@@ -432,7 +432,7 @@ class TestConversationTurnEvent:
         assert actual_event.anonymized_user_id is not None
         assert actual_event.anonymized_user_id != given_user_id
 
-        # AND the compass message count should match the given value
+        # AND the brujula message count should match the given value
         assert actual_event.compass_message_count == given_compass_message_count
         # AND the user message count
         assert actual_event.user_message_count == given_user_message_count

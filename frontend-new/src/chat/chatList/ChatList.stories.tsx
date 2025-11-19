@@ -118,7 +118,7 @@ export const MultipleMessages: Story = {
     messages: [
       createMessage("Hello", ConversationMessageSender.USER, USER_CHAT_MESSAGE_TYPE),
       createMessage("Hi, I'm Brujula", ConversationMessageSender.COMPASS, COMPASS_CHAT_MESSAGE_TYPE),
-      createMessage("Thank you for using compass", ConversationMessageSender.COMPASS, CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE),
+      createMessage("Thank you for using brujula", ConversationMessageSender.COMPASS, CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE),
       createMessage("Typing...", ConversationMessageSender.COMPASS, TYPING_CHAT_MESSAGE_TYPE),
     ],
   },

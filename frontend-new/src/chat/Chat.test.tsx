@@ -201,7 +201,7 @@ describe("Chat", () => {
   ) {
     assertMessagesAreShown(
       givenConversationResponse.messages.map((message) => ({
-        message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined, // only compass messages are called with message_id
+        message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined, // only brujula messages are called with message_id
         type: expect.any(String), // The type field is inferred on the frontend
         component: expect.any(Function), // The component field will be a function that returns a react component
         sender: message.sender,
@@ -436,7 +436,7 @@ describe("Chat", () => {
 
         // AND expect chat history was fetched with the active session ID
         expect(ChatService.getInstance().getChatHistory).toHaveBeenCalledWith(givenActiveSessionId);
-        // AND the chat list to be called with a message that says that compass is typing
+        // AND the chat list to be called with a message that says that brujula is typing
         assertTypingMessageWasShown();
         // AND no message to be sent to the chat service
         expect(ChatService.getInstance().sendMessage).not.toHaveBeenCalled();
@@ -518,7 +518,7 @@ describe("Chat", () => {
 
         // AND expect chat history was fetched with the active session ID
         expect(ChatService.getInstance().getChatHistory).toHaveBeenCalledWith(givenActiveSessionId);
-        // AND the chat list to be called with a message that says that compass is typing
+        // AND the chat list to be called with a message that says that brujula is typing
         assertTypingMessageWasShown();
         // AND no message to be sent to the chat service
         expect(ChatService.getInstance().sendMessage).not.toHaveBeenCalled();

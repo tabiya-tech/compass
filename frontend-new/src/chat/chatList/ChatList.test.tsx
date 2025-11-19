@@ -114,7 +114,7 @@ describe("ChatList", () => {
       sent_at: givenDate,
     };
 
-    // AND compass message data with reaction
+    // AND brujula message data with reaction
     const compassMessageData: CompassChatMessageProps = {
       message_id: nanoid(),
       message: "Hi, I'm Brujula",
@@ -125,7 +125,7 @@ describe("ChatList", () => {
       },
     };
 
-    // AND another compass message data
+    // AND another brujula message data
     const compassMessageData2: CompassChatMessageProps = {
       message_id: nanoid(),
       message: "Let's explore your experiences!",
@@ -140,7 +140,7 @@ describe("ChatList", () => {
 
     // AND conclusion message data
     const conclusionMessageData: ConversationConclusionChatMessageProps = {
-      message: "Thank you for using compass",
+      message: "Thank you for using brujula",
     };
 
     // AND error message data

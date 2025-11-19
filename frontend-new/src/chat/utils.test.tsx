@@ -98,7 +98,7 @@ describe("Chat Utils", () => {
   });
 
   describe("generateCompassMessage", () => {
-    test("should generate a compass message with the correct structure", () => {
+    test("should generate a brujula message with the correct structure", () => {
       // GIVEN a message string
       const givenMessage = "foo";
       // AND a specific message ID
@@ -110,7 +110,7 @@ describe("Chat Utils", () => {
         id: "foo-reaction-id",
         kind: ReactionKind.LIKED,
       };
-      // WHEN generating a compass message
+      // WHEN generating a brujula message
       const result = generateCompassMessage(givenMessageId, givenMessage, givenSentAt, givenReaction);
 
       // THEN expect the message to have the correct structure
@@ -140,7 +140,7 @@ describe("Chat Utils", () => {
       const givenMessageId = "specific-id";
       // AND a timestamp
       const givenSentAt = "2024-03-20T12:00:00Z";
-      // WHEN generating a compass message with null reaction
+      // WHEN generating a brujula message with null reaction
       const result = generateCompassMessage(givenMessageId, givenMessage, givenSentAt, null);
 
       // THEN expect the message to have the correct structure

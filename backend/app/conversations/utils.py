@@ -46,7 +46,7 @@ async def filter_conversation_history(history: 'ConversationHistory', reactions_
                 sender=ConversationMessageSender.USER
             ))
 
-        # Get reaction for a compass message if it exists (user messages can't have reactions)
+        # Get reaction for a brujula message if it exists (user messages can't have reactions)
         compass_reaction: Reaction | None = None
         # Find and remove the reaction from the list once it's assigned to a message
         for i, reaction in enumerate(reactions_for_session):
