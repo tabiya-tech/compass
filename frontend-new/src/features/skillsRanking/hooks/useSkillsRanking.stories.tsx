@@ -1,9 +1,14 @@
 import { Meta, StoryObj } from "@storybook/react";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IChatMessage } from "src/chat/Chat.types";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
-import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState, getLatestPhaseName } from "src/features/skillsRanking/types";
+import {
+  getLatestPhaseName,
+  SkillsRankingExperimentGroups,
+  SkillsRankingPhase,
+  SkillsRankingState,
+} from "src/features/skillsRanking/types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { action } from "@storybook/addon-actions";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
@@ -21,6 +26,7 @@ const getPhaseFlowForGroup = (experimentGroup: SkillsRankingExperimentGroups): S
         SkillsRankingPhase.BRIEFING,
         SkillsRankingPhase.PROOF_OF_VALUE,
         SkillsRankingPhase.PRIOR_BELIEF,
+        SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,
         SkillsRankingPhase.MARKET_DISCLOSURE,
         SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
         SkillsRankingPhase.PERCEIVED_RANK,
@@ -35,6 +41,7 @@ const getPhaseFlowForGroup = (experimentGroup: SkillsRankingExperimentGroups): S
         SkillsRankingPhase.BRIEFING,
         SkillsRankingPhase.PROOF_OF_VALUE,
         SkillsRankingPhase.PRIOR_BELIEF,
+        SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,
         SkillsRankingPhase.MARKET_DISCLOSURE,
         SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
         SkillsRankingPhase.PERCEIVED_RANK,

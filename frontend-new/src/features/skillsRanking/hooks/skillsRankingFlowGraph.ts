@@ -7,6 +7,7 @@ export const skillsRankingHappyPathFull = [
   SkillsRankingPhase.BRIEFING,
   SkillsRankingPhase.PROOF_OF_VALUE,
   SkillsRankingPhase.PRIOR_BELIEF,
+  SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,
   SkillsRankingPhase.MARKET_DISCLOSURE,
   SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
   SkillsRankingPhase.PERCEIVED_RANK,
@@ -20,6 +21,7 @@ export const skillsRankingHappyPathSkipped = [
   SkillsRankingPhase.BRIEFING,
   SkillsRankingPhase.PROOF_OF_VALUE,
   SkillsRankingPhase.PRIOR_BELIEF,
+  SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,
   SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
   SkillsRankingPhase.PERCEIVED_RANK,
   SkillsRankingPhase.COMPLETED

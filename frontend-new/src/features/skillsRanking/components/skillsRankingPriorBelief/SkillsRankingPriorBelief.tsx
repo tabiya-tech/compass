@@ -91,7 +91,7 @@ const SkillsRankingPriorBelief: React.FC<Readonly<SkillsRankingPriorBeliefProps>
 
       const updatedState = await SkillsRankingService.getInstance().updateSkillsRankingState(
         activeSessionId,
-        SkillsRankingPhase.MARKET_DISCLOSURE, // Next phase
+        SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,
         value
       );
 
@@ -122,6 +122,7 @@ const SkillsRankingPriorBelief: React.FC<Readonly<SkillsRankingPriorBeliefProps>
           message={
             <>
               Just before I tell you, I am curious about your thoughts. In our conversation, we found that you have
+              skills in the following areas: {aboveAverageSkills}, and {belowAverageSkills}. <br />
               skills in the following areas: {aboveAverageSkills}, and {belowAverageSkills}. <br />
               <br />
               For the next few questions, please give your best guess.{" "}

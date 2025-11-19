@@ -242,6 +242,7 @@ describe("useSkillsRanking", () => {
           [SkillsRankingPhase.BRIEFING]: "brief",
           [SkillsRankingPhase.PROOF_OF_VALUE]: "effort",
           [SkillsRankingPhase.PRIOR_BELIEF]: "prior",
+          [SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL]: "prior-for-skill",
           [SkillsRankingPhase.MARKET_DISCLOSURE]: "market",
           [SkillsRankingPhase.JOB_SEEKER_DISCLOSURE]: "jobseeker",
           [SkillsRankingPhase.PERCEIVED_RANK]: "perceived",
