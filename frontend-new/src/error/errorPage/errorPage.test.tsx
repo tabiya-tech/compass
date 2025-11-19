@@ -2,7 +2,6 @@
 import "src/_test_utilities/sentryMock"
 import { render, screen } from "src/_test_utilities/test-utils";
 import ErrorPage, { DATA_TEST_ID } from "src/error/errorPage/ErrorPage";
-import React from "react";
 import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import * as Sentry from "@sentry/react";
 
@@ -35,15 +34,14 @@ describe("ErrorPage", () => {
     expect(console.warn).not.toHaveBeenCalled();
     // AND the ErrorPage component container should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.ERROR_CONTAINER)).toBeInTheDocument();
-    // AND the ErrorPage component illustration should be rendered with translated alt text
-    const illustration = screen.getByTestId(DATA_TEST_ID.ERROR_ILLUSTRATION);
-    expect(illustration).toBeInTheDocument();
-    expect(illustration).toHaveAttribute("alt", "error illustration");
+    // AND the ErrorPage component illustration should be rendered
+    expect(screen.getByTestId(DATA_TEST_ID.ERROR_ILLUSTRATION)).toBeInTheDocument();
     // AND the ErrorPage component message should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.ERROR_MESSAGE)).toBeInTheDocument();
     expect(screen.getByText(errorMessage)).toBeInTheDocument();
     // AND expect the bug report button to be rendered
     expect(screen.getByTestId(BUG_REPORT_DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER)).toBeInTheDocument();
-  // Snapshot omitted to avoid brittleness with style/classname changes
+    // AND the ErrorPage component should match the snapshot
+    expect(screen.getByTestId(DATA_TEST_ID.ERROR_CONTAINER)).toMatchSnapshot();
   });
 });
