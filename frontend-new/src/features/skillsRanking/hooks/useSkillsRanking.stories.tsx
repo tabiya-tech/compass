@@ -15,12 +15,12 @@ const TEST_SESSION_ID = 123;
 const getPhaseFlowForGroup = (experimentGroup: SkillsRankingExperimentGroups): SkillsRankingPhase[] => {
   switch (experimentGroup) {
     case SkillsRankingExperimentGroups.GROUP_1:
-    case SkillsRankingExperimentGroups.GROUP_3:
       // Full flow - includes market disclosure and retyped rank
       return [
         SkillsRankingPhase.INITIAL,
         SkillsRankingPhase.BRIEFING,
         SkillsRankingPhase.PROOF_OF_VALUE,
+        SkillsRankingPhase.PRIOR_BELIEF,
         SkillsRankingPhase.MARKET_DISCLOSURE,
         SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
         SkillsRankingPhase.PERCEIVED_RANK,
@@ -28,11 +28,13 @@ const getPhaseFlowForGroup = (experimentGroup: SkillsRankingExperimentGroups): S
         SkillsRankingPhase.COMPLETED,
       ];
     case SkillsRankingExperimentGroups.GROUP_2:
+    case SkillsRankingExperimentGroups.GROUP_3:
       // Same flow but market disclosure auto-skips internally
       return [
         SkillsRankingPhase.INITIAL,
         SkillsRankingPhase.BRIEFING,
         SkillsRankingPhase.PROOF_OF_VALUE,
+        SkillsRankingPhase.PRIOR_BELIEF,
         SkillsRankingPhase.MARKET_DISCLOSURE,
         SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
         SkillsRankingPhase.PERCEIVED_RANK,

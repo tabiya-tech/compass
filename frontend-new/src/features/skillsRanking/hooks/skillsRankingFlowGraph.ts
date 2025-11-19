@@ -6,6 +6,7 @@ export const skillsRankingHappyPathFull = [
   SkillsRankingPhase.INITIAL,
   SkillsRankingPhase.BRIEFING,
   SkillsRankingPhase.PROOF_OF_VALUE,
+  SkillsRankingPhase.PRIOR_BELIEF,
   SkillsRankingPhase.MARKET_DISCLOSURE,
   SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
   SkillsRankingPhase.PERCEIVED_RANK,
@@ -18,6 +19,7 @@ export const skillsRankingHappyPathSkipped = [
   SkillsRankingPhase.INITIAL,
   SkillsRankingPhase.BRIEFING,
   SkillsRankingPhase.PROOF_OF_VALUE,
+  SkillsRankingPhase.PRIOR_BELIEF,
   SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
   SkillsRankingPhase.PERCEIVED_RANK,
   SkillsRankingPhase.COMPLETED
@@ -27,9 +29,9 @@ export const skillsRankingHappyPathSkipped = [
 export const getFlowPathForGroup = (experimentGroup: SkillsRankingExperimentGroups) => {
   switch (experimentGroup) {
     case SkillsRankingExperimentGroups.GROUP_1:
-    case SkillsRankingExperimentGroups.GROUP_3:
       return skillsRankingHappyPathFull;
     case SkillsRankingExperimentGroups.GROUP_2:
+    case SkillsRankingExperimentGroups.GROUP_3:
       return skillsRankingHappyPathSkipped;
     default:
       console.error(new SkillsRankingError("Invalid experiment group." + experimentGroup));
