@@ -13,7 +13,7 @@ exports[`Landing Page Continue as Guest button should not show guest button when
       class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
       data-testid="bug-report-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
       tabindex="0"
-      title="Report a bug"
+      title="Report a bug."
       type="button"
     >
       <span
@@ -210,7 +210,6 @@ exports[`Landing Page Continue as Guest button should not show guest button when
       </div>
     </div>
   </div>
-   
 </div>
 `;
 
@@ -227,7 +226,7 @@ exports[`Landing Page Continue as Guest button should not show guest button when
       class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
       data-testid="bug-report-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
       tabindex="0"
-      title="Report a bug"
+      title="Report a bug."
       type="button"
     >
       <span
@@ -424,7 +423,6 @@ exports[`Landing Page Continue as Guest button should not show guest button when
       </div>
     </div>
   </div>
-   
 </div>
 `;
 
@@ -441,7 +439,7 @@ exports[`Landing Page Continue as Guest button should not show guest button when
       class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
       data-testid="bug-report-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
       tabindex="0"
-      title="Report a bug"
+      title="Report a bug."
       type="button"
     >
       <span
@@ -638,7 +636,6 @@ exports[`Landing Page Continue as Guest button should not show guest button when
       </div>
     </div>
   </div>
-   
 </div>
 `;
 
@@ -655,7 +652,7 @@ exports[`Landing Page Continue as Guest button should show guest button when app
       class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
       data-testid="bug-report-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
       tabindex="0"
-      title="Report a bug"
+      title="Report a bug."
       type="button"
     >
       <span
@@ -852,7 +849,6 @@ exports[`Landing Page Continue as Guest button should show guest button when app
       </div>
     </div>
   </div>
-   
 </div>
 `;
 
@@ -869,7 +865,7 @@ exports[`Landing Page Register button should not show register link when registr
       class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
       data-testid="bug-report-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
       tabindex="0"
-      title="Report a bug"
+      title="Report a bug."
       type="button"
     >
       <span
@@ -1066,7 +1062,6 @@ exports[`Landing Page Register button should not show register link when registr
       </div>
     </div>
   </div>
-   
 </div>
 `;
 
@@ -1083,7 +1078,7 @@ exports[`Landing Page Register button should not show register link when registr
       class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
       data-testid="bug-report-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
       tabindex="0"
-      title="Report a bug"
+      title="Report a bug."
       type="button"
     >
       <span
@@ -1280,7 +1275,6 @@ exports[`Landing Page Register button should not show register link when registr
       </div>
     </div>
   </div>
-   
 </div>
 `;
 
@@ -1297,7 +1291,7 @@ exports[`Landing Page Register button should show register link when registratio
       class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
       data-testid="bug-report-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
       tabindex="0"
-      title="Report a bug"
+      title="Report a bug."
       type="button"
     >
       <span
@@ -1494,7 +1488,6 @@ exports[`Landing Page Register button should show register link when registratio
       </div>
     </div>
   </div>
-   
 </div>
 `;
 
@@ -1511,7 +1504,7 @@ exports[`Landing Page Register button should show register link when registratio
       class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
       data-testid="bug-report-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
       tabindex="0"
-      title="Report a bug"
+      title="Report a bug."
       type="button"
     >
       <span
@@ -1708,7 +1701,6 @@ exports[`Landing Page Register button should show register link when registratio
       </div>
     </div>
   </div>
-   
 </div>
 `;
 
@@ -1785,7 +1777,7 @@ exports[`Landing Page should render landing page successfully 1`] = `
               class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
               data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
             >
-              Welcome back!
+              Welcome to Compass!
             </h4>
             <div
               class="MuiBox-root css-0"
@@ -1795,7 +1787,6 @@ exports[`Landing Page should render landing page successfully 1`] = `
                 class="MuiTypography-root MuiTypography-body1 css-m3wh3t-MuiTypography-root"
               >
                 Discover your Full Potential
-                 
               </p>
               <p
                 class="MuiTypography-root MuiTypography-body2 css-69jwga-MuiTypography-root"
@@ -1817,7 +1808,6 @@ exports[`Landing Page should render landing page successfully 1`] = `
                 type="button"
               >
                 Login
-                 
                 <span
                   class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
                 />
@@ -1830,7 +1820,6 @@ exports[`Landing Page should render landing page successfully 1`] = `
                 type="button"
               >
                 Register
-                 
                 <span
                   class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
                 />
@@ -1849,7 +1838,6 @@ exports[`Landing Page should render landing page successfully 1`] = `
                   class="MuiTypography-root MuiTypography-subtitle2 css-zq12aa-MuiTypography-root"
                 >
                   or
-                   
                 </h6>
               </span>
             </div>
@@ -1859,7 +1847,6 @@ exports[`Landing Page should render landing page successfully 1`] = `
               data-testid="landing-continue-as-guest-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
             >
               Continue as Guest
-               
             </a>
           </div>
         </div>
