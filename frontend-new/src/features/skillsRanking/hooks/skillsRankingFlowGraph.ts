@@ -1,25 +1,31 @@
 import { SkillsRankingPhase, SkillsRankingExperimentGroups } from "../types";
 import { SkillsRankingError } from "../errors";
 
-// Flow path for groups that see market disclosure and retyped rank (groups 1 & 3)
-export const skillsRankingHappyPathFull = [
+// Flow path for Group 1 (Control): Opportunity skill requirements shown before disclosure
+export const skillsRankingGroup1Path = [
   SkillsRankingPhase.INITIAL,
   SkillsRankingPhase.BRIEFING,
   SkillsRankingPhase.PROOF_OF_VALUE,
-  SkillsRankingPhase.MARKET_DISCLOSURE,
-  SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
-  SkillsRankingPhase.PERCEIVED_RANK,
-  SkillsRankingPhase.RETYPED_RANK,
+  SkillsRankingPhase.PRIOR_BELIEF,
+  SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,
+  SkillsRankingPhase.OPPORTUNITY_SKILL_REQUIREMENT,
+  SkillsRankingPhase.DISCLOSURE,
   SkillsRankingPhase.COMPLETED
 ];
 
-// Flow path for groups that skip market disclosure and retyped rank (groups 2 & 4)
-export const skillsRankingHappyPathSkipped = [
+// Flow path for Groups 2 & 3 (Treatment A & B): Disclosure before application willingness questions
+export const skillsRankingGroup2And3Path = [
   SkillsRankingPhase.INITIAL,
   SkillsRankingPhase.BRIEFING,
   SkillsRankingPhase.PROOF_OF_VALUE,
-  SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
+  SkillsRankingPhase.PRIOR_BELIEF,
+  SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,
+  SkillsRankingPhase.DISCLOSURE,
+  SkillsRankingPhase.APPLICATION_WILLINGNESS,
+  SkillsRankingPhase.APPLICATION_24H,
   SkillsRankingPhase.PERCEIVED_RANK,
+  SkillsRankingPhase.PERCEIVED_RANK_FOR_SKILL,
+  SkillsRankingPhase.OPPORTUNITY_SKILL_REQUIREMENT,
   SkillsRankingPhase.COMPLETED
 ];
 
@@ -27,13 +33,12 @@ export const skillsRankingHappyPathSkipped = [
 export const getFlowPathForGroup = (experimentGroup: SkillsRankingExperimentGroups) => {
   switch (experimentGroup) {
     case SkillsRankingExperimentGroups.GROUP_1:
-    case SkillsRankingExperimentGroups.GROUP_3:
-      return skillsRankingHappyPathFull;
+      return skillsRankingGroup1Path;
     case SkillsRankingExperimentGroups.GROUP_2:
-    case SkillsRankingExperimentGroups.GROUP_4:
-      return skillsRankingHappyPathSkipped;
+    case SkillsRankingExperimentGroups.GROUP_3:
+      return skillsRankingGroup2And3Path;
     default:
-      console.error(new SkillsRankingError("Invalid experiment group." + experimentGroup));
-      return skillsRankingHappyPathFull;
+      console.error(new SkillsRankingError("Invalid experiment group: " + experimentGroup));
+      return skillsRankingGroup1Path;
   }
 };
