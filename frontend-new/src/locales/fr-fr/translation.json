@@ -385,6 +385,11 @@
       "helpCollect": "Tap a CV to load its content into the text field. Review and send when you're ready.",
       "helpDisabled": "CV selection is only available during the experience collection phase.",
       "empty": "No uploaded CVs found."
+    },
+    "cancellableTypingChatMessage": {
+      "typing": "Saisie en cours",
+      "thinking": "Veuillez patienter, cela peut prendre un moment",
+      "cancel": "Annuler"
     }
   },
   "experiences": {
