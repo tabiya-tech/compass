@@ -17,6 +17,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   ...props
 }: Readonly<PrimaryButtonProps>) => {
   const isOnline = useContext(IsOnlineContext);
+  const isContainedVariant = (props.variant ?? "contained") === "contained";
 
   if (!children) {
     throw new ComponentError("Children are required for PrimaryButton component");
@@ -29,9 +30,21 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       color={"primary"}
       style={style}
       sx={{
+        ...(isContainedVariant && {
+          backgroundColor: (theme) => theme.palette.primary.main,
+          color: (theme) => theme.palette.primary.contrastText,
+        }),
         borderRadius: (theme) => theme.tabiyaRounding.xl,
         paddingY: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.xs),
         paddingX: (theme) => theme.fixedSpacing(theme.tabiyaSpacing.md),
+        "&:hover": {
+          backgroundColor: (theme) => theme.palette.primary.main,
+          boxShadow: "none",
+        },
+        "&:focus-visible": {
+          backgroundColor: (theme) => theme.palette.primary.main,
+          boxShadow: "none",
+        },
         ...sx,
       }}
       disableElevation

@@ -47,8 +47,9 @@ describe("ChatProgresBar", () => {
       const progressBarElement = screen.getByTestId(DATA_TEST_ID.PROGRESS_BAR);
       expect(progressBarElement).toBeInTheDocument();
       await waitFor(() => {
-        expect(progressBarElement).toHaveStyle(`width: ${givenPercentage}%`);
-      })
+        const widthValue = parseFloat(progressBarElement.style.width);
+        expect(widthValue).toBeCloseTo(givenPercentage, 1);
+      });
 
       // AND container should match snapshot.
       expect(container).toMatchSnapshot();

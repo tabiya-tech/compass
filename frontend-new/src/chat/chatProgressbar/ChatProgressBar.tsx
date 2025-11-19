@@ -44,7 +44,7 @@ const ChatProgressBar: React.FC<CurrentPhase> = (currentPhase) => {
       >
         <motion.div
           style={{
-            backgroundColor: theme.palette.primary.main,
+            backgroundColor: theme.palette.secondary.main,
             height: "100%",gridRow: 1,
             borderRadius: theme.rounding(theme.tabiyaRounding.xs),
             gridColumn: 1

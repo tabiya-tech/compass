@@ -24,7 +24,7 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
       sx={{
         backgroundColor: props.transparent ? "transparent" : undefined,
         zIndex: Math.max(theme.zIndex.drawer, theme.zIndex.modal) + 1,
-        color: theme.palette.info.contrastText,
+        color: theme.palette.text.primary,
       }}
       data-testid={DATA_TEST_ID.BACKDROP_CONTAINER}
       open={props.isShown}
@@ -33,9 +33,9 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
         <Paper
           elevation={props.transparent ? 0 : 24}
           sx={{
-            backgroundColor: "containerBackground.main",
+            backgroundColor: theme.palette.secondary.main,
             border: props.transparent ? theme.tabiyaSpacing.md : 0,
-            borderColor: "info.contrastText",
+            borderColor: theme.palette.text.primary,
           }}
         >
           <Grid
@@ -51,7 +51,7 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
               <Grid item>
                 <Typography
                   variant="h6"
-                  color="info.contrastText"
+                  color="text.primary"
                   data-testid={DATA_TEST_ID.MESSAGE_ELEMENT}
                   sx={{
                     paddingRight: theme.spacing(theme.tabiyaSpacing.md),
@@ -65,7 +65,7 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
             )}
             <Grid style={{ lineHeight: 0 }} item>
               <CircularProgress
-                sx={{ color: (theme) => theme.palette.info.contrastText }}
+                sx={{ color: (theme) => theme.palette.text.primary }}
                 size={2 * theme.typography.fontSize}
                 data-testid={DATA_TEST_ID.PROGRESS_ELEMENT}
               />

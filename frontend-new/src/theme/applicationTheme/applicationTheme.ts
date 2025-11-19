@@ -32,6 +32,12 @@ const augmentedThemeColor = (color: string, contrastColor?: string) => {
   });
 };
 
+const mixHexColors = (base: string, blend: string, ratio: number) =>
+  new Color(base).mix(new Color(blend), ratio, { space: "lab" }).to("srgb").toString({ format: "hex" });
+
+const lightenHex = (hex: string, ratio: number) => mixHexColors(hex, "#ffffff", ratio);
+const darkenHex = (hex: string, ratio: number) => mixHexColors(hex, "#000000", ratio);
+
 /**
  * Creates a grey scale palette between the DarkBlue and Gray colors
  */
@@ -59,8 +65,11 @@ const createGreyScale = () => {
 };
 
 export const TabiyaBasicColors = {
-  DarkBlue: "#002147",
-  LightBlue: "#265EA7",
+  DarkBlue: "#204E9A", // Pantone 2945 C
+  LightBlue: "#29AEB3", // Pantone 306 C
+  PanelBlue: "#0F4C94",
+  PageBackground: "#FFFFFF",
+  TextDefault: "#222222",
   Yellow: "#EEFF41",
   Green: "#00FF91",
   LightGreen: "#E4F8E2",
@@ -68,6 +77,12 @@ export const TabiyaBasicColors = {
   Gray: "#F3F1EE",
   GrayDark: "#41403D",
 };
+
+const panelLight = lightenHex(TabiyaBasicColors.PanelBlue, 0.25);
+const panelDark = darkenHex(TabiyaBasicColors.PanelBlue, 0.2);
+const primarySolid = TabiyaBasicColors.DarkBlue;
+const accentSolid = TabiyaBasicColors.LightBlue;
+
 export const TabiyaIconStyles = {
   fontSizeSmall: {
     fontSize: "1rem",
@@ -85,15 +100,15 @@ export const TabiyaIconStyles = {
 
 const lightPalette: PaletteOptions = {
   contrastThreshold: 4.5, // WCAG 2.0 (AA) ensure color-contrast is at least 4.5:1
-  primary: augmentedThemeColor(TabiyaBasicColors.Green),
-  secondary: augmentedThemeColor(TabiyaBasicColors.DarkGreen),
+  primary: augmentedThemeColor(TabiyaBasicColors.DarkBlue),
+  secondary: augmentedThemeColor(TabiyaBasicColors.LightBlue),
   tabiyaYellow: augmentedThemeColor(TabiyaBasicColors.Yellow),
   tabiyaBlue: augmentedThemeColor(TabiyaBasicColors.DarkBlue),
   containerBackground: {
-    light: "#FFFFFF",
-    dark: "#DFDDD9",
-    main: TabiyaBasicColors.Gray,
-    contrastText: TabiyaBasicColors.GrayDark,
+    light: panelLight,
+    dark: panelDark,
+    main: TabiyaBasicColors.PanelBlue,
+    contrastText: "#FFFFFF",
   },
   error: {
     ...augmentedThemeColor("#FF5449"),
@@ -117,12 +132,16 @@ const lightPalette: PaletteOptions = {
   },
   grey: createGreyScale(),
   text: {
-    primary: TabiyaBasicColors.DarkBlue,
+    primary: TabiyaBasicColors.TextDefault,
     secondary: TabiyaBasicColors.GrayDark,
     textAccent: TabiyaBasicColors.LightBlue,
     textWhite: "#FFFFFF",
     textBlack: "#000000",
-    disabled: "#000000",
+    disabled: "#94A3B8",
+  },
+  background: {
+    default: TabiyaBasicColors.PageBackground,
+    paper: "#FFFFFF",
   },
   common: {
     white: "#ffffff",
@@ -161,6 +180,8 @@ export const applicationTheme = (theme: ThemeMode) => {
   const roundingClampFn = CSSClampFnCalculatorPx(TabiyaBaseSizes.rounding / 4, TabiyaBaseSizes.rounding, screenSizePx);
 
   const activePalette: PaletteOptions = theme === ThemeMode.LIGHT ? lightPalette : darkPalette;
+  const drawerPaperColor = (activePalette.background?.paper as string) ?? TabiyaBasicColors.PageBackground;
+  const drawerTextColor = (activePalette.text?.primary as string) ?? TabiyaBasicColors.TextDefault;
   const activeTheme: ThemeOptions = {
     palette: activePalette,
     spacing: (factor: number) => `calc(${spacingClampFn} * ${factor})`,
@@ -295,6 +316,121 @@ export const applicationTheme = (theme: ThemeMode) => {
       }
     },
     components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          ":root": {
+            "--color-primary": TabiyaBasicColors.DarkBlue,
+            "--color-accent": TabiyaBasicColors.LightBlue,
+            "--bg-panel": TabiyaBasicColors.PanelBlue,
+            "--page-bg": TabiyaBasicColors.PageBackground,
+            "--text-default": TabiyaBasicColors.TextDefault,
+          },
+          body: {
+            backgroundColor: TabiyaBasicColors.PageBackground,
+            color: TabiyaBasicColors.TextDefault,
+          },
+          "#root": {
+            backgroundColor: TabiyaBasicColors.PageBackground,
+          },
+          ".sidebar": {
+            backgroundColor: "var(--bg-panel)",
+            color: "#FFFFFF",
+          },
+          ".btn-primary": {
+            backgroundColor: "var(--color-primary)",
+            color: "#FFFFFF",
+            border: "none",
+          },
+          ".badge-accent": {
+            backgroundColor: "var(--color-accent)",
+            color: "#FFFFFF",
+            borderRadius: "100px",
+            padding: "0.5rem 1rem",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+          },
+          ".card": {
+            borderLeft: "4px solid var(--color-primary)",
+          },
+        },
+      },
+      MuiDrawer: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: drawerPaperColor,
+            color: drawerTextColor,
+            backgroundImage: "none",
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            textTransform: "none",
+            transition: "none",
+            boxShadow: "none",
+            "&:hover": {
+              boxShadow: "none",
+            },
+            "&:focus-visible": {
+              boxShadow: "none",
+            },
+          },
+          containedPrimary: {
+            backgroundColor: primarySolid,
+            color: "#FFFFFF",
+            border: "none",
+            boxShadow: "none",
+            transition: "none",
+            "&:hover": {
+              backgroundColor: primarySolid,
+              boxShadow: "none",
+              filter: "none",
+            },
+            "&:active": {
+              backgroundColor: primarySolid,
+              boxShadow: "none",
+            },
+            "&:focus-visible": {
+              backgroundColor: primarySolid,
+              boxShadow: "none",
+            },
+            "&.Mui-disabled": {
+              color: "#FFFFFF",
+              backgroundColor: "rgba(32, 78, 154, 0.35)",
+            },
+          },
+          containedSecondary: {
+            backgroundColor: accentSolid,
+            color: "#FFFFFF",
+            border: "none",
+            "&:hover": {
+              backgroundColor: accentSolid,
+              boxShadow: "none",
+            },
+            "&:active": {
+              backgroundColor: accentSolid,
+              boxShadow: "none",
+            },
+            "&:focus-visible": {
+              backgroundColor: accentSolid,
+              boxShadow: "none",
+            },
+            "&.Mui-disabled": {
+              color: "#FFFFFF",
+              backgroundColor: "rgba(41, 174, 179, 0.35)",
+            },
+          },
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderLeft: "4px solid var(--color-primary)",
+          },
+        },
+      },
       MuiDialogTitle: {
         defaultProps: {
           variant: "h2",
@@ -341,6 +477,8 @@ export const applicationTheme = (theme: ThemeMode) => {
         styleOverrides: {
           root: {
             fontSize: CSSClampFnCalculatorRem(0.75, 1, screenSizeRem),
+            borderRadius: "100px",
+            fontWeight: 500,
           },
           colorSecondary: {
             textTransform: "none",
@@ -349,6 +487,10 @@ export const applicationTheme = (theme: ThemeMode) => {
             overflow: "hidden",
             textOverflow: "ellipsis",
             maxWidth: "15.625rem",
+            backgroundColor: "var(--color-accent)",
+            color: "#FFFFFF",
+            borderRadius: "100px",
+            paddingInline: "1rem",
           },
         },
       },

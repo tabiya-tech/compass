@@ -389,8 +389,14 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
               />
             </CustomAccordion>
             <Divider
-              color="primary"
-              sx={{ height: "0.2rem", marginY: isSmallMobile ? 8 : 2, marginRight: 1 }}
+              sx={{
+                height: "0.2rem",
+                marginY: isSmallMobile ? 8 : 2,
+                marginRight: 1,
+                backgroundColor: theme.palette.primary.main,
+                borderColor: theme.palette.primary.main,
+                opacity: 1,
+              }}
               data-testid={DATA_TEST_ID.EXPERIENCES_DIVIDER}
             />
             <Box display="flex" flexDirection="column" gap={isSmallMobile ? 10 : 6}>
