@@ -172,7 +172,7 @@
     },
     "util": {
       "feedbackThankYou": "Thank you for taking the time to share your valuable feedback.",
-      "ratingThankYou": "Thank you for rating Compass.",
+      "ratingThankYou": "Thank you for rating Brujula.",
       "errorSomethingWentWrong": "I'm sorry, Something seems to have gone wrong on my end... Can you please refresh the page and try again?",
       "errorPleaseRepeat": "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
       "messages": {
@@ -224,7 +224,7 @@
       "viewExperiences": "View experiences",
       "feedbackMessage": "We'd love to hear your feedback on your experience so far!",
       "giveFeedback": "Give Feedback",
-      "feedbackMessagePlaceholder": "We'd love to hear your thoughts! Please share any feedback or suggestions you have for improving Compass.",
+      "feedbackMessagePlaceholder": "We'd love to hear your thoughts! Please share any feedback or suggestions you have for improving Brujula.",
       "sendFeedback": "Send Feedback",
       "feedbackSuccessMessage": "Thank you for your feedback!",
       "giveGeneralFeedback": "Give general feedback",
@@ -241,7 +241,7 @@
   "auth": {
     "pages": {
       "login": {
-        "welcomeTitle": "Welcome to Compass!",
+        "welcomeTitle": "Welcome to Brujula!",
         "welcomeBack": "Welcome back!",
         "loginToYourAccountToContinue": "Login to your account to continue",
         "loginUsing": "Login using",
@@ -278,7 +278,7 @@
         "invitationCodeValid": "Invitation code is valid"
       },
       "verifyEmail": {
-        "registrationThankYou": "Thank you for registering to Compass.",
+        "registrationThankYou": "Thank you for registering to Brujula.",
         "verificationEmailSentMessage": "A verification email has been sent to your email address. To continue, please verify your email address first."
       }
     },
@@ -310,13 +310,13 @@
         "reachOut": "Reach out"
       },
       "requestInvitationCodeFormModal": {
-        "requestAccessTitle": "Request access to Compass",
-        "requestAccessSubtitle": "Please let us know how you plan to use Compass. We will carefully review your request and contact you shortly.",
+        "requestAccessTitle": "Request access to Brujula",
+        "requestAccessSubtitle": "Please let us know how you plan to use Brujula. We will carefully review your request and contact you shortly.",
         "closeRequestInvitationForm": "Close request invitation code form",
         "name": "Name",
         "message": "Message",
-        "messagePlaceholder": "Please share how you plan to use Compass",
-        "invitationRequestSubmitSuccess": "Your request for access to Compass has been submitted successfully. We will get back to you soon.",
+        "messagePlaceholder": "Please share how you plan to use Brujula",
+        "invitationRequestSubmitSuccess": "Your request for access to Brujula has been submitted successfully. We will get back to you soon.",
         "invitationRequestSubmitError": "Something went wrong while attempting to send your request"
       },
       "requestInvitationCode": {
@@ -417,7 +417,7 @@
             "delete": "Delete",
             "revert": "Revert"
           },
-          "actionsUnavailableUntilExplored": "These actions will become available once you have discussed the experience in detail with Compass.",
+          "actionsUnavailableUntilExplored": "These actions will become available once you have discussed the experience in detail with Brujula.",
           "moreOptionsTitle": "More options",
           "topSkillsLabel": "Top Skills",
           "topSkillsHelp": "Tap a skill to view more details.",
@@ -484,7 +484,7 @@
           "formalSectorWagedEmployment": "You have a paid job and work for an employer, company, or organization",
           "formalSectorUnpaidTraineeWork": "You're in a training or internship role to gain skills or experience",
           "unseenUnpaid": "You do unpaid work like caregiving, household tasks, or community volunteering",
-          "uncategorized": "Compass couldn't categorize this work type"
+          "uncategorized": "Brujula couldn't categorize this work type"
         }
       }
     },
@@ -498,13 +498,13 @@
       "traineeWorkTitle": "Trainee Work",
       "uncategorizedTitle": "Uncategorized",
       "topSkillsTitle": "Top Skills: ",
-      "skillsDescriptionText": "Below, you will find a list of the skills discovered during your conversation with Compass, along with their descriptions.",
+      "skillsDescriptionText": "Below, you will find a list of the skills discovered during your conversation with Brujula, along with their descriptions.",
       "disclaimer": {
         "part1": "Disclaimer: ",
         "part2": "Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate. ",
-        "part3": "Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with Compass again or create a complete CV based on this report."
+        "part3": "Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with Brujula again or create a complete CV based on this report."
       },
-      "bodyText": "This report summarizes the key information gathered during a conversation with Compass on {{date}}. Compass is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV."
+      "bodyText": "This report summarizes the key information gathered during a conversation with Brujula on {{date}}. Brujula is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV."
     }
   },
   "features": {
@@ -578,8 +578,8 @@
         "introPart4": "Help us keep all AI interactions safe and positive! 😊",
         "termsAndConditions": "Terms and Conditions",
         "privacyPolicy": "Privacy Policy",
-        "checkboxTermsAndConditions": "I have read and accept the <0>{{terms_and_conditions}}</0> of Compass.",
-        "checkboxPrivacyPolicy": "I have read and accept the <0>{{privacy_policy}}</0> of Compass.",
+        "checkboxTermsAndConditions": "I have read and accept the <0>{{terms_and_conditions}}</0> of Brujula.",
+        "checkboxPrivacyPolicy": "I have read and accept the <0>{{privacy_policy}}</0> of Brujula.",
         "areYouReady": "Are you ready to start?",
         "acceptButton": "Sure, I am ready",
         "withSupportFrom": "With support from",
@@ -599,7 +599,7 @@
     "components": {
       "sensitiveDataForm": {
         "title": "Provide Your Information",
-        "subtitle": "We use your data to personalize your experience and may contact you about Compass.",
+        "subtitle": "We use your data to personalize your experience and may contact you about Brujula.",
         "unskippableSubtitle": "Please provide the following information to continue.",
         "skippableSubtitle": "You can skip this step.",
         "helpTipText": "Your information is encrypted using state-of-the-art, end-to-end encryption and stored securely.",
@@ -609,8 +609,8 @@
         "errorDefault": "The personal data could not be saved. Please try again and if the problem persists, clear your browser's cache and refresh the page.",
         "errorEncryptedDataTooLarge": "The personal data seems to be too large to be saved. Please try again by entering smaller values for the fields. If the problem persists, clear your browser's cache and refresh the page.",
         "collectionSkipped": "Personal data collection skipped.",
-        "rejectParagraph1": "We're sorry that you chose not to provide your data. Providing this information helps Compass deliver a more personalized experience for you. You will not be able to proceed and will be logged out.",
-        "skipParagraph1": "We're sorry that you prefer not to provide your data. Providing this information helps Compass deliver a more personalized experience for you. Please note that if you skip this step,",
+        "rejectParagraph1": "We're sorry that you chose not to provide your data. Providing this information helps Brujula deliver a more personalized experience for you. You will not be able to proceed and will be logged out.",
+        "skipParagraph1": "We're sorry that you prefer not to provide your data. Providing this information helps Brujula deliver a more personalized experience for you. Please note that if you skip this step,",
         "skipParagraph1Highlighted": " you won't be able to provide this information later.",
         "startConversation": "Start conversation",
         "areYouSureYouWantToSkip": "Are you sure you want to skip?",
@@ -655,7 +655,7 @@
   "error": {
     "errorPage": {
       "illustrationAlt": "error illustration",
-      "defaultMessage": "Something went wrong with Compass. Try reloading the page...",
+      "defaultMessage": "Something went wrong with Brujula. Try reloading the page...",
       "notFound": "404 Error - Page Not Found"
     },
     "restAPIError": {
@@ -668,8 +668,8 @@
       "offline": "You are offline",
       "backOnline": "You are back online"
     },
-    "appName": "Compass",
-    "compassLogoAlt": "Compass Logo"
+    "appName": "Brujula",
+    "compassLogoAlt": "Brujula Logo"
   },
   "info":{
     "infoDrawer": {

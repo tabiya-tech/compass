@@ -13,7 +13,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     style="line-height: 0;"
   >
     <img
-      alt="Compass Logo"
+      alt="Brujula Logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
       height="48"
       src="/compass.svg"
@@ -22,7 +22,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
   <h1
     class="MuiTypography-root MuiTypography-h1 css-1m1rxeh-MuiTypography-root"
   >
-    Compass
+    Brujula
   </h1>
   <div
     class="MuiBox-root css-1n05jrb"
@@ -124,7 +124,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     style="line-height: 0;"
   >
     <img
-      alt="Compass Logo"
+      alt="Brujula Logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
       height="48"
       src="/compass.svg"
@@ -133,7 +133,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
   <h1
     class="MuiTypography-root MuiTypography-h1 css-1m1rxeh-MuiTypography-root"
   >
-    Compass
+    Brujula
   </h1>
   <div
     class="MuiBox-root css-1n05jrb"
@@ -241,7 +241,7 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
     style="line-height: 0;"
   >
     <img
-      alt="Compass Logo"
+      alt="Brujula Logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
       height="48"
       src="/compass.svg"
@@ -250,7 +250,7 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
   <h1
     class="MuiTypography-root MuiTypography-h1 css-1m1rxeh-MuiTypography-root"
   >
-    Compass
+    Brujula
   </h1>
   <div
     class="MuiBox-root css-1n05jrb"

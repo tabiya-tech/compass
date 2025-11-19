@@ -108,7 +108,7 @@ export const TypingWhenEmpty: Story = {
 export const SingleMessage: Story = {
   args: {
     messages: [
-      createMessage("Hello, I'm Compass", ConversationMessageSender.COMPASS, COMPASS_CHAT_MESSAGE_TYPE)
+      createMessage("Hello, I'm Brujula", ConversationMessageSender.COMPASS, COMPASS_CHAT_MESSAGE_TYPE)
     ],
   },
 };
@@ -117,7 +117,7 @@ export const MultipleMessages: Story = {
   args: {
     messages: [
       createMessage("Hello", ConversationMessageSender.USER, USER_CHAT_MESSAGE_TYPE),
-      createMessage("Hi, I'm Compass", ConversationMessageSender.COMPASS, COMPASS_CHAT_MESSAGE_TYPE),
+      createMessage("Hi, I'm Brujula", ConversationMessageSender.COMPASS, COMPASS_CHAT_MESSAGE_TYPE),
       createMessage("Thank you for using compass", ConversationMessageSender.COMPASS, CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE),
       createMessage("Typing...", ConversationMessageSender.COMPASS, TYPING_CHAT_MESSAGE_TYPE),
     ],

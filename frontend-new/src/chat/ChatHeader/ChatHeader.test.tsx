@@ -156,8 +156,8 @@ describe("ChatHeader", () => {
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_CONTAINER)).toBeInTheDocument();
     // AND the chat header logo to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_LOGO)).toBeInTheDocument();
-    // AND the Compass text to be visible
-    expect(screen.getByText("Compass")).toBeInTheDocument();
+    // AND the Brujula text to be visible
+    expect(screen.getByText("Brujula")).toBeInTheDocument();
     // AND the user button to be shown with the user icon
     const chatHeaderButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
     expect(chatHeaderButton).toBeInTheDocument();
@@ -228,7 +228,7 @@ describe("ChatHeader", () => {
         />
       </ChatProvider>
     );
-    testNavigateToPath(givenChatHeader, "Compass Logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
+    testNavigateToPath(givenChatHeader, "Brujula Logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
 
     test("should open the context menu when the user icon is clicked", async () => {
       // GIVEN a ChatHeader component

@@ -26,7 +26,7 @@ export const DATA_TEST_ID = {
 };
 
 export const UI_TEXT = {
-  CUSTOMER_SATISFACTION_QUESTION_TEXT: "Finally, we'd love to hear your thoughts on your experience so far! How satisfied are you with Compass?",
+  CUSTOMER_SATISFACTION_QUESTION_TEXT: "Finally, we'd love to hear your thoughts on your experience so far! How satisfied are you with Brujula?",
   RATING_LABEL_LOW: "Unsatisfied",
   RATING_LABEL_HIGH: "Satisfied",
 };
@@ -105,7 +105,7 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
 
   const customerSatisfactionText = t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.questionText").concat(
     questionsData?.[QUESTION_KEYS.CUSTOMER_SATISFACTION]?.question_text ??
-    "How satisfied are you with Compass?");    
+    "How satisfied are you with Brujula?");    
 
   return (
     <div data-testid={DATA_TEST_ID.CUSTOMER_SATISFACTION_RATING_CONTAINER}>

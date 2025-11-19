@@ -166,7 +166,7 @@ const Landing: React.FC = () => {
             }}
           >
             <AuthHeader
-              title={t("auth.pages.login.welcomeBack")} // Changed from "Welcome to Compass!" to t("auth.pages.login.welcomeBack")
+              title={t("auth.pages.login.welcomeBack")} // Changed from "Welcome to Brujula!" to t("auth.pages.login.welcomeBack")
               subtitle={
                 <>
                   <Typography

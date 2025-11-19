@@ -1,21 +1,21 @@
 {
   "interaction_ease": {
-    "question_text": "How easy or difficult was it to interact with Compass and understand its responses?",
+    "question_text": "How easy or difficult was it to interact with Brujula and understand its responses?",
     "description": "This question is used to measure the Customer Effort Score (CES). The response is on a scale from 1 (Very difficult) to 5 (Very easy).",
-    "comment_placeholder": "Please explain your rating and share any suggestions for improving the ease of interaction with Compass."
+    "comment_placeholder": "Please explain your rating and share any suggestions for improving the ease of interaction with Brujula."
   },
   "clarity_of_skills": {
-    "question_text": "Did Compass help you gain a clearer understanding of your skills? If not, why?",
-    "description": "This question aims to measure Perceived Usefulness (PU). The user can answer TRUE (indicating Compass helped) or FALSE (indicating Compass did not help), with an optional text field for additional comments.",
-    "comment_placeholder": "Please share why Compass did not help you gain a clearer understanding of your skills."
+    "question_text": "Did Brujula help you gain a clearer understanding of your skills? If not, why?",
+    "description": "This question aims to measure Perceived Usefulness (PU). The user can answer TRUE (indicating Brujula helped) or FALSE (indicating Brujula did not help), with an optional text field for additional comments.",
+    "comment_placeholder": "Please share why Brujula did not help you gain a clearer understanding of your skills."
   },
   "satisfaction_with_compass": {
-    "question_text": "How satisfied are you with Compass?",
+    "question_text": "How satisfied are you with Brujula?",
     "description": "This question is used to measure the Customer Satisfaction Score (CSAT). The response is on a scale from 1 (Very dissatisfied) to 5 (Very satisfied).",
     "comment_placeholder": null
   },
   "work_experience_accuracy": {
-    "question_text": "Were there any aspects of your work experience information identified by Compass that were inaccurate?",
+    "question_text": "Were there any aspects of your work experience information identified by Brujula that were inaccurate?",
     "options": {
       "experience_title": "Incorrect Experience title",
       "experience_dates": "Incorrect start/end dates",
@@ -25,31 +25,31 @@
       "other": "Other"
     },
     "description": "This question to identify specific inaccuracies in the work experience information. The response is an array of selected option keys, with optional additional comments.",
-    "comment_placeholder": "Please provide more details about the inaccuracies in your work experience information identified by Compass."
+    "comment_placeholder": "Please provide more details about the inaccuracies in your work experience information identified by Brujula."
   },
   "incorrect_skills": {
-    "question_text": "Are there any skills that Compass incorrectly identified for you?",
+    "question_text": "Are there any skills that Brujula incorrectly identified for you?",
     "description": "This question aims to indentify incorrectly identified skills The user can answer TRUE (indicating incorrect skills) or FALSE (indicating no incorrect skills). In case of TRUE, the user can provide additional comments.",
-    "comment_placeholder": "Please list any skills that Compass incorrectly identified for you."
+    "comment_placeholder": "Please list any skills that Brujula incorrectly identified for you."
   },
   "missing_skills": {
-    "question_text": "Are there any skills you have that Compass missed and did not identify?",
+    "question_text": "Are there any skills you have that Brujula missed and did not identify?",
     "description": "This question aims to identify missing skills. Responses should be TRUE (indicating missing skills) or FALSE (indicating no missing skills). In case of TRUE, the user can provide additional comments.",
-    "comment_placeholder": "Please list any skills you have that Compass did not identify."
+    "comment_placeholder": "Please list any skills you have that Brujula did not identify."
   },
   "perceived_bias": {
-    "question_text": "Did you feel that Compass treated you unfairly by making assumptions about your background, language, or other personal characteristics? If so, please describe your experience.",
+    "question_text": "Did you feel that Brujula treated you unfairly by making assumptions about your background, language, or other personal characteristics? If so, please describe your experience.",
     "description": "This question aims to identify perceived bias. Responses should be TRUE (indicating bias) or FALSE (indicating no bias), with an optional text field for additional comments.",
-    "comment_placeholder": "Please share more details about your experience. Include specific examples of when you felt Compass treated you unfairly or made assumptions about your background, language, or other personal characteristics."
+    "comment_placeholder": "Please share more details about your experience. Include specific examples of when you felt Brujula treated you unfairly or made assumptions about your background, language, or other personal characteristics."
   },
   "recommendation": {
-    "question_text": "How likely are you to recommend Compass to other job seekers?",
+    "question_text": "How likely are you to recommend Brujula to other job seekers?",
     "description": "This question is used to measure the Net Promoter Score (NPS). The response is on a scale from 1 (Not at all likely) to 5 (Extremely likely).",
     "comment_placeholder": null
   },
   "additional_feedback": {
-    "question_text": "Please share any additional feedback or suggestions you have for improving Compass.",
-    "description": "Used to collect any additional feedback or suggestions for improving Compass from the user. The response is in the form of a text.",
-    "comment_placeholder": "We'd love to hear your thoughts! Please share any additional feedback or suggestions you have for improving Compass."
+    "question_text": "Please share any additional feedback or suggestions you have for improving Brujula.",
+    "description": "Used to collect any additional feedback or suggestions for improving Brujula from the user. The response is in the form of a text.",
+    "comment_placeholder": "We'd love to hear your thoughts! Please share any additional feedback or suggestions you have for improving Brujula."
   }
 }

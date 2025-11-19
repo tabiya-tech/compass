@@ -117,7 +117,7 @@ describe("ChatList", () => {
     // AND compass message data with reaction
     const compassMessageData: CompassChatMessageProps = {
       message_id: nanoid(),
-      message: "Hi, I'm Compass",
+      message: "Hi, I'm Brujula",
       sent_at: givenDate,
       reaction: {
         id: nanoid(),
@@ -228,14 +228,14 @@ describe("ChatList", () => {
       {}
     );
 
-    // AND expect the Compass Chat message components to be shown
+    // AND expect the Brujula Chat message components to be shown
     const compassChatMessages = screen.getAllByTestId(COMPASS_CHAT_MESSAGE_DATA_TEST_ID.CHAT_MESSAGE_CONTAINER);
     expect(compassChatMessages).toHaveLength(2);
     compassChatMessages.forEach((chatMessage) => {
       expect(chatMessage).toBeInTheDocument();
     });
 
-    // AND expect the Compass Chat message components to be called with the correct messages
+    // AND expect the Brujula Chat message components to be called with the correct messages
     expect(CompassChatMessage).toHaveBeenNthCalledWith(1, compassMessageData, {});
     expect(CompassChatMessage).toHaveBeenNthCalledWith(2, compassMessageData2, {});
 

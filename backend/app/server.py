@@ -273,9 +273,9 @@ async def lifespan(_app: FastAPI):
 # and set the server URL to the backend URL so that Swagger UI can correctly call the backend paths
 app = FastAPI(
     # redirect_slashes is set False to prevent FastAPI from redirecting when a trailing slash is added.
-    title="Compass API",
+    title="Brujula API",
     version=get_application_config().version_info.to_version_string(),
-    description="The Compass API is used to interact with the Compass conversation agent.",
+    description="The Brujula API is used to interact with the Brujula conversation agent.",
     redirect_slashes=False,
     servers=[
         {

@@ -121,7 +121,7 @@ async def main():
     parser = argparse.ArgumentParser(dedent("""
                                         Copy embeddings from one MongoDB to another.
                                         
-                                        This script copies documents from collections related to Compass embeddings between MongoDB databases.
+                                        This script copies documents from collections related to Brujula embeddings between MongoDB databases.
                                         You can optionally delete existing documents and regenerate indexes post-copy, or just create indexes.
     
                                         Required environment variables:

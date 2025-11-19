@@ -1,4 +1,4 @@
-# Compass Frontend
+# Brujula Frontend
 
 The deployed version can be found here: [Frontend URL](https://dev.compass.tabiya.tech)
 ## Prerequisites

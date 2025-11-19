@@ -112,7 +112,7 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
               </HelpTip>
             </Box>
             <Typography variant="body2" fontWeight="bold" data-testid={DATA_TEST_ID.SKILL_DRAWER_SUBTITLE}>
-              These are additional top skills identified by Compass based on your experience.
+              These are additional top skills identified by Brujula based on your experience.
             </Typography>
           </Box>
           <Box display="flex" flexWrap="wrap" whiteSpace="normal" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>

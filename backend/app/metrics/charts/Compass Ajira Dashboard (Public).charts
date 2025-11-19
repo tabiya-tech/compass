@@ -2,7 +2,7 @@
   "exportVersion": 9,
   "dashboards": {
     "dashboard-1": {
-      "title": "Compass Ajira Dashboard (Public)",
+      "title": "Brujula Ajira Dashboard (Public)",
       "layout": [
         {
           "w": 1,
@@ -306,7 +306,7 @@
           "i": "item-43"
         }
       ],
-      "description": "Information about Ajira's Compass deployment.",
+      "description": "Information about Ajira's Brujula deployment.",
       "embedding": {},
       "filters": [
         {

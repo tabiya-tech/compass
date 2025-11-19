@@ -74,7 +74,7 @@
           },
           "output": {
             "message_id": "67f7e6d0a6b8f912b339cbeb",
-            "message_for_user": "Welcome! I'm Compass, your skills exploration guide.  Are you ready to begin?",
+            "message_for_user": "Welcome! I'm Brujula, your skills exploration guide.  Are you ready to begin?",
             "finished": false,
             "agent_type": "WELCOME_AGENT",
             "agent_response_time_in_sec": 2.49,
