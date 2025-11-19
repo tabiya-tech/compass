@@ -1159,7 +1159,7 @@ describe("ChatMessageField", () => {
             open: true,
             items: expect.arrayContaining([
               expect.objectContaining({
-                description: `PDF, DOCX, TXT • Max ${MAX_FILE_SIZE_MB} MB • ${MAX_MARKDOWN_CHARS} chars max`,
+                description: "Attach your CV to the conversation",
                 disabled: false, // Should be enabled in COLLECT_EXPERIENCES phase
               }),
             ]),
