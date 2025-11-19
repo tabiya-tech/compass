@@ -265,10 +265,24 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
               action: () => {
                 const feedback = Sentry.getFeedback();
                 if (feedback) {
-                  feedback.createForm().then((form) => {
+                  feedback.createForm({
+                      formTitle: t("chat.chatHeader.giveGeneralFeedback"),           // "Dar comentarios generales"
+                      nameLabel: t("chat.chatHeader.nameLabel"),                     // "Name"
+                      namePlaceholder: t("chat.chatHeader.namePlaceholder"),         // "Your Name"
+                      emailLabel: t("chat.chatHeader.emailLabel"),                   // "Email"
+                      emailPlaceholder: t("chat.chatHeader.emailPlaceholder"),       // "your.email@example.org"
+                      isRequiredLabel: t("chat.chatHeader.requiredLabel"),
+                      messageLabel: t("chat.chatHeader.descriptionLabel"),           // "Description (required)"
+                      messagePlaceholder: t("chat.chatHeader.feedbackMessagePlaceholder"), // "¡Nos encantaría conocer tu opinión!... "
+                      addScreenshotButtonLabel: t("chat.chatHeader.addScreenshot"),     // "Add a screenshot"
+                      submitButtonLabel: t("chat.chatHeader.sendFeedback"),          // "Enviar comentarios"
+                      cancelButtonLabel: t("chat.chatHeader.cancelButton"),          // "Cancel"
+                      successMessageText: t("chat.chatHeader.feedbackSuccessMessage") // Success message after submission
+
+                  }).then((form) => {
                     if (form) {
                       form.appendToDom();
-                      form.open();
+                      form.open(); // shows the feedback form
                     }
                   });
                 }

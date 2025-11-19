@@ -235,7 +235,16 @@
       "anonymousAccountWarning": "Vous utilisez actuellement un compte anonyme. Si vous vous déconnectez, vous perdrez l'accès à votre historique de conversations et d'expériences.",
       "logoutWarningAnonymous": "Si vous vous déconnectez, vous perdrez l'accès à votre historique de conversations et d'expériences.",
       "createAccountToSaveProgress": "Créez un compte pour sauvegarder votre progression",
-      "continueYourJourneyLater": "et poursuivre votre parcours plus tard."
+      "continueYourJourneyLater": "et poursuivre votre parcours plus tard.",
+      "formTitle": "Donner un retour général",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Votre nom",
+      "emailLabel": "E-mail",
+      "descriptionLabel": "Description",
+      "emailPlaceholder": "votre.email@exemple.org",
+      "addScreenshot": "Ajouter une capture d’écran",
+      "requiredLabel": "(obligatoire)",
+      "cancelButton": "Annuler"
     }
   },
   "auth": {
