@@ -4,7 +4,7 @@ import SendIcon from "@mui/icons-material/Send";
 import AddIcon from "@mui/icons-material/Add";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { AnimatePresence, motion } from "framer-motion";
-import { CV_UPLOAD_ERROR_MESSAGES, getCvUploadErrorMessageFromHttpStatus } from "../CVUploadErrorHandling";
+import { CV_UPLOAD_ERROR_I18N_KEYS, getCvUploadErrorMessageFromHttpStatus } from "../CVUploadErrorHandling";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
@@ -352,12 +352,12 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     }
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      setErrorMessage(CV_UPLOAD_ERROR_MESSAGES.MAX_FILE_SIZE);
+      setErrorMessage(CV_UPLOAD_ERROR_I18N_KEYS.MAX_FILE_SIZE);
       return;
     }
 
     // Clear size error specifically if previously set
-    if (errorMessage === CV_UPLOAD_ERROR_MESSAGES.MAX_FILE_SIZE) {
+    if (errorMessage === CV_UPLOAD_ERROR_I18N_KEYS.MAX_FILE_SIZE) {
       setErrorMessage("");
     }
 
