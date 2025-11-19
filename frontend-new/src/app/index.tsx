@@ -50,11 +50,13 @@ const ProtectedRouteKeys = {
   SENSITIVE_DATA: "SENSITIVE_DATA",
 };
 
-const App = () => {
-  const NotFound: React.FC = () => {
+const NotFound: React.FC = () => {
     const { t } = useTranslation();
     return <ErrorPage errorMessage={t("error.errorPage.notFound")} />;
-  };
+};
+
+const App = () => {
+
 
   const [loading, setLoading] = useState(true);
 

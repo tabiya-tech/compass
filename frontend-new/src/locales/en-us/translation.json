@@ -116,7 +116,16 @@
       "anonymousAccountWarning": "You're currently using an anonymous account. If you log out, you'll lose access to your conversation history and experiences.",
       "logoutWarningAnonymous": "If you log out, you'll lose access to your conversation history and experiences.",
       "createAccountToSaveProgress": "Create an account to save your progress",
-      "continueYourJourneyLater": "and continue your journey later."
+      "continueYourJourneyLater": "and continue your journey later.",
+      "formTitle": "Give general feedback",
+      "nameLabel": "Name",
+      "namePlaceholder": "Your Name",
+      "emailLabel": "Email",
+      "descriptionLabel": "Description",
+      "emailPlaceholder": "your.email@example.org",
+      "addScreenshot": "Add a screenshot",
+      "requiredLabel":"(required)",
+      "cancelButton": "Cancel"
     },
     "cvUploadPolling": {
       "uploadingCv": "Uploading CV",

@@ -235,7 +235,16 @@
       "anonymousAccountWarning": "Actualmente estás usando una cuenta anónima. Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
       "logoutWarningAnonymous": "Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
       "createAccountToSaveProgress": "Crea una cuenta para guardar tu progreso",
-      "continueYourJourneyLater": "y continuar tu experiencia más tarde."
+      "continueYourJourneyLater": "y continuar tu experiencia más tarde.",
+      "formTitle": "Dar comentarios generales",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "emailLabel": "Correo electrónico",
+      "descriptionLabel": "Descripción",
+      "emailPlaceholder": "tu.correo@ejemplo.org",
+      "addScreenshot": "Agregar una captura de pantalla",
+      "requiredLabel": "(obligatorio)",
+      "cancelButton": "Cancelar"
     }
   },
   "auth": {
