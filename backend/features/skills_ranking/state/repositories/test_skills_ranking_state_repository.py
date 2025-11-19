@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import pytest
 
 from common_libs.test_utilities import get_random_session_id
-from common_libs.time_utilities import get_now, convert_python_datetime_to_mongo_datetime
+from common_libs.time_utilities import get_now
 from features.skills_ranking.state._test_utilities import get_skills_ranking_state
 from features.skills_ranking.state.repositories.skills_ranking_state_repository import SkillsRankingStateRepository
 from features.skills_ranking.state.services.type import (SkillsRankingState, SkillRankingExperimentGroup,
@@ -55,7 +55,7 @@ class TestSkillsRankingRepository:
 
             # THEN the state is returned
             assert state is not None
-            assert state.metadata.session_id == given_state.metadata.session_id
+            assert state.session_id == given_state.session_id
 
         @pytest.mark.asyncio
         async def test_get_by_session_id_db_error(self, in_memory_skills_ranking_state_db, mocker):
@@ -158,7 +158,7 @@ class TestSkillsRankingRepository:
 
             update_request = UpdateSkillsRankingRequest(**given_updates)
             await repository.update(
-                session_id=given_state.metadata.session_id,
+                session_id=given_state.session_id,
                 update_request=update_request
             )
 
@@ -242,7 +242,7 @@ class TestSkillsRankingRepository:
 
             update_request = UpdateSkillsRankingRequest(metadata={"experiment_group": SkillRankingExperimentGroup.GROUP_2})
             updated_state = await repository.update(
-                session_id=given_state.metadata.session_id,
+                session_id=given_state.session_id,
                 update_request=update_request
             )
 
@@ -269,7 +269,7 @@ class TestSkillsRankingRepository:
                 metadata={"experiment_group": SkillRankingExperimentGroup.GROUP_3}
             )
             updated_state = await repository.update(
-                session_id=given_state.metadata.session_id,
+                session_id=given_state.session_id,
                 update_request=update_request
             )
 

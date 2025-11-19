@@ -1,17 +1,16 @@
-import datetime
 from unittest.mock import AsyncMock, patch
 
 import httpx
 import pytest
 
 from common_libs.test_utilities import get_random_printable_string
-from features.skills_ranking.services.skills_ranking_service import (
-    SkillsRankingService,
-)
 from features.skills_ranking.services.errors import (
     SkillsRankingServiceHTTPError,
     SkillsRankingServiceTimeoutError,
     SkillsRankingServiceRequestError,
+)
+from features.skills_ranking.services.skills_ranking_service import (
+    SkillsRankingService,
 )
 from features.skills_ranking.types import PriorBeliefs, SkillsRankingScore
 
@@ -29,6 +28,7 @@ def given_test_prior_beliefs():
         external_user_id="test-external-user",
         opportunity_rank_prior_belief=0.5,
         compare_to_others_prior_belief=0.6,
+        province="given-some-province"
     )
 
 
@@ -48,17 +48,16 @@ def given_test_taxonomy_model_id():
 def given_test_ranking_score():
     """Fixture to create test ranking score response."""
     return SkillsRankingScore(
-        calculated_at=datetime.datetime.now(datetime.timezone.utc),
         above_average_labels=[get_random_printable_string(10)],
         below_average_labels=[get_random_printable_string(10)],
         most_demanded_label=get_random_printable_string(10),
         most_demanded_percent=65.0,
         least_demanded_label=get_random_printable_string(10),
         least_demanded_percent=10.0,
-        average_percent_for_jobseeker_skillgroups=45.0,
-        average_count_for_jobseeker_skillgroups=418.0,
+        average_percent_for_jobseeker_skill_groups=45.0,
+        average_count_for_jobseeker_skill_groups=418.0,
         province_used=get_random_printable_string(10),
-        matched_skillgroups=5,
+        matched_skill_groups=5,
     )
 
 
@@ -96,12 +95,15 @@ class TestSkillsRankingService:
             )
 
             # THEN the result matches the expected score
-            assert result == given_test_ranking_score
+            assert result.model_dump(exclude={"calculated_at"}) == given_test_ranking_score.model_dump(exclude={"calculated_at"})
+
+            # AND the calculated_at field is set
+            assert result.calculated_at is not None
 
             # AND the correct URL was called
             mock_client.post.assert_called_once()
             call_args, call_kwargs = mock_client.post.call_args
-            assert call_args[0] == "https://test-service.com/api/v1/ranking/calculate"
+            assert call_args[0] == "https://test-service.com/api/v2/ranking/calculate"
 
             # AND the correct headers were sent
             assert call_kwargs["headers"]["x-api-key"] == "test-api-key"
@@ -110,8 +112,8 @@ class TestSkillsRankingService:
             # AND the correct request data was sent
             actual_request_data = call_kwargs["json"]
             assert actual_request_data["user_id"] == "test-user-123"
-            assert actual_request_data["prior_beliefs"] == given_test_prior_beliefs.model_dump(mode="json")
             assert set(actual_request_data["participants_skills_uuids"]) == given_test_skills_uuids
+            assert actual_request_data["province"] == given_test_prior_beliefs.province
             assert actual_request_data["taxonomy_model_id"] == given_test_taxonomy_model_id
 
     @pytest.mark.asyncio
@@ -207,5 +209,3 @@ class TestSkillsRankingService:
 
             # AND the error message contains the network error details
             assert "Network unreachable" in str(exc_info.value)
-
-

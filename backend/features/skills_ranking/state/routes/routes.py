@@ -13,16 +13,17 @@ from app.users.auth import Authentication, UserInfo
 from app.users.get_user_preferences_repository import get_user_preferences_repository
 from app.users.repositories import IUserPreferenceRepository
 from features.skills_ranking.errors import InvalidNewPhaseError, InvalidFieldsForPhaseError
-from features.skills_ranking.state.repositories.get_skills_ranking_state_repository import get_skills_ranking_state_mongo_repository
-from features.skills_ranking.state.repositories.skills_ranking_state_repository import ISkillsRankingStateRepository
-from features.skills_ranking.state.routes.type import UpsertSkillsRankingRequest, SkillsRankingStateResponse
-from features.skills_ranking.state.services.get_skills_ranking_state_service import get_skills_ranking_state_service
+from features.skills_ranking.errors import SkillsRankingStateNotFound
 from features.skills_ranking.services.errors import (
     SkillsRankingGenericError,
 )
+from features.skills_ranking.state.repositories.get_skills_ranking_state_repository import \
+    get_skills_ranking_state_mongo_repository
+from features.skills_ranking.state.repositories.skills_ranking_state_repository import ISkillsRankingStateRepository
+from features.skills_ranking.state.routes.type import UpsertSkillsRankingRequest, SkillsRankingStateResponse
+from features.skills_ranking.state.services.get_skills_ranking_state_service import get_skills_ranking_state_service
 from features.skills_ranking.state.services.skills_ranking_state_service import ISkillsRankingStateService
 from features.skills_ranking.state.services.type import UpdateSkillsRankingRequest
-from features.skills_ranking.errors import SkillsRankingStateNotFound
 
 logger = logging.getLogger(__name__)
 
@@ -95,10 +96,9 @@ def get_skills_ranking_router(auth: Authentication) -> APIRouter:
             # check if state exists
             existing_state = await skills_ranking_repository.get_by_session_id(session_id=session_id)
 
-            if existing_state is None:
+            if existing_state is None and request.phase != "INITIAL":
                 # if INITIAL create a new state, else throw a state not found error
-                if request.phase != "INITIAL":
-                    raise SkillsRankingStateNotFound(session_id=session_id)
+                raise SkillsRankingStateNotFound(session_id=session_id)
 
             metadata_dict = request.metadata.model_dump(exclude_none=True) if request.metadata else None
             user_responses_dict = request.user_responses.model_dump(exclude_none=True) if request.user_responses else None

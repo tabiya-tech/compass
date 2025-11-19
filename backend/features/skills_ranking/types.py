@@ -47,12 +47,12 @@ class SkillsRankingScore(BaseModel):
     Demand percentage associated with the `least_demanded_label`.
     """
 
-    average_percent_for_jobseeker_skillgroups: float
+    average_percent_for_jobseeker_skill_groups: float
     """
     Average demand percentage across the participant's matched skill groups.
     """
 
-    average_count_for_jobseeker_skillgroups: float
+    average_count_for_jobseeker_skill_groups: float
     """
     Average job count across the participant's matched skill groups.
     """
@@ -62,7 +62,7 @@ class SkillsRankingScore(BaseModel):
     Province reference used for aggregating labour market demand.
     """
 
-    matched_skillgroups: int
+    matched_skill_groups: int
     """
     Number of skill groups matched between the participant and the market data.
     """
@@ -89,4 +89,10 @@ class PriorBeliefs(BaseModel):
     opportunity_rank_prior_belief: Optional[float] = None
     """
     The prior belief of the job seeker's rank in relation to available opportunities.
+    """
+
+    province: Optional[str] = "ALL"
+    """
+    The province the job seeker is going to be compared to
+    By default we are using the ALL -> Meaning the job seeker will be compared to the entire country/locale. 
     """

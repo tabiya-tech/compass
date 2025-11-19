@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, field_serializer, field_validator
+from pydantic import BaseModel, Field, field_serializer, field_validator, ConfigDict
 
 from features.skills_ranking.types import SkillsRankingScore
 
@@ -57,7 +57,6 @@ class UserResponses(BaseModel):
 
 
 class ProcessMetadata(BaseModel):
-    session_id: int
     experiment_group: SkillRankingExperimentGroup
     started_at: datetime
     completed_at: datetime | None = None
@@ -83,6 +82,8 @@ class ProcessMetadata(BaseModel):
                 raise ValueError(f"Invalid experiment group: {value}")
         return value
 
+    model_config = ConfigDict(extra="forbid")
+
 
 class UpdateSkillsRankingRequest(BaseModel):
     phase: Optional[SkillsRankingPhaseName] = None
@@ -105,6 +106,7 @@ class SkillsRankingPhase(BaseModel):
 
 
 class SkillsRankingState(BaseModel):
+    session_id: int
     phase: list[SkillsRankingPhase]
     metadata: ProcessMetadata
     score: SkillsRankingScore

@@ -9,12 +9,6 @@ from app.users.repositories import IUserPreferenceRepository
 from common_libs.time_utilities import get_now
 from features.skills_ranking.constants import SKILLS_RANKING_EXPERIMENT_ID
 from features.skills_ranking.errors import InvalidNewPhaseError, SkillsRankingStateNotFound
-from features.skills_ranking.state.repositories.skills_ranking_state_repository import ISkillsRankingStateRepository
-from features.skills_ranking.state.repositories.types import IRegistrationDataRepository
-from features.skills_ranking.state.services.type import SkillsRankingState, SkillRankingExperimentGroup, \
-    SkillsRankingScore, \
-    SkillsRankingPhase, UpdateSkillsRankingRequest, ProcessMetadata, UserResponses
-from features.skills_ranking.services.skills_ranking_service import SkillsRankingService
 from features.skills_ranking.services.errors import (
     SkillsRankingServiceHTTPError,
     SkillsRankingServiceTimeoutError,
@@ -22,8 +16,16 @@ from features.skills_ranking.services.errors import (
     SkillsRankingServiceError,
     SkillsRankingGenericError,
 )
+from features.skills_ranking.services.skills_ranking_service import SkillsRankingService
+from features.skills_ranking.state.repositories.errors import RegistrationDataNotFoundError
+from features.skills_ranking.state.repositories.skills_ranking_state_repository import ISkillsRankingStateRepository
+from features.skills_ranking.state.repositories.types import IRegistrationDataRepository
+from features.skills_ranking.state.services.type import SkillsRankingState, SkillRankingExperimentGroup, \
+    SkillsRankingScore, \
+    SkillsRankingPhase, UpdateSkillsRankingRequest, ProcessMetadata, UserResponses
 from features.skills_ranking.state.utils.get_group import get_group
 from features.skills_ranking.state.utils.phase_utils import get_possible_next_phase
+from features.skills_ranking.types import PriorBeliefs
 
 
 class ISkillsRankingStateService(ABC):
@@ -82,7 +84,6 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         # Logger
         self._logger = logging.getLogger(self.__class__.__name__)
 
-
     async def _initialize_state(self,
                                 session_id: int,
                                 update_request: UpdateSkillsRankingRequest,
@@ -101,12 +102,14 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         # 3. Construct the new SkillsRankingState with the INITIAL phase.
         #    AND the `started at` as now, as it is the first time the user is calling this method.
         new_state = SkillsRankingState(
-            phase=[SkillsRankingPhase(
-                name=update_request.phase,
-                time=get_now()
-            )],
+            session_id=session_id,
+            phase=[
+                SkillsRankingPhase(
+                    name=update_request.phase,  # INITIAL
+                    time=get_now()
+                )
+            ],
             metadata=ProcessMetadata(
-                session_id=session_id,
                 experiment_group=experiment_group,
                 started_at=get_now()
             ),
@@ -199,7 +202,19 @@ class SkillsRankingStateService(ISkillsRankingStateService):
                                            session_id: int) -> Tuple[SkillsRankingScore, SkillRankingExperimentGroup]:
 
         # 1. we need to get the prior beliefs
-        prior_beliefs = await self._registration_data_repository.get_prior_beliefs(user_id=user_id)
+        try:
+            prior_beliefs = await self._registration_data_repository.get_prior_beliefs(user_id=user_id)
+        except RegistrationDataNotFoundError as e:
+            # A new algorithm doesn't require prior beliefs,
+            # so we can continue with default values.
+            # Log an exception in this case to evaluate this separately.
+            # Also, for local development and testing, we can continue with default values.
+            _default_prior_beliefs = PriorBeliefs()
+            self._logger.error(
+                f"Registration data not found for user: {user_id}. "
+                f"Continuing with default values. {_default_prior_beliefs} "
+                f"Exception: {e}", exc_info=e)
+            prior_beliefs = _default_prior_beliefs
 
         # 2. let's get all the skills for this specific session.
         state = await self._application_state_manager.get_state(session_id=session_id)
@@ -216,12 +231,26 @@ class SkillsRankingStateService(ISkillsRankingStateService):
             participant_skills += experience.top_skills
             participant_skills += experience.remaining_skills
 
-        # Flatten the list of skills and get the originUUIDs
-        participant_skills_uuids: set[str] = {skill.originUUID for skill in participant_skills}
+        # Ranking algorithm v2 uses skill UUIDs
+        participant_skills_uuids: set[str] = {skill.UUID for skill in participant_skills}
+
+        # Get the taxonomy model id used to generate the skills.
+        # Prefer the taxonomy model id used to generate the skills.
+        # If not found, fall back to the config taxonomy model id.
+        # Be more tolerant.
+        taxonomy_model_ids = [skill.modelId for skill in participant_skills]
+        taxonomy_model_id = None
+        match len(set(taxonomy_model_ids)):
+            case 0:
+                taxonomy_model_id = get_application_config().tabiya_model_id
+            case 1:
+                taxonomy_model_id = taxonomy_model_ids
+            case _:
+                taxonomy_model_id = taxonomy_model_ids[0]
+                self._logger.warning(
+                    f"User had more than one taxonomy model id. {taxonomy_model_ids}, going with {taxonomy_model_id}")
 
         # 3. Compute the ranking score for this participant
-        taxonomy_model_id = get_application_config().taxonomy_model_id
-        
         try:
             score = await self._http_client.get_participant_ranking(
                 user_id=user_id,
@@ -231,16 +260,16 @@ class SkillsRankingStateService(ISkillsRankingStateService):
             )
         except SkillsRankingServiceHTTPError as e:
             self._logger.error(f"HTTP error from skills ranking service: {e.status_code} - {e.body}")
-            raise SkillsRankingGenericError("Skills ranking service HTTP error")
+            raise SkillsRankingGenericError("Skills ranking service HTTP error") from e
         except SkillsRankingServiceTimeoutError as e:
             self._logger.error(f"Timeout from skills ranking service: {e.details}")
-            raise SkillsRankingGenericError("Skills ranking service timeout")
+            raise SkillsRankingGenericError("Skills ranking service timeout") from e
         except SkillsRankingServiceRequestError as e:
             self._logger.error(f"Request error from skills ranking service: {e.details}")
-            raise SkillsRankingGenericError("Skills ranking service request error")
+            raise SkillsRankingGenericError("Skills ranking service request error") from e
         except SkillsRankingServiceError as e:
             self._logger.error(f"Generic error from skills ranking service: {e.message}")
-            raise SkillsRankingGenericError("Skills ranking service error")
+            raise SkillsRankingGenericError("Skills ranking service error") from e
 
         savable_score = score
 

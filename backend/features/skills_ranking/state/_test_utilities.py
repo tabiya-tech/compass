@@ -1,5 +1,5 @@
-from common_libs.time_utilities import get_now, truncate_microseconds
 from common_libs.test_utilities import get_random_printable_string
+from common_libs.time_utilities import get_now, truncate_microseconds
 from features.skills_ranking.state.services.type import (
     ApplicationWillingness,
     SkillsRankingPhaseName,
@@ -21,12 +21,12 @@ def get_skills_ranking_state(
     is_proof_of_value_phase = phase == "PROOF_OF_VALUE"
 
     return SkillsRankingState(
+        session_id=session_id,
         phase=[SkillsRankingPhase(
             name=phase,
             time=truncate_microseconds(get_now())
         )],
         metadata=ProcessMetadata(
-            session_id=session_id,
             experiment_group=experiment_group,
             started_at=truncate_microseconds(get_now()),
             completed_at=None,
@@ -44,10 +44,10 @@ def get_skills_ranking_state(
             most_demanded_percent=75.5,
             least_demanded_label=get_random_printable_string(8),
             least_demanded_percent=10.0,
-            average_percent_for_jobseeker_skillgroups=50.0,
-            average_count_for_jobseeker_skillgroups=250.0,
+            average_percent_for_jobseeker_skill_groups=50.0,
+            average_count_for_jobseeker_skill_groups=250.0,
             province_used=get_random_printable_string(8),
-            matched_skillgroups=5,
+            matched_skill_groups=5,
         ),
         user_responses=UserResponses(
             prior_belief_percentile=42.0,

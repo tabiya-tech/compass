@@ -1,7 +1,3 @@
-from features.skills_ranking.services.errors import (
-    SkillsRankingGenericError,
-)
-
 from datetime import datetime
 from http import HTTPStatus
 from typing import Generator, Tuple
@@ -20,6 +16,9 @@ from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequ
 from common_libs.test_utilities.mock_auth import MockAuth
 from features.skills_ranking.constants import SKILLS_RANKING_FEATURE_ID
 from features.skills_ranking.errors import InvalidNewPhaseError, InvalidFieldsForPhaseError
+from features.skills_ranking.services.errors import (
+    SkillsRankingGenericError,
+)
 from features.skills_ranking.state._test_utilities import get_skills_ranking_state
 from features.skills_ranking.state.repositories.get_skills_ranking_state_repository import \
     get_skills_ranking_state_mongo_repository
@@ -149,14 +148,14 @@ class TestSkillsRankingRoutes:
 
             # AND the user has a valid session with the correct experiment groups
             mocked_preferences.get_user_preference_by_user_id = AsyncMock(
-                return_value=get_mock_user_preferences(given_state.metadata.session_id,
+                return_value=get_mock_user_preferences(given_state.session_id,
                                                        {SKILLS_RANKING_FEATURE_ID: given_state.metadata.experiment_group.name}))
 
             # AND the repository's get_by_session_id method will return the state
             mocked_skills_ranking_repository.get_by_session_id = AsyncMock(return_value=given_state)
 
             # WHEN a GET request is made
-            response = client.get(f"/conversations/{given_state.metadata.session_id}/skills-ranking/state")
+            response = client.get(f"/conversations/{given_state.session_id}/skills-ranking/state")
 
             # THEN the response is OK
             assert response.status_code == HTTPStatus.OK
@@ -169,7 +168,7 @@ class TestSkillsRankingRoutes:
                     }
                     for p in given_state.phase
             ]
-            assert response_data["metadata"]["session_id"] == given_state.metadata.session_id
+            assert response_data["session_id"] == given_state.session_id
             assert response_data["metadata"]["experiment_group"] == given_state.metadata.experiment_group.name
             assert response_data["metadata"]["started_at"] == given_state.metadata.started_at.isoformat().replace("+00:00", "Z")
             assert response_data["metadata"].get("completed_at") == (given_state.metadata.completed_at.isoformat().replace("+00:00", "Z") if given_state.metadata.completed_at else None)
@@ -243,7 +242,7 @@ class TestSkillsRankingRoutes:
             assert call_args[1]["session_id"] == session_id
             assert call_args[1]["update_request"].phase == "INITIAL"
             # AND the response contains the created state
-            assert response.json()["metadata"]["session_id"] == session_id
+            assert response.json()["session_id"] == session_id
             assert response.json()["phase"][-1]["name"] == "INITIAL"
 
         @pytest.mark.asyncio
@@ -337,7 +336,7 @@ class TestSkillsRankingRoutes:
             assert call_args[1]["update_request"].user_responses["application_24h"] == given_application_24h
             assert call_args[1]["update_request"].user_responses["opportunity_skill_requirement_percentile"] == pytest.approx(given_opportunity_requirement)
             mocked_preferences.set_experiment_by_user_id.assert_not_called()
-            assert response.json()["metadata"]["session_id"] == session_id
+            assert response.json()["session_id"] == session_id
             assert response.json()["phase"][-1]["name"] == "COMPLETED"
 
         @pytest.mark.asyncio

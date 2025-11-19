@@ -17,6 +17,9 @@ class MetadataUpdate(BaseModel):
     correct_rotations: int | None = None
     clicks_count: int | None = None
 
+    class Config:
+        extra = "forbid"
+
 
 class UserResponsesUpdate(BaseModel):
     prior_belief_percentile: float | None = None
@@ -27,15 +30,25 @@ class UserResponsesUpdate(BaseModel):
     application_24h: int | None = None
     opportunity_skill_requirement_percentile: float | None = None
 
+    class Config:
+        extra = "forbid"
+
 
 class UpsertSkillsRankingRequest(BaseModel):
     phase: SkillsRankingPhaseName | None = None
     metadata: MetadataUpdate | None = None
     user_responses: UserResponsesUpdate | None = None
 
+    class Config:
+        extra = "forbid"
+
 
 class SkillsRankingStateResponse(BaseModel):
+    session_id: int
     phase: list[SkillsRankingPhase]
     metadata: ProcessMetadata
     score: SkillsRankingScore
     user_responses: UserResponses
+
+    class Config:
+        extra = "forbid"

@@ -35,6 +35,7 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
         :return: Mapping representing the MongoDB document.
         """
         return {
+            "session_id": skills_ranking_state.session_id,
             "phase": [
                 {
                     "name": p.name,
@@ -43,7 +44,6 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
                 for p in skills_ranking_state.phase
             ],
             "metadata": {
-                "session_id": skills_ranking_state.metadata.session_id,
                 "experiment_group": skills_ranking_state.metadata.experiment_group.name,
                 "started_at": datetime_to_mongo_date(skills_ranking_state.metadata.started_at),
                 "completed_at": datetime_to_mongo_date(
@@ -62,10 +62,10 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
                 "most_demanded_percent": skills_ranking_state.score.most_demanded_percent,
                 "least_demanded_label": skills_ranking_state.score.least_demanded_label,
                 "least_demanded_percent": skills_ranking_state.score.least_demanded_percent,
-                "average_percent_for_jobseeker_skillgroups": skills_ranking_state.score.average_percent_for_jobseeker_skillgroups,
-                "average_count_for_jobseeker_skillgroups": skills_ranking_state.score.average_count_for_jobseeker_skillgroups,
+                "average_percent_for_jobseeker_skill_groups": skills_ranking_state.score.average_percent_for_jobseeker_skill_groups,
+                "average_count_for_jobseeker_skill_groups": skills_ranking_state.score.average_count_for_jobseeker_skill_groups,
                 "province_used": skills_ranking_state.score.province_used,
-                "matched_skillgroups": skills_ranking_state.score.matched_skillgroups,
+                "matched_skill_groups": skills_ranking_state.score.matched_skill_groups,
             },
             "user_responses": {
                 "prior_belief_percentile": skills_ranking_state.user_responses.prior_belief_percentile,
@@ -103,6 +103,7 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
             return value if value is not None else default
 
         return SkillsRankingState(
+            session_id=doc["session_id"],
             phase=[
                 SkillsRankingPhase(
                     name=p["name"],
@@ -111,7 +112,6 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
                 for p in doc.get("phase", [])
             ],
             metadata=ProcessMetadata(
-                session_id=metadata_doc["session_id"],
                 experiment_group=experiment_group,
                 started_at=mongo_date_to_datetime(metadata_doc["started_at"]),
                 completed_at=mongo_date_to_datetime(metadata_doc["completed_at"]) if metadata_doc.get(
@@ -130,10 +130,10 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
                 most_demanded_percent=_get("most_demanded_percent", 0.0),
                 least_demanded_label=_get("least_demanded_label", ""),
                 least_demanded_percent=_get("least_demanded_percent", 0.0),
-                average_percent_for_jobseeker_skillgroups=_get("average_percent_for_jobseeker_skillgroups", 0.0),
-                average_count_for_jobseeker_skillgroups=_get("average_count_for_jobseeker_skillgroups", 0.0),
+                average_percent_for_jobseeker_skill_groups=_get("average_percent_for_jobseeker_skill_groups", 0.0),
+                average_count_for_jobseeker_skill_groups=_get("average_count_for_jobseeker_skill_groups", 0.0),
                 province_used=_get("province_used", ""),
-                matched_skillgroups=_get("matched_skillgroups", 0),
+                matched_skill_groups=_get("matched_skill_groups", 0),
             ),
             user_responses=UserResponses(
                 prior_belief_percentile=user_responses_doc.get("prior_belief_percentile"),
@@ -151,7 +151,7 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
 
     async def get_by_session_id(self, session_id: int) -> SkillsRankingState | None:
         _doc = await self._collection.find_one({
-            "metadata.session_id": {
+            "session_id": {
                 "$eq": session_id
             }
         })
@@ -210,12 +210,12 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
 
         if not update_ops:
             existing_doc = await self._collection.find_one({
-                "metadata.session_id": session_id
+                "session_id": session_id
             })
             return self._from_db_doc(existing_doc) if existing_doc else None
 
         updated_doc = await self._collection.find_one_and_update(
-            {"metadata.session_id": session_id},
+            {"session_id": session_id},
             update_ops,
             return_document=ReturnDocument.AFTER
         )

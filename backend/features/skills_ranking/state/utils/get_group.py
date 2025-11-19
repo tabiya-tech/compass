@@ -1,5 +1,3 @@
-from enum import IntEnum
-
 import numpy as np
 
 from features.skills_ranking.state.services.type import SkillRankingExperimentGroup
@@ -10,6 +8,7 @@ _AVAILABLE_GROUPS = [
     SkillRankingExperimentGroup.GROUP_2,
     SkillRankingExperimentGroup.GROUP_3,
 ]
+
 
 def get_group_based_on_randomization() -> SkillRankingExperimentGroup:
     """

@@ -1,5 +1,5 @@
 import datetime
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 import pytest_mock
@@ -11,6 +11,11 @@ from app.users.types import PossibleExperimentValues, UserPreferences
 from common_libs.test_utilities import get_random_printable_string, get_random_session_id, get_random_user_id
 from common_libs.time_utilities import get_now
 from features.skills_ranking.errors import InvalidNewPhaseError
+from features.skills_ranking.services.errors import (
+    SkillsRankingGenericError,
+    SkillsRankingServiceHTTPError,
+    SkillsRankingServiceTimeoutError,
+)
 from features.skills_ranking.state._test_utilities import get_skills_ranking_state
 from features.skills_ranking.state.repositories.skills_ranking_state_repository import ISkillsRankingStateRepository
 from features.skills_ranking.state.services.skills_ranking_state_service import SkillsRankingStateService
@@ -27,11 +32,6 @@ from features.skills_ranking.state.services.type import (
     UpdateSkillsRankingRequest,
 )
 from features.skills_ranking.types import PriorBeliefs, SkillsRankingScore
-from features.skills_ranking.services.errors import (
-    SkillsRankingGenericError,
-    SkillsRankingServiceHTTPError,
-    SkillsRankingServiceTimeoutError,
-)
 
 
 @pytest.fixture(scope="function")
@@ -56,9 +56,9 @@ def _mock_user_preference_repository() -> IUserPreferenceRepository:
             raise NotImplementedError()
 
         async def update_user_preference(
-            self,
-            user_id: str | None = None,
-            experiment_groups: SkillRankingExperimentGroup | None = None,
+                self,
+                user_id: str | None = None,
+                experiment_groups: SkillRankingExperimentGroup | None = None,
         ) -> UserPreferences:
             raise NotImplementedError()
 
@@ -69,10 +69,10 @@ def _mock_user_preference_repository() -> IUserPreferenceRepository:
             raise NotImplementedError()
 
         async def set_experiment_by_user_id(
-            self,
-            user_id: str,
-            experiment_id: str,
-            experiment_config: dict[str, PossibleExperimentValues],
+                self,
+                user_id: str,
+                experiment_id: str,
+                experiment_config: dict[str, PossibleExperimentValues],
         ) -> None:
             raise NotImplementedError()
 
@@ -86,8 +86,8 @@ def _mock_user_preference_repository() -> IUserPreferenceRepository:
 
 
 def _build_service(
-    repository: ISkillsRankingStateRepository,
-    user_preferences_repository: IUserPreferenceRepository,
+        repository: ISkillsRankingStateRepository,
+        user_preferences_repository: IUserPreferenceRepository,
 ):
     return SkillsRankingStateService(
         repository,
@@ -102,10 +102,10 @@ class TestSkillsRankingService:
     class TestUpsertState:
         @pytest.mark.asyncio
         async def test_upsert_state_create(
-            self,
-                                           _mock_skills_ranking_state_repository: ISkillsRankingStateRepository,
-                                           _mock_user_preference_repository: IUserPreferenceRepository,
-            setup_application_config: ApplicationConfig,
+                self,
+                _mock_skills_ranking_state_repository: ISkillsRankingStateRepository,
+                _mock_user_preference_repository: IUserPreferenceRepository,
+                setup_application_config: ApplicationConfig,
         ):
             given_state = get_skills_ranking_state()
 
@@ -118,11 +118,11 @@ class TestSkillsRankingService:
 
             result = await service.upsert_state(
                 user_id=get_random_user_id(),
-                session_id=given_state.metadata.session_id,
+                session_id=given_state.session_id,
                 update_request=UpdateSkillsRankingRequest(phase="INITIAL"),
             )
 
-            _mock_skills_ranking_state_repository.get_by_session_id.assert_called_once_with(given_state.metadata.session_id)
+            _mock_skills_ranking_state_repository.get_by_session_id.assert_called_once_with(given_state.session_id)
             _mock_skills_ranking_state_repository.create.assert_called_once()
             _mock_skills_ranking_state_repository.update.assert_not_called()
             assert result == given_state
@@ -131,8 +131,8 @@ class TestSkillsRankingService:
         async def test_upsert_state_update_valid_transition(
                 self,
                 _mock_skills_ranking_state_repository: ISkillsRankingStateRepository,
-            _mock_user_preference_repository: IUserPreferenceRepository,
-            setup_application_config: ApplicationConfig,
+                _mock_user_preference_repository: IUserPreferenceRepository,
+                setup_application_config: ApplicationConfig,
         ):
             existing_state = get_skills_ranking_state(phase="INITIAL")
             new_phase: SkillsRankingPhaseName = "BRIEFING"
@@ -148,11 +148,11 @@ class TestSkillsRankingService:
 
             result = await service.upsert_state(
                 user_id=get_random_user_id(),
-                session_id=new_state.metadata.session_id,
+                session_id=new_state.session_id,
                 update_request=UpdateSkillsRankingRequest(phase=new_phase),
             )
 
-            _mock_skills_ranking_state_repository.get_by_session_id.assert_called_once_with(new_state.metadata.session_id)
+            _mock_skills_ranking_state_repository.get_by_session_id.assert_called_once_with(new_state.session_id)
             _mock_skills_ranking_state_repository.update.assert_called_once()
             _mock_skills_ranking_state_repository.create.assert_not_called()
             assert result == new_state
@@ -161,7 +161,7 @@ class TestSkillsRankingService:
         async def test_upsert_state_update_invalid_transition(
                 self,
                 _mock_skills_ranking_state_repository: ISkillsRankingStateRepository,
-            _mock_user_preference_repository: IUserPreferenceRepository,
+                _mock_user_preference_repository: IUserPreferenceRepository,
         ):
             existing_state = get_skills_ranking_state(phase="BRIEFING")
             new_phase: SkillsRankingPhaseName = "COMPLETED"
@@ -176,7 +176,7 @@ class TestSkillsRankingService:
             with pytest.raises(InvalidNewPhaseError):
                 await service.upsert_state(
                     user_id=get_random_user_id(),
-                    session_id=existing_state.metadata.session_id,
+                    session_id=existing_state.session_id,
                     update_request=UpdateSkillsRankingRequest(phase=new_phase),
                 )
 
@@ -189,8 +189,8 @@ class TestSkillsRankingService:
                 self,
                 _mock_skills_ranking_state_repository,
                 _mock_user_preference_repository,
-            mocker: pytest_mock.MockFixture,
-            setup_application_config: ApplicationConfig,
+                mocker: pytest_mock.MockFixture,
+                setup_application_config: ApplicationConfig,
         ):
             given_user_id = get_random_user_id()
             given_session_id = get_random_session_id()
@@ -217,7 +217,7 @@ class TestSkillsRankingService:
             )
 
             expected_skills_uuids: set[str] = {
-                skill.originUUID
+                skill.UUID
                 for experience in given_application_state.explore_experiences_director_state.experiences_state.values()
                 for skill in experience.experience.top_skills + experience.experience.remaining_skills
             }
@@ -231,10 +231,10 @@ class TestSkillsRankingService:
                 most_demanded_percent=65.0,
                 least_demanded_label=get_random_printable_string(8),
                 least_demanded_percent=10.0,
-                average_percent_for_jobseeker_skillgroups=45.0,
-                average_count_for_jobseeker_skillgroups=418.0,
+                average_percent_for_jobseeker_skill_groups=45.0,
+                average_count_for_jobseeker_skill_groups=418.0,
                 province_used=get_random_printable_string(8),
-                matched_skillgroups=5,
+                matched_skill_groups=5,
             )
 
             http_client_get_participant_ranking_spy = mocker.patch.object(
@@ -251,16 +251,25 @@ class TestSkillsRankingService:
                 ranking_service,
             )
 
-            get_group_spy = mocker.patch.object(service, "_get_group", Mock(return_value=SkillRankingExperimentGroup.GROUP_1))
+            get_group_spy = mocker.patch.object(service, "_get_group",
+                                                Mock(return_value=SkillRankingExperimentGroup.GROUP_1))
 
             actual_ranks, actual_group = await service.calculate_ranking_and_groups(given_user_id, given_session_id)
+
+            expected_taxonomy_model_id = \
+            list(given_application_state.explore_experiences_director_state.experiences_state.values())[
+                0].experience.top_skills[0].modelId
 
             assert actual_group == SkillRankingExperimentGroup.GROUP_1
             assert actual_ranks == given_participant_ranks
             assert registration_data_repository_get_prior_beliefs_spy.call_args.kwargs.get("user_id") == given_user_id
             assert application_state_manager_get_state_spy.call_args.kwargs.get("session_id") == given_session_id
             assert http_client_get_participant_ranking_spy.call_count == 1
-            assert http_client_get_participant_ranking_spy.call_args.kwargs.get("participants_skills_uuids") == expected_skills_uuids
+            assert http_client_get_participant_ranking_spy.call_args.kwargs.get(
+                "participants_skills_uuids") == expected_skills_uuids
+
+            assert http_client_get_participant_ranking_spy.call_args.kwargs.get(
+                "taxonomy_model_id") == expected_taxonomy_model_id
             get_group_spy.assert_called_once()
 
     class TestErrorHandling:
@@ -270,7 +279,7 @@ class TestSkillsRankingService:
                 _mock_skills_ranking_state_repository: ISkillsRankingStateRepository,
                 _mock_user_preference_repository: IUserPreferenceRepository,
                 setup_application_config: ApplicationConfig,
-            mocker: pytest_mock.MockFixture,
+                mocker: pytest_mock.MockFixture,
         ):
             given_user_id = get_random_user_id()
             given_session_id = get_random_session_id()
@@ -278,15 +287,15 @@ class TestSkillsRankingService:
             registration_data_repository = get_test_registration_data_repository()
             application_state_manager = get_test_application_state_manager()
             given_application_state = get_test_application_state(given_session_id)
-            
+
             mocker.patch.object(
                 registration_data_repository,
                 "get_prior_beliefs",
                 AsyncMock(
                     return_value=PriorBeliefs(
-                external_user_id=get_random_user_id(),
-                compare_to_others_prior_belief=0.5,
-                opportunity_rank_prior_belief=0.6,
+                        external_user_id=get_random_user_id(),
+                        compare_to_others_prior_belief=0.5,
+                        opportunity_rank_prior_belief=0.6,
                     )
                 ),
             )
@@ -316,7 +325,7 @@ class TestSkillsRankingService:
                 _mock_skills_ranking_state_repository: ISkillsRankingStateRepository,
                 _mock_user_preference_repository: IUserPreferenceRepository,
                 setup_application_config: ApplicationConfig,
-            mocker: pytest_mock.MockFixture,
+                mocker: pytest_mock.MockFixture,
         ):
             given_user_id = get_random_user_id()
             given_session_id = get_random_session_id()
@@ -324,15 +333,15 @@ class TestSkillsRankingService:
             registration_data_repository = get_test_registration_data_repository()
             application_state_manager = get_test_application_state_manager()
             given_application_state = get_test_application_state(given_session_id)
-            
+
             mocker.patch.object(
                 registration_data_repository,
                 "get_prior_beliefs",
                 AsyncMock(
                     return_value=PriorBeliefs(
-                external_user_id=get_random_user_id(),
-                compare_to_others_prior_belief=0.5,
-                opportunity_rank_prior_belief=0.6,
+                        external_user_id=get_random_user_id(),
+                        compare_to_others_prior_belief=0.5,
+                        opportunity_rank_prior_belief=0.6,
                     )
                 ),
             )

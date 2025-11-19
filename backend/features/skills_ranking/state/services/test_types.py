@@ -2,9 +2,9 @@ import datetime
 from typing import AsyncIterator
 
 from app.application_state import IApplicationStateManager, ApplicationState
+from app.store.database_application_state_store_test import get_test_application_state
 from common_libs.test_utilities import get_random_session_id, get_random_printable_string
 from features.skills_ranking.services.skills_ranking_service import SkillsRankingService
-from app.store.database_application_state_store_test import get_test_application_state
 from features.skills_ranking.state.repositories.types import IRegistrationDataRepository
 from features.skills_ranking.types import SkillsRankingScore, PriorBeliefs
 
@@ -28,10 +28,10 @@ def get_test_http_client():
                 most_demanded_percent=60.0,
                 least_demanded_label=get_random_printable_string(8),
                 least_demanded_percent=10.0,
-                average_percent_for_jobseeker_skillgroups=45.0,
-                average_count_for_jobseeker_skillgroups=300.0,
+                average_percent_for_jobseeker_skill_groups=45.0,
+                average_count_for_jobseeker_skill_groups=300.0,
                 province_used=get_random_printable_string(8),
-                matched_skillgroups=5,
+                matched_skill_groups=5,
             )
 
     return TestHttpClient()
