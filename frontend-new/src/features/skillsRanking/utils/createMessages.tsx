@@ -34,7 +34,8 @@ import SkillsRankingCompletionAdvice, {
   SKILLS_RANKING_COMPLETION_ADVICE_MESSAGE_ID,
   SkillsRankingCompletionAdviceProps,
 } from "src/features/skillsRanking/components/skillsRankingCompletionAdvice/SkillsRankingCompletionAdvice";
-import { SkillsRankingState, SkillsRankingExperimentGroups } from "src/features/skillsRanking/types";
+import { SkillsRankingExperimentGroups, SkillsRankingState } from "src/features/skillsRanking/types";
+import { faker } from "@faker-js/faker";
 
 // Utility function to check if a group should skip market disclosure (and consequently retyped rank)
 export const shouldSkipMarketDisclosure = (experimentGroup: SkillsRankingExperimentGroups): boolean => {
@@ -132,9 +133,12 @@ export const createPerceivedRankMessage = (
 ): IChatMessage<SkillsRankingPerceivedRankProps> => ({
   message_id: SKILLS_RANKING_PERCEIVED_RANK_MESSAGE_ID,
   type: SKILLS_RANKING_PERCEIVED_RANK_MESSAGE_ID,
+  // TODO: adjust accordingly during integration.
   payload: {
-    skillsRankingState,
-    onFinish,
+    isReadOnly: false,
+    mostDemandedLabel: faker.word.words({ count: 2 }),
+    sentAt: faker.date.recent().toISOString(),
+    onSubmit: console.log,
   },
   sender: ConversationMessageSender.COMPASS,
   component: (props: SkillsRankingPerceivedRankProps) => React.createElement(SkillsRankingPerceivedRank, props),
