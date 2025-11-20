@@ -108,8 +108,8 @@ class OperationsProcessor:
                 to_update.end_date = _data.end_date
             if _data.company is not None:
                 to_update.company = _data.company
-            if _data.location is not None:
-                to_update.location = _data.location
+            # if _data.location is not None:
+            #     to_update.location = _data.location
 
             # Resolve empties/duplicates inline to keep indexes consistent
             if self._is_experience_empty(to_update):
@@ -173,7 +173,7 @@ class OperationsProcessor:
                 start_date=add_payload.start_date,
                 end_date=add_payload.end_date,
                 company=add_payload.company,
-                location=add_payload.location
+                # location=add_payload.location
             )
             collected_experience_data_so_far.append(new_item)
 
@@ -184,8 +184,8 @@ class OperationsProcessor:
             (experience.experience_title is None or experience.experience_title.strip() == "") and
             (experience.start_date is None or experience.start_date.strip() == "") and
             (experience.end_date is None or experience.end_date.strip() == "") and
-            (experience.company is None or experience.company.strip() == "") and
-            (experience.location is None or experience.location.strip() == "")
+            (experience.company is None or experience.company.strip() == "") 
+            # and (experience.location is None or experience.location.strip() == "")
         )
 
     @staticmethod
@@ -198,8 +198,9 @@ class OperationsProcessor:
             if (item.experience_title == existing_item.experience_title and
                     item.start_date == existing_item.start_date and
                     item.end_date == existing_item.end_date and
-                    item.company == existing_item.company and
-                    item.location == existing_item.location):
+                    item.company == existing_item.company 
+                    # and item.location == existing_item.location
+                    ):
                 return i
         return -1
 

@@ -333,7 +333,7 @@ class _ConversationLLM:
                 - 'start_date': see ##Timeline instructions
                 - 'end_date': see ##Timeline instructions
                 - 'company': see ##'company' instructions
-                - 'location': see ##'location' instructions
+                
                      
                 You will inspect the '#Collected Experience Data' and our conversation to understand 
                 what information you have collected so far for the work experience we are discussing 
@@ -351,7 +351,7 @@ class _ConversationLLM:
                 
                 Once you have gathered all the information for a work experience, you will respond with a summary of that work experience in plain text (no Markdown, JSON, bold, italics or other formating) 
                 and by explicitly asking me if I would like to add or change anything to the specific work experience before moving on to another experience.
-                Make sure to include in the summary the title, company, location and timeline information you have gathered and is '#Collected Experience Data'
+                Make sure to include in the summary the title, company and timeline information you have gathered and is '#Collected Experience Data'
                 and not information from the conversation history.   
                 You will wait for my response before moving on to the next work experience as outlined in the '#Experiences To Explore' section.
                 
@@ -400,13 +400,6 @@ class _ConversationLLM:
                     /// In case the of caregiving for family, helping in the household, use common sense and adjust your questions to reflect the nature of the work,
                     /// as there is not a company in this case but the family or household.
                     Do not ask for any personal information such as the name of a person, of a family or a household.
-                ##'location' instructions
-                    The location (e.g City, Region, District or remote) of the company or organization.
-                    An exact address is not required.
-                    If I have not provided the location, ask me for it.
-                    Choose the question to ask based on the context of the work experience (company, title etc).
-                    In case of caregiving for family, helping in the household, do not ask for an exact address, just the city or region would be sufficient.
-                    Do not ask for any personal information such as the address of a person, of a family, or a household.
             #Collected Experience Data 
                 All the work experiences you have collected so far:
                     {collected_experience_data}
@@ -543,7 +536,7 @@ def _transition_instructions(*,
             
             {language_style}
                                                                   
-            Ask me: 
+            Ask me (in the language style indicated above - using same language as the rest of the conversation): 
                 "Let's recap the information we have collected so far: 
                 {summary_of_experiences}
                 Is there anything you would like to add or change?"
@@ -612,8 +605,8 @@ def _get_missing_fields(collected_data: list[CollectedData], index: int) -> str:
         missing_fields.append("end_date")
     if experience_data.company is None:
         missing_fields.append("company")
-    if experience_data.location is None:
-        missing_fields.append("location")
+    # if experience_data.location is None:
+    #     missing_fields.append("location")
     if len(missing_fields) == 0:
         try:
             return t("messages", "collect_experiences.all_fields_filled")
@@ -642,8 +635,8 @@ def _get_not_missing_fields(collected_data: list[CollectedData], index: int) -> 
         not_missing_fields.append("end_date")
     if experience_data.company is not None:
         not_missing_fields.append("company")
-    if experience_data.location is not None:
-        not_missing_fields.append("location")
+    # if experience_data.location is not None:
+    #     not_missing_fields.append("location")
     if len(not_missing_fields) == 0:
         try:
             return t("messages", "collect_experiences.all_fields_not_filled")
@@ -789,7 +782,7 @@ def _get_explore_experiences_instructions(*,
 def _get_example_summary() -> str:
     return "• " + ExperienceEntity.get_structured_summary(
         experience_title="Crew Member",
-        location="London",
+        # location="London",
         work_type=WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name,
         start_date="2020",
         end_date="2021",
@@ -803,7 +796,7 @@ def _get_summary_of_experiences(collected_data: list[CollectedData]) -> str:
     for experience in collected_data:
         summary += "• " + ExperienceEntity.get_structured_summary(
             experience_title=experience.experience_title or "",
-            location=experience.location,
+            # location=experience.location,
             work_type=experience.work_type,
             start_date=experience.start_date,
             end_date=experience.end_date,

@@ -224,7 +224,6 @@ class CollectExperiencesAgent(Agent):
                     uuid=elem.uuid if elem.uuid else None,
                     experience_title=elem.experience_title if elem.experience_title else '',
                     company=elem.company,
-                    location=elem.location,
                     timeline=Timeline(start=elem.start_date, end=elem.end_date),
                     work_type=WorkType.from_string_key(elem.work_type)
                 )

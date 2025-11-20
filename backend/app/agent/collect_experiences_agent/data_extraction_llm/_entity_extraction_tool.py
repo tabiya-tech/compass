@@ -35,7 +35,7 @@ class ExtractedData(BaseModel):
     # Experience Details
     experience_title: Optional[str] = None
     company: Optional[str] = None
-    location: Optional[str] = None
+    # location: Optional[str] = None
 
 
 # Empty/Default extracted data.
@@ -63,7 +63,7 @@ class EntityExtractionTool:
     Responsibilities:
     - Given the user's statement about the experience, extract the experience details.
         — Company Name
-        — Location
+        — Location # removed
         — Experience Title (Job title)
 
     — Detect if the user doesn't want to share the details and mark then as empty string.
@@ -153,7 +153,7 @@ class EntityExtractionTool:
         extracted_data = ExtractedData(
             experience_title=clean_string_field(experience_details.experience_title),
             company=clean_string_field(experience_details.company),
-            location=clean_string_field(experience_details.location)
+            # location=clean_string_field(experience_details.location)
         )
 
         # Successful extraction, return 0 penalty.
@@ -175,7 +175,7 @@ _SYSTEM_INSTRUCTIONS = """
     You will collect information for the following fields:-
     - experience_title
     - company
-    - location    
+    
     
     You will collect and place them to the output as instructed below:
     ##'experience_title' instructions
@@ -197,12 +197,6 @@ _SYSTEM_INSTRUCTIONS = """
         `null` if the information was not provided by the user and the user was not explicitly asked for this information yet.
         Use empty string if the user was asked and explicitly chose to not provide this information, or the user don't want us to store the information any more.
         
-     ##'location' instructions 
-        The location (e.g City, Region, District) where the job was performed or the company is located any one of them. 
-        In case of paid remote work or work from home use (Remote, Home Office etc) as the location.
-        For unpaid work, use the receiver's location.
-        Return a string value containing the location.
-        
         `null` if the information was not provided by the user and the user was not explicitly asked for this information yet.
         Use empty string if the user was asked and explicitly chose to not provide this information, or the user don't want us to store the information any more.
 
@@ -220,7 +214,7 @@ _SYSTEM_INSTRUCTIONS = """
         {{
             - data_extraction_references: a dictionary with short (up to 100 words) explanations in prose (not json) about 
                 what information you intend to collect based on the '<User's Last Input>' and the '<Conversation History>'.
-                Constrain the explanation to the data relevant for the fields 'experience_title', 'company' and 'location' 
+                Constrain the explanation to the data relevant for the fields 'experience_title' and 'company'
                 Explain where you found the information e.g in '<User's Last Input>'.
                 More of like the reason why you shared the respective values or empty values.
                 Formatted as a json string.
@@ -228,11 +222,9 @@ _SYSTEM_INSTRUCTIONS = """
                 {{
                     - experience_title_references: 
                     - company_references:
-                    - location_references:
                 }}
             - experience_title: A title for the experience. Formatted as a json string. Refer to the "##'experience_title' instructions" section.
             - company: The name of the company or type. Formatted as a json string. Refer to the "##'company' instructions" section.
-            - location: The location in which the job was performed. Formatted as a json string. Refer to the "##'location' instructions" section.
         }}                            
 </System Instructions>
 """

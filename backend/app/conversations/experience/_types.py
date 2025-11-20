@@ -85,10 +85,10 @@ class ExperienceResponse(BaseModel):
     Company name (e.g. "at McDonald's")
     """
 
-    location: Optional[str] = None
-    """
-    Location of the experience (e.g. "Cape Town, South Africa")
-    """
+    # location: Optional[str] = None
+    # """
+    # Location of the experience (e.g. "Cape Town, South Africa")
+    # """
 
     timeline: Optional[Timeline] = None
     """
@@ -149,7 +149,7 @@ class ExperienceResponse(BaseModel):
             UUID=experience_entity.uuid,
             experience_title=experience_entity.experience_title,
             company=experience_entity.company,
-            location=experience_entity.location,
+            # location=experience_entity.location,
             timeline=experience_entity.timeline,
             work_type=experience_entity.work_type,
             top_skills=convert_skill_entities_to_skills_response(experience_entity.top_skills),
@@ -240,12 +240,12 @@ class UpdateExperienceRequest(BaseModel):
         examples=["McDonald's"],
         max_length=COMPANY_MAX_LENGTH
     )
-    location: Optional[str] = Field(
-        default=None,
-        description="The location of the experience. If omitted, not updated. If null, cleared.",
-        examples=["Cape Town, South Africa"],
-        max_length=LOCATION_MAX_LENGTH
-    )
+    # location: Optional[str] = Field(
+    #     default=None,
+    #     description="The location of the experience. If omitted, not updated. If null, cleared.",
+    #     examples=["Cape Town, South Africa"],
+    #     max_length=LOCATION_MAX_LENGTH
+    # )
 
     # Use the type as `str` to allow the API user to send the keys.
     # By default, Pydantic will convert the enum to its value.

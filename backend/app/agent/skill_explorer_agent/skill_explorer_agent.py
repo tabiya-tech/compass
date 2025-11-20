@@ -186,7 +186,7 @@ class SkillsExplorerAgent(Agent):
             title = getattr(self.experience_entity, 'experience_title', None)
             work_type = getattr(self.experience_entity, 'work_type', None)
             company = getattr(self.experience_entity, 'company', None)
-            location = getattr(self.experience_entity, 'location', None)
+            # location = getattr(self.experience_entity, 'location', None)
             timeline = getattr(self.experience_entity, 'timeline', None)
             start_date = getattr(timeline, 'start', None) if timeline else None
             end_date = getattr(timeline, 'end', None) if timeline else None
@@ -195,7 +195,7 @@ class SkillsExplorerAgent(Agent):
                 experience_title=title,
                 work_type=work_type,
                 company=company,
-                location=location,
+                # location=location,
                 start_date=start_date,
                 end_date=end_date
             )

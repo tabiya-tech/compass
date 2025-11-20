@@ -82,7 +82,7 @@ class _DataExtractionLLM:
             experience_title=experience_details.experience_title,
             defined_at_turn_number=turn_number if data_operation == DataOperation.ADD else None,
             company=experience_details.company,
-            location=experience_details.location,
+            # location=experience_details.location,
             paid_work=timestamps_and_work_type.paid_work,
             work_type=timestamps_and_work_type.work_type,
             start_date=timestamps_and_work_type.start_date,

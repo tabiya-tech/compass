@@ -19,9 +19,9 @@ from ...countries import Country
 
 
 class ExperiencePipelineConfig(BaseModel):
-    number_of_clusters: int = 5
+    number_of_clusters: int = 8
     """
-    Default is 5
+    Default is 8
     
     The number of clusters to group the responsibilities. 
     Each cluster of responsibilities will contribute to N top skills (where N = number_of_top_skills_to_pick_per_cluster).
@@ -33,9 +33,9 @@ class ExperiencePipelineConfig(BaseModel):
     The number of top skills to pick for each cluster among the top skills candidates of the cluster.
     """
 
-    top_skills_threshold: int = 7
+    top_skills_threshold: int = 8
     """
-    Default is 7
+    Default is 8
     When scoring the top skills of each cluster, the top skills with a score lower than this threshold will be ignored.
     See PickTopSkillsTool for more details.
     """
@@ -61,7 +61,7 @@ class ExperiencePipelineConfig(BaseModel):
     This refers to the number of occupations retrieved from the search service for each alternative title.
     """
 
-    number_of_top_skills_candidates_per_cluster: int = 5
+    number_of_top_skills_candidates_per_cluster: int = 8
     """
     Default is 5
     The number of top skills candidates to return for each cluster.
