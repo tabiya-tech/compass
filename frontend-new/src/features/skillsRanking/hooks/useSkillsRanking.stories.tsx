@@ -312,21 +312,21 @@ export default meta;
 
 type Story = StoryObj<typeof SkillsRankingFlowTester>;
 
-export const Group1_TimeBased: Story = {
+export const Group1_NoDisclosure: Story = {
   args: {
     experimentGroup: SkillsRankingExperimentGroups.GROUP_1,
   },
   render: (args) => <SkillsRankingFlowTester {...args} onFinishFlow={action("Group 1 flow finished")} />,
 };
 
-export const Group2_WorkBased: Story = {
+export const Group2_MostDemandedOnly: Story = {
   args: {
     experimentGroup: SkillsRankingExperimentGroups.GROUP_2,
   },
   render: (args) => <SkillsRankingFlowTester {...args} onFinishFlow={action("Group 2 flow finished")} />,
 };
 
-export const Group3_WorkBased: Story = {
+export const Group3_MostAndLeastDemanded: Story = {
   args: {
     experimentGroup: SkillsRankingExperimentGroups.GROUP_3,
   },

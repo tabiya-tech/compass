@@ -2,7 +2,12 @@ import { Meta, StoryObj } from "@storybook/react";
 import SkillsRankingPriorBelief from "src/features/skillsRanking/components/skillsRankingPriorBelief/SkillsRankingPriorBelief";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
-import { SkillsRankingPhase, SkillsRankingPhaseWithTime, SkillsRankingState } from "src/features/skillsRanking/types";
+import {
+  SkillsRankingExperimentGroups,
+  SkillsRankingPhase,
+  SkillsRankingPhaseWithTime,
+  SkillsRankingState,
+} from "src/features/skillsRanking/types";
 import { action } from "@storybook/addon-actions";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
 import { Box } from "@mui/material";
@@ -54,15 +59,43 @@ export default meta;
 
 type Story = StoryObj<typeof SkillsRankingPriorBelief>;
 
-export const Default: Story = {
+const BaseArgs = {
+  onFinish: async (state: SkillsRankingState) => {
+    action("onFinish")(state);
+  },
+  skillsRankingState: (() => {
+    const base = getRandomSkillsRankingState();
+    base.phases = createPhaseArray(SkillsRankingPhase.PRIOR_BELIEF);
+    return base;
+  })(),
+};
+
+export const Group1_NoDisclosure: Story = {
   args: {
-    onFinish: async (state: SkillsRankingState) => {
-      action("onFinish")(state);
+    ...BaseArgs,
+    skillsRankingState: {
+      ...BaseArgs.skillsRankingState,
+      experiment_group: SkillsRankingExperimentGroups.GROUP_1,
     },
-    skillsRankingState: (() => {
-      const base = getRandomSkillsRankingState();
-      base.phases = createPhaseArray(SkillsRankingPhase.PRIOR_BELIEF);
-      return base;
-    })(),
+  },
+};
+
+export const Group2_MostDemandedOnly: Story = {
+  args: {
+    ...BaseArgs,
+    skillsRankingState: {
+      ...BaseArgs.skillsRankingState,
+      experiment_group: SkillsRankingExperimentGroups.GROUP_2,
+    },
+  },
+};
+
+export const Group3_MostAndLeastDemanded: Story = {
+  args: {
+    ...BaseArgs,
+    skillsRankingState: {
+      ...BaseArgs.skillsRankingState,
+      experiment_group: SkillsRankingExperimentGroups.GROUP_3,
+    },
   },
 };
