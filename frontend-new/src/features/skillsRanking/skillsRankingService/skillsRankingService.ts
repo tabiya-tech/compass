@@ -142,6 +142,7 @@ export class SkillsRankingService extends FeaturesService {
       perceived_rank_percentile: data.perceived_rank_percentile,
       retyped_rank_percentile: data.retyped_rank_percentile,
       application_willingness: data.application_willingness ?? undefined,
+      application24h: data.application24h ?? undefined,
       started_at: data.started_at,
       completed_at: data.completed_at,
     };
@@ -215,6 +216,7 @@ export class SkillsRankingService extends FeaturesService {
       perceived_rank_percentile: data.perceived_rank_percentile ?? undefined,
       retyped_rank_percentile: data.retyped_rank_percentile ?? undefined,
       application_willingness: data.application_willingness ?? undefined,
+      application24h: data.application24h ?? undefined,
       started_at: data.started_at,
       completed_at: data.completed_at ?? undefined,
     };
@@ -264,6 +266,7 @@ export class SkillsRankingService extends FeaturesService {
       perceived_rank_percentile: data.perceived_rank_percentile,
       retyped_rank_percentile: data.retyped_rank_percentile,
       application_willingness: data.application_willingness ?? undefined,
+      application24h: data.application24h ?? undefined,
       started_at: data.started_at,
       completed_at: data.completed_at,
     };

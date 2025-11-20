@@ -151,6 +151,11 @@ export interface SkillsRankingState {
   application_willingness?: ApplicationWillingness;
 
   /**
+   * Planned hours the user intends to spend applying in the next 24 hours (0-24).
+   */
+  application24h?: number;
+
+  /**
    * The time the skills ranking process started, in ISO format, in UTC.
    */
   started_at: string;

@@ -13,6 +13,7 @@ export const getRandomSkillsRankingState = (
   experimentGroup?: SkillsRankingExperimentGroups
 ): SkillsRankingState => {
   const application_willingness = getRandomApplicationWillingness();
+  const application24h = Math.random() < 0.5 ? Math.floor(Math.random() * 25) : undefined;
 
   return {
     phases: [
@@ -32,6 +33,7 @@ export const getRandomSkillsRankingState = (
     perceived_rank_percentile: Math.random() < 0.5 ? Math.floor(Math.random() * 100) + 1 : undefined, // Random percentile or undefined
     retyped_rank_percentile: Math.random() < 0.5 ? Math.floor(Math.random() * 100) + 1 : undefined, // Random percentile or undefined
     application_willingness,
+    application24h,
     started_at: new Date().toISOString(), // Current time in ISO format
     completed_at: phase === SkillsRankingPhase.COMPLETED ? new Date().toISOString() : undefined, // Set completed_at if phase is COMPLETED
   };
