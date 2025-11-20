@@ -500,6 +500,13 @@
           "formalSectorUnpaidTraineeWork": "Vous êtes dans un rôle de formation ou de stage pour acquérir des compétences ou de l'expérience",
           "unseenUnpaid": "Vous effectuez du travail non rémunéré comme la garde, les tâches ménagères ou le bénévolat",
           "uncategorized": "Compass n'a pas pu catégoriser ce type de travail"
+        },
+        "errors": {
+          "experienceTitleMaxLength": "Maximum {{max}} de caractères autorisés.",
+          "companyMaxLength": "Maximum {{max}} de caractères autorisés.",
+          "locationMaxLength": "Maximum {{max}} de caractères autorisés.",
+          "summaryMaxLength": "Maximum {{max}} de caractères autorisés.",
+          "timelineMaxLength": "Maximum {{max}} de caractères autorisés."
         }
       }
     },
