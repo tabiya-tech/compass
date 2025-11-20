@@ -13,13 +13,13 @@ import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChat
 import { getDefaultTypingDurationMs } from "src/features/skillsRanking/constants";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
-const likertOptions = [
-  { value: 1, label: "Very Discouraged" },
+const motivationScale = [
+  { value: 1, label: "Very discouraged" },
   { value: 2, label: "Discouraged" },
-  { value: 3, label: "Somewhat Discouraged" },
-  { value: 4, label: "Somewhat Motivated" },
+  { value: 3, label: "Somewhat discouraged" },
+  { value: 4, label: "Somewhat motivated" },
   { value: 5, label: "Motivated" },
-  { value: 6, label: "Very Motivated" },
+  { value: 6, label: "Very motivated" },
 ];
 
 export interface SkillsRankingApplicationMotivationProps {
@@ -57,7 +57,7 @@ const SkillsRankingApplicationMotivation: React.FC<Readonly<SkillsRankingApplica
   }, []);
 
   const selectedOption = useMemo(
-    () => likertOptions.find((option) => option.value === selectedValue),
+    () => motivationScale.find((option) => option.value === selectedValue),
     [selectedValue]
   );
 
@@ -107,47 +107,56 @@ const SkillsRankingApplicationMotivation: React.FC<Readonly<SkillsRankingApplica
           <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
             <FormControl fullWidth component="fieldset" disabled={submitted || !isOnline}>
               <RadioGroup
+                row
                 aria-label="Motivation to apply"
                 name="application-motivation"
                 value={selectedValue?.toString() ?? ""}
                 onChange={handleSelect}
+                sx={{
+                  justifyContent: "space-between",
+                  gap: theme.spacing(1),
+                }}
               >
-                {likertOptions.map((option) => (
+                {motivationScale.map((option) => (
                   <FormControlLabel
                     key={option.value}
                     value={option.value.toString()}
-                    control={<Radio color="primary" size="small" />}
-                    label={
-                      <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center" }}>
-                        <Typography variant="body2" fontWeight={600}>
-                          {option.value}
-                        </Typography>
-                        <Typography variant="body2">{option.label}</Typography>
-                      </Box>
+                    control={
+                      <Radio
+                        color="primary"
+                        sx={{
+                          padding: 0,
+                          "& .MuiSvgIcon-root": {
+                            fontSize: theme.spacing(9),
+                            borderRadius: "50%",
+                            backgroundColor:
+                              selectedValue === option.value
+                                ? theme.palette.primary.light
+                                : theme.palette.common.white,
+                          },
+                        }}
+                        inputProps={{ "aria-label": option.label }}
+                      />
                     }
+                    label=""
                     sx={{
                       margin: 0,
-                      padding: theme.spacing(1.5, 2),
-                      border: `1px solid ${theme.palette.grey[300]}`,
-                      borderRadius: theme.shape.borderRadius,
-                      backgroundColor: theme.palette.common.white,
                       "& .MuiButtonBase-root": {
-                        padding: 0,
-                        marginRight: theme.spacing(1),
-                      },
-                      "& .MuiFormControlLabel-label": {
-                        width: "100%",
-                      },
-                      "&.MuiFormControlLabel-root": {
-                        marginBottom: theme.spacing(1),
-                      },
-                      "& .Mui-checked": {
-                        color: theme.palette.primary.main,
+                        margin: 0,
                       },
                     }}
                   />
                 ))}
               </RadioGroup>
+
+              <Box display="flex" justifyContent="space-between" mt={1}>
+                <Typography variant="body2" color="text.secondary">
+                  {motivationScale[0].label}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {motivationScale[motivationScale.length - 1].label}
+                </Typography>
+              </Box>
             </FormControl>
 
             <Box mt={theme.spacing(2)} textAlign="right">
