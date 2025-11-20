@@ -75,7 +75,7 @@ const Landing: React.FC = () => {
         navigate(routerPaths.CONSENT, { replace: true });
       } else {
         navigate(routerPaths.ROOT, { replace: true });
-        enqueueSnackbar(t("auth.pages.login.welcomeBack"), { variant: "success" });
+        enqueueSnackbar(t("auth.pages.landing.welcome"), { variant: "success" });
       }
     } catch (error: unknown) {
       console.error(new AuthenticationError("An error occurred while trying to get your preferences", error));
@@ -236,7 +236,7 @@ const Landing: React.FC = () => {
         </DialogContent>
       </Dialog>
       <BugReportButton bottomAlign={true} />
-      <Backdrop isShown={isLoading} message={t("auth.pages.login.loggingYouIn")} /> {/* Changed from "Logging you in..." */}
+      <Backdrop isShown={isLoading} message={t("auth.pages.login.loggingYouIn")} />
     </>
   );
 };
