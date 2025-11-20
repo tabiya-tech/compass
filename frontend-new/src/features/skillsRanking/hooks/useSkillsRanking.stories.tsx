@@ -24,6 +24,7 @@ const getPhaseFlowForGroup = (experimentGroup: SkillsRankingExperimentGroups): S
       return [
         SkillsRankingPhase.INITIAL,
         SkillsRankingPhase.BRIEFING,
+        SkillsRankingPhase.PROOF_OF_VALUE_INTRO,
         SkillsRankingPhase.PROOF_OF_VALUE,
         SkillsRankingPhase.PRIOR_BELIEF,
         SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,
@@ -39,6 +40,7 @@ const getPhaseFlowForGroup = (experimentGroup: SkillsRankingExperimentGroups): S
       return [
         SkillsRankingPhase.INITIAL,
         SkillsRankingPhase.BRIEFING,
+        SkillsRankingPhase.PROOF_OF_VALUE_INTRO,
         SkillsRankingPhase.PROOF_OF_VALUE,
         SkillsRankingPhase.PRIOR_BELIEF,
         SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,

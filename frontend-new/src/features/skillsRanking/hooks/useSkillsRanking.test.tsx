@@ -240,6 +240,7 @@ describe("useSkillsRanking", () => {
         const expectedReplayMessageTypeByPhase: Record<SkillsRankingPhase, string> = {
           [SkillsRankingPhase.INITIAL]: "prompt",
           [SkillsRankingPhase.BRIEFING]: "brief",
+          [SkillsRankingPhase.PROOF_OF_VALUE_INTRO]: "effort-intro",
           [SkillsRankingPhase.PROOF_OF_VALUE]: "effort",
           [SkillsRankingPhase.PRIOR_BELIEF]: "prior",
           [SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL]: "prior-for-skill",

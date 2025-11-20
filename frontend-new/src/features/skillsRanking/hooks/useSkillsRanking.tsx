@@ -20,6 +20,7 @@ import {
   createPriorBeliefMessage,
   createPriorBeliefForSkillMessage,
   createPromptMessage,
+  createProofOfValueIntroMessage,
   createRetypedRankMessage,
   shouldSkipMarketDisclosure,
 } from "src/features/skillsRanking/utils/createMessages";
@@ -27,6 +28,7 @@ import {
 const phaseToMessageFactory = {
   [SkillsRankingPhase.INITIAL]: createPromptMessage,
   [SkillsRankingPhase.BRIEFING]: createBriefingMessage,
+  [SkillsRankingPhase.PROOF_OF_VALUE_INTRO]: createProofOfValueIntroMessage,
   [SkillsRankingPhase.PROOF_OF_VALUE]: createEffortMessage,
   [SkillsRankingPhase.PRIOR_BELIEF]: createPriorBeliefMessage,
   [SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL]: createPriorBeliefForSkillMessage,

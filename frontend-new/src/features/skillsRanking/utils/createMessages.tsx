@@ -41,6 +41,10 @@ import SkillsRankingPriorBelief, {
 import SkillsRankingPriorBeliefForSkill, {
   SKILLS_RANKING_PRIOR_BELIEF_FOR_SKIll_MESSAGE_ID, SkillsRankingPriorBeliefForSkillProps,
 } from "src/features/skillsRanking/components/skillsRankingPriorBeliefForSkill/SkillsRankingPriorBeliefForSkill";
+import ProofOfValueIntro, {
+  PROOF_OF_VALUE_INTRO_MESSAGE_ID,
+  ProofOfValueIntroProps,
+} from "src/features/skillsRanking/components/skillsRankingProofOfValueIntro/SkillsRankingProofOfValueIntro";
 
 // Utility function to check if a group should skip market disclosure (and consequently retyped rank)
 export const shouldSkipMarketDisclosure = (experimentGroup: SkillsRankingExperimentGroups): boolean => {
@@ -185,6 +189,20 @@ export const createPriorBeliefForSkillMessage = (
   },
   sender: ConversationMessageSender.COMPASS,
   component: (props: SkillsRankingPriorBeliefForSkillProps) => React.createElement(SkillsRankingPriorBeliefForSkill, props),
+});
+
+export const createProofOfValueIntroMessage = (
+  skillsRankingState: SkillsRankingState,
+  onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>
+): IChatMessage<ProofOfValueIntroProps> => ({
+  message_id: PROOF_OF_VALUE_INTRO_MESSAGE_ID,
+  type: PROOF_OF_VALUE_INTRO_MESSAGE_ID,
+  payload: {
+    skillsRankingState,
+    onFinish,
+  },
+  sender: ConversationMessageSender.COMPASS,
+  component: (props: ProofOfValueIntroProps) => React.createElement(ProofOfValueIntro, props),
 });
 
 export const createCompletionAdviceMessage = (

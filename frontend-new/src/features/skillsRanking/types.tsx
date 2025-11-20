@@ -37,6 +37,7 @@ export function isValidExperimentGroupKey(value: unknown): value is keyof typeof
 export enum SkillsRankingPhase {
   INITIAL = "INITIAL",
   BRIEFING = "BRIEFING",
+  PROOF_OF_VALUE_INTRO = "PROOF_OF_VALUE_INTRO",
   PROOF_OF_VALUE = "PROOF_OF_VALUE",
   PRIOR_BELIEF = "PRIOR_BELIEF",
   PRIOR_BELIEF_FOR_SKILL = "PRIOR_BELIEF_FOR_SKILL",

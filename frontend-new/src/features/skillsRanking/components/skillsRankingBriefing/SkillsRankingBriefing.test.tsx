@@ -74,42 +74,28 @@ describe("SkillsRankingBriefing", () => {
     // WHEN rendering
     render(<SkillsRankingBriefing onFinish={actualOnFinish} skillsRankingState={givenState} />);
 
-    // THEN expect only the first message and no second message yet; no typing container visible since second not shown yet
+    // THEN expect the briefing message to be displayed
     expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTAINER)).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON)).toBeInTheDocument();
 
-    // WHEN click the first Continue button
-    const givenFirstContinueButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_BRIEFING_FIRST_CONTINUE_BUTTON);
+    // WHEN click the Continue button
+    const givenContinueButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON);
     act(() => {
-      givenFirstContinueButton.click();
+      givenContinueButton.click();
     });
     await flush();
 
     // THEN expect the typing to appear
     expect(screen.getByTestId(TYPING_DATA_TEST_ID.TYPING_CHAT_MESSAGE_CONTAINER)).toBeInTheDocument();
-    act(() => {
-      jest.runOnlyPendingTimers();
-    });
-    await flush();
-    // AND the second message to appear
-    const givenSecondContinueButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_BRIEFING_SECOND_CONTINUE_BUTTON);
-    expect(givenSecondContinueButton).toBeInTheDocument();
 
-    // WHEN clicking the second Continue button
-    act(() => {
-      givenSecondContinueButton.click();
-    });
-    await flush();
-
-    // THEN typing should appear
-    expect(screen.getByTestId(TYPING_DATA_TEST_ID.TYPING_CHAT_MESSAGE_CONTAINER)).toBeInTheDocument();
     // WHEN typing duration elapses
     act(() => {
       jest.runOnlyPendingTimers();
     });
     await flush();
 
-    // THEN service called with PROOF_OF_VALUE and onFinish invoked
-    expect(mockUpdate).toHaveBeenCalledWith(givenSessionId, SkillsRankingPhase.PROOF_OF_VALUE);
+    // THEN service called with PROOF_OF_VALUE_INTRO and onFinish invoked
+    expect(mockUpdate).toHaveBeenCalledWith(givenSessionId, SkillsRankingPhase.PROOF_OF_VALUE_INTRO);
     expect(actualOnFinish).toHaveBeenCalled();
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
@@ -135,8 +121,8 @@ describe("SkillsRankingBriefing", () => {
 
     // WHEN rendering and clicking Continue
     render(<SkillsRankingBriefing onFinish={actualOnFinish} skillsRankingState={givenState} />);
-    const givenContinueButtons = screen.getAllByTestId(DATA_TEST_ID.SKILLS_RANKING_BRIEFING_FIRST_CONTINUE_BUTTON);
-    givenContinueButtons[0].click();
+    const givenContinueButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON);
+    givenContinueButton.click();
 
     // THEN error logged and no update/finish
     expect(console.error).toHaveBeenCalled();
@@ -166,7 +152,7 @@ describe("SkillsRankingBriefing", () => {
 
     // WHEN rendering and clicking Continue
     render(<SkillsRankingBriefing onFinish={actualOnFinish} skillsRankingState={givenState} />);
-    const givenContinueButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_BRIEFING_FIRST_CONTINUE_BUTTON);
+    const givenContinueButton = screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON);
     givenContinueButton.click();
 
     // THEN error logged and onFinish not called

@@ -1,18 +1,12 @@
-import React, { useCallback, useContext, useState, useMemo } from "react";
+import React, { useCallback, useContext, useMemo, useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import {
-  SkillsRankingExperimentGroups,
-  SkillsRankingPhase,
-  SkillsRankingState,
-  getLatestPhaseName,
-} from "src/features/skillsRanking/types";
+import { SkillsRankingPhase, SkillsRankingState, getLatestPhaseName } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
@@ -20,13 +14,15 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
-import { getDefaultTypingDurationMs, getJobPlatformUrl } from "src/features/skillsRanking/constants";
+import { getDefaultTypingDurationMs } from "src/features/skillsRanking/constants";
 
-const uniqueId = "0e95404a-2044-4634-a6e8-29cc7b2d754e";
+const uniqueId = "eee627fe-a483-46d8-98e4-3a4eab72920a";
+
+export const PROOF_OF_VALUE_INTRO_MESSAGE_ID = `skills-ranking-proof-of-value-intro-message-${uniqueId}`;
 
 export const DATA_TEST_ID = {
-  SKILLS_RANKING_BRIEFING_CONTAINER: `skills-ranking-briefing-container-${uniqueId}`,
-  SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON: `skills-ranking-briefing-continue-button-${uniqueId}`,
+  PROOF_OF_VALUE_INTRO_CONTAINER: `proof-of-value-intro-container-${uniqueId}`,
+  PROOF_OF_VALUE_INTRO_CONTINUE_BUTTON: `proof-of-value-intro-continue-button-${uniqueId}`,
 };
 
 enum ScrollStep {
@@ -34,85 +30,18 @@ enum ScrollStep {
   TYPING = 1,
 }
 
-const getBriefingMessage = (group: SkillsRankingExperimentGroups): JSX.Element => {
-  const jobPlatform = getJobPlatformUrl();
-
-  switch (group) {
-    case SkillsRankingExperimentGroups.GROUP_1:
-      return (
-        <>
-          If you are interested,{" "}
-          <strong>I can show you information on which skill areas employers ask for on {jobPlatform}.</strong> Here is
-          what I mean with this:
-          <br />
-          <br /> On {jobPlatform}, some skill areas are asked for in many opportunities, and some are asked for in few.
-          I can give you some information on these trends. <br />
-          <br />
-          Calculating this will take some time. When you are ready please click continue. If you are not interested, you
-          will be given a chance to cancel.
-        </>
-      );
-
-    case SkillsRankingExperimentGroups.GROUP_2:
-      return (
-        <>
-          If you are interested,{" "}
-          <strong>
-            I can show you information about which of your skill areas are 'above average' in demand on {jobPlatform}.
-          </strong>{" "}
-          Here is what I mean with this:
-          <br />
-          <br /> On {jobPlatform}, some skill areas are asked for in many opportunities, and some are asked for in few.
-          I calculate the average demand for the skill areas you have. A skill area is 'above average' in demand if it
-          is asked for in more opportunities than the average skill area.
-          <br />
-          <br />
-          Calculating this will take some time. When you are ready please click continue. If you are not interested, you
-          will be given a chance to cancel.
-        </>
-      );
-
-    case SkillsRankingExperimentGroups.GROUP_3:
-      return (
-        <>
-          If you are interested,{" "}
-          <strong>
-            I can show you information about which of your skill areas are 'above average' in demand on {jobPlatform}.
-          </strong>{" "}
-          Here is what I mean with this:
-          <br />
-          <br /> On {jobPlatform}, some skill areas are asked for in many opportunities, and some are asked for in few.
-          I calculate the average demand for the skill areas you have. A skill area is 'below average' in demand if it
-          is asked for in fewer opportunities than the average skill area. It is 'above average' if it is asked for in
-          more opportunities than average.
-          <br />
-          <br />
-          Calculating this will take some time. When you are ready please click continue. If you are not interested, you
-          will be given a chance to cancel.
-        </>
-      );
-
-    default:
-      throw new SkillsRankingError("Invalid experiment group.");
-  }
-};
-
-export const SKILLS_RANKING_BRIEFING_MESSAGE_ID = `skills-ranking-briefing-message-${uniqueId}`;
-
-export interface SkillsRankingBriefingProps {
+export interface ProofOfValueIntroProps {
   onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>;
   skillsRankingState: SkillsRankingState;
 }
 
-const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({ onFinish, skillsRankingState }) => {
+const SkillsRankingProofOfValueIntro: React.FC<Readonly<ProofOfValueIntroProps>> = ({ onFinish, skillsRankingState }) => {
   const theme = useTheme();
-
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
 
   const currentPhase = getLatestPhaseName(skillsRankingState);
-
-  const isReplay = currentPhase !== SkillsRankingPhase.BRIEFING;
+  const isReplay = currentPhase !== SkillsRankingPhase.PROOF_OF_VALUE_INTRO;
 
   const [submitted, setSubmitted] = useState(false);
   const [isTypingVisible, setIsTypingVisible] = useState(false);
@@ -135,13 +64,13 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
       const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
 
       if (!activeSessionId) {
-        console.error(new SkillsRankingError("No session ID."));
+        console.error("No session ID.");
         return;
       }
 
       newSkillsRankingState = await SkillsRankingService.getInstance().updateSkillsRankingState(
         activeSessionId,
-        SkillsRankingPhase.PROOF_OF_VALUE_INTRO
+        SkillsRankingPhase.PROOF_OF_VALUE
       );
     } catch (err) {
       console.error(err);
@@ -163,13 +92,20 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
   return (
     <MessageContainer
       origin={ConversationMessageSender.COMPASS}
-      data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTAINER}
+      data-testid={DATA_TEST_ID.PROOF_OF_VALUE_INTRO_CONTAINER}
       ref={scrollRef}
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
       <Box sx={{ width: "100%" }}>
         <ChatBubble
-          message={getBriefingMessage(skillsRankingState.experiment_group)}
+          message={
+            <>
+              You'll see tilted letters on a few screens. Turn each letter upright using the rotation buttons. You can
+              cancel anytime. In 5% of cases,{" "}
+              <strong>more letters fixed = higher chance of receiving the information.</strong> The rest of the time it
+              depends on me.
+            </>
+          }
           sender={ConversationMessageSender.COMPASS}
         >
           <Box
@@ -181,7 +117,7 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
             <PrimaryButton
               onClick={handleContinue}
               disabled={isReplay || !isOnline || submitted || isTypingVisible}
-              data-testid={DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON}
+              data-testid={DATA_TEST_ID.PROOF_OF_VALUE_INTRO_CONTINUE_BUTTON}
             >
               Continue
             </PrimaryButton>
@@ -197,11 +133,10 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
         </ChatMessageFooterLayout>
       </Box>
 
-      {/* Typing shown after clicking continue */}
       <AnimatePresence mode="wait">
         {isTypingVisible && (
           <motion.div
-            key="final-typing"
+            key="proof-of-value-intro-typing"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -215,4 +150,4 @@ const SkillsRankingBriefing: React.FC<Readonly<SkillsRankingBriefingProps>> = ({
   );
 };
 
-export default SkillsRankingBriefing;
+export default SkillsRankingProofOfValueIntro;
