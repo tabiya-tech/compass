@@ -16,7 +16,6 @@ import { UserPreference } from "src/userPreferences/UserPreferencesService/userP
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { FirebaseError } from "src/error/FirebaseError/firebaseError";
-import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import {
   FirebaseErrorCodes,
   USER_FRIENDLY_FIREBASE_ERROR_MESSAGES,
