@@ -3,7 +3,6 @@ import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { SkillsRankingPhase, SkillsRankingState, getLatestPhaseName } from "src/features/skillsRanking/types";
-import { getCompensationAmount } from "src/features/skillsRanking/constants";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -49,8 +48,6 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
   const currentPhase = getLatestPhaseName(skillsRankingState);
   const isReplay = currentPhase !== SkillsRankingPhase.INITIAL;
 
-  const compensationAmount = getCompensationAmount();
-
   const handleAdvanceState = useCallback(async () => {
     if (isReplay) return;
     const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
@@ -95,7 +92,9 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
       <ChatBubble
         message={
           <>
-            You are almost there! Remember that if you completely finish this conversation with me you will receive <strong>{compensationAmount} Rand in airtime.</strong><br/>
+            You are almost there! Remember that if you completely finish this conversation with me you will receive{" "}
+            <strong>20-30 Rand in airtime.</strong>
+            <br />
             Whether you receive 20 or 30 depends on your responses below, so please read carefully.
           </>
         }

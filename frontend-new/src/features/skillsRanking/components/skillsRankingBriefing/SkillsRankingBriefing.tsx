@@ -77,14 +77,15 @@ const getBriefingMessage = (group: SkillsRankingExperimentGroups): JSX.Element =
         <>
           If you are interested,{" "}
           <strong>
-            I can show you information about which of your skill areas are 'above average' in demand on {jobPlatform}.
-          </strong>{" "}
-          Here is what I mean with this:
+            I can show you information about which of your skill areas are 'below average', and which are 'above average'
+            in demand on {jobPlatform}
+          </strong>
+          . Here is what I mean:
           <br />
-          <br /> On {jobPlatform}, some skill areas are asked for in many opportunities, and some are asked for in few.
-          I calculate the average demand for the skill areas you have. A skill area is 'below average' in demand if it
-          is asked for in fewer opportunities than the average skill area. It is 'above average' if it is asked for in
-          more opportunities than average.
+          <br /> On {jobPlatform}, some skill areas are asked for in many opportunities, and some are asked for in few. I
+          calculate the average demand for the skill areas you have. A skill area is 'below average' in demand if it is
+          asked for in fewer opportunities than the average skill area. It is 'above average' if it is asked for in more
+          opportunities than average.
           <br />
           <br />
           Calculating this will take some time. When you are ready please click continue. If you are not interested, you
