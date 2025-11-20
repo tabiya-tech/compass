@@ -25,8 +25,6 @@ async def get_skills_ranking_state_service(
         user_preferences_repository: IUserPreferenceRepository = Depends(get_user_preferences_repository),
         registration_data_repository: IRegistrationDataRepository = Depends(get_registration_data_repository),
         application_state_manager: IApplicationStateManager = Depends(get_application_state_manager),
-        high_difference_threshold: float = Depends(lambda: get_skills_ranking_config().high_difference_threshold),
-        correct_rotations_threshold_for_group_switch: int = Depends(lambda: get_skills_ranking_config().correct_rotations_threshold_for_group_switch)
 ) -> ISkillsRankingStateService:
     global _skills_ranking_service_singleton
 
@@ -44,12 +42,12 @@ async def get_skills_ranking_state_service(
                     api_key=config.skills_ranking_service_api_key
                 )
                 
-                _skills_ranking_service_singleton = SkillsRankingStateService(repository,
-                                                                              user_preferences_repository,
-                                                                              registration_data_repository,
-                                                                              application_state_manager,
-                                                                              http_client,
-                                                                              high_difference_threshold,
-                                                                              correct_rotations_threshold_for_group_switch)
+                _skills_ranking_service_singleton = SkillsRankingStateService(
+                    repository,
+                    user_preferences_repository,
+                    registration_data_repository,
+                    application_state_manager,
+                    http_client,
+                )
 
     return _skills_ranking_service_singleton

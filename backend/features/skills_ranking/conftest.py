@@ -30,5 +30,4 @@ def setup_skills_ranking_feature_config(in_memory_skills_ranking_state_db: Async
         registration_data_mongodb_uri=f"{in_memory_registration_data_db.client.HOST}:{in_memory_registration_data_db.client.PORT}",
         registration_data_database_name=in_memory_registration_data_db.name,
         registration_data_collection_name=get_random_printable_string(10),
-        high_difference_threshold=0.2,
     ))

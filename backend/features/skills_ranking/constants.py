@@ -7,4 +7,4 @@ see: /frontend-new/src/features/skillsRanking/constants.ts
 """
 SKILLS_RANKING_FEATURE_ID = "4b0c7428-9c01-4688-81fd-d3ef159bce79"
 
-SKILLS_RANKING_EXPERIMENT_ID = "skills_ranking"
+SKILLS_RANKING_EXPERIMENT_ID = "skills_ranking_v2"

@@ -6,17 +6,17 @@ import pytest
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
+from app.app_config import ApplicationConfig, set_application_config, get_application_config
 from app.countries import Country
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.version.types import Version
-from app.app_config import ApplicationConfig, set_application_config, get_application_config
 
 
 @pytest.fixture(scope='session')
 def in_memory_mongo_server():
     """
     Fixture to start an in-memory MongoDB server.
-    As starting and stopping the server is a heavy operation, we use the session scope.
+    As starting and stopping the server is a heavy op eration, we use the session scope.
     This may lead to issues if tests are not properly isolated.
     For that reason it is recommended to, use a different database name for each test (use the random_db_name() function).
     :return:

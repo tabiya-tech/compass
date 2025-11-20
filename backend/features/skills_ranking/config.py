@@ -1,5 +1,5 @@
 import logging
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from features.skills_ranking.state.repositories.default_collections import DefaultCollections as DefaultCollections
 
@@ -52,21 +52,6 @@ class SkillsRankingConfig(BaseModel):
     registration_data_collection_name: str = DefaultCollections.REGISTRATION_DATA
     """
     The registration data collection name.
-    """
-
-    high_difference_threshold: float = Field(gt=0)
-    """
-    Used for calculating if the difference between the self-estimated rank and the actual rank is high.
-    This value is used to determine the high difference between the self-estimated rank and the actual
-    
-    It should be a positive value.
-    """
-
-    correct_rotations_threshold_for_group_switch: int = Field(default=30)
-    """
-    The correct threshold for switching the experiment group.
-    If the user don't finish the above rotations on the frontend, it is more likely for the user not to see the
-    information, but with more than this threshold, they are more likely to see the information.
     """
 
     class Config:
