@@ -879,7 +879,7 @@ describe("Api Service tests", () => {
       // AND enqueueSnackbar should be called with i18n-based log out message
       const i18n = require("src/i18n/i18n").default;
       expect(enqueueSnackbar).toHaveBeenCalledWith(
-        `${i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS.AUTHENTICATION_FAILURE)} ${i18n.t("auth.loggingYouOutNotice")}`,
+        `${i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS.AUTHENTICATION_FAILURE)} ${i18n.t("auth.loggingYouOutNotice")}`,
         {
           autoHideDuration: LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
           variant: "error",
