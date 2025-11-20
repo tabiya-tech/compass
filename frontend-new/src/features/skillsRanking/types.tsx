@@ -76,6 +76,11 @@ export interface SkillsRankingScore {
   calculated_at: string;
 }
 
+export interface ApplicationWillingness {
+  value: number;
+  label: string;
+}
+
 export interface SkillsRankingState {
   session_id: number;
   /**
@@ -139,6 +144,11 @@ export interface SkillsRankingState {
    * Only available for groups that see ranking results.
    */
   retyped_rank_percentile?: number;
+
+  /**
+   * Self-reported motivation to apply to jobs right now (Likert 1-6).
+   */
+  application_willingness?: ApplicationWillingness;
 
   /**
    * The time the skills ranking process started, in ISO format, in UTC.

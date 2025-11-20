@@ -1,4 +1,10 @@
-import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingScore, SkillsRankingState } from "../types";
+import {
+  ApplicationWillingness,
+  SkillsRankingExperimentGroups,
+  SkillsRankingPhase,
+  SkillsRankingScore,
+  SkillsRankingState,
+} from "../types";
 import { getRandomString } from "src/_test_utilities/specialCharacters";
 import { jobSeekerComparisonLabels } from "../components/skillsRankingDisclosure/types";
 
@@ -6,6 +12,8 @@ export const getRandomSkillsRankingState = (
   phase?: SkillsRankingPhase,
   experimentGroup?: SkillsRankingExperimentGroups
 ): SkillsRankingState => {
+  const application_willingness = getRandomApplicationWillingness();
+
   return {
     phases: [
       {
@@ -23,6 +31,7 @@ export const getRandomSkillsRankingState = (
     clicks_count: 0,
     perceived_rank_percentile: Math.random() < 0.5 ? Math.floor(Math.random() * 100) + 1 : undefined, // Random percentile or undefined
     retyped_rank_percentile: Math.random() < 0.5 ? Math.floor(Math.random() * 100) + 1 : undefined, // Random percentile or undefined
+    application_willingness,
     started_at: new Date().toISOString(), // Current time in ISO format
     completed_at: phase === SkillsRankingPhase.COMPLETED ? new Date().toISOString() : undefined, // Set completed_at if phase is COMPLETED
   };
@@ -46,6 +55,22 @@ export const getRandomScore = (): SkillsRankingScore => {
     calculated_at: new Date().toISOString(), // Current time in ISO format
   };
 };
+
+const applicationWillingnessOptions: ApplicationWillingness[] = [
+  { value: 1, label: "Very Discouraged" },
+  { value: 2, label: "Discouraged" },
+  { value: 3, label: "Somewhat Discouraged" },
+  { value: 4, label: "Somewhat Motivated" },
+  { value: 5, label: "Motivated" },
+  { value: 6, label: "Very Motivated" },
+];
+
+function getRandomApplicationWillingness(): ApplicationWillingness | undefined {
+  if (Math.random() < 0.5) {
+    return undefined;
+  }
+  return applicationWillingnessOptions[Math.floor(Math.random() * applicationWillingnessOptions.length)];
+}
 
 export const getRandomComparisonLabel = (): string => {
   return jobSeekerComparisonLabels[Math.floor(Math.random() * jobSeekerComparisonLabels.length)];

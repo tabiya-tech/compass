@@ -141,6 +141,7 @@ export class SkillsRankingService extends FeaturesService {
       clicks_count: data.clicks_count,
       perceived_rank_percentile: data.perceived_rank_percentile,
       retyped_rank_percentile: data.retyped_rank_percentile,
+      application_willingness: data.application_willingness ?? undefined,
       started_at: data.started_at,
       completed_at: data.completed_at,
     };
@@ -213,6 +214,7 @@ export class SkillsRankingService extends FeaturesService {
       clicks_count: data.clicks_count ?? undefined,
       perceived_rank_percentile: data.perceived_rank_percentile ?? undefined,
       retyped_rank_percentile: data.retyped_rank_percentile ?? undefined,
+      application_willingness: data.application_willingness ?? undefined,
       started_at: data.started_at,
       completed_at: data.completed_at ?? undefined,
     };
@@ -261,6 +263,7 @@ export class SkillsRankingService extends FeaturesService {
       clicks_count: data.clicks_count,
       perceived_rank_percentile: data.perceived_rank_percentile,
       retyped_rank_percentile: data.retyped_rank_percentile,
+      application_willingness: data.application_willingness ?? undefined,
       started_at: data.started_at,
       completed_at: data.completed_at,
     };
