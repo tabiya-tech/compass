@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Box, FormControl, FormControlLabel, Radio, RadioGroup, Typography, useTheme } from "@mui/material";
+import { Box, FormControl, Typography, useTheme, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
@@ -61,8 +61,12 @@ const SkillsRankingApplicationMotivation: React.FC<Readonly<SkillsRankingApplica
     [selectedValue]
   );
 
-  const handleSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedValue(Number(event.target.value));
+  const handleSelect = (_event: React.MouseEvent<HTMLElement>, value: number | null) => {
+    if (value === null) {
+      return;
+    }
+
+    setSelectedValue(value);
   };
 
   const handleSubmit = () => {
@@ -105,49 +109,53 @@ const SkillsRankingApplicationMotivation: React.FC<Readonly<SkillsRankingApplica
           }
         >
           <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-            <FormControl fullWidth component="fieldset" disabled={submitted || !isOnline}>
-              <RadioGroup
-                row
+            <FormControl fullWidth component="fieldset">
+              <ToggleButtonGroup
+                value={selectedValue}
+                exclusive
+                fullWidth
                 aria-label="Motivation to apply"
-                name="application-motivation"
-                value={selectedValue?.toString() ?? ""}
                 onChange={handleSelect}
                 sx={{
-                  justifyContent: "space-between",
-                  gap: theme.spacing(1),
+                  borderRadius: theme.shape.borderRadius * 3,
+                  overflow: "hidden",
+                  border: `1px solid ${theme.palette.grey[300]}`,
+                  "& .MuiToggleButton-root": {
+                    flex: 1,
+                    border: "none",
+                    borderRadius: 0,
+                    color: theme.palette.text.primary,
+                    padding: theme.spacing(1, 0),
+                    fontWeight: 500,
+                    fontSize: theme.typography.pxToRem(14),
+                    textTransform: "none",
+                    "&.Mui-selected": {
+                      backgroundColor: theme.palette.primary.main,
+                      color: theme.palette.primary.contrastText,
+                      "&:hover": {
+                        backgroundColor: theme.palette.primary.dark,
+                      },
+                    },
+                    "&:not(.Mui-selected)": {
+                      backgroundColor: theme.palette.common.white,
+                    },
+                  },
+                  "& .MuiToggleButtonGroup-grouped:not(:last-of-type)": {
+                    borderRight: `1px solid ${theme.palette.grey[300]}`,
+                  },
                 }}
               >
                 {motivationScale.map((option) => (
-                  <FormControlLabel
+                  <ToggleButton
                     key={option.value}
-                    value={option.value.toString()}
-                    control={
-                      <Radio
-                        color="primary"
-                        sx={{
-                          padding: 0,
-                          "& .MuiSvgIcon-root": {
-                            fontSize: theme.spacing(9),
-                            borderRadius: "50%",
-                            backgroundColor:
-                              selectedValue === option.value
-                                ? theme.palette.primary.light
-                                : theme.palette.common.white,
-                          },
-                        }}
-                        inputProps={{ "aria-label": option.label }}
-                      />
-                    }
-                    label=""
-                    sx={{
-                      margin: 0,
-                      "& .MuiButtonBase-root": {
-                        margin: 0,
-                      },
-                    }}
-                  />
+                    value={option.value}
+                    disabled={submitted || !isOnline}
+                    aria-label={option.label}
+                  >
+                    {option.value}
+                  </ToggleButton>
                 ))}
-              </RadioGroup>
+              </ToggleButtonGroup>
 
               <Box display="flex" justifyContent="space-between" mt={1}>
                 <Typography variant="body2" color="text.secondary">
