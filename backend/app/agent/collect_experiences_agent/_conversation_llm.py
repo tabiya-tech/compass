@@ -511,11 +511,12 @@ def _transition_instructions(*,
         {language_style}
 
         Once we have explored all work experiences that include '{exploring_type}',
-        or if I have stated that I don't have any more work experiences that include '{exploring_type}',
-        you will respond with a plain <END_OF_WORKTYPE>.
+        or if I have stated (e.g., "no", "none", "that's all") that I don't have any more work experiences that include '{exploring_type}',
+        you will respond immediately with a plain <END_OF_WORKTYPE>.
         /// If I have stated that I don't have any more work experiences that include '{exploring_type}', you will respond with a plain <END_OF_WORKTYPE>.
+        Do not wait for further confirmation once I have clearly indicated there are no more experiences of this type.
         
-        Do not add anything before or after the <END_OF_WORKTYPE> message.
+        Do not add anything before or after the <END_OF_WORKTYPE> message and do not include any other text in that reply.
         ///Review our conversation carefully and ignore any previous statements I may have made about not having more work experiences to share,
         ///specifically those related with types:
         ///    {excluding_experiences}
