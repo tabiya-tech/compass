@@ -72,7 +72,17 @@ const feedbackTranslations = {
   no: "No",
 };
 
-const mockTranslations = { ...enTranslations, ...feedbackTranslations };
+const errorTranslations = {
+  errors: {
+    experienceTitleMaxLength: "Maximum {{max}} characters allowed.",
+    companyMaxLength: "Maximum {{max}} characters allowed.",
+    locationMaxLength: "Maximum {{max}} characters allowed.",
+    summaryMaxLength: "Maximum {{max}} characters allowed.",
+    timelineMaxLength: "Maximum {{max}} characters allowed.",
+  },
+};
+
+const mockTranslations = { ...enTranslations, ...feedbackTranslations, ...errorTranslations };
 
 const stableT = (key: string, options?: any) => {
   const keys = key.split(".");

@@ -494,6 +494,13 @@
           "formalSectorUnpaidTraineeWork": "Estás en un rol de formación o pasantía para adquirir habilidades o experiencia",
           "unseenUnpaid": "Realizas trabajo no remunerado como cuidado, tareas del hogar o voluntariado comunitario",
           "uncategorized": "Compass no pudo categorizar este tipo de trabajo"
+        },
+        "errors": {
+          "experienceTitleMaxLength": "Máximo {{max}} de caracteres permitido.",
+          "companyMaxLength": "Máximo {{max}} de caracteres permitido.",
+          "locationMaxLength": "Máximo {{max}} de caracteres permitido.",
+          "summaryMaxLength": "Máximo {{max}} de caracteres permitido.",
+          "timelineMaxLength": "Máximo {{max}} de caracteres permitido."
         }
       }
     },

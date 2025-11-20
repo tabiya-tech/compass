@@ -500,6 +500,13 @@
           "formalSectorUnpaidTraineeWork": "You're in a training or internship role to gain skills or experience",
           "unseenUnpaid": "You do unpaid work like caregiving, household tasks, or community volunteering",
           "uncategorized": "Compass couldn't categorize this work type"
+        },
+        "errors": {
+          "experienceTitleMaxLength": "Maximum {{max}} characters allowed.",
+          "companyMaxLength": "Maximum {{max}} characters allowed.",
+          "locationMaxLength": "Maximum {{max}} characters allowed.",
+          "summaryMaxLength": "Maximum {{max}} characters allowed.",
+          "timelineMaxLength": "Maximum {{max}} characters allowed."
         }
       }
     },
