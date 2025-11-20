@@ -284,7 +284,8 @@
         "continueAsGuest": "Continuer en tant qu'invité",
         "subtitleBold": "Découvrez tout votre potentiel",
         "subtitleBody": "Découvrez et exprimez vos compétences à travers des conversations naturelles guidées par l'IA. Créez votre profil de compétences et téléchargez un CV pour lancer votre recherche d'emploi. Créez un compte gratuit pour enregistrer vos progrès et revenir sur l'historique de vos conversations.",
-        "invitationCodeValid": "Le code d`invitation est valide"
+        "invitationCodeValid": "Le code d`invitation est valide",
+        "welcome": "Bienvenue !"
       },
       "verifyEmail": {
         "registrationThankYou": "Merci de vous être inscrit sur Compass.",

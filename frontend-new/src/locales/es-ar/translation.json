@@ -284,7 +284,8 @@
         "continueAsGuest": "Continuar como invitado",
         "subtitleBold": "Descubre todo tu potencial",
         "subtitleBody": "Descubre y expresa tus habilidades a través de conversaciones naturales guiadas por IA. Crea tu perfil de habilidades y descarga un CV para impulsar tu búsqueda de empleo. Crea una cuenta gratuita para guardar tu progreso y volver a consultar tu historial de conversaciones.",
-        "invitationCodeValid": "El código de invitación es válido"
+        "invitationCodeValid": "El código de invitación es válido",
+        "welcome": "¡Bienvenido!"
       },
       "verifyEmail": {
         "registrationThankYou": "Gracias por registrarte en Compass.",

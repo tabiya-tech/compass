@@ -284,7 +284,8 @@
         "continueAsGuest": "Continue as Guest",
         "subtitleBold": "Discover your Full Potential",
         "subtitleBody": "Uncover and articulate your skills through natural AI-guided conversations. Build your skill profile and download a CV to kickstart your job search. Create a free account to save your progress and revisit your conversation history.",
-        "invitationCodeValid": "Invitation code is valid"
+        "invitationCodeValid": "Invitation code is valid",
+        "welcome": "Welcome!"
       },
       "verifyEmail": {
         "registrationThankYou": "Thank you for registering to Compass.",
