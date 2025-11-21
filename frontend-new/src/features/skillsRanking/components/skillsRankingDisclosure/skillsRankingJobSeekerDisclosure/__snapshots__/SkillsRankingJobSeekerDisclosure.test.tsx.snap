@@ -19,7 +19,8 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
           class="MuiTypography-root MuiTypography-body1 css-13zm2uq-MuiTypography-root"
           data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
         >
-          Moreover, 
+          Moreover,
+           
           <strong>
             Compared to other 
             x
@@ -38,7 +39,8 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
             3
             ]
           </strong>
-          , which is the 
+          , which is the
+           
           <strong>
             [
             MIDDLE
