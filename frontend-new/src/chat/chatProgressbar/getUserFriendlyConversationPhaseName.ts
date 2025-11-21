@@ -1,14 +1,27 @@
 import { ConversationPhase, CurrentPhase } from "./types";
 import i18n from "src/i18n/i18n";
-// Compute translations at call time so they react to language changes and avoid module-scope resolution.
-export const getUserFriendlyPhaseNames = (): Record<ConversationPhase, string> => ({
-  [ConversationPhase.INITIALIZING]: i18n.t("chat.chatProgressbar.phases.initializing"),
-  [ConversationPhase.INTRO]: i18n.t("chat.chatProgressbar.phases.intro"),
-  [ConversationPhase.COLLECT_EXPERIENCES]: i18n.t("chat.chatProgressbar.phases.collecting"),
-  [ConversationPhase.DIVE_IN]: i18n.t("chat.chatProgressbar.phases.exploring"),
-  [ConversationPhase.ENDED]: i18n.t("chat.chatProgressbar.phases.finished"),
-  [ConversationPhase.UNKNOWN]: i18n.t("chat.chatProgressbar.phases.unknown"),
-});
+
+// Use a Proxy to create a getter pattern that fetches translations on-demand.
+// This ensures that if the user changes the language, translations are always up-to-date.
+const getUserFriendlyPhaseNames = (): Record<ConversationPhase, string> => {
+  return new Proxy({} as Record<ConversationPhase, string>, {
+    get(target, prop: string | symbol) {
+      if (typeof prop !== 'string') return undefined;
+
+      const phase = prop as ConversationPhase;
+      const translationMap: Record<ConversationPhase, string> = {
+        [ConversationPhase.INITIALIZING]: "chat.chatProgressbar.phases.initializing",
+        [ConversationPhase.INTRO]: "chat.chatProgressbar.phases.intro",
+        [ConversationPhase.COLLECT_EXPERIENCES]: "chat.chatProgressbar.phases.collecting",
+        [ConversationPhase.DIVE_IN]: "chat.chatProgressbar.phases.exploring",
+        [ConversationPhase.ENDED]: "chat.chatProgressbar.phases.finished",
+        [ConversationPhase.UNKNOWN]: "chat.chatProgressbar.phases.unknown",
+      };
+
+      return i18n.t(translationMap[phase] || translationMap[ConversationPhase.UNKNOWN]);
+    }
+  });
+};
 
 /**
  * Get a user-friendly name for the conversation phase

@@ -252,8 +252,9 @@ describe("ChatHeader", () => {
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
       await userEvent.click(userButton);
 
-      // THEN expect the context menu to be visible
-      expect(screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU)).toBeInTheDocument();
+      // THEN expect the context menus to be visible (language selector + user menu)
+      const contextMenus = screen.getAllByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
+      expect(contextMenus.length).toBeGreaterThanOrEqual(2);
       // AND the context menu to be open and anchored to the user button
       await waitFor(() => {
         expect(ContextMenu).toHaveBeenCalledWith(
@@ -687,8 +688,10 @@ describe("ChatHeader", () => {
           );
         });
         // AND the context menu to contain the correct menu items
-        const contextMenu = screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
-        expect(contextMenu).toBeInTheDocument();
+        const contextMenus = screen.getAllByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
+        // User menu is the second context menu (index 1), language menu is the first (index 0)
+        const userContextMenu = contextMenus[1];
+        expect(userContextMenu).toBeInTheDocument();
         expect(screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION)).toBeInTheDocument();
         expect(screen.getByTestId(MENU_ITEM_ID.SETTINGS_SELECTOR)).toBeInTheDocument();
         expect(screen.getByTestId(MENU_ITEM_ID.LOGOUT_BUTTON)).toBeInTheDocument();
