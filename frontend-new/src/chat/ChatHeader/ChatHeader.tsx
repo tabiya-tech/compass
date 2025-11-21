@@ -25,6 +25,7 @@ import MetricsService from "src/metrics/metricsService";
 import { EventType } from "src/metrics/types";
 import { MetricsError } from "src/error/commonErrors";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
+import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
@@ -165,7 +166,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     } catch (error) {
       console.error("Error creating feedback form:", error);
     }
-  }, [sentryEnabled,t]);
+  }, [sentryEnabled, t]);
 
   // Show notification after 30 minutes if conversation is not completed
   useEffect(() => {
@@ -258,47 +259,47 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
       },
       ...(sentryEnabled
         ? [
-            {
-              id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
-              text: t("feedback.bugReport.reportBug").toLowerCase(),
-              disabled: !isOnline,
-              action: () => {
-                const feedback = Sentry.getFeedback();
-                if (feedback) {
-                  feedback.createForm({
-                      formTitle: t("chat.chatHeader.giveGeneralFeedback"),           // "Dar comentarios generales"
-                      nameLabel: t("chat.chatHeader.nameLabel"),                     // "Name"
-                      namePlaceholder: t("chat.chatHeader.namePlaceholder"),         // "Your Name"
-                      emailLabel: t("chat.chatHeader.emailLabel"),                   // "Email"
-                      emailPlaceholder: t("chat.chatHeader.emailPlaceholder"),       // "your.email@example.org"
-                      isRequiredLabel: t("chat.chatHeader.requiredLabel"),
-                      messageLabel: t("chat.chatHeader.descriptionLabel"),           // "Description (required)"
-                      messagePlaceholder: t("chat.chatHeader.feedbackMessagePlaceholder"), // "¡Nos encantaría conocer tu opinión!... "
-                      addScreenshotButtonLabel: t("chat.chatHeader.addScreenshot"),     // "Add a screenshot"
-                      submitButtonLabel: t("chat.chatHeader.sendFeedback"),          // "Enviar comentarios"
-                      cancelButtonLabel: t("chat.chatHeader.cancelButton"),          // "Cancel"
-                      successMessageText: t("chat.chatHeader.feedbackSuccessMessage") // Success message after submission
+          {
+            id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
+            text: t("feedback.bugReport.reportBug").toLowerCase(),
+            disabled: !isOnline,
+            action: () => {
+              const feedback = Sentry.getFeedback();
+              if (feedback) {
+                feedback.createForm({
+                  formTitle: t("chat.chatHeader.giveGeneralFeedback"),           // "Dar comentarios generales"
+                  nameLabel: t("chat.chatHeader.nameLabel"),                     // "Name"
+                  namePlaceholder: t("chat.chatHeader.namePlaceholder"),         // "Your Name"
+                  emailLabel: t("chat.chatHeader.emailLabel"),                   // "Email"
+                  emailPlaceholder: t("chat.chatHeader.emailPlaceholder"),       // "your.email@example.org"
+                  isRequiredLabel: t("chat.chatHeader.requiredLabel"),
+                  messageLabel: t("chat.chatHeader.descriptionLabel"),           // "Description (required)"
+                  messagePlaceholder: t("chat.chatHeader.feedbackMessagePlaceholder"), // "¡Nos encantaría conocer tu opinión!... "
+                  addScreenshotButtonLabel: t("chat.chatHeader.addScreenshot"),     // "Add a screenshot"
+                  submitButtonLabel: t("chat.chatHeader.sendFeedback"),          // "Enviar comentarios"
+                  cancelButtonLabel: t("chat.chatHeader.cancelButton"),          // "Cancel"
+                  successMessageText: t("chat.chatHeader.feedbackSuccessMessage") // Success message after submission
 
-                  }).then((form) => {
-                    if (form) {
-                      form.appendToDom();
-                      form.open(); // shows the feedback form
-                    }
-                  });
-                }
-              },
+                }).then((form) => {
+                  if (form) {
+                    form.appendToDom();
+                    form.open(); // shows the feedback form
+                  }
+                });
+              }
             },
-          ]
+          },
+        ]
         : []),
       ...(isAnonymous
         ? [
-            {
-              id: MENU_ITEM_ID.REGISTER,
-              text: t("common.buttons.register").toLowerCase(),
-              disabled: !isOnline,
-              action: () => setShowConversionDialog(true),
-            },
-          ]
+          {
+            id: MENU_ITEM_ID.REGISTER,
+            text: t("common.buttons.register").toLowerCase(),
+            disabled: !isOnline,
+            action: () => setShowConversionDialog(true),
+          },
+        ]
         : []),
       {
         id: MENU_ITEM_ID.LOGOUT_BUTTON,
@@ -307,7 +308,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         action: handleLogout,
       },
     ],
-    [isAnonymous, isOnline, startNewConversation, sentryEnabled, handleLogout,t]
+    [isAnonymous, isOnline, startNewConversation, sentryEnabled, handleLogout, t]
   );
 
   return (
@@ -363,6 +364,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
             <FeedbackOutlinedIcon data-testid={DATA_TEST_ID.CHAT_HEADER_ICON_FEEDBACK} />
           </PrimaryIconButton>
         )}
+        <LanguageContextMenu removeMargin={true} />
         <PrimaryIconButton
           sx={{
             color: theme.palette.common.black,
@@ -397,9 +399,9 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         onCancel={handleConfirmLogout}
         onDismiss={() => setShowLogoutConfirmation(false)}
         onConfirm={handleRegister}
-    title={t("chat.chatHeader.beforeYouGo")}
-    confirmButtonText={t("common.buttons.register")}
-    cancelButtonText={t("common.buttons.logout")}
+        title={t("chat.chatHeader.beforeYouGo")}
+        confirmButtonText={t("common.buttons.register")}
+        cancelButtonText={t("common.buttons.logout")}
         showCloseIcon={true}
         textParagraphs={[
           {
