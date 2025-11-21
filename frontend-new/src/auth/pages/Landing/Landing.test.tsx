@@ -16,10 +16,6 @@ import { UserPreference } from "src/userPreferences/UserPreferencesService/userP
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { FirebaseError } from "src/error/FirebaseError/firebaseError";
-import {
-  FirebaseErrorCodes,
-  USER_FRIENDLY_FIREBASE_ERROR_I18N_KEYS,
-} from "src/error/FirebaseError/firebaseError.constants";
 
 const DATA_VALIDATION_ERROR=
       "There seems to be an issue with your request. " +
