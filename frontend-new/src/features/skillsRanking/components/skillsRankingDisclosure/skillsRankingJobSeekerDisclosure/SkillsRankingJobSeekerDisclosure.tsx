@@ -17,7 +17,6 @@ import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/compone
 import { getDefaultTypingDurationMs, getJobPlatformUrl } from "src/features/skillsRanking/constants";
 import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
-
 const uniqueId = "9b0dbc80-c786-4c24-ba9d-04b6946fa0b9";
 export const DATA_TEST_ID = {
   SKILLS_RANKING_JOB_SEEKER_DISCLOSURE_CONTAINER: `skills-ranking-job-seeker-disclosure-container-${uniqueId}`,
@@ -89,16 +88,20 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
 
     return () => clearTimeout(timer);
   }, [isReplay, hasFinished, handleContinue]);
-  const isGroupUndisclosed = useMemo(() => shouldSkipMarketDisclosure(skillsRankingState.experiment_group), [skillsRankingState.experiment_group]);
+  const isGroupUndisclosed = useMemo(
+    () => shouldSkipMarketDisclosure(skillsRankingState.experiment_group),
+    [skillsRankingState.experiment_group]
+  );
 
   const renderGroupMessage = () => {
-   if (isGroupUndisclosed) {
+    if (isGroupUndisclosed) {
       return (
         <ChatBubble
           sender={ConversationMessageSender.COMPASS}
           message={
             <>
-              Thanks! We’re double-checking the latest {getJobPlatformUrl()} opportunities so the numbers are accurate. We’ll share your results soon or you can ask for them when we call you for the phone survey.
+              Thanks! We’re double-checking the latest {getJobPlatformUrl()} opportunities so the numbers are accurate.
+              We’ll share your results soon or you can ask for them when we call you for the phone survey.
             </>
           }
         />
@@ -110,8 +113,17 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
         sender={ConversationMessageSender.COMPASS}
         message={
           <>
-            Moreover, <strong>Compared to other {getJobPlatformUrl()} users, you are in group [{jobSeekerComparisonLabels.indexOf(selectedLabel) + 1}] of {jobSeekerComparisonLabels.length}.</strong><br/>
-            Imagine lining up 100 {getJobPlatformUrl()} users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You’re in block <strong>[{jobSeekerComparisonLabels.indexOf(selectedLabel) + 1}]</strong>, which is the <strong>[{selectedLabel}]</strong> block.<br/>
+            Moreover,{" "}
+            <strong>
+              Compared to other {getJobPlatformUrl()} users, you are in group [
+              {jobSeekerComparisonLabels.indexOf(selectedLabel) + 1}] of {jobSeekerComparisonLabels.length}.
+            </strong>
+            <br />
+            Imagine lining up 100 {getJobPlatformUrl()} users from the fewest to the most jobs they fit. We cut the line
+            into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest.
+            You’re in block <strong>[{jobSeekerComparisonLabels.indexOf(selectedLabel) + 1}]</strong>, which is the{" "}
+            <strong>[{selectedLabel}]</strong> block.
+            <br />
           </>
         }
       >

@@ -116,7 +116,8 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
         <ChatBubble
           message={
             <>
-              You meet the key skills for <strong>{skillsRankingState.score.jobs_matching_rank}%</strong> of opportunities advertised on {getJobPlatformUrl()}. That’s a solid range of options!
+              You meet the key skills for <strong>{skillsRankingState.score.jobs_matching_rank}%</strong> of
+              opportunities advertised on {getJobPlatformUrl()}. That’s a solid range of options!
             </>
           }
           sender={ConversationMessageSender.COMPASS}
