@@ -29,7 +29,12 @@ export const MENU_ITEM_TEXT = {
   FRENCH: `French`,
 };
 
-const LanguageContextMenu = () => {
+export type LanguageContextMenuProps = {
+  /** If true, removes the margin from the button to allow consistent spacing in different contexts */
+  removeMargin?: boolean;
+};
+
+const LanguageContextMenu: React.FC<LanguageContextMenuProps> = ({ removeMargin = false }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
 
@@ -58,7 +63,7 @@ const LanguageContextMenu = () => {
       disabled: !supportedLanguages.includes("en-gb"),
       action: () => changeLanguage("en-gb"),
     },
-     {
+    {
       id: MENU_ITEM_ID.AUTH_ENGLISH_SELECTOR + "-ar",
       text: MENU_ITEM_TEXT.ENGLISH,
       disabled: !supportedLanguages.includes("en-us"),
@@ -102,7 +107,7 @@ const LanguageContextMenu = () => {
           color: theme.palette.common.black,
           alignSelf: "flex-start",
           justifySelf: "flex-end",
-          margin: theme.tabiyaSpacing.lg,
+          margin: removeMargin ? 0 : theme.tabiyaSpacing.lg,
         }}
         onClick={(event) => setAnchorEl(event.currentTarget)}
         data-testid={DATA_TEST_ID.AUTH_LANGUAGE_SELECTOR_BUTTON}

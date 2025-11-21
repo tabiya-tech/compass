@@ -18,7 +18,7 @@ import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { FirebaseError } from "src/error/FirebaseError/firebaseError";
 import {
   FirebaseErrorCodes,
-  USER_FRIENDLY_FIREBASE_ERROR_MESSAGES,
+  USER_FRIENDLY_FIREBASE_ERROR_I18N_KEYS,
 } from "src/error/FirebaseError/firebaseError.constants";
 
 const DATA_VALIDATION_ERROR=
@@ -315,7 +315,7 @@ describe("Landing Page", () => {
 
       // AND the error message to be shown
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        `Failed to login: ${USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR]}`,
+        `Failed to login: An internal error has occurred.`,
         { variant: "error" }
       );
     });
