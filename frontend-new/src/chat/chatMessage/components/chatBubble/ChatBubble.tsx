@@ -34,11 +34,19 @@ const MessageBubble = styled(Box)<{ origin: ConversationMessageSender }>(({ them
 }));
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({ message, sender, children }) => {
+  const isStringMessage = typeof message === "string";
+  
   return (
     <MessageBubble origin={sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER}>
-      <Typography whiteSpace="pre-line" data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT}>
-        {message}
-      </Typography>
+      {isStringMessage ? (
+        <Typography whiteSpace="pre-line" data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT}>
+          {message}
+        </Typography>
+      ) : (
+        <Box data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT} sx={{ whiteSpace: "pre-line", color: "inherit" }}>
+          {message}
+        </Box>
+      )}
       <Box data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_FOOTER_CONTAINER}>{children}</Box>
     </MessageBubble>
   );

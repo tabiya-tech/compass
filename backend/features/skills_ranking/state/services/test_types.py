@@ -2,9 +2,9 @@ import datetime
 from typing import AsyncIterator
 
 from app.application_state import IApplicationStateManager, ApplicationState
-from common_libs.test_utilities import get_random_session_id
-from features.skills_ranking.services.skills_ranking_service import SkillsRankingService
 from app.store.database_application_state_store_test import get_test_application_state
+from common_libs.test_utilities import get_random_session_id, get_random_printable_string
+from features.skills_ranking.services.skills_ranking_service import SkillsRankingService
 from features.skills_ranking.state.repositories.types import IRegistrationDataRepository
 from features.skills_ranking.types import SkillsRankingScore, PriorBeliefs
 
@@ -21,10 +21,17 @@ def get_test_http_client():
                                           participants_skills_uuids: set[str],
                                           taxonomy_model_id: str):
             return SkillsRankingScore(
-                comparison_rank=0,
-                jobs_matching_rank=0,
-                comparison_label="",
-                calculated_at=datetime.datetime.now()
+                calculated_at=datetime.datetime.now(),
+                above_average_labels=[get_random_printable_string(8)],
+                below_average_labels=[get_random_printable_string(8)],
+                most_demanded_label=get_random_printable_string(8),
+                most_demanded_percent=60.0,
+                least_demanded_label=get_random_printable_string(8),
+                least_demanded_percent=10.0,
+                average_percent_for_jobseeker_skill_groups=45.0,
+                average_count_for_jobseeker_skill_groups=300.0,
+                province_used=get_random_printable_string(8),
+                matched_skill_groups=5,
             )
 
     return TestHttpClient()
@@ -55,7 +62,7 @@ def get_test_registration_data_repository():
     class TestRegistrationDataRepository(IRegistrationDataRepository):
         async def get_prior_beliefs(self, user_id: str) -> PriorBeliefs:
             return PriorBeliefs(
-                external_user_id="given-external-user-id",
+                external_user_id=get_random_printable_string(10),
                 opportunity_rank_prior_belief=0.0,
                 compare_to_others_prior_belief=0.0
             )

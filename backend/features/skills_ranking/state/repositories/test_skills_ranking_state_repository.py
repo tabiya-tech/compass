@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import pytest
 
 from common_libs.test_utilities import get_random_session_id
-from common_libs.time_utilities import get_now, convert_python_datetime_to_mongo_datetime
+from common_libs.time_utilities import get_now
 from features.skills_ranking.state._test_utilities import get_skills_ranking_state
 from features.skills_ranking.state.repositories.skills_ranking_state_repository import SkillsRankingStateRepository
 from features.skills_ranking.state.services.type import (SkillsRankingState, SkillRankingExperimentGroup,
@@ -72,43 +72,6 @@ class TestSkillsRankingRepository:
             with pytest.raises(Exception):
                 await repository.get_by_session_id(1)
 
-        @pytest.mark.asyncio
-        async def test_get_by_session_id_backward_compatibility_old_format(self, in_memory_skills_ranking_state_db):
-            # GIVEN a repository and a collection name
-            given_collection_name = "skills_ranking_state"
-            repository = SkillsRankingStateRepository(in_memory_skills_ranking_state_db, given_collection_name)
-
-            # AND a state in the database with old enum format (GROUP_1 instead of the full value)
-            collection = repository._collection
-
-            # Insert document with old format
-            old_format_doc = {
-                "session_id": 1,
-                "experiment_group": "GROUP_1",  # Old format
-                "phase": [
-                    {
-                        "name": "INITIAL",
-                        "time": convert_python_datetime_to_mongo_datetime(get_now())
-                    }
-                ],
-                "score": {
-                    "calculated_at": convert_python_datetime_to_mongo_datetime(get_now()),
-                    "jobs_matching_rank": 0.0,
-                    "comparison_rank": 0.0,
-                    "comparison_label": "LOWEST"
-                },
-                "started_at": convert_python_datetime_to_mongo_datetime(get_now())
-            }
-            await collection.insert_one(old_format_doc)
-
-            # WHEN getting the state
-            state = await repository.get_by_session_id(1)
-
-            # THEN the state is returned and converted to new format
-            assert state is not None
-            assert state.session_id == 1
-            assert state.experiment_group == SkillRankingExperimentGroup.GROUP_1
-            assert state.experiment_group.name == "GROUP_1"
 
     class TestCreate:
         """
@@ -158,15 +121,18 @@ class TestSkillsRankingRepository:
             "given_updates",
             [
                 {"phase": "BRIEFING"},
-                {"cancelled_after": "1000.0ms"},
-                {"perceived_rank_percentile": 50.0},
-                {"retyped_rank_percentile": 75.0},
+                {"metadata": {"cancelled_after": "1000.0ms"}},
+                {"user_responses": {"perceived_rank_percentile": 50.0}},
+                {"user_responses": {"perceived_rank_for_skill_percentile": 75.0}},
                 {"completed_at": fixed_time},
                 {
                     "phase": "COMPLETED",
-                    "cancelled_after": "1000.0ms",
+                    "metadata": {"cancelled_after": "1000.0ms"},
+                    "user_responses": {
                     "perceived_rank_percentile": 50.0,
-                    "retyped_rank_percentile": 75.0,
+                        "perceived_rank_for_skill_percentile": 75.0,
+                        "application_willingness": {"value": 4, "label": "Likely"}
+                    },
                     "completed_at": fixed_time
                 }
             ],
@@ -174,13 +140,12 @@ class TestSkillsRankingRepository:
                 "update_phase",
                 "update_cancelled_after",
                 "update_perceived_rank",
-                "update_retyped_rank",
+                "update_perceived_rank_for_skill",
                 "update_completed_at",
                 "update_all_fields"
             ]
         )
         async def test_update_success(self, in_memory_skills_ranking_state_db, mocker, given_updates: dict):
-            # GIVEN a repository and a collection_name
             given_collection_name = "skills_ranking_state"
             repository = SkillsRankingStateRepository(in_memory_skills_ranking_state_db, given_collection_name)
 
@@ -188,40 +153,40 @@ class TestSkillsRankingRepository:
             mocker.patch('common_libs.time_utilities._time_utils.datetime',
                          new=mocker.Mock(now=lambda tz=None: fixed_time))
 
-            # AND an existing state
             given_state = get_skills_ranking_state()
             await repository.create(given_state)
 
-            # AND new values to update with
-            # WHEN updating the state with the given updates
             update_request = UpdateSkillsRankingRequest(**given_updates)
             await repository.update(
                 session_id=given_state.session_id,
                 update_request=update_request
             )
 
-            # THEN the state is updated in the database
             collection = repository._collection
             assert await collection.count_documents({}) == 1
 
-            # AND the state data matches what we expect
             actual_stored_state = await collection.find_one({})
-            expected_state = given_state
+            expected_state = given_state.model_copy(deep=True)
 
-            # Handle phase updates specially since it's a list
             if "phase" in given_updates:
-                expected_state = expected_state.model_copy()
                 expected_state.phase.append(SkillsRankingPhase(
                     name=given_updates["phase"],
                     time=get_now()
                 ))
-            else:
-                expected_state = expected_state.model_copy(update=given_updates)
 
-            # For the all_fields test, we need to handle both phase and other fields
-            if "phase" in given_updates and len(given_updates) > 1:
-                other_updates = {k: v for k, v in given_updates.items() if k != "phase"}
-                expected_state = expected_state.model_copy(update=other_updates)
+            if "metadata" in given_updates:
+                for key, value in given_updates["metadata"].items():
+                    setattr(expected_state.metadata, key, value)
+
+            if "user_responses" in given_updates:
+                for key, value in given_updates["user_responses"].items():
+                    if key == "application_willingness" and isinstance(value, dict):
+                        from features.skills_ranking.state.services.type import ApplicationWillingness
+                        value = ApplicationWillingness(**value)
+                    setattr(expected_state.user_responses, key, value)
+
+            if "completed_at" in given_updates:
+                expected_state.metadata.completed_at = given_updates["completed_at"]
 
             _assert_skills_ranking_state_fields_match(expected_state, actual_stored_state)
 
@@ -275,21 +240,19 @@ class TestSkillsRankingRepository:
             given_state = get_skills_ranking_state(experiment_group=SkillRankingExperimentGroup.GROUP_1)
             await repository.create(given_state)
 
-            # WHEN updating the experiment group to GROUP_2
-            update_request = UpdateSkillsRankingRequest(experiment_group=SkillRankingExperimentGroup.GROUP_2)
+            update_request = UpdateSkillsRankingRequest(metadata={"experiment_group": SkillRankingExperimentGroup.GROUP_2})
             updated_state = await repository.update(
                 session_id=given_state.session_id,
                 update_request=update_request
             )
 
-            # THEN the state is returned with the updated experiment group
             assert updated_state is not None
-            assert updated_state.experiment_group == SkillRankingExperimentGroup.GROUP_2
+            assert updated_state.metadata.experiment_group == SkillRankingExperimentGroup.GROUP_2
 
             # AND the state is updated in the database
             collection = repository._collection
             actual_stored_state = await collection.find_one({})
-            assert actual_stored_state["experiment_group"] == "GROUP_2"
+            assert actual_stored_state["metadata"]["experiment_group"] == "GROUP_2"
 
         @pytest.mark.asyncio
         async def test_update_phase_and_experiment_group_together(self, in_memory_skills_ranking_state_db):
@@ -301,24 +264,22 @@ class TestSkillsRankingRepository:
             given_state = get_skills_ranking_state(experiment_group=SkillRankingExperimentGroup.GROUP_1)
             await repository.create(given_state)
 
-            # WHEN updating both phase and experiment group
             update_request = UpdateSkillsRankingRequest(
-                phase="MARKET_DISCLOSURE",
-                experiment_group=SkillRankingExperimentGroup.GROUP_3
+                phase="DISCLOSURE",
+                metadata={"experiment_group": SkillRankingExperimentGroup.GROUP_3}
             )
             updated_state = await repository.update(
                 session_id=given_state.session_id,
                 update_request=update_request
             )
 
-            # THEN the state is returned with both updates
             assert updated_state is not None
-            assert updated_state.experiment_group == SkillRankingExperimentGroup.GROUP_3
-            assert updated_state.phase[-1].name == "MARKET_DISCLOSURE"
+            assert updated_state.metadata.experiment_group == SkillRankingExperimentGroup.GROUP_3
+            assert updated_state.phase[-1].name == "DISCLOSURE"
 
             # AND the state is updated in the database
             collection = repository._collection
             actual_stored_state = await collection.find_one({})
-            assert actual_stored_state["experiment_group"] == "GROUP_3"
-            assert len(actual_stored_state["phase"]) == 2  # Original + new phase
-            assert actual_stored_state["phase"][-1]["name"] == "MARKET_DISCLOSURE"
+            assert actual_stored_state["metadata"]["experiment_group"] == "GROUP_3"
+            assert len(actual_stored_state["phase"]) == 2
+            assert actual_stored_state["phase"][-1]["name"] == "DISCLOSURE"

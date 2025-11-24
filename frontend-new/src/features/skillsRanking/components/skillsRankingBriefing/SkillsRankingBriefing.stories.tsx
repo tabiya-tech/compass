@@ -66,51 +66,40 @@ const BaseArgs = {
   },
   skillsRankingState: (() => {
     const base = getRandomSkillsRankingState();
-    base.phases = createPhaseArray(SkillsRankingPhase.BRIEFING);
+    base.phase = createPhaseArray(SkillsRankingPhase.BRIEFING);
     return base;
   })(),
 };
 
-// GROUP 1: TIME_BASED
-export const Group1_TimeBased: Story = {
+// GROUP 1: NO_DISCLOSURE
+export const Group1_NoDisclosure: Story = {
   args: {
     ...BaseArgs,
     skillsRankingState: {
       ...BaseArgs.skillsRankingState,
-      experiment_group: SkillsRankingExperimentGroups.GROUP_1,
+      metadata: { ...BaseArgs.skillsRankingState.metadata, experiment_group: SkillsRankingExperimentGroups.GROUP_1 },
     },
   },
 };
 
-// GROUP 2: WORK_BASED
-export const Group2_WorkBased: Story = {
+// GROUP 2: MOST_DEMANDED_ONLY
+export const Group2_MostDemandedOnly: Story = {
   args: {
     ...BaseArgs,
     skillsRankingState: {
       ...BaseArgs.skillsRankingState,
-      experiment_group: SkillsRankingExperimentGroups.GROUP_2,
+      metadata: { ...BaseArgs.skillsRankingState.metadata, experiment_group: SkillsRankingExperimentGroups.GROUP_2 },
     },
   },
 };
 
-// GROUP 3: WORK_BASED
-export const Group3_WorkBased: Story = {
+// GROUP 3: MOST_AND_LEAST_DEMANDED
+export const Group3_MostAndLeastDemanded: Story = {
   args: {
     ...BaseArgs,
     skillsRankingState: {
       ...BaseArgs.skillsRankingState,
-      experiment_group: SkillsRankingExperimentGroups.GROUP_3,
-    },
-  },
-};
-
-// GROUP 4: TIME_BASED
-export const Group4_TimeBased: Story = {
-  args: {
-    ...BaseArgs,
-    skillsRankingState: {
-      ...BaseArgs.skillsRankingState,
-      experiment_group: SkillsRankingExperimentGroups.GROUP_4,
+      metadata: { ...BaseArgs.skillsRankingState.metadata, experiment_group: SkillsRankingExperimentGroups.GROUP_3 },
     },
   },
 };

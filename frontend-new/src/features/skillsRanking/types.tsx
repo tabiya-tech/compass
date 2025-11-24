@@ -2,47 +2,22 @@ import { FeatureConfig } from "src/features/featuresService/FeaturesService";
 
 export enum SkillsRankingExperimentGroups {
   /**
-   * Group 1: High Difference/Greater
-   * - time based effort task
-   * - see ranking results.
-   * - confirm they've seen the ranking results
+   * Group 1: Control
+   * - Opportunity skill requirements are shown before disclosure.
    */
-  GROUP_1 = "Group 1: High Difference/Greater",
+  GROUP_1 = "Group 1: Control",
   /**
-   * Group 2: High Difference/Smaller
-   * - work based effort task
-   *
-   *  Note: original: not see ranking results.
-   *
-   *  95%
-   *    not see ranking results.
-   *  5%
-   *    if solved _30_ characters:-
-   *       - see the result
-   *    else:
-   *      - not see the result
+   * Group 2: Treatment A
+   * - Participants see disclosure before application willingness questions.
+   * - Participants see only above average skills ranking results in disclosure
    */
-  GROUP_2 = "Group 2: High Difference/Smaller",
+  GROUP_2 = "Group 2: Treatment A",
   /**
-   * Group 3: Underconfidence/Yes
-   * - work based effort task
-   *
-   * Note: original: see ranking results.
-   *  95%
-   *    see ranking results.
-   *  5%
-   *    if solved _30_ characters:-
-   *       - see the result
-   *    else:
-   *      - not see the result
+   * Group 3: Treatment B
+   * - Same flow as Group 2 but may differ in messaging/experience.
+   * - Participants see both above and below average skills ranking results in disclosure
    */
-  GROUP_3 = "Group 3: Underconfidence/Yes",
-  /**
-   * Group 4: Underconfidence/No
-   * - time based effort task
-   * - not see ranking results.
-   */
-  GROUP_4 = "Group 4: Underconfidence/No",
+  GROUP_3 = "Group 3: Treatment B",
 }
 
 /**
@@ -57,11 +32,16 @@ export function isValidExperimentGroupKey(value: unknown): value is keyof typeof
 export enum SkillsRankingPhase {
   INITIAL = "INITIAL",
   BRIEFING = "BRIEFING",
+  PROOF_OF_VALUE_INTRO = "PROOF_OF_VALUE_INTRO",
   PROOF_OF_VALUE = "PROOF_OF_VALUE",
-  MARKET_DISCLOSURE = "MARKET_DISCLOSURE",
-  JOB_SEEKER_DISCLOSURE = "JOB_SEEKER_DISCLOSURE",
+  PRIOR_BELIEF = "PRIOR_BELIEF",
+  PRIOR_BELIEF_FOR_SKILL = "PRIOR_BELIEF_FOR_SKILL",
+  DISCLOSURE = "DISCLOSURE",
+  APPLICATION_WILLINGNESS = "APPLICATION_WILLINGNESS",
+  APPLICATION_24H = "APPLICATION_24H",
   PERCEIVED_RANK = "PERCEIVED_RANK",
-  RETYPED_RANK = "RETYPED_RANK",
+  PERCEIVED_RANK_FOR_SKILL = "PERCEIVED_RANK_FOR_SKILL",
+  OPPORTUNITY_SKILL_REQUIREMENT = "OPPORTUNITY_SKILL_REQUIREMENT",
   COMPLETED = "COMPLETED",
 }
 
@@ -72,20 +52,54 @@ export interface SkillsRankingPhaseWithTime {
 
 export interface SkillsRankingScore {
   /**
-   * The rank of the user as compared to the job market.
+   * Skill group labels where the participant outperforms the job market average.
    */
-
-  jobs_matching_rank: number;
-
-  /**
-   * The rank of the user as compared to other job seekers.
-   */
-  comparison_rank: number;
+  above_average_labels: string[];
 
   /**
-   * The label of the comparison rank, LOWEST, SECOND_LOWEST, MIDDLE, SECOND_HIGHEST, HIGHEST.
+   * Skill group labels where the participant underperforms compared to the job market average.
    */
-  comparison_label: string;
+  below_average_labels: string[];
+
+  /**
+   * Skill group with the highest demand in the participant's profile.
+   */
+  most_demanded_label: string;
+
+  /**
+   * Demand percentage for the most demanded skill group.
+   */
+  most_demanded_percent: number;
+
+  /**
+   * Skill group with the lowest demand in the participant's profile.
+   */
+  least_demanded_label: string;
+
+  /**
+   * Demand percentage for the least demanded skill group.
+   */
+  least_demanded_percent: number;
+
+  /**
+   * Average demand percentage across the participant's matched skill groups.
+   */
+  average_percent_for_jobseeker_skill_groups: number;
+
+  /**
+   * Average job count across the participant's matched skill groups.
+   */
+  average_count_for_jobseeker_skill_groups: number;
+
+  /**
+   * Province reference used for the demand comparison.
+   */
+  province_used: string;
+
+  /**
+   * Number of skill groups matched to the participant.
+   */
+  matched_skill_groups: number;
 
   /**
    * The time the score was calculated, in ISO format, in UTC.
@@ -93,82 +107,43 @@ export interface SkillsRankingScore {
   calculated_at: string;
 }
 
+export interface ApplicationWillingness {
+  value: number;
+  label: string;
+}
+
+export interface SkillsRankingMetadata {
+  experiment_group: SkillsRankingExperimentGroups;
+  started_at: string;
+  completed_at?: string;
+  cancelled_after?: string;
+  succeeded_after?: string;
+  puzzles_solved?: number;
+  correct_rotations?: number;
+  clicks_count?: number;
+}
+
+export interface ApplicationWillingness {
+  value: number;
+  label: string;
+}
+
+export interface SkillsRankingUserResponses {
+  prior_belief_percentile?: number;
+  prior_belief_for_skill_percentile?: number;
+  perceived_rank_percentile?: number;
+  perceived_rank_for_skill_percentile?: number;
+  application_willingness?: ApplicationWillingness;
+  application_24h?: number;
+  opportunity_skill_requirement_percentile?: number;
+}
+
 export interface SkillsRankingState {
   session_id: number;
-  /**
-   * session id - the session ranking will be made on
-   */
-  experiment_group: SkillsRankingExperimentGroups;
-  /**
-   * the group the user is assigned for each experiment branch
-   */
-  /**
-   * The full phase history of the skills ranking process.
-   * Note: This is a stack structure where the last element is the most recent phase.
-   * The phases are ordered chronologically with the most recent phase at the end.
-   */
-  phases: SkillsRankingPhaseWithTime[];
-
-  /**
-   * The score given to the user as compared to other job seekers and the job market.
-   */
+  phase: SkillsRankingPhaseWithTime[];
   score: SkillsRankingScore;
-
-  /**
-   * Represents the time in ms spent by the user before they cancelled the skills ranking process.
-   * Only available for GROUP_2 and GROUP_3 (work-based effort tasks).
-   */
-  cancelled_after?: string;
-
-  /**
-   * Represents the time in ms spent by the user before they finished the skills ranking process.
-   * Only available for GROUP_2 and GROUP_3 (work-based effort tasks).
-   */
-  succeeded_after?: string;
-
-  /**
-   * The number of puzzles the user solved for the proof_of_value task during the skills ranking process.
-   * Only relevant for the work-based proof_of_value task (GROUP_2 and GROUP_3).
-   */
-  puzzles_solved?: number;
-
-  /**
-   * The number of characters the user rotated correctly for the proof_of_value task during the skills ranking process.
-   * Only relevant for the time-based proof_of_value task (GROUP_1 and GROUP_4).
-   */
-  correct_rotations?: number;
-
-  /**
-   * The number of clicks the user made during the proof_of_value task.
-   * Includes character selection and rotation [clockwise/counter-clockwise].
-   * Only relevant for the time-based proof_of_value task (GROUP_1 and GROUP_4).
-   */
-  clicks_count?: number;
-
-  /**
-   * The percentile rank the user thinks they have (0-100).
-   * Only available for groups that see ranking results.
-   */
-  perceived_rank_percentile?: number;
-
-  /**
-   * The rank the user retyped to confirm they saw it correctly (0-100).
-   * Only available for groups that see ranking results.
-   */
-  retyped_rank_percentile?: number;
-
-  /**
-   * The time the skills ranking process started, in ISO format, in UTC.
-   */
-  started_at: string;
-
-  /**
-   * The time the skills ranking process completed, in ISO format, in UTC.
-   */
-  completed_at?: string;
-  /**
-   * The time the skills ranking process completed, in ISO format, in UTC.
-   */
+  metadata: SkillsRankingMetadata;
+  user_responses: SkillsRankingUserResponses;
 }
 
 /**
@@ -222,7 +197,7 @@ export interface SkillsRankingConfig extends FeatureConfig {
  * @returns The latest phase or undefined if no phases exist
  */
 export function getLatestPhase(state: SkillsRankingState): SkillsRankingPhaseWithTime | undefined {
-  return state.phases[state.phases.length - 1];
+  return state.phase[state.phase.length - 1];
 }
 
 /**
@@ -231,5 +206,5 @@ export function getLatestPhase(state: SkillsRankingState): SkillsRankingPhaseWit
  * @returns The latest phase name or undefined if no phases exist
  */
 export function getLatestPhaseName(state: SkillsRankingState): SkillsRankingPhase | undefined {
-  return state.phases[state.phases.length - 1]?.name;
+  return getLatestPhase(state)?.name;
 }

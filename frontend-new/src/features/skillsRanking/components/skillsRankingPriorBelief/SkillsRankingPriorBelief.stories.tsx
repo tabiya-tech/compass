@@ -1,16 +1,15 @@
 import { Meta, StoryObj } from "@storybook/react";
-import SkillsRankingJobSeekerDisclosure from "src/features/skillsRanking/components/skillsRankingDisclosure/skillsRankingJobSeekerDisclosure/SkillsRankingJobSeekerDisclosure";
-import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
-import {
-  SkillsRankingPhase,
-  SkillsRankingState,
-  SkillsRankingExperimentGroups,
-  SkillsRankingPhaseWithTime,
-} from "src/features/skillsRanking/types";
+import SkillsRankingPriorBelief from "src/features/skillsRanking/components/skillsRankingPriorBelief/SkillsRankingPriorBelief";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
+import {
+  SkillsRankingExperimentGroups,
+  SkillsRankingPhase,
+  SkillsRankingPhaseWithTime,
+  SkillsRankingState,
+} from "src/features/skillsRanking/types";
 import { action } from "@storybook/addon-actions";
-
+import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
 import { Box } from "@mui/material";
 
 const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -26,9 +25,9 @@ const createPhaseArray = (phase: SkillsRankingPhase): SkillsRankingPhaseWithTime
   ];
 };
 
-const meta: Meta<typeof SkillsRankingJobSeekerDisclosure> = {
-  title: "Features/SkillsRanking/SkillsRankingJobSeekerDisclosure",
-  component: SkillsRankingJobSeekerDisclosure,
+const meta: Meta<typeof SkillsRankingPriorBelief> = {
+  title: "Features/SkillsRanking/SkillsRankingPriorBelief",
+  component: SkillsRankingPriorBelief,
   tags: ["autodocs"],
   decorators: [
     (Story) => {
@@ -58,7 +57,7 @@ const meta: Meta<typeof SkillsRankingJobSeekerDisclosure> = {
 
 export default meta;
 
-type Story = StoryObj<typeof SkillsRankingJobSeekerDisclosure>;
+type Story = StoryObj<typeof SkillsRankingPriorBelief>;
 
 const BaseArgs = {
   onFinish: async (state: SkillsRankingState) => {
@@ -66,51 +65,37 @@ const BaseArgs = {
   },
   skillsRankingState: (() => {
     const base = getRandomSkillsRankingState();
-    base.phases = createPhaseArray(SkillsRankingPhase.JOB_SEEKER_DISCLOSURE);
+    base.phase = createPhaseArray(SkillsRankingPhase.PRIOR_BELIEF);
     return base;
   })(),
 };
 
-// GROUP 1: Disclosed
-export const Group1_Disclosed: Story = {
+export const Group1_NoDisclosure: Story = {
   args: {
     ...BaseArgs,
     skillsRankingState: {
       ...BaseArgs.skillsRankingState,
-      experiment_group: SkillsRankingExperimentGroups.GROUP_1,
+      metadata: { ...BaseArgs.skillsRankingState.metadata, experiment_group: SkillsRankingExperimentGroups.GROUP_1 },
     },
   },
 };
 
-// GROUP 2: Undisclosed
-export const Group2_Undisclosed: Story = {
+export const Group2_MostDemandedOnly: Story = {
   args: {
     ...BaseArgs,
     skillsRankingState: {
       ...BaseArgs.skillsRankingState,
-      experiment_group: SkillsRankingExperimentGroups.GROUP_2,
+      metadata: { ...BaseArgs.skillsRankingState.metadata, experiment_group: SkillsRankingExperimentGroups.GROUP_2 },
     },
   },
 };
 
-// GROUP 3: Disclosed
-export const Group3_Disclosed: Story = {
+export const Group3_MostAndLeastDemanded: Story = {
   args: {
     ...BaseArgs,
     skillsRankingState: {
       ...BaseArgs.skillsRankingState,
-      experiment_group: SkillsRankingExperimentGroups.GROUP_3,
-    },
-  },
-};
-
-// GROUP 4: Undisclosed
-export const Group4_Undisclosed: Story = {
-  args: {
-    ...BaseArgs,
-    skillsRankingState: {
-      ...BaseArgs.skillsRankingState,
-      experiment_group: SkillsRankingExperimentGroups.GROUP_4,
+      metadata: { ...BaseArgs.skillsRankingState.metadata, experiment_group: SkillsRankingExperimentGroups.GROUP_3 },
     },
   },
 };

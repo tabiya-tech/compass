@@ -3,7 +3,6 @@ import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { SkillsRankingPhase, SkillsRankingState, getLatestPhaseName } from "src/features/skillsRanking/types";
-import { getCompensationAmount } from "src/features/skillsRanking/constants";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -14,7 +13,7 @@ import { useTheme } from "@mui/material/styles";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { getDefaultTypingDurationMs, MESSAGE_DURATION_MS } from "src/features/skillsRanking/constants";
 
 const uniqueId = "1e13ec58-2931-47ef-b1a9-30550519707b";
@@ -48,8 +47,6 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
 
   const currentPhase = getLatestPhaseName(skillsRankingState);
   const isReplay = currentPhase !== SkillsRankingPhase.INITIAL;
-
-  const compensationAmount = getCompensationAmount();
 
   const handleAdvanceState = useCallback(async () => {
     if (isReplay) return;
@@ -94,10 +91,11 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
     return (
       <ChatBubble
         message={
-          <>
-            <strong>Almost done!</strong> Answer a few more research questions and we’ll send you{" "}
-            <strong>{compensationAmount} </strong> airtime once you have completed all tasks.
-          </>
+          <Typography>
+            You are almost there! Remember that if you completely finish this conversation with me you will receive <strong>20-30 Rand in airtime.</strong>
+            <br />
+            Whether you receive 20 or 30 depends on your responses below, so please read carefully.
+          </Typography>
         }
         sender={ConversationMessageSender.COMPASS}
       />
@@ -117,7 +115,7 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
           <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
             <Timestamp
               sentAt={
-                skillsRankingState.phases[skillsRankingState.phases.length - 1]?.time || skillsRankingState.started_at
+                skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.metadata.started_at
               }
             />
           </ChatMessageFooterLayout>
@@ -150,8 +148,8 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
                 <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
                   <Timestamp
                     sentAt={
-                      skillsRankingState.phases[skillsRankingState.phases.length - 1]?.time ||
-                      skillsRankingState.started_at
+                      skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time ||
+                      skillsRankingState.metadata.started_at
                     }
                   />
                 </ChatMessageFooterLayout>

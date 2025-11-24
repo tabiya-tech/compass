@@ -9,36 +9,42 @@ import {
   getLatestPhaseName,
   SkillsRankingExperimentGroups,
 } from "src/features/skillsRanking/types";
-import { getFlowPathForGroup, skillsRankingHappyPathFull } from "./skillsRankingFlowGraph";
+import { getFlowPathForGroup, skillsRankingGroup1Path } from "./skillsRankingFlowGraph";
 import {
   createBriefingMessage,
-  createCompletionAdviceMessage,
   createEffortMessage,
-  createJobMarketDisclosureMessage,
-  createJobSeekerDisclosureMessage,
+  createDisclosureMessage,
   createPerceivedRankMessage,
+  createPriorBeliefMessage,
+  createPriorBeliefForSkillMessage,
   createPromptMessage,
-  createRetypedRankMessage,
-  shouldSkipMarketDisclosure,
+  createProofOfValueIntroMessage,
+  createOpportunitySkillRequirementMessage,
+  createApplicationMotivationMessage,
+  createApplication24hMessage,
+  createPerceivedRankForSkillMessage,
 } from "src/features/skillsRanking/utils/createMessages";
 
-const phaseToMessageFactory = {
+const phaseToMessageFactory: Partial<Record<SkillsRankingPhase, any>> = {
   [SkillsRankingPhase.INITIAL]: createPromptMessage,
   [SkillsRankingPhase.BRIEFING]: createBriefingMessage,
+  [SkillsRankingPhase.PROOF_OF_VALUE_INTRO]: createProofOfValueIntroMessage,
   [SkillsRankingPhase.PROOF_OF_VALUE]: createEffortMessage,
-  [SkillsRankingPhase.MARKET_DISCLOSURE]: createJobMarketDisclosureMessage,
-  [SkillsRankingPhase.JOB_SEEKER_DISCLOSURE]: createJobSeekerDisclosureMessage,
+  [SkillsRankingPhase.PRIOR_BELIEF]: createPriorBeliefMessage,
+  [SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL]: createPriorBeliefForSkillMessage,
+  [SkillsRankingPhase.APPLICATION_WILLINGNESS]: createApplicationMotivationMessage,
+  [SkillsRankingPhase.APPLICATION_24H]: createApplication24hMessage,
+  [SkillsRankingPhase.OPPORTUNITY_SKILL_REQUIREMENT]: createOpportunitySkillRequirementMessage,
+  [SkillsRankingPhase.DISCLOSURE]: createDisclosureMessage,
   [SkillsRankingPhase.PERCEIVED_RANK]: createPerceivedRankMessage,
-  [SkillsRankingPhase.RETYPED_RANK]: createRetypedRankMessage,
-  [SkillsRankingPhase.COMPLETED]: createCompletionAdviceMessage,
+  [SkillsRankingPhase.PERCEIVED_RANK_FOR_SKILL]: createPerceivedRankForSkillMessage,
 };
 
 const getPathToPhase = (
   phase: SkillsRankingPhase,
   experimentGroup?: SkillsRankingExperimentGroups
 ): SkillsRankingPhase[] => {
-  // Use the full path as default if no experiment group is provided
-  const flowPath = experimentGroup ? getFlowPathForGroup(experimentGroup) : skillsRankingHappyPathFull;
+  const flowPath = experimentGroup ? getFlowPathForGroup(experimentGroup) : skillsRankingGroup1Path;
   const index = flowPath.indexOf(phase);
   if (index === -1) {
     console.warn(`[SkillsRanking] Phase '${phase}' not found in path`, flowPath);
@@ -78,57 +84,50 @@ export const useSkillsRanking = (
   addMessage: (message: IChatMessage<any>) => void,
   removeMessage: (messageId: string) => void
 ) => {
-  /**
-   * Handles the flow transition between skills ranking phases.
-   * Determines the next phase in the flow and creates the appropriate message.
-   * @param currentPhase - The current phase in the skills ranking flow
-   * @param onFinishFlow - Callback to execute when the flow is complete
-   * @returns A function that handles the state transition
-   */
   const getNextPhaseHandler =
     (currentPhase: SkillsRankingPhase, onFinishFlow: () => void) => async (newState: SkillsRankingState) => {
       const currentPhaseName = getLatestPhaseName(newState);
 
-      if (currentPhaseName === SkillsRankingPhase.COMPLETED) {
-        console.debug(`[Flow] Final phase '${currentPhaseName}' reached`);
-
-        // Check if we should show completion advice based on experiment group
-        const shouldShowAdvice = !shouldSkipMarketDisclosure(newState.experiment_group);
-        if (shouldShowAdvice) {
-          console.debug(`[Flow] Showing completion advice for group ${newState.experiment_group}`);
-          const factory = phaseToMessageFactory[SkillsRankingPhase.COMPLETED];
-          if (factory) {
-            const result = factory(newState, async (skillsRankingState: SkillsRankingState) => {
-              console.debug(`[Flow] Completion advice finished, calling onFinishFlow`);
-              onFinishFlow();
-            });
-            (Array.isArray(result) ? result : [result]).filter((message) => message !== null).forEach(addMessage);
-          }
-        } else {
-          console.debug(
-            `[Flow] Skipping completion advice for group ${newState.experiment_group}, calling onFinishFlow directly`
-          );
-          onFinishFlow();
-        }
+      if (!currentPhaseName) {
+        console.warn(`[Flow] No current phase found in state`);
+        onFinishFlow();
         return;
       }
-      // Get the correct flow path for this experiment group
-      const flowPath = getFlowPathForGroup(newState.experiment_group);
-      const currentIndex = flowPath.indexOf(currentPhase);
-      const nextPhase = flowPath[currentIndex + 1];
-      const factory = phaseToMessageFactory[nextPhase];
+
+      if (currentPhaseName === SkillsRankingPhase.COMPLETED) {
+        console.debug(`[Flow] Final phase '${currentPhaseName}' reached`);
+        onFinishFlow();
+        return;
+      }
+      
+      // Components advance the state before calling onFinish, so currentPhaseName is the phase we transitioned to.
+      // If currentPhaseName is different from currentPhase, we've transitioned and should show currentPhaseName.
+      // Otherwise, find the next phase after currentPhase.
+      const flowPath = getFlowPathForGroup(newState.metadata.experiment_group);
+      let phaseToShow: SkillsRankingPhase | undefined;
+      
+      if (currentPhaseName !== currentPhase) {
+        // We've transitioned to a new phase, show that phase
+        phaseToShow = currentPhaseName;
+      } else {
+        // Still in the same phase, find the next one
+        const currentIndex = flowPath.indexOf(currentPhase);
+        phaseToShow = flowPath[currentIndex + 1];
+      }
+      
+      const factory = phaseToShow ? phaseToMessageFactory[phaseToShow] : undefined;
 
       console.debug(
-        `[Flow] going from '${currentPhase}' to '${nextPhase}' for group ${newState.experiment_group} using path: ${flowPath.join(" → ")}`
+        `[Flow] going from '${currentPhase}' to '${phaseToShow}' (currentPhaseName: ${currentPhaseName}) for group ${newState.metadata.experiment_group} using path: ${flowPath.join(" → ")}`
       );
 
-      if (!nextPhase || !factory) {
+      if (!phaseToShow || !factory) {
         console.debug(`[Flow] No next phase or factory found. Ending flow.`);
         onFinishFlow();
         return;
       }
 
-      const result = factory(newState, getNextPhaseHandler(nextPhase, onFinishFlow));
+      const result = factory(newState, getNextPhaseHandler(phaseToShow, onFinishFlow));
       (Array.isArray(result) ? result : [result]).filter((message) => message !== null).forEach(addMessage);
     };
 
@@ -150,7 +149,7 @@ export const useSkillsRanking = (
       return;
     }
 
-    const path = getPathToPhase(currentPhaseName, state.experiment_group);
+    const path = getPathToPhase(currentPhaseName, state.metadata.experiment_group);
     if (path.length === 0) {
       console.warn(`[Flow] Invalid phase path for phase: '${currentPhaseName}'`);
       onFinishFlow();
@@ -160,24 +159,12 @@ export const useSkillsRanking = (
     console.debug(`[Flow] Replaying path: ${path.join(" → ")}`);
 
     path.forEach((phase) => {
-      const factory = phaseToMessageFactory[phase];
-
       if (phase === SkillsRankingPhase.COMPLETED) {
-        // Check if we should show completion advice based on experiment group
-        const shouldShowAdvice = !shouldSkipMarketDisclosure(state.experiment_group);
-        if (!shouldShowAdvice) {
-          console.debug(`[Flow] Skipping completion advice for phase: ${phase} in group: ${state.experiment_group}`);
-          onFinishFlow();
-          return;
-        }
-        console.debug(`[Flow] Showing completion advice for phase: ${phase} in group: ${state.experiment_group}`);
-        const result = factory(state, async (skillsRankingState: SkillsRankingState) => {
-          console.debug(`[Flow] Completion advice finished during replay, calling onFinishFlow`);
-          onFinishFlow();
-        });
-        (Array.isArray(result) ? result : [result]).filter((message) => message !== null).forEach(addMessage);
+        console.debug(`[Flow] Final phase '${phase}' reached during replay`);
+        onFinishFlow();
         return;
       }
+      const factory = phaseToMessageFactory[phase];
       if (factory) {
         const result = factory(state, getNextPhaseHandler(phase, onFinishFlow));
         (Array.isArray(result) ? result : [result]).filter((message) => message !== null).forEach(addMessage);

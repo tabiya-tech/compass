@@ -1,21 +1,15 @@
 import asyncio
 import logging
+import random
 from abc import ABC, abstractmethod
 from typing import Tuple, cast
-import random
 
 from app.app_config import get_application_config
 from app.application_state import IApplicationStateManager
 from app.users.repositories import IUserPreferenceRepository
 from common_libs.time_utilities import get_now
-from features.skills_ranking.constants import SKILLS_RANKING_EXPERIMENT_ID
+from features.skills_ranking.constants import SKILLS_RANKING_EXPERIMENT_ID, SKILLS_RANKING_FEATURE_ID
 from features.skills_ranking.errors import InvalidNewPhaseError, SkillsRankingStateNotFound
-from features.skills_ranking.state.repositories.skills_ranking_state_repository import ISkillsRankingStateRepository
-from features.skills_ranking.state.repositories.types import IRegistrationDataRepository
-from features.skills_ranking.state.services.type import SkillsRankingState, SkillRankingExperimentGroup, \
-    SkillsRankingScore, \
-    SkillsRankingPhase, UpdateSkillsRankingRequest, SkillsRankingPhaseName
-from features.skills_ranking.services.skills_ranking_service import SkillsRankingService
 from features.skills_ranking.services.errors import (
     SkillsRankingServiceHTTPError,
     SkillsRankingServiceTimeoutError,
@@ -23,10 +17,18 @@ from features.skills_ranking.services.errors import (
     SkillsRankingServiceError,
     SkillsRankingGenericError,
 )
+from features.skills_ranking.services.skills_ranking_service import SkillsRankingService
+from features.skills_ranking.state.repositories.errors import RegistrationDataNotFoundError
+from features.skills_ranking.state.repositories.skills_ranking_state_repository import ISkillsRankingStateRepository
+from features.skills_ranking.state.repositories.types import IRegistrationDataRepository
+from features.skills_ranking.state.services.type import SkillsRankingState, SkillRankingExperimentGroup, \
+    SkillsRankingScore, \
+    SkillsRankingPhase, UpdateSkillsRankingRequest, ProcessMetadata, UserResponses, SkillsRankingPhaseName
 from features.skills_ranking.state.utils.get_group import get_group
 from features.skills_ranking.state.utils.phase_utils import get_possible_next_phase
+from features.skills_ranking.types import PriorBeliefs
 
-CORRECT_ROTATIONS_THRESHOLD_FOR_GROUP_SWITCH = 30
+CORRECT_ROTATIONS_THRESHOLD_FOR_GROUP_SWITCH_DEFAULT = 30
 
 
 class ISkillsRankingStateService(ABC):
@@ -72,9 +74,7 @@ class SkillsRankingStateService(ISkillsRankingStateService):
                  user_preferences_repository: IUserPreferenceRepository,
                  registration_data_repository: IRegistrationDataRepository,
                  application_state_manager: IApplicationStateManager,
-                 skills_ranking_service: SkillsRankingService,
-                 high_difference_threshold: float,
-                 correct_rotations_threshold_for_group_switch: int):
+                 skills_ranking_service: SkillsRankingService):
         # repositories
         self._repository = repository
         self._user_preferences_repository = user_preferences_repository
@@ -84,64 +84,136 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         self._http_client = skills_ranking_service
         self._application_state_manager = application_state_manager
 
-        # Configurations
-        self._high_difference_threshold = high_difference_threshold
-        self._correct_rotations_threshold_for_group_switch = correct_rotations_threshold_for_group_switch
-        
         # Logger
         self._logger = logging.getLogger(self.__class__.__name__)
 
-    def _get_switched_update_request(self,
-                                     update_request: UpdateSkillsRankingRequest,
-                                     existing_state: SkillsRankingState) -> UpdateSkillsRankingRequest:
+    def _get_correct_rotations_threshold(self) -> int:
+        """
+        Get the correct rotations threshold for group switching from configuration.
+        Falls back to the default value if not configured.
+        """
+        try:
+            app_config = get_application_config()
+            feature_config = app_config.features.get(SKILLS_RANKING_FEATURE_ID)
+            if feature_config and isinstance(feature_config.config, dict):
+                threshold = feature_config.config.get("correct_rotations_threshold_for_group_switch")
+                if threshold is not None and isinstance(threshold, (int, float)):
+                    return int(threshold)
+        except Exception as e:
+            self._logger.warning(
+                f"Failed to get correct_rotations_threshold_for_group_switch from config, using default: {e}"
+            )
+        return CORRECT_ROTATIONS_THRESHOLD_FOR_GROUP_SWITCH_DEFAULT
+
+    def _get_switched_update_request(
+        self,
+        update_request: UpdateSkillsRankingRequest,
+        existing_state: SkillsRankingState,
+    ) -> UpdateSkillsRankingRequest:
         """
         Determine if a group switch should occur and return an updated request with the correct phase and group.
+        
+        Logic:
+        - Only applies when transitioning FROM PROOF_OF_VALUE
+        - 95% of the time, no switch occurs
+        - 5% of the time:
+          - If GROUP_1 and satisfactory (correct_rotations > threshold) → randomly assign to GROUP_2 or GROUP_3
+          - If GROUP_2 or GROUP_3 and unsatisfactory (correct_rotations <= threshold) → assign to GROUP_1
+          - Otherwise, keep the same group
         """
-
         # Only apply group switching when transitioning FROM PROOF_OF_VALUE
-        # If the new phase is not PROOF_OF_VALUE, return the original update request
         if update_request.phase is None or existing_state.phase[-1].name != "PROOF_OF_VALUE":
+            if update_request.phase is None:
+                self._logger.info(
+                    f"Group switching not applicable: no phase transition requested. "
+                    f"Current group: {existing_state.metadata.experiment_group.name}"
+                )
+            else:
+                self._logger.info(
+                    f"Group switching not applicable: not transitioning from PROOF_OF_VALUE. "
+                    f"Current phase: {existing_state.phase[-1].name}, "
+                    f"Requested phase: {update_request.phase}, "
+                    f"Current group: {existing_state.metadata.experiment_group.name}"
+                )
             return update_request
 
-        # Only apply to groups 2 and 3
-        # We are only left with Group 2 and Group 3,
-        if existing_state.experiment_group not in [SkillRankingExperimentGroup.GROUP_2,
-                                                   SkillRankingExperimentGroup.GROUP_3]:
-            return update_request
+        current_group = existing_state.metadata.experiment_group
+        correct_rotations = existing_state.metadata.correct_rotations
 
-        # Only apply if we should apply the random group switch
-        # 95% we don't switch.
-        # 5% we are going to do a switch of the group.
+        # 95% of the time, we don't switch
         should_apply_switch = random.random() < 0.05  # nosec B311 # we are intentionally using a random check here for group switching
-        # if the random value gets between 0.05 and 1, (95% of the time), we will do not apply the switch and return.
         if not should_apply_switch:
+            self._logger.info(
+                f"Group switching not applied: random check failed (95% chance to keep group). "
+                f"Current group: {current_group.name}, "
+                f"Correct rotations: {correct_rotations}"
+            )
             return update_request
 
-        # Otherwise, apply the switching of the groups
-        # Determine the new group based on `correct rotations` switch
-        if existing_state.correct_rotations is None or existing_state.correct_rotations <= self._correct_rotations_threshold_for_group_switch:
-            new_group = SkillRankingExperimentGroup.GROUP_2  # No information
-        else:
-            new_group = SkillRankingExperimentGroup.GROUP_3  # Information
+        # Get the threshold from configuration, with fallback to default
+        threshold = self._get_correct_rotations_threshold()
 
-        # Determine the correct phase for the new group.
-        # Group 2 and 4 skip `MARKET_DISCLOSURE`, while Group 1 and 3 see it.
-        if new_group == SkillRankingExperimentGroup.GROUP_2:
-            # Job Seeker Disclosure phase applies differently.
-            # If in Group 1 and Group 3 -> You see the actual jobseeker rank.
-            # But if the Group 2 and Group 4 -> You see the message telling you, we will contact you later.
-            # @see: frontend-new/src/features/skillsRanking/components/skillsRankingDisclosure/skillsRankingJobSeekerDisclosure/SkillsRankingJobSeekerDisclosure.tsx
-            # So that is why we are jumping to the `JOB_SEEKER_DISCLOSURE` phase if you have been moved to Group 2.
-            # Otherwise, you get to see the `MARKET_DISCLOSURE` phase. (which comes before the `JOB_SEEKER_DISCLOSURE` phase)
-            correct_phase = "JOB_SEEKER_DISCLOSURE"
+        # Determine if user is satisfactory based on correct_rotations
+        is_satisfactory = (
+            correct_rotations is not None
+            and correct_rotations > threshold
+        )
+
+        new_group = None
+        switch_reason = None
+
+        # Apply switching logic
+        if current_group == SkillRankingExperimentGroup.GROUP_1 and is_satisfactory:
+            # GROUP_1 + satisfactory → randomly assign to GROUP_2 or GROUP_3 (treatment)
+            new_group = random.choice([  # nosec B311 # we are intentionally using random for group assignment
+                SkillRankingExperimentGroup.GROUP_2,
+                SkillRankingExperimentGroup.GROUP_3,
+            ])
+            switch_reason = f"GROUP_1 satisfactory (correct_rotations={correct_rotations} > {threshold})"
+        elif current_group in [
+            SkillRankingExperimentGroup.GROUP_2,
+            SkillRankingExperimentGroup.GROUP_3,
+        ] and not is_satisfactory:
+            # GROUP_2 or GROUP_3 + unsatisfactory → assign to GROUP_1 (control)
+            new_group = SkillRankingExperimentGroup.GROUP_1
+            switch_reason = f"{current_group.name} unsatisfactory (correct_rotations={correct_rotations} <= {threshold})"
         else:
-            correct_phase = "MARKET_DISCLOSURE"
+            # Otherwise, keep the same group
+            if current_group == SkillRankingExperimentGroup.GROUP_1:
+                reason = f"GROUP_1 but not satisfactory (correct_rotations={correct_rotations} <= {threshold})"
+            elif current_group in [SkillRankingExperimentGroup.GROUP_2, SkillRankingExperimentGroup.GROUP_3]:
+                reason = f"{current_group.name} but satisfactory (correct_rotations={correct_rotations} > {threshold})"
+            else:
+                reason = f"Unknown group or condition not met"
+            self._logger.info(
+                f"Group switching not applied: conditions not met. "
+                f"Current group: {current_group.name}, "
+                f"Correct rotations: {correct_rotations}, "
+                f"Reason: {reason}"
+            )
+            return update_request
+
+        # After PROOF_OF_VALUE, all groups go to PRIOR_BELIEF
+        correct_phase = "PRIOR_BELIEF"
+
+        # Create updated metadata dict with the new group
+        updated_metadata = update_request.metadata.copy() if update_request.metadata else {}
+        updated_metadata["experiment_group"] = new_group.name
+
+        self._logger.info(
+            f"Group switching applied: {current_group.name} → {new_group.name}. "
+            f"Reason: {switch_reason}, "
+            f"Correct rotations: {correct_rotations}, "
+            f"New phase: {correct_phase}"
+        )
 
         # Create a new update request with both the group change and phase adjustment
         return UpdateSkillsRankingRequest(
             phase=cast(SkillsRankingPhaseName, correct_phase),
-            experiment_group=new_group,
-            **update_request.model_dump(exclude={'phase', 'experiment_group'}))
+            metadata=updated_metadata,
+            user_responses=update_request.user_responses,
+            completed_at=update_request.completed_at,
+        )
 
     async def _initialize_state(self,
                                 session_id: int,
@@ -162,13 +234,18 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         #    AND the `started at` as now, as it is the first time the user is calling this method.
         new_state = SkillsRankingState(
             session_id=session_id,
-            phase=[SkillsRankingPhase(
-                name=update_request.phase,
-                time=get_now()
-            )],
-            experiment_group=experiment_group,
+            phase=[
+                SkillsRankingPhase(
+                    name=update_request.phase,  # INITIAL
+                    time=get_now()
+                )
+            ],
+            metadata=ProcessMetadata(
+                experiment_group=experiment_group,
+                started_at=get_now()
+            ),
             score=participant_rank,
-            started_at=get_now()
+            user_responses=UserResponses()
         )
 
         # 4. Save the new state to the database and update user preferences.
@@ -193,8 +270,8 @@ class SkillsRankingStateService(ISkillsRankingStateService):
                             user_id: str) -> SkillsRankingState:
         # update_request.phase is optional, but if provided, it must be a valid next phase
         if update_request.phase is not None:
-            last_phase = existing_state.phase[-1]  # latest phase in history
-            possible_next_states = get_possible_next_phase(last_phase.name)
+            last_phase = existing_state.phase[-1]
+            possible_next_states = get_possible_next_phase(last_phase.name, existing_state.metadata.experiment_group)
             if update_request.phase not in possible_next_states:
                 raise InvalidNewPhaseError(
                     current_phase=last_phase.name,
@@ -202,20 +279,33 @@ class SkillsRankingStateService(ISkillsRankingStateService):
                 )
 
         # Apply random group switching logic — this may modify the update request
-        # Only applies when transitioning FROM PROOF_OF_VALUE for groups 2 and 3 with 5% probability
-        # This will add the experiment_group in the update_request if needed
+        # Only applies when transitioning FROM PROOF_OF_VALUE with 5% probability
+        # This will add the experiment_group in the update_request.metadata if needed
         updated_request = self._get_switched_update_request(update_request, existing_state)
+
+        if updated_request.metadata is None:
+            updated_request.metadata = {}
+        if updated_request.user_responses is None:
+            updated_request.user_responses = {}
 
         # If the experiment group has changed (because a previous step of randomly switching groups was applied),
         # update the user preferences with the new experiment group.
-        experiment_group_changed = updated_request.experiment_group != existing_state.experiment_group
-        if updated_request.experiment_group is not None and experiment_group_changed:
-            # update the repository with the new experiment group
-            await self._user_preferences_repository.set_experiment_by_user_id(
-                user_id=user_id,
-                experiment_id=SKILLS_RANKING_EXPERIMENT_ID,
-                experiment_config=updated_request.experiment_group.name
-            )
+        if "experiment_group" in updated_request.metadata:
+            experiment_group = updated_request.metadata["experiment_group"]
+            if isinstance(experiment_group, str):
+                experiment_group = SkillRankingExperimentGroup[experiment_group]
+            experiment_group_changed = experiment_group != existing_state.metadata.experiment_group
+            if experiment_group_changed:
+                self._logger.info(
+                    f"Experiment group changed for user {user_id}, session {session_id}: "
+                    f"{existing_state.metadata.experiment_group.name} → {experiment_group.name}. "
+                    f"Updating user preferences."
+                )
+                await self._user_preferences_repository.set_experiment_by_user_id(
+                    user_id=user_id,
+                    experiment_id=SKILLS_RANKING_EXPERIMENT_ID,
+                    experiment_config=experiment_group.name
+                )
 
         # Automatically set completed at when transitioning to COMPLETED phase
         if updated_request.phase == "COMPLETED":
@@ -253,7 +343,19 @@ class SkillsRankingStateService(ISkillsRankingStateService):
                                            session_id: int) -> Tuple[SkillsRankingScore, SkillRankingExperimentGroup]:
 
         # 1. we need to get the prior beliefs
-        prior_beliefs = await self._registration_data_repository.get_prior_beliefs(user_id=user_id)
+        try:
+            prior_beliefs = await self._registration_data_repository.get_prior_beliefs(user_id=user_id)
+        except RegistrationDataNotFoundError as e:
+            # A new algorithm doesn't require prior beliefs,
+            # so we can continue with default values.
+            # Log an exception in this case to evaluate this separately.
+            # Also, for local development and testing, we can continue with default values.
+            _default_prior_beliefs = PriorBeliefs()
+            self._logger.error(
+                f"Registration data not found for user: {user_id}. "
+                f"Continuing with default values. {_default_prior_beliefs} "
+                f"Exception: {e}", exc_info=e)
+            prior_beliefs = _default_prior_beliefs
 
         # 2. let's get all the skills for this specific session.
         state = await self._application_state_manager.get_state(session_id=session_id)
@@ -270,12 +372,26 @@ class SkillsRankingStateService(ISkillsRankingStateService):
             participant_skills += experience.top_skills
             participant_skills += experience.remaining_skills
 
-        # Flatten the list of skills and get the originUUIDs
-        participant_skills_uuids: set[str] = {skill.originUUID for skill in participant_skills}
+        # Ranking algorithm v2 uses skill UUIDs
+        participant_skills_uuids: set[str] = {skill.UUID for skill in participant_skills}
+
+        # Get the taxonomy model id used to generate the skills.
+        # Prefer the taxonomy model id used to generate the skills.
+        # If not found, fall back to the config taxonomy model id.
+        # Be more tolerant.
+        taxonomy_model_ids = [skill.modelId for skill in participant_skills]
+        taxonomy_model_id = None
+        match len(set(taxonomy_model_ids)):
+            case 0:
+                taxonomy_model_id = get_application_config().tabiya_model_id
+            case 1:
+                taxonomy_model_id = taxonomy_model_ids[0]
+            case _:
+                taxonomy_model_id = taxonomy_model_ids[0]
+                self._logger.warning(
+                    f"User had more than one taxonomy model id. {taxonomy_model_ids}, going with {taxonomy_model_id}")
 
         # 3. Compute the ranking score for this participant
-        taxonomy_model_id = get_application_config().taxonomy_model_id
-        
         try:
             score = await self._http_client.get_participant_ranking(
                 user_id=user_id,
@@ -285,45 +401,24 @@ class SkillsRankingStateService(ISkillsRankingStateService):
             )
         except SkillsRankingServiceHTTPError as e:
             self._logger.error(f"HTTP error from skills ranking service: {e.status_code} - {e.body}")
-            raise SkillsRankingGenericError("Skills ranking service HTTP error")
+            raise SkillsRankingGenericError("Skills ranking service HTTP error") from e
         except SkillsRankingServiceTimeoutError as e:
             self._logger.error(f"Timeout from skills ranking service: {e.details}")
-            raise SkillsRankingGenericError("Skills ranking service timeout")
+            raise SkillsRankingGenericError("Skills ranking service timeout") from e
         except SkillsRankingServiceRequestError as e:
             self._logger.error(f"Request error from skills ranking service: {e.details}")
-            raise SkillsRankingGenericError("Skills ranking service request error")
+            raise SkillsRankingGenericError("Skills ranking service request error") from e
         except SkillsRankingServiceError as e:
             self._logger.error(f"Generic error from skills ranking service: {e.message}")
-            raise SkillsRankingGenericError("Skills ranking service error")
+            raise SkillsRankingGenericError("Skills ranking service error") from e
 
-        # 4. Because the ranking service returns scores between 0 and 1,
-        #    we need to convert it to a values between 0 and 100 and round to 2 decimal places
-        jobs_matching_rank_percentage = round(score.jobs_matching_rank * 100, 2)
-        comparison_rank_percentage = round(score.comparison_rank * 100, 2)
+        savable_score = score
 
-        savable_score = SkillsRankingScore(
-            jobs_matching_rank=jobs_matching_rank_percentage,
-            comparison_rank=comparison_rank_percentage,
-            comparison_label=score.comparison_label,
-            calculated_at=score.calculated_at
-        )
-
-        # 5. THEN compute the experiment group based on the prior belief, and the actual rank
-        experiment_group = self._get_group(
-            # Using the prior belief as opportunity_rank_prior_belief
-            self_estimated_rank=prior_beliefs.opportunity_rank_prior_belief,
-            actual_rank=score.jobs_matching_rank
-        )
+        # 5. Compute the experiment group via randomized assignment
+        experiment_group = self._get_group()
 
         # 6. Return the score, and the experiment group
         return savable_score, experiment_group
 
-    def _get_group(self,
-                   self_estimated_rank: float,
-                   actual_rank: float):
-
-        return get_group(
-            self_estimated_rank=self_estimated_rank,
-            actual_rank=actual_rank,
-            high_difference_threshold=self._high_difference_threshold
-        )
+    def _get_group(self) -> SkillRankingExperimentGroup:
+        return get_group()

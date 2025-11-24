@@ -15,20 +15,22 @@ exports[`SkillsRankingRetypedRank snapshot: initial render in RETYPED_RANK (non-
         data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
         origin="COMPASS"
       >
-        <p
-          class="MuiTypography-root MuiTypography-body1 css-13zm2uq-MuiTypography-root"
+        <div
+          class="MuiBox-root css-153web7"
           data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
         >
-          As a last question, let's recall what I told you further above just regarding your own fit with opportunities:
-           
-          <strong>
-            check again what I said three messages ago, how many percent of opportunities
-          </strong>
-           on
-           
-          x
-           do you meet the key skills for?
-        </p>
+          <p
+            class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+          >
+            As a last question, let's recall what I told you further above just regarding your own fit with opportunities: 
+            <strong>
+              check again what I said three messages ago, how many percent of opportunities
+            </strong>
+             on 
+            x
+             do you meet the key skills for?
+          </p>
+        </div>
         <div
           class="MuiBox-root css-0"
           data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
