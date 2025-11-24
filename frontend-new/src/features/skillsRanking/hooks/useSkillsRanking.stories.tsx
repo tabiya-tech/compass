@@ -1,9 +1,14 @@
 import { Meta, StoryObj } from "@storybook/react";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IChatMessage } from "src/chat/Chat.types";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
-import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState, getLatestPhaseName } from "src/features/skillsRanking/types";
+import {
+  getLatestPhaseName,
+  SkillsRankingExperimentGroups,
+  SkillsRankingPhase,
+  SkillsRankingState,
+} from "src/features/skillsRanking/types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { action } from "@storybook/addon-actions";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
@@ -15,28 +20,34 @@ const TEST_SESSION_ID = 123;
 const getPhaseFlowForGroup = (experimentGroup: SkillsRankingExperimentGroups): SkillsRankingPhase[] => {
   switch (experimentGroup) {
     case SkillsRankingExperimentGroups.GROUP_1:
-    case SkillsRankingExperimentGroups.GROUP_3:
-      // Full flow - includes market disclosure and retyped rank
+      // Group 1: Opportunity skill requirement before disclosure
       return [
         SkillsRankingPhase.INITIAL,
         SkillsRankingPhase.BRIEFING,
+        SkillsRankingPhase.PROOF_OF_VALUE_INTRO,
         SkillsRankingPhase.PROOF_OF_VALUE,
-        SkillsRankingPhase.MARKET_DISCLOSURE,
-        SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
-        SkillsRankingPhase.PERCEIVED_RANK,
-        SkillsRankingPhase.RETYPED_RANK,
+        SkillsRankingPhase.PRIOR_BELIEF,
+        SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,
+        SkillsRankingPhase.OPPORTUNITY_SKILL_REQUIREMENT,
+        SkillsRankingPhase.DISCLOSURE,
         SkillsRankingPhase.COMPLETED,
       ];
     case SkillsRankingExperimentGroups.GROUP_2:
-    case SkillsRankingExperimentGroups.GROUP_4:
-      // Same flow but market disclosure auto-skips internally
+    case SkillsRankingExperimentGroups.GROUP_3:
+      // Full flow: disclosure before application questions, then perceived rank questions, then opportunity requirement
       return [
         SkillsRankingPhase.INITIAL,
         SkillsRankingPhase.BRIEFING,
+        SkillsRankingPhase.PROOF_OF_VALUE_INTRO,
         SkillsRankingPhase.PROOF_OF_VALUE,
-        SkillsRankingPhase.MARKET_DISCLOSURE,
-        SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
+        SkillsRankingPhase.PRIOR_BELIEF,
+        SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL,
+        SkillsRankingPhase.DISCLOSURE,
+        SkillsRankingPhase.APPLICATION_WILLINGNESS,
+        SkillsRankingPhase.APPLICATION_24H,
         SkillsRankingPhase.PERCEIVED_RANK,
+        SkillsRankingPhase.PERCEIVED_RANK_FOR_SKILL,
+        SkillsRankingPhase.OPPORTUNITY_SKILL_REQUIREMENT,
         SkillsRankingPhase.COMPLETED,
       ];
     default:
@@ -68,8 +79,15 @@ class MockSkillsRankingService {
   async updateSkillsRankingState(
     sessionId: number,
     phase: SkillsRankingPhase,
-    perceived_rank_percentile?: number,
-    retyped_rank_percentile?: number,
+    options?: {
+      perceived_rank_percentile?: number;
+      perceived_rank_for_skill?: number;
+      prior_belief?: number;
+      prior_belief_for_skill?: number;
+      application_willingness?: { value: number; label: string };
+      application_24h?: number;
+      opportunity_skill_requirement?: number;
+    },
     metrics?: any
   ): Promise<SkillsRankingState> {
     // The components call updateSkillsRankingState with the phase they want to transition TO
@@ -88,25 +106,16 @@ class MockSkillsRankingService {
 
     // If ProofOfValue is transitioning to MARKET_DISCLOSURE, check if we should skip to JOB_SEEKER_DISCLOSURE
     if (
-      phase === SkillsRankingPhase.MARKET_DISCLOSURE &&
-      (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2 ||
-        this.experimentGroup === SkillsRankingExperimentGroups.GROUP_4)
+      phase === SkillsRankingPhase.DISCLOSURE &&
+      (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2)
     ) {
-      targetPhase = SkillsRankingPhase.JOB_SEEKER_DISCLOSURE;
+      targetPhase = SkillsRankingPhase.DISCLOSURE;
       console.log(
         `[Mock] Skipping MARKET_DISCLOSURE for group ${this.experimentGroup}, going to JOB_SEEKER_DISCLOSURE`
       );
     }
 
-    // If PerceivedRank is transitioning to RETYPED_RANK, check if we should skip to COMPLETED
-    if (
-      phase === SkillsRankingPhase.RETYPED_RANK &&
-      (this.experimentGroup === SkillsRankingExperimentGroups.GROUP_2 ||
-        this.experimentGroup === SkillsRankingExperimentGroups.GROUP_4)
-    ) {
-      targetPhase = SkillsRankingPhase.COMPLETED;
-      console.log(`[Mock] Skipping RETYPED_RANK for group ${this.experimentGroup}, going to COMPLETED`);
-    }
+    // No skipping needed - PERCEIVED_RANK should proceed normally through PERCEIVED_RANK_FOR_SKILL and OPPORTUNITY_SKILL_REQUIREMENT
 
     // Create new state with the target phase
     this.currentState = getRandomSkillsRankingState(targetPhase, this.experimentGroup);
@@ -114,25 +123,25 @@ class MockSkillsRankingService {
     // For PROOF_OF_VALUE phase, ensure we don't have cancelled_after or succeeded_after
     // as this would make the component think it's already finished
     if (targetPhase === SkillsRankingPhase.PROOF_OF_VALUE) {
-      this.currentState.cancelled_after = undefined;
-      this.currentState.succeeded_after = undefined;
-      this.currentState.puzzles_solved = 0;
-      this.currentState.correct_rotations = 0;
-      this.currentState.clicks_count = 0;
+      this.currentState.metadata.cancelled_after = undefined;
+      this.currentState.metadata.succeeded_after = undefined;
+      this.currentState.metadata.puzzles_solved = 0;
+      this.currentState.metadata.correct_rotations = 0;
+      this.currentState.metadata.clicks_count = 0;
     }
 
-    console.log(`[Mock] Created state with phases:`, this.currentState.phases);
+    console.log(`[Mock] Created state with phase:`, this.currentState.phase);
     console.log(`[Mock] Latest phase before fix:`, getLatestPhaseName(this.currentState));
 
     // Ensure the state is actually in the target phase
-    if (this.currentState.phases && this.currentState.phases.length > 0) {
-      this.currentState.phases[this.currentState.phases.length - 1] = {
+    if (this.currentState.phase && this.currentState.phase.length > 0) {
+      this.currentState.phase[this.currentState.phase.length - 1] = {
         name: targetPhase,
         time: new Date().toISOString(),
       };
     } else {
-      // If phases array is empty or doesn't exist, create it
-      this.currentState.phases = [
+      // If phase array is empty or doesn't exist, create it
+      this.currentState.phase = [
         {
           name: targetPhase,
           time: new Date().toISOString(),
@@ -140,7 +149,7 @@ class MockSkillsRankingService {
       ];
     }
 
-    console.log(`[Mock] State phases after fix:`, this.currentState.phases);
+    console.log(`[Mock] State phase after fix:`, this.currentState.phase);
     console.log(`[Mock] Latest phase after fix:`, getLatestPhaseName(this.currentState));
 
     // Double-check that the phase is correct
@@ -150,19 +159,16 @@ class MockSkillsRankingService {
     }
 
     // Update state with provided data
-    if (perceived_rank_percentile !== undefined) {
-      this.currentState.perceived_rank_percentile = perceived_rank_percentile;
-    }
-    if (retyped_rank_percentile !== undefined) {
-      this.currentState.retyped_rank_percentile = retyped_rank_percentile;
+    if (options?.perceived_rank_percentile !== undefined) {
+      this.currentState.user_responses.perceived_rank_percentile = options.perceived_rank_percentile;
     }
     if (metrics) {
-      Object.assign(this.currentState, metrics);
+      Object.assign(this.currentState.metadata, metrics);
     }
 
-    // Update phases array to include the new phase
-    if (this.currentState.phases) {
-      this.currentState.phases.push({
+    // Update phase array to include the new phase
+    if (this.currentState.phase) {
+      this.currentState.phase.push({
         name: targetPhase,
         time: new Date().toISOString(),
       });
@@ -306,30 +312,24 @@ export default meta;
 
 type Story = StoryObj<typeof SkillsRankingFlowTester>;
 
-export const Group1_TimeBased: Story = {
+export const Group1_NoDisclosure: Story = {
   args: {
     experimentGroup: SkillsRankingExperimentGroups.GROUP_1,
   },
   render: (args) => <SkillsRankingFlowTester {...args} onFinishFlow={action("Group 1 flow finished")} />,
 };
 
-export const Group2_WorkBased: Story = {
+export const Group2_MostDemandedOnly: Story = {
   args: {
     experimentGroup: SkillsRankingExperimentGroups.GROUP_2,
   },
   render: (args) => <SkillsRankingFlowTester {...args} onFinishFlow={action("Group 2 flow finished")} />,
 };
 
-export const Group3_WorkBased: Story = {
+export const Group3_MostAndLeastDemanded: Story = {
   args: {
     experimentGroup: SkillsRankingExperimentGroups.GROUP_3,
   },
   render: (args) => <SkillsRankingFlowTester {...args} onFinishFlow={action("Group 3 flow finished")} />,
 };
 
-export const Group4_TimeBased: Story = {
-  args: {
-    experimentGroup: SkillsRankingExperimentGroups.GROUP_4,
-  },
-  render: (args) => <SkillsRankingFlowTester {...args} onFinishFlow={action("Group 4 flow finished")} />,
-};

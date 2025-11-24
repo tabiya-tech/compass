@@ -1,29 +1,14 @@
-import { Meta, StoryObj } from "@storybook/react";
-import SkillsRankingPerceivedRank from "src/features/skillsRanking/components/skillsRankingPerceivedRank/SkillsRankingPerceivedRank";
-import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
-import {
-  SkillsRankingState,
-  SkillsRankingPhase,
-  SkillsRankingPhaseWithTime,
-  SkillsRankingExperimentGroups,
-} from "src/features/skillsRanking/types";
 import { Box } from "@mui/material";
-import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
+import { faker } from "@faker-js/faker";
+import { Meta, StoryObj } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
 
-const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
-  <Box sx={{ width: "600px" }}>{children}</Box>
-);
+import SkillsRankingPerceivedRank
+  from "src/features/skillsRanking/components/skillsRankingPerceivedRank/SkillsRankingPerceivedRank";
 
-const createPhaseArray = (phase: SkillsRankingPhase): SkillsRankingPhaseWithTime[] => {
-  return [
-    {
-      name: phase,
-      time: new Date().toISOString(),
-    },
-  ];
-};
+const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
+  <Box sx={{ width: "700px", padding: "50px" }}>{children}</Box>
+);
 
 const meta: Meta<typeof SkillsRankingPerceivedRank> = {
   title: "Features/SkillsRanking/SkillsRankingPerceivedRank",
@@ -31,26 +16,6 @@ const meta: Meta<typeof SkillsRankingPerceivedRank> = {
   tags: ["autodocs"],
   decorators: [
     (Story) => {
-      // Mock session ID
-      const mockUserPreferencesStateService = UserPreferencesStateService.getInstance();
-      mockUserPreferencesStateService.getActiveSessionId = () => 1234;
-
-      // Mock state update call
-      // @ts-ignore
-      SkillsRankingService.getInstance().updateSkillsRankingState = (
-        sessionId: number,
-        phase: SkillsRankingPhase,
-        perceivedRankPercentile?: number,
-        retypedRankPercentile?: number
-      ) => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            action("success")(`Updated skills ranking state to phase: ${phase}`);
-            resolve(getRandomSkillsRankingState(phase, SkillsRankingExperimentGroups.GROUP_1));
-          }, 1000);
-        });
-      };
-
       return (
         <FixedWidthWrapper>
           <Story />
@@ -64,17 +29,48 @@ export default meta;
 
 type Story = StoryObj<typeof SkillsRankingPerceivedRank>;
 
-const createState = (phase: SkillsRankingPhase) => {
-  const state = getRandomSkillsRankingState(phase, SkillsRankingExperimentGroups.GROUP_1);
-  state.phases = createPhaseArray(phase);
-  return state;
-};
-
 export const Default: Story = {
   args: {
-    onFinish: async (state: SkillsRankingState) => {
-      console.log("onFinish called with state:", state);
-    },
-    skillsRankingState: createState(SkillsRankingPhase.PERCEIVED_RANK),
+    onSubmit: (value: number) => action(`User Clicked ${value}`),
+    isReadOnly: false,
+    mostDemandedLabel: faker.word.words({ count: 2 }),
+    sentAt: faker.date.recent().toISOString(),
+  },
+};
+
+export const ReadOnly: Story = {
+  args: {
+    onSubmit: (value: number) => action("onSubmit")({ value }),
+    isReadOnly: true,
+    defaultValue: 45,
+    mostDemandedLabel: faker.word.words({ count: 3 }),
+    sentAt: faker.date.recent().toISOString(),
+  },
+};
+
+export const Group2: Story = {
+  args: {
+    onSubmit: (value: number) => action("onSubmit")({ value }),
+    isReadOnly: false,
+    mostDemandedLabel: faker.word.words({ count: 2 }),
+    sentAt: faker.date.recent().toISOString(),
+  },
+};
+
+export const Group3: Story = {
+  args: {
+    onSubmit: (value: number) => action("onSubmit")({ value }),
+    isReadOnly: false,
+    mostDemandedLabel: faker.word.words({ count: 3 }),
+    sentAt: faker.date.recent().toISOString(),
+  },
+};
+
+export const VerLongLabel: Story = {
+  args: {
+    onSubmit: (value: number) => action("onSubmit")({ value }),
+    isReadOnly: false,
+    mostDemandedLabel: faker.word.words({ count: 7 }),
+    sentAt: faker.date.recent().toISOString(),
   },
 };

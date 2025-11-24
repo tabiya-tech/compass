@@ -23,7 +23,7 @@ class IRegistrationDataRepository(ABC):
 
 class ISkillsRankingStateRepository(ABC):
     @abstractmethod
-    async def get_by_session_id(self, session_id: int) -> SkillsRankingState:
+    async def get_by_session_id(self, session_id: int) -> SkillsRankingState | None:
         """
         Get skills ranking state by session ID.
         :param session_id: conversation unique identifier

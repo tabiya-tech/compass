@@ -1,7 +1,3 @@
-from features.skills_ranking.services.errors import (
-    SkillsRankingGenericError,
-)
-
 from datetime import datetime
 from http import HTTPStatus
 from typing import Generator, Tuple
@@ -20,6 +16,9 @@ from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequ
 from common_libs.test_utilities.mock_auth import MockAuth
 from features.skills_ranking.constants import SKILLS_RANKING_FEATURE_ID
 from features.skills_ranking.errors import InvalidNewPhaseError, InvalidFieldsForPhaseError
+from features.skills_ranking.services.errors import (
+    SkillsRankingGenericError,
+)
 from features.skills_ranking.state._test_utilities import get_skills_ranking_state
 from features.skills_ranking.state.repositories.get_skills_ranking_state_repository import \
     get_skills_ranking_state_mongo_repository
@@ -150,7 +149,7 @@ class TestSkillsRankingRoutes:
             # AND the user has a valid session with the correct experiment groups
             mocked_preferences.get_user_preference_by_user_id = AsyncMock(
                 return_value=get_mock_user_preferences(given_state.session_id,
-                                                       {SKILLS_RANKING_FEATURE_ID: given_state.experiment_group.name}))
+                                                       {SKILLS_RANKING_FEATURE_ID: given_state.metadata.experiment_group.name}))
 
             # AND the repository's get_by_session_id method will return the state
             mocked_skills_ranking_repository.get_by_session_id = AsyncMock(return_value=given_state)
@@ -161,35 +160,31 @@ class TestSkillsRankingRoutes:
             # THEN the response is OK
             assert response.status_code == HTTPStatus.OK
             # AND the response contains the state
-            assert response.json() == {
-                "session_id": given_state.session_id,
-                "phase": [
+            response_data = response.json()
+            assert response_data["phase"] == [
                     {
                         "name": p.name,
                         "time": p.time.isoformat().replace("+00:00", "Z")
                     }
                     for p in given_state.phase
-                ],
-                "experiment_group": given_state.experiment_group.name,
-                "score": {
-                    "calculated_at": given_state.score.calculated_at.isoformat().replace("+00:00", "Z"),
-                    "jobs_matching_rank": given_state.score.jobs_matching_rank,
-                    "comparison_rank": given_state.score.comparison_rank,
-                    "comparison_label": given_state.score.comparison_label,
-                },
-                "cancelled_after": given_state.cancelled_after,
-                "succeeded_after": given_state.succeeded_after,
-                "puzzles_solved": given_state.puzzles_solved,
-                "correct_rotations": given_state.correct_rotations,
-                "clicks_count": given_state.clicks_count,
-                "perceived_rank_percentile": given_state.perceived_rank_percentile,
-                "retyped_rank_percentile": given_state.retyped_rank_percentile,
-                "started_at": given_state.started_at.isoformat().replace("+00:00", "Z"),
-                "completed_at": (
-                    given_state.completed_at.isoformat().replace("+00:00", "Z")
-                    if given_state.completed_at else None
-                )
-            }
+            ]
+            assert response_data["session_id"] == given_state.session_id
+            assert response_data["metadata"]["experiment_group"] == given_state.metadata.experiment_group.name
+            assert response_data["metadata"]["started_at"] == given_state.metadata.started_at.isoformat().replace("+00:00", "Z")
+            assert response_data["metadata"].get("completed_at") == (given_state.metadata.completed_at.isoformat().replace("+00:00", "Z") if given_state.metadata.completed_at else None)
+            assert response_data["metadata"].get("cancelled_after") == given_state.metadata.cancelled_after
+            assert response_data["metadata"].get("succeeded_after") == given_state.metadata.succeeded_after
+            assert response_data["metadata"].get("puzzles_solved") == given_state.metadata.puzzles_solved
+            assert response_data["metadata"].get("correct_rotations") == given_state.metadata.correct_rotations
+            assert response_data["metadata"].get("clicks_count") == given_state.metadata.clicks_count
+            assert response_data["score"]["calculated_at"] == given_state.score.calculated_at.isoformat().replace("+00:00", "Z")
+            assert response_data["user_responses"].get("prior_belief_percentile") == given_state.user_responses.prior_belief_percentile
+            assert response_data["user_responses"].get("prior_belief_for_skill_percentile") == given_state.user_responses.prior_belief_for_skill_percentile
+            assert response_data["user_responses"].get("perceived_rank_percentile") == given_state.user_responses.perceived_rank_percentile
+            assert response_data["user_responses"].get("perceived_rank_for_skill_percentile") == given_state.user_responses.perceived_rank_for_skill_percentile
+            assert response_data["user_responses"].get("application_willingness") == (given_state.user_responses.application_willingness.model_dump() if given_state.user_responses.application_willingness else None)
+            assert response_data["user_responses"].get("application_24h") == given_state.user_responses.application_24h
+            assert response_data["user_responses"].get("opportunity_skill_requirement_percentile") == given_state.user_responses.opportunity_skill_requirement_percentile
 
         @pytest.mark.asyncio
         async def test_get_skills_ranking_state_not_found(
@@ -235,8 +230,7 @@ class TestSkillsRankingRoutes:
 
             # WHEN a PATCH request is made with INITIAL phase
             response = client.patch(f"/conversations/{session_id}/skills-ranking/state", json={
-                "phase": "INITIAL",
-                "self_ranking": None
+                "phase": "INITIAL"
             })
 
             # THEN the response is ACCEPTED
@@ -295,7 +289,7 @@ class TestSkillsRankingRoutes:
             # AND the user has a valid session
             mocked_preferences.get_user_preference_by_user_id = AsyncMock(
                 return_value=get_mock_user_preferences(session_id, {
-                    SKILLS_RANKING_FEATURE_ID: existing_state.experiment_group.name}))
+                    SKILLS_RANKING_FEATURE_ID: existing_state.metadata.experiment_group.name}))
             # AND preferences set_experiment_by_user_id should not be called
             mocked_preferences.set_experiment_by_user_id = AsyncMock()
             # AND the service upsert_state will succeed
@@ -305,12 +299,22 @@ class TestSkillsRankingRoutes:
             # WHEN a PATCH request is made to update
             given_new_cancelled_after = "40.0ms"
             given_new_perceived_rank = 75.0
-            given_retyped_rank = 80.0
+            given_perceived_rank_for_skill = 65.0
+            given_application_willingness = {"value": 4, "label": "Likely"}
+            given_application_24h = 6
+            given_opportunity_requirement = 72.0
             response = client.patch(f"/conversations/{session_id}/skills-ranking/state", json={
                 "phase": "COMPLETED",
-                "cancelled_after": given_new_cancelled_after,
-                "perceived_rank_percentile": given_new_perceived_rank,
-                "retyped_rank_percentile": given_retyped_rank
+                "metadata": {
+                    "cancelled_after": given_new_cancelled_after,
+                },
+                "user_responses": {
+                    "perceived_rank_percentile": given_new_perceived_rank,
+                    "perceived_rank_for_skill_percentile": given_perceived_rank_for_skill,
+                    "application_willingness": given_application_willingness,
+                    "application_24h": given_application_24h,
+                    "opportunity_skill_requirement_percentile": given_opportunity_requirement
+                }
             })
 
             # THEN the response is ACCEPTED
@@ -320,12 +324,17 @@ class TestSkillsRankingRoutes:
             call_args = mocked_service.upsert_state.call_args
             assert call_args[1]["session_id"] == session_id
             assert call_args[1]["update_request"].phase == "COMPLETED"
-            assert call_args[1]["update_request"].cancelled_after == given_new_cancelled_after
-            assert call_args[1]["update_request"].perceived_rank_percentile == pytest.approx(given_new_perceived_rank)
-            assert call_args[1]["update_request"].retyped_rank_percentile == pytest.approx(given_retyped_rank)
-            # AND preferences set_experiment_by_user_id is not called
+            assert call_args[1]["update_request"].metadata["cancelled_after"] == given_new_cancelled_after
+            assert call_args[1]["update_request"].user_responses["perceived_rank_percentile"] == pytest.approx(given_new_perceived_rank)
+            assert call_args[1]["update_request"].user_responses["perceived_rank_for_skill_percentile"] == pytest.approx(given_perceived_rank_for_skill)
+            app_willingness = call_args[1]["update_request"].user_responses["application_willingness"]
+            if hasattr(app_willingness, "model_dump"):
+                assert app_willingness.model_dump() == given_application_willingness
+            else:
+                assert app_willingness == given_application_willingness
+            assert call_args[1]["update_request"].user_responses["application_24h"] == given_application_24h
+            assert call_args[1]["update_request"].user_responses["opportunity_skill_requirement_percentile"] == pytest.approx(given_opportunity_requirement)
             mocked_preferences.set_experiment_by_user_id.assert_not_called()
-            # AND the response contains the updated state
             assert response.json()["session_id"] == session_id
             assert response.json()["phase"][-1]["name"] == "COMPLETED"
 
@@ -343,7 +352,7 @@ class TestSkillsRankingRoutes:
             # AND the user has a valid session
             mocked_preferences.get_user_preference_by_user_id = AsyncMock(
                 return_value=get_mock_user_preferences(session_id, {
-                    SKILLS_RANKING_FEATURE_ID: existing_state.experiment_group.name}))
+                    SKILLS_RANKING_FEATURE_ID: existing_state.metadata.experiment_group.name}))
             # AND preferences set_experiment_by_user_id returns
             mocked_preferences.set_experiment_by_user_id = AsyncMock()
             # AND the service upsert_state should raises InvalidNewPhaseError
@@ -378,20 +387,22 @@ class TestSkillsRankingRoutes:
             # AND the user has a valid session
             mocked_preferences.get_user_preference_by_user_id = AsyncMock(
                 return_value=get_mock_user_preferences(session_id, {
-                    SKILLS_RANKING_FEATURE_ID: existing_state.experiment_group.name}))
+                    SKILLS_RANKING_FEATURE_ID: existing_state.metadata.experiment_group.name}))
             # AND preferences set_experiment_by_user_id returns
             mocked_preferences.set_experiment_by_user_id = AsyncMock()
             # AND the service upsert_state should raises InvalidFieldsForPhaseError
             mocked_service.upsert_state = AsyncMock(side_effect=InvalidFieldsForPhaseError(
                 current_phase=existing_state.phase[-1].name,
                 invalid_fields=["cancelled_after"],
-                valid_fields=["phase", "perceived_rank_percentile", "retyped_rank_percentile"]
+                valid_fields=["phase", "perceived_rank_percentile", "perceived_rank_for_skill"]
             ))
 
             # WHEN a PATCH request is made with invalid fields for the phase
             response = client.patch(f"/conversations/{session_id}/skills-ranking/state", json={
                 "phase": "INITIAL",
-                "cancelled_after": "1000ms"  # Invalid field for INITIAL phase
+                "metadata": {
+                    "cancelled_after": "1000ms"  # Invalid field for INITIAL phase
+                }
             })
 
             # THEN the response is BAD_REQUEST
@@ -439,7 +450,7 @@ class TestSkillsRankingRoutes:
             # AND the user has a valid session
             mocked_preferences.get_user_preference_by_user_id = AsyncMock(
                 return_value=get_mock_user_preferences(session_id, {
-                    SKILLS_RANKING_FEATURE_ID: existing_state.experiment_group.name}))
+                    SKILLS_RANKING_FEATURE_ID: existing_state.metadata.experiment_group.name}))
             # AND preferences set_experiment_by_user_id returns
             mocked_preferences.set_experiment_by_user_id = AsyncMock()
             # AND the service upsert_state will raise an exception

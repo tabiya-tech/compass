@@ -66,7 +66,7 @@ type Story = StoryObj<typeof SkillsRankingRetypedRank>;
 
 const createState = (phase: SkillsRankingPhase) => {
   const state = getRandomSkillsRankingState(phase, SkillsRankingExperimentGroups.GROUP_1);
-  state.phases = createPhaseArray(phase);
+  state.phase = createPhaseArray(phase);
   return state;
 };
 
@@ -75,6 +75,6 @@ export const Default: Story = {
     onFinish: async (state: SkillsRankingState) => {
       console.log("onFinish called with state:", state);
     },
-    skillsRankingState: createState(SkillsRankingPhase.RETYPED_RANK),
+    skillsRankingState: createState(SkillsRankingPhase.PERCEIVED_RANK),
   },
 };

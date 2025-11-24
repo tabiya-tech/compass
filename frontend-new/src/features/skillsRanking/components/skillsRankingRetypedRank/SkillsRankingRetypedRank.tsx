@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { Box, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
@@ -53,7 +53,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
   const scrollRef = useAutoScrollOnChange(showTyping);
 
   // Use the utility function instead of local variable
-  const shouldNotShow = shouldSkipMarketDisclosure(skillsRankingState.experiment_group);
+  const shouldNotShow = shouldSkipMarketDisclosure(skillsRankingState.metadata.experiment_group);
 
   const handleUpdateState = useCallback(async () => {
     if (!activeSessionId) {
@@ -64,8 +64,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
       const newState = await SkillsRankingService.getInstance().updateSkillsRankingState(
         activeSessionId,
         SkillsRankingPhase.COMPLETED,
-        undefined,
-        value
+        { perceived_rank_percentile: value }
       );
       setSubmitted(true);
       setShowTyping(true);
@@ -83,14 +82,14 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
   }, [activeSessionId, value, onFinish, enqueueSnackbar]);
 
   const handleSubmit = async () => {
-    if (!submitted && currentPhase === SkillsRankingPhase.RETYPED_RANK) {
+    if (!submitted && currentPhase === SkillsRankingPhase.PERCEIVED_RANK) {
       await handleUpdateState();
     }
   };
 
   useEffect(() => {
-    if (currentPhase !== SkillsRankingPhase.RETYPED_RANK) {
-      setValue(skillsRankingState.retyped_rank_percentile ?? 0);
+    if (currentPhase !== SkillsRankingPhase.PERCEIVED_RANK) {
+      setValue(skillsRankingState.user_responses.perceived_rank_percentile ?? 0);
     }
   }, [skillsRankingState, currentPhase]);
 
@@ -103,7 +102,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           return;
         }
 
-        if (currentPhase !== SkillsRankingPhase.RETYPED_RANK) {
+        if (currentPhase !== SkillsRankingPhase.PERCEIVED_RANK) {
           console.warn(`[RetypedRank] Skipping auto-submit. Phase is already ${currentPhase}`);
           return;
         }
@@ -113,7 +112,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           const newState = await SkillsRankingService.getInstance().updateSkillsRankingState(
             activeSessionId,
             SkillsRankingPhase.COMPLETED,
-            value
+            { perceived_rank_percentile: value }
           );
           await onFinish(newState);
         } catch (err) {
@@ -140,12 +139,10 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           <ChatBubble
             sender={ConversationMessageSender.COMPASS}
             message={
-              <>
+              <Typography>
                 As a last question, let's recall what I told you further above just regarding your own fit with
-                opportunities:{" "}
-                <strong>check again what I said three messages ago, how many percent of opportunities</strong> on{" "}
-                {getJobPlatformUrl()} do you meet the key skills for?
-              </>
+                opportunities: <strong>check again what I said three messages ago, how many percent of opportunities</strong> on {getJobPlatformUrl()} do you meet the key skills for?
+              </Typography>
             }
           >
             <Box padding={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
@@ -155,7 +152,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
                   setStartedEditing(true);
                   setValue(newVal as number);
                 }}
-                disabled={submitted || !isOnline || currentPhase !== SkillsRankingPhase.RETYPED_RANK}
+                disabled={submitted || !isOnline || currentPhase !== SkillsRankingPhase.PERCEIVED_RANK}
                 data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SLIDER}
                 aria-label="Retyped rank percentile slider"
               />
@@ -164,7 +161,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
                 <PrimaryButton
                   onClick={handleSubmit}
                   disabled={
-                    submitted || !startedEditing || !isOnline || currentPhase !== SkillsRankingPhase.RETYPED_RANK
+                    submitted || !startedEditing || !isOnline || currentPhase !== SkillsRankingPhase.PERCEIVED_RANK
                   }
                   data-testid={DATA_TEST_ID.SKILLS_RANKING_RETYPED_RANK_SUBMIT_BUTTON}
                 >
@@ -177,7 +174,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
             <Timestamp
               sentAt={
-                skillsRankingState.phases[skillsRankingState.phases.length - 1]?.time || skillsRankingState.started_at
+                skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.metadata.started_at
               }
             />
           </ChatMessageFooterLayout>
