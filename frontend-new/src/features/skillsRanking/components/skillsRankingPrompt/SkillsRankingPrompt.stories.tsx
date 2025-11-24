@@ -1,8 +1,16 @@
 import { Meta, StoryObj } from "@storybook/react";
 import SkillsRankingPrompt from "src/features/skillsRanking/components/skillsRankingPrompt/SkillsRankingPrompt";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
-import { SkillsRankingPhase, SkillsRankingState, SkillsRankingPhaseWithTime } from "src/features/skillsRanking/types";
+import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
+import {
+  SkillsRankingPhase,
+  SkillsRankingState,
+  SkillsRankingPhaseWithTime,
+  SkillsRankingExperimentGroups,
+} from "src/features/skillsRanking/types";
 import { Box } from "@mui/material";
+import { action } from "@storybook/addon-actions";
 
 const FixedWidthWrapper = ({ children }: { children: React.ReactNode }) => (
   <Box sx={{ width: "600px" }}>{children}</Box>
@@ -22,11 +30,28 @@ const meta: Meta<typeof SkillsRankingPrompt> = {
   component: SkillsRankingPrompt,
   tags: ["autodocs"],
   decorators: [
-    (Story) => (
-      <FixedWidthWrapper>
-        <Story />
-      </FixedWidthWrapper>
-    ),
+    (Story) => {
+      // Mock session ID
+      const mockUserPreferencesStateService = UserPreferencesStateService.getInstance();
+      mockUserPreferencesStateService.getActiveSessionId = () => 1234;
+
+      // Mock state update call
+      // @ts-ignore
+      SkillsRankingService.getInstance().updateSkillsRankingState = (sessionId: number, phase: SkillsRankingPhase) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            action("success")(`Updated skills ranking state to phase: ${phase}`);
+            resolve(getRandomSkillsRankingState());
+          }, 1000);
+        });
+      };
+
+      return (
+        <FixedWidthWrapper>
+          <Story />
+        </FixedWidthWrapper>
+      );
+    },
   ],
 };
 
@@ -34,17 +59,43 @@ export default meta;
 
 type Story = StoryObj<typeof SkillsRankingPrompt>;
 
-const createState = (phase: SkillsRankingPhase) => {
-  const state = getRandomSkillsRankingState();
-  state.phases = createPhaseArray(phase);
-  return state;
+const BaseArgs = {
+  onFinish: async (state: SkillsRankingState) => {
+    action("onFinish")(state);
+  },
+  skillsRankingState: (() => {
+    const base = getRandomSkillsRankingState();
+    base.phase = createPhaseArray(SkillsRankingPhase.INITIAL);
+    return base;
+  })(),
 };
 
-export const Default: Story = {
+export const Group1_NoDisclosure: Story = {
   args: {
-    onFinish: async (state: SkillsRankingState) => {
-      console.log("onFinish called with state:", state);
+    ...BaseArgs,
+    skillsRankingState: {
+      ...BaseArgs.skillsRankingState,
+      metadata: { ...BaseArgs.skillsRankingState.metadata, experiment_group: SkillsRankingExperimentGroups.GROUP_1 },
     },
-    skillsRankingState: createState(SkillsRankingPhase.INITIAL),
+  },
+};
+
+export const Group2_MostDemandedOnly: Story = {
+  args: {
+    ...BaseArgs,
+    skillsRankingState: {
+      ...BaseArgs.skillsRankingState,
+      metadata: { ...BaseArgs.skillsRankingState.metadata, experiment_group: SkillsRankingExperimentGroups.GROUP_2 },
+    },
+  },
+};
+
+export const Group3_MostAndLeastDemanded: Story = {
+  args: {
+    ...BaseArgs,
+    skillsRankingState: {
+      ...BaseArgs.skillsRankingState,
+      metadata: { ...BaseArgs.skillsRankingState.metadata, experiment_group: SkillsRankingExperimentGroups.GROUP_3 },
+    },
   },
 };

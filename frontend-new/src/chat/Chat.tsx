@@ -534,7 +534,7 @@ return {
           if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
             // Check if skill ranking is already completed
             const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(activeSessionId!);
-            const isAlreadyCompleted = skillsRankingState?.completed_at !== undefined;
+            const isAlreadyCompleted = skillsRankingState?.metadata.completed_at !== undefined;
 
             const showConclusionMessage = createShowConclusionMessage(
               lastMessage,
@@ -622,7 +622,7 @@ return {
             if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
               // Check if skill ranking is already completed
               const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(sessionId);
-              const isAlreadyCompleted = skillsRankingState?.completed_at !== undefined;
+              const isAlreadyCompleted = skillsRankingState?.metadata.completed_at !== undefined;
 
               const showConclusionMessage = createShowConclusionMessage(
                 lastMessage,

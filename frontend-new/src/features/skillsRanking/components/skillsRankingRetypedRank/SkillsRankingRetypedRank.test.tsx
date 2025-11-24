@@ -59,16 +59,27 @@ describe("SkillsRankingRetypedRank", () => {
 
   const createState = (phase: SkillsRankingPhase, retyped?: number): SkillsRankingState => ({
     session_id: 1,
+    metadata: {
     experiment_group: SkillsRankingExperimentGroups.GROUP_2,
-    phases: [{ name: phase, time: new Date().toISOString() }],
+      started_at: new Date().toISOString(),
+    },
+    phase: [{ name: phase, time: new Date().toISOString() }],
     score: {
-      jobs_matching_rank: 0,
-      comparison_rank: 0,
-      comparison_label: "MIDDLE",
+      above_average_labels: [],
+      below_average_labels: [],
+      most_demanded_label: "test",
+      most_demanded_percent: 0,
+      least_demanded_label: "test",
+      least_demanded_percent: 0,
+      average_percent_for_jobseeker_skill_groups: 0,
+      average_count_for_jobseeker_skill_groups: 0,
+      province_used: "test",
+      matched_skill_groups: 0,
       calculated_at: new Date().toISOString(),
     },
-    started_at: new Date().toISOString(),
-    retyped_rank_percentile: retyped,
+    user_responses: {
+      ...(retyped !== undefined ? { perceived_rank_percentile: retyped } : {}),
+    },
   });
 
   const setSliderValue = (value: number) => {
@@ -98,7 +109,7 @@ describe("SkillsRankingRetypedRank", () => {
       .spyOn(UserPreferencesStateService, "getInstance")
       .mockReturnValue({ getActiveSessionId: () => givenSessionId } as any);
     const actualOnFinish = jest.fn().mockResolvedValue(undefined);
-    const givenState = createState(SkillsRankingPhase.RETYPED_RANK);
+    const givenState = createState(SkillsRankingPhase.PERCEIVED_RANK);
 
     // WHEN render and change slider and submit
     render(<SkillsRankingRetypedRank onFinish={actualOnFinish} skillsRankingState={givenState} />);
@@ -119,7 +130,7 @@ describe("SkillsRankingRetypedRank", () => {
       jest.runOnlyPendingTimers();
     }); // call onFinish
     await flush();
-    expect(mockUpdate).toHaveBeenCalledWith(givenSessionId, SkillsRankingPhase.COMPLETED, undefined, 55);
+    expect(mockUpdate).toHaveBeenCalledWith(givenSessionId, SkillsRankingPhase.COMPLETED, { perceived_rank_percentile: 55 });
     expect(actualOnFinish).toHaveBeenCalled();
     expect(console.error).not.toHaveBeenCalled();
   });
@@ -146,7 +157,7 @@ describe("SkillsRankingRetypedRank", () => {
       .spyOn(UserPreferencesStateService, "getInstance")
       .mockReturnValue({ getActiveSessionId: () => givenSessionId } as any);
     const actualOnFinish = jest.fn().mockResolvedValue(undefined);
-    const givenState = createState(SkillsRankingPhase.RETYPED_RANK, 23);
+    const givenState = createState(SkillsRankingPhase.PERCEIVED_RANK, 23);
 
     // WHEN render (component returns empty but effect runs)
     render(<SkillsRankingRetypedRank onFinish={actualOnFinish} skillsRankingState={givenState} />);
@@ -157,7 +168,7 @@ describe("SkillsRankingRetypedRank", () => {
 
     // THEN service called and onFinish invoked
     // value remains 0 in RETYPED_RANK (state is not synced from props)
-    expect(mockUpdate).toHaveBeenCalledWith(givenSessionId, SkillsRankingPhase.COMPLETED, 0);
+    expect(mockUpdate).toHaveBeenCalledWith(givenSessionId, SkillsRankingPhase.COMPLETED, {"perceived_rank_percentile": 0});
     expect(actualOnFinish).toHaveBeenCalled();
   });
 
@@ -176,7 +187,7 @@ describe("SkillsRankingRetypedRank", () => {
     } as unknown as SkillsRankingService);
     jest.spyOn(UserPreferencesStateService, "getInstance").mockReturnValue({ getActiveSessionId: () => null } as any);
     const actualOnFinish = jest.fn();
-    const givenState = createState(SkillsRankingPhase.RETYPED_RANK);
+    const givenState = createState(SkillsRankingPhase.PERCEIVED_RANK);
 
     render(<SkillsRankingRetypedRank onFinish={actualOnFinish} skillsRankingState={givenState} />);
     setSliderValue(10);
@@ -232,7 +243,7 @@ describe("SkillsRankingRetypedRank", () => {
       }),
     } as unknown as SkillsRankingService);
     jest.spyOn(UserPreferencesStateService, "getInstance").mockReturnValue({ getActiveSessionId: () => 1 } as any);
-    const givenState = createState(SkillsRankingPhase.RETYPED_RANK);
+    const givenState = createState(SkillsRankingPhase.PERCEIVED_RANK);
 
     // WHEN render
     const { container } = render(<SkillsRankingRetypedRank onFinish={jest.fn()} skillsRankingState={givenState} />);

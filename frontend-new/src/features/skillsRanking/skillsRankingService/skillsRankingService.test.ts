@@ -65,46 +65,66 @@ describe("SkillsRankingService", () => {
     });
   });
 
-  describe("getSkillsRankingState", () => {
-    const mockSkillsRankingState: SkillsRankingState = {
-      session_id: mockSessionId,
-      experiment_group: SkillsRankingExperimentGroups.GROUP_1,
-      phases: [
-        {
-          name: SkillsRankingPhase.INITIAL,
-          time: "2023-01-01T00:00:00.000Z",
-        },
-      ],
-      score: {
-        jobs_matching_rank: 75,
-        comparison_rank: 3,
-        comparison_label: "HIGHEST",
-        calculated_at: "2023-01-01T00:00:00.000Z",
+  const baseApiResponse = {
+    session_id: mockSessionId,
+    phase: [
+      {
+        name: SkillsRankingPhase.INITIAL,
+        time: "2023-01-01T00:00:00.000Z",
       },
+    ],
+    metadata: {
+      experiment_group: "GROUP_1",
       started_at: "2023-01-01T00:00:00.000Z",
-    };
+      completed_at: null,
+      cancelled_after: null,
+      succeeded_after: null,
+      puzzles_solved: null,
+      correct_rotations: null,
+      clicks_count: null,
+    },
+    score: {
+      above_average_labels: ["Skill A", "Skill B"],
+      below_average_labels: ["Skill C"],
+      most_demanded_label: "Skill A",
+      most_demanded_percent: 85.5,
+      least_demanded_label: "Skill C",
+      least_demanded_percent: 15.2,
+      average_percent_for_jobseeker_skill_groups: 50.0,
+      average_count_for_jobseeker_skill_groups: 250.0,
+      province_used: "Ontario",
+      matched_skill_groups: 5,
+      calculated_at: "2023-01-01T00:00:00.000Z",
+    },
+    user_responses: {
+      prior_belief_percentile: null,
+      prior_belief_for_skill_percentile: null,
+      perceived_rank_percentile: null,
+      perceived_rank_for_skill_percentile: null,
+      application_willingness: null,
+      application_24h: null,
+      opportunity_skill_requirement_percentile: null,
+    },
+  };
+
+  const mapExpectedState = (overrides: Partial<SkillsRankingState> = {}): SkillsRankingState => ({
+    session_id: mockSessionId,
+    phase: baseApiResponse.phase,
+    score: baseApiResponse.score,
+    metadata: {
+      experiment_group: SkillsRankingExperimentGroups.GROUP_1,
+      started_at: "2023-01-01T00:00:00.000Z",
+    },
+    user_responses: {},
+    ...overrides,
+  });
+
+  describe("getSkillsRankingState", () => {
+    const mockSkillsRankingState: SkillsRankingState = mapExpectedState();
 
     test("should fetch and return skills ranking state successfully", async () => {
       // GIVEN the API returns a valid skills ranking state
-      const apiResponse = {
-        session_id: mockSessionId,
-        experiment_group: "GROUP_1",
-        phase: [
-          {
-            name: "INITIAL",
-            time: "2023-01-01T00:00:00.000Z",
-          },
-        ],
-        score: {
-          jobs_matching_rank: 75,
-          comparison_rank: 3,
-          comparison_label: "HIGHEST",
-          calculated_at: "2023-01-01T00:00:00.000Z",
-        },
-        started_at: "2023-01-01T00:00:00.000Z",
-      };
-
-      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, apiResponse, "application/json");
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, baseApiResponse, "application/json");
 
       // WHEN getting the skills ranking state
       const result = await service.getSkillsRankingState(mockSessionId);
@@ -137,18 +157,16 @@ describe("SkillsRankingService", () => {
     });
 
     test("should throw SkillsRankingError for invalid experiment group", async () => {
-      // GIVEN the API returns an invalid experiment group
-      const apiResponse = {
-        session_id: mockSessionId,
-        experiment_group: "INVALID_GROUP",
-        phase: [],
-        started_at: "2023-01-01T00:00:00.000Z",
+      const invalidResponse = {
+        ...baseApiResponse,
+        metadata: {
+          ...baseApiResponse.metadata,
+          experiment_group: "INVALID_GROUP",
+        },
       };
 
-      setupAPIServiceSpy(StatusCodes.OK, apiResponse, "application/json");
+      setupAPIServiceSpy(StatusCodes.OK, invalidResponse, "application/json");
 
-      // WHEN getting the skills ranking state
-      // THEN expect a SkillsRankingError to be thrown
       await expect(service.getSkillsRankingState(mockSessionId)).rejects.toThrow(
         new SkillsRankingError("Unknown experiment_group 'INVALID_GROUP' from API")
       );
@@ -170,42 +188,25 @@ describe("SkillsRankingService", () => {
   });
 
   describe("updateSkillsRankingState", () => {
-    const mockUpdatedState: SkillsRankingState = {
-      session_id: mockSessionId,
-      experiment_group: SkillsRankingExperimentGroups.GROUP_1,
-      phases: [
+    const mockUpdatedState: SkillsRankingState = mapExpectedState({
+      phase: [
         {
           name: SkillsRankingPhase.BRIEFING,
           time: "2023-01-01T00:01:00.000Z",
         },
       ],
-      score: {
-        jobs_matching_rank: 75,
-        comparison_rank: 3,
-        comparison_label: "HIGHEST",
-        calculated_at: "2023-01-01T00:00:00.000Z",
-      },
-      started_at: "2023-01-01T00:00:00.000Z",
-    };
+    });
 
     test("should update skills ranking state successfully", async () => {
       // GIVEN the API returns a valid updated state
       const apiResponse = {
-        session_id: mockSessionId,
-        experiment_group: "GROUP_1",
+        ...baseApiResponse,
         phase: [
           {
-            name: "BRIEFING",
+            name: SkillsRankingPhase.BRIEFING,
             time: "2023-01-01T00:01:00.000Z",
           },
         ],
-        score: {
-          jobs_matching_rank: 75,
-          comparison_rank: 3,
-          comparison_label: "HIGHEST",
-          calculated_at: "2023-01-01T00:00:00.000Z",
-        },
-        started_at: "2023-01-01T00:00:00.000Z",
       };
 
       const fetchSpy = setupAPIServiceSpy(StatusCodes.ACCEPTED, apiResponse, "application/json");
@@ -223,7 +224,7 @@ describe("SkillsRankingService", () => {
         failureMessage: `Failed to update skills ranking state for session ${mockSessionId}`,
         expectedContentType: "application/json",
         body: JSON.stringify({
-          phase: SkillsRankingPhase.BRIEFING,
+          phase: SkillsRankingPhase.BRIEFING,"metadata":{}
         }),
       });
 
@@ -234,60 +235,74 @@ describe("SkillsRankingService", () => {
     test("should update state with perceived rank percentile", async () => {
       // GIVEN the API returns a valid updated state
       const apiResponse = {
-        session_id: mockSessionId,
-        experiment_group: "GROUP_1",
+        ...baseApiResponse,
         phase: [],
-        perceived_rank_percentile: 85,
-        started_at: "2023-01-01T00:00:00.000Z",
+        user_responses: {
+          ...baseApiResponse.user_responses,
+          perceived_rank_percentile: 85,
+        },
       };
 
       setupAPIServiceSpy(StatusCodes.ACCEPTED, apiResponse, "application/json");
 
-      // WHEN updating the skills ranking state with perceived rank percentile
       const result = await service.updateSkillsRankingState(
         mockSessionId,
         SkillsRankingPhase.PERCEIVED_RANK,
-        85
+        { perceived_rank_percentile: 85 }
       );
 
-      // THEN expect the result to include the perceived rank percentile
-      expect(result.perceived_rank_percentile).toBe(85);
+      expect(result.user_responses.perceived_rank_percentile).toBe(85);
     });
 
-    test("should update state with retyped rank percentile", async () => {
+    test("should update state with new fields", async () => {
       // GIVEN the API returns a valid updated state
       const apiResponse = {
-        session_id: mockSessionId,
-        experiment_group: "GROUP_1",
+        ...baseApiResponse,
         phase: [],
-        retyped_rank_percentile: 90,
-        started_at: "2023-01-01T00:00:00.000Z",
+        user_responses: {
+          prior_belief_percentile: 70.0,
+          prior_belief_for_skill_percentile: 80.0,
+          perceived_rank_for_skill_percentile: 90.0,
+          application_willingness: { value: 5, label: "Very Willing" },
+          application_24h: 12,
+          opportunity_skill_requirement_percentile: 75.0,
+        },
       };
 
       setupAPIServiceSpy(StatusCodes.ACCEPTED, apiResponse, "application/json");
 
-      // WHEN updating the skills ranking state with retyped rank percentile
       const result = await service.updateSkillsRankingState(
         mockSessionId,
-        SkillsRankingPhase.RETYPED_RANK,
-        undefined,
-        90
+        SkillsRankingPhase.PRIOR_BELIEF,
+        {
+          prior_belief: 70.0,
+          prior_belief_for_skill: 80.0,
+          perceived_rank_for_skill: 90.0,
+          application_willingness: { value: 5, label: "Very Willing" },
+          application_24h: 12,
+          opportunity_skill_requirement: 75.0,
+        }
       );
 
-      // THEN expect the result to include the retyped rank percentile
-      expect(result.retyped_rank_percentile).toBe(90);
+      expect(result.user_responses.prior_belief_percentile).toBe(70.0);
+      expect(result.user_responses.prior_belief_for_skill_percentile).toBe(80.0);
+      expect(result.user_responses.perceived_rank_for_skill_percentile).toBe(90.0);
+      expect(result.user_responses.application_willingness).toEqual({ value: 5, label: "Very Willing" });
+      expect(result.user_responses.application_24h).toBe(12);
+      expect(result.user_responses.opportunity_skill_requirement_percentile).toBe(75.0);
     });
 
     test("should update state with metrics", async () => {
       // GIVEN the API returns a valid updated state
       const apiResponse = {
-        session_id: mockSessionId,
-        experiment_group: "GROUP_1",
+        ...baseApiResponse,
         phase: [],
-        puzzles_solved: 5,
-        correct_rotations: 10,
-        clicks_count: 15,
-        started_at: "2023-01-01T00:00:00.000Z",
+        metadata: {
+          ...baseApiResponse.metadata,
+          puzzles_solved: 5,
+          correct_rotations: 10,
+          clicks_count: 15,
+        },
       };
 
       const metrics: SkillsRankingMetrics = {
@@ -303,29 +318,26 @@ describe("SkillsRankingService", () => {
         mockSessionId,
         SkillsRankingPhase.PROOF_OF_VALUE,
         undefined,
-        undefined,
         metrics
       );
 
       // THEN expect the result to include the metrics
-      expect(result.puzzles_solved).toBe(5);
-      expect(result.correct_rotations).toBe(10);
-      expect(result.clicks_count).toBe(15);
+      expect(result.metadata.puzzles_solved).toBe(5);
+      expect(result.metadata.correct_rotations).toBe(10);
+      expect(result.metadata.clicks_count).toBe(15);
     });
 
     test("should throw SkillsRankingError for invalid experiment group in response", async () => {
-      // GIVEN the API returns an invalid experiment group
       const apiResponse = {
-        session_id: mockSessionId,
-        experiment_group: "INVALID_GROUP",
-        phase: [],
-        started_at: "2023-01-01T00:00:00.000Z",
+        ...baseApiResponse,
+        metadata: {
+          ...baseApiResponse.metadata,
+          experiment_group: "INVALID_GROUP",
+        },
       };
 
       setupAPIServiceSpy(StatusCodes.ACCEPTED, apiResponse, "application/json");
 
-      // WHEN updating the skills ranking state
-      // THEN expect a SkillsRankingError to be thrown
       await expect(service.updateSkillsRankingState(mockSessionId, SkillsRankingPhase.BRIEFING)).rejects.toThrow(
         new SkillsRankingError("Unknown experiment_group 'INVALID_GROUP' from API")
       );
@@ -356,13 +368,14 @@ describe("SkillsRankingService", () => {
     test("should update metrics successfully", async () => {
       // GIVEN the API returns a valid updated state
       const apiResponse = {
-        session_id: mockSessionId,
-        experiment_group: "GROUP_1",
+        ...baseApiResponse,
         phase: [],
-        puzzles_solved: 5,
-        correct_rotations: 10,
-        clicks_count: 15,
-        started_at: "2023-01-01T00:00:00.000Z",
+        metadata: {
+          ...baseApiResponse.metadata,
+          puzzles_solved: 5,
+          correct_rotations: 10,
+          clicks_count: 15,
+        },
       };
 
       const fetchSpy = setupAPIServiceSpy(StatusCodes.ACCEPTED, apiResponse, "application/json");
@@ -379,28 +392,26 @@ describe("SkillsRankingService", () => {
         serviceFunction: "updateSkillsRankingMetrics",
         failureMessage: `Failed to update skills ranking metrics for session ${mockSessionId}`,
         expectedContentType: "application/json",
-        body: JSON.stringify(mockMetrics),
+        body: JSON.stringify({ metadata: mockMetrics }),
       });
 
       // AND expect the result to include the metrics
-      expect(result.puzzles_solved).toBe(5);
-      expect(result.correct_rotations).toBe(10);
-      expect(result.clicks_count).toBe(15);
+      expect(result.metadata.puzzles_solved).toBe(5);
+      expect(result.metadata.correct_rotations).toBe(10);
+      expect(result.metadata.clicks_count).toBe(15);
     });
 
     test("should throw SkillsRankingError for invalid experiment group in response", async () => {
-      // GIVEN the API returns an invalid experiment group
       const apiResponse = {
-        session_id: mockSessionId,
-        experiment_group: "INVALID_GROUP",
-        phase: [],
-        started_at: "2023-01-01T00:00:00.000Z",
+        ...baseApiResponse,
+        metadata: {
+          ...baseApiResponse.metadata,
+          experiment_group: "INVALID_GROUP",
+        },
       };
 
       setupAPIServiceSpy(StatusCodes.ACCEPTED, apiResponse, "application/json");
 
-      // WHEN updating the metrics
-      // THEN expect a SkillsRankingError to be thrown
       await expect(service.updateSkillsRankingMetrics(mockSessionId, mockMetrics)).rejects.toThrow(
         new SkillsRankingError("Unknown experiment_group 'INVALID_GROUP' from API")
       );

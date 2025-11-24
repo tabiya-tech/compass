@@ -4,7 +4,7 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { act, render, screen } from "src/_test_utilities/test-utils";
 import SkillsRankingPrompt, { DATA_TEST_ID } from "./SkillsRankingPrompt";
-import { SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
+import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { DATA_TEST_ID as TYPING_DATA_TEST_ID } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
@@ -38,15 +38,25 @@ describe("SkillsRankingPrompt", () => {
 
   const createState = (phase: SkillsRankingPhase): SkillsRankingState => ({
     session_id: 1,
-    experiment_group: 0 as any,
-    phases: [{ name: phase, time: new Date().toISOString() }],
+    metadata: {
+      experiment_group: SkillsRankingExperimentGroups.GROUP_1,
+      started_at: new Date().toISOString(),
+    },
+    phase: [{ name: phase, time: new Date().toISOString() }],
     score: {
-      jobs_matching_rank: 0,
-      comparison_rank: 0,
-      comparison_label: "MIDDLE",
+      above_average_labels: [],
+      below_average_labels: [],
+      most_demanded_label: "test",
+      most_demanded_percent: 0,
+      least_demanded_label: "test",
+      least_demanded_percent: 0,
+      average_percent_for_jobseeker_skill_groups: 0,
+      average_count_for_jobseeker_skill_groups: 0,
+      province_used: "test",
+      matched_skill_groups: 0,
       calculated_at: new Date().toISOString(),
     },
-    started_at: new Date().toISOString(),
+    user_responses: {},
   });
 
   test("should go through steps and call onFinish on completion (non-replay)", async () => {

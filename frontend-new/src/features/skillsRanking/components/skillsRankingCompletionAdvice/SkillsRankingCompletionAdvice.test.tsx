@@ -32,16 +32,31 @@ describe("SkillsRankingCompletionAdvice", () => {
 
   const createState = (phase: SkillsRankingPhase): SkillsRankingState => ({
     session_id: 1,
+    metadata: {
     experiment_group: SkillsRankingExperimentGroups.GROUP_1,
-    phases: [{ name: phase, time: new Date().toISOString() }],
-    score: { jobs_matching_rank: 0, comparison_rank: 0, comparison_label: "MIDDLE", calculated_at: new Date().toISOString() },
     started_at: new Date().toISOString(),
+    },
+    phase: [{ name: phase, time: new Date().toISOString() }],
+    score: {
+      above_average_labels: [],
+      below_average_labels: [],
+      most_demanded_label: "test",
+      most_demanded_percent: 0,
+      least_demanded_label: "test",
+      least_demanded_percent: 0,
+      average_percent_for_jobseeker_skill_groups: 0,
+      average_count_for_jobseeker_skill_groups: 0,
+      province_used: "test",
+      matched_skill_groups: 0,
+      calculated_at: new Date().toISOString(),
+    },
+    user_responses: {},
   });
 
   test("should show advice then typing then call onFinish (non-replay)", async () => {
     // GIVEN initial flow
     const actualOnFinish = jest.fn().mockResolvedValue(undefined);
-    const givenState = createState(SkillsRankingPhase.RETYPED_RANK);
+    const givenState = createState(SkillsRankingPhase.PERCEIVED_RANK);
 
     // WHEN rendering
     render(<SkillsRankingCompletionAdvice onFinish={actualOnFinish} skillsRankingState={givenState} />);
@@ -83,7 +98,7 @@ describe("SkillsRankingCompletionAdvice", () => {
     const { shouldSkipMarketDisclosure } = jest.requireMock("src/features/skillsRanking/utils/createMessages");
     shouldSkipMarketDisclosure.mockReturnValueOnce(true);
     const actualOnFinish = jest.fn();
-    const givenState = createState(SkillsRankingPhase.RETYPED_RANK);
+    const givenState = createState(SkillsRankingPhase.PERCEIVED_RANK);
 
     // WHEN rendering
     const { container } = render(

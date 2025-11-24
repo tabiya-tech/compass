@@ -6,10 +6,10 @@ import pytest
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
+from app.app_config import ApplicationConfig, set_application_config, get_application_config
 from app.countries import Country
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.version.types import Version
-from app.app_config import ApplicationConfig, set_application_config, get_application_config
 
 
 @pytest.fixture(scope='session')

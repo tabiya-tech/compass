@@ -1,41 +1,67 @@
-from features.skills_ranking.state.services.type import SkillsRankingPhaseName
+from features.skills_ranking.state.services.type import (
+    SkillRankingExperimentGroup,
+    SkillsRankingPhaseName,
+)
+
+_GROUP_PHASE_SEQUENCE: dict[SkillRankingExperimentGroup, list[SkillsRankingPhaseName]] = {
+    SkillRankingExperimentGroup.GROUP_1: [
+        "INITIAL",
+        "BRIEFING",
+        "PROOF_OF_VALUE_INTRO",
+        "PROOF_OF_VALUE",
+        "PRIOR_BELIEF",
+        "PRIOR_BELIEF_FOR_SKILL",
+        "OPPORTUNITY_SKILL_REQUIREMENT",
+        "DISCLOSURE",
+        "COMPLETED",
+    ],
+    SkillRankingExperimentGroup.GROUP_2: [
+        "INITIAL",
+        "BRIEFING",
+        "PROOF_OF_VALUE_INTRO",
+        "PROOF_OF_VALUE",
+        "PRIOR_BELIEF",
+        "PRIOR_BELIEF_FOR_SKILL",
+        "DISCLOSURE",
+        "APPLICATION_WILLINGNESS",
+        "APPLICATION_24H",
+        "PERCEIVED_RANK",
+        "PERCEIVED_RANK_FOR_SKILL",
+        "OPPORTUNITY_SKILL_REQUIREMENT",
+        "COMPLETED",
+    ],
+    SkillRankingExperimentGroup.GROUP_3: [
+        "INITIAL",
+        "BRIEFING",
+        "PROOF_OF_VALUE_INTRO",
+        "PROOF_OF_VALUE",
+        "PRIOR_BELIEF",
+        "PRIOR_BELIEF_FOR_SKILL",
+        "DISCLOSURE",
+        "APPLICATION_WILLINGNESS",
+        "APPLICATION_24H",
+        "PERCEIVED_RANK",
+        "PERCEIVED_RANK_FOR_SKILL",
+        "OPPORTUNITY_SKILL_REQUIREMENT",
+        "COMPLETED",
+    ],
+}
 
 
-def get_possible_next_phase(current_phase: SkillsRankingPhaseName) -> list[SkillsRankingPhaseName]:
+def get_possible_next_phase(current_phase: SkillsRankingPhaseName,
+                            experiment_group: SkillRankingExperimentGroup) -> list[SkillsRankingPhaseName]:
     """
-    Returns the list of possible next phase based on the current phase.
-    This is a more explicit and testable alternative to the phase navigation graph.
-
-    Args:
-        current_phase: The current phase of the skills ranking process
-
-    Returns:
-        List of possible next phases (including the current phase for metrics-only updates)
+    Returns the list of possible next phases based on the current phase and experiment group.
+    Includes the current phase to allow metrics-only updates.
     """
-    if current_phase == "INITIAL":
-        return ["INITIAL", "BRIEFING"]
+    sequence = _GROUP_PHASE_SEQUENCE.get(experiment_group, [])
+    if not sequence or current_phase not in sequence:
+        return []
 
-    if current_phase == "BRIEFING":
-        return ["BRIEFING", "PROOF_OF_VALUE"]
+    current_index = sequence.index(current_phase)
+    if current_index == len(sequence) - 1:
+        # Terminal state
+        return [current_phase]
 
-    if current_phase == "PROOF_OF_VALUE":
-        return ["PROOF_OF_VALUE", "MARKET_DISCLOSURE", "JOB_SEEKER_DISCLOSURE"]
-
-    if current_phase == "MARKET_DISCLOSURE":
-        return ["MARKET_DISCLOSURE", "JOB_SEEKER_DISCLOSURE"]
-
-    if current_phase == "JOB_SEEKER_DISCLOSURE":
-        return ["JOB_SEEKER_DISCLOSURE", "PERCEIVED_RANK"]
-
-    if current_phase == "PERCEIVED_RANK":
-        return ["PERCEIVED_RANK", "RETYPED_RANK", "COMPLETED"]
-
-    if current_phase == "RETYPED_RANK":
-        return ["RETYPED_RANK", "COMPLETED"]
-
-    # COMPLETED is a terminal state with no next states, but allows same phase for metrics updates
-    if current_phase == "COMPLETED":
-        return ["COMPLETED"]
-
-    # Fallback - should not reach here
-    return []
+    next_phase = sequence[current_index + 1]
+    return [current_phase, next_phase]

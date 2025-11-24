@@ -123,27 +123,7 @@ export class SkillsRankingService extends FeaturesService {
       return null;
     }
 
-    // Validate experiment group returned from the API.
-    if (data.experiment_group && !isValidExperimentGroupKey(data.experiment_group)) {
-      throw new SkillsRankingError(`Unknown experiment_group '${data.experiment_group}' from API`);
-    }
-
-    return {
-      session_id: data.session_id,
-      experiment_group:
-        SkillsRankingExperimentGroups[data.experiment_group as keyof typeof SkillsRankingExperimentGroups],
-      phases: data.phase,
-      score: data.score,
-      cancelled_after: data.cancelled_after,
-      succeeded_after: data.succeeded_after,
-      puzzles_solved: data.puzzles_solved,
-      correct_rotations: data.correct_rotations,
-      clicks_count: data.clicks_count,
-      perceived_rank_percentile: data.perceived_rank_percentile,
-      retyped_rank_percentile: data.retyped_rank_percentile,
-      started_at: data.started_at,
-      completed_at: data.completed_at,
-    };
+    return this.mapStateResponse(data);
   }
 
   /**
@@ -151,35 +131,74 @@ export class SkillsRankingService extends FeaturesService {
    *
    * @param sessionId - The ID of the session to update the ranking state for.
    * @param phase - The new current phase.
-   *   This is only relevant for the effort-based proof_of_value task.
-   *   This is only relevant for the time-based proof_of_value task.
-   *     This is only relevant for the time-based proof_of_value task.
-   * @param perceived_rank_percentile - Optional parameter indicating the user's perceived rank percentile (0-100).
-   * @param retyped_rank_percentile - Optional parameter indicating the rank the user retyped to confirm they saw it correctly (0-100).
-   * @param metrics
+   * @param options - Optional parameters for updating the state.
+   * @param options.perceived_rank_percentile - Optional parameter indicating the user's perceived rank percentile (0-100).
+   * @param options.perceived_rank_for_skill - Optional parameter indicating the user's perceived rank for a specific skill (0-100).
+   * @param options.prior_belief - Optional parameter indicating the user's prior belief (0-100).
+   * @param options.prior_belief_for_skill - Optional parameter indicating the user's prior belief for a specific skill (0-100).
+   * @param options.application_willingness - Optional parameter indicating the user's application willingness (value + label).
+   * @param options.application_24h - Optional parameter indicating number of applications willing to submit within 24 hours (0-24).
+   * @param options.opportunity_skill_requirement - Optional parameter indicating required skill percentile for the opportunity (0-100).
+   * @param metrics - Optional metrics for effort task tracking.
    * @returns {Promise<SkillsRankingState>} The updated ranking state for the session.
    */
   async updateSkillsRankingState(
     sessionId: number,
     phase: SkillsRankingPhase,
-    perceived_rank_percentile?: number,
-    retyped_rank_percentile?: number,
+    options?: {
+      perceived_rank_percentile?: number;
+      perceived_rank_for_skill?: number;
+      prior_belief?: number;
+      prior_belief_for_skill?: number;
+      application_willingness?: { value: number; label: string };
+      application_24h?: number;
+      opportunity_skill_requirement?: number;
+    },
     metrics?: SkillsRankingMetrics
   ): Promise<SkillsRankingState> {
     const url = `${this.skillsRankingEndpointUrl}/${sessionId}/skills-ranking/state`;
 
     // Build request body based on phase validation rules
-    const body: any = {
-      phase: phase,
+    const body: Record<string, unknown> = {
+      phase,
     };
 
-    body.cancelled_after = metrics?.cancelled_after ?? undefined;
-    body.succeeded_after = metrics?.succeeded_after ?? undefined;
-    body.puzzles_solved = metrics?.puzzles_solved ?? undefined;
-    body.correct_rotations = metrics?.correct_rotations ?? undefined;
-    body.clicks_count = metrics?.clicks_count ?? undefined;
-    body.perceived_rank_percentile = perceived_rank_percentile ?? undefined;
-    body.retyped_rank_percentile = retyped_rank_percentile ?? undefined;
+    const metadataPayload = {
+      cancelled_after: metrics?.cancelled_after,
+      succeeded_after: metrics?.succeeded_after,
+      puzzles_solved: metrics?.puzzles_solved,
+      correct_rotations: metrics?.correct_rotations,
+      clicks_count: metrics?.clicks_count,
+    };
+    body.metadata = metadataPayload;
+
+    const userResponsesPayload: Record<string, unknown> = {};
+    if (options?.perceived_rank_percentile !== undefined) {
+      userResponsesPayload.perceived_rank_percentile = options.perceived_rank_percentile;
+    }
+    if (options?.perceived_rank_for_skill !== undefined) {
+      userResponsesPayload.perceived_rank_for_skill_percentile = options.perceived_rank_for_skill;
+    }
+    if (options?.prior_belief !== undefined) {
+      userResponsesPayload.prior_belief_percentile = options.prior_belief;
+    }
+    if (options?.prior_belief_for_skill !== undefined) {
+      userResponsesPayload.prior_belief_for_skill_percentile = options.prior_belief_for_skill;
+    }
+    if (options?.application_willingness !== undefined) {
+      userResponsesPayload.application_willingness = options.application_willingness;
+    }
+    if (options?.application_24h !== undefined) {
+      userResponsesPayload.application_24h = options.application_24h;
+    }
+    if (options?.opportunity_skill_requirement !== undefined) {
+      userResponsesPayload.opportunity_skill_requirement_percentile = options.opportunity_skill_requirement;
+    }
+    
+    // Only include user_responses if there are any values to send
+    if (Object.keys(userResponsesPayload).length > 0) {
+      body.user_responses = userResponsesPayload;
+    }
 
     const response = await customFetch(url, {
       method: "PATCH",
@@ -196,26 +215,7 @@ export class SkillsRankingService extends FeaturesService {
 
     const data = await response.json();
 
-    if (data.experiment_group && !isValidExperimentGroupKey(data.experiment_group)) {
-      throw new SkillsRankingError(`Unknown experiment_group '${data.experiment_group}' from API`);
-    }
-
-    return {
-      session_id: data.session_id,
-      experiment_group:
-        SkillsRankingExperimentGroups[data.experiment_group as keyof typeof SkillsRankingExperimentGroups],
-      phases: data.phase,
-      score: data.score,
-      cancelled_after: data.cancelled_after ?? undefined,
-      succeeded_after: data.succeeded_after ?? undefined,
-      puzzles_solved: data.puzzles_solved ?? undefined,
-      correct_rotations: data.correct_rotations ?? undefined,
-      clicks_count: data.clicks_count ?? undefined,
-      perceived_rank_percentile: data.perceived_rank_percentile ?? undefined,
-      retyped_rank_percentile: data.retyped_rank_percentile ?? undefined,
-      started_at: data.started_at,
-      completed_at: data.completed_at ?? undefined,
-    };
+    return this.mapStateResponse(data);
   }
 
   /**
@@ -238,32 +238,21 @@ export class SkillsRankingService extends FeaturesService {
       serviceName: "SkillsRankingService",
       serviceFunction: "updateSkillsRankingMetrics",
       failureMessage: `Failed to update skills ranking metrics for session ${sessionId}`,
-      body: JSON.stringify(metrics),
+      body: JSON.stringify({
+        metadata: {
+          cancelled_after: metrics.cancelled_after,
+          succeeded_after: metrics.succeeded_after,
+          puzzles_solved: metrics.puzzles_solved,
+          correct_rotations: metrics.correct_rotations,
+          clicks_count: metrics.clicks_count,
+        },
+      }),
       expectedContentType: "application/json",
     });
 
     const data = await response.json();
 
-    if (data.experiment_group && !isValidExperimentGroupKey(data.experiment_group)) {
-      throw new SkillsRankingError(`Unknown experiment_group '${data.experiment_group}' from API`);
-    }
-
-    return {
-      session_id: data.session_id,
-      experiment_group:
-        SkillsRankingExperimentGroups[data.experiment_group as keyof typeof SkillsRankingExperimentGroups],
-      phases: data.phase,
-      score: data.score,
-      cancelled_after: data.cancelled_after,
-      succeeded_after: data.succeeded_after,
-      puzzles_solved: data.puzzles_solved,
-      correct_rotations: data.correct_rotations,
-      clicks_count: data.clicks_count,
-      perceived_rank_percentile: data.perceived_rank_percentile,
-      retyped_rank_percentile: data.retyped_rank_percentile,
-      started_at: data.started_at,
-      completed_at: data.completed_at,
-    };
+    return this.mapStateResponse(data);
   }
 
   /**
@@ -310,5 +299,50 @@ export class SkillsRankingService extends FeaturesService {
         `Invalid configuration for feature ${this.featureId}: longTypingDurationMs must be a number`
       );
     }
+  }
+
+  private parseExperimentGroup(value: string): SkillsRankingExperimentGroups {
+    if (!isValidExperimentGroupKey(value)) {
+      throw new SkillsRankingError(`Unknown experiment_group '${value}' from API`);
+    }
+    return SkillsRankingExperimentGroups[value];
+  }
+
+  private mapStateResponse(data: any): SkillsRankingState {
+    if (!data?.metadata || !data?.score || data?.session_id === undefined) {
+      throw new SkillsRankingError("Malformed skills ranking state response from API");
+    }
+
+    const phaseHistory = Array.isArray(data.phase) ? data.phase : [];
+    const experiment_group = this.parseExperimentGroup(data.metadata.experiment_group);
+    const metadata = {
+      experiment_group,
+      started_at: data.metadata.started_at,
+      completed_at: data.metadata.completed_at ?? undefined,
+      cancelled_after: data.metadata.cancelled_after ?? undefined,
+      succeeded_after: data.metadata.succeeded_after ?? undefined,
+      puzzles_solved: data.metadata.puzzles_solved ?? undefined,
+      correct_rotations: data.metadata.correct_rotations ?? undefined,
+      clicks_count: data.metadata.clicks_count ?? undefined,
+    };
+
+    const user_responses = {
+      prior_belief_percentile: data.user_responses?.prior_belief_percentile ?? undefined,
+      prior_belief_for_skill_percentile: data.user_responses?.prior_belief_for_skill_percentile ?? undefined,
+      perceived_rank_percentile: data.user_responses?.perceived_rank_percentile ?? undefined,
+      perceived_rank_for_skill_percentile: data.user_responses?.perceived_rank_for_skill_percentile ?? undefined,
+      application_willingness: data.user_responses?.application_willingness ?? undefined,
+      application_24h: data.user_responses?.application_24h ?? undefined,
+      opportunity_skill_requirement_percentile:
+        data.user_responses?.opportunity_skill_requirement_percentile ?? undefined,
+    };
+
+    return {
+      session_id: data.session_id,
+      phase: phaseHistory,
+      score: data.score,
+      metadata,
+      user_responses,
+    };
   }
 }

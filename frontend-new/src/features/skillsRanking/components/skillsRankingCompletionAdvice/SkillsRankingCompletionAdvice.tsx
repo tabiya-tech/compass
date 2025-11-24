@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { Box, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
@@ -75,7 +75,7 @@ const SkillsRankingCompletionAdvice: React.FC<Readonly<SkillsRankingCompletionAd
     return () => clearTimeout(timeout);
   }, [onFinish, skillsRankingState, isReplay]);
 
-  if (shouldSkipMarketDisclosure(skillsRankingState.experiment_group)) {
+  if (shouldSkipMarketDisclosure(skillsRankingState.metadata.experiment_group)) {
     return <></>;
   }
 
@@ -88,10 +88,10 @@ const SkillsRankingCompletionAdvice: React.FC<Readonly<SkillsRankingCompletionAd
       <Box sx={{ width: "100%" }}>
         <ChatBubble
           message={
-            <>
+            <Typography>
               Some advice: These numbers are for you. How might these numbers change the way you look for roles this
               week? Pause and consider where your time and energy now feel best spent in your strategy to find a job.
-            </>
+            </Typography>
           }
           sender={ConversationMessageSender.COMPASS}
         />
@@ -99,7 +99,7 @@ const SkillsRankingCompletionAdvice: React.FC<Readonly<SkillsRankingCompletionAd
         <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
           <Timestamp
             sentAt={
-              skillsRankingState.phases[skillsRankingState.phases.length - 1]?.time || skillsRankingState.started_at
+              skillsRankingState.phase[skillsRankingState.phase.length - 1]?.time || skillsRankingState.metadata.started_at
             }
           />
         </ChatMessageFooterLayout>
