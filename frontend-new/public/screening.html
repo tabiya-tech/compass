@@ -718,6 +718,26 @@
     }
   }
 
+  function redirectToControlGroup(context) {
+    window.location.href = context.configs.CONTROL_GROUP_REDIRECT_LINK;
+    return true;
+  }
+
+  function redirectToStaticForm(context) {
+    const staticFormLink = context.configs.STATIC_FORM_REDIRECT_LINK;
+    if (!staticFormLink) {
+      console.error("Static form redirect link is not configured.");
+      showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+      const errorContainer = document.getElementById("server-error-message-content");
+      if (errorContainer) {
+        errorContainer.innerHTML = "Static form redirect link is not configured. Please contact support.";
+      }
+      return false;
+    }
+    window.location.href = staticFormLink;
+    return true;
+  }
+
   function getClientID() {
     let clientId = localStorage.getItem(ENV_KEYS.CLIENT_ID);
     if (!clientId) {
@@ -888,34 +908,48 @@
         return;
       }
 
-      if (data.group === "not_using_compass") {
-        window.location.href = context.configs.CONTROL_GROUP_REDIRECT_LINK;
-      } else if (data.group === "using_compass") {
-        const credentials = data.credentials;
+      const assignedGroup = data.group;
 
-        firebase.initializeApp({
-          apiKey: context.configs.RCT_FIREBASE_API_KEY,
-          authDomain: atob(window.tabiyaConfig.FIREBASE_AUTH_DOMAIN),
-        });
+      if (assignedGroup === context.groups.NOT_USING_COMPASS) {
+        redirectToControlGroup(context);
+        return;
+      }
 
-        const userCredential = await firebase.auth().signInWithEmailAndPassword(context.request.email, atob(credentials.password));
-        const token = await userCredential.user.getIdToken();
+      if (assignedGroup === context.groups.STATIC_FORM) {
+        redirectToStaticForm(context);
+        return;
+      }
 
-        // Set the client ID and token in localStorage
-        localStorage.setItem(ENV_KEYS.TOKEN, token);
-        localStorage.setItem(ENV_KEYS.LOGIN_METHOD, LOGIN_METHODS.FIREBASE_EMAIL);
+      if (assignedGroup !== context.groups.USING_COMPASS) {
+        console.error("Invalid group:", assignedGroup);
+        showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+        return;
+      }
 
-        showSection(IDS.SECTIONS.CHAT_CONTAINER);
+      const credentials = data.credentials;
 
-        // Set chat iframe source and handle its load event
-        const chatIframe = document.querySelector(`#${CHAT_PAGE_CONTAINER_IFRAME} iframe`);
-        if (chatIframe) {
-          chatIframe.onload = () => {
-            handleShowSnackbarNotification();
-            history.replaceState({}, document.title, "/#/");
-          };
-          chatIframe.src = "/#/";
-        }
+      firebase.initializeApp({
+        apiKey: context.configs.RCT_FIREBASE_API_KEY,
+        authDomain: atob(window.tabiyaConfig.FIREBASE_AUTH_DOMAIN),
+      });
+
+      const userCredential = await firebase.auth().signInWithEmailAndPassword(context.request.email, atob(credentials.password));
+      const token = await userCredential.user.getIdToken();
+
+      // Set the client ID and token in localStorage
+      localStorage.setItem(ENV_KEYS.TOKEN, token);
+      localStorage.setItem(ENV_KEYS.LOGIN_METHOD, LOGIN_METHODS.FIREBASE_EMAIL);
+
+      showSection(IDS.SECTIONS.CHAT_CONTAINER);
+
+      // Set chat iframe source and handle its load event
+      const chatIframe = document.querySelector(`#${CHAT_PAGE_CONTAINER_IFRAME} iframe`);
+      if (chatIframe) {
+        chatIframe.onload = () => {
+          handleShowSnackbarNotification();
+          history.replaceState({}, document.title, "/#/");
+        };
+        chatIframe.src = "/#/";
       }
     } catch (error) {
       console.error("Error:", error);
@@ -1040,6 +1074,7 @@
     const RCT_BACKEND_API_KEY = atob(screeningConfig.RCT_BACKEND_API_KEY);
     const RCT_FIREBASE_API_KEY = atob(screeningConfig.RCT_FIREBASE_API_KEY);
     const CONTROL_GROUP_REDIRECT_LINK = atob(screeningConfig.CONTROL_GROUP_REDIRECT_LINK);
+    const STATIC_FORM_REDIRECT_LINK = screeningConfig.STATIC_FORM_REDIRECT_LINK ? atob(screeningConfig.STATIC_FORM_REDIRECT_LINK) : "";
 
     const { email, externalUserId } = getUrlParams();
 
@@ -1049,10 +1084,12 @@
         RCT_BACKEND_API_KEY,
         RCT_FIREBASE_API_KEY,
         CONTROL_GROUP_REDIRECT_LINK,
+        STATIC_FORM_REDIRECT_LINK,
       },
       groups: {
         USING_COMPASS: atob(screeningConfig.USER_GROUP_USING_COMPASS),
         NOT_USING_COMPASS: atob(screeningConfig.USER_GROUP_NOT_USING_COMPASS),
+        STATIC_FORM: screeningConfig.USER_GROUP_STATIC_FORM ? atob(screeningConfig.USER_GROUP_STATIC_FORM) : "static_form",
       },
       request: {
         email,
@@ -1093,9 +1130,17 @@
 
       if (acceptedTc && group) {
         // User has accepted and has a group redirect accordingly
-        return group === context.groups.USING_COMPASS
-          ? window.location.replace("/#/")
-          : window.location.href = context.configs.CONTROL_GROUP_REDIRECT_LINK;
+        if (group === context.groups.USING_COMPASS) {
+          window.location.replace("/#/");
+        } else if (group === context.groups.NOT_USING_COMPASS) {
+          redirectToControlGroup(context);
+        } else if (group === context.groups.STATIC_FORM) {
+          redirectToStaticForm(context);
+        } else {
+          console.error("Unknown group:", group);
+          showSection(IDS.SECTIONS.SERVER_ERROR_MESSAGE);
+        }
+        return;
       } else if (acceptedTc) {
         // User has accepted, but no group show initial question
         return showSection(IDS.SECTIONS.INITIAL_QUESTION);
