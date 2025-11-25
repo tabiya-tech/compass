@@ -20,7 +20,12 @@ class RegistrationMongoRepository(IRegistrationDataRepository):
             # https://github.com/tabiya-tech/zaf-rct/blob/main/backend/src/createUser/usersModel.ts#L10
             doc = await self._collection.find_one(
                 {"compassUserId": {"$eq": user_id}},
-                {"externalUserId": 1, 'opportunityRankPriorBelief': 1, "compareToOthersPriorBelief": 1, '_id': False}
+                {
+                    "externalUserId": 1,
+                    'opportunityRankPriorBelief': 1,
+                    "compareToOthersPriorBelief": 1,
+                    "province": 1,
+                    '_id': False}
             )
 
             if not doc:
@@ -32,10 +37,14 @@ class RegistrationMongoRepository(IRegistrationDataRepository):
             if "compareToOthersPriorBelief" not in doc:
                 self._logger.error("compareToOthersPriorBelief not found in document, setting to default 0.0")
 
+            if "province" not in doc:
+                self._logger.error("province not found in document, using the ALL")
+
             return PriorBeliefs(
                 external_user_id=doc.get("externalUserId"),
                 compare_to_others_prior_belief=doc.get("compareToOthersPriorBelief", 0.0),
-                opportunity_rank_prior_belief=doc.get("opportunityRankPriorBelief") # it is validated to be available
+                opportunity_rank_prior_belief=doc.get("opportunityRankPriorBelief"),  # it is validated to be available,
+                province=doc.get("province", "ALL")
             )
         except Exception as e:
             self._logger.error(f"Failed to get prior belief for user {user_id}: {e}")
