@@ -1,6 +1,6 @@
 import pytest
 
-from common_libs.test_utilities import get_random_user_id
+from common_libs.test_utilities import get_random_user_id, get_random_printable_string
 from features.skills_ranking.state.repositories.errors import RegistrationDataNotFoundError
 from features.skills_ranking.state.repositories.registration_mongo_repository import RegistrationMongoRepository
 
@@ -11,6 +11,7 @@ class TestGetPriorBeliefs:
         # GIVEN a compass user id
         given_user_id = get_random_user_id()
         given_external_user_id = get_random_user_id()
+        given_user_province = get_random_printable_string(10)
 
         # AND given a collection name, and a document with all the fields
         given_collection_name = "registration_data"
@@ -18,6 +19,7 @@ class TestGetPriorBeliefs:
             "compassUserId": given_user_id,
             "externalUserId": given_external_user_id,
             "opportunityRankPriorBelief": 0.8,
+            "province": given_user_province,
             "compareToOthersPriorBelief": 0.5
         }
 
@@ -34,6 +36,7 @@ class TestGetPriorBeliefs:
         # THEN the returned PriorBeliefs object should match the expected values
         assert prior_beliefs.opportunity_rank_prior_belief == given_document["opportunityRankPriorBelief"]
         assert prior_beliefs.compare_to_others_prior_belief == given_document["compareToOthersPriorBelief"]
+        assert prior_beliefs.province == given_user_province
         assert prior_beliefs.external_user_id == given_external_user_id
 
     @pytest.mark.asyncio
@@ -99,6 +102,7 @@ class TestGetPriorBeliefs:
         # THEN the returned PriorBeliefs object should have compare_to_others_prior_belief set to 0.0
         assert prior_beliefs.opportunity_rank_prior_belief == given_document["opportunityRankPriorBelief"]
         assert prior_beliefs.compare_to_others_prior_belief == 0
+        assert prior_beliefs.province == "ALL"
 
         # AND a warning should be logged
         assert "compareToOthersPriorBelief not found in document, setting to default 0.0" in caplog.text
