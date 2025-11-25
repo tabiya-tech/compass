@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from dataclasses import dataclass
 from typing import Optional
 
 from pydantic import BaseModel
@@ -41,6 +42,13 @@ class _CollectedExperience(BaseModel):
         Disallow extra fields in the model
         """
         extra = "forbid"
+
+
+@dataclass
+class DataExtractionLLMResult:
+    last_referenced_experience_index: int
+    llm_stats: list[LLMStats]
+    has_user_updates: bool
 
 
 class _DataExtractionLLM:
@@ -94,7 +102,7 @@ class _DataExtractionLLM:
                       user_input: AgentInput,
                       context: ConversationContext,
                       collected_experience_data_so_far: list[CollectedData]
-                      ) -> tuple[int, list[LLMStats]]:
+                      ) -> DataExtractionLLMResult:
         """
         Given the last user input, a conversation history and the experience data collected so far.
         Extracts the experience data from the user input and conversation history and
@@ -176,4 +184,13 @@ class _DataExtractionLLM:
             collected_data.index = index_counter
             index_counter += 1
 
-        return last_referenced_index, llm_stats
+        has_user_updates = any(
+            operation.data_operation and operation.data_operation.lower() != DataOperation.NOOP.value.lower()
+            for operation in operations
+        )
+
+        return DataExtractionLLMResult(
+            last_referenced_experience_index=last_referenced_index,
+            llm_stats=llm_stats,
+            has_user_updates=has_user_updates
+        )

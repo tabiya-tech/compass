@@ -63,6 +63,16 @@ class CollectExperiencesAgentState(BaseModel):
     Whether this is the first time the agent is visited during the conversation.
     """
 
+    final_summary_sent: bool = False
+    """
+    Tracks if the recap has already been presented to the user.
+    """
+
+    final_summary_confirmed: bool = False
+    """
+    Tracks if the user has confirmed the recap so we can end the conversation.
+    """
+
     class Config:
         """
         Disallow extra fields in the model
@@ -111,7 +121,9 @@ class CollectExperiencesAgentState(BaseModel):
                                             collected_data=_doc["collected_data"],
                                             unexplored_types=_doc["unexplored_types"],
                                             explored_types=_doc["explored_types"],
-                                            first_time_visit=_doc["first_time_visit"])
+                                            first_time_visit=_doc["first_time_visit"],
+                                            final_summary_sent=_doc.get("final_summary_sent", False),
+                                            final_summary_confirmed=_doc.get("final_summary_confirmed", False))
 
 
 class CollectExperiencesAgent(Agent):
@@ -141,17 +153,31 @@ class CollectExperiencesAgent(Agent):
         collected_data = self._state.collected_data
         last_referenced_experience_index = -1
         data_extraction_llm_stats = []
+        user_made_updates = False
         if user_input.message == "":
             # If the user input is empty, set it to "(silence)"
             # This is to avoid the agent failing to respond to an empty input
             user_input.message = "(silence)"
+            user_input.is_artificial = True
         else:
             # The data extraction LLM is responsible for extracting the experience data from the conversation
             data_extraction_llm = _DataExtractionLLM(self.logger)
             # TODO: the LLM can and will fail with an exception or even return None, we need to handle this
-            last_referenced_experience_index, data_extraction_llm_stats = await data_extraction_llm.execute(user_input=user_input,
-                                                                                                            context=context,
-                                                                                                            collected_experience_data_so_far=collected_data)
+            extraction_result = await data_extraction_llm.execute(user_input=user_input,
+                                                                  context=context,
+                                                                  collected_experience_data_so_far=collected_data)
+            last_referenced_experience_index = extraction_result.last_referenced_experience_index
+            data_extraction_llm_stats = extraction_result.llm_stats
+            user_made_updates = extraction_result.has_user_updates
+
+        if self._state.final_summary_sent and user_made_updates:
+            self._state.final_summary_sent = False
+            self._state.final_summary_confirmed = False
+
+        if (self._state.final_summary_sent and not self._state.final_summary_confirmed
+                and not user_input.is_artificial and not user_made_updates):
+            self._state.final_summary_confirmed = True
+
         conversion_llm = _ConversationLLM()
         # TODO: Keep track of the last_referenced_experience_index and if it has changed it means that the user has
         #   provided a new experience, we need to handle this as
@@ -168,6 +194,8 @@ class CollectExperiencesAgent(Agent):
             exploring_type=exploring_type,
             unexplored_types=self._state.unexplored_types,
             explored_types=self._state.explored_types,
+            final_summary_sent=self._state.final_summary_sent,
+            final_summary_confirmed=self._state.final_summary_confirmed,
             logger=self.logger)
         self._state.first_time_visit = False  # The first time visit is over
         if conversation_llm_output.exploring_type_finished and self._state.unexplored_types:
@@ -204,7 +232,12 @@ class CollectExperiencesAgent(Agent):
                                                                    exploring_type=exploring_type,
                                                                    unexplored_types=self._state.unexplored_types,
                                                                    explored_types=self._state.explored_types,
+                                                                   final_summary_sent=self._state.final_summary_sent,
+                                                                   final_summary_confirmed=self._state.final_summary_confirmed,
                                                                    logger=self.logger)
+
+        if len(self._state.unexplored_types) == 0 and not self._state.final_summary_sent:
+            self._state.final_summary_sent = True
 
         conversation_llm_output.llm_stats = data_extraction_llm_stats + conversation_llm_output.llm_stats
         return conversation_llm_output

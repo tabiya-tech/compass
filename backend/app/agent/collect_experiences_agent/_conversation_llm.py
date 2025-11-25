@@ -18,6 +18,7 @@ from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
 from common_libs.retry import Retry
 from app.i18n.translation_service import t
+from app.i18n.locale_detector import get_locale
 
 _NO_EXPERIENCE_COLLECTED = "No experience data has been collected yet"
 _FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step."
@@ -100,10 +101,12 @@ class _ConversationLLM:
                       country_of_user: Country,
                       context: ConversationContext,
                       collected_data: list[CollectedData],
-                      exploring_type: WorkType,
+                      exploring_type: WorkType | None,
                       unexplored_types: list[WorkType],
                       explored_types: list[WorkType],
                       last_referenced_experience_index: int,
+                      final_summary_sent: bool,
+                      final_summary_confirmed: bool,
                       logger: logging.Logger) -> ConversationLLMAgentOutput:
         async def _callback(attempt: int, max_retries: int) -> tuple[ConversationLLMAgentOutput, float, BaseException | None]:
             # Call the LLM to get the next message for the user
@@ -126,6 +129,8 @@ class _ConversationLLM:
                 unexplored_types=unexplored_types,
                 explored_types=explored_types,
                 last_referenced_experience_index=last_referenced_experience_index,
+                final_summary_sent=final_summary_sent,
+                final_summary_confirmed=final_summary_confirmed,
                 logger=logger
             )
 
@@ -140,10 +145,12 @@ class _ConversationLLM:
                                 country_of_user: Country,
                                 context: ConversationContext,
                                 collected_data: list[CollectedData],
-                                exploring_type: WorkType,
+                                exploring_type: WorkType | None,
                                 unexplored_types: list[WorkType],
                                 explored_types: list[WorkType],
                                 last_referenced_experience_index: int,
+                                final_summary_sent: bool,
+                                final_summary_confirmed: bool,
                                 logger: logging.Logger) -> tuple[ConversationLLMAgentOutput, float, BaseException | None]:
         """
         Converses with the user and asks probing questions to collect experiences.
@@ -177,6 +184,7 @@ class _ConversationLLM:
         if first_time_visit:
             # If this is the first time the user has visited the agent, the agent should get to the point
             # and not introduce itself or ask how the user is doing.
+            assert exploring_type is not None, "Exploring type must be set on first visit"
             llm = GeminiGenerativeLLM(
                 system_instructions=None,
                 config=LLMConfig(
@@ -193,6 +201,8 @@ class _ConversationLLM:
                                                                             unexplored_types=unexplored_types,
                                                                             explored_types=explored_types,
                                                                             last_referenced_experience_index=last_referenced_experience_index,
+                                                                            final_summary_sent=final_summary_sent,
+                                                                            final_summary_confirmed=final_summary_confirmed,
                                                                             )
             llm = GeminiGenerativeLLM(
                 system_instructions=system_instructions,
@@ -286,10 +296,12 @@ class _ConversationLLM:
     def _get_system_instructions(*,
                                  country_of_user: Country,
                                  collected_data: list[CollectedData],
-                                 exploring_type: WorkType,
+                                 exploring_type: WorkType | None,
                                  unexplored_types: list[WorkType],
                                  explored_types: list[WorkType],
                                  last_referenced_experience_index: int,
+                                 final_summary_sent: bool,
+                                 final_summary_confirmed: bool,
                                  ) -> str:
         system_instructions_template = dedent("""\
         <system_instructions>
@@ -431,6 +443,7 @@ class _ConversationLLM:
         </system_instructions>
         """)
 
+        summary_language_hint = _get_summary_language_hint()
         return replace_placeholders_with_indent(system_instructions_template,
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 agent_character=STD_AGENT_CHARACTER,
@@ -449,6 +462,9 @@ class _ConversationLLM:
                                                     collected_data=collected_data,
                                                     exploring_type=exploring_type,
                                                     unexplored_types=unexplored_types,
+                                                    final_summary_sent=final_summary_sent,
+                                                    final_summary_confirmed=final_summary_confirmed,
+                                                    summary_language_hint=summary_language_hint
                                                 ),
                                                 last_referenced_experience=_get_last_referenced_experience(collected_data, last_referenced_experience_index),
                                                 example_summary=_get_example_summary(),
@@ -485,8 +501,11 @@ class _ConversationLLM:
 
 def _transition_instructions(*,
                              collected_data: list[CollectedData],
-                             exploring_type: WorkType,
+                             exploring_type: WorkType | None,
                              unexplored_types: list[WorkType],
+                             final_summary_sent: bool,
+                             final_summary_confirmed: bool,
+                             summary_language_hint: str,
                              ):
     # Check if there are incomplete experiences that need to be completed first
     incomplete_experiences = _find_incomplete_experiences(collected_data)
@@ -531,36 +550,63 @@ def _transition_instructions(*,
         duplicate_hint = ""
         if len(collected_data) > 1:
             duplicate_hint = "Also, with the above question inform me that if one of the work experiences seems to be duplicated, I can ask you to remove it.\n"
-        summarize_and_confirm = dedent("""
-            Explicitly summarize all the work experiences you collected and explicitly ask me if I would like to add or change anything in the information 
-            you collected before moving forward to the next step. 
-            
-            {language_style}
+
+        if not final_summary_sent:
+            summarize_and_confirm = dedent("""
+                Explicitly summarize all the work experiences you collected and explicitly ask me if I would like to add or change anything in the information 
+                you collected before moving forward to the next step. 
+                
+                {language_style}
+                {summary_language_hint}
                                                                   
-            Ask me (in the language style indicated above - using same language as the rest of the conversation): 
-                "Let's recap the information we have collected so far: 
-                {summary_of_experiences}
-                Is there anything you would like to add or change?"
-            The summary is in plain text (no Markdown, JSON, or other formats).
-            {duplicate_hint}             
-            You must wait for me to respond to your question and explicitly confirm that I have nothing to add or change 
-            to the information presented in the summary. 
-            
-            if I have something to add or change, you will ask me to provide the missing information or correct the information
-            before evaluating if you can transition to the next step.
-            
-            Then, you will respond by saying <END_OF_CONVERSATION> to end the conversation and move to the next step.
-            You will not add anything before or after the <END_OF_CONVERSATION> message.   
-            
-            You will not ask any questions or make any suggestions regarding the next step. 
-            It is not your responsibility to conduct the next step.
-            
-            You must perform the summarization and confirmation step before ending the conversation.
+                Ask me (in the language style indicated above - using the same language as the rest of the conversation): 
+                    "Let's recap the information we have collected so far: 
+                    {summary_of_experiences}
+                    Is there anything you would like to add or change?"
+                The summary is in plain text (no Markdown, JSON, or other formats).
+                {duplicate_hint}             
+                You must wait for me to respond to your question and explicitly confirm that I have nothing to add or change 
+                to the information presented in the summary. 
+                
+                if I have something to add or change, you will ask me to provide the missing information or correct the information
+                before evaluating if you can transition to the next step.
+                
+                Then, you will respond by saying <END_OF_CONVERSATION> to end the conversation and move to the next step.
+                You will not add anything before or after the <END_OF_CONVERSATION> message.   
+                
+                You will not ask any questions or make any suggestions regarding the next step. 
+                It is not your responsibility to conduct the next step.
+                
+                You must perform the summarization and confirmation step before ending the conversation.
+                """)
+            return replace_placeholders_with_indent(summarize_and_confirm,
+                                                    language_style=STD_LANGUAGE_STYLE,
+                                                    summary_language_hint=summary_language_hint,
+                                                    summary_of_experiences=_get_summary_of_experiences(collected_data),
+                                                    duplicate_hint=duplicate_hint)
+
+        if not final_summary_confirmed:
+            wait_for_confirmation = dedent("""
+                {language_style}
+                {summary_language_hint}
+
+                You already presented the recap. Do not repeat it.
+                If I clearly state that the information is correct or I have nothing else to add, respond immediately with <END_OF_CONVERSATION>.
+                If I provide new information, follow the #Gather Details instructions instead of ending the conversation.
             """)
-        return replace_placeholders_with_indent(summarize_and_confirm,
+            return replace_placeholders_with_indent(wait_for_confirmation,
+                                                    language_style=STD_LANGUAGE_STYLE,
+                                                    summary_language_hint=summary_language_hint)
+
+        end_conversation = dedent("""
+            {language_style}
+            {summary_language_hint}
+
+            Respond immediately with <END_OF_CONVERSATION>. Do not add any other text.
+        """)
+        return replace_placeholders_with_indent(end_conversation,
                                                 language_style=STD_LANGUAGE_STYLE,
-                                                summary_of_experiences=_get_summary_of_experiences(collected_data),
-                                                duplicate_hint=duplicate_hint)
+                                                summary_language_hint=summary_language_hint)
 
 
 def _get_collected_experience_data(collected_data: list[CollectedData]) -> str:
@@ -718,7 +764,7 @@ def _ask_experience_type_question(work_type: WorkType) -> str:
 
 def _get_explore_experiences_instructions(*,
                                           collected_data: list[CollectedData],
-                                          exploring_type: WorkType,
+                                          exploring_type: WorkType | None,
                                           explored_types: list[WorkType],
                                           ) -> str:
     if exploring_type is not None:
@@ -809,3 +855,10 @@ def _get_country_of_user_segment(country_of_user: Country) -> str:
     if country_of_user == Country.UNSPECIFIED:
         return ""
     return f" living in {country_of_user.value}"
+
+
+def _get_summary_language_hint() -> str:
+    locale = get_locale()
+    if locale.lower().startswith("es"):
+        return "Detected locale: Spanish. Keep the recap, confirmation question, and final response entirely in Spanish."
+    return f"Detected locale: {locale}. Keep the recap, confirmation question, and final response entirely in this language."

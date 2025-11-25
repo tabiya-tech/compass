@@ -15,7 +15,7 @@ def _create_collected_data(
         index: int,
         experience_title: str,
         company: Optional[str] = None,
-        location: Optional[str] = None,
+        # location: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         paid_work: Optional[bool] = None,
@@ -29,7 +29,7 @@ def _create_collected_data(
         defined_at_turn_number=defined_at_turn_number,
         experience_title=experience_title,
         company=company,
-        location=location,
+        # location=location,
         start_date=start_date,
         end_date=end_date,
         paid_work=paid_work,
@@ -42,7 +42,7 @@ def create_experience_data(
         index: int,
         experience_title: Optional[str] = None,
         company: Optional[str] = None,
-        location: Optional[str] = None,
+        # location: Optional[str] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         paid_work: Optional[bool] = None,
@@ -55,7 +55,7 @@ def create_experience_data(
         defined_at_turn_number=1,
         experience_title=experience_title,
         company=company,
-        location=location,
+        # location=location,
         start_date=start_date,
         end_date=end_date,
         paid_work=paid_work,
@@ -96,7 +96,7 @@ class TestExperienceDataProcessor:
                 index=0,  # Will be reassigned to 0
                 experience_title="Software Developer",
                 company="TechCorp",
-                location="Cape Town",
+                #location="Cape Town",
                 start_date="2020",
                 end_date="2022",
                 paid_work=True,
@@ -123,7 +123,7 @@ class TestExperienceDataProcessor:
         assert experience.index == 0
         assert experience.experience_title == "Software Developer"
         assert experience.company == "TechCorp"
-        assert experience.location == "Cape Town"
+        # assert experience.location == "Cape Town"
         assert experience.start_date == "2020"
         assert experience.end_date == "2022"
         assert experience.paid_work is True
@@ -141,7 +141,7 @@ class TestExperienceDataProcessor:
                 index=0,
                 experience_title="Software Developer",
                 company="TechCorp",
-                location="Cape Town"
+                #location="Cape Town"
             )
         ]
 
@@ -152,7 +152,7 @@ class TestExperienceDataProcessor:
                 index=1,  # Will be reassigned to 1
                 experience_title="Freelance Designer",
                 company="Self",
-                location="Johannesburg",
+                # location="Johannesburg",
                 work_type=WorkType.SELF_EMPLOYMENT.name
             ),
             create_experience_data(
@@ -160,7 +160,7 @@ class TestExperienceDataProcessor:
                 index=2,  # Will be reassigned to 2
                 experience_title="Volunteer",
                 company="Animal Shelter",
-                location="Durban",
+                # location="Durban",
                 work_type=WorkType.UNSEEN_UNPAID.name
             )
         ]
@@ -198,7 +198,7 @@ class TestExperienceDataProcessor:
                 index=0,
                 experience_title="Software Developer",
                 company=None,  # Missing company
-                location=None,  # Missing location
+                # location=None,  # Missing location
                 start_date="2020",
                 end_date="2022"
             )
@@ -211,7 +211,7 @@ class TestExperienceDataProcessor:
                 index=0,
                 experience_title="Software Developer",  # Same title
                 company="TechCorp",  # Adding company
-                location="Cape Town",  # Adding location
+                # location="Cape Town",  # Adding location
                 start_date="2020",
                 end_date="2022"
             )
@@ -235,7 +235,7 @@ class TestExperienceDataProcessor:
         experience = actual_collected_data[0]
         assert experience.index == 0
         assert experience.company == "TechCorp"
-        assert experience.location == "Cape Town"
+        # assert experience.location == "Cape Town"
 
         # AND should log the update
         mock_logger.info.assert_any_call("Updating experience with index: %s", 0)
@@ -248,7 +248,7 @@ class TestExperienceDataProcessor:
                 index=0,
                 experience_title="Software Developer",
                 company="TechCorp",
-                location="Cape Town",
+          #      location="Cape Town",
                 start_date="2020",
                 end_date="2022",
                 paid_work=True
@@ -262,7 +262,7 @@ class TestExperienceDataProcessor:
                 index=0,
                 experience_title="Senior Software Developer",  # Only updating title
                 company=None,  # Not updating company
-                location=None,  # Not updating location
+           #     location=None,  # Not updating location
                 start_date=None,  # Not updating start_date
                 end_date=None,  # Not updating end_date
                 paid_work=None  # Not updating paid_work
@@ -281,7 +281,7 @@ class TestExperienceDataProcessor:
         experience = actual_collected_data[0]
         assert experience.experience_title == "Senior Software Developer"
         assert experience.company == "TechCorp"  # Unchanged
-        assert experience.location == "Cape Town"  # Unchanged
+        # assert experience.location == "Cape Town"  # Unchanged
         assert experience.start_date == "2020"  # Unchanged
         assert experience.end_date == "2022"  # Unchanged
         assert experience.paid_work is True  # Unchanged
@@ -555,7 +555,8 @@ class TestExperienceDataProcessor:
         # GIVEN existing collected data with two experiences
         given_collected_data = [
             _create_collected_data(index=0, experience_title="Software Developer", company="TechCorp",
-                                   location="Cape Town", start_date="2020", end_date="2022"),
+                                   # location="Cape Town", 
+                                   start_date="2020", end_date="2022"),
             _create_collected_data(index=1, experience_title="Freelance Designer", company="Self")
         ]
 
@@ -566,7 +567,7 @@ class TestExperienceDataProcessor:
                 index=1,
                 experience_title="Software Developer",  # Same as index 0
                 company="TechCorp",  # Same as index 0
-                location="Cape Town",  # Same as index 0
+                # location="Cape Town",  # Same as index 0
                 start_date="2020",  # Same as index 0
                 end_date="2022"  # Same as index 0
             )
@@ -606,7 +607,7 @@ class TestExperienceDataProcessor:
                 index=0,
                 experience_title="",  # Empty title
                 company="",  # Empty company
-                location="",  # Empty location
+                # location="",  # Empty location
                 start_date="",  # Empty start date
                 end_date=""  # Empty end date
             )
