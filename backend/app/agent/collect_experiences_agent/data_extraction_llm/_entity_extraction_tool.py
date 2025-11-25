@@ -191,7 +191,7 @@ _SYSTEM_INSTRUCTIONS = """
     ##'company' instructions
         What the company does or name of the company depending on the context.
         Use specific company names (eg: Acme inc) not generic ones (eg: 'company', 'online, 'organization', 'freelance' or 'self') in the output.
-        For unpaid work, use the receiver of the work (e.g. "My Family", "My Community", etc) but not the generic name.
+        For unpaid work, use the receiver of the work (e.g. "My Family", "My Community" etc) but not the generic name, in the language being used of the conversation.
         Return a string value containing the type, or name of the company, or the receiver of the work.
         
         `null` if the information was not provided by the user and the user was not explicitly asked for this information yet.

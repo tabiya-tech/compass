@@ -232,7 +232,7 @@ _SYSTEM_INSTRUCTIONS = """
             
         ###'end_date' instructions
             If I provide a conversational date input for the end of an experience, you should accurately 
-            calculate these based on my current date. In case it is an ongoing experience, use the word "Present". 
+            calculate these based on my current date. In case it is an ongoing experience, use the word "Present" (in the language being used of the conversation, e.g. "Presente" for Spanish). 
             Return a string value containing the end date.
             
             `null` It was not provided by the user and the user was not explicitly asked for this information yet.

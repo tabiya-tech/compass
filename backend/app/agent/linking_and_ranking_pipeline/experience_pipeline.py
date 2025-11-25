@@ -19,17 +19,17 @@ from ...countries import Country
 
 
 class ExperiencePipelineConfig(BaseModel):
-    number_of_clusters: int = 8
+    number_of_clusters: int = 4
     """
-    Default is 8
+    Default is 4
     
     The number of clusters to group the responsibilities. 
     Each cluster of responsibilities will contribute to N top skills (where N = number_of_top_skills_to_pick_per_cluster).
     """
 
-    number_of_top_skills_to_pick_per_cluster: int = 1
+    number_of_top_skills_to_pick_per_cluster: int = 2
     """
-    Default is 1
+    Default is 2
     The number of top skills to pick for each cluster among the top skills candidates of the cluster.
     """
 
