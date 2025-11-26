@@ -14,10 +14,6 @@ import SkillsRankingPrompt, {
   SKILLS_RANKING_PROMPT_MESSAGE_ID,
   SkillsRankingPromptProps,
 } from "src/features/skillsRanking/components/skillsRankingPrompt/SkillsRankingPrompt";
-import SkillsRankingRetypedRank, {
-  SKILLS_RANKING_RETYPED_RANK_MESSAGE_ID,
-  SkillsRankingRetypedRankProps,
-} from "src/features/skillsRanking/components/skillsRankingRetypedRank/SkillsRankingRetypedRank";
 import SkillsRankingPerceivedRank, {
   SKILLS_RANKING_PERCEIVED_RANK_MESSAGE_ID,
   SkillsRankingPerceivedRankProps,
@@ -26,15 +22,13 @@ import SkillsRankingProofOfValue, {
   SKILLS_RANKING_EFFORT_MESSAGE_ID,
   SkillsRankingEffortProps,
 } from "src/features/skillsRanking/components/skillsRankingProofOfValue/SkillsRankingProofOfValue";
-import SkillsRankingCompletionAdvice, {
-  SKILLS_RANKING_COMPLETION_ADVICE_MESSAGE_ID,
-  SkillsRankingCompletionAdviceProps,
-} from "src/features/skillsRanking/components/skillsRankingCompletionAdvice/SkillsRankingCompletionAdvice";
 import SkillsRankingPriorBelief, {
-  SKILLS_RANKING_PRIOR_BELIEF_MESSAGE_ID, SkillsRankingPriorBeliefProps,
+  SKILLS_RANKING_PRIOR_BELIEF_MESSAGE_ID,
+  SkillsRankingPriorBeliefProps,
 } from "src/features/skillsRanking/components/skillsRankingPriorBelief/SkillsRankingPriorBelief";
 import SkillsRankingPriorBeliefForSkill, {
-  SKILLS_RANKING_PRIOR_BELIEF_FOR_SKIll_MESSAGE_ID, SkillsRankingPriorBeliefForSkillProps,
+  SKILLS_RANKING_PRIOR_BELIEF_FOR_SKIll_MESSAGE_ID,
+  SkillsRankingPriorBeliefForSkillProps,
 } from "src/features/skillsRanking/components/skillsRankingPriorBeliefForSkill/SkillsRankingPriorBeliefForSkill";
 import ProofOfValueIntro, {
   PROOF_OF_VALUE_INTRO_MESSAGE_ID,
@@ -54,22 +48,11 @@ import SkillsRankingOpportunitySkillRequirement, {
   SKILLS_RANKING_OPPORTUNITY_SKILL_REQUIREMENT_MESSAGE_ID,
   Props as SkillsRankingOpportunitySkillRequirementProps,
 } from "src/features/skillsRanking/components/skillsRankingOpportunitySkillRequirement/SkillsRankingOpportunitySkillRequirement";
-import {
-  SkillsRankingExperimentGroups,
-  SkillsRankingState,
-  SkillsRankingPhase,
-  getLatestPhaseName,
-} from "src/features/skillsRanking/types";
+import { SkillsRankingState, SkillsRankingPhase, getLatestPhaseName } from "src/features/skillsRanking/types";
 import { getNextPhaseForGroup } from "src/features/skillsRanking/hooks/skillsRankingFlowGraph";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
-
-// Utility function to check if a group should skip market disclosure (and consequently retyped rank)
-// TODO: remove this utility (not useful anymoree)
-export const shouldSkipMarketDisclosure = (experimentGroup: SkillsRankingExperimentGroups): boolean => {
-  return experimentGroup === SkillsRankingExperimentGroups.GROUP_2;
-};
 
 export const createBriefingMessage = (
   skillsRankingState: SkillsRankingState,
@@ -96,8 +79,7 @@ export const createDisclosureMessage = (
     onFinish,
   },
   sender: ConversationMessageSender.COMPASS,
-  component: (props: SkillsRankingDisclosureProps) =>
-    React.createElement(SkillsRankingDisclosure, props),
+  component: (props: SkillsRankingDisclosureProps) => React.createElement(SkillsRankingDisclosure, props),
 });
 
 export const createPromptMessage = (
@@ -113,30 +95,6 @@ export const createPromptMessage = (
   sender: ConversationMessageSender.COMPASS,
   component: (props: SkillsRankingPromptProps) => React.createElement(SkillsRankingPrompt, props),
 });
-
-export const createRetypedRankMessage = (
-  skillsRankingState: SkillsRankingState,
-  onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>
-): IChatMessage<SkillsRankingRetypedRankProps> | null => {
-  // Check if the component should be shown based on experiment group
-  const shouldNotShow = shouldSkipMarketDisclosure(skillsRankingState.metadata.experiment_group);
-
-  // If the component should not be shown, don't create a message
-  if (shouldNotShow) {
-    return null;
-  }
-
-  return {
-    message_id: SKILLS_RANKING_RETYPED_RANK_MESSAGE_ID,
-    type: SKILLS_RANKING_RETYPED_RANK_MESSAGE_ID,
-    payload: {
-      skillsRankingState,
-      onFinish,
-    },
-    sender: ConversationMessageSender.COMPASS,
-    component: (props: SkillsRankingRetypedRankProps) => React.createElement(SkillsRankingRetypedRank, props),
-  };
-};
 
 export const createPerceivedRankMessage = (
   skillsRankingState: SkillsRankingState,
@@ -177,17 +135,17 @@ export const createPerceivedRankMessage = (
   };
 
   return {
-  message_id: SKILLS_RANKING_PERCEIVED_RANK_MESSAGE_ID,
-  type: SKILLS_RANKING_PERCEIVED_RANK_MESSAGE_ID,
-  payload: {
+    message_id: SKILLS_RANKING_PERCEIVED_RANK_MESSAGE_ID,
+    type: SKILLS_RANKING_PERCEIVED_RANK_MESSAGE_ID,
+    payload: {
       isReadOnly: isReplay,
       mostDemandedLabel: skillsRankingState.score.most_demanded_label,
       sentAt: currentPhase?.time || skillsRankingState.metadata.started_at,
       onSubmit: handleSubmit,
       defaultValue: existingResponse,
-  },
-  sender: ConversationMessageSender.COMPASS,
-  component: (props: SkillsRankingPerceivedRankProps) => React.createElement(SkillsRankingPerceivedRank, props),
+    },
+    sender: ConversationMessageSender.COMPASS,
+    component: (props: SkillsRankingPerceivedRankProps) => React.createElement(SkillsRankingPerceivedRank, props),
   };
 };
 
@@ -217,7 +175,7 @@ export const createPriorBeliefMessage = (
   },
   sender: ConversationMessageSender.COMPASS,
   component: (props: SkillsRankingPriorBeliefProps) => React.createElement(SkillsRankingPriorBelief, props),
-  });
+});
 
 export const createPriorBeliefForSkillMessage = (
   skillsRankingState: SkillsRankingState,
@@ -230,7 +188,8 @@ export const createPriorBeliefForSkillMessage = (
     onFinish,
   },
   sender: ConversationMessageSender.COMPASS,
-  component: (props: SkillsRankingPriorBeliefForSkillProps) => React.createElement(SkillsRankingPriorBeliefForSkill, props),
+  component: (props: SkillsRankingPriorBeliefForSkillProps) =>
+    React.createElement(SkillsRankingPriorBeliefForSkill, props),
 });
 
 export const createProofOfValueIntroMessage = (
@@ -352,30 +311,6 @@ export const createApplication24hMessage = (
   };
 };
 
-export const createCompletionAdviceMessage = (
-  skillsRankingState: SkillsRankingState,
-  onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>
-): IChatMessage<SkillsRankingCompletionAdviceProps> | null => {
-  // Check if the component should be shown based on experiment group
-  const shouldNotShow = shouldSkipMarketDisclosure(skillsRankingState.metadata.experiment_group);
-
-  // If the component should not be shown, don't create a message
-  if (shouldNotShow) {
-    return null;
-  }
-
-  return {
-    message_id: SKILLS_RANKING_COMPLETION_ADVICE_MESSAGE_ID,
-    type: SKILLS_RANKING_COMPLETION_ADVICE_MESSAGE_ID,
-    payload: {
-      skillsRankingState,
-      onFinish,
-    },
-    sender: ConversationMessageSender.COMPASS,
-    component: (props: SkillsRankingCompletionAdviceProps) => React.createElement(SkillsRankingCompletionAdvice, props),
-  };
-};
-
 export const createOpportunitySkillRequirementMessage = (
   skillsRankingState: SkillsRankingState,
   onFinish: (skillsRankingState: SkillsRankingState) => Promise<void>
@@ -399,7 +334,7 @@ export const createOpportunitySkillRequirementMessage = (
       );
 
       if (!nextPhase) {
-      console.error(new SkillsRankingError("No next phase found for OPPORTUNITY_SKILL_REQUIREMENT"));
+        console.error(new SkillsRankingError("No next phase found for OPPORTUNITY_SKILL_REQUIREMENT"));
         return;
       }
 
@@ -480,6 +415,7 @@ export const createPerceivedRankForSkillMessage = (
       defaultValue: existingResponse,
     },
     sender: ConversationMessageSender.COMPASS,
-    component: (props: SkillsRankingPerceivedRankForSkillProps) => React.createElement(SkillsRankingPerceivedRankForSkill, props),
+    component: (props: SkillsRankingPerceivedRankForSkillProps) =>
+      React.createElement(SkillsRankingPerceivedRankForSkill, props),
   };
 };

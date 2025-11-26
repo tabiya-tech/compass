@@ -18,6 +18,14 @@ import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChat
 import { getDefaultTypingDurationMs } from "src/features/skillsRanking/constants";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
+const uniqueId = "af8a82c1-2759-44ef-9393-3fe907d1da4b";
+
+export const DATA_TEST_ID = {
+  CONTAINER: `skills-ranking-application-motivation-container-${uniqueId}`,
+  TOGGLE_GROUP: `skills-ranking-application-motivation-toggle-group-${uniqueId}`,
+  SUBMIT_BUTTON: `skills-ranking-application-motivation-submit-button-${uniqueId}`,
+}
+
 const motivationScale = [
   { value: 1, label: "Very discouraged" },
   { value: 2, label: "Discouraged" },
@@ -106,6 +114,7 @@ const SkillsRankingApplicationMotivation: React.FC<Readonly<SkillsRankingApplica
       origin={ConversationMessageSender.COMPASS}
       ref={scrollRef}
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+      data-testid={DATA_TEST_ID.CONTAINER}
     >
       <Box sx={{ width: "100%" }}>
         <ChatBubble
@@ -125,6 +134,7 @@ const SkillsRankingApplicationMotivation: React.FC<Readonly<SkillsRankingApplica
                 fullWidth
                 aria-label="Motivation to apply"
                 onChange={handleSelect}
+                data-testid={DATA_TEST_ID.TOGGLE_GROUP}
                 sx={{
                   borderRadius: theme.shape.borderRadius * 3,
                   overflow: "hidden",
@@ -180,6 +190,7 @@ const SkillsRankingApplicationMotivation: React.FC<Readonly<SkillsRankingApplica
               <PrimaryButton
                 onClick={handleSubmit}
                 disabled={isReplay || submitted || selectedValue === null || !isOnline || currentPhase !== SkillsRankingPhase.APPLICATION_WILLINGNESS}
+                data-testid={DATA_TEST_ID.SUBMIT_BUTTON}
               >
                 Submit
               </PrimaryButton>

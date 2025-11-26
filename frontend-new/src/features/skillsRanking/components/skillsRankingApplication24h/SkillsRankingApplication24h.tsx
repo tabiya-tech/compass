@@ -25,9 +25,6 @@ export const DATA_TEST_ID = {
 
 const marks = [
   { value: 0, label: "0h" },
-  // { value: 6, label: "6h" },
-  // { value: 12, label: "12h" },
-  // { value: 18, label: "18h" },
   { value: 24, label: "24h" },
 ];
 
