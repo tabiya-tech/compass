@@ -149,7 +149,7 @@ const InfoDrawer: React.FC<InfoDrawerProps> = ({ isOpen, notifyOnClose }) => {
       <Box data-testid={DATA_TEST_ID.INFO_ROOT}>
         <ApplicationInfoMain versions={versions} />
       </Box>
-      <p>T</p>
+      <p>Test</p>
     </Drawer>
   );
 };
