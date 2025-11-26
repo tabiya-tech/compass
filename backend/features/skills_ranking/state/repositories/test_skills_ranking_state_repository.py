@@ -6,8 +6,13 @@ from common_libs.test_utilities import get_random_session_id
 from common_libs.time_utilities import get_now
 from features.skills_ranking.state._test_utilities import get_skills_ranking_state
 from features.skills_ranking.state.repositories.skills_ranking_state_repository import SkillsRankingStateRepository
-from features.skills_ranking.state.services.type import (SkillsRankingState, SkillRankingExperimentGroup,
-                                                         SkillsRankingPhase, UpdateSkillsRankingRequest)
+from features.skills_ranking.state.services.type import (
+    SkillsRankingState,
+    SkillRankingExperimentGroup,
+    SkillsRankingPhase,
+    UpdateSkillsRankingRequest,
+    UserReassignmentMetadata,
+)
 
 
 def _assert_skills_ranking_state_fields_match(given_state: SkillsRankingState, actual_stored_state: dict) -> None:
@@ -122,6 +127,7 @@ class TestSkillsRankingRepository:
             [
                 {"phase": "BRIEFING"},
                 {"metadata": {"cancelled_after": "1000.0ms"}},
+                {"metadata": {"user_reassigned": {"original_group": "GROUP_1", "reassigned_group": "GROUP_2"}}},
                 {"user_responses": {"perceived_rank_percentile": 50.0}},
                 {"user_responses": {"perceived_rank_for_skill_percentile": 75.0}},
                 {"completed_at": fixed_time},
@@ -139,6 +145,7 @@ class TestSkillsRankingRepository:
             ids=[
                 "update_phase",
                 "update_cancelled_after",
+                "update_user_reassigned",
                 "update_perceived_rank",
                 "update_perceived_rank_for_skill",
                 "update_completed_at",
@@ -176,6 +183,8 @@ class TestSkillsRankingRepository:
 
             if "metadata" in given_updates:
                 for key, value in given_updates["metadata"].items():
+                    if key == "user_reassigned" and isinstance(value, dict):
+                        value = UserReassignmentMetadata(**value)
                     setattr(expected_state.metadata, key, value)
 
             if "user_responses" in given_updates:

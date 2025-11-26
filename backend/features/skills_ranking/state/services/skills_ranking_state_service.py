@@ -199,6 +199,10 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         # Create updated metadata dict with the new group
         updated_metadata = update_request.metadata.copy() if update_request.metadata else {}
         updated_metadata["experiment_group"] = new_group.name
+        updated_metadata["user_reassigned"] = {
+            "original_group": current_group.name,
+            "reassigned_group": new_group.name,
+        }
 
         self._logger.info(
             f"Group switching applied: {current_group.name} → {new_group.name}. "

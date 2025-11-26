@@ -8,6 +8,7 @@ from features.skills_ranking.state.services.type import (
     SkillsRankingState,
     ProcessMetadata,
     UserResponses,
+    UserReassignmentMetadata,
 )
 from features.skills_ranking.types import SkillsRankingScore
 
@@ -16,7 +17,8 @@ def get_skills_ranking_state(
         session_id: int = 1,
         phase: SkillsRankingPhaseName = "INITIAL",
         correct_rotations: int = 1,
-        experiment_group: SkillRankingExperimentGroup = SkillRankingExperimentGroup.GROUP_1
+        experiment_group: SkillRankingExperimentGroup = SkillRankingExperimentGroup.GROUP_1,
+        user_reassigned: UserReassignmentMetadata | None = None,
 ) -> SkillsRankingState:
     is_proof_of_value_phase = phase == "PROOF_OF_VALUE"
 
@@ -35,6 +37,7 @@ def get_skills_ranking_state(
             puzzles_solved=2 if is_proof_of_value_phase else None,
             correct_rotations=correct_rotations if is_proof_of_value_phase else None,
             clicks_count=10 if is_proof_of_value_phase else None,
+            user_reassigned=user_reassigned,
         ),
         score=SkillsRankingScore(
             calculated_at=truncate_microseconds(get_now()),

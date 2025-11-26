@@ -57,6 +57,27 @@ class UserResponses(BaseModel):
     opportunity_skill_requirement_percentile: float | None = Field(default=None, ge=0, le=100)
 
 
+class UserReassignmentMetadata(BaseModel):
+    original_group: SkillRankingExperimentGroup
+    reassigned_group: SkillRankingExperimentGroup
+
+    @field_serializer("original_group", "reassigned_group")
+    def serialize_group(self, experiment_group: SkillRankingExperimentGroup, _info):
+        return experiment_group.name
+
+    @field_validator("original_group", "reassigned_group", mode="before")
+    def deserialize_group(cls, value):
+        if isinstance(value, str):
+            try:
+                return SkillRankingExperimentGroup[value]
+            except KeyError:
+                for group in SkillRankingExperimentGroup:
+                    if group.value == value:
+                        return group
+                raise ValueError(f"Invalid experiment group: {value}")
+        return value
+
+
 class ProcessMetadata(BaseModel):
     experiment_group: SkillRankingExperimentGroup
     started_at: datetime
@@ -66,6 +87,7 @@ class ProcessMetadata(BaseModel):
     puzzles_solved: int | None = None
     correct_rotations: int | None = None
     clicks_count: int | None = None
+    user_reassigned: UserReassignmentMetadata | None = None
 
     @field_serializer("experiment_group")
     def serialize_experiment_group(self, experiment_group: SkillRankingExperimentGroup, _info):
