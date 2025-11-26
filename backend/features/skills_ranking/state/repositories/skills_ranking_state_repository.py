@@ -14,6 +14,7 @@ from features.skills_ranking.state.services.type import (
     UpdateSkillsRankingRequest,
     ProcessMetadata,
     UserResponses,
+    UserReassignmentMetadata,
 )
 
 
@@ -53,6 +54,8 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
                 "puzzles_solved": skills_ranking_state.metadata.puzzles_solved,
                 "correct_rotations": skills_ranking_state.metadata.correct_rotations,
                 "clicks_count": skills_ranking_state.metadata.clicks_count,
+                "user_reassigned": skills_ranking_state.metadata.user_reassigned.model_dump()
+                if skills_ranking_state.metadata.user_reassigned else None,
             },
             "score": {
                 "calculated_at": datetime_to_mongo_date(skills_ranking_state.score.calculated_at),
@@ -121,6 +124,8 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
                 puzzles_solved=metadata_doc.get("puzzles_solved"),
                 correct_rotations=metadata_doc.get("correct_rotations"),
                 clicks_count=metadata_doc.get("clicks_count"),
+                user_reassigned=UserReassignmentMetadata(**metadata_doc["user_reassigned"])
+                if metadata_doc.get("user_reassigned") else None,
             ),
             score=SkillsRankingScore(
                 calculated_at=mongo_date_to_datetime(calculated_at) if calculated_at else get_now(),

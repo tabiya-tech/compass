@@ -30,6 +30,7 @@ from features.skills_ranking.state.services.type import (
     SkillRankingExperimentGroup,
     SkillsRankingState,
     UpdateSkillsRankingRequest,
+    UserReassignmentMetadata,
 )
 from features.skills_ranking.types import PriorBeliefs, SkillsRankingScore
 
@@ -182,6 +183,67 @@ class TestSkillsRankingService:
 
             _mock_skills_ranking_state_repository.update.assert_not_called()
             _mock_skills_ranking_state_repository.create.assert_not_called()
+
+        @pytest.mark.asyncio
+        async def test_upsert_state_records_group_switch_metadata(
+                self,
+                _mock_skills_ranking_state_repository: ISkillsRankingStateRepository,
+                _mock_user_preference_repository: IUserPreferenceRepository,
+                mocker: pytest_mock.MockFixture,
+        ):
+            existing_state = get_skills_ranking_state(
+                phase="PROOF_OF_VALUE",
+                correct_rotations=50,
+                experiment_group=SkillRankingExperimentGroup.GROUP_1,
+            )
+
+            new_phase: SkillsRankingPhaseName = "PRIOR_BELIEF"
+            reassigned_group = SkillRankingExperimentGroup.GROUP_2
+
+            _mock_skills_ranking_state_repository.get_by_session_id = AsyncMock(return_value=existing_state)
+            expected_state = existing_state.model_copy(deep=True)
+            expected_state.phase.append(SkillsRankingPhase(name=new_phase, time=get_now()))
+            expected_state.metadata.experiment_group = reassigned_group
+            expected_state.metadata.user_reassigned = UserReassignmentMetadata(
+                original_group=SkillRankingExperimentGroup.GROUP_1,
+                reassigned_group=reassigned_group,
+            )
+            _mock_skills_ranking_state_repository.update = AsyncMock(return_value=expected_state)
+            _mock_skills_ranking_state_repository.create = AsyncMock()
+            _mock_user_preference_repository.set_experiment_by_user_id = AsyncMock()
+
+            service = _build_service(_mock_skills_ranking_state_repository, _mock_user_preference_repository)
+
+            mocker.patch(
+                "features.skills_ranking.state.services.skills_ranking_state_service.random.random",
+                return_value=0.0,
+            )
+            mocker.patch(
+                "features.skills_ranking.state.services.skills_ranking_state_service.random.choice",
+                return_value=reassigned_group,
+            )
+            mocker.patch.object(service, "_get_correct_rotations_threshold", return_value=10)
+
+            result = await service.upsert_state(
+                user_id=get_random_user_id(),
+                session_id=existing_state.session_id,
+                update_request=UpdateSkillsRankingRequest(phase=new_phase),
+            )
+
+            update_request_used: UpdateSkillsRankingRequest = \
+                _mock_skills_ranking_state_repository.update.call_args.kwargs["update_request"]
+
+            assert update_request_used.metadata is not None
+            assert update_request_used.metadata["experiment_group"] == reassigned_group.name
+            assert update_request_used.metadata["user_reassigned"] == {
+                "original_group": SkillRankingExperimentGroup.GROUP_1.name,
+                "reassigned_group": reassigned_group.name,
+            }
+            assert result.metadata.user_reassigned == UserReassignmentMetadata(
+                original_group=SkillRankingExperimentGroup.GROUP_1,
+                reassigned_group=reassigned_group,
+            )
+            _mock_user_preference_repository.set_experiment_by_user_id.assert_called_once()
 
     class TestCalculateRankingAndGroups:
         @pytest.mark.asyncio
