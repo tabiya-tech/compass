@@ -110,7 +110,7 @@ const SkillsRankingPriorBelief: React.FC<Readonly<SkillsRankingPriorBeliefProps>
           sender={ConversationMessageSender.COMPASS}
           message={
             <Typography>
-              {skillsRankingState.metadata.experiment_group !== SkillsRankingExperimentGroups.GROUP_1 && <Typography>Just before I tell you,</Typography>} I am curious about your thoughts. <strong>In our conversation, we found that you have
+              {skillsRankingState.metadata.experiment_group !== SkillsRankingExperimentGroups.GROUP_1 && <span>Just before I tell you,</span>} I am curious about your thoughts. <strong>In our conversation, we found that you have
               skills in the following areas:</strong> {aboveAverageSkills}, and {belowAverageSkills}. <br />
               <br />
               For the next few questions, please give your best guess. <strong>The more accurate your guesses are, the more airtime you will receive.</strong>
