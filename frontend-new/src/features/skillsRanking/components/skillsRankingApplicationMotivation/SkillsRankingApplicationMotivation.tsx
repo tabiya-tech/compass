@@ -38,7 +38,6 @@ const SkillsRankingApplicationMotivation: React.FC<Readonly<SkillsRankingApplica
 }) => {
   const theme = useTheme();
   const isOnline = useContext(IsOnlineContext);
-  const scrollRef = useAutoScrollOnChange(0);
   const typingTimeoutRef = useRef<number | null>(null);
 
   const currentPhase = getLatestPhaseName(skillsRankingState);
@@ -49,6 +48,7 @@ const SkillsRankingApplicationMotivation: React.FC<Readonly<SkillsRankingApplica
   const [selectedValue, setSelectedValue] = useState<number | null>(existingValue);
   const [submitted, setSubmitted] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
+  const scrollRef = useAutoScrollOnChange(showTyping);
 
   useEffect(() => {
     setSelectedValue(skillsRankingState.user_responses.application_willingness?.value ?? null);

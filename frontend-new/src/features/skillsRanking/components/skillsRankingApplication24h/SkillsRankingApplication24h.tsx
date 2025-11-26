@@ -42,7 +42,6 @@ const SkillsRankingApplication24h: React.FC<Readonly<SkillsRankingApplication24h
 }) => {
   const theme = useTheme();
   const isOnline = useContext(IsOnlineContext);
-  const scrollRef = useAutoScrollOnChange(0);
   const typingTimeoutRef = useRef<number | null>(null);
 
   const currentPhase = getLatestPhaseName(skillsRankingState);
@@ -53,6 +52,7 @@ const SkillsRankingApplication24h: React.FC<Readonly<SkillsRankingApplication24h
   const [submitted, setSubmitted] = useState(false);
   const [startedEditing, setStartedEditing] = useState(existingValue > 0);
   const [showTyping, setShowTyping] = useState(false);
+  const scrollRef = useAutoScrollOnChange(showTyping);
 
   useEffect(() => {
     setHours(skillsRankingState.user_responses.application_24h ?? 0);

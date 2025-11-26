@@ -21,6 +21,7 @@ import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingSe
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
+import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 
 const uniqueId = "8d8d3e2f-7ba5-4f34-aaf2-b0fc39bc6c59";
 
@@ -47,6 +48,7 @@ const SkillsRankingPriorBelief: React.FC<Readonly<SkillsRankingPriorBeliefProps>
   const [startedEditing, setStartedEditing] = useState(existingValue > 0);
   const [submitted, setSubmitted] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
+  const scrollRef = useAutoScrollOnChange(showTyping);
 
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
@@ -104,6 +106,7 @@ const SkillsRankingPriorBelief: React.FC<Readonly<SkillsRankingPriorBeliefProps>
       origin={ConversationMessageSender.COMPASS}
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
       data-testid={DATA_TEST_ID.SKILLS_RANKING_PRIOR_BELIEF_CONTAINER}
+      ref={scrollRef}
     >
       <Box>
         <ChatBubble
