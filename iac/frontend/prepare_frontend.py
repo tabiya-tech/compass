@@ -123,6 +123,9 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     features = getenv("FRONTEND_FEATURES", False, False)
     enable_cv_upload: Optional[str] = getenv("FRONTEND_ENABLE_CV_UPLOAD", False, False)
 
+    supported_languages: str = getenv("FRONTEND_SUPPORTED_LANGUAGES", False, False)
+    default_language: str = getenv("FRONTEND_DEFAULT_LOCALE", False, False)
+
     # validations, apart from the keys are required, some values also need to be validated
     # the sensitive encryption key should be a valid RSA public key.
     _validate_rsa_public_key(sensitive_personal_data_rsa_encryption_key.encode("utf-8"))
@@ -151,6 +154,8 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "FRONTEND_DISABLE_REGISTRATION": base64_encode(disable_registration),
         "FRONTEND_DISABLE_SOCIAL_AUTH": base64_encode(disable_social_auth),
         "FRONTEND_FEATURES": base64_encode(features),
+        "FRONTEND_SUPPORTED_LANGUAGES": base64_encode(supported_languages),
+        "FRONTEND_DEFAULT_LOCALE": base64_encode(default_language),
     }
 
     env_json_content = f"""window.tabiyaConfig = {json.dumps(frontend_env_json, indent=4)};"""

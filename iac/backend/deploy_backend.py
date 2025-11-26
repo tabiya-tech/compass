@@ -41,6 +41,7 @@ class BackendServiceConfig:
     sentry_config: Optional[str]
     enable_sentry: str
     enable_metrics: str
+    supported_languages: str
     default_country_of_user: str
     gcp_oauth_client_id: str
     cloudrun_max_instance_request_concurrency: int
@@ -360,6 +361,9 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_CV_RATE_LIMIT_PER_MINUTE",
                             value=backend_service_cfg.cv_rate_limit_per_minute),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_SUPPORTED_LANGUAGES",
+                            value=backend_service_cfg.supported_languages)
                         # Add more environment variables here
                     ],
                 )
