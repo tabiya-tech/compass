@@ -194,6 +194,9 @@ const SkillsRankingDisclosure: React.FC<Readonly<SkillsRankingDisclosureProps>> 
           </Typography>
       );
     case SkillsRankingExperimentGroups.GROUP_2:
+      const aboveAverageLabelsWithoutMostGroup2 = aboveAverageLabels.filter(
+        (label) => label !== mostDemandedLabel
+      );
       return (
           <Typography component="div" sx={{ display: "flex", flexDirection: "column", gap: theme.spacing(4) }}>
             <Typography component="div">
@@ -208,11 +211,17 @@ const SkillsRankingDisclosure: React.FC<Readonly<SkillsRankingDisclosureProps>> 
               <strong>&#9650;&#9650; {mostDemandedLabel} is 'above average' in demand</strong>, and the <strong>most demanded</strong> of your skill areas.
             </Typography>
             <Typography component="div" sx={{ backgroundColor: theme.palette.success.light }}>
-              <strong>&#9650; {combineWords(aboveAverageLabels)} is also 'above average'</strong> in demand.
+              <strong>&#9650; {combineWords(aboveAverageLabelsWithoutMostGroup2)} is also 'above average'</strong> in demand.
             </Typography>
           </Typography>
       );
     case SkillsRankingExperimentGroups.GROUP_3:
+      const belowAverageLabelsWithoutLeast = belowAverageLabels.filter(
+        (label) => label !== leastDemandedLabel
+      );
+      const aboveAverageLabelsWithoutMost = aboveAverageLabels.filter(
+        (label) => label !== mostDemandedLabel
+      );
       return (
           <Typography component="div" sx={{ display: "flex", flexDirection: "column", gap: theme.spacing(4) }}>
             <Typography component="div">
@@ -225,24 +234,24 @@ const SkillsRankingDisclosure: React.FC<Readonly<SkillsRankingDisclosureProps>> 
             <Typography component="div">In that data sample, here is what we found:</Typography>
             <Typography component="div">
               <Typography component="span" sx={{ backgroundColor: theme.palette.error.light }}>
-              &#9660;&#9660; {leastDemandedLabel} is 'below average' in demand, and the least demanded of your skill
+              &#9660;&#9660; <strong>{leastDemandedLabel}</strong> is <strong>'below average'</strong> in demand, and the <strong>'least demanded'</strong> of your skill
               areas.
             </Typography>
           </Typography>
             <Typography component="div">
               <Typography component="span" sx={{ backgroundColor: theme.palette.error.light }}>
-              &#9660; {combineWords(belowAverageLabels)} are also 'below average' in demand.
+              &#9660; <strong>{combineWords(belowAverageLabelsWithoutLeast)}</strong> are also <strong>'below average'</strong> in demand.
             </Typography>
           </Typography>
             <Typography component="div">
               <Typography component="span" sx={{ backgroundColor: theme.palette.success.light }}>
-              &#9650;&#9650; {mostDemandedLabel} is 'above average' in demand, and the most demanded of your skill
+              &#9650;&#9650; <strong>{mostDemandedLabel}</strong> is <strong>'above average'</strong> in demand, and the <strong>'most demanded'</strong> of your skill
               areas.
             </Typography>
           </Typography>
             <Typography component="div">
               <Typography component="span" sx={{ backgroundColor: theme.palette.success.light }}>
-                <strong>&#9650; {combineWords(aboveAverageLabels)} is also 'above average'</strong> in demand.
+                <strong>&#9650; {combineWords(aboveAverageLabelsWithoutMost)}</strong> is also <strong>'above average'</strong> in demand.
               </Typography>
             </Typography>
           </Typography>
