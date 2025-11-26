@@ -1,9 +1,4 @@
-import {
-  SkillsRankingExperimentGroups,
-  SkillsRankingPhase,
-  SkillsRankingScore,
-  SkillsRankingState,
-} from "../types";
+import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingScore, SkillsRankingState } from "../types";
 import { getRandomString } from "src/_test_utilities/specialCharacters";
 
 export const getRandomSkillsRankingState = (
