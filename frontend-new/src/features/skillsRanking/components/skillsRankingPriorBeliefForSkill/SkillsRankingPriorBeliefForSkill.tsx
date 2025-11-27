@@ -1,5 +1,6 @@
 import React, { useContext, useMemo, useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
@@ -19,9 +20,10 @@ import {
   getLatestPhaseName,
 } from "src/features/skillsRanking/types";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
-import { getDefaultTypingDurationMs } from "src/features/skillsRanking/constants";
+import { getDefaultTypingDurationMs, SKILL_GROUP_DESCRIPTIONS } from "src/features/skillsRanking/constants";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
 import { getNextPhaseForGroup } from "src/features/skillsRanking/hooks/skillsRankingFlowGraph";
+import HelpTip from "src/theme/HelpTip/HelpTip";
 
 const uniqueId = "75e03749-9172-41d8-a45f-2fbe64b07a4b";
 
@@ -42,6 +44,27 @@ enum ScrollStep {
 }
 
 export const SKILLS_RANKING_PRIOR_BELIEF_FOR_SKIll_MESSAGE_ID = `skills-ranking-prior-belief-for-skill-message`;
+
+const renderSkillLabelWithTooltip = (label?: string) => {
+  if (!label) {
+    return null;
+  }
+
+  // important: trim and lowercase to match keys in SKILL_GROUP_DESCRIPTIONS
+  // if the label doesnt exist in the dictionary (since we're not using uuids), we just return the label without tooltip
+  const description = SKILL_GROUP_DESCRIPTIONS[label.trim().toLowerCase()];
+
+  if (!description) {
+    return label;
+  }
+
+  return (
+    <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}>
+      {label}
+      <HelpTip icon={<InfoIcon fontSize="small" />}>{description}</HelpTip>
+    </Box>
+  );
+};
 
 const SkillsRankingPriorBeliefForSkill: React.FC<Readonly<SkillsRankingPriorBeliefForSkillProps>> = ({
   onFinish,
@@ -133,7 +156,7 @@ const SkillsRankingPriorBeliefForSkill: React.FC<Readonly<SkillsRankingPriorBeli
           sender={ConversationMessageSender.COMPASS}
           message={
             <Typography>
-              <strong>And what is the chance</strong> (0–100%) that your <strong>{leastDemandedSkillLabel} is 'above average'</strong> in demand?
+              <strong>And what is the chance</strong> (0–100%) that your <strong>{renderSkillLabelWithTooltip(leastDemandedSkillLabel)} is 'above average'</strong> in demand?
             </Typography>
           }
         >

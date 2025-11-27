@@ -16,6 +16,7 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import { DATA_TEST_ID as TYPING_DATA_TEST_ID } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
+import { DATA_TEST_ID as HELP_TIP_DATA_TEST_ID } from "src/theme/HelpTip/HelpTip";
 
 // Mock framer motion
 jest.mock("framer-motion", () => ({
@@ -308,5 +309,39 @@ describe("SkillsRankingPriorBelief", () => {
     fireEvent.click(submitButton);
     await flush();
     expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  test("renders info tooltips for skill groups with known descriptions", async () => {
+    const givenState = createState(SkillsRankingExperimentGroups.GROUP_1, SkillsRankingPhase.PRIOR_BELIEF);
+    givenState.score = {
+      ...givenState.score,
+      above_average_labels: ["Social and communication skills and competences"],
+      below_average_labels: ["Information skills"],
+      most_demanded_label: "Management skills",
+    };
+
+    render(<SkillsRankingPriorBelief skillsRankingState={givenState} onFinish={jest.fn()} />);
+
+    const helpIcons = screen.getAllByTestId(HELP_TIP_DATA_TEST_ID.HELP_ICON);
+    expect(helpIcons).toHaveLength(3);
+
+    fireEvent.mouseEnter(helpIcons[0]);
+    expect(
+      await screen.findByText("Empathetic communication, goal coordination, support for well-being, and leadership.")
+    ).toBeInTheDocument();
+  });
+
+  test("does not render tooltips when skill labels lack descriptions", () => {
+    const givenState = createState(SkillsRankingExperimentGroups.GROUP_1, SkillsRankingPhase.PRIOR_BELIEF);
+    givenState.score = {
+      ...givenState.score,
+      above_average_labels: ["Unknown skill group"],
+      below_average_labels: ["Another unknown group"],
+      most_demanded_label: "Mystery label",
+    };
+
+    render(<SkillsRankingPriorBelief skillsRankingState={givenState} onFinish={jest.fn()} />);
+
+    expect(screen.queryAllByTestId(HELP_TIP_DATA_TEST_ID.HELP_ICON)).toHaveLength(0);
   });
 });
