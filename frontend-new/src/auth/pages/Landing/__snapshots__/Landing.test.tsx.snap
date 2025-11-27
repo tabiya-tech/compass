@@ -1706,7 +1706,7 @@ exports[`Landing Page Register button should show register link when registratio
 
 exports[`Landing Page should render landing page successfully 1`] = `
 <div
-  class="MuiDialog-root MuiModal-root css-zw3mfo-MuiModal-root-MuiDialog-root"
+  class="MuiDialog-root MuiModal-root css-1atdshk-MuiModal-root-MuiDialog-root"
   data-testid="landing-dialog-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
   role="presentation"
 >
@@ -1727,7 +1727,7 @@ exports[`Landing Page should render landing page successfully 1`] = `
   >
     <div
       aria-labelledby=":r0:"
-      class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthXs MuiDialog-paperFullWidth css-1yw6an0-MuiPaper-root-MuiDialog-paper"
+      class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthXs MuiDialog-paperFullWidth css-clohnj-MuiPaper-root-MuiDialog-paper"
       role="dialog"
     >
       <div
