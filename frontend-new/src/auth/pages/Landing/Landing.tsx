@@ -113,6 +113,13 @@ const Landing: React.FC = () => {
         disableEscapeKeyDown
         onClose={() => {}}
         hideBackdrop={false}
+        sx={{
+          "& .MuiDialog-container": {
+            display: "flex",
+            alignItems: "flex-start",
+            paddingTop: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+          },
+        }}
         slotProps={{
           backdrop: {
             sx: {
@@ -133,10 +140,6 @@ const Landing: React.FC = () => {
             height: "fit-content",
             borderRadius: 2,
             width: "calc(100% - 16px)",
-            position: "absolute",
-            top: "24px",
-            left: "50%",
-            transform: "translateX(-50%)",
             margin: "0",
           },
         }}
