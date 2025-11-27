@@ -16,6 +16,7 @@ import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
+import { DATA_TEST_ID as HELP_TIP_DATA_TEST_ID } from "src/theme/HelpTip/HelpTip";
 
 // Mock framer motion
 jest.mock("framer-motion", () => ({
@@ -315,5 +316,34 @@ describe("SkillsRankingPriorBeliefForSkill", () => {
     expect(console.error).toHaveBeenCalled();
     expect(mockUpdate).not.toHaveBeenCalled();
     expect(mockOnFinish).not.toHaveBeenCalled();
+  });
+
+  test("renders info tooltip when least demanded skill has a description", async () => {
+    const givenState = createState(SkillsRankingExperimentGroups.GROUP_1, SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL);
+    givenState.score = {
+      ...givenState.score,
+      least_demanded_label: "Information skills",
+    };
+
+    render(<SkillsRankingPriorBeliefForSkill skillsRankingState={givenState} onFinish={jest.fn()} />);
+
+    const helpIcon = screen.getByTestId(HELP_TIP_DATA_TEST_ID.HELP_ICON);
+    fireEvent.mouseEnter(helpIcon);
+
+    expect(
+      await screen.findByText("Research, record-keeping, analysis, and outcome projection.")
+    ).toBeInTheDocument();
+  });
+
+  test("does not render tooltip when least demanded skill lacks description", () => {
+    const givenState = createState(SkillsRankingExperimentGroups.GROUP_1, SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL);
+    givenState.score = {
+      ...givenState.score,
+      least_demanded_label: "Unknown label",
+    };
+
+    render(<SkillsRankingPriorBeliefForSkill skillsRankingState={givenState} onFinish={jest.fn()} />);
+
+    expect(screen.queryByTestId(HELP_TIP_DATA_TEST_ID.HELP_ICON)).toBeNull();
   });
 });

@@ -3,6 +3,7 @@ import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/Compas
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { Box, Typography, useTheme } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 import { AnimatePresence, motion } from "framer-motion";
 import TypingChatMessage from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -15,13 +16,14 @@ import {
 import SkillsRankingSlider from "src/features/skillsRanking/components/skillsRankingSlider/SkillsRankingSlider";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { getJobPlatformUrl, getDefaultTypingDurationMs } from "src/features/skillsRanking/constants";
+import { getJobPlatformUrl, getDefaultTypingDurationMs, SKILL_GROUP_DESCRIPTIONS } from "src/features/skillsRanking/constants";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import ChatMessageFooterLayout from "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { useAutoScrollOnChange } from "src/features/skillsRanking/hooks/useAutoScrollOnChange";
+import HelpTip from "src/theme/HelpTip/HelpTip";
 
 const uniqueId = "8d8d3e2f-7ba5-4f34-aaf2-b0fc39bc6c59";
 
@@ -37,6 +39,40 @@ export interface SkillsRankingPriorBeliefProps {
 }
 
 export const SKILLS_RANKING_PRIOR_BELIEF_MESSAGE_ID = `skills-ranking-prior-belief-message`;
+
+const renderSkillLabelWithTooltip = (label?: string) => {
+  if (!label) {
+    return null;
+  }
+
+  // important: trim and lowercase to match keys in SKILL_GROUP_DESCRIPTIONS
+  // if the label doesnt exist in the dictionary (since we're not using uuids), we just return the label without tooltip
+  const description = SKILL_GROUP_DESCRIPTIONS[label.trim().toLowerCase()];
+
+  if (!description) {
+    return label;
+  }
+
+  return (
+    <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}>
+      {label}
+      <HelpTip icon={<InfoIcon fontSize="small" />}>{description}</HelpTip>
+    </Box>
+  );
+};
+
+const renderSkillListWithTooltips = (labels: string[]) => {
+  if (!labels.length) {
+    return "—";
+  }
+
+  return labels.map((label, index) => (
+    <React.Fragment key={`${label}-${index}`}>
+      {renderSkillLabelWithTooltip(label)}
+      {index < labels.length - 1 && ", "}
+    </React.Fragment>
+  ));
+};
 
 const SkillsRankingPriorBelief: React.FC<Readonly<SkillsRankingPriorBeliefProps>> = ({
   onFinish,
@@ -56,8 +92,8 @@ const SkillsRankingPriorBelief: React.FC<Readonly<SkillsRankingPriorBeliefProps>
   const currentPhase = getLatestPhaseName(skillsRankingState);
   const isReplay = currentPhase !== SkillsRankingPhase.PRIOR_BELIEF;
 
-  const aboveAverageSkills = skillsRankingState.score.above_average_labels.join(", ");
-  const belowAverageSkills = skillsRankingState.score.below_average_labels.join(", ");
+  const aboveAverageSkillLabels = skillsRankingState.score.above_average_labels;
+  const belowAverageSkillLabels = skillsRankingState.score.below_average_labels;
   const mostDemandedSkillLabel = skillsRankingState.score.most_demanded_label;
 
   const handleChange = (_: Event, newValue: number | number[]) => {
@@ -114,12 +150,13 @@ const SkillsRankingPriorBelief: React.FC<Readonly<SkillsRankingPriorBeliefProps>
           message={
             <Typography>
               {skillsRankingState.metadata.experiment_group !== SkillsRankingExperimentGroups.GROUP_1 && <span>Just before I tell you,</span>} I am curious about your thoughts. <strong>In our conversation, we found that you have
-              skills in the following areas:</strong> {aboveAverageSkills}, and {belowAverageSkills}. <br />
+              skills in the following areas:</strong>{" "}
+              {renderSkillListWithTooltips(aboveAverageSkillLabels)}, and {renderSkillListWithTooltips(belowAverageSkillLabels)}. <br />
               <br />
               For the next few questions, please give your best guess. <strong>The more accurate your guesses are, the more airtime you will receive.</strong>
               <br />
               <br />
-              <strong>How likely</strong> do you think your <strong>{mostDemandedSkillLabel} is 'above average'</strong>{" "}
+              <strong>How likely</strong> do you think your <strong>{renderSkillLabelWithTooltip(mostDemandedSkillLabel)} is 'above average'</strong>{" "}
               in demand on {getJobPlatformUrl()} (in your province, in the last 6 months)? Please give your best guess
               from 0% to 100%.
             </Typography>

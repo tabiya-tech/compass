@@ -66,6 +66,13 @@ const BaseArgs = {
   skillsRankingState: (() => {
     const base = getRandomSkillsRankingState();
     base.phase = createPhaseArray(SkillsRankingPhase.PRIOR_BELIEF);
+    base.score = {
+      ...base.score,
+      above_average_labels: ["Social and communication skills and competences", "Management skills"],
+      below_average_labels: ["Information skills", "Handling and moving"],
+      most_demanded_label: "Working with machinery and specialised equipment",
+      least_demanded_label: "Working with computers",
+    };
     return base;
   })(),
 };
@@ -96,6 +103,21 @@ export const Group3_MostAndLeastDemanded: Story = {
     skillsRankingState: {
       ...BaseArgs.skillsRankingState,
       metadata: { ...BaseArgs.skillsRankingState.metadata, experiment_group: SkillsRankingExperimentGroups.GROUP_3 },
+    },
+  },
+};
+
+export const UnknownSkillGroups: Story = {
+  args: {
+    ...BaseArgs,
+    skillsRankingState: {
+      ...BaseArgs.skillsRankingState,
+      score: {
+        ...BaseArgs.skillsRankingState.score,
+        above_average_labels: ["Marine operations", "Quantum gastronomy"],
+        below_average_labels: ["Hyperloop logistics", "Urban farming ops"],
+        most_demanded_label: "Metaverse facilitation",
+      },
     },
   },
 };

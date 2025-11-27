@@ -66,6 +66,11 @@ const BaseArgs = {
   skillsRankingState: (() => {
     const base = getRandomSkillsRankingState();
     base.phase = createPhaseArray(SkillsRankingPhase.PRIOR_BELIEF_FOR_SKILL);
+    base.score = {
+      ...base.score,
+      least_demanded_label: "Information and communication technologies (ICTs)",
+      most_demanded_label: "Social sciences, journalism and information",
+    };
     return base;
   })(),
 };
@@ -96,6 +101,19 @@ export const Group3_MostAndLeastDemanded: Story = {
     skillsRankingState: {
       ...BaseArgs.skillsRankingState,
       metadata: { ...BaseArgs.skillsRankingState.metadata, experiment_group: SkillsRankingExperimentGroups.GROUP_3 },
+    },
+  },
+};
+
+export const UnknownSkillGroup: Story = {
+  args: {
+    ...BaseArgs,
+    skillsRankingState: {
+      ...BaseArgs.skillsRankingState,
+      score: {
+        ...BaseArgs.skillsRankingState.score,
+        least_demanded_label: "Asteroid mining readiness",
+      },
     },
   },
 };
