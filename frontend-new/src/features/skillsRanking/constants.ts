@@ -8,7 +8,9 @@ export const CALCULATION_DELAY = 60000;
 export const EFFORT_METRICS_UPDATE_INTERVAL = 10000;
 
 // Puzzle constants
-export const DEFAULT_STRINGS = ["TRSLKGJDFV", "ZCRSLKJTFV", "DFGLKJTRSV", "KJTRSLDFGV", "LKGJFDTRSV"];
+// This constant should follow the following rules.
+//   — No letters that behave the same when rotated clockwise. (i.e: H, I, N, O, S, X, Z)
+export const DEFAULT_STRINGS = ["TRMLKGJDFA", "LCRQLKJTFM", "DFGLKJTRGV", "KJTRYLDFGP", "LKGJFDTRTK", "PBBJFQTRMK"];
 
 // Config constants - these values are unlikely to change during runtime
 export const getJobPlatformUrl = () => SkillsRankingService.getInstance().getConfig().config.jobPlatformUrl;
