@@ -2,6 +2,7 @@ import "src/_test_utilities/consoleMock";
 import { nanoid } from "nanoid";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import {
+  applySkillsRankingChangeToPhase,
   FIXED_MESSAGES_TEXT,
   generateCompassMessage,
   generateCVTypingMessage,
@@ -266,7 +267,7 @@ describe("Chat Utils", () => {
 
       // AND console.error to have been called with the correct error message
       expect(console.error).toHaveBeenCalledWith(
-        new InvalidConversationPhasePercentage(newPhase.percentage, "greater than 100")
+        new InvalidConversationPhasePercentage(newPhase.percentage, "greater than 100"),
       );
     });
 
@@ -288,7 +289,7 @@ describe("Chat Utils", () => {
 
       // AND console.error to have been called with the correct error message
       expect(console.error).toHaveBeenCalledWith(
-        new InvalidConversationPhasePercentage(newPhase.percentage, "less than previous percentage 50")
+        new InvalidConversationPhasePercentage(newPhase.percentage, "less than previous percentage 50"),
       );
     });
 
@@ -310,7 +311,7 @@ describe("Chat Utils", () => {
 
       // AND console.error to have been called with the correct error message
       expect(console.error).toHaveBeenCalledWith(
-        new InvalidConversationPhasePercentage(newPhase.percentage, "less than 0")
+        new InvalidConversationPhasePercentage(newPhase.percentage, "less than 0"),
       );
     });
 
@@ -345,6 +346,68 @@ describe("Chat Utils", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
   });
+
+  describe("applySkillsRankingChangeToPhase", () => {
+    test("should set percentage to 100 when phase is ENDED and skills ranking is disabled", () => {
+      // GIVEN ENDED phase with skills ranking disabled
+      const givenPhase = ConversationPhase.ENDED;
+      const givenPercentage = 100;
+      const givenSkillsRankingEnabled = false;
+      const givenSkillsRankingCompleted = false;
+
+      // WHEN parsing with skills ranking disabled
+      const result = applySkillsRankingChangeToPhase(givenPhase, givenPercentage, givenSkillsRankingEnabled, givenSkillsRankingCompleted);
+
+      // THEN percentage forced to 100
+      expect(result).toEqual(100);
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should set percentage to 100 when phase is ENDED and skills ranking already completed", () => {
+      // GIVEN ENDED phase with skills ranking enabled and completed
+      const givenPhase = ConversationPhase.ENDED;
+      const givenPercentage = 100;
+      const givenSkillsRankingEnabled = true;
+      const givenSkillsRankingCompleted = true;
+
+      // WHEN parsing with completed ranking
+      const result = applySkillsRankingChangeToPhase(givenPhase, givenPercentage, givenSkillsRankingEnabled, givenSkillsRankingCompleted);
+
+      // THEN percentage forced to 100
+      expect(result).toEqual(100);
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    test("should set percentage to 95 when phase is ENDED and skills ranking pending", () => {
+      // GIVEN ENDED phase with skills ranking enabled but not completed
+      const givenPhase = ConversationPhase.ENDED;
+      const givenPercentage = 70;
+      const givenSkillsRankingEnabled = true;
+      const givenSkillsRankingCompleted = false;
+
+      // WHEN parsing with pending ranking
+      const result = applySkillsRankingChangeToPhase(givenPhase, givenPercentage, givenSkillsRankingEnabled, givenSkillsRankingCompleted);
+
+      // THEN percentage forced to 95
+      expect(result).toEqual(95);
+      expect(console.error).not.toHaveBeenCalled();
+    });
+  });
+
+  test("should retain the percentage if the phase is not ENDED", () => {
+    // GIVEN ENDED phase with skills ranking enabled but not completed
+    const givenPhase = ConversationPhase.COLLECT_EXPERIENCES;
+    const givenPercentage = 43;
+    const givenSkillsRankingEnabled = true;
+    const givenSkillsRankingCompleted = false;
+
+    // WHEN parsing with pending ranking
+    const result = applySkillsRankingChangeToPhase(givenPhase, givenPercentage, givenSkillsRankingEnabled, givenSkillsRankingCompleted);
+
+    // THEN percentage forced to 95
+    expect(result).toEqual(43);
+    expect(console.error).not.toHaveBeenCalled();
+  })
 
   describe("generateCVTypingMessage", () => {
     test("should generate a CV typing message with the correct structure when isUploaded is false", () => {

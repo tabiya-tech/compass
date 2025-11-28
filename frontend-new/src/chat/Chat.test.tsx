@@ -51,7 +51,9 @@ import { USER_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/userChatMessage/Use
 import { COMPASS_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { TYPING_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import { ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
-import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import {
+  CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
+} from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { getRandomSessionID } from "../features/skillsRanking/utils/getSkillsRankingState";
 import { SkillsRankingService } from "../features/skillsRanking/skillsRankingService/skillsRankingService";
@@ -299,6 +301,14 @@ describe("Chat", () => {
     resetAllMethodMocks(UserPreferencesService.getInstance());
     // Reset the mock implementation of the ExperienceService to avoid side effects between tests
     jest.spyOn(ExperienceService.prototype, "getExperiences").mockImplementation(mockGetExperiences);
+
+    const skillsRankingServiceMock = {
+      isSkillsRankingFeatureEnabled: jest.fn(),
+      getSkillsRankingState: jest.fn(),
+    };
+    jest.spyOn(SkillsRankingService, "getInstance").mockReturnValue(skillsRankingServiceMock as unknown as SkillsRankingService);
+    skillsRankingServiceMock.isSkillsRankingFeatureEnabled.mockReturnValue(false);
+    skillsRankingServiceMock.getSkillsRankingState.mockResolvedValue(null);
   });
 
   describe("render tests", () => {

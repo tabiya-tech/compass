@@ -3,6 +3,7 @@ import ChatService from "src/chat/ChatService/ChatService";
 import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "src/chat/Chat.types";
 import {
+  applySkillsRankingChangeToPhase,
   CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE,
   generateCancellableCVTypingMessage,
   generateCompassMessage,
@@ -36,7 +37,9 @@ import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableCompo
 import ChatProgressBar from "./chatProgressbar/ChatProgressBar";
 import { ConversationPhase, CurrentPhase, defaultCurrentPhase } from "./chatProgressbar/types";
 import { CompassChatMessageProps } from "./chatMessage/compassChatMessage/CompassChatMessage";
-import { CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import {
+  CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
+} from "./chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 import cvService from "src/CV/CVService/CVService";
@@ -79,7 +82,7 @@ const createShowConclusionMessage = (
   lastMessage: ConversationMessage,
   addMessageToChat: (message: IChatMessage<any>) => void,
   setAiIsTyping: (isTyping: boolean) => void,
-  skipTyping: boolean = false
+  skipTyping: boolean = false,
 ) => {
   return () => {
     const conclusionMessage = generateConversationConclusionMessage(lastMessage.message_id, lastMessage.message);
@@ -98,9 +101,9 @@ const createShowConclusionMessage = (
 };
 
 export const Chat: React.FC<Readonly<ChatProps>> = ({
-  showInactiveSessionAlert = false,
-  disableInactivityCheck = false,
-}) => {
+                                                      showInactiveSessionAlert = false,
+                                                      disableInactivityCheck = false,
+                                                    }) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const [messages, setMessages] = useState<IChatMessage<any>[]>([]);
@@ -118,13 +121,18 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   const [newConversationDialog, setNewConversationDialog] = React.useState<boolean>(false);
   const [exploredExperiencesNotification, setExploredExperiencesNotification] = useState<boolean>(false);
   const [activeSessionId, setActiveSessionId] = useState<number | null>(
-    UserPreferencesStateService.getInstance().getActiveSessionId()
+    UserPreferencesStateService.getInstance().getActiveSessionId(),
   );
   const [currentUserId] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
   const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
+  const [skillsRankingCompleted, setSkillsRankingCompleted] = useState<boolean>(false);
   // CV upload states
   const [isUploadingCv, setIsUploadingCv] = useState<boolean>(false);
-  const [activeUploads, setActiveUploads] = useState<Map<string, { messageId: string; intervalId: NodeJS.Timeout; timeoutId: NodeJS.Timeout }>>(new Map());
+  const [activeUploads, setActiveUploads] = useState<Map<string, {
+    messageId: string;
+    intervalId: NodeJS.Timeout;
+    timeoutId: NodeJS.Timeout
+  }>>(new Map());
 
   const navigate = useNavigate();
 
@@ -134,8 +142,10 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   // Experiences that have been processed
   const exploredExperiencesCount = useMemo(
     () => (experiences ?? []).filter((experience) => experience.exploration_phase === DiveInPhase.PROCESSED),
-    [experiences]
+    [experiences],
   );
+
+  const skillsRankingEnabled = SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled();
 
   /**
    * --- Utility functions ---
@@ -178,7 +188,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
 
     // Get timestamp from the first compass message in the conversation
     const firstCompassMessage = messages.find((message) =>
-      message.type.startsWith("compass-message-")
+      message.type.startsWith("compass-message-"),
     ) as IChatMessage<CompassChatMessageProps>;
     // If there is no compass message, we can't calculate the time
     if (!firstCompassMessage) return null;
@@ -197,24 +207,24 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   /**
    * --- Service handlers ---
    */
-  // Goes to the experience service to get the experiences
+    // Goes to the experience service to get the experiences
   const fetchExperiences = useCallback(async () => {
-    if (!activeSessionId) {
-      // If there is no session id, we can't get the experiences
-      throw new ChatError("Session id is not available");
-    }
-    setIsLoading(true);
-    try {
-      const experienceService = ExperienceService.getInstance();
-      const data = await experienceService.getExperiences(activeSessionId);
-      setExperiences(data);
-    } catch (error) {
-      console.error(new ChatError("Failed to retrieve experiences", error));
-      enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [enqueueSnackbar, activeSessionId]);
+      if (!activeSessionId) {
+        // If there is no session id, we can't get the experiences
+        throw new ChatError("Session id is not available");
+      }
+      setIsLoading(true);
+      try {
+        const experienceService = ExperienceService.getInstance();
+        const data = await experienceService.getExperiences(activeSessionId);
+        setExperiences(data);
+      } catch (error) {
+        console.error(new ChatError("Failed to retrieve experiences", error));
+        enqueueSnackbar("Failed to retrieve experiences", { variant: "error" });
+      } finally {
+        setIsLoading(false);
+      }
+    }, [enqueueSnackbar, activeSessionId]);
 
   // Opens the experiences drawer and get experiences if needed
   const handleOpenExperiencesDrawer = useCallback(async () => {
@@ -269,7 +279,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         if (!currentUserId) throw new Error("User ID missing");
         const resp = await cvService.getInstance().getUploadStatus(currentUserId, id);
         // Narrow to UploadStatus
-return {
+        return {
           upload_process_state: resp.upload_process_state as UploadStatus["upload_process_state"],
           cancel_requested: resp.cancel_requested,
           filename: resp.filename,
@@ -292,7 +302,7 @@ return {
                 ...msg.payload,
                 message: getCvUploadDisplayMessageMemo(status),
                 disabled: status.upload_process_state === "COMPLETED" || status.upload_process_state === "CANCELLED" || status.cancel_requested,
-              }
+              },
             };
           }
           return msg;
@@ -324,7 +334,11 @@ return {
         stopPollingForUpload(uploadId, handles.intervalId as any, handles.timeoutId as any);
         // Ensure no stale prefill remains on errors
         setPrefillMessage(null);
-        const err = error as { status?: number; response?: { status?: number; data?: { detail?: string } }; message?: string };
+        const err = error as {
+          status?: number;
+          response?: { status?: number; data?: { detail?: string } };
+          message?: string
+        };
         const statusCode = err?.status || err?.response?.status;
         const detail = err?.response?.data?.detail || err?.message;
         if (statusCode === 404 || err?.message === "timeout") {
@@ -349,9 +363,13 @@ return {
       isCancelled: () => {
         const currentMessage = messages.find(msg => msg.message_id === messageId);
         return Boolean(currentMessage?.payload.disabled);
-      }
+      },
     });
-    setActiveUploads(prev => new Map(prev).set(uploadId, { messageId, intervalId: handles.intervalId as any, timeoutId: handles.timeoutId as any }));
+    setActiveUploads(prev => new Map(prev).set(uploadId, {
+      messageId,
+      intervalId: handles.intervalId as any,
+      timeoutId: handles.timeoutId as any,
+    }));
   }, [activeUploads, enqueueSnackbar, removeMessageFromChat, messages, stopPollingForUpload, getCvUploadDisplayMessageMemo]);
 
   // Helper function to cancel an upload
@@ -367,7 +385,7 @@ return {
                 ...msg.payload,
                 message: "CV upload cancelled",
                 disabled: true,
-              }
+              },
             };
           }
           return msg;
@@ -390,7 +408,7 @@ return {
               ...msg.payload,
               message: "CV upload cancelled",
               disabled: true,
-            }
+            },
           };
         }
         return msg;
@@ -435,7 +453,7 @@ return {
             handleCancelUpload,
             false,
             false,
-            "UPLOADING"
+            "UPLOADING",
           ),
           message_id: uploadingMessageId,
         });
@@ -452,7 +470,7 @@ return {
                 payload: {
                   ...msg.payload,
                   onCancel: async () => await handleCancelUpload(response.uploadId!),
-                }
+                },
               };
             }
             return msg;
@@ -490,7 +508,18 @@ return {
         setIsUploadingCv(false);
       }
     },
-    [isUploadingCv, enqueueSnackbar, addMessageToChat, handleCancelUpload, startPollingForUpload, removeMessageFromChat]
+    [isUploadingCv, enqueueSnackbar, addMessageToChat, handleCancelUpload, startPollingForUpload, removeMessageFromChat],
+  );
+
+  const updateConversationPhase = useCallback(
+    (phase: CurrentPhase, skillsRankingCompleted: boolean) => {
+      setCurrentPhase((prev) => {
+        let validPhase = parseConversationPhase(phase, prev);
+        validPhase.percentage = applySkillsRankingChangeToPhase(phase.phase, validPhase.percentage, skillsRankingEnabled, skillsRankingCompleted);
+        return validPhase;
+      });
+    },
+    [skillsRankingEnabled],
   );
 
   // Goes to the chat service to send a message
@@ -506,7 +535,7 @@ return {
       try {
         // Send the user's message
         const response = await ChatService.getInstance().sendMessage(sessionId, userMessage);
-
+        let isSkillsRankingCompleted = skillsRankingCompleted;
         setExploredExperiences(response.experiences_explored);
 
         if (response.experiences_explored > exploredExperiences) {
@@ -522,8 +551,8 @@ return {
                 messageItem.message_id,
                 messageItem.message,
                 messageItem.sent_at,
-                messageItem.reaction
-              )
+                messageItem.reaction,
+              ),
             );
           }
         });
@@ -532,21 +561,29 @@ return {
           const lastMessage = response.messages[response.messages.length - 1];
 
           if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
-            // Check if skill ranking is already completed
-            const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(activeSessionId!);
-            const isAlreadyCompleted = skillsRankingState?.metadata.completed_at !== undefined;
-
             const showConclusionMessage = createShowConclusionMessage(
               lastMessage,
               addMessageToChat,
               setAiIsTyping,
-              isAlreadyCompleted
+              false,
             );
-            await showSkillsRanking(showConclusionMessage);
+
+            // Wrap onFinishFlow to update phase after Skills ranking completes
+            const onFinishFlowWithPhaseUpdate = async () => {
+              showConclusionMessage();
+
+              // Since the skillsRankingHook called suggested that the session is complete.
+              // Update the state to reflect that.
+              isSkillsRankingCompleted = true;
+              setSkillsRankingCompleted(isSkillsRankingCompleted);
+              updateConversationPhase(response.current_phase, isSkillsRankingCompleted);
+            };
+
+            await showSkillsRanking(onFinishFlowWithPhaseUpdate);
           } else {
             const conclusionMessage = generateConversationConclusionMessage(
               lastMessage.message_id,
-              lastMessage.message
+              lastMessage.message,
             );
 
             addMessageToChat(conclusionMessage);
@@ -557,9 +594,7 @@ return {
         setConversationConductedAt(response.conversation_conducted_at);
 
         // Set the current conversation phase
-        setCurrentPhase((_previousCurrentPhase) => {
-          return parseConversationPhase(response.current_phase, _previousCurrentPhase);
-        });
+        updateConversationPhase(response.current_phase, isSkillsRankingCompleted);
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error));
         addMessageToChat(generatePleaseRepeatMessage());
@@ -567,7 +602,14 @@ return {
         setAiIsTyping(false);
       }
     },
-    [addMessageToChat, exploredExperiences, fetchExperiences, activeSessionId, showSkillsRanking]
+    [
+      addMessageToChat,
+      exploredExperiences,
+      updateConversationPhase,
+      fetchExperiences,
+      showSkillsRanking,
+      skillsRankingCompleted,
+    ],
   );
 
   const initializeChat = useCallback(
@@ -599,6 +641,7 @@ return {
         // Get the chat history
         const instance = ChatService.getInstance();
         const history = await instance.getChatHistory(sessionId);
+        let isSkillsRankingCompleted = skillsRankingCompleted;
 
         // Set the messages from the chat history
         if (history.messages.length) {
@@ -620,21 +663,26 @@ return {
             const lastMessage = history.messages[history.messages.length - 1];
 
             if (SkillsRankingService.getInstance().isSkillsRankingFeatureEnabled()) {
-              // Check if skill ranking is already completed
-              const skillsRankingState = await SkillsRankingService.getInstance().getSkillsRankingState(sessionId);
-              const isAlreadyCompleted = skillsRankingState?.metadata.completed_at !== undefined;
-
               const showConclusionMessage = createShowConclusionMessage(
                 lastMessage,
                 addMessageToChat,
                 setAiIsTyping,
-                isAlreadyCompleted
+                true,
               );
-              await showSkillsRanking(showConclusionMessage);
+
+              // Wrap onFinishFlow to update completion state when skills ranking finishes
+              const onFinishFlowWithCompletion = async () => {
+                showConclusionMessage();
+                isSkillsRankingCompleted = true;
+                setSkillsRankingCompleted(isSkillsRankingCompleted);
+                updateConversationPhase(history.current_phase, isSkillsRankingCompleted);
+              };
+
+              await showSkillsRanking(onFinishFlowWithCompletion);
             } else {
               const conclusionMessage = generateConversationConclusionMessage(
                 lastMessage.message_id,
-                lastMessage.message
+                lastMessage.message,
               );
               addMessageToChat(conclusionMessage);
             }
@@ -658,9 +706,8 @@ return {
         setActiveSessionId(sessionId);
 
         // Set the current conversation phase
-        setCurrentPhase((_previousCurrentPhase) => {
-          return parseConversationPhase(history.current_phase, _previousCurrentPhase);
-        });
+        // Skills ranking completion is only known when onFinishFlowWithCompletion callback is called
+        updateConversationPhase(history.current_phase, isSkillsRankingCompleted);
         return true;
       } catch (e) {
         console.error(new ChatError("Failed to initialize chat", e));
@@ -669,7 +716,7 @@ return {
         setAiIsTyping(false);
       }
     },
-    [addMessageToChat, setAiIsTyping, showSkillsRanking, sendMessage]
+    [addMessageToChat, setAiIsTyping, showSkillsRanking, sendMessage, updateConversationPhase, skillsRankingCompleted],
   );
 
   // Resets the text field for the next message
@@ -679,7 +726,7 @@ return {
     async (userMessage: string) => {
       await sendMessage(userMessage, activeSessionId!);
     },
-    [sendMessage, activeSessionId]
+    [sendMessage, activeSessionId],
   );
 
   /**
@@ -767,7 +814,7 @@ return {
     if (exploredExperiencesNotification) {
       console.debug("Preloading DownloadReportDropdown");
       const LazyDownloadReportDropdown = lazyWithPreload(
-        () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown")
+        () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown"),
       );
       LazyDownloadReportDropdown.preload().then(() => {
         console.debug("DownloadReportDropdown preloaded");
