@@ -9,7 +9,7 @@ export function useAutoScrollOnChange<T>(dependency: T): React.RefObject<HTMLDiv
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    ref.current?.scrollIntoView({ behavior: "smooth" });
+    ref.current?.scrollIntoView?.({ behavior: "smooth" });
   }, [dependency]);
 
   return ref;
