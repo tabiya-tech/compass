@@ -4,7 +4,7 @@ import { ReportContent } from "src/experiences/report/reportContent";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
 import {
   COLORS,
-  formatDate,
+  formatSkillsReportDate,
   getBase64Image,
   prettifyText,
 } from "src/experiences/report/util";
@@ -98,20 +98,6 @@ const constructReportTitle = (paragraphs: Paragraph[]): void => {
   }));
 };
 
-// Construct the report body text
-const constructReportDescription = (paragraphs: Paragraph[], conversationConductedAt: string | null): void => {
-  paragraphs.push(new Paragraph({
-    children: [
-      new TextRun({
-        text: prettifyText(ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt))),
-        size: 22,
-      }),
-    ],
-    alignment: AlignmentType.START,
-    spacing: { before: 300, after: 200 },
-  }));
-};
-
 // Construct the section divider
 const constructSectionDivider = (paragraphs: Paragraph[]): void => {
   paragraphs.push(new Paragraph({
@@ -120,6 +106,28 @@ const constructSectionDivider = (paragraphs: Paragraph[]): void => {
     },
     spacing: { before: 200 },
   }));
+};
+
+const constructFinalDisclaimer = (paragraphs: Paragraph[], conversationConductedAt: string | null): void => {
+  paragraphs.push(
+    new Paragraph({
+      children: [
+        new TextRun({
+          text: prettifyText(ReportContent.DISCLAIMER_FINAL_TEXT(formatSkillsReportDate(conversationConductedAt))),
+          size: 20,
+          color: COLORS.grey700,
+        }),
+      ],
+      alignment: AlignmentType.LEFT,
+      border: {
+        top: { style: BorderStyle.SINGLE, size: 8, color: TabiyaBasicColors.GrayDark, space: 10 },
+        bottom: { style: BorderStyle.SINGLE, size: 8, color: TabiyaBasicColors.GrayDark, space: 10 },
+        left: { style: BorderStyle.SINGLE, size: 8, color: TabiyaBasicColors.GrayDark, space: 10 },
+        right: { style: BorderStyle.SINGLE, size: 8, color: TabiyaBasicColors.GrayDark, space: 10 },
+      },
+      spacing: { before: 300 },
+    })
+  );
 };
 
 export const constructSkillReportDocument = async (props: SkillReportDocumentProps): Promise<Document> => {
@@ -133,15 +141,15 @@ export const constructSkillReportDocument = async (props: SkillReportDocumentPro
   // Add personal information section
   await constructPersonalInformationSection(paragraphs, name, address, phone, email);
 
-  // Add report description
-  constructReportDescription(paragraphs, conversationConductedAt);
   constructSectionDivider(paragraphs);
 
   // Add the list of experiences
-  await constructExperienceList(paragraphs, experiences)
+  await constructExperienceList(paragraphs, experiences);
 
   // Add skills description (Glossary)
   constructSkillsDescription(paragraphs, experiences);
+
+  constructFinalDisclaimer(paragraphs, conversationConductedAt);
 
   // construct the document
   return new Document({
@@ -158,7 +166,7 @@ export const constructSkillReportDocument = async (props: SkillReportDocumentPro
     sections: [
       {
         headers: { default: await HeaderComponent() },
-        footers: { default: await FooterComponent() },
+        footers: { default: FooterComponent() },
         properties: {
           page: {
             margin: {

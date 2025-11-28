@@ -1,4 +1,5 @@
 import { Experience, Skill, WorkType } from "src/experiences/experienceService/experiences.types";
+import i18n from "src/i18n/i18n";
 import { customFetch } from "src/utils/customFetch/customFetch";
 
 // Get a list of all unique skills in alphabetical order
@@ -35,6 +36,23 @@ export const formatDate = (dateString: string | null): string => {
   const day = String(date.getUTCDate()).padStart(2, "0");
   const year = date.getUTCFullYear();
   return `${month} ${day}, ${year}`;
+};
+
+export const formatSkillsReportDate = (dateString: string | null): string => {
+  const date = dateString ? new Date(dateString) : new Date();
+  const locale = (i18n.language || "en").replace("_", "-");
+
+  try {
+    const formatter = new Intl.DateTimeFormat(locale, {
+      timeZone: "UTC",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    return formatter.format(date);
+  } catch {
+    return formatDate(dateString);
+  }
 };
 
 // Utility function to group experiences by work type

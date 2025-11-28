@@ -2,7 +2,7 @@ import React from "react";
 import { Document, Text, Page, View, Image } from "@react-pdf/renderer";
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import {
-  formatDate,
+  formatSkillsReportDate,
   getBase64Image,
   getUniqueSkills,
   groupExperiencesByWorkType,
@@ -33,7 +33,6 @@ export const DATA_TEST_ID = {
   SKILL_REPORT_EMAIL: `skill-report-email-${uniqueId}`,
   SKILL_REPORT_PHONE: `skill-report-phone-${uniqueId}`,
   SKILL_REPORT_ADDRESS: `skill-report-address-${uniqueId}`,
-  SKILL_REPORT_BODY_TEXT: `skill-report-body-text-${uniqueId}`,
   SKILL_REPORT_EXPERIENCES_TITLE: `skill-report-experiences-title-${uniqueId}`,
   SKILL_REPORT_EXPERIENCES_CONTAINER: `skill-report-experiences-container-${uniqueId}`,
 };
@@ -126,9 +125,6 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
 
             {renderPersonalInfo(email, ReportContent.IMAGE_URLS.EMAIL_ICON, DATA_TEST_ID.SKILL_REPORT_EMAIL)}
           </View>
-          <Text x={0} y={0} style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
-            {prettifyText(ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt)))}
-          </Text>
           <View style={styles.divider} />
           <Text x={0} y={0} style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>
             {ReportContent.EXPERIENCES_TITLE}
@@ -163,8 +159,13 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
             )}
           </View>
           <SkillsDescription skillsList={skillsList} />
+          <View style={styles.finalDisclaimerSection} wrap={false}>
+            <Text x={0} y={0} style={styles.finalDisclaimerText}>
+              {prettifyText(ReportContent.DISCLAIMER_FINAL_TEXT(formatSkillsReportDate(conversationConductedAt)))}
+            </Text>
+          </View>
         </View>
-        <Footer experiences={experiences} />
+        <Footer />
       </Page>
     </Document>
   );

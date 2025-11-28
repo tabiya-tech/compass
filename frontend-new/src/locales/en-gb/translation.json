@@ -500,11 +500,8 @@
       "topSkillsTitle": "Top Skills: ",
       "skillsDescriptionText": "Below, you will find a list of the skills discovered during your conversation with Brujula, along with their descriptions.",
       "disclaimer": {
-        "part1": "Disclaimer: ",
-        "part2": "Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate. ",
-        "part3": "Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with Brujula again or create a complete CV based on this report."
-      },
-      "bodyText": "This report summarizes the key information gathered during a conversation with Brujula on {{date}}. Brujula is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV."
+        "final": "This report summarises the key information gathered during a conversation with Brujula on {{date}}. Brujula is an AI chatbot that helps job seekers explore their skills and experiences. This information can be used to guide the job search and highlight their skills when applying, especially during interviews with potential employers."
+      }
     }
   },
   "features": {

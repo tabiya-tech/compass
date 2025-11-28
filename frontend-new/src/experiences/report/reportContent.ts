@@ -32,17 +32,8 @@ export const ReportContent = {
   get SKILLS_DESCRIPTION_TEXT() {
     return i18n.t("experiences.report.skillsDescriptionText");
   },
-  get DISCLAIMER_TEXT_PART1() {
-    return i18n.t("experiences.report.disclaimer.part1");
-  },
-  get DISCLAIMER_TEXT_PART2() {
-    return i18n.t("experiences.report.disclaimer.part2");
-  },
-  get DISCLAIMER_TEXT_PART3() {
-    return i18n.t("experiences.report.disclaimer.part3");
-  },
-  REPORT_BODY_TEXT: (currentDate: string) =>
-    i18n.t("experiences.report.bodyText", { date: currentDate }),
+  DISCLAIMER_FINAL_TEXT: (currentDate: string) =>
+    i18n.t("experiences.report.disclaimer.final", { date: currentDate }),
   IMAGE_URLS: {
     COMPASS_LOGO: `${process.env.PUBLIC_URL}/logo.png`,
     OXFORD_LOGO: `${process.env.PUBLIC_URL}/oxford-logo.png`,

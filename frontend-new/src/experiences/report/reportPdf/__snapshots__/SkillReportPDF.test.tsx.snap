@@ -16,16 +16,28 @@ exports[`Report should render Report correctly 1`] = `
       >
         <image
           src="[object Promise]"
-          style="height: 46px;"
+          style="height: 20px;"
         />
         <image
           src="[object Promise]"
-          style="height: 42px;"
+          style="height: 20px;"
+        />
+        <image
+          src="[object Promise]"
+          style="height: 20px;"
+        />
+        <image
+          src="[object Promise]"
+          style="height: 20px;"
+        />
+        <image
+          src="[object Promise]"
+          style="height: 30px;"
         />
       </view>
       <text
         data-testid="skill-report-title-5a296552-f91f-4c38-b88f-542cacaced8e"
-        style="font-size: 16px; padding-bottom: 18px; color: rgb(0, 33, 71); font-family: Inter; font-weight: bold;"
+        style="font-size: 16px; padding-bottom: 18px; color: rgb(32, 78, 154); font-family: Inter; font-weight: bold;"
         x="0"
         y="0"
       >
@@ -103,20 +115,12 @@ exports[`Report should render Report correctly 1`] = `
           </text>
         </view>
       </view>
-      <text
-        data-testid="skill-report-body-text-5a296552-f91f-4c38-b88f-542cacaced8e"
-        style="font-size: 11px; word-break: break-word;"
-        x="0"
-        y="0"
-      >
-        This report summarizes the key information gathered during a conversation with Brujula on June 01, 2021. Brujula is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV.
-      </text>
       <view
         style="border: 1px; margin-top: 12px; margin-bottom: 16px;"
       />
       <text
         data-testid="skill-report-experiences-title-5a296552-f91f-4c38-b88f-542cacaced8e"
-        style="font-size: 14px; color: rgb(0, 33, 71); font-family: Inter; font-weight: bold;"
+        style="font-size: 14px; color: rgb(32, 78, 154); font-family: Inter; font-weight: bold;"
         x="0"
         y="0"
       >
@@ -343,7 +347,7 @@ exports[`Report should render Report correctly 1`] = `
         style="display: flex; flex-direction: column;"
       >
         <text
-          style="font-size: 16px; padding-bottom: 18px; color: rgb(0, 33, 71); font-family: Inter; font-weight: bold;"
+          style="font-size: 16px; padding-bottom: 18px; color: rgb(32, 78, 154); font-family: Inter; font-weight: bold;"
           x="0"
           y="0"
         >
@@ -414,36 +418,21 @@ exports[`Report should render Report correctly 1`] = `
           </text>
         </view>
       </view>
-    </view>
-    <view
-      style="width: 100%; display: flex; flex-direction: column; padding-bottom: 26px; position: absolute; gap: 16px; bottom: 0px;"
-    >
       <view
-        style="display: flex; flex-direction: row; padding: 8px; border: 1px;"
+        style="margin-top: 24px; padding: 12px; border-width: 1px; border-color: #41403d;"
       >
-        <image
-          src="[object Promise]"
-          style="width: 12px; height: 12px;"
-        />
         <text
-          style="display: flex; flex: 1; flex-wrap: wrap; font-size: 9px; color: rgb(65, 64, 61);"
+          style="font-size: 10px; line-height: 1.4; color: rgb(65, 64, 61);"
           x="0"
           y="0"
         >
-           
-          Disclaimer: 
-           
-          <text
-            style="font-size: 9px; color: rgb(0, 0, 0);"
-            x="0"
-            y="0"
-          >
-            Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate. 
-             
-          </text>
-          Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with Brujula again or create a complete CV based on this report.
+          This report summarises the key information gathered during a conversation with Brujula on June 1, 2021. Brujula is an AI chatbot that helps job seekers explore their skills and experiences. This information can be used to guide the job search and highlight their skills when applying, especially during interviews with potential employers.
         </text>
       </view>
+    </view>
+    <view
+      style="width: 100%; display: flex; flex-direction: column; padding-bottom: 26px; position: absolute; bottom: 0px;"
+    >
       <text
         style="font-size: 10px; display: flex; justify-content: center; text-align: center;"
         x="0"

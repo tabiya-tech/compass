@@ -83,11 +83,6 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 48,
   },
-  bodyText: {
-    fontSize: 11,
-    wordBreak: "break-word",
-    paddingHorizontal: 48,
-  },
   experiencesContainer: {
     display: "flex",
     flexDirection: "column",
@@ -234,30 +229,19 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     paddingBottom: 26,
     position: "absolute",
-    gap: 16,
     bottom: 0,
   },
-  disclaimerContainer: {
-    display: "flex",
-    flexDirection: "row",
+  finalDisclaimerSection: {
     marginHorizontal: 48,
-    padding: 8,
-    border: 1,
+    marginTop: 24,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: TabiyaBasicColors.GrayDark,
   },
-  disclaimerText: {
-    display: "flex",
-    flex: 1,
-    flexWrap: "wrap",
-    fontSize: 9,
+  finalDisclaimerText: {
+    fontSize: 10,
+    lineHeight: 1.4,
     color: TabiyaBasicColors.GrayDark,
-  },
-  disclaimerTextBold: {
-    fontSize: 9,
-    color: COLORS.textBlack,
-  },
-  disclaimerIcon: {
-    width: 12,
-    height: 12,
   },
   pageNumber: {
     fontSize: 10,
