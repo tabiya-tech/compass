@@ -18,7 +18,7 @@ from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
 from common_libs.retry import Retry
 from app.i18n.translation_service import t
-from app.i18n.locale_detector import get_locale
+from app.i18n.locale_detector import get_locale_hint
 
 _NO_EXPERIENCE_COLLECTED = "No experience data has been collected yet"
 _FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step."
@@ -443,7 +443,7 @@ class _ConversationLLM:
         </system_instructions>
         """)
 
-        summary_language_hint = _get_summary_language_hint()
+        summary_language_hint = get_locale_hint("the recap, confirmation question, and final response")
         return replace_placeholders_with_indent(system_instructions_template,
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 agent_character=STD_AGENT_CHARACTER,
@@ -855,10 +855,3 @@ def _get_country_of_user_segment(country_of_user: Country) -> str:
     if country_of_user == Country.UNSPECIFIED:
         return ""
     return f" living in {country_of_user.value}"
-
-
-def _get_summary_language_hint() -> str:
-    locale = get_locale()
-    if locale.lower().startswith("es"):
-        return "Detected locale: Spanish. Keep the recap, confirmation question, and final response entirely in Spanish."
-    return f"Detected locale: {locale}. Keep the recap, confirmation question, and final response entirely in this language."

@@ -16,6 +16,7 @@ from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_
     get_config_variation
 from common_libs.retry import Retry
 from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE
+from app.i18n.locale_detector import get_locale_hint
 
 _TAGS_TO_FILTER = [
     "system instructions",
@@ -81,7 +82,10 @@ class EntityExtractionTool:
             temperature_config = {}
 
         return GeminiGenerativeLLM(
-            system_instructions=_SYSTEM_INSTRUCTIONS.format(language_style=STD_LANGUAGE_STYLE),
+            system_instructions=_SYSTEM_INSTRUCTIONS.format(
+                language_style=STD_LANGUAGE_STYLE,
+                language_hint=get_locale_hint("every extracted field value")
+            ),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000
@@ -167,6 +171,7 @@ _SYSTEM_INSTRUCTIONS = """
     Do not over-suggest any information, only extract the ones provided explicitly by the user.
     
 {language_style}
+{language_hint}
         
 #Extract data instructions
     Make sure you are extracting information about experiences that should be added to the 'experience_details' field.
@@ -192,6 +197,7 @@ _SYSTEM_INSTRUCTIONS = """
         What the company does or name of the company depending on the context.
         Use specific company names (eg: Acme inc) not generic ones (eg: 'company', 'online, 'organization', 'freelance' or 'self') in the output.
         For unpaid work, use the receiver of the work (e.g. "My Family", "My Community" etc) but not the generic name, in the language being used of the conversation.
+        Keep every value entirely in the detected language.
         Return a string value containing the type, or name of the company, or the receiver of the work.
         
         `null` if the information was not provided by the user and the user was not explicitly asked for this information yet.

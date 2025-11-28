@@ -74,3 +74,12 @@ def get_locale(
     current_locale.set(chosen_locale)
 
     return chosen_locale
+
+
+def get_locale_hint(purpose: str) -> str:
+    """Return a locale guidance string for prompts, defaulting to Spanish."""
+    locale = get_locale(default_locale="es") or "es"
+    locale_lower = locale.lower()
+    if locale_lower.startswith("es"):
+        return f"Detected locale: Spanish. Keep {purpose} entirely in Spanish."
+    return f"Detected locale: {locale}. Keep {purpose} entirely in this language."
