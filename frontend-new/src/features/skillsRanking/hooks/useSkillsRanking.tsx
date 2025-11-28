@@ -4,28 +4,28 @@ import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingSe
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import { SessionError } from "src/error/commonErrors";
 import {
-  SkillsRankingPhase,
-  SkillsRankingState,
   getLatestPhaseName,
   SkillsRankingExperimentGroups,
+  SkillsRankingPhase,
+  SkillsRankingState,
 } from "src/features/skillsRanking/types";
-import { getFlowPathForGroup, skillsRankingGroup1Path } from "./skillsRankingFlowGraph";
+import { getFlowPathForGroup } from "./skillsRankingFlowGraph";
 import {
+  createApplication24hMessage,
+  createApplicationMotivationMessage,
   createBriefingMessage,
-  createEffortMessage,
   createDisclosureMessage,
+  createEffortMessage,
+  createOpportunitySkillRequirementMessage,
+  createPerceivedRankForSkillMessage,
   createPerceivedRankMessage,
-  createPriorBeliefMessage,
   createPriorBeliefForSkillMessage,
+  createPriorBeliefMessage,
   createPromptMessage,
   createProofOfValueIntroMessage,
-  createOpportunitySkillRequirementMessage,
-  createApplicationMotivationMessage,
-  createApplication24hMessage,
-  createPerceivedRankForSkillMessage,
 } from "src/features/skillsRanking/utils/createMessages";
 
-const phaseToMessageFactory: Partial<Record<SkillsRankingPhase, any>> = {
+const phaseToMessageFactory: Partial<Record<SkillsRankingPhase, (...args: any[]) => IChatMessage<any>>> = {
   [SkillsRankingPhase.INITIAL]: createPromptMessage,
   [SkillsRankingPhase.BRIEFING]: createBriefingMessage,
   [SkillsRankingPhase.PROOF_OF_VALUE_INTRO]: createProofOfValueIntroMessage,
@@ -42,21 +42,35 @@ const phaseToMessageFactory: Partial<Record<SkillsRankingPhase, any>> = {
 
 const getPathToPhase = (
   phase: SkillsRankingPhase,
-  experimentGroup?: SkillsRankingExperimentGroups
+  experimentGroup?: SkillsRankingExperimentGroups,
 ): SkillsRankingPhase[] => {
-  const flowPath = experimentGroup ? getFlowPathForGroup(experimentGroup) : skillsRankingGroup1Path;
-  const index = flowPath.indexOf(phase);
-  if (index === -1) {
-    console.warn(`[SkillsRanking] Phase '${phase}' not found in path`, flowPath);
+  const fallbackGroup = SkillsRankingExperimentGroups.GROUP_1;
+  if (!experimentGroup) {
+    experimentGroup = fallbackGroup;
+  }
+
+  const flowPath = getFlowPathForGroup(experimentGroup);
+  const currentPhaseIndex = flowPath.indexOf(phase);
+
+  if (currentPhaseIndex === -1) {
+    console.warn(`[SkillsRanking] Phase '${phase}' not found in path ${flowPath} for group: ${experimentGroup}`);
     return [];
   }
-  return flowPath.slice(0, index + 1);
+
+  // Return the path up to and including the current phase
+  return flowPath.slice(0, currentPhaseIndex + 1);
 };
 
+/**
+ * Fetches the current state for the active session.
+ * From the backend service.
+ */
 const getSkillsRankingState = async (): Promise<SkillsRankingState | null> => {
   const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
 
-  if (!activeSessionId) throw new SessionError("Active session ID is not available.");
+  if (!activeSessionId)
+    throw new SessionError("Active session ID is not available.");
+
   try {
     return await SkillsRankingService.getInstance().getSkillsRankingState(activeSessionId);
   } catch (error) {
@@ -68,11 +82,13 @@ const getSkillsRankingState = async (): Promise<SkillsRankingState | null> => {
 const initializeSkillsRankingState = async (): Promise<SkillsRankingState | null> => {
   const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
 
-  if (!activeSessionId) throw new SessionError("Active session ID is not available.");
+  if (!activeSessionId)
+    throw new SessionError("Active session ID is not available.");
+
   try {
     return await SkillsRankingService.getInstance().updateSkillsRankingState(
       activeSessionId,
-      SkillsRankingPhase.INITIAL
+      SkillsRankingPhase.INITIAL,
     );
   } catch (error) {
     console.error(new SkillsRankingError("Error initializing skills ranking state:", error));
@@ -82,7 +98,7 @@ const initializeSkillsRankingState = async (): Promise<SkillsRankingState | null
 
 export const useSkillsRanking = (
   addMessage: (message: IChatMessage<any>) => void,
-  removeMessage: (messageId: string) => void
+  removeMessage: (messageId: string) => void,
 ) => {
   const getNextPhaseHandler =
     (currentPhase: SkillsRankingPhase, onFinishFlow: () => void) => async (newState: SkillsRankingState) => {
@@ -99,41 +115,48 @@ export const useSkillsRanking = (
         onFinishFlow();
         return;
       }
-      
+
       // Components advance the state before calling onFinish, so currentPhaseName is the phase we transitioned to.
       // If currentPhaseName is different from currentPhase, we've transitioned and should show currentPhaseName.
       // Otherwise, find the next phase after currentPhase.
       const flowPath = getFlowPathForGroup(newState.metadata.experiment_group);
       let phaseToShow: SkillsRankingPhase | undefined;
-      
-      if (currentPhaseName !== currentPhase) {
-        // We've transitioned to a new phase, show that phase
-        phaseToShow = currentPhaseName;
-      } else {
+
+      if (currentPhaseName === currentPhase) {
         // Still in the same phase, find the next one
         const currentIndex = flowPath.indexOf(currentPhase);
         phaseToShow = flowPath[currentIndex + 1];
+      } else {
+        // We've transitioned to a new phase, show that phase
+        phaseToShow = currentPhaseName;
       }
-      
-      const factory = phaseToShow ? phaseToMessageFactory[phaseToShow] : undefined;
 
-      console.debug(
-        `[Flow] going from '${currentPhase}' to '${phaseToShow}' (currentPhaseName: ${currentPhaseName}) for group ${newState.metadata.experiment_group} using path: ${flowPath.join(" → ")}`
-      );
-
-      if (!phaseToShow || !factory) {
-        console.debug(`[Flow] No next phase or factory found. Ending flow.`);
+      if (!phaseToShow) {
+        console.debug(`[Flow] No next phase Ending flow.`);
         onFinishFlow();
         return;
       }
 
-      const result = factory(newState, getNextPhaseHandler(phaseToShow, onFinishFlow));
-      (Array.isArray(result) ? result : [result]).filter((message) => message !== null).forEach(addMessage);
+      const factory = phaseToMessageFactory[phaseToShow];
+      if (!factory) {
+        console.debug(`[Flow] No factory to generate a message`);
+        onFinishFlow();
+        return;
+      }
+
+      console.debug(
+        `[Flow] going from '${currentPhase}' to '${phaseToShow}' (currentPhaseName: ${currentPhaseName}) for group ${newState.metadata.experiment_group} using path: ${flowPath.join(" → ")}`,
+      );
+
+      const message = factory(newState, getNextPhaseHandler(phaseToShow, onFinishFlow));
+      addMessage(message);
     };
 
   const showSkillsRanking = async (onFinishFlow: () => void) => {
+    // Fetch the current available state.
     let state = await getSkillsRankingState();
 
+    // If the state is null, initialize it.
     state ??= await initializeSkillsRankingState();
 
     if (!state) {
@@ -144,7 +167,7 @@ export const useSkillsRanking = (
 
     const currentPhaseName = getLatestPhaseName(state);
     if (!currentPhaseName) {
-      console.warn(`[Flow] No current phase found in state`);
+      console.error(`[Flow] No or invalid current phase found in state: `, state);
       onFinishFlow();
       return;
     }
@@ -164,10 +187,15 @@ export const useSkillsRanking = (
         onFinishFlow();
         return;
       }
+
       const factory = phaseToMessageFactory[phase];
       if (factory) {
-        const result = factory(state, getNextPhaseHandler(phase, onFinishFlow));
-        (Array.isArray(result) ? result : [result]).filter((message) => message !== null).forEach(addMessage);
+        // Get the component that is to be shown for this phase.
+        // Add the message to the message history.
+        const message = factory(state, getNextPhaseHandler(phase, onFinishFlow));
+        addMessage(message);
+      } else {
+        console.error(new SkillsRankingError(`[Flow] No factory found for phase: ${phase} Skipping phase.`));
       }
     });
   };
