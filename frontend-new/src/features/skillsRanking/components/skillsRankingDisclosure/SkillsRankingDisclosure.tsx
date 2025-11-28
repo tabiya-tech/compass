@@ -210,9 +210,11 @@ const SkillsRankingDisclosure: React.FC<Readonly<SkillsRankingDisclosureProps>> 
             <Typography component="div" sx={{ backgroundColor: theme.palette.success.light }}>
               <strong>&#9650;&#9650; {mostDemandedLabel} is 'above average' in demand</strong>, and the <strong>most demanded</strong> of your skill areas.
             </Typography>
-            <Typography component="div" sx={{ backgroundColor: theme.palette.success.light }}>
-              <strong>&#9650; {combineWords(aboveAverageLabelsWithoutMostGroup2)} is also 'above average'</strong> in demand.
-            </Typography>
+            {aboveAverageLabelsWithoutMostGroup2.length > 0 && (
+              <Typography component="div" sx={{ backgroundColor: theme.palette.success.light }}>
+                <strong>&#9650; {combineWords(aboveAverageLabelsWithoutMostGroup2)} is also 'above average'</strong> in demand.
+              </Typography>
+            )}
           </Typography>
       );
     case SkillsRankingExperimentGroups.GROUP_3:
@@ -238,22 +240,26 @@ const SkillsRankingDisclosure: React.FC<Readonly<SkillsRankingDisclosureProps>> 
               areas.
             </Typography>
           </Typography>
-            <Typography component="div">
-              <Typography component="span" sx={{ backgroundColor: theme.palette.error.light }}>
-              &#9660; <strong>{combineWords(belowAverageLabelsWithoutLeast)}</strong> are also <strong>'below average'</strong> in demand.
+            {belowAverageLabelsWithoutLeast.length > 0 && (
+              <Typography component="div">
+                <Typography component="span" sx={{ backgroundColor: theme.palette.error.light }}>
+                &#9660; <strong>{combineWords(belowAverageLabelsWithoutLeast)}</strong> are also <strong>'below average'</strong> in demand.
+              </Typography>
             </Typography>
-          </Typography>
+            )}
             <Typography component="div">
               <Typography component="span" sx={{ backgroundColor: theme.palette.success.light }}>
               &#9650;&#9650; <strong>{mostDemandedLabel}</strong> is <strong>'above average'</strong> in demand, and the <strong>'most demanded'</strong> of your skill
               areas.
             </Typography>
           </Typography>
-            <Typography component="div">
-              <Typography component="span" sx={{ backgroundColor: theme.palette.success.light }}>
-                <strong>&#9650; {combineWords(aboveAverageLabelsWithoutMost)}</strong> is also <strong>'above average'</strong> in demand.
+            {aboveAverageLabelsWithoutMost.length > 0 && (
+              <Typography component="div">
+                <Typography component="span" sx={{ backgroundColor: theme.palette.success.light }}>
+                  <strong>&#9650; {combineWords(aboveAverageLabelsWithoutMost)}</strong> is also <strong>'above average'</strong> in demand.
+                </Typography>
               </Typography>
-            </Typography>
+            )}
           </Typography>
       );
     default:
