@@ -1,0 +1,2634 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Skills Ranking Integration Should finish an already complicated state should automatically complete the feature if the state is already completed for group Group 1: Control 1`] = `
+Array [
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-prompt-message-1e13ec58-2931-47ef-b1a9-30550519707b",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 1: Control",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-prompt-message-1e13ec58-2931-47ef-b1a9-30550519707b",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-briefing-message-0e95404a-2044-4634-a6e8-29cc7b2d754e",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 1: Control",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-briefing-message-0e95404a-2044-4634-a6e8-29cc7b2d754e",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-proof-of-value-intro-message-eee627fe-a483-46d8-98e4-3a4eab72920a",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 1: Control",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-proof-of-value-intro-message-eee627fe-a483-46d8-98e4-3a4eab72920a",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-effort-message-d08ec52d-cd41-4934-b62f-dcd10eadfb3c",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 1: Control",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-effort-message-d08ec52d-cd41-4934-b62f-dcd10eadfb3c",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-prior-belief-message",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 1: Control",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-prior-belief-message",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-prior-belief-for-skill-message",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 1: Control",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-prior-belief-for-skill-message",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-opportunity-skill-requirement-message-1db28aba-6396-4629-8f0a-cc22034d155b",
+      "payload": Object {
+        "defaultValue": 45,
+        "isReadOnly": true,
+        "mostDemandedLabel": "most-demanded-label",
+        "onSubmit": [Function],
+        "sentAt": "2024-01-01T00:00:00.000Z",
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-opportunity-skill-requirement-message-1db28aba-6396-4629-8f0a-cc22034d155b",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-disclosure-message-67c4908b-b15f-4740-a017-84e509584c10",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 1: Control",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-disclosure-message-67c4908b-b15f-4740-a017-84e509584c10",
+    },
+  ],
+]
+`;
+
+exports[`Skills Ranking Integration Should finish an already complicated state should automatically complete the feature if the state is already completed for group Group 2: Treatment A 1`] = `
+Array [
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-prompt-message-1e13ec58-2931-47ef-b1a9-30550519707b",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 2: Treatment A",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-prompt-message-1e13ec58-2931-47ef-b1a9-30550519707b",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-briefing-message-0e95404a-2044-4634-a6e8-29cc7b2d754e",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 2: Treatment A",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-briefing-message-0e95404a-2044-4634-a6e8-29cc7b2d754e",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-proof-of-value-intro-message-eee627fe-a483-46d8-98e4-3a4eab72920a",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 2: Treatment A",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-proof-of-value-intro-message-eee627fe-a483-46d8-98e4-3a4eab72920a",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-effort-message-d08ec52d-cd41-4934-b62f-dcd10eadfb3c",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 2: Treatment A",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-effort-message-d08ec52d-cd41-4934-b62f-dcd10eadfb3c",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-prior-belief-message",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 2: Treatment A",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-prior-belief-message",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-prior-belief-for-skill-message",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 2: Treatment A",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-prior-belief-for-skill-message",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-disclosure-message-67c4908b-b15f-4740-a017-84e509584c10",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 2: Treatment A",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-disclosure-message-67c4908b-b15f-4740-a017-84e509584c10",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-application-motivation-message",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 2: Treatment A",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-application-motivation-message",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-application-24h-message",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 2: Treatment A",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-application-24h-message",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-perceived-rank-message-7c582beb-6070-43b0-92fb-7fd0a4cb533e",
+      "payload": Object {
+        "defaultValue": 45,
+        "isReadOnly": true,
+        "mostDemandedLabel": "most-demanded-label",
+        "onSubmit": [Function],
+        "sentAt": "2024-01-01T00:00:00.000Z",
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-perceived-rank-message-7c582beb-6070-43b0-92fb-7fd0a4cb533e",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-perceived-rank-for-skill-message-b0645605-1864-4170-a612-57c9fcda6dfc",
+      "payload": Object {
+        "defaultValue": 71,
+        "isReadOnly": true,
+        "leastDemandedLabel": "least-demanded-label",
+        "onSubmit": [Function],
+        "sentAt": "2024-01-01T00:00:00.000Z",
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-perceived-rank-for-skill-message-b0645605-1864-4170-a612-57c9fcda6dfc",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-opportunity-skill-requirement-message-1db28aba-6396-4629-8f0a-cc22034d155b",
+      "payload": Object {
+        "defaultValue": 45,
+        "isReadOnly": true,
+        "mostDemandedLabel": "most-demanded-label",
+        "onSubmit": [Function],
+        "sentAt": "2024-01-01T00:00:00.000Z",
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-opportunity-skill-requirement-message-1db28aba-6396-4629-8f0a-cc22034d155b",
+    },
+  ],
+]
+`;
+
+exports[`Skills Ranking Integration Should finish an already complicated state should automatically complete the feature if the state is already completed for group Group 3: Treatment B 1`] = `
+Array [
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-prompt-message-1e13ec58-2931-47ef-b1a9-30550519707b",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 3: Treatment B",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-prompt-message-1e13ec58-2931-47ef-b1a9-30550519707b",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-briefing-message-0e95404a-2044-4634-a6e8-29cc7b2d754e",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 3: Treatment B",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-briefing-message-0e95404a-2044-4634-a6e8-29cc7b2d754e",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-proof-of-value-intro-message-eee627fe-a483-46d8-98e4-3a4eab72920a",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 3: Treatment B",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-proof-of-value-intro-message-eee627fe-a483-46d8-98e4-3a4eab72920a",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-effort-message-d08ec52d-cd41-4934-b62f-dcd10eadfb3c",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 3: Treatment B",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-effort-message-d08ec52d-cd41-4934-b62f-dcd10eadfb3c",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-prior-belief-message",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 3: Treatment B",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-prior-belief-message",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-prior-belief-for-skill-message",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 3: Treatment B",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-prior-belief-for-skill-message",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-disclosure-message-67c4908b-b15f-4740-a017-84e509584c10",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 3: Treatment B",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-disclosure-message-67c4908b-b15f-4740-a017-84e509584c10",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-application-motivation-message",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 3: Treatment B",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-application-motivation-message",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-application-24h-message",
+      "payload": Object {
+        "onFinish": [Function],
+        "skillsRankingState": Object {
+          "metadata": Object {
+            "experiment_group": "Group 3: Treatment B",
+            "started_at": "2024-01-01T00:00:00.000Z",
+          },
+          "phase": Array [
+            Object {
+              "name": "INITIAL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "BRIEFING",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE_INTRO",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PROOF_OF_VALUE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PRIOR_BELIEF_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "DISCLOSURE",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_WILLINGNESS",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "APPLICATION_24H",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "PERCEIVED_RANK_FOR_SKILL",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "OPPORTUNITY_SKILL_REQUIREMENT",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+            Object {
+              "name": "COMPLETED",
+              "time": "2024-01-01T00:00:00.000Z",
+            },
+          ],
+          "score": Object {
+            "above_average_labels": Array [
+              "most-demanded-label",
+              "above-average-label-1",
+              "above-average-label-2",
+            ],
+            "average_count_for_jobseeker_skill_groups": 50,
+            "average_percent_for_jobseeker_skill_groups": 40,
+            "below_average_labels": Array [
+              "least-demanded-label",
+              "below-average-label-1",
+              "below-average-label-2",
+            ],
+            "calculated_at": "2024-01-01T00:00:00.000Z",
+            "least_demanded_label": "least-demanded-label",
+            "least_demanded_percent": 10,
+            "matched_skill_groups": 0,
+            "most_demanded_label": "most-demanded-label",
+            "most_demanded_percent": 75,
+            "province_used": "GIVEN_PROVINCE_USED",
+          },
+          "session_id": 1,
+          "user_responses": Object {
+            "application_24h": 1,
+            "application_willingness": Object {
+              "label": "application-willingness-label",
+              "value": 10,
+            },
+            "opportunity_skill_requirement_percentile": 45,
+            "perceived_rank_for_skill_percentile": 71,
+            "perceived_rank_percentile": 45,
+            "prior_belief_for_skill_percentile": 31,
+            "prior_belief_percentile": 33,
+          },
+        },
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-application-24h-message",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-perceived-rank-message-7c582beb-6070-43b0-92fb-7fd0a4cb533e",
+      "payload": Object {
+        "defaultValue": 45,
+        "isReadOnly": true,
+        "mostDemandedLabel": "most-demanded-label",
+        "onSubmit": [Function],
+        "sentAt": "2024-01-01T00:00:00.000Z",
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-perceived-rank-message-7c582beb-6070-43b0-92fb-7fd0a4cb533e",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-perceived-rank-for-skill-message-b0645605-1864-4170-a612-57c9fcda6dfc",
+      "payload": Object {
+        "defaultValue": 71,
+        "isReadOnly": true,
+        "leastDemandedLabel": "least-demanded-label",
+        "onSubmit": [Function],
+        "sentAt": "2024-01-01T00:00:00.000Z",
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-perceived-rank-for-skill-message-b0645605-1864-4170-a612-57c9fcda6dfc",
+    },
+  ],
+  Array [
+    Object {
+      "component": [Function],
+      "message_id": "skills-ranking-opportunity-skill-requirement-message-1db28aba-6396-4629-8f0a-cc22034d155b",
+      "payload": Object {
+        "defaultValue": 45,
+        "isReadOnly": true,
+        "mostDemandedLabel": "most-demanded-label",
+        "onSubmit": [Function],
+        "sentAt": "2024-01-01T00:00:00.000Z",
+      },
+      "sender": "COMPASS",
+      "type": "skills-ranking-opportunity-skill-requirement-message-1db28aba-6396-4629-8f0a-cc22034d155b",
+    },
+  ],
+]
+`;
