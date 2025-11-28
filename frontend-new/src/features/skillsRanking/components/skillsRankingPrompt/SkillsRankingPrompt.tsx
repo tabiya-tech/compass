@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import { SkillsRankingPhase, SkillsRankingState, getLatestPhaseName } from "src/features/skillsRanking/types";
+import { getLatestPhaseName, SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -76,7 +76,7 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
     if (step === PromptStep.INITIAL_TYPING) {
       timeoutId = setTimeout(() => setStep(PromptStep.SHOW_MESSAGE), getDefaultTypingDurationMs());
     } else if (step === PromptStep.SHOW_MESSAGE) {
-      timeoutId = setTimeout(() => setStep(PromptStep.FINAL_TYPING), MESSAGE_DURATION_MS);
+      timeoutId = setTimeout(() => setStep(PromptStep.FINAL_TYPING), MESSAGE_DURATION_MS());
     } else if (step === PromptStep.FINAL_TYPING) {
       timeoutId = setTimeout(() => {
         setStep(PromptStep.COMPLETED);
