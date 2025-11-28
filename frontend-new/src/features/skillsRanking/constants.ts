@@ -3,7 +3,8 @@ import { SkillsRankingService } from "./skillsRankingService/skillsRankingServic
 export const SKILLS_RANKING_FEATURE_ID = "4b0c7428-9c01-4688-81fd-d3ef159bce79";
 
 // Typing durations for different components
-export const MESSAGE_DURATION_MS = 5000;
+export const MESSAGE_DURATION_MS = () => 5000
+
 export const CALCULATION_DELAY = 60000;
 export const EFFORT_METRICS_UPDATE_INTERVAL = 10000;
 
