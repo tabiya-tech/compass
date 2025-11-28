@@ -1,21 +1,21 @@
 {
   "interaction_ease": {
-    "question_text": "¿Qué tan fácil o difícil fue interactuar con Brujula y entender sus respuestas?",
+    "question_text": "¿Qué tan fácil o difícil fue interactuar con Brújula y entender sus respuestas?",
     "description": "Esta pregunta se utiliza para medir el Customer Effort Score (CES). La respuesta está en una escala del 1 (Muy difícil) al 5 (Muy fácil).",
-    "comment_placeholder": "Por favor, explica tu calificación y comparte cualquier sugerencia para mejorar la facilidad de interacción con Brujula."
+    "comment_placeholder": "Por favor, explica tu calificación y comparte cualquier sugerencia para mejorar la facilidad de interacción con Brújula."
   },
   "clarity_of_skills": {
-    "question_text": "¿Te ayudó Brujula a obtener una comprensión más clara de tus habilidades? Si no, ¿por qué?",
-    "description": "Esta pregunta tiene como objetivo medir la Utilidad Percibida (PU). El usuario puede responder VERDADERO (indicando que Brujula ayudó) o FALSO (indicando que Brujula no ayudó), con un campo de texto opcional para comentarios adicionales.",
-    "comment_placeholder": "Por favor, comparte por qué Brujula no te ayudó a obtener una comprensión más clara de tus habilidades."
+    "question_text": "¿Te ayudó Brújula a obtener una comprensión más clara de tus habilidades? Si no, ¿por qué?",
+    "description": "Esta pregunta tiene como objetivo medir la Utilidad Percibida (PU). El usuario puede responder VERDADERO (indicando que Brújula ayudó) o FALSO (indicando que Brújula no ayudó), con un campo de texto opcional para comentarios adicionales.",
+    "comment_placeholder": "Por favor, comparte por qué Brújula no te ayudó a obtener una comprensión más clara de tus habilidades."
   },
   "satisfaction_with_compass": {
-    "question_text": "¿Qué tan satisfecho estás con Brujula?",
+    "question_text": "¿Qué tan satisfecho estás con Brújula?",
     "description": "Esta pregunta se utiliza para medir el Customer Satisfaction Score (CSAT). La respuesta está en una escala del 1 (Muy insatisfecho) al 5 (Muy satisfecho).",
     "comment_placeholder": null
   },
   "work_experience_accuracy": {
-    "question_text": "¿Hubo algún aspecto de tu experiencia laboral identificado por Brujula que fuera inexacto?",
+    "question_text": "¿Hubo algún aspecto de tu experiencia laboral identificado por Brújula que fuera inexacto?",
     "options": {
       "experience_title": "Título de experiencia incorrecto",
       "experience_dates": "Fechas de inicio/fin incorrectas",
@@ -25,31 +25,31 @@
       "other": "Otro"
     },
     "description": "Esta pregunta busca identificar inexactitudes específicas en la información de experiencia laboral. La respuesta es una lista de opciones seleccionadas, con comentarios adicionales opcionales.",
-    "comment_placeholder": "Por favor, proporciona más detalles sobre las inexactitudes en tu información de experiencia laboral identificadas por Brujula."
+    "comment_placeholder": "Por favor, proporciona más detalles sobre las inexactitudes en tu información de experiencia laboral identificadas por Brújula."
   },
   "incorrect_skills": {
-    "question_text": "¿Hay alguna habilidad que Brujula haya identificado incorrectamente para ti?",
+    "question_text": "¿Hay alguna habilidad que Brújula haya identificado incorrectamente para ti?",
     "description": "Esta pregunta tiene como objetivo identificar habilidades incorrectamente reconocidas. El usuario puede responder VERDADERO (indicando habilidades incorrectas) o FALSO (indicando ninguna habilidad incorrecta). En caso de VERDADERO, puede agregar comentarios adicionales.",
-    "comment_placeholder": "Por favor, enumera las habilidades que Brujula identificó incorrectamente para ti."
+    "comment_placeholder": "Por favor, enumera las habilidades que Brújula identificó incorrectamente para ti."
   },
   "missing_skills": {
-    "question_text": "¿Hay alguna habilidad que tengas y que Brujula no haya identificado?",
+    "question_text": "¿Hay alguna habilidad que tengas y que Brújula no haya identificado?",
     "description": "Esta pregunta busca identificar habilidades faltantes. Las respuestas pueden ser VERDADERO (indicando habilidades faltantes) o FALSO (indicando ninguna habilidad faltante). En caso de VERDADERO, se pueden agregar comentarios adicionales.",
-    "comment_placeholder": "Por favor, enumera las habilidades que tienes y que Brujula no identificó."
+    "comment_placeholder": "Por favor, enumera las habilidades que tienes y que Brújula no identificó."
   },
   "perceived_bias": {
-    "question_text": "¿Sentiste que Brujula te trató injustamente al hacer suposiciones sobre tu origen, idioma u otras características personales? Si es así, describe tu experiencia.",
+    "question_text": "¿Sentiste que Brújula te trató injustamente al hacer suposiciones sobre tu origen, idioma u otras características personales? Si es así, describe tu experiencia.",
     "description": "Esta pregunta busca identificar sesgos percibidos. Las respuestas pueden ser VERDADERO (indicando sesgo) o FALSO (indicando ningún sesgo), con un campo de texto opcional para comentarios adicionales.",
-    "comment_placeholder": "Por favor, comparte más detalles sobre tu experiencia. Incluye ejemplos específicos de cuándo sentiste que Brujula te trató injustamente o hizo suposiciones sobre tu origen, idioma u otras características personales."
+    "comment_placeholder": "Por favor, comparte más detalles sobre tu experiencia. Incluye ejemplos específicos de cuándo sentiste que Brújula te trató injustamente o hizo suposiciones sobre tu origen, idioma u otras características personales."
   },
   "recommendation": {
-    "question_text": "¿Qué tan probable es que recomiendes Brujula a otros buscadores de empleo?",
+    "question_text": "¿Qué tan probable es que recomiendes Brújula a otros buscadores de empleo?",
     "description": "Esta pregunta se utiliza para medir el Net Promoter Score (NPS). La respuesta está en una escala del 1 (Nada probable) al 5 (Extremadamente probable).",
     "comment_placeholder": null
   },
   "additional_feedback": {
-    "question_text": "Por favor, comparte cualquier comentario o sugerencia adicional que tengas para mejorar Brujula.",
-    "description": "Se utiliza para recopilar comentarios o sugerencias adicionales de los usuarios sobre cómo mejorar Brujula. La respuesta se da en forma de texto.",
-    "comment_placeholder": "¡Nos encantaría conocer tu opinión! Por favor, comparte cualquier comentario o sugerencia adicional que tengas para mejorar Brujula."
+    "question_text": "Por favor, comparte cualquier comentario o sugerencia adicional que tengas para mejorar Brújula.",
+    "description": "Se utiliza para recopilar comentarios o sugerencias adicionales de los usuarios sobre cómo mejorar Brújula. La respuesta se da en forma de texto.",
+    "comment_placeholder": "¡Nos encantaría conocer tu opinión! Por favor, comparte cualquier comentario o sugerencia adicional que tengas para mejorar Brújula."
   }
 }
