@@ -370,11 +370,10 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         # a list of all experiences that the user has discovered and explored
         participant_experiences = [exp_state.experience for exp_state in experiences_data]
 
-        # for each experience, we will get the top skills and the remaining skills
+        # for each experience, we will collect only the top skills
         participant_skills = []
         for experience in participant_experiences:
             participant_skills += experience.top_skills
-            participant_skills += experience.remaining_skills
 
         # Ranking algorithm v2 uses skill UUIDs
         participant_skills_uuids: set[str] = {skill.UUID for skill in participant_skills}

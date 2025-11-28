@@ -281,7 +281,7 @@ class TestSkillsRankingService:
             expected_skills_uuids: set[str] = {
                 skill.UUID
                 for experience in given_application_state.explore_experiences_director_state.experiences_state.values()
-                for skill in experience.experience.top_skills + experience.experience.remaining_skills
+                for skill in experience.experience.top_skills
             }
 
             ranking_service = get_test_http_client()
