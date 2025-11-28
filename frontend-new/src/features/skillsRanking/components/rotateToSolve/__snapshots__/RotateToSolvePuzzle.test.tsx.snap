@@ -69,7 +69,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
         <p
           class="MuiTypography-root MuiTypography-body1 css-1gdmqfx-MuiTypography-root"
         >
-          S
+          M
         </p>
       </div>
       <div
@@ -139,7 +139,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
         <p
           class="MuiTypography-root MuiTypography-body1 css-1gdmqfx-MuiTypography-root"
         >
-          V
+          A
         </p>
       </div>
     </div>
