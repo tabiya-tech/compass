@@ -695,6 +695,13 @@
     "helpTip":{
       "tooltip": "help"
     }
+    ,
+    "backdrop": {
+      "inactiveBackdrop": {
+        "title": "Are you still here?",
+        "tapAnywhere": "Tap anywhere to continue..."
+      }
+    }
   },
   "i18n": {
     "languageContextMenu": {

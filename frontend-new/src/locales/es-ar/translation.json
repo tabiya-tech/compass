@@ -695,6 +695,13 @@
     "helpTip":{
       "tooltip": "ayuda"
     }
+    ,
+    "backdrop": {
+      "inactiveBackdrop": {
+        "title": "¿Seguís aquí?",
+        "tapAnywhere": "Tocá en cualquier parte para continuar..."
+      }
+    }
   },
   "i18n": {
     "languageContextMenu": {

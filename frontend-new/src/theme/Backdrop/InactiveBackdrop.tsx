@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import Paper from "@mui/material/Paper";
 import { Theme } from "@mui/material/styles";
 import { Backdrop, Typography, useMediaQuery, useTheme } from "@mui/material";
@@ -17,6 +18,7 @@ export const DATA_TEST_ID = {
 const InactiveBackdrop: React.FC<InactivityBackdropProps> = ({ isShown }) => {
   const theme = useTheme();
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+  const { t } = useTranslation();
   return (
     <Backdrop
       sx={{ zIndex: theme.zIndex.drawer + 1, backgroundColor: "rgba(0, 0, 0, 0.75)" }}
@@ -37,9 +39,9 @@ const InactiveBackdrop: React.FC<InactivityBackdropProps> = ({ isShown }) => {
           textAlign="center"
           data-testid={DATA_TEST_ID.INACTIVE_BACKDROP_MESSAGE}
         >
-          Are you still here?
+          {t("theme.backdrop.inactiveBackdrop.title")}
           <br />
-          Tap anywhere to continue...
+          {t("theme.backdrop.inactiveBackdrop.tapAnywhere")}
         </Typography>
       </Paper>
     </Backdrop>
