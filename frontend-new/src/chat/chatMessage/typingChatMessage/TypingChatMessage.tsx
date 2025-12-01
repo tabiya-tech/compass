@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, keyframes } from "@mui/material";
+import { Box, keyframes, Typography } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
@@ -13,7 +13,7 @@ export const DATA_TEST_ID = {
 
 export const UI_TEXT = {
   TYPING: "Typing",
-  THINKING: "Please wait, I'm thinking",
+  THINKING: "Please wait, I'm thinking. It might up to 2 minutes.",
 };
 
 export const WAIT_BEFORE_THINKING = 15000;
