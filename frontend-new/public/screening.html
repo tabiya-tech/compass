@@ -504,9 +504,9 @@
             as well as some initial questions.</p>
           <p><span class="text-bold">Required time:</span> up to 1 hour -- you can start it now or anytime in the next 2
             weeks by simply clicking the link in the E-Mail again.</p>
-          <p>You’ll receive <strong>20 Rand</strong> airtime as a token of appreciation after finishing the task and
-            another <strong>40 Rand</strong>
-            about <span id="config-experiment-duration"></span> later when you complete a phone survey with us.</p>
+          <p>You’ll receive <strong>R20-R30</strong> airtime as a token of appreciation after finishing the task and
+            another <strong>R50</strong>
+            about 3 months later when you complete a phone survey with us.</p>
           <p class="text-bold">Do you have a stable internet connection and about 1 hour free right now?</p>
         </div>
         <div class="buttons">
@@ -588,7 +588,6 @@
     CONSENT_AGREE_BTN: "consent-agree-btn",
     CONSENT_DISAGREE_BTN: "consent-disagree-btn",
     RECONSIDER_BTN: "reconsider-btn",
-    EXPERIMENT_DURATION_SPAN: "config-experiment-duration",
     CONSENT_CHECKBOX_STUDY: "consent-checkbox-study",
     CONSENT_CHECKBOX_TC: "consent-checkbox-tc",
     CONSENT_CHECKBOX_PRIVACY: "consent-checkbox-privacy",
@@ -1184,9 +1183,6 @@
 
     const frontendFeatures = JSON.parse(atob(window.tabiyaConfig.FRONTEND_FEATURES));
     const screeningConfigPath = frontendFeatures.screening.config.config_buckets_url;
-    const experimentDuration = frontendFeatures.screening.config.experimentDuration;
-
-    document.getElementById(IDS.EXPERIMENT_DURATION_SPAN).textContent = experimentDuration;
 
     loadScript(screeningConfigPath)
       .then(handleAppLoaded)
