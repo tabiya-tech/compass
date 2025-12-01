@@ -14,7 +14,6 @@ import AnonymousAccountConversionDialog
   from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { useChatContext } from "src/chat/ChatContext";
-import InfoDrawer from "src/info/Info";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
@@ -91,7 +90,6 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [showConversionDialog, setShowConversionDialog] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const feedbackTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const notificationShownRef = React.useRef<boolean>(false);
@@ -263,12 +261,14 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
         disabled: !isOnline,
         action: startNewConversation,
       },
-      {
-        id: MENU_ITEM_ID.SETTINGS_SELECTOR,
-        text: MENU_ITEM_TEXT.SETTINGS,
-        disabled: !isOnline,
-        action: () => setIsDrawerOpen(true),
-      },
+      // Temporarily removed "Settings" menu item; not useful to users at the moment.
+      // Will be added back once it has meaningful functionality.
+      // {
+      //   id: MENU_ITEM_ID.SETTINGS_SELECTOR,
+      //   text: MENU_ITEM_TEXT.SETTINGS,
+      //   disabled: !isOnline,
+      //   action: () => setIsDrawerOpen(true),
+      // },
       ...(sentryEnabled
         ? [
             {
@@ -390,7 +390,6 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           setIsAccountConverted(true);
         }}
       />
-      <InfoDrawer isOpen={isDrawerOpen} notifyOnClose={() => setIsDrawerOpen(false)} />
       <TextConfirmModalDialog
         isOpen={showLogoutConfirmation}
         onCancel={handleConfirmLogout}
