@@ -47,20 +47,11 @@ export default class InvitationsService {
       });
 
       const responseBody = await response.text();
-      try {
-        const data: Invitation = JSON.parse(responseBody);
-        return data;
-      } catch (err: any) {
-        // Normalize JSON parse errors to stable messages expected by tests
-        if (responseBody === "{") {
-          throw new Error("Expected property name or '}' in JSON at position 1");
-        }
-        if (responseBody === "foo") {
-          throw new Error("Unexpected token 'o', \"foo\" is not valid JSON");
-        }
-        // Fallback to the original error message if not one of the above canned cases
-        throw err;
-      }
+      let data: Invitation;
+
+      data = JSON.parse(responseBody);
+
+      return data;
   }
 }
 

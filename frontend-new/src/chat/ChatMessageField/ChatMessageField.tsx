@@ -535,7 +535,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           onKeyDown={handleKeyDown}
           inputRef={inputRef}
           error={!!errorMessage}
-          helperText={errorMessage ? t(errorMessage) : ""}
+          helperText={errorMessage ? t(errorMessage) : undefined}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
