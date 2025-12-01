@@ -12,6 +12,11 @@ class CompassTestCase(BaseModel):
     The name of the test case.
     """
 
+    locale: str = "en-us"
+    """
+    The locale to be used for the test case.
+    """
+
     skip_force: Optional[Literal['skip', 'force', '']] = None
     """
     If set to 'skip', the test case will be skipped.

@@ -2,14 +2,23 @@
 import json
 import os
 import argparse
-from typing import Dict, Any, Set
+from typing import Dict, Any, Set, Optional
 from collections import defaultdict
+from app.i18n.locale_provider import LocaleProvider
 
 class I18nManager:
-    def __init__(self, locales_dir: str = "app/i18n/locales"):
+    def __init__(self, locales_dir: str = "app/i18n/locales", locale_provider: Optional[LocaleProvider] = None):
         self.locales_dir = locales_dir
+        self.locale_provider = locale_provider or LocaleProvider()
         self.translations: Dict[str, Dict[str, Any]] = {}
         self.load_translations()
+
+    def get_locale(self) -> str:
+        return self.locale_provider.get()
+    
+    def set_locale(self, provider) -> str:
+        self.locale_provider = provider
+        return self.locale_provider.get()
 
     def load_translations(self):
         """
@@ -32,7 +41,7 @@ class I18nManager:
                         except (json.JSONDecodeError, IOError) as e:
                             print(f"Warning: Could not load {file_path}. Error: {e}")
 
-    def get_translation(self, locale: str, domain: str, key: str, fallback_message: str = "", fallback_locale: str = "en") -> str:
+    def get_translation(self, locale: str, domain: str, key: str, fallback_message: str = "", fallback_locale: str = "en-us") -> str:
         """
         Retrieves a translation for a given locale, domain, and key.
         Falls back to the default locale if the key is not found or the locale/domain doesn't exist.
@@ -52,12 +61,22 @@ class I18nManager:
 
         return key
 
+    def t(self, domain: str, key: str, **kwargs) -> str:
+        locale = self.locale_provider.get()
+        # We can add fallback_message handling here if needed, but for now matching the requested signature
+        # The user example: return self.get_translation(locale, domain, key)
+        # But translation_service.py t() has fallback_message and kwargs.
+        # The user asked to add t() to I18nManager.
+        # "def t(self, domain: str, key: str): locale = self.locale_provider.get(); return self.get_translation(locale, domain, key)"
+        # I will implement it as requested but maybe support kwargs if I replace translation_service logic with this.
+        return self.get_translation(locale, domain, key)
+
     def verify_keys(self) -> bool:
         """
         Verifies that all locales have the same set of keys for each domain.
         """
         all_keys: Dict[str, Set[str]] = defaultdict(set)
-        reference_locale = 'en' if 'en' in self.translations else next(iter(self.translations), None)
+        reference_locale = 'en-us' if 'en-us' in self.translations else next(iter(self.translations), None)
         if not reference_locale:
             print("No locales found to verify.")
             return True
@@ -99,7 +118,7 @@ def main():
     parser.add_argument(
         "--verify",
         action="store_true",
-        help="Check that all locales have matching keys against 'en' locale.",
+        help="Check that all locales have matching keys against 'en-us' locale.",
     )
     args = parser.parse_args()
 
