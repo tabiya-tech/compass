@@ -17,8 +17,9 @@ import AnonymousAccountConversionDialog, {
   DATA_TEST_ID as ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID,
 } from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
 import { DATA_TEST_ID as CONFIRM_MODAL_DATA_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
-import { DATA_TEST_ID as TEXT_CONFIRM_MODAL_DIALOG_DATA_TEST_ID } from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
-import { DATA_TEST_ID as INFO_DRAWER_DATA_TEST_ID } from "src/info/Info";
+import {
+  DATA_TEST_ID as TEXT_CONFIRM_MODAL_DIALOG_DATA_TEST_ID,
+} from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
 import { ChatProvider } from "src/chat/ChatContext";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import * as Sentry from "@sentry/react";
@@ -263,58 +264,6 @@ describe("ChatHeader", () => {
           {}
         );
       });
-    });
-
-    test("should open info drawer when the settings menu item is clicked", async () => {
-      // GIVEN a ChatHeader component
-      const givenNotifyOnLogout = jest.fn();
-      const givenChatHeader = (
-        <ChatHeader
-          notifyOnLogout={givenNotifyOnLogout}
-          startNewConversation={givenStartNewConversation}
-          experiencesExplored={0}
-          exploredExperiencesNotification={true}
-          setExploredExperiencesNotification={jest.fn()}
-          conversationCompleted={false}
-          progressPercentage={0}
-          timeUntilNotification={null}
-          conversationPhase={ConversationPhase.INTRO}
-          collectedExperiences={1}
-        />
-      );
-      // AND the chat header is rendered
-      renderWithChatProvider(givenChatHeader);
-      // AND the user button is clicked
-      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
-      await userEvent.click(userButton);
-      // AND the context menu is opened
-      await waitFor(() => {
-        expect(ContextMenu).toHaveBeenCalledWith(
-          expect.objectContaining({
-            anchorEl: userButton,
-            open: true,
-          }),
-          {}
-        );
-      });
-
-      // WHEN the settings menu item is clicked
-      const settingsMenuItem = screen.getByTestId(MENU_ITEM_ID.SETTINGS_SELECTOR);
-      await userEvent.click(settingsMenuItem);
-      // AND the context menu is closed
-      await waitFor(() => {
-        expect(ContextMenu).toHaveBeenCalledWith(
-          expect.objectContaining({
-            anchorEl: null,
-            open: false,
-          }),
-          {}
-        );
-      });
-
-      // THEN expect info drawer to be opened
-      const infoDrawer = screen.getByTestId(INFO_DRAWER_DATA_TEST_ID.INFO_DRAWER_CONTAINER);
-      expect(infoDrawer).toBeInTheDocument();
     });
 
     test("should call start new conversation when the start new conversation menu item is clicked", async () => {
@@ -671,11 +620,6 @@ describe("ChatHeader", () => {
                   disabled: !browserIsOnline,
                 }),
                 expect.objectContaining({
-                  id: MENU_ITEM_ID.SETTINGS_SELECTOR,
-                  text: "settings",
-                  disabled: !browserIsOnline,
-                }),
-                expect.objectContaining({
                   id: MENU_ITEM_ID.LOGOUT_BUTTON,
                   text: "logout",
                   disabled: false,
@@ -689,7 +633,6 @@ describe("ChatHeader", () => {
         const contextMenu = screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
         expect(contextMenu).toBeInTheDocument();
         expect(screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION)).toBeInTheDocument();
-        expect(screen.getByTestId(MENU_ITEM_ID.SETTINGS_SELECTOR)).toBeInTheDocument();
         expect(screen.getByTestId(MENU_ITEM_ID.LOGOUT_BUTTON)).toBeInTheDocument();
       }
     );
