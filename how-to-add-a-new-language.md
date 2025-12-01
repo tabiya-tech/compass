@@ -18,23 +18,19 @@ Notes
 
 ## 1) Backend changes (FastAPI)
 
-Backend i18n lives in `backend/app/i18n/`. Translations are loaded by `I18nManager` and fetched via `t(domain, key, ...)` from `translation_service.py`. The locale is selected by `get_locale()` in `locale_detector.py` with the following priority:
-1. First language in `BACKEND_SUPPORTED_LANGUAGES` env var (highest priority)
-2. Locale on the current conversation context (if set)
-3. Best effort match from the HTTP `Accept-Language` header
-4. Default fallback ("en")
+The locale is determined by `LocaleProvider` in `locale_provider.py`. Currently, it defaults to the first language in `BACKEND_SUPPORTED_LANGUAGES` env var, or "en-us" if not set.
 
-Important: The backend looks up translations by the exact locale string returned by `get_locale()`; make sure you create a folder matching that code or use a code in `BACKEND_SUPPORTED_LANGUAGES` that matches an existing folder name.
+Important: The backend looks up translations by the exact locale string returned by `LocaleProvider`; make sure you create a folder matching that code or use a code in `BACKEND_SUPPORTED_LANGUAGES` that matches an existing folder name.
 
 ### 1.1 Create locale directory and messages file
 Create a folder for your new locale under `backend/app/i18n/locales/<locale>/` and add a `messages.json` file with the same keys as English.
 
 Example
 ```
-backend/app/i18n/locales/en/messages.json      # reference
-backend/app/i18n/locales/fr/messages.json      # new (primary language)
+backend/app/i18n/locales/en-us/messages.json      # reference
+backend/app/i18n/locales/es-es/messages.json      # new (primary language)
 # Optionally, region-specific variant
-backend/app/i18n/locales/fr-fr/messages.json
+backend/app/i18n/locales/es-ar/messages.json
 ```
 
 Template for `messages.json` (keep keys identical to English; values are your translations):
@@ -47,7 +43,7 @@ Template for `messages.json` (keep keys identical to English; values are your tr
 ```
 
 Best practice
-- Start by copying `backend/app/i18n/locales/en/messages.json` and translating values.
+- Start by copying `backend/app/i18n/locales/en-us/messages.json` and translating values.
 - Keep placeholders unchanged (e.g., `{end_date}`) so formatting still works.
 
 ### 1.2 Enable the language via env var
@@ -55,9 +51,9 @@ Add or update `BACKEND_SUPPORTED_LANGUAGES` in your backend environment (see `ba
 
 Example
 ```
-BACKEND_SUPPORTED_LANGUAGES='["en","fr"]'
+BACKEND_SUPPORTED_LANGUAGES='["en-us","es-es"]'
 # If you created a region-specific folder, you can target it directly:
-# BACKEND_SUPPORTED_LANGUAGES='["fr-fr","en"]'
+# BACKEND_SUPPORTED_LANGUAGES='["es-ar","en-us"]'
 ```
 
 ### 1.3 Optional: verify backend key consistency
@@ -81,7 +77,7 @@ Add a new folder under `frontend-new/src/locales/<locale>/` and copy the referen
 Example
 ```
 frontend-new/src/locales/en-gb/translation.json   # reference
-frontend-new/src/locales/fr-fr/translation.json   # new
+frontend-new/src/locales/es-es/translation.json   # new
 ```
 
 Template for `translation.json` (keep keys identical to English; values are your translations):
@@ -100,12 +96,12 @@ Open `frontend-new/src/i18n/i18n.ts` and:
 
 Example diff (illustrative)
 ```ts
-import fr from "../locales/fr-fr/translation.json";
+import es from "../locales/es-es/translation.json";
 
 i18n.init({
   resources: {
-    "fr-FR": { translation: fr },
-    "fr-fr": { translation: fr },
+    "es-ES": { translation: es },
+    "es-es": { translation: es },
     // … keep existing entries …
   },
   fallbackLng: DEFAULT_LOCALE,
@@ -175,7 +171,7 @@ yarn test -t "i18n locales consistency"
 - Keep keys consistent. Do not rename keys between languages; translate only the values.
 - Preserve placeholders such as `{end_date}` and ICU style `{{variable}}` exactly.
 - Align codes across layers:
-  - If backend `get_locale()` returns `fr-fr` you need a `backend/app/i18n/locales/fr-fr/` folder (or change the env to return `fr`).
+  - If backend `LocaleProvider` returns `fr-fr` you need a `backend/app/i18n/locales/fr-fr/` folder (or change the env to return `fr`).
   - Frontend resources must be registered with the same code you will pass to `i18n.changeLanguage()`.
 - Default languages
   - Backend: first item in `BACKEND_SUPPORTED_LANGUAGES` wins.
@@ -210,7 +206,7 @@ Frontend `translation.json`
 - Backend
   - Loader: `backend/app/i18n/i18n_manager.py`
   - Translator: `backend/app/i18n/translation_service.py` (function: `t(domain, key, ...)`)
-  - Locale detection: `backend/app/i18n/locale_detector.py`
+  - Locale detection: `backend/app/i18n/locale_provider.py`
   - Locales: `backend/app/i18n/locales/<locale>/messages.json`
   - Env: `BACKEND_SUPPORTED_LANGUAGES` in backend environment
 - Frontend-new
@@ -226,3 +222,28 @@ If you also maintain the old Next.js POC in `frontend`, note it does not current
 ---
 
 That’s it — add your locale files, wire them up in config, and verify with the built-in checks. If you need help aligning codes across layers or planning a gradual rollout, add notes near the env configs explaining the intended default and allowed languages.
+
+---
+
+## 7) Evaluation Tests
+
+For evaluation tests, you can set the locale using `CustomProvider`.
+
+Example:
+
+```python
+from app.i18n.translation_service import get_i18n_manager
+from app.i18n.locale_provider import CustomProvider
+import logging
+import pytest
+
+@pytest.mark.asyncio
+@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.repeat(3)
+@pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_data_extraction),
+                         ids=[case.name for case in get_test_cases_to_run(test_cases_data_extraction)])
+async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytest.LogCaptureFixture):
+    logger = logging.getLogger()
+
+    get_i18n_manager().set_locale(CustomProvider(test_case.locale))
+```
