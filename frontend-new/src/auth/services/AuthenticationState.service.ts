@@ -93,7 +93,7 @@ export default class AuthenticationStateService {
   public loadToken(): void {
     this.token = PersistentStorageService.getToken();
     if (!this.token) {
-      console.warn("AuthenticationStateService: No token found in persistent storage");
+      console.info("AuthenticationStateService: No token found in persistent storage");
     }
   }
 
