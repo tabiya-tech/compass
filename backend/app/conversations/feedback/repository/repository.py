@@ -133,7 +133,7 @@ class UserFeedbackRepository(IUserFeedbackRepository):
             # use $eq to avoid no-sql injection
             doc = await self._collection.find_one({"session_id": {"$eq": session_id}})
             if not doc:
-                self._logger.warning(f"Feedback for session_id '{session_id}' not found")
+                self._logger.info(f"Feedback for session_id '{session_id}' not found")
                 return None
 
             return self._from_db_doc(doc)
@@ -186,7 +186,7 @@ class UserFeedbackRepository(IUserFeedbackRepository):
             feedback_sessions = await cursor.to_list(length=None)
 
             if not feedback_sessions:
-                self._logger.warning(f"Feedback for user_id '{user_id}' not found")
+                self._logger.info(f"Feedback for user_id '{user_id}' not found")
                 return {}
 
             # Convert documents to Feedback objects and organize by session_id
