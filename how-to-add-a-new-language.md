@@ -92,7 +92,7 @@ Template for `translation.json` (keep keys identical to English; values are your
 ### 2.2 Register the new locale in i18n resources
 Open `frontend-new/src/i18n/i18n.ts` and:
 - Import your new translation file
-- Add it to the `resources` map under the appropriate BCP‑47 code(s). Consider adding both uppercase (e.g., `fr-FR`) and lowercase (`fr-FR`) variants for leniency with detectors/storage.
+- Add it to the `resources` map under the appropriate BCP‑47 code(s). Consider adding both uppercase (e.g., `en-US`) and lowercase (`en-us`) variants for leniency with detectors/storage.
 
 Example diff (illustrative)
 ```ts
@@ -110,15 +110,15 @@ i18n.init({
 ```
 
 ### 2.3 Add the language to the language menu (optional but recommended)
-Update `frontend-new/src/i18n/languageContextMenu/LanguageContextMenu.tsx` to include a new menu item (text label, id, and action) that calls `i18n.changeLanguage("fr-FR")` (or your code). The item will be disabled unless your environment enables it (see next step).
+Update `frontend-new/src/i18n/languageContextMenu/LanguageContextMenu.tsx` to include a new menu item (text label, id, and action) that calls `i18n.changeLanguage("en-US")` (or your code). The item will be disabled unless your environment enables it (see next step).
 
 Example (illustrative)
 ```ts
 {
   id: MENU_ITEM_ID.AUTH_FRENCH_SELECTOR,
   text: MENU_ITEM_TEXT.FRENCH,
-  disabled: !supportedLanguages.includes("fr-FR"),
-  action: () => changeLanguage("fr-FR"),
+  disabled: !supportedLanguages.includes("en-US"),
+  action: () => changeLanguage("en-US"),
 }
 ```
 
@@ -133,7 +133,7 @@ Example (`frontend-new/public/data/env.js`)
 ```js
 window.tabiyaConfig = {
   // …other settings…
-  FRONTEND_SUPPORTED_LANGUAGES: btoa(JSON.stringify(["en-gb","en-us","fr-FR"])),
+  FRONTEND_SUPPORTED_LANGUAGES: btoa(JSON.stringify(["en-gb","en-us","es-es"])),
   FRONTEND_DEFAULT_LOCALE: btoa("en-gb"),
 };
 ```
@@ -171,12 +171,12 @@ yarn test -- src/i18n/locales/locales.test.ts
 - Keep keys consistent. Do not rename keys between languages; translate only the values.
 - Preserve placeholders such as `{end_date}` and ICU style `{{variable}}` exactly.
 - Align codes across layers:
-  - If backend `LocaleProvider` returns `fr-FR` you need a `backend/app/i18n/locales/fr-FR/` folder (or change the env to return `fr`).
+  - If backend `LocaleProvider` returns `en-US` you need a `backend/app/i18n/locales/en-US/` folder (or change the env to return `es-ES`).
   - Frontend resources must be registered with the same code you will pass to `i18n.changeLanguage()`.
 - Default languages
   - Backend: first item in `BACKEND_SUPPORTED_LANGUAGES` wins.
   - Frontend: `FRONTEND_DEFAULT_LOCALE` in `env.js`.
-- Region variants: You can support both primary (`fr`) and region-specific (`fr-FR`) on the backend by providing both folders. On the frontend, add both entries to `resources` (upper + lower case) if needed.
+- Region variants: You can support both primary (`es-ES`) and region-specific (`en-US`) on the backend by providing both folders. On the frontend, add both entries to `resources` (upper + lower case) if needed.
 
 ---
 
