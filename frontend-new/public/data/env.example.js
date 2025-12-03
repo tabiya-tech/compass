@@ -38,24 +38,21 @@ window.tabiyaConfig = {
   SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY: btoa("sensitive-data-encryption-key"),
   SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID: btoa("key_id"),
 
-  FRONTEND_LOGIN_CODE: btoa("login_code"),
-  FRONTEND_REGISTRATION_CODE: btoa("registration_code"),
-
-  FRONTEND_SUPPORTED_LANGUAGES: btoa(JSON.stringify(["en-us","es-ar"])),
+  // ################################################################
+  // #       Locales (Languages)
+  // ################################################################
   // Default locale (used as initial UI language if user preference not set)
   FRONTEND_DEFAULT_LOCALE: btoa("en-gb"),
+  FRONTEND_SUPPORTED_LANGUAGES: btoa(JSON.stringify(["en-us","es-ar"])),
 
-  // Format for displaying dates target pattern (e.g., "YYYY-MM", "YYYY/MM", "MM-YYYY").
-  FRONTEND_DATE_PATTERN: btoa("YYYY-MM"),
-
-  // Visual separator used in the date pattern source(e.g., "-", "/", ".").
-  FRONTEND_DATE_SPLITTER: btoa("/"),
-
-
+  // ################################################################
+  // #       Auth Settings.
+  // ################################################################
   FRONTEND_DISABLE_LOGIN_CODE: btoa("false"),
   FRONTEND_DISABLE_REGISTRATION: btoa("false"),
-
   FRONTEND_DISABLE_SOCIAL_AUTH: btoa("false"),
+  FRONTEND_LOGIN_CODE: btoa("login_code"),
+  FRONTEND_REGISTRATION_CODE: btoa("registration_code"),
 
   // CV Upload feature flag (optional, defaults to false if not set)
   FRONTEND_ENABLE_CV_UPLOAD: btoa("true"),

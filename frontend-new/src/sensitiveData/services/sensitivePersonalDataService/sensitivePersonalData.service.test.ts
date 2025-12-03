@@ -228,7 +228,7 @@ describe("SensitivePersonalDataService", () => {
     });
   });
 
-  describe("common.buttons.skip", () => {
+  describe("skip", () => {
     test("should construct the skip error class correctly", () => {
       // GIVEN some random error message
       const givenErrorMessage = getRandomLorem(10);
@@ -264,7 +264,7 @@ describe("SensitivePersonalDataService", () => {
         failureMessage: `Failed to skip sensitive personal data for user with id ${givenUserId}`,
         body: JSON.stringify({}),
         serviceName: "SensitivePersonalData",
-        serviceFunction: "common.buttons.skip",
+        serviceFunction: "skip",
       });
     });
   });

@@ -2,7 +2,6 @@ import { SensitivePersonalDataRequirement, UserPreference, Language } from "src/
 import {
   QUESTION_KEYS,
 } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
-import * as Sentry from "@sentry/react";
 
 export default class UserPreferencesStateService {
   private static instance: UserPreferencesStateService;
@@ -41,14 +40,6 @@ export default class UserPreferencesStateService {
   public setUserPreferences(preferences: UserPreference): void {
     // Store a deep copy of the user preferences object to prevent direct modification
     this.userPreferences = this.cloneUserPreferences(preferences);
-    try {
-      // Set the session context for Sentry so that we can track the session id in errors
-      Sentry.setContext("session", {
-        session_id: this.getActiveSessionId() ?? "UNKNOWN"
-      });
-    } catch (err) {
-      console.error(new Error(`Failed to set sentry context`, { cause: err }));
-    }
   }
 
   public clearUserPreferences(): void {

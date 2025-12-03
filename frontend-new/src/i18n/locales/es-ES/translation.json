@@ -227,6 +227,7 @@
       "feedbackMessagePlaceholder": "¡Nos encantaría conocer tu opinión! Comparte cualquier comentario o sugerencia para mejorar Compass.",
       "sendFeedback": "Enviar comentarios",
       "feedbackSuccessMessage": "¡Gracias por tus comentarios!",
+      "formTitle": "Dar comentarios generales",
       "giveGeneralFeedback": "Dar comentarios generales",
       "userInfo": "Información del usuario",
       "userIconAlt": "Icono de usuario",
@@ -424,7 +425,9 @@
         },
         "experiencesDrawerContent": {
           "menu": {
-            "revert": "Revertir"
+            "revert": "Revertir",
+            "edit": "Editar",
+            "delete": "Eliminar"
           },
           "actionsUnavailableUntilExplored": "Estas acciones estarán disponibles una vez que hayas discutido la experiencia en detalle con Compass.",
           "moreOptionsTitle": "Más opciones",
@@ -435,6 +438,9 @@
         },
         "skillPopover": {
           "alsoKnownAs": "También conocido como:"
+        },
+        "experiencesDrawerHeader": {
+          "closeTitle": "Cerrar experiencias"
         },
         "restoreExperiencesDrawer": {
           "title": "Restaurar experiencias",

@@ -23,6 +23,8 @@ import {
   getLoginCodeDisabled,
   getRegistrationDisabled,
   getSocialAuthDisabled,
+  getDefaultLocale,
+  getSupportedLanguages,
 } from "./envService";
 import { getRandomString } from "./_test_utilities/specialCharacters";
 
@@ -63,6 +65,8 @@ describe.each([
   ["FRONTEND_METRICS_CONFIG", getMetricsConfig],
   ["FRONTEND_ENABLE_CV_UPLOAD", getCvUploadEnabled],
   ["FRONTEND_FEATURES", getFeatures],
+  ["FRONTEND_SUPPORTED_LANGUAGES", getSupportedLanguages],
+  ["FRONTEND_DEFAULT_LOCALE", getDefaultLocale],
 ])("Env Getters", (ENV_KEY, getterFn) => {
   describe(`${ENV_KEY} Getter (${getterFn.name}) tests`, () => {
     test(`getAPI should not fail if the ${ENV_KEY} is not set`, () => {
@@ -166,6 +170,8 @@ describe("Ensure Required Environment Variables", () => {
         TARGET_ENVIRONMENT_NAME: btoa("foo"),
         SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY: btoa("foo"),
         SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID: btoa("foo"),
+        FRONTEND_SUPPORTED_LANGUAGES: btoa("[]"),
+        FRONTEND_DEFAULT_LOCALE: btoa("en-US")
       },
       writable: true,
     });

@@ -1,3 +1,6 @@
+// mute chatty console
+import "src/_test_utilities/consoleMock";
+
 import { SLIDE_DURATION } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import { focusAndScrollToField } from "src/feedback/overallFeedback/feedbackForm/util";
 

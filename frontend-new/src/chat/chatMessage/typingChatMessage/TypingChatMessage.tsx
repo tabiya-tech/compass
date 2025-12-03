@@ -12,7 +12,7 @@ export const DATA_TEST_ID = {
   TYPING_CHAT_MESSAGE_CONTAINER: `typing-chat-message-container-${uniqueId}`,
 };
 
-export const UI_TEXT = {
+export const UI_TEXT_KEYS = {
   // i18n keys
   TYPING: "chat.chatMessage.typingChatMessage.typing",
   THINKING: "chat.chatMessage.typingChatMessage.thinking",
@@ -44,12 +44,12 @@ const textVariants = {
 
 const TypingChatMessage: React.FC<TypingChatMessageProps> = ({ waitBeforeThinking = WAIT_BEFORE_THINKING }) => {
   const { t } = useTranslation();
-  const [displayText, setDisplayText] = useState(t(UI_TEXT.TYPING));
+  const [displayText, setDisplayText] = useState(t(UI_TEXT_KEYS.TYPING));
 
   useEffect(() => {
     // Change text after waitBeforeThinking duration
     const textChangeTimer = setTimeout(() => {
-      setDisplayText(t(UI_TEXT.THINKING));
+      setDisplayText(t(UI_TEXT_KEYS.THINKING));
     }, waitBeforeThinking,t);
 
     return () => {

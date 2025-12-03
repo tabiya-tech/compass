@@ -6,6 +6,7 @@ import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { useTranslation } from "react-i18next";
 import { getSupportedLanguages } from "src/envService";
+import { Locale } from "src/i18n/constants";
 
 const uniqueId = "f4d06e4b-0e0c-49c7-ad93-924c5ac89070";
 
@@ -60,33 +61,27 @@ const LanguageContextMenu: React.FC<LanguageContextMenuProps> = ({ removeMargin 
     {
       id: MENU_ITEM_ID.AUTH_ENGLISH_SELECTOR,
       text: MENU_ITEM_TEXT.ENGLISH,
-      disabled: !supportedLanguages.includes("en-gb"),
-      action: () => changeLanguage("en-gb"),
+      disabled: !supportedLanguages.includes(Locale.EN_GB),
+      action: () => changeLanguage(Locale.EN_GB),
     },
     {
       id: MENU_ITEM_ID.AUTH_ENGLISH_SELECTOR + "-ar",
       text: MENU_ITEM_TEXT.ENGLISH,
-      disabled: !supportedLanguages.includes("en-us"),
-      action: () => changeLanguage("en-us"),
+      disabled: !supportedLanguages.includes(Locale.EN_US),
+      action: () => changeLanguage(Locale.EN_US),
     },
     {
       id: MENU_ITEM_ID.AUTH_SPANISH_SELECTOR,
       text: MENU_ITEM_TEXT.SPANISH,
-      disabled: !supportedLanguages.includes("es-es"),
-      action: () => changeLanguage("es-es"),
+      disabled: !supportedLanguages.includes(Locale.ES_ES),
+      action: () => changeLanguage(Locale.ES_ES),
     },
     {
       id: MENU_ITEM_ID.AUTH_SPANISH_SELECTOR + "-ar",
       text: MENU_ITEM_TEXT.SPANISH_ARGENTINA,
-      disabled: !supportedLanguages.includes("es-ar"),
-      action: () => changeLanguage("es-ar"),
-    },
-    {
-      id: MENU_ITEM_ID.AUTH_FRENCH_SELECTOR,
-      text: MENU_ITEM_TEXT.FRENCH,
-      disabled: !supportedLanguages.includes("fr-fr"),
-      action: () => changeLanguage("fr-fr"),
-    },
+      disabled: !supportedLanguages.includes(Locale.ES_AR),
+      action: () => changeLanguage(Locale.ES_AR),
+    }
   ];
 
   // --- Filter out languages that are disabled
