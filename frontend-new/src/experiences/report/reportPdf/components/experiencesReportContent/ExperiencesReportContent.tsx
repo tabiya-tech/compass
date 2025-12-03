@@ -3,7 +3,6 @@ import { Text, View } from "@react-pdf/renderer";
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import styles from "src/experiences/report/reportPdf/styles";
 import { ReportContent } from "src/experiences/report/reportContent";
-import { cvFormatDate } from "src/utils/dateUtils";
 
 interface ExperienceProps {
   experience: Experience;
@@ -26,9 +25,7 @@ export const capitalizeFirstLetter = (string: string): string => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-const ExperiencesReportContent: React.FC<
-
-ExperienceProps> = ({ experience }) => {
+const ExperiencesReportContent: React.FC<ExperienceProps> = ({ experience }) => {
   return (
     <View style={styles.container} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_CONTAINER}>
       <View style={styles.contentColumn}>
@@ -44,12 +41,12 @@ ExperienceProps> = ({ experience }) => {
           <View style={styles.experienceInfo} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_EXPERIENCE_INFO}>
             <Text x={0} y={0} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_DATE}>
               {experience.timeline.end && experience.timeline.start
-                ? `${cvFormatDate(experience.timeline.start)} — ${cvFormatDate(experience.timeline.end)}`
-                : cvFormatDate(experience.timeline.start) || cvFormatDate(experience.timeline.end)}
+                ? `${experience.timeline.start} — ${experience.timeline.end}`
+                : experience.timeline.start || experience.timeline.end}
             </Text>
             {(experience.timeline.start || experience.timeline.end) && experience.company && (
               <Text x={0} y={0}>
-                ,{" "} 
+                ,{" "}
               </Text>
             )}
             <Text x={0} y={0} data-testid={DATA_TEST_ID.EXPERIENCES_CONTENT_REPORT_COMPANY}>

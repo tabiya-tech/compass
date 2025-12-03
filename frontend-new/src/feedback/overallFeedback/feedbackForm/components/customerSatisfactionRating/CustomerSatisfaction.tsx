@@ -49,11 +49,11 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       
       try {
         const module = await import(
-          /* @vite-ignore */ `src/feedback/overallFeedback/feedbackForm/questions-${locale}.json`
+          `src/feedback/overallFeedback/feedbackForm/questions-${locale}.json`
         );
         setQuestionsData(module.default || module);
       } catch (error) {
-        console.error(`❌ Failed to load questions for locale '${locale}'.`, error);
+        console.error(`Failed to load questions for locale '${locale}'.`, error);
 
         if (locale !== DEFAULT_LOCALE) {
           console.info(`Attempting fallback to '${DEFAULT_LOCALE}' locale...`);

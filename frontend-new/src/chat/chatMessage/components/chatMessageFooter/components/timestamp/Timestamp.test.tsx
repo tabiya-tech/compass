@@ -1,21 +1,24 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
-import { useTranslation } from "react-i18next";
-import Timestamp , { DATA_TEST_ID } from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
+import Timestamp, {
+  DATA_TEST_ID,
+} from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { getDurationFromNow } from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/getDurationFromNow/getDurationFromNow";
 
-jest.mock("src/chat/chatMessage/components/chatMessageFooter/components/timestamp/getDurationFromNow/getDurationFromNow", () => {
-  return {
-    getDurationFromNow: jest.fn()
+jest.mock(
+  "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/getDurationFromNow/getDurationFromNow",
+  () => {
+    return {
+      getDurationFromNow: jest.fn(),
+    };
   }
-})
+);
 
 describe("render tests", () => {
-  const { t } = useTranslation();
   test("should render the Chat Message Timestamp without a child if none is passed", () => {
     // GIVEN a sent at time
-    const givenSentAt: string = new Date().toISOString()
+    const givenSentAt: string = new Date().toISOString();
 
     // AND a getDurationFromNow function that returns a given duration string
     const givenDuration = "a foo years ago";
@@ -27,7 +30,7 @@ describe("render tests", () => {
     // THEN expect the timestamp to be visible
     expect(screen.getByTestId(DATA_TEST_ID.TIMESTAMP)).toBeInTheDocument();
     // AND expect the getDurationFromNow method to have been called with the given sentAt as a Date object
-    expect(getDurationFromNow).toHaveBeenCalledWith(new Date(givenSentAt),t);
+    expect(getDurationFromNow).toHaveBeenCalledWith(new Date(givenSentAt), expect.any(Function));
     // AND expect the given duration to be shown
     expect(screen.getByTestId(DATA_TEST_ID.TIMESTAMP)).toHaveTextContent(givenDuration);
 

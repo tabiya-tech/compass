@@ -1,3 +1,6 @@
+// mute chatty console
+import "src/_test_utilities/consoleMock";
+
 // standard sentry mock
 import "src/_test_utilities/sentryMock"
 import { render, screen } from "src/_test_utilities/test-utils";

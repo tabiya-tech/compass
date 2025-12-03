@@ -1,3 +1,6 @@
+// mute chatty console
+import "src/_test_utilities/consoleMock";
+
 import React from 'react';
 import '@testing-library/jest-dom';
 import { screen, render, waitFor, fireEvent } from 'src/_test_utilities/test-utils';

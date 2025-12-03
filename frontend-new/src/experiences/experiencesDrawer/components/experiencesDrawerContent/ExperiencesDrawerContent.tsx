@@ -15,8 +15,6 @@ import RestoreIcon from "@mui/icons-material/Restore";
 import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 import { deduplicateSkills } from "src/utils/skillsUtils";
 import { useTranslation } from "react-i18next";
-import { cvFormatDate } from "src/utils/dateUtils";
-
 
 const uniqueId = "34a59a9e-e7f6-4a10-8b72-0fd401c727de";
 
@@ -146,7 +144,11 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
             fontWeight="bold"
             data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_OCCUPATION}
           >
-            {experience.experience_title ? experience.experience_title : <i>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.untitled")}</i>}
+            {experience.experience_title ? (
+              experience.experience_title
+            ) : (
+              <i>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.untitled")}</i>
+            )}
           </Typography>
           <Box display="flex" alignItems="center" justifyContent="flex-end">
             <PrimaryIconButton
@@ -166,8 +168,8 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
         >
           {/* display the start and end dates */}
           {experience.timeline.end && experience.timeline.start
-            ? `${cvFormatDate(experience.timeline.start)} — ${cvFormatDate(experience.timeline.end)}`
-            : cvFormatDate(experience.timeline.start) || cvFormatDate(experience.timeline.end)}  
+            ? `${experience.timeline.start} — ${experience.timeline.end}`
+            : experience.timeline.start || experience.timeline.end}
 
           {(experience.timeline.start || experience.timeline.end) && experience.company && ", "}
 
@@ -191,7 +193,9 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
         >
           <b>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.topSkillsLabel")}</b>
         </Typography>
-        <HelpTip icon={<InfoIcon sx={{ padding: 0.1 }} />}>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.topSkillsHelp")}</HelpTip>
+        <HelpTip icon={<InfoIcon sx={{ padding: 0.1 }} />}>
+          {t("experiences.experiencesDrawer.components.experiencesDrawerContent.topSkillsHelp")}
+        </HelpTip>
       </Box>
       <Box
         display="flex"
