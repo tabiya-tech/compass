@@ -565,7 +565,7 @@
             "message_1": "Tu réponds aux compétences clés pour ",
             "message_2": " des opportunités publiées sur ",
             "message_3": ". C’est une belle amplitude de possibilités!"
-          },          
+          },
           "skillsRankingJobSeekerDisclosure": {
             "pendingMessage": "Merci ! Nous vérifions à nouveau les dernières opportunités sur {{jobPlatformUrl}} pour que les chiffres soient précis. Nous partagerons vos résultats bientôt ou vous pourrez les demander quand nous vous appellerons pour l'enquête téléphonique.",
             "comparisonPart1_prefix": "De plus, ",
@@ -706,18 +706,18 @@
         "gitSha": "GIT SHA"
       }
     }
-  },  
-  "theme":{
-    "confirmModalDialog":{
-        "closeConfirmModal": "Fermer la fenêtre de confirmation"
+  },
+  "theme": {
+    "confirmModalDialog": {
+      "closeConfirmModal": "Fermer la fenêtre de confirmation"
     },
     "passwordInput": {
       "togglePasswordVisibility": "Afficher ou masquer le mot de passe"
     },
-    "helpTip":{
+    "helpTip": {
       "tooltip": "aide"
     }
-  }, 
+  },
   "i18n": {
     "languageContextMenu": {
       "selector": "Sélecteur de langue"
@@ -733,5 +733,25 @@
     "easy": "Facile",
     "unlikely": "Peu probable",
     "likely": "Probable"
+  },
+  "yes": "Oui",
+  "no": "Non",
+  "steps": {
+    "biasAndExperience": "Biais et Précision de l'Expérience",
+    "skillAccuracy": "Précision des Compétences",
+    "finalFeedback": "Commentaires finaux"
+  },
+  "labels": {
+    "inaccurate": "Inexact",
+    "veryAccurate": "Très précis",
+    "difficult": "Difficile",
+    "easy": "Facile",
+    "unlikely": "Improbable",
+    "likely": "Probable"
+  },
+  "buttons": {
+    "submit": "Soumettre",
+    "next": "Suivant",
+    "previous": "Précédent"
   }
 }

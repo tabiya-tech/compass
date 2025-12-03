@@ -706,15 +706,15 @@
         "gitSha": "GIT SHA"
       }
     }
-  }, 
-  "theme":{
-    "confirmModalDialog":{
-        "closeConfirmModal": "Cerrar modal de confirmación"
+  },
+  "theme": {
+    "confirmModalDialog": {
+      "closeConfirmModal": "Cerrar modal de confirmación"
     },
     "passwordInput": {
       "togglePasswordVisibility": "Mostrar u ocultar contraseña"
     },
-    "helpTip":{
+    "helpTip": {
       "tooltip": "ayuda"
     }
   },
@@ -733,5 +733,25 @@
     "easy": "Fácil",
     "unlikely": "Poco probable",
     "likely": "Probable"
+  },
+  "yes": "Sí",
+  "no": "No",
+  "steps": {
+    "biasAndExperience": "Sesgo y Precisión de la Experiencia",
+    "skillAccuracy": "Precisión de Habilidades",
+    "finalFeedback": "Comentarios finales"
+  },
+  "labels": {
+    "inaccurate": "Inexacto",
+    "veryAccurate": "Muy preciso",
+    "difficult": "Difícil",
+    "easy": "Fácil",
+    "unlikely": "Improbable",
+    "likely": "Probable"
+  },
+  "buttons": {
+    "submit": "Enviar",
+    "next": "Siguiente",
+    "previous": "Anterior"
   }
 }
