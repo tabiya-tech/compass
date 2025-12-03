@@ -734,8 +734,6 @@
     "unlikely": "Poco probable",
     "likely": "Probable"
   },
-  "yes": "Sí",
-  "no": "No",
   "steps": {
     "biasAndExperience": "Sesgo y Precisión de la Experiencia",
     "skillAccuracy": "Precisión de Habilidades",

@@ -734,8 +734,6 @@
     "unlikely": "Unlikely",
     "likely": "Likely"
   },
-  "yes": "Yes",
-  "no": "No",
   "steps": {
     "biasAndExperience": "Bias & Experience Accuracy",
     "skillAccuracy": "Skill Accuracy",
