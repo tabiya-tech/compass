@@ -243,7 +243,7 @@
       "descriptionLabel": "Description",
       "emailPlaceholder": "your.email@example.org",
       "addScreenshot": "Add a screenshot",
-      "requiredLabel":"(required)",
+      "requiredLabel": "(required)",
       "cancelButton": "Cancel"
     }
   },
@@ -693,7 +693,7 @@
     "appName": "Compass",
     "compassLogoAlt": "Compass Logo"
   },
-  "info":{
+  "info": {
     "infoDrawer": {
       "frontendTitle": "Frontend",
       "backendTitle": "Backend",
@@ -706,15 +706,15 @@
         "gitSha": "GIT SHA"
       }
     }
-  }, 
-  "theme":{
-    "confirmModalDialog":{
-        "closeConfirmModal": "close confirm modal"
+  },
+  "theme": {
+    "confirmModalDialog": {
+      "closeConfirmModal": "close confirm modal"
     },
-    "passwordInput":{
+    "passwordInput": {
       "togglePasswordVisibility": "toggle password visibility"
     },
-    "helpTip":{
+    "helpTip": {
       "tooltip": "help"
     }
   },
@@ -733,5 +733,25 @@
     "easy": "Easy",
     "unlikely": "Unlikely",
     "likely": "Likely"
+  },
+  "yes": "Yes",
+  "no": "No",
+  "steps": {
+    "biasAndExperience": "Bias & Experience Accuracy",
+    "skillAccuracy": "Skill Accuracy",
+    "finalFeedback": "Final feedback"
+  },
+  "labels": {
+    "inaccurate": "Inaccurate",
+    "veryAccurate": "Very accurate",
+    "difficult": "Difficult",
+    "easy": "Easy",
+    "unlikely": "Unlikely",
+    "likely": "Likely"
+  },
+  "buttons": {
+    "submit": "Submit",
+    "next": "Next",
+    "previous": "Previous"
   }
 }
