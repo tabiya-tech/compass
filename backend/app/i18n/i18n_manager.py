@@ -7,7 +7,9 @@ from collections import defaultdict
 from app.i18n.locale_provider import LocaleProvider
 
 class I18nManager:
-    def __init__(self, locales_dir: str = "app/i18n/locales", locale_provider: Optional[LocaleProvider] = None):
+    def __init__(self, locales_dir: Optional[str] = None, locale_provider: Optional[LocaleProvider] = None):
+        if locales_dir is None:
+            locales_dir = os.path.join(os.path.dirname(__file__), "locales")
         self.locales_dir = locales_dir
         self.locale_provider = locale_provider or LocaleProvider()
         self.translations: Dict[str, Dict[str, Any]] = {}
@@ -41,21 +43,36 @@ class I18nManager:
                         except (json.JSONDecodeError, IOError) as e:
                             print(f"Warning: Could not load {file_path}. Error: {e}")
 
-    def get_translation(self, locale: str, domain: str, key: str, fallback_message: str = "", fallback_locale: str = "en-us") -> str:
+    def get_translation(self, locale: str, domain: str, key: str, fallback_message: str = "", fallback_locale: str = "en-us") -> Any:
         """
         Retrieves a translation for a given locale, domain, and key.
+        Supports dot notation for nested keys (e.g., 'category.subcategory.key').
         Falls back to the default locale if the key is not found or the locale/domain doesn't exist.
         If the key is not found in the fallback, it returns the key itself.
         """
-        translation = self.translations.get(locale, {}).get(domain, {}).get(key)
+        def resolve_key(data: Dict[str, Any], key_path: str) -> Optional[Any]:
+            parts = key_path.split('.')
+            curr = data
+            for part in parts:
+                if isinstance(curr, dict) and part in curr:
+                    curr = curr[part]
+                else:
+                    return None
+            return curr
+
+        domain_data = self.translations.get(locale, {}).get(domain, {})
+        translation = resolve_key(domain_data, key)
+        
         if translation is not None:
             return translation
 
-        fallback_translation = self.translations.get(fallback_locale, {}).get(domain, {}).get(key)
+        fallback_domain_data = self.translations.get(fallback_locale, {}).get(domain, {})
+        fallback_translation = resolve_key(fallback_domain_data, key)
+        
         if fallback_translation is not None:
             return fallback_translation
         
-            # fallback_default takes priority over returning the key
+        # fallback_default takes priority over returning the key
         if fallback_message:
             return fallback_message
 

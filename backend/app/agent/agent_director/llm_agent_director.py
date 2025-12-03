@@ -121,7 +121,7 @@ class LLMAgentDirector(AbstractAgentDirector):
             agent_output: AgentOutput | None = None
             while first_call or transitioned_to_new_phase:
                 if self._state.current_phase == ConversationPhase.ENDED:                    
-                    finished_msg = t("messages", "agent_director.final_message","The conversation has finished!")
+                    finished_msg = t("messages", "agentDirector.finalMessage","The conversation has finished!")
                     agent_output = AgentOutput(
                         message_for_user=finished_msg,
                         finished=True,
@@ -168,7 +168,7 @@ class LLMAgentDirector(AbstractAgentDirector):
         # executing an agent can raise any number of unknown exceptions
         except Exception as e:  # pylint: disable=broad-except
             self._logger.error("Error while executing the agent director: %s", e, exc_info=True)
-            err_msg = t("messages", "agent_director.error_retry","I am facing some difficulties right now, could you please repeat what you said?")
+            err_msg = t("messages", "agentDirector.errorRetry")
             agent_output = AgentOutput(
                 message_for_user=err_msg,
                 finished=True,

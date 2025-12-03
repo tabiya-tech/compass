@@ -1,43 +1,65 @@
 {
-  "welcome_agent_first_encounter": "¡Bienvenido! Soy Compass, y estoy aquí para ayudarte a capturar y resaltar tus habilidades.\nAsí es como funciona este proceso:\n\n• Primero, te pediré una breve descripción de tu trabajo, incluyendo actividades no remuneradas como voluntariados o contribuciones familiares.\n• A medida que conversemos, tu CV tomará forma.\n• Una vez cubiertos los aspectos básicos, profundizaremos en cada experiencia para registrar los detalles clave.\n\nConcéntrate en lo que más te importa. Puedes dedicar entre 10 y 15 minutos por experiencia laboral, así que planea con tiempo.\nSi lo necesitas, puedes crear una cuenta y volver más tarde para continuar.\n\nSi tienes alguna pregunta, no dudes en hacerla.\n\n¿Listo para comenzar?",
-  "collect_experiences.did_not_understand": "Perdón, no entendí eso. ¿Podrías reformularlo?",
-  "collect_experiences.move_to_other_experiences": "Pasemos a otras experiencias laborales.",
-  "collect_experiences.final_message": "Gracias por compartir tus experiencias. Pasemos al siguiente paso."
-  ,"collect_experiences.no_experience_collected": "Todavía no se ha recopilado información sobre experiencias.",
-  "collect_experiences.all_fields_filled": "Todos los campos han sido completados.",
-  "collect_experiences.all_fields_not_filled": "Aún hay campos sin completar.",
-  "collect_experiences.work_type.formal_waged_description": "trabajar para una empresa o el negocio de otra persona a cambio de dinero",
-  "collect_experiences.work_type.unpaid_trainee_description": "trabajo no remunerado como aprendiz en una empresa u organización",
-  "collect_experiences.work_type.self_employment_description": "tener mi propio negocio, hacer trabajos por cuenta propia o por contrato",
-  "collect_experiences.work_type.unseen_unpaid_description": "trabajo no remunerado como voluntariado comunitario, cuidados a mi familia u otra, ayuda en un hogar",
-  "collect_experiences.work_type.none_description": "sin experiencia laboral",
-  "collect_experiences.fields.experience_title": "título de la experiencia",
-  "collect_experiences.fields.paid_work": "trabajo remunerado",
-  "collect_experiences.fields.work_type": "tipo de trabajo",
-  "collect_experiences.fields.start_date": "fecha de inicio",
-  "collect_experiences.fields.end_date": "fecha de finalización",
-  "collect_experiences.fields.company": "empresa/receptor del trabajo",
-  "collect_experiences.fields.location": "ubicación"
-  ,
-  "collect_experiences.ask_about_type": "Preguntame sobre experiencias que incluyan: {experience_type}",
-  "collect_experiences.recap_prompt": "Hagamos un repaso y dame la oportunidad de corregir cualquier error.",
-  "explore_experiences.no_more_experiences": "Parece que no hay más experiencias para conversar.",
-  "explore_experiences.skipped_experience_missing_details": "He omitido tu experiencia \"{experience_title}\" porque no compartiste suficientes detalles",
-  "explore_experiences.finished_all": "He terminado de explorar todas tus experiencias.",
-  "explore_experiences.no_skills_identified": "No se identificaron habilidades",
-  "explore_experiences.link_and_rank.summary_message": "Según la información proporcionada sobre tu experiencia como '{experience_title}', aquí tienes un breve resumen:\n\n{summary}\n\nPrincipales {top_count} habilidades demostradas:{skills_summary}",
-  "agent_director.final_message": "¡La conversación ha finalizado!",
-  "agent_director.error_retry": "Estoy teniendo algunas dificultades en este momento, ¿podrías repetir lo que dijiste?",
-  "agent_director.all_agents_done": "¡Conversación finalizada, todos los agentes han terminado!",
-  "agent_director.forcefully_ended": "La conversación se terminó de manera forzada",
-  "experience.until": "hasta {end_date}",
-  "experience.no_title_provided_yet": "Sin título aún",
-  "experience.work_type.short.formal_sector_waged_employment": "Trabajo asalariado",
-  "experience.work_type.short.formal_sector_unpaid_trainee_work": "Práctica no remunerada",
-  "experience.work_type.short.self_employment": "Autoempleo",
-  "experience.work_type.short.unseen_unpaid": "Voluntariado/No remunerado",
-  "explore_skills.final_message": "¡Gracias por compartir estos detalles! Tengo toda la información que necesito.",
-  "explore_skills.question.formal_waged": "¿Qué creés que es importante al trabajar en una empresa así?",
-  "explore_skills.question.self_employment": "¿Qué creés que es importante cuando sos tu propio jefe?",
-  "explore_skills.question.unseen_unpaid": "¿Qué creés que es más importante al ayudar en la comunidad o cuidar a otras personas?"
+  "welcomeAgentFirstEncounter": "¡Bienvenido! Soy Compass, y estoy aquí para ayudarte a capturar y resaltar tus habilidades.\nAsí es como funciona este proceso:\n\n• Primero, te pediré una breve descripción de tu trabajo, incluyendo actividades no remuneradas como voluntariados o contribuciones familiares.\n• A medida que conversemos, tu CV tomará forma.\n• Una vez cubiertos los aspectos básicos, profundizaremos en cada experiencia para registrar los detalles clave.\n\nConcéntrate en lo que más te importa. Puedes dedicar entre 10 y 15 minutos por experiencia laboral, así que planea con tiempo.\nSi lo necesitas, puedes crear una cuenta y volver más tarde para continuar.\n\nSi tienes alguna pregunta, no dudes en hacerla.\n\n¿Listo para comenzar?",
+  "collectExperiences": {
+    "didNotUnderstand": "Perdón, no entendí eso. ¿Podrías reformularlo?",
+    "moveToOtherExperiences": "Pasemos a otras experiencias laborales.",
+    "finalMessage": "Gracias por compartir tus experiencias. Pasemos al siguiente paso.",
+    "noExperienceCollected": "Todavía no se ha recopilado información sobre experiencias.",
+    "allFieldsFilled": "Todos los campos han sido completados.",
+    "allFieldsNotFilled": "Aún hay campos sin completar.",
+    "workType": {
+      "formalWagedDescription": "trabajar para una empresa o el negocio de otra persona a cambio de dinero",
+      "unpaidTraineeDescription": "trabajo no remunerado como aprendiz en una empresa u organización",
+      "selfEmploymentDescription": "tener mi propio negocio, hacer trabajos por cuenta propia o por contrato",
+      "unseenUnpaidDescription": "trabajo no remunerado como voluntariado comunitario, cuidados a mi familia u otra, ayuda en un hogar",
+      "noneDescription": "sin experiencia laboral",
+      "notSupported": "tipo de trabajo no compatible"
+    },
+    "fields": {
+      "experienceTitle": "título de la experiencia",
+      "paidWork": "trabajo remunerado",
+      "workType": "tipo de trabajo",
+      "startDate": "fecha de inicio",
+      "endDate": "fecha de finalización",
+      "company": "empresa/receptor del trabajo",
+      "location": "ubicación"
+    },
+    "askAboutType": "Preguntame sobre experiencias que incluyan: {experience_type}",
+    "recapPrompt": "Hagamos un repaso y dame la oportunidad de corregir cualquier error."
+  },
+  "exploreExperiences": {
+    "noMoreExperiences": "Parece que no hay más experiencias para conversar.",
+    "skippedExperienceMissingDetails": "He omitido tu experiencia \"{experience_title}\" porque no compartiste suficientes detalles",
+    "finishedAll": "He terminado de explorar todas tus experiencias.",
+    "noSkillsIdentified": "No se identificaron habilidades",
+    "linkAndRank": {
+      "summaryMessage": "Según la información proporcionada sobre tu experiencia como '{experience_title}', aquí tienes un breve resumen:\n\n{summary}\n\nPrincipales {top_count} habilidades demostradas:{skills_summary}"
+    }
+  },
+  "agentDirector": {
+    "finalMessage": "¡La conversación ha finalizado!",
+    "errorRetry": "Estoy teniendo algunas dificultades en este momento, ¿podrías repetir lo que dijiste?",
+    "allAgentsDone": "¡Conversación finalizada, todos los agentes han terminado!",
+    "forcefullyEnded": "La conversación se terminó de manera forzada"
+  },
+  "experience": {
+    "until": "hasta {end_date}",
+    "noTitleProvidedYet": "Sin título aún",
+    "workType": {
+      "short": {
+        "formalSectorWagedEmployment": "Trabajo asalariado",
+        "formalSectorUnpaidTraineeWork": "Práctica no remunerada",
+        "selfEmployment": "Autoempleo",
+        "unseenUnpaid": "Voluntariado/No remunerado"
+      }
+    }
+  },
+  "exploreSkills": {
+    "finalMessage": "¡Gracias por compartir estos detalles! Tengo toda la información que necesito.",
+    "question": {
+      "formalWaged": "¿Qué creés que es importante al trabajar en una empresa así?",
+      "selfEmployment": "¿Qué creés que es importante cuando sos tu propio jefe?",
+      "unseenUnpaid": "¿Qué creés que es más importante al ayudar en la comunidad o cuidar a otras personas?"
+    }
+  }
 }

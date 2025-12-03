@@ -4,7 +4,7 @@ from pathlib import Path
 
 from app.i18n.i18n_manager import I18nManager
 from app.i18n.locale_provider import CustomProvider
-from app.i18n.translation_service import get_i18n_manager
+from app.i18n.translation_service import get_i18n_manager, t
 
 
 def test_translation_keys_consistency():
@@ -113,3 +113,56 @@ def test_custom_provider_locale_setting():
     assert updated_locale == "es-es", (
         f"Expected locale 'es-es', got '{updated_locale}'"
     )
+
+
+def test_nested_key():
+    """
+    Feature: Nested Key Resolution
+    ==============================
+    
+    Ensures that I18nManager can resolve nested keys using dot notation.
+    """
+    locales_dir = Path(__file__).parent / "locales"
+    manager = I18nManager(locales_dir=str(locales_dir))
+    
+    # Try to get a nested key
+    # Based on user input, messages.json has "experience": { "noTitleProvidedYet": ... }
+    
+    # We use es-ar as in the user request, assuming it exists and has the key
+    # If es-ar doesn't exist or doesn't have the key, this might fail, but let's follow the user's lead
+    # or fallback to en-us if es-ar is not available in the environment.
+    # However, the user explicitly asked for this test code.
+    
+    val = manager.get_translation("es-ar", "messages", "experience.noTitleProvidedYet")
+    print(f"Result for 'experience.noTitleProvidedYet': {val}")
+    
+    if val == "experience.noTitleProvidedYet":
+        pytest.fail("Returned key instead of translation")
+    else:
+        print("SUCCESS: Found translation")
+        # Assert it's not the key
+        assert val != "experience.noTitleProvidedYet"
+
+
+def test_translation_service_nested_key():
+    """
+    Feature: Translation Service Nested Key Resolution
+    ==================================================
+    
+    Ensures that the global t() function can resolve nested keys.
+    """
+    manager = get_i18n_manager()
+    # Reset to en-us for consistency or use a specific locale
+    manager.set_locale(CustomProvider("en-us"))
+    
+    # "experience.noTitleProvidedYet" should resolve to "No title provided yet" in en-us
+    val = t("messages", "experience.noTitleProvidedYet")
+    assert val == "No title provided yet"
+    
+    # Test with a fallback
+    val_fallback = t("messages", "non.existent.key", fallback_message="Fallback Value")
+    assert val_fallback == "Fallback Value"
+
+    # Test deep nested key
+    val_deep = t("messages", "experience.workType.short.formalSectorWagedEmployment")
+    assert val_deep == "Waged Employment"
