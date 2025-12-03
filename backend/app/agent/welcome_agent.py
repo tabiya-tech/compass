@@ -217,7 +217,7 @@ class WelcomeAgent(Agent):
 
     @staticmethod
     async def get_first_encounter_message(locale: str):
-        return t("messages", "welcome_agent_first_encounter", locale)
+        return t("messages", "welcomeAgentFirstEncounter", locale)
 
     @staticmethod
     def get_system_instructions(state: WelcomeAgentState) -> str:

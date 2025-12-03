@@ -17,7 +17,7 @@ from app.i18n.translation_service import t
 
 
 # centralize use for skill_explorer_agent and conversation_llm_test
-_FINAL_MESSAGE = t("messages", "explore_experiences.no_more_experiences")
+_FINAL_MESSAGE = t("messages", "exploreExperiences.noMoreExperiences")
 
 
 class _ConversationLLM:
@@ -138,17 +138,17 @@ class _ConversationLLM:
                            llm_input)
 
             return AgentOutput(
-                message_for_user=t("messages", "collect_experiences.did_not_understand"),
+                message_for_user=t("messages", "collectExperiences.didNotUnderstand"),
                 finished=False,
                 agent_type=AgentType.EXPLORE_SKILLS_AGENT,
                 agent_response_time_in_sec=round(llm_end_time - llm_start_time, 2),
                 llm_stats=[llm_stats]), 100, ValueError("LLM response is empty")
 
         if llm_response.text == "<END_OF_CONVERSATION>":
-            llm_response.text = t("messages", "explore_skills.final_message")
+            llm_response.text = t("messages", "exploreSkills.finalMessage")
             finished = True
         if llm_response.text.find("<END_OF_CONVERSATION>") != -1:
-            llm_response.text = t("messages", "explore_skills.final_message")
+            llm_response.text = t("messages", "exploreSkills.finalMessage")
             finished = True
             logger.warning("The response contains '<END_OF_CONVERSATION>' and additional text: %s", llm_response.text)
 
@@ -323,10 +323,10 @@ def _get_question_c(work_type: WorkType) -> str:
     Get the question for the specific work type
     """
     if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-        return t("messages", "explore_skills.question.formal_waged")
+        return t("messages", "exploreSkills.question.formalWaged")
     elif work_type == WorkType.SELF_EMPLOYMENT:
-        return t("messages", "explore_skills.question.self_employment")
+        return t("messages", "exploreSkills.question.selfEmployment")
     elif work_type == WorkType.UNSEEN_UNPAID:
-        return t("messages", "explore_skills.question.unseen_unpaid")
+        return t("messages", "exploreSkills.question.unseenUnpaid")
     else:
         return ""
