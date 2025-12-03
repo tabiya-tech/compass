@@ -71,7 +71,6 @@ switch (normalizedLang) {
   case "es-ar":
     i18n.changeLanguage(Locale.ES_AR);
     break;
-  case "fr":
   default:
     i18n.changeLanguage(Locale.EN_GB);
 }
