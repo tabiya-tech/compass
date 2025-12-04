@@ -20,8 +20,6 @@ import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { FeedbackResponse, QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 import { QuestionType } from "src/feedback/overallFeedback/feedbackForm/feedbackForm.types";
 import { FeedbackError } from "src/error/commonErrors";
-import i18n from "src/i18n/i18n";
-import questions from "src/feedback/overallFeedback/feedbackForm/questions-en-gb.json";
 
 // mock the snackbar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {

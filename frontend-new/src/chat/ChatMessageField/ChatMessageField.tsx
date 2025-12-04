@@ -464,9 +464,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
             text: t(MENU_ITEM_TEXT.VIEW_UPLOADED_CVS),
             icon: <DescriptionOutlinedIcon />,
             trailingIcon: <ChevronRightIcon />,
-            // description: t("chat.chatMessageField.viewUploadedDescription"),
             description: "",
-              //TODO: check if empty is correct
             disabled: inputIsDisabled(),
             action: () => {
               void handleViewUploadedCVs();
@@ -478,15 +476,13 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
             text: t(MENU_ITEM_TEXT.UPLOAD_CV),
             description:
               props.currentPhase === ConversationPhase.INTRO
-                ? "You can upload your CV as soon as we start exploring your experiences"
+              ?t("upload_cv_intro")
                 : props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
-                  ? `PDF, DOCX, TXT • Max ${MAX_FILE_SIZE_MB} MB • ${MAX_MARKDOWN_CHARS} chars max`
-                  : "CV upload is only available during experience collection",
-                    // TODO: fix translation
-              // ?t("upload_cv_intro")
-                //: props.currentPhase === ConversationPhase.COLLECT_EXPERIENCES
-                  //? t("chat.chatMessageField.uploadCvCollectExperiences")
-                  // : t("chat.chatMessageField.uploadCvOtherPhase"),
+                  ? t("chat.chatMessageField.uploadCvCollectExperiences", {
+                      MAX_FILE_SIZE_MB,
+                      MAX_MARKDOWN_CHARS,
+                    })
+                  : t("chat.chatMessageField.uploadCvOtherPhase"),
             icon: <UploadFileIcon />,
             disabled: inputIsDisabled() || props.currentPhase !== ConversationPhase.COLLECT_EXPERIENCES,
             action: handleFileMenuItemClick,

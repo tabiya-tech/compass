@@ -147,11 +147,10 @@
       "moreActionsTooltip": "more actions",
       "sendMessageTooltip": "send message",
       "uploadCvIntro": "You can upload your CV as soon as we start exploring your experiences",
-      "uploadCvCollectExperiences": "Attach your CV to the conversation",
+      "uploadCvCollectExperiences": "PDF, DOCX, TXT • Max {{MAX_FILE_SIZE_MB}} MB • {{MAX_MARKDOWN_CHARS}} chars max",
       "uploadCvOtherPhase": "CV upload is only available during experience collection",
       "uploadCvLabel": "Upload CV",
       "viewUploadedLabel": "Previously uploaded CVs",
-      "viewUploadedDescription": "Attach your uploaded CV to the conversation",
       "placeholders": {
         "chatFinished": "Conversation has been completed. You can't send any more messages.",
         "aiTyping": "AI is typing..., wait for it to finish.",

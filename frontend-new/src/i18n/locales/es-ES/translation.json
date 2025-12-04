@@ -113,11 +113,10 @@
         "uploading": "Subiendo CV..."
       },
       "uploadCvIntro": "You can upload your CV as soon as we start exploring your experiences",
-      "uploadCvCollectExperiences": "Attach your CV to the conversation",
+      "uploadCvCollectExperiences": "PDF, DOCX, TXT • Máximo {{MAX_FILE_SIZE_MB}} MB • {{MAX_MARKDOWN_CHARS}} caracteres como límite",
       "uploadCvOtherPhase": "CV upload is only available during experience collection",
       "uploadCvLabel": "Upload CV",
-      "viewUploadedLabel": "Previously uploaded CVs",
-      "viewUploadedDescription": "Attach your uploaded CV to the conversation"
+      "viewUploadedLabel": "Previously uploaded CVs"
     },
     "chatMessage": {
       "typingChatMessage": {

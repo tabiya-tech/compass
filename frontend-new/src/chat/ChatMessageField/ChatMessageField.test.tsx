@@ -7,7 +7,6 @@ import ChatMessageField, {
   DISALLOWED_CHARACTERS,
   MENU_ITEM_ID,
   MAX_FILE_SIZE_BYTES,
-  CHARACTER_LIMIT_ERROR_MESSAGES,
   MAX_FILE_SIZE_MB,
   MAX_MARKDOWN_CHARS,
 } from "./ChatMessageField";
@@ -1121,7 +1120,7 @@ describe("ChatMessageField", () => {
             open: true,
             items: expect.arrayContaining([
               expect.objectContaining({
-                description: "You can upload your CV as soon as we start exploring your experiences",
+                description: i18n.t("chat.chatMessageField.uploadCvIntro"),
                 disabled: true, // Should be disabled in INTRO phase
               }),
             ]),
@@ -1162,7 +1161,7 @@ describe("ChatMessageField", () => {
             open: true,
             items: expect.arrayContaining([
               expect.objectContaining({
-                description: `PDF, DOCX, TXT • Max ${MAX_FILE_SIZE_MB} MB • ${MAX_MARKDOWN_CHARS} chars max`,
+                description: i18n.t("chat.chatMessageField.uploadCvCollectExperiences"),
                 disabled: false, // Should be enabled in COLLECT_EXPERIENCES phase
               }),
             ]),
@@ -1203,7 +1202,7 @@ describe("ChatMessageField", () => {
             open: true,
             items: expect.arrayContaining([
               expect.objectContaining({
-                description: "CV upload is only available during experience collection",
+                description: i18n.t("chat.chatMessageField.uploadCvOtherPhase"),
                 disabled: true, // Should be disabled after COLLECT_EXPERIENCES phase
               }),
             ]),
