@@ -56,18 +56,18 @@
     },
     "upload": {
       "errors": {
-        "maxFileSize": "Selected file is too large. Maximum size is 3 MB.",
-        "tooDense": "The uploaded file content is too long to process. Please reduce its length and try again.",
-        "emptyParse": "We couldn't detect experiences in your CV. Please check the file and try again.",
-        "generic": "Failed to parse your CV. Please try again or use a different file.",
-        "rateLimit": "Too many uploads at once. Please wait one minute and try again.",
-        "maxUploadsReached": "You've reached the maximum number of CV uploads for this conversation. Further uploads aren't allowed.",
-        "duplicate": "This CV has already been uploaded. Select it from your previously uploaded CVs.",
-        "unsupportedFileType": "Unsupported file type. Allowed: PDF, DOCX, TXT.",
-        "timeout": "The upload timed out. Please try again.",
-        "unauthorized": "You are not authorized. Please sign in again.",
-        "uploadNotFound": "Upload not found. It may have failed to start.",
-        "cvMarkdownTooLong": "Your CV content is too long. Please shorten your CV and try again."
+        "maxFileSize": "El archivo seleccionado es demasiado grande. El tamaño máximo es 3 MB.",
+        "tooDense": "El contenido del archivo subido es demasiado largo para procesar. Por favor, reducí su longitud e intentá de nuevo.",
+        "emptyParse": "No pudimos detectar experiencias en tu CV. Por favor, verificá el archivo e intentá de nuevo.",
+        "generic": "Error al analizar tu CV. Por favor, intentá de nuevo o usá un archivo diferente.",
+        "rateLimit": "Demasiadas subidas a la vez. Por favor, esperá un minuto e intentá de nuevo.",
+        "maxUploadsReached": "Alcanzaste el número máximo de subidas de CV para esta conversación. No se permiten más subidas.",
+        "duplicate": "Este CV ya fue subido. Seleccionalo de tus CVs subidos anteriormente.",
+        "unsupportedFileType": "Tipo de archivo no soportado. Permitidos: PDF, DOCX, TXT.",
+        "timeout": "La subida expiró. Por favor, intentá de nuevo.",
+        "unauthorized": "No estás autorizado. Por favor, iniciá sesión de nuevo.",
+        "uploadNotFound": "Subida no encontrada. Es posible que haya fallado al iniciar.",
+        "cvMarkdownTooLong": "El contenido de tu CV es demasiado largo. Por favor, acortá tu CV e intentá de nuevo."
       }
     },
     "errors": {
@@ -112,11 +112,11 @@
         "default": "Escribe tu mensaje...",
         "uploading": "Subiendo CV..."
       },
-      "uploadCvIntro": "You can upload your CV as soon as we start exploring your experiences",
+      "uploadCvIntro": "Podés subir tu CV tan pronto como empecemos a explorar tus experiencias",
       "uploadCvCollectExperiences": "PDF, DOCX, TXT • Máximo {{MAX_FILE_SIZE_MB}} MB • {{MAX_MARKDOWN_CHARS}} caracteres como límite",
-      "uploadCvOtherPhase": "CV upload is only available during experience collection",
-      "uploadCvLabel": "Upload CV",
-      "viewUploadedLabel": "Previously uploaded CVs"
+      "uploadCvOtherPhase": "La subida de CV solo está disponible durante la recopilación de experiencias",
+      "uploadCvLabel": "Subir CV",
+      "viewUploadedLabel": "CVs subidos anteriormente"
     },
     "chatMessage": {
       "typingChatMessage": {
@@ -205,19 +205,19 @@
       }
     },
     "cvUploadPolling": {
-      "uploadingCv": "Uploading CV",
-      "cancelled": "CV upload cancelled",
-      "uploadedSuccessfully": "CV uploaded successfully",
-      "converting": "Converting CV",
-      "processing": "Processing CV",
-      "extractingExperiences": "Extracting experiences",
-      "savingCv": "Saving CV",
-      "failed": "CV upload failed",
-      "failedToStart": "Failed to start upload.",
-      "networkErrorStatus": "Network error while checking upload status.",
-      "failedToCancel": "Failed to cancel upload",
-      "uploadingFileNamed": "Uploading {{filename}}...",
-      "thinkingMessage": "Processing your CV, this might take a while..."
+      "uploadingCv": "Subiendo CV",
+      "cancelled": "Subida de CV cancelada",
+      "uploadedSuccessfully": "CV subido exitosamente",
+      "converting": "Convirtiendo CV",
+      "processing": "Procesando CV",
+      "extractingExperiences": "Extrayendo experiencias",
+      "savingCv": "Guardando CV",
+      "failed": "Error al subir CV",
+      "failedToStart": "Error al iniciar la subida.",
+      "networkErrorStatus": "Error de red al verificar el estado de la subida.",
+      "failedToCancel": "Error al cancelar la subida",
+      "uploadingFileNamed": "Subiendo {{filename}}...",
+      "thinkingMessage": "Procesando tu CV, esto puede tardar un rato..."
     },
     "chatHeader": {
       "viewExperiences": "Ver experiencias",
@@ -376,15 +376,15 @@
   },
   "cv": {
     "cvTypingChatMessage": {
-      "uploading": "Please wait while I upload and parse your CV",
-      "uploadedReady": "Your CV content is in the text field. Review it and send when ready."
+      "uploading": "Por favor esperá mientras subo y analizo tu CV",
+      "uploadedReady": "El contenido de tu CV está en el campo de texto. Revisalo y envialo cuando estés listo."
     },
     "uploadedCVsMenu": {
-      "backTitle": "Back to main menu",
-      "titleWithCount": "Previously uploaded CVs ({{count}})",
-      "helpCollect": "Tap a CV to load its content into the text field. Review and send when you're ready.",
-      "helpDisabled": "CV selection is only available during the experience collection phase.",
-      "empty": "No uploaded CVs found."
+      "backTitle": "Volver al menú principal",
+      "titleWithCount": "CVs subidos anteriormente ({{count}})",
+      "helpCollect": "Tocá un CV para cargar su contenido en el campo de texto. Revisalo y envialo cuando estés listo.",
+      "helpDisabled": "La selección de CV solo está disponible durante la fase de recopilación de experiencias.",
+      "empty": "No se encontraron CVs subidos."
     },
     "cancellableTypingChatMessage": {
       "typing": "Escribiendo",
