@@ -386,7 +386,7 @@ class SkillsRankingStateService(ISkillsRankingStateService):
         taxonomy_model_id = None
         match len(set(taxonomy_model_ids)):
             case 0:
-                taxonomy_model_id = get_application_config().tabiya_model_id
+                taxonomy_model_id = get_application_config().taxonomy_model_id
             case 1:
                 taxonomy_model_id = taxonomy_model_ids[0]
             case _:
