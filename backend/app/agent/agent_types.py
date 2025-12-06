@@ -1,9 +1,10 @@
+# app/agent/agent_types.py -> Defines the data contracts/schemas for the agent system
 from enum import Enum
 from typing import Optional
 from datetime import datetime, timezone
-from bson import ObjectId
+from bson import ObjectId # type:ignore
 
-from pydantic import BaseModel, Field, field_validator, field_serializer
+from pydantic import BaseModel, Field, field_validator, field_serializer # type:ignore
 
 
 class AgentType(Enum):

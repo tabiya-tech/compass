@@ -1,3 +1,4 @@
+# app/conversations/routes.py -> Defines the HTTP API endpoints for the conversation functionality
 """
 This module contains the routes for the conversation module.
 """
@@ -5,8 +6,8 @@ import logging
 from http import HTTPStatus
 from typing import Annotated
 
-from fastapi import FastAPI, APIRouter, Request, Depends, HTTPException, Path
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from fastapi import FastAPI, APIRouter, Request, Depends, HTTPException, Path # type:ignore
+from motor.motor_asyncio import AsyncIOMotorDatabase # type:ignore
 
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.application_state import ApplicationStateManager

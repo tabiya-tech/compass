@@ -1,3 +1,5 @@
+# app/agent/agent_director/llm_agent_director.py
+# -> The "brain" that decides which agent should handle each user message
 from app.agent.agent import Agent
 from app.agent.agent_director._llm_router import LLMRouter
 from app.agent.agent_director.abstract_agent_director import AbstractAgentDirector, ConversationPhase

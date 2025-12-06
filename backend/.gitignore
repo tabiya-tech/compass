@@ -1,9 +1,10 @@
 __pycache__
 venv-backend
-.env
+# .env
 keys
 test_output/
 .idea/
 logs/
 feedback-reports/
 exports/
+i.txt

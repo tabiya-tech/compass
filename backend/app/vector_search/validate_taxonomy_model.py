@@ -1,7 +1,8 @@
+# app/vector_search/validate_taxonomy_model.py
 import logging
 
-from bson import ObjectId
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from bson import ObjectId #type:ignore
+from motor.motor_asyncio import AsyncIOMotorDatabase #type:ignore
 
 from common_libs.environment_settings.constants import EmbeddingConfig
 

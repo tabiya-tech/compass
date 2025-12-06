@@ -1,6 +1,6 @@
 /.idea/
 *.iml
-*.env
+# *.env
 
 credentials*.json
 .run/

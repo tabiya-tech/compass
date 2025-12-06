@@ -1,13 +1,14 @@
+# app/server.py -> Bootstraps and configures the entire FastAPI application
 import asyncio
 import json
 import logging
 import os
 from typing import cast
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv #type:ignore
 
-from fastapi import FastAPI, APIRouter, Depends
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, APIRouter, Depends #type:ignore
+from fastapi.middleware.cors import CORSMiddleware #type:ignore
 from app.conversations.routes import add_conversation_routes
 from app.countries import Country, get_country_from_string
 from app.invitations import add_user_invitations_routes
@@ -28,12 +29,15 @@ from app.app_config import ApplicationConfig, set_application_config, get_applic
 from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
 from features.loader import FeatureLoader
-from starlette.datastructures import State
+from starlette.datastructures import State #type:ignore
 from app.middleware.brotli_request import BrotliRequestMiddleware
 from app.users.cv.constants import (
     DEFAULT_MAX_UPLOADS_PER_USER,
     DEFAULT_RATE_LIMIT_PER_MINUTE,
 )
+
+from app.routers import taxonomy
+
 
 
 def setup_logging():
@@ -223,10 +227,10 @@ async def lifespan(_app: FastAPI):
     # Startup logic
     logger.info("Starting up...")
 
-    application_db = await CompassDBProvider.get_application_db()
-    taxonomy_db = await CompassDBProvider.get_taxonomy_db()
-    userdata_db = await CompassDBProvider.get_userdata_db()
-    metrics_db = await CompassDBProvider.get_metrics_db()
+    application_db = await CompassDBProvider.get_application_db() #-> Main app data (conversation state, user preferences, feedback)
+    taxonomy_db = await CompassDBProvider.get_taxonomy_db() #-> ESCO/KeSCO occupation & skill taxonomies
+    userdata_db = await CompassDBProvider.get_userdata_db() #-> Sensitive user data (personal info, CV uploads)
+    metrics_db = await CompassDBProvider.get_metrics_db() #-> Analytics and usage metrics
 
     app_cfg = get_application_config()
     # Initialize the MongoDB databases
@@ -369,8 +373,10 @@ feature_loader.add_routes(features_router, auth)
 
 # inject the feature router into the main app
 app.include_router(features_router)
+app.include_router(taxonomy.router)
 
 if __name__ == "__main__":
-    import uvicorn
+    import uvicorn # type:ignore
 
-    uvicorn.run(app, host="0.0.0.0", port=8080)  # nosec B104 # this will be run in a container
+    # uvicorn.run(app, host="0.0.0.0", port=8080)  # nosec B104 # this will be run in a container
+    uvicorn.run(app, port=8080)

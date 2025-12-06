@@ -1,3 +1,4 @@
+# app/server_dependencies/database_collections.py
 class Collections:
     USER_PREFERENCES: str = "user_preferences"
     SENSITIVE_PERSONAL_DATA: str = "sensitive_personal_data"

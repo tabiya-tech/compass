@@ -1,8 +1,10 @@
+# app/server_dependencies/db_dependencies.py
+# -> Database connection manager and index initializer for all MongoDB databases
 import asyncio
 import logging
 from typing import Optional
 
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase #type:ignore
 
 from common_libs.environment_settings.mongo_db_settings import MongoDbSettings
 from .database_collections import Collections

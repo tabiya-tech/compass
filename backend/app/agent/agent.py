@@ -1,3 +1,4 @@
+# app/agent/agent.py -> Abstract base class that all agents must implement
 import logging
 
 from abc import ABC, abstractmethod
