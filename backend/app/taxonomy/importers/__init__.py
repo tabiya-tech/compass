@@ -7,8 +7,6 @@ Taxonomy data importers for ESCO and KeSCO
 
 # drop duplicates first:
 
-source venv-backend/bin/activate 
-
 python3 -c "
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient

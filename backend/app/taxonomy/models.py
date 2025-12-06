@@ -3,18 +3,35 @@ Defines MongoDB document schemas for:
 1. Taxonomy Database (ESCO + KeSCO + Custom Occupations & Skills)
 2. Labor Demand Database
 3. Jobs Database
+4. Training Opportunities Database
+5. Preferences Database
 
------Summary of models
-OccupationGroupModel         -> Hierarchical occupation groups (ESCO)
-OccupationModel              -> THE CORE MODEL - unified ESCO + KeSCO + Custom occupations
-SkillModel                   -> ESCO skills taxonomy
-OccupationSkillRelationModel -> Skills required per occupation
-SkillRelationModel           -> Hierarchical skill connections
-CareerPathModel              -> Career progression routes
-LaborDemandModel             -> Occupation demand by region
-LaborMarketInsightModel      -> Qualitative labor market analysis
-JobListingModel              -> Scraped jobs from 6 Kenyan platforms
-JobScrapingLogModel          -> Monitoring scraper runs
+-----Summary
+
+# Taxonomy schemas
+
+OccupationGroupModel                -> Hierarchical occupation groups (ESCO)
+OccupationModel                     -> THE CORE MODEL - unified ESCO + KeSCO + Custom occupations
+SkillModel                          -> ESCO skills taxonomy
+OccupationSkillRelationModel        -> Skills required per occupation
+SkillRelationModel                  -> Hierarchical skill connections
+CareerPathModel                     -> Career progression routes
+
+# Labor demand schemas
+
+LaborDemandModel                    -> Occupation demand by region
+LaborMarketInsightModel             -> Qualitative labor market analysis
+
+# Job schemas
+
+JobListingModel                     -> Scraped jobs from 6 Kenyan platforms
+JobScrapingLogModel                 -> Monitoring scraper runs
+
+
+# Training and preferences schemas
+TrainingOpportunityModel            -> Upskilling courses, certifications, TVET programs
+PreferenceDimensionModel            -> Canonical preference dimensions (salary, flexibility, work type)
+OccupationPreferenceProfileModel    -> Preference characteristics per occupation (salary ranges, amenities)
 """
 
 from datetime import datetime, timezone
@@ -99,12 +116,12 @@ class JobStatus(str, Enum):
 
 class JobPlatform(str, Enum):
     """Kenyan job platforms"""
-    BRIGHTER_MONDAY = "BrighterMonday"
-    FUZU = "Fuzu"
-    MY_JOB_MAG = "MyJobMag"
-    JOBS_IN_KENYA = "JobsinKenya"
-    JOBWEB_KENYA = "Jobweb Kenya"
-    CAREERJET = "Careerjet"
+    BRIGHTERMONDAY = "brightermonday"
+    CAREERJET = "careerjet"
+    FUZU = "fuzu"
+    JOBWEBKENYA = "jobwebkenya"
+    MYJOBMAG = "myjobmag"
+    JOBSINKENYA = "jobsinkenya"  
 
 
 # ============================================================================

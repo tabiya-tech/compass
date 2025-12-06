@@ -1,0 +1,8 @@
+taxonomy:
+  databases:-
+    - compass-taxonomy-dev
+    - compass-kenya-application-local
+
+  credentials:
+    - username: compass-kenya-developers-473b9a08-f325-42ca-b182-88691313ecd0
+      password: GUf06zUPyj8X2vd4
