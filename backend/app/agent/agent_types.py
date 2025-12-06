@@ -15,6 +15,7 @@ class AgentType(Enum):
     COLLECT_EXPERIENCES_AGENT = "CollectExperiencesAgent"
     INFER_OCCUPATIONS_AGENT = "InferOccupationsAgent"
     EXPLORE_SKILLS_AGENT = "ExploreSkillsAgent"
+    PREFERENCE_ELICITATION_AGENT = "PreferenceElicitationAgent"
     FAREWELL_AGENT = "FarewellAgent"
     QNA_AGENT = "QnaAgent"
 
