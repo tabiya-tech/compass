@@ -1,0 +1,292 @@
+[
+  {
+    "vignette_id": "financial_001",
+    "category": "financial",
+    "scenario_text": "Let me paint a picture. Imagine you're deciding between two jobs:",
+    "options": [
+      {
+        "option_id": "A",
+        "title": "Customer Service Officer at Bank",
+        "description": "You'd work at a bank as a customer service officer. You'd be at a desk, helping customers with their accounts, following clear procedures. It's a permanent position with a steady 60,000 KES per month salary. You work Monday to Friday, 8:30am to 5pm. There's a dress code - formal office wear. Full benefits included (NHIF, NSSF, paid leave).",
+        "attributes": {
+          "salary": 60000,
+          "salary_type": "fixed",
+          "benefits": "full",
+          "contract_type": "permanent",
+          "work_location": "office",
+          "hours": "fixed_8to5",
+          "dress_code": "formal",
+          "job_security": "high",
+          "flexibility": "low"
+        }
+      },
+      {
+        "option_id": "B",
+        "title": "Freelance Event Coordinator",
+        "description": "You'd work as a freelance event coordinator. You'd organize weddings, parties, corporate events - different every week. Your income varies - some months 40,000 KES, some months 90,000 KES depending on bookings. You set your own hours but often work evenings and weekends when events happen. You can dress however you like. No benefits, you manage your own insurance.",
+        "attributes": {
+          "salary": 65000,
+          "salary_type": "variable",
+          "salary_range_min": 40000,
+          "salary_range_max": 90000,
+          "benefits": "none",
+          "contract_type": "freelance",
+          "work_location": "varies",
+          "hours": "flexible_evenings_weekends",
+          "dress_code": "casual",
+          "job_security": "low",
+          "flexibility": "high",
+          "variety": "high"
+        }
+      }
+    ],
+    "follow_up_questions": [
+      "What was the most important factor in your choice?",
+      "If the stable job paid 10,000 KES less, would you still choose it?"
+    ],
+    "targeted_dimensions": [
+      "job_security.importance",
+      "job_security.income_stability_required",
+      "financial.bonus_commission_tolerance",
+      "work_life_balance.weekend_work_tolerance",
+      "work_environment.work_hours_flexibility_importance"
+    ],
+    "difficulty_level": "medium"
+  },
+  {
+    "vignette_id": "remote_commute_001",
+    "category": "work_environment",
+    "scenario_text": "Both of these are stable, permanent positions with good benefits:",
+    "options": [
+      {
+        "option_id": "A",
+        "title": "Office Administrator at Logistics Company",
+        "description": "Office administrator at a logistics company. 65,000 KES/month. You must be in the office every day, 8am-5pm sharp. The office is in Industrial Area (probably 1.5 hours from where you are). Very structured, clear expectations. Good team, supportive manager.",
+        "attributes": {
+          "salary": 65000,
+          "work_location": "office_industrial_area",
+          "commute_time": 90,
+          "hours": "fixed_8to5",
+          "structure": "high",
+          "contract_type": "permanent",
+          "benefits": "full"
+        }
+      },
+      {
+        "option_id": "B",
+        "title": "Customer Support Specialist (Remote)",
+        "description": "Customer support specialist for an online platform. 55,000 KES/month. You work from home, but you need to be available 9am-6pm on your computer. More independence in how you work, just need to meet response time targets. Permanent position with benefits.",
+        "attributes": {
+          "salary": 55000,
+          "work_location": "remote",
+          "commute_time": 0,
+          "hours": "fixed_9to6_remote",
+          "structure": "medium",
+          "autonomy": "high",
+          "contract_type": "permanent",
+          "benefits": "full"
+        }
+      }
+    ],
+    "follow_up_questions": [
+      "How much would the remote job need to pay to be worth the same as the office job to you?",
+      "What if the office job was only 30 minutes away instead of 1.5 hours?"
+    ],
+    "targeted_dimensions": [
+      "work_environment.remote_work_preference",
+      "work_environment.commute_tolerance_minutes",
+      "financial.salary_trade_offs.remote_work",
+      "work_environment.autonomy_importance"
+    ],
+    "difficulty_level": "medium"
+  },
+  {
+    "vignette_id": "growth_vs_income_001",
+    "category": "career_advancement",
+    "scenario_text": "Both are remote positions with good work-life balance:",
+    "options": [
+      {
+        "option_id": "A",
+        "title": "Junior Data Analyst at Tech Company",
+        "description": "Junior data analyst at a tech company, 50,000 KES/month to start. The company will train you in data science, pay for online courses, and has a clear path: junior (50K) → analyst (75K) → senior (110K) over 3 years. Remote work, friendly team. You'll learn Python, SQL, data visualization.",
+        "attributes": {
+          "salary": 50000,
+          "salary_progression": [50000, 75000, 110000],
+          "progression_timeline": "3_years",
+          "training_provided": true,
+          "learning_opportunities": "high",
+          "work_location": "remote",
+          "contract_type": "permanent"
+        }
+      },
+      {
+        "option_id": "B",
+        "title": "Data Entry Specialist at Bank",
+        "description": "Data entry specialist at established bank, 65,000 KES/month. The work is repetitive but easy. No training provided, and there's not really a promotion path - you'd likely stay at this level. Remote 3 days/week. Very stable position.",
+        "attributes": {
+          "salary": 65000,
+          "salary_progression": [65000],
+          "progression_timeline": "none",
+          "training_provided": false,
+          "learning_opportunities": "low",
+          "work_location": "hybrid",
+          "job_security": "very_high",
+          "work_difficulty": "low"
+        }
+      }
+    ],
+    "follow_up_questions": [
+      "What if the junior data analyst role started at only 40,000 KES - would you still choose it?",
+      "How important is it to you to learn new skills in your work?"
+    ],
+    "targeted_dimensions": [
+      "career_advancement.importance",
+      "career_advancement.learning_opportunities_value",
+      "career_advancement.time_horizon",
+      "financial.salary_trade_offs.learning_opportunities"
+    ],
+    "difficulty_level": "medium"
+  },
+  {
+    "vignette_id": "hours_vs_pay_001",
+    "category": "work_life_balance",
+    "scenario_text": "Here are two opportunities in the same company:",
+    "options": [
+      {
+        "option_id": "A",
+        "title": "Accounts Assistant (Standard Hours)",
+        "description": "Accounts assistant role, 55,000 KES/month. Monday to Friday, 9am-5pm, strict boundaries - you never work past 5pm or on weekends. Near your home (30 minute commute). Relaxed pace, enough time to do your work without stress.",
+        "attributes": {
+          "salary": 55000,
+          "hours_per_week": 40,
+          "overtime": "never",
+          "weekend_work": "never",
+          "commute_time": 30,
+          "work_pace": "relaxed",
+          "work_life_balance": "excellent"
+        }
+      },
+      {
+        "option_id": "B",
+        "title": "Senior Accounts Officer",
+        "description": "Senior accounts officer role, 80,000 KES/month. Monday to Friday typically 7:30am-6pm, and you often work 1-2 Saturdays per month during busy periods (month-end, audits). Same commute. Fast-paced, high responsibility, but good career progression.",
+        "attributes": {
+          "salary": 80000,
+          "hours_per_week": 50,
+          "overtime": "frequent",
+          "weekend_work": "1-2_saturdays_monthly",
+          "commute_time": 30,
+          "work_pace": "fast",
+          "responsibility": "high",
+          "career_progression": "good"
+        }
+      }
+    ],
+    "follow_up_questions": [
+      "What's the main reason you chose that option?",
+      "Is there any amount of extra pay that would make you change your mind?"
+    ],
+    "targeted_dimensions": [
+      "work_life_balance.importance",
+      "work_life_balance.max_acceptable_hours_per_week",
+      "work_life_balance.weekend_work_tolerance",
+      "financial.salary_trade_offs.work_life_balance"
+    ],
+    "difficulty_level": "easy"
+  },
+  {
+    "vignette_id": "autonomy_vs_structure_001",
+    "category": "work_environment",
+    "scenario_text": "Both are sales roles with similar pay:",
+    "options": [
+      {
+        "option_id": "A",
+        "title": "Retail Sales (Structured)",
+        "description": "Sales associate at a phone shop in a mall. 50,000 KES/month base + small commission. You work in the shop, manager is always there watching and helping. Clear scripts for what to say to customers. Scheduled breaks. Team of 4 people, you work together.",
+        "attributes": {
+          "salary": 50000,
+          "commission": "low",
+          "supervision": "close",
+          "autonomy": "low",
+          "structure": "high",
+          "team_size": "small",
+          "work_location": "shop"
+        }
+      },
+      {
+        "option_id": "B",
+        "title": "Field Sales Representative",
+        "description": "Field sales representative for business services. 45,000 KES/month base + high commission (can reach 70-80K total). You travel to meet clients on your own schedule. Your manager checks in once a week. You figure out your own approach. Must meet monthly targets but how you do it is up to you.",
+        "attributes": {
+          "salary": 45000,
+          "commission": "high",
+          "total_earnings_potential": 75000,
+          "supervision": "minimal",
+          "autonomy": "very_high",
+          "structure": "low",
+          "travel": "frequent",
+          "work_location": "field"
+        }
+      }
+    ],
+    "follow_up_questions": [
+      "Do you prefer having clear guidance or figuring things out yourself?",
+      "How comfortable are you with working independently most of the time?"
+    ],
+    "targeted_dimensions": [
+      "work_environment.autonomy_importance",
+      "work_environment.supervision_preference",
+      "financial.bonus_commission_tolerance",
+      "work_environment.team_size_preference"
+    ],
+    "difficulty_level": "medium"
+  },
+  {
+    "vignette_id": "stability_vs_growth_001",
+    "category": "job_security",
+    "scenario_text": "Here's an interesting choice:",
+    "options": [
+      {
+        "option_id": "A",
+        "title": "Government Administrative Officer",
+        "description": "Administrative officer at a government ministry. 70,000 KES/month, permanent and pensionable. Almost impossible to lose this job. The work is slow-paced, somewhat bureaucratic. Salary increases slowly (maybe 3-5K every few years). You'll likely do similar work for many years.",
+        "attributes": {
+          "salary": 70000,
+          "contract_type": "permanent_pensionable",
+          "job_security": "very_high",
+          "salary_growth": "slow",
+          "work_pace": "slow",
+          "career_progression": "limited",
+          "sector": "government"
+        }
+      },
+      {
+        "option_id": "B",
+        "title": "Operations Manager at Startup",
+        "description": "Operations manager at a growing startup. 75,000 KES/month + equity. Contract renewed yearly. The company is growing fast - if it succeeds, you could be earning 150K+ in 2 years and have valuable equity. But there's a risk the company could fail. Fast-paced, exciting, lots of learning.",
+        "attributes": {
+          "salary": 75000,
+          "equity": true,
+          "contract_type": "contract_annual",
+          "job_security": "medium",
+          "salary_growth": "potentially_high",
+          "work_pace": "fast",
+          "career_progression": "potentially_high",
+          "sector": "startup",
+          "risk": "medium"
+        }
+      }
+    ],
+    "follow_up_questions": [
+      "What concerns you most about the option you didn't choose?",
+      "Do you have financial responsibilities that make stable income important (rent, family support, loans)?"
+    ],
+    "targeted_dimensions": [
+      "job_security.importance",
+      "job_security.risk_tolerance",
+      "career_advancement.importance",
+      "work_environment.work_pace_preference"
+    ],
+    "difficulty_level": "hard"
+  }
+]
