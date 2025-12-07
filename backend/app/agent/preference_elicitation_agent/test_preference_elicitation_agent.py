@@ -48,9 +48,9 @@ class TestVignetteEngine:
 
     @pytest.fixture
     def vignette_engine(self):
-        """Create a vignette engine for testing."""
-        # Use the actual vignettes config
-        return VignetteEngine()
+        """Create a vignette engine for testing basic functionality."""
+        # Use static vignettes for unit tests
+        return VignetteEngine(use_personalization=False)
 
     def test_vignette_engine_loads_vignettes(self, vignette_engine):
         """Test that vignette engine loads vignettes from config."""
@@ -69,21 +69,23 @@ class TestVignetteEngine:
         assert len(financial_vignettes) > 0
         assert all(v.category == "financial" for v in financial_vignettes)
 
-    def test_select_next_vignette(self, vignette_engine):
+    @pytest.mark.asyncio
+    async def test_select_next_vignette(self, vignette_engine):
         """Test selecting next vignette based on state."""
         state = PreferenceElicitationAgentState(session_id=1)
-        vignette = vignette_engine.select_next_vignette(state)
+        vignette = await vignette_engine.select_next_vignette(state)
 
         assert vignette is not None
         assert vignette.vignette_id not in state.completed_vignettes
 
-    def test_select_next_vignette_avoids_completed(self, vignette_engine):
+    @pytest.mark.asyncio
+    async def test_select_next_vignette_avoids_completed(self, vignette_engine):
         """Test that next vignette selection avoids already completed ones."""
         state = PreferenceElicitationAgentState(
             session_id=1,
             completed_vignettes=["financial_001"]
         )
-        vignette = vignette_engine.select_next_vignette(state)
+        vignette = await vignette_engine.select_next_vignette(state)
 
         if vignette:  # May be None if all vignettes completed
             assert vignette.vignette_id != "financial_001"
