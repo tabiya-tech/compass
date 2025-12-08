@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timezone
 
 import pytest
@@ -5,6 +6,7 @@ import pytest
 from common_libs.test_utilities import get_random_session_id
 from common_libs.time_utilities import get_now
 from features.skills_ranking.state._test_utilities import get_skills_ranking_state
+from features.skills_ranking.state.repositories.get_skills_ranking_state_db import initialize_skills_ranking_state_db
 from features.skills_ranking.state.repositories.skills_ranking_state_repository import SkillsRankingStateRepository
 from features.skills_ranking.state.services.type import (
     SkillsRankingState,
@@ -77,7 +79,6 @@ class TestSkillsRankingRepository:
             with pytest.raises(Exception):
                 await repository.get_by_session_id(1)
 
-
     class TestCreate:
         """
         Tests for the create method of SkillsRankingRepository.
@@ -119,6 +120,32 @@ class TestSkillsRankingRepository:
             # WHEN creating a state
             with pytest.raises(Exception):
                 await repository.create(get_skills_ranking_state())
+
+        @pytest.mark.asyncio
+        async def test_create_duplicate_skills_ranking_state(self, in_memory_skills_ranking_state_db, caplog):
+            # GIVEN a repository and a collection_name
+            given_collection_name = "skills_ranking_state"
+            logger = logging.getLogger(self.__class__.__name__)
+            await initialize_skills_ranking_state_db(in_memory_skills_ranking_state_db, given_collection_name, logger)
+            repository = SkillsRankingStateRepository(in_memory_skills_ranking_state_db, given_collection_name)
+
+            # AND a state already exists in the database.
+            given_state = get_skills_ranking_state()
+            first_score_field_value = 1
+            given_state.user_responses.prior_belief_percentile = first_score_field_value
+            await repository.create(given_state)
+
+            # WHEN the state is created for the second time
+            second_score_field_value = 2
+            given_state.user_responses.prior_belief_percentile = second_score_field_value
+            returned_state = await repository.create(given_state)
+
+            # THEN a warning should be logged
+            assert 'WARNING' in caplog.text
+            assert 'Duplicate skills ranking state by session id' in caplog.text
+
+            # AND the v1 state should be returned instead of the second one.
+            assert returned_state.user_responses.prior_belief_percentile == first_score_field_value
 
     class TestUpdate:
         @pytest.mark.asyncio

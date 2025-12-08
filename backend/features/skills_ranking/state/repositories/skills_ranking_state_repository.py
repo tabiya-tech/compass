@@ -1,7 +1,9 @@
+import logging
 from typing import Mapping
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo import ReturnDocument
+from pymongo.errors import DuplicateKeyError
 
 from common_libs.time_utilities import datetime_to_mongo_date, mongo_date_to_datetime, get_now
 from features.skills_ranking.state.repositories.types import ISkillsRankingStateRepository
@@ -26,6 +28,7 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
         :param skills_ranking_state_db: A callable that returns an AsyncIOMotorDatabase
         """
         self._collection = skills_ranking_state_db.get_collection(collection_name)
+        self._logger = logging.getLogger(self.__class__.__name__)
 
     @classmethod
     def _to_db_doc(cls, skills_ranking_state: SkillsRankingState) -> Mapping:
@@ -167,9 +170,33 @@ class SkillsRankingStateRepository(ISkillsRankingStateRepository):
         return self._from_db_doc(_doc)
 
     async def create(self, state: SkillsRankingState) -> SkillsRankingState:
-        _doc = self._to_db_doc(state)
-        await self._collection.insert_one(_doc)
-        return state
+        existing_state = await self.get_by_session_id(state.session_id)
+        # double check that the state does not exist in the database before saving the record
+        if existing_state is not None:
+            self._logger.warning(f"Duplicate skills ranking state by session id  detected: {state.session_id}. "
+                                 "Falling back to the previous state.")
+            return existing_state
+
+        try:
+            _doc = self._to_db_doc(state)
+            await self._collection.insert_one(_doc)
+            return state
+        except Exception as e:
+            # Handle the case where a duplicate key error occurs due to a race condition between the check and insert.
+            if isinstance(e, DuplicateKeyError):
+                if e.details.get("keyValue", {}).get("session_id", None) is not None:
+                    self._logger.warning(f"Duplicate skills ranking state by session id  detected: {state.session_id}. "
+                                         f"Falling back to the previous state. "
+                                         f"Exception details: {str(e)}")
+                    # [Edge-case Ignored]: if the record in this collection is deleted at this moment,
+                    #                      and the next line returns None.
+                    existing_state = await self.get_by_session_id(state.session_id)
+                    if existing_state is not None:
+                        return existing_state
+                    else:
+                        self._logger.exception(f"Failed to create skills ranking state for session id {state.session_id}: {str(e)}")
+                        raise
+            raise e
 
     async def update(self, *, session_id: int, update_request: UpdateSkillsRankingRequest) -> SkillsRankingState:
         update_ops = {}
