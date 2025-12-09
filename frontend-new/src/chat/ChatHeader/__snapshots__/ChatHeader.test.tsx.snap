@@ -70,7 +70,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     </button>
     <button
       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1p1b6w7-MuiButtonBase-root-MuiIconButton-root"
-      data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+      data-testid="language-context-menu-select-button-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
       tabindex="0"
       title="Language Selector"
       type="button"
@@ -94,9 +94,9 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
     >
       <div
-        data-testid="english-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+        data-testid="language-context-menu-f4d06e4b-0e0c-49c7-ad93-924c5ac89070-en-US"
       >
-        English
+        English (US)
       </div>
       ;
     </div>
@@ -214,7 +214,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     </button>
     <button
       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1p1b6w7-MuiButtonBase-root-MuiIconButton-root"
-      data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+      data-testid="language-context-menu-select-button-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
       tabindex="0"
       title="Language Selector"
       type="button"
@@ -238,9 +238,9 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
     >
       <div
-        data-testid="english-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+        data-testid="language-context-menu-f4d06e4b-0e0c-49c7-ad93-924c5ac89070-en-US"
       >
-        English
+        English (US)
       </div>
       ;
     </div>
@@ -380,7 +380,7 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
     </button>
     <button
       class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1p1b6w7-MuiButtonBase-root-MuiIconButton-root"
-      data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+      data-testid="language-context-menu-select-button-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
       tabindex="0"
       title="Language Selector"
       type="button"
@@ -404,9 +404,9 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
       data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
     >
       <div
-        data-testid="english-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+        data-testid="language-context-menu-f4d06e4b-0e0c-49c7-ad93-924c5ac89070-en-US"
       >
-        English
+        English (US)
       </div>
       ;
     </div>

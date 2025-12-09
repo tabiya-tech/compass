@@ -19,11 +19,7 @@ class ParseLocaleError extends Error {
 export function getPossibleLocaleNames(locale: Locale): string[] {
   try {
     const intlLocale = new Intl.Locale(locale);
-    const possibleLocaleNames = [
-      locale,
-      intlLocale.language,
-      locale.toLowerCase(),
-    ];
+    const possibleLocaleNames = [locale, intlLocale.language, locale.toLowerCase()];
 
     if (intlLocale.region) {
       possibleLocaleNames.push(`${intlLocale.language}-${intlLocale.region.toUpperCase()}`);
@@ -38,7 +34,6 @@ export function getPossibleLocaleNames(locale: Locale): string[] {
     return [locale];
   }
 }
-
 
 export function constructLocaleResources(locale: Locale, resourceLanguage: ResourceLanguage): Resource {
   return getPossibleLocaleNames(locale).reduce<Resource>((acc, localeName) => {

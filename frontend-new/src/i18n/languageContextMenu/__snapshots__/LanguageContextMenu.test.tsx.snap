@@ -3,7 +3,7 @@
 exports[`LanguageContextMenu should render the LanguageContextMenu with the default props 1`] = `
 <button
   class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
-  data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+  data-testid="language-context-menu-select-button-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
   tabindex="0"
   title="Language Selector"
   type="button"
@@ -23,4 +23,43 @@ exports[`LanguageContextMenu should render the LanguageContextMenu with the defa
     class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
   />
 </button>
+`;
+
+exports[`LanguageContextMenu should render the LanguageContextMenu with the default props 2`] = `
+Array [
+  Array [
+    Object {
+      "anchorEl": null,
+      "items": Array [
+        Object {
+          "action": [Function],
+          "disabled": false,
+          "id": "language-context-menu-f4d06e4b-0e0c-49c7-ad93-924c5ac89070-en-GB",
+          "text": "English (UK)",
+        },
+        Object {
+          "action": [Function],
+          "disabled": false,
+          "id": "language-context-menu-f4d06e4b-0e0c-49c7-ad93-924c5ac89070-en-US",
+          "text": "English (US)",
+        },
+        Object {
+          "action": [Function],
+          "disabled": false,
+          "id": "language-context-menu-f4d06e4b-0e0c-49c7-ad93-924c5ac89070-es-ES",
+          "text": "Spanish (Spain)",
+        },
+        Object {
+          "action": [Function],
+          "disabled": false,
+          "id": "language-context-menu-f4d06e4b-0e0c-49c7-ad93-924c5ac89070-es-AR",
+          "text": "Spanish (Argentina)",
+        },
+      ],
+      "notifyOnClose": [Function],
+      "open": false,
+    },
+    Object {},
+  ],
+]
 `;

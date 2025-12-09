@@ -1,8 +1,9 @@
 // mute chatty console
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
 
 import { useNavigate } from "react-router-dom";
-import { render, screen, waitFor, userEvent, act } from "src/_test_utilities/test-utils";
+import { act, render, screen, userEvent, waitFor } from "src/_test_utilities/test-utils";
 import { getRandomString, getTestString } from "src/_test_utilities/specialCharacters";
 import i18n from "src/i18n/i18n";
 
@@ -11,15 +12,17 @@ import { DATA_TEST_ID as BACKDROP_DATA_TEST_IDS } from "src/theme/Backdrop/Backd
 import { DATA_TEST_ID as CONFIRM_MODAL_DATA_TEST_IDS } from "src/theme/confirmModalDialog/ConfirmModalDialog";
 
 import { routerPaths } from "src/app/routerPaths";
-import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import * as RestAPIErrorModule from "src/error/restAPIError/RestAPIError";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import {
   Language,
   SensitivePersonalDataRequirement,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
+import {
+  sensitivePersonalDataService,
+} from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePersonalDataService/errors";
 import { FieldDefinition, FieldType } from "./config/types";
 import * as useFieldsConfigModule from "./config/useFieldsConfig";
