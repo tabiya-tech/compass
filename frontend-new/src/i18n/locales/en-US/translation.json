@@ -266,6 +266,8 @@
         }
       },
       "register": {
+        "welcomeTitle": "Welcome to Compass!",
+        "welcomeBack": "Welcome back!",
         "subtitle": "We need some information to get started",
         "registerWithGoogle": "Register with Google",
         "alreadyHaveAccount": "Already have an account?",
