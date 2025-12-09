@@ -368,25 +368,25 @@ class TaxonomyContextualizer:
         } for m in self.matches])
         
         # Export all matches
-        all_matches_file = '/home/steve/tabiya/resources/outputs/kesco_esco_all_matches.csv'
+        all_matches_file = '/home/steve/tabiya/resources/kesco_esco_all_matches.csv'
         df.to_csv(all_matches_file, index=False)
         print(f"✓ All matches: {all_matches_file}")
         
         # Export manual review cases
         manual_review_df = df[df['Status'] == 'manual_review']
-        manual_review_file = '/home/steve/tabiya/resources/outputs/kesco_esco_manual_review.csv'
+        manual_review_file = '/home/steve/tabiya/resources/kesco_esco_manual_review.csv'
         manual_review_df.to_csv(manual_review_file, index=False)
         print(f"✓ Manual review cases: {manual_review_file}")
         
         # Export no match cases
         no_match_df = df[df['Status'] == 'no_match']
-        no_match_file = '/home/steve/tabiya/resources/outputs/kesco_esco_no_matches.csv'
+        no_match_file = '/home/steve/tabiya/resources/kesco_esco_no_matches.csv'
         no_match_df.to_csv(no_match_file, index=False)
         print(f"✓ No match cases: {no_match_file}")
         
         # Export auto-matched
         auto_match_df = df[df['Status'] == 'auto_matched']
-        auto_match_file = '/home/steve/tabiya/resources/outputs/kesco_esco_auto_matched.csv'
+        auto_match_file = '/home/steve/tabiya/resources/kesco_esco_auto_matched.csv'
         auto_match_df.to_csv(auto_match_file, index=False)
         print(f"✓ Auto-matched cases: {auto_match_file}")
         

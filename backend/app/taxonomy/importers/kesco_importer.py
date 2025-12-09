@@ -1,314 +1,331 @@
+# app/taxonomy/importers/kesco_importer.py
 """
-KeSCO Occupations Importer with Built-in Contextualization
-===========================================================
-Imports KeSCO occupations ALREADY CONTEXTUALIZED - no post-processing needed.
-
-For each KeSCO occupation:
-1. Fuzzy match to ESCO occupations (in memory)
-2. If good match (≥85%): inherit ESCO skills immediately
-3. Save to database ALREADY LINKED and USEFUL
+Import KeSCO occupations from Excel with INLINE CONTEXTUALIZATION
 """
 
+import pandas as pd #type:ignore
+from motor.motor_asyncio import AsyncIOMotorDatabase #type:ignore
+from bson import ObjectId #type:ignore
+from typing import Dict, Any, Optional, Tuple
 import asyncio
-import pandas as pd
-from motor.motor_asyncio import AsyncIOMotorClient
-from datetime import datetime, timezone
-from bson import ObjectId
-from thefuzz import fuzz, process
-import os
-import sys
+import logging
+from thefuzz import fuzz, process #type:ignore
 
-# Add parent directory to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+from app.taxonomy.models import (
+    OccupationModel,
+    DataSource,
+    OccupationType,
+    TaxonomyCollections
+)
+from .config import KESCO_OCCUPATIONS_XLSX, TAXONOMY_MODEL_ID, MONGODB_URI, TAXONOMY_DB_NAME
 
-from app.taxonomy.importers.config import ImporterConfig
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
-class ContextualizedKeSCOImporter:
-    """Import KeSCO occupations with contextualization built-in."""
+class KeSCOImporter:
+    """Import KeSCO occupations with inline ESCO fuzzy matching"""
     
-    def __init__(self):
-        self.config = ImporterConfig()
-        self.client = AsyncIOMotorClient(self.config.mongodb_uri)
-        self.db = self.client[self.config.database_name]
+    def __init__(
+        self, 
+        db: AsyncIOMotorDatabase, 
+        excel_path: str = None, 
+        taxonomy_model_id: ObjectId = None,
+        esco_lookup: Dict[str, Dict] = None
+    ):
+        self.db = db
+        self.excel_path = excel_path or KESCO_OCCUPATIONS_XLSX
+        self.taxonomy_model_id = taxonomy_model_id or TAXONOMY_MODEL_ID
+        self.esco_lookup = esco_lookup or {}
         
-        # Collections
-        self.occupations = self.db.occupations
-        self.relations = self.db.occupation_skill_relations
-        
-        # In-memory caches for fast fuzzy matching
-        self.esco_occupations = {}  # title -> full doc
-        self.esco_skills_by_occupation = {}  # occupation_id -> list of skill relations
-        
-        # Statistics
         self.stats = {
-            'total': 0,
-            'exact_match': 0,
-            'fuzzy_match': 0,
-            'manual_review': 0,
-            'no_match': 0,
-            'skills_inherited': 0,
-            'inserted': 0,
-            'errors': 0
+            "total_rows": 0,
+            "imported": 0,
+            "skipped": 0,
+            "errors": 0,
+            "auto_matched": 0,
+            "manual_review": 0,
+            "no_match": 0
         }
-    
-    async def load_esco_context(self):
-        """Load ESCO occupations and skills into memory for fast matching."""
-        print("Loading ESCO context into memory...")
         
-        # Load ESCO occupations
-        cursor = self.occupations.find({"source": "ESCO"})
-        async for occ in cursor:
-            title = occ['preferred_label'].lower().strip()
-            self.esco_occupations[title] = occ
+        # For reporting
+        self.matches = []
+    
+    def fuzzy_match_to_esco(self, kesco_title: str) -> Tuple[Optional[Dict], float, str]:
+        """
+        Fuzzy match KeSCO occupation to ESCO occupation.
+        
+        Args:
+            kesco_title: KeSCO occupation title
             
-            # Also index alternative labels
-            for alt in occ.get('alternative_labels', []):
-                alt_title = alt.lower().strip()
-                if alt_title not in self.esco_occupations:
-                    self.esco_occupations[alt_title] = occ
-        
-        print(f"  ✓ Loaded {len(self.esco_occupations)} ESCO occupation titles")
-        
-        # Load ESCO skill relations grouped by occupation
-        cursor = self.relations.find({})
-        async for rel in cursor:
-            occ_id = rel['occupation_id']
-            if occ_id not in self.esco_skills_by_occupation:
-                self.esco_skills_by_occupation[occ_id] = []
-            self.esco_skills_by_occupation[occ_id].append(rel)
-        
-        print(f"  ✓ Loaded skill relations for {len(self.esco_skills_by_occupation)} occupations")
-    
-    def fuzzy_match_to_esco(self, kesco_title: str):
+        Returns:
+            Tuple of (matched_esco_dict, confidence_score, match_method)
         """
-        Fuzzy match KeSCO title to ESCO.
-        Returns: (esco_doc, confidence, method) or (None, 0, "no_match")
-        """
-        kesco_clean = kesco_title.lower().strip()
+        if not self.esco_lookup:
+            return None, 0.0, "no_esco_lookup"
         
-        # Exact match
-        if kesco_clean in self.esco_occupations:
-            return self.esco_occupations[kesco_clean], 100, "exact"
+        kesco_title_clean = kesco_title.lower().strip()
         
-        # Fuzzy matching
-        esco_titles = list(self.esco_occupations.keys())
+        # Method 1: Exact match (100%)
+        if kesco_title_clean in self.esco_lookup:
+            return self.esco_lookup[kesco_title_clean], 100.0, "exact"
         
-        # Try multiple algorithms, take best
-        best_score = 0
-        best_title = None
-        best_method = None
+        # Method 2: Fuzzy matching
+        esco_titles = list(self.esco_lookup.keys())
         
-        # Token sort ratio
-        result = process.extractOne(kesco_clean, esco_titles, scorer=fuzz.token_sort_ratio)
-        if result and result[1] > best_score:
-            best_score = result[1]
-            best_title = result[0]
-            best_method = "fuzzy_token_sort"
+        matches = []
         
-        # Token set ratio
-        result = process.extractOne(kesco_clean, esco_titles, scorer=fuzz.token_set_ratio)
-        if result and result[1] > best_score:
-            best_score = result[1]
-            best_title = result[0]
-            best_method = "fuzzy_token_set"
+        # Token sort ratio (good for reordered words)
+        result = process.extractOne(
+            kesco_title_clean, 
+            esco_titles, 
+            scorer=fuzz.token_sort_ratio
+        )
+        if result:
+            matches.append(('token_sort', result[0], result[1]))
         
-        # Partial ratio
-        result = process.extractOne(kesco_clean, esco_titles, scorer=fuzz.partial_ratio)
-        if result and result[1] > best_score:
-            best_score = result[1]
-            best_title = result[0]
-            best_method = "fuzzy_partial"
+        # Token set ratio (good for partial matches)
+        result = process.extractOne(
+            kesco_title_clean,
+            esco_titles,
+            scorer=fuzz.token_set_ratio
+        )
+        if result:
+            matches.append(('token_set', result[0], result[1]))
         
-        if best_score >= 70:
-            return self.esco_occupations[best_title], best_score, best_method
+        # Partial ratio (good for substrings)
+        result = process.extractOne(
+            kesco_title_clean,
+            esco_titles,
+            scorer=fuzz.partial_ratio
+        )
+        if result:
+            matches.append(('partial', result[0], result[1]))
         
-        return None, 0, "no_match"
+        # Take best match
+        if matches:
+            best_match = max(matches, key=lambda x: x[2])
+            method, matched_title, score = best_match
+            return self.esco_lookup.get(matched_title), float(score), f"fuzzy_{method}"
+        
+        return None, 0.0, "no_match"
     
-    async def import_with_contextualization(self):
-        """Import KeSCO occupations with contextualization built-in."""
-        print("\n" + "=" * 80)
-        print("IMPORTING KESCO OCCUPATIONS (CONTEXTUALIZED)")
-        print("=" * 80)
+    def _row_to_occupation_model(self, row: pd.Series) -> OccupationModel:
+        """
+        Convert Excel row to OccupationModel with INLINE CONTEXTUALIZATION
+        """
+        kesco_code = str(row['KeSCO Code']).strip()
+        kesco_title = row['Occupational Title'].strip()
         
-        # Load KeSCO data
-        kesco_file = "/home/steve/tabiya/resources/kesco_occupations.xlsx"
-        print(f"\nLoading KeSCO data from {kesco_file}...")
-        df = pd.read_excel(kesco_file)
-        self.stats['total'] = len(df)
-        print(f"  ✓ Loaded {len(df)} KeSCO occupations")
+        # *** CONTEXTUALIZE HERE - during import! ***
+        esco_match, confidence, method = self.fuzzy_match_to_esco(kesco_title)
+        confidence_decimal = confidence / 100.0
         
-        # Process each KeSCO occupation
-        print("\nProcessing KeSCO occupations with contextualization...")
-        print("-" * 80)
+        # Determine mapping fields based on confidence
+        mapped_to_esco_id = None
+        suggested_esco_id = None
+        requires_manual_review = False
+        requires_manual_skill_assignment = False
+        is_localized = False
         
+        if esco_match:
+            esco_id = str(esco_match['_id'])
+            
+            if confidence >= 85:
+                # Auto-match (high confidence)
+                mapped_to_esco_id = esco_id
+                is_localized = True
+                self.stats['auto_matched'] += 1
+            elif confidence >= 70:
+                # Manual review (medium confidence)
+                suggested_esco_id = esco_id
+                requires_manual_review = True
+                self.stats['manual_review'] += 1
+            else:
+                # No good match
+                requires_manual_skill_assignment = True
+                self.stats['no_match'] += 1
+        else:
+            # No match at all
+            requires_manual_skill_assignment = True
+            self.stats['no_match'] += 1
+        
+        # Track match for reporting
+        self.matches.append({
+            'kesco_code': kesco_code,
+            'kesco_title': kesco_title,
+            'esco_title': esco_match.get('preferred_label', '') if esco_match else '',
+            'esco_code': esco_match.get('code', '') if esco_match else '',
+            'confidence': confidence,
+            'method': method
+        })
+        
+        # Create occupation model with contextualization
+        occupation = OccupationModel(
+            code=kesco_code,
+            preferred_label=kesco_title,
+            alt_labels=[],
+            occupation_type=OccupationType.LOCAL_OCCUPATION,
+            kesco_code=kesco_code,
+            kesco_serial_number=int(row['S/No']),
+            
+            # *** Contextualization fields ***
+            mapped_to_esco_id=mapped_to_esco_id,
+            suggested_esco_id=suggested_esco_id,
+            mapping_confidence=confidence_decimal if esco_match else None,
+            mapping_method=method if esco_match else None,
+            requires_manual_review=requires_manual_review,
+            requires_manual_skill_assignment=requires_manual_skill_assignment,
+            is_localized=is_localized,
+            
+            # Standard fields
+            is_relevant_for_kenya=True,
+            is_informal_sector=False,
+            is_entrepreneurship=False,
+            source=DataSource.KESCO,
+            taxonomy_model_id=self.taxonomy_model_id,
+            added_by="kesco_importer_with_contextualization"
+        )
+        
+        return occupation
+    
+    async def import_occupations(self, batch_size: int = 100) -> Dict[str, Any]:
+        """
+        Import all KeSCO occupations with inline contextualization
+        """
+        logger.info(f"Starting KeSCO occupations import from {self.excel_path}")
+        
+        if not self.esco_lookup:
+            logger.warning("⚠️  No ESCO lookup provided! Contextualization will be skipped.")
+        else:
+            logger.info(f"✓ ESCO lookup loaded with {len(self.esco_lookup)} searchable titles")
+        
+        # Read Excel
+        logger.info("Reading Excel file...")
+        df = pd.read_excel(self.excel_path)
+        self.stats['total_rows'] = len(df)
+        logger.info(f"Found {self.stats['total_rows']} KeSCO occupations")
+        
+        # Get collection
+        collection = self.db[TaxonomyCollections.OCCUPATIONS]
+        
+        # Process in batches
         batch = []
-        relations_batch = []
-        
         for idx, row in df.iterrows():
             try:
-                kesco_title = str(row['Occupational Title']).strip()
-                kesco_code = str(row['KeSCO Code']).strip()
+                occupation = self._row_to_occupation_model(row)
+                batch.append(occupation.model_dump(by_alias=True, exclude_none=True, mode='python'))
                 
-                # Fuzzy match to ESCO
-                esco_match, confidence, method = self.fuzzy_match_to_esco(kesco_title)
-                
-                # Build occupation document
-                occ_doc = {
-                    'source': 'KeSCO',
-                    'preferred_label': kesco_title,
-                    'code': kesco_code,
-                    'alternative_labels': [],
-                    'created_at': datetime.now(timezone.utc),
-                    'updated_at': datetime.now(timezone.utc)
-                }
-                
-                # Contextualization based on match quality
-                if confidence == 100:
-                    # Exact match
-                    self.stats['exact_match'] += 1
-                    occ_doc.update({
-                        'mapped_to_esco_id': esco_match['_id'],
-                        'mapping_confidence': 1.0,
-                        'mapping_method': method,
-                        'is_localized': True,
-                        'is_relevant_for_kenya': True,
-                        'contextualization_status': 'auto_matched_exact'
-                    })
-                    
-                    # Inherit skills
-                    esco_skills = self.esco_skills_by_occupation.get(esco_match['_id'], [])
-                    if esco_skills:
-                        occ_id = ObjectId()
-                        occ_doc['_id'] = occ_id
-                        occ_doc['has_skill_relations'] = True
-                        occ_doc['skill_relations_count'] = len(esco_skills)
-                        
-                        # Prepare skill relations
-                        for skill_rel in esco_skills:
-                            relations_batch.append({
-                                'occupation_id': occ_id,
-                                'skill_id': skill_rel['skill_id'],
-                                'relation_type': skill_rel.get('relation_type', 'essential'),
-                                'source': 'inherited_from_esco',
-                                'inherited_from_esco_id': esco_match['_id'],
-                                'created_at': datetime.now(timezone.utc)
-                            })
-                        self.stats['skills_inherited'] += len(esco_skills)
-                
-                elif confidence >= 85:
-                    # High confidence fuzzy match
-                    self.stats['fuzzy_match'] += 1
-                    occ_doc.update({
-                        'mapped_to_esco_id': esco_match['_id'],
-                        'mapping_confidence': confidence / 100.0,
-                        'mapping_method': method,
-                        'is_localized': True,
-                        'is_relevant_for_kenya': True,
-                        'contextualization_status': 'auto_matched_fuzzy'
-                    })
-                    
-                    # Inherit skills
-                    esco_skills = self.esco_skills_by_occupation.get(esco_match['_id'], [])
-                    if esco_skills:
-                        occ_id = ObjectId()
-                        occ_doc['_id'] = occ_id
-                        occ_doc['has_skill_relations'] = True
-                        occ_doc['skill_relations_count'] = len(esco_skills)
-                        
-                        for skill_rel in esco_skills:
-                            relations_batch.append({
-                                'occupation_id': occ_id,
-                                'skill_id': skill_rel['skill_id'],
-                                'relation_type': skill_rel.get('relation_type', 'essential'),
-                                'source': 'inherited_from_esco',
-                                'inherited_from_esco_id': esco_match['_id'],
-                                'created_at': datetime.now(timezone.utc)
-                            })
-                        self.stats['skills_inherited'] += len(esco_skills)
-                
-                elif confidence >= 70:
-                    # Medium confidence - flag for manual review
-                    self.stats['manual_review'] += 1
-                    occ_doc.update({
-                        'suggested_esco_id': esco_match['_id'],
-                        'mapping_confidence': confidence / 100.0,
-                        'mapping_method': method,
-                        'requires_manual_review': True,
-                        'is_relevant_for_kenya': True,  # Assume relevant, but needs review
-                        'contextualization_status': 'needs_manual_review'
-                    })
-                
-                else:
-                    # No good match - needs manual skill assignment
-                    self.stats['no_match'] += 1
-                    occ_doc.update({
-                        'requires_manual_skill_assignment': True,
-                        'is_relevant_for_kenya': True,  # Kenyan occupation, so relevant
-                        'contextualization_status': 'needs_manual_skills'
-                    })
-                
-                batch.append(occ_doc)
-                
-                # Batch insert every 100 records
-                if len(batch) >= 100:
-                    await self.occupations.insert_many(batch, ordered=False)
-                    if relations_batch:
-                        await self.relations.insert_many(relations_batch, ordered=False)
-                    self.stats['inserted'] += len(batch)
-                    print(f"  Processed {self.stats['inserted']}/{self.stats['total']}...")
+                if len(batch) >= batch_size:
+                    await self._insert_batch(collection, batch)
                     batch = []
-                    relations_batch = []
+                    
+                    if (idx + 1) % 100 == 0:
+                        logger.info(f"Processed {idx + 1}/{self.stats['total_rows']} occupations")
                 
             except Exception as e:
-                print(f"  ✗ Error processing {kesco_title}: {e}")
+                logger.error(f"Error processing row {idx}: {str(e)}")
                 self.stats['errors'] += 1
         
         # Insert remaining batch
         if batch:
-            await self.occupations.insert_many(batch, ordered=False)
-            if relations_batch:
-                await self.relations.insert_many(relations_batch, ordered=False)
-            self.stats['inserted'] += len(batch)
+            await self._insert_batch(collection, batch)
         
-        print(f"\n✓ Import complete!")
+        # Print contextualization summary
+        self._print_contextualization_summary()
+        
+        logger.info("Import complete!")
+        logger.info(f"Statistics: {self.stats}")
+        
+        return self.stats
     
-    def print_summary(self):
-        """Print import summary."""
-        print("\n" + "=" * 80)
-        print("IMPORT SUMMARY")
-        print("=" * 80)
-        print(f"\nTotal KeSCO occupations: {self.stats['total']}")
-        print(f"Successfully inserted: {self.stats['inserted']}")
-        print(f"Errors: {self.stats['errors']}")
-        print(f"\nContextualization Breakdown:")
-        print(f"  • Exact matches (100%): {self.stats['exact_match']} ({self.stats['exact_match']/self.stats['total']*100:.1f}%)")
-        print(f"  • Fuzzy matches (≥85%): {self.stats['fuzzy_match']} ({self.stats['fuzzy_match']/self.stats['total']*100:.1f}%)")
-        print(f"  • Manual review (70-84%): {self.stats['manual_review']} ({self.stats['manual_review']/self.stats['total']*100:.1f}%)")
-        print(f"  • No match (<70%): {self.stats['no_match']} ({self.stats['no_match']/self.stats['total']*100:.1f}%)")
-        print(f"\nSkills inherited: {self.stats['skills_inherited']}")
-        print(f"\n✓ Database is CONTEXTUALIZED and USEFUL from day 1!")
-        print("=" * 80)
-    
-    async def run(self):
-        """Execute the import with contextualization."""
+    async def _insert_batch(self, collection, batch: list):
+        """Insert a batch of documents"""
+        if not batch:
+            return
+        
         try:
-            # Step 1: Load ESCO context
-            await self.load_esco_context()
-            
-            # Step 2: Import KeSCO with contextualization
-            await self.import_with_contextualization()
-            
-            # Step 3: Print summary
-            self.print_summary()
-            
-        finally:
-            self.client.close()
+            result = await collection.insert_many(batch, ordered=False)
+            self.stats['imported'] += len(result.inserted_ids)
+        except Exception as e:
+            if "duplicate key error" in str(e).lower():
+                error_count = str(e).count("duplicate key")
+                inserted = len(batch) - error_count
+                self.stats['imported'] += inserted
+                self.stats['skipped'] += error_count
+                logger.warning(f"Skipped {error_count} duplicates in batch")
+            else:
+                logger.error(f"Batch insert error: {str(e)}")
+                self.stats['errors'] += len(batch)
+    
+    def _print_contextualization_summary(self):
+        """Print summary of contextualization results"""
+        total = self.stats['total_rows']
+        
+        print("\n" + "=" * 80)
+        print("KESCO ↔ ESCO CONTEXTUALIZATION SUMMARY (INLINE)")
+        print("=" * 80)
+        print(f"Total KeSCO occupations: {total}")
+        print(f"Auto-matched (≥85% confidence): {self.stats['auto_matched']} ({self.stats['auto_matched']/total*100:.1f}%)")
+        print(f"Manual review (70-84%): {self.stats['manual_review']} ({self.stats['manual_review']/total*100:.1f}%)")
+        print(f"No match (<70%): {self.stats['no_match']} ({self.stats['no_match']/total*100:.1f}%)")
+        
+        # Show sample auto-matches
+        print("\n" + "-" * 80)
+        print("SAMPLE AUTO-MATCHED (≥85% confidence):")
+        print("-" * 80)
+        auto_matches = [m for m in self.matches if m['confidence'] >= 85][:10]
+        for match in auto_matches:
+            print(f"{match['confidence']:.0f}% | {match['kesco_title']} → {match['esco_title']}")
+        
+        # Show sample manual review cases
+        print("\n" + "-" * 80)
+        print("SAMPLE MANUAL REVIEW NEEDED (70-84% confidence):")
+        print("-" * 80)
+        manual_reviews = [m for m in self.matches if 70 <= m['confidence'] < 85][:10]
+        for match in manual_reviews:
+            print(f"{match['confidence']:.0f}% | {match['kesco_title']} → {match['esco_title']} ⚠️")
+        
+        print("=" * 80 + "\n")
+    
+    def export_matches_to_csv(self, output_path: str = None):
+        """Export match results to CSV for review"""
+        if not output_path:
+            output_path = "/home/steve/tabiya/resources/kesco_esco_inline_matches.csv"
+        
+        df = pd.DataFrame(self.matches)
+        df.to_csv(output_path, index=False)
+        logger.info(f"✓ Exported matches to {output_path}")
 
 
 async def main():
-    importer = ContextualizedKeSCOImporter()
-    await importer.run()
+    """Example usage"""
+    from motor.motor_asyncio import AsyncIOMotorClient #type:ignore
+    
+    client = AsyncIOMotorClient(MONGODB_URI)
+    db = client[TAXONOMY_DB_NAME]
+    
+    # Note: In production, you'd get esco_lookup from the ESCO importer
+    # For now, we'll build it here
+    from .esco_occupations_importer import ESCOOccupationsImporter
+    
+    esco_importer = ESCOOccupationsImporter(db)
+    esco_lookup = await esco_importer.build_esco_lookup()
+    
+    # Import KeSCO with contextualization
+    kesco_importer = KeSCOImporter(db, esco_lookup=esco_lookup)
+    stats = await kesco_importer.import_occupations()
+    
+    print(f"\n✅ Import complete!")
+    print(f"   Total rows: {stats['total_rows']}")
+    print(f"   Imported: {stats['imported']}")
+    print(f"   Skipped (duplicates): {stats['skipped']}")
+    print(f"   Errors: {stats['errors']}")
+    
+    # Export matches
+    kesco_importer.export_matches_to_csv()
+    
+    client.close()
 
 
 if __name__ == "__main__":

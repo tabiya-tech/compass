@@ -140,6 +140,38 @@ class ESCOOccupationsImporter:
             else:
                 logger.error(f"Batch insert error: {str(e)}")
                 self.stats['errors'] += len(batch)
+    
+    async def build_esco_lookup(self) -> Dict[str, Dict]:
+        """
+        Build a lookup dictionary for ESCO occupations after import.
+        
+        Returns:
+            Dict mapping lowercase titles -> full occupation document
+        """
+        logger.info("Building ESCO occupation lookup dictionary...")
+        
+        collection = self.db[TaxonomyCollections.OCCUPATIONS]
+        cursor = collection.find({"source": "ESCO"})
+        esco_occupations = await cursor.to_list(length=None)
+        
+        lookup = {}
+        
+        for occ in esco_occupations:
+            # Add preferred label
+            title = occ.get('preferred_label', '').lower().strip()
+            if title:
+                lookup[title] = occ
+            
+            # Add alternative labels
+            alt_labels = occ.get('alt_labels', [])
+            for alt in alt_labels:
+                alt_title = alt.lower().strip()
+                if alt_title and alt_title not in lookup:
+                    lookup[alt_title] = occ
+        
+        logger.info(f"✓ Built lookup dictionary with {len(lookup)} searchable titles from {len(esco_occupations)} ESCO occupations")
+        
+        return lookup
 
 
 async def main():
@@ -158,6 +190,10 @@ async def main():
     print(f"   Imported: {stats['imported']}")
     print(f"   Skipped (duplicates): {stats['skipped']}")
     print(f"   Errors: {stats['errors']}")
+    
+    # Build lookup
+    lookup = await importer.build_esco_lookup()
+    print(f"\n✅ Lookup dictionary built with {len(lookup)} searchable titles")
     
     client.close()
 

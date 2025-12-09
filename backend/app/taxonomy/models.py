@@ -223,6 +223,16 @@ class OccupationModel(BaseModel):
     is_entrepreneurship: bool = Field(False, description="True for entrepreneurship roles")
     kenya_specific_notes: Optional[str] = Field(None, description="Kenya-specific context")
     
+    # *** NEW: Contextualization fields (KeSCO ↔ ESCO mapping) ***
+    mapped_to_esco_id: Optional[PyObjectId] = Field(None, description="Auto-matched ESCO occupation (≥85% confidence)")
+    suggested_esco_id: Optional[PyObjectId] = Field(None, description="Suggested ESCO match for manual review (70-84%)")
+    mapping_confidence: Optional[float] = Field(None, ge=0, le=1, description="Fuzzy match confidence score (0-1)")
+    mapping_method: Optional[str] = Field(None, description="Method used for matching (e.g., 'fuzzy_token_sort')")
+    requires_manual_review: bool = Field(False, description="True if mapping confidence is 70-84%")
+    requires_manual_skill_assignment: bool = Field(False, description="True if no good ESCO match found (<70%)")
+    has_inherited_skills: bool = Field(False, description="True if skills were inherited from ESCO")
+    inherited_skills_count: int = Field(0, description="Number of skills inherited from ESCO")
+    
     # Provenance & metadata
     source: DataSource = Field(..., description="Original data source")
     taxonomy_model_id: PyObjectId = Field(..., description="Reference to taxonomy model version")
@@ -292,6 +302,9 @@ class OccupationSkillRelationModel(BaseModel):
     # Custom fields for Kenya
     skill_level: Optional[str] = Field(None, description="Required proficiency level")
     is_critical_for_kenya: bool = Field(False, description="Critical skill in Kenya market")
+    
+    # *** NEW: Skill inheritance tracking ***
+    inherited_from_esco_id: Optional[PyObjectId] = Field(None, description="ESCO occupation this skill was inherited from")
     
     # Metadata
     source: DataSource = Field(default=DataSource.ESCO)
@@ -655,5 +668,3 @@ class OccupationPreferenceProfileModel(BaseModel):
     data_source: str = Field(..., description="How profile was determined")
     confidence_score: Optional[float] = Field(None, ge=0, le=1)
     last_updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-

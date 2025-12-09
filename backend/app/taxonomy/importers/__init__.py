@@ -5,8 +5,6 @@ Taxonomy data importers for ESCO and KeSCO
 
 '''How to run
 
-# drop duplicates first:
-
 python3 -c "
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
