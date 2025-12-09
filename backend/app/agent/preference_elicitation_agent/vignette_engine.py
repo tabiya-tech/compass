@@ -171,10 +171,29 @@ class VignetteEngine:
             Personalized vignette or None
         """
         # Check if there's a pre-generated vignette in the queue
-        if self._vignette_queue:
+        # BUT validate it's still needed (category not already covered)
+        while self._vignette_queue:
             vignette = self._vignette_queue.pop(0)
-            self._logger.info(f"Using pre-generated vignette from queue: {vignette.vignette_id}")
+            
+            # Check if this vignette's category is already covered
+            if vignette.category in state.categories_covered:
+                self._logger.warning(
+                    f"⚠️  Discarding pre-warmed vignette {vignette.vignette_id} - "
+                    f"category '{vignette.category}' already covered. Queue size: {len(self._vignette_queue)}"
+                )
+                continue  # Try next vignette in queue
+            
+            # Valid vignette - use it
+            self._logger.info(
+                f"✅ Using pre-generated vignette from queue: {vignette.vignette_id} "
+                f"(category: {vignette.category})"
+            )
             return vignette
+        
+        # Queue is empty or all queued vignettes were for covered categories
+        if self._vignette_queue:
+            self._logger.info("All queued vignettes were for covered categories, generating fresh vignette")
+        # Fall through to generate a new vignette below
 
         if self._personalizer is None:
             self._logger.error("Personalizer not initialized")
@@ -187,9 +206,16 @@ class VignetteEngine:
         # Get next category to explore
         next_category = state.get_next_category_to_explore()
 
+        self._logger.info(
+            f"\n🔍 VignetteEngine: Selecting personalized vignette\n"
+            f"  - Next category from state: {next_category}\n"
+            f"  - Categories to explore: {state.categories_to_explore}\n"
+            f"  - Categories covered: {state.categories_covered}"
+        )
+
         if next_category is None:
             # All priority categories covered
-            self._logger.info("All categories explored")
+            self._logger.info("✅ All categories explored")
             return None
 
         # Get templates for this category
@@ -206,12 +232,21 @@ class VignetteEngine:
             for resp in state.vignette_responses[-3:]  # Last 3 responses
         ]
 
+        self._logger.info(
+            f"  - Available templates for '{next_category}': {len(templates)}\n"
+            f"  - Recently used template IDs (to avoid): {used_template_ids}"
+        )
+
         # Find first unused template, or use first if all used
         template = templates[0]
         for t in templates:
             if t.template_id not in used_template_ids:
                 template = t
                 break
+        
+        self._logger.info(
+            f"  - Selected template: {template.template_id} (category: {next_category})"
+        )
 
         # Get previous vignette scenarios for context (use scenario text, not user responses)
         previous_scenarios = []
@@ -232,8 +267,11 @@ class VignetteEngine:
             )
 
             self._logger.info(
-                f"Generated personalized vignette from template {template.template_id} "
-                f"for category {next_category}"
+                f"✅ Generated personalized vignette:\n"
+                f"  - Vignette ID: {personalized.vignette.vignette_id}\n"
+                f"  - Template ID: {template.template_id}\n"
+                f"  - Category: {next_category}\n"
+                f"  - Scenario: {personalized.vignette.scenario_text[:100]}..."
             )
 
             # Cache the generated vignette for later retrieval

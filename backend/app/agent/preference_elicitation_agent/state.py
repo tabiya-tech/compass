@@ -92,6 +92,12 @@ class PreferenceElicitationAgentState(BaseModel):
     follow_up_question: Optional[str] = None
     """Current follow-up question being asked (if any)"""
 
+    follow_ups_asked: set[str] = Field(default_factory=set)
+    """Set of vignette IDs we've already asked follow-ups for (max one per vignette)"""
+
+    last_experience_question_asked: Optional[str] = None
+    """The last experience question that was asked (for extraction context)"""
+
     user_has_indicated_completion: bool = False
     """Whether user has indicated they want to finish"""
 
@@ -141,6 +147,8 @@ class PreferenceElicitationAgentState(BaseModel):
             ]),
             needs_follow_up=doc.get("needs_follow_up", False),
             follow_up_question=doc.get("follow_up_question"),
+            follow_ups_asked=set(doc.get("follow_ups_asked", [])),
+            last_experience_question_asked=doc.get("last_experience_question_asked"),
             user_has_indicated_completion=doc.get("user_has_indicated_completion", False),
             minimum_vignettes_completed=doc.get("minimum_vignettes_completed", 5),
             notes=doc.get("notes", "")
@@ -197,3 +205,12 @@ class PreferenceElicitationAgentState(BaseModel):
     def increment_turn_count(self) -> None:
         """Increment the conversation turn counter."""
         self.conversation_turn_count += 1
+
+    def mark_follow_up_asked(self, vignette_id: str) -> None:
+        """
+        Mark that we've asked a follow-up for this vignette.
+
+        Args:
+            vignette_id: ID of the vignette we asked a follow-up for
+        """
+        self.follow_ups_asked.add(vignette_id)

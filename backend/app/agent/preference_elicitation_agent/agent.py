@@ -33,7 +33,9 @@ from app.agent.preference_elicitation_agent.types import (
 from app.agent.preference_elicitation_agent.vignette_engine import VignetteEngine
 from app.agent.preference_elicitation_agent.preference_extractor import (
     PreferenceExtractor,
-    PreferenceExtractionResult
+    PreferenceExtractionResult,
+    ExperiencePreferenceExtractor,
+    ExperiencePreferenceExtractionResult
 )
 from app.agent.preference_elicitation_agent.user_context_extractor import UserContextExtractor
 from app.agent.prompt_template.agent_prompt_template import (
@@ -149,8 +151,9 @@ class PreferenceElicitationAgent(Agent):
         # User context extractor
         self._context_extractor = UserContextExtractor(llm=self._shared_llm)
 
-        # Preference extractor (creates its own LLM with system instructions)
+        # Preference extractors (create their own LLMs with system instructions)
         self._preference_extractor = PreferenceExtractor()
+        self._experience_preference_extractor = ExperiencePreferenceExtractor()
 
     def set_state(self, state: PreferenceElicitationAgentState) -> None:
         """
@@ -285,7 +288,7 @@ class PreferenceElicitationAgent(Agent):
                 return self._create_error_response(agent_start_time)
 
         except Exception as e:
-            self.logger.exception("Error in preference elicitation agent", e)
+            self.logger.exception("Error in preference elicitation agent: %s", str(e))
             return self._create_error_response(agent_start_time)
 
         # Create output
@@ -421,10 +424,9 @@ class PreferenceElicitationAgent(Agent):
             # Extract user context for personalization
             await self._extract_user_context()
 
-            # Pre-warm: Generate first vignette in background (optional optimization)
+            # Pre-warm: Generate first vignette in background
             # This reduces perceived latency when transitioning to VIGNETTES phase
-            # Uncomment to enable:
-            # asyncio.create_task(self._prewarm_next_vignette())
+            asyncio.create_task(self._prewarm_next_vignette())
 
             # Move to experience questions phase
             self._state.conversation_phase = "EXPERIENCE_QUESTIONS"
@@ -454,8 +456,19 @@ class PreferenceElicitationAgent(Agent):
         Returns:
             Tuple of (response, LLM stats)
         """
+        all_llm_stats: list[LLMStats] = []
+        previous_experience_question = self._state.last_experience_question_asked
+
+        # If there was a previous experience question, extract preferences from the response
+        if previous_experience_question and user_input.strip():
+            await self._extract_and_store_experience_preferences(
+                question_asked=previous_experience_question,
+                user_response=user_input,
+                all_llm_stats=all_llm_stats
+            )
+
         # After 2-3 turns of experience questions, move to vignettes
-        if self._state.conversation_turn_count >= 3:
+        if self._state.conversation_turn_count >= 4:
             self._state.conversation_phase = "VIGNETTES"
             return await self._handle_vignettes_phase(user_input, context)
 
@@ -477,12 +490,20 @@ class PreferenceElicitationAgent(Agent):
                 )
                 exp_summaries.append(summary)
 
+            previous_question_context = f"""
+                When constructing the question, keep in mind the previous question asked and DO NOT repeat it.
+                <previous_experience_question>
+                {previous_experience_question}
+                </previous_experience_question>
+                """ if previous_experience_question else ""
+
             prompt = f"""The user previously shared these work experiences:
                 {chr(10).join(f'- {s}' for s in exp_summaries)}
 
-                Ask them a REFLECTIVE question about what they ENJOYED or DISLIKED about these specific experiences.
-                Focus on understanding their PREFERENCES, not their responsibilities.
-
+                # GUIDELINES
+                - Ask them a REFLECTIVE question about what they ENJOYED or DISLIKED about these specific experiences.
+                - Focus on understanding their PREFERENCES, not their responsibilities.
+                {previous_question_context}
                 Examples:
                 - "You mentioned working as {experiences[0].experience_title}. What aspects of that work did you find most satisfying?"
                 - "What frustrated you most about the {experiences[0].experience_title} role?"
@@ -503,8 +524,8 @@ class PreferenceElicitationAgent(Agent):
 
         # Combine the experience-based prompt with JSON instructions
         combined_instructions = f"""{prompt}
-
-{get_json_response_instructions()}"""
+            {get_json_response_instructions()}
+        """
 
         response, llm_stats = await self._conversation_caller.call_llm(
             llm=self._conversation_llm,
@@ -515,6 +536,12 @@ class PreferenceElicitationAgent(Agent):
             ),
             logger=self.logger
         )
+        all_llm_stats.extend(llm_stats)
+
+        # Pre-warm next vignette after 2nd experience question
+        # User will answer ~2-3 more questions before seeing vignettes
+        if self._state.conversation_turn_count == 2:
+            asyncio.create_task(self._prewarm_next_vignette())
 
         if response is None:
             # Fallback question
@@ -529,7 +556,10 @@ class PreferenceElicitationAgent(Agent):
                 finished=False
             )
 
-        return response, llm_stats
+        # Store the question being asked for next turn's extraction
+        self._state.last_experience_question_asked = response.message
+
+        return response, all_llm_stats
 
     async def _handle_vignettes_phase(
         self,
@@ -585,13 +615,63 @@ class PreferenceElicitationAgent(Agent):
 
                 # Mark category as covered if confidence is high
                 if extraction_result.confidence > 0.6:
+                    self.logger.info(
+                        f"✅ Marking category '{vignette.category}' as covered "
+                        f"(confidence: {extraction_result.confidence:.2f}, vignette: {vignette.vignette_id})"
+                    )
                     self._state.mark_category_covered(vignette.category)
+                else:
+                    self.logger.warning(
+                        f"⚠️  NOT marking category '{vignette.category}' as covered - confidence too low "
+                        f"(confidence: {extraction_result.confidence:.2f}, threshold: 0.6, vignette: {vignette.vignette_id})"
+                    )
+
+                # Check if we should ask follow-up BEFORE moving to next vignette
+                if self._should_ask_follow_up(vignette_response):
+                    # Generate follow-up and pre-warm next vignette IN PARALLEL
+                    self.logger.info(f"Generating follow-up for vignette {vignette_response.vignette_id}")
+
+                    # Run follow-up generation and vignette pre-warming concurrently
+                    follow_up_task = asyncio.create_task(
+                        self._generate_contextual_follow_up(
+                            vignette_response=vignette_response,
+                            extraction_result=extraction_result,
+                            context=context
+                        )
+                    )
+                    prewarm_task = asyncio.create_task(self._prewarm_next_vignette())
+
+                    # Wait for both to complete
+                    follow_up_message, _ = await asyncio.gather(follow_up_task, prewarm_task)
+
+                    # Transition to follow-up phase
+                    self._state.conversation_phase = "FOLLOW_UP"
+
+                    response = ConversationResponse(
+                        reasoning=f"Asking follow-up for low-confidence extraction (confidence: {extraction_result.confidence:.2f})",
+                        message=follow_up_message,
+                        finished=False
+                    )
+
+                    return response, all_llm_stats
+
+        # Pre-warm next vignette while user is thinking (background task)
+        asyncio.create_task(self._prewarm_next_vignette())
 
         # Check if we can complete
         if self._state.can_complete() and len(self._state.completed_vignettes) >= 5:
             self._state.conversation_phase = "WRAPUP"
             return await self._handle_wrapup_phase(user_input, context)
 
+        # Log current state before selecting next vignette
+        self.logger.info(
+            f"\n📊 Vignette Selection State:\n"
+            f"  - Completed vignettes: {len(self._state.completed_vignettes)}\n"
+            f"  - Categories covered: {self._state.categories_covered}\n"
+            f"  - Categories to explore: {self._state.categories_to_explore}\n"
+            f"  - Current preference vector confidence: {self._state.preference_vector.confidence_score:.2f}"
+        )
+        
         # Select next vignette (with user context for personalization)
         next_vignette = await self._vignette_engine.select_next_vignette(
             self._state,
@@ -606,6 +686,14 @@ class PreferenceElicitationAgent(Agent):
         # Update state with new vignette
         self._state.current_vignette_id = next_vignette.vignette_id
 
+        # Log selected vignette details
+        self.logger.info(
+            f"🎯 Selected vignette:\n"
+            f"  - ID: {next_vignette.vignette_id}\n"
+            f"  - Category: {next_vignette.category}\n"
+            f"  - Scenario: {next_vignette.scenario_text[:100]}..."
+        )
+
         # Present the vignette
         vignette_message = self._format_vignette_message(next_vignette)
 
@@ -617,6 +705,108 @@ class PreferenceElicitationAgent(Agent):
 
         return response, all_llm_stats
 
+    def _should_ask_follow_up(self, vignette_response: VignetteResponse) -> bool:
+        """
+        Decide if we should ask a follow-up question.
+
+        Triggers:
+        - Low extraction confidence (<0.7)
+        - Haven't asked follow-up for this vignette yet
+        - User gave very short response (<15 words)
+
+        Args:
+            vignette_response: The vignette response to evaluate
+
+        Returns:
+            True if follow-up should be asked
+        """
+        # Already asked follow-up for this vignette?
+        if vignette_response.vignette_id in self._state.follow_ups_asked:
+            return False
+
+        # Low confidence extraction?
+        if vignette_response.confidence < 0.7:
+            self.logger.info(
+                f"Follow-up needed for vignette {vignette_response.vignette_id} "
+                f"(confidence: {vignette_response.confidence:.2f})"
+            )
+            return True
+
+        # Very short response (likely needs clarification)
+        word_count = len(vignette_response.user_reasoning.split())
+        if word_count < 15:
+            self.logger.info(
+                f"Follow-up needed for vignette {vignette_response.vignette_id} "
+                f"(word count: {word_count})"
+            )
+            return True
+
+        return False
+
+    async def _generate_contextual_follow_up(
+        self,
+        vignette_response: VignetteResponse,
+        extraction_result: PreferenceExtractionResult,
+        context: ConversationContext
+    ) -> str:
+        """
+        Generate a contextual follow-up based on the vignette and user's response.
+
+        Uses the suggested_follow_up from extraction result if available,
+        otherwise generates one using the conversation LLM.
+
+        Args:
+            vignette_response: The vignette response
+            extraction_result: The preference extraction result
+            context: Conversation context
+
+        Returns:
+            Follow-up question string
+        """
+        # Use suggested follow-up from extraction if available
+        if extraction_result.suggested_follow_up:
+            return extraction_result.suggested_follow_up
+
+        # Fallback: Generate using conversation LLM
+        vignette = self._vignette_engine.get_vignette_by_id(vignette_response.vignette_id)
+
+        if not vignette:
+            return "Could you tell me a bit more about why you chose that option?"
+
+        # Build prompt for LLM to generate natural follow-up
+        prompt = f"""The user just responded to a job choice scenario.
+
+Scenario: {vignette.scenario_text}
+
+Their response: {vignette_response.user_reasoning}
+
+Confidence in extraction: {extraction_result.confidence:.2f} (low confidence)
+
+Generate ONE short follow-up question (max 15 words) to clarify their preference.
+
+Examples:
+- "What was the main factor in your choice?"
+- "Would you feel the same if the salary difference was smaller?"
+- "Tell me more about why that matters to you"
+
+Keep it conversational, not interrogative.
+
+{get_json_response_instructions()}"""
+
+        try:
+            response, _ = await self._conversation_caller.call_llm(
+                llm=self._conversation_llm,
+                llm_input=prompt,
+                logger=self.logger
+            )
+
+            if response:
+                return response.message.strip('"')
+        except Exception as e:
+            self.logger.warning(f"Failed to generate follow-up: {e}")
+
+        return "Could you tell me more about your choice?"
+
     async def _handle_follow_up_phase(
         self,
         user_input: str,
@@ -625,6 +815,9 @@ class PreferenceElicitationAgent(Agent):
         """
         Handle follow-up questions phase.
 
+        Extracts additional preferences from follow-up response,
+        then returns to vignettes phase.
+
         Args:
             user_input: User's message
             context: Conversation context
@@ -632,8 +825,39 @@ class PreferenceElicitationAgent(Agent):
         Returns:
             Tuple of (response, LLM stats)
         """
-        # TODO: Implement follow-up logic
-        # For now, return to vignettes
+        all_llm_stats: list[LLMStats] = []
+
+        # Get the last vignette response
+        if not self._state.vignette_responses:
+            self._state.conversation_phase = "VIGNETTES"
+            return await self._handle_vignettes_phase(user_input, context)
+
+        last_response = self._state.vignette_responses[-1]
+        vignette = self._vignette_engine.get_vignette_by_id(last_response.vignette_id)
+
+        if vignette:
+            # Extract additional preferences from follow-up response
+            extraction_result, extraction_stats = await self._preference_extractor.extract_preferences(
+                vignette=vignette,
+                user_response=f"{last_response.user_reasoning}\n\nFollow-up response: {user_input}",
+                current_preference_vector=self._state.preference_vector
+            )
+            all_llm_stats.extend(extraction_stats)
+
+            # Update preference vector with refined preferences
+            self._state.preference_vector = self._preference_extractor.update_preference_vector(
+                self._state.preference_vector,
+                extraction_result
+            )
+
+            self.logger.info(
+                f"Updated preferences from follow-up (new confidence: {extraction_result.confidence:.2f})"
+            )
+
+        # Mark that we've asked follow-up for this vignette
+        self._state.mark_follow_up_asked(last_response.vignette_id)
+
+        # Return to vignettes phase
         self._state.conversation_phase = "VIGNETTES"
         return await self._handle_vignettes_phase(user_input, context)
 
@@ -700,6 +924,77 @@ class PreferenceElicitationAgent(Agent):
         )
 
         return response, []
+
+    async def _extract_and_store_experience_preferences(
+        self,
+        question_asked: str,
+        user_response: str,
+        all_llm_stats: list[LLMStats]
+    ) -> None:
+        """
+        Extract preference signals from experience question response and update state.
+
+        Args:
+            question_asked: The question that was asked
+            user_response: User's response
+            all_llm_stats: List to append LLM stats to
+        """
+        # Get experience context if available
+        experiences = await self._get_experiences_for_questions()
+        experience_context = None
+        if experiences and len(experiences) > 0:
+            exp_summaries = []
+            for exp in experiences[:2]:  # Use first 2 for context
+                summary = ExperienceEntity.get_structured_summary(
+                    experience_title=exp.experience_title,
+                    work_type=exp.work_type,
+                    company=exp.company,
+                    location=exp.location,
+                    start_date=exp.timeline.start if exp.timeline else None,
+                    end_date=exp.timeline.end if exp.timeline else None
+                )
+                exp_summaries.append(summary)
+            experience_context = "\n".join(exp_summaries)
+
+        try:
+            # Extract preferences
+            extraction_result, extraction_stats = await self._experience_preference_extractor.extract_preferences_from_experience(
+                question_asked=question_asked,
+                user_response=user_response,
+                experience_context=experience_context
+            )
+            all_llm_stats.extend(extraction_stats)
+
+            if extraction_result.confidence > 0.2:  # Only use if minimally confident
+                # Store in experience_based_preferences
+                for dimension, value in extraction_result.inferred_preferences.items():
+                    self._state.experience_based_preferences[dimension] = {
+                        "value": value,
+                        "confidence": extraction_result.confidence,
+                        "source": "experience_question"
+                    }
+
+                # Update preference vector with low-confidence seeding
+                for dimension, value in extraction_result.inferred_preferences.items():
+                    self._preference_extractor._update_preference_field(
+                        preference_vector=self._state.preference_vector,
+                        field_path=dimension,
+                        value=value,
+                        weight=extraction_result.confidence * 0.7  # Scale down weight for experience-based
+                    )
+
+                self.logger.info(
+                    f"Extracted {len(extraction_result.inferred_preferences)} preference signals from experience "
+                    f"(confidence: {extraction_result.confidence:.2f})"
+                )
+            else:
+                self.logger.debug(
+                    f"Skipped experience extraction due to low confidence: {extraction_result.confidence:.2f}"
+                )
+
+        except Exception as e:
+            # Don't fail the conversation if extraction fails
+            self.logger.warning(f"Failed to extract preferences from experience response: {e}")
 
     def _format_vignette_message(self, vignette: Vignette) -> str:
         """

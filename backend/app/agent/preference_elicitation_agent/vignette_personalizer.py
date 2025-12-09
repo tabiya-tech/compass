@@ -6,6 +6,7 @@ Generates personalized vignettes based on user context and vignette templates.
 
 import logging
 import json
+import uuid
 from pathlib import Path
 from typing import Optional
 
@@ -241,9 +242,11 @@ Example Output:
             attributes=template.option_b  # Use template attributes
         )
 
-        # Build personalized Vignette
+        # Build personalized Vignette with unique ID per generation
+        # Use template_id + a unique suffix to ensure each generated vignette is tracked separately
+        unique_suffix = str(uuid.uuid4())[:8]
         vignette = Vignette(
-            vignette_id=f"{template.template_id}_{hash(user_context.current_role or 'default') % 10000}",
+            vignette_id=f"{template.template_id}_{unique_suffix}",
             category=template.category,
             scenario_text=generated.scenario_intro,
             options=[option_a, option_b],
