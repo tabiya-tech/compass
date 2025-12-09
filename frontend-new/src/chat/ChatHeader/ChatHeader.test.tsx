@@ -1,5 +1,7 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
+
 // standard sentry mock
 import "src/_test_utilities/sentryMock";
 

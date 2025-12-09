@@ -1,6 +1,8 @@
-import "src/_test_utilities/consoleMock"
-import SensitiveDataFormSkeleton, { DATA_TEST_ID } from "./SensitiveDataFormSkeleton"
-import { render, screen } from "src/_test_utilities/test-utils"
+import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
+
+import SensitiveDataFormSkeleton, { DATA_TEST_ID } from "./SensitiveDataFormSkeleton";
+import { render, screen } from "src/_test_utilities/test-utils";
 
 test("should render the SensitiveDataFormSkeleton", () => {
     // WHEN the SensitiveDataFormSkeleton is rendered

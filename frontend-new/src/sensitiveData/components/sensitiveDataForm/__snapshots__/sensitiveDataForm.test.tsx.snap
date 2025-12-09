@@ -23,7 +23,7 @@ exports[`Sensitive Data Form Form validation should enable submit button when al
         />
         <button
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
-          data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+          data-testid="language-context-menu-select-button-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
           type="button"
@@ -156,7 +156,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should hand
         />
         <button
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
-          data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+          data-testid="language-context-menu-select-button-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
           type="button"
@@ -270,7 +270,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         />
         <button
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
-          data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+          data-testid="language-context-menu-select-button-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
           type="button"
@@ -389,7 +389,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         />
         <button
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
-          data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+          data-testid="language-context-menu-select-button-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
           type="button"
@@ -508,7 +508,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         />
         <button
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
-          data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+          data-testid="language-context-menu-select-button-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
           type="button"
@@ -639,7 +639,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         />
         <button
           class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
-          data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+          data-testid="language-context-menu-select-button-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
           type="button"

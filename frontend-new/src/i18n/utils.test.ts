@@ -67,6 +67,5 @@ describe("utils", () => {
       // AND the response should be the passed locale.
       expect(actualPossibleLocaleNames).toStrictEqual([givenLocale]);
     });
-
   });
 });
