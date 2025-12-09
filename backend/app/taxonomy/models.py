@@ -1,3 +1,4 @@
+# app/taxonomy/models.py
 """
 Defines MongoDB document schemas for:
 1. Taxonomy Database (ESCO + KeSCO + Custom Occupations & Skills)
@@ -29,6 +30,7 @@ JobScrapingLogModel                 -> Monitoring scraper runs
 
 
 # Training and preferences schemas
+
 TrainingOpportunityModel            -> Upskilling courses, certifications, TVET programs
 PreferenceDimensionModel            -> Canonical preference dimensions (salary, flexibility, work type)
 OccupationPreferenceProfileModel    -> Preference characteristics per occupation (salary ranges, amenities)
@@ -122,6 +124,39 @@ class JobPlatform(str, Enum):
     JOBWEBKENYA = "jobwebkenya"
     MYJOBMAG = "myjobmag"
     JOBSINKENYA = "jobsinkenya"  
+
+# ============================================================================
+# COLLECTION NAME CONSTANTS
+# ============================================================================
+
+class TaxonomyCollections:
+    """Taxonomy database collection names"""
+    OCCUPATION_GROUPS = "occupation_groups"
+    OCCUPATIONS = "occupations"
+    SKILLS = "skills"
+    OCCUPATION_SKILL_RELATIONS = "occupation_skill_relations"
+    SKILL_RELATIONS = "skill_relations"
+    CAREER_PATHS = "career_paths"
+
+
+class LaborDemandCollections:
+    """Labor demand database collection names"""
+    LABOR_DEMAND = "labor_demand"
+    MARKET_INSIGHTS = "labor_market_insights"
+
+
+class JobsCollections:
+    """Jobs database collection names"""
+    JOB_LISTINGS = "job_listings"
+    SCRAPING_LOGS = "job_scraping_logs"
+
+
+class TrainingCollections:
+    """Training database collection names (Milestone 2)"""
+    TRAINING_OPPORTUNITIES = "training_opportunities"
+    PREFERENCE_DIMENSIONS = "preference_dimensions"
+    OCCUPATION_PREFERENCE_PROFILES = "occupation_preference_profiles"
+
 
 
 # ============================================================================
@@ -622,34 +657,3 @@ class OccupationPreferenceProfileModel(BaseModel):
     last_updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
-# ============================================================================
-# 6. COLLECTION NAME CONSTANTS
-# ============================================================================
-
-class TaxonomyCollections:
-    """Taxonomy database collection names"""
-    OCCUPATION_GROUPS = "occupation_groups"
-    OCCUPATIONS = "occupations"
-    SKILLS = "skills"
-    OCCUPATION_SKILL_RELATIONS = "occupation_skill_relations"
-    SKILL_RELATIONS = "skill_relations"
-    CAREER_PATHS = "career_paths"
-
-
-class LaborDemandCollections:
-    """Labor demand database collection names"""
-    LABOR_DEMAND = "labor_demand"
-    MARKET_INSIGHTS = "labor_market_insights"
-
-
-class JobsCollections:
-    """Jobs database collection names"""
-    JOB_LISTINGS = "job_listings"
-    SCRAPING_LOGS = "job_scraping_logs"
-
-
-class TrainingCollections:
-    """Training database collection names (Milestone 2)"""
-    TRAINING_OPPORTUNITIES = "training_opportunities"
-    PREFERENCE_DIMENSIONS = "preference_dimensions"
-    OCCUPATION_PREFERENCE_PROFILES = "occupation_preference_profiles"
