@@ -72,9 +72,9 @@ def test_nested_key(given_locale):
     # Try to get a nested key
     # Based on user input, messages.json has "experience": { "noTitleProvidedYet": ... }
 
-    # We use es-ar as in the user request, assuming it exists and has the key
-    # If es-ar doesn't exist or doesn't have the key, this might fail, but let's follow the user's lead
-    # or fallback to en-US if es-ar is not available in the environment.
+    # We use es-AR as in the user request, assuming it exists and has the key
+    # If es-AR doesn't exist or doesn't have the key, this might fail, but let's follow the user's lead
+    # or fallback to en-US if es-AR is not available in the environment.
     # However, the user explicitly asked for this test code.
 
     val = manager.get_translation(given_locale, "messages", "experience.noTitleProvidedYet")

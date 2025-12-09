@@ -9,7 +9,7 @@ Notes
 - Supported languages are enabled via environment variables on both backend and frontend.
 
 ### Prerequisites
-- Decide the language code(s) you want to support (e.g., `es-ar`).
+- Decide the language code(s) you want to support (e.g., `es-AR`).
 - Pick a reference language to copy from (English is recommended):
   - Backend reference: `backend/app/i18n/locales/en/messages.json`
   - Frontend-new reference: `frontend-new/src/locales/en-GB/translation.json`
@@ -28,9 +28,9 @@ Create a folder for your new locale under `backend/app/i18n/locales/<locale>/` a
 Example
 ```
 backend/app/i18n/locales/en-US/messages.json      # reference
-backend/app/i18n/locales/es-es/messages.json      # new (primary language)
+backend/app/i18n/locales/es-ES/messages.json      # new (primary language)
 # Optionally, region-specific variant
-backend/app/i18n/locales/es-ar/messages.json
+backend/app/i18n/locales/es-AR/messages.json
 ```
 
 Template for `messages.json` (keep keys identical to English; values are your translations):
@@ -99,7 +99,6 @@ import es from "../locales/es-es/translation.json";
 i18n.init({
   resources: {
     "es-ES": { translation: es },
-    "es-es": { translation: es },
     // … keep existing entries …
   },
   fallbackLng: DEFAULT_LOCALE,
