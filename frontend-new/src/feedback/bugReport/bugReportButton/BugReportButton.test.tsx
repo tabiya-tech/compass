@@ -3,7 +3,7 @@ import "src/_test_utilities/sentryMock"
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import { render, screen, waitFor } from "src/_test_utilities/test-utils";
+import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
 import BugReportButton, { DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import * as Sentry from "@sentry/react";
 import { useMediaQuery } from "@mui/material";
@@ -84,10 +84,15 @@ describe("BugReportButton component", () => {
   });
 
   test("should attach Sentry bugReport when available", async () => {
-    // GIVEN a mock implementation of Sentry.getFeedback
-    const mockAttachTo = jest.fn();
+    // GIVEN a mock implementation of Sentry.getFeedback and createForm
+    const mockOpen = jest.fn();
+    const mockAppendToDom = jest.fn();
+    const mockCreateForm = jest.fn().mockResolvedValue({
+      appendToDom: mockAppendToDom,
+      open: mockOpen,
+    });
     (Sentry.getFeedback as jest.Mock).mockReturnValue({
-      attachTo: mockAttachTo,
+      createForm: mockCreateForm,
     });
     // AND sentry is initialized
     (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
@@ -95,13 +100,17 @@ describe("BugReportButton component", () => {
     // WHEN the component is rendered
     render(<BugReportButton />);
 
+    // AND the user clicks the button
+    const button = screen.getByTestId(DATA_TEST_ID.BUG_REPORT_BUTTON);
+    fireEvent.click(button);
+
     // THEN expect Sentry.getFeedback to have been called
     expect(Sentry.getFeedback).toHaveBeenCalled();
 
-    // AND expect the attachTo method to have been called with the button container element
-    await waitFor(() => {
-      expect(mockAttachTo).toHaveBeenCalledWith(expect.any(HTMLDivElement));
-    });
+    // AND expect the form to be created and opened with translations
+    await waitFor(() => expect(mockCreateForm).toHaveBeenCalled());
+    await waitFor(() => expect(mockAppendToDom).toHaveBeenCalled());
+    await waitFor(() => expect(mockOpen).toHaveBeenCalled());
 
     // AND expect no errors or warnings to have occurred
     expect(console.error).not.toHaveBeenCalled();
@@ -116,6 +125,10 @@ describe("BugReportButton component", () => {
 
     // WHEN the component is rendered
     render(<BugReportButton />);
+
+    // AND the user clicks the button
+    const button = screen.getByTestId(DATA_TEST_ID.BUG_REPORT_BUTTON);
+    fireEvent.click(button);
 
     // THEN expect Sentry.getFeedback to have been called
     expect(Sentry.getFeedback).toHaveBeenCalled();

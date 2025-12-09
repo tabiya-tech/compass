@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import * as Sentry from "@sentry/react";
 import { Box, styled, useMediaQuery, Theme } from "@mui/material";
@@ -38,8 +38,6 @@ const StyledPrimaryIconButton = styled(PrimaryIconButton)(({ theme }) => ({
 
 const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, className }) => {
   const { t } = useTranslation();
-  const [bugReport, setBugReport] = useState<any>();
-  const buttonRef = useRef<HTMLDivElement>(null);
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [sentryEnabled, setSentryEnabled] = useState(false);
 
@@ -47,22 +45,44 @@ const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, classNam
     setSentryEnabled(Sentry.isInitialized());
   }, []);
 
-  useEffect(() => {
-    if (sentryEnabled) {
-      setBugReport(Sentry.getFeedback());
+  const handleOpenBugReport = useCallback(async () => {
+    if (!sentryEnabled) {
+      return;
     }
-  }, [sentryEnabled]);
 
-  useEffect(() => {
-    if (bugReport && buttonRef.current) {
-      return bugReport.attachTo(buttonRef.current);
+    try {
+      const feedback = Sentry.getFeedback();
+      if (!feedback) {
+        return;
+      }
+
+      const form = await feedback.createForm({
+        formTitle: t("chat.chatHeader.giveGeneralFeedback"),
+        nameLabel: t("chat.chatHeader.nameLabel"),
+        namePlaceholder: t("chat.chatHeader.namePlaceholder"),
+        emailLabel: t("chat.chatHeader.emailLabel"),
+        emailPlaceholder: t("chat.chatHeader.emailPlaceholder"),
+        isRequiredLabel: t("chat.chatHeader.requiredLabel"),
+        messageLabel: t("chat.chatHeader.descriptionLabel"),
+        messagePlaceholder: t("chat.chatHeader.feedbackMessagePlaceholder"),
+        addScreenshotButtonLabel: t("chat.chatHeader.addScreenshot"),
+        submitButtonLabel: t("chat.chatHeader.sendFeedback"),
+        cancelButtonLabel: t("chat.chatHeader.cancelButton"),
+        successMessageText: t("chat.chatHeader.feedbackSuccessMessage"),
+      });
+
+      if (form) {
+        form.appendToDom();
+        form.open();
+      }
+    } catch (error) {
+      console.error("Error creating bug report form:", error);
     }
-  }, [bugReport]);
+  }, [sentryEnabled, t]);
 
   return (
     sentryEnabled && (
       <Box
-        ref={buttonRef}
         data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}
         className={className}
         sx={{
@@ -72,17 +92,21 @@ const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, classNam
           zIndex: (theme) => Math.max(theme.zIndex.drawer, theme.zIndex.modal) + 1,
         }}
       >
-        {" "}
         {isMobile ? (
-          <StyledPrimaryIconButton title={t("feedback.bugReport.reportBug")} data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}>
+          <StyledPrimaryIconButton
+            title={t("feedback.bugReport.reportBug")}
+            data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}
+            onClick={handleOpenBugReport}
+          >
             <BugReport data-testid={DATA_TEST_ID.BUG_REPORT_ICON} />
           </StyledPrimaryIconButton>
         ) : (
           <PrimaryButton
             disableWhenOffline={true}
             startIcon={<BugReport data-testid={DATA_TEST_ID.BUG_REPORT_ICON} />}
-            title={t("feedback.bugReport.reportBug")+"."}
+            title={t("feedback.bugReport.reportBug") + "."}
             data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON}
+            onClick={handleOpenBugReport}
           >
             {t("feedback.bugReport.reportBug")}
           </PrimaryButton>
