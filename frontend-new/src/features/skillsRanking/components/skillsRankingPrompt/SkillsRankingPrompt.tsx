@@ -92,9 +92,9 @@ const SkillsRankingPrompt: React.FC<Readonly<SkillsRankingPromptProps>> = ({ onF
       <ChatBubble
         message={
           <Typography>
-            You are almost there! Remember that if you completely finish this conversation with me you will receive <strong>30-40 Rand in airtime.</strong>
+            You are almost there! Remember that if you completely finish this conversation with me you will receive <strong>R40-R50 in airtime.</strong>
             <br />
-            Whether you receive 30 or 40 depends on your responses below, so please read carefully.
+            Whether you receive R40 or R50 depends on your responses below, so please read carefully.
           </Typography>
         }
         sender={ConversationMessageSender.COMPASS}
