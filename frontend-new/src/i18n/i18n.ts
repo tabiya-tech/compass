@@ -1,8 +1,9 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-import { DEFAULT_LOCALE, Locale } from "./constants";
+import { DEFAULT_LOCALE, FALL_BACK_LOCALE, Locale, SupportedLocales } from "./constants";
 import { constructLocaleResources } from "./utils";
+import { ConfigurationError } from "../error/commonErrors";
 
 // --- Import translations ---
 import enGb from "./locales/en-GB/translation.json";
@@ -33,12 +34,23 @@ const resources = {
   ...constructLocaleResources(Locale.ES_ES, { ...esEs, questions: questionsEsEs }),
 };
 
+// Validate DEFAULT_LOCALE before using it
+const isValidDefaultLocale = DEFAULT_LOCALE && SupportedLocales.includes(DEFAULT_LOCALE as Locale);
+const fallbackLocale = isValidDefaultLocale ? (DEFAULT_LOCALE as Locale) : FALL_BACK_LOCALE;
+
+if (!isValidDefaultLocale) {
+  const errorMessage = DEFAULT_LOCALE
+    ? `Invalid FRONTEND_DEFAULT_LOCALE environment variable: "${DEFAULT_LOCALE}". Must be one of: ${SupportedLocales.join(", ")}. Falling back to ${FALL_BACK_LOCALE}.`
+    : `FRONTEND_DEFAULT_LOCALE environment variable is not set or empty. Falling back to ${FALL_BACK_LOCALE}.`;
+  console.error(new ConfigurationError(errorMessage));
+}
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: DEFAULT_LOCALE,
+    fallbackLng: fallbackLocale,
     interpolation: { escapeValue: false },
   });
 

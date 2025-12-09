@@ -35,27 +35,34 @@ export function parseEnvSupportedLocales(): Locale[] {
       // Filter out invalid and unsupported locales
       const isValid = Object.values(Locale).includes(locale);
       if (!isValid) {
-        console.error(new ParseEnvLocaleError(`Env supported locale ${locale} is not a valid locale`));
+        console.error(
+          new ParseEnvLocaleError(
+            `Invalid locale in FRONTEND_SUPPORTED_LOCALES: "${locale}". Must be one of: ${Object.values(Locale).join(", ")}`
+          )
+        );
         return false;
       }
 
       const isSupported = SupportedLocales.includes(locale);
       if (!isSupported) {
-        console.warn(
+        console.error(
           new ParseEnvLocaleError(
-            `Env supported locale ${locale} is not supported by the artifacts. Supported locales: ${SupportedLocales.join(",")}`
+            `Unsupported locale in FRONTEND_SUPPORTED_LOCALES: "${locale}". Supported locales: ${SupportedLocales.join(", ")}`
           )
         );
+        return false;
       }
 
-      return isSupported;
+      return true;
     });
 
     if (supportedAndValidLocales.length > 0) {
       return supportedAndValidLocales;
     } else {
       console.error(
-        new ParseEnvLocaleError(`Env supported and valid locales are empty, Falling back to ${FALL_BACK_LOCALE}`)
+        new ParseEnvLocaleError(
+          `FRONTEND_SUPPORTED_LOCALES contains no valid supported locales. Falling back to ${FALL_BACK_LOCALE}`
+        )
       );
     }
   } catch (e) {
@@ -66,14 +73,18 @@ export function parseEnvSupportedLocales(): Locale[] {
 
   const defaultLocaleStr = getDefaultLocale() as Locale;
   if (!defaultLocaleStr) {
-    console.error(new ParseEnvLocaleError(`Env default locale not provided`));
+    console.error(
+      new ParseEnvLocaleError(
+        `FRONTEND_DEFAULT_LOCALE is not set or empty. Falling back to ${FALL_BACK_LOCALE}`
+      )
+    );
     return [FALL_BACK_LOCALE];
   }
 
   if (!SupportedLocales.includes(defaultLocaleStr)) {
     console.error(
       new ParseEnvLocaleError(
-        `Env default locale ${defaultLocaleStr} is not supported. Supported locales: ${SupportedLocales.join(",")}`
+        `FRONTEND_DEFAULT_LOCALE "${defaultLocaleStr}" is not supported. Supported locales: ${SupportedLocales.join(", ")}. Falling back to ${FALL_BACK_LOCALE}`
       )
     );
     return [FALL_BACK_LOCALE];
