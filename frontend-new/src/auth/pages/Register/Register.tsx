@@ -121,8 +121,8 @@ const Register: React.FC = () => {
       if (!prefs?.accepted_tc || isNaN(prefs?.accepted_tc.getTime())) {
         navigate(routerPaths.CONSENT, { replace: true });
       } else {
-  navigate(routerPaths.ROOT, { replace: true });
-  enqueueSnackbar(t("auth.pages.login.welcomeBack"), { variant: "success" });
+        navigate(routerPaths.ROOT, { replace: true });
+        enqueueSnackbar(t("auth.pages.register.welcomeBack"), { variant: "success" });
       }
     } catch (error) {
       const firebaseSocialAuthServiceInstance = FirebaseSocialAuthenticationService.getInstance();
@@ -192,7 +192,7 @@ const Register: React.FC = () => {
         width={"100%"}
       >
         <AuthHeader
-          title={t("auth.pages.login.welcomeTitle")}
+          title={t("auth.pages.register.welcomeTitle")}
           subtitle={
             <Typography variant="body2" gutterBottom>
               {t("auth.pages.register.subtitle")}
