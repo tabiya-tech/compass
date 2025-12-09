@@ -14,9 +14,8 @@ export const LocalesLabels = {
   [Locale.EN_GB]: "English (UK)",
   [Locale.EN_US]: "English (US)",
   [Locale.ES_ES]: "Spanish (Spain)",
-  [Locale.ES_AR]: "Spanish (Argentina)",
+  [Locale.ES_AR]: "Spanish (Argentina)"
 } as const;
 
-export const SupportedLocales: readonly Locale[] = [Locale.EN_GB, Locale.EN_US, Locale.ES_ES, Locale.ES_AR] as const;
-
+export const SupportedLocales: Locale[] = [Locale.EN_GB, Locale.EN_US, Locale.ES_ES, Locale.ES_AR];
 export const FALL_BACK_LOCALE = Locale.EN_GB;
