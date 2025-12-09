@@ -2,6 +2,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { DEFAULT_LOCALE, Locale } from "./constants";
+import { constructLocaleResources } from "./utils";
 
 // --- Import translations ---
 import enGb from "./locales/en-GB/translation.json";
@@ -16,27 +17,31 @@ import questionsEsEs from "src/feedback/overallFeedback/feedbackForm/questions-e
 import questionsEsAr from "src/feedback/overallFeedback/feedbackForm/questions-es-AR.json";
 
 // --- i18n initialization ---
+const resources = {
+  // For each locale, construct the locale resources for each possible case
+  //   - for only language without a region e.g.: `en`
+  //   - or for cases where the language does not follow [IETF BCP 47](https://www.ietf.org/rfc/bcp/bcp47.txt) format eg: en-ng
+
+  // Note: since both en-GB and en-US share the same language code `en`,
+  //       if the user has stated the en, then en-US will be used since it is at a later position.
+  //       same with the es-AR and es-ES, es, if the user has provided es, es-ES will be used.
+  //       We are relying on the JS object construction here.
+  //       The last object entry will override the previous entry.
+  ...constructLocaleResources(Locale.EN_GB, { ...enGb, questions: questionsEnGb }),
+  ...constructLocaleResources(Locale.EN_US, { ...enUs, questions: questionsEnUs }),
+  ...constructLocaleResources(Locale.ES_AR, { ...esAr, questions: questionsEsAr }),
+  ...constructLocaleResources(Locale.ES_ES, { ...esEs, questions: questionsEsEs }),
+};
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources: {
-      [Locale.EN_GB]: {
-        translation: { ...enGb, questions: questionsEnGb },
-      },
-      [Locale.EN_US]: {
-        translation: { ...enUs, questions: questionsEnUs },
-      },
-      [Locale.ES_ES]: {
-        translation: { ...esEs, questions: questionsEsEs },
-      },
-      [Locale.ES_AR]: {
-        translation: { ...esAr, questions: questionsEsAr },
-      },
-    },
+    resources,
     fallbackLng: DEFAULT_LOCALE,
     interpolation: { escapeValue: false },
   });
+
 
 // ========================================================
 //             Unexpected Events
@@ -53,26 +58,5 @@ i18n.on("missingKey", (languages, namespace, key: string, res: string) => {
 i18n.on("failedLoading", (lng, ns, msg) => {
   console.error(`Failed to load translation for ${lng} ${ns}`, msg);
 });
-
-// --- Normalize legacy or lowercase locale codes automatically ---
-const normalizedLang = i18n.language.toLowerCase();
-switch (normalizedLang) {
-  case "en":
-  case "en-GB":
-    i18n.changeLanguage(Locale.EN_GB);
-    break;
-  case "en-US":
-    i18n.changeLanguage(Locale.EN_US);
-    break;
-  case "es":
-  case "es-es":
-    i18n.changeLanguage(Locale.ES_ES);
-    break;
-  case "es-ar":
-    i18n.changeLanguage(Locale.ES_AR);
-    break;
-  default:
-    i18n.changeLanguage(Locale.EN_GB);
-}
 
 export default i18n;
