@@ -83,6 +83,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
       setCooldownSeconds(COOLDOWN_SECONDS);
     } catch (error) {
       const message = error instanceof FirebaseError ? getUserFriendlyFirebaseErrorMessage(error) : (error as Error).message;
+      console.error("Password reset request failed:", message, error);
       enqueueSnackbar(`${t("auth.components.passwordReset.failedToSendResetEmail")}: ${message}`, { variant: "error" });
     } finally {
       setIsLoading(false);

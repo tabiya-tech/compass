@@ -1,6 +1,6 @@
 # Infrastructure as Code
 
-The infrastructure for Compass is managed using [Pulumi](https://www.pulumi.com/). The infrastructure is defined in code and can be deployed to Google Cloud
+The infrastructure for Brújula is managed using [Pulumi](https://www.pulumi.com/). The infrastructure is defined in code and can be deployed to Google Cloud
 Platform (GCP) using Pulumi.
 
 ## IaC Codebase Components

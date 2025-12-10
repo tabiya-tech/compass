@@ -146,7 +146,11 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
             fontWeight="bold"
             data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_OCCUPATION}
           >
-            {experience.experience_title ? experience.experience_title : <i>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.untitled")}</i>}
+            {experience.experience_title ? (
+              experience.experience_title
+            ) : (
+              <i>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.untitled")}</i>
+            )}
           </Typography>
           <Box display="flex" alignItems="center" justifyContent="flex-end">
             <PrimaryIconButton
@@ -191,7 +195,9 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
         >
           <b>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.topSkillsLabel")}</b>
         </Typography>
-        <HelpTip icon={<InfoIcon sx={{ padding: 0.1 }} />}>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.topSkillsHelp")}</HelpTip>
+        <HelpTip icon={<InfoIcon sx={{ padding: 0.1 }} />}>
+          {t("experiences.experiencesDrawer.components.experiencesDrawerContent.topSkillsHelp")}
+        </HelpTip>
       </Box>
       <Box
         display="flex"

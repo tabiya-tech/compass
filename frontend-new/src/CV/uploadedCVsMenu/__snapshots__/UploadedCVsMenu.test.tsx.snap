@@ -9,7 +9,7 @@ exports[`UploadedCVsMenuContent render tests should render the Uploaded CVs Menu
     class="MuiBox-root css-t5n7v9"
   >
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-pawek1-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-lxkxci-MuiButtonBase-root-MuiIconButton-root"
       data-testid="uploaded-cvs-menu-arrow-back-icon-e9b40dcc-8068-45ec-a96a-9feb823f1696"
       tabindex="0"
       title="Back to main menu"
@@ -31,7 +31,7 @@ exports[`UploadedCVsMenuContent render tests should render the Uploaded CVs Menu
       />
     </button>
     <h6
-      class="MuiTypography-root MuiTypography-subtitle2 css-1rof9ss-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-subtitle2 css-zx0tws-MuiTypography-root"
       data-testid="uploaded-cvs-menu-uploaded-text-e9b40dcc-8068-45ec-a96a-9feb823f1696"
     >
       Previously uploaded CVs (1)
@@ -61,7 +61,7 @@ exports[`UploadedCVsMenuContent render tests should render the Uploaded CVs Menu
         class="MuiBox-root css-j7qwjs"
       >
         <span
-          class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-757dsf-MuiTypography-root"
           data-testid="uploaded-cvs-menu-file-name-e9b40dcc-8068-45ec-a96a-9feb823f1696"
         >
           foo_bar.pdf

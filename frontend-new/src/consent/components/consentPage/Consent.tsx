@@ -259,7 +259,7 @@ const Consent: React.FC = () => {
                     components={[
                       <CustomLink
                         onClick={() =>
-                          handleExternalNavigationOnNewTab("https://www.tabiya.org/brujula-terms-privacy")
+                          handleExternalNavigationOnNewTab("https://www.tabiya.org/compass-terms-privacy")
                         }
                       />,
                     ]}

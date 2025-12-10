@@ -1,5 +1,6 @@
 from textwrap import dedent
 
+from app.agent.prompt_template.locale_style import get_language_style
 from app.agent.simple_llm_agent.simple_llm_agent import SimpleLLMAgent
 from app.agent.agent_types import AgentType, AgentInput, AgentOutput
 from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions, \
@@ -24,6 +25,9 @@ class FarewellAgent(SimpleLLMAgent):
         system_instructions_template = dedent("""\
             Your task is to thank me for participating in the skill exploration session, and say goodbye.
             Be friendly and farewell me with a positive and supportive message that captures the bigger picture of my working experiences from our conversation
+           
+            {language_style}
+                                                          
            
             {language_style}
                                                           

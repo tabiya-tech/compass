@@ -16,11 +16,12 @@ import { UserPreference } from "src/userPreferences/UserPreferencesService/userP
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { FirebaseError } from "src/error/FirebaseError/firebaseError";
-import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
-import {
-  FirebaseErrorCodes,
-  USER_FRIENDLY_FIREBASE_ERROR_MESSAGES,
-} from "src/error/FirebaseError/firebaseError.constants";
+
+const DATA_VALIDATION_ERROR=
+      "There seems to be an issue with your request. " +
+      "If you're submitting data, please make sure they're valid and try again. " +
+      "If the problem persists, clear your browser's cache and refresh the page.";
+
 
 // mock the router
 jest.mock("react-router-dom", () => {
@@ -157,8 +158,7 @@ describe("Landing Page", () => {
       });
 
       // AND welcome message
-      const i18n = require("src/i18n/i18n").default;
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("auth.pages.login.welcomeBack"), { variant: "success" });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Welcome!", { variant: "success" });
 
       // AND no errors or warnings to have occurred
       expect(console.error).not.toHaveBeenCalled();
@@ -276,9 +276,8 @@ describe("Landing Page", () => {
       expect(console.error).toHaveBeenCalledWith(error);
 
       // AND the error message to be shown
-      const i18n = require("src/i18n/i18n").default;
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        `Failed to login: ${i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS.DATA_VALIDATION_ERROR)}`,
+        `Failed to login: ${DATA_VALIDATION_ERROR}`,
         { variant: "error" }
       );
     });
@@ -311,10 +310,8 @@ describe("Landing Page", () => {
       expect(console.warn).toHaveBeenCalledWith(error);
 
       // AND the error message to be shown
-      // message now comes from i18n translation keys; setupTests mocks i18next.t
-      const i18next = require("i18next");
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        `Failed to login: ${i18next.t(USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[FirebaseErrorCodes.INTERNAL_ERROR])}`,
+        `Failed to login: An internal error has occurred.`,
         { variant: "error" }
       );
     });

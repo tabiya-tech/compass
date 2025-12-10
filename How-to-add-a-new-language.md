@@ -1,4 +1,4 @@
-## How to add a new language to Brujula
+## How to add a new language to Brújula
 
 This guide shows how to add a new language end-to-end across the backend and the new frontend (`frontend-new`). It includes what files to add, the expected templates, which configs to update, and how to verify everything.
 
@@ -87,7 +87,7 @@ frontend-new/src/locales/fr-fr/translation.json   # new
 Template for `translation.json` (keep keys identical to English; values are your translations):
 ```json
 {
-  "welcome_to_compass": "Bienvenue sur Brujula !",
+  "welcome_to_compass": "Bienvenue sur Brújula !",
   "login": "Se connecter",
   "language_selector": "Sélecteur de langue"
 }
@@ -198,7 +198,7 @@ Backend `messages.json`
 Frontend `translation.json`
 ```json
 {
-  "welcome_to_compass": "Bienvenue sur Brujula !",
+  "welcome_to_compass": "Bienvenue sur Brújula !",
   "login": "Se connecter",
   "language_selector": "Sélecteur de langue"
 }

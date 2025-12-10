@@ -31,7 +31,7 @@ exports[`AnimatedBadge should render the badge for a large number 1`] = `
     class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-9cqolc-MuiBadge-badge"
   >
     <span
-      class="css-1tmou61"
+      class="css-1fsksa"
     >
       99+
     </span>
@@ -70,7 +70,7 @@ exports[`AnimatedBadge should render the badge with provided content 1`] = `
     class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-9cqolc-MuiBadge-badge"
   >
     <span
-      class="css-1tmou61"
+      class="css-1fsksa"
     >
       2
     </span>

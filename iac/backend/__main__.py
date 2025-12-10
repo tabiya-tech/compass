@@ -66,6 +66,7 @@ def main():
         enable_metrics=getenv("BACKEND_ENABLE_METRICS"),
         default_country_of_user=getenv("DEFAULT_COUNTRY_OF_USER"),
         gcp_oauth_client_id=getenv("GCP_OAUTH_CLIENT_ID"),
+        default_locale=getenv("BACKEND_DEFAULT_LOCALE", False, True),
         supported_languages=getenv("BACKEND_SUPPORTED_LANGUAGES"),
 
         cloudrun_max_instance_request_concurrency=cloudrun_max_instance_request_concurrency,

@@ -42,7 +42,7 @@ exports[`CancellableTypingChatMessage should render the Cancellable Typing Chat 
       </div>
       <a
         aria-disabled="false"
-        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1ryri3t-MuiTypography-root-MuiLink-root"
         data-testid="cancellable-typing-chat-message-cancel-button-6cbdaa24-09da-4c18-907c-7d98d210d2e9"
         style="display: inline-flex; flex-direction: row; gap: calc(clamp(2px, (2dvh + -8px + 1.5dvw + -10px)/2 , 8px) * 0.25); vertical-align: bottom;"
       >

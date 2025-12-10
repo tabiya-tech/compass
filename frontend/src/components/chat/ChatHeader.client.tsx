@@ -26,7 +26,7 @@ export const ChatHeader = ({ sessionId }: Readonly<ChatHeaderProps>) => {
           href="#"
           className="text-4xl font-bold bg-gradient-to-r from-lime-500 to-lime-400 bg-clip-text text-transparent"
         >
-          Compass
+          Brújula
         </Link>
       </div>
       <Button

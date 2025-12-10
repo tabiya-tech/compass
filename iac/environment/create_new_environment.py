@@ -89,7 +89,7 @@ def create_new_environment(*,
 
     # The next step is to enable the required GCP APIs for the environment.
     # Otherwise, the environment will not be able to use the GCP services that require these APIs.
-    # The following APIs are required by the GCP services that Compass uses.
+    # The following APIs are required by the GCP services that Brújula uses.
     # The APIs are enabled in a specific order to avoid any issues.
 
     # GCP APIs that must be enabled first in order to enable other GCP APIs

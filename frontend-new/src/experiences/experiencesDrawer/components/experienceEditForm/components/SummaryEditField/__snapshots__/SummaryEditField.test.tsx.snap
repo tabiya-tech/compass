@@ -6,11 +6,11 @@ exports[`SummaryEditField should render with initial summary and no error 1`] = 
   data-testid="form-summary-b1a6b2cd-cfac-46ff-9c35-0298d87def6b"
 >
   <div
-    class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-multiline css-1fv69vb-MuiInputBase-root-MuiOutlinedInput-root"
+    class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-multiline css-obke3q-MuiInputBase-root-MuiOutlinedInput-root"
   >
     <textarea
       aria-invalid="false"
-      class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+      class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-efmhw3-MuiInputBase-input-MuiOutlinedInput-input"
       id=":r0:"
       maxlength="1001"
       placeholder="Summary of experience"
@@ -20,7 +20,7 @@ exports[`SummaryEditField should render with initial summary and no error 1`] = 
     </textarea>
     <textarea
       aria-hidden="true"
-      class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+      class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-efmhw3-MuiInputBase-input-MuiOutlinedInput-input"
       readonly=""
       style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
       tabindex="-1"

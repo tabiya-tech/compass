@@ -1,6 +1,6 @@
 # Agent-based design
 
-The Brujula conversational agent under the hood is designed as a set of agents interacting together. Agents may have 
+The Brújula conversational agent under the hood is designed as a set of agents interacting together. Agents may have 
 "sub-agents" if they are complex enough. 
 
 Agents are coordinated by the **AgentDirector**.

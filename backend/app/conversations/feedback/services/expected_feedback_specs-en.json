@@ -1,29 +1,29 @@
 [
   {
     "question_id": "interaction_ease",
-    "question_text": "How easy or difficult was it to interact with Brujula and understand its responses?",
+    "question_text": "How easy or difficult was it to interact with Brújula and understand its responses?",
     "description": "This question is used to measure the Customer Effort Score (CES). The response is on a scale from 1 (Very difficult) to 5 (Very easy).",
     "answer": {
       "rating_numeric": 1,
       "rating_boolean": false,
       "selected_options": {},
-      "comment": "This was very difficult to interact with Brujula and understand its responses."
+      "comment": "This was very difficult to interact with Brújula and understand its responses."
     }
   },
   {
     "question_id": "clarity_of_skills",
-    "question_text": "Did Brujula help you gain a clearer understanding of your skills? If not, why?",
-    "description": "This question aims to measure Perceived Usefulness (PU). The user can answer TRUE (indicating Brujula helped) or FALSE (indicating Brujula did not help), with an optional text field for additional comments.",
+    "question_text": "Did Brújula help you gain a clearer understanding of your skills? If not, why?",
+    "description": "This question aims to measure Perceived Usefulness (PU). The user can answer TRUE (indicating Brújula helped) or FALSE (indicating Brújula did not help), with an optional text field for additional comments.",
     "answer": {
       "rating_numeric": 1,
       "rating_boolean": false,
       "selected_options": {},
-      "comment": "Brujula did not help me gain a clearer understanding of my skills."
+      "comment": "Brújula did not help me gain a clearer understanding of my skills."
     }
   },
   {
     "question_id": "satisfaction_with_compass",
-    "question_text": "How satisfied are you with Brujula?",
+    "question_text": "How satisfied are you with Brújula?",
     "description": "This question is used to measure the Customer Satisfaction Score (CSAT). The response is on a scale from 1 (Very dissatisfied) to 5 (Very satisfied).",
     "answer": {
       "rating_numeric": 1,
@@ -33,7 +33,7 @@
   },
   {
     "question_id": "work_experience_accuracy",
-    "question_text": "Were there any aspects of your work experience information identified by Brujula that were inaccurate?",
+    "question_text": "Were there any aspects of your work experience information identified by Brújula that were inaccurate?",
     "description": "This question to identify specific inaccuracies in the work experience information. The response is an array of selected option keys, with optional additional comments.",
     "answer": {
       "rating_numeric": null,
@@ -45,44 +45,44 @@
         "duplicate_experience": "Duplicate Experiences",
         "missing_experience": "Missing Experiences"
       },
-      "comment": "I found the following inaccuracies in my work experience information identified by Brujula: ..."
+      "comment": "I found the following inaccuracies in my work experience information identified by Brújula: ..."
     }
   },
   {
     "question_id": "incorrect_skills",
-    "question_text": "Are there any skills that Brujula incorrectly identified for you?",
+    "question_text": "Are there any skills that Brújula incorrectly identified for you?",
     "description": "This question aims to indentify incorrectly identified skills The user can answer TRUE (indicating incorrect skills) or FALSE (indicating no incorrect skills). In case of TRUE, the user can provide additional comments.",
     "answer": {
       "rating_numeric": null,
       "rating_boolean": true,
       "selected_options": {},
-      "comment": "Brujula incorrectly identified the following skills for me: ..."
+      "comment": "Brújula incorrectly identified the following skills for me: ..."
     }
   },
   {
     "question_id": "missing_skills",
-    "question_text": "Are there any skills you have that Brujula missed and did not identify?",
+    "question_text": "Are there any skills you have that Brújula missed and did not identify?",
     "description": "This question aims to identify missing skills. Responses should be TRUE (indicating missing skills) or FALSE (indicating no missing skills). In case of TRUE, the user can provide additional comments.",
     "answer": {
       "rating_numeric": null,
       "rating_boolean": true,
       "selected_options": {},
-      "comment": "I have the following skills that Brujula did not identify: ..."
+      "comment": "I have the following skills that Brújula did not identify: ..."
     }
   },
   {
     "question_id": "perceived_bias",
-    "question_text": "Did you feel that Brujula treated you unfairly by making assumptions about your background, language, or other personal characteristics? If so, please describe your experience.",
+    "question_text": "Did you feel that Brújula treated you unfairly by making assumptions about your background, language, or other personal characteristics? If so, please describe your experience.",
     "description": "This question aims to identify perceived bias. Responses should be TRUE (indicating bias) or FALSE (indicating no bias), with an optional text field for additional comments.",
     "answer": {"rating_numeric": null,
       "rating_boolean": true,
       "selected_options": {},
-      "comment": "I felt that Brujula treated me unfairly by making assumptions about my background, language, or other personal characteristics. For example, ..."
+      "comment": "I felt that Brújula treated me unfairly by making assumptions about my background, language, or other personal characteristics. For example, ..."
     }
   },
   {
     "question_id": "recommendation",
-    "question_text": "How likely are you to recommend Brujula to other job seekers?",
+    "question_text": "How likely are you to recommend Brújula to other job seekers?",
     "description": "This question is used to measure the Net Promoter Score (NPS). The response is on a scale from 1 (Not at all likely) to 5 (Extremely likely).",
     "answer": {
       "rating_numeric": 1,
@@ -92,13 +92,13 @@
   },
   {
     "question_id": "additional_feedback",
-    "question_text": "Please share any additional feedback or suggestions you have for improving Brujula.",
-    "description": "Used to collect any additional feedback or suggestions for improving Brujula from the user. The response is in the form of a text.",
+    "question_text": "Please share any additional feedback or suggestions you have for improving Brújula.",
+    "description": "Used to collect any additional feedback or suggestions for improving Brújula from the user. The response is in the form of a text.",
     "answer": {
       "rating_numeric": null,
       "rating_boolean": null,
       "selected_options": {},
-      "comment": "I have the following feedback or suggestions for improving Brujula: ..."
+      "comment": "I have the following feedback or suggestions for improving Brújula: ..."
     }
   }
 ]

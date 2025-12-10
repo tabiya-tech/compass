@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from app.agent.experience import WorkType
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
-from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_AGENT_CHARACTER
+from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.countries import Country, get_country_glossary
 from app.vector_search.esco_entities import SkillEntity
@@ -87,7 +87,7 @@ class ExperienceSummarizer:
             """)
         return replace_placeholders_with_indent(
             _summarize_system_instructions,
-            language_style=STD_LANGUAGE_STYLE,
+            language_style=get_language_style(),
             country_instructions=_country_instructions
         )
 

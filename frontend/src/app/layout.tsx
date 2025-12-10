@@ -3,8 +3,8 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tabiya Compass",
-  description: "Tabiya Compass is a chat application that helps you navigate your way to a better job.",
+  title: "Brújula",
+  description: "Brújula is a chat application that helps you navigate your way to a better job.",
 };
 
 export const viewport = {

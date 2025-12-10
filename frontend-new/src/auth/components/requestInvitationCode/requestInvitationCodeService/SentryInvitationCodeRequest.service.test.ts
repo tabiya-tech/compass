@@ -16,7 +16,7 @@ describe("requestInvitationCode", () => {
     const requestData = {
       name: "John Doe",
       email: "john@example.com",
-      message: "I want to try Brujula",
+      message: "I want to try Brújula",
     };
 
     // WHEN requesting an invitation code
@@ -46,7 +46,7 @@ describe("requestInvitationCode", () => {
     const requestData = {
       name: "John Doe",
       email: "john@example.com",
-      message: "I want to try Brujula",
+      message: "I want to try Brújula",
     };
 
     // WHEN requesting an invitation code AND it fails

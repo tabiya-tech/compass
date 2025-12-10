@@ -21,7 +21,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
         class="MuiBox-root css-192qrng"
       >
         <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-sgk6ea-MuiButtonBase-root-MuiIconButton-root"
           data-testid="experiences-drawer-more-button-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
           tabindex="0"
           title="More options"
@@ -102,7 +102,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     data-testid="experiences-drawer-skills-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
   >
     <div
-      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1n9e303-MuiButtonBase-root-MuiChip-root"
+      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-xehbfk-MuiButtonBase-root-MuiChip-root"
       data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
       role="button"
       tabindex="0"
@@ -117,7 +117,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
       />
     </div>
     <div
-      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1n9e303-MuiButtonBase-root-MuiChip-root"
+      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-xehbfk-MuiButtonBase-root-MuiChip-root"
       data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
       role="button"
       tabindex="0"
@@ -138,7 +138,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     <div
       data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-header-message"
     >
-      These actions will become available once you have discussed the experience in detail with Brujula.
+      These actions will become available once you have discussed the experience in detail with Brújula.
     </div>
     <div
       data-disabled="true"
@@ -179,12 +179,12 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent skeleton cor
       class="MuiBox-root css-yj95vr"
     >
       <span
-        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-qn5ikh-MuiSkeleton-root"
+        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-1djazo1-MuiSkeleton-root"
         data-testid="skeleton-text"
         style="width: 60%;"
       />
       <span
-        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-qn5ikh-MuiSkeleton-root"
+        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-1djazo1-MuiSkeleton-root"
         data-testid="skeleton-text"
         style="width: 90%;"
       />
@@ -193,7 +193,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent skeleton cor
       class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4 css-gj1fbr-MuiGrid-root"
     >
       <span
-        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-qn5ikh-MuiSkeleton-root"
+        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-1djazo1-MuiSkeleton-root"
         data-testid="skeleton-text"
         style="width: 80%;"
       />

@@ -7,7 +7,7 @@ exports[`ChatProgresBar render tests should render the progress bar with the cor
 >
   <div
     data-testid="chat-progress-bar-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
-    style="background-color: rgb(41, 174, 179); height: 100%; grid-row: 1; border-radius: 4px; grid-column: 1; width: 74.99517%;"
+    style="background-color: rgb(41, 174, 179); height: 100%; grid-row: 1; border-radius: 4px; grid-column: 1; width: 75%;"
   />
   <div
     class="MuiBox-root css-1d3l42j"

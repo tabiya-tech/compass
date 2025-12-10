@@ -358,7 +358,7 @@ exports[`Report should render Report correctly 1`] = `
           x="0"
           y="0"
         >
-          Below, you will find a list of the skills discovered during your conversation with Brujula, along with their descriptions.
+          Below, you will find a list of the skills discovered during your conversation with Brújula, along with their descriptions.
         </text>
         <view
           style="border: 1px; margin-top: 12px; margin-bottom: 20px;"
@@ -426,7 +426,7 @@ exports[`Report should render Report correctly 1`] = `
           x="0"
           y="0"
         >
-          This report summarises the key information gathered during a conversation with Brujula on June 1, 2021. Brujula is an AI chatbot that helps job seekers explore their skills and experiences. This information can be used to guide the job search and highlight their skills when applying, especially during interviews with potential employers.
+          experiences.report.disclaimer.final
         </text>
       </view>
     </view>

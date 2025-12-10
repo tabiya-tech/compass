@@ -8,7 +8,7 @@ import { ConversationMessageSender } from "src/chat/ChatService/ChatService.type
 describe("render tests", () => {
   test("should render the Chat Bubble without a child if none is passed", () => {
     // GIVEN a message
-    const givenMessage: string = "Hello, I'm Brujula";
+    const givenMessage: string = "Hello, I'm Brújula";
     // AND a sender
     const givenSender: ConversationMessageSender = ConversationMessageSender.COMPASS;
 
@@ -26,7 +26,7 @@ describe("render tests", () => {
 
   test("should render the Chat Bubble with a child if one is passed", () => {
     // GIVEN a message
-    const givenMessage: string = "Hello, I'm Brujula";
+    const givenMessage: string = "Hello, I'm Brújula";
     // AND a sender
     const givenSender: ConversationMessageSender = ConversationMessageSender.COMPASS;
     // AND a footer

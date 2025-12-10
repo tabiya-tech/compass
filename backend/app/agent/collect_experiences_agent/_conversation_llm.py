@@ -9,7 +9,8 @@ from app.agent.collect_experiences_agent._types import CollectedData
 from app.agent.experience import ExperienceEntity
 from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT, WorkType
 from app.agent.penalty import get_penalty
-from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER, STD_LANGUAGE_STYLE
+from app.agent.prompt_template import get_language_style
+from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory
@@ -17,8 +18,7 @@ from app.countries import Country
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
 from common_libs.retry import Retry
-from app.i18n.translation_service import t
-from app.i18n.locale_detector import get_locale_hint
+from app.i18n.translation_service import t, get_i18n_manager
 
 _NO_EXPERIENCE_COLLECTED = "No experience data has been collected yet"
 _FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step."
@@ -67,15 +67,15 @@ def _get_incomplete_experiences_instructions(collected_data: list[CollectedData]
             Only move on to exploring new work types after you have gathered all available information for incomplete experiences.
     """)
     
-    return replace_placeholders_with_indent(instructions_template, 
-                                            language_style=STD_LANGUAGE_STYLE,
+    return replace_placeholders_with_indent(instructions_template,
+                                            language_style=get_language_style(),
                                             incomplete_experiences_list=incomplete_experiences_text)
 
 
 def _no_experience_collected_text() -> str:
     """Return translated text for 'no experience collected yet' with safe fallback."""
     try:
-        return t("messages", "collect_experiences.no_experience_collected")
+        return t("messages", "collectExperiences.noExperienceCollected")
     except Exception:
         return _NO_EXPERIENCE_COLLECTED
 
@@ -83,7 +83,7 @@ def _no_experience_collected_text() -> str:
 def _translate_field(field_key: str) -> str:
     """Translate a field identifier to a localized label, with safe fallback to the key itself."""
     try:
-        return t("messages", f"collect_experiences.fields.{field_key}")
+        return t("messages", f"collectExperiences.fields.{field_key}")
     except Exception:
         return field_key
 
@@ -239,11 +239,7 @@ class _ConversationLLM:
                 (system_instructions if isinstance(system_instructions, str) else "\n".join(system_instructions or [])),
                 llm_input,
             )
-            # i18n: generic fallback when LLM returns empty
-            try:
-                _didnt_understand = t("messages", "collect_experiences.did_not_understand")
-            except Exception:
-                _didnt_understand = "Sorry, I didn't understand that. Can you please rephrase?"
+            _didnt_understand = t("messages", "collectExperiences.didNotUnderstand")
             return ConversationLLMAgentOutput(
                 message_for_user=_didnt_understand,
                 exploring_type_finished=False,
@@ -262,11 +258,7 @@ class _ConversationLLM:
                 logger.warning("The response contains '<END_OF_WORKTYPE>' and additional text: %s", llm_response.text)
             exploring_type_finished = True
             finished = False
-            # i18n: prompt user to proceed to other experiences
-            try:
-                llm_response.text = t("messages", "collect_experiences.move_to_other_experiences")
-            except Exception:
-                llm_response.text = "Let's move on to other work experiences."
+            llm_response.text = t("messages", "collectExperiences.moveToOtherExperiences")
 
         if llm_response.text.find("<END_OF_CONVERSATION>") != -1:
             if llm_response.text != "<END_OF_CONVERSATION>":
@@ -275,12 +267,8 @@ class _ConversationLLM:
                 penalty = get_penalty(conversation_prematurely_ended_penalty_level)
                 error = ValueError(f"LLM response contains '<END_OF_CONVERSATION>' but there are unexplored types: {unexplored_types}")
                 logger.error(error)
-
-            # i18n: final message at the end of conversation
-            try:
-                llm_response.text = t("messages", "collect_experiences.final_message")
-            except Exception:
-                llm_response.text = _FINAL_MESSAGE
+            
+            llm_response.text = t("messages", "collectExperiences.finalMessage")
             exploring_type_finished = False
             finished = True
 
@@ -447,7 +435,7 @@ class _ConversationLLM:
         return replace_placeholders_with_indent(system_instructions_template,
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 agent_character=STD_AGENT_CHARACTER,
-                                                language_style=STD_LANGUAGE_STYLE,
+                                                language_style=get_language_style(),
                                                 exploring_type_instructions=_get_explore_experiences_instructions(
                                                     collected_data=collected_data,
                                                     exploring_type=exploring_type,
@@ -495,7 +483,7 @@ class _ConversationLLM:
                 """)
         return replace_placeholders_with_indent(first_time_generative_prompt,
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
-                                                language_style=STD_LANGUAGE_STYLE,
+                                                language_style=get_language_style(),
                                                 question_to_ask=_ask_experience_type_question(exploring_type))
 
 
@@ -541,7 +529,7 @@ def _transition_instructions(*,
         ///    {excluding_experiences}
         """)
         return replace_placeholders_with_indent(_instructions,
-                                                language_style=STD_LANGUAGE_STYLE,
+                                                language_style=get_language_style(),
                                                 exploring_type=_get_experience_type(exploring_type),
                                                 # excluding_experiences=_get_excluding_experiences(exploring_type)
                                                 )
@@ -550,40 +538,38 @@ def _transition_instructions(*,
         duplicate_hint = ""
         if len(collected_data) > 1:
             duplicate_hint = "Also, with the above question inform me that if one of the work experiences seems to be duplicated, I can ask you to remove it.\n"
-
-        if not final_summary_sent:
-            summarize_and_confirm = dedent("""
-                Explicitly summarize all the work experiences you collected and explicitly ask me if I would like to add or change anything in the information 
-                you collected before moving forward to the next step. 
-                
-                {language_style}
-                {summary_language_hint}
+        user_language = get_i18n_manager().get_locale().value
+        summarize_and_confirm = dedent("""
+            Explicitly summarize all the work experiences you collected and explicitly ask me if I would like to add or change anything in the information 
+            you collected before moving forward to the next step. 
+            
+            {language_style}
                                                                   
-                Ask me (in the language style indicated above - using the same language as the rest of the conversation): 
-                    "Let's recap the information we have collected so far: 
-                    {summary_of_experiences}
-                    Is there anything you would like to add or change?"
-                The summary is in plain text (no Markdown, JSON, or other formats).
-                {duplicate_hint}             
-                You must wait for me to respond to your question and explicitly confirm that I have nothing to add or change 
-                to the information presented in the summary. 
-                
-                if I have something to add or change, you will ask me to provide the missing information or correct the information
-                before evaluating if you can transition to the next step.
-                
-                Then, you will respond by saying <END_OF_CONVERSATION> to end the conversation and move to the next step.
-                You will not add anything before or after the <END_OF_CONVERSATION> message.   
-                
-                You will not ask any questions or make any suggestions regarding the next step. 
-                It is not your responsibility to conduct the next step.
-                
-                You must perform the summarization and confirmation step before ending the conversation.
-                """)
-            return replace_placeholders_with_indent(summarize_and_confirm,
-                                                    language_style=STD_LANGUAGE_STYLE,
-                                                    summary_language_hint=summary_language_hint,
-                                                    summary_of_experiences=_get_summary_of_experiences(collected_data),
-                                                    duplicate_hint=duplicate_hint)
+            Ask me in {user_language} language: 
+                "Let's recap the information we have collected so far: 
+                {summary_of_experiences}
+                Is there anything you would like to add or change?".
+            The summary is in plain text (no Markdown, JSON, or other formats).
+            {duplicate_hint}             
+            You must wait for me to respond to your question and explicitly confirm that I have nothing to add or change 
+            to the information presented in the summary. 
+            
+            if I have something to add or change, you will ask me to provide the missing information or correct the information
+            before evaluating if you can transition to the next step.
+            
+            Then, you will respond by saying <END_OF_CONVERSATION> to end the conversation and move to the next step.
+            You will not add anything before or after the <END_OF_CONVERSATION> message.   
+            
+            You will not ask any questions or make any suggestions regarding the next step. 
+            It is not your responsibility to conduct the next step.
+            
+            You must perform the summarization and confirmation step before ending the conversation.
+            """)
+        return replace_placeholders_with_indent(summarize_and_confirm,
+                                                language_style=get_language_style(),
+                                                user_language=user_language,
+                                                summary_of_experiences=_get_summary_of_experiences(collected_data),
+                                                duplicate_hint=duplicate_hint)
 
         if not final_summary_confirmed:
             wait_for_confirmation = dedent("""
@@ -641,24 +627,22 @@ def _get_missing_fields(collected_data: list[CollectedData], index: int) -> str:
 
     missing_fields = []
     if experience_data.experience_title is None:
-        missing_fields.append("experience_title")
+        missing_fields.append("experienceTitle")
     # if experience_data.paid_work is None:
     #    missing_fields.append("paid_work")
     # if experience_data.work_type is None:
     #    missing_fields.append("work_type")
     if experience_data.start_date is None:
-        missing_fields.append("start_date")
+        missing_fields.append("startDate")
     if experience_data.end_date is None:
-        missing_fields.append("end_date")
+        missing_fields.append("endDate")
     if experience_data.company is None:
         missing_fields.append("company")
     # if experience_data.location is None:
     #     missing_fields.append("location")
     if len(missing_fields) == 0:
-        try:
-            return t("messages", "collect_experiences.all_fields_filled")
-        except Exception:
-            return "All fields have been filled."
+       return t("messages", "collectExperiences.allFieldsFilled")
+
     # Localize field labels
     return ", ".join([_translate_field(f) for f in missing_fields])
 
@@ -671,56 +655,38 @@ def _get_not_missing_fields(collected_data: list[CollectedData], index: int) -> 
 
     not_missing_fields = []
     if experience_data.experience_title is not None:
-        not_missing_fields.append("experience_title")
+        not_missing_fields.append("experienceTitle")
     # if experience_data.paid_work is not None:
     #    not_missing_fields.append("paid_work")
     # if WorkType.from_string_key(experience_data.work_type) is not None:
     #    not_missing_fields.append("work_type")
     if experience_data.start_date is not None:
-        not_missing_fields.append("start_date")
+        not_missing_fields.append("startDate")
     if experience_data.end_date is not None:
-        not_missing_fields.append("end_date")
+        not_missing_fields.append("endDate")
     if experience_data.company is not None:
         not_missing_fields.append("company")
     # if experience_data.location is not None:
     #     not_missing_fields.append("location")
     if len(not_missing_fields) == 0:
-        try:
-            return t("messages", "collect_experiences.all_fields_not_filled")
-        except Exception:
-            return "All fields are not filled."
+        return t("messages", "collectExperiences.allFieldsNotFilled")
     # Localize field labels
     return ", ".join([_translate_field(f) for f in not_missing_fields])
 
 
 def _get_experience_type(work_type: WorkType | None) -> str:
     if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-        try:
-            return t("messages", "collect_experiences.work_type.formal_waged_description")
-        except Exception:
-            return "working for a company or someone else's business for money"
+        return t("messages", "collectExperiences.workType.formalWagedDescription")
     elif work_type == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
-        try:
-            return t("messages", "collect_experiences.work_type.unpaid_trainee_description")
-        except Exception:
-            return "unpaid work as a trainee for a company or organization"
+        return t("messages", "collectExperiences.workType.unpaidTraineeDescription")
     elif work_type == WorkType.SELF_EMPLOYMENT:
-        try:
-            return t("messages", "collect_experiences.work_type.self_employment_description")
-        except Exception:
-            return "running my own business, doing freelance or contract work"
+        return t("messages", "collectExperiences.workType.selfEmploymentDescription")
     elif work_type == WorkType.UNSEEN_UNPAID:
-        try:
-            return t("messages", "collect_experiences.work_type.unseen_unpaid_description")
-        except Exception:
-            return "unpaid work such as community volunteering, caregiving for own or another family, helping in a household"
+        return t("messages", "collectExperiences.workType.unseenUnpaidDescription")
     elif work_type is None:
-        try:
-            return t("messages", "collect_experiences.work_type.none_description")
-        except Exception:
-            return "no work experience"
+        return t("messages", "collectExperiences.workType.noneDescription")
     else:
-        raise ValueError("The work type is not supported")
+        raise ValueError(t("messages", "collectExperiences.workType.notSupported"))
 
 
 def _get_experience_types(work_type: list[WorkType]) -> str:
@@ -809,7 +775,7 @@ def _get_explore_experiences_instructions(*,
         return replace_placeholders_with_indent(instructions_template,
                                                 questions_to_ask=questions_to_ask,
                                                 experiences_in_type=experiences_in_type,
-                                                language_style=STD_LANGUAGE_STYLE,
+                                                language_style=get_language_style(),
                                                 # excluding_experiences=excluding_experiences,
                                                 # already_explored_types=already_explored_types,
                                                 # not_explored_types=not_explored_types,
@@ -843,7 +809,7 @@ def _get_summary_of_experiences(collected_data: list[CollectedData]) -> str:
     for experience in collected_data:
         summary += "• " + ExperienceEntity.get_structured_summary(
             experience_title=experience.experience_title or "",
-            # location=experience.location,
+            location=experience.location,
             work_type=experience.work_type,
             start_date=experience.start_date,
             end_date=experience.end_date,

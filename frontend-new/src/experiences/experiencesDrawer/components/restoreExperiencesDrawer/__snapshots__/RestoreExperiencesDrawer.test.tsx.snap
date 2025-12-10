@@ -11,12 +11,12 @@ exports[`RestoreExperiencesDrawer should render deleted experiences when availab
     data-testid="experiences-drawer-header-container-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
   >
     <h5
-      class="MuiTypography-root MuiTypography-h5 css-vmt1ul-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h5 css-nbrps5-MuiTypography-root"
     >
       Restore Experiences
     </h5>
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-xu2vll-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12d7bfg-MuiButtonBase-root-MuiIconButton-root"
       data-testid="experiences-drawer-header-button-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
       tabindex="0"
       title="Close experiences"
@@ -52,7 +52,7 @@ exports[`RestoreExperiencesDrawer should render deleted experiences when availab
         class="MuiBox-root css-1kkt86i"
       >
         <h6
-          class="MuiTypography-root MuiTypography-subtitle1 css-15jwqi5-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-subtitle1 css-1fezak8-MuiTypography-root"
           data-testid="restore-experience-title-086216b2-a180-4a13-ac3c-cfd23f46153f"
         >
           Software Engineer
@@ -83,14 +83,14 @@ exports[`RestoreExperiencesDrawer should render deleted experiences when availab
         class="MuiBox-root css-192qrng"
       >
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-an9y8j-MuiButtonBase-root-MuiButton-root"
           data-testid="restore-experience-button-086216b2-a180-4a13-ac3c-cfd23f46153f"
           tabindex="0"
           title="Restore"
           type="button"
         >
           <span
-            class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1d6wzja-MuiButton-startIcon"
+            class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-gcc2o7-MuiButton-startIcon"
           >
             <img
               alt="Restore"

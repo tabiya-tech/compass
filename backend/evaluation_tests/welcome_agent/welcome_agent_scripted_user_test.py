@@ -7,6 +7,8 @@ import pytest
 from app.agent.welcome_agent import WelcomeAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
+from app.i18n.translation_service import get_i18n_manager
+from app.i18n.types import Locale
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from common_libs.test_utilities import get_random_session_id
 from common_libs.test_utilities.guard_caplog import guard_caplog
@@ -87,6 +89,24 @@ test_cases = [
         evaluations=[]
     ),
     ScriptedUserEvaluationTestCase(
+        name='user_delays_questions_es',
+        skip_force="force",
+        locale=Locale.ES_AR,
+        simulated_user_prompt="Scripted user: user is uncertain and asks various questions",
+        scripted_user=[
+            "¿Dime cómo funciona este proceso?",
+            "¿Qué tengo que hacer?",
+            "¿Qué pasa al final?",
+            "¿Cómo empieza el proceso?",
+            "¿Qué pasa si no puedo completar el proceso?",
+            "Todavía no estoy seguro/a, ¿puedes explicar de nuevo?",
+            "¿Qué pasa si no entiendo el proceso?",
+            "¿Qué pasa si no me gusta el proceso?",
+            "Empecemos"
+        ],
+        evaluations=[Evaluation(type=EvaluationType.SINGLE_LANGUAGE, expected=100)]
+    ),
+    ScriptedUserEvaluationTestCase(
         name='user_shares_experience',
         simulated_user_prompt="Scripted user: user shares an experience during the introduction",
         scripted_user=[
@@ -135,6 +155,8 @@ async def test_welcome_agent_scripted_user(max_iterations: int,
     as the agent is expected to complete the conversation at the last input from the user
     :return:
     """
+    get_i18n_manager().set_locale(test_case.locale)
+
     print(f"Running test case {test_case.name}")
 
     session_id = get_random_session_id()

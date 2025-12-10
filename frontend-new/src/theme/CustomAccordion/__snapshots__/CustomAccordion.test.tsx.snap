@@ -2,7 +2,7 @@
 
 exports[`CustomAccordion should render CustomAccordion correctly 1`] = `
 <div
-  class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiAccordion-root MuiAccordion-rounded MuiAccordion-gutters css-1lu2ztt-MuiPaper-root-MuiAccordion-root"
+  class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiAccordion-root MuiAccordion-rounded MuiAccordion-gutters css-1tq2iqh-MuiPaper-root-MuiAccordion-root"
   data-testid="custom-accordion-container-34d24bf6-1b9b-40f1-93b3-baf68ab03da4"
 >
   <div

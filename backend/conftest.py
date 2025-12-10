@@ -9,6 +9,7 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from app.countries import Country
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.version.types import Version
+from app.i18n.types import Locale
 from app.app_config import ApplicationConfig, set_application_config, get_application_config
 
 
@@ -152,7 +153,8 @@ def setup_application_config() -> Generator[ApplicationConfig, Any, None]:
         embeddings_service_name="foo-service",
         embeddings_model_name="bar-model",
         cv_storage_bucket="foo-bucket",
-        features={}
+        features={},
+        default_language=Locale.EN_US
     )
 
     set_application_config(config)

@@ -6,12 +6,12 @@ exports[`ExperiencesDrawerHeader should render ExperiencesDrawerHeader correctly
   data-testid="experiences-drawer-header-container-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
 >
   <h5
-    class="MuiTypography-root MuiTypography-h5 css-vmt1ul-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h5 css-nbrps5-MuiTypography-root"
   >
     FOo Bar
   </h5>
   <button
-    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-xu2vll-MuiButtonBase-root-MuiIconButton-root"
+    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12d7bfg-MuiButtonBase-root-MuiIconButton-root"
     data-testid="experiences-drawer-header-button-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
     tabindex="0"
     title="Close experiences"

@@ -14,5 +14,7 @@ def create_evaluator(evaluations_type: EvaluationType) -> BaseEvaluator:
             return CriteriaEvaluator(EvaluationType.CONCISENESS)
         case EvaluationType.FOCUS:
             return CriteriaEvaluator(EvaluationType.FOCUS)
+        case EvaluationType.SINGLE_LANGUAGE:
+            return CriteriaEvaluator(EvaluationType.SINGLE_LANGUAGE)
         case _:
             raise NotImplementedError()

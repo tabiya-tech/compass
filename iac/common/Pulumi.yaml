@@ -1,4 +1,4 @@
 name: compass-common
 runtime:
   name: python
-description: Tabiya Compass BE/FE common infrastructure
+description: Brújula BE/FE common infrastructure

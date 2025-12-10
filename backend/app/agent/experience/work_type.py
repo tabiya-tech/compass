@@ -42,6 +42,19 @@ class WorkType(Enum):
             return "Volunteer/Unpaid"
         else:
             return ""
+    
+    @staticmethod
+    def work_type_short_i18n_key(work_type: WorkType) -> str:
+        if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
+            return "experience.workType.short.formalSectorWagedEmployment"
+        elif work_type == WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK:
+            return "experience.workType.short.formalSectorUnpaidTraineeWork"
+        elif work_type == WorkType.SELF_EMPLOYMENT:
+            return "experience.workType.short.selfEmployment"
+        elif work_type == WorkType.UNSEEN_UNPAID:
+            return "experience.workType.short.unseenUnpaid"
+        else:
+            return ""    
 
     @staticmethod
     def work_type_long(work_type: WorkType | None) -> str:

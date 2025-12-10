@@ -1,5 +1,5 @@
-import { useCallback, useState, useEffect, Suspense } from "react";
-import { Box, CircularProgress, Container, useMediaQuery, useTheme, Typography } from "@mui/material";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { Box, CircularProgress, Container, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -516,7 +516,7 @@ const SensitiveDataForm: React.FC = () => {
               {
                 id: "1",
                 text: (
-                  <>                  
+                  <>
                     {t("sensitiveData.components.sensitiveDataForm.skipParagraph1")}{" "}
                     <HighlightedSpan>{t("sensitiveData.components.sensitiveDataForm.skipParagraph1Highlighted")}</HighlightedSpan>
                   </>

@@ -16,9 +16,7 @@ namespace ErrorConstants {
     API_ERROR = "API_ERROR",
   }
 
-  // Map of user-friendly message identifiers to i18n translation keys.
-  // These keys are resolved at call/render time using the app's initialized i18n instance.
-  export const USER_FRIENDLY_ERROR_MESSAGE_KEYS = {
+  export const USER_FRIENDLY_ERROR_I18N_KEYS = {
     REQUEST_TOO_LONG: "common.errors.api.requestTooLong",
     TOO_MANY_REQUESTS: "common.errors.api.tooManyRequests",
     UNEXPECTED_ERROR: "common.errors.api.unexpectedError",
@@ -30,6 +28,6 @@ namespace ErrorConstants {
     SERVICE_UNAVAILABLE: "common.errors.api.serviceUnavailable",
     DATA_VALIDATION_ERROR: "common.errors.api.dataValidationError",
     UNABLE_TO_PROCESS_REQUEST: "common.errors.api.unableToProcessRequest",
-  } as const;
+  };
 }
 export default ErrorConstants;

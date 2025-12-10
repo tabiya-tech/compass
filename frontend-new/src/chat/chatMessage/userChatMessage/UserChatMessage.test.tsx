@@ -56,7 +56,7 @@ describe("render tests", () => {
     const messageData = {
       message_id: nanoid(),
       sender: ConversationMessageSender.COMPASS,
-      message: "Hello, I'm Brujula",
+      message: "Hello, I'm Brújula",
       sent_at: givenDate,
       type: USER_CHAT_MESSAGE_TYPE,
       reaction: null,

@@ -8,7 +8,7 @@ from app.agent.agent_types import LLMStats
 from app.agent.collect_experiences_agent.data_extraction_llm import clean_string_field
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
-from app.agent.prompt_template import sanitize_input
+from app.agent.prompt_template import sanitize_input, get_language_style
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
@@ -82,10 +82,7 @@ class EntityExtractionTool:
             temperature_config = {}
 
         return GeminiGenerativeLLM(
-            system_instructions=_SYSTEM_INSTRUCTIONS.format(
-                language_style=STD_LANGUAGE_STYLE,
-                language_hint=get_locale_hint("every extracted field value")
-            ),
+            system_instructions=_SYSTEM_INSTRUCTIONS.format(language_style=get_language_style()),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000
@@ -171,7 +168,6 @@ _SYSTEM_INSTRUCTIONS = """
     Do not over-suggest any information, only extract the ones provided explicitly by the user.
     
 {language_style}
-{language_hint}
         
 #Extract data instructions
     Make sure you are extracting information about experiences that should be added to the 'experience_details' field.

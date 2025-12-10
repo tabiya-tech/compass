@@ -5,7 +5,7 @@
       "rating_numeric": 1,
       "rating_boolean": false,
       "selected_options_keys": [],
-      "comment": "This was very difficult to interact with Brujula and understand its responses."
+      "comment": "This was very difficult to interact with Brújula and understand its responses."
     }
   },
   {
@@ -14,7 +14,7 @@
       "rating_numeric": 1,
       "rating_boolean": false,
       "selected_options_keys": [],
-      "comment": "Brujula did not help me gain a clearer understanding of my skills."
+      "comment": "Brújula did not help me gain a clearer understanding of my skills."
     }
   },
   {
@@ -37,7 +37,7 @@
         "duplicate_experience",
         "missing_experience"
       ],
-      "comment": "I found the following inaccuracies in my work experience information identified by Brujula: ..."
+      "comment": "I found the following inaccuracies in my work experience information identified by Brújula: ..."
     }
   },
   {
@@ -46,7 +46,7 @@
       "rating_numeric": null,
       "rating_boolean": true,
       "selected_options_keys": [],
-      "comment": "Brujula incorrectly identified the following skills for me: ..."
+      "comment": "Brújula incorrectly identified the following skills for me: ..."
     }
   },
   {
@@ -55,7 +55,7 @@
       "rating_numeric": null,
       "rating_boolean": true,
       "selected_options_keys": [],
-      "comment": "I have the following skills that Brujula did not identify: ..."
+      "comment": "I have the following skills that Brújula did not identify: ..."
     }
   },
   {
@@ -64,7 +64,7 @@
       "rating_numeric": null,
       "rating_boolean": true,
       "selected_options_keys": [],
-      "comment": "I felt that Brujula treated me unfairly by making assumptions about my background, language, or other personal characteristics. For example, ..."
+      "comment": "I felt that Brújula treated me unfairly by making assumptions about my background, language, or other personal characteristics. For example, ..."
     }
   },
   {
@@ -81,7 +81,7 @@
       "rating_numeric": null,
       "rating_boolean": null,
       "selected_options_keys": [],
-      "comment": "I have the following feedback or suggestions for improving Brujula: ..."
+      "comment": "I have the following feedback or suggestions for improving Brújula: ..."
     }
   }
 ]

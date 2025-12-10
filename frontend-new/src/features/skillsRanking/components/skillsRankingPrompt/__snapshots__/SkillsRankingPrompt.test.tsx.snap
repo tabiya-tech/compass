@@ -26,7 +26,7 @@ exports[`SkillsRankingPrompt snapshot: initial render in INITIAL phase (non-repl
           origin="COMPASS"
         >
           <div
-            class="MuiBox-root css-u9ttk8"
+            class="MuiBox-root css-9qh4u2"
             data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
             origin="COMPASS"
           >

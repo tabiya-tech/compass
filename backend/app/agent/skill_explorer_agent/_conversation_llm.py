@@ -5,7 +5,8 @@ from textwrap import dedent
 
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMStats
 from app.agent.experience.work_type import WorkType
-from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER, STD_LANGUAGE_STYLE
+from app.agent.prompt_template import get_language_style
+from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
@@ -17,7 +18,7 @@ from app.i18n.translation_service import t
 
 
 # centralize use for skill_explorer_agent and conversation_llm_test
-_FINAL_MESSAGE = t("messages", "explore_experiences.no_more_experiences")
+_FINAL_MESSAGE_KEY = "exploreExperiences.noMoreExperiences"
 
 
 class _ConversationLLM:
@@ -138,17 +139,17 @@ class _ConversationLLM:
                            llm_input)
 
             return AgentOutput(
-                message_for_user=t("messages", "collect_experiences.did_not_understand"),
+                message_for_user=t("messages", "collectExperiences.didNotUnderstand"),
                 finished=False,
                 agent_type=AgentType.EXPLORE_SKILLS_AGENT,
                 agent_response_time_in_sec=round(llm_end_time - llm_start_time, 2),
                 llm_stats=[llm_stats]), 100, ValueError("LLM response is empty")
 
         if llm_response.text == "<END_OF_CONVERSATION>":
-            llm_response.text = t("messages", "explore_skills.final_message")
+            llm_response.text = t("messages", "exploreSkills.finalMessage")
             finished = True
         if llm_response.text.find("<END_OF_CONVERSATION>") != -1:
-            llm_response.text = t("messages", "explore_skills.final_message")
+            llm_response.text = t("messages", "exploreSkills.finalMessage")
             finished = True
             logger.warning("The response contains '<END_OF_CONVERSATION>' and additional text: %s", llm_response.text)
 
@@ -247,7 +248,7 @@ class _ConversationLLM:
             country_of_user_segment=_get_country_of_user_segment(country_of_user),
             question_asked_until_now="\n".join(f"- \"{s}\"" for s in question_asked_until_now),
             agent_character=STD_AGENT_CHARACTER,
-            language_style=STD_LANGUAGE_STYLE,
+            language_style=get_language_style(),
             experience_title=f"'{experience_title}'",
             work_type=f" ({WorkType.work_type_short(work_type)})" if work_type is not None else ""
         )
@@ -300,7 +301,7 @@ class _ConversationLLM:
                                                 experiences_explored_instructions=experiences_explored_instructions,
                                                 experience_title=f"'{experience_title}'",
                                                 work_type=f" ({WorkType.work_type_short(work_type)})" if work_type is not None else "",
-                                                language_style=STD_LANGUAGE_STYLE,
+                                                language_style=get_language_style(),
                                                 )
 
 
@@ -310,16 +311,15 @@ def _get_country_of_user_segment(country_of_user: Country) -> str:
     return f" living in {country_of_user.value}"
 
 
-# for now, keep the function but it is not being used
-# def _get_question_b(work_type: WorkType) -> str:
-#     """
-#     Get the question for the specific work type
-#     """
-#     if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-#         return t("messages", "explore_skills.question.formal_waged")
-#     elif work_type == WorkType.SELF_EMPLOYMENT:
-#         return t("messages", "explore_skills.question.self_employment")
-#     elif work_type == WorkType.UNSEEN_UNPAID:
-#         return t("messages", "explore_skills.question.unseen_unpaid")
-#     else:
-#         return ""
+def _get_question_c(work_type: WorkType) -> str:
+    """
+    Get the question for the specific work type
+    """
+    if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
+        return t("messages", "exploreSkills.question.formalWaged")
+    elif work_type == WorkType.SELF_EMPLOYMENT:
+        return t("messages", "exploreSkills.question.selfEmployment")
+    elif work_type == WorkType.UNSEEN_UNPAID:
+        return t("messages", "exploreSkills.question.unseenUnpaid")
+    else:
+        return ""

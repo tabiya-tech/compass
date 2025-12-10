@@ -209,9 +209,9 @@ The Google OAuth enables Google Sign-In and requires a privacy page, a consent s
 ### Step 2.2: Set up OAuth Consent Screen.
 
 **Set up the OAuth consent screen** under **API & Services** → **OAuth consent screen** → **Get started**:
-- **App Name**: `<app-name>` (e.g., *Brujula by Tabiya*)
+- **App Name**: `<app-name>` (e.g., *Brújula by Fundacion Empujar*)
 - **User Support Email**: `<support-email>`
-- **Audience**: `External`. Brujula is a public application. Not an internal one.
+- **Audience**: `External`. Brújula is a public application. Not an internal one.
 - **Contact Information**: `<developer contact email>`
 - Complete the form and submit.
 

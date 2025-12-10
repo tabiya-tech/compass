@@ -9,7 +9,7 @@ from app.agent.agent_types import LLMStats
 from app.agent.experience.work_type import WorkType
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty_for_multiple_errors
-from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_AGENT_CHARACTER
+from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.countries import Country, get_country_glossary
 from common_libs.llm.generative_models import GeminiGenerativeLLM
@@ -71,7 +71,7 @@ def _get_system_instructions(country_of_interest: Country, number_of_titles: int
         """)
     return replace_placeholders_with_indent(system_instructions_template,
                                             country_of_interest=country_of_interest.value,
-                                            language_style=STD_LANGUAGE_STYLE,
+                                            language_style=get_language_style(),
                                             work_type_names=", ".join([work_type.name for work_type in WorkType]),
                                             glossary=glossary_str,
                                             number_of_titles=f"{number_of_titles}")

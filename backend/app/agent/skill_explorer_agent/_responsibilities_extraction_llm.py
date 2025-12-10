@@ -8,7 +8,7 @@ from pydantic import Field
 from app.agent.agent_types import LLMStats
 from app.agent.experience.experience_entity import ResponsibilitiesData
 from app.agent.llm_caller import LLMCaller
-from app.agent.prompt_template import sanitize_input
+from app.agent.prompt_template import sanitize_input, get_language_style
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
@@ -151,7 +151,7 @@ class _ResponsibilitiesExtractionLLM:
         </System Instructions>
         """)
 
-        return system_instructions_template.format(language_style=STD_LANGUAGE_STYLE)
+        return system_instructions_template.format(language_style=get_language_style())
 
     @staticmethod
     def _extraction_prompt_template(context: ConversationContext, last_user_input: str) -> str:

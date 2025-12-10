@@ -11,7 +11,7 @@ exports[`SkillsRankingRetypedRank snapshot: initial render in RETYPED_RANK (non-
       class="MuiBox-root css-8atqhb"
     >
       <div
-        class="MuiBox-root css-u9ttk8"
+        class="MuiBox-root css-9qh4u2"
         data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
         origin="COMPASS"
       >
@@ -46,7 +46,7 @@ exports[`SkillsRankingRetypedRank snapshot: initial render in RETYPED_RANK (non-
               class="MuiBox-root css-k6jh9e"
             >
               <button
-                class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+                class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-an9y8j-MuiButtonBase-root-MuiButton-root"
                 data-testid="skills-ranking-retyped-rank-submit-button-eb90de4c-2462-4b6d-8b9c-1b5c6ae64129"
                 disabled=""
                 tabindex="-1"

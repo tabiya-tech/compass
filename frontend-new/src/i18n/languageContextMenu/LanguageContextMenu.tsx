@@ -5,7 +5,8 @@ import { useTheme } from "@mui/material";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { useTranslation } from "react-i18next";
-import { getSupportedLanguages } from "src/envService";
+import { getSupportedLocales } from "src/envService";
+import { Locale } from "src/i18n/constants";
 
 const uniqueId = "f4d06e4b-0e0c-49c7-ad93-924c5ac89070";
 
@@ -29,14 +30,19 @@ export const MENU_ITEM_TEXT = {
   FRENCH: `French`,
 };
 
-const LanguageContextMenu = () => {
+export type LanguageContextMenuProps = {
+  /** If true, removes the margin from the button to allow consistent spacing in different contexts */
+  removeMargin?: boolean;
+};
+
+const LanguageContextMenu: React.FC<LanguageContextMenuProps> = ({ removeMargin = false }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
 
   // --- Parse supported languages from environment config
   let supportedLanguages: string[] = [];
   try {
-    const configJson = getSupportedLanguages();
+    const configJson = getSupportedLocales();
     if (configJson) {
       supportedLanguages = JSON.parse(configJson);
     } else {
@@ -55,33 +61,27 @@ const LanguageContextMenu = () => {
     {
       id: MENU_ITEM_ID.AUTH_ENGLISH_SELECTOR,
       text: MENU_ITEM_TEXT.ENGLISH,
-      disabled: !supportedLanguages.includes("en-gb"),
-      action: () => changeLanguage("en-gb"),
+      disabled: !supportedLanguages.includes(Locale.EN_GB),
+      action: () => changeLanguage(Locale.EN_GB),
     },
-     {
+    {
       id: MENU_ITEM_ID.AUTH_ENGLISH_SELECTOR + "-ar",
       text: MENU_ITEM_TEXT.ENGLISH,
-      disabled: !supportedLanguages.includes("en-us"),
-      action: () => changeLanguage("en-us"),
+      disabled: !supportedLanguages.includes(Locale.EN_US),
+      action: () => changeLanguage(Locale.EN_US),
     },
     {
       id: MENU_ITEM_ID.AUTH_SPANISH_SELECTOR,
       text: MENU_ITEM_TEXT.SPANISH,
-      disabled: !supportedLanguages.includes("es-es"),
-      action: () => changeLanguage("es-es"),
+      disabled: !supportedLanguages.includes(Locale.ES_ES),
+      action: () => changeLanguage(Locale.ES_ES),
     },
     {
       id: MENU_ITEM_ID.AUTH_SPANISH_SELECTOR + "-ar",
       text: MENU_ITEM_TEXT.SPANISH_ARGENTINA,
-      disabled: !supportedLanguages.includes("es-ar"),
-      action: () => changeLanguage("es-ar"),
-    },
-    {
-      id: MENU_ITEM_ID.AUTH_FRENCH_SELECTOR,
-      text: MENU_ITEM_TEXT.FRENCH,
-      disabled: !supportedLanguages.includes("fr-fr"),
-      action: () => changeLanguage("fr-fr"),
-    },
+      disabled: !supportedLanguages.includes(Locale.ES_AR),
+      action: () => changeLanguage(Locale.ES_AR),
+    }
   ];
 
   // --- Filter out languages that are disabled
@@ -102,7 +102,7 @@ const LanguageContextMenu = () => {
           color: theme.palette.common.black,
           alignSelf: "flex-start",
           justifySelf: "flex-end",
-          margin: theme.tabiyaSpacing.lg,
+          margin: removeMargin ? 0 : theme.tabiyaSpacing.lg,
         }}
         onClick={(event) => setAnchorEl(event.currentTarget)}
         data-testid={DATA_TEST_ID.AUTH_LANGUAGE_SELECTOR_BUTTON}

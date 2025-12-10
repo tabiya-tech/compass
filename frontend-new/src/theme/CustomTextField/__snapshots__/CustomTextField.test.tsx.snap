@@ -16,11 +16,11 @@ exports[`Custom text field should render CustomTextField correctly 1`] = `
     data-testid="custom-text-field-input-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
   >
     <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-puw5zz-MuiInputBase-root-MuiOutlinedInput-root"
     >
       <input
         aria-invalid="false"
-        class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+        class="MuiInputBase-input MuiOutlinedInput-input css-1byvbod-MuiInputBase-input-MuiOutlinedInput-input"
         id=":r0:"
         placeholder="Enter text here"
         type="text"
