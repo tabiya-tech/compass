@@ -16,6 +16,7 @@ To develop the frontend locally, you must install the following:
 - [Typescript](https://www.typescriptlang.org/)
 - [Storybook](https://storybook.js.org/)
 - [Jest](https://jestjs.io/)
+- [i18next](https://www.i18next.com/)
 
 ## Installation
 
