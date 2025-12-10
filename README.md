@@ -3,7 +3,7 @@
 <img src="https://raw.githubusercontent.com/tabiya-tech/docs/refs/heads/main/.gitbook/assets/compass_logo_web_dark.png#gh-light-mode-only" alt="logo" width=300/>
 </h1>
 
-**Compass by Tabiya** is an AI chatbot designed to assist job-seekers in exploring and discovering their skills.
+**Compass** is an AI chatbot designed to assist job-seekers in exploring and discovering their skills.
 
 Compass has two objectives: 
 - Populate a digital skill wallet that captures the experience of job-seekers, including the
@@ -23,16 +23,56 @@ their skills and interests based on their lived experiences.
 - **[Sensitive Data Protection](sensitive-data-protection.md)**: Explore the sensitive data protection functionality for detailed insights about how we are safeguarding sensitive personal data.
 
 
+## Why Contribute?
+
+- **Make an Impact:** Your contributions will directly improve the user experience and functionality of Compass, helping job-seekers explore and discover their skills more effectively.
+- **Help Achieve Our Goals:** By contributing, you are supporting Compass’s mission to populate digital skill wallets and guide job-seekers in understanding their skills and interests based on their lived experiences.
+
+## Ways to Contribute
+
+1. **Reporting Issues:** If you encounter bugs or have suggestions, open an issue on GitHub. Your feedback is valuable.
+2. **Code Contributions:** Help enhance the codebase by submitting pull requests.
+3. **Write or Improve Tests:** We aim for 100% code coverage. You can help achieve this goal by writing or improving tests.
+4. **Documentation:** Improve project documentation by submitting pull requests. Clear documentation is crucial for new contributors.
+5. **Support:** Give the project a star on GitHub—your support encourages us to keep improving!
+
 ## Contribution Guidelines
 
 🎉 Thank you for considering contributing to Tabiya Compass! 🎉
 
+### Code Formatting
+
+### Frontend
+We follow the **[Prettier](https://prettier.io/)** code formatting guidelines to make sure the code is properly formatted in a uniform way.
+
+You can find the configuration in the **[.prettierrc.json](frontend-new/.prettierrc.json)** file.
+
+> **Note:**  
+> For IntelliJ IDEA, if you make changes to the Prettier config, you may need to restart the IDE before formatting code using the IDE’s formatting function.
+
+### Backend
+We follow the **[PEP 8 Style Guide](https://peps.python.org/pep-0008/)** to ensure the backend Python code is properly formatted in a consistent way.
+
+We use **pylint** (with `pylint-pydantic`) as our linting tool.
+
+You can find the configuration in the **[.pylintrc](backend/.pylintrc)** file.
+
+> **Note:**  
+> For IntelliJ IDEA / PyCharm, if you make changes to the linting configuration, you may need to restart the IDE before formatting or linting code using the IDE’s built-in tools.
+
 ### Conventional Commits
 
-Please follow the **[Conventional Commits](https://www.conventionalcommits.org/)** format for your commit messages.
+Please follow the **[Conventional Commits](https://www.conventionalcommits.org/)** format for commit messages.
 
+### Guidelines for Readable BDD Testing
 
-### Getting Started
+To contribute to our 100% code coverage goal, refer to our "Guidelines for Readable BDD Testing" in the **[testing-guidelines.md](testing-guidelines.md)**
+
+### Guidelines for Snapshot Testing
+To ensure component stability, refer to our "Snapshot Testing Guidelines" in the **[snapshot-testing-guidelines.md](snapshot-testing-guidelines.md)**
+
+## Getting Started
+
 To work with this repository you should have a system with a bash compatible terminal (linux, macOS, cygwin) as most of the scripts are written for bash and will not work on windows cmd or powershell.
 
 1. Fork the repository and clone it to your local environment.
@@ -51,11 +91,11 @@ To work with this repository you should have a system with a bash compatible ter
       
     If you get any errors, fix them before proceeding. A common source of errors is not fully completing step `3` from above.
 
-4. Commit them, and push to your fork.
+5. Commit them and push to your fork.
 
-5. Use descriptive commit messages following [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+6. Use descriptive commit messages following [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
-6. Open a pull request to our main branch.
+7. Open a pull request to our main branch.
 
 Happy contributing! 🚀
 
