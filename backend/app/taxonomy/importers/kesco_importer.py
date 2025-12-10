@@ -1,6 +1,6 @@
 # app/taxonomy/importers/kesco_importer.py
 """
-Import KeSCO occupations from Excel with INLINE CONTEXTUALIZATION
+Import KeSCO occupations from Excel with SEMANTIC CONTEXTUALIZATION
 """
 
 import pandas as pd #type:ignore
@@ -24,19 +24,31 @@ logger = logging.getLogger(__name__)
 
 
 class KeSCOImporter:
-    """Import KeSCO occupations with inline ESCO fuzzy matching"""
+    """Import KeSCO occupations with semantic ESCO matching"""
     
     def __init__(
         self, 
         db: AsyncIOMotorDatabase, 
         excel_path: str = None, 
         taxonomy_model_id: ObjectId = None,
-        esco_lookup: Dict[str, Dict] = None
+        esco_lookup: Dict[str, Dict] = None,
+        semantic_matcher = None  # SemanticOccupationMatcher
     ):
+        """
+        Initialize KeSCO importer with semantic matcher.
+        
+        Args:
+            db: MongoDB database
+            excel_path: Path to KeSCO Excel file
+            taxonomy_model_id: Taxonomy version ID
+            esco_lookup: ESCO lookup dictionary (for exact matches)
+            semantic_matcher: SemanticOccupationMatcher instance (NEW!)
+        """
         self.db = db
         self.excel_path = excel_path or KESCO_OCCUPATIONS_XLSX
         self.taxonomy_model_id = taxonomy_model_id or TAXONOMY_MODEL_ID
         self.esco_lookup = esco_lookup or {}
+        self.semantic_matcher = semantic_matcher  # NEW!
         
         self.stats = {
             "total_rows": 0,
@@ -53,7 +65,7 @@ class KeSCOImporter:
     
     def fuzzy_match_to_esco(self, kesco_title: str) -> Tuple[Optional[Dict], float, str]:
         """
-        Fuzzy match KeSCO occupation to ESCO occupation.
+        Fuzzy match KeSCO occupation to ESCO (OLD METHOD - fallback only).
         
         Args:
             kesco_title: KeSCO occupation title
@@ -110,15 +122,37 @@ class KeSCOImporter:
         
         return None, 0.0, "no_match"
     
+    def semantic_match_to_esco(self, kesco_title: str) -> Tuple[Optional[Dict], float, str]:
+        """
+        Semantic match KeSCO occupation to ESCO (MUCH BETTER than fuzzy).
+        
+        Args:
+            kesco_title: KeSCO occupation title
+            
+        Returns:
+            Tuple of (matched_esco_dict, confidence_score, match_method)
+        """
+        if not self.semantic_matcher:
+            # Fallback to old fuzzy if semantic matcher not available
+            logger.warning("⚠️  Semantic matcher not available, using fuzzy matching")
+            return self.fuzzy_match_to_esco(kesco_title)
+        
+        return self.semantic_matcher.match_with_fallback(
+            kesco_title,
+            fuzzy_lookup=self.esco_lookup,
+            semantic_threshold=0.70,  # 70% semantic similarity for auto-match
+            fuzzy_threshold=70
+        )
+    
     def _row_to_occupation_model(self, row: pd.Series) -> OccupationModel:
         """
-        Convert Excel row to OccupationModel with INLINE CONTEXTUALIZATION
+        Convert Excel row to OccupationModel with SEMANTIC CONTEXTUALIZATION
         """
         kesco_code = str(row['KeSCO Code']).strip()
         kesco_title = row['Occupational Title'].strip()
         
-        # *** CONTEXTUALIZE HERE - during import! ***
-        esco_match, confidence, method = self.fuzzy_match_to_esco(kesco_title)
+        # *** USE SEMANTIC MATCHING (MUCH BETTER!) ***
+        esco_match, confidence, method = self.semantic_match_to_esco(kesco_title)
         confidence_decimal = confidence / 100.0
         
         # Determine mapping fields based on confidence
@@ -131,12 +165,12 @@ class KeSCOImporter:
         if esco_match:
             esco_id = str(esco_match['_id'])
             
-            if confidence >= 85:
+            if confidence >= 70:
                 # Auto-match (high confidence)
                 mapped_to_esco_id = esco_id
                 is_localized = True
                 self.stats['auto_matched'] += 1
-            elif confidence >= 70:
+            elif confidence >= 60:
                 # Manual review (medium confidence)
                 suggested_esco_id = esco_id
                 requires_manual_review = True
@@ -184,14 +218,14 @@ class KeSCOImporter:
             is_entrepreneurship=False,
             source=DataSource.KESCO,
             taxonomy_model_id=self.taxonomy_model_id,
-            added_by="kesco_importer_with_contextualization"
+            added_by="kesco_importer_semantic"
         )
         
         return occupation
     
     async def import_occupations(self, batch_size: int = 100) -> Dict[str, Any]:
         """
-        Import all KeSCO occupations with inline contextualization
+        Import all KeSCO occupations with semantic contextualization
         """
         logger.info(f"Starting KeSCO occupations import from {self.excel_path}")
         
@@ -199,6 +233,11 @@ class KeSCOImporter:
             logger.warning("⚠️  No ESCO lookup provided! Contextualization will be skipped.")
         else:
             logger.info(f"✓ ESCO lookup loaded with {len(self.esco_lookup)} searchable titles")
+        
+        if not self.semantic_matcher:
+            logger.warning("⚠️  No semantic matcher provided! Will use fuzzy matching (lower quality).")
+        else:
+            logger.info("✓ Semantic matcher available for high-quality contextualization")
         
         # Read Excel
         logger.info("Reading Excel file...")
@@ -263,26 +302,26 @@ class KeSCOImporter:
         total = self.stats['total_rows']
         
         print("\n" + "=" * 80)
-        print("KESCO ↔ ESCO CONTEXTUALIZATION SUMMARY (INLINE)")
+        print("KESCO ↔ ESCO CONTEXTUALIZATION SUMMARY (SEMANTIC)")
         print("=" * 80)
         print(f"Total KeSCO occupations: {total}")
-        print(f"Auto-matched (≥85% confidence): {self.stats['auto_matched']} ({self.stats['auto_matched']/total*100:.1f}%)")
-        print(f"Manual review (70-84%): {self.stats['manual_review']} ({self.stats['manual_review']/total*100:.1f}%)")
-        print(f"No match (<70%): {self.stats['no_match']} ({self.stats['no_match']/total*100:.1f}%)")
+        print(f"Auto-matched (≥70% confidence): {self.stats['auto_matched']} ({self.stats['auto_matched']/total*100:.1f}%)")
+        print(f"Manual review (60-69%): {self.stats['manual_review']} ({self.stats['manual_review']/total*100:.1f}%)")
+        print(f"No match (<60%): {self.stats['no_match']} ({self.stats['no_match']/total*100:.1f}%)")
         
         # Show sample auto-matches
         print("\n" + "-" * 80)
-        print("SAMPLE AUTO-MATCHED (≥85% confidence):")
+        print("SAMPLE AUTO-MATCHED (≥70% confidence):")
         print("-" * 80)
-        auto_matches = [m for m in self.matches if m['confidence'] >= 85][:10]
+        auto_matches = [m for m in self.matches if m['confidence'] >= 70][:10]
         for match in auto_matches:
             print(f"{match['confidence']:.0f}% | {match['kesco_title']} → {match['esco_title']}")
         
         # Show sample manual review cases
         print("\n" + "-" * 80)
-        print("SAMPLE MANUAL REVIEW NEEDED (70-84% confidence):")
+        print("SAMPLE MANUAL REVIEW NEEDED (60-69% confidence):")
         print("-" * 80)
-        manual_reviews = [m for m in self.matches if 70 <= m['confidence'] < 85][:10]
+        manual_reviews = [m for m in self.matches if 60 <= m['confidence'] < 70][:10]
         for match in manual_reviews:
             print(f"{match['confidence']:.0f}% | {match['kesco_title']} → {match['esco_title']} ⚠️")
         
@@ -291,7 +330,7 @@ class KeSCOImporter:
     def export_matches_to_csv(self, output_path: str = None):
         """Export match results to CSV for review"""
         if not output_path:
-            output_path = "/home/steve/tabiya/resources/kesco_esco_inline_matches.csv"
+            output_path = "/home/steve/tabiya/resources/kesco_esco_semantic_matches.csv"
         
         df = pd.DataFrame(self.matches)
         df.to_csv(output_path, index=False)
@@ -301,19 +340,20 @@ class KeSCOImporter:
 async def main():
     """Example usage"""
     from motor.motor_asyncio import AsyncIOMotorClient #type:ignore
+    from .semantic_matcher import build_semantic_matcher_from_db
     
     client = AsyncIOMotorClient(MONGODB_URI)
     db = client[TAXONOMY_DB_NAME]
     
-    # Note: In production, you'd get esco_lookup from the ESCO importer
-    # For now, we'll build it here
-    from .esco_occupations_importer import ESCOOccupationsImporter
+    # Build semantic matcher
+    semantic_matcher, esco_lookup = await build_semantic_matcher_from_db(db)
     
-    esco_importer = ESCOOccupationsImporter(db)
-    esco_lookup = await esco_importer.build_esco_lookup()
-    
-    # Import KeSCO with contextualization
-    kesco_importer = KeSCOImporter(db, esco_lookup=esco_lookup)
+    # Import KeSCO with semantic contextualization
+    kesco_importer = KeSCOImporter(
+        db, 
+        esco_lookup=esco_lookup,
+        semantic_matcher=semantic_matcher
+    )
     stats = await kesco_importer.import_occupations()
     
     print(f"\n✅ Import complete!")

@@ -86,24 +86,33 @@ async def run_all_imports():
         all_stats['esco_relations'] = await esco_relations_importer.import_relations()
         
         # ========================================================================
-        # STEP 5: Import KeSCO with INLINE CONTEXTUALIZATION
+        # STEP 5: Build Semantic Matcher
         # ========================================================================
         logger.info("\n" + "="*80)
-        logger.info("STEP 5/5: Importing KeSCO Occupations WITH INLINE CONTEXTUALIZATION")
+        logger.info("STEP 5/6: Building Semantic Matcher for High-Quality Contextualization")
         logger.info("="*80)
-        kesco_importer = KeSCOImporter(db, esco_lookup=esco_lookup)
+
+        from .semantic_matcher import build_semantic_matcher_from_db
+
+        # Build semantic matcher (takes ~30 seconds but worth it!)
+        semantic_matcher, esco_lookup_enhanced = await build_semantic_matcher_from_db(db)
+
+        # ========================================================================
+        # STEP 6: Import KeSCO with SEMANTIC CONTEXTUALIZATION
+        # ========================================================================
+        logger.info("\n" + "="*80)
+        logger.info("STEP 6/6: Importing KeSCO with SEMANTIC CONTEXTUALIZATION")
+        logger.info("="*80)
+
+        kesco_importer = KeSCOImporter(
+            db, 
+            esco_lookup=esco_lookup_enhanced,
+            semantic_matcher=semantic_matcher  # THIS IS THE KEY!
+        )
         all_stats['kesco_occupations'] = await kesco_importer.import_occupations()
-        
+
         # Export matches for review
         kesco_importer.export_matches_to_csv()
-        
-        # ========================================================================
-        # STEP 6: Inherit Skills for Auto-Matched Occupations
-        # ========================================================================
-        logger.info("\n" + "="*80)
-        logger.info("STEP 6/6: Inheriting Skills for Auto-Matched KeSCO Occupations")
-        logger.info("="*80)
-        all_stats['skill_inheritance'] = await inherit_skills_for_matched_kesco(db)
         
     finally:
         client.close()
