@@ -35,7 +35,7 @@ function backend() {
 function frontend() {
     local project="frontend"
     printTitle ${project}
-    (cd frontend/ && yarn install && yarn lint && yarn format:check && yarn build)
+    (cd frontend-new/ && yarn install && yarn lint && yarn format:check && yarn build)
     if [ $? -ne 0 ]; then
         printError ${project}
         exit 1
