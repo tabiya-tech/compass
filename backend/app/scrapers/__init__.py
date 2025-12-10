@@ -1,7 +1,3 @@
-"""
-Job scrapers package for Compass Kenya.
-"""
-
 from .platforms.brightermonday import BrighterMondayScraper
 from .platforms.careerjet import CareerjetScraper
 from .platforms.fuzu import FuzuScraper

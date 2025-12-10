@@ -1,15 +1,9 @@
-"""
-Taxonomy matcher - Maps job titles and descriptions to ESCO/KeSCO occupations and skills.
-Uses fuzzy matching with thefuzz library.
-"""
-
 from typing import List, Optional, Dict, Tuple
 from thefuzz import fuzz, process
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("TaxonomyMatcher")
-
 
 class TaxonomyMatcher:
     """Matches job titles/descriptions to taxonomy occupations and skills."""

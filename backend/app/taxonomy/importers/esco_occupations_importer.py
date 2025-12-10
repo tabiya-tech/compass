@@ -1,8 +1,3 @@
-# app/taxonomy/importers/esco_occupations_importer.py
-"""
-Import ESCO occupations from occupations.csv into taxonomy_db
-"""
-
 import pandas as pd #type:ignore
 from motor.motor_asyncio import AsyncIOMotorDatabase #type:ignore
 from bson import ObjectId #type:ignore

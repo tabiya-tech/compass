@@ -1,8 +1,3 @@
-"""
-Master script to run all job scrapers.
-Scrapes jobs from all platforms, matches to taxonomy, and saves to database.
-"""
-
 import asyncio
 import logging
 from datetime import datetime

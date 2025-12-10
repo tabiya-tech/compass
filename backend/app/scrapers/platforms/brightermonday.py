@@ -1,11 +1,5 @@
-"""
-BrighterMonday scraper - Kenya's leading job portal.
-URL: https://www.brightermonday.co.ke/jobs
-"""
-
 from typing import Dict, Optional
 from ..base import BaseScraper
-
 
 class BrighterMondayScraper(BaseScraper):
     """Scraper for BrighterMonday job listings."""

@@ -1,9 +1,3 @@
-# app/taxonomy/importers/semantic_matcher.py
-"""
-Semantic occupation matcher using sentence transformers.
-Much better than fuzzy string matching - understands context and meaning.
-"""
-
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -15,10 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class SemanticOccupationMatcher:
-    """
-    Semantic matching using sentence transformers.
-    Understands context and meaning, not just character similarity.
-    """
+    """Semantic matching using sentence transformers."""
     
     def __init__(self, model_name: str = 'all-MiniLM-L6-v2'):
         """
@@ -72,7 +63,7 @@ class SemanticOccupationMatcher:
         logger.info(f"Generating semantic embeddings for {len(self.esco_titles)} titles...")
         self.esco_embeddings = self.model.encode(
             self.esco_titles,
-            show_progress_bar=True,
+            show_progress_bar=False,
             convert_to_numpy=True
         )
         

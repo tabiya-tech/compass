@@ -1,0 +1,74 @@
+================================================================================
+KESCO ↔ ESCO CONTEXTUALIZATION SUMMARY (SEMANTIC)
+================================================================================
+Total KeSCO occupations: 5917
+Auto-matched (≥70% confidence): 4475 (75.6%)
+Manual review (60-69%): 909 (15.4%)
+No match (<60%): 533 (9.0%)
+
+--------------------------------------------------------------------------------
+SAMPLE AUTO-MATCHED (≥70% confidence):
+--------------------------------------------------------------------------------
+71% | Abrasive Former → abrasive blasting operator
+72% | Accessioner, library → librarian
+100% | Accountant → accountant
+75% | Accountant Controller → financial controller
+90% | Accounts Controller → financial controller
+100% | Actor → actor/actress
+100% | Actuary → actuarial consultant
+100% | Acupuncturist → acupuncturist
+100% | Addictions Counsellor → drug and alcohol addiction counsellor
+100% | Adjuster, claims → insurance claims handler
+
+--------------------------------------------------------------------------------
+SAMPLE MANUAL REVIEW NEEDED (60-69% confidence):
+--------------------------------------------------------------------------------
+69% | Adjuster, precision instrument → precision instrument assembler
+70% | Administrator Hospital → medical administrative assistant
+67% | Administrator, website → database administrator
+69% | Adviser, after-sales service → after-sales service technician
+68% | Adviser, education: methods → education policy officer
+68% | Aerial Crop Sprayer → pesticides sprayer
+68% | Aeromechanic, aircraft maintenance: airframe → aircraft maintenance engineer
+69% | Aeromechanic, aircraft maintenance: engines → aircraft maintenance engineer
+69% | Agent, clearing → letting agent
+68% | Agent, group insurance → insurance agency manager
+================================================================================
+
+INFO:app.taxonomy.importers.kesco_importer:Import complete!
+INFO:app.taxonomy.importers.kesco_importer:Statistics: {'total_rows': 5917, 'imported': 5915, 'skipped': 2, 'errors': 0, 'auto_matched': 4475, 'manual_review': 909, 'no_match': 533}
+INFO:app.taxonomy.importers.kesco_importer:✓ Exported matches to /home/steve/tabiya/resources/kesco_esco_semantic_matches.csv
+INFO:__main__:
+================================================================================
+INFO:__main__:IMPORT COMPLETE - FINAL SUMMARY
+INFO:__main__:================================================================================
+INFO:__main__:Total duration: 849.51 seconds (14.16 minutes)
+INFO:__main__:
+INFO:__main__:ESCO_OCCUPATIONS:
+INFO:__main__:  ✓ Imported: 3062
+INFO:__main__:  ⊘ Skipped: 11
+INFO:__main__:  ✗ Errors: 1
+INFO:__main__:
+INFO:__main__:ESCO_SKILLS:
+INFO:__main__:  ✓ Imported: 13896
+INFO:__main__:  ⊘ Skipped: 0
+INFO:__main__:  ✗ Errors: 0
+INFO:__main__:
+INFO:__main__:ESCO_RELATIONS:
+INFO:__main__:  ✓ Imported: 130822
+INFO:__main__:  ⊘ Skipped: 0
+INFO:__main__:  ✗ Errors: 0
+INFO:__main__:
+INFO:__main__:KESCO_OCCUPATIONS:
+INFO:__main__:  ✓ Imported: 5915
+INFO:__main__:  ⊘ Skipped: 2
+INFO:__main__:  ✗ Errors: 0
+INFO:__main__:   Auto-matched: 4475
+INFO:__main__:   Manual review: 909
+INFO:__main__:   No match: 533
+INFO:__main__:
+INFO:__main__:TOTALS:
+INFO:__main__:  ✓ Total Imported: 153,695 records
+INFO:__main__:  ⊘ Total Skipped: 13 records
+INFO:__main__:  ✗ Total Errors: 1 records
+INFO:__main__:================================================================================

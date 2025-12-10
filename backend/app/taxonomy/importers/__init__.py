@@ -1,10 +1,5 @@
-# app/taxonomy/importers/__init__.py
-"""
-Taxonomy data importers for ESCO and KeSCO
-"""
-
-
 '''How to run
+
 
 python3 -c "
 import asyncio
@@ -28,6 +23,8 @@ asyncio.run(clear())
 "
 
 python3 -m app.taxonomy.importers.run_all_imports
+
+
 
 '''
 

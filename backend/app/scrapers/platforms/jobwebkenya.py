@@ -1,11 +1,5 @@
-"""
-JobWebKenya scraper - Kenyan job portal.
-URL: https://jobwebkenya.com/jobs/
-"""
-
 from typing import Dict, Optional
 from ..base import BaseScraper
-
 
 class JobWebKenyaScraper(BaseScraper):
     """Scraper for JobWebKenya listings."""

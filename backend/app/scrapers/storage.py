@@ -1,7 +1,3 @@
-"""
-Storage module for saving scraped jobs to MongoDB.
-"""
-
 from typing import List, Dict
 from datetime import datetime, timezone
 from motor.motor_asyncio import AsyncIOMotorClient

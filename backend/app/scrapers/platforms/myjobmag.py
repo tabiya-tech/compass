@@ -1,11 +1,5 @@
-"""
-MyJobMag scraper - East African job platform.
-URL: https://www.myjobmag.co.ke/jobs
-"""
-
 from typing import Dict, Optional
 from ..base import BaseScraper
-
 
 class MyJobMagScraper(BaseScraper):
     """Scraper for MyJobMag job listings."""

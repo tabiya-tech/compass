@@ -1,8 +1,3 @@
-# app/taxonomy/importers/run_all_imports.py
-"""
-Runs all taxonomy imports with INLINE CONTEXTUALIZATION
-"""
-
 import asyncio
 import logging
 from motor.motor_asyncio import AsyncIOMotorClient #type:ignore
@@ -12,7 +7,6 @@ from .esco_occupations_importer import ESCOOccupationsImporter
 from .esco_skills_importer import ESCOSkillsImporter
 from .esco_relations_importer import ESCORelationsImporter
 from .kesco_importer import KeSCOImporter
-from .inherit_skills import inherit_skills_for_matched_kesco
 from .config import MONGODB_URI, TAXONOMY_DB_NAME, validate_files
 
 logging.basicConfig(
@@ -94,7 +88,7 @@ async def run_all_imports():
 
         from .semantic_matcher import build_semantic_matcher_from_db
 
-        # Build semantic matcher (takes ~30 seconds but worth it!)
+        # Build semantic matcher
         semantic_matcher, esco_lookup_enhanced = await build_semantic_matcher_from_db(db)
 
         # ========================================================================
@@ -107,7 +101,7 @@ async def run_all_imports():
         kesco_importer = KeSCOImporter(
             db, 
             esco_lookup=esco_lookup_enhanced,
-            semantic_matcher=semantic_matcher  # THIS IS THE KEY!
+            semantic_matcher=semantic_matcher  
         )
         all_stats['kesco_occupations'] = await kesco_importer.import_occupations()
 

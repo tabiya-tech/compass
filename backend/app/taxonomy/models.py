@@ -1,4 +1,3 @@
-# app/taxonomy/models.py
 """
 Defines MongoDB document schemas for:
 1. Taxonomy Database (ESCO + KeSCO + Custom Occupations & Skills)

@@ -1,8 +1,3 @@
-# app/taxonomy/importers/kesco_importer.py
-"""
-Import KeSCO occupations from Excel with SEMANTIC CONTEXTUALIZATION
-"""
-
 import pandas as pd #type:ignore
 from motor.motor_asyncio import AsyncIOMotorDatabase #type:ignore
 from bson import ObjectId #type:ignore
@@ -11,12 +6,7 @@ import asyncio
 import logging
 from thefuzz import fuzz, process #type:ignore
 
-from app.taxonomy.models import (
-    OccupationModel,
-    DataSource,
-    OccupationType,
-    TaxonomyCollections
-)
+from app.taxonomy.models import OccupationModel, DataSource, OccupationType, TaxonomyCollections
 from .config import KESCO_OCCUPATIONS_XLSX, TAXONOMY_MODEL_ID, MONGODB_URI, TAXONOMY_DB_NAME
 
 logging.basicConfig(level=logging.INFO)
@@ -32,7 +22,7 @@ class KeSCOImporter:
         excel_path: str = None, 
         taxonomy_model_id: ObjectId = None,
         esco_lookup: Dict[str, Dict] = None,
-        semantic_matcher = None  # SemanticOccupationMatcher
+        semantic_matcher = None  
     ):
         """
         Initialize KeSCO importer with semantic matcher.
@@ -42,13 +32,13 @@ class KeSCOImporter:
             excel_path: Path to KeSCO Excel file
             taxonomy_model_id: Taxonomy version ID
             esco_lookup: ESCO lookup dictionary (for exact matches)
-            semantic_matcher: SemanticOccupationMatcher instance (NEW!)
+            semantic_matcher: SemanticOccupationMatcher instance 
         """
         self.db = db
         self.excel_path = excel_path or KESCO_OCCUPATIONS_XLSX
         self.taxonomy_model_id = taxonomy_model_id or TAXONOMY_MODEL_ID
         self.esco_lookup = esco_lookup or {}
-        self.semantic_matcher = semantic_matcher  # NEW!
+        self.semantic_matcher = semantic_matcher
         
         self.stats = {
             "total_rows": 0,
@@ -151,7 +141,7 @@ class KeSCOImporter:
         kesco_code = str(row['KeSCO Code']).strip()
         kesco_title = row['Occupational Title'].strip()
         
-        # *** USE SEMANTIC MATCHING (MUCH BETTER!) ***
+        # *** USE SEMANTIC MATCHING ***
         esco_match, confidence, method = self.semantic_match_to_esco(kesco_title)
         confidence_decimal = confidence / 100.0
         

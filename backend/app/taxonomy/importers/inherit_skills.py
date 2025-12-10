@@ -1,20 +1,11 @@
-# app/taxonomy/importers/inherit_skills.py
-"""
-Inherit skill relations from ESCO to auto-matched KeSCO occupations
-"""
-
 import asyncio
 import logging
 from motor.motor_asyncio import AsyncIOMotorDatabase #type:ignore
 from bson import ObjectId #type:ignore
 from datetime import datetime, timezone
-from typing import Dict, Any
+from typing import Dict
 
-from app.taxonomy.models import (
-    TaxonomyCollections,
-    OccupationSkillRelationModel,
-    DataSource
-)
+from app.taxonomy.models import TaxonomyCollections
 from .config import MONGODB_URI, TAXONOMY_DB_NAME
 
 logging.basicConfig(level=logging.INFO)

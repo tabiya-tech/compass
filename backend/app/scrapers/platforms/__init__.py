@@ -1,7 +1,3 @@
-"""
-Platform-specific job scrapers.
-"""
-
 from .brightermonday import BrighterMondayScraper
 from .careerjet import CareerjetScraper
 from .fuzu import FuzuScraper

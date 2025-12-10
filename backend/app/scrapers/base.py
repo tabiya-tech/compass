@@ -1,8 +1,3 @@
-"""
-Base scraper class with common functionality for all job platforms.
-Uses Selenium for dynamic page rendering.
-"""
-
 from abc import ABC, abstractmethod
 from typing import List, Dict, Optional
 from datetime import datetime, timezone

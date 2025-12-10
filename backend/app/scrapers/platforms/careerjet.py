@@ -1,11 +1,5 @@
-"""
-Careerjet scraper - International job search engine.
-URL: https://www.careerjet.co.ke/jobs
-"""
-
 from typing import Dict, Optional
 from ..base import BaseScraper
-
 
 class CareerjetScraper(BaseScraper):
     """Scraper for Careerjet job listings."""

@@ -1,11 +1,5 @@
-"""
-Fuzu scraper - Professional networking and job platform.
-URL: https://www.fuzu.com/kenya/job
-"""
-
 from typing import Dict, Optional
 from ..base import BaseScraper
-
 
 class FuzuScraper(BaseScraper):
     """Scraper for Fuzu job listings."""

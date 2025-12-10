@@ -1,8 +1,3 @@
-"""
-Scraper configuration for all job platforms.
-Each platform config includes URL, CSS selectors, and wait conditions.
-"""
-
 PLATFORMS = {
     'brightermonday': {
         'name': 'BrighterMonday',

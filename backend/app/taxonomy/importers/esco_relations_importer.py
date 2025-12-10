@@ -1,7 +1,3 @@
-# app/taxonomy/importers/esco_relations_importer.py
-"""
-Import ESCO occupation-to-skill relations from occupation_to_skill_relations.csv
-"""
 import pandas as pd #type:ignore
 from motor.motor_asyncio import AsyncIOMotorDatabase #type:ignore
 from bson import ObjectId #type:ignore
