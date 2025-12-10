@@ -19,6 +19,7 @@ from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
 from common_libs.retry import Retry
 from app.i18n.translation_service import t, get_i18n_manager
+from app.i18n.locale_detector import get_locale_hint
 
 _NO_EXPERIENCE_COLLECTED = "No experience data has been collected yet"
 _FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step."
@@ -400,6 +401,8 @@ class _ConversationLLM:
                     /// In case the of caregiving for family, helping in the household, use common sense and adjust your questions to reflect the nature of the work,
                     /// as there is not a company in this case but the family or household.
                     Do not ask for any personal information such as the name of a person, of a family or a household.
+        
+           
             #Collected Experience Data 
                 All the work experiences you have collected so far:
                     {collected_experience_data}
@@ -638,8 +641,8 @@ def _get_missing_fields(collected_data: list[CollectedData], index: int) -> str:
         missing_fields.append("endDate")
     if experience_data.company is None:
         missing_fields.append("company")
-    # if experience_data.location is None:
-    #     missing_fields.append("location")
+    #if experience_data.location is None:
+    #    missing_fields.append("location")
     if len(missing_fields) == 0:
        return t("messages", "collectExperiences.allFieldsFilled")
 
@@ -666,8 +669,8 @@ def _get_not_missing_fields(collected_data: list[CollectedData], index: int) -> 
         not_missing_fields.append("endDate")
     if experience_data.company is not None:
         not_missing_fields.append("company")
-    # if experience_data.location is not None:
-    #     not_missing_fields.append("location")
+    #if experience_data.location is not None:
+    #    not_missing_fields.append("location")
     if len(not_missing_fields) == 0:
         return t("messages", "collectExperiences.allFieldsNotFilled")
     # Localize field labels
@@ -795,7 +798,7 @@ def _get_explore_experiences_instructions(*,
 def _get_example_summary() -> str:
     return "• " + ExperienceEntity.get_structured_summary(
         experience_title="Crew Member",
-        # location="London",
+        #location="London",
         work_type=WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name,
         start_date="2020",
         end_date="2021",
@@ -809,7 +812,7 @@ def _get_summary_of_experiences(collected_data: list[CollectedData]) -> str:
     for experience in collected_data:
         summary += "• " + ExperienceEntity.get_structured_summary(
             experience_title=experience.experience_title or "",
-            location=experience.location,
+            #location=experience.location,
             work_type=experience.work_type,
             start_date=experience.start_date,
             end_date=experience.end_date,

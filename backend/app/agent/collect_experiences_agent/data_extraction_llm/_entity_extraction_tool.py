@@ -64,7 +64,6 @@ class EntityExtractionTool:
     Responsibilities:
     - Given the user's statement about the experience, extract the experience details.
         — Company Name
-        — Location # removed
         — Experience Title (Job title)
 
     — Detect if the user doesn't want to share the details and mark then as empty string.

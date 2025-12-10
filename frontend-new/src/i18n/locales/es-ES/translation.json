@@ -521,9 +521,7 @@
       "topSkillsTitle": "Habilidades principales: ",
       "skillsDescriptionText": "A continuación encontrarás una lista de las habilidades descubiertas durante tu conversación con Brújula, junto con sus descripciones.",
       "disclaimer": {
-        "part1": "Aviso: ",
-        "part2": "Las habilidades listadas se basan en una conversación con el candidato, no han sido verificadas o validadas por Fundacion Empujar y pueden ser inexactas. ",
-        "part3": "La información debe ser verificada antes de usarla para la búsqueda de empleo, entrevistas o para crear un CV. Para revisar esta información, vuelve a hablar con Brújula o crea un CV completo basado en este informe."
+        "final": "Este informe resume la información clave recopilada durante una conversación con Brújula el {{date}}. Brújula es un chatbot de IA que ayuda a las personas que buscan empleo a explorar sus habilidades y experiencias. Esta información puede usarse para guiar la búsqueda de empleo y resaltar sus habilidades al postular, especialmente durante entrevistas con posibles empleadores."
       },
       "bodyText": "Este informe resume la información clave recopilada durante una conversación con Brújula el {{date}}. Brújula es un chatbot de IA que ayuda a los buscadores de empleo a explorar sus habilidades y experiencias. Este informe presenta la experiencia laboral del candidato y las habilidades identificadas en cada experiencia. Esta información puede usarse para guiar la búsqueda de empleo y resaltar sus habilidades al postular, especialmente durante entrevistas con posibles empleadores. Puede ser un buen punto de partida para crear un CV completo."
     }

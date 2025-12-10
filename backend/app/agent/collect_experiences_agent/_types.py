@@ -24,7 +24,7 @@ class CollectedData(BaseModel):
     """
     experience_title: Optional[str]
     company: Optional[str]
-    # location: Optional[str]
+    #location: Optional[str] = None
     start_date: Optional[str]
     end_date: Optional[str]
     paid_work: Optional[bool | str]
@@ -42,8 +42,7 @@ class CollectedData(BaseModel):
                 item1.work_type == item2.work_type and
                 (item1.start_date == item2.start_date or item1.start_date == "" or item2.start_date == "") and
                 (item1.end_date == item2.end_date or item1.end_date == "" or item2.end_date == "") and
-                (item1.company == item2.company or item1.company == "" or item2.company == "") 
-                # and (item1.location == item2.location or item1.location == "" or item2.location == "")
+                (item1.company == item2.company or item1.company == "" or item2.company == "")
                 )
 
     @staticmethod
@@ -52,7 +51,6 @@ class CollectedData(BaseModel):
                     experience.start_date == "" or experience.start_date is None,
                     experience.end_date == "" or experience.end_date is None,
                     experience.company == "" or experience.company is None,
-                    # experience.location == "" or experience.location is None,
                     ])
 
     @staticmethod
@@ -69,8 +67,7 @@ class CollectedData(BaseModel):
         missing_important_fields = (
             (experience.start_date is None or experience.start_date.strip() == "") or
             (experience.end_date is None or experience.end_date.strip() == "") or
-            (experience.company is None or experience.company.strip() == "") 
-            # or (experience.location is None or experience.location.strip() == "")
+            (experience.company is None or experience.company.strip() == "")
         )
         
         return has_title and missing_important_fields
@@ -92,7 +89,5 @@ class CollectedData(BaseModel):
             missing_fields.append("end_date")
         if experience.company is None:
             missing_fields.append("company")
-        # if experience.location is None:
-        #     missing_fields.append("location")
             
         return missing_fields

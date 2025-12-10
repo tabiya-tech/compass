@@ -1,6 +1,7 @@
 from enum import Enum
 
 class Locale(Enum):
+    EN = "en"
     EN_US = "en-US"
     EN_GB = "en-GB"
     ES_AR = "es-AR"
@@ -12,6 +13,8 @@ class Locale(Enum):
 
     def label(self) -> str:
         match self:
+            case Locale.EN:
+                return "English"
             case Locale.EN_US:
                 return "English (US)"
             case Locale.EN_GB:
@@ -21,7 +24,7 @@ class Locale(Enum):
             case Locale.ES_AR:
                 return "Spanish (Argentina)"
 
-SUPPORTED_LOCALES: list[Locale] = [Locale.EN_US, Locale.EN_GB, Locale.ES_AR, Locale.ES_ES]
+SUPPORTED_LOCALES: list[Locale] = [Locale.EN, Locale.EN_US, Locale.EN_GB, Locale.ES_AR, Locale.ES_ES]
 
 
 def is_locale_supported(language: Locale) -> bool:

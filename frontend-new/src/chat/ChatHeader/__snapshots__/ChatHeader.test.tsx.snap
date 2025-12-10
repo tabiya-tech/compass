@@ -16,7 +16,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       alt="Brújula Logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
       height="48"
-      src="/compass.svg"
+      src="/brujula.svg"
     />
   </a>
   <h1
@@ -154,7 +154,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       alt="Brújula Logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
       height="48"
-      src="/compass.svg"
+      src="/brujula.svg"
     />
   </a>
   <h1
@@ -298,7 +298,7 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
       alt="Brújula Logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
       height="48"
-      src="/compass.svg"
+      src="/brujula.svg"
     />
   </a>
   <h1

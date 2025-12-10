@@ -71,11 +71,7 @@ class ExperienceEntity(BaseModel, Generic[SkillEntityT]):
     Company name (e.g. "at McDonald's")
     """
 
-    # location: Optional[str] = None
-    # """
-    # Location of the experience (e.g. "Cape Town, South Africa")
-    # """
-
+    
     timeline: Optional[Timeline] = None
     """
     Start and end date of the experience
@@ -149,7 +145,6 @@ class ExperienceEntity(BaseModel, Generic[SkillEntityT]):
     def __init__(self, *,
                  experience_title: str,
                  company: Optional[str] = None,
-                #  location: Optional[str] = None,
                  timeline: Optional[Timeline] = None,
                  work_type: Optional[WorkType] = None,
                  uuid: Optional[str] = None,
@@ -164,7 +159,6 @@ class ExperienceEntity(BaseModel, Generic[SkillEntityT]):
             uuid=uuid if uuid is not None else str(uuid4()),  # Generate a unique UUID for each instance
             experience_title=experience_title,
             company=company,
-            # location=location,
             timeline=timeline,
             work_type=work_type,
             responsibilities=responsibilities if responsibilities is not None else ResponsibilitiesData(),
@@ -191,7 +185,6 @@ class ExperienceEntity(BaseModel, Generic[SkillEntityT]):
 
     @staticmethod
     def get_structured_summary(*, experience_title: str,
-                               # location: Optional[str] = None,
                                work_type: Optional[str] = None,
                                start_date: Optional[str] = None,
                                end_date: Optional[str] = None,
@@ -207,11 +200,10 @@ class ExperienceEntity(BaseModel, Generic[SkillEntityT]):
             else:
                 date_part = ""
         company_part = f", {company}" if company is not None and company != "" else ""
-        # location_part = f", {location}" if location is not None and location != "" else ""
         _work_type = WorkType.from_string_key(work_type)
         work_type_part = f" ({ExperienceEntity._tr_work_type_short(_work_type)})" if _work_type is not None else ""
         if experience_title is not None:
             experience_title_part = experience_title
         else:
             experience_title_part = t("messages", "experience.noTitleProvidedYet")
-        return experience_title_part + work_type_part + date_part + company_part + location_part + "\n"
+        return experience_title_part + work_type_part + date_part + company_part + "\n"
