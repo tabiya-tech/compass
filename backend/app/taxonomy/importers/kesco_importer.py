@@ -95,7 +95,7 @@ class KeSCOImporter:
         kesco_isco_group: str = None
     ) -> Tuple[Optional[Dict], float, str]:
         """
-        Hierarchical semantic match () - 
+        Hierarchical semantic match (Jasmin's approach)
         
         Args:
             kesco_title: KeSCO occupation title
@@ -116,13 +116,13 @@ class KeSCOImporter:
             logger.warning("⚠️  Hierarchical matcher not available!")
             return None, 0.0, "no_matcher"
         
-        # Use hierarchical matcher with ISCO group filtering ()
+        # Use hierarchical matcher with ISCO group filtering
         # Aggressive 55% threshold for maximum auto-matching
         esco_match, confidence, method = self.hierarchical_matcher.match_with_fallback(
             kesco_title,
             kesco_isco_group=kesco_isco_group,
-            fuzzy_lookup=None,  # NO FUZZY FALLBACK!
-            semantic_threshold=0.55  # 55% semantic similarity for auto-match (AGGRESSIVE!)
+            fuzzy_lookup=None,
+            semantic_threshold=0.55
         )
         
         # Track which method was used
@@ -143,7 +143,7 @@ class KeSCOImporter:
         # Extract ISCO group code from KeSCO code
         kesco_isco_group = self._extract_kesco_isco_group(kesco_code)
         
-        # *** USE HIERARCHICAL SEMANTIC MATCHING ( - ) ***
+        # *** USE HIERARCHICAL SEMANTIC MATCHING ***
         esco_match, confidence, method = self.hierarchical_match_to_esco(
             kesco_title,
             kesco_isco_group
@@ -160,12 +160,12 @@ class KeSCOImporter:
         if esco_match:
             esco_id = str(esco_match['_id'])
             
-            if confidence >= 55:  
+            if confidence >= 55:
                 # Auto-match (high confidence)
                 mapped_to_esco_id = esco_id
                 is_localized = True
                 self.stats['auto_matched'] += 1
-            elif confidence >= 45:  
+            elif confidence >= 45:
                 # Manual review (medium confidence)
                 suggested_esco_id = esco_id
                 requires_manual_review = True
@@ -191,12 +191,23 @@ class KeSCOImporter:
             'method': method
         })
         
+        # Get alt_labels from matched ESCO occupation
+        alt_labels = []
+        if esco_match:
+            # Copy alt_labels from ESCO (excluding the KeSCO title itself)
+            esco_alt_labels = esco_match.get('alt_labels', [])
+            kesco_title_lower = kesco_title.lower().strip()
+            alt_labels = [
+                label for label in esco_alt_labels 
+                if label.lower().strip() != kesco_title_lower
+            ][:10]  # Limit to 10 alt labels
+        
         # Create occupation model with contextualization
         occupation = OccupationModel(
             code=kesco_code,
             isco_group_code=kesco_isco_group,
             preferred_label=kesco_title,
-            alt_labels=[],
+            alt_labels=alt_labels,
             occupation_type=OccupationType.LOCAL_OCCUPATION,
             kesco_code=kesco_code,
             kesco_serial_number=int(row['S/No']),
@@ -236,7 +247,7 @@ class KeSCOImporter:
             logger.error("❌ No hierarchical matcher provided! Cannot proceed.")
             return self.stats
         else:
-            logger.info("✓ Hierarchical semantic matcher available ()")
+            logger.info("✓ Hierarchical semantic matcher available (Jasmin's approach)")
             logger.info("✓ AGGRESSIVE 55% threshold for maximum auto-matching")
         
         # Read Excel
