@@ -3,7 +3,7 @@ import { render, screen, fireEvent, act } from "src/_test_utilities/test-utils";
 import FeedbackFormContent, { DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import getFeedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
 import { useSwipeable } from "react-swipeable";
-import i18next from "i18next";
+import i18n from "src/i18n/i18n";
 import { DATA_TEST_ID as CHECKBOX_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/checkboxQuestion/CheckboxQuestion";
 import { DATA_TEST_ID as YES_NO_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/yesNoQuestion/YesNoQuestion";
 import { DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/customRating/CustomRating";
@@ -21,7 +21,7 @@ jest.mock("framer-motion", () => ({
   AnimatePresence: ({ children }: { children: React.ReactElement }) => <>{children}</>,
 }));
 
-const feedbackFormContentSteps = getFeedbackFormContentSteps(i18next.t);
+const feedbackFormContentSteps = getFeedbackFormContentSteps(i18n.t);
 
 describe("FeedbackFormContent", () => {
   beforeEach(() => {

@@ -352,7 +352,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     }
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      setErrorMessage(CV_UPLOAD_ERROR_I18N_KEYS.MAX_FILE_SIZE);
+      setErrorMessage(t(CV_UPLOAD_ERROR_I18N_KEYS.MAX_FILE_SIZE));
       return;
     }
 
@@ -380,7 +380,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       const detail = err?.response?.data?.detail;
       // Use centralized error message mapping
       const errorMessage = getCvUploadErrorMessageFromHttpStatus(status, detail);
-      setErrorMessage(errorMessage);
+      setErrorMessage(t(errorMessage));
     }
   };
 
@@ -540,7 +540,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           onKeyDown={handleKeyDown}
           inputRef={inputRef}
           error={!!errorMessage}
-          helperText={errorMessage ? t(errorMessage) : undefined}
+          helperText={errorMessage}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
