@@ -4,6 +4,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import { DEFAULT_LOCALE, FALL_BACK_LOCALE, Locale, SupportedLocales } from "./constants";
 import { constructLocaleResources } from "./utils";
 import { ConfigurationError } from "../error/commonErrors";
+import { parseEnvSupportedLocales } from "./languageContextMenu/parseEnvSupportedLocales";
 
 // --- Import translations ---
 import enGb from "./locales/en-GB/translation.json";
@@ -45,14 +46,47 @@ if (!isValidDefaultLocale) {
   console.error(new ConfigurationError(errorMessage));
 }
 
+// Get supported locales from environment to restrict language detection
+const envSupportedLocales = parseEnvSupportedLocales();
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
     fallbackLng: fallbackLocale,
+    supportedLngs: envSupportedLocales,
+    detection: {
+      order: ["localStorage", "navigator"],
+      lookupLocalStorage: "i18nextLng",
+      caches: ["localStorage"],
+      convertDetectedLanguage: (lng: string) => {
+        const normalizedLng = lng.toLowerCase();
+        
+        if (envSupportedLocales.includes(lng as Locale)) {
+          return lng;
+        }
+        
+        const matchingLocale = envSupportedLocales.find((locale) => 
+          locale.toLowerCase().startsWith(normalizedLng.split("-")[0] + "-")
+        );
+        
+        if (matchingLocale) {
+          return matchingLocale;
+        }
+        return fallbackLocale;
+      },
+    },
     interpolation: { escapeValue: false },
   });
+
+// After initialization, ensure the language is set to a supported locale
+// This handles the case where the detector might have selected an unsupported language
+const currentLanguage = i18n.language;
+if (!envSupportedLocales.includes(currentLanguage as Locale)) {
+  console.error(`Current language ${currentLanguage} is not supported. Falling back to ${fallbackLocale}`);
+  i18n.changeLanguage(fallbackLocale);
+}
 
 // ========================================================
 //             Unexpected Events
