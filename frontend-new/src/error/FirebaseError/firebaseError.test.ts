@@ -8,7 +8,7 @@ import {
   FirebaseErrorCodes,
   USER_FRIENDLY_FIREBASE_ERROR_I18N_KEYS,
 } from "src/error/FirebaseError/firebaseError.constants";
-import i18next from "i18next";
+import i18n from "src/i18n/i18n";
 
 describe("FirebaseError", () => {
   describe("FirebaseError class", () => {
@@ -105,7 +105,7 @@ describe("FirebaseError", () => {
       const actual = getUserFriendlyFirebaseErrorMessage({ errorCode: givenErrorCode } as any);
 
       // THEN the function should return the user-friendly message
-      expect(i18next.t(actual)).toBe(i18next.t(expected));
+      expect(actual).toBe(i18n.t(expected));
     });
   });
 
