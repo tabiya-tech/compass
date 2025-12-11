@@ -1,6 +1,8 @@
 '''How to run
 
 
+rm -rf ../../tabiya/resources/kesco_esco_hierarchical_matches.csv
+
 python3 -c "
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient

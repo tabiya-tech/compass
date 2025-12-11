@@ -1,12 +1,22 @@
+# app/taxonomy/importers/kesco_importer.py
+"""
+Import KeSCO occupations from Excel with HIERARCHICAL SEMANTIC CONTEXTUALIZATION
+Algorithm: Filter by ISCO group first, then semantic match within group
+"""
+
 import pandas as pd #type:ignore
 from motor.motor_asyncio import AsyncIOMotorDatabase #type:ignore
 from bson import ObjectId #type:ignore
 from typing import Dict, Any, Optional, Tuple
 import asyncio
 import logging
-from thefuzz import fuzz, process #type:ignore
 
-from app.taxonomy.models import OccupationModel, DataSource, OccupationType, TaxonomyCollections
+from app.taxonomy.models import (
+    OccupationModel,
+    DataSource,
+    OccupationType,
+    TaxonomyCollections
+)
 from .config import KESCO_OCCUPATIONS_XLSX, TAXONOMY_MODEL_ID, MONGODB_URI, TAXONOMY_DB_NAME
 
 logging.basicConfig(level=logging.INFO)
@@ -14,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class KeSCOImporter:
-    """Import KeSCO occupations with semantic ESCO matching"""
+    """Import KeSCO occupations with hierarchical semantic ESCO matching"""
     
     def __init__(
         self, 
@@ -22,23 +32,23 @@ class KeSCOImporter:
         excel_path: str = None, 
         taxonomy_model_id: ObjectId = None,
         esco_lookup: Dict[str, Dict] = None,
-        semantic_matcher = None  
+        hierarchical_matcher = None  # HierarchicalSemanticMatcher
     ):
         """
-        Initialize KeSCO importer with semantic matcher.
+        Initialize KeSCO importer with hierarchical semantic matcher.
         
         Args:
             db: MongoDB database
             excel_path: Path to KeSCO Excel file
             taxonomy_model_id: Taxonomy version ID
-            esco_lookup: ESCO lookup dictionary (for exact matches)
-            semantic_matcher: SemanticOccupationMatcher instance 
+            esco_lookup: ESCO lookup dictionary (for exact matches only)
+            hierarchical_matcher: HierarchicalSemanticMatcher instance
         """
         self.db = db
         self.excel_path = excel_path or KESCO_OCCUPATIONS_XLSX
         self.taxonomy_model_id = taxonomy_model_id or TAXONOMY_MODEL_ID
         self.esco_lookup = esco_lookup or {}
-        self.semantic_matcher = semantic_matcher
+        self.hierarchical_matcher = hierarchical_matcher
         
         self.stats = {
             "total_rows": 0,
@@ -47,102 +57,97 @@ class KeSCOImporter:
             "errors": 0,
             "auto_matched": 0,
             "manual_review": 0,
-            "no_match": 0
+            "no_match": 0,
+            "exact_matches": 0,
+            "hierarchical_group_matches": 0,
+            "hierarchical_fallback_matches": 0
         }
         
         # For reporting
         self.matches = []
     
-    def fuzzy_match_to_esco(self, kesco_title: str) -> Tuple[Optional[Dict], float, str]:
+    def _extract_kesco_isco_group(self, kesco_code: str) -> Optional[str]:
         """
-        Fuzzy match KeSCO occupation to ESCO (OLD METHOD - fallback only).
+        Extract 4-digit ISCO group code from KeSCO code.
+        
+        Examples:
+            "7314-11" -> "7314"
+            "2411-12" -> "2411"
+            "1211-14" -> "1211"
+        """
+        if not kesco_code:
+            return None
+        
+        # Split by dash and take first part
+        parts = str(kesco_code).split('-')
+        if len(parts) > 0:
+            group_code = parts[0].strip()
+            
+            # Validate it's a 4-digit number
+            if len(group_code) == 4 and group_code.isdigit():
+                return group_code
+        
+        return None
+    
+    def hierarchical_match_to_esco(
+        self, 
+        kesco_title: str,
+        kesco_isco_group: str = None
+    ) -> Tuple[Optional[Dict], float, str]:
+        """
+        Hierarchical semantic match () - 
         
         Args:
             kesco_title: KeSCO occupation title
+            kesco_isco_group: 4-digit ISCO group code from KeSCO
             
         Returns:
             Tuple of (matched_esco_dict, confidence_score, match_method)
         """
-        if not self.esco_lookup:
-            return None, 0.0, "no_esco_lookup"
-        
         kesco_title_clean = kesco_title.lower().strip()
         
-        # Method 1: Exact match (100%)
-        if kesco_title_clean in self.esco_lookup:
+        # Step 1: Try exact match first (fastest)
+        if self.esco_lookup and kesco_title_clean in self.esco_lookup:
+            self.stats['exact_matches'] += 1
             return self.esco_lookup[kesco_title_clean], 100.0, "exact"
         
-        # Method 2: Fuzzy matching
-        esco_titles = list(self.esco_lookup.keys())
+        # Step 2: Use hierarchical semantic matcher
+        if not self.hierarchical_matcher:
+            logger.warning("⚠️  Hierarchical matcher not available!")
+            return None, 0.0, "no_matcher"
         
-        matches = []
-        
-        # Token sort ratio (good for reordered words)
-        result = process.extractOne(
-            kesco_title_clean, 
-            esco_titles, 
-            scorer=fuzz.token_sort_ratio
-        )
-        if result:
-            matches.append(('token_sort', result[0], result[1]))
-        
-        # Token set ratio (good for partial matches)
-        result = process.extractOne(
-            kesco_title_clean,
-            esco_titles,
-            scorer=fuzz.token_set_ratio
-        )
-        if result:
-            matches.append(('token_set', result[0], result[1]))
-        
-        # Partial ratio (good for substrings)
-        result = process.extractOne(
-            kesco_title_clean,
-            esco_titles,
-            scorer=fuzz.partial_ratio
-        )
-        if result:
-            matches.append(('partial', result[0], result[1]))
-        
-        # Take best match
-        if matches:
-            best_match = max(matches, key=lambda x: x[2])
-            method, matched_title, score = best_match
-            return self.esco_lookup.get(matched_title), float(score), f"fuzzy_{method}"
-        
-        return None, 0.0, "no_match"
-    
-    def semantic_match_to_esco(self, kesco_title: str) -> Tuple[Optional[Dict], float, str]:
-        """
-        Semantic match KeSCO occupation to ESCO (MUCH BETTER than fuzzy).
-        
-        Args:
-            kesco_title: KeSCO occupation title
-            
-        Returns:
-            Tuple of (matched_esco_dict, confidence_score, match_method)
-        """
-        if not self.semantic_matcher:
-            # Fallback to old fuzzy if semantic matcher not available
-            logger.warning("⚠️  Semantic matcher not available, using fuzzy matching")
-            return self.fuzzy_match_to_esco(kesco_title)
-        
-        return self.semantic_matcher.match_with_fallback(
+        # Use hierarchical matcher with ISCO group filtering ()
+        # Aggressive 55% threshold for maximum auto-matching
+        esco_match, confidence, method = self.hierarchical_matcher.match_with_fallback(
             kesco_title,
-            fuzzy_lookup=self.esco_lookup,
-            semantic_threshold=0.70,  # 70% semantic similarity for auto-match
-            fuzzy_threshold=70
+            kesco_isco_group=kesco_isco_group,
+            fuzzy_lookup=None,  # NO FUZZY FALLBACK!
+            semantic_threshold=0.55  # 55% semantic similarity for auto-match (AGGRESSIVE!)
         )
+        
+        # Track which method was used
+        if method.startswith('hierarchical_group'):
+            self.stats['hierarchical_group_matches'] += 1
+        elif method.startswith('hierarchical_fallback'):
+            self.stats['hierarchical_fallback_matches'] += 1
+        
+        return esco_match, confidence, method
     
     def _row_to_occupation_model(self, row: pd.Series) -> OccupationModel:
         """
-        Convert Excel row to OccupationModel with SEMANTIC CONTEXTUALIZATION
+        Convert Excel row to OccupationModel with HIERARCHICAL SEMANTIC CONTEXTUALIZATION
         """
         kesco_code = str(row['KeSCO Code']).strip()
         kesco_title = row['Occupational Title'].strip()
         
-        # *** USE SEMANTIC MATCHING ***
-        esco_match, confidence, method = self.semantic_match_to_esco(kesco_title)
+        # Extract ISCO group code from KeSCO code
+        kesco_isco_group = self._extract_kesco_isco_group(kesco_code)
+        
+        # *** USE HIERARCHICAL SEMANTIC MATCHING ( - ) ***
+        esco_match, confidence, method = self.hierarchical_match_to_esco(
+            kesco_title,
+            kesco_isco_group
+        )
         confidence_decimal = confidence / 100.0
         
         # Determine mapping fields based on confidence
@@ -155,12 +160,12 @@ class KeSCOImporter:
         if esco_match:
             esco_id = str(esco_match['_id'])
             
-            if confidence >= 70:
+            if confidence >= 55:  
                 # Auto-match (high confidence)
                 mapped_to_esco_id = esco_id
                 is_localized = True
                 self.stats['auto_matched'] += 1
-            elif confidence >= 60:
+            elif confidence >= 45:  
                 # Manual review (medium confidence)
                 suggested_esco_id = esco_id
                 requires_manual_review = True
@@ -177,9 +182,11 @@ class KeSCOImporter:
         # Track match for reporting
         self.matches.append({
             'kesco_code': kesco_code,
+            'kesco_isco_group': kesco_isco_group or '',
             'kesco_title': kesco_title,
             'esco_title': esco_match.get('preferred_label', '') if esco_match else '',
             'esco_code': esco_match.get('code', '') if esco_match else '',
+            'esco_isco_group': esco_match.get('isco_group_code', '') if esco_match else '',
             'confidence': confidence,
             'method': method
         })
@@ -187,6 +194,7 @@ class KeSCOImporter:
         # Create occupation model with contextualization
         occupation = OccupationModel(
             code=kesco_code,
+            isco_group_code=kesco_isco_group,
             preferred_label=kesco_title,
             alt_labels=[],
             occupation_type=OccupationType.LOCAL_OCCUPATION,
@@ -208,26 +216,28 @@ class KeSCOImporter:
             is_entrepreneurship=False,
             source=DataSource.KESCO,
             taxonomy_model_id=self.taxonomy_model_id,
-            added_by="kesco_importer_semantic"
+            added_by="kesco_importer_hierarchical"
         )
         
         return occupation
     
     async def import_occupations(self, batch_size: int = 100) -> Dict[str, Any]:
         """
-        Import all KeSCO occupations with semantic contextualization
+        Import all KeSCO occupations with hierarchical semantic contextualization
         """
         logger.info(f"Starting KeSCO occupations import from {self.excel_path}")
         
         if not self.esco_lookup:
-            logger.warning("⚠️  No ESCO lookup provided! Contextualization will be skipped.")
+            logger.warning("⚠️  No ESCO lookup provided! Exact matching will be skipped.")
         else:
             logger.info(f"✓ ESCO lookup loaded with {len(self.esco_lookup)} searchable titles")
         
-        if not self.semantic_matcher:
-            logger.warning("⚠️  No semantic matcher provided! Will use fuzzy matching (lower quality).")
+        if not self.hierarchical_matcher:
+            logger.error("❌ No hierarchical matcher provided! Cannot proceed.")
+            return self.stats
         else:
-            logger.info("✓ Semantic matcher available for high-quality contextualization")
+            logger.info("✓ Hierarchical semantic matcher available ()")
+            logger.info("✓ AGGRESSIVE 55% threshold for maximum auto-matching")
         
         # Read Excel
         logger.info("Reading Excel file...")
@@ -292,35 +302,48 @@ class KeSCOImporter:
         total = self.stats['total_rows']
         
         print("\n" + "=" * 80)
-        print("KESCO ↔ ESCO CONTEXTUALIZATION SUMMARY (SEMANTIC)")
+        print("KESCO ↔ ESCO CONTEXTUALIZATION SUMMARY (HIERARCHICAL SEMANTIC)")
         print("=" * 80)
         print(f"Total KeSCO occupations: {total}")
-        print(f"Auto-matched (≥70% confidence): {self.stats['auto_matched']} ({self.stats['auto_matched']/total*100:.1f}%)")
-        print(f"Manual review (60-69%): {self.stats['manual_review']} ({self.stats['manual_review']/total*100:.1f}%)")
-        print(f"No match (<60%): {self.stats['no_match']} ({self.stats['no_match']/total*100:.1f}%)")
+        print(f"Auto-matched (≥55% confidence): {self.stats['auto_matched']} ({self.stats['auto_matched']/total*100:.1f}%)")
+        print(f"Manual review (45-54%): {self.stats['manual_review']} ({self.stats['manual_review']/total*100:.1f}%)")
+        print(f"No match (<45%): {self.stats['no_match']} ({self.stats['no_match']/total*100:.1f}%)")
         
-        # Show sample auto-matches
         print("\n" + "-" * 80)
-        print("SAMPLE AUTO-MATCHED (≥70% confidence):")
+        print("MATCHING METHOD BREAKDOWN:")
         print("-" * 80)
-        auto_matches = [m for m in self.matches if m['confidence'] >= 70][:10]
+        print(f"Exact matches: {self.stats['exact_matches']} (perfect title match)")
+        print(f"Hierarchical group matches: {self.stats['hierarchical_group_matches']} (semantic within ISCO group)")
+        print(f"Hierarchical fallback matches: {self.stats['hierarchical_fallback_matches']} (semantic across all occupations)")
+        
+        # Show sample auto-matches with ISCO groups
+        print("\n" + "-" * 80)
+        print("SAMPLE AUTO-MATCHED (≥55% confidence):")
+        print("-" * 80)
+        auto_matches = [m for m in self.matches if m['confidence'] >= 55][:10]
         for match in auto_matches:
-            print(f"{match['confidence']:.0f}% | {match['kesco_title']} → {match['esco_title']}")
+            kesco_group = f"[{match['kesco_isco_group']}]" if match['kesco_isco_group'] else "[N/A]"
+            esco_group = f"[{match['esco_isco_group']}]" if match['esco_isco_group'] else "[N/A]"
+            method_display = match['method'].replace('_', ' ').title()
+            print(f"{match['confidence']:.0f}% | {kesco_group} {match['kesco_title']} → {esco_group} {match['esco_title']} ({method_display})")
         
         # Show sample manual review cases
         print("\n" + "-" * 80)
-        print("SAMPLE MANUAL REVIEW NEEDED (60-69% confidence):")
+        print("SAMPLE MANUAL REVIEW NEEDED (45-54% confidence):")
         print("-" * 80)
-        manual_reviews = [m for m in self.matches if 60 <= m['confidence'] < 70][:10]
+        manual_reviews = [m for m in self.matches if 45 <= m['confidence'] < 55][:10]
         for match in manual_reviews:
-            print(f"{match['confidence']:.0f}% | {match['kesco_title']} → {match['esco_title']} ⚠️")
+            kesco_group = f"[{match['kesco_isco_group']}]" if match['kesco_isco_group'] else "[N/A]"
+            esco_group = f"[{match['esco_isco_group']}]" if match['esco_isco_group'] else "[N/A]"
+            method_display = match['method'].replace('_', ' ').title()
+            print(f"{match['confidence']:.0f}% | {kesco_group} {match['kesco_title']} → {esco_group} {match['esco_title']} ({method_display}) ⚠️")
         
         print("=" * 80 + "\n")
     
     def export_matches_to_csv(self, output_path: str = None):
         """Export match results to CSV for review"""
         if not output_path:
-            output_path = "/home/steve/tabiya/resources/kesco_esco_semantic_matches.csv"
+            output_path = "/home/steve/tabiya/resources/kesco_esco_hierarchical_matches.csv"
         
         df = pd.DataFrame(self.matches)
         df.to_csv(output_path, index=False)
@@ -330,19 +353,19 @@ class KeSCOImporter:
 async def main():
     """Example usage"""
     from motor.motor_asyncio import AsyncIOMotorClient #type:ignore
-    from .semantic_matcher import build_semantic_matcher_from_db
+    from .hierarchical_semantic_matcher import build_hierarchical_matcher_from_db
     
     client = AsyncIOMotorClient(MONGODB_URI)
     db = client[TAXONOMY_DB_NAME]
     
-    # Build semantic matcher
-    semantic_matcher, esco_lookup = await build_semantic_matcher_from_db(db)
+    # Build hierarchical semantic matcher
+    hierarchical_matcher, esco_lookup, _ = await build_hierarchical_matcher_from_db(db)
     
-    # Import KeSCO with semantic contextualization
+    # Import KeSCO with hierarchical semantic contextualization
     kesco_importer = KeSCOImporter(
         db, 
         esco_lookup=esco_lookup,
-        semantic_matcher=semantic_matcher
+        hierarchical_matcher=hierarchical_matcher
     )
     stats = await kesco_importer.import_occupations()
     

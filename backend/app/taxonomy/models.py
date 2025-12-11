@@ -1,3 +1,4 @@
+# app/taxonomy/models.py
 """
 Defines MongoDB document schemas for:
 1. Taxonomy Database (ESCO + KeSCO + Custom Occupations & Skills)
@@ -195,11 +196,13 @@ class OccupationModel(BaseModel):
     
     # Primary identification
     code: str = Field(..., description="Occupation code (ESCO code, KeSCO code, or custom)")
+    isco_group_code: Optional[str] = Field(None, description="4-digit ISCO-08 occupation group code (e.g., '7314')")
     preferred_label: str = Field(..., description="Main occupation title")
     alt_labels: List[str] = Field(default_factory=list, description="Alternative titles/synonyms")
     
     # ESCO-specific fields
     esco_uri: Optional[str] = Field(None, description="ESCO URI if from ESCO")
+    esco_code: Optional[str] = Field(None, description="ESCO occupation code")
     esco_uuid: Optional[str] = Field(None, description="ESCO UUID history")
     occupation_type: OccupationType = Field(..., description="Type of occupation")
     
@@ -222,13 +225,13 @@ class OccupationModel(BaseModel):
     is_entrepreneurship: bool = Field(False, description="True for entrepreneurship roles")
     kenya_specific_notes: Optional[str] = Field(None, description="Kenya-specific context")
     
-    # *** NEW: Contextualization fields (KeSCO ↔ ESCO mapping) ***
-    mapped_to_esco_id: Optional[PyObjectId] = Field(None, description="Auto-matched ESCO occupation (≥85% confidence)")
-    suggested_esco_id: Optional[PyObjectId] = Field(None, description="Suggested ESCO match for manual review (70-84%)")
-    mapping_confidence: Optional[float] = Field(None, ge=0, le=1, description="Fuzzy match confidence score (0-1)")
-    mapping_method: Optional[str] = Field(None, description="Method used for matching (e.g., 'fuzzy_token_sort')")
-    requires_manual_review: bool = Field(False, description="True if mapping confidence is 70-84%")
-    requires_manual_skill_assignment: bool = Field(False, description="True if no good ESCO match found (<70%)")
+    # *** UPDATED: Contextualization fields (KeSCO ↔ ESCO mapping with hierarchical matching) ***
+    mapped_to_esco_id: Optional[PyObjectId] = Field(None, description="Auto-matched ESCO occupation (≥70% confidence)")
+    suggested_esco_id: Optional[PyObjectId] = Field(None, description="Suggested ESCO match for manual review (60-69%)")
+    mapping_confidence: Optional[float] = Field(None, ge=0, le=1, description="Matching confidence score (0-1)")
+    mapping_method: Optional[str] = Field(None, description="Method: 'exact', 'hierarchical_group', 'hierarchical_fallback', 'fuzzy_fallback', etc.")
+    requires_manual_review: bool = Field(False, description="True if mapping confidence is 60-69%")
+    requires_manual_skill_assignment: bool = Field(False, description="True if no good ESCO match found (<60%)")
     has_inherited_skills: bool = Field(False, description="True if skills were inherited from ESCO")
     inherited_skills_count: int = Field(0, description="Number of skills inherited from ESCO")
     
@@ -302,7 +305,7 @@ class OccupationSkillRelationModel(BaseModel):
     skill_level: Optional[str] = Field(None, description="Required proficiency level")
     is_critical_for_kenya: bool = Field(False, description="Critical skill in Kenya market")
     
-    # *** NEW: Skill inheritance tracking ***
+    # *** Skill inheritance tracking ***
     inherited_from_esco_id: Optional[PyObjectId] = Field(None, description="ESCO occupation this skill was inherited from")
     
     # Metadata

@@ -1,7 +1,12 @@
+# app/taxonomy/importers/esco_occupations_importer.py
+"""
+Import ESCO occupations from CSV with ISCO group codes and alternative labels
+"""
+
 import pandas as pd #type:ignore
 from motor.motor_asyncio import AsyncIOMotorDatabase #type:ignore
 from bson import ObjectId #type:ignore
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import asyncio
 import logging
 
@@ -18,12 +23,13 @@ logger = logging.getLogger(__name__)
 
 
 class ESCOOccupationsImporter:
-    """Import ESCO occupations from CSV"""
+    """Import ESCO occupations with ISCO group codes and alternative labels"""
     
     def __init__(self, db: AsyncIOMotorDatabase, csv_path: str = None, taxonomy_model_id: ObjectId = None):
         self.db = db
         self.csv_path = csv_path or ESCO_OCCUPATIONS_CSV
         self.taxonomy_model_id = taxonomy_model_id or TAXONOMY_MODEL_ID
+        
         self.stats = {
             "total_rows": 0,
             "imported": 0,
@@ -42,6 +48,31 @@ class ESCOOccupationsImporter:
         """Extract occupation code from ESCO URI"""
         return uri.split('/')[-1]
     
+    def _extract_isco_group_code(self, code: str) -> Optional[str]:
+        """
+        Extract 4-digit ISCO group code from OCCUPATIONGROUPCODE.
+        
+        Examples:
+            "7314" -> "7314"
+            "7314.1" -> "7314"
+            "73141" -> "7314"
+        """
+        if pd.isna(code) or not code:
+            return None
+        
+        # Convert to string and clean
+        clean_code = str(code).strip()
+        
+        # Take first 4 characters
+        if len(clean_code) >= 4:
+            isco_code = clean_code[:4]
+            
+            # Validate it's a 4-digit number
+            if isco_code.isdigit():
+                return isco_code
+        
+        return None
+    
     def _row_to_occupation_model(self, row: pd.Series) -> OccupationModel:
         """Convert CSV row to OccupationModel"""
         
@@ -53,12 +84,19 @@ class ESCOOccupationsImporter:
         else:
             occupation_type = OccupationType.LOCAL_OCCUPATION
         
+        # Extract ISCO group code
+        isco_group_code = self._extract_isco_group_code(
+            row.get('OCCUPATIONGROUPCODE')
+        )
+        
         occupation = OccupationModel(
             id=str(ObjectId(row['ID'])),
             code=code,
+            isco_group_code=isco_group_code,
             preferred_label=row['PREFERREDLABEL'],
             alt_labels=self._parse_alt_labels(row.get('ALTLABELS')),
             esco_uri=row['ORIGINURI'],
+            esco_code=row.get('CODE') if pd.notna(row.get('CODE')) else None,
             esco_uuid=row.get('UUIDHISTORY'),
             occupation_type=occupation_type,
             description=row.get('DESCRIPTION') if pd.notna(row.get('DESCRIPTION')) else None,
@@ -139,6 +177,7 @@ class ESCOOccupationsImporter:
     async def build_esco_lookup(self) -> Dict[str, Dict]:
         """
         Build a lookup dictionary for ESCO occupations after import.
+        Includes both preferred labels and alternative labels.
         
         Returns:
             Dict mapping lowercase titles -> full occupation document
@@ -167,6 +206,73 @@ class ESCOOccupationsImporter:
         logger.info(f"✓ Built lookup dictionary with {len(lookup)} searchable titles from {len(esco_occupations)} ESCO occupations")
         
         return lookup
+    
+    def build_esco_lookup_from_list(self, esco_occupations: List[Dict]) -> Dict[str, Dict]:
+        """
+        Build lookup dictionary from a list of occupations.
+        Includes both preferred labels and alternative labels.
+        
+        Args:
+            esco_occupations: List of occupation dicts
+            
+        Returns:
+            Dict mapping lowercase titles to occupation dicts
+        """
+        logger.info("Building ESCO lookup dictionary with alt labels...")
+        
+        lookup = {}
+        
+        for occ in esco_occupations:
+            # Add preferred label
+            preferred = occ.get('preferred_label', '').lower().strip()
+            if preferred:
+                lookup[preferred] = occ
+            
+            # Add alternative labels
+            for alt in occ.get('alt_labels', []):
+                alt_lower = alt.lower().strip()
+                if alt_lower and alt_lower not in lookup:
+                    lookup[alt_lower] = occ
+        
+        logger.info(f"✓ Built lookup with {len(lookup)} searchable titles from {len(esco_occupations)} occupations")
+        
+        return lookup
+    
+    def build_esco_lookup_by_group(self, esco_occupations: List[Dict]) -> Dict[str, List[Dict]]:
+        """
+        Build lookup dictionary grouped by ISCO code.
+        
+        Args:
+            esco_occupations: List of occupation dicts
+            
+        Returns:
+            Dict mapping ISCO group codes to lists of occupations
+        """
+        logger.info("Building ESCO group-based lookup...")
+        
+        group_lookup = {}
+        no_group_count = 0
+        
+        for occ in esco_occupations:
+            group_code = occ.get('isco_group_code')
+            
+            if group_code:
+                if group_code not in group_lookup:
+                    group_lookup[group_code] = []
+                group_lookup[group_code].append(occ)
+            else:
+                no_group_count += 1
+        
+        logger.info(f"✓ Built group lookup with {len(group_lookup)} ISCO groups")
+        if no_group_count > 0:
+            logger.info(f"  ⚠️  {no_group_count} occupations without ISCO group code")
+        
+        # Print sample groups
+        sample_groups = list(group_lookup.items())[:5]
+        for group_code, occs in sample_groups:
+            logger.info(f"    Group {group_code}: {len(occs)} occupations")
+        
+        return group_lookup
 
 
 async def main():
