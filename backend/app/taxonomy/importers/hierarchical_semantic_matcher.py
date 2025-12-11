@@ -1,4 +1,3 @@
-# app/taxonomy/importers/hierarchical_semantic_matcher.py
 """
 Hierarchical semantic matcher using ISCO group codes.
 Algorithm: Filter by ISCO group first, then semantic match within group.

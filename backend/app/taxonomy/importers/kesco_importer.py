@@ -1,4 +1,3 @@
-# app/taxonomy/importers/kesco_importer.py
 """
 Import KeSCO occupations from Excel with HIERARCHICAL SEMANTIC CONTEXTUALIZATION
 Algorithm: Filter by ISCO group first, then semantic match within group

@@ -83,7 +83,7 @@ INFO:__main__:STEP 5/5: Importing KeSCO with HIERARCHICAL SEMANTIC CONTEXTUALIZA
 INFO:__main__:================================================================================
 INFO:app.taxonomy.importers.kesco_importer:Starting KeSCO occupations import from /home/steve/tabiya/resources/kesco_occupations.xlsx
 INFO:app.taxonomy.importers.kesco_importer:✓ ESCO lookup loaded with 32106 searchable titles
-INFO:app.taxonomy.importers.kesco_importer:✓ Hierarchical semantic matcher available ()
+INFO:app.taxonomy.importers.kesco_importer:✓ Hierarchical semantic matcher available (Jasmin's approach)
 INFO:app.taxonomy.importers.kesco_importer:✓ AGGRESSIVE 55% threshold for maximum auto-matching
 INFO:app.taxonomy.importers.kesco_importer:Reading Excel file...
 INFO:app.taxonomy.importers.kesco_importer:Found 5917 KeSCO occupations
@@ -190,7 +190,7 @@ INFO:__main__:
 ================================================================================
 INFO:__main__:IMPORT COMPLETE - FINAL SUMMARY
 INFO:__main__:================================================================================
-INFO:__main__:Total duration: 503.74 seconds (8.40 minutes)
+INFO:__main__:Total duration: 582.19 seconds (9.70 minutes)
 INFO:__main__:
 ESCO_OCCUPATIONS:
 INFO:__main__:  ✓ Imported: 3062

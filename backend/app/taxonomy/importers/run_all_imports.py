@@ -1,4 +1,3 @@
-# app/taxonomy/importers/run_all_imports.py
 """
 Master import script for all taxonomy data with HIERARCHICAL SEMANTIC CONTEXTUALIZATION
 Runs all importers in correct order with inline KeSCO-ESCO matching

@@ -1,4 +1,3 @@
-# app/taxonomy/importers/esco_occupations_importer.py
 """
 Import ESCO occupations from CSV with ISCO group codes and alternative labels
 """
