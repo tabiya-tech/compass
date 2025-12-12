@@ -426,7 +426,7 @@ exports[`Report should render Report correctly 1`] = `
           x="0"
           y="0"
         >
-          experiences.report.disclaimer.final
+          This report summarizes the key information gathered during a conversation with Brújula on June 1, 2021. Brújula is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV.
         </text>
       </view>
     </view>
