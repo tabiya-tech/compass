@@ -93,37 +93,67 @@ Your task: Generate TWO realistic job scenario options that:
 4. Feel personalized and realistic for this specific person
 5. Use Kenyan context (companies, salary ranges in KES, local considerations)
 6. Are DIFFERENT from previously shown scenarios
+7. CREATE A MEANINGFUL DILEMMA - both options should be attractive in different ways
 
-Guidelines:
-- Use realistic Kenyan companies or job types
-- Salary ranges should be realistic for Kenya (e.g., 40K-150K KES/month)
-- Include local context (commute in Nairobi traffic, M-PESA, NHIF, etc.)
+CRITICAL: Enforce Real Trade-offs
+================================
+DO NOT make one option objectively better than the other. Each option should have:
+- Clear ADVANTAGES that make it attractive
+- Clear SACRIFICES that make it challenging
+
+The user should feel CONFLICTED about which to choose.
+
+Bad Example (Option B is obviously better):
+❌ Option A: Office job, 60K/month, benefits
+❌ Option B: Remote job, 80K/month, benefits, flexible hours
+   → Option B wins on ALL dimensions. No trade-off!
+
+Good Example (Real dilemma):
+✅ Option A: Office job, 100K/month guaranteed, full benefits, job security
+✅ Option B: Startup, 60K/month base (40% cut!), potential 150K+ with equity, high risk
+   → Now user must choose: Security vs Growth potential
+
+Trade-off Guidelines:
+--------------------
+- If Option A has STABILITY → it should pay MORE on average (30-50% premium)
+- If Option B has FLEXIBILITY/UPSIDE → it should start LOWER but have higher ceiling
+- If Option A has BENEFITS → Option B should lack them but compensate elsewhere
+- If Option B requires SACRIFICE (commute, long hours) → it should pay meaningfully more
+
+Salary Balance Rules:
+- Stable job average should be 20-40% higher than risky job average
+- Risky job ceiling should be 50-100% higher than stable job ceiling
+- Never make the "exciting" option ALSO pay more guaranteed - that's unrealistic
+
+Kenyan Context Guidelines:
+- Use realistic Kenyan companies or job types (Safaricom, Equity Bank, local startups)
+- Salary ranges should be realistic for Kenya (50K-180K KES/month)
+- Include local context (Nairobi traffic commute, M-PESA, NHIF/NSSF benefits)
 - Make jobs feel relevant to THEIR background, not generic
 - Keep descriptions clear and concise (3-5 sentences each)
-- Ensure the trade-off is meaningful and balanced
 
 Examples of good personalization:
-- Software Developer background → Compare "Senior Engineer at Safaricom" vs "Freelance Developer"
-- Teacher background → Compare "Teacher at private school" vs "Tutor at education startup"
-- Retail background → Compare "Shop Manager" vs "Online Retail Coordinator"
+- Software Developer → "Backend Engineer at Safaricom" vs "Tech Lead at 2-person startup"
+- Teacher → "Public school teacher (secure, lower pay)" vs "Private tutoring (variable, higher ceiling)"
+- Sales → "Corporate sales rep (stable, structured)" vs "Commission-only broker (risky, unlimited upside)"
 
 Output Schema:
 You must return a JSON object with exactly these fields:
 - scenario_intro (string): Brief introduction to the scenario (1-2 sentences)
-- option_a_title (string): Short job title for option A (e.g., "Senior Developer at Safaricom")
-- option_a_description (string): Detailed description of option A (3-5 sentences)
-- option_b_title (string): Short job title for option B (e.g., "Freelance Software Engineer")
-- option_b_description (string): Detailed description of option B (3-5 sentences)
+- option_a_title (string): Short job title for option A
+- option_a_description (string): Detailed description including salary, benefits, and trade-offs (3-5 sentences)
+- option_b_title (string): Short job title for option B
+- option_b_description (string): Detailed description including salary, benefits, and trade-offs (3-5 sentences)
 - reasoning (string): Brief explanation of how this was personalized
 
 Example Output:
 {
-  "scenario_intro": "Imagine you have two job offers in the software development field.",
-  "option_a_title": "Backend Developer at Safaricom",
-  "option_a_description": "You'd work as a Backend Developer at Safaricom's headquarters in Nairobi. The salary is KES 120,000 per month with full benefits including NHIF and NSSF. The role offers excellent job security and clear career progression, but requires being in the office 5 days a week during peak Nairobi traffic hours.",
-  "option_b_title": "Freelance Full-Stack Developer",
-  "option_b_description": "You'd work as a freelance developer taking on projects from various clients. Your income could range from KES 80,000 to KES 200,000 per month depending on projects secured. You have complete flexibility in schedule and location, but income is variable and you're responsible for your own benefits and finding clients.",
-  "reasoning": "Personalized for software developer background with scenarios relevant to Kenya's tech industry. Maintains job security vs. income flexibility trade-off."
+  "scenario_intro": "You're weighing two paths in software development with very different risk profiles.",
+  "option_a_title": "Senior Developer at Safaricom",
+  "option_a_description": "You'd work as a Senior Backend Developer at Safaricom's headquarters in Nairobi. The salary is KES 110,000 per month with full benefits including NHIF, NSSF, and pension. The role offers excellent job security, predictable career progression, and great work-life balance. However, the work is often routine, innovation is slow, and you'd spend 2 hours daily commuting through Nairobi traffic.",
+  "option_b_title": "Tech Lead at Early-Stage Fintech Startup",
+  "option_b_description": "You'd be the founding engineer at a 5-person fintech startup targeting mobile money users. Base salary is KES 70,000 per month (a 36% cut from corporate) but includes 3% equity that could be worth millions if the company succeeds. The role offers rapid learning, significant autonomy, and remote work flexibility. However, the startup might fail, there are no benefits, and you'd often work 50+ hour weeks during critical launches.",
+  "reasoning": "Personalized for senior developer background. Creates real dilemma: guaranteed 110K comfort vs 70K + equity upside. Neither is obviously better - depends on risk tolerance and life stage."
 }
 """
 

@@ -7,18 +7,37 @@
       "dimension_b": "income_flexibility"
     },
     "option_a": {
-      "high_dimensions": ["job_security", "income_stability"],
-      "low_dimensions": ["schedule_flexibility", "income_variability"],
-      "salary_range": [60000, 70000],
+      "high_dimensions": [
+        "job_security",
+        "income_stability"
+      ],
+      "low_dimensions": [
+        "schedule_flexibility",
+        "income_variability"
+      ],
+      "salary_range": [
+        95000,
+        115000
+      ],
       "contract_type": "permanent",
       "benefits": "full",
       "work_location": "office",
       "hours": "fixed"
     },
     "option_b": {
-      "high_dimensions": ["schedule_flexibility", "income_variability", "autonomy"],
-      "low_dimensions": ["job_security", "income_stability"],
-      "salary_range": [40000, 90000],
+      "high_dimensions": [
+        "schedule_flexibility",
+        "income_variability",
+        "autonomy"
+      ],
+      "low_dimensions": [
+        "job_security",
+        "income_stability"
+      ],
+      "salary_range": [
+        50000,
+        150000
+      ],
       "contract_type": "freelance",
       "benefits": "none",
       "work_location": "varies",
@@ -44,9 +63,17 @@
       "dimension_b": "remote_work_preference"
     },
     "option_a": {
-      "high_dimensions": ["salary"],
-      "low_dimensions": ["remote_work", "commute_tolerance"],
-      "salary_range": [65000, 75000],
+      "high_dimensions": [
+        "salary"
+      ],
+      "low_dimensions": [
+        "remote_work",
+        "commute_tolerance"
+      ],
+      "salary_range": [
+        90000,
+        110000
+      ],
       "work_location": "office_far",
       "commute_time_minutes": 90,
       "hours": "fixed",
@@ -54,9 +81,17 @@
       "benefits": "full"
     },
     "option_b": {
-      "high_dimensions": ["remote_work", "autonomy"],
-      "low_dimensions": ["salary"],
-      "salary_range": [55000, 65000],
+      "high_dimensions": [
+        "remote_work",
+        "autonomy"
+      ],
+      "low_dimensions": [
+        "salary"
+      ],
+      "salary_range": [
+        65000,
+        85000
+      ],
       "work_location": "remote",
       "commute_time_minutes": 0,
       "hours": "flexible_within_window",
@@ -83,9 +118,17 @@
       "dimension_b": "career_growth"
     },
     "option_a": {
-      "high_dimensions": ["career_growth", "learning_opportunities"],
-      "low_dimensions": ["immediate_salary"],
-      "salary_range": [45000, 55000],
+      "high_dimensions": [
+        "career_growth",
+        "learning_opportunities"
+      ],
+      "low_dimensions": [
+        "immediate_salary"
+      ],
+      "salary_range": [
+        55000,
+        70000
+      ],
       "salary_progression": "high",
       "training_provided": true,
       "learning_opportunities": "high",
@@ -93,9 +136,18 @@
       "contract_type": "permanent"
     },
     "option_b": {
-      "high_dimensions": ["immediate_salary", "job_security"],
-      "low_dimensions": ["career_growth", "learning_opportunities"],
-      "salary_range": [65000, 75000],
+      "high_dimensions": [
+        "immediate_salary",
+        "job_security"
+      ],
+      "low_dimensions": [
+        "career_growth",
+        "learning_opportunities"
+      ],
+      "salary_range": [
+        95000,
+        110000
+      ],
       "salary_progression": "none",
       "training_provided": false,
       "learning_opportunities": "low",
@@ -122,18 +174,35 @@
       "dimension_b": "salary"
     },
     "option_a": {
-      "high_dimensions": ["work_life_balance", "schedule_predictability"],
-      "low_dimensions": ["salary"],
-      "salary_range": [50000, 60000],
+      "high_dimensions": [
+        "work_life_balance",
+        "schedule_predictability"
+      ],
+      "low_dimensions": [
+        "salary"
+      ],
+      "salary_range": [
+        75000,
+        90000
+      ],
       "hours_per_week": 40,
       "overtime": "never",
       "weekend_work": "never",
       "work_pace": "relaxed"
     },
     "option_b": {
-      "high_dimensions": ["salary", "career_progression"],
-      "low_dimensions": ["work_life_balance", "free_time"],
-      "salary_range": [75000, 90000],
+      "high_dimensions": [
+        "salary",
+        "career_progression"
+      ],
+      "low_dimensions": [
+        "work_life_balance",
+        "free_time"
+      ],
+      "salary_range": [
+        110000,
+        150000
+      ],
       "hours_per_week": 50,
       "overtime": "frequent",
       "weekend_work": "1-2_per_month",
@@ -160,18 +229,38 @@
       "dimension_b": "autonomy_independence"
     },
     "option_a": {
-      "high_dimensions": ["structure", "supervision", "team_support"],
-      "low_dimensions": ["autonomy", "independence"],
-      "salary_range": [50000, 55000],
+      "high_dimensions": [
+        "structure",
+        "supervision",
+        "team_support"
+      ],
+      "low_dimensions": [
+        "autonomy",
+        "independence"
+      ],
+      "salary_range": [
+        50000,
+        55000
+      ],
       "supervision": "close",
       "autonomy": "low",
       "structure": "high",
       "team_size": "small"
     },
     "option_b": {
-      "high_dimensions": ["autonomy", "independence", "income_potential"],
-      "low_dimensions": ["structure", "supervision"],
-      "salary_range": [45000, 80000],
+      "high_dimensions": [
+        "autonomy",
+        "independence",
+        "income_potential"
+      ],
+      "low_dimensions": [
+        "structure",
+        "supervision"
+      ],
+      "salary_range": [
+        45000,
+        80000
+      ],
       "supervision": "minimal",
       "autonomy": "very_high",
       "structure": "low",
@@ -197,18 +286,37 @@
       "dimension_b": "growth_potential"
     },
     "option_a": {
-      "high_dimensions": ["job_security", "income_stability"],
-      "low_dimensions": ["career_growth", "excitement"],
-      "salary_range": [65000, 75000],
+      "high_dimensions": [
+        "job_security",
+        "income_stability"
+      ],
+      "low_dimensions": [
+        "career_growth",
+        "excitement"
+      ],
+      "salary_range": [
+        95000,
+        115000
+      ],
       "contract_type": "permanent",
       "job_security": "very_high",
       "salary_growth": "slow",
       "work_pace": "slow"
     },
     "option_b": {
-      "high_dimensions": ["growth_potential", "learning", "excitement"],
-      "low_dimensions": ["job_security", "stability"],
-      "salary_range": [70000, 150000],
+      "high_dimensions": [
+        "growth_potential",
+        "learning",
+        "excitement"
+      ],
+      "low_dimensions": [
+        "job_security",
+        "stability"
+      ],
+      "salary_range": [
+        60000,
+        180000
+      ],
       "contract_type": "contract",
       "job_security": "medium",
       "salary_growth": "potentially_high",
@@ -226,5 +334,69 @@
       "work_environment.work_pace_preference"
     ],
     "difficulty_level": "hard"
+  },
+  {
+    "template_id": "task_type_preference",
+    "category": "task_preferences",
+    "trade_off": {
+      "dimension_a": "social_interactive_tasks",
+      "dimension_b": "independent_analytical_tasks"
+    },
+    "option_a": {
+      "high_dimensions": [
+        "social_tasks",
+        "communication",
+        "teamwork",
+        "client_interaction"
+      ],
+      "low_dimensions": [
+        "routine_tasks",
+        "independence",
+        "analytical_work"
+      ],
+      "salary_range": [
+        80000,
+        95000
+      ],
+      "task_type": "client_facing",
+      "collaboration_level": "high",
+      "autonomy": "low",
+      "social_interaction": "frequent",
+      "work_pace": "dynamic"
+    },
+    "option_b": {
+      "high_dimensions": [
+        "cognitive_tasks",
+        "independence",
+        "analytical_work",
+        "problem_solving"
+      ],
+      "low_dimensions": [
+        "social_tasks",
+        "teamwork",
+        "client_interaction"
+      ],
+      "salary_range": [
+        75000,
+        90000
+      ],
+      "task_type": "technical_analytical",
+      "collaboration_level": "low",
+      "autonomy": "high",
+      "social_interaction": "minimal",
+      "work_pace": "self_directed"
+    },
+    "follow_up_prompts": [
+      "Do you prefer working directly with people or focusing on independent work?",
+      "How do you feel about tasks that require frequent collaboration versus working alone?"
+    ],
+    "targeted_dimensions": [
+      "task_preferences.social_tasks_preference",
+      "task_preferences.cognitive_tasks_preference",
+      "task_preferences.routine_tasks_tolerance",
+      "task_preferences.manual_tasks_preference",
+      "work_environment.autonomy_importance"
+    ],
+    "difficulty_level": "medium"
   }
 ]
