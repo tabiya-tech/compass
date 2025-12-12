@@ -13,8 +13,8 @@ export enum Locale {
 export const LocalesLabels = {
   [Locale.EN_GB]: "English (UK)",
   [Locale.EN_US]: "English (US)",
-  [Locale.ES_ES]: "Spanish (Spain)",
-  [Locale.ES_AR]: "Spanish (Argentina)"
+  [Locale.ES_ES]: "Español (España)",
+  [Locale.ES_AR]: "Español (Argentina)",
 } as const;
 
 export const SupportedLocales: Locale[] = [Locale.EN_GB, Locale.EN_US, Locale.ES_ES, Locale.ES_AR];

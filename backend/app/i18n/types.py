@@ -17,9 +17,9 @@ class Locale(Enum):
             case Locale.EN_GB:
                 return "English (UK)"
             case Locale.ES_ES:
-                return "Spanish (Spain)"
+                return "Español (España)"
             case Locale.ES_AR:
-                return "Spanish (Argentina)"
+                return "Español (Argentina)"
 
 SUPPORTED_LOCALES: list[Locale] = [Locale.EN_US, Locale.EN_GB, Locale.ES_AR, Locale.ES_ES]
 
