@@ -63,6 +63,23 @@ class VignetteEngine:
                 raise ValueError("LLM is required when use_personalization=True")
             self._personalizer = VignettePersonalizer(llm=llm)
             self._logger.info("Initialized VignetteEngine with personalization")
+            
+            # Validate all required categories have templates
+            required_categories = [
+                "financial", "work_environment", "job_security",
+                "career_advancement", "work_life_balance", "task_preferences"
+            ]
+            missing_categories = []
+            for category in required_categories:
+                templates = self._personalizer.get_templates_by_category(category)
+                if not templates:
+                    missing_categories.append(category)
+            
+            if missing_categories:
+                self._logger.warning(
+                    f"⚠️  CONFIGURATION WARNING: Missing templates for categories: {missing_categories}. "
+                    f"These categories will be skipped during preference elicitation!"
+                )
         else:
             # Load static vignettes from config for backward compatibility
             if vignettes_config_path is None:
