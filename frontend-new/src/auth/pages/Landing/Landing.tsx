@@ -113,6 +113,7 @@ const Landing: React.FC = () => {
         maxWidth="xs"
         fullWidth
         disableEscapeKeyDown
+        disableEnforceFocus
         onClose={() => {}}
         hideBackdrop={false}
         sx={{

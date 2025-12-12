@@ -20,9 +20,7 @@ import AnonymousAccountConversionDialog, {
   DATA_TEST_ID as ANONYMOUS_ACCOUNT_CONVERSION_DIALOG_DATA_TEST_ID,
 } from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
 import { DATA_TEST_ID as CONFIRM_MODAL_DATA_TEST_ID } from "src/theme/confirmModalDialog/ConfirmModalDialog";
-import {
-  DATA_TEST_ID as TEXT_CONFIRM_MODAL_DIALOG_DATA_TEST_ID,
-} from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
+import { DATA_TEST_ID as TEXT_CONFIRM_MODAL_DIALOG_DATA_TEST_ID } from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
 import { ChatProvider } from "src/chat/ChatContext";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import * as Sentry from "@sentry/react";
@@ -569,10 +567,17 @@ describe("ChatHeader", () => {
       // THEN expect the create form to be called with the correct parameters
       expect(mockCreateForm).toHaveBeenCalledWith({
         formTitle: i18n.t("chat.chatHeader.giveGeneralFeedback"),
+        nameLabel: i18n.t("chat.chatHeader.nameLabel"),
+        namePlaceholder: i18n.t("chat.chatHeader.namePlaceholder"),
+        emailLabel: i18n.t("chat.chatHeader.emailLabel"),
+        emailPlaceholder: i18n.t("chat.chatHeader.emailPlaceholder"),
+        isRequiredLabel: i18n.t("chat.chatHeader.requiredLabel"),
+        messageLabel: i18n.t("chat.chatHeader.descriptionLabel"),
         messagePlaceholder: i18n.t("chat.chatHeader.feedbackMessagePlaceholder"),
+        addScreenshotButtonLabel: i18n.t("chat.chatHeader.addScreenshot"),
         submitButtonLabel: i18n.t("chat.chatHeader.sendFeedback"),
+        cancelButtonLabel: i18n.t("chat.chatHeader.cancelButton"),
         successMessageText: i18n.t("chat.chatHeader.feedbackSuccessMessage"),
-        enableScreenshot: false,
       });
       // AND the form should be appended to DOM and opened
       expect(mockForm.appendToDom).toHaveBeenCalled();
