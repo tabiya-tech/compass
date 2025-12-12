@@ -163,8 +163,8 @@ class PreferenceElicitationAgentState(BaseModel):
         """
         return (
             len(self.completed_vignettes) >= self.minimum_vignettes_completed
-            and len(self.categories_covered) >= 3  # At least 3 categories explored
-            and self.preference_vector.confidence_score > 0.3  # Minimum confidence
+            and len(self.categories_covered) >= 6
+            and self.preference_vector.confidence_score > 0.3
         )
 
     def get_next_category_to_explore(self) -> Optional[str]:
