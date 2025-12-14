@@ -92,8 +92,8 @@ class PreferenceElicitationAgentState(BaseModel):
     follow_up_question: Optional[str] = None
     """Current follow-up question being asked (if any)"""
 
-    follow_ups_asked: set[str] = Field(default_factory=set)
-    """Set of vignette IDs we've already asked follow-ups for (max one per vignette)"""
+    follow_ups_asked: list[str] = Field(default_factory=list)
+    """List of vignette IDs we've already asked follow-ups for (max one per vignette)"""
 
     last_experience_question_asked: Optional[str] = None
     """The last experience question that was asked (for extraction context)"""
@@ -147,7 +147,7 @@ class PreferenceElicitationAgentState(BaseModel):
             ]),
             needs_follow_up=doc.get("needs_follow_up", False),
             follow_up_question=doc.get("follow_up_question"),
-            follow_ups_asked=set(doc.get("follow_ups_asked", [])),
+            follow_ups_asked=list(doc.get("follow_ups_asked", [])),
             last_experience_question_asked=doc.get("last_experience_question_asked"),
             user_has_indicated_completion=doc.get("user_has_indicated_completion", False),
             minimum_vignettes_completed=doc.get("minimum_vignettes_completed", 5),
@@ -213,4 +213,5 @@ class PreferenceElicitationAgentState(BaseModel):
         Args:
             vignette_id: ID of the vignette we asked a follow-up for
         """
-        self.follow_ups_asked.add(vignette_id)
+        if vignette_id not in self.follow_ups_asked:
+            self.follow_ups_asked.append(vignette_id)
