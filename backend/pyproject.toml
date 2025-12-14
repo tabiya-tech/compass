@@ -46,6 +46,7 @@ pytest-repeat = "^0.9.4"
 matplotlib="^3.9.0"
 google-genai="^1.26.0"
 google-cloud-storage = "^2.18.2"
+rich = "^14.2.0"
 
 [build-system]
 requires = ["poetry-core"]
