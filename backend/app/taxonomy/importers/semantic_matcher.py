@@ -59,7 +59,7 @@ class SemanticOccupationMatcher:
                 self.esco_titles.append(title)
                 self.esco_lookup[title] = occ
         
-        # Generate embeddings (this is the magic!)
+        # Generate embeddings
         logger.info(f"Generating semantic embeddings for {len(self.esco_titles)} titles...")
         self.esco_embeddings = self.model.encode(
             self.esco_titles,
