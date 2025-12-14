@@ -114,11 +114,12 @@ class TestPreferenceElicitationAgentState:
         assert not state.can_complete()
 
     def test_can_complete_after_minimum_vignettes(self):
-        """Test completion after minimum vignettes."""
+        """Test completion after minimum vignettes and category coverage."""
         state = PreferenceElicitationAgentState(
             session_id=1,
             completed_vignettes=["v1", "v2", "v3", "v4", "v5"],
-            categories_covered=["financial", "work_environment", "job_security"]
+            categories_covered=["financial", "work_environment", "job_security",
+                              "career_advancement", "work_life_balance", "task_preferences"]  # All 6 categories
         )
         state.preference_vector.confidence_score = 0.5
         assert state.can_complete()

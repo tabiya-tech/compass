@@ -333,10 +333,20 @@ Example Output:
 **Template Trade-Off:**
 {template_description}
 
-**Previously Shown Scenarios:**
+**Previously Shown Scenarios (MUST be VERY different):**
 {previous_desc}
 
-Generate a personalized vignette that feels relevant to this user's background.
+**CRITICAL REQUIREMENTS:**
+1. The job scenarios you generate MUST be SUBSTANTIALLY DIFFERENT from all previous scenarios
+2. If previous scenarios used freelance/permanent contrast, use a DIFFERENT contrast (startup vs corporate, field work vs office, client-facing vs backend)
+3. If previous scenarios used a specific industry/company, use a COMPLETELY DIFFERENT industry/company
+4. Vary the job settings: if previous were tech/office jobs, try field work, retail, healthcare, education, etc.
+5. The trade-off dimensions from the template are what matter - not the specific job types
+
+Generate a personalized vignette that:
+- Tests the TEMPLATE'S trade-off dimensions
+- Uses job scenarios VERY DIFFERENT from previous ones
+- Feels relevant to user's skills but in a different context
 """
 
         caller = LLMCaller[GeneratedVignetteContent](

@@ -229,7 +229,8 @@ class PreferenceExtractor:
         self,
         vignette: Vignette,
         user_response: str,
-        current_preference_vector: PreferenceVector
+        current_preference_vector: PreferenceVector,
+        conversation_history: Optional[str] = None
     ) -> tuple[PreferenceExtractionResult, list[LLMStats]]:
         """
         Extract preference signals from user's response to a vignette.
@@ -238,6 +239,7 @@ class PreferenceExtractor:
             vignette: The vignette that was presented
             user_response: User's response (choice + reasoning)
             current_preference_vector: Current state of preference vector
+            conversation_history: Optional conversation history for context
 
         Returns:
             Tuple of (extraction result, LLM stats)
@@ -245,8 +247,20 @@ class PreferenceExtractor:
         # Build the vignette context (NOT instructions - those are in the LLM)
         context_prompt = self._build_context_prompt(vignette)
 
+        # Add conversation history if provided
+        history_context = ""
+        if conversation_history:
+            history_context = f"""
+        <Previous Conversation>
+        {conversation_history}
+        </Previous Conversation>
+
+        NOTE: The user may reference previous responses or choices. Use this context to understand their current response better.
+        """
+
         # Combine context with user response
         full_input = f"""{context_prompt}
+        {history_context}
 
         <User's Response>
         {user_response}

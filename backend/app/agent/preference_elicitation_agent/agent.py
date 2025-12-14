@@ -82,6 +82,29 @@ class ConversationResponse(BaseModel):
         extra = "forbid"
 
 
+class PreferenceSummaryGenerator(BaseModel):
+    """
+    LLM response model for generating preference summary.
+
+    Generates natural, conversational bullet points summarizing
+    the user's key job preferences from their preference vector.
+    """
+    reasoning: str = Field(
+        description="Brief reasoning about what stands out in their preferences"
+    )
+
+    finished: bool = Field(
+        description="Always set to True when summary is generated"
+    )
+
+    message: str = Field(
+        description="Summary of user's preferences as formatted bullet points (use • for bullets)"
+    )
+
+    class Config:
+        extra = "forbid"
+
+
 class PreferenceElicitationAgent(Agent):
     """
     Agent that elicits user preferences through vignettes and conversation.
@@ -189,6 +212,11 @@ class PreferenceElicitationAgent(Agent):
 
             next_category = self._state.get_next_category_to_explore()
             if next_category:
+                # Double-check category not already covered (race condition protection)
+                if next_category in self._state.categories_covered:
+                    self.logger.debug(f"Category '{next_category}' already covered, skipping pre-warm")
+                    return
+
                 self.logger.info(f"Pre-warming vignette for category: {next_category}")
 
                 # Get templates for next category
@@ -199,7 +227,18 @@ class PreferenceElicitationAgent(Agent):
                 # Generate vignette directly using personalizer (bypass select_next_vignette to avoid state changes)
                 from app.agent.preference_elicitation_agent.vignette_personalizer import VignettePersonalizer
 
+                # Select template: avoid recently used templates (same logic as vignette_engine)
+                used_template_ids = [
+                    resp.vignette_id.rsplit('_', 1)[0]  # Extract template_id from vignette_id
+                    for resp in self._state.vignette_responses[-3:]  # Last 3 responses
+                ]
+
+                # Find first unused template, or use first if all used
                 template = templates[0]
+                for t in templates:
+                    if t.template_id not in used_template_ids:
+                        template = t
+                        break
                 previous_scenarios = []
                 for resp in self._state.vignette_responses:
                     prev_vignette = self._vignette_engine.get_vignette_by_id(resp.vignette_id)
@@ -587,11 +626,15 @@ class PreferenceElicitationAgent(Agent):
             )
 
             if vignette:
+                # Build conversation history context for extraction
+                conversation_history = self._build_conversation_history_for_extraction(context)
+
                 # Extract preferences from user's response
                 extraction_result, extraction_stats = await self._preference_extractor.extract_preferences(
                     vignette=vignette,
                     user_response=user_input,
-                    current_preference_vector=self._state.preference_vector
+                    current_preference_vector=self._state.preference_vector,
+                    conversation_history=conversation_history
                 )
                 all_llm_stats.extend(extraction_stats)
 
@@ -628,21 +671,15 @@ class PreferenceElicitationAgent(Agent):
 
                 # Check if we should ask follow-up BEFORE moving to next vignette
                 if self._should_ask_follow_up(vignette_response):
-                    # Generate follow-up and pre-warm next vignette IN PARALLEL
+                    # Generate follow-up question
                     self.logger.info(f"Generating follow-up for vignette {vignette_response.vignette_id}")
 
-                    # Run follow-up generation and vignette pre-warming concurrently
-                    follow_up_task = asyncio.create_task(
-                        self._generate_contextual_follow_up(
-                            vignette_response=vignette_response,
-                            extraction_result=extraction_result,
-                            context=context
-                        )
+                    # Generate follow-up (no parallel pre-warming to avoid rate limits)
+                    follow_up_message = await self._generate_contextual_follow_up(
+                        vignette_response=vignette_response,
+                        extraction_result=extraction_result,
+                        context=context
                     )
-                    prewarm_task = asyncio.create_task(self._prewarm_next_vignette())
-
-                    # Wait for both to complete
-                    follow_up_message, _ = await asyncio.gather(follow_up_task, prewarm_task)
 
                     # Transition to follow-up phase
                     self._state.conversation_phase = "FOLLOW_UP"
@@ -659,13 +696,13 @@ class PreferenceElicitationAgent(Agent):
         asyncio.create_task(self._prewarm_next_vignette())
 
         # Check if we can complete
-        if self._state.can_complete() and len(self._state.completed_vignettes) >= 5:
+        if self._state.can_complete() and len(self._state.completed_vignettes) >= 6:
             self._state.conversation_phase = "WRAPUP"
             return await self._handle_wrapup_phase(user_input, context)
 
         # Log current state before selecting next vignette
         self.logger.info(
-            f"\n📊 Vignette Selection State:\n"
+            f"\nVignette Selection State:\n"
             f"  - Completed vignettes: {len(self._state.completed_vignettes)}\n"
             f"  - Categories covered: {self._state.categories_covered}\n"
             f"  - Categories to explore: {self._state.categories_to_explore}\n"
@@ -854,8 +891,25 @@ Keep it conversational, not interrogative.
                 f"Updated preferences from follow-up (new confidence: {extraction_result.confidence:.2f})"
             )
 
+            # Check if we should now mark the category as covered (after follow-up improved confidence)
+            if extraction_result.confidence > 0.6:
+                self.logger.info(
+                    f"✅ Marking category '{vignette.category}' as covered after follow-up "
+                    f"(confidence: {extraction_result.confidence:.2f}, vignette: {vignette.vignette_id})"
+                )
+                self._state.mark_category_covered(vignette.category)
+            else:
+                self.logger.warning(
+                    f"⚠️  NOT marking category '{vignette.category}' as covered after follow-up - confidence still too low "
+                    f"(confidence: {extraction_result.confidence:.2f}, threshold: 0.6, vignette: {vignette.vignette_id})"
+                )
+
         # Mark that we've asked follow-up for this vignette
         self._state.mark_follow_up_asked(last_response.vignette_id)
+
+        # Pre-warm next vignette now (after follow-up response, before presenting next vignette)
+        # This spreads out LLM calls to avoid rate limiting
+        asyncio.create_task(self._prewarm_next_vignette())
 
         # Return to vignettes phase
         self._state.conversation_phase = "VIGNETTES"
@@ -878,8 +932,11 @@ Keep it conversational, not interrogative.
         Returns:
             Tuple of (response, LLM stats)
         """
-        # Summarize preferences
-        summary = self._generate_preference_summary()
+        all_llm_stats: list[LLMStats] = []
+
+        # Summarize preferences using LLM
+        summary, summary_stats = await self._generate_preference_summary()
+        all_llm_stats.extend(summary_stats)
 
         wrapup_message = f"""Great! I've learned a lot about your preferences.
 
@@ -900,7 +957,7 @@ Keep it conversational, not interrogative.
 
         self._state.conversation_phase = "COMPLETE"
 
-        return response, []
+        return response, all_llm_stats
 
     async def _handle_complete_phase(
         self,
@@ -1019,38 +1076,178 @@ Keep it conversational, not interrogative.
 
         return "\n".join(message_parts)
 
-    def _generate_preference_summary(self) -> str:
+    def _build_conversation_history_for_extraction(
+        self,
+        context: ConversationContext
+    ) -> str:
         """
-        Generate a summary of extracted preferences.
+        Build a concise conversation history for preference extraction.
+
+        Only includes the last few relevant turns to provide context
+        without overwhelming the extraction LLM.
+
+        Args:
+            context: Current conversation context
 
         Returns:
-            Human-readable summary string
+            Formatted conversation history string
+        """
+        # Get the last 3-5 turns for context
+        recent_turns = context.history.turns[-5:] if len(context.history.turns) > 0 else []
+
+        if not recent_turns:
+            return ""
+
+        history_parts = []
+        for turn in recent_turns:
+            # Only include turns during vignette/follow-up phases for relevance
+            history_parts.append(f"Assistant: {turn.output.message_for_user}")
+            history_parts.append(f"User: {turn.input.message}")
+
+        return "\n".join(history_parts)
+
+    async def _generate_preference_summary(self) -> tuple[str, list[LLMStats]]:
+        """
+        Generate a natural summary of extracted preferences using LLM.
+
+        Uses LLM to create personalized, conversational bullet points that
+        highlight the strongest and most distinctive preferences.
+
+        Returns:
+            Tuple of (summary string, LLM stats)
+        """
+        pv = self._state.preference_vector
+
+        # Format the preference vector for the LLM
+        pv_formatted = self._format_preference_vector_for_summary(pv)
+
+        prompt = f"""
+The user has completed a preference elicitation conversation. Below is their preference vector with scores and values.
+
+Your task: Generate 3-5 natural, conversational bullet points summarizing what matters most to them in a job.
+
+**Guidelines:**
+1. Focus on the STRONGEST signals (high scores >0.7 or low scores <0.3)
+2. Combine related preferences naturally (e.g., "flexibility and autonomy" not separate bullets)
+3. Include task preferences - they're critical for recommendations
+4. Mention negative signals if meaningful (e.g., low work-life balance = career-driven)
+5. Use conversational language, not technical jargon
+6. Prioritize the top 3-5 most distinctive preferences
+7. Be specific - reference actual values when they tell a story
+
+**Preference Vector:**
+{pv_formatted}
+
+**Examples of good summaries:**
+- "Job security and stable income are very important to you - you strongly prefer permanent roles"
+- "You thrive on analytical and problem-solving work, especially tasks that require deep thinking"
+- "You prefer working independently rather than in social or team-based roles"
+- "Career growth and learning opportunities matter more to you than work-life balance"
+- "Flexible hours and autonomy are important, though remote work isn't a must-have"
+
+Generate a summary that captures what's UNIQUE about this user's preferences.
+"""
+
+        # Create LLM caller
+        caller = LLMCaller[PreferenceSummaryGenerator](
+            model_response_type=PreferenceSummaryGenerator
+        )
+
+        try:
+            response, llm_stats = await caller.call_llm(
+                llm=self._conversation_llm,  # Reuse existing conversation LLM
+                llm_input=prompt,
+                logger=self.logger
+            )
+
+            if response and response.message:
+                self.logger.info(
+                    f"Generated LLM preference summary. "
+                    f"Reasoning: {response.reasoning}"
+                )
+                # Message already contains formatted bullets, return as-is
+                return response.message, llm_stats
+            else:
+                self.logger.warning("LLM returned empty summary, using fallback")
+                fallback = self._generate_basic_preference_summary()
+                return fallback, llm_stats  # Still return stats even if using fallback
+
+        except Exception as e:
+            self.logger.warning(f"Failed to generate LLM summary: {e}, using fallback")
+            fallback = self._generate_basic_preference_summary()
+            return fallback, []  # No stats on exception
+
+    def _format_preference_vector_for_summary(self, pv: PreferenceVector) -> str:
+        """
+        Format preference vector in a readable way for LLM.
+
+        Args:
+            pv: Preference vector to format
+
+        Returns:
+            Formatted string representation
+        """
+        return f"""
+Financial:
+- Importance: {pv.financial.importance:.2f}
+- Benefits importance: {pv.financial.benefits_importance:.2f}
+- Bonus/commission tolerance: {pv.financial.bonus_commission_tolerance:.2f}
+
+Work Environment:
+- Remote preference: {pv.work_environment.remote_work_preference}
+- Flexibility importance: {pv.work_environment.work_hours_flexibility_importance:.2f}
+- Autonomy importance: {pv.work_environment.autonomy_importance:.2f}
+- Supervision preference: {pv.work_environment.supervision_preference}
+
+Job Security:
+- Importance: {pv.job_security.importance:.2f}
+- Stability required: {pv.job_security.income_stability_required}
+- Risk tolerance: {pv.job_security.risk_tolerance}
+- Contract preference: {pv.job_security.contract_type_preference}
+
+Career Advancement:
+- Importance: {pv.career_advancement.importance:.2f}
+- Learning value: {pv.career_advancement.learning_opportunities_value}
+- Skill development: {pv.career_advancement.skill_development_importance:.2f}
+
+Work-Life Balance:
+- Importance: {pv.work_life_balance.importance:.2f}
+- Max hours/week: {pv.work_life_balance.max_acceptable_hours_per_week or 'Not set'}
+- Weekend work: {pv.work_life_balance.weekend_work_tolerance}
+- Evening work: {pv.work_life_balance.evening_work_tolerance}
+
+Task Preferences:
+- Social tasks: {pv.task_preferences.social_tasks_preference:.2f}
+- Cognitive tasks: {pv.task_preferences.cognitive_tasks_preference:.2f}
+- Routine tolerance: {pv.task_preferences.routine_tasks_tolerance:.2f}
+- Creative tasks: {pv.task_preferences.creative_tasks_preference:.2f}
+- Manual tasks: {pv.task_preferences.manual_tasks_preference:.2f}
+
+Overall Confidence: {pv.confidence_score:.2f}
+"""
+
+    def _generate_basic_preference_summary(self) -> str:
+        """
+        Fallback basic summary if LLM fails.
+
+        Returns:
+            Simple fallback summary
         """
         pv = self._state.preference_vector
         summary_parts = []
 
-        # Financial preferences
-        if pv.financial.importance > 0.6:
-            summary_parts.append("• Salary and financial compensation are important to you")
+        # Only include strongest signals as fallback
+        if pv.financial.importance > 0.7:
+            summary_parts.append("• Financial compensation is important to you")
 
-        # Work environment
-        if pv.work_environment.remote_work_preference in ["strongly_prefer", "prefer"]:
-            summary_parts.append("• You prefer remote or flexible work arrangements")
-
-        # Job security
-        if pv.job_security.importance > 0.6:
+        if pv.job_security.importance > 0.7:
             summary_parts.append("• Job security and stability matter to you")
 
-        # Career advancement
-        if pv.career_advancement.importance > 0.6:
-            summary_parts.append("• You value opportunities for growth and learning")
-
-        # Work-life balance
-        if pv.work_life_balance.importance > 0.6:
-            summary_parts.append("• Work-life balance is important to you")
+        if pv.career_advancement.importance > 0.7:
+            summary_parts.append("• Career growth is important to you")
 
         if not summary_parts:
-            summary_parts.append("• I'm still learning about your preferences")
+            summary_parts.append("• I've learned about your job preferences")
 
         return "\n".join(summary_parts)
 
