@@ -12,10 +12,12 @@ from datasets import load_dataset, Features, Value, VerificationMode
 from dotenv import load_dotenv
 from tqdm import tqdm
 
+from _base_data_settings import Type
+from app.i18n.types import Locale
 from app.vector_search.esco_search_service import VectorSearchConfig
 from app.vector_search.similarity_search_service import SimilaritySearchService
+from common_libs.agent.translation_tool import TranslationTool
 from common_libs.environment_settings.constants import EmbeddingConfig
-from _base_data_settings import Type
 from common_libs.logging.log_utilities import setup_logging_config
 from evaluation_tests.conversation_libs.search_service_fixtures import get_search_services
 
@@ -29,6 +31,9 @@ EMBEDDING_SETTINGS = EmbeddingConfig()
 
 setup_logging_config("logging.cfg.yaml")
 logger = logging.getLogger()
+
+# TODO: Change according to the model you are evaluating
+_TARGET_LOCALE = Locale.ES_ES
 
 
 def _precision_at_k(prediction: List[List[str]], true: List[List[str]], k: Optional[int] = None):
@@ -90,9 +95,13 @@ async def _get_predictions(*, search_service: SimilaritySearchService, queries: 
     # API. We are running it sequentially to avoid hitting the limit.
     predictions = []
     progress = tqdm(total=len(queries), desc=f"Evaluating predictions for {evaluated_type.name}", file=sys.stdout)
-
+    translation_tool = TranslationTool(_TARGET_LOCALE)
     for query in queries:
-        result = await search_service.search(query=query, k=k)
+        translated_text = query
+        # Since the tests are in english, do not translate them
+        if _TARGET_LOCALE not in [Locale.EN_GB, Locale.ES_ES]:
+            translated_text = await translation_tool.translate(query)
+        result = await search_service.search(query=translated_text, k=k)
         predictions.append([_get_evaluated_field(e, evaluated_type) for e in result])
         progress.update(1)
     progress.close()
