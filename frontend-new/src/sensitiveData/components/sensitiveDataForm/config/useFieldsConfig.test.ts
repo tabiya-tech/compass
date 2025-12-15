@@ -1,5 +1,6 @@
 import "src/_test_utilities/consoleMock";
 import { renderHook } from "@testing-library/react-hooks";
+import { waitFor } from "@testing-library/react";
 import { useFieldsConfig } from "./useFieldsConfig";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import {
@@ -10,6 +11,26 @@ import {
   StringFieldDefinition,
 } from "./types";
 import * as CustomFetchModule from "src/utils/customFetch/customFetch";
+import { Locale } from "src/i18n/constants";
+
+const mockI18nState: { language: Locale } = { language: Locale.EN_US as Locale };
+jest.mock("react-i18next", () => {
+  const actual = jest.requireActual("react-i18next");
+  return {
+    ...actual,
+    useTranslation: () => ({
+      i18n: {
+        get language() {
+          return mockI18nState.language;
+        },
+        changeLanguage: jest.fn((lng: Locale) => {
+          mockI18nState.language = lng;
+          return Promise.resolve();
+        }),
+      },
+    }),
+  };
+});
 
 // Mock the utils functions
 jest.mock("./utils", () => ({
@@ -22,6 +43,8 @@ describe("Config Hooks", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset default language to en-US
+    mockI18nState.language = Locale.EN_US;
   });
 
   afterEach(() => {
@@ -43,24 +66,29 @@ describe("Config Hooks", () => {
     test("should fetch and update config on mount for various fields at the same time", async () => {
       // GIVEN a successful fetch response with yaml with all required fields for the fields
       const givenMultipleSelectFieldWithRequiredFields = `
-multipleFieldName:
-  dataKey: multiple_field_name
-  type: MULTIPLE_SELECT
-  required: true
-  label: Multiple select Field
-  values: ["value1", "value2"]
-enumFieldName:
-  dataKey: enum_field_name
-  type: ENUM
-  required: true
-  label: Enum Field
-  values: ["value1", "value2"]
-stringFieldName:
-  dataKey: string_field_name
-  type: STRING
-  required: true
-  label: String Field
-`;
+      multipleFieldName:
+        dataKey: multiple_field_name
+        type: MULTIPLE_SELECT
+        required: true
+        label:
+          en-US: Multiple select Field
+        values:
+          en-US: ["value1", "value2"]
+      enumFieldName:
+        dataKey: enum_field_name
+        type: ENUM
+        required: true
+        label:
+          en-US: Enum Field
+        values:
+          en-US: ["value1", "value2"]
+      stringFieldName:
+        dataKey: string_field_name
+        type: STRING
+        required: true
+        label:
+          en-US: String Field
+      `;
       fetchSpy = setupAPIServiceSpy(200, givenMultipleSelectFieldWithRequiredFields, "");
 
       // WHEN the hook is mounted
@@ -98,11 +126,11 @@ stringFieldName:
           label: "String Field",
         }),
       ];
-      expect(fetchSpy).toHaveBeenCalledWith("/data/config/fields-en-US.yaml", {
+      expect(fetchSpy).toHaveBeenCalledWith("/data/config/fields.yaml", {
         authRequired: false,
         retryOnFailedToFetch: true,
         expectedStatusCode: [200, 204],
-        failureMessage: "Failed to fetch fields configuration from /data/config/fields-en-US.yaml",
+        failureMessage: "Failed to fetch fields configuration from /data/config/fields.yaml",
         serviceFunction: "useFieldsConfig",
         serviceName: "SensitiveDataService",
       });
@@ -134,8 +162,7 @@ stringFieldName:
 
     test("should clean up on unmount", async () => {
       // GIVEN a pending fetch that never resolves
-      fetchSpy = setupAPIServiceSpy(200, new Promise(() => {
-      }), "");
+      fetchSpy = setupAPIServiceSpy(200, new Promise(() => {}), "");
 
       // WHEN the hook is mounted and then unmounted
       const { unmount } = renderHook(() => useFieldsConfig());
@@ -155,7 +182,8 @@ stringFieldName:
         dataKey: unknown_field_name
         type: UNKNOWN
         required: true
-        label: Unknown Field
+        label:
+          en-US: Unknown Field
       `;
       fetchSpy = setupAPIServiceSpy(200, givenUnknownFieldType, "");
 
@@ -168,11 +196,13 @@ stringFieldName:
       // WHEN the fetch completes
       await waitForNextUpdate();
 
-      // THEN it should update the state with the error
+      // THEN it should update the state with a detailed parse error
       expect(result.current.fields).toEqual([]);
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toContain("Failed to parse fields configuration");
+      expect(result.current.error?.message).toContain(
+        "Invalid field type for 'unknownFieldName': UNKNOWN",
+      );
     });
 
     test("should throw an error if the field has a duplicate data key", async () => {
@@ -182,12 +212,14 @@ stringFieldName:
         dataKey: string_field_name
         type: STRING
         required: true
-        label: String Field 1
+        label:
+          en-US: String Field 1
       stringFieldName2:
         dataKey: string_field_name
         type: STRING
         required: true
-        label: String Field 2
+        label:
+          en-US: String Field 2
       `;
       fetchSpy = setupAPIServiceSpy(200, givenDuplicateDataKey, "");
 
@@ -200,11 +232,13 @@ stringFieldName:
       // WHEN the fetch completes
       await waitForNextUpdate();
 
-      // THEN it should update the state with the error
+      // THEN it should update the state with a detailed duplicate dataKey error
       expect(result.current.fields).toEqual([]);
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toContain("Failed to parse fields configuration");
+      expect(result.current.error?.message).toContain(
+        "Duplicate dataKey 'string_field_name'",
+      );
     });
 
     test("should throw an error when an unexpected error occurs", async () => {
@@ -226,6 +260,71 @@ stringFieldName:
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeInstanceOf(Error);
       expect(result.current.error?.message).toBe(givenError.message);
+    });
+
+    test("should re-parse config when language changes without re-fetching", async () => {
+      // GIVEN a successful fetch with multi-language YAML
+      const givenMultiLanguageYaml = `
+      stringFieldName:
+        dataKey: string_field_name
+        type: STRING
+        required: true
+        label:
+          en-US: String Field
+          es-ES: Campo de Cadena
+      `;
+      fetchSpy = setupAPIServiceSpy(200, givenMultiLanguageYaml, "");
+
+      // Set initial language to en-US
+      mockI18nState.language = Locale.EN_US;
+
+      // WHEN the hook is mounted with en-US language
+      const { result, waitForNextUpdate, rerender } = renderHook(() => useFieldsConfig());
+
+      // Wait for initial fetch
+      await waitForNextUpdate();
+
+      // THEN the fetch should have been called once
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      expect(result.current.fields[0].label).toBe("String Field");
+
+      // WHEN the language changes to es-ES
+      mockI18nState.language = Locale.ES_ES;
+      rerender();
+
+      // THEN the fetch should still have been called only once (no re-fetch)
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      // AND the fields should be re-parsed with the new language
+      await waitFor(() => expect(result.current.fields[0].label).toBe("Campo de Cadena"));
+    });
+
+    test("should handle parsing errors separately from fetch errors", async () => {
+      // GIVEN a successful fetch but invalid YAML
+      const givenInvalidYaml = `
+      stringFieldName:
+        dataKey: string_field_name
+        type: STRING
+        required: true
+        # Missing label field
+      `;
+      fetchSpy = setupAPIServiceSpy(200, givenInvalidYaml, "");
+
+      // WHEN the hook is mounted
+      const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
+
+      // THEN it should initially be in loading state
+      expect(result.current.loading).toBe(true);
+
+      // WHEN the fetch completes
+      await waitForNextUpdate();
+
+      // THEN it should update the state with a detailed parsing error
+      expect(result.current.fields).toEqual([]);
+      expect(result.current.loading).toBe(false);
+      expect(result.current.error).toBeInstanceOf(Error);
+      expect(result.current.error?.message).toContain(
+        "Missing label for field 'stringFieldName' (lang=en-US)",
+      );
     });
   });
 });
