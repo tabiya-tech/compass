@@ -170,7 +170,7 @@ const Landing: React.FC = () => {
             }}
           >
             <AuthHeader
-              title={t("auth.pages.login.welcomeTitle")}
+              title={t("auth.pages.landing.welcomeTitle")}
               subtitle={
                 <>
                   <Typography
@@ -219,7 +219,7 @@ const Landing: React.FC = () => {
                 <>
                   <Divider textAlign="center" style={{ width: "100%" }} data-testid={DATA_TEST_ID.LANDING_DIVIDER}>
                     <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-                      {t("auth.pages.login.or")}
+                      {t("auth.pages.landing.or")}
                     </Typography>
                   </Divider>
                   <CustomLink
@@ -237,7 +237,7 @@ const Landing: React.FC = () => {
         </DialogContent>
       </Dialog>
       <BugReportButton bottomAlign={true} />
-      <Backdrop isShown={isLoading} message={t("auth.pages.login.loggingYouIn")} />
+      <Backdrop isShown={isLoading} message={t("auth.pages.landing.loggingYouIn")} />
     </>
   );
 };

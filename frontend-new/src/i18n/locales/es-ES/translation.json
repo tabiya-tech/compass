@@ -259,6 +259,8 @@
         "fillInEmailAndPassword": "Por favor, rellene los campos de correo electrónico y contraseña",
         "orLoginToYourAccountToContinue": "O inicia sesión en tu cuenta para continuar",
         "or": "o",
+        "invitationCodeValid": "El código de invitación es válido",
+        "continueAsGuest": "Continuar como invitado",
         "components": {
           "loginWithInviteCodeForm": {
             "loginCode": "Código de inicio de sesión"
@@ -286,7 +288,10 @@
         "subtitleBold": "Descubre todo tu potencial",
         "subtitleBody": "Descubre y expresa tus habilidades a través de conversaciones naturales guiadas por IA. Crea tu perfil de habilidades y descarga un CV para impulsar tu búsqueda de empleo. Crea una cuenta gratuita para guardar tu progreso y volver a consultar tu historial de conversaciones.",
         "invitationCodeValid": "El código de invitación es válido",
-        "welcome": "¡Bienvenido!"
+        "welcome": "¡Bienvenido!",
+        "welcomeTitle": "¡Bienvenido a Compass!",
+        "or": "o",
+        "loggingYouIn": "Iniciando sesión..."
       },
       "verifyEmail": {
         "registrationThankYou": "Gracias por registrarte en Compass.",

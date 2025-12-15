@@ -259,6 +259,8 @@
         "fillInEmailAndPassword": "Please fill in the email and password fields",
         "orLoginToYourAccountToContinue": "Or login to your account to continue",
         "or": "or",
+        "invitationCodeValid": "Invitation code is valid",
+        "continueAsGuest": "Continue as Guest",
         "components": {
           "loginWithInviteCodeForm": {
             "loginCode": "Login Code"
@@ -286,7 +288,10 @@
         "subtitleBold": "Discover your Full Potential",
         "subtitleBody": "Uncover and articulate your skills through natural AI-guided conversations. Build your skill profile and download a CV to kickstart your job search. Create a free account to save your progress and revisit your conversation history.",
         "invitationCodeValid": "Invitation code is valid",
-        "welcome": "Welcome!"
+        "welcome": "Welcome!",
+        "welcomeTitle": "Welcome to Compass!",
+        "or": "or",
+        "loggingYouIn": "Logging you in..."
       },
       "verifyEmail": {
         "registrationThankYou": "Thank you for registering to Compass.",

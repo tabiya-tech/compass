@@ -272,7 +272,7 @@ const Login: React.FC = () => {
         const firebaseInvitationAuthServiceInstance = FirebaseInvitationCodeAuthenticationService.getInstance();
         await firebaseInvitationAuthServiceInstance.login(code);
         console.info("User logged in via invitation code.");
-        enqueueSnackbar(t("auth.pages.landing.invitationCodeValid"), { variant: "success" });
+        enqueueSnackbar(t("auth.pages.login.invitationCodeValid"), { variant: "success" });
         await handlePostLogin();
       } catch (error) {
         await handleError(error as Error);
