@@ -129,7 +129,6 @@ test_cases = [
     E2ESpecificTestCase(
         country_of_user=Country.UNSPECIFIED,
         conversation_rounds=50,
-        skip_force="force",
         name='single_experience_specific_and_concise_user_e2e_es-AR',
         locale=Locale.ES_AR,
         simulated_user_prompt=dedent("""
@@ -386,5 +385,52 @@ test_cases = [
             You can come up with specific activities and details for each experience when asked.
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)]
+    ),
+    E2ESpecificTestCase(
+        country_of_user=Country.ARGENTINA,
+        conversation_rounds=60,
+        name='argentina_conversation_e2e',
+        locale=Locale.ES_AR,
+        simulated_user_prompt=dedent("""
+            Actúa como una persona joven de Argentina. Estás chateando con un bot para armar tu CV.
+            Usa jerga argentina (laburo, guita, viejo/vieja, dale, buenísimo).
+            Sé conciso.
+
+            Tus experiencias son:
+            1. Asistente de ventas en el local de tu viejo (Enero 2015 - Diciembre 2022).
+               - Tareas: "Limpiar el lugar", "Manejar la guita", "Tratar con proveedores", "Contabilidad básica", "Venta de productos", "Empaquetar pedidos". (Dilo como una lista).
+               - Tarea importante: La atención al cliente.
+               - Detalles: escuchaba atentamente y ayudaba rápido. "solo eso" si preguntan más.
+
+            2. Trabajando en la casa de mi madre (Marzo 2022 - Enero 2025). Es Voluntario.
+               - Tareas: "Limpiar", "Comprar lo que haga falta", "Preparar la comida", "Lavar la ropa", "Planchar", "Terminar el día con la cena". (Dilo como lista).
+               - Tarea importante: Organizar bien las tareas del día.
+               - Detalles: hablaba con mi vieja para acordar lo importante. Herramientas: escoba y herramientas del hogar. "solo eso" si preguntan más.
+        
+            No tienes otras experiencias. 
+            Responde "si" o "no" cuando corresponda. Di "asi esta bien" si te piden confirmar.
+            """) + system_instruction_prompt,
+        evaluations=[Evaluation(type=EvaluationType.SINGLE_LANGUAGE, expected=100)],
+        expected_experiences_count_min=2,
+        expected_experiences_count_max=2,
+        expected_work_types={
+            WorkType.SELF_EMPLOYMENT: (0, 1),
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 1),
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+            WorkType.UNSEEN_UNPAID: (1, 1),
+        },
+        matchers=["llm", "matcher"],
+        expected_experience_data=[
+            {
+                "experience_title": AnyOf(ContainsString("asistente"), ContainsString("ventas")),
+                "company": AnyOf(ContainsString("padre"), ContainsString("viejo")),
+                "timeline": {"start": ContainsString("2015"), "end": ContainsString("2022")},
+            },
+            {
+                "experience_title": AnyOf(ContainsString("casa"), ContainsString("madre")),
+                "company": AnyOf(ContainsString("madre"), ContainsString("vieja")),
+                "timeline": {"start": ContainsString("2022"), "end": ContainsString("2025")},
+            }
+        ]
     )
 ]
