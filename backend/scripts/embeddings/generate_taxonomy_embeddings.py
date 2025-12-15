@@ -55,6 +55,7 @@ COMPASS_DB = (AsyncIOMotorClient(
 
 class Options(BaseModel):
     hot_run: bool = False
+    num_of_dimensions: int
     delete_existing: bool = False
     generate_embeddings: bool = True
     generate_indexes: bool = True
@@ -425,6 +426,7 @@ async def main(opts: Options):
     if opts.generate_indexes:
         await generate_indexes(hot_run=opts.hot_run,
                                db=COMPASS_DB,
+                               num_of_dimensions=opts.num_of_dimensions,
                                logger=logger)
 
 
@@ -456,6 +458,14 @@ if __name__ == "__main__":
             action="store_true",
             help="Delete existing embeddings before copying"
         )
+        options_group.add_argument(
+            "--num-of-dimensions",
+            type=int,
+            required=False,
+            default=768,
+            choices=[768, 3072],
+            help="The number of dimensions for the embeddings"
+        )
 
         args = parser.parse_args()
 
@@ -467,6 +477,7 @@ if __name__ == "__main__":
 
         _options = Options(
             hot_run=args.hot_run,
+            num_of_dimensions=args.num_of_dimensions,
             delete_existing=args.delete_existing,
             generate_embeddings=generate_embeddings,
             generate_indexes=True
