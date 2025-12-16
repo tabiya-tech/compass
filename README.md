@@ -34,7 +34,8 @@ their skills and interests based on their lived experiences.
 2. **Code Contributions:** Help enhance the codebase by submitting pull requests.
 3. **Write or Improve Tests:** We aim for 100% code coverage. You can help achieve this goal by writing or improving tests.
 4. **Documentation:** Improve project documentation by submitting pull requests. Clear documentation is crucial for new contributors.
-5. **Support:** Give the project a star on GitHub—your support encourages us to keep improving!
+5. **Add a New Language**: Help make Compass accessible to more users by adding support for a new language. Follow the guidelines in [add-a-new-language.md](./add-a-new-language.md).
+6. **Support:** Give the project a star on GitHub—your support encourages us to keep improving!
 
 ## Contribution Guidelines
 
