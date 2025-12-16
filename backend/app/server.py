@@ -19,7 +19,7 @@ from app.vector_search.occupation_search_routes import add_occupation_search_rou
 from app.vector_search.skill_search_routes import add_skill_search_routes
 from app.vector_search.validate_taxonomy_model import validate_taxonomy_model
 from app.version.version_routes import add_version_routes
-from app.i18n.types import Locale, is_locale_supported
+from app.i18n.language_config import get_language_config
 
 from contextlib import asynccontextmanager
 
@@ -182,20 +182,19 @@ if _experience_pipeline_config:
 else:
     logger.info("No EXPERIENCE_PIPELINE_CONFIG environment variable set, using empty configuration.")
 
-# Load the default language from the environment variables
-backend_default_locale_str = os.getenv("BACKEND_DEFAULT_LOCALE")
-if backend_default_locale_str is None:
-    _error_message = "BACKEND_DEFAULT_LOCALE environment variable is not set!"
+# Validate and load BACKEND_LANGUAGE_CONFIG environment variable
+try:
+    language_config = get_language_config()
+    logger.info(f"Loaded BACKEND_LANGUAGE_CONFIG with {len(language_config.available_locales)} available locales")
+    logger.info(f"Backend default locale: {language_config.default_locale}")
+except RuntimeError as e:
+    _error_message = f"BACKEND_LANGUAGE_CONFIG environment variable is not set! {e}"
     logger.error(_error_message)
-    raise ValueError(_error_message)
-
-backend_default_locale = Locale.from_locale_str(backend_default_locale_str)
-if not is_locale_supported(backend_default_locale):
-    _error_message = f"BACKEND_DEFAULT_LOCALE environment variable an unsupported locale: {backend_default_locale_str}"
+    raise ValueError(_error_message) from e
+except ValueError as e:
+    _error_message = f"BACKEND_LANGUAGE_CONFIG environment variable is invalid! {e}"
     logger.error(_error_message)
-    raise ValueError(_error_message)
-
-logger.info(f"Backend default locale: {backend_default_locale}")
+    raise ValueError(_error_message) from e
 
 # set global application configuration
 application_config = ApplicationConfig(
@@ -211,7 +210,7 @@ application_config = ApplicationConfig(
     cv_storage_bucket=os.getenv("BACKEND_CV_STORAGE_BUCKET"),
     cv_max_uploads_per_user=os.getenv("BACKEND_CV_MAX_UPLOADS_PER_USER") or DEFAULT_MAX_UPLOADS_PER_USER,
     cv_rate_limit_per_minute=os.getenv("BACKEND_CV_RATE_LIMIT_PER_MINUTE") or DEFAULT_RATE_LIMIT_PER_MINUTE,
-    default_language=backend_default_locale
+    language_config=language_config
 )
 
 set_application_config(application_config)

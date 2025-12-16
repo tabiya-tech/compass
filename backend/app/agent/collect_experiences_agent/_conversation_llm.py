@@ -10,6 +10,7 @@ from app.agent.experience import ExperienceEntity
 from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT, WorkType
 from app.agent.penalty import get_penalty
 from app.agent.prompt_template import get_language_style
+from app.i18n.locale_date_format import get_locale_date_format, format_date_value_for_locale
 from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
@@ -376,6 +377,11 @@ class _ConversationLLM:
                     An exact date is not required, year or year and month is sufficient.
                     In case the of caregiving for family, helping in the household, use common sense and adjust your questions to reflect the nature of the work.
                     For reference the current date is {current_date}.
+                    Return dates using the user's locale-specific format:
+                        - Full date: {date_format_full}
+                        - Month and year: {date_format_month_year}
+                        - Year only: {date_format_year}
+                    Use the exact separators shown above.
                     ###Date Consistency instructions
                         Check the start_date and end_date dates and ensure they are not inconsistent:
                         - they do not refer to the future
@@ -427,6 +433,9 @@ class _ConversationLLM:
         </system_instructions>
         """)
 
+        date_formats = get_locale_date_format()
+        canonical_now = datetime.now().strftime("%Y-%m-%d")
+        current_date_formatted = format_date_value_for_locale(canonical_now, locale=None)
         return replace_placeholders_with_indent(system_instructions_template,
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 agent_character=STD_AGENT_CHARACTER,
@@ -448,7 +457,10 @@ class _ConversationLLM:
                                                 ),
                                                 last_referenced_experience=_get_last_referenced_experience(collected_data, last_referenced_experience_index),
                                                 example_summary=_get_example_summary(),
-                                                current_date=datetime.now().strftime("%Y/%m")
+                                                current_date=current_date_formatted,
+                                                date_format_full=date_formats.full,
+                                                date_format_month_year=date_formats.month_year,
+                                                date_format_year=date_formats.year_only,
                                                 )
 
     @staticmethod

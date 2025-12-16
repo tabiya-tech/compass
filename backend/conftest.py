@@ -6,11 +6,12 @@ import pytest
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
+from app.app_config import ApplicationConfig, set_application_config, get_application_config
 from app.countries import Country
+from app.i18n.language_config import LanguageConfig, LocaleDateFormatEntry
+from app.i18n.types import Locale
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.version.types import Version
-from app.i18n.types import Locale
-from app.app_config import ApplicationConfig, set_application_config, get_application_config
 
 
 @pytest.fixture(scope='session')
@@ -154,7 +155,10 @@ def setup_application_config() -> Generator[ApplicationConfig, Any, None]:
         embeddings_model_name="bar-model",
         cv_storage_bucket="foo-bucket",
         features={},
-        default_language=Locale.EN_US
+        language_config=LanguageConfig(
+            default_locale=Locale.EN_US,
+            available_locales=[LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY")]
+        )
     )
 
     set_application_config(config)

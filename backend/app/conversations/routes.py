@@ -93,7 +93,7 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
         # The user's language to send messages in.
         # For now, it is using the backend default language from app_config.
         app_config = get_application_config()
-        user_language_ctx_var.set(app_config.default_language)
+        user_language_ctx_var.set(app_config.language_config.default_locale)
 
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.
