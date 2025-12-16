@@ -9,11 +9,12 @@ def _get_locale_section():
     language_label = language.label()
 
     return textwrap.dedent(f"""
-    #Language 
-    - Stick to the {language_label} language.
-    - Any questions I tell you to ask me should also be in the {language_label} language.
-    - Any information or data you are asked to extract and provide should also be in the same language as the conversation.
-    """)
+        #Language 
+        - Stick to the {language_label} language when replying to me.
+        - Any questions I tell you to ask me should also be in the {language_label} language.
+        - If my previous message is in another language, do not respond in that language, instead respond in the {language_label} language.
+        - Any information or data you are asked to extract from our conversation should also be in or translated to the {language_label} language.
+        """)
 
 
 def get_language_style(*, with_locale: bool = True) -> str:

@@ -8,6 +8,7 @@ from app.agent.collect_experiences_agent import CollectedData
 from app.agent.collect_experiences_agent.data_extraction_llm import IntentAnalyzerTool
 from app.agent.experience import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
+from app.i18n.translation_service import get_i18n_manager
 from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
@@ -234,6 +235,7 @@ async def test_intent_analyzer_tool(test_case: IntentAnalyzerToolTestCase, caplo
     logger = logging.getLogger()
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
+        get_i18n_manager().set_locale(test_case.locale)
 
         # GIVEN the previous conversation context
         context: ConversationContext = ConversationContext(

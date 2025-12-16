@@ -5,6 +5,7 @@ import pytest
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.skill_explorer_agent._responsibilities_extraction_tool import _ResponsibilitiesExtractionTool
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationTurn
+from app.i18n.translation_service import get_i18n_manager
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
@@ -150,6 +151,7 @@ test_cases_data_extraction = [
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_data_extraction),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_data_extraction)])
 async def test_data_extraction(test_case: _TestCaseDataExtraction):
+    get_i18n_manager().set_locale(test_case.locale)
     context: ConversationContext = ConversationContext()
 
     # GIVEN the previous conversation context

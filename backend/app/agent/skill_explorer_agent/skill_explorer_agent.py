@@ -3,14 +3,14 @@ from typing import Mapping, Any
 from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from app.agent.agent import Agent
-from app.agent.agent_types import AgentType
 from app.agent.agent_types import AgentInput, AgentOutput
-from ._conversation_llm import _ConversationLLM, _FINAL_MESSAGE_KEY
+from app.agent.agent_types import AgentType
 from app.agent.experience.experience_entity import ExperienceEntity, ResponsibilitiesData
 from app.conversation_memory.conversation_memory_types import ConversationContext
-from ._responsibilities_extraction_tool import _ResponsibilitiesExtractionTool
 from app.countries import Country
 from app.i18n.translation_service import t
+from ._conversation_llm import _ConversationLLM, _FINAL_MESSAGE_KEY
+from ._responsibilities_extraction_tool import _ResponsibilitiesExtractionTool
 
 
 class SkillsExplorerAgentState(BaseModel):

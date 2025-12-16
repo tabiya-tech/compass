@@ -37,6 +37,14 @@ class CompassTestCase(BaseModel):
     Can be used to conditionally assert warnings in the logs.
     """
 
+    @property
+    def test_id(self):
+        """
+        Test Identifier, to be used by pytest ids,
+        it combines the test name and locale since a single test can be used in multiple locales.
+        """
+        return f"{self.name}-{self.locale.name}"
+
 
 class Config:
     """

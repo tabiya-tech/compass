@@ -5,6 +5,7 @@ import pytest
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.skill_explorer_agent._sentence_decomposition_llm import _SentenceDecompositionLLM
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationTurn
+from app.i18n.translation_service import get_i18n_manager
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
@@ -136,6 +137,7 @@ test_cases_sentence_decomposition = [
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_sentence_decomposition),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_sentence_decomposition)])
 async def test_sentence_decomposition(test_case: _TestCaseSentenceDecomposition):
+    get_i18n_manager().set_locale(test_case.locale)
     context: ConversationContext = ConversationContext()
 
     # GIVEN the previous conversation context
