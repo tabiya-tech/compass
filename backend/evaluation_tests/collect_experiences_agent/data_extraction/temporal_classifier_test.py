@@ -306,8 +306,8 @@ async def test_temporal_and_work_type_classification(test_case: TemporalAndWorkT
                                                      setup_multi_locale_app_config):
     logger = logging.getLogger()
     with caplog.at_level(logging.DEBUG):
-        get_i18n_manager().set_locale(test_case.locale)
         guard_caplog(logger=logger, caplog=caplog)
+        get_i18n_manager().set_locale(test_case.locale)
 
         # GIVEN users last input
         given_user_input = test_case.users_input

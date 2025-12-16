@@ -1,5 +1,4 @@
 import logging
-
 import time
 from datetime import datetime
 from textwrap import dedent
@@ -16,10 +15,10 @@ from app.agent.prompt_template.format_prompt import replace_placeholders_with_in
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory
 from app.countries import Country
+from app.i18n.translation_service import t, get_i18n_manager
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
 from common_libs.retry import Retry
-from app.i18n.translation_service import t, get_i18n_manager
 
 _NO_EXPERIENCE_COLLECTED = "No experience data has been collected yet"
 _FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step."
@@ -538,23 +537,23 @@ def _transition_instructions(*,
         duplicate_hint = ""
         if len(collected_data) > 1:
             duplicate_hint = "Also, with the above question inform me that if one of the work experiences seems to be duplicated, I can ask you to remove it.\n"
-        user_language = get_i18n_manager().get_locale().value
+        user_language = get_i18n_manager().get_locale().label()
         summarize_and_confirm = dedent("""
             Explicitly summarize all the work experiences you collected and explicitly ask me if I would like to add or change anything in the information 
             you collected before moving forward to the next step. 
-            
-            {language_style}
                                                                   
-            Ask me in {user_language} language: 
-                "Let's recap the information we have collected so far: 
+            Ask me the following question in the respective language:-
+            <Question targetLanguage="{user_language}">
+                Let's recap the information we have collected so far: 
                 {summary_of_experiences}
-                Is there anything you would like to add or change?".
+                Is there anything you would like to add or change?
+            </Question>
             The summary is in plain text (no Markdown, JSON, or other formats).
             {duplicate_hint}             
             You must wait for me to respond to your question and explicitly confirm that I have nothing to add or change 
             to the information presented in the summary. 
             
-            if I have something to add or change, you will ask me to provide the missing information or correct the information
+            If I have something to add or change, you will ask me to provide the missing information or correct the information
             before evaluating if you can transition to the next step.
             
             Then, you will respond by saying <END_OF_CONVERSATION> to end the conversation and move to the next step.
@@ -564,6 +563,8 @@ def _transition_instructions(*,
             It is not your responsibility to conduct the next step.
             
             You must perform the summarization and confirmation step before ending the conversation.
+            
+            {language_style}
             """)
         return replace_placeholders_with_indent(summarize_and_confirm,
                                                 language_style=get_language_style(),

@@ -7,16 +7,18 @@ from _pytest.logging import LogCaptureFixture
 from app.agent.skill_explorer_agent import SkillsExplorerAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
+from app.i18n.translation_service import get_i18n_manager
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from common_libs.test_utilities import get_random_session_id
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
-from .skills_explorer_agent_executor import SkillsExplorerAgentExecutor, SkillsExplorerAgentGetConversationContextExecutor, \
-    SkillsExplorerAgentIsFinished
-from .skills_explorer_test_cases import SkillsExplorerAgentTestCase, test_cases
 from evaluation_tests.conversation_libs.conversation_test_function import LLMSimulatedUser, \
     ConversationTestConfig, conversation_test_function, assert_expected_evaluation_results
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
+from .skills_explorer_agent_executor import SkillsExplorerAgentExecutor, \
+    SkillsExplorerAgentGetConversationContextExecutor, \
+    SkillsExplorerAgentIsFinished
+from .skills_explorer_test_cases import SkillsExplorerAgentTestCase, test_cases
 
 
 @pytest.mark.asyncio
@@ -32,6 +34,7 @@ async def test_skills_explorer_agent_simulated_user(max_iterations: int, test_ca
     print(f"Running test case {test_case.name}")
 
     session_id = get_random_session_id()
+    get_i18n_manager().set_locale(test_case.locale)
     output_folder = os.path.join(os.getcwd(), 'test_output/skills_explorer_agent/simulated_user/', test_case.name)
 
     # The conversation manager for this test

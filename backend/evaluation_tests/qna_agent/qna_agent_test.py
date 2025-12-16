@@ -136,7 +136,7 @@ async def test_qna_agent_responds_to_follow_up_questions(fake_conversation_conte
 
 
 async def _execute_agent(context: FakeConversationContext, agent, agent_input):
-    agent_output = await agent.execute(agent_input, context)
+    agent_output = await agent.translate(agent_input, context)
     context.add_history(agent_input, agent_output)
     return agent_output
 
