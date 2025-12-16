@@ -6,23 +6,24 @@ from typing import Coroutine, Callable, Awaitable
 import pytest
 from _pytest.logging import LogCaptureFixture
 
-from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
-from app.vector_search.vector_search_dependencies import SearchServices
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState
+from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentType
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
-from app.agent.agent_director.llm_agent_director import LLMAgentDirector
+from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
 from app.agent.welcome_agent import WelcomeAgentState
-from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, ConversationMemoryManagerState
+from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
+    ConversationMemoryManagerState
+from app.i18n.translation_service import get_i18n_manager
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
+from app.vector_search.vector_search_dependencies import SearchServices
+from common_libs.test_utilities import get_random_session_id
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.agent_director.agent_director_executors import AgentDirectorExecutor, \
     AgentDirectorGetConversationContextExecutor, AgentDirectorIsFinished
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
     ConversationTestConfig, ScriptedUserEvaluationTestCase, ScriptedSimulatedUser
-
-from common_libs.test_utilities import get_random_session_id
 
 
 @pytest.fixture(scope="function")
@@ -51,6 +52,7 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
     async def agent_director_exec(caplog: LogCaptureFixture, test_case: ScriptedUserEvaluationTestCase):
         print(f"Running test case {test_case.name}")
 
+        get_i18n_manager().set_locale(test_case.locale)
         output_folder = os.path.join(os.getcwd(), 'test_output/llm_agent_director/scripted', test_case.name)
         execute_evaluated_agent = AgentDirectorExecutor(agent_director=agent_director)
 
@@ -107,7 +109,7 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
             "yes",
             "yes",
             "yes",
-            "yes"
+            "yes",
             "nothing to add",  # this is not passed to the evaluated agent, see the internal logic of how the conversation is simulated
         ],
         evaluations=[]

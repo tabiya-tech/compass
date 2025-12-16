@@ -5,6 +5,7 @@ import pytest
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.collect_experiences_agent.data_extraction_llm import EntityExtractionTool
 from app.conversation_memory.conversation_memory_types import ConversationTurn, ConversationContext, ConversationHistory
+from app.i18n.translation_service import get_i18n_manager
 from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
@@ -363,6 +364,7 @@ async def test_entity_extraction_tool(test_case: EntityExtractionToolTestCase, c
     logger = logging.getLogger()
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
+        get_i18n_manager().set_locale(test_case.locale)
 
         # GIVEN users last input
         given_user_input = AgentInput(message=test_case.users_input)

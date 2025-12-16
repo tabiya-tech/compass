@@ -35,7 +35,7 @@ class TranslationTool:
                 "text": the translated text in {target_language}
             }}
         """)
-        return _template.format(target_language=self._target_locale.value,
+        return _template.format(target_language=self._target_locale.label(),
                                 user_input=user_input)
 
     def _get_compare_prompt(self, *, user_input: str, translation: str) -> str:

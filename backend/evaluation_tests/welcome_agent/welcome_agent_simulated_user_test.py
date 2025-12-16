@@ -6,6 +6,7 @@ import pytest
 from app.agent.welcome_agent import WelcomeAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
+from app.i18n.translation_service import get_i18n_manager
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
     EvaluationTestCase, ConversationTestConfig, LLMSimulatedUser
@@ -42,6 +43,7 @@ async def test_welcome_agent_simulated_user(max_iterations: int, test_case: Eval
     print(f"Running test case {test_case.name}")
 
     session_id = hash(test_case.name) % 10 ** 10
+    get_i18n_manager().set_locale(test_case.locale)
     output_folder = os.path.join(os.getcwd(), 'test_output/welcome_agent/simulated_user/', test_case.name)
 
     # The conversation manager for this test
