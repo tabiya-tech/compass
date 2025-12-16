@@ -11,10 +11,12 @@ from app.agent.collect_experiences_agent import CollectedData
 from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtractionLLM
 from app.agent.experience import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
+from app.i18n.translation_service import get_i18n_manager
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 from evaluation_tests.matcher import check_actual_data_matches_expected, ContainsString, AnyOf, Matcher, match_expected
+
 
 class _TestCaseDataExtraction(CompassTestCase):
     # The GIVEN
@@ -919,7 +921,7 @@ test_cases_data_extraction = [
                 "location": ContainsString("Kigali, Rwanda"),
                 "company": ContainsString("Cool Lab, African Leadership University"),
                 "paid_work": AnyOf(None, True),
-                "start_date": "2020/06",
+                "start_date": '2020/06',
                 "end_date": ContainsString("Present"),
                 "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
             },
@@ -999,9 +1001,10 @@ test_cases_data_extraction = [
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_data_extraction),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_data_extraction)])
-async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytest.LogCaptureFixture):
+async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytest.LogCaptureFixture,
+                               setup_multi_locale_app_config):
     logger = logging.getLogger()
-       
+    get_i18n_manager().set_locale(test_case.locale)
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
 

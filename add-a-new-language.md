@@ -27,9 +27,7 @@ Notes
 
 ### 1. Backend
 
-The backend uses `LocaleProvider` to determine the current locale. The first language listed in `BACKEND_DEFAULT_LOCALE` is used as the default.
-
-**Important:** The backend looks up translations by the exact locale string returned by `LocaleProvider`; make sure you create a folder matching that code or use a code in `BACKEND_DEFAULT_LOCALE` that matches an existing folder name.
+The backend uses `LocaleProvider` to determine the current locale. The default locale in `BACKEND_LANGUAGE_CONFIG` configuration is used as the default.
 
 #### 1.1 Create Locale directory and messages file
 
@@ -48,7 +46,7 @@ For the message structure and keys, please refer to the reference file: [`backen
 
   - Add the locale to [`backend/app/i18n/types.py`](backend/app/i18n/types.py) (`Locale` enum and `SUPPORTED_LOCALES`).
   - Update [`backend/app/i18n/constants.py`](backend/app/i18n/constants.py) only if the default fallback changes.
-  - Enable the new locale in your backend environment via `BACKEND_DEFAULT_LOCALE`. The first item becomes the default.
+  - Enable the new locale in your backend environment via `BACKEND_LANGUAGE_CONFIG`.
 
 #### 1.3 Verify Backend Key Consistency
 
@@ -114,13 +112,13 @@ Supported languages are enabled via environment variables on both backend and fr
   - `FRONTEND_DEFAULT_LOCALE`: Default locale string.
 
 * **Add environment variables for the backend** ([see deployment procedure](./deployment-procedure.md) and [upload to secret manager](./deployment-procedure.md)):
-  - `BACKEND_DEFAULT_LOCALE`: Default backend locale (BCP 47).
+  - `BACKEND_LANGUAGE_CONFIG`: Default backend locale (BCP 47).
 
 ### 4.  Quick checklist (summary)
 
 * **Backend**
   * [ ] Create `backend/app/i18n/locales/<locale>/messages.json` with the same keys as English
-  * [ ] Add the locale code to `BACKEND_DEFAULT_LOCALE`
+  * [ ] Add language configurations to `BACKEND_LANGUAGE_CONFIG`
   * [ ] Add the locale to `backend/app/i18n/types.py` (`Locale` enum and `SUPPORTED_LOCALES`)
   * [ ] Generate embeddings for the new language using the new taxonomy model ID \([Generate Embeddings](./deployment-procedure.md#step-43-generate-embeddings)\)
   * [ ] (Optional) Run backend i18n verify script
@@ -145,9 +143,8 @@ This section explains how to enable or switch between languages that are already
 
 ### 1. Backend
 
-* **Default locale:** `BACKEND_DEFAULT_LOCALE` determines the default backend language. The first locale listed is used if no user preference is set.
+* **Language Config:** `BACKEND_LANGUAGE_CONFIG` determines the default backend language and other configurations.
 * **Supported languages:** Listed in the `SUPPORTED_LOCALES` enum in [`backend/app/i18n/types.py`](backend/app/i18n/types.py).
-* **Locale determination:** `LocaleProvider` returns the current locale for backend requests. Changing the environment variable or the first locale in `BACKEND_DEFAULT_LOCALE` updates the backend default language.
 
 ### 2. Frontend
 

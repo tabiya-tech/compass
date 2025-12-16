@@ -18,6 +18,7 @@ from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_
     get_config_variation
 from common_libs.retry import Retry
 from app.agent.prompt_template import get_language_style
+from app.i18n.locale_date_format import get_locale_date_format, format_date_value_for_locale
 
 _TAGS_TO_FILTER = [
     "system instructions",
@@ -72,18 +73,28 @@ class TemporalAndWorkTypeClassifierTool:
 
         self._logger = logger
         self._llm_caller = LLMCaller[_LLMOutput](model_response_type=_LLMOutput)
-        self._system_instructions = _SYSTEM_INSTRUCTIONS.format(
+
+    def _get_system_instructions(self) -> str:
+        """Build system instructions dynamically based on the current locale."""
+        date_formats = get_locale_date_format()
+        canonical_now = datetime.now().strftime("%Y-%m-%d")
+        current_date_formatted = format_date_value_for_locale(canonical_now, locale=None)
+        return _SYSTEM_INSTRUCTIONS.format(
             work_type_definitions=WORK_TYPE_DEFINITIONS_FOR_PROMPT,
-            current_date=datetime.now().strftime("%Y/%m"),
-            language_style=get_language_style())
+            current_date=current_date_formatted,
+            language_style=get_language_style(),
+            date_format_full=date_formats.full,
+            date_format_month_year=date_formats.month_year,
+            date_format_year=date_formats.year_only,
+        )
 
     def _get_llm(self, temperature_config: Optional[dict] = None) -> GeminiGenerativeLLM:
-        # if no temperature configu provided, use the default one.
+        # if no temperature config provided, use the default one.
         if temperature_config is None:
             temperature_config = {}
 
         return GeminiGenerativeLLM(
-            system_instructions=self._system_instructions,
+            system_instructions=self._get_system_instructions(),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000
@@ -213,9 +224,14 @@ _SYSTEM_INSTRUCTIONS = """
         The user may provide the beginning and end of an experience at any order, 
         in a single input or in separate inputs, as a period or as a single date in relative or absolute terms.
         The user may mention only one date, you may consider it as the start and the end of the experience.
-        The user may provide unstructured dates like I worked in the first four months of 2020, and we expect you to extract the dates in (YYYY-MM).
+        The user may provide unstructured dates like I worked in the first four months of 2020.
         If the user provides only one date and no additional context, do not infer or assume a second date.
         For reference, my current date is {current_date}
+        Always return dates using the user's locale-specific format:
+            - Full date: {date_format_full}
+            - Month and year: {date_format_month_year}
+            - Year only: {date_format_year}
+        Use the exact separators shown above.
         
         ###'dates_mentioned' instructions
             Contains the conversational date input e.g., "March 2021" or "last month", "since n months", 
@@ -225,7 +241,7 @@ _SYSTEM_INSTRUCTIONS = """
         ###'start_date' instructions
             If I provide a conversational date input for the start of an experience, you should accurately 
             calculate these based on my current date.
-            Return a string value containing the start date.
+            Return a string value containing the start date using the locale-specific format described above.
             
             `null` It was not provided by the user and the user was not explicitly asked for this information yet.
             Empty string if the user was asked and explicitly chose to not provide this information or the user doesn't remember the start date. 
@@ -233,7 +249,7 @@ _SYSTEM_INSTRUCTIONS = """
         ###'end_date' instructions
             If I provide a conversational date input for the end of an experience, you should accurately 
             calculate these based on my current date. In case it is an ongoing experience, use the word "Present". 
-            Return a string value containing the end date.
+            Return a string value containing the end date using the locale-specific format described above.
             
             `null` It was not provided by the user and the user was not explicitly asked for this information yet.
             Empty string if the user was asked and explicitly chose to not provide this information or the user doesn't remember the end date. 
@@ -275,13 +291,17 @@ _SYSTEM_INSTRUCTIONS = """
                                 produce the start_date, and end_date values. 
                                 Empty string "" If you did not perform any calculations.
                                 Formatted as a json string.         
-            - start_date: The start date in YYYY/MM/DD or YYYY/MM or YYYY 
-                                depending on what input was provided.
-                                Formatted as a json string
+            - start_date: The start date formatted using the locale-specific format described above.
+                                Use {date_format_full} when day, month, and year are known,
+                                {date_format_month_year} when only month and year are known,
+                                and {date_format_year} when only the year is known.
+                                Formatted as a json string.
                                 Refer to the "###'start_date' instructions"
-            - end_date: The end date in YYYY/MM//DD or YYYY/MM or YYYY or 'Present'
-                                depending on what input was provided.
-                                Formatted as a json string
+            - end_date: The end date formatted using the locale-specific format described above or 'Present'.
+                                Use {date_format_full} when day, month, and year are known,
+                                {date_format_month_year} when only month and year are known,
+                                and {date_format_year} when only the year is known.
+                                Formatted as a json string.
                                 Refer to the "###'end_date' instructions"
         }}                            
 </System Instructions>

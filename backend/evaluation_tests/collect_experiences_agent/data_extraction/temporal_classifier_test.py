@@ -8,6 +8,8 @@ from app.agent.collect_experiences_agent.data_extraction_llm._temporal_classifie
     TemporalAndWorkTypeClassifierTool
 from app.agent.experience import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationTurn, ConversationContext, ConversationHistory
+from app.i18n.translation_service import get_i18n_manager
+from app.i18n.types import Locale
 from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
@@ -46,7 +48,7 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
         given_experience_title="Software Engineer",
         users_input="May 2021",
         expected_extracted_data={
-            "start_date": "2021/05",
+            "start_date": "05/2021",
             "end_date": AnyOf(None, ContainsString("present")),
             "paid_work": True,
             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
@@ -59,7 +61,7 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
         ],
         users_input="June 2020",
         expected_extracted_data={
-            "end_date": "2020/06",
+            "end_date": "06/2020",
             "start_date": None,
         }
     ),
@@ -171,8 +173,8 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
         expected_extracted_data={
             "paid_work": False,
             "work_type": ContainsString("unpaid"),
-            "start_date": "2020/02",
-            "end_date": "2025/01"
+            "start_date": "02/2020",
+            "end_date": "01/2025"
         }
     ),
 
@@ -188,8 +190,8 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
         expected_extracted_data={
             "paid_work": False,
             "work_type": ContainsString("unpaid"),
-            "start_date": "2021/01",
-            "end_date": AnyOf("2021/04", "2021/05")  # Sometime, the LLM might do addition to the end date.
+            "start_date": "01/2021",
+            "end_date": AnyOf("04/2021", "05/2021")  # Sometime, the LLM might do addition to the end date.
         }
     ),
 
@@ -260,6 +262,38 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
             "end_date": AnyOf(None, '')
         }
     ),
+
+    # Different date formats
+    # Look at these default configurations for reference: -
+    # backend/app/i18n/locale_date_format.py#_DEFAULT_LOCALE_DATE_FORMAT
+    TemporalAndWorkTypeClassifierToolTestCase(
+        name="date_format_en_gb",
+        locale=Locale.EN_GB,
+        turns=[
+            (SILENCE_MESSAGE, "Have you run any other businesses, done freelance or contract work?"),
+            ("yes, I didi freelance work", "Okay, I understand."
+                                           "Can you tell me when you started doing freelance work?"),
+        ],
+        users_input="on the second of January 2018",
+        expected_extracted_data={
+            "start_date": "02/01/2018",  # DD/MM/YYYY
+            "end_date": None
+        }
+    ),
+    TemporalAndWorkTypeClassifierToolTestCase(
+        name="date_format_en_us",
+        locale=Locale.EN_US,
+        turns=[
+            (SILENCE_MESSAGE, "Have you run any other businesses, done freelance or contract work?"),
+            ("yes, I didi freelance work", "Okay, I understand."
+                                           "Can you tell me when you started doing freelance work?"),
+        ],
+        users_input="on the second of January 2018",
+        expected_extracted_data={
+            "start_date": "01/02/2018",  # MM/DD/YYYY
+            "end_date": None
+        }
+    ),
 ]
 
 
@@ -268,9 +302,11 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
 @pytest.mark.evaluation_test("gemini-2.0-flash-001/")
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
-async def test_temporal_and_work_type_classification(test_case: TemporalAndWorkTypeClassifierToolTestCase, caplog):
+async def test_temporal_and_work_type_classification(test_case: TemporalAndWorkTypeClassifierToolTestCase, caplog,
+                                                     setup_multi_locale_app_config):
     logger = logging.getLogger()
     with caplog.at_level(logging.DEBUG):
+        get_i18n_manager().set_locale(test_case.locale)
         guard_caplog(logger=logger, caplog=caplog)
 
         # GIVEN users last input
