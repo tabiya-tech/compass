@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Locale(Enum):
     EN_US = "en-US"
     EN_GB = "en-GB"
@@ -20,6 +21,7 @@ class Locale(Enum):
                 return "Español (España)"
             case Locale.ES_AR:
                 return "Español (Argentina)"
+
 
 SUPPORTED_LOCALES: list[Locale] = [Locale.EN_US, Locale.EN_GB, Locale.ES_AR, Locale.ES_ES]
 

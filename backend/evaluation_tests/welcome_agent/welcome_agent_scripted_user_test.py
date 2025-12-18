@@ -90,7 +90,6 @@ test_cases = [
     ),
     ScriptedUserEvaluationTestCase(
         name='user_delays_questions_es',
-        skip_force="force",
         locale=Locale.ES_AR,
         simulated_user_prompt="Scripted user: user is uncertain and asks various questions",
         scripted_user=[

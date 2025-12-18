@@ -8,8 +8,8 @@ from typing import Coroutine, Callable, Awaitable
 import pytest
 from _pytest.logging import LogCaptureFixture
 
-from app.agent.agent_director.simple_agent_director import SimpleAgentDirector
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState
+from app.agent.agent_director.simple_agent_director import SimpleAgentDirector
 from app.agent.agent_types import AgentType
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
@@ -17,6 +17,7 @@ from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
 from app.agent.welcome_agent import WelcomeAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
     ConversationMemoryManagerState
+from app.i18n.translation_service import get_i18n_manager
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from app.vector_search.vector_search_dependencies import SearchServices
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
@@ -69,7 +70,7 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
 
     async def agent_director_exec(caplog, test_case):
         print(f"Running test case {test_case.name}")
-
+        get_i18n_manager().set_locale(test_case.locale)
         output_folder = os.path.join(os.getcwd(), 'test_output/agent_director/scripted', test_case.name)
 
         execute_evaluated_agent = AgentDirectorExecutor(agent_director=agent_director)

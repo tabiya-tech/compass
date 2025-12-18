@@ -8,6 +8,7 @@ from app.agent.collect_experiences_agent.data_extraction_llm._temporal_classifie
     TemporalAndWorkTypeClassifierTool
 from app.agent.experience import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationTurn, ConversationContext, ConversationHistory
+from app.i18n.translation_service import get_i18n_manager
 from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
@@ -272,6 +273,7 @@ async def test_temporal_and_work_type_classification(test_case: TemporalAndWorkT
     logger = logging.getLogger()
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
+        get_i18n_manager().set_locale(test_case.locale)
 
         # GIVEN users last input
         given_user_input = test_case.users_input

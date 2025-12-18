@@ -62,7 +62,7 @@ class PromptGenerator:
                 Even if the SIMULATED_USER used a different language.
                 
                 Evaluation Steps:
-                1. Read the conversation carefully and identify the language used by the SIMULATED_USER and EVALUATED_AGENT.
+                1. Read the conversation carefully and identify the language used by the EVALUATED_AGENT.
                 2. Check if the conversation was in the same language throughout (eg: English, Spanish, French, Swahili, etc)..
                 3. Assign a score of 100 if the conversation was in the same language throughout, or 0 otherwise.
                 """)
@@ -94,7 +94,10 @@ class PromptGenerator:
                 """)
             case EvaluationType.SINGLE_LANGUAGE:
                 return textwrap.dedent("""
-                The language used in the conversation is somewhat consistent and it is 'Spanish' mixed with 'English'
+                The language used in the conversation is somewhat consistent and it is 'Spanish' mixed with 'English'.
+                Here are a list of cases where the language deviated.
+                
+                - EVALUATED_AGENT used 'Hello' instead of 'Hola' at message 2.
                 """)
             case _:
                 raise NotImplementedError()
