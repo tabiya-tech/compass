@@ -399,14 +399,18 @@ test_cases = [
             Tus experiencias son:
             1. Asistente de ventas en el local de tu viejo (Enero 2015 - Diciembre 2022).
                - Tareas: "Limpiar el lugar", "Manejar la guita", "Tratar con proveedores", "Contabilidad básica", "Venta de productos", "Empaquetar pedidos". (Dilo como una lista).
+               - Día típico: "Limpiar el lugar", "Abrir el negocio", "Recibir proveedores", "Acomodar la mercadería", "Vender productos", "Atender a los clientes", "Contar la guita al final del día y anotarla" y "Cerrar el local". (Dilo como una lista).
                - Tarea importante: La atención al cliente.
                - Detalles: escuchaba atentamente y ayudaba rápido. "solo eso" si preguntan más.
+               - Tareas que no realizaba: No tenía que negociar con proveedores, solo hacer o recibir pedidos.
 
             2. Trabajando en la casa de mi madre (Marzo 2022 - Enero 2025). Es Voluntario.
-               - Tareas: "Limpiar", "Comprar lo que haga falta", "Preparar la comida", "Lavar la ropa", "Planchar", "Terminar el día con la cena". (Dilo como lista).
+               - Tareas: "Limpiar", "Comprar suministros", "Preparar la comida", "Barrer la casa" ,"Lavar la loza", "Tender la cama", "Lavar baños", "Lavar la ducha", "Solicitar citas médicas", "Llevar los niños al médico","Llevar los niños al odontólogo",   "Lavar la ropa", "Planchar", "Organizar las cosas y decorar". (Dilo como lista).
+               - Día típico: "Limpiar", "Comprar lo que haga falta", "Preparar la comida", "Lavar la loza", "Tender la cama", "Lavar baños", "Lavar la ducha",  "Lavar la ropa", "Planchar", "Terminar el día con la cena". (Dilo como lista).
                - Tarea importante: Organizar bien las tareas del día.
                - Detalles: hablaba con mi vieja para acordar lo importante. Herramientas: escoba y herramientas del hogar. "solo eso" si preguntan más.
-        
+               - Tareas que no realizaba: No tenía que cambiarle la ropa a los bebés ni nada de eso.
+
             No tienes otras experiencias. 
             Responde "si" o "no" cuando corresponda. Di "asi esta bien" si te piden confirmar.
             """) + system_instruction_prompt,
@@ -422,12 +426,12 @@ test_cases = [
         matchers=["llm", "matcher"],
         expected_experience_data=[
             {
-                "experience_title": AnyOf(ContainsString("asistente"), ContainsString("ventas")),
+                "experience_title": AnyOf(ContainsString("asistente"), ContainsString("venta"), ContainsString("ventas")),
                 "company": AnyOf(ContainsString("padre"), ContainsString("viejo")),
                 "timeline": {"start": ContainsString("2015"), "end": ContainsString("2022")},
             },
             {
-                "experience_title": AnyOf(ContainsString("casa"), ContainsString("madre")),
+                "experience_title": AnyOf(ContainsString("madre"), ContainsString("casa")),
                 "company": AnyOf(ContainsString("madre"), ContainsString("vieja")),
                 "timeline": {"start": ContainsString("2022"), "end": ContainsString("2025")},
             }
