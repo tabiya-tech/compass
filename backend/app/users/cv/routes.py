@@ -2,7 +2,7 @@ import asyncio
 import logging
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Request
+from fastapi import APIRouter, Depends, HTTPException, Path, Request, FastAPI
 
 from app.constants.errors import HTTPErrorResponse
 from app.users.auth import Authentication, UserInfo
@@ -18,7 +18,12 @@ from app.users.cv.get_repository import get_user_cv_repository
 from app.users.cv.repository import IUserCVRepository
 from app.users.cv.service import CVUploadService, ICVUploadService
 from app.users.cv.storage import _get_cv_storage_service, ICVCloudStorageService
-from app.users.cv.types import CVUploadStatusResponse, CVUploadResponseListItem
+from app.users.cv.types import CVUploadStatusResponse, CVUploadResponseListItem, PublicReportResponse
+from app.users.get_user_preferences_repository import get_user_preferences_repository
+from app.users.repositories import IUserPreferenceRepository
+from app.conversations.experience.get_experience_service import get_experience_service
+from app.conversations.experience.service import IExperienceService
+from app.conversations.experience._types import ExperienceResponse
 
 logger = logging.getLogger(__name__)
 
@@ -341,3 +346,67 @@ def add_user_cv_routes(users_router: APIRouter, auth: Authentication):
             )
 
     users_router.include_router(router)
+
+
+def add_public_report_routes(app: FastAPI):
+    router = APIRouter(prefix="/reports", tags=["public-reports"])
+
+    @router.get(
+        path="/{user_id}",
+        status_code=HTTPStatus.OK,
+        response_model=PublicReportResponse,
+        responses={
+            HTTPStatus.NOT_FOUND: {"model": HTTPErrorResponse},
+            HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse},
+        },
+        description="Retrieve the latest CV report data for a user (Public)",
+    )
+    async def get_public_report(
+        user_id: str = Path(description="the unique identifier of the user", examples=["1"]),
+        user_preferences_repository: IUserPreferenceRepository = Depends(get_user_preferences_repository),
+        experience_service: IExperienceService = Depends(get_experience_service),
+    ) -> PublicReportResponse:
+        try:
+            # 1. Get user preferences to find the latest session
+            preferences = await user_preferences_repository.get_user_preference_by_user_id(user_id)
+            if not preferences or not preferences.sessions:
+                logger.warning("No preferences or sessions found for user {user_id=%s}", user_id)
+                raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="No report data found for this user")
+
+            # 2. Use the latest session
+            latest_session_id = preferences.sessions[0]
+
+            # 3. Get experiences for the latest session
+            experience_entity_list = await experience_service.get_experiences_by_session_id(latest_session_id)
+            
+            # Map to ExperienceResponse
+            experiences = [
+                ExperienceResponse.from_experience_entity(
+                    experience_entity=entity,
+                    dive_in_phase=phase
+                )
+                for entity, phase in experience_entity_list
+            ]
+
+            # Use the time of the latest session if available, or now
+            # In a real scenario, we might want to get the actual conversation end time
+            conducted_at = None
+            if hasattr(preferences, "accepted_tc"): # Just a placeholder for some date
+                 conducted_at = preferences.accepted_tc
+
+            return PublicReportResponse(
+                user_id=user_id,
+                experiences=experiences,
+                conversation_conducted_at=conducted_at
+            )
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.exception(e)
+            raise HTTPException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                detail="Failed to retrieve report data"
+            )
+
+    app.include_router(router)

@@ -35,6 +35,7 @@ from app.users.cv.constants import (
     DEFAULT_MAX_UPLOADS_PER_USER,
     DEFAULT_RATE_LIMIT_PER_MINUTE,
 )
+from app.users.cv.routes import add_public_report_routes
 
 
 def setup_logging():
@@ -370,6 +371,11 @@ app.include_router(search_router)
 # Add metrics routes
 ############################################
 add_metrics_routes(app)
+
+############################################
+# Add public report routes
+############################################
+add_public_report_routes(app)
 
 ############################################
 # Add POC chat routes

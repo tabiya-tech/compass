@@ -29,6 +29,7 @@ const LazyLoadedSensitiveDataForm = lazyWithPreload(
   () => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm")
 );
 const LazyLoadedChat = lazyWithPreload(() => import("src/chat/Chat"));
+const LazyLoadedPublicReport = lazyWithPreload(() => import("src/experiences/report/PublicReportPage"));
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouterV6(createHashRouter);
@@ -51,8 +52,8 @@ const ProtectedRouteKeys = {
 };
 
 const NotFound: React.FC = () => {
-    const { t } = useTranslation();
-    return <ErrorPage errorMessage={t("error.errorPage.notFound")} />;
+  const { t } = useTranslation();
+  return <ErrorPage errorMessage={t("error.errorPage.notFound")} />;
 };
 
 const App = () => {
@@ -268,15 +269,15 @@ const App = () => {
     ...(isRegistrationDisabled
       ? []
       : [
-          {
-            path: routerPaths.REGISTER,
-            element: (
-              <ProtectedRoute key={ProtectedRouteKeys.REGISTER}>
-                <Register />
-              </ProtectedRoute>
-            ),
-          },
-        ]),
+        {
+          path: routerPaths.REGISTER,
+          element: (
+            <ProtectedRoute key={ProtectedRouteKeys.REGISTER}>
+              <Register />
+            </ProtectedRoute>
+          ),
+        },
+      ]),
     {
       path: routerPaths.LOGIN,
       element: (
@@ -308,6 +309,10 @@ const App = () => {
           <LazyLoadedSensitiveDataForm />
         </ProtectedRoute>
       ),
+    },
+    {
+      path: routerPaths.REPORT,
+      element: <LazyLoadedPublicReport />,
     },
     {
       path: "*",

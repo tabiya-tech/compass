@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, Field
+from app.conversations.experience._types import ExperienceResponse
 
 
 class CVUploadStateResponse(BaseModel):
@@ -38,6 +39,12 @@ class CVUploadStatusResponse(BaseModel):
     error_code: Optional['CVUploadErrorCode'] = None
     error_detail: str | None = None
     experience_bullets: list[str] | None = None
+
+
+class PublicReportResponse(BaseModel):
+    user_id: str
+    experiences: list[ExperienceResponse]
+    conversation_conducted_at: Optional[datetime] = None
 
 
 class CVUploadResponseListItem(BaseModel):
