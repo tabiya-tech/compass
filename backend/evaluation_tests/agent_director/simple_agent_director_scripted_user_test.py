@@ -189,3 +189,52 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
         turn = context.all_history.turns[i]
         actual_state = AgentState(i, turn.output.agent_type, turn.output.finished)
         assert actual_state == expected_state, f"Agent actual state: {actual_state} did have the expected state: {expected_state}"
+
+@pytest.mark.asyncio
+@pytest.mark.evaluation_test
+async def test_argentina_counseling_flow_simple(caplog: LogCaptureFixture,
+                                                setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
+                                                    [LogCaptureFixture, ScriptedUserEvaluationTestCase],
+                                                    Coroutine[None, None, None]
+                                                ]]]):
+    """
+    Conversation test, based on a scripted user with Argentinian slang.
+    Asserts that the simple agent director routes correctly between Welcome and Collect Experiences agents.
+    """
+
+    @dataclasses.dataclass
+    class AgentState:
+        index: int
+        agent_type: AgentType
+        finished: bool
+
+    given_test_case = ScriptedUserEvaluationTestCase(
+        name='argentina_counseling_flow_simple',
+        simulated_user_prompt="Scripted user: Argentinian persona",
+        scripted_user=[
+            "Hola, ¿me explicás cómo funciona esto?",
+            "Dale, arranquemos",  # END of Welcome
+            "ok",  # Acknowledge forwarding
+            "Laburé como asistente de ventas en el local de mi viejo",  # Job 1
+            "Vendedor",  # Title
+            "nada más",
+        ],
+        evaluations=[]
+    )
+
+    conversation_manager, agent_director_exec = await setup_agent_director
+    await agent_director_exec(caplog, given_test_case)
+
+    context = await conversation_manager.get_conversation_context()
+    expected_agent_states: list[AgentState] = [
+        AgentState(0, AgentType.WELCOME_AGENT, False),
+        AgentState(1, AgentType.WELCOME_AGENT, False),
+        AgentState(2, AgentType.WELCOME_AGENT, True),
+        AgentState(3, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+        AgentState(4, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+        AgentState(5, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+    ]
+    for i, expected_state in enumerate(expected_agent_states):
+        turn = context.all_history.turns[i]
+        actual_state = AgentState(i, turn.output.agent_type, turn.output.finished)
+        assert actual_state == expected_state, f"Agent actual state: {actual_state} did have the expected state: {expected_state}"

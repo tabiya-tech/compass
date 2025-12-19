@@ -386,5 +386,56 @@ test_cases = [
             You can come up with specific activities and details for each experience when asked.
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)]
+    ),
+    E2ESpecificTestCase(
+        country_of_user=Country.ARGENTINA,
+        conversation_rounds=60,
+        name='argentina_conversation_e2e',
+        locale=Locale.ES_AR,
+        simulated_user_prompt=dedent("""
+            Actúa como una persona joven de Argentina. Estás chateando con un bot para armar tu CV.
+            Usa jerga argentina (laburo, guita, viejo/vieja, dale, buenísimo).
+            Sé conciso.
+
+            Tus experiencias son:
+            1. Asistente de ventas en el local de tu viejo (Enero 2015 - Diciembre 2022).
+               - Tareas: "Limpiar el lugar", "Manejar la guita", "Tratar con proveedores", "Contabilidad básica", "Venta de productos", "Empaquetar pedidos". (Dilo como una lista).
+               - Día típico: "Limpiar el lugar", "Abrir el negocio", "Recibir proveedores", "Acomodar la mercadería", "Vender productos", "Atender a los clientes", "Contar la guita al final del día y anotarla" y "Cerrar el local". (Dilo como una lista).
+               - Tarea importante: La atención al cliente.
+               - Detalles: escuchaba atentamente y ayudaba rápido. "solo eso" si preguntan más.
+               - Tareas que no realizaba: No tenía que negociar con proveedores, solo hacer o recibir pedidos.
+
+            2. Trabajando en la casa de mi madre (Marzo 2022 - Enero 2025). Es Voluntario.
+               - Tareas: "Limpiar", "Comprar suministros", "Preparar la comida", "Barrer la casa" ,"Lavar la loza", "Tender la cama", "Lavar baños", "Lavar la ducha", "Solicitar citas médicas", "Llevar los niños al médico","Llevar los niños al odontólogo",   "Lavar la ropa", "Planchar", "Organizar las cosas y decorar". (Dilo como lista).
+               - Día típico: "Limpiar", "Comprar lo que haga falta", "Preparar la comida", "Lavar la loza", "Tender la cama", "Lavar baños", "Lavar la ducha",  "Lavar la ropa", "Planchar", "Terminar el día con la cena". (Dilo como lista).
+               - Tarea importante: Organizar bien las tareas del día.
+               - Detalles: hablaba con mi vieja para acordar lo importante. Herramientas: escoba y herramientas del hogar. "solo eso" si preguntan más.
+               - Tareas que no realizaba: No tenía que cambiarle la ropa a los bebés ni nada de eso.
+
+            No tienes otras experiencias. 
+            Responde "si" o "no" cuando corresponda. Di "asi esta bien" si te piden confirmar.
+            """) + system_instruction_prompt,
+        evaluations=[Evaluation(type=EvaluationType.SINGLE_LANGUAGE, expected=100)],
+        expected_experiences_count_min=2,
+        expected_experiences_count_max=2,
+        expected_work_types={
+            WorkType.SELF_EMPLOYMENT: (0, 1),
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 1),
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+            WorkType.UNSEEN_UNPAID: (1, 1),
+        },
+        matchers=["llm", "matcher"],
+        expected_experience_data=[
+            {
+                "experience_title": AnyOf(ContainsString("asistente"), ContainsString("venta"), ContainsString("ventas")),
+                "company": AnyOf(ContainsString("padre"), ContainsString("viejo")),
+                "timeline": {"start": ContainsString("2015"), "end": ContainsString("2022")},
+            },
+            {
+                "experience_title": AnyOf(ContainsString("madre"), ContainsString("casa")),
+                "company": AnyOf(ContainsString("madre"), ContainsString("vieja")),
+                "timeline": {"start": ContainsString("2022"), "end": ContainsString("2025")},
+            }
+        ]
     )
 ]
