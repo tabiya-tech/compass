@@ -55,7 +55,7 @@ COMPASS_DB = (AsyncIOMotorClient(
 
 class Options(BaseModel):
     hot_run: bool = False
-    num_of_dimensions: int
+    num_of_dimensions: int = 768
     delete_existing: bool = False
     generate_embeddings: bool = True
     generate_indexes: bool = True

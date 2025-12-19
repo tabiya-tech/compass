@@ -10,10 +10,12 @@ def _get_locale_section():
 
     return textwrap.dedent(f"""
         #Language 
-        - Stick to the {language_label} language when replying to me.
+        - CRITICAL: You MUST reply ONLY in {language_label}. Never mix languages or use words from other languages.
         - Any questions I tell you to ask me should also be in the {language_label} language.
         - If my previous message is in another language, do not respond in that language, instead respond in the {language_label} language.
         - Any information or data you are asked to extract from our conversation should also be in or translated to the {language_label} language.
+        - If you see text in these instructions or prompts that is not in {language_label}, you MUST translate it to {language_label} before using it in your response.
+        - Never mix languages - your entire response must be in {language_label} only.
         """)
 
 

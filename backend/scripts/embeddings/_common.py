@@ -90,8 +90,7 @@ async def _upsert_index(*,
         if ex.code == 85:
             logger.error(f"IndexOptionsConflict: '{collection.name}.{name}': {ex}")
     except Exception as ex:
-        logger.exception(ex)
-        logger.error(f"Failed to create index '{collection.name}.{name}': {ex}")
+        logger.exception(f"Failed to create index '{collection.name}.{name}': {ex}")
 
 
 async def _create_std_indexes(*, hot_run: bool,

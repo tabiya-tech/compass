@@ -110,6 +110,239 @@ test_cases = [
 
 ```
 
+## Using Matchers for Data Validation
+
+Matchers provide a flexible way to validate extracted data in tests, especially when dealing with LLM outputs that may vary in exact wording. Instead of exact string matching, matchers allow you to specify patterns and conditions.
+
+### Available Matchers
+
+- **`ContainsString(string, case_sensitive=False)`** - Checks if a string contains the specified substring
+- **`AnyOf(*options)`** - Matches if the value matches any of the provided options (can include other matchers, strings, or regex patterns)
+- **`DictContaining(expected_dict)`** - Matches if a dictionary contains all expected keys with matching values
+- **`AnyValue()`** - Matches any value (useful for optional fields)
+
+### Example Usage
+
+```python
+from evaluation_tests.matcher import ContainsString, AnyOf, DictContaining
+
+expected_experience_data = [{
+    "location": AnyOf(ContainsString("Tokyo"), ContainsString("Tokio")),
+    "company": ContainsString("Shoe Soles"),
+    "timeline": {
+        "start": ContainsString("2023"),
+        "end": AnyOf(ContainsString("present"), "")
+    },
+    "experience_title": ContainsString("Salesperson")
+}]
+```
+
+Matchers can be nested and combined:
+
+```python
+# Match any of multiple possible values
+"location": AnyOf("Tokyo", "Tokio", ContainsString("Japan"))
+
+# Nested dictionary matching
+"timeline": DictContaining({
+    "start": ContainsString("2023"),
+    "end": AnyOf("present", "Present", "")
+})
+
+# Case-insensitive matching
+"company": ContainsString("shoe soles", case_sensitive=False)
+```
+
+### When to Use Matchers vs LLM Evaluators
+
+- **Use Matchers** when you need deterministic, fast validation of structured data (e.g., extracted experience fields, dates, locations)
+- **Use LLM Evaluators** when you need semantic understanding or evaluation of conversational quality (e.g., conciseness, relevance, language consistency)
+
+## Working with Locales
+
+Evaluation tests support multiple locales to test multilingual behavior. Each test case can specify a `locale` property to set the language context.
+
+### Supported Locales
+
+- `Locale.EN_US` - English (US)
+- `Locale.EN_GB` - English (UK)
+- `Locale.ES_AR` - Español (Argentina)
+- `Locale.ES_ES` - Español (España)
+
+### Setting Locale in Test Cases
+
+```python
+from app.i18n.types import Locale
+
+test_cases = [
+    EvaluationTestCase(
+        name='spanish_test',
+        locale=Locale.ES_AR,  # Set the locale for this test
+        simulated_user_prompt='...',
+        evaluations=[...]
+    ),
+]
+```
+
+### Locale in Test Execution
+
+When a test case specifies a locale, the i18n manager is automatically configured:
+
+```python
+# In your test function
+async def test_my_agent(test_case: EvaluationTestCase):
+    get_i18n_manager().set_locale(test_case.locale)
+    # ... rest of test
+```
+
+The locale affects:
+- Agent responses (should be in the specified language)
+- Translation behavior
+- Language-specific evaluations (e.g., `SINGLE_LANGUAGE` evaluation type)
+
+### Test ID Generation
+
+Test cases automatically generate a `test_id` property that combines the test name and locale:
+
+```python
+test_case.test_id  # Returns: "my_test-ES_AR"
+```
+
+This is used for pytest parametrization to distinguish the same test run in different locales.
+
+## Translation Tool
+
+The `TranslationTool` is a utility for translating text between languages using LLM-based translation. It's primarily used in evaluation tests to support multilingual testing scenarios.
+
+### When to Use
+
+- **Embedding Evaluation**: Translating English test queries to evaluate embeddings in other languages
+- **Cross-lingual Testing**: Verifying that translations maintain semantic meaning
+- **Multilingual Test Data**: Generating test data in different languages
+
+**Note**: The TranslationTool is NOT for runtime translation of UI strings. Use the i18n system (`t()` function) for that purpose.
+
+### Basic Usage
+
+```python
+from common_libs.agent.translation_tool import TranslationTool
+from app.i18n.types import Locale
+
+# Initialize with target locale
+tool = TranslationTool(target_locale=Locale.ES_AR)
+
+# Translate text
+translated_text = await tool.translate("Hello, how are you?")
+# Returns: "Hola, ¿cómo estás?"
+
+# Compare semantic equivalence
+result = await tool.compare("Hello", "Hola")
+# Returns: "SIMILAR" or "DIFFERENT"
+```
+
+### Limitations
+
+- **LLM-based**: Makes API calls to Gemini, so it's slow and has costs
+- **Non-deterministic**: Translations may vary between calls
+- **No caching**: Each call translates fresh (no memoization)
+- **Test-only**: Designed for evaluation scenarios, not production use
+
+### Example: Embedding Evaluation
+
+```python
+translation_tool = TranslationTool(Locale.ES_AR)
+for query in english_queries:
+    translated_query = await translation_tool.translate(query)
+    results = await search_service.search(query=translated_query, k=10)
+    # Evaluate Spanish embeddings with translated queries
+```
+
+## Test Output Interpretation
+
+Evaluation tests generate detailed output files that help you understand test results and track performance over time.
+
+### Output Files
+
+All evaluation tests generate output in `backend/test_output/`:
+
+- **`test_results.json`** - Detailed JSON log of all test runs
+- **`test_results.csv`** - CSV format for easy analysis
+- **`test_summary.csv`** - Aggregated summary (generated by `evalution_metrics.py`)
+- **Per-test directories** - Individual test outputs with conversation records
+
+### Understanding Test Results
+
+#### CSV Structure
+
+The `test_results.csv` contains:
+- `test_name` - Full test name including parameters
+- `label` - Version label from `@pytest.mark.evaluation_test("label")`
+- `outcome` - "passed" or "failed"
+- `duration` - Test execution time in seconds
+- `timestamp` - When the test ran
+
+#### Summary Metrics
+
+After running `python evaluation_tests/evalution_metrics.py`, `test_summary.csv` provides:
+
+- **`duration_mean`** - Average test duration
+- **`duration_std`** - Standard deviation of duration
+- **`duration_count`** - Number of test runs
+- **`outcome_distribution`** - Dictionary of pass/fail counts (e.g., `{"passed": 8, "failed": 2}`)
+- **`pass_percentage`** - Percentage of runs that passed
+
+#### Interpreting Scores
+
+Evaluation results use a **0-100 scale**:
+- **100** - Perfect match/quality
+- **70-99** - Good quality with minor issues
+- **50-69** - Acceptable but needs improvement
+- **0-49** - Poor quality, significant issues
+
+Example evaluation assertion:
+```python
+evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=70)]
+# This expects the conciseness score to be at least 70
+```
+
+### Reading Test Outputs
+
+#### Individual Test Outputs
+
+Each test creates a directory in `test_output/` with:
+- Conversation records (JSON/Markdown)
+- Extracted data
+- Evaluation results
+- Failure messages (if any)
+
+#### Identifying Regressions
+
+1. **Compare pass percentages** across different labels:
+   ```bash
+   # Run with different labels
+   pytest --eval-label="before-change" ...
+   pytest --eval-label="after-change" ...
+   
+   # Compare in test_summary.csv
+   ```
+
+2. **Check outcome distributions**: A test going from `{"passed": 10}` to `{"passed": 7, "failed": 3}` indicates a regression
+
+3. **Monitor duration**: Significant increases in `duration_mean` may indicate performance issues
+
+#### Common Patterns
+
+- **Flaky tests**: High `duration_std` and mixed `outcome_distribution` (e.g., `{"passed": 6, "failed": 4}`)
+- **Consistent failures**: `pass_percentage` near 0% indicates a broken test
+- **Performance degradation**: `duration_mean` increasing over time
+
+### Best Practices
+
+- **Use version labels** to track changes: `@pytest.mark.evaluation_test("v1.2.3")`
+- **Run tests multiple times** with `@pytest.mark.repeat(3)` to catch flakiness
+- **Review individual outputs** when tests fail to understand root causes
+- **Compare summaries** before/after changes to detect regressions
+
 ## Troubleshooting
 
 If when you run it python complains about an unknown parameter, re-install poetry components using:

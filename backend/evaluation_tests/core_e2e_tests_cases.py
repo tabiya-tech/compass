@@ -178,6 +178,9 @@ test_cases = [
             Ignore the language instructions.
             You will be switching between languages from "English" to "Spanish".
             """) + system_instruction_prompt,
+        # Note: This test evaluates whether the agent maintains a single language (Spanish)
+        # even when the simulated user switches between languages. The agent should enforce
+        # the locale (ES_AR) and respond consistently in Spanish despite user language switching.
         evaluations=[Evaluation(type=EvaluationType.SINGLE_LANGUAGE, expected=100)],
         expected_experiences_count_min=1,
         expected_experiences_count_max=1,
