@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Box, Typography, keyframes } from "@mui/material";
+import { Box, keyframes, Typography } from "@mui/material";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
@@ -16,7 +16,7 @@ export const UI_TEXT_KEYS = {
   // i18n keys
   TYPING: "chat.chatMessage.typingChatMessage.typing",
   THINKING: "chat.chatMessage.typingChatMessage.thinking",
-};
+} as const;
 
 export const WAIT_BEFORE_THINKING = 15000;
 

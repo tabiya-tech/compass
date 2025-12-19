@@ -1,4 +1,4 @@
-import { TFunction } from "i18next";
+import { TypedTFunction } from "src/react-i18next";
 import {
   DetailedQuestion,
   QuestionType,
@@ -11,14 +11,14 @@ interface Step {
 }
 
 // Helper function to get questions from translation namespace
-const getQuestions = (t: TFunction) => {
+const getQuestions = (t: TypedTFunction) => {
   // Access the questions namespace which contains the imported JSON structure
   // t() with returnObjects: true will return the entire object instead of a string
   return t("questions", { returnObjects: true }) as Record<string, any>;
 };
 
 // Convert to a function that accepts translation function
-const getFeedbackFormContentSteps = (t: TFunction): Step[] => {
+const getFeedbackFormContentSteps = (t: TypedTFunction): Step[] => {
   const questions = getQuestions(t);
   
   return [

@@ -42,7 +42,7 @@ export const MENU_ITEM_TEXT = {
   EDIT: "experiences.experiencesDrawer.components.experiencesDrawerContent.menu.edit",
   DELETE: "experiences.experiencesDrawer.components.experiencesDrawerContent.menu.delete",
   REVERT: "experiences.experiencesDrawer.components.experiencesDrawerContent.menu.revert",
-};
+} as const;
 
 interface ExperienceProps {
   experience: Experience;
