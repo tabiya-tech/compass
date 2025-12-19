@@ -198,7 +198,6 @@ class TestRecorderFlow:
             experience_title=get_random_printable_string(10),
             work_type=WorkType.SELF_EMPLOYMENT.name,
             company=None,
-            location=None,
             start_date=None,
             end_date=None,
             paid_work=None,

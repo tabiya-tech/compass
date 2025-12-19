@@ -15,7 +15,7 @@ def _create_collected_data(
         index: int,
         experience_title: str,
         company: Optional[str] = None,
-        # location: Optional[str] = None,
+        
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         paid_work: Optional[bool] = None,
@@ -42,7 +42,7 @@ def create_experience_data(
         index: int,
         experience_title: Optional[str] = None,
         company: Optional[str] = None,
-        # location: Optional[str] = None,
+        
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
         paid_work: Optional[bool] = None,
