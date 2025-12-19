@@ -178,7 +178,7 @@ _SYSTEM_INSTRUCTIONS = """
     
     You will collect and place them to the output as instructed below:
     ##'experience_title' instructions
-        Extract the title of the experience from the '<User's Last Input>', but do not alter it.
+        Extract the title of the experience from the '<User's Last Input>'.
         For unpaid work, use the kind of work done (e.g. "Helping Neighbors", "Volunteering" etc).
         Make sure that the user is actually referring to an experience they have have.
         When summarizing a user-stated action (e.g., "I sell tomatoes"), convert it directly into a gerund-phrase experience title (e.g., "Selling Tomatoes"). 
