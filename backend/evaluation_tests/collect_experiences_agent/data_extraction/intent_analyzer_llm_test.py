@@ -96,7 +96,6 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
                 uuid="test-uuid-1",
                 company="Acme Inc",
                 experience_title="Software Engineer",
-                location="New York",
                 start_date=None,
                 end_date=None,
                 paid_work=True,
