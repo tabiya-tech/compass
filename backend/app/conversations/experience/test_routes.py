@@ -174,7 +174,6 @@ class TestExperienceRoutes:
                     uuid="foo_uuid",
                     experience_title="Foo Bar",
                     company="Foo Company",
-                    location="Foo Location",
                     timeline=Timeline(start="2020-01-01", end="2021-01-01"),
                     work_type=WorkType.SELF_EMPLOYMENT,
                     top_skills=[
@@ -359,7 +358,6 @@ class TestExperienceRoutes:
                 uuid=given_experience_uuid,
                 experience_title="new title",
                 company="company",
-                location="location",
                 timeline=Timeline(start="2020", end="2021"),
                 work_type=WorkType.SELF_EMPLOYMENT,
                 top_skills=[],
@@ -475,13 +473,11 @@ class TestExperienceRoutes:
             # GIVEN a payload with fields that exceed max length
             too_long_title = "x" * (EXPERIENCE_TITLE_MAX_LENGTH + 1)
             too_long_company = "y" * (COMPANY_MAX_LENGTH + 1)
-            too_long_location = "z" * (LOCATION_MAX_LENGTH + 1)
             too_long_summary = "s" * (SUMMARY_MAX_LENGTH + 1)
             too_long_skill_label = "l" * (SKILL_LABEL_MAX_LENGTH + 1)
             given_update_payload = {
                 "experience_title": too_long_title,
                 "company": too_long_company,
-                "location": too_long_location,
                 "summary": too_long_summary,
                 "top_skills": [{"UUID": "skill-uuid-1", "preferredLabel": too_long_skill_label}]
             }
@@ -495,7 +491,6 @@ class TestExperienceRoutes:
             error_fields = [err["loc"][-1] for err in error_json.get("detail", [])]
             assert "experience_title" in error_fields
             assert "company" in error_fields
-            assert "location" in error_fields
             assert "summary" in error_fields
             assert "preferredLabel" in error_fields
 
@@ -607,7 +602,6 @@ class TestExperienceRoutes:
                 uuid=given_experience_uuid,
                 experience_title="Unedited Title",
                 company="Unedited Company",
-                location="Unedited Location",
                 timeline=Timeline(start="2020", end="2021"),
                 work_type=WorkType.SELF_EMPLOYMENT,
                 top_skills=[],

@@ -10,12 +10,13 @@ from app.agent.collect_experiences_agent import CollectedData
 from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtractionLLM
 from app.agent.experience import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
+from app.i18n.translation_service import get_i18n_manager
+from app.i18n.types import Locale
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 from evaluation_tests.matcher import check_actual_data_matches_expected, ContainsString, AnyOf, Matcher, match_expected
-from app.i18n.translation_service import get_i18n_manager
-from app.i18n.types import Locale
+
 
 class _TestCaseDataExtraction(CompassTestCase):
     # The GIVEN
@@ -126,7 +127,7 @@ test_cases_data_extraction = [
         user_input="Empecé a vender zapatos en el mercado local los fines de semana en 2019.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Venta de Zapatos', company='Mercado Local',
-                          location=None, start_date=None,
+                           start_date=None,
                           end_date=None,
                           paid_work=None, work_type='SELF_EMPLOYMENT')
         ],
@@ -165,6 +166,57 @@ test_cases_data_extraction = [
         expected_last_referenced_experience_index=-1,  # The experience should be deleted
         expected_collected_data_count=0
     ),
+    # Add new experience AR
+    _TestCaseDataExtraction(
+        name="add_new_experience_ar",
+        locale=Locale.ES_AR,
+        summary="",
+        turns=[
+            ("(silence)",
+             "Contame sobre tus laburos. ¿Alguna vez laburaste para alguien?"),
+        ],
+        user_input="Sí, laburé de asistente de ventas en el local de mi viejo.",
+        collected_data_so_far=[
+        ],
+        expected_last_referenced_experience_index=0,
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": AnyOf(ContainsString("asistente"), ContainsString("venta")),
+             "company": AnyOf(ContainsString("viejo"), ContainsString("padre")),
+             }
+        ]
+    ),
+    # Update experience AR
+    _TestCaseDataExtraction(
+        name="update_experience_ar",
+        locale=Locale.ES_AR,
+        summary="",
+        turns=[
+            ("(silence)",
+             "Contame sobre tus laburos. ¿Alguna vez laburaste para alguien?"),
+            ("Laburé de asistente de ventas en el local de mi viejo.",
+             "¡Buenísimo! ¿Y qué hacías ahí?"),
+        ],
+        user_input="Manejaba la guita y atendía a los clientes. Estuve desde 2015 hasta 2022.",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Asistente de ventas', company='Local de mi viejo',
+                          start_date=None,
+                          end_date=None,
+                          paid_work=None, work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT')
+        ],
+        expected_last_referenced_experience_index=0,
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "start_date": ContainsString("2015"),
+             "end_date": ContainsString("2022"),
+             "experience_title": AnyOf(ContainsString("asistente"), ContainsString("venta")),
+             }
+        ]
+    ),
+
 ]
 
 
@@ -173,9 +225,9 @@ test_cases_data_extraction = [
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_data_extraction),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_data_extraction)])
-async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytest.LogCaptureFixture):
+async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytest.LogCaptureFixture,
+                               setup_multi_locale_app_config):
     logger = logging.getLogger()
-
     get_i18n_manager().set_locale(test_case.locale)
 
     with caplog.at_level(logging.DEBUG):

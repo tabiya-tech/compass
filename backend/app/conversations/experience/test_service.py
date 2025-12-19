@@ -72,7 +72,6 @@ def _make_editable_experience_entity(uuid: str, title: str, skills=None) -> Edit
         uuid=uuid,
         experience_title=title,
         company="fooCorp",
-        location="fooVille",
         timeline=Timeline(start="2020", end="2021"),
         work_type=WorkType.SELF_EMPLOYMENT,
         esco_occupations=[],
@@ -88,7 +87,6 @@ def _make_experience_entity(uuid: str, title: str, skills=None) -> ExperienceEnt
         uuid=uuid,
         experience_title=title,
         company="fooCorp",
-        location="fooVille",
         timeline=Timeline(start="2020", end="2021"),
         work_type=WorkType.SELF_EMPLOYMENT,
         esco_occupations=[],
@@ -233,9 +231,9 @@ class TestUpdateExperience:
                 id="timeline_only"
             ),
             pytest.param(
-                UpdateExperienceRequest(company="New Co", location="New Loc"),
-                {"company": "New Co", "location": "New Loc"},
-                id="company_and_location"
+                UpdateExperienceRequest(company="New Co"),
+                {"company": "New Co"},
+                id="company_only"
             ),
             pytest.param(
                 UpdateExperienceRequest(work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name, summary="New Sum"),
