@@ -352,6 +352,30 @@ test_cases: list[EntityExtractionToolTestCase] = [
             "location": "",
         },
     )
+    ,
+    EntityExtractionToolTestCase(
+        name="argentina_asistente_ventas",
+        turns=[
+            (SILENCE_MESSAGE, "Contame de tu laburo más reciente")
+        ],
+        users_input="Laburé como asistente de ventas en el local de mi viejo en Buenos Aires",
+        expected_extracted_data={
+            "company": AnyOf(ContainsString("local"), ContainsString("viejo")),
+            "location": "Buenos Aires",
+            "experience_title": AnyOf(ContainsString("asistente"), ContainsString("ventas"))
+        }
+    ),
+    EntityExtractionToolTestCase(
+        name="argentina_casa_madre",
+        turns=[
+            (SILENCE_MESSAGE, "¿Hiciste algún laburo no pago en casa?")
+        ],
+        users_input="Sí, estuve laburando en la casa de mi madre, me encargaba de la limpieza y la comida",
+        expected_extracted_data={
+            "company": AnyOf(ContainsString("casa"), ContainsString("madre")),
+            "location": None,
+            "experience_title": AnyOf(ContainsString("limpieza"), ContainsString("comida"), ContainsString("casa"))
+        }
 ]
 
 

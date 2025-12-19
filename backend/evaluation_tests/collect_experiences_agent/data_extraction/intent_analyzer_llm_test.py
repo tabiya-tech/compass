@@ -223,6 +223,30 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
         users_last_input="I like Nigerian Food",
         expected_operations=[]
     ),
+    IntentAnalyzerToolTestCase(
+        name="argentina_multiple_experiences",
+        turns=[
+            (SILENCE_MESSAGE, "Contame sobre tus experiencias laborales o proyectos.")
+        ],
+        collected_data_so_far=[],
+        users_last_input=dedent("""
+            Che, te cuento mis laburos:
+            - Asistente de ventas en el local de mi viejo (2015-2022).
+            - Laburando en la casa de mi vieja ayudando con todo (2022-2025).
+            """),
+        expected_operations=[
+            {
+                "data_operation": ContainsString("add"),
+                "potential_new_experience_title": AnyOf(ContainsString("asistente"), ContainsString("ventas")),
+                "users_statement": ContainsString("Asistente de ventas en el local de mi viejo")
+            },
+            {
+                "data_operation": ContainsString("add"),
+                "potential_new_experience_title": AnyOf(ContainsString("casa"), ContainsString("vieja")),
+                "users_statement": ContainsString("Laburando en la casa de mi vieja")
+            }
+        ]
+    ),
 ]
 
 

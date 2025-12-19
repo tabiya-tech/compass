@@ -1,6 +1,7 @@
 import logging
 from copy import deepcopy
-from typing import Optional
+from textwrap import dedent
+from typing import Optional, Awaitable
 
 import pytest
 from pydantic import ConfigDict
@@ -165,6 +166,57 @@ test_cases_data_extraction = [
         ],
         expected_last_referenced_experience_index=-1,  # The experience should be deleted
         expected_collected_data_count=0
+    ),
+
+     # Add new experience AR
+    _TestCaseDataExtraction(
+        name="add_new_experience_ar",
+        locale=Locale.ES_AR,
+        summary="",
+        turns=[
+            ("(silence)",
+             "Contame sobre tus laburos. ¿Alguna vez laburaste para alguien?"),
+        ],
+        user_input="Sí, laburé de asistente de ventas en el local de mi viejo.",
+        collected_data_so_far=[
+        ],
+        expected_last_referenced_experience_index=0,
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "defined_at_turn_number": 1,
+             "experience_title": AnyOf(ContainsString("asistente"), ContainsString("venta")),
+             "company": AnyOf(ContainsString("viejo"), ContainsString("padre")),
+             }
+        ]
+    ),
+    # Update experience AR
+    _TestCaseDataExtraction(
+        name="update_experience_ar",
+        locale=Locale.ES_AR,
+        summary="",
+        turns=[
+            ("(silence)",
+             "Contame sobre tus laburos. ¿Alguna vez laburaste para alguien?"),
+            ("Laburé de asistente de ventas en el local de mi viejo.",
+             "¡Buenísimo! ¿Y qué hacías ahí?"),
+        ],
+        user_input="Manejaba la guita y atendía a los clientes. Estuve desde 2015 hasta 2022.",
+        collected_data_so_far=[
+            CollectedData(index=0, defined_at_turn_number=1, experience_title='Asistente de ventas', company='Local de mi viejo',
+                          start_date=None,
+                          end_date=None,
+                          paid_work=None, work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT')
+        ],
+        expected_last_referenced_experience_index=0,
+        expected_collected_data_count=1,
+        expected_collected_data=[
+            {"index": 0,
+             "start_date": ContainsString("2015"),
+             "end_date": ContainsString("2022"),
+             "experience_title": AnyOf(ContainsString("asistente"), ContainsString("venta")),
+             }
+        ]
     ),
 ]
 
