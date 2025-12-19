@@ -51,7 +51,7 @@ class TranslationTool:
             }}
         """)
 
-        return _template.format(target_language=self._target_locale,
+        return _template.format(target_language=self._target_locale.label(),
                                 user_input=user_input,
                                 translation=translation)
 

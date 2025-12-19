@@ -60,8 +60,8 @@ async def test_main_app_chat(
 
     # Add the language instruction to the simulated user prompt
     system_instruction = current_test_case.simulated_user_prompt
-    system_instruction += (f"\n\n VERY IMPORTANT: You are going to be chatting in {current_test_case.locale.label()}. "
-                           f"         Never in any case reply to the LLM in a different language even though the instructions might contain 'English'")
+    system_instruction += (f"\n\nVERY IMPORTANT: You are going to be chatting in {current_test_case.locale.label()}. "
+                           f"Never in any case reply to the LLM in a different language even though the instructions might contain 'English'")
     try:
         evaluation_result.add_conversation_records(
             await conversation_generator.generate(
