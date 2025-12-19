@@ -4,7 +4,7 @@ import { Box, Popover, Typography, useTheme } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import { DislikeReason, DislikeReasonTransalationKey } from "src/chat/reaction/reaction.types";
+import { DislikeReason, DislikeReasonTranslationKey } from "src/chat/reaction/reaction.types";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 export interface DislikeReasonPopoverProps {
@@ -35,7 +35,7 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
   const isOnline = useContext(IsOnlineContext)
 
   const getDislikeReasonLabel = (reason: DislikeReason) =>
-    t(`${DislikeReasonTransalationKey[reason]}`);
+    t(`${DislikeReasonTranslationKey[reason]}`);
 
   const handleReasonClick = (reason: DislikeReason) => {
     // for now, our ui only allows selecting one reason

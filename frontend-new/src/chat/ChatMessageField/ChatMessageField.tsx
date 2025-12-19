@@ -1,5 +1,5 @@
-import React, { useEffect, useContext, useMemo, useState, MouseEvent, KeyboardEvent, useCallback } from "react";
-import { IconButton, InputAdornment, TextField, styled, useTheme, Typography, Box } from "@mui/material";
+import React, { KeyboardEvent, MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { Box, IconButton, InputAdornment, styled, TextField, Typography, useTheme } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import AddIcon from "@mui/icons-material/Add";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
@@ -20,6 +20,7 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import UploadedCVsMenu from "src/CV/uploadedCVsMenu/UploadedCVsMenu";
 import { useTranslation } from "react-i18next";
+import { TranslationKey } from "src/react-i18next";
 
 export interface ChatMessageFieldProps {
   handleSend: (message: string) => void;
@@ -59,7 +60,7 @@ export const MENU_ITEM_TEXT = {
   UPLOAD_CV: "chat.chatMessageField.uploadCvLabel",
   UPLOADED_CV_ACCORDION: "chat.chatMessageField.viewUploadedLabel",
   VIEW_UPLOADED_CVS: "chat.chatMessageField.viewUploadedLabel",
-};
+} as const;
 
 export const PLACEHOLDER_TEXTS = {
   CHAT_FINISHED: "chat.chatMessageField.placeholders.chatFinished",
@@ -67,7 +68,8 @@ export const PLACEHOLDER_TEXTS = {
   OFFLINE: "chat.chatMessageField.placeholders.offline",
   DEFAULT: "chat.chatMessageField.placeholders.default",
   UPLOADING: "chat.chatMessageField.placeholders.uploading",
-};
+} as const;
+
 export const CHARACTER_LIMIT_ERROR_MESSAGES = {
   MESSAGE_LIMIT: "common.chat.errors.messageLimit",
   INVALID_SPECIAL_CHARACTERS: "common.chat.errors.invalidSpecialCharacters",
@@ -80,7 +82,7 @@ export const CHARACTER_LIMIT_ERROR_MESSAGES = {
   DUPLICATE_CV: "common.upload.errors.duplicate",
   UNSUPPORTED_FILE_TYPE: "common.upload.errors.unsupportedFileType",
   UPLOAD_TIMEOUT: "common.upload.errors.timeout",
-};
+} as const;
 
 // Define the max file size in bytes 3 MB
 export const MAX_FILE_SIZE_BYTES = 3 * 1024 * 1024;
@@ -380,7 +382,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       const detail = err?.response?.data?.detail;
       // Use centralized error message mapping
       const errorMessage = getCvUploadErrorMessageFromHttpStatus(status, detail);
-      setErrorMessage(t(errorMessage));
+      setErrorMessage(t(errorMessage as TranslationKey));
     }
   };
 
