@@ -7,7 +7,7 @@ from features.skills_ranking.state.utils.get_group import TargetGroup, _get_grou
 TEST_THRESHOLD = 0.2
 
 
-class TestCase(BaseModel):
+class SkillRankingTestCase(BaseModel):
     given_target_group: TargetGroup
     """
     The target group for the test case, either HIGH_DIFFERENCE or UNDERCONFIDENT.
@@ -32,9 +32,9 @@ class TestCase(BaseModel):
     doc: str
 
 
-test_cases: list[TestCase] = [
+test_cases: list[SkillRankingTestCase] = [
     # HIGH DIFFERENCE group cases
-    TestCase(
+    SkillRankingTestCase(
         given_target_group=TargetGroup.HIGH_DIFFERENCE,
         given_self_estimated_rank=0,
         given_actual_rank=1,
@@ -46,7 +46,7 @@ test_cases: list[TestCase] = [
             if has_high_difference: we are in GROUP_1
             """
     ),
-    TestCase(
+    SkillRankingTestCase(
         given_target_group=TargetGroup.HIGH_DIFFERENCE,
         given_self_estimated_rank=0.5,
         given_actual_rank=0.8,
@@ -57,7 +57,7 @@ test_cases: list[TestCase] = [
             if has_high_difference: we are in GROUP_1
             """
     ),
-    TestCase(
+    SkillRankingTestCase(
         given_target_group=TargetGroup.HIGH_DIFFERENCE,
         given_self_estimated_rank=0,
         given_actual_rank=1,
@@ -69,7 +69,7 @@ test_cases: list[TestCase] = [
             if has_high_difference: we are in GROUP_1
             """
     ),
-    TestCase(
+    SkillRankingTestCase(
         given_target_group=TargetGroup.HIGH_DIFFERENCE,
         given_self_estimated_rank=0.5,
         given_actual_rank=0.4,
@@ -80,7 +80,7 @@ test_cases: list[TestCase] = [
             if not has_high_difference: we are in GROUP_2
             """
     ),
-    TestCase(
+    SkillRankingTestCase(
         given_target_group=TargetGroup.HIGH_DIFFERENCE,
         given_self_estimated_rank=1,
         given_actual_rank=1,
@@ -92,7 +92,7 @@ test_cases: list[TestCase] = [
             """
     ),
 
-    TestCase(
+    SkillRankingTestCase(
         given_target_group=TargetGroup.HIGH_DIFFERENCE,
         given_self_estimated_rank=0,
         given_actual_rank=0,
@@ -104,7 +104,7 @@ test_cases: list[TestCase] = [
             """
     ),
 
-    TestCase(
+    SkillRankingTestCase(
         given_target_group=TargetGroup.HIGH_DIFFERENCE,
         given_self_estimated_rank=0.1,
         given_actual_rank=0.3,
@@ -117,7 +117,7 @@ test_cases: list[TestCase] = [
     ),
 
     # UNDERCONFIDENCE group cases
-    TestCase(
+    SkillRankingTestCase(
         given_target_group=TargetGroup.UNDERCONFIDENT,
         given_self_estimated_rank=0.5,
         given_actual_rank=0.3,
@@ -129,7 +129,7 @@ test_cases: list[TestCase] = [
             if is_underconfident: we are in GROUP_4
             """
     ),
-    TestCase(
+    SkillRankingTestCase(
         given_target_group=TargetGroup.UNDERCONFIDENT,
         given_self_estimated_rank=1,
         given_actual_rank=1,
@@ -141,7 +141,7 @@ test_cases: list[TestCase] = [
             if not is_underconfident: we are in GROUP_4
             """
     ),
-    TestCase(
+    SkillRankingTestCase(
         given_target_group=TargetGroup.UNDERCONFIDENT,
         given_self_estimated_rank=0.5,
         given_actual_rank=0.8,
@@ -162,7 +162,7 @@ class TestGetGroupBasedOnRanks:
             case,
             id=f"should return {case.expected_group.name}, given group:{case.expected_group},self rank:{case.given_self_estimated_rank} and actual rank:{case.given_actual_rank}"
         ) for case in test_cases])
-    def test_compute_group(self, case: TestCase, mocker):
+    def test_compute_group(self, case: SkillRankingTestCase, mocker):
         # GIVEN the self_estimated_rank
         given_self_estimated_rank = case.given_self_estimated_rank
 

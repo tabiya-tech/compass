@@ -30,10 +30,7 @@ class AgentDirectorState(BaseModel):
 
     class Config:
         extra = "forbid"
-        json_encoders = {
-            # ensure datetime values are serialized as a ISODate object
-            datetime: lambda dt: dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt.astimezone(timezone.utc)
-        }
+
 
     def __setattr__(self, key, value):
         if key == "conversation_conducted_at":
@@ -45,6 +42,12 @@ class AgentDirectorState(BaseModel):
     @field_serializer("current_phase")
     def serialize_current_phase(self, current_phase: ConversationPhase, _info):
         return current_phase.name
+
+    @field_serializer("conversation_conducted_at")
+    def serialize_conversation_conducted_at(self, dt: Optional[datetime], _info):
+        if dt is None:
+            return None
+        return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt.astimezone(timezone.utc)
 
     # Deserialize the current_phase from the enum name
     @field_validator("current_phase", mode='before')

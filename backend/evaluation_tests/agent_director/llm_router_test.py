@@ -160,6 +160,29 @@ test_cases_router = [
         conversation_phase=ConversationPhase.COUNSELING,
         expected_agent_type=AgentType.WELCOME_AGENT
     ),
+    RouterTestCase(
+        name="argentina_route_to_explore",
+        summary="",
+        turns=[
+            ("(silence)", "¡Hola! Bienvenid@ a Brújula. Vamos a arrancar explorando tus experiencias. Decime 'empezar' cuando estés listo/a."),
+            ("Empezar", "¡Genial! Contame sobre tu primer laburo.")
+        ],
+        user_input="Laburé como asistente de ventas",
+        conversation_phase=ConversationPhase.COUNSELING,
+        expected_agent_type=AgentType.EXPLORE_EXPERIENCES_AGENT
+    ),
+    RouterTestCase(
+        name="argentina_route_to_welcome",
+        summary="",
+        turns=[
+            ("(silence)", "¡Hola! Bienvenid@ a Brújula. Vamos a arrancar explorando tus experiencias. Decime 'empezar' cuando estés listo/a."),
+            ("Empezar", "¡Genial! Contame sobre tu primer laburo."),
+            ("Laburé como asistente de ventas", "¿Qué hacías ahí?")
+        ],
+        user_input="Che, ¿me explicás de nuevo qué estamos haciendo?",
+        conversation_phase=ConversationPhase.COUNSELING,
+        expected_agent_type=AgentType.WELCOME_AGENT
+    ),
 ]
 
 

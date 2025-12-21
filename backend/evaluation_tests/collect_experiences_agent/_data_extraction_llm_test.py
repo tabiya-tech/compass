@@ -11,10 +11,12 @@ from app.agent.collect_experiences_agent import CollectedData
 from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtractionLLM
 from app.agent.experience import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
+from app.i18n.translation_service import get_i18n_manager
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 from evaluation_tests.matcher import check_actual_data_matches_expected, ContainsString, AnyOf, Matcher, match_expected
+
 
 class _TestCaseDataExtraction(CompassTestCase):
     # The GIVEN
@@ -82,11 +84,14 @@ test_cases_data_extraction = [
         expected_collected_data_count=0
     ),
     # Add new experience
-     _TestCaseDataExtraction(
+    _TestCaseDataExtraction(
         name="add_new_experience",
         summary="",
-        turns=t("add_new_experience.turns"),
-        user_input=t("add_new_experience.user_input"),
+        turns=[
+            ("(silence)",
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+        ],
+        user_input="I sell shoes at the local market on weekends.",
         collected_data_so_far=[
         ],
         expected_last_referenced_experience_index=0,
@@ -94,12 +99,11 @@ test_cases_data_extraction = [
         expected_collected_data=[
             {"index": 0,
              "defined_at_turn_number": 1,
-             "experience_title": ContainsString(t("add_new_experience.selling_shoes")),
-            #  "location": AnyOf(None, ContainsString(t("add_new_experience.local_market"))),
-             "company": AnyOf(None, ContainsString(t("add_new_experience.local_market"))),
+             "experience_title": ContainsString("selling shoes"),
+             "company": AnyOf(None, ContainsString("local market")),
              "paid_work": AnyOf(True, False),
              "start_date": AnyOf('', None),
-             "end_date": AnyOf('', None, ContainsString(t("add_new_experience.present"))),
+             "end_date": AnyOf('', None, ContainsString("Present")),
              "work_type":
                  AnyOf(*WorkType.__members__.keys())
              },
@@ -125,7 +129,6 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("Software Architect"),
-            #  "location": ContainsString("Berlin"),
              "company": ContainsString("ProUbis GmbH"),
              "paid_work": True,
              "start_date": '2010',
@@ -136,7 +139,6 @@ test_cases_data_extraction = [
             {"index": 1,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("Project Manager"),
-             # "location": AnyOf(ContainsString("Oxford"), ContainsString("remote")),
              "company": ContainsString("University of Oxford"),
              "paid_work": True,
              "start_date": '2018',
@@ -160,7 +162,6 @@ test_cases_data_extraction = [
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing',
                           company=None,
-                          # location=None, 
                           start_date='2020/06',
                           end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT')
@@ -171,7 +172,6 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("Graphic design teacher"),
-             # "location": AnyOf(None, ContainsString("online"), ContainsString("remote")),
              "company": AnyOf(None, ContainsString("Self"), ContainsString("online"), ContainsString("remote")),
              "paid_work": AnyOf("True", True),
              "start_date": ContainsString("2020/06"),
@@ -197,7 +197,6 @@ test_cases_data_extraction = [
         user_input="OK, so it was Graphic design teacher and i was working online",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None,
-                          # location=None, 
                           start_date='2020/06',
                           end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT')
@@ -208,7 +207,6 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("Graphic design teacher"),
-             # "location": AnyOf(ContainsString("online"), ContainsString("remote")),
              "company": AnyOf(None, '', ContainsString("Self"), ContainsString("Online")),
              "paid_work": AnyOf("True", True),
              "start_date": ContainsString("2020/06"),
@@ -242,7 +240,6 @@ test_cases_data_extraction = [
                             collected_data_so_far=[
                                 CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing',
                                               company=None,
-                                              # location=None,
                                               start_date='2020/06',
                                               end_date=None,
                                               paid_work=True, work_type='SELF_EMPLOYMENT')
@@ -253,7 +250,6 @@ test_cases_data_extraction = [
                                 {"index": 0,
                                  "defined_at_turn_number": 1,
                                  "experience_title": ContainsString("Graphic design teacher"),
-                                 # "location": AnyOf(ContainsString("online"), ContainsString("remote")),
                                  "company": AnyOf(None, ContainsString("Self"), ContainsString("client")),
                                  "paid_work": AnyOf("True", True),
                                  "start_date": ContainsString("2020/06"),
@@ -276,7 +272,6 @@ test_cases_data_extraction = [
         user_input="I sell shoes at the local market on weekends?",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Selling Shoes', company='Local Market',
-                          # location=None,
                           start_date=None,
                           end_date=None,
                           paid_work=None, work_type='SELF_EMPLOYMENT')
@@ -287,7 +282,6 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("selling shoes"),
-             # "location": AnyOf(None, ContainsString("local market")),
              "company": AnyOf(None, ContainsString("local market")),
              "paid_work": AnyOf('', None, "True", "False", True, False),
              "start_date": AnyOf('', None),
@@ -310,7 +304,6 @@ test_cases_data_extraction = [
         user_input="I started selling shoes at the local market on weekends in 2019.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Selling Shoes', company='Local Market',
-                          # location=None,
                           start_date=None,
                           end_date=None,
                           paid_work=None, work_type='SELF_EMPLOYMENT')
@@ -321,7 +314,6 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("Selling Shoes"),
-             # "location": AnyOf(None, ContainsString("local market")),
              "company": ContainsString("Local Market"),
              "paid_work": AnyOf(None, True),
              "start_date": ContainsString("2019"),
@@ -344,7 +336,6 @@ test_cases_data_extraction = [
         user_input="you know, i was wrong i don't sell shoes at the local market on weekends.",
         collected_data_so_far=[
             CollectedData(index=0, experience_title='Selling Shoes', company='Local Market',
-                          # location=None,
                           start_date=None, end_date=None,
                           paid_work=None, work_type='SELF_EMPLOYMENT')
         ],
@@ -374,13 +365,10 @@ test_cases_data_extraction = [
         collected_data_so_far=[CollectedData(index=0, defined_at_turn_number=3,
                                              experience_title='Volunteer Peer mentor, Educator and a mentor manager',
                                              company='Mombasa Youth Empowerment Network, the Kenya Red Cross Society, and the Mombasa County Government',
-                                             # location='Mombasa',
                                              start_date='2016', end_date='2022', paid_work=False,
                                              work_type='None'),
                                CollectedData(index=1, defined_at_turn_number=9, experience_title='Volunteering',
-                                             company=None,
-                                             # location=None,
-                                             start_date='',
+                                             company=None, start_date='',
                                              end_date='', paid_work=False, work_type='UNSEEN_UNPAID')],
         expected_last_referenced_experience_index=-1,  # The experience should be deleted
         expected_collected_data_count=1,
@@ -388,7 +376,6 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 3,
              "experience_title": ContainsString("Volunteer Peer mentor, Educator and a mentor manager"),
-             # "location": ContainsString("Mombasa"),
              "company": ContainsString(
                  "Mombasa Youth Empowerment Network, the Kenya Red Cross Society, and the Mombasa County Government"),
              "paid_work": False,
@@ -426,12 +413,10 @@ test_cases_data_extraction = [
         user_input="No, I don't get paid for that. It's just something I do to help her out",
         collected_data_so_far=[
             CollectedData(index=0, experience_title='Helping Neighbors with their gardens', company='Neighbors',
-                          # location='Nairobi', 
                           start_date=None,
                           end_date=None,
                           paid_work=False, work_type='UNSEEN_UNPAID'),
             CollectedData(index=1, experience_title='Helping Grandmother with Transportation', company='Grandmother',
-                          # location=None,
                           start_date=None,
                           end_date=None,
                           paid_work=None, work_type='UNSEEN_UNPAID')
@@ -463,13 +448,11 @@ test_cases_data_extraction = [
         user_input="No, I haven't.",
         collected_data_so_far=[
             CollectedData(index=0, experience_title='delivery job', company='Uber Eats',
-                          # location='Paris',
                           start_date='2021/01', end_date='2023/03',
                           paid_work=True,
                           work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT'),
             CollectedData(index=1, experience_title='Selling old furniture',
                           company='Flea Market of rue Jean Henri Fabre',
-                          # location='15th arrondissement, near the Eiffel Tower', 
                           start_date='2019', end_date='Present',
                           paid_work=True,
                           work_type='SELF_EMPLOYMENT')
@@ -494,7 +477,6 @@ test_cases_data_extraction = [
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelance Work',
                           company=None,
-                          # location=None,
                           start_date=None, end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT'),
         ],
@@ -504,7 +486,6 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("teaching graphic design"),
-             # "location": AnyOf(None, ContainsString("online"), ContainsString("remote")),
              "company": AnyOf(None, ContainsString("self"), ContainsString("online")),
              "paid_work": True,
              "start_date": '2020/06',
@@ -537,16 +518,13 @@ test_cases_data_extraction = [
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=2, experience_title='Project Manager',
                           company='University of Oxford',
-                          # location='Remote',
                           start_date='2018', end_date='2020', paid_work=True,
                           work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT'),
             CollectedData(index=1, defined_at_turn_number=6, experience_title='Software Architect',
                           company='ProUbis GmbH',
-                          # location='Berlin',
                           start_date='2010', end_date='2018', paid_work=True,
                           work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT'),
             CollectedData(index=2, defined_at_turn_number=9, experience_title='Software Developer', company='Ubis GmbH',
-                          # location='Berlin', 
                           start_date='1998',
                           end_date='', paid_work=False, work_type='FORMAL_SECTOR_UNPAID_TRAINEE_WORK')
         ],
@@ -581,7 +559,6 @@ test_cases_data_extraction = [
         user_input="Yes, remove the title. I don't want to provide one.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='TitleOnly', company=None,
-                          # location=None,
                           start_date=None,
                           end_date=None,
                           paid_work=None, work_type='UNSEEN_UNPAID')
@@ -602,27 +579,6 @@ test_cases_data_extraction = [
         user_input="Yes, remove the company. I don't want to provide one.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='', company='Company',
-                          # location=None,
-                          start_date=None,
-                          end_date=None,
-                          paid_work=None, work_type='UNSEEN_UNPAID')
-        ],
-        expected_last_referenced_experience_index=-1,
-        expected_collected_data_count=0
-    ),
-    _TestCaseDataExtraction(
-        name="update_location_removed_results_in_empty_then_deleted",
-        summary="",
-        turns=[
-            ("(silence)",
-             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
-            ("Earlier you set my location; I actually don't want to provide a location.",
-             "Okay, would you like me to remove the location for this experience?"),
-        ],
-        user_input="Yes, remove the location. I don't want to provide one.",
-        collected_data_so_far=[
-            CollectedData(index=0, defined_at_turn_number=1, experience_title='', company=None,
-                          # location='Location',
                           start_date=None,
                           end_date=None,
                           paid_work=None, work_type='UNSEEN_UNPAID')
@@ -643,7 +599,6 @@ test_cases_data_extraction = [
         user_input="Yes, remove the start date. I don't want to provide one.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='', company=None,
-                          # location=None,
                           start_date='Start Date', end_date=None,
                           paid_work=None, work_type='UNSEEN_UNPAID')
         ],
@@ -662,7 +617,6 @@ test_cases_data_extraction = [
         user_input="Yes, remove the end date. I don't want to provide one.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='', company=None,
-                          # location=None,
                           start_date=None,
                           end_date='End Date',
                           paid_work=None, work_type='UNSEEN_UNPAID')
@@ -682,7 +636,6 @@ test_cases_data_extraction = [
         user_input="Yes, remove the paid work. I don't want to provide one.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='', company=None,
-                          # location=None,
                           start_date=None,
                           end_date=None,
                           paid_work=True, work_type='UNSEEN_UNPAID')
@@ -706,7 +659,6 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("software developer"),
-                # "location": AnyOf(None, ContainsString("Google")),
              "company": ContainsString("Google"),
              "paid_work": True,
              "start_date": '2020',
@@ -716,7 +668,6 @@ test_cases_data_extraction = [
             {"index": 1,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("web design"),
-                # "location": AnyOf(None, ContainsString("local")),
              "company": AnyOf(None, ContainsString("local businesses")),
              "paid_work": True,
              "start_date": '2023',
@@ -739,7 +690,6 @@ test_cases_data_extraction = [
         user_input="Actually, I worked at Walmart from 2022-2023. I was also volunteering in night shift at the local food bank",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Cashier', company='Walmart',
-                          # location=None, 
                           start_date='2023',
                           end_date=None,
                           paid_work=True, work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT')
@@ -750,7 +700,6 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("cashier"),
-             # "location": AnyOf(None, ContainsString("Walmart")),
              "company": ContainsString("Walmart"),
              "paid_work": True,
              "start_date": '2022',
@@ -760,7 +709,6 @@ test_cases_data_extraction = [
             {"index": 1,
              "defined_at_turn_number": 2,  # New experience gets current turn number
              "experience_title": ContainsString("volunteer"),
-             # "location": AnyOf(None, ContainsString("local"), ContainsString("food bank")),
              "company": AnyOf(None, ContainsString("food bank")),
              "paid_work": False,
              "start_date": AnyOf(None, '2022'),
@@ -783,12 +731,10 @@ test_cases_data_extraction = [
         user_input="Actually, I worked as a waiter at Mario's Restaurant from 2021-2022, I still do freelance writing since 2020, and I also want to remove the waiter job - I don't want to include it anymore.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Waiter', company='Restaurant',
-                          # location=None, 
                           start_date=None,
                           end_date=None,
                           paid_work=True, work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT'),
             CollectedData(index=1, defined_at_turn_number=1, experience_title='Freelance Writing', company=None,
-                          # location=None, 
                           start_date='2020',
                           end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT')
@@ -799,7 +745,6 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,  # Updated experience keeps original turn number
              "experience_title": ContainsString("freelance writing"),
-             # "location": AnyOf(None, ContainsString("writing")),
              "company": None,
              "paid_work": True,
              "start_date": '2020',
@@ -828,7 +773,6 @@ test_cases_data_extraction = [
                                        ContainsString("microsoft"),  # Worked at Microsoft
                                        ContainsString("engineer"),  # Software Engineer.
                                        ContainsString("Employee")),
-             # "location": AnyOf(None, ContainsString("Microsoft")),
              "company": ContainsString("Microsoft"),
              "paid_work": True,
              "start_date": AnyOf(None, ''),
@@ -838,7 +782,6 @@ test_cases_data_extraction = [
             {"index": 1,
              "defined_at_turn_number": 1,
              "experience_title": ContainsString("volunteer"),
-             # "location": AnyOf(None, ''),
              "company": AnyOf(None, '', ContainsString("community")),
              "paid_work": False,
              "start_date": AnyOf(None, ''),
@@ -879,12 +822,10 @@ test_cases_data_extraction = [
                    "Also, I did some freelance photography since 2021.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Teacher', company='School',
-                          # location=None, 
                           start_date=None,
                           end_date=None,
                           paid_work=True, work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT'),
             CollectedData(index=1, defined_at_turn_number=1, experience_title='Consulting', company=None,
-                          # location=None, 
                           start_date=None,
                           end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT')
@@ -895,7 +836,6 @@ test_cases_data_extraction = [
             {"index": 0,
              "defined_at_turn_number": 1,  # Updated experience keeps original turn number
              "experience_title": ContainsString("consulting"),
-             # "location": AnyOf(None),
              "company": AnyOf(None, ContainsString("tech startups")),
              "paid_work": True,
              "start_date": AnyOf(None, ContainsString('2020')),
@@ -905,7 +845,6 @@ test_cases_data_extraction = [
             {"index": 1,
              "defined_at_turn_number": 2,  # New experience gets current turn number
              "experience_title": ContainsString("photography"),
-             # "location": AnyOf(None, ''),
              "company": AnyOf(None, ContainsString("Self")),
              "paid_work": AnyOf(None, True),
              "start_date": '2021',
@@ -941,10 +880,9 @@ test_cases_data_extraction = [
                 "index": 0,
                 "defined_at_turn_number": 1,
                 "experience_title": ContainsString("Research Assistant"),
-                # "location": ContainsString("Kigali, Rwanda"),
                 "company": ContainsString("Cool Lab, African Leadership University"),
                 "paid_work": AnyOf(None, True),
-                "start_date": "2020/06",
+                "start_date": '2020/06',
                 "end_date": ContainsString("Present"),
                 "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
             },
@@ -952,7 +890,6 @@ test_cases_data_extraction = [
                 "index": 1,
                 "defined_at_turn_number": 1,
                 "experience_title": ContainsString("Research Assistant"),
-                # "location": AnyOf(None, "African Leadership University"),
                 "company": ContainsString("Fancy Science Lab, African Leadership University"),
                 "paid_work": AnyOf(None, True),
                 "start_date": "2018/01",
@@ -963,7 +900,6 @@ test_cases_data_extraction = [
                 "index": 2,
                 "defined_at_turn_number": 1,
                 "experience_title": ContainsString("Past Non-academic Job"),
-                # "location": ContainsString("New York City"),
                 "company": ContainsString("Tabiya"),
                 "paid_work": AnyOf(None, True),
                 "start_date": "2016",
@@ -974,7 +910,6 @@ test_cases_data_extraction = [
                 "index": 3,
                 "defined_at_turn_number": 1,
                 "experience_title": ContainsString("Assistant Instructor"),
-                # "location": AnyOf(None, "", "University1 Name"),
                 "company": ContainsString("University1 Name"),
                 "paid_work": AnyOf(None, True),
                 "start_date": "2014",
@@ -985,7 +920,6 @@ test_cases_data_extraction = [
                 "index": 4,
                 "defined_at_turn_number": 1,
                 "experience_title": ContainsString("Guest lecturer"),
-                # "location": AnyOf(None, "", "University1 Name"),
                 "company": ContainsString("University1 Name"),
                 "paid_work": AnyOf(None, True),
                 "start_date": "2013",
@@ -996,7 +930,6 @@ test_cases_data_extraction = [
                 "index": 5,
                 "defined_at_turn_number": 1,
                 "experience_title": ContainsString("Assistant Instructor"),
-                # "location": AnyOf(None, "", "University2 Name"),
                 "company": ContainsString("University2 Name"),
                 "paid_work": AnyOf(None, True),
                 "start_date": "2013",
@@ -1007,7 +940,6 @@ test_cases_data_extraction = [
                 "index": 6,
                 "defined_at_turn_number": 1,
                 "experience_title": ContainsString("Guest lecturer"),
-                # "location": AnyOf(None, "", "ABCC High school"),
                 "company": ContainsString("ABCC High school"),
                 "paid_work": AnyOf(None, True),
                 "start_date": "2012",
@@ -1021,12 +953,13 @@ test_cases_data_extraction = [
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test("gemini-2.0-flash-001/")
-@pytest.mark.repeat(1)
+@pytest.mark.repeat(3)
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_data_extraction),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_data_extraction)])
-async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytest.LogCaptureFixture):
+async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytest.LogCaptureFixture,
+                               setup_multi_locale_app_config):
     logger = logging.getLogger()
-       
+    get_i18n_manager().set_locale(test_case.locale)
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
 
@@ -1049,10 +982,9 @@ async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytes
 
         # WHEN the data extraction LLM is executed
         data_extraction_llm = _DataExtractionLLM(logger)
-        result = await data_extraction_llm.execute(user_input=user_input,
-                               context=context,
-                               collected_experience_data_so_far=collected_data)
-        last_referenced_experience_index = result.last_referenced_experience_index
+        last_referenced_experience_index, _ = await data_extraction_llm.execute(user_input=user_input,
+                                                                                context=context,
+                                                                                collected_experience_data_so_far=collected_data)
 
         failures = []
         # THEN the last referenced experience index should be the expected one

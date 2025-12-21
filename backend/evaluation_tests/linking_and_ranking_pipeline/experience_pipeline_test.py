@@ -247,6 +247,24 @@ test_cases = [
         given_work_type=WorkType.UNSEEN_UNPAID,
         expected_top_skills=['guarantee customer satisfaction']
     ),
+    ExperiencePipelineTestCase(
+        name="argentina_asistente_ventas",
+        given_experience_title="Asistente de ventas",
+        given_company_name="Local de mi viejo",
+        given_responsibilities=["Limpiar el lugar", "Manejar la guita", "Tratar con proveedores", "Contabilidad básica", "Venta de productos", "Empaquetar pedidos"],
+        given_country_of_interest=Country.ARGENTINA,
+        given_work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+        expected_top_skills=[]
+    ),
+    ExperiencePipelineTestCase(
+        name="argentina_casa_madre",
+        given_experience_title="Trabajo en casa",
+        given_company_name="Casa de mi madre",
+        given_responsibilities=["Limpiar", "Comprar suministros", "Preparar la comida", "Barrer la casa", "Lavar la loza"],
+        given_country_of_interest=Country.ARGENTINA,
+        given_work_type=WorkType.UNSEEN_UNPAID,
+        expected_top_skills=[]
+    ),
 ]
 
 
