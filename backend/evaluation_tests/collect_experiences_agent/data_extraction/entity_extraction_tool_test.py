@@ -376,6 +376,7 @@ test_cases: list[EntityExtractionToolTestCase] = [
             "location": None,
             "experience_title": AnyOf(ContainsString("limpieza"), ContainsString("comida"), ContainsString("casa"))
         }
+    ),
 ]
 
 
