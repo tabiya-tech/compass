@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+from textwrap import dedent
 
 import pytest
 
