@@ -204,7 +204,7 @@ test_cases_data_extraction = [
         user_input="Manejaba la guita y atendía a los clientes. Estuve desde 2015 hasta 2022.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Asistente de ventas', company='Local de mi viejo',
-                          start_date=None,
+                          location=None, start_date=None,
                           end_date=None,
                           paid_work=None, work_type='FORMAL_SECTOR_WAGED_EMPLOYMENT')
         ],
