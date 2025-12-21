@@ -92,7 +92,6 @@ test_cases = [
         matchers=["llm", "matcher"],
         expected_experience_data=[{
             "experience_title": ContainsString("Shoe Salesperson"),
-            "location": ContainsString("Tokyo"),
             "company": ContainsString("Shoe Soles"),
             "timeline": {"start": ContainsString("2023"), "end": AnyOf(ContainsString("present"), "")},
         }]
@@ -121,7 +120,6 @@ test_cases = [
         matchers=["llm", "matcher"],
         expected_experience_data=[{
             "experience_title": ContainsString("Shoe Salesperson"),
-            "location": ContainsString("Tokyo"),
             "company": ContainsString("Shoe Soles"),
             "timeline": {"start": ContainsString("2023"), "end": AnyOf(ContainsString("present"), "")},
         }]
@@ -153,7 +151,6 @@ test_cases = [
         matchers=["matcher"],
         expected_experience_data=[{
             "experience_title": AnyOf(ContainsString("vend"), ContainsString("zapato")),
-            "location": AnyOf(ContainsString("Tokyo"), ContainsString("Tokio")),
             "company": ContainsString("Shoe Soles"),
             "timeline": {"start": ContainsString("2023"), "end": AnyOf(ContainsString("present"), "")},
         }]
@@ -180,7 +177,6 @@ test_cases = [
         matchers=["llm", "matcher"],
         expected_experience_data=[{
             "experience_title": ContainsString("Mom"),
-            "location": ContainsString("Mombasa"),
             "company": ContainsString("family"),
             "timeline": {"start": "2022", "end": ContainsString("present")},
             "work_type": WorkType.UNSEEN_UNPAID.name,

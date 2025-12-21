@@ -1,6 +1,7 @@
 import logging
 from copy import deepcopy
-from typing import Optional
+from textwrap import dedent
+from typing import Optional, Awaitable
 
 import pytest
 from pydantic import ConfigDict
@@ -159,7 +160,7 @@ test_cases_data_extraction = [
         ],
         user_input="Sabes, me equivoqué, no vendo zapatos en el mercado local los fines de semana.",
         collected_data_so_far=[
-            CollectedData(index=0, experience_title='Venta de Zapatos', company='Mercado Local', location=None,
+            CollectedData(index=0, experience_title='Venta de Zapatos', company='Mercado Local', 
                           start_date=None, end_date=None,
                           paid_work=None, work_type='SELF_EMPLOYMENT')
         ],
