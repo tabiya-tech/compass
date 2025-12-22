@@ -31,7 +31,6 @@ from app.server_dependencies.application_state_dependencies import get_applicati
 from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo
-from app.i18n.types import Locale
 
 
 async def get_conversation_service(agent_director: LLMAgentDirector = Depends(get_agent_director),
