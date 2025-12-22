@@ -309,17 +309,3 @@ def _get_country_of_user_segment(country_of_user: Country) -> str:
     if country_of_user == Country.UNSPECIFIED:
         return ""
     return f" living in {country_of_user.value}"
-
-
-def _get_question_c(work_type: WorkType) -> str:
-    """
-    Get the question for the specific work type
-    """
-    if work_type == WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT:
-        return t("messages", "exploreSkills.question.formalWaged")
-    elif work_type == WorkType.SELF_EMPLOYMENT:
-        return t("messages", "exploreSkills.question.selfEmployment")
-    elif work_type == WorkType.UNSEEN_UNPAID:
-        return t("messages", "exploreSkills.question.unseenUnpaid")
-    else:
-        return ""
