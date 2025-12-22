@@ -713,6 +713,12 @@
     },
     "helpTip": {
       "tooltip": "help"
+    },
+    "backdrop": {
+      "inactiveBackdrop": {
+        "title": "Session paused due to inactivity.",
+        "tapAnywhere": "Tap anywhere to continue."
+      }
     }
   },
   "i18n": {
