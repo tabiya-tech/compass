@@ -39,7 +39,7 @@ class IConversationService(ABC):
                    filter_pii: bool) -> ConversationResponse:
         # TODO: discuss filter pii and clear_memory
         """
-        Get a message from the user and return a response from Brujula, save the message and response into the application state
+        Get a message from the user and return a response from Brújula, save the message and response into the application state
         :param user_id: str - the id of the user sending the message
         :param session_id: int - id for the conversation session
         :param user_input: str - the message sent by the user

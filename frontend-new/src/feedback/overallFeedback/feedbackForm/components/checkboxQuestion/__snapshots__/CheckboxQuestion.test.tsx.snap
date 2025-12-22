@@ -6,7 +6,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
   data-testid="checkbox-with-textarea-form-control-989402f0-9fda-4400-958c-2d6c7bce9821"
 >
   <legend
-    class="MuiFormLabel-root MuiFormLabel-colorPrimary css-1bbwsov-MuiFormLabel-root"
+    class="MuiFormLabel-root MuiFormLabel-colorPrimary css-yzafff-MuiFormLabel-root"
     data-testid="checkbox-with-textarea-form-label-989402f0-9fda-4400-958c-2d6c7bce9821"
   >
     <p
@@ -20,10 +20,10 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
     class="MuiFormGroup-root css-4ht0cc-MuiFormGroup-root"
   >
     <label
-      class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+      class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1unq32j-MuiFormControlLabel-root"
     >
       <span
-        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-1nlqaau-MuiButtonBase-root-MuiCheckbox-root"
         data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
         <input
@@ -54,10 +54,10 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
       </span>
     </label>
     <label
-      class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+      class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1unq32j-MuiFormControlLabel-root"
     >
       <span
-        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-1nlqaau-MuiButtonBase-root-MuiCheckbox-root"
         data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
         <input
@@ -88,10 +88,10 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
       </span>
     </label>
     <label
-      class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+      class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1unq32j-MuiFormControlLabel-root"
     >
       <span
-        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-1nlqaau-MuiButtonBase-root-MuiCheckbox-root"
         data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
         <input
@@ -121,10 +121,10 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
       </span>
     </label>
     <label
-      class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+      class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1unq32j-MuiFormControlLabel-root"
     >
       <span
-        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-1nlqaau-MuiButtonBase-root-MuiCheckbox-root"
         data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
         <input
@@ -158,11 +158,11 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
     class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-4c32m-MuiFormControl-root-MuiTextField-root"
   >
     <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline css-6mofgw-MuiInputBase-root-MuiOutlinedInput-root"
     >
       <textarea
         aria-invalid="false"
-        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-efmhw3-MuiInputBase-input-MuiOutlinedInput-input"
         data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
         id=":r0:"
         rows="3"
@@ -172,7 +172,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
       </textarea>
       <textarea
         aria-hidden="true"
-        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-efmhw3-MuiInputBase-input-MuiOutlinedInput-input"
         readonly=""
         style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
         tabindex="-1"

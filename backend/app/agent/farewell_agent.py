@@ -27,6 +27,9 @@ class FarewellAgent(SimpleLLMAgent):
            
             {language_style}
                                                           
+           
+            {language_style}
+                                                          
             Do not summarize my skills
             Do not ask any questions.
             Do not make things up.

@@ -230,7 +230,7 @@ const Login: React.FC = () => {
         variant: "error",
       });
     }
-  }, [navigate, enqueueSnackbar, t]); 
+  }, [navigate, enqueueSnackbar, t]);
 
   /* ------------------
    * Actual login handlers

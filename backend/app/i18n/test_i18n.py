@@ -1,61 +1,120 @@
+import json
+
 import pytest
-from collections import defaultdict
+
+from app.i18n.constants import LOCALES_DIR
 from app.i18n.i18n_manager import I18nManager
+from app.i18n.translation_service import get_i18n_manager, t
+from app.i18n.types import Locale, SUPPORTED_LOCALES
+
+LOCALES_DIR_CHILDREN = [p.name for p in LOCALES_DIR.iterdir() if p.is_dir()]
+
+_REFERENCE_LOCALE = Locale.EN_US
 
 
-def test_translation_keys_consistency():
+def _read_json_file(file_path: str) -> dict:
+    with open(file_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def replace_values_with_dash(value):
     """
-    Feature: Translation Keys Consistency
-      Ensures all translation locales contain the same keys as the reference locale ('en').
-
-    Scenario: Validate that all translation files match the reference locale
-      GIVEN the I18nManager loads all translations
-      AND the reference locale "en" is available
-      WHEN we compare each locale's keys with the reference
-      THEN all locales must contain the same domains
-      AND must not be missing any translation keys
+    Recursively replaces all values in a nested dictionary with "-".
+    Mirrors the behavior of the TypeScript version.
     """
+    if isinstance(value, dict):
+        return {key: replace_values_with_dash(val) for key, val in value.items()}
 
-    # --- GIVEN --------------------------------------------------------------
+    # Leaf node -> replace with dash
+    return "-"
 
-    # GIVEN the I18nManager loads all translations
-    manager = I18nManager(locales_dir="app/i18n/locales")
-    assert manager.translations, "No translations found. Please create locale files first."
 
-    # AND the reference locale "en" is available
-    reference_locale = "en"
-    assert reference_locale in manager.translations, f"Reference locale '{reference_locale}' not found."
+@pytest.mark.parametrize("given_locale", SUPPORTED_LOCALES)
+def test_translation_keys_consistency(given_locale):
+    # GIVEN locale json file
+    given_locale_json_file = LOCALES_DIR / given_locale.value / "messages.json"
+    given_locale_translations = _read_json_file(given_locale_json_file.__str__())
 
-    # Collect reference keys
-    reference_keys_by_domain = defaultdict(set)
-    reference_domains = manager.translations.get(reference_locale, {})
-    for domain, translations in reference_domains.items():
-        for key in translations.keys():
-            reference_keys_by_domain[domain].add(key)
+    # AND a reference locale json file
+    given_reference_locale_json_file = LOCALES_DIR / _REFERENCE_LOCALE.value / "messages.json"
+    given_reference_locale_translations = _read_json_file(given_reference_locale_json_file.__str__())
 
-    # --- WHEN --------------------------------------------------------------
+    # THEN the keys should be the same
+    assert replace_values_with_dash(given_locale_translations) == replace_values_with_dash(
+        given_reference_locale_translations)
 
-    # WHEN we compare each locale against the reference
-    error_messages = []
-    for locale, domains in manager.translations.items():
-        if locale == reference_locale:
-            continue
 
-        for domain, ref_keys in reference_keys_by_domain.items():
-            if domain not in domains:
-                error_messages.append(f"Locale '{locale}' is missing domain '{domain}.json'")
-                continue
+def test_custom_provider_locale_setting():
+    # GIVEN a fresh manager.
+    manager = get_i18n_manager()
 
-            locale_keys = set(domains[domain].keys())
-            missing_keys = ref_keys - locale_keys
+    # AND a locale is set.
+    given_locale = Locale.EN_US
+    manager.set_locale(given_locale)
 
-            if missing_keys:
-                error_messages.append(
-                    f"Locale '{locale}' in domain '{domain}' is missing keys: {sorted(list(missing_keys))}"
-                )
+    # WHEN getting the acual locale
+    actual_locale = get_i18n_manager().get_locale()
 
-    # --- THEN --------------------------------------------------------------
+    # THEN it should be the same as the one set.
+    assert actual_locale == given_locale
 
-    # THEN no inconsistencies should be found
-    if error_messages:
-        pytest.fail("I18n key inconsistencies found:\n" + "\n".join(error_messages))
+
+@pytest.mark.parametrize("given_locale", SUPPORTED_LOCALES)
+def test_nested_key(given_locale):
+    """
+    Feature: Nested Key Resolution
+    ==============================
+    
+    Ensures that I18nManager can resolve nested keys using dot notation.
+    """
+    manager = I18nManager()
+
+    # Try to get a nested key
+    # Based on user input, messages.json has "experience": { "noTitleProvidedYet": ... }
+
+    # We use es-ar as in the user request, assuming it exists and has the key
+    # If es-ar doesn't exist or doesn't have the key, this might fail, but let's follow the user's lead
+    # or fallback to en-US if es-ar is not available in the environment.
+    # However, the user explicitly asked for this test code.
+
+    val = manager.get_translation(given_locale, "messages", "experience.noTitleProvidedYet")
+    print(f"Result for 'experience.noTitleProvidedYet': {val}")
+
+    if val == "experience.noTitleProvidedYet":
+        pytest.fail("Returned key instead of translation")
+    else:
+        print("SUCCESS: Found translation")
+        # Assert it's not the key
+        assert val != "experience.noTitleProvidedYet"
+
+
+@pytest.mark.parametrize("given_locale", SUPPORTED_LOCALES)
+def test_translation_service_nested_key(given_locale):
+    """
+    Feature: Translation Service Nested Key Resolution
+    ==================================================
+    
+    Ensures that the global t() function can resolve nested keys.
+    """
+    manager = get_i18n_manager()
+    # Reset to en-US for consistency or use a specific locale
+    manager.set_locale(given_locale)
+
+    # "experience.noTitleProvidedYet" should resolve to "No title provided yet" in en-US
+    val = t("messages", "experience.noTitleProvidedYet")
+    assert val is not None
+
+    # Test with a fallback
+    val_fallback = t("messages", "non.existent.key", fallback_message="Fallback Value")
+    assert val_fallback == "Fallback Value"
+
+    # Test deep nested key
+    val_deep = t("messages", "experience.workType.short.formalSectorWagedEmployment")
+    assert val_deep is not None
+
+
+@pytest.mark.parametrize("given_locale", SUPPORTED_LOCALES)
+def test_all_supported_languages_have_jsons(given_locale):
+    # GIVEN a supported locale
+    # THEN it should have a corresponding JSON file in the locales directory
+    assert (LOCALES_DIR / given_locale.value / "messages.json").exists()

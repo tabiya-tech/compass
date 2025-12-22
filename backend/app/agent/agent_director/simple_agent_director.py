@@ -90,10 +90,8 @@ class SimpleAgentDirector(AbstractAgentDirector):
                 await self._conversation_manager.update_history(user_input, agent_output)
             else:
                 # No more agents to run
-                try:
-                    done_msg = t("messages", "agent_director.all_agents_done")
-                except Exception:
-                    done_msg = "Conversation finished, all agents are done!"
+
+                done_msg = t("messages", "agentDirector.allAgentsDone")
                 agent_output = AgentOutput(
                     message_for_user=done_msg,
                     finished=True, agent_type=None)
@@ -101,9 +99,6 @@ class SimpleAgentDirector(AbstractAgentDirector):
         # executing an agent can raise any number of unknown exceptions
         except Exception as e:  # pylint: disable=broad-except
             self._logger.error("Error while executing the agent director: %s", e, exc_info=True)
-            try:
-                end_msg = t("messages", "agent_director.forcefully_ended")
-            except Exception:
-                end_msg = "Conversation forcefully ended"
+            end_msg = t("messages", "agentDirector.forcefullyEnded")
             return AgentOutput(message_for_user=end_msg,
                                finished=True, agent_type=None)

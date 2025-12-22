@@ -216,12 +216,12 @@ class CollectExperiencesAgent(Agent):
             if exploring_type is not None:
                 transition_message = (
                     f"{user_input.message}\n"
-                    f"{t('messages', 'collect_experiences.ask_about_type', experience_type=_get_experience_type(exploring_type))}"
+                    f"{t('messages', 'collectExperiences.askAboutType', experience_type=_get_experience_type(exploring_type))}"
                 )
             else:
                 transition_message = (
                     f"{user_input.message}\n"
-                    f"{t('messages', 'collect_experiences.recap_prompt')}"
+                    f"{t('messages', 'collectExperiences.recapPrompt')}"
                 )
             conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
                                                                    context=context,

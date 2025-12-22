@@ -9,9 +9,10 @@ from fastapi import FastAPI, APIRouter, Request, Depends, HTTPException, Path
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
+from app.app_config import get_application_config
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
-from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var
+from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var, user_language_ctx_var
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversations.constants import MAX_MESSAGE_LENGTH, UNEXPECTED_FAILURE_MESSAGE
 from app.conversations.experience.routes import add_experience_routes
@@ -87,6 +88,11 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
         # and downstream functions
         session_id_ctx_var.set(session_id)
         user_id_ctx_var.set(user_id)
+
+        # The user's language to send messages in.
+        # For now, it is using the backend default language from app_config.
+        app_config = get_application_config()
+        user_language_ctx_var.set(app_config.default_language)
 
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.

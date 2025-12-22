@@ -75,7 +75,7 @@ const Landing: React.FC = () => {
         navigate(routerPaths.CONSENT, { replace: true });
       } else {
         navigate(routerPaths.ROOT, { replace: true });
-        enqueueSnackbar(t("auth.pages.login.welcomeBack"), { variant: "success" });
+        enqueueSnackbar(t("auth.pages.landing.welcome"), { variant: "success" });
       }
     } catch (error: unknown) {
       console.error(new AuthenticationError("An error occurred while trying to get your preferences", error));
@@ -115,6 +115,13 @@ const Landing: React.FC = () => {
         disableEscapeKeyDown
         onClose={() => {}}
         hideBackdrop={false}
+        sx={{
+          "& .MuiDialog-container": {
+            display: "flex",
+            alignItems: "flex-start",
+            paddingTop: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+          },
+        }}
         slotProps={{
           backdrop: {
             sx: {
@@ -135,10 +142,6 @@ const Landing: React.FC = () => {
             height: "fit-content",
             borderRadius: 2,
             width: "calc(100% - 16px)",
-            position: "absolute",
-            top: "24px",
-            left: "50%",
-            transform: "translateX(-50%)",
             margin: "0",
           },
         }}
@@ -166,7 +169,7 @@ const Landing: React.FC = () => {
             }}
           >
             <AuthHeader
-              title={t("auth.pages.login.welcomeBack")} // Changed from "Welcome to Brujula!" to t("auth.pages.login.welcomeBack")
+              title={t("auth.pages.login.welcomeTitle")}
               subtitle={
                 <>
                   <Typography
@@ -175,11 +178,10 @@ const Landing: React.FC = () => {
                     textAlign="center"
                     paddingBottom={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
                   >
-                    {t("auth.pages.landing.subtitleBold")} {/* Changed from "Discover your Full Potential" */}
+                    {t("auth.pages.landing.subtitleBold")}
                   </Typography>
                   <Typography variant="body2" textAlign="center">
                     {t("auth.pages.landing.subtitleBody")}
-                    {/* Changed from long marketing text */}
                   </Typography>
                 </>
               }
@@ -198,7 +200,7 @@ const Landing: React.FC = () => {
                   onClick={() => navigate(routerPaths.LOGIN)}
                   data-testid={DATA_TEST_ID.LANDING_LOGIN_BUTTON}
                 >
-                  {t("common.buttons.login")} {/* Changed from "Login" */}
+                  {t("common.buttons.login")}
                 </PrimaryButton>
                 {!registrationDisabled && (
                   <SecondaryButton
@@ -208,7 +210,7 @@ const Landing: React.FC = () => {
                     onClick={() => navigate(routerPaths.REGISTER)}
                     data-testid={DATA_TEST_ID.LANDING_SIGNUP_BUTTON}
                   >
-                    {t("common.buttons.register")} {/* Changed from "Register" */}
+                    {t("common.buttons.register")}
                   </SecondaryButton>
                 )}
               </Box>
@@ -216,7 +218,7 @@ const Landing: React.FC = () => {
                 <>
                   <Divider textAlign="center" style={{ width: "100%" }} data-testid={DATA_TEST_ID.LANDING_DIVIDER}>
                     <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-                      {t("auth.pages.login.or")} {/* Changed from "auth.pages.login.or" */}
+                      {t("auth.pages.login.or")}
                     </Typography>
                   </Divider>
                   <CustomLink
@@ -225,7 +227,7 @@ const Landing: React.FC = () => {
                     disableWhenOffline={true}
                     data-testid={DATA_TEST_ID.LANDING_GUEST_BUTTON}
                   >
-                    {t("auth.pages.landing.continueAsGuest")} {/* Changed from "Continue as Guest" */}
+                    {t("auth.pages.landing.continueAsGuest")}
                   </CustomLink>
                 </>
               )}
@@ -234,7 +236,7 @@ const Landing: React.FC = () => {
         </DialogContent>
       </Dialog>
       <BugReportButton bottomAlign={true} />
-      <Backdrop isShown={isLoading} message={t("auth.pages.login.loggingYouIn")} /> {/* Changed from "Logging you in..." */}
+      <Backdrop isShown={isLoading} message={t("auth.pages.login.loggingYouIn")} />
     </>
   );
 };

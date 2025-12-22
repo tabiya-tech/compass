@@ -26,13 +26,13 @@ export const DATA_TEST_ID = {
 };
 
 export const UI_TEXT = {
-  CUSTOMER_SATISFACTION_QUESTION_TEXT: "Finally, we'd love to hear your thoughts on your experience so far! How satisfied are you with Brujula?",
+  CUSTOMER_SATISFACTION_QUESTION_TEXT: "Finally, we'd love to hear your thoughts on your experience so far! How satisfied are you with Brújula?",
   RATING_LABEL_LOW: "Unsatisfied",
   RATING_LABEL_HIGH: "Satisfied",
 };
 const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
-                                                                                 notifyOnCustomerSatisfactionRatingSubmitted,
-                                                                               }) => {
+  notifyOnCustomerSatisfactionRatingSubmitted,
+}) => {
   const { enqueueSnackbar } = useSnackbar();
   const isOnline = useContext(IsOnlineContext);
   const { i18n } = useTranslation();
@@ -47,7 +47,7 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
    */
   const loadQuestions = useCallback(
     async (locale: string) => {
-      
+
       try {
         const module = await import(
           /* @vite-ignore */ `src/feedback/overallFeedback/feedbackForm/questions-${locale}.json`
@@ -64,7 +64,7 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
         console.error(`Fallback '${DEFAULT_LOCALE}' locale also failed to load.`);
         setQuestionsData({});
       } finally {
-      
+
       }
     },
     []
@@ -72,14 +72,14 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
 
   // Load locale-specific questions on mount and when locale changes
   useEffect(() => {
-    loadQuestions(i18n.language.toLowerCase());
+    loadQuestions(i18n.language);
   }, [i18n.language, loadQuestions]);
 
   const handleInputChange = async (questionId: string, value: SimplifiedAnswer) => {
     const formattedData: FeedbackItem = {
       question_id: questionId,
       simplified_answer: value,
-    }; 
+    };
 
     setSelectedRating(value.rating_numeric ?? null);
     setIsSubmittingRating(true);
@@ -103,9 +103,9 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
     }
   };
 
-  const customerSatisfactionText = t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.questionText").concat(
+  const customerSatisfactionText =
     questionsData?.[QUESTION_KEYS.CUSTOMER_SATISFACTION]?.question_text ??
-    "How satisfied are you with Brujula?");    
+    t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.questionText");
 
   return (
     <div data-testid={DATA_TEST_ID.CUSTOMER_SATISFACTION_RATING_CONTAINER}>

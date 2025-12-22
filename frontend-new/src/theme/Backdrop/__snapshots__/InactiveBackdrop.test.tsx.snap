@@ -8,15 +8,15 @@ exports[`InactiveBackdrop render tests should show InactiveBackdrop when isShown
   style="opacity: 1; webkit-transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;"
 >
   <div
-    class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-1cir30c-MuiPaper-root"
+    class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-ciqpj9-MuiPaper-root"
   >
     <p
       class="MuiTypography-root MuiTypography-body1 css-5u9vay-MuiTypography-root"
       data-testid="inactive-backdrop-message-e9ca9c1e-3933-4c5b-b5fd-453601ee9947"
     >
-      Are you still here?
+      theme.backdrop.inactiveBackdrop.title
       <br />
-      Tap anywhere to continue...
+      theme.backdrop.inactiveBackdrop.tapAnywhere
     </p>
   </div>
 </div>

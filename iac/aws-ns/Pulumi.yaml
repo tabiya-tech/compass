@@ -1,4 +1,4 @@
 name: compass-aws-ns
 runtime:
   name: python
-description: Tabiya Compass AWS DNS for domain apex
+description: Brújula AWS DNS for domain apex

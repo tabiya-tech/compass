@@ -4,6 +4,7 @@ from pydantic import ConfigDict, BaseModel
 
 from app.agent.experience import WorkType
 from app.countries import Country
+from app.i18n.types import Locale
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, Evaluation
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
 from evaluation_tests.discovered_experience_test_case import DiscoveredExperienceTestCase
@@ -121,6 +122,38 @@ test_cases = [
         expected_experience_data=[{
             "experience_title": ContainsString("Shoe Salesperson"),
             "location": ContainsString("Tokyo"),
+            "company": ContainsString("Shoe Soles"),
+            "timeline": {"start": ContainsString("2023"), "end": AnyOf(ContainsString("present"), "")},
+        }]
+    ),
+    E2ESpecificTestCase(
+        country_of_user=Country.UNSPECIFIED,
+        conversation_rounds=50,
+        name='single_experience_specific_and_concise_user_e2e_es-AR',
+        locale=Locale.ES_AR,
+        simulated_user_prompt=dedent("""
+            You're a Gen Y living alone. you have this single experience as an employee:
+            - Selling Shoes at Shoe Soles, a shoe store in Tokyo, from 2023 to present.
+            When asked you will reply with the information about this experience all at once, in a single message.
+            You have never had another job experience beside the shoe salesperson job. Also never
+            did any internship, never run your own business, never volunteered, never did any freelance work.
+            Be as concise as possible, and do not make up any information.
+            
+            Very important: You are going to be chatting in Argentinian Spanish.
+            """) + system_instruction_prompt,
+        evaluations=[Evaluation(type=EvaluationType.SINGLE_LANGUAGE, expected=100)],
+        expected_experiences_count_min=1,
+        expected_experiences_count_max=1,
+        expected_work_types={
+            WorkType.SELF_EMPLOYMENT: (0, 0),
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+            WorkType.UNSEEN_UNPAID: (0, 0),
+        },
+        matchers=["matcher"],
+        expected_experience_data=[{
+            "experience_title": AnyOf(ContainsString("vend"), ContainsString("zapato")),
+            "location": AnyOf(ContainsString("Tokyo"), ContainsString("Tokio")),
             "company": ContainsString("Shoe Soles"),
             "timeline": {"start": ContainsString("2023"), "end": AnyOf(ContainsString("present"), "")},
         }]
@@ -352,5 +385,52 @@ test_cases = [
             You can come up with specific activities and details for each experience when asked.
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)]
+    ),
+    E2ESpecificTestCase(
+        country_of_user=Country.ARGENTINA,
+        conversation_rounds=60,
+        name='argentina_conversation_e2e',
+        locale=Locale.ES_AR,
+        simulated_user_prompt=dedent("""
+            Actúa como una persona joven de Argentina. Estás chateando con un bot para armar tu CV.
+            Usa jerga argentina (laburo, guita, viejo/vieja, dale, buenísimo).
+            Sé conciso.
+
+            Tus experiencias son:
+            1. Asistente de ventas en el local de tu viejo (Enero 2015 - Diciembre 2022).
+               - Tareas: "Limpiar el lugar", "Manejar la guita", "Tratar con proveedores", "Contabilidad básica", "Venta de productos", "Empaquetar pedidos". (Dilo como una lista).
+               - Tarea importante: La atención al cliente.
+               - Detalles: escuchaba atentamente y ayudaba rápido. "solo eso" si preguntan más.
+
+            2. Trabajando en la casa de mi madre (Marzo 2022 - Enero 2025). Es Voluntario.
+               - Tareas: "Limpiar", "Comprar lo que haga falta", "Preparar la comida", "Lavar la ropa", "Planchar", "Terminar el día con la cena". (Dilo como lista).
+               - Tarea importante: Organizar bien las tareas del día.
+               - Detalles: hablaba con mi vieja para acordar lo importante. Herramientas: escoba y herramientas del hogar. "solo eso" si preguntan más.
+        
+            No tienes otras experiencias. 
+            Responde "si" o "no" cuando corresponda. Di "asi esta bien" si te piden confirmar.
+            """) + system_instruction_prompt,
+        evaluations=[Evaluation(type=EvaluationType.SINGLE_LANGUAGE, expected=100)],
+        expected_experiences_count_min=2,
+        expected_experiences_count_max=2,
+        expected_work_types={
+            WorkType.SELF_EMPLOYMENT: (0, 1),
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 1),
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
+            WorkType.UNSEEN_UNPAID: (1, 1),
+        },
+        matchers=["llm", "matcher"],
+        expected_experience_data=[
+            {
+                "experience_title": AnyOf(ContainsString("asistente"), ContainsString("ventas")),
+                "company": AnyOf(ContainsString("padre"), ContainsString("viejo")),
+                "timeline": {"start": ContainsString("2015"), "end": ContainsString("2022")},
+            },
+            {
+                "experience_title": AnyOf(ContainsString("casa"), ContainsString("madre")),
+                "company": AnyOf(ContainsString("madre"), ContainsString("vieja")),
+                "timeline": {"start": ContainsString("2022"), "end": ContainsString("2025")},
+            }
+        ]
     )
 ]

@@ -4,7 +4,7 @@ from vertexai.generative_models import GenerativeModel, Content, Part, Generatio
 from vertexai.language_models import TextGenerationModel
 
 from common_libs.llm.models_utils import LLMConfig, LLMInput, LLMResponse, BasicLLM
-from app.i18n.locale_detector import get_locale
+from app.i18n.translation_service import get_i18n_manager
 
 
 class GeminiGenerativeLLM(BasicLLM):
@@ -17,16 +17,15 @@ class GeminiGenerativeLLM(BasicLLM):
                  config: LLMConfig = LLMConfig()):
         super().__init__(config=config)
 
-        # Agregar instrucción obligatoria en español
-        locale = get_locale()
-        mandatory_instruction = f"Super important! Please produce all responses in the locale {locale}. Do not mix languages under any circumstances. Keep the entire conversation strictly in {locale}."
-        if system_instructions is None:
-            system_instructions = [mandatory_instruction]
-        elif isinstance(system_instructions, str):
-            system_instructions = [mandatory_instruction, system_instructions]
-        elif isinstance(system_instructions, list):
-            system_instructions.insert(0,mandatory_instruction)
-            system_instructions.append("You always must handle the dates with this pattern  MM/YYYY, for example 03/2022")
+        # Add mandatory instruction to enforce locale
+        # locale = get_i18n_manager().get_locale()
+        # mandatory_instruction = f"Super important! Please produce all responses in the {locale} locale. Do not mix languages under any circumstances. Keep the entire conversation strictly in {locale}."
+        # if system_instructions is None:
+        #     system_instructions = [mandatory_instruction]
+        # elif isinstance(system_instructions, str):
+        #     system_instructions = [mandatory_instruction, system_instructions]
+        # elif isinstance(system_instructions, list):
+        #     system_instructions.insert(0,mandatory_instruction)
             
 
         self._model = GenerativeModel(
@@ -62,8 +61,8 @@ class PalmTextGenerativeLLM(BasicLLM):
         self._model = TextGenerationModel.from_pretrained("text-bison@002")
         self._params = config.generation_config
 
-        # Agregar instrucción obligatoria en español
-        locale = get_locale()
+        # Add mandatory instruction to enforce locale
+        locale = get_i18n_manager().get_locale()
         mandatory_instruction = f"Super important!! Please, produce the response in this locale {locale}"
         if system_instructions is None:
             self._system_instructions = mandatory_instruction

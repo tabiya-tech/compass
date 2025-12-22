@@ -16,7 +16,7 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
     tabindex="0"
   />
   <div
-    class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation2 MuiPopover-paper MuiMenu-paper MuiMenu-paper css-178dswp-MuiPaper-root-MuiPopover-paper-MuiMenu-paper"
+    class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation2 MuiPopover-paper MuiMenu-paper MuiMenu-paper css-qtjk2g-MuiPaper-root-MuiPopover-paper-MuiMenu-paper"
     style="opacity: 1; transform: scale(1, 1); transition: opacity 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; top: 16px; left: 16px; transform-origin: -16px -16px;"
     tabindex="-1"
   >
@@ -26,7 +26,7 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
       tabindex="0"
     >
       <li
-        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-f908r0-MuiButtonBase-root-MuiMenuItem-root"
+        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-1hbsavb-MuiButtonBase-root-MuiMenuItem-root"
         data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item"
         role="menuitem"
         tabindex="0"
@@ -50,7 +50,7 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
             class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-1bcerjy-MuiTypography-root"
           >
             <span
-              class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-caption css-757dsf-MuiTypography-root"
             >
               foo
             </span>
@@ -61,7 +61,7 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
         />
       </li>
       <li
-        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-f908r0-MuiButtonBase-root-MuiMenuItem-root"
+        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-1hbsavb-MuiButtonBase-root-MuiMenuItem-root"
         data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item"
         role="menuitem"
         tabindex="-1"
@@ -74,7 +74,7 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
             class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-1bcerjy-MuiTypography-root"
           >
             <span
-              class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-caption css-757dsf-MuiTypography-root"
             >
               bar
             </span>
@@ -86,7 +86,7 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
       </li>
       <li
         aria-disabled="true"
-        class="MuiButtonBase-root MuiMenuItem-root Mui-disabled MuiMenuItem-gutters Mui-disabled MuiMenuItem-root Mui-disabled MuiMenuItem-gutters css-f908r0-MuiButtonBase-root-MuiMenuItem-root"
+        class="MuiButtonBase-root MuiMenuItem-root Mui-disabled MuiMenuItem-gutters Mui-disabled MuiMenuItem-root Mui-disabled MuiMenuItem-gutters css-1hbsavb-MuiButtonBase-root-MuiMenuItem-root"
         data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item"
         role="menuitem"
         tabindex="-1"
@@ -110,7 +110,7 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
             class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-1bcerjy-MuiTypography-root"
           >
             <span
-              class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-caption css-757dsf-MuiTypography-root"
             >
               baz
             </span>
@@ -118,7 +118,7 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
         </div>
       </li>
       <li
-        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-f908r0-MuiButtonBase-root-MuiMenuItem-root"
+        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-1hbsavb-MuiButtonBase-root-MuiMenuItem-root"
         data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item"
         role="menuitem"
         tabindex="-1"
@@ -142,7 +142,7 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
             class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-1bcerjy-MuiTypography-root"
           >
             <span
-              class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-caption css-757dsf-MuiTypography-root"
             >
               qux
             </span>

@@ -25,7 +25,7 @@ export const useFieldsConfig = () => {
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        // Build localized path (e.g., /data/config/fields-en-gb.yaml)
+        // Build localized path (e.g., /data/config/fields-en-GB.yaml)
         const lang = i18n.language || DEFAULT_LOCALE;
         const configPath = `${CONFIG_BASE_PATH}/fields-${lang}.yaml`;
 
@@ -65,7 +65,7 @@ export const useFieldsConfig = () => {
  */
 
 export const parseYamlConfig = (yamlText: string): FieldDefinition[] => {
-  let fieldDefinitions: FieldDefinition[]
+  let fieldDefinitions: FieldDefinition[];
   try {
     const yamlJson = parse(yamlText) as Record<string, FieldDefinition>;
 
@@ -84,22 +84,22 @@ export const parseYamlConfig = (yamlText: string): FieldDefinition[] => {
         case FieldType.MultipleSelect:
           return new MultipleSelectFieldDefinition({ ...field, name });
         default:
-          throw new Error('Invalid field type');
+          throw new Error("Invalid field type");
       }
     });
 
     // Validate duplicate dataKeys
     const dataKeys: Map<string, boolean> = new Map();
-    fieldDefinitions.forEach(field => {
+    fieldDefinitions.forEach((field) => {
       if (dataKeys.has(field.dataKey)) {
         throw new ConfigurationError(`Duplicate dataKey '${field.dataKey}'`);
       }
-      dataKeys.set(field.dataKey, true)
+      dataKeys.set(field.dataKey, true);
     });
 
     return fieldDefinitions;
   } catch (error) {
     console.error(error);
-    throw new Error('Failed to parse fields configuration');
+    throw new Error("Failed to parse fields configuration");
   }
 };

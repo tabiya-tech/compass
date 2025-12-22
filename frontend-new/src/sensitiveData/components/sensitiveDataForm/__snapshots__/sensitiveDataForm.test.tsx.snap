@@ -22,7 +22,7 @@ exports[`Sensitive Data Form Form validation should enable submit button when al
           style="max-width: 60%; margin: 5% 10%;"
         />
         <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-cg2f42-MuiButtonBase-root-MuiIconButton-root"
           data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
@@ -45,7 +45,7 @@ exports[`Sensitive Data Form Form validation should enable submit button when al
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1ubhg5d-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Provide Your Information
@@ -54,7 +54,7 @@ exports[`Sensitive Data Form Form validation should enable submit button when al
         class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about Brujula.
+        We use your data to personalize your experience and may contact you about Brújula.
          Please provide the following information to continue.
         <button
           aria-label="help"
@@ -111,13 +111,13 @@ exports[`Sensitive Data Form Form validation should enable submit button when al
       >
         <a
           aria-disabled="false"
-          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1ryri3t-MuiTypography-root-MuiLink-root"
           data-testid="sensitive-data-reject-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
           No, thank you
         </a>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1d8cme1-MuiButtonBase-root-MuiButton-root"
           data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
           tabindex="0"
           type="button"
@@ -155,7 +155,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should hand
           style="max-width: 60%; margin: 5% 10%;"
         />
         <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-cg2f42-MuiButtonBase-root-MuiIconButton-root"
           data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
@@ -178,7 +178,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should hand
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1ubhg5d-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Provide Your Information
@@ -187,7 +187,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should hand
         class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about Brujula.
+        We use your data to personalize your experience and may contact you about Brújula.
          Please provide the following information to continue.
         <button
           aria-label="help"
@@ -225,13 +225,13 @@ exports[`Sensitive Data Form Rendering fields based on configuration should hand
       >
         <a
           aria-disabled="false"
-          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1ryri3t-MuiTypography-root-MuiLink-root"
           data-testid="sensitive-data-reject-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
           No, thank you
         </a>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1d8cme1-MuiButtonBase-root-MuiButton-root"
           data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
           tabindex="0"
           type="button"
@@ -269,7 +269,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
           style="max-width: 60%; margin: 5% 10%;"
         />
         <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-cg2f42-MuiButtonBase-root-MuiIconButton-root"
           data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
@@ -292,7 +292,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1ubhg5d-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Provide Your Information
@@ -301,7 +301,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about Brujula.
+        We use your data to personalize your experience and may contact you about Brújula.
          Please provide the following information to continue.
         <button
           aria-label="help"
@@ -346,13 +346,13 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
       >
         <a
           aria-disabled="false"
-          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1ryri3t-MuiTypography-root-MuiLink-root"
           data-testid="sensitive-data-reject-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
           No, thank you
         </a>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1d8cme1-MuiButtonBase-root-MuiButton-root"
           data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
           disabled=""
           tabindex="-1"
@@ -388,7 +388,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
           style="max-width: 60%; margin: 5% 10%;"
         />
         <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-cg2f42-MuiButtonBase-root-MuiIconButton-root"
           data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
@@ -411,7 +411,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1ubhg5d-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Provide Your Information
@@ -420,7 +420,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about Brujula.
+        We use your data to personalize your experience and may contact you about Brújula.
          Please provide the following information to continue.
         <button
           aria-label="help"
@@ -465,13 +465,13 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
       >
         <a
           aria-disabled="false"
-          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1ryri3t-MuiTypography-root-MuiLink-root"
           data-testid="sensitive-data-reject-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
           No, thank you
         </a>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1d8cme1-MuiButtonBase-root-MuiButton-root"
           data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
           disabled=""
           tabindex="-1"
@@ -507,7 +507,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
           style="max-width: 60%; margin: 5% 10%;"
         />
         <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-cg2f42-MuiButtonBase-root-MuiIconButton-root"
           data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
@@ -530,7 +530,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1ubhg5d-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Provide Your Information
@@ -539,7 +539,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about Brujula.
+        We use your data to personalize your experience and may contact you about Brújula.
          Please provide the following information to continue.
         <button
           aria-label="help"
@@ -596,13 +596,13 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
       >
         <a
           aria-disabled="false"
-          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1ryri3t-MuiTypography-root-MuiLink-root"
           data-testid="sensitive-data-reject-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
           No, thank you
         </a>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1d8cme1-MuiButtonBase-root-MuiButton-root"
           data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
           disabled=""
           tabindex="-1"
@@ -638,7 +638,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
           style="max-width: 60%; margin: 5% 10%;"
         />
         <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-cg2f42-MuiButtonBase-root-MuiIconButton-root"
           data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
@@ -661,7 +661,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1ubhg5d-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Provide Your Information
@@ -670,7 +670,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about Brujula.
+        We use your data to personalize your experience and may contact you about Brújula.
          Please provide the following information to continue.
         <button
           aria-label="help"
@@ -715,13 +715,13 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
       >
         <a
           aria-disabled="false"
-          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1ryri3t-MuiTypography-root-MuiLink-root"
           data-testid="sensitive-data-reject-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
         >
           No, thank you
         </a>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1d8cme1-MuiButtonBase-root-MuiButton-root"
           data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
           disabled=""
           tabindex="-1"

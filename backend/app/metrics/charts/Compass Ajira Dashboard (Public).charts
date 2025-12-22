@@ -2,7 +2,7 @@
   "exportVersion": 9,
   "dashboards": {
     "dashboard-1": {
-      "title": "Brujula Ajira Dashboard (Public)",
+      "title": "Brújula Ajira Dashboard (Public)",
       "layout": [
         {
           "w": 1,
@@ -306,7 +306,7 @@
           "i": "item-43"
         }
       ],
-      "description": "Information about Ajira's Brujula deployment.",
+      "description": "Information about Ajira's Brújula deployment.",
       "embedding": {},
       "filters": [
         {

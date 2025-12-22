@@ -54,6 +54,18 @@ class PromptGenerator:
                 3. Assess how well the new summary covers the main points of the current summary and conversation, and how much irrelevant or redundant information it contains.
                 4. Assign a relevance score from of 1 to 5, where 1 is the lowest and 5 is the highest based on the Evaluation Criteria.
                 """)
+            case EvaluationType.SINGLE_LANGUAGE:
+                return textwrap.dedent("""
+                Evaluation Criteria:
+                
+                Single - Language - Did the EVALUATED_AGENT maintain the same language throughout the conversation? 
+                Even if the SIMULATED_USER used a different language.
+                
+                Evaluation Steps:
+                1. Read the conversation carefully and identify the language used by the SIMULATED_USER and EVALUATED_AGENT.
+                2. Check if the conversation was in the same language throughout (eg: English, Spanish, French, Swahili, etc)..
+                3. Assign a score of 100 if the conversation was in the same language throughout, or 0 otherwise.
+                """)
             case _:
                 raise NotImplementedError()
 
@@ -79,6 +91,10 @@ class PromptGenerator:
             case EvaluationType.SUMMARY_RELEVANCE:
                 return textwrap.dedent("""
                 The summary is somewhat relevant to the current conversation.
+                """)
+            case EvaluationType.SINGLE_LANGUAGE:
+                return textwrap.dedent("""
+                The language used in the conversation is somewhat consistent and it is 'Spanish' mixed with 'English'
                 """)
             case _:
                 raise NotImplementedError()

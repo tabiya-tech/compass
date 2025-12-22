@@ -47,7 +47,7 @@ class IConversationMemoryManager(ABC):
         """
         Utility method that checks if a message with a certain message_id comes from the user or not
         :param message_id: the id of the message to check
-        :return - bool: True if the message is a User message, False if it is a Brujula message
+        :return - bool: True if the message is a User message, False if it is a Brújula message
         :raises ValueError: if the message_id is not found in the conversation history
         """
 

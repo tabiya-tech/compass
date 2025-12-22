@@ -29,8 +29,8 @@ Feature: Consistency of i18n Translation Keys
 ──────────────────────────────────────────────────────────────
 */
 
-const localesDir = path.join(__dirname, '../locales');
-const referenceLanguage = 'en-gb';
+const localesDir = path.join(__dirname, 'locales');
+const referenceLanguage = 'en-GB';
 
 describe('Feature: i18n locales consistency', () => {
   const referenceTranslationsPath = path.join(localesDir, referenceLanguage, 'translation.json');

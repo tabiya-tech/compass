@@ -12,7 +12,7 @@ exports[`ConversationConclusionFooter render tests should render component succe
      
     <a
       aria-disabled="false"
-      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1ryri3t-MuiTypography-root-MuiLink-root"
       data-testid="feedback-form-experiences-drawer-button-41675f8b-257c-4a63-9563-3fe9feb6a850"
       style="display: inline-flex; flex-direction: row; gap: calc(clamp(2px, (2dvh + -8px + 1.5dvw + -10px)/2 , 8px) * 0.5); vertical-align: bottom;"
     >

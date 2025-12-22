@@ -19,7 +19,7 @@ exports[`should render the SensitiveDataFormSkeleton 1`] = `
         style="max-width: 60%; margin: 5% 10%;"
       />
       <button
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-cg2f42-MuiButtonBase-root-MuiIconButton-root"
         data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
         tabindex="0"
         title="Language Selector"
@@ -42,7 +42,7 @@ exports[`should render the SensitiveDataFormSkeleton 1`] = `
       </button>
     </div>
     <h4
-      class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1ubhg5d-MuiTypography-root"
       data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
     >
       Loading form...
@@ -59,13 +59,13 @@ exports[`should render the SensitiveDataFormSkeleton 1`] = `
       class="MuiBox-root css-1pzlugo"
     >
       <span
-        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-1cfhir4-MuiSkeleton-root"
+        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-c5b3p2-MuiSkeleton-root"
       />
       <span
-        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-o76exe-MuiSkeleton-root"
+        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-j3eyxq-MuiSkeleton-root"
       />
       <span
-        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-qq72b0-MuiSkeleton-root"
+        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-1d86awl-MuiSkeleton-root"
       />
     </div>
     <div
@@ -78,7 +78,7 @@ exports[`should render the SensitiveDataFormSkeleton 1`] = `
           class="MuiBox-root css-1w00lo4"
         >
           <span
-            class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-3zf2al-MuiSkeleton-root"
+            class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-1jlkwvt-MuiSkeleton-root"
             style="width: 100%; height: 56px;"
           />
         </div>
@@ -86,7 +86,7 @@ exports[`should render the SensitiveDataFormSkeleton 1`] = `
           class="MuiBox-root css-1w00lo4"
         >
           <span
-            class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-3zf2al-MuiSkeleton-root"
+            class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-1jlkwvt-MuiSkeleton-root"
             style="width: 100%; height: 56px;"
           />
         </div>
@@ -94,7 +94,7 @@ exports[`should render the SensitiveDataFormSkeleton 1`] = `
           class="MuiBox-root css-1w00lo4"
         >
           <span
-            class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-3zf2al-MuiSkeleton-root"
+            class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-1jlkwvt-MuiSkeleton-root"
             style="width: 100%; height: 56px;"
           />
         </div>
@@ -102,7 +102,7 @@ exports[`should render the SensitiveDataFormSkeleton 1`] = `
           class="MuiBox-root css-1w00lo4"
         >
           <span
-            class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-3zf2al-MuiSkeleton-root"
+            class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-1jlkwvt-MuiSkeleton-root"
             style="width: 100%; height: 56px;"
           />
         </div>
@@ -110,7 +110,7 @@ exports[`should render the SensitiveDataFormSkeleton 1`] = `
           class="MuiBox-root css-1w00lo4"
         >
           <span
-            class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-3zf2al-MuiSkeleton-root"
+            class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-1jlkwvt-MuiSkeleton-root"
             style="width: 100%; height: 56px;"
           />
         </div>
@@ -118,7 +118,7 @@ exports[`should render the SensitiveDataFormSkeleton 1`] = `
           class="MuiBox-root css-1w00lo4"
         >
           <span
-            class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-3zf2al-MuiSkeleton-root"
+            class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-1jlkwvt-MuiSkeleton-root"
             style="width: 100%; height: 56px;"
           />
         </div>
@@ -127,11 +127,11 @@ exports[`should render the SensitiveDataFormSkeleton 1`] = `
         class="MuiBox-root css-macbv2"
       >
         <span
-          class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-qn5ikh-MuiSkeleton-root"
+          class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-1djazo1-MuiSkeleton-root"
           style="width: 80px; height: 40px;"
         />
         <span
-          class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-3zf2al-MuiSkeleton-root"
+          class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-1jlkwvt-MuiSkeleton-root"
           style="width: 70%; height: 40px;"
         />
       </div>

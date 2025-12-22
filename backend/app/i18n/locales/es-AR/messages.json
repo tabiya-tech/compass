@@ -1,0 +1,65 @@
+{
+  "welcomeAgentFirstEncounter": "¡Bienvenido! Soy Brújula, voy a ayudarte a destacar tus habilidades.\nAsí es como funciona este proceso:\n\n• Primero: contame brevemente tu puesto y tareas (incluye voluntariado o trabajo no remunerado).\n• Después: repasaremos cada experiencia para anotar los detalles clave.\n\nToma alrededor de 10–15 minutos por experiencia. Podés crear una cuenta y volver después si necesitás.\n\nSi tenés preguntas, escribilas.\n\n¿Listo para empezar?",
+  "collectExperiences": {
+    "didNotUnderstand": "Perdón, no entendí. ¿Podés decirlo de otra manera?",
+    "moveToOtherExperiences": "Sigamos con otras experiencias laborales.",
+    "finalMessage": "Gracias por compartir tus experiencias. Sigamos con el próximo paso.",
+    "noExperienceCollected": "Todavía no se recopilaron datos de experiencias.",
+    "allFieldsFilled": "Todos los campos están completos.",
+    "allFieldsNotFilled": "Todavía hay campos sin completar.",
+    "workType": {
+      "formalWagedDescription": "trabajar para una empresa o el negocio de otra persona por dinero",
+      "unpaidTraineeDescription": "trabajo no pago como aprendiz en una empresa u organización",
+      "selfEmploymentDescription": "tener mi propio emprendimiento, hacer trabajos por cuenta propia o por contrato",
+      "unseenUnpaidDescription": "trabajo no pago como voluntariado comunitario, cuidados a mi familia u otra, ayuda en un hogar",
+      "noneDescription": "sin experiencia laboral",
+      "notSupported": "tipo de trabajo no compatible"
+    },
+    "fields": {
+      "experienceTitle": "título de la experiencia",
+      "paidWork": "trabajo pago",
+      "workType": "tipo de trabajo",
+      "startDate": "fecha de inicio",
+      "endDate": "fecha de finalización",
+      "company": "empresa/receptor del trabajo",
+      "location": "ubicación"
+    },
+    "askAboutType": "Preguntame sobre experiencias que incluyan: {experience_type}",
+    "recapPrompt": "Hagamos un repaso y dame la chance de corregir cualquier error."
+  },
+  "exploreExperiences": {
+    "noMoreExperiences": "Parece que no hay experiencias para seguir conversando.",
+    "skippedExperienceMissingDetails": "Omití tu experiencia \"{experience_title}\" porque no compartiste suficientes detalles",
+    "finishedAll": "Terminé de explorar todas tus experiencias.",
+    "noSkillsIdentified": "No se identificaron habilidades",
+    "linkAndRank": {
+      "summaryMessage": "Según la información que brindaste sobre tu experiencia como '{experience_title}', acá va un resumen breve:\n\n{summary}\n\nPrincipales {top_count} habilidades demostradas:{skills_summary}"
+    }
+  },
+  "agentDirector": {
+    "finalMessage": "¡La conversación terminó!",
+    "errorRetry": "Estoy teniendo algunas dificultades ahora, ¿podés repetir lo que dijiste?",
+    "allAgentsDone": "¡Conversación finalizada, todos los agentes terminaron!",
+    "forcefullyEnded": "La conversación se terminó de forma forzada"
+  },
+  "experience": {
+    "until": "hasta {end_date}",
+    "noTitleProvidedYet": "Sin título aún",
+    "workType": {
+      "short": {
+        "formalSectorWagedEmployment": "Trabajo asalariado",
+        "formalSectorUnpaidTraineeWork": "Pasantía no paga",
+        "selfEmployment": "Trabajo por cuenta propia",
+        "unseenUnpaid": "Voluntariado/No pago"
+      }
+    }
+  },
+  "exploreSkills": {
+    "finalMessage": "¡Gracias por compartir estos detalles! Tengo toda la información que necesito.",
+    "question": {
+      "formalWaged": "¿Qué pensás que es importante al trabajar en una empresa así?",
+      "selfEmployment": "¿Qué pensás que es importante cuando sos tu propio jefe?",
+      "unseenUnpaid": "¿Qué pensás que es más importante al ayudar en la comunidad o cuidar a otras personas?"
+    }
+  }
+}

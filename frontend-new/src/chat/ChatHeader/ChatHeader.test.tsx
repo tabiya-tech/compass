@@ -21,7 +21,6 @@ import { DATA_TEST_ID as CONFIRM_MODAL_DATA_TEST_ID } from "src/theme/confirmMod
 import {
   DATA_TEST_ID as TEXT_CONFIRM_MODAL_DIALOG_DATA_TEST_ID,
 } from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
-import { DATA_TEST_ID as INFO_DRAWER_DATA_TEST_ID } from "src/info/Info";
 import { ChatProvider } from "src/chat/ChatContext";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import * as Sentry from "@sentry/react";
@@ -156,8 +155,8 @@ describe("ChatHeader", () => {
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_CONTAINER)).toBeInTheDocument();
     // AND the chat header logo to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_LOGO)).toBeInTheDocument();
-    // AND the Brujula text to be visible
-    expect(screen.getByText("Brujula")).toBeInTheDocument();
+    // AND the Brújula text to be visible
+    expect(screen.getByText("Brújula")).toBeInTheDocument();
     // AND the user button to be shown with the user icon
     const chatHeaderButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
     expect(chatHeaderButton).toBeInTheDocument();
@@ -228,7 +227,7 @@ describe("ChatHeader", () => {
         />
       </ChatProvider>
     );
-    testNavigateToPath(givenChatHeader, "Brujula Logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
+    testNavigateToPath(givenChatHeader, "Brújula Logo", DATA_TEST_ID.CHAT_HEADER_LOGO_LINK, routerPaths.ROOT);
 
     test("should open the context menu when the user icon is clicked", async () => {
       // GIVEN a ChatHeader component
@@ -254,8 +253,9 @@ describe("ChatHeader", () => {
       const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
       await userEvent.click(userButton);
 
-      // THEN expect the context menu to be visible
-      expect(screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU)).toBeInTheDocument();
+      // THEN expect the context menus to be visible (language selector + user menu)
+      const contextMenus = screen.getAllByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
+      expect(contextMenus.length).toBeGreaterThanOrEqual(2);
       // AND the context menu to be open and anchored to the user button
       await waitFor(() => {
         expect(ContextMenu).toHaveBeenCalledWith(
@@ -266,58 +266,6 @@ describe("ChatHeader", () => {
           {}
         );
       });
-    });
-
-    test("should open info drawer when the settings menu item is clicked", async () => {
-      // GIVEN a ChatHeader component
-      const givenNotifyOnLogout = jest.fn();
-      const givenChatHeader = (
-        <ChatHeader
-          notifyOnLogout={givenNotifyOnLogout}
-          startNewConversation={givenStartNewConversation}
-          experiencesExplored={0}
-          exploredExperiencesNotification={true}
-          setExploredExperiencesNotification={jest.fn()}
-          conversationCompleted={false}
-          progressPercentage={0}
-          timeUntilNotification={null}
-          conversationPhase={ConversationPhase.INTRO}
-          collectedExperiences={1}
-        />
-      );
-      // AND the chat header is rendered
-      renderWithChatProvider(givenChatHeader);
-      // AND the user button is clicked
-      const userButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
-      await userEvent.click(userButton);
-      // AND the context menu is opened
-      await waitFor(() => {
-        expect(ContextMenu).toHaveBeenCalledWith(
-          expect.objectContaining({
-            anchorEl: userButton,
-            open: true,
-          }),
-          {}
-        );
-      });
-
-      // WHEN the settings menu item is clicked
-      const settingsMenuItem = screen.getByTestId(MENU_ITEM_ID.SETTINGS_SELECTOR);
-      await userEvent.click(settingsMenuItem);
-      // AND the context menu is closed
-      await waitFor(() => {
-        expect(ContextMenu).toHaveBeenCalledWith(
-          expect.objectContaining({
-            anchorEl: null,
-            open: false,
-          }),
-          {}
-        );
-      });
-
-      // THEN expect info drawer to be opened
-      const infoDrawer = screen.getByTestId(INFO_DRAWER_DATA_TEST_ID.INFO_DRAWER_CONTAINER);
-      expect(infoDrawer).toBeInTheDocument();
     });
 
     test("should call start new conversation when the start new conversation menu item is clicked", async () => {
@@ -674,11 +622,6 @@ describe("ChatHeader", () => {
                   disabled: !browserIsOnline,
                 }),
                 expect.objectContaining({
-                  id: MENU_ITEM_ID.SETTINGS_SELECTOR,
-                  text: "settings",
-                  disabled: !browserIsOnline,
-                }),
-                expect.objectContaining({
                   id: MENU_ITEM_ID.LOGOUT_BUTTON,
                   text: "logout",
                   disabled: false,
@@ -689,10 +632,11 @@ describe("ChatHeader", () => {
           );
         });
         // AND the context menu to contain the correct menu items
-        const contextMenu = screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
-        expect(contextMenu).toBeInTheDocument();
+        const contextMenus = screen.getAllByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
+        // User menu is the second context menu (index 1), language menu is the first (index 0)
+        const userContextMenu = contextMenus[1];
+        expect(userContextMenu).toBeInTheDocument();
         expect(screen.getByTestId(MENU_ITEM_ID.START_NEW_CONVERSATION)).toBeInTheDocument();
-        expect(screen.getByTestId(MENU_ITEM_ID.SETTINGS_SELECTOR)).toBeInTheDocument();
         expect(screen.getByTestId(MENU_ITEM_ID.LOGOUT_BUTTON)).toBeInTheDocument();
       }
     );

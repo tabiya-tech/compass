@@ -55,14 +55,15 @@ class BackendServiceConfig:
     experience_pipeline_config: Optional[str]
     cv_max_uploads_per_user: Optional[str]
     cv_rate_limit_per_minute: Optional[str]
+    default_locale: str
 
 
 """
 # Set up GCP API Gateway.
-# The API Gateway will route the requests to the Compass Cloudrun instance. Additionally, it will verify the incoming 
+# The API Gateway will route the requests to the Brújula Cloudrun instance. Additionally, it will verify the incoming 
 # JWT tokens and add a new header x-apigateway-api-userinfo that will contain the JWT claims.
-# The Compass Cloudrun instance is publicly accessible over internet, otherwise it cannot be behind API Gateway.
-# To prevent direct calls to the Compass Cloudrun instance, the Cloudrun instance will require GCP IAM based 
+# The Brújula Cloudrun instance is publicly accessible over internet, otherwise it cannot be behind API Gateway.
+# To prevent direct calls to the Brújula Cloudrun instance, the Cloudrun instance will require GCP IAM based 
 # authentication. A service account with 'roles/run.invoker' permission is created for the API Gateway 
 # which will allow it to call the Cloudrun instance.
 """
@@ -241,7 +242,7 @@ def _deploy_cloud_run_service(
         get_resource_name(resource="backend", resource_type="sa"),
 
         account_id="backend-sa",
-        display_name="The dedicated service account for the Compass backend service",
+        display_name="The dedicated service account for the Brújula backend service",
         create_ignore_already_exists=True,
         project=basic_config.project,
         opts=pulumi.ResourceOptions(depends_on=dependencies, provider=basic_config.provider),
@@ -361,6 +362,9 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_CV_RATE_LIMIT_PER_MINUTE",
                             value=backend_service_cfg.cv_rate_limit_per_minute),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_DEFAULT_LOCALE",
+                            value=backend_service_cfg.default_locale),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_SUPPORTED_LANGUAGES",
                             value=backend_service_cfg.supported_languages)

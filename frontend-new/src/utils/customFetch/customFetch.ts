@@ -112,7 +112,7 @@ const refreshToken = async (
 
   if (!isProviderSessionValid) {
     const userFriendlyErrorMessage = i18n.t(
-      ErrorConstants.USER_FRIENDLY_ERROR_MESSAGE_KEYS.AUTHENTICATION_FAILURE,
+      ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS.AUTHENTICATION_FAILURE,
     );
     await authService.logout();
     enqueueSnackbar(`${userFriendlyErrorMessage} ${i18n.t("auth.loggingYouOutNotice")}`, {
@@ -317,7 +317,9 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
               processedBody = bodyString;
               headers.delete("Content-Encoding");
             } else {
-              console.debug(`Compressing request for ${serviceName}.${serviceFunction} with body size ${rawBytes.length}, gain: ${performanceGainPercent}`);
+              console.debug(
+                `Compressing request for ${serviceName}.${serviceFunction} with body size ${rawBytes.length}, gain: ${performanceGainPercent}`
+              );
               // Copy to a fresh ArrayBuffer to satisfy BlobPart typing (avoid SharedArrayBuffer)
               const ab = new ArrayBuffer(compressedBytes.byteLength);
               new Uint8Array(ab).set(compressedBytes);

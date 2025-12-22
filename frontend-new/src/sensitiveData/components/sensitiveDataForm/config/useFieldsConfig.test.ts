@@ -98,11 +98,11 @@ stringFieldName:
           label: "String Field",
         }),
       ];
-      expect(fetchSpy).toHaveBeenCalledWith("/data/config/fields-en-gb.yaml", {
+      expect(fetchSpy).toHaveBeenCalledWith("/data/config/fields-en-US.yaml", {
         authRequired: false,
         retryOnFailedToFetch: true,
         expectedStatusCode: [200, 204],
-        failureMessage: "Failed to fetch fields configuration from /data/config/fields-en-gb.yaml",
+        failureMessage: "Failed to fetch fields configuration from /data/config/fields-en-US.yaml",
         serviceFunction: "useFieldsConfig",
         serviceName: "SensitiveDataService",
       });

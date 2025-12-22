@@ -30,7 +30,7 @@ def _convert_to_message_reaction(reaction: Reaction | None) -> MessageReaction |
 async def filter_conversation_history(history: 'ConversationHistory', reactions_for_session: list[Reaction]) -> list[
     ConversationMessage]:
     """
-    Filter the conversation history to only include the messages that were sent by the user and the Brujula.
+    Filter the conversation history to only include the messages that were sent by the user and the Brújula.
     :param history: ConversationHistory - the conversation history
     :param reactions_for_session: Optional[List[Reaction]] - list of reactions for the session
     :return: List[ConversationMessage]

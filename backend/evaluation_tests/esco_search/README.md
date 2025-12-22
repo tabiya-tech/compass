@@ -2,7 +2,7 @@
 
 The purpose of our study has been to evaluate linking models to the Occupation and Skill ESCO taxonomies to choose how to do so as effectively as possible for our brujula application. 
 
-The evaluation was run on synthetic queries based on a dataset of 542 job descriptions with the corresponding ESCO code for the occupations and of 1054 sentences containing 2013 skills with the corresponding Tabiya UUID. Those synthetic queries are assumed to be similar to the input that an hypothetical user of the Brujula platform would submit. We also fixed the embedding model to be VertexAI's Gecko003.
+The evaluation was run on synthetic queries based on a dataset of 542 job descriptions with the corresponding ESCO code for the occupations and of 1054 sentences containing 2013 skills with the corresponding Fundacion Empujar UUID. Those synthetic queries are assumed to be similar to the input that an hypothetical user of the Brújula platform would submit. We also fixed the embedding model to be VertexAI's Gecko003.
 
 We first focused the evaluation on a selection of hyperparameters that would guarantee the maximum recall at various values of retrieved nodes k. We assumed that k would be decided in advance and that we would prioritize retrieving the ground truth within the first k documents (recall-based approach) rather than having most retrieved documents be the ground truth (precision-based approach). The hyperparameter we considered were 
 * The score function (euclidean distance, scalar product or cosine similarity);

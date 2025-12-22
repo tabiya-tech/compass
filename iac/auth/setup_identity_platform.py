@@ -182,12 +182,12 @@ def _setup_identity_platform(
                 ),
                 verify_email_template=EmailTemplateArgs(
                     sender_local_part="noreply",
-                    sender_display_name="Compass",
+                    sender_display_name="Brújula",
                     subject="Please verify your email address",
                 ),
                 reset_password_template=EmailTemplateArgs(
                     sender_local_part="noreply",
-                    sender_display_name="Compass",
+                    sender_display_name="Brújula",
                     subject="Reset your password",
                 )
             )

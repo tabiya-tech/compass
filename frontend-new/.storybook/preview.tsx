@@ -25,6 +25,23 @@ import { ChatProvider } from "../src/chat/ChatContext";
 import i18n from "../src/i18n/i18n";
 import { initSentry } from "../src/sentryInit";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
+import { LocalesLabels, Locale } from "../src/i18n/constants";
+
+type StorybookSelectOption = {
+  value: string;
+  title: string;
+};
+
+/**
+ * A list of all the locales and their labels in the form of {StorybookSelectOption[]}:
+ */
+const localeOptions = Object.entries(LocalesLabels).reduce<StorybookSelectOption[]>((acc, [locale, label]) => {
+  acc.push({
+    value: locale,
+    title: label,
+  });
+  return acc;
+}, []);
 
 const preview: Preview = {
   parameters: {
@@ -77,17 +94,12 @@ const preview: Preview = {
       },
     },
     locale: {
-      name: 'Locale',
-      description: 'Internationalization locale',
+      name: "Locale",
+      description: "Internationalization locale",
       toolbar: {
-        icon: 'globe',
-        items: [
-          { value: 'en-gb', title: 'English (UK)' },
-          { value: 'en-us', title: 'English (US)' },
-          { value: 'es-es', title: 'Spanish (Spain)' },
-          { value: 'es-ar', title: 'Spanish (Argentina)' },
-          { value: 'fr-fr', title: 'French' },
-        ],
+        icon: "globe",
+        items: localeOptions,
+        defaultValue: Locale.EN_US,
         showName: true,
       },
     },
@@ -108,11 +120,11 @@ export const decorators = [
   (Story: StoryFn, context: { globals: { online: any; sentryEnabled: boolean; locale?: string } }) => {
     const isOnline = context.globals.online;
     const sentryEnabled = context.globals.sentryEnabled;
-    const locale = context.globals.locale || 'en-gb';
+    const locale = context.globals.locale;
     const prevSentryEnabled = React.useRef(sentryEnabled);
 
     // Handle Sentry enable/disable
-     useEffect(() => {
+    useEffect(() => {
       if (prevSentryEnabled.current !== sentryEnabled) {
         // @ts-ignore
         window.tabiyaConfig.FRONTEND_ENABLE_SENTRY = btoa(sentryEnabled);
@@ -140,10 +152,10 @@ export const decorators = [
       };
 
       i18n.changeLanguage(locale); // switch to toolbar-selected locale
-      i18n.on('languageChanged', handleLanguageChange);
+      i18n.on("languageChanged", handleLanguageChange);
 
       return () => {
-        i18n.off('languageChanged', handleLanguageChange);
+        i18n.off("languageChanged", handleLanguageChange);
       };
     }, [locale]);
 

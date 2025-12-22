@@ -1,6 +1,6 @@
 # UI Styling Guidelines
 
-At [Tabiya](https://tabiya.tech/), we follow these UI guidelines to ensure consistency and maintainability in our
+At [Fundacion Empujar](https://tabiya.tech/), we follow these UI guidelines to ensure consistency and maintainability in our
 project's user interface.
 
 Additionally, we have a [Styles Stories in Storybook](src/theme/applicationTheme) to visualize various aspects

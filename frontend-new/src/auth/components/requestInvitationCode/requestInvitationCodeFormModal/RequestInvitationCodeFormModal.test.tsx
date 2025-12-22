@@ -108,7 +108,7 @@ describe("RequestInvitationCodeFormModal", () => {
     });
     // AND the notification should be displayed
     expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-      "Your request for access to Brujula has been submitted successfully. We will get back to you soon.",
+      "Your request for access to Brújula has been submitted successfully. We will get back to you soon.",
       { variant: "success" }
     );
   });

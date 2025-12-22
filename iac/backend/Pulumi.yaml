@@ -1,4 +1,4 @@
 name: compass-backend
 runtime:
   name: python
-description: Tabiya Compass Backend Infrastructure
+description: Brújula Backend Infrastructure

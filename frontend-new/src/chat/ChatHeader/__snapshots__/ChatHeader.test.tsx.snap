@@ -13,22 +13,22 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     style="line-height: 0;"
   >
     <img
-      alt="Brujula Logo"
+      alt="Brújula Logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
       height="48"
       src="/brujula.svg"
     />
   </a>
   <h1
-    class="MuiTypography-root MuiTypography-h1 css-1m1rxeh-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h1 css-1gssl5s-MuiTypography-root"
   >
-    Brujula
+    Brújula
   </h1>
   <div
     class="MuiBox-root css-1n05jrb"
   >
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-sgk6ea-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-experiences-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="view experiences"
@@ -69,7 +69,39 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       />
     </button>
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-6g7loi-MuiButtonBase-root-MuiIconButton-root"
+      data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+      tabindex="0"
+      title="Language Selector"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        data-testid="LanguageOutlinedIcon"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2m6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56M12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56m2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8M12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96M14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2m.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56M16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2z"
+        />
+      </svg>
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <div
+      data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
+    >
+      <div
+        data-testid="english-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+      >
+        English
+      </div>
+      ;
+    </div>
+    <button
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-sgk6ea-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-user-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="user info"
@@ -92,11 +124,6 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       data-testid="start-new-conversation-7413b63a-887b-4f41-b930-89e9770db12b"
     >
       start new conversation
-    </div>
-    <div
-      data-testid="settings-selector-7413b63a-887b-4f41-b930-89e9770db12b"
-    >
-      settings
     </div>
     <div
       data-testid="logout-button-7413b63a-887b-4f41-b930-89e9770db12b"
@@ -124,22 +151,22 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
     style="line-height: 0;"
   >
     <img
-      alt="Brujula Logo"
+      alt="Brújula Logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
       height="48"
       src="/brujula.svg"
     />
   </a>
   <h1
-    class="MuiTypography-root MuiTypography-h1 css-1m1rxeh-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h1 css-1gssl5s-MuiTypography-root"
   >
-    Brujula
+    Brújula
   </h1>
   <div
     class="MuiBox-root css-1n05jrb"
   >
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-sgk6ea-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-experiences-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="view experiences"
@@ -175,7 +202,7 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
           class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-9cqolc-MuiBadge-badge"
         >
           <span
-            class="css-1tmou61"
+            class="css-1fsksa"
           >
             1
           </span>
@@ -186,7 +213,39 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       />
     </button>
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-6g7loi-MuiButtonBase-root-MuiIconButton-root"
+      data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+      tabindex="0"
+      title="Language Selector"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        data-testid="LanguageOutlinedIcon"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2m6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56M12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56m2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8M12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96M14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2m.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56M16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2z"
+        />
+      </svg>
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <div
+      data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
+    >
+      <div
+        data-testid="english-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+      >
+        English
+      </div>
+      ;
+    </div>
+    <button
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-sgk6ea-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-user-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="user info"
@@ -209,11 +268,6 @@ exports[`ChatHeader should render the Chat Header with exploredExperiencesNotifi
       data-testid="start-new-conversation-7413b63a-887b-4f41-b930-89e9770db12b"
     >
       start new conversation
-    </div>
-    <div
-      data-testid="settings-selector-7413b63a-887b-4f41-b930-89e9770db12b"
-    >
-      settings
     </div>
     <div
       data-testid="logout-button-7413b63a-887b-4f41-b930-89e9770db12b"
@@ -241,22 +295,22 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
     style="line-height: 0;"
   >
     <img
-      alt="Brujula Logo"
+      alt="Brújula Logo"
       data-testid="chat-header-logo-7413b63a-887b-4f41-b930-89e9770db12b"
       height="48"
       src="/brujula.svg"
     />
   </a>
   <h1
-    class="MuiTypography-root MuiTypography-h1 css-1m1rxeh-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h1 css-1gssl5s-MuiTypography-root"
   >
-    Brujula
+    Brújula
   </h1>
   <div
     class="MuiBox-root css-1n05jrb"
   >
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-sgk6ea-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-experiences-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="view experiences"
@@ -292,7 +346,7 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
           class="MuiBadge-badge MuiBadge-standard MuiBadge-invisible MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-ohrnoc-MuiBadge-badge"
         >
           <span
-            class="css-1tmou61"
+            class="css-1fsksa"
           >
             0
           </span>
@@ -303,7 +357,7 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
       />
     </button>
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-sgk6ea-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-feedback-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="give feedback"
@@ -325,7 +379,39 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
       />
     </button>
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-6g7loi-MuiButtonBase-root-MuiIconButton-root"
+      data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+      tabindex="0"
+      title="Language Selector"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        data-testid="LanguageOutlinedIcon"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2m6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56M12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56m2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8M12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96M14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2m.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56M16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2z"
+        />
+      </svg>
+      <span
+        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
+    <div
+      data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
+    >
+      <div
+        data-testid="english-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
+      >
+        English
+      </div>
+      ;
+    </div>
+    <button
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-sgk6ea-MuiButtonBase-root-MuiIconButton-root"
       data-testid="chat-header-button-user-7413b63a-887b-4f41-b930-89e9770db12b"
       tabindex="0"
       title="user info"
@@ -348,11 +434,6 @@ exports[`ChatHeader should show feedback button when sentry is initialized 1`] =
       data-testid="start-new-conversation-7413b63a-887b-4f41-b930-89e9770db12b"
     >
       start new conversation
-    </div>
-    <div
-      data-testid="settings-selector-7413b63a-887b-4f41-b930-89e9770db12b"
-    >
-      settings
     </div>
     <div
       data-testid="report-bug-button-7413b63a-887b-4f41-b930-89e9770db12b"

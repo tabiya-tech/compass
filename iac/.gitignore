@@ -6,3 +6,4 @@ venv-iac
 keys/
 _tmp/
 cfgs/
+.venv/

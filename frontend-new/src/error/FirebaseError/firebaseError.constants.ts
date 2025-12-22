@@ -22,29 +22,30 @@ export enum FirebaseErrorCodes {
 
 /**
  * Map of error codes to i18n translation keys for user-friendly messages.
- * Consumers should resolve these via i18n.t(USER_FRIENDLY_FIREBASE_ERROR_MESSAGES[code]).
+ * Consumers should resolve these via i18n.t(USER_FRIENDLY_FIREBASE_ERROR_I18N_KEYS[code]).
  **/
-export const USER_FRIENDLY_FIREBASE_ERROR_MESSAGES: Record<FirebaseErrorCodes, string> = {
-  [FirebaseErrorCodes.EMAIL_ALREADY_IN_USE]: "firebase_error_email_already_in_use",
-  [FirebaseErrorCodes.EMAIL_NOT_VERIFIED]: "firebase_error_email_not_verified",
-  [FirebaseErrorCodes.INVALID_CREDENTIAL]: "firebase_error_invalid_credential",
-  [FirebaseErrorCodes.INVALID_EMAIL]: "firebase_error_invalid_email",
-  [FirebaseErrorCodes.OPERATION_NOT_ALLOWED]: "firebase_error_operation_not_allowed",
-  [FirebaseErrorCodes.WEAK_PASSWORD]: "firebase_error_weak_password",
-  [FirebaseErrorCodes.USER_DISABLED]: "firebase_error_user_disabled",
-  [FirebaseErrorCodes.USER_NOT_FOUND]: "firebase_error_user_not_found",
-  [FirebaseErrorCodes.WRONG_PASSWORD]: "firebase_error_wrong_password",
-  [FirebaseErrorCodes.TOO_MANY_REQUESTS]: "firebase_error_too_many_requests",
-  [FirebaseErrorCodes.INTERNAL_ERROR]: "firebase_error_internal_error",
-  [FirebaseErrorCodes.TOO_MANY_USERS]: "firebase_error_too_many_users",
-  [FirebaseErrorCodes.INVALID_REGISTRATION_CODE]: "firebase_error_invalid_registration_code",
-  [FirebaseErrorCodes.INVALID_INVITATION_CODE]: "firebase_error_invalid_invitation_code",
-  [FirebaseErrorCodes.INVALID_INVITATION_TYPE]: "firebase_error_invalid_invitation_type",
-  [FirebaseErrorCodes.INVALID_REGISTRATION_TYPE]: "firebase_error_invalid_registration_type",
-  [FirebaseErrorCodes.POPUP_CLOSED_BY_USER]: "firebase_error_popup_closed_by_user",
-  [FirebaseErrorCodes.INVALID_LOGIN_METHOD]: "firebase_error_invalid_login_method",
-  [FirebaseErrorCodes.EMAIL_ALREADY_VERIFIED]: "firebase_error_email_already_verified",
+export const USER_FRIENDLY_FIREBASE_ERROR_I18N_KEYS: Record<FirebaseErrorCodes, string> = {
+  [FirebaseErrorCodes.EMAIL_ALREADY_IN_USE]: "auth.errors.firebase.emailAlreadyInUse",
+  [FirebaseErrorCodes.EMAIL_NOT_VERIFIED]: "auth.errors.firebase.emailNotVerified",
+  [FirebaseErrorCodes.INVALID_CREDENTIAL]: "auth.errors.firebase.invalidCredential",
+  [FirebaseErrorCodes.INVALID_EMAIL]: "auth.errors.firebase.invalidEmail",
+  [FirebaseErrorCodes.OPERATION_NOT_ALLOWED]: "auth.errors.firebase.operationNotAllowed",
+  [FirebaseErrorCodes.WEAK_PASSWORD]: "auth.errors.firebase.weakPassword",
+  [FirebaseErrorCodes.USER_DISABLED]: "auth.errors.firebase.userDisabled",
+  [FirebaseErrorCodes.USER_NOT_FOUND]: "auth.errors.firebase.userNotFound",
+  [FirebaseErrorCodes.WRONG_PASSWORD]: "auth.errors.firebase.wrongPassword",
+  [FirebaseErrorCodes.TOO_MANY_REQUESTS]: "auth.errors.firebase.tooManyRequests",
+  [FirebaseErrorCodes.INTERNAL_ERROR]: "auth.errors.firebase.internalError",
+  [FirebaseErrorCodes.TOO_MANY_USERS]: "auth.errors.firebase.tooManyUsers",
+  [FirebaseErrorCodes.INVALID_REGISTRATION_CODE]: "auth.errors.firebase.invalidRegistrationCode",
+  [FirebaseErrorCodes.INVALID_INVITATION_CODE]: "auth.errors.firebase.invalidInvitationCode",
+  [FirebaseErrorCodes.INVALID_INVITATION_TYPE]: "auth.errors.firebase.invalidInvitationType",
+  [FirebaseErrorCodes.INVALID_REGISTRATION_TYPE]: "auth.errors.firebase.invalidRegistrationType",
+  [FirebaseErrorCodes.POPUP_CLOSED_BY_USER]: "auth.errors.firebase.popupClosedByUser",
+  [FirebaseErrorCodes.INVALID_LOGIN_METHOD]: "auth.errors.firebase.invalidLoginMethod",
+  [FirebaseErrorCodes.EMAIL_ALREADY_VERIFIED]: "auth.errors.firebase.emailAlreadyVerified"
 };
+
 
 export function isFirebaseErrorCode(value: string): value is FirebaseErrorCodes {
   return Object.values(FirebaseErrorCodes).includes(value as FirebaseErrorCodes);

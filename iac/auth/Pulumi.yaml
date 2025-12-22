@@ -1,4 +1,4 @@
 name: compass-auth
 runtime:
   name: python
-description: Tabiya Compass Authentication Infrastructure
+description: Brújula Authentication Infrastructure

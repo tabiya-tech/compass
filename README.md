@@ -3,9 +3,9 @@
 <img src="https://raw.githubusercontent.com/tabiya-tech/docs/refs/heads/main/.gitbook/assets/compass_logo_web_dark.png#gh-light-mode-only" alt="logo" width=300/>
 </h1>
 
-**Brujula by Tabiya** is an AI chatbot designed to assist job-seekers in exploring and discovering their skills.
+**Brújula by Fundacion Empujar** is an AI chatbot designed to assist job-seekers in exploring and discovering their skills.
 
-Brujula has two objectives: 
+Brújula has two objectives: 
 - Populate a digital skill wallet that captures the experience of job-seekers, including the
 skills inherent in their formal and informal work.
 - By doing so, guide job-seekers in exploring and discovering
@@ -27,7 +27,7 @@ their skills and interests based on their lived experiences.
 
 ## Contribution Guidelines
 
-🎉 Thank you for considering contributing to Tabiya Brujula! 🎉
+🎉 Thank you for considering contributing to Fundacion Empujar Brújula! 🎉
 
 ### Conventional Commits
 

@@ -15,7 +15,7 @@ exports[`AuthHeader tests should not render subtitle if not passed 1`] = `
       style="max-width: 60%; margin: 5% 10%;"
     />
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-cg2f42-MuiButtonBase-root-MuiIconButton-root"
       data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
       tabindex="0"
       title="Language Selector"
@@ -38,7 +38,7 @@ exports[`AuthHeader tests should not render subtitle if not passed 1`] = `
     </button>
   </div>
   <h4
-    class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1ubhg5d-MuiTypography-root"
     data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
   >
     Only title
@@ -61,7 +61,7 @@ exports[`AuthHeader tests should render the AuthHeader 1`] = `
       style="max-width: 60%; margin: 5% 10%;"
     />
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-cg2f42-MuiButtonBase-root-MuiIconButton-root"
       data-testid="auth-language-selector-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
       tabindex="0"
       title="Language Selector"
@@ -84,7 +84,7 @@ exports[`AuthHeader tests should render the AuthHeader 1`] = `
     </button>
   </div>
   <h4
-    class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1ubhg5d-MuiTypography-root"
     data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
   >
     Test title

@@ -167,7 +167,7 @@ async def test_qna_agent_responds_to_multiple_questions_in_a_row(fake_conversati
         assert conciseness_eval.score > 70, f"reasoning: {conciseness_eval.reasoning}"
         assert "TRUE" in await _evaluate_with_llm(
             f"""Respond with TRUE if given the conversation below, the EVALUATED_AGENT responds to each question 
-                about Brujula, not going into unnecessary detail and sticking to facts. 
+                about Brújula, not going into unnecessary detail and sticking to facts. 
                 Otherwise respond with FALSE. Provide a reason.
                 CONVERSATION:
                 {evaluation_record.generate_conversation()}

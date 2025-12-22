@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, keyframes, Typography, useTheme } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import ChatBubble from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import { MessageContainer } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
@@ -64,30 +65,31 @@ const StyledCustomLink: React.FC<React.ComponentProps<typeof CustomLink>> = (pro
 };
 
 const CancellableTypingChatMessage: React.FC<CancellableTypingChatMessageProps> = ({
-  message = UI_TEXT.TYPING,
-  thinkingMessage = UI_TEXT.THINKING,
+  message,
+  thinkingMessage,
   waitBeforeThinking = WAIT_BEFORE_THINKING,
   disabled = false,
   onCancel,
 }) => {
-  const [displayText, setDisplayText] = useState(message);
+  const { t } = useTranslation();
+  const [displayText, setDisplayText] = useState(message || t("cv.cancellableTypingChatMessage.typing"));
   const theme = useTheme();
 
   // Update displayText when message prop changes
   useEffect(() => {
-    setDisplayText(message);
-  }, [message]);
+    setDisplayText(message || t("cv.cancellableTypingChatMessage.typing"));
+  }, [message, t]);
 
   useEffect(() => {
     // Change text after waitBeforeThinking duration
     const textChangeTimer = setTimeout(() => {
-      setDisplayText(thinkingMessage);
+      setDisplayText(thinkingMessage || t("cv.cancellableTypingChatMessage.thinking"));
     }, waitBeforeThinking);
 
     return () => {
       clearTimeout(textChangeTimer);
     };
-  }, [waitBeforeThinking, thinkingMessage]);
+  }, [waitBeforeThinking, thinkingMessage, t]);
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -133,7 +135,7 @@ const CancellableTypingChatMessage: React.FC<CancellableTypingChatMessageProps> 
               </Box>
               <StyledCustomLink onClick={onCancel} disabled={disabled} data-testid={DATA_TEST_ID.CANCEL_BUTTON}>
                 <HighlightOffIcon />
-                {UI_TEXT.CANCEL}
+                {t("cv.cancellableTypingChatMessage.cancel")}
               </StyledCustomLink>
             </Box>
           </ChatBubble>

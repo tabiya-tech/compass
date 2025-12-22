@@ -11,7 +11,7 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
       class="MuiBox-root css-8atqhb"
     >
       <div
-        class="MuiBox-root css-u9ttk8"
+        class="MuiBox-root css-9qh4u2"
         data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
         origin="COMPASS"
       >
@@ -61,7 +61,7 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
                 class="MuiBox-root css-ruvgho"
               >
                 <div
-                  class="MuiBox-root css-zs7r0q"
+                  class="MuiBox-root css-5mlsia"
                 >
                   LOWEST
                 </div>
@@ -70,7 +70,7 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
                 class="MuiBox-root css-ruvgho"
               >
                 <div
-                  class="MuiBox-root css-zs7r0q"
+                  class="MuiBox-root css-5mlsia"
                 >
                   SECOND LOWEST
                 </div>
@@ -79,7 +79,7 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
                 class="MuiBox-root css-ruvgho"
               >
                 <div
-                  class="MuiBox-root css-13gukws"
+                  class="MuiBox-root css-1bizni1"
                 >
                   MIDDLE
                 </div>
@@ -88,7 +88,7 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
                 class="MuiBox-root css-ruvgho"
               >
                 <div
-                  class="MuiBox-root css-zs7r0q"
+                  class="MuiBox-root css-5mlsia"
                 >
                   SECOND HIGHEST
                 </div>
@@ -97,7 +97,7 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
                 class="MuiBox-root css-ruvgho"
               >
                 <div
-                  class="MuiBox-root css-zs7r0q"
+                  class="MuiBox-root css-5mlsia"
                 >
                   HIGHEST
                 </div>
@@ -107,19 +107,19 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
               class="MuiBox-root css-1w3y7iw"
             >
               <div
-                class="MuiBox-root css-1cxuz5j"
+                class="MuiBox-root css-1ocgm8z"
               />
               <div
-                class="MuiBox-root css-1cxuz5j"
+                class="MuiBox-root css-1ocgm8z"
               />
               <div
                 class="MuiBox-root css-5ou94c"
               />
               <div
-                class="MuiBox-root css-1cxuz5j"
+                class="MuiBox-root css-1ocgm8z"
               />
               <div
-                class="MuiBox-root css-1cxuz5j"
+                class="MuiBox-root css-1ocgm8z"
               />
             </div>
             <div

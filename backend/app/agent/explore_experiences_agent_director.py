@@ -190,7 +190,7 @@ class ExploreExperiencesAgentDirector(Agent):
 
         if not current_experience:
             message = AgentOutput(
-                message_for_user=t("messages", "explore_experiences.no_more_experiences"),
+                message_for_user=t("messages", "exploreExperiences.noMoreExperiences"),
                 finished=True,
                 agent_type=self._agent_type,
                 agent_response_time_in_sec=0,
@@ -245,13 +245,13 @@ class ExploreExperiencesAgentDirector(Agent):
                 state.current_experience_uuid = None
             else:
                 # if the current experience does not have any responsibilities, then we should skip this experience
-                # as there is no information to link and ran, and we should move to the next experience
+                # as there is no information to link and rank, and we should move to the next experience
                 current_experience.dive_in_phase = DiveInPhase.PROCESSED
                 state.current_experience_uuid = None
                 agent_output = AgentOutput(
                     message_for_user=t(
                         "messages",
-                        "explore_experiences.skipped_experience_missing_details",
+                        "exploreExperiences.skippedExperienceMissingDetails",
                         experience_title=current_experience.experience.experience_title,
                     ),
                     finished=False,
@@ -277,7 +277,7 @@ class ExploreExperiencesAgentDirector(Agent):
             if not _next_experience:
                 # No more experiences to process, we are done
                 return AgentOutput(
-                    message_for_user=t("messages", "explore_experiences.finished_all"),
+                    message_for_user=t("messages", "exploreExperiences.finishedAll"),
                     finished=True,
                     agent_type=self._agent_type,
                     agent_response_time_in_sec=0,
@@ -390,7 +390,7 @@ class ExploreExperiencesAgentDirector(Agent):
         # construct a summary of the skills
         skills_summary = "\n"
         if len(current_experience.top_skills) == 0:
-            skills_summary += f"• {t('messages', 'explore_experiences.no_skills_identified')}\n"
+            skills_summary += f"• {t('messages', 'exploreExperiences.noSkillsIdentified')}\n"
         else:
             for skill in current_experience.top_skills:
                 skills_summary += f"• {skill.preferredLabel}\n"
@@ -409,7 +409,7 @@ class ExploreExperiencesAgentDirector(Agent):
         agent_output: AgentOutput = AgentOutput(
             message_for_user=t(
                 "messages",
-                "explore_experiences.link_and_rank.summary_message",
+                "exploreExperiences.linkAndRank.summaryMessage",
                 experience_title=current_experience.experience_title,
                 summary=current_experience.summary,
                 top_count=len(current_experience.top_skills),

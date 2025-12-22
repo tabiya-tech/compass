@@ -1,4 +1,4 @@
-# Brujula Backend
+# Brújula Backend
 
 ## Prerequisites
 
@@ -54,7 +54,7 @@ poetry install --sync
 
 ## Running the code locally
 
-The backend is a FastAPI app that serves the Brujula API.
+The backend is a FastAPI app that serves the Brújula API.
 
 When running the code locally, the backend will use the credentials and the project set in the Google Cloud SDK.
 
@@ -275,7 +275,7 @@ Assuming the `.env` file is in the root directory of the project and the service
 named `credentials.json` is in a folder named `keys` in the root directory and a mongodb instance is running locally (`mongodb://localhost:27017`).
 
 ```dotenv
-TAXONOMY_MONGODB_URI=mongodb+srv://<USERNAME>:<PASSORD>@<CLUSTER>/?retryWrites=true&w=majority&appName=Brujula-Dev
+TAXONOMY_MONGODB_URI=mongodb+srv://<USERNAME>:<PASSORD>@<CLUSTER>/?retryWrites=true&w=majority&appName=Brújula-Dev
 TAXONOMY_DATABASE_NAME=brujula-taxonomy-dev
 TAXONOMY_MODEL_ID=<MODEL_ID>
 APPLICATION_MONGODB_URI=mongodb://localhost:27017
@@ -369,7 +369,7 @@ Use the [generate_taxonomy_embeddings.py](scripts/embeddings/generate_taxonomy_e
 skills.
 
 The script reads
-the occupations and skills from the Platform Taxonomy MongoDB database and generates the embeddings for the Brujula Taxonomy database.
+the occupations and skills from the Platform Taxonomy MongoDB database and generates the embeddings for the Brújula Taxonomy database.
 
 The script requires environment variables, please refer to the [class ScriptSettings](scripts/embeddings/_base_data_settings.py)  for more information.
 The environment variables **must** be run before running the script. Also, the script **must** be authenticated with the Google Cloud SDK and have permissions

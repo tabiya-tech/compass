@@ -5,6 +5,7 @@ import pytest
 from tqdm import tqdm
 
 from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
+from app.i18n.translation_service import get_i18n_manager
 from app.vector_search.vector_search_dependencies import SearchServices
 from common_libs.test_utilities import get_random_session_id
 from evaluation_tests.conversation_libs import conversation_generator
@@ -41,6 +42,7 @@ async def test_main_app_chat(
     logger = logging.getLogger()
     logger.info(f"Running test case {current_test_case.name}")
     session_id = get_random_session_id()
+    get_i18n_manager().set_locale(current_test_case.locale)
     search_services = await setup_search_services
     experience_pipeline_config = ExperiencePipelineConfig.model_validate(
         {"number_of_clusters": current_test_case.given_number_of_clusters,

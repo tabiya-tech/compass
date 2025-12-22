@@ -56,23 +56,23 @@
     },
     "upload": {
       "errors": {
-        "maxFileSize": "Selected file is too large. Maximum size is 3 MB.",
-        "tooDense": "The uploaded file content is too long to process. Please reduce its length and try again.",
-        "emptyParse": "We couldn't detect experiences in your CV. Please check the file and try again.",
-        "generic": "Failed to parse your CV. Please try again or use a different file.",
-        "rateLimit": "Too many uploads at once. Please wait one minute and try again.",
-        "maxUploadsReached": "You've reached the maximum number of CV uploads for this conversation. Further uploads aren't allowed.",
-        "duplicate": "This CV has already been uploaded. Select it from your previously uploaded CVs.",
-        "unsupportedFileType": "Unsupported file type. Allowed: PDF, DOCX, TXT.",
-        "timeout": "The upload timed out. Please try again.",
-        "unauthorized": "You are not authorized. Please sign in again.",
-        "uploadNotFound": "Upload not found. It may have failed to start.",
-        "cvMarkdownTooLong": "Your CV content is too long. Please shorten your CV and try again."
+        "maxFileSize": "El archivo seleccionado es demasiado grande. El tamaño máximo es 3 MB.",
+        "tooDense": "El contenido del archivo subido es demasiado largo para procesar. Por favor, reducí su longitud e intentá de nuevo.",
+        "emptyParse": "No pudimos detectar experiencias en tu CV. Por favor, verificá el archivo e intentá de nuevo.",
+        "generic": "Error al analizar tu CV. Por favor, intentá de nuevo o usá un archivo diferente.",
+        "rateLimit": "Demasiadas subidas a la vez. Por favor, esperá un minuto e intentá de nuevo.",
+        "maxUploadsReached": "Alcanzaste el número máximo de subidas de CV para esta conversación. No se permiten más subidas.",
+        "duplicate": "Este CV ya fue subido. Seleccionalo de tus CVs subidos anteriormente.",
+        "unsupportedFileType": "Tipo de archivo no soportado. Permitidos: PDF, DOCX, TXT.",
+        "timeout": "La subida expiró. Por favor, intentá de nuevo.",
+        "unauthorized": "No estás autorizado. Por favor, iniciá sesión de nuevo.",
+        "uploadNotFound": "Subida no encontrada. Es posible que haya fallado al iniciar.",
+        "cvMarkdownTooLong": "El contenido de tu CV es demasiado largo. Por favor, acortá tu CV e intentá de nuevo."
       }
     },
     "errors": {
-      "updateState": "No se pudo actualizar el estado del ranking de habilidades. Por favor inténtalo más tarde.",
-      "generic": "Algo salió mal. Por favor inténtalo de nuevo.",
+      "updateState": "No se pudo actualizar el estado del ranking de habilidades. Probá de nuevo más tarde.",
+      "generic": "Algo salió mal. Probá de nuevo.",
       "api": {
         "requestTooLong": "Los datos enviados al servicio parecen ser demasiado grandes. Intentá nuevamente con un contenido más pequeño. Si el problema persiste, limpiá la caché de tu navegador y actualizá la página.",
         "tooManyRequests": "Parece que estás realizando demasiadas solicitudes. Intentá nuevamente más tarde.",
@@ -102,7 +102,7 @@
   },
   "chat": {
     "chatMessageField": {
-      "addActionAriaLabel": "añadir",
+      "addActionAriaLabel": "agregar",
       "moreActionsTooltip": "más acciones",
       "sendMessageTooltip": "enviar mensaje",
       "placeholders": {
@@ -112,17 +112,16 @@
         "default": "Escribe tu mensaje...",
         "uploading": "Subiendo CV..."
       },
-      "uploadCvIntro": "You can upload your CV as soon as we start exploring your experiences",
-      "uploadCvCollectExperiences": "Attach your CV to the conversation",
-      "uploadCvOtherPhase": "CV upload is only available during experience collection",
-      "uploadCvLabel": "Upload CV",
-      "viewUploadedLabel": "Previously uploaded CVs",
-      "viewUploadedDescription": "Attach your uploaded CV to the conversation"
+      "uploadCvIntro": "Podés subir tu CV tan pronto como empecemos a explorar tus experiencias",
+      "uploadCvCollectExperiences": "PDF, DOCX, TXT • Máximo {{MAX_FILE_SIZE_MB}} MB • {{MAX_MARKDOWN_CHARS}} caracteres como límite",
+      "uploadCvOtherPhase": "La subida de CV solo está disponible durante la recopilación de experiencias",
+      "uploadCvLabel": "Subir CV",
+      "viewUploadedLabel": "CVs subidos anteriormente"
     },
     "chatMessage": {
       "typingChatMessage": {
         "typing": "Escribiendo",
-        "thinking": "La IA está pensando, por favor espera"
+        "thinking": "La IA está pensando, por favor esperá"
       },
       "conversationConclusionFooter": {
         "youCanNow": "Ahora puedes",
@@ -171,10 +170,10 @@
       }
     },
     "util": {
-      "feedbackThankYou": "Gracias por tomarte el tiempo de compartir tus valiosos comentarios.",
+      "feedbackThankYou": "Gracias por tomarte el tiempo de compartir tus comentarios.",
       "ratingThankYou": "Gracias por calificar Brújula.",
-      "errorSomethingWentWrong": "Lo siento, parece que algo salió mal de mi lado... ¿Puedes actualizar la página e intentarlo de nuevo?",
-      "errorPleaseRepeat": "Lo siento, parece que algo salió mal de mi lado... ¿Puedes repetir eso?",
+      "errorSomethingWentWrong": "Perdón, parece que algo salió mal de mi lado... ¿Podés actualizar la página e intentarlo de nuevo?",
+      "errorPleaseRepeat": "Perdón, parece que algo salió mal de mi lado... ¿Podés repetir eso?",
       "messages": {
         "experiencesIntro": "Estas son mis experiencias:"
       }
@@ -206,19 +205,19 @@
       }
     },
     "cvUploadPolling": {
-      "uploadingCv": "Uploading CV",
-      "cancelled": "CV upload cancelled",
-      "uploadedSuccessfully": "CV uploaded successfully",
-      "converting": "Converting CV",
-      "processing": "Processing CV",
-      "extractingExperiences": "Extracting experiences",
-      "savingCv": "Saving CV",
-      "failed": "CV upload failed",
-      "failedToStart": "Failed to start upload.",
-      "networkErrorStatus": "Network error while checking upload status.",
-      "failedToCancel": "Failed to cancel upload",
-      "uploadingFileNamed": "Uploading {{filename}}...",
-      "thinkingMessage": "Processing your CV, this might take a while..."
+      "uploadingCv": "Subiendo CV",
+      "cancelled": "Subida de CV cancelada",
+      "uploadedSuccessfully": "CV subido exitosamente",
+      "converting": "Convirtiendo CV",
+      "processing": "Procesando CV",
+      "extractingExperiences": "Extrayendo experiencias",
+      "savingCv": "Guardando CV",
+      "failed": "Error al subir CV",
+      "failedToStart": "Error al iniciar la subida.",
+      "networkErrorStatus": "Error de red al verificar el estado de la subida.",
+      "failedToCancel": "Error al cancelar la subida",
+      "uploadingFileNamed": "Subiendo {{filename}}...",
+      "thinkingMessage": "Procesando tu CV, esto puede tardar un rato..."
     },
     "chatHeader": {
       "viewExperiences": "Ver experiencias",
@@ -229,13 +228,22 @@
       "feedbackSuccessMessage": "¡Gracias por tus comentarios!",
       "giveGeneralFeedback": "Dar comentarios generales",
       "userInfo": "Información del usuario",
-      "userIconAlt": "Icono de usuario",
+      "userIconAlt": "Ícono de usuario",
       "beforeYouGo": "Antes de irte",
       "logoutConfirmationMessage": "¿Estás seguro de que deseas cerrar sesión?",
       "anonymousAccountWarning": "Actualmente estás usando una cuenta anónima. Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
       "logoutWarningAnonymous": "Si cierras sesión, perderás el acceso a tu historial de conversaciones y experiencias.",
       "createAccountToSaveProgress": "Crea una cuenta para guardar tu progreso",
-      "continueYourJourneyLater": "y continuar tu experiencia más tarde."
+      "continueYourJourneyLater": "y continuar tu experiencia más tarde.",
+      "formTitle": "Dar comentarios generales",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "emailLabel": "Correo electrónico",
+      "descriptionLabel": "Descripción",
+      "emailPlaceholder": "tu.correo@ejemplo.org",
+      "addScreenshot": "Agregar una captura de pantalla",
+      "requiredLabel": "(obligatorio)",
+      "cancelButton": "Cancelar"
     }
   },
   "auth": {
@@ -275,7 +283,8 @@
         "continueAsGuest": "Continuar como invitado",
         "subtitleBold": "Descubre todo tu potencial",
         "subtitleBody": "Descubre y expresa tus habilidades a través de conversaciones naturales guiadas por IA. Crea tu perfil de habilidades y descarga un CV para impulsar tu búsqueda de empleo. Crea una cuenta gratuita para guardar tu progreso y volver a consultar tu historial de conversaciones.",
-        "invitationCodeValid": "El código de invitación es válido"
+        "invitationCodeValid": "El código de invitación es válido",
+        "welcome": "¡Bienvenido!"
       },
       "verifyEmail": {
         "registrationThankYou": "Gracias por registrarte en Brújula.",
@@ -343,7 +352,7 @@
       "preferencesFetchFailedWithMessage": "Se produjo un error al obtener tus preferencias: {{message}}",
       "firebase": {
         "emailAlreadyInUse": "La dirección de correo ya está en uso por otra cuenta.",
-        "emailNotVerified": "El correo que estás usando está registrado, pero aún no ha sido verificado. Por favor verifica tu correo para continuar.",
+        "emailNotVerified": "El correo que estás usando está registrado, pero aún no ha sido verificado. Por favor verificá tu correo para continuar.",
         "invalidCredential": "El correo/contraseña proporcionados no son válidos.",
         "invalidEmail": "La dirección de correo no es válida.",
         "operationNotAllowed": "Las cuentas de correo/contraseña no están habilitadas.",
@@ -351,13 +360,13 @@
         "userDisabled": "La cuenta de usuario ha sido deshabilitada.",
         "userNotFound": "No se encontró un usuario con las credenciales proporcionadas.",
         "wrongPassword": "La contraseña no es válida.",
-        "tooManyRequests": "Hemos bloqueado todas las solicitudes desde este dispositivo debido a actividad inusual. Inténtalo de nuevo más tarde.",
-        "internalError": "Ha ocurrido un error interno.",
+        "tooManyRequests": "Bloqueamos todas las solicitudes desde este dispositivo por actividad inusual. Intentá más tarde.",
+        "internalError": "Ocurrió un error interno.",
         "tooManyUsers": "Hay demasiados usuarios en este proyecto de Firebase.",
-        "invalidRegistrationCode": "El código de registro ingresado no es válido. Verifica el código e inténtalo nuevamente.",
-        "invalidInvitationCode": "El código de invitación ingresado no es válido. Verifica el código e inténtalo nuevamente.",
-        "invalidInvitationType": "El código que usaste es para registro y no para inicio de sesión. Ve a la página de registro.",
-        "invalidRegistrationType": "El código que usaste es para inicio de sesión y no para registro. Ve a la página de inicio de sesión.",
+        "invalidRegistrationCode": "El código de registro ingresado no es válido. Verificá el código e intentá nuevamente.",
+        "invalidInvitationCode": "El código de invitación ingresado no es válido. Verificá el código e intentá nuevamente.",
+        "invalidInvitationType": "El código que usaste es para registro y no para inicio de sesión. Andá a la página de registro.",
+        "invalidRegistrationType": "El código que usaste es para inicio de sesión y no para registro. Andá a la página de inicio de sesión.",
         "popupClosedByUser": "La ventana emergente de Google se cerró antes de completar el inicio de sesión.",
         "invalidLoginMethod": "Esta operación no está permitida con el método de inicio de sesión actual.",
         "emailAlreadyVerified": "La dirección de correo ya está verificada."
@@ -367,15 +376,20 @@
   },
   "cv": {
     "cvTypingChatMessage": {
-      "uploading": "Please wait while I upload and parse your CV",
-      "uploadedReady": "Your CV content is in the text field. Review it and send when ready."
+      "uploading": "Por favor esperá mientras subo y analizo tu CV",
+      "uploadedReady": "El contenido de tu CV está en el campo de texto. Revisalo y envialo cuando estés listo."
     },
     "uploadedCVsMenu": {
-      "backTitle": "Back to main menu",
-      "titleWithCount": "Previously uploaded CVs ({{count}})",
-      "helpCollect": "Tap a CV to load its content into the text field. Review and send when you're ready.",
-      "helpDisabled": "CV selection is only available during the experience collection phase.",
-      "empty": "No uploaded CVs found."
+      "backTitle": "Volver al menú principal",
+      "titleWithCount": "CVs subidos anteriormente ({{count}})",
+      "helpCollect": "Tocá un CV para cargar su contenido en el campo de texto. Revisalo y envialo cuando estés listo.",
+      "helpDisabled": "La selección de CV solo está disponible durante la fase de recopilación de experiencias.",
+      "empty": "No se encontraron CVs subidos."
+    },
+    "cancellableTypingChatMessage": {
+      "typing": "Escribiendo",
+      "thinking": "Por favor, espera, esto podría tomar un momento",
+      "cancel": "Cancelar"
     }
   },
   "experiences": {
@@ -390,11 +404,11 @@
             }
           },
           "updateSuccess": "¡Experiencia actualizada con éxito!",
-          "updateFailed": "Error al actualizar la experiencia. Por favor, inténtalo más tarde.",
+          "updateFailed": "Error al actualizar la experiencia. Por favor, intentá más tarde.",
           "skillsAddedSuccess": "¡Habilidades agregadas con éxito!",
           "editTitle": "Editar experiencia",
           "infoLabel": "Información de la experiencia",
-          "infoHelp": "Toca un campo para actualizar el tipo de trabajo, título, fechas, empresa, ubicación o resumen de tu experiencia.",
+          "infoHelp": "Tocá un campo para actualizar el tipo de trabajo, título, fechas, empresa, ubicación o resumen de tu experiencia.",
           "field": {
             "experienceTitlePlaceholder": "Título de la experiencia",
             "experienceTitleRequired": "* Se requiere el título de la experiencia",
@@ -403,20 +417,25 @@
             "companyPlaceholder": "Empresa",
             "locationPlaceholder": "Ubicación"
           },
-          "topSkillsHelpEdit": "Toca una habilidad para ver más detalles. Usa el menú para cambiar la etiqueta y el ícono de eliminar para quitarla. Toca el botón Agregar habilidad para añadir más.",
+          "topSkillsHelpEdit": "Tocá una habilidad para ver más detalles. Usá el menú para cambiar la etiqueta y el ícono de eliminar para quitarla. Tocá el botón Agregar habilidad para sumar más.",
           "addSkillButton": "Agregar habilidad",
           "updatingBackdrop": "Actualizando experiencia...",
           "maxCharsAllowed": "Máximo {{count}} caracteres permitidos."
         },
+        "experiencesDrawerHeader": {
+          "closeTitle": "Cerrar experiencias"
+        },
         "experiencesDrawerContent": {
           "menu": {
+            "edit": "Editar",
+            "delete": "Eliminar",
             "revert": "Revertir"
           },
-          "actionsUnavailableUntilExplored": "Estas acciones estarán disponibles una vez que hayas discutido la experiencia en detalle con Brújula.",
+          "actionsUnavailableUntilExplored": "Estas acciones van a estar disponibles cuando hayas conversado sobre la experiencia en detalle con Brújula.",
           "moreOptionsTitle": "Más opciones",
           "topSkillsLabel": "Habilidades principales",
-          "topSkillsHelp": "Toca una habilidad para ver más detalles.",
-          "noSkillsYet": "Aún no se han descubierto habilidades",
+          "topSkillsHelp": "Tocá una habilidad para ver más detalles.",
+          "noSkillsYet": "Todavía no se descubrieron habilidades",
           "untitled": "¡Sin título!"
         },
         "skillPopover": {
@@ -424,13 +443,13 @@
         },
         "restoreExperiencesDrawer": {
           "title": "Restaurar experiencias",
-          "fetchFailed": "Error al obtener experiencias eliminadas. Por favor, inténtalo más tarde.",
+          "fetchFailed": "Error al obtener experiencias eliminadas. Por favor, intentá más tarde.",
           "empty": "No se encontraron experiencias eliminadas."
         },
         "downloadReportButton": {
           "downloadCv": "Descargar CV",
           "downloading": "Descargando",
-          "helpTipBlockedMessage": "No puedes descargar el informe hasta que termines de explorar al menos una experiencia."
+          "helpTipBlockedMessage": "No podés descargar el informe hasta que termines de explorar al menos una experiencia."
         }
       },
       "deleteSuccess": "¡Experiencia eliminada con éxito!",
@@ -472,14 +491,21 @@
       },
       "deletingBackdrop": "Eliminando experiencia...",
       "restoringBackdrop": "Restaurando experiencia...",
-      "emptyStateMessage": "Aún no hemos descubierto experiencias. Sigamos conversando.",
+      "emptyStateMessage": "Todavía no descubrimos experiencias. Sigamos chateando.",
       "util": {
         "workTypeDescription": {
-          "selfEmployment": "Trabajas por tu cuenta, diriges tu propio negocio o realizas trabajos freelance o por contrato",
-          "formalSectorWagedEmployment": "Tienes un trabajo remunerado y trabajas para un empleador, empresa u organización",
+          "selfEmployment": "Trabajás por tu cuenta, dirigís tu propio negocio o hacés trabajos freelance o por contrato",
+          "formalSectorWagedEmployment": "Tenés un trabajo remunerado y trabajás para un empleador, empresa u organización",
           "formalSectorUnpaidTraineeWork": "Estás en un rol de formación o pasantía para adquirir habilidades o experiencia",
-          "unseenUnpaid": "Realizas trabajo no remunerado como cuidado, tareas del hogar o voluntariado comunitario",
+          "unseenUnpaid": "Realizás trabajo no remunerado como cuidado, tareas del hogar o voluntariado comunitario",
           "uncategorized": "Brújula no pudo categorizar este tipo de trabajo"
+        },
+        "errors": {
+          "experienceTitleMaxLength": "Máximo {{max}} de caracteres permitido.",
+          "companyMaxLength": "Máximo {{max}} de caracteres permitido.",
+          "locationMaxLength": "Máximo {{max}} de caracteres permitido.",
+          "summaryMaxLength": "Máximo {{max}} de caracteres permitido.",
+          "timelineMaxLength": "Máximo {{max}} de caracteres permitido."
         }
       }
     },
@@ -493,54 +519,55 @@
       "traineeWorkTitle": "Trabajo como aprendiz",
       "uncategorizedTitle": "Sin categoría",
       "topSkillsTitle": "Habilidades principales: ",
-      "skillsDescriptionText": "A continuación encontrarás una lista de las habilidades descubiertas durante tu conversación con Brújula, junto con sus descripciones.",
+      "skillsDescriptionText": "A continuación vas a encontrar una lista de las habilidades descubiertas durante tu conversación con Brújula, junto con sus descripciones.",
       "disclaimer": {
         "final": "Este informe resume la información clave recopilada durante una conversación con Brújula el {{date}}. Brújula es un chatbot de IA que ayuda a las personas que buscan empleo a explorar sus habilidades y experiencias. Esta información puede usarse para guiar la búsqueda de empleo y resaltar sus habilidades al postular, especialmente durante entrevistas con posibles empleadores."
-      }
+      },
+      "bodyText": "Este informe resume la información clave recopilada durante una conversación con Brújula el {{date}}. Brújula es un chatbot de IA que ayuda a las personas que buscan empleo a explorar sus habilidades y experiencias. Este informe presenta la experiencia laboral de la persona candidata y las habilidades identificadas en cada experiencia. Esta información puede usarse para guiar la búsqueda de empleo y resaltar sus habilidades al postular, especialmente durante entrevistas con posibles empleadores. Puede ser un buen punto de partida para crear un CV completo."
     }
   },
   "features": {
     "skillsRanking": {
       "components": {
         "skillsRankingPrompt": {
-          "mainMessage": "¡Casi terminamos! Responde unas pocas preguntas finales de investigación y te enviaremos <0>{{compensationAmount}}</0> de saldo una vez que completes todas las tareas."
+          "mainMessage": "¡Ya casi! Respondé unas pocas preguntas finales y te vamos a enviar <0>{{compensationAmount}}</0> de crédito cuando termines todas las tareas."
         },
         "skillsRankingBriefing": {
-          "introWorkBased": "Si te interesa, puedo calcular qué porcentaje de las oportunidades en <0>{{jobPlatformUrl}}</0> coincide con tus habilidades y cómo te comparas con otros buscadores — solo necesitas mostrarme cuánto valor tiene esta información para ti.",
-          "introTimeBased": "Si te interesa, puedo calcular qué porcentaje de las oportunidades en <0>{{jobPlatformUrl}}</0> coincide con tus habilidades y cómo te comparas con otros buscadores. Esto puede tomar algo de tiempo — si no quieres esperar más, puedes hacer clic en <0>cancelar</0> en cualquier momento en el siguiente mensaje mientras calculo. Cuando estés listo haz clic en <1>continuar</1>.",
-          "puzzleInstructions": "Verás letras inclinadas en algunas pantallas. Gira cada letra hasta ponerla derecha utilizando los botones de rotación. Puedes cancelar en cualquier momento. En el 5% de los casos, <0>más letras corregidas = mayor probabilidad de recibir la información.</0> El resto del tiempo depende de mí.",
+          "introWorkBased": "Si te interesa, puedo calcular qué parte de las oportunidades en <0>{{jobPlatformUrl}}</0> coincide con tus habilidades y cómo te comparás con otras personas que buscan trabajo — solo tenés que mostrarme cuánto valor te aporta esta información.",
+          "introTimeBased": "Si te interesa, puedo calcular qué parte de las oportunidades en <0>{{jobPlatformUrl}}</0> coincide con tus habilidades y cómo te comparás con otras personas. Esto puede llevar un rato — si no querés esperar más, podés hacer clic en <0>cancelar</0> en cualquier momento en el próximo mensaje mientras calculo. Cuando estés listo hacé clic en <1>continuar</1>.",
+          "puzzleInstructions": "Vas a ver letras inclinadas en algunas pantallas. Girá cada letra hasta ponerla derecha usando los botones. Podés cancelar en cualquier momento. En el 5% de los casos, <0>más letras corregidas = más chance de recibir la información.</0> El resto del tiempo depende de mí.",
           "failedToContinue": "No se pudo continuar. Por favor, inténtalo más tarde."
         },
         "skillsRankingProofOfValue": {
-          "waitingMessage": "Espera mientras realizo los cálculos, o haz clic en cancelar en cualquier momento si ya no quieres seguir esperando la información.",
+          "waitingMessage": "Esperá mientras hago los cálculos, o hacé clic en cancelar en cualquier momento si ya no querés esperar la información.",
           "puzzleAutoCompleteMessage": "Completando automáticamente los rompecabezas restantes..."
         },
         "skillsRankingCompletionAdvice": {
-          "adviceMessage": "Un consejo: Estos números son para ti. ¿Cómo podrían cambiar la forma en que buscas puestos esta semana? Haz una pausa y considera dónde tu tiempo y energía se invierten mejor en tu estrategia para encontrar empleo."
+          "adviceMessage": "Un consejo: Estos números son para vos. ¿Cómo podrían cambiar la forma en que buscás puestos esta semana? Hacé una pausa y pensá dónde conviene más poner tu tiempo y tu energía en tu estrategia para encontrar trabajo."
         },
         "skillsRankingRetypedRank": {
-          "question_1": "Última pregunta: recordemos lo que te dije más arriba sobre tu propio encaje con las oportunidades:",
-          "question_2": "vuelve a revisar lo que dije tres mensajes atrás, qué porcentaje de oportunidades",
+          "question_1": "Última pregunta: recordemos lo que te dije más arriba sobre tu encaje con las oportunidades:",
+          "question_2": "volvé a mirar lo que dije tres mensajes atrás, qué porcentaje de oportunidades",
           "question_3": " en",
-          "question_4": " cumples con las habilidades clave?",
-          "sliderAria": "Control deslizante percentil de rango reescrito"
+          "question_4": " cumplís con las habilidades clave?",
+          "sliderAria": "Slider percentil de rango reescrito"
         },
         "skillsRankingPerceivedRank": {
-          "questionWithDisclosure": "Ahora, piensa en estos 100 usuarios de <0>{{jobPlatformUrl}}</0>, que son mayormente buscadores de empleo de Sudáfrica de 18–34 años con un 'matric' de una escuela de township o rural. <0>¿Exactamente cuántos de esos 100</0> crees que encajarían con <0>menos oportunidades</0> en <0>{{jobPlatformUrl}}</0> <0>que tú</0>?",
-          "questionWithoutDisclosure": "Antes de terminar de verdad nuestra conversación, tengo solo una última pregunta relacionada con lo anterior — si piensas en 100 personas que son buscadores de empleo de Sudáfrica de 18–34 años con un 'matric' de una escuela de township o rural. ¿Cuántos de esos 100 crees que encajarían con <0>menos puestos</0> en <1>{{jobPlatformUrl}}</1> que tú?",
-          "sliderAria": "Control deslizante percentil de rango percibido"
+          "questionWithDisclosure": "Ahora, pensá en estos 100 usuarios de <0>{{jobPlatformUrl}}</0>, que son en su mayoría buscadores de empleo de Sudáfrica de 18–34 años con 'matric' de una escuela de township o rural. <0>¿Exactamente cuántos de esos 100</0> creés que encajan con <0>menos oportunidades</0> en <0>{{jobPlatformUrl}}</0> <0>que vos</0>?",
+          "questionWithoutDisclosure": "Antes de terminar de verdad nuestra charla, tengo una última pregunta relacionada con lo anterior — si pensás en 100 personas que buscan trabajo en Sudáfrica, de 18–34 años y con 'matric' de una escuela de township o rural. ¿Cuántos de esos 100 creés que encajan con <0>menos puestos</0> en <1>{{jobPlatformUrl}}</1> que vos?",
+          "sliderAria": "Slider percentil de rango percibido"
         },
         "skillsRankingDisclosure": {
           "skillsRankingMarketDisclosure": {
-            "message_1": "Cumples las habilidades clave para el ",
+            "message_1": "Cumplís las habilidades clave para el ",
             "message_2": " de las oportunidades publicadas en ",
-            "message_3": ". ¡Es un rango sólido de opciones!"
+            "message_3": ". ¡Es un buen rango de opciones!"
           },
           "skillsRankingJobSeekerDisclosure": {
-            "pendingMessage": "¡Gracias! Estamos verificando las últimas oportunidades de {{jobPlatformUrl}} para que los números sean precisos. Compartiremos tus resultados pronto o puedes preguntar por ellos cuando te llamemos para la encuesta telefónica.",
+            "pendingMessage": "¡Gracias! Estamos verificando las últimas oportunidades de {{jobPlatformUrl}} para que los números sean precisos. Compartiremos tus resultados pronto o podés preguntar por ellos cuando te llamemos para la encuesta telefónica.",
             "comparisonPart1_prefix": "Además, ",
             "comparisonPart1_main": "Comparado con otros usuarios de \n{{jobPlatformUrl}}\n, estás en el grupo [\n{{groupIndex}}\n] de \n{{groupTotal}}\n.",
-            "comparisonPart2_prefix": "Imagina alinear a 100 usuarios de \n{{jobPlatformUrl}}\n desde los que encajan con menos hasta los que encajan con más puestos. Dividimos la fila en cinco bloques de 20 personas. El bloque 1 (los 20 más altos) encaja con más puestos; el bloque 5 (los 20 más bajos) con menos. Estás en el bloque ",
+            "comparisonPart2_prefix": "Imaginá alinear a 100 usuarios de \n{{jobPlatformUrl}}\n desde quienes encajan con menos hasta quienes encajan con más puestos. Dividimos la fila en cinco bloques de 20. El bloque 1 (los 20 más altos) encaja con más puestos; el bloque 5 (los 20 más bajos) con menos. Estás en el bloque ",
             "comparisonPart2_group": "[\n{{groupIndex}}\n]",
             "comparisonPart2_middle": ", que es el bloque ",
             "comparisonPart2_label": "[\n{{comparisonLabel}}\n]",
@@ -549,10 +576,10 @@
           }
         },
         "rotateToSolve": {
-          "instructions1": "Gira cada letra hasta que quede derecha. Selecciona una letra haciendo clic y luego gírala en sentido horario con",
+          "instructions1": "Girá cada letra hasta que quede derecha. Seleccioná una letra haciendo clic y después girala en sentido horario con",
           "instructions2": " o antihorario con.",
-          "allCompleteMessage": "¡Todos los rompecabezas completados! ¡Bien hecho!",
-          "puzzleCompleteMessage": "¡Rompecabezas completado! Resuelve otro o cancela si no te interesa tanto la información.",
+          "allCompleteMessage": "¡Todos los rompecabezas completos! ¡Bien hecho!",
+          "puzzleCompleteMessage": "¡Rompecabezas completo! Resolvé otro o cancelá si no te interesa tanto la información.",
           "rotateLeftAria": "Rotar carácter en sentido antihorario",
           "rotateRightAria": "Rotar carácter en sentido horario"
         }
@@ -612,7 +639,7 @@
         "refreshPage": "Actualizar página"
       },
       "enumField": {
-        "pleaseSelectX": "Por favor, seleccione {{x}}",
+        "pleaseSelectX": "Por favor, seleccioná {{x}}",
         "clearSelection": "Limpiar selección"
       }
     }
@@ -626,7 +653,7 @@
             "ratingLabelLow": "Insatisfecho",
             "ratingLabelHigh": "Satisfecho",
             "submitSuccess": "¡Calificación enviada con éxito!",
-            "submitError": "Error al enviar la calificación. Por favor, inténtalo más tarde."
+            "submitError": "Error al enviar la calificación. Por favor, intentá más tarde."
           },
           "feedbackFormContent": {
             "previous": "Anterior",
@@ -677,24 +704,23 @@
       }
     }
   },
-  "theme":{
-    "confirmModalDialog":{
-        "closeConfirmModal": "Cerrar modal de confirmación"
+  "theme": {
+    "confirmModalDialog": {
+      "closeConfirmModal": "Cerrar modal de confirmación"
     },
     "passwordInput": {
       "togglePasswordVisibility": "Mostrar u ocultar contraseña"
     },
-    "helpTip":{
+    "helpTip": {
       "tooltip": "ayuda"
-    }
-    ,
+    },
     "backdrop": {
       "inactiveBackdrop": {
-        "title": "¿Sigues aquí?",
-        "tapAnywhere": "Toca en cualquier parte para continuar..."
+        "title": "Sesión pausada por inactividad.",
+        "tapAnywhere": "Tocá en cualquier lugar para continuar."
       }
     }
-  }, 
+  },
   "i18n": {
     "languageContextMenu": {
       "selector": "Selector de idioma"
@@ -710,5 +736,23 @@
     "easy": "Fácil",
     "unlikely": "Poco probable",
     "likely": "Probable"
+  },
+  "steps": {
+    "biasAndExperience": "Sesgo y Precisión de la Experiencia",
+    "skillAccuracy": "Precisión de Habilidades",
+    "finalFeedback": "Comentarios finales"
+  },
+  "labels": {
+    "inaccurate": "Inexacto",
+    "veryAccurate": "Muy preciso",
+    "difficult": "Difícil",
+    "easy": "Fácil",
+    "unlikely": "Improbable",
+    "likely": "Probable"
+  },
+  "buttons": {
+    "submit": "Enviar",
+    "next": "Siguiente",
+    "previous": "Anterior"
   }
 }

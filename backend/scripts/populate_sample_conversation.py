@@ -382,7 +382,7 @@ def create_sample_conversation_history() -> ConversationHistory:
             ),
             output=AgentOutput(
                 message_id=str(ObjectId()),
-                message_for_user="Welcome! I'm Brujula, your skills exploration guide. Are you ready to begin?",
+                message_for_user="Welcome! I'm Brújula, your skills exploration guide. Are you ready to begin?",
                 finished=False,
                 agent_type=AgentType.WELCOME_AGENT,
                 agent_response_time_in_sec=0.5,

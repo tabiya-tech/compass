@@ -1,0 +1,65 @@
+{
+  "welcomeAgentFirstEncounter": "¡Bienvenido! Soy Brújula, y estoy aquí para ayudarte a capturar y resaltar tus habilidades.\nAsí es como funciona este proceso:\n\n• Primero, te pediré una breve descripción de tu trabajo, incluyendo actividades no remuneradas como voluntariados o contribuciones familiares.\n• A medida que conversemos, tu CV tomará forma.\n• Una vez cubiertos los aspectos básicos, profundizaremos en cada experiencia para registrar los detalles clave.\n\nConcéntrate en lo que más te importa. Puedes dedicar entre 10 y 15 minutos por experiencia laboral, así que planea con tiempo.\nSi lo necesitas, puedes crear una cuenta y volver más tarde para continuar.\n\nSi tienes alguna pregunta, no dudes en hacerla.\n\n¿Listo para comenzar?",
+  "collectExperiences": {
+    "didNotUnderstand": "Perdón, no entendí eso. ¿Podrías reformularlo?",
+    "moveToOtherExperiences": "Pasemos a otras experiencias laborales.",
+    "finalMessage": "Gracias por compartir tus experiencias. Pasemos al siguiente paso.",
+    "noExperienceCollected": "Todavía no se ha recopilado información sobre experiencias.",
+    "allFieldsFilled": "Todos los campos han sido completados.",
+    "allFieldsNotFilled": "Aún hay campos sin completar.",
+    "workType": {
+      "formalWagedDescription": "trabajar para una empresa o el negocio de otra persona a cambio de dinero",
+      "unpaidTraineeDescription": "trabajo no remunerado como aprendiz en una empresa u organización",
+      "selfEmploymentDescription": "tener mi propio negocio, hacer trabajos por cuenta propia o por contrato",
+      "unseenUnpaidDescription": "trabajo no remunerado como voluntariado comunitario, cuidados a mi familia u otra, ayuda en un hogar",
+      "noneDescription": "sin experiencia laboral",
+      "notSupported": "tipo de trabajo no compatible"
+    },
+    "fields": {
+      "experienceTitle": "título de la experiencia",
+      "paidWork": "trabajo remunerado",
+      "workType": "tipo de trabajo",
+      "startDate": "fecha de inicio",
+      "endDate": "fecha de finalización",
+      "company": "empresa/receptor del trabajo",
+      "location": "ubicación"
+    },
+    "askAboutType": "Preguntame sobre experiencias que incluyan: {experience_type}",
+    "recapPrompt": "Hagamos un repaso y dame la oportunidad de corregir cualquier error."
+  },
+  "exploreExperiences": {
+    "noMoreExperiences": "Parece que no hay más experiencias para conversar.",
+    "skippedExperienceMissingDetails": "He omitido tu experiencia \"{experience_title}\" porque no compartiste suficientes detalles",
+    "finishedAll": "He terminado de explorar todas tus experiencias.",
+    "noSkillsIdentified": "No se identificaron habilidades",
+    "linkAndRank": {
+      "summaryMessage": "Según la información proporcionada sobre tu experiencia como '{experience_title}', aquí tienes un breve resumen:\n\n{summary}\n\nPrincipales {top_count} habilidades demostradas:{skills_summary}"
+    }
+  },
+  "agentDirector": {
+    "finalMessage": "¡La conversación ha finalizado!",
+    "errorRetry": "Estoy teniendo algunas dificultades en este momento, ¿podrías repetir lo que dijiste?",
+    "allAgentsDone": "¡Conversación finalizada, todos los agentes han terminado!",
+    "forcefullyEnded": "La conversación se terminó de manera forzada"
+  },
+  "experience": {
+    "until": "hasta {end_date}",
+    "noTitleProvidedYet": "Sin título aún",
+    "workType": {
+      "short": {
+        "formalSectorWagedEmployment": "Trabajo asalariado",
+        "formalSectorUnpaidTraineeWork": "Práctica no remunerada",
+        "selfEmployment": "Autoempleo",
+        "unseenUnpaid": "Voluntariado/No remunerado"
+      }
+    }
+  },
+  "exploreSkills": {
+    "finalMessage": "¡Gracias por compartir estos detalles! Tengo toda la información que necesito.",
+    "question": {
+      "formalWaged": "¿Qué creés que es importante al trabajar en una empresa así?",
+      "selfEmployment": "¿Qué creés que es importante cuando sos tu propio jefe?",
+      "unseenUnpaid": "¿Qué creés que es más importante al ayudar en la comunidad o cuidar a otras personas?"
+    }
+  }
+}

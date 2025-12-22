@@ -17,7 +17,7 @@ from common_libs.retry import Retry
 from . import DataOperation
 from .._types import CollectedData
 from ...penalty import get_penalty, get_penalty_for_multiple_errors
-from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE
+from app.agent.prompt_template import get_language_style
 
 _TAGS_TO_FILTER = [
     "system instructions",
@@ -72,7 +72,7 @@ class IntentAnalyzerTool:
 
         return GeminiGenerativeLLM(
             system_instructions=_SYSTEM_INSTRUCTIONS.format(previously_extracted_data=previously_extracted_data,
-                                                            language_style=STD_LANGUAGE_STYLE),
+                                                            language_style=get_language_style()),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000
