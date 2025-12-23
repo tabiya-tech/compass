@@ -10,7 +10,7 @@ describe("ExperiencesDrawerHeader", () => {
   test("should render ExperiencesDrawerHeader correctly", () => {
     // GIVEN the ExperiencesDrawerHeader component
     const givenTitle = "FOo Bar";
-    const givenExperiencesDrawerHeader = <ExperiencesDrawerHeader notifyOnClose={jest.fn()} title={givenTitle}/>;
+    const givenExperiencesDrawerHeader = <ExperiencesDrawerHeader notifyOnClose={jest.fn()} title={givenTitle} />;
 
     // WHEN the component is rendered
     render(givenExperiencesDrawerHeader);
@@ -36,7 +36,7 @@ describe("ExperiencesDrawerHeader", () => {
     const givenNotifyOnClose = jest.fn();
     // AND the ExperiencesDrawerHeader component is rendered
     const givenTitle = "Foo Bar";
-    render(<ExperiencesDrawerHeader notifyOnClose={givenNotifyOnClose} title={givenTitle}/>);
+    render(<ExperiencesDrawerHeader notifyOnClose={givenNotifyOnClose} title={givenTitle} />);
 
     // WHEN the close button is clicked
     const closeButton = screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_BUTTON);

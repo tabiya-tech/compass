@@ -4,9 +4,11 @@ import { DuplicateSkillError } from "../error/commonErrors";
 /**
  * Deduplicates skills by UUID and returns information about duplicates found
  */
-export const deduplicateSkills = (skills: Skill[]): { 
-  uniqueSkills: Skill[]; 
-  hasDuplicates: boolean; 
+export const deduplicateSkills = (
+  skills: Skill[]
+): {
+  uniqueSkills: Skill[];
+  hasDuplicates: boolean;
   duplicateCount: number;
   duplicates: Skill[];
 } => {
@@ -28,6 +30,6 @@ export const deduplicateSkills = (skills: Skill[]): {
     uniqueSkills,
     hasDuplicates: duplicates.length > 0,
     duplicateCount: duplicates.length,
-    duplicates
+    duplicates,
   };
 };

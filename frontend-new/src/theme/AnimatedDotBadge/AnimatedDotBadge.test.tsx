@@ -54,5 +54,3 @@ describe("AnimatedDotBadge", () => {
     expect(screen.getByTestId(givenTestId)).toBeInTheDocument();
   });
 });
-
-

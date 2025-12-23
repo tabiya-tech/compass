@@ -18,7 +18,6 @@ import { AuthBroadcastChannel, AuthChannelMessage } from "src/auth/services/auth
 
 type UserCredential = firebase.auth.UserCredential;
 
-
 class FirebaseEmailAuthenticationService extends AuthenticationService {
   private static instance: FirebaseEmailAuthenticationService;
   private readonly stdFirebaseAuthServiceInstance: StdFirebaseAuthenticationService;
@@ -48,10 +47,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
    * @throws {FirebaseError} If login fails or email is not verified
    */
   async login(email: string, password: string): Promise<string> {
-    const firebaseErrorFactory = getFirebaseErrorFactory(
-      "EmailAuthService",
-      "handleLogin",
-    );
+    const firebaseErrorFactory = getFirebaseErrorFactory("EmailAuthService", "handleLogin");
 
     let userCredential;
 
@@ -103,21 +99,18 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
    * @throws {FirebaseError} If registration code is invalid or wrong type
    */
   async register(email: string, password: string, username: string, registrationCode: string): Promise<string> {
-    const firebaseErrorFactory = getFirebaseErrorFactory(
-      "EmailAuthService",
-      "handleRegister",
-    );
+    const firebaseErrorFactory = getFirebaseErrorFactory("EmailAuthService", "handleRegister");
     const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
     if (invitation.status === InvitationStatus.INVALID) {
       throw firebaseErrorFactory(
         FirebaseErrorCodes.INVALID_REGISTRATION_CODE,
-        `the registration code is invalid: ${registrationCode}`,
+        `the registration code is invalid: ${registrationCode}`
       );
     }
     if (invitation.invitation_type !== InvitationType.REGISTER) {
       throw firebaseErrorFactory(
         FirebaseErrorCodes.INVALID_REGISTRATION_TYPE,
-        `the invitation code is not for registration: ${registrationCode}`,
+        `the invitation code is not for registration: ${registrationCode}`
       );
     }
 
@@ -235,11 +228,11 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     const { isValid: isValidFirebaseToken, failureCause: firebaseTokenValidationFailureCause } =
       this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(
         decodedToken as FirebaseToken,
-        FirebaseTokenProvider.PASSWORD,
+        FirebaseTokenProvider.PASSWORD
       );
     if (!isValidFirebaseToken) {
       console.debug(
-        `token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`,
+        `token is not a valid firebase token: ${firebaseTokenValidationFailureCause} - ${formatTokenForLogging(token)}`
       );
       return { isValid: false, decodedToken: null, failureCause: firebaseTokenValidationFailureCause! };
     }
@@ -256,10 +249,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
    * @throws {FirebaseError} If linking fails or verification email fails
    */
   async linkAnonymousAccount(email: string, password: string, username: string): Promise<string> {
-    const firebaseErrorFactory = getFirebaseErrorFactory(
-      "EmailAuthService",
-      "linkAnonymousAccount",
-    );
+    const firebaseErrorFactory = getFirebaseErrorFactory("EmailAuthService", "linkAnonymousAccount");
 
     const currentUser = firebaseAuth.currentUser;
     if (!currentUser) {
@@ -313,10 +303,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
    * @throws {FirebaseError} If sending verification email fails
    */
   async resendVerificationEmail(email: string, password: string): Promise<void> {
-    const firebaseErrorFactory = getFirebaseErrorFactory(
-      "EmailAuthService",
-      "resendVerificationEmail",
-    );
+    const firebaseErrorFactory = getFirebaseErrorFactory("EmailAuthService", "resendVerificationEmail");
 
     let userCredential;
     try {
@@ -347,11 +334,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
    * @throws {FirebaseError} If sending the reset email fails
    */
   async resetPassword(email: string): Promise<void> {
-
-    const firebaseErrorFactory = getFirebaseErrorFactory(
-      "EmailAuthService",
-      "resetPassword",
-    );
+    const firebaseErrorFactory = getFirebaseErrorFactory("EmailAuthService", "resetPassword");
 
     try {
       await firebaseAuth.sendPasswordResetEmail(email);
@@ -366,7 +349,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
    * @returns {boolean} True if an active session exists, false otherwise.
    */
   async isProviderSessionValid(): Promise<boolean> {
-    return await this.stdFirebaseAuthServiceInstance.isAuthSessionValid()
+    return await this.stdFirebaseAuthServiceInstance.isAuthSessionValid();
   }
 }
 

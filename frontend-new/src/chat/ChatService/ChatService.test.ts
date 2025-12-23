@@ -9,7 +9,6 @@ import {
   generateTestHistory,
 } from "src/chat/ChatService/_test_utilities/generateTestChatResponses";
 
-
 describe("ChatService", () => {
   let givenApiServerUrl: string = "/path/to/api";
   beforeEach(() => {
@@ -48,7 +47,7 @@ describe("ChatService", () => {
       const fetchSpy = setupAPIServiceSpy(
         StatusCodes.CREATED,
         expectedRootMessageResponse,
-        "application/json;charset=UTF-8",
+        "application/json;charset=UTF-8"
       );
 
       // WHEN the sendMessage function is called with the given arguments
@@ -126,7 +125,7 @@ describe("ChatService", () => {
             StatusCodes.CREATED,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
-            "",
+            ""
           ),
           cause: expect.anything(),
         };
@@ -135,7 +134,7 @@ describe("ChatService", () => {
         // AND expect no errors or warning to have occurred
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
-      },
+      }
     );
   });
 
@@ -159,7 +158,7 @@ describe("ChatService", () => {
         serviceFunction: "getChatHistory",
         failureMessage: `Failed to get chat history for session id ${givenSessionId}`,
         expectedContentType: "application/json",
-        retryOnFailedToFetch: true
+        retryOnFailedToFetch: true,
       });
 
       // AND returns the history response
@@ -216,7 +215,7 @@ describe("ChatService", () => {
             StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
-            "",
+            ""
           ),
           cause: expect.anything(),
         };
@@ -225,7 +224,7 @@ describe("ChatService", () => {
         // AND expect no errors or warning to have occurred
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
-      },
+      }
     );
   });
 });

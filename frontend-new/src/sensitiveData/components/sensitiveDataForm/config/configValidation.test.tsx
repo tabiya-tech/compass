@@ -126,7 +126,9 @@ describe("Fields Configuration Validation", () => {
     // THEN the component should show an error about missing required fields
     render(<TestComponent />);
     await waitFor(() => {
-      expect(screen.getByText(/Error: SensitiveData: Field 'required' is required and must be a boolean/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Error: SensitiveData: Field 'required' is required and must be a boolean/i)
+      ).toBeInTheDocument();
     });
 
     // AND expect an error to be logged to the console

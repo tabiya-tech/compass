@@ -54,7 +54,7 @@ class TestAuthenticationService extends AuthenticationService {
   }
 
   async isProviderSessionValid(): Promise<boolean> {
-    return false
+    return false;
   }
 }
 
@@ -85,7 +85,6 @@ describe("AuthenticationService", () => {
   });
 
   describe("onSuccessfulLogout", () => {
-
     test("should clear user data and login method", async () => {
       // setup mocks
       jest.spyOn(AuthenticationStateService.getInstance(), "clearUser");
@@ -110,7 +109,6 @@ describe("AuthenticationService", () => {
   });
 
   describe("onSuccessfulLogin", () => {
-
     test("should set user data and preferences on successful login", async () => {
       // GIVEN a token from a given user
       const givenToken = "test-token";
@@ -124,9 +122,11 @@ describe("AuthenticationService", () => {
       // AND the given user has some preferences
       const givenUserPreferences: UserPreference = {
         user_id: "foo-id",
-        sessions:[]
+        sessions: [],
       } as unknown as UserPreference;
-      jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValueOnce(givenUserPreferences);
+      jest
+        .spyOn(UserPreferencesService.getInstance(), "getUserPreferences")
+        .mockResolvedValueOnce(givenUserPreferences);
 
       // WHEN onSuccessfulLogin is called
       await service.onSuccessfulLogin(givenToken);
@@ -174,7 +174,7 @@ describe("AuthenticationService", () => {
         "/",
         StatusCodes.NOT_FOUND,
         "Not Found",
-        "",
+        ""
       );
       jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockRejectedValueOnce(givenError);
 
@@ -191,7 +191,7 @@ describe("AuthenticationService", () => {
       expect(UserPreferencesStateService.getInstance().getUserPreferences()).toBeNull();
       // AND an info message should be logged
       expect(console.info).toHaveBeenCalledWith(
-        `User has not registered! Preferences could not be found for userId: ${givenUser.id}`,
+        `User has not registered! Preferences could not be found for userId: ${givenUser.id}`
       );
       // AND no error should be logged
       expect(console.error).not.toHaveBeenCalled();
@@ -219,7 +219,6 @@ describe("AuthenticationService", () => {
   });
 
   describe("onSuccessfulRegistration", () => {
-
     test("should set user data and create preferences on successful registration", async () => {
       // GIVEN a registration code
       const givenRegistrationCode = "test-registration-code";
@@ -236,9 +235,11 @@ describe("AuthenticationService", () => {
       // AND some user preferences will be created for the user
       const givenReturnedPrefs: UserPreference = {
         user_id: "foo-id",
-        sessions:[]
+        sessions: [],
       } as unknown as UserPreference;
-      jest.spyOn(UserPreferencesService.getInstance(), "createUserPreferences").mockResolvedValueOnce(givenReturnedPrefs);
+      jest
+        .spyOn(UserPreferencesService.getInstance(), "createUserPreferences")
+        .mockResolvedValueOnce(givenReturnedPrefs);
 
       // WHEN onSuccessfulRegistration is called for the given token and registration code
       await service.onSuccessfulRegistration(givenToken, givenRegistrationCode);
@@ -250,7 +251,7 @@ describe("AuthenticationService", () => {
       expect(AuthenticationStateService.getInstance().getUser()).toEqual(givenUser);
 
       // AND new user preferences should be created for the user with the registration code
-      expect((UserPreferencesService.getInstance().createUserPreferences)).toHaveBeenCalledWith({
+      expect(UserPreferencesService.getInstance().createUserPreferences).toHaveBeenCalledWith({
         user_id: givenUser.id,
         invitation_code: givenRegistrationCode,
         language: Language.en,
@@ -375,8 +376,16 @@ describe("AuthenticationService", () => {
     });
 
     test.each([
-      ["expired token", { iat: currentTime - CLOCK_TOLERANCE - 100, exp: currentTime - CLOCK_TOLERANCE - 1 }, "TOKEN_EXPIRED"],
-      ["future token", { iat: currentTime + CLOCK_TOLERANCE + 1, exp: currentTime + CLOCK_TOLERANCE + 100 }, "TOKEN_NOT_YET_VALID"],
+      [
+        "expired token",
+        { iat: currentTime - CLOCK_TOLERANCE - 100, exp: currentTime - CLOCK_TOLERANCE - 1 },
+        "TOKEN_EXPIRED",
+      ],
+      [
+        "future token",
+        { iat: currentTime + CLOCK_TOLERANCE + 1, exp: currentTime + CLOCK_TOLERANCE + 100 },
+        "TOKEN_NOT_YET_VALID",
+      ],
     ])("should return false for %s", (_, payload, expectedFailureCause) => {
       // GIVEN a token with invalid timing
       const givenToken = "invalid-token";

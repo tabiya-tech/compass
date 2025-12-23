@@ -32,7 +32,9 @@ export const generateExperience = (experience: Experience): Paragraph[] => {
         size: 20,
       }),
 
-      ...((experience.timeline.start || experience.timeline.end) && experience.company ? [new TextRun({ text: ", " })] : []),
+      ...((experience.timeline.start || experience.timeline.end) && experience.company
+        ? [new TextRun({ text: ", " })]
+        : []),
 
       // display the company if it exists
       ...(experience.company

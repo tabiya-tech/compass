@@ -1,25 +1,25 @@
 // mute chatty console
 import "src/_test_utilities/consoleMock";
 
-import React from 'react';
-import '@testing-library/jest-dom';
-import { screen, render, waitFor } from 'src/_test_utilities/test-utils';
-import userEvent from '@testing-library/user-event';
-import MultipleSelectField, { DATA_TEST_ID } from './MultipleSelectField';
-import { FieldType, MultipleSelectFieldDefinition } from '../config/types';
+import React from "react";
+import "@testing-library/jest-dom";
+import { screen, render, waitFor } from "src/_test_utilities/test-utils";
+import userEvent from "@testing-library/user-event";
+import MultipleSelectField, { DATA_TEST_ID } from "./MultipleSelectField";
+import { FieldType, MultipleSelectFieldDefinition } from "../config/types";
 
-const getFieldDefinition = () : MultipleSelectFieldDefinition => {
+const getFieldDefinition = (): MultipleSelectFieldDefinition => {
   return {
-    name: 'test',
-    label: 'Test Label',
-    dataKey: 'test',
-    values: ['option1', 'option2'],
+    name: "test",
+    label: "Test Label",
+    dataKey: "test",
+    values: ["option1", "option2"],
     required: false,
     type: FieldType.MultipleSelect,
   };
-}
+};
 
-describe('MultipleSelectField', () => {
+describe("MultipleSelectField", () => {
   // Create a new userEvent instance before each test
   let user: ReturnType<typeof userEvent.setup>;
   beforeEach(() => {
@@ -27,7 +27,7 @@ describe('MultipleSelectField', () => {
     user = userEvent.setup();
   });
 
-  describe('render', () => {
+  describe("render", () => {
     test("should render with the correct label and options", async () => {
       // GIVEN the field definition
       const givenFieldDefinition = getFieldDefinition();
@@ -69,11 +69,11 @@ describe('MultipleSelectField', () => {
       }
     });
 
-    test('should render optional question text when provided', async () => {
+    test("should render optional question text when provided", async () => {
       // GIVEN we render the component with an optional question text
       const givenFieldDefinitionWithQuestionText = {
         ...getFieldDefinition(),
-        questionText: 'Optional text'
+        questionText: "Optional text",
       };
       const givenOnChange = jest.fn();
       render(
@@ -87,13 +87,13 @@ describe('MultipleSelectField', () => {
       // THEN the optional text should be visible
       await waitFor(() => {
         const questionText = screen.getByTestId(DATA_TEST_ID.MULTIPLE_SELECT_FIELD_QUESTION_TEXT);
-        expect(questionText).toHaveTextContent('Optional text');
+        expect(questionText).toHaveTextContent("Optional text");
       });
     });
   });
 
-  describe('action', () => {
-    test('should call onChange when values are selected', async () => {
+  describe("action", () => {
+    test("should call onChange when values are selected", async () => {
       // GIVEN we render the component
       const givenFieldDefinition = getFieldDefinition();
       const givenOnChange = jest.fn();
@@ -127,15 +127,15 @@ describe('MultipleSelectField', () => {
 
       // THEN onChange should be called with the selected values and valid state
       await waitFor(() => {
-        expect(givenOnChange).toHaveBeenCalledWith(['option1', 'option2'], true);
+        expect(givenOnChange).toHaveBeenCalledWith(["option1", "option2"], true);
       });
     });
 
-    test('should show validation error for required field when empty', async () => {
+    test("should show validation error for required field when empty", async () => {
       // GIVEN we render the component as required
       const givenRequiredField = {
         ...getFieldDefinition(),
-        required: true
+        required: true,
       };
       const givenOnChange = jest.fn();
       render(
@@ -168,13 +168,13 @@ describe('MultipleSelectField', () => {
       // THEN the input should show error state
       await waitFor(() => {
         const input = screen.getByTestId(DATA_TEST_ID.MULTIPLE_SELECT_FIELD_SELECT);
-        expect(input).toHaveClass('Mui-error');
+        expect(input).toHaveClass("Mui-error");
       });
-      
+
       // AND the error message should be displayed
       await waitFor(() => {
         const errorMessage = screen.getByTestId(DATA_TEST_ID.MULTIPLE_SELECT_FIELD_HELPER_TEXT);
-        expect(errorMessage).toHaveTextContent('Please select at least one test label');
+        expect(errorMessage).toHaveTextContent("Please select at least one test label");
       });
 
       // AND onChange should be called with empty array and invalid state
@@ -183,7 +183,7 @@ describe('MultipleSelectField', () => {
       });
     });
 
-    test('should initialize with the provided initial values', async () => {
+    test("should initialize with the provided initial values", async () => {
       // GIVEN we render the component with initial values
       const givenFieldDefinition = getFieldDefinition();
       const givenOnChange = jest.fn();
@@ -192,18 +192,18 @@ describe('MultipleSelectField', () => {
           field={givenFieldDefinition}
           dataTestId={DATA_TEST_ID.MULTIPLE_SELECT_FIELD_SELECT}
           onChange={givenOnChange}
-          initialValue={['option1']}
+          initialValue={["option1"]}
         />
       );
 
       // THEN the select should show the initial values
       await waitFor(() => {
         const select = screen.getByTestId(DATA_TEST_ID.MULTIPLE_SELECT_FIELD_SELECT);
-        expect(select).toHaveTextContent('option1');
+        expect(select).toHaveTextContent("option1");
       });
     });
 
-    test('should render chips for selected values', async () => {
+    test("should render chips for selected values", async () => {
       // GIVEN we render the component with initial values
       const givenFieldDefinition = getFieldDefinition();
       const givenOnChange = jest.fn();
@@ -212,23 +212,23 @@ describe('MultipleSelectField', () => {
           field={givenFieldDefinition}
           dataTestId={DATA_TEST_ID.MULTIPLE_SELECT_FIELD_SELECT}
           onChange={givenOnChange}
-          initialValue={['option1', 'option2']}
+          initialValue={["option1", "option2"]}
         />
       );
 
       // THEN chips should be rendered for each selected value
       await waitFor(() => {
         const chip1 = screen.getByTestId(`${DATA_TEST_ID.MULTIPLE_SELECT_FIELD_CHIP}-option1`);
-        expect(chip1).toHaveTextContent('option1');
+        expect(chip1).toHaveTextContent("option1");
       });
 
       await waitFor(() => {
         const chip2 = screen.getByTestId(`${DATA_TEST_ID.MULTIPLE_SELECT_FIELD_CHIP}-option2`);
-        expect(chip2).toHaveTextContent('option2');
+        expect(chip2).toHaveTextContent("option2");
       });
     });
 
-    test('should use default dataTestId when not provided', async () => {
+    test("should use default dataTestId when not provided", async () => {
       // GIVEN we render the component without dataTestId
       const givenFieldDefinition = getFieldDefinition();
       const givenOnChange = jest.fn();
@@ -247,4 +247,4 @@ describe('MultipleSelectField', () => {
       });
     });
   });
-}); 
+});

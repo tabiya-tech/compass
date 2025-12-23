@@ -26,7 +26,6 @@ const ChatMessageFooterLayout: React.FC<ChatMessageFooterLayoutProps> = ({ sende
     >
       {children}
     </Box>
-
   );
 };
 

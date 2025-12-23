@@ -6,7 +6,7 @@ const uniqueId = "480b210a-d548-4fc6-a2c0-35f46e98e537";
 
 export const DATA_TEST_ID = {
   PASSWORD_REQUIREMENTS: `${uniqueId}-password-requirements`,
-}
+};
 
 interface PasswordRequirementsProps {
   validationResults: {
@@ -22,16 +22,19 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({ validationR
   const theme = useTheme();
   const { t } = useTranslation();
 
-  const validationCriteria = useMemo(() => [
-    { label: t("common.validation.passwordMinLength"), isValid: validationResults.isLongEnough },
-    { label: t("common.validation.passwordNeedLowercase"), isValid: validationResults.hasLowercase },
-    { label: t("common.validation.passwordNeedUppercase"), isValid: validationResults.hasUppercase },
-    { label: t("common.validation.passwordNeedNumber"), isValid: validationResults.hasNumber },
-    {
-      label: t("common.validation.passwordNeedSpecialChar"),
-      isValid: validationResults.hasSpecialChar,
-    },
-  ], [validationResults, t]);
+  const validationCriteria = useMemo(
+    () => [
+      { label: t("common.validation.passwordMinLength"), isValid: validationResults.isLongEnough },
+      { label: t("common.validation.passwordNeedLowercase"), isValid: validationResults.hasLowercase },
+      { label: t("common.validation.passwordNeedUppercase"), isValid: validationResults.hasUppercase },
+      { label: t("common.validation.passwordNeedNumber"), isValid: validationResults.hasNumber },
+      {
+        label: t("common.validation.passwordNeedSpecialChar"),
+        isValid: validationResults.hasSpecialChar,
+      },
+    ],
+    [validationResults, t]
+  );
 
   return (
     // we have to use a component that can be a child of a <p>

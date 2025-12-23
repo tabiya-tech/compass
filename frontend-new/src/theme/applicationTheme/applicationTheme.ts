@@ -218,7 +218,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       h2: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.40, 1.975, screenSizeRem),
+        fontSize: CSSClampFnCalculatorRem(1.4, 1.975, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h3: {
@@ -230,7 +230,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       h4: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.30, 1.675, screenSizeRem),
+        fontSize: CSSClampFnCalculatorRem(1.3, 1.675, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h5: {
@@ -242,7 +242,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       h6: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.20, 1.375, screenSizeRem),
+        fontSize: CSSClampFnCalculatorRem(1.2, 1.375, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       subtitle1: {
@@ -292,7 +292,7 @@ export const applicationTheme = (theme: ThemeMode) => {
         fontWeight: "700",
         fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem),
         color: activePalette.text!!.primary,
-      }
+      },
     },
     components: {
       MuiDialogTitle: {
@@ -302,7 +302,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       },
       MuiFormLabel: {
         styleOverrides: {
-          root:({theme}) => ({
+          root: ({ theme }) => ({
             fontSize: theme.typography.caption.fontSize,
             marginBottom: 8,
           }),
@@ -383,16 +383,16 @@ export const applicationTheme = (theme: ThemeMode) => {
             padding: "0",
             color: activePalette.text!.secondary,
             opacity: 0.7,
-            '&.Mui-focused': {
+            "&.Mui-focused": {
               color: activePalette.text!.textBlack,
-            }
+            },
           },
         },
       },
       MuiFormControl: {
         styleOverrides: {
           root: {
-            '& .MuiInputLabel-root': {
+            "& .MuiInputLabel-root": {
               color: activePalette.text!.secondary,
               opacity: 0.7,
             },

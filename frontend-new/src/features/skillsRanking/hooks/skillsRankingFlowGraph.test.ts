@@ -2,7 +2,11 @@
 import "src/_test_utilities/consoleMock";
 
 import { SkillsRankingExperimentGroups, SkillsRankingPhase } from "../types";
-import { getFlowPathForGroup, skillsRankingHappyPathFull, skillsRankingHappyPathSkipped } from "./skillsRankingFlowGraph";
+import {
+  getFlowPathForGroup,
+  skillsRankingHappyPathFull,
+  skillsRankingHappyPathSkipped,
+} from "./skillsRankingFlowGraph";
 
 describe("skillsRankingFlowGraph", () => {
   test("paths are defined as expected", () => {
@@ -35,5 +39,3 @@ describe("skillsRankingFlowGraph", () => {
     expect(getFlowPathForGroup(group)).toBe(expected);
   });
 });
-
-

@@ -200,9 +200,7 @@ describe("Config Hooks", () => {
       expect(result.current.fields).toEqual([]);
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toContain(
-        "Invalid field type for 'unknownFieldName': UNKNOWN",
-      );
+      expect(result.current.error?.message).toContain("Invalid field type for 'unknownFieldName': UNKNOWN");
     });
 
     test("should throw an error if the field has a duplicate data key", async () => {
@@ -236,9 +234,7 @@ describe("Config Hooks", () => {
       expect(result.current.fields).toEqual([]);
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toContain(
-        "Duplicate dataKey 'string_field_name'",
-      );
+      expect(result.current.error?.message).toContain("Duplicate dataKey 'string_field_name'");
     });
 
     test("should throw an error when an unexpected error occurs", async () => {
@@ -322,9 +318,7 @@ describe("Config Hooks", () => {
       expect(result.current.fields).toEqual([]);
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toContain(
-        "Missing label for field 'stringFieldName' (lang=en-US)",
-      );
+      expect(result.current.error?.message).toContain("Missing label for field 'stringFieldName' (lang=en-US)");
     });
   });
 });

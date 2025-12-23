@@ -48,7 +48,7 @@ export default class ExperienceService {
       serviceFunction: "getExperiences",
       failureMessage: "Failed to retrieve experiences",
       expectedContentType: "application/json",
-      retryOnFailedToFetch: true
+      retryOnFailedToFetch: true,
     });
     responseBody = await response.text();
 
@@ -128,7 +128,7 @@ export default class ExperienceService {
       serviceFunction,
       failureMessage: `Failed to retrieve experience with UUID ${experienceId}`,
       expectedContentType: "application/json",
-      retryOnFailedToFetch: true
+      retryOnFailedToFetch: true,
     });
 
     let updatedExperience: Experience;

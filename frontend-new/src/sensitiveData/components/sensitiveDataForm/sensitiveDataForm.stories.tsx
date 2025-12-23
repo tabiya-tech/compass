@@ -96,4 +96,4 @@ export const ShownWithInvalidConfiguration: StoryObj<typeof SensitiveDataForm> =
       },
     ],
   },
-}
+};

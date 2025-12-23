@@ -23,7 +23,6 @@ export const focusAndScrollToField = (ref: React.RefObject<HTMLInputElement>) =>
   // Using setTimeout to delay refocusing to prevent layout shifts.
   isFocusingOnElement = true;
   setTimeout(() => {
-
     // Scroll to the input field
     const yOffset = ref.current?.getBoundingClientRect().top;
     window.scrollTo({ top: yOffset, behavior: "smooth" });

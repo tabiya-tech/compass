@@ -11,9 +11,9 @@ const meta: Meta<typeof ChatProgressBar> = {
       options: Object.values(ConversationPhase),
       control: {
         type: "select",
-      }
-    }
-  }
+      },
+    },
+  },
 };
 
 export default meta;
@@ -30,14 +30,14 @@ export const Shown: Story = {
 export const Initializing: Story = {
   args: {
     percentage: 0,
-    phase: ConversationPhase.INITIALIZING
+    phase: ConversationPhase.INITIALIZING,
   },
 };
 
 export const Introduction: Story = {
   args: {
     percentage: 0,
-    phase: ConversationPhase.INTRO
+    phase: ConversationPhase.INTRO,
   },
 };
 
@@ -62,14 +62,13 @@ export const DiveIn: Story = {
 export const Ended: Story = {
   args: {
     percentage: 100,
-    phase: ConversationPhase.ENDED
+    phase: ConversationPhase.ENDED,
   },
 };
 
 export const Unknown: Story = {
   args: {
     percentage: 0,
-    phase: ConversationPhase.UNKNOWN
+    phase: ConversationPhase.UNKNOWN,
   },
 };
-

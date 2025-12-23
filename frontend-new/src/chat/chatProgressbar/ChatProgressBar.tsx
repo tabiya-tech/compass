@@ -19,16 +19,18 @@ const ChatProgressBar: React.FC<CurrentPhase> = (currentPhase) => {
   const userFriendlyConversationPhaseText = getUserFriendlyConversationPhaseName(currentPhase);
 
   return (
-    <Box sx={{
-      display: "flex",
-      flexDirection: "column",
-      gap: theme.fixedSpacing(theme.tabiyaSpacing.xs),
-      // to match the width of the message list container
-      [theme.breakpoints.up("md")]: {
-        width: "60%",
-        margin: "auto",
-      },
-    }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: theme.fixedSpacing(theme.tabiyaSpacing.xs),
+        // to match the width of the message list container
+        [theme.breakpoints.up("md")]: {
+          width: "60%",
+          margin: "auto",
+        },
+      }}
+    >
       <Box
         data-testid={DATA_TEST_ID.CONTAINER}
         sx={{
@@ -45,9 +47,10 @@ const ChatProgressBar: React.FC<CurrentPhase> = (currentPhase) => {
         <motion.div
           style={{
             backgroundColor: theme.palette.primary.main,
-            height: "100%",gridRow: 1,
+            height: "100%",
+            gridRow: 1,
             borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-            gridColumn: 1
+            gridColumn: 1,
           }}
           initial={{
             width: 0,
@@ -70,10 +73,12 @@ const ChatProgressBar: React.FC<CurrentPhase> = (currentPhase) => {
             paddingX: theme.fixedSpacing(theme.tabiyaSpacing.sm),
             paddingY: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
             gridRow: 1,
-            gridColumn: 1
+            gridColumn: 1,
           }}
         >
-          <Typography variant="progressBarText" lineHeight={1} data-testid={DATA_TEST_ID.PROGRESS_BAR_PHASE_TEXT}>{userFriendlyConversationPhaseText}</Typography>
+          <Typography variant="progressBarText" lineHeight={1} data-testid={DATA_TEST_ID.PROGRESS_BAR_PHASE_TEXT}>
+            {userFriendlyConversationPhaseText}
+          </Typography>
           <Box data-testid={DATA_TEST_ID.PROGRESS_BAR_LABEL}>{percentageInText}</Box>
         </Box>
       </Box>

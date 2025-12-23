@@ -67,15 +67,14 @@ export interface UIInteractionEvent extends BaseMetricsEvent {
   details: Record<string, any>; // Additional details about the interaction
 }
 
-export type MetricsEventUnion = 
-  | CVDownloadedEvent 
-  | DemographicsEvent 
-  | DeviceSpecificationEvent 
+export type MetricsEventUnion =
+  | CVDownloadedEvent
+  | DemographicsEvent
+  | DeviceSpecificationEvent
   | UserLocationEvent
   | NetworkInformationEvent
   | UIInteractionEvent;
 
-
 export type SavableMetricsEventUnion = MetricsEventUnion & {
   client_id: string; // The client ID to associate with the event
-}
+};

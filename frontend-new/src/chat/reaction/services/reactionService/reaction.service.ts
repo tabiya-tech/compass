@@ -23,7 +23,7 @@ export class ReactionService {
     const method = "PUT";
 
     const reactionURL = `${this.reactionEndpointUrl}/${sessionId}/messages/${messageId}/reactions`;
-    
+
     const body: ReactionRequest = {
       kind: reaction.kind,
       reasons: reaction.reasons,

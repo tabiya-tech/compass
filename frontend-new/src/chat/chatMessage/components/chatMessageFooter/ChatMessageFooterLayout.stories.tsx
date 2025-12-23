@@ -19,13 +19,13 @@ export const ShownWithTimestampCompassSender: Story = {
     sender: ConversationMessageSender.COMPASS,
     children: <Timestamp sentAt={new Date().toISOString()} />,
   },
-}
+};
 export const ShownWithTimestampUserSender: Story = {
   args: {
     sender: ConversationMessageSender.USER,
     children: <Timestamp sentAt={new Date().toISOString()} />,
   },
-}
+};
 
 export const OneFullWidthChild: Story = {
   args: {
@@ -36,22 +36,19 @@ export const OneFixedWidthChild: Story = {
   args: {
     children: <VisualMock maxWidth={"200px"} text={"only child"} />,
   },
-}
+};
 
 export const MultipleFullWidthChildren: Story = {
   args: {
-    children: [
-      <VisualMock text={"child 1"} key={"1"}/>,
-      <VisualMock text={"child 2"} key={"2"}/>,
-    ],
+    children: [<VisualMock text={"child 1"} key={"1"} />, <VisualMock text={"child 2"} key={"2"} />],
   },
 };
 
 export const MultipleFixedWidthChildren: Story = {
   args: {
     children: [
-      <VisualMock maxWidth={"200px"} text={"child 1"} key={"1"}/>,
-      <VisualMock maxWidth={"200px"} text={"child 2"} key={"2"}/>,
+      <VisualMock maxWidth={"200px"} text={"child 1"} key={"1"} />,
+      <VisualMock maxWidth={"200px"} text={"child 2"} key={"2"} />,
     ],
   },
 };

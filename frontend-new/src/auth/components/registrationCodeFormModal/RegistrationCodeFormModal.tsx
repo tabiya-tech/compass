@@ -78,7 +78,6 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
     setIsInvitationCodeRequestModalOpen(true);
   };
 
-
   return (
     <>
       <Modal
@@ -137,22 +136,26 @@ const RegistrationCodeFormModal: React.FC<InvitationCodeFormModalProps> = ({ mod
               t("common.buttons.submit")
             )}
           </PrimaryButton>
-          { Sentry.isInitialized() && <Typography
-            variant="caption"
-            sx={{
-              textAlign: "center",
-              marginTop: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-            }}
-          >
-            {t("auth.components.registrationCodeFormModal.noRegistrationCodePrompt")}{" "}
-            <CustomLink onClick={handleOpenRequestModal} data-testid={DATA_TEST_ID.REQUEST_REGISTRATION_CODE_LINK}>
-              {t("auth.components.registrationCodeFormModal.reachOut")}
-            </CustomLink>
-          </Typography>
-          }
+          {Sentry.isInitialized() && (
+            <Typography
+              variant="caption"
+              sx={{
+                textAlign: "center",
+                marginTop: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+              }}
+            >
+              {t("auth.components.registrationCodeFormModal.noRegistrationCodePrompt")}{" "}
+              <CustomLink onClick={handleOpenRequestModal} data-testid={DATA_TEST_ID.REQUEST_REGISTRATION_CODE_LINK}>
+                {t("auth.components.registrationCodeFormModal.reachOut")}
+              </CustomLink>
+            </Typography>
+          )}
         </Box>
       </Modal>
-      <RequestInvitationCodeFormModal open={isInvitationCodeRequestModalOpen} onClose={() => setIsInvitationCodeRequestModalOpen(false)} />
+      <RequestInvitationCodeFormModal
+        open={isInvitationCodeRequestModalOpen}
+        onClose={() => setIsInvitationCodeRequestModalOpen(false)}
+      />
     </>
   );
 };

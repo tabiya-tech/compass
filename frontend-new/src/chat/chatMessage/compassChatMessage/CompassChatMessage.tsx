@@ -23,31 +23,30 @@ export const MessageContainer = styled(Box)<{ origin: ConversationMessageSender 
 export const COMPASS_CHAT_MESSAGE_TYPE = `compass-message-${uniqueId}`;
 
 export interface CompassChatMessageProps {
-    message_id: string;
-    message: string;
-    sent_at: string; // ISO formatted datetime string
-    reaction: MessageReaction | null;
+  message_id: string;
+  message: string;
+  sent_at: string; // ISO formatted datetime string
+  reaction: MessageReaction | null;
 }
 
 const CompassChatMessage: React.FC<CompassChatMessageProps> = ({ message_id, message, sent_at, reaction }) => {
   return (
     <MessageContainer origin={ConversationMessageSender.COMPASS} data-testid={DATA_TEST_ID.CHAT_MESSAGE_CONTAINER}>
-      <Box sx={{
-        width: "fit-content",
-        minWidth: "30%",
-        maxWidth: "80%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start"
-      }}>
+      <Box
+        sx={{
+          width: "fit-content",
+          minWidth: "30%",
+          maxWidth: "80%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+        }}
+      >
         <Box sx={{ width: "100%" }}>
           <ChatBubble message={message} sender={ConversationMessageSender.COMPASS} />
           <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
             <Timestamp sentAt={sent_at} />
-            <ReactionButtons
-              messageId={message_id}
-              currentReaction={reaction}
-            />
+            <ReactionButtons messageId={message_id} currentReaction={reaction} />
           </ChatMessageFooterLayout>
         </Box>
       </Box>

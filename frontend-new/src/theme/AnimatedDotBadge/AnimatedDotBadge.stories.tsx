@@ -25,5 +25,3 @@ export const Hidden: Story = {
     children: <div style={{ width: 40, height: 40, background: "#e0e0e0", borderRadius: 8 }} />,
   },
 };
-
-

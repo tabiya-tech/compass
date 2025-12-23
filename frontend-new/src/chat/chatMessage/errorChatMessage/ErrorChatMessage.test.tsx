@@ -15,7 +15,7 @@ describe("ErrorChatMessage", () => {
 
     // THEN the error message container should be present
     expect(screen.getByTestId(DATA_TEST_ID.ERROR_CHAT_MESSAGE_CONTAINER)).toBeInTheDocument();
-    
+
     // AND the message text should be displayed
     expect(screen.getByText(message)).toBeInTheDocument();
   });
@@ -43,4 +43,4 @@ describe("ErrorChatMessage", () => {
     // THEN the message type should be consistent
     expect(type1).toBe(type2);
   });
-}); 
+});

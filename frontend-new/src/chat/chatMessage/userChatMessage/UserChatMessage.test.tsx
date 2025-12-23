@@ -14,7 +14,9 @@ import { nanoid } from "nanoid";
 import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 
 jest.mock("src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout", () => {
-  const originalModule = jest.requireActual("src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout");
+  const originalModule = jest.requireActual(
+    "src/chat/chatMessage/components/chatMessageFooter/ChatMessageFooterLayout"
+  );
   return {
     __esModule: true,
     ...originalModule,
@@ -32,13 +34,15 @@ jest.mock("src/chat/chatMessage/components/chatBubble/ChatBubble", () => {
 });
 
 jest.mock("src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp", () => {
-  const originalModule = jest.requireActual("src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp");
+  const originalModule = jest.requireActual(
+    "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp"
+  );
   return {
     __esModule: true,
     ...originalModule,
     default: jest.fn(() => <div data-testid={originalModule.DATA_TEST_ID.TIMESTAMP}></div>),
-  }
-})
+  };
+});
 
 describe("render tests", () => {
   beforeAll(() => {
@@ -69,7 +73,9 @@ describe("render tests", () => {
     // AND expect the message bubble to be visible
     expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
     // AND expect the footer to be visible
-    expect(screen.getByTestId(CHAT_MESSAGE_FOOTER_DATA_TEST_ID.CHAT_MESSAGE_FOOTER_LAYOUT_CONTAINER)).toBeInTheDocument();
+    expect(
+      screen.getByTestId(CHAT_MESSAGE_FOOTER_DATA_TEST_ID.CHAT_MESSAGE_FOOTER_LAYOUT_CONTAINER)
+    ).toBeInTheDocument();
 
     // AND the footer to have been called with a timestamp component
     const footerCall = (ChatMessageFooter as jest.Mock).mock.calls[0][0];

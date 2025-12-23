@@ -19,7 +19,11 @@ describe("useAutoScrollOnChange", () => {
 
   const TestComponent: React.FC<{ dep: number }> = ({ dep }) => {
     const ref = useAutoScrollOnChange(dep);
-    return <div data-testid="auto-scroll-root"><div ref={ref} data-testid="auto-scroll-anchor" /></div>;
+    return (
+      <div data-testid="auto-scroll-root">
+        <div ref={ref} data-testid="auto-scroll-anchor" />
+      </div>
+    );
   };
 
   test("should call scrollIntoView on mount and again when dependency changes", () => {
@@ -41,5 +45,3 @@ describe("useAutoScrollOnChange", () => {
     expect(console.warn).not.toHaveBeenCalled();
   });
 });
-
-

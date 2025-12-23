@@ -3,13 +3,33 @@ import { IChatMessage } from "src/chat/Chat.types";
 import { ConversationMessageSender, MessageReaction } from "./ChatService/ChatService.types";
 import { CurrentPhase } from "src/chat/chatProgressbar/types";
 import { InvalidConversationPhasePercentage } from "./errors";
-import UserChatMessage, { UserChatMessageProps, USER_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/userChatMessage/UserChatMessage";
-import CompassChatMessage, { CompassChatMessageProps, COMPASS_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
-import ConversationConclusionChatMessage, { ConversationConclusionChatMessageProps, CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
-import TypingChatMessage, { TypingChatMessageProps, TYPING_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
-import ErrorChatMessage, { ErrorChatMessageProps, ERROR_CHAT_MESSAGE_TYPE } from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
-import CVTypingChatMessage, { CV_TYPING_CHAT_MESSAGE_TYPE, CVTypingChatMessageProps } from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
-import CancellableTypingChatMessage, { CancellableTypingChatMessageProps } from "src/chat/chatMessage/cancellableTypingChatMessage/CancellableTypingChatMessage";
+import UserChatMessage, {
+  UserChatMessageProps,
+  USER_CHAT_MESSAGE_TYPE,
+} from "src/chat/chatMessage/userChatMessage/UserChatMessage";
+import CompassChatMessage, {
+  CompassChatMessageProps,
+  COMPASS_CHAT_MESSAGE_TYPE,
+} from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
+import ConversationConclusionChatMessage, {
+  ConversationConclusionChatMessageProps,
+  CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
+} from "src/chat/chatMessage/conversationConclusionChatMessage/ConversationConclusionChatMessage";
+import TypingChatMessage, {
+  TypingChatMessageProps,
+  TYPING_CHAT_MESSAGE_TYPE,
+} from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
+import ErrorChatMessage, {
+  ErrorChatMessageProps,
+  ERROR_CHAT_MESSAGE_TYPE,
+} from "src/chat/chatMessage/errorChatMessage/ErrorChatMessage";
+import CVTypingChatMessage, {
+  CV_TYPING_CHAT_MESSAGE_TYPE,
+  CVTypingChatMessageProps,
+} from "src/CV/CVTypingChatMessage/CVTypingChatMessage";
+import CancellableTypingChatMessage, {
+  CancellableTypingChatMessageProps,
+} from "src/chat/chatMessage/cancellableTypingChatMessage/CancellableTypingChatMessage";
 import i18n from "src/i18n/i18n";
 
 const uniqueId = "cancellable-cv-typing-message-2a76494f-351d-409d-ba58-e1b2cfaf2a53";

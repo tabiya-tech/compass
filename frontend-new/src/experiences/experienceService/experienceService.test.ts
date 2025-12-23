@@ -57,7 +57,7 @@ describe("ExperienceService", () => {
             serviceName: "ExperienceService",
             serviceFunction: "getExperiences",
             failureMessage: "Failed to retrieve experiences",
-            expectedContentType: "application/json"
+            expectedContentType: "application/json",
           }
         );
         // AND to return the correct experiences

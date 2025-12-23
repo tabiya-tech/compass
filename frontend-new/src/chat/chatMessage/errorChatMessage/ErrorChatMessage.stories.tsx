@@ -27,7 +27,8 @@ export const UserError: Story = {
 
 export const LongErrorMessage: Story = {
   args: {
-    message: "A detailed error message that spans multiple lines and contains more information about what went wrong. This helps users understand the issue better and what they might need to do to resolve it.",
+    message:
+      "A detailed error message that spans multiple lines and contains more information about what went wrong. This helps users understand the issue better and what they might need to do to resolve it.",
   },
 };
 
@@ -36,4 +37,4 @@ export const WithChildren: Story = {
     message: "Error with additional information",
     children: <div style={{ color: "red", fontSize: "0.8em" }}>Additional error details</div>,
   },
-}; 
+};

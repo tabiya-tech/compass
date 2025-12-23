@@ -3,7 +3,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { IChatMessage } from "src/chat/Chat.types";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 import { getRandomSkillsRankingState } from "src/features/skillsRanking/utils/getSkillsRankingState";
-import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState, getLatestPhaseName } from "src/features/skillsRanking/types";
+import {
+  SkillsRankingExperimentGroups,
+  SkillsRankingPhase,
+  SkillsRankingState,
+  getLatestPhaseName,
+} from "src/features/skillsRanking/types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { action } from "@storybook/addon-actions";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";

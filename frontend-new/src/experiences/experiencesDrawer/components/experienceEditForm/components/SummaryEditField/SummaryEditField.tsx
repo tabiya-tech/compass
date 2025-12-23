@@ -80,7 +80,9 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
       const experienceService = ExperienceService.getInstance();
       const originalExperience = await experienceService.getUneditedExperience(sessionId, experience_uuid);
       setSummaryValue(originalExperience.summary ?? "");
-      setSuccessText(t("experiences.experiencesDrawer.components.experienceEditForm.components.summaryEditField.restored"));
+      setSuccessText(
+        t("experiences.experiencesDrawer.components.experienceEditForm.components.summaryEditField.restored")
+      );
       notifyOnChange(
         { target: { value: originalExperience.summary ?? "" } } as React.ChangeEvent<HTMLTextAreaElement>,
         SUMMARY_FIELD_NAME,
@@ -91,7 +93,10 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
       }, 3000); // Clear message after 3 seconds
     } catch (err) {
       console.error(new ExperienceError("Failed to restore summary:", err));
-      enqueueSnackbar(t("experiences.experiencesDrawer.components.experienceEditForm.components.summaryEditField.restoreFailed"), { variant: "error" });
+      enqueueSnackbar(
+        t("experiences.experiencesDrawer.components.experienceEditForm.components.summaryEditField.restoreFailed"),
+        { variant: "error" }
+      );
     } finally {
       setIsRestoring(false);
     }
@@ -154,7 +159,8 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
               >
                 {/* We wanted to have an icon of 20*20; By default, material icon sizes are 24*24
                     We went with using md(16) * 1.25 = 20 */}
-                <RestoreIcon sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md * 1.25) }} /> {t("common.buttons.revert")}
+                <RestoreIcon sx={{ fontSize: theme.fixedSpacing(theme.tabiyaSpacing.md * 1.25) }} />{" "}
+                {t("common.buttons.revert")}
               </StyledCustomLink>
               {/* Other buttons */}
             </Stack>
@@ -167,7 +173,9 @@ const SummaryEditField: React.FC<Readonly<SummaryEditFieldProps>> = ({
             }}
           >
             <InlineEditField
-              placeholder={t("experiences.experiencesDrawer.components.experienceEditForm.components.summaryEditField.summaryPlaceholder")}
+              placeholder={t(
+                "experiences.experiencesDrawer.components.experienceEditForm.components.summaryEditField.summaryPlaceholder"
+              )}
               value={summaryValue}
               onChange={handleInputChange}
               multiline

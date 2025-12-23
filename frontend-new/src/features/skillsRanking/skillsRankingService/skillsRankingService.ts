@@ -115,7 +115,7 @@ export class SkillsRankingService extends FeaturesService {
       serviceFunction: "getSkillsRankingState",
       failureMessage: `Failed to get skills ranking state for session ${sessionId}`,
       expectedContentType: "application/json",
-      retryOnFailedToFetch: true
+      retryOnFailedToFetch: true,
     });
 
     const data = await response.json();
@@ -295,17 +295,26 @@ export class SkillsRankingService extends FeaturesService {
         `Invalid configuration for feature ${this.featureId}: jobPlatformUrl must be a string`
       );
     }
-    if (!config.config.hasOwnProperty("shortTypingDurationMs") || typeof config.config.shortTypingDurationMs !== "number") {
+    if (
+      !config.config.hasOwnProperty("shortTypingDurationMs") ||
+      typeof config.config.shortTypingDurationMs !== "number"
+    ) {
       throw new SkillsRankingError(
         `Invalid configuration for feature ${this.featureId}: shortTypingDurationMs must be a number`
       );
     }
-    if (!config.config.hasOwnProperty("defaultTypingDurationMs") || typeof config.config.defaultTypingDurationMs !== "number") {
+    if (
+      !config.config.hasOwnProperty("defaultTypingDurationMs") ||
+      typeof config.config.defaultTypingDurationMs !== "number"
+    ) {
       throw new SkillsRankingError(
         `Invalid configuration for feature ${this.featureId}: defaultTypingDurationMs must be a number`
       );
     }
-    if (!config.config.hasOwnProperty("longTypingDurationMs") || typeof config.config.longTypingDurationMs !== "number") {
+    if (
+      !config.config.hasOwnProperty("longTypingDurationMs") ||
+      typeof config.config.longTypingDurationMs !== "number"
+    ) {
       throw new SkillsRankingError(
         `Invalid configuration for feature ${this.featureId}: longTypingDurationMs must be a number`
       );

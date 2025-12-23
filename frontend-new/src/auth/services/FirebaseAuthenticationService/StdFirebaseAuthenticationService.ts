@@ -29,7 +29,7 @@ export enum FirebaseTokenProvider {
 export enum FirebaseTokenValidationFailureCause {
   INVALID_FIREBASE_TOKEN = "INVALID_FIREBASE_TOKEN",
   INVALID_FIREBASE_SIGN_IN_PROVIDER = "INVALID_FIREBASE_SIGN_IN_PROVIDER",
-  INVALID_FIREBASE_USER_ID = "INVALID_FIREBASE_USER_ID"
+  INVALID_FIREBASE_USER_ID = "INVALID_FIREBASE_USER_ID",
 }
 /**
  * The FirebaseAuthenticationService is a concrete class that provides common functionality
@@ -55,8 +55,7 @@ class StdFirebaseAuthenticationService {
 
   private static instance: StdFirebaseAuthenticationService;
 
-  private constructor() {
-  }
+  private constructor() {}
 
   static getInstance(): StdFirebaseAuthenticationService {
     if (!this.instance) {
@@ -166,7 +165,6 @@ class StdFirebaseAuthenticationService {
    */
   public cleanup() {
     console.debug("Cleaning up FirebaseAuthService");
-
   }
 
   public getUserFromDecodedToken(decodedToken: FirebaseToken): TabiyaUser {
@@ -212,20 +210,29 @@ class StdFirebaseAuthenticationService {
    */
   public getCurrentUser(): Promise<firebase.User | null> {
     return new Promise((resolve, reject) => {
-      const unsubscribe = firebaseAuth.onAuthStateChanged(user => {
-        if (user) {
-          resolve(user)
-        } else {
-          resolve(null)
-        }
+      const unsubscribe = firebaseAuth.onAuthStateChanged(
+        (user) => {
+          if (user) {
+            resolve(user);
+          } else {
+            resolve(null);
+          }
 
-        unsubscribe()
-      }, firebaseError => {
-        const error = new FirebaseError("StdFirebaseAuthenticationService", "getCurrentUser", "auth/auth-user-is-null", "Failed to get current user from Firebase Auth", firebaseError);
-        reject(error)
-        unsubscribe()
-      })
-    })
+          unsubscribe();
+        },
+        (firebaseError) => {
+          const error = new FirebaseError(
+            "StdFirebaseAuthenticationService",
+            "getCurrentUser",
+            "auth/auth-user-is-null",
+            "Failed to get current user from Firebase Auth",
+            firebaseError
+          );
+          reject(error);
+          unsubscribe();
+        }
+      );
+    });
   }
 
   /**
@@ -234,10 +241,10 @@ class StdFirebaseAuthenticationService {
    */
   public async isAuthSessionValid(): Promise<boolean> {
     try {
-      const currentUser = await this.getCurrentUser()
+      const currentUser = await this.getCurrentUser();
       return currentUser != null;
     } catch (error) {
-      console.error(error)
+      console.error(error);
       return false;
     }
   }

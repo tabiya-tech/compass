@@ -28,7 +28,7 @@ const StyledCustomLink: React.FC<React.ComponentProps<typeof CustomLink>> = (pro
         flexDirection: "row",
         gap: theme.spacing(theme.tabiyaSpacing.xs),
         verticalAlign: "bottom",
-        ...props.style
+        ...props.style,
       }}
     />
   );
@@ -92,7 +92,6 @@ const ConversationConclusionFooter: React.FC = () => {
     }
   }, [feedbackData.length, sessionHasFeedback, setFeedbackStatus]);
 
-
   const handleFeedbackFormClose = (closeEvent: FeedbackCloseEvent) => {
     setIsFeedbackFormOpen(false);
     if (closeEvent === FeedbackCloseEvent.SUBMIT) {
@@ -107,7 +106,7 @@ const ConversationConclusionFooter: React.FC = () => {
     }
   };
 
-  const feedbackSubmitted = (sessionHasFeedback || feedbackStatus === FeedbackStatus.SUBMITTED);
+  const feedbackSubmitted = sessionHasFeedback || feedbackStatus === FeedbackStatus.SUBMITTED;
 
   return (
     <>
@@ -119,21 +118,21 @@ const ConversationConclusionFooter: React.FC = () => {
         marginTop={theme.fixedSpacing(theme.tabiyaSpacing.md)}
         data-testid={DATA_TEST_ID.CONVERSATION_CONCLUSION_FOOTER_CONTAINER}
       >
-        <Typography variant="body1">          
-           {t("chat.chatMessage.conversationConclusionFooter.youCanNow")}{" "}                                   
+        <Typography variant="body1">
+          {t("chat.chatMessage.conversationConclusionFooter.youCanNow")}{" "}
           <StyledCustomLink
             onClick={handleOpenExperiencesDrawer}
             disableWhenOffline
             data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_BUTTON}
           >
-           <BadgeOutlinedIcon />
+            <BadgeOutlinedIcon />
             {t("chat.chatMessage.conversationConclusionFooter.viewAndDownloadCv")}
           </StyledCustomLink>{" "}
           {t("chat.chatMessage.conversationConclusionFooter.here")}
           {/* Show anonymous user registration link if the user is anonymous and hasn't already converted */}
           {isAnonymous && !isAccountConverted && (
             <span data-testid={DATA_TEST_ID.CREATE_ACCOUNT_MESSAGE}>
-              {t("chat.chatMessage.conversationConclusionFooter.createAccountIntro")} {" "}
+              {t("chat.chatMessage.conversationConclusionFooter.createAccountIntro")}{" "}
               <StyledCustomLink
                 onClick={() => setShowConversionDialog(true)}
                 disableWhenOffline
@@ -168,8 +167,9 @@ const ConversationConclusionFooter: React.FC = () => {
           )}
           {/* Show feedback form if the rating has been submitted */}
           {hasSubmittedCustomerSatisfactionRating && feedbackStatus === FeedbackStatus.NOT_STARTED && (
-            <span data-testid={DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT}>{" "}
-              {t("chat.chatMessage.conversationConclusionFooter.feedbackWelcome")} {" "}
+            <span data-testid={DATA_TEST_ID.FEEDBACK_MESSAGE_TEXT}>
+              {" "}
+              {t("chat.chatMessage.conversationConclusionFooter.feedbackWelcome")}{" "}
               <StyledCustomLink
                 onClick={() => setIsFeedbackFormOpen(true)}
                 disableWhenOffline
@@ -184,7 +184,7 @@ const ConversationConclusionFooter: React.FC = () => {
           {/* Show continue feedback if the status is already started */}
           {hasSubmittedCustomerSatisfactionRating && feedbackStatus === FeedbackStatus.STARTED && (
             <span data-testid={DATA_TEST_ID.FEEDBACK_IN_PROGRESS_MESSAGE}>
-              {t("chat.chatMessage.conversationConclusionFooter.feedbackInProgressPrefix")} {" "}
+              {t("chat.chatMessage.conversationConclusionFooter.feedbackInProgressPrefix")}{" "}
               <StyledCustomLink
                 onClick={() => setIsFeedbackFormOpen(true)}
                 disableWhenOffline

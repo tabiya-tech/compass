@@ -2,7 +2,7 @@
 import "src/_test_utilities/consoleMock";
 
 import React from "react";
-import { render, screen, userEvent} from "src/_test_utilities/test-utils";
+import { render, screen, userEvent } from "src/_test_utilities/test-utils";
 import DislikeReasonPopover, {
   DATA_TEST_ID,
 } from "src/chat/reaction/components/dislikeReasonPopover/DislikeReasonPopover";
@@ -10,7 +10,6 @@ import { DislikeReason, DislikeReasonMessages } from "src/chat/reaction/reaction
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 
 describe("ReactionReasonPopover", () => {
-
   beforeEach(() => {
     jest.clearAllMocks();
     mockBrowserIsOnLine(true);
@@ -86,7 +85,7 @@ describe("ReactionReasonPopover", () => {
       // AND expect no errors or warnings to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
-    })
+    });
   });
 
   describe("action tests", () => {
@@ -94,11 +93,7 @@ describe("ReactionReasonPopover", () => {
       // GIVEN the popover is rendered and open
       const givenOnClose = jest.fn();
       const givenComponent = (
-        <DislikeReasonPopover
-          anchorEl={document.createElement("div")}
-          open={true}
-          onClose={givenOnClose}
-        />
+        <DislikeReasonPopover anchorEl={document.createElement("div")} open={true} onClose={givenOnClose} />
       );
       render(givenComponent);
 
@@ -118,13 +113,7 @@ describe("ReactionReasonPopover", () => {
     test("should call onClose with an empty array when clicking the close icon", async () => {
       // GIVEN the popover is rendered and open
       const givenOnClose = jest.fn();
-      render(
-        <DislikeReasonPopover
-          anchorEl={document.createElement("div")}
-          open={true}
-          onClose={givenOnClose}
-        />
-      );
+      render(<DislikeReasonPopover anchorEl={document.createElement("div")} open={true} onClose={givenOnClose} />);
 
       // WHEN the close icon button is clicked
       const closeIconButton = screen.getByTestId(DATA_TEST_ID.CLOSE_ICON_BUTTON);
@@ -140,13 +129,7 @@ describe("ReactionReasonPopover", () => {
     test("should call onClose with an empty array when clicking outside the popover", async () => {
       // GIVEN the popover is rendered and open
       const givenOnClose = jest.fn();
-      render(
-        <DislikeReasonPopover
-          anchorEl={document.createElement("div")}
-          open={true}
-          onClose={givenOnClose}
-        />
-      );
+      render(<DislikeReasonPopover anchorEl={document.createElement("div")} open={true} onClose={givenOnClose} />);
 
       // WHEN clicking outside the popover
       // eslint-disable-next-line testing-library/no-node-access
@@ -165,13 +148,7 @@ describe("ReactionReasonPopover", () => {
     test("should call onClose with an empty array when pressing escape", async () => {
       // GIVEN the popover is rendered and open
       const givenOnClose = jest.fn();
-      render(
-        <DislikeReasonPopover
-          anchorEl={document.createElement("div")}
-          open={true}
-          onClose={givenOnClose}
-        />
-      );
+      render(<DislikeReasonPopover anchorEl={document.createElement("div")} open={true} onClose={givenOnClose} />);
 
       // WHEN the escape key is pressed
       await userEvent.keyboard("{Escape}");

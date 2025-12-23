@@ -1,6 +1,11 @@
 import "src/_test_utilities/consoleMock";
 import { SkillsRankingService } from "./skillsRankingService";
-import { SkillsRankingPhase, SkillsRankingExperimentGroups, SkillsRankingState, SkillsRankingMetrics } from "src/features/skillsRanking/types";
+import {
+  SkillsRankingPhase,
+  SkillsRankingExperimentGroups,
+  SkillsRankingState,
+  SkillsRankingMetrics,
+} from "src/features/skillsRanking/types";
 import { expectCorrectFetchRequest, setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { StatusCodes } from "http-status-codes";
 import { SkillsRankingError } from "src/features/skillsRanking/errors";
@@ -35,7 +40,7 @@ describe("SkillsRankingService", () => {
       const mockService = {
         ...service,
         isFeatureEnabled: jest.fn().mockReturnValue(true),
-        isSkillsRankingFeatureEnabled: function() {
+        isSkillsRankingFeatureEnabled: function () {
           return this.isFeatureEnabled();
         },
       };
@@ -52,7 +57,7 @@ describe("SkillsRankingService", () => {
       const mockService = {
         ...service,
         isFeatureEnabled: jest.fn().mockReturnValue(false),
-        isSkillsRankingFeatureEnabled: function() {
+        isSkillsRankingFeatureEnabled: function () {
           return this.isFeatureEnabled();
         },
       };
@@ -244,11 +249,7 @@ describe("SkillsRankingService", () => {
       setupAPIServiceSpy(StatusCodes.ACCEPTED, apiResponse, "application/json");
 
       // WHEN updating the skills ranking state with perceived rank percentile
-      const result = await service.updateSkillsRankingState(
-        mockSessionId,
-        SkillsRankingPhase.PERCEIVED_RANK,
-        85
-      );
+      const result = await service.updateSkillsRankingState(mockSessionId, SkillsRankingPhase.PERCEIVED_RANK, 85);
 
       // THEN expect the result to include the perceived rank percentile
       expect(result.perceived_rank_percentile).toBe(85);
@@ -342,7 +343,9 @@ describe("SkillsRankingService", () => {
 
       // WHEN updating the skills ranking state
       // THEN expect the same error to be thrown
-      await expect(service.updateSkillsRankingState(mockSessionId, SkillsRankingPhase.BRIEFING)).rejects.toThrow(givenError);
+      await expect(service.updateSkillsRankingState(mockSessionId, SkillsRankingPhase.BRIEFING)).rejects.toThrow(
+        givenError
+      );
     });
   });
 
@@ -499,7 +502,9 @@ describe("SkillsRankingService", () => {
       // WHEN validating the config
       // THEN expect a SkillsRankingError to be thrown
       expect(() => service.validateConfig(invalidConfig)).toThrow(
-        new SkillsRankingError("Invalid configuration for feature 4b0c7428-9c01-4688-81fd-d3ef159bce79: compensationAmount must be a string")
+        new SkillsRankingError(
+          "Invalid configuration for feature 4b0c7428-9c01-4688-81fd-d3ef159bce79: compensationAmount must be a string"
+        )
       );
     });
 
@@ -519,7 +524,9 @@ describe("SkillsRankingService", () => {
       // WHEN validating the config
       // THEN expect a SkillsRankingError to be thrown
       expect(() => service.validateConfig(invalidConfig)).toThrow(
-        new SkillsRankingError("Invalid configuration for feature 4b0c7428-9c01-4688-81fd-d3ef159bce79: jobPlatformUrl must be a string")
+        new SkillsRankingError(
+          "Invalid configuration for feature 4b0c7428-9c01-4688-81fd-d3ef159bce79: jobPlatformUrl must be a string"
+        )
       );
     });
 
@@ -539,7 +546,9 @@ describe("SkillsRankingService", () => {
       // WHEN validating the config
       // THEN expect a SkillsRankingError to be thrown
       expect(() => service.validateConfig(invalidConfig)).toThrow(
-        new SkillsRankingError("Invalid configuration for feature 4b0c7428-9c01-4688-81fd-d3ef159bce79: shortTypingDurationMs must be a number")
+        new SkillsRankingError(
+          "Invalid configuration for feature 4b0c7428-9c01-4688-81fd-d3ef159bce79: shortTypingDurationMs must be a number"
+        )
       );
     });
 
@@ -559,7 +568,9 @@ describe("SkillsRankingService", () => {
       // WHEN validating the config
       // THEN expect a SkillsRankingError to be thrown
       expect(() => service.validateConfig(invalidConfig)).toThrow(
-        new SkillsRankingError("Invalid configuration for feature 4b0c7428-9c01-4688-81fd-d3ef159bce79: defaultTypingDurationMs must be a number")
+        new SkillsRankingError(
+          "Invalid configuration for feature 4b0c7428-9c01-4688-81fd-d3ef159bce79: defaultTypingDurationMs must be a number"
+        )
       );
     });
 
@@ -579,7 +590,9 @@ describe("SkillsRankingService", () => {
       // WHEN validating the config
       // THEN expect a SkillsRankingError to be thrown
       expect(() => service.validateConfig(invalidConfig)).toThrow(
-        new SkillsRankingError("Invalid configuration for feature 4b0c7428-9c01-4688-81fd-d3ef159bce79: longTypingDurationMs must be a number")
+        new SkillsRankingError(
+          "Invalid configuration for feature 4b0c7428-9c01-4688-81fd-d3ef159bce79: longTypingDurationMs must be a number"
+        )
       );
     });
   });

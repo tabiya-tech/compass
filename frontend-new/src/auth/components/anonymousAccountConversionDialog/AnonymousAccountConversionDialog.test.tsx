@@ -24,7 +24,6 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
-
 // mock the password input
 jest.mock("src/theme/PasswordInput/PasswordInput", () => {
   const actual = jest.requireActual("src/theme/PasswordInput/PasswordInput");
@@ -64,13 +63,11 @@ describe("AnonymousAccountConversionDialog", () => {
     });
 
     // WHEN the dialog is rendered
-    render(
-      <AnonymousAccountConversionDialog {...defaultProps} />
-    );
+    render(<AnonymousAccountConversionDialog {...defaultProps} />);
 
     // THEN the email field should be prefilled with the stored email
     const emailContainer = screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT);
-    const emailInput = within(emailContainer).getByRole('textbox');
+    const emailInput = within(emailContainer).getByRole("textbox");
     expect(emailInput).toHaveValue(storedEmail);
   });
 
@@ -79,13 +76,11 @@ describe("AnonymousAccountConversionDialog", () => {
     mockPersistentStorageService.getPersonalInfo.mockReturnValue(null);
 
     // WHEN the dialog is rendered
-    render(
-      <AnonymousAccountConversionDialog {...defaultProps} />
-    );
+    render(<AnonymousAccountConversionDialog {...defaultProps} />);
 
     // THEN the email field should be empty
     const emailContainer = screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT);
-    const emailInput = within(emailContainer).getByRole('textbox');
+    const emailInput = within(emailContainer).getByRole("textbox");
     expect(emailInput).toHaveValue("");
 
     // AND no errors or warnings are shown
@@ -100,15 +95,13 @@ describe("AnonymousAccountConversionDialog", () => {
     mockFirebaseEmailAuthService.linkAnonymousAccount.mockResolvedValue("success");
 
     // WHEN the dialog is rendered
-    render(
-      <AnonymousAccountConversionDialog {...defaultProps} />
-    );
+    render(<AnonymousAccountConversionDialog {...defaultProps} />);
 
     // AND valid form data is entered
     const emailContainer = screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT);
-    const emailInput = within(emailContainer).getByRole('textbox');
+    const emailInput = within(emailContainer).getByRole("textbox");
     const emailConfirmContainer = screen.getByTestId(DATA_TEST_ID.EMAIL_CONFIRMATION_INPUT);
-    const emailConfirmInput = within(emailConfirmContainer).getByRole('textbox');
+    const emailConfirmInput = within(emailConfirmContainer).getByRole("textbox");
 
     await userEvent.type(emailInput, givenEmail);
     await userEvent.type(emailConfirmInput, givenEmail);
@@ -116,7 +109,7 @@ describe("AnonymousAccountConversionDialog", () => {
     act(() => {
       (PasswordInput as jest.Mock).mock.calls[0][0].onChange({ target: { value: givenPassword } });
       (PasswordInput as jest.Mock).mock.calls[0][0].onValidityChange(true);
-    })
+    });
 
     // Wait for validation to complete
     const submitButton = screen.getByTestId(DATA_TEST_ID.SUBMIT_BUTTON);
@@ -126,15 +119,25 @@ describe("AnonymousAccountConversionDialog", () => {
     await userEvent.click(submitButton);
 
     // THEN the service should be called with correct data
-    expect(mockFirebaseEmailAuthService.linkAnonymousAccount).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail);
+    expect(mockFirebaseEmailAuthService.linkAnonymousAccount).toHaveBeenCalledWith(
+      givenEmail,
+      givenPassword,
+      givenEmail
+    );
 
     // AND the snackbar should show two messages
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenNthCalledWith(1, "Account successfully registered!", { variant: "success" });
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenNthCalledWith(2, `Currently logged in with the email: ${givenEmail}. A verification email has been sent to your email address. Please verify your account before logging in again.`, {
-      variant: "info",
-      persist: true,
-      autoHideDuration: null
-    })
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenNthCalledWith(1, "Account successfully registered!", {
+      variant: "success",
+    });
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenNthCalledWith(
+      2,
+      `Currently logged in with the email: ${givenEmail}. A verification email has been sent to your email address. Please verify your account before logging in again.`,
+      {
+        variant: "info",
+        persist: true,
+        autoHideDuration: null,
+      }
+    );
 
     // AND success callbacks should be triggered
     expect(defaultProps.onSuccess).toHaveBeenCalled();
@@ -153,15 +156,13 @@ describe("AnonymousAccountConversionDialog", () => {
     mockFirebaseEmailAuthService.linkAnonymousAccount.mockRejectedValue(new Error(errorMessage));
 
     // WHEN the dialog is rendered
-    render(
-      <AnonymousAccountConversionDialog {...defaultProps} />
-    );
+    render(<AnonymousAccountConversionDialog {...defaultProps} />);
 
     // AND valid form data is entered
     const emailContainer = screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT);
-    const emailInput = within(emailContainer).getByRole('textbox');
+    const emailInput = within(emailContainer).getByRole("textbox");
     const emailConfirmContainer = screen.getByTestId(DATA_TEST_ID.EMAIL_CONFIRMATION_INPUT);
-    const emailConfirmInput = within(emailConfirmContainer).getByRole('textbox');
+    const emailConfirmInput = within(emailConfirmContainer).getByRole("textbox");
 
     await userEvent.type(emailInput, givenEmail);
     await userEvent.type(emailConfirmInput, givenEmail);
@@ -169,7 +170,7 @@ describe("AnonymousAccountConversionDialog", () => {
     act(() => {
       (PasswordInput as jest.Mock).mock.calls[0][0].onChange({ target: { value: givenPassword } });
       (PasswordInput as jest.Mock).mock.calls[0][0].onValidityChange(true);
-    })
+    });
 
     // Wait for validation to complete
     const submitButton = screen.getByTestId(DATA_TEST_ID.SUBMIT_BUTTON);
@@ -179,12 +180,12 @@ describe("AnonymousAccountConversionDialog", () => {
     await userEvent.click(submitButton);
 
     // THEN an error message should be shown
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(errorMessage, { variant: "error" })
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(errorMessage, { variant: "error" });
 
     // AND an error should be logged
-    expect(console.error).toHaveBeenCalledWith(
-      new Error("Failed to link anonymous account"), { cause: expect.any(Error) }
-    );
+    expect(console.error).toHaveBeenCalledWith(new Error("Failed to link anonymous account"), {
+      cause: expect.any(Error),
+    });
 
     // AND the callbacks should not be called
     expect(defaultProps.onSuccess).not.toHaveBeenCalled();
@@ -209,5 +210,4 @@ describe("AnonymousAccountConversionDialog", () => {
     expect(console.warn).not.toHaveBeenCalled();
     expect(console.error).not.toHaveBeenCalled();
   });
-  
-}); 
+});

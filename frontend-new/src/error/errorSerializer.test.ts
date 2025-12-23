@@ -20,8 +20,7 @@ describe("serializeError", () => {
   });
 
   it("serializes a function", () => {
-    const func = () => {
-    };
+    const func = () => {};
     const result = serializeError(func);
     expect(result).toBe("[Function]");
   });
@@ -36,7 +35,6 @@ describe("serializeError", () => {
       stack: expect.any(String),
     });
   });
-
 
   it("serializes an Error object with nested custom cause", () => {
     // construct a deeply nested error
@@ -80,7 +78,9 @@ describe("serializeError", () => {
       name: "Error",
       message: "Root error",
       stack: expect.any(String),
-      messageChain: expect.stringContaining("Error: Root error\n  ↳ Error: Child1 error\n   ↳ Error: Grandchild1 error\n  ↳ Error: Child2 error\n   ↳ Error: Grandchild2 error"),
+      messageChain: expect.stringContaining(
+        "Error: Root error\n  ↳ Error: Child1 error\n   ↳ Error: Grandchild1 error\n  ↳ Error: Child2 error\n   ↳ Error: Grandchild2 error"
+      ),
       cause: {
         "0": {
           name: "Error",
@@ -101,7 +101,7 @@ describe("serializeError", () => {
             message: "Grandchild2 error",
             stack: expect.any(String),
           },
-        }
+        },
       },
     });
   });

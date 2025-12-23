@@ -1,5 +1,10 @@
 import * as Sentry from "@sentry/react";
-import { createTransport, type Transport,  type TransportRequest, type TransportMakeRequestResponse } from "@sentry/core";
+import {
+  createTransport,
+  type Transport,
+  type TransportRequest,
+  type TransportMakeRequestResponse,
+} from "@sentry/core";
 import { getBackendUrl, getSentryConfig, getSentryDSN, getSentryEnabled, getTargetEnvironmentName } from "./envService";
 import React from "react";
 import { createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from "react-router-dom";
@@ -119,7 +124,7 @@ export function sentryTransport(options: any): Transport {
       console.error(new CompressionError("Error compressing Sentry request body, sending uncompressed", e));
       // If an error compressing the body, we just send the uncompressed body
       requestBody = rawBytes;
-      contentEncoding = undefined
+      contentEncoding = undefined;
     }
 
     const requestOptions: RequestInit = {
@@ -130,7 +135,7 @@ export function sentryTransport(options: any): Transport {
         ...(options.headers || {}),
         "Content-Encoding": contentEncoding,
       },
-      ...options.fetchOptions
+      ...options.fetchOptions,
     };
 
     // Make the request to Sentry (options.url = dsn) using custom fetch
@@ -147,9 +152,9 @@ export function sentryTransport(options: any): Transport {
         "x-sentry-rate-limits": response.headers.get("X-Sentry-Rate-Limits"),
         "retry-after": response.headers.get("Retry-After"),
       },
-    }
+    };
 
-    return result
+    return result;
   }
 
   // Return the transport created with the custom makeRequest function
@@ -251,7 +256,7 @@ export function initSentry() {
         client_id: UserPreferencesService.getInstance().getClientID(),
         user_id: AuthenticationStateService.getInstance().getUser()?.id,
         session_id: UserPreferencesStateService.getInstance().getActiveSessionId(),
-        component_name: "compass-frontend"
+        component_name: "compass-frontend",
       };
 
       return obfuscateEvent(log);

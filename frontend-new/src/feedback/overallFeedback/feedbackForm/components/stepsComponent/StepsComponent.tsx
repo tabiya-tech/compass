@@ -23,7 +23,7 @@ export const DATA_TEST_ID = {
 };
 
 const StepsComponent: React.FC<StepProps> = ({ questions, feedbackItems, onChange }) => {
-  const isSmallOrShortScreen = useIsSmallOrShortScreen()
+  const isSmallOrShortScreen = useIsSmallOrShortScreen();
 
   const getAnswerByQuestionId = (questionId: string): SimplifiedAnswer | undefined => {
     return feedbackItems.find((item: FeedbackItem) => item.question_id === questionId)?.simplified_answer;

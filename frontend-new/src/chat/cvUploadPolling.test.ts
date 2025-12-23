@@ -5,14 +5,26 @@ import i18n from "src/i18n/i18n";
 
 describe("cvUploadPolling", () => {
   test("getCvUploadDisplayMessage maps states", () => {
-    expect(getCvUploadDisplayMessage({ upload_process_state: "CONVERTING" })).toBe(i18n.t("chat.cvUploadPolling.converting"));
-    expect(getCvUploadDisplayMessage({ upload_process_state: "UPLOADING_TO_GCS" })).toBe(i18n.t("chat.cvUploadPolling.processing"));
-    expect(getCvUploadDisplayMessage({ upload_process_state: "EXTRACTING" })).toBe(i18n.t("chat.cvUploadPolling.extractingExperiences"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "CONVERTING" })).toBe(
+      i18n.t("chat.cvUploadPolling.converting")
+    );
+    expect(getCvUploadDisplayMessage({ upload_process_state: "UPLOADING_TO_GCS" })).toBe(
+      i18n.t("chat.cvUploadPolling.processing")
+    );
+    expect(getCvUploadDisplayMessage({ upload_process_state: "EXTRACTING" })).toBe(
+      i18n.t("chat.cvUploadPolling.extractingExperiences")
+    );
     expect(getCvUploadDisplayMessage({ upload_process_state: "SAVING" })).toBe(i18n.t("chat.cvUploadPolling.savingCv"));
     expect(getCvUploadDisplayMessage({ upload_process_state: "FAILED" })).toBe(i18n.t("chat.cvUploadPolling.failed"));
-    expect(getCvUploadDisplayMessage({ upload_process_state: "COMPLETED" })).toBe(i18n.t("chat.cvUploadPolling.uploadedSuccessfully"));
-    expect(getCvUploadDisplayMessage({ upload_process_state: "CANCELLED" })).toBe(i18n.t("chat.cvUploadPolling.cancelled"));
-    expect(getCvUploadDisplayMessage({ upload_process_state: "PENDING_UPLOAD" })).toBe(i18n.t("chat.cvUploadPolling.uploadingCv"));
+    expect(getCvUploadDisplayMessage({ upload_process_state: "COMPLETED" })).toBe(
+      i18n.t("chat.cvUploadPolling.uploadedSuccessfully")
+    );
+    expect(getCvUploadDisplayMessage({ upload_process_state: "CANCELLED" })).toBe(
+      i18n.t("chat.cvUploadPolling.cancelled")
+    );
+    expect(getCvUploadDisplayMessage({ upload_process_state: "PENDING_UPLOAD" })).toBe(
+      i18n.t("chat.cvUploadPolling.uploadingCv")
+    );
   });
 
   test("polling calls onStatus and completes", async () => {
@@ -40,7 +52,7 @@ describe("cvUploadPolling", () => {
     });
 
     // Wait for all three polls to complete
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     // stop timers and cleanup
     stopUploadPolling(handles);
@@ -78,16 +90,12 @@ describe("cvUploadPolling", () => {
     });
 
     // Wait for both polls to complete
-    await new Promise(resolve => setTimeout(resolve, 30));
+    await new Promise((resolve) => setTimeout(resolve, 30));
 
     stopUploadPolling(handles);
 
     // THEN expect the events to reflect the status change and termination
-    expect(recordedEvents).toEqual([
-      "status:CONVERTING",
-      "status:FAILED",
-      "terminal:FAILED",
-    ]);
+    expect(recordedEvents).toEqual(["status:CONVERTING", "status:FAILED", "terminal:FAILED"]);
   });
 
   test("polling errors invoke onError and cleanup", async () => {
@@ -111,7 +119,7 @@ describe("cvUploadPolling", () => {
     });
 
     // Wait for the error to be triggered
-    await new Promise(resolve => setTimeout(resolve, 20));
+    await new Promise((resolve) => setTimeout(resolve, 20));
     stopUploadPolling(handles);
     // THEN expect the error to be recorded
     expect(recordedEvents).toEqual(["error:boom"]);
@@ -139,11 +147,9 @@ describe("cvUploadPolling", () => {
     });
 
     // Wait for timeout to trigger
-    await new Promise(resolve => setTimeout(resolve, 60));
+    await new Promise((resolve) => setTimeout(resolve, 60));
 
     stopUploadPolling(handles);
     expect(events).toContain("error:timeout");
   });
 });
-
-

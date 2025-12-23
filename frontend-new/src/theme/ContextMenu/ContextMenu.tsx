@@ -118,10 +118,7 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
               )}
             </ListItemText>
             {item.trailingIcon && (
-              <ListItemIcon
-                data-testid={DATA_TEST_ID.MENU_ITEM_TRAILING_ICON}
-                sx={{ justifyContent: "flex-end" }}
-              >
+              <ListItemIcon data-testid={DATA_TEST_ID.MENU_ITEM_TRAILING_ICON} sx={{ justifyContent: "flex-end" }}>
                 <Icon sx={{ color: theme.palette.text.secondary }}>{item.trailingIcon}</Icon>
               </ListItemIcon>
             )}

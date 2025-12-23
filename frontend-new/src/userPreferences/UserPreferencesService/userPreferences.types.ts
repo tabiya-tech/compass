@@ -6,11 +6,11 @@ export enum SensitivePersonalDataRequirement {
 
 export type AnsweredQuestions = {
   [questionId: string]: string[];
-}
+};
 
 // we dont constrain the keys to the experiment ids, since the frontend doesnt
 // necessarily know all the experiment ids. some might be backend only.
-export type UserPreferencesExperiments = Partial<Record<string, string | Record<string, any>>>
+export type UserPreferencesExperiments = Partial<Record<string, string | Record<string, any>>>;
 
 export type UserPreference = {
   user_id: string;
@@ -21,7 +21,7 @@ export type UserPreference = {
   user_feedback_answered_questions: AnsweredQuestions;
   sensitive_personal_data_requirement: SensitivePersonalDataRequirement;
   has_sensitive_personal_data: boolean;
-  experiments: UserPreferencesExperiments
+  experiments: UserPreferencesExperiments;
 };
 
 export type CreateUserPreferencesSpec = {
@@ -37,7 +37,7 @@ export type UpdateUserPreferencesSpec = {
   language?: Language;
   accepted_tc?: Date;
   client_id?: string;
-  experiments?: UserPreferencesExperiments
+  experiments?: UserPreferencesExperiments;
 };
 
 export enum Language {

@@ -5,9 +5,9 @@ import { capitalizeFirstLetter } from "src/experiences/report/reportPdf/componen
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
 import { getUniqueSkills } from "src/experiences/report/util";
 
-const ConstructSkillsDescription = ( paragraphs: Paragraph[], experiences : Experience[]) => {
+const ConstructSkillsDescription = (paragraphs: Paragraph[], experiences: Experience[]) => {
   // get all unique skills from the experiences
-  const skillsList : Skill[] = getUniqueSkills(experiences);
+  const skillsList: Skill[] = getUniqueSkills(experiences);
   paragraphs.push(
     new Paragraph({
       children: [
@@ -54,7 +54,7 @@ const ConstructSkillsDescription = ( paragraphs: Paragraph[], experiences : Expe
         ],
         spacing: { after: 200 },
       });
-    }),
+    })
   );
 };
 

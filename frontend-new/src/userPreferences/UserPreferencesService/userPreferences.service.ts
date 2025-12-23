@@ -53,7 +53,11 @@ export default class UserPreferencesService {
    * @param errorFactory
    * @private
    */
-  private async parseJsonResponse(response: Response, userId: string, errorFactory: RestAPIErrorFactory): Promise<UserPreference> {
+  private async parseJsonResponse(
+    response: Response,
+    userId: string,
+    errorFactory: RestAPIErrorFactory
+  ): Promise<UserPreference> {
     // parse the response body
     let userPreferencesResponse: UserPreference;
     try {
@@ -69,7 +73,7 @@ export default class UserPreferencesService {
         has_sensitive_personal_data: jsonPayload.has_sensitive_personal_data,
         accepted_tc: this.formatAcceptedTC(jsonPayload.accepted_tc),
         user_feedback_answered_questions: jsonPayload.user_feedback_answered_questions,
-        experiments: jsonPayload.experiments
+        experiments: jsonPayload.experiments,
       };
     } catch (error) {
       throw errorFactory(
@@ -93,12 +97,7 @@ export default class UserPreferencesService {
     const serviceName = UserPreferencesService.serviceName;
     const serviceFunction = "createUserPreferences";
     const method = "POST";
-    const errorFactory = getRestAPIErrorFactory(
-      serviceName,
-      serviceFunction,
-      method,
-      this.userPreferencesEndpointUrl
-    );
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, this.userPreferencesEndpointUrl);
     const requestBody = JSON.stringify({
       ...user_preferences,
       client_id: this.getClientID(),
@@ -127,12 +126,7 @@ export default class UserPreferencesService {
     const serviceName = UserPreferencesService.serviceName;
     const serviceFunction = "updateUserPreferences";
     const method = "PATCH";
-    const errorFactory = getRestAPIErrorFactory(
-      serviceName,
-      serviceFunction,
-      method,
-      this.userPreferencesEndpointUrl
-    );
+    const errorFactory = getRestAPIErrorFactory(serviceName, serviceFunction, method, this.userPreferencesEndpointUrl);
 
     const requestBody = JSON.stringify(newUserPreferencesSpec);
     const response = await customFetch(this.userPreferencesEndpointUrl, {
@@ -173,7 +167,7 @@ export default class UserPreferencesService {
       serviceFunction: serviceFunction,
       failureMessage: `Failed to get user preferences for user with id ${userId}`,
       expectedContentType: "application/json",
-      retryOnFailedToFetch: true
+      retryOnFailedToFetch: true,
     });
 
     const userPreferences = await this.parseJsonResponse(response, userId, errorFactory);
@@ -184,8 +178,8 @@ export default class UserPreferencesService {
     // Or if the client_id has changed.
     // This can happen if the user is opening the app on a different device or browser.
     // We will update the user preferences with the current client ID.
-    if(!userPreferences.client_id || userPreferences.client_id !== clientId) {
-      await this.updateUserPreferences({ user_id: userId, client_id: clientId })
+    if (!userPreferences.client_id || userPreferences.client_id !== clientId) {
+      await this.updateUserPreferences({ user_id: userId, client_id: clientId });
     }
 
     return userPreferences;
@@ -225,8 +219,8 @@ export default class UserPreferencesService {
   public getClientID(): string {
     let clientId = PersistentStorageService.getClientId();
 
-    if(!clientId) {
-      clientId = UUIDV4()
+    if (!clientId) {
+      clientId = UUIDV4();
       PersistentStorageService.setClientID(clientId);
     }
 

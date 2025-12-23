@@ -103,7 +103,7 @@ describe("RotateToSolvePuzzle", () => {
       correct_rotations: 2,
       puzzles_solved: 1,
       time_spent_ms: 600, // 6 clicks and rotations at 100ms intervals
-    })
+    });
 
     // AND expect no console errors/warnings
     expect(console.error).not.toHaveBeenCalled();

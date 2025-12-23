@@ -1,7 +1,7 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import * as SentryInvitationCodeRequestService from "src/auth/components/requestInvitationCode/requestInvitationCodeService/SentryInvitationCodeRequest.service"
+import * as SentryInvitationCodeRequestService from "src/auth/components/requestInvitationCode/requestInvitationCodeService/SentryInvitationCodeRequest.service";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import userEvent from "@testing-library/user-event";
@@ -28,7 +28,7 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 describe("RequestInvitationCodeFormModal", () => {
   beforeEach(() => {
     unmockBrowserIsOnLine();
-  })
+  });
   test("should render modal correctly when open", () => {
     // GIVEN the nodal is open
     const givenOpen = true;
@@ -84,7 +84,9 @@ describe("RequestInvitationCodeFormModal", () => {
 
   test("should send user information to Sentry when the submit button is clicked", async () => {
     // GIVEN a sentry invitationCode service that successfully captures user feedback
-    const mockRequestInvitationCode = jest.spyOn(SentryInvitationCodeRequestService, "requestInvitationCode").mockImplementation(jest.fn());
+    const mockRequestInvitationCode = jest
+      .spyOn(SentryInvitationCodeRequestService, "requestInvitationCode")
+      .mockImplementation(jest.fn());
     // AND the modal is open
     const givenOpen = true;
     // AND the internet is online
@@ -116,9 +118,11 @@ describe("RequestInvitationCodeFormModal", () => {
   test("should show a notification and log an error when the invitation code service throws an error", async () => {
     // GIVEN a sentry invitationCode service that fails to capture feedback with an error
     const givenError = new RequestInvitationCodeError("foo error");
-    const mockRequestInvitationCode = jest.spyOn(SentryInvitationCodeRequestService, "requestInvitationCode").mockImplementation(() => {
-      throw givenError;
-    });
+    const mockRequestInvitationCode = jest
+      .spyOn(SentryInvitationCodeRequestService, "requestInvitationCode")
+      .mockImplementation(() => {
+        throw givenError;
+      });
     // AND the modal is open
     const givenOpen = true;
     // AND the internet is online
@@ -146,7 +150,7 @@ describe("RequestInvitationCodeFormModal", () => {
       { variant: "error" }
     );
     // AND a console error should be shown
-    expect(console.error).toHaveBeenCalledWith(givenError)
+    expect(console.error).toHaveBeenCalledWith(givenError);
   });
 
   test("should not allow the user to submit the form when the internet is offline", async () => {
@@ -159,4 +163,3 @@ describe("RequestInvitationCodeFormModal", () => {
     expect(submitButton).toBeDisabled();
   });
 });
-

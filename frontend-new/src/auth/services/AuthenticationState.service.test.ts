@@ -185,9 +185,7 @@ describe("AuthenticationStateService", () => {
         expect(expectedToken).toBe(givenToken);
       });
 
-      it.each(
-        [null, undefined, ""]
-      )("should debug when setting %s token", (givenToken) => {
+      it.each([null, undefined, ""])("should debug when setting %s token", (givenToken) => {
         // GIVEN a null token
         // WHEN setToken is called with an empty token
         // @ts-ignore
@@ -205,7 +203,7 @@ describe("AuthenticationStateService", () => {
         service.setToken(givenToken);
         // guard
         expect(service.getToken()).toBe(givenToken);
-        
+
         const clearTokenSpy = jest.spyOn(PersistentStorageService, "clearToken");
         jest.spyOn(PersistentStorageService, "getToken").mockReturnValueOnce(null);
         const consoleDebugSpy = jest.spyOn(console, "debug");
@@ -246,4 +244,4 @@ describe("AuthenticationStateService", () => {
       });
     });
   });
-}); 
+});

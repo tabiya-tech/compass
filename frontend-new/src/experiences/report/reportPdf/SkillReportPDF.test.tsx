@@ -22,7 +22,7 @@ describe("Report", () => {
     );
 
     // AND GET: Image will return a base64 image
-    const mockedCustomerFetch = setupAPIServiceSpy(200, new Blob(['mock file content']), "image/png")
+    const mockedCustomerFetch = setupAPIServiceSpy(200, new Blob(["mock file content"]), "image/png");
 
     // WHEN the component is rendered
     render(givenReport);
@@ -53,6 +53,6 @@ describe("Report", () => {
       expect.objectContaining({
         authRequired: false, // With no Authentication.
       })
-    )
+    );
   });
 });

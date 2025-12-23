@@ -25,13 +25,14 @@ export const DATA_TEST_ID = {
 };
 
 export const UI_TEXT = {
-  CUSTOMER_SATISFACTION_QUESTION_TEXT: "Finally, we'd love to hear your thoughts on your experience so far! How satisfied are you with Compass?",
+  CUSTOMER_SATISFACTION_QUESTION_TEXT:
+    "Finally, we'd love to hear your thoughts on your experience so far! How satisfied are you with Compass?",
   RATING_LABEL_LOW: "Unsatisfied",
   RATING_LABEL_HIGH: "Satisfied",
 };
 const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
-                                                                                 notifyOnCustomerSatisfactionRatingSubmitted,
-                                                                               }) => {
+  notifyOnCustomerSatisfactionRatingSubmitted,
+}) => {
   const { enqueueSnackbar } = useSnackbar();
   const isOnline = useContext(IsOnlineContext);
   const { t } = useTranslation();
@@ -56,17 +57,23 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
       await feedbackService.sendFeedback(sessionId, [formattedData]);
 
       notifyOnCustomerSatisfactionRatingSubmitted();
-      enqueueSnackbar(t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.submitSuccess"), { variant: "success" });
+      enqueueSnackbar(t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.submitSuccess"), {
+        variant: "success",
+      });
     } catch (error) {
       console.error(new FeedbackError("Feedback submission failed:", error));
-      enqueueSnackbar(t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.submitError"), { variant: "error" });
+      enqueueSnackbar(t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.submitError"), {
+        variant: "error",
+      });
     } finally {
       setIsSubmittingRating(false);
       setSelectedRating(null);
     }
   };
 
-  const customerSatisfactionText = t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.questionText")
+  const customerSatisfactionText = t(
+    "feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.questionText"
+  );
 
   return (
     <div data-testid={DATA_TEST_ID.CUSTOMER_SATISFACTION_RATING_CONTAINER}>
@@ -80,7 +87,9 @@ const CustomerSatisfactionRating: React.FC<CustomerSatisfactionRatingProps> = ({
           handleInputChange(QUESTION_KEYS.CUSTOMER_SATISFACTION, { rating_numeric: value, comment: comments })
         }
         lowRatingLabel={t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.ratingLabelLow")}
-        highRatingLabel={t("feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.ratingLabelHigh")}
+        highRatingLabel={t(
+          "feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.ratingLabelHigh"
+        )}
         maxRating={5}
         disabled={!isOnline || isSubmittingRating}
       />

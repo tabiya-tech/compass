@@ -69,12 +69,12 @@ export const PlusBadgeAppearsOnPhaseTransition: Story = {
 };
 
 export const CVUploadDisabledInOtherPhases: Story = {
-    render: (args) => <ChatMessageFieldWrapper {...args} />,
-    args: {
-        handleSend: action("Message sent"),
-        currentPhase: ConversationPhase.INTRO,
-    },
-}
+  render: (args) => <ChatMessageFieldWrapper {...args} />,
+  args: {
+    handleSend: action("Message sent"),
+    currentPhase: ConversationPhase.INTRO,
+  },
+};
 
 // Character Limit Stories
 export const CharacterLimitWarning: Story = {

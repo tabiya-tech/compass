@@ -36,22 +36,22 @@ export default class InvitationsService {
     const serviceFunction = "checkInvitationCodeStatus";
     const method = "GET";
     const endpointUrl = `${this.invitationStatusEndpointUrl}/check-status?invitation_code=${code}`;
-      const response = await customFetch(endpointUrl, {
-        method: method,
-        expectedStatusCode: StatusCodes.OK,
-        serviceName: serviceName,
-        serviceFunction: serviceFunction,
-        failureMessage: `Failed to check status for invitation code ${code}`,
-        authRequired: false,
-        retryOnFailedToFetch: true
-      });
+    const response = await customFetch(endpointUrl, {
+      method: method,
+      expectedStatusCode: StatusCodes.OK,
+      serviceName: serviceName,
+      serviceFunction: serviceFunction,
+      failureMessage: `Failed to check status for invitation code ${code}`,
+      authRequired: false,
+      retryOnFailedToFetch: true,
+    });
 
-      const responseBody = await response.text();
-      let data: Invitation;
+    const responseBody = await response.text();
+    let data: Invitation;
 
-      data = JSON.parse(responseBody);
+    data = JSON.parse(responseBody);
 
-      return data;
+    return data;
   }
 }
 

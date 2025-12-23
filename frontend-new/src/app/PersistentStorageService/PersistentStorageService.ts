@@ -197,13 +197,13 @@ export class PersistentStorageService {
    * @param userId - ID of the user
    */
   static clearSeenFeedbackNotification(userId: string): void {
-    const usersStr = this.storage.getItem(FEEDBACK_NOTIFICATION_KEY)
+    const usersStr = this.storage.getItem(FEEDBACK_NOTIFICATION_KEY);
     if (!usersStr) return;
 
     const userIds: string[] = JSON.parse(usersStr);
-    const updatedUserIds = userIds.filter(id => id !== userId);
+    const updatedUserIds = userIds.filter((id) => id !== userId);
 
-    if (updatedUserIds.length === 0){
+    if (updatedUserIds.length === 0) {
       this.storage.removeItem(FEEDBACK_NOTIFICATION_KEY);
     } else if (userIds.length !== updatedUserIds.length) {
       this.storage.setItem(FEEDBACK_NOTIFICATION_KEY, JSON.stringify(updatedUserIds));
@@ -222,7 +222,7 @@ export class PersistentStorageService {
    * @returns string - The client Device UUID.
    */
   static getClientId(): string | null {
-    return this.storage.getItem(CLIENT_ID_KEY)
+    return this.storage.getItem(CLIENT_ID_KEY);
   }
 
   /**

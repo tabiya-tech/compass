@@ -18,6 +18,6 @@ export const Shown: StoryObj<typeof AuthHeader> = {
 
 export const NoSubtitle: StoryObj<typeof AuthHeader> = {
   args: {
-    title: "Only title"
-  }
-}
+    title: "Only title",
+  },
+};

@@ -171,7 +171,7 @@ describe("Ensure Required Environment Variables", () => {
         SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY: btoa("foo"),
         SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID: btoa("foo"),
         FRONTEND_SUPPORTED_LOCALES: btoa("[]"),
-        FRONTEND_DEFAULT_LOCALE: btoa("en-US")
+        FRONTEND_DEFAULT_LOCALE: btoa("en-US"),
       },
       writable: true,
     });

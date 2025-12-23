@@ -95,8 +95,8 @@ describe("SkillsRankingPerceivedRank", () => {
       .spyOn(UserPreferencesStateService, "getInstance")
       .mockReturnValue({ getActiveSessionId: () => givenSessionId } as any);
     const actualOnFinish = jest.fn().mockResolvedValue(undefined);
-    const givenState = createState(SkillsRankingPhase.PERCEIVED_RANK)
-    const givenUserPerceivedRankValue = 42
+    const givenState = createState(SkillsRankingPhase.PERCEIVED_RANK);
+    const givenUserPerceivedRankValue = 42;
 
     // WHEN rendering, change slider and submit
     render(<SkillsRankingPerceivedRank onFinish={actualOnFinish} skillsRankingState={givenState} />);
@@ -118,7 +118,11 @@ describe("SkillsRankingPerceivedRank", () => {
       jest.runOnlyPendingTimers();
     });
     await flush();
-    expect(mockUpdate).toHaveBeenCalledWith(givenSessionId, SkillsRankingPhase.RETYPED_RANK, givenUserPerceivedRankValue);
+    expect(mockUpdate).toHaveBeenCalledWith(
+      givenSessionId,
+      SkillsRankingPhase.RETYPED_RANK,
+      givenUserPerceivedRankValue
+    );
     expect(actualOnFinish).toHaveBeenCalled();
     expect(console.error).not.toHaveBeenCalled();
   });

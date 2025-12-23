@@ -195,11 +195,7 @@ export const ReactionButtons: React.FC<ReactionButtonsProps> = ({ messageId, cur
           )}
         </PrimaryIconButton>
       </Box>
-      <DislikeReasonPopover
-        anchorEl={anchorEl}
-        open={isPopoverOpen}
-        onClose={handlePopoverClose}
-      />
+      <DislikeReasonPopover anchorEl={anchorEl} open={isPopoverOpen} onClose={handlePopoverClose} />
     </>
   );
 };

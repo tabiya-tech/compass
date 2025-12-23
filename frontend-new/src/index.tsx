@@ -79,7 +79,7 @@ waitForRoot()
     // At this point, the root element is in the DOM and the loading screen can be hidden.
     const loadingScreen = document.getElementById("loading");
     if (loadingScreen) {
-      fadeOutAndHide(loadingScreen, 500);// fade out the loading screen over 500ms
+      fadeOutAndHide(loadingScreen, 500); // fade out the loading screen over 500ms
     }
     const root = ReactDOM.createRoot(rootElement);
     root.render(
@@ -96,7 +96,7 @@ waitForRoot()
             </SnackbarProvider>
           </ThemeProvider>
         </Sentry.ErrorBoundary>
-      </React.StrictMode>,
+      </React.StrictMode>
     );
   })
   .catch((error) => {

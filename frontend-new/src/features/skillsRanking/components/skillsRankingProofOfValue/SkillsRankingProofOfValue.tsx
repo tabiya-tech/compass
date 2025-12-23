@@ -145,7 +145,10 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
 
   const effortMessage =
     effortType === EffortType.TIME_BASED ? (
-      <Trans i18nKey="features.skillsRanking.components.skillsRankingProofOfValue.waitingMessage" components={{ strong: <strong /> }} />
+      <Trans
+        i18nKey="features.skillsRanking.components.skillsRankingProofOfValue.waitingMessage"
+        components={{ strong: <strong /> }}
+      />
     ) : (
       ""
     );
@@ -348,7 +351,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
             <>
               {Math.max(0, 5 - (skillsRankingState.puzzles_solved || 0)) === 0 ? (
                 // If nothing remains, immediately complete (no extra puzzle rendered)
-                handlePuzzleSuccess() as any
+                (handlePuzzleSuccess() as any)
               ) : (
                 <RotateToSolvePuzzle
                   puzzles={Math.max(0, 5 - (skillsRankingState.puzzles_solved || 0))}

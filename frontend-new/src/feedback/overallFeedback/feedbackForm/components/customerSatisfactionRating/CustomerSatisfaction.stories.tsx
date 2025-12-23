@@ -8,7 +8,7 @@ const meta: Meta<typeof CustomerSatisfactionRating> = {
   tags: ["autodocs"],
   args: {
     notifyOnCustomerSatisfactionRatingSubmitted: action("notifyOnCustomerSatisfactionRatingSubmitted"),
-  }
+  },
 };
 
 export default meta;

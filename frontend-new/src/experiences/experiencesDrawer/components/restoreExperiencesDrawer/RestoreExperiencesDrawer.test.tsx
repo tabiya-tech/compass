@@ -64,7 +64,7 @@ describe("RestoreExperiencesDrawer", () => {
       exploration_phase: DiveInPhase.PROCESSED,
     };
     // AND a mock for getExperiences that returns some experiences (when asked deleted)
-   const getExperiencesMock = jest
+    const getExperiencesMock = jest
       .spyOn(ExperienceService.getInstance(), "getExperiences")
       .mockResolvedValueOnce([deletedExperience]);
 
@@ -144,9 +144,9 @@ describe("RestoreExperiencesDrawer", () => {
   test("should sort experiences alphabetically by title", async () => {
     // GIVEN unsorted experiences with various titles
     const unsortedExperiences: Experience[] = [
-      { ...mockExperiences[0], UUID: "1", experience_title: "Foo"},
-      { ...mockExperiences[0], UUID: "2", experience_title: "Bar"},
-      { ...mockExperiences[0], UUID: "3", experience_title: "Baz"},
+      { ...mockExperiences[0], UUID: "1", experience_title: "Foo" },
+      { ...mockExperiences[0], UUID: "2", experience_title: "Bar" },
+      { ...mockExperiences[0], UUID: "3", experience_title: "Baz" },
     ];
     // AND a mock for getExperiences that returns these unsorted experiences
     jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce([...unsortedExperiences]);
@@ -180,9 +180,7 @@ describe("RestoreExperiencesDrawer", () => {
       exploration_phase: DiveInPhase.PROCESSED,
     };
     // AND a mock for getExperiences that returns current and deleted experience
-    jest
-      .spyOn(ExperienceService.getInstance(), "getExperiences")
-      .mockResolvedValueOnce([deletedExperience]);
+    jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce([deletedExperience]);
 
     // WHEN the component is rendered
     render(

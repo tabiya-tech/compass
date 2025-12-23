@@ -62,15 +62,15 @@ i18n
       caches: ["localStorage"],
       convertDetectedLanguage: (lng: string) => {
         const normalizedLng = lng.toLowerCase();
-        
+
         if (envSupportedLocales.includes(lng as Locale)) {
           return lng;
         }
-        
-        const matchingLocale = envSupportedLocales.find((locale) => 
+
+        const matchingLocale = envSupportedLocales.find((locale) =>
           locale.toLowerCase().startsWith(normalizedLng.split("-")[0] + "-")
         );
-        
+
         if (matchingLocale) {
           return matchingLocale;
         }

@@ -51,16 +51,16 @@ describe("ResetPasswordEmailSender", () => {
     // WHEN user clicks the reset link and enters an email
     await user.click(screen.getByTestId(DATA_TEST_ID.RESET_LINK));
     const inputWrapper = screen.getByTestId(DATA_TEST_ID.INPUT);
-    const input = within(inputWrapper).getByRole('textbox');
+    const input = within(inputWrapper).getByRole("textbox");
     fireEvent.change(input, { target: { value: "test@example.com" } });
-    
+
     await user.click(screen.getByTestId(DATA_TEST_ID.SUBMIT));
 
     // THEN the service should be called
     await waitFor(() => {
       expect(mockResetPassword).toHaveBeenCalledWith("test@example.com");
     });
-    
+
     // AND modal should close
     await waitFor(() => {
       expect(screen.queryByTestId(DATA_TEST_ID.DIALOG)).not.toBeInTheDocument();
@@ -77,9 +77,9 @@ describe("ResetPasswordEmailSender", () => {
     // WHEN submitting the form
     await user.click(screen.getByTestId(DATA_TEST_ID.RESET_LINK));
     const inputWrapper = screen.getByTestId(DATA_TEST_ID.INPUT);
-    const input = within(inputWrapper).getByRole('textbox');
+    const input = within(inputWrapper).getByRole("textbox");
     fireEvent.change(input, { target: { value: "fail@example.com" } });
-    
+
     await user.click(screen.getByTestId(DATA_TEST_ID.SUBMIT));
 
     // THEN the modal should close

@@ -1,9 +1,8 @@
-import "src/_test_utilities/sentryMock"
+import "src/_test_utilities/sentryMock";
 
 import * as Sentry from "@sentry/react";
 import { requestInvitationCode } from "./SentryInvitationCodeRequest.service";
 import { RequestInvitationCodeError } from "src/error/commonErrors";
-
 
 describe("requestInvitationCode", () => {
   beforeEach(() => {
@@ -23,7 +22,8 @@ describe("requestInvitationCode", () => {
     requestInvitationCode(requestData);
 
     // THEN expect Sentry.captureFeedback to be called with the correct data
-    expect(Sentry.captureFeedback).toHaveBeenCalledWith({
+    expect(Sentry.captureFeedback).toHaveBeenCalledWith(
+      {
         name: requestData.name,
         email: requestData.email,
         message: `A user has requested an invitation code. Additional information: ${requestData.message}`,
@@ -31,7 +31,8 @@ describe("requestInvitationCode", () => {
           source: "Request Invitation Code Form",
           name: requestData.name,
         },
-      }, { includeReplay: false },
+      },
+      { includeReplay: false }
     );
   });
 
@@ -51,6 +52,10 @@ describe("requestInvitationCode", () => {
 
     // WHEN requesting an invitation code AND it fails
     // THEN expect the error to be thrown
-    expect(() => requestInvitationCode(requestData)).toThrow(new RequestInvitationCodeError(`Something went wrong while attempting to request new invitation for user with email ${requestData.email}`));
+    expect(() => requestInvitationCode(requestData)).toThrow(
+      new RequestInvitationCodeError(
+        `Something went wrong while attempting to request new invitation for user with email ${requestData.email}`
+      )
+    );
   });
-}); 
+});

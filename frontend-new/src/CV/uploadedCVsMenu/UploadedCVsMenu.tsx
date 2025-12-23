@@ -42,9 +42,7 @@ const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
   const { t } = useTranslation();
   const isCollectPhase = currentPhase === ConversationPhase.COLLECT_EXPERIENCES;
 
-  const helpTipText = isCollectPhase
-    ? t("cv.uploadedCVsMenu.helpCollect")
-    : t("cv.uploadedCVsMenu.helpDisabled");
+  const helpTipText = isCollectPhase ? t("cv.uploadedCVsMenu.helpCollect") : t("cv.uploadedCVsMenu.helpDisabled");
 
   return (
     <Box

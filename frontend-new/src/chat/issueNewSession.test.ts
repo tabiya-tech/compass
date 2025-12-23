@@ -2,7 +2,11 @@
 import "src/_test_utilities/consoleMock";
 
 import { issueNewSession } from "src/chat/issueNewSession";
-import { Language, SensitivePersonalDataRequirement, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {
+  Language,
+  SensitivePersonalDataRequirement,
+  UserPreference,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { SessionError } from "src/error/commonErrors";
@@ -20,7 +24,7 @@ describe("issueNewSession", () => {
     const givenUserPreferences: UserPreference = {
       user_id: givenUserId,
       language: Language.en,
-      accepted_tc : new Date(),
+      accepted_tc: new Date(),
       sessions: [givenNewSessionId],
       user_feedback_answered_questions: {},
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
@@ -29,7 +33,6 @@ describe("issueNewSession", () => {
     };
     const givenUserPreferencesServiceInstance = UserPreferencesService.getInstance();
     jest.spyOn(givenUserPreferencesServiceInstance, "getNewSession").mockResolvedValueOnce(givenUserPreferences);
-
 
     // WHEN the function is called
     const actualNewSessionId = await issueNewSession(givenUserId);
@@ -52,7 +55,7 @@ describe("issueNewSession", () => {
     const givenUserPreferences: UserPreference = {
       user_id: "foo",
       language: Language.en,
-      accepted_tc : new Date(),
+      accepted_tc: new Date(),
       sessions: [123],
       user_feedback_answered_questions: {},
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,

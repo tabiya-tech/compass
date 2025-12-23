@@ -17,7 +17,7 @@ describe("TextConfirmModalDialog", () => {
     const givenCancelButtonText = "Cancel";
     const givenApproveButtonText = "Yes, continue";
     const givenTextParagraphs = [
-      { id: "001", text: <>This is a sample body text for the TextConfirmModalDialog component.</>},
+      { id: "001", text: <>This is a sample body text for the TextConfirmModalDialog component.</> },
       { id: "002", text: <>Are you sure you want to proceed?</> },
     ];
 
@@ -80,7 +80,7 @@ describe("TextConfirmModalDialog", () => {
     const givenCancelButtonText = "Cancel";
     const givenApproveButtonText = "Yes, continue";
     const givenTextParagraphs = [
-      { id: "001", text: <>This is a sample body text for the TextConfirmModalDialog component.</>},
+      { id: "001", text: <>This is a sample body text for the TextConfirmModalDialog component.</> },
     ];
 
     // WHEN the TextConfirmModalDialog is rendered

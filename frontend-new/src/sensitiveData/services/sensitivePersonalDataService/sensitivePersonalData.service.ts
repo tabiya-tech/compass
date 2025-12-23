@@ -15,7 +15,10 @@ import { FieldDefinition } from "src/sensitiveData/components/sensitiveDataForm/
 import { toEncryptionPayload } from "../../components/sensitiveDataForm/config/utils";
 
 export class SensitivePersonalDataSkipError extends Error {
-  constructor(message: string, public readonly cause?: Error) {
+  constructor(
+    message: string,
+    public readonly cause?: Error
+  ) {
     super(message);
     this.name = "SensitivePersonalDataSkipError";
   }
@@ -39,7 +42,7 @@ class SensitivePersonalDataService {
   async createSensitivePersonalData(
     personal_data: SensitivePersonalData,
     user_id: string,
-    fields: FieldDefinition[],
+    fields: FieldDefinition[]
   ): Promise<void> {
     // Create full name from first and last name if available
     let fullName = "";

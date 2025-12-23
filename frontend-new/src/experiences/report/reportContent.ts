@@ -41,8 +41,7 @@ export const ReportContent = {
   get DISCLAIMER_TEXT_PART3() {
     return i18n.t("experiences.report.disclaimer.part3");
   },
-  REPORT_BODY_TEXT: (currentDate: string) =>
-    i18n.t("experiences.report.bodyText", { date: currentDate }),
+  REPORT_BODY_TEXT: (currentDate: string) => i18n.t("experiences.report.bodyText", { date: currentDate }),
   IMAGE_URLS: {
     COMPASS_LOGO: `${process.env.PUBLIC_URL}/logo.png`,
     OXFORD_LOGO: `${process.env.PUBLIC_URL}/oxford-logo.png`,

@@ -111,9 +111,7 @@ const refreshToken = async (
   const isProviderSessionValid = await authService.isProviderSessionValid();
 
   if (!isProviderSessionValid) {
-    const userFriendlyErrorMessage = i18n.t(
-      ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS.AUTHENTICATION_FAILURE,
-    );
+    const userFriendlyErrorMessage = i18n.t(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS.AUTHENTICATION_FAILURE);
     await authService.logout();
     enqueueSnackbar(`${userFriendlyErrorMessage} ${i18n.t("auth.loggingYouOutNotice")}`, {
       autoHideDuration: LOGGED_OUT_SNACKBAR_AUTO_HIDE_DURATION,
@@ -135,7 +133,9 @@ const refreshToken = async (
     await authService.refreshToken();
     const newToken = AuthenticationStateService.getInstance().getToken();
     if (newToken && authService.isTokenValid(newToken).isValid) {
-      console.info(`customFetch: Token refreshed successfully for ${serviceName}.${serviceFunction} on attempt ${attempt}.`);
+      console.info(
+        `customFetch: Token refreshed successfully for ${serviceName}.${serviceFunction} on attempt ${attempt}.`
+      );
     }
 
     if (!newToken) {

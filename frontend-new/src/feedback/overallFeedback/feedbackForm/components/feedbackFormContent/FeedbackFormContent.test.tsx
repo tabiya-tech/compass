@@ -1,6 +1,8 @@
 import "src/_test_utilities/consoleMock";
 import { render, screen, fireEvent, act } from "src/_test_utilities/test-utils";
-import FeedbackFormContent, { DATA_TEST_ID } from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
+import FeedbackFormContent, {
+  DATA_TEST_ID,
+} from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import getFeedbackFormContentSteps from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/feedbackFormContentSteps";
 import { useSwipeable } from "react-swipeable";
 import i18n from "src/i18n/i18n";
@@ -166,7 +168,7 @@ describe("FeedbackFormContent", () => {
           rating_boolean: undefined,
           rating_numeric: 5,
           selected_options_keys: undefined,
-        }
+        },
       });
 
       // AND no errors or warnings to be shown

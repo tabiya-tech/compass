@@ -151,8 +151,8 @@ const Register: React.FC = () => {
         // if the instance has application registration code set, we should use that instead of the one entered by the user.
         const registrationCodeToUse = registrationCode || applicationRegistrationCode;
         // We're using the mail as the username for now, since we don't have any use case in the app for it
-  await firebaseEmailAuthServiceInstance.register(email, password, email, registrationCodeToUse);
-  enqueueSnackbar(t("auth.verificationEmailSentShort"), { variant: "success" });
+        await firebaseEmailAuthServiceInstance.register(email, password, email, registrationCodeToUse);
+        enqueueSnackbar(t("auth.verificationEmailSentShort"), { variant: "success" });
         // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
         // since if we don't do that, the user may be able to access the application without verifying their email
         // or accepting the dpa.
@@ -236,7 +236,8 @@ const Register: React.FC = () => {
           />
         )}
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          {t("auth.pages.register.alreadyHaveAccount")} <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>{t("common.buttons.login")}</CustomLink>
+          {t("auth.pages.register.alreadyHaveAccount")}{" "}
+          <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>{t("common.buttons.login")}</CustomLink>
         </Typography>
         {!applicationRegistrationCode && <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />}
       </Box>

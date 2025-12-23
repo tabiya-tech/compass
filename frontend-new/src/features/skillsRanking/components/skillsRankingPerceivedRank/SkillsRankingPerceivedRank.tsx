@@ -77,9 +77,7 @@ const SkillsRankingPerceivedRank: React.FC<Readonly<SkillsRankingPerceivedRankPr
       }
 
       // Determine the next phase based on experiment group
-      const nextPhase = shouldShowMarketDisclosure
-        ? SkillsRankingPhase.RETYPED_RANK 
-        : SkillsRankingPhase.COMPLETED;
+      const nextPhase = shouldShowMarketDisclosure ? SkillsRankingPhase.RETYPED_RANK : SkillsRankingPhase.COMPLETED;
 
       const updatedState = await SkillsRankingService.getInstance().updateSkillsRankingState(
         activeSessionId,

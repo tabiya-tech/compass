@@ -1,14 +1,15 @@
-import { SensitivePersonalDataRequirement, UserPreference, Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import {
-  QUESTION_KEYS,
-} from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+  SensitivePersonalDataRequirement,
+  UserPreference,
+  Language,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 
 export default class UserPreferencesStateService {
   private static instance: UserPreferencesStateService;
   private userPreferences: UserPreference | null = null;
 
-  private constructor() {
-  }
+  private constructor() {}
 
   public static getInstance(): UserPreferencesStateService {
     if (!UserPreferencesStateService.instance) {
@@ -55,7 +56,7 @@ export default class UserPreferencesStateService {
     if (activeSessionId === null) {
       return false;
     }
-    const answered_questions = this.userPreferences!.user_feedback_answered_questions
+    const answered_questions = this.userPreferences!.user_feedback_answered_questions;
     if (Object.keys(answered_questions).length === 0) {
       return false;
     }
@@ -64,11 +65,9 @@ export default class UserPreferencesStateService {
       return false;
     }
 
-    return answered_questions[activeSessionId].some(
-      (question) => question !== QUESTION_KEYS.CUSTOMER_SATISFACTION
-    );
+    return answered_questions[activeSessionId].some((question) => question !== QUESTION_KEYS.CUSTOMER_SATISFACTION);
   }
-  
+
   public activeSessionHasCustomerSatisfactionRating(): boolean {
     const activeSessionId = this.getActiveSessionId();
 
@@ -79,7 +78,7 @@ export default class UserPreferencesStateService {
     // userPreferences.user_feedback_answered_questions is an object with session ids as keys,
     // and it is never undefined, but it can be an empty object: {}.
     // For Postel's Law: assert that the object is defined.
-    const answered_questions = this.userPreferences!.user_feedback_answered_questions
+    const answered_questions = this.userPreferences!.user_feedback_answered_questions;
     if (!answered_questions || Object.keys(answered_questions).length === 0) {
       return false;
     }
@@ -88,7 +87,7 @@ export default class UserPreferencesStateService {
       return false;
     }
 
-    return answered_questions[activeSessionId].includes(QUESTION_KEYS.CUSTOMER_SATISFACTION)
+    return answered_questions[activeSessionId].includes(QUESTION_KEYS.CUSTOMER_SATISFACTION);
   }
 
   private cloneUserPreferences(preferences: UserPreference | null): UserPreference | null {

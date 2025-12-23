@@ -10,7 +10,7 @@ export const skillsRankingHappyPathFull = [
   SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
   SkillsRankingPhase.PERCEIVED_RANK,
   SkillsRankingPhase.RETYPED_RANK,
-  SkillsRankingPhase.COMPLETED
+  SkillsRankingPhase.COMPLETED,
 ];
 
 // Flow path for groups that skip market disclosure and retyped rank (groups 2 & 4)
@@ -20,7 +20,7 @@ export const skillsRankingHappyPathSkipped = [
   SkillsRankingPhase.PROOF_OF_VALUE,
   SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
   SkillsRankingPhase.PERCEIVED_RANK,
-  SkillsRankingPhase.COMPLETED
+  SkillsRankingPhase.COMPLETED,
 ];
 
 // Helper function to get the correct flow path for an experiment group

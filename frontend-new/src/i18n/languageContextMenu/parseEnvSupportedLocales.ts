@@ -74,9 +74,7 @@ export function parseEnvSupportedLocales(): Locale[] {
   const defaultLocaleStr = getDefaultLocale() as Locale;
   if (!defaultLocaleStr) {
     console.error(
-      new ParseEnvLocaleError(
-        `FRONTEND_DEFAULT_LOCALE is not set or empty. Falling back to ${FALL_BACK_LOCALE}`
-      )
+      new ParseEnvLocaleError(`FRONTEND_DEFAULT_LOCALE is not set or empty. Falling back to ${FALL_BACK_LOCALE}`)
     );
     return [FALL_BACK_LOCALE];
   }

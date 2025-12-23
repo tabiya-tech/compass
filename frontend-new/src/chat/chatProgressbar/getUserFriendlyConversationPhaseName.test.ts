@@ -65,12 +65,12 @@ describe("getUserFriendlyConversationPhaseName", () => {
       percentage: 0,
       current: null,
       total: null,
-    }
+    };
 
     // WHEN getUserFriendlyConversationPhaseName is called
     const actual = getUserFriendlyConversationPhaseName(givenConversationPhase);
 
     // THEN it should return the user-friendly name for the UNKNOWN phase.
     expect(actual).toBe(i18n.t("chat.chatProgressbar.phases.unknown"));
-  })
+  });
 });

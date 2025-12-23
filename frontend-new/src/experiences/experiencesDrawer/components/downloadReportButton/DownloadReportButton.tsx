@@ -45,7 +45,9 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({ disabled, i
         onClick={notifyOnDownloadPdf}
         data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON}
       >
-        {isLoading ? t("experiences.experiencesDrawer.components.downloadReportButton.downloading") : t("experiences.experiencesDrawer.components.downloadReportButton.downloadCv")}
+        {isLoading
+          ? t("experiences.experiencesDrawer.components.downloadReportButton.downloading")
+          : t("experiences.experiencesDrawer.components.downloadReportButton.downloadCv")}
       </PrimaryButton>
       {disabled && (
         <HelpTip icon={<InfoIcon />} data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_HELP_TIP}>

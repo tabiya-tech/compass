@@ -428,7 +428,9 @@ describe("Testing Register component", () => {
     );
 
     // AND the request registration code link should not be displayed
-    expect(screen.queryByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)
+    ).not.toBeInTheDocument();
 
     // AND the register form should match snapshot
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_CONTAINER)).toMatchSnapshot();

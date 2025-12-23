@@ -246,13 +246,13 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
       data-testid={DATA_TEST_ID.CONTAINER}
     >
-  
       <Typography variant="body1" color="text.secondary" data-testid={DATA_TEST_ID.INSTRUCTION_TEXT}>
         {t("features.skillsRanking.components.rotateToSolve.instructions1")}{" "}
-        <RotateRightIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />{t("features.skillsRanking.components.rotateToSolve.instructions2")}{" "}
+        <RotateRightIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />
+        {t("features.skillsRanking.components.rotateToSolve.instructions2")}{" "}
         <RotateLeftIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />.
       </Typography>
-      
+
       <Box
         display="flex"
         gap={1.5}

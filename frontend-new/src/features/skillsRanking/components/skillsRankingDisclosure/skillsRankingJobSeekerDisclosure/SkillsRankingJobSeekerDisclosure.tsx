@@ -18,7 +18,6 @@ import Timestamp from "src/chat/chatMessage/components/chatMessageFooter/compone
 import { getDefaultTypingDurationMs, getJobPlatformUrl } from "src/features/skillsRanking/constants";
 import { shouldSkipMarketDisclosure } from "src/features/skillsRanking/utils/createMessages";
 
-
 const uniqueId = "9b0dbc80-c786-4c24-ba9d-04b6946fa0b9";
 export const DATA_TEST_ID = {
   SKILLS_RANKING_JOB_SEEKER_DISCLOSURE_CONTAINER: `skills-ranking-job-seeker-disclosure-container-${uniqueId}`,
@@ -71,9 +70,12 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
       await onFinish(newSkillsRankingState);
     } catch (error) {
       console.error("Error updating skills ranking state:", error);
-      enqueueSnackbar(t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.updateError"), { variant: "error" });
+      enqueueSnackbar(
+        t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.updateError"),
+        { variant: "error" }
+      );
     }
-  }, [currentPhase, onFinish, enqueueSnackbar,t]);
+  }, [currentPhase, onFinish, enqueueSnackbar, t]);
 
   useEffect(() => {
     if (isReplay || hasFinished) return;
@@ -91,16 +93,20 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
 
     return () => clearTimeout(timer);
   }, [isReplay, hasFinished, handleContinue]);
-  const isGroupUndisclosed = useMemo(() => shouldSkipMarketDisclosure(skillsRankingState.experiment_group), [skillsRankingState.experiment_group]);
+  const isGroupUndisclosed = useMemo(
+    () => shouldSkipMarketDisclosure(skillsRankingState.experiment_group),
+    [skillsRankingState.experiment_group]
+  );
 
   const renderGroupMessage = () => {
-   if (isGroupUndisclosed) {
+    if (isGroupUndisclosed) {
       return (
         <ChatBubble
           sender={ConversationMessageSender.COMPASS}
-          message={
-            t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.pendingMessage", { jobPlatformUrl: getJobPlatformUrl() })
-          }
+          message={t(
+            "features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.pendingMessage",
+            { jobPlatformUrl: getJobPlatformUrl() }
+          )}
         />
       );
     }
@@ -110,25 +116,49 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
         sender={ConversationMessageSender.COMPASS}
         message={
           <>
-            {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart1_prefix")}
-            <strong>{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart1_main", {
-              jobPlatformUrl: getJobPlatformUrl(),
-              groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1,
-              groupTotal: jobSeekerComparisonLabels.length
-            })}</strong>
-            <br/>
-            {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_prefix", {
-              jobPlatformUrl: getJobPlatformUrl()
-            })}
-            <strong>{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_group", {
-              groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1
-            })}</strong>
-            {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_middle")}
-            <strong>{t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_label", {
-              comparisonLabel: selectedLabel
-            })}</strong>
-            {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_suffix")}
-            <br/>
+            {t(
+              "features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart1_prefix"
+            )}
+            <strong>
+              {t(
+                "features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart1_main",
+                {
+                  jobPlatformUrl: getJobPlatformUrl(),
+                  groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1,
+                  groupTotal: jobSeekerComparisonLabels.length,
+                }
+              )}
+            </strong>
+            <br />
+            {t(
+              "features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_prefix",
+              {
+                jobPlatformUrl: getJobPlatformUrl(),
+              }
+            )}
+            <strong>
+              {t(
+                "features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_group",
+                {
+                  groupIndex: jobSeekerComparisonLabels.indexOf(selectedLabel) + 1,
+                }
+              )}
+            </strong>
+            {t(
+              "features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_middle"
+            )}
+            <strong>
+              {t(
+                "features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_label",
+                {
+                  comparisonLabel: selectedLabel,
+                }
+              )}
+            </strong>
+            {t(
+              "features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_suffix"
+            )}
+            <br />
           </>
         }
       >

@@ -51,13 +51,11 @@ const ProtectedRouteKeys = {
 };
 
 const NotFound: React.FC = () => {
-    const { t } = useTranslation();
-    return <ErrorPage errorMessage={t("error.errorPage.notFound")} />;
+  const { t } = useTranslation();
+  return <ErrorPage errorMessage={t("error.errorPage.notFound")} />;
 };
 
 const App = () => {
-
-
   const [loading, setLoading] = useState(true);
 
   const loadApplicationState = async () => {
@@ -109,7 +107,9 @@ const App = () => {
       // get the user from the token (validating again internally)
       const user = authenticationServiceInstance.getUser(token);
       if (!user) {
-        console.debug("Authentication token is not valid or user could not be extracted from token. Logging out the user.");
+        console.debug(
+          "Authentication token is not valid or user could not be extracted from token. Logging out the user."
+        );
         await authenticationServiceInstance.logout();
         return;
       }
@@ -133,9 +133,7 @@ const App = () => {
           console.warn("User has not registered but has a valid token. Logging out user.");
         } else {
           // Unexpected error while retrieving user preferences
-          console.error(
-            new AuthenticationError("Error retrieving user preferences. Logging out user.", error)
-          );
+          console.error(new AuthenticationError("Error retrieving user preferences. Logging out user.", error));
         }
 
         // Log out in both cases

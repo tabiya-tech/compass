@@ -19,7 +19,7 @@ export default class ChatService {
    * @returns {ChatService} The singleton instance of the ChatService.
    */
   static getInstance(): ChatService {
-     if (!ChatService.instance) {
+    if (!ChatService.instance) {
       ChatService.instance = new ChatService();
     }
     return ChatService.instance;
@@ -81,7 +81,7 @@ export default class ChatService {
       serviceFunction,
       failureMessage: `Failed to get chat history for session id ${sessionId}`,
       expectedContentType: "application/json",
-      retryOnFailedToFetch: true
+      retryOnFailedToFetch: true,
     });
 
     const responseBody = await response.text();
