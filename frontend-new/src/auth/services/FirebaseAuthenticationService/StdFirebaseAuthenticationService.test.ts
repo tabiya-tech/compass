@@ -87,7 +87,7 @@ describe("StdFirebaseAuthenticationService", () => {
   describe("refreshToken", () => {
     beforeEach(() => {
       resetAllMethodMocks(AuthenticationStateService.getInstance());
-    })
+    });
     test("should successfully refresh token when user exists", async () => {
       // GIVEN a current user exists with a token
       const mockToken = "new-token";
@@ -95,7 +95,7 @@ describe("StdFirebaseAuthenticationService", () => {
       const mockUser = {
         getIdToken: jest.fn().mockResolvedValue(mockToken),
       };
-      
+
       // AND the auth state listener is set up to return the user
       const mockUnsubscribe = jest.fn();
       (firebaseAuth.onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
@@ -105,7 +105,7 @@ describe("StdFirebaseAuthenticationService", () => {
       });
 
       // AND setting the token into state will succeed
-      jest.spyOn(AuthenticationStateService.getInstance(), "setToken")
+      jest.spyOn(AuthenticationStateService.getInstance(), "setToken");
 
       // WHEN refreshToken is called
       const result = await service.refreshToken();
@@ -122,14 +122,14 @@ describe("StdFirebaseAuthenticationService", () => {
       // AND it should call the unsubscribe function
       expect(mockUnsubscribe).toHaveBeenCalled();
     });
-    
+
     test("should handle errors during token refresh", async () => {
       // GIVEN a current user exists
       const mockError = new Error("Token refresh failed");
       const mockUser = {
         getIdToken: jest.fn().mockRejectedValue(mockError),
       };
-      
+
       // AND the auth state listener is set up to return the user
       const mockUnsubscribe = jest.fn();
       (firebaseAuth.onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
@@ -143,7 +143,7 @@ describe("StdFirebaseAuthenticationService", () => {
 
       // THEN it should reject with the error
       await expect(refreshPromise).rejects.toThrow("Token refresh failed");
-      
+
       // AND it should call the unsubscribe function
       expect(mockUnsubscribe).toHaveBeenCalled();
     });
@@ -283,7 +283,7 @@ describe("StdFirebaseAuthenticationService", () => {
 
       // THEN it should return the user
       expect(user).toBe(null);
-    })
+    });
 
     it("should return the user if the user is in the firebase storage", async () => {
       // GIVEN firebase.onAuthStateChanged calls back with a user
@@ -300,9 +300,7 @@ describe("StdFirebaseAuthenticationService", () => {
 
       // THEN it should return the user
       expect(user).toBe(mockUser);
-    })
-
-
+    });
 
     it("should reject with an error if firebase.getUser throws an error", async () => {
       // GIVEN firebase.onAuthStateChanged calls the onError callback
@@ -318,8 +316,8 @@ describe("StdFirebaseAuthenticationService", () => {
 
       // THEN it should reject with an error
       await expect(getCurrentUserPromise).rejects.toThrow("Failed to get current user from Firebase Auth");
-    })
-  })
+    });
+  });
 
   describe("isAuthSessionValid", () => {
     it("should return true if there is a valid auth session", async () => {
@@ -331,7 +329,7 @@ describe("StdFirebaseAuthenticationService", () => {
 
       // THEN it should be false
       expect(isValid).toBe(true);
-    })
+    });
 
     it("should return false if there is no valid auth session", async () => {
       // GIVEN getCurrentUser returns null
@@ -342,7 +340,7 @@ describe("StdFirebaseAuthenticationService", () => {
 
       // THEN it should be false
       expect(isValid).toBe(false);
-    })
+    });
 
     it("should return false if getCurrentUser throws an error", async () => {
       // GIVEN getCurrentUser throws an error
@@ -356,6 +354,6 @@ describe("StdFirebaseAuthenticationService", () => {
 
       // AND it should log the error
       expect(console.error).toHaveBeenCalledWith(new Error("Failed to get user"));
-    })
+    });
   });
 });

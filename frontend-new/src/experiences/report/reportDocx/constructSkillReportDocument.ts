@@ -2,12 +2,7 @@ import { Document, Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType, Bo
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import { ReportContent } from "src/experiences/report/reportContent";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
-import {
-  COLORS,
-  formatDate,
-  getBase64Image,
-  prettifyText,
-} from "src/experiences/report/util";
+import { COLORS, formatDate, getBase64Image, prettifyText } from "src/experiences/report/util";
 import constructSkillsDescription from "src/experiences/report/reportDocx/components/ConstructSkillsDescription";
 import HeaderComponent from "src/experiences/report/reportDocx/components/Header";
 import FooterComponent from "src/experiences/report/reportDocx/components/Footer";
@@ -51,7 +46,7 @@ const constructPersonalInformationSection = async (
   address: string | undefined,
   phone: string | undefined,
   email: string | undefined
-) : Promise<void> => {
+): Promise<void> => {
   if (name) {
     paragraphs.push(
       new Paragraph({
@@ -83,43 +78,49 @@ const constructPersonalInformationSection = async (
 
 // Construct the report title
 const constructReportTitle = (paragraphs: Paragraph[]): void => {
-  paragraphs.push(new Paragraph({
-    children: [
-      new TextRun({
-        text: ReportContent.SKILLS_REPORT_TITLE,
-        bold: true,
-        color: TabiyaBasicColors.DarkBlue,
-        size: 32,
-      }),
-    ],
-    heading: HeadingLevel.TITLE,
-    alignment: AlignmentType.LEFT,
-    spacing: { after: 300 },
-  }));
+  paragraphs.push(
+    new Paragraph({
+      children: [
+        new TextRun({
+          text: ReportContent.SKILLS_REPORT_TITLE,
+          bold: true,
+          color: TabiyaBasicColors.DarkBlue,
+          size: 32,
+        }),
+      ],
+      heading: HeadingLevel.TITLE,
+      alignment: AlignmentType.LEFT,
+      spacing: { after: 300 },
+    })
+  );
 };
 
 // Construct the report body text
 const constructReportDescription = (paragraphs: Paragraph[], conversationConductedAt: string | null): void => {
-  paragraphs.push(new Paragraph({
-    children: [
-      new TextRun({
-        text: prettifyText(ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt))),
-        size: 22,
-      }),
-    ],
-    alignment: AlignmentType.START,
-    spacing: { before: 300, after: 200 },
-  }));
+  paragraphs.push(
+    new Paragraph({
+      children: [
+        new TextRun({
+          text: prettifyText(ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt))),
+          size: 22,
+        }),
+      ],
+      alignment: AlignmentType.START,
+      spacing: { before: 300, after: 200 },
+    })
+  );
 };
 
 // Construct the section divider
 const constructSectionDivider = (paragraphs: Paragraph[]): void => {
-  paragraphs.push(new Paragraph({
-    border: {
-      top: { style: BorderStyle.SINGLE, size: 10 },
-    },
-    spacing: { before: 200 },
-  }));
+  paragraphs.push(
+    new Paragraph({
+      border: {
+        top: { style: BorderStyle.SINGLE, size: 10 },
+      },
+      spacing: { before: 200 },
+    })
+  );
 };
 
 export const constructSkillReportDocument = async (props: SkillReportDocumentProps): Promise<Document> => {
@@ -138,7 +139,7 @@ export const constructSkillReportDocument = async (props: SkillReportDocumentPro
   constructSectionDivider(paragraphs);
 
   // Add the list of experiences
-  await constructExperienceList(paragraphs, experiences)
+  await constructExperienceList(paragraphs, experiences);
 
   // Add skills description (Glossary)
   constructSkillsDescription(paragraphs, experiences);
@@ -171,4 +172,4 @@ export const constructSkillReportDocument = async (props: SkillReportDocumentPro
       },
     ],
   });
-}; 
+};

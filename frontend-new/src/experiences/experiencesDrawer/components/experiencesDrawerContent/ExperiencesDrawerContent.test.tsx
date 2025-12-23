@@ -383,7 +383,7 @@ describe("ReportDrawerContent", () => {
       fireEvent.click(moreButton);
 
       // AND the restore to original menu item is clicked
-  const restoreToOriginalMenuItem = screen.getByText("Revert");
+      const restoreToOriginalMenuItem = screen.getByText("Revert");
       fireEvent.click(restoreToOriginalMenuItem);
 
       // THEN the onRestoreToOriginal handler should be called with the experience

@@ -26,7 +26,7 @@ jest.mock("@sentry/react", () => ({
 }));
 
 jest.mock("@sentry/core", () => ({
-  createTransport: jest.fn()
+  createTransport: jest.fn(),
 }));
 
 jest.mock("./envService", () => ({
@@ -169,7 +169,7 @@ describe("sentryInit", () => {
         replaysOnErrorSampleRate: expectedConfig.replaysOnErrorSampleRate,
         beforeSend: expect.any(Function),
         beforeSendLog: expect.any(Function),
-        transport: expect.any(Function)
+        transport: expect.any(Function),
       });
 
       // AND the Sentry.captureConsoleIntegration should be called with default levels
@@ -258,7 +258,7 @@ describe("sentryInit", () => {
           replayIntegration: true,
           enableLogs: true,
           levels: ["error", "warn", "info", "debug"],
-          logLevels: ["error", "warn", "info", "debug", "log"]
+          logLevels: ["error", "warn", "info", "debug", "log"],
         },
       ],
       [

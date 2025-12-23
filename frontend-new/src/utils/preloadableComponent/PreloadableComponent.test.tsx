@@ -52,10 +52,10 @@ describe("PreloadableComponent", () => {
         <PreloadableComponent foo="bar">baz</PreloadableComponent>
       </Suspense>
     );
-    
+
     // THEN expect the loading fallback to be shown first
     expect(screen.getByText("Loading...")).toBeInTheDocument();
-    
+
     // AND the component to eventually be loaded
     await waitFor(() => {
       expect(isLoaded()).toBe(true);

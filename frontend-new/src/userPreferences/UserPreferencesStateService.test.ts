@@ -2,7 +2,11 @@
 import "src/_test_utilities/consoleMock";
 
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import { Language, SensitivePersonalDataRequirement, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {
+  Language,
+  SensitivePersonalDataRequirement,
+  UserPreference,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { nanoid } from "nanoid";
 import { QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 
@@ -19,7 +23,7 @@ function getMockUserPreference(): UserPreference {
     // 3 random session ids
     sessions: randomSessions,
     user_feedback_answered_questions: {
-      [randomSessions[0]]: ["question1", "question2"]
+      [randomSessions[0]]: ["question1", "question2"],
     },
     experiments: {},
   };
@@ -221,7 +225,9 @@ describe("UserPreferencesStateService", () => {
         // GIVEN user preferences with feedback for the active session are set
         const givenPreferences: UserPreference = getMockUserPreference();
         //guard
-        expect(Object.keys(givenPreferences.user_feedback_answered_questions)[0]).toEqual(givenPreferences.sessions[0].toString());
+        expect(Object.keys(givenPreferences.user_feedback_answered_questions)[0]).toEqual(
+          givenPreferences.sessions[0].toString()
+        );
         service.setUserPreferences(givenPreferences);
 
         // WHEN activeSessionHasFeedback is called
@@ -246,7 +252,7 @@ describe("UserPreferencesStateService", () => {
         // GIVEN user preferences with no sessions are set
         const givenPreferences: UserPreference = getMockUserPreference();
         givenPreferences.sessions = [];
-        givenPreferences.user_feedback_answered_questions = { };
+        givenPreferences.user_feedback_answered_questions = {};
         service.setUserPreferences(givenPreferences);
 
         // WHEN activeSessionHasFeedback is called
@@ -260,7 +266,7 @@ describe("UserPreferencesStateService", () => {
         // GIVEN user preferences with customer satisfaction rating for the active session are set
         const givenPreferences: UserPreference = getMockUserPreference();
         givenPreferences.user_feedback_answered_questions = {
-          [givenPreferences.sessions[0]]: [QUESTION_KEYS.CUSTOMER_SATISFACTION]
+          [givenPreferences.sessions[0]]: [QUESTION_KEYS.CUSTOMER_SATISFACTION],
         };
         service.setUserPreferences(givenPreferences);
 
@@ -275,7 +281,7 @@ describe("UserPreferencesStateService", () => {
         // GIVEN user preferences with no customer satisfaction rating for the active session are set
         const givenPreferences: UserPreference = getMockUserPreference();
         givenPreferences.user_feedback_answered_questions = {
-          [givenPreferences.sessions[0]]: ["question1", "question2"]
+          [givenPreferences.sessions[0]]: ["question1", "question2"],
         };
         service.setUserPreferences(givenPreferences);
 

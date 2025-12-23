@@ -38,5 +38,5 @@ describe("AuthHeader tests", () => {
 
     // AND expect the component to match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.AUTH_HEADER_CONTAINER)).toMatchSnapshot();
-  })
+  });
 });

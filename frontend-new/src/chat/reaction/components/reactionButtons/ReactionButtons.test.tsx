@@ -1,7 +1,7 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
 
-import { render, screen, act, waitFor , userEvent } from "src/_test_utilities/test-utils";
+import { render, screen, act, waitFor, userEvent } from "src/_test_utilities/test-utils";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { DislikeReaction, DislikeReason, LikeReaction, ReactionKind } from "src/chat/reaction/reaction.types";
 import { ReactionService } from "src/chat/reaction/services/reactionService/reaction.service";
@@ -20,9 +20,7 @@ jest.mock("src/chat/reaction/components/dislikeReasonPopover/DislikeReasonPopove
   return {
     __esModule: true,
     ...actual,
-    default: jest.fn(() => (
-      <div data-testid={actual.DATA_TEST_ID.CONTAINER} />
-    )),
+    default: jest.fn(() => <div data-testid={actual.DATA_TEST_ID.CONTAINER} />),
   };
 });
 
@@ -37,7 +35,7 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
     __esModule: true,
     useSnackbar: jest.fn().mockReturnValue({
       enqueueSnackbar: jest.fn(),
-      closeSnackbar: jest.fn()
+      closeSnackbar: jest.fn(),
     }),
   };
 });
@@ -56,8 +54,8 @@ describe("ReactionButtons", () => {
       const givenCurrentReaction = null;
 
       UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
 
       // WHEN the component is rendered
       render(<ReactionButtons messageId={givenMessageId} currentReaction={givenCurrentReaction} />);
@@ -93,8 +91,8 @@ describe("ReactionButtons", () => {
       const givenMessageId = "123";
       const givenSessionId = 234;
       UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
 
       // WHEN the component is rendered
       render(<ReactionButtons messageId={givenMessageId} currentReaction={reaction} />);
@@ -122,8 +120,8 @@ describe("ReactionButtons", () => {
       const givenMessageId = "123";
       const givenSessionId = 234;
       UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
 
       // AND the browser is offline
       mockBrowserIsOnLine(false);
@@ -135,9 +133,9 @@ describe("ReactionButtons", () => {
       const container = screen.getByTestId(DATA_TEST_ID.CONTAINER);
       expect(container).toBeInTheDocument();
       // AND expect both like and dislike buttons to be rendered
-      const likeButton = screen.getByTestId(DATA_TEST_ID.BUTTON_LIKE)
+      const likeButton = screen.getByTestId(DATA_TEST_ID.BUTTON_LIKE);
       expect(likeButton).toBeInTheDocument();
-      const dislikeButton = screen.getByTestId(DATA_TEST_ID.BUTTON_DISLIKE)
+      const dislikeButton = screen.getByTestId(DATA_TEST_ID.BUTTON_DISLIKE);
       expect(dislikeButton).toBeInTheDocument();
       // AND expect both buttons to be disabled
       expect(likeButton).toBeDisabled();
@@ -147,20 +145,22 @@ describe("ReactionButtons", () => {
       // THEN expect no errors or warnings to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
-    })
+    });
 
     test("shold throw an error if there is no session", () => {
       // GIVEN no session id
       const givenMessageId = "123";
       const givenSessionId = null;
       UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
 
       // WHEN the component is rendered
       // THEN expect an error to be thrown
-      expect(() => render(<ReactionButtons messageId={givenMessageId} currentReaction={null} />)).toThrow(ReactionError);
-    })
+      expect(() => render(<ReactionButtons messageId={givenMessageId} currentReaction={null} />)).toThrow(
+        ReactionError
+      );
+    });
   });
 
   describe("action tests", () => {
@@ -170,8 +170,8 @@ describe("ReactionButtons", () => {
         const givenMessageId = "123";
         const givenSessionId = 234;
         UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+          sessions: [givenSessionId],
+        } as unknown as UserPreference);
 
         render(<ReactionButtons messageId={givenMessageId} currentReaction={null} />);
 
@@ -185,8 +185,9 @@ describe("ReactionButtons", () => {
             expect.objectContaining({
               anchorEl: dislikeButton,
               open: true,
-              onClose: expect.any(Function)
-            }), {}
+              onClose: expect.any(Function),
+            }),
+            {}
           );
         });
 
@@ -199,8 +200,8 @@ describe("ReactionButtons", () => {
         const givenMessageId = "123";
         const givenSessionId = 234;
         UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+          sessions: [givenSessionId],
+        } as unknown as UserPreference);
 
         const givenReason = DislikeReason.CONFUSING;
         // AND a mocked service
@@ -231,8 +232,8 @@ describe("ReactionButtons", () => {
         const givenMessageId = "1234";
         const givenSessionId = 234;
         UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+          sessions: [givenSessionId],
+        } as unknown as UserPreference);
 
         const givenReason = DislikeReason.BIASED;
         // AND a mocked service that rejects
@@ -270,8 +271,8 @@ describe("ReactionButtons", () => {
         const givenMessageId = "123";
         const givenSessionId = 234;
         UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+          sessions: [givenSessionId],
+        } as unknown as UserPreference);
 
         // AND the service fails for the new reaction
         const givenPreviousReaction = {
@@ -302,7 +303,11 @@ describe("ReactionButtons", () => {
           expect(screen.getByTestId(DATA_TEST_ID.ICON_DISLIKE_ACTIVE)).toBeInTheDocument();
         });
         // AND the service to be called with the dislike reaction
-        expect(sendSpy).toHaveBeenCalledWith(givenSessionId, givenMessageId, new DislikeReaction([givenReason as unknown as DislikeReason]));
+        expect(sendSpy).toHaveBeenCalledWith(
+          givenSessionId,
+          givenMessageId,
+          new DislikeReaction([givenReason as unknown as DislikeReason])
+        );
 
         // WHEN the service request fails
         await act(async () => {
@@ -324,8 +329,8 @@ describe("ReactionButtons", () => {
         const givenMessageId = "123";
         const givenSessionId = 234;
         UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+          sessions: [givenSessionId],
+        } as unknown as UserPreference);
 
         // AND the service has a pending request that doesn't resolve
         let resolveSendReaction: (value: any) => void = () => {};
@@ -356,10 +361,13 @@ describe("ReactionButtons", () => {
         await userEvent.click(dislikeButton, { pointerEventsCheck: 0 });
 
         // THEN expect the popover not to open again
-        expect(DislikeReasonPopover).toHaveBeenLastCalledWith(expect.objectContaining({
-          anchorEl: null,
-          open: false,
-        }), {});
+        expect(DislikeReasonPopover).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            anchorEl: null,
+            open: false,
+          }),
+          {}
+        );
 
         // WHEN the first request finally resolves
         act(() => {
@@ -378,8 +386,8 @@ describe("ReactionButtons", () => {
         const givenMessageId = "123";
         const givenSessionId = 234;
         UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+          sessions: [givenSessionId],
+        } as unknown as UserPreference);
 
         // AND the reaction will be sent successfully
         const sendSpy = jest.spyOn(ReactionService.prototype, "sendReaction").mockResolvedValueOnce();
@@ -405,8 +413,8 @@ describe("ReactionButtons", () => {
         const givenMessageId = "123";
         const givenSessionId = 234;
         UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+          sessions: [givenSessionId],
+        } as unknown as UserPreference);
 
         // AND the service has a pending request that doesn't resolve
         let resolveSendReaction: (value: any) => void = () => {};
@@ -439,7 +447,7 @@ describe("ReactionButtons", () => {
         // THEN expect the buttons to be enabled again
         await waitFor(() => {
           expect(screen.getByTestId(DATA_TEST_ID.BUTTON_LIKE)).not.toBeDisabled();
-        })
+        });
         expect(screen.getByTestId(DATA_TEST_ID.BUTTON_DISLIKE)).not.toBeDisabled();
 
         // AND expect no errors or warnings to have occurred
@@ -452,8 +460,8 @@ describe("ReactionButtons", () => {
         const givenMessageId = "123";
         const givenSessionId = 234;
         UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+          sessions: [givenSessionId],
+        } as unknown as UserPreference);
 
         // AND the service has a pending request that doesn't resolve
         let resolveSendReaction: (value: any) => void = () => {};
@@ -495,11 +503,11 @@ describe("ReactionButtons", () => {
         const givenMessageId = "123";
         const givenSessionId = 234;
         UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+          sessions: [givenSessionId],
+        } as unknown as UserPreference);
 
         // AND a mocked service that rejects
-        const givenError = new Error("Failed to submit reaction")
+        const givenError = new Error("Failed to submit reaction");
         const sendSpy = jest.spyOn(ReactionService.prototype, "sendReaction").mockRejectedValueOnce(givenError);
         // AND the component is rendered
         render(<ReactionButtons messageId={givenMessageId} currentReaction={null} />);
@@ -510,7 +518,6 @@ describe("ReactionButtons", () => {
 
         // THEN expect the service to be called with the LIKE reaction
         expect(sendSpy).toHaveBeenCalledWith(givenSessionId, givenMessageId, new LikeReaction());
-
 
         // AND expect an error snackbar to be displayed
         expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit the feedback. Please try again.", {
@@ -528,8 +535,8 @@ describe("ReactionButtons", () => {
         const givenMessageId = "123";
         const givenSessionId = 234;
         UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+          sessions: [givenSessionId],
+        } as unknown as UserPreference);
 
         const givenPreviousReaction = {
           id: "456",
@@ -571,7 +578,7 @@ describe("ReactionButtons", () => {
           variant: "error",
         });
       });
-    })
+    });
 
     test.each([
       ["liked", ReactionKind.LIKED, DATA_TEST_ID.BUTTON_LIKE, DATA_TEST_ID.ICON_LIKE_ACTIVE],
@@ -585,8 +592,8 @@ describe("ReactionButtons", () => {
         kind: reaction,
       };
       UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
 
       // AND a mocked service that resolves
       const deleteSpy = jest.spyOn(ReactionService.prototype, "deleteReaction").mockResolvedValueOnce();
@@ -619,11 +626,13 @@ describe("ReactionButtons", () => {
         kind: reaction,
       };
       UserPreferencesStateService.getInstance().setUserPreferences({
-        sessions: [givenSessionId]
-      } as unknown as UserPreference)
+        sessions: [givenSessionId],
+      } as unknown as UserPreference);
 
       // AND a mocked service that rejects
-      jest.spyOn(ReactionService.prototype, "deleteReaction").mockRejectedValueOnce(new Error("Failed to remove reaction"));
+      jest
+        .spyOn(ReactionService.prototype, "deleteReaction")
+        .mockRejectedValueOnce(new Error("Failed to remove reaction"));
 
       // AND the component is rendered with the current reaction
       render(<ReactionButtons messageId={givenMessageId} currentReaction={givenCurrentReaction} />);

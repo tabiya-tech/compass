@@ -62,7 +62,9 @@ describe("OverallFeedbackService", () => {
         },
       ];
       // AND the authentication state service returns a user with an ID
-      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue({ id: "001" } as unknown as TabiyaUser);
+      jest
+        .spyOn(AuthenticationStateService.getInstance(), "getUser")
+        .mockReturnValue({ id: "001" } as unknown as TabiyaUser);
       // AND the info service will return the correct version
       const givenFrontendInfoData = {
         date: "fooFrontend",
@@ -130,7 +132,9 @@ describe("OverallFeedbackService", () => {
         });
       });
       // AND the authentication state service returns a user with an ID
-      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue({ id: "001" } as unknown as TabiyaUser);
+      jest
+        .spyOn(AuthenticationStateService.getInstance(), "getUser")
+        .mockReturnValue({ id: "001" } as unknown as TabiyaUser);
       // AND the info service will return the correct version
       const givenFrontendInfoData = {
         date: "fooFrontend",
@@ -159,7 +163,9 @@ describe("OverallFeedbackService", () => {
 
     test("should fail with user not found if the authentication state service doesnt return a user with an ID", async () => {
       // GIVEN the authentication state service returns a user without an ID
-      jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue({ id: null } as unknown as TabiyaUser);
+      jest
+        .spyOn(AuthenticationStateService.getInstance(), "getUser")
+        .mockReturnValue({ id: null } as unknown as TabiyaUser);
 
       // WHEN calling sendFeedback method
       const givenSessionId = 1234;
@@ -178,7 +184,9 @@ describe("OverallFeedbackService", () => {
         // GIVEN fetch resolves with a response that has invalid JSON
         setupAPIServiceSpy(StatusCodes.OK, givenResponse, "application/json;charset=UTF-8");
         // AND the authentication state service returns a user with an ID
-        jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue({ id: "001" } as unknown as TabiyaUser);
+        jest
+          .spyOn(AuthenticationStateService.getInstance(), "getUser")
+          .mockReturnValue({ id: "001" } as unknown as TabiyaUser);
 
         // AND the info service will return the correct version
         const givenFrontendInfoData = {

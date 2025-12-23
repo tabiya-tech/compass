@@ -18,4 +18,3 @@ export type SensitivePersonalData = {
 export type SensitivePersonalDataEncryptionPayload = {
   [key: string]: FieldContentValue;
 };
-

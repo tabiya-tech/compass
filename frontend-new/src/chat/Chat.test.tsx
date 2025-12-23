@@ -212,8 +212,11 @@ describe("Chat", () => {
   }
 
   function assertMessagesAreShown(conversationMessages: IChatMessage<any>[], areLastMessages: boolean = true) {
-    // eslint-disable-next-line jest/valid-expect
-    const fn = areLastMessages ? expect(ChatList as jest.Mock).toHaveBeenLastCalledWith : expect(ChatList as jest.Mock).toHaveBeenCalledWith;
+    const fn = areLastMessages
+      ? // eslint-disable-next-line jest/valid-expect
+        expect(ChatList as jest.Mock).toHaveBeenLastCalledWith
+      : // eslint-disable-next-line jest/valid-expect
+        expect(ChatList as jest.Mock).toHaveBeenCalledWith;
     fn(
       expect.objectContaining({
         messages: expect.arrayContaining(
@@ -1058,10 +1061,12 @@ describe("Chat", () => {
         );
 
         // AND the chat history will not return later
-        let chatHistoryResolve
-        getChatHistorySpy.mockReturnValue(new Promise((resolve) => {
-          chatHistoryResolve = resolve
-        }))
+        let chatHistoryResolve;
+        getChatHistorySpy.mockReturnValue(
+          new Promise((resolve) => {
+            chatHistoryResolve = resolve;
+          })
+        );
 
         // GUARD for typescript asserting chatHistoryResolve is defined
         expect(chatHistoryResolve).toBeDefined();
@@ -1070,7 +1075,7 @@ describe("Chat", () => {
         render(<Chat />);
 
         // THEN chatservice.getChatHistory should be called with the active session ID
-        expect(getChatHistorySpy).toHaveBeenCalledWith(givenActiveSessionId)
+        expect(getChatHistorySpy).toHaveBeenCalledWith(givenActiveSessionId);
 
         // AND expect the getExperiences method to be called with the active session ID
         expect(getExperiencesSpy).not.toHaveBeenCalledWith(givenActiveSessionId);
@@ -1087,7 +1092,7 @@ describe("Chat", () => {
             current: null,
             total: null,
           },
-        })
+        });
 
         // THEN expect the getExperiences method to be called with the active session ID
         await waitFor(() => {
@@ -1096,7 +1101,7 @@ describe("Chat", () => {
 
         // AND expect the Chat component to be initialized
         await assertChatInitialized();
-      })
+      });
     });
   });
 
@@ -1478,11 +1483,35 @@ describe("Chat", () => {
       });
 
       // THEN expect the previous conversation and the response from the chat service to be shown in the chat
-      await waitFor(
-        () => {
-          assertMessagesAreShown(
-            [
-              ...givenPreviousConversation.messages.map((message) => ({
+      await waitFor(() => {
+        assertMessagesAreShown(
+          [
+            ...givenPreviousConversation.messages.map((message) => ({
+              message_id: expect.any(String),
+              type: expect.any(String),
+              sender: message.sender,
+              payload: {
+                message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined,
+                message: message.message,
+                sent_at: message.sent_at,
+                reaction: message.sender === ConversationMessageSender.COMPASS ? message.reaction : undefined,
+              },
+              component: expect.any(Function),
+            })),
+            {
+              message_id: expect.any(String),
+              type: USER_CHAT_MESSAGE_TYPE,
+              sender: ConversationMessageSender.USER,
+              payload: {
+                message: givenMessage,
+                sent_at: expect.any(String),
+              },
+              component: expect.any(Function),
+            },
+            // the last message will be replaced with a conversation conclusion message
+            ...givenSendMessageResponse.messages
+              .filter((message, index) => index !== givenSendMessageResponse.messages.length - 1)
+              .map((message) => ({
                 message_id: expect.any(String),
                 type: expect.any(String),
                 sender: message.sender,
@@ -1494,44 +1523,19 @@ describe("Chat", () => {
                 },
                 component: expect.any(Function),
               })),
-              {
-                message_id: expect.any(String),
-                type: USER_CHAT_MESSAGE_TYPE,
-                sender: ConversationMessageSender.USER,
-                payload: {
-                  message: givenMessage,
-                  sent_at: expect.any(String),
-                },
-                component: expect.any(Function),
+            {
+              message_id: expect.any(String),
+              type: CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
+              sender: ConversationMessageSender.COMPASS,
+              payload: {
+                message: expect.any(String),
               },
-              // the last message will be replaced with a conversation conclusion message
-              ...givenSendMessageResponse.messages
-                .filter((message, index) => index !== givenSendMessageResponse.messages.length - 1)
-                .map((message) => ({
-                  message_id: expect.any(String),
-                  type: expect.any(String),
-                  sender: message.sender,
-                  payload: {
-                    message_id: message.sender === ConversationMessageSender.COMPASS ? expect.any(String) : undefined,
-                    message: message.message,
-                    sent_at: message.sent_at,
-                    reaction: message.sender === ConversationMessageSender.COMPASS ? message.reaction : undefined,
-                  },
-                  component: expect.any(Function),
-                })),
-              {
-                message_id: expect.any(String),
-                type: CONVERSATION_CONCLUSION_CHAT_MESSAGE_TYPE,
-                sender: ConversationMessageSender.COMPASS,
-                payload: {
-                  message: expect.any(String),
-                },
-                component: expect.any(Function),
-              },
-            ],
-            true
-          );
-        });
+              component: expect.any(Function),
+            },
+          ],
+          true
+        );
+      });
       // AND expect input field to have been disabled
       await waitFor(() => {
         expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
@@ -1811,9 +1815,12 @@ describe("Chat", () => {
       });
       expect(console.error).toHaveBeenCalledTimes(1);
       // AND expect a snackbar notification
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("chat.chat.notifications.experiencesFetchFailed"), {
-        variant: "error",
-      });
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+        i18n.t("chat.chat.notifications.experiencesFetchFailed"),
+        {
+          variant: "error",
+        }
+      );
     });
   });
 
@@ -2421,7 +2428,7 @@ describe("Chat", () => {
       // THEN expect CV file upload fails
       await act(async () => {
         const onUploadCv = (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].onUploadCv;
-          await expect(onUploadCv(file)).rejects.toThrow("Upload failed");
+        await expect(onUploadCv(file)).rejects.toThrow("Upload failed");
       });
     });
   });

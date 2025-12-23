@@ -40,11 +40,7 @@ const VerifyEmail: React.FC = () => {
       >
         <AuthHeader
           title={t("auth.pages.verifyEmail.registrationThankYou")}
-          subtitle={
-            <Typography variant="body2">
-              {t("auth.pages.verifyEmail.verificationEmailSentMessage")}
-            </Typography>
-          }
+          subtitle={<Typography variant="body2">{t("auth.pages.verifyEmail.verificationEmailSentMessage")}</Typography>}
         />
         <PrimaryButton
           fullWidth

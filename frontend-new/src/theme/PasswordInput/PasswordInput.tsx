@@ -8,7 +8,7 @@ import PasswordRequirements from "src/theme/PasswordInput/PasswordRequirements/P
 type PasswordInputProps = Omit<TextFieldProps, "type" | "helperText"> & {
   showPassword?: boolean;
   onValidityChange?: (isValid: boolean) => void;
-  shouldValidatePassword?: boolean
+  shouldValidatePassword?: boolean;
 };
 
 const uniqueId = "b7499b01-8082-4209-8667-c7d559a70cag";
@@ -23,7 +23,8 @@ export const DATA_TEST_ID = {
 const PasswordInput: React.FC<Readonly<PasswordInputProps>> = ({
   showPassword: _showPassword,
   onValidityChange,
-  onChange, shouldValidatePassword = true,
+  onChange,
+  shouldValidatePassword = true,
   value,
   ...props
 }) => {
@@ -37,8 +38,8 @@ const PasswordInput: React.FC<Readonly<PasswordInputProps>> = ({
   const type = useMemo(() => (showPassword ? "text" : "password"), [showPassword]);
 
   const passwordValidation = useMemo(() => {
-    if(!shouldValidatePassword) return validatePassword('');
-    if (typeof value !== 'string') return validatePassword('');
+    if (!shouldValidatePassword) return validatePassword("");
+    if (typeof value !== "string") return validatePassword("");
     return validatePassword(value);
   }, [shouldValidatePassword, value]);
 
@@ -60,7 +61,7 @@ const PasswordInput: React.FC<Readonly<PasswordInputProps>> = ({
     onChange?.(event);
   };
 
-  const shouldShowHelperText = value !== "" && (shouldValidatePassword && !isPasswordValid);
+  const shouldShowHelperText = value !== "" && shouldValidatePassword && !isPasswordValid;
 
   return (
     <TextField
@@ -69,12 +70,8 @@ const PasswordInput: React.FC<Readonly<PasswordInputProps>> = ({
       onChange={handleChange}
       data-testid={DATA_TEST_ID.TEXT_FIELD}
       value={value}
-      error={value !== "" && (shouldValidatePassword && !isPasswordValid)}
-      helperText={shouldShowHelperText && (
-        <PasswordRequirements
-          validationResults={passwordValidation}
-        />
-      )}
+      error={value !== "" && shouldValidatePassword && !isPasswordValid}
+      helperText={shouldShowHelperText && <PasswordRequirements validationResults={passwordValidation} />}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">

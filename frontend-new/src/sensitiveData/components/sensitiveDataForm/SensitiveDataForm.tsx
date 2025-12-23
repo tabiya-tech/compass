@@ -12,9 +12,7 @@ import AuthenticationServiceFactory from "src/auth/services/Authentication.servi
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePersonalDataService/errors";
-import {
-  sensitivePersonalDataService,
-} from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
+import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 import TextConfirmModalDialog from "src/theme/textConfirmModalDialog/TextConfirmModalDialog";
 import { FieldDefinition, FieldType } from "src/sensitiveData/components/sensitiveDataForm/config/types";
 import { useFieldsConfig } from "src/sensitiveData/components/sensitiveDataForm/config/useFieldsConfig";
@@ -146,9 +144,7 @@ const renderField = (
           field={field}
           dataTestId={fieldTestId}
           initialValue={
-            typeof initialData[field.name] === "string"
-              ? (initialData[field.name] as string)
-              : (field.defaultValue ?? "")
+            typeof initialData[field.name] === "string" ? (initialData[field.name] as string) : field.defaultValue ?? ""
           }
           onChange={(value: string, isValid: boolean) => handleFieldChange(field.name, value, isValid)}
         />
@@ -161,9 +157,7 @@ const renderField = (
           field={field}
           dataTestId={fieldTestId}
           initialValue={
-            typeof initialData[field.name] === "string"
-              ? (initialData[field.name] as string)
-              : (field.defaultValue ?? "")
+            typeof initialData[field.name] === "string" ? (initialData[field.name] as string) : field.defaultValue ?? ""
           }
           onChange={(value: string, isValid: boolean) => handleFieldChange(field.name, value, isValid)}
         />
@@ -296,7 +290,17 @@ const SensitiveDataForm: React.FC = () => {
       setIsSavingSensitiveData(false);
       setIsSubmitButtonEnabled(true);
     }
-  }, [configLoading, configError, validationErrors, enqueueSnackbar, sensitiveData, fields, userPreferences, navigate, t]);
+  }, [
+    configLoading,
+    configError,
+    validationErrors,
+    enqueueSnackbar,
+    sensitiveData,
+    fields,
+    userPreferences,
+    navigate,
+    t,
+  ]);
 
   const handleRejectProvidingSensitiveData = useCallback(async () => {
     setIsRejecting(true);
@@ -331,7 +335,7 @@ const SensitiveDataForm: React.FC = () => {
       });
       console.info("User skipped providing sensitive data.");
 
-  enqueueSnackbar(t("sensitiveData.components.sensitiveDataForm.collectionSkipped"), { variant: "success" });
+      enqueueSnackbar(t("sensitiveData.components.sensitiveDataForm.collectionSkipped"), { variant: "success" });
       navigate(routerPaths.ROOT);
     } catch (e) {
       console.error("Failed to skip personal data", e);
@@ -407,7 +411,9 @@ const SensitiveDataForm: React.FC = () => {
                     {isPIIRequired
                       ? " " + t("sensitiveData.components.sensitiveDataForm.unskippableSubtitle")
                       : " " + t("sensitiveData.components.sensitiveDataForm.skippableSubtitle")}
-                    <HelpTip icon={<PrivacyTipIcon />}>{t("sensitiveData.components.sensitiveDataForm.helpTipText")}</HelpTip>
+                    <HelpTip icon={<PrivacyTipIcon />}>
+                      {t("sensitiveData.components.sensitiveDataForm.helpTipText")}
+                    </HelpTip>
                   </>
                 }
               />
@@ -518,7 +524,9 @@ const SensitiveDataForm: React.FC = () => {
                 text: (
                   <>
                     {t("sensitiveData.components.sensitiveDataForm.skipParagraph1")}{" "}
-                    <HighlightedSpan>{t("sensitiveData.components.sensitiveDataForm.skipParagraph1Highlighted")}</HighlightedSpan>
+                    <HighlightedSpan>
+                      {t("sensitiveData.components.sensitiveDataForm.skipParagraph1Highlighted")}
+                    </HighlightedSpan>
                   </>
                 ),
               },
@@ -537,7 +545,12 @@ const SensitiveDataForm: React.FC = () => {
             cancelButtonText={t("sensitiveData.components.sensitiveDataForm.yesSkip")}
             confirmButtonText={t("sensitiveData.components.sensitiveDataForm.shareData")}
           />
-          <Backdrop isShown={isSkipping || isRejecting} message={isSkipping ? t("sensitiveData.components.sensitiveDataForm.skipping") : t("common.backdrop.loggingYouOut")} />
+          <Backdrop
+            isShown={isSkipping || isRejecting}
+            message={
+              isSkipping ? t("sensitiveData.components.sensitiveDataForm.skipping") : t("common.backdrop.loggingYouOut")
+            }
+          />
         </>
       )}
     </Suspense>

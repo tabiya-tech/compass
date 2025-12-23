@@ -201,8 +201,6 @@ export const CVMarkdownTooLong: Story = {
   },
 };
 
-
-
 export const SinglePreviouslyUploadedCV: Story = {
   render: (args) => <WithMockedCvService {...args} items={createMockCvList(1)} />,
   args: {

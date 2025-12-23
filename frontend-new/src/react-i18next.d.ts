@@ -5,9 +5,7 @@ import defaultLanguage from "src/i18n/locales/en-GB/translation.json";
  * Generate dot-notation keys from translation JSON
  */
 type DotKeys<T> = {
-  [K in keyof T & string]: T[K] extends Record<string, any>
-    ? `${K}` | `${K}.${DotKeys<T[K]>}`
-    : `${K}`;
+  [K in keyof T & string]: T[K] extends Record<string, any> ? `${K}` | `${K}.${DotKeys<T[K]>}` : `${K}`;
 }[keyof T & string];
 
 export type TranslationKey = DotKeys<typeof defaultLanguage>;
@@ -23,10 +21,7 @@ export type TypedTFunction = TFunction<"translation"> & {
  */
 declare module "react-i18next" {
   export function useTranslation(): {
-    t: (
-      key: TranslationKey,
-      options?: Record<string, any>
-    ) => string;
+    t: (key: TranslationKey, options?: Record<string, any>) => string;
     i18n: I18nInstance;
   };
 }

@@ -339,7 +339,10 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
           sx={{ minHeight: "100%" }}
         >
           <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-            <ExperiencesDrawerHeader notifyOnClose={handleClose} title={t("experiences.experiencesDrawer.andSkillsTitle")} />
+            <ExperiencesDrawerHeader
+              notifyOnClose={handleClose}
+              title={t("experiences.experiencesDrawer.andSkillsTitle")}
+            />
             <Box display="flex" flexDirection="column" alignItems="end" justifyContent="flex-end">
               <Suspense
                 fallback={
@@ -359,7 +362,10 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
             </Box>
           </Box>
           <Box display="flex" flexDirection="column" gap={2}>
-            <CustomAccordion title={t("experiences.experiencesDrawer.personalInformationTitle")} tooltipText={tooltipText}>
+            <CustomAccordion
+              title={t("experiences.experiencesDrawer.personalInformationTitle")}
+              tooltipText={tooltipText}
+            >
               <Typography variant="h6" data-testid={DATA_TEST_ID.PERSONAL_INFORMATION_TITLE} sx={{ display: "none" }}>
                 {t("experiences.experiencesDrawer.personalInformationTitle")}
               </Typography>
@@ -522,7 +528,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         onDismiss={() => setShowDeleteConfirmDialog(false)}
         onCancel={() => setShowDeleteConfirmDialog(false)}
         confirmButtonText={t("experiences.experiencesDrawer.delete.confirmButton")}
-  cancelButtonText={t("common.buttons.cancel")}
+        cancelButtonText={t("common.buttons.cancel")}
         showCloseIcon
         data-testid={DATA_TEST_ID.DELETE_EXPERIENCE_DIALOG}
       />
@@ -534,7 +540,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
         onDismiss={cancelRestoreToOriginalExperience}
         onCancel={cancelRestoreToOriginalExperience}
         confirmButtonText={t("experiences.experiencesDrawer.revert.confirmButton")}
-  cancelButtonText={t("common.buttons.cancel")}
+        cancelButtonText={t("common.buttons.cancel")}
         showCloseIcon
         data-testid={DATA_TEST_ID.RESTORE_TO_ORIGINAL_CONFIRM_DIALOG}
       />

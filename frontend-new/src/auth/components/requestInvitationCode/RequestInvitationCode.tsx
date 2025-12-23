@@ -21,7 +21,6 @@ export const UI_TEXT = {
   REQUEST_LOGIN_CODE: "Don't have a login code?",
   REQUEST_REGISTRATION_CODE: "Don't have a registration code?",
   REQUEST_INVITATION_CODE_LINK: "Reach out",
-
 };
 const RequestInvitationCode = ({ invitationCodeType, notifyOnModalOpened }: Props) => {
   const { t } = useTranslation();
@@ -40,13 +39,17 @@ const RequestInvitationCode = ({ invitationCodeType, notifyOnModalOpened }: Prop
   return (
     <>
       <Typography variant="caption" textAlign="center" gutterBottom>
-        {invitationCodeType === InvitationType.LOGIN ? t("auth.components.requestInvitationCode.requestLoginCode") : t("auth.components.registrationCodeFormModal.noRegistrationCodePrompt")}
+        {invitationCodeType === InvitationType.LOGIN
+          ? t("auth.components.requestInvitationCode.requestLoginCode")
+          : t("auth.components.registrationCodeFormModal.noRegistrationCodePrompt")}
         &nbsp;
         <CustomLink
           disabled={!isOnline}
           onClick={handleModalOpen}
           data-testid={`${DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK}`}
-        >{t("auth.components.registrationCodeFormModal.reachOut")}</CustomLink>
+        >
+          {t("auth.components.registrationCodeFormModal.reachOut")}
+        </CustomLink>
       </Typography>
 
       <RequestInvitationCodeFormModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />

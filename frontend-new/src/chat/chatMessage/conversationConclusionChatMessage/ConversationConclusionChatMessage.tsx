@@ -16,9 +16,7 @@ export interface ConversationConclusionChatMessageProps {
   message: string;
 }
 
-const ConversationConclusionChatMessage: React.FC<ConversationConclusionChatMessageProps> = ({
-  message,
-}) => {
+const ConversationConclusionChatMessage: React.FC<ConversationConclusionChatMessageProps> = ({ message }) => {
   return (
     <MessageContainer
       origin={ConversationMessageSender.COMPASS}

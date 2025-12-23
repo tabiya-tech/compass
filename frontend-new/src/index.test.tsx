@@ -4,10 +4,6 @@ import "src/_test_utilities/consoleMock";
 import { render, screen, within } from "@testing-library/react";
 import { MAX_WAIT_TIME_FOR_ROOT_ELEMENT, ROOT_ELEMENT_POLL_INTERVAL } from "./index";
 
-
-
-
-
 // mock the react-dom/client
 // Using jest.doMock() so that the render function can be accessed from within the mock
 jest.doMock("react-dom/client", () => {
@@ -112,7 +108,6 @@ describe("test the application bootstrapping", () => {
   });
 
   test("should render the app when root element is immediately available", async () => {
-
     // GIVEN the root element exists in the DOM
     const mockRootElement = document.createElement("div");
     mockRootElement.id = "root";
@@ -172,7 +167,6 @@ describe("test the application bootstrapping", () => {
     // guard to ensure the loading screen is  visible
     expect(loadingScreen).toBeVisible();
 
-
     // WHEN the main index module is imported
     let ensureRequiredEnvVarsMock: jest.SpyInstance = jest.fn();
     jest.isolateModules(async () => {
@@ -228,9 +222,7 @@ describe("test the application bootstrapping", () => {
   test("should log error when root element is not found after maximum attempts", async () => {
     // WHEN the main index module is imported
     jest.isolateModules(async () => {
-      jest
-        .spyOn(require("src/envService"), "ensureRequiredEnvVars")
-        .mockImplementation(jest.fn);
+      jest.spyOn(require("src/envService"), "ensureRequiredEnvVars").mockImplementation(jest.fn);
       require("./index");
     });
 
@@ -245,16 +237,11 @@ describe("test the application bootstrapping", () => {
     await Promise.resolve(); // Double flush to ensure all microtasks complete
 
     // THEN expect an error to be logged
-    expect(console.error).toHaveBeenCalledWith(
-      "Failed to initialize React:",
-      expect.any(Error),
-    );
+    expect(console.error).toHaveBeenCalledWith("Failed to initialize React:", expect.any(Error));
 
     // AND expect the error message to indicate maximum attempts were reached
     const errorCall = (console.error as jest.Mock).mock.calls[0];
-    expect(errorCall[1].message).toBe(
-      "Root element not found after maximum attempts",
-    );
+    expect(errorCall[1].message).toBe("Root element not found after maximum attempts");
 
     // AND expect no app to be rendered
     expect(screen.queryByTestId("theme-provider-id")).not.toBeInTheDocument();

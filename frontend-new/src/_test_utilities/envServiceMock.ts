@@ -11,5 +11,5 @@ jest.mock("src/envService", () => ({
   getCvUploadEnabled: jest.fn(() => "true"),
   getSocialAuthDisabled: jest.fn(() => "false"),
   getSupportedLocales: jest.fn(() => JSON.stringify(["en-US"])),
-  getDefaultLocale: jest.fn(() => "en-US")
+  getDefaultLocale: jest.fn(() => "en-US"),
 }));

@@ -25,13 +25,9 @@ export class RestAPIError extends ServiceError {
     statusCode: number,
     errorCode: ErrorConstants.ErrorCodes | string,
     message: string,
-    cause?: RestAPIErrorDetails,
+    cause?: RestAPIErrorDetails
   ) {
-    super(serviceName,
-      serviceFunction,
-      `RestAPIError: ${message}`,
-      cause,
-    );
+    super(serviceName, serviceFunction, `RestAPIError: ${message}`, cause);
     this.method = method;
     this.path = path;
     this.statusCode = statusCode;
@@ -44,31 +40,30 @@ export type RestAPIErrorFactory = (
   statusCode: number,
   errorCode: ErrorConstants.ErrorCodes | string,
   message: string,
-  cause?: RestAPIErrorDetails,
+  cause?: RestAPIErrorDetails
 ) => RestAPIError;
 
 export function getRestAPIErrorFactory(
   serviceName: string,
   serviceFunction: string,
   method: string,
-  path: string,
+  path: string
 ): RestAPIErrorFactory {
   return (
     statusCode: number,
     errorCode: ErrorConstants.ErrorCodes | string,
     message: string,
-    cause?: RestAPIErrorDetails,
+    cause?: RestAPIErrorDetails
   ): RestAPIError => {
     return new RestAPIError(serviceName, serviceFunction, method, path, statusCode, errorCode, message, cause);
   };
 }
 
 export const translateUserFriendlyErrorMessage = (
-  key: (typeof ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS)[keyof typeof ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS],
+  key: (typeof ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS)[keyof typeof ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS]
 ): string => {
   return i18n.t(key);
 };
-
 
 /**
  * @param {RestAPIError} error
@@ -116,7 +111,9 @@ export const getUserFriendlyErrorMessage = (error: RestAPIError | Error): string
         // - refresh the page to get the latest version of the app
         // - clear the browser cache to get the latest version of the app
         // - if the problem persists, contact support
-        return translateUserFriendlyErrorMessage(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS.UNABLE_TO_PROCESS_RESPONSE);
+        return translateUserFriendlyErrorMessage(
+          ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS.UNABLE_TO_PROCESS_RESPONSE
+        );
       }
       switch (error.statusCode) {
         case StatusCodes.UNAUTHORIZED:
@@ -204,7 +201,9 @@ export const getUserFriendlyErrorMessage = (error: RestAPIError | Error): string
     case ErrorConstants.ErrorCodes.FORBIDDEN:
       if (error.statusCode === 422) {
         // we use a forbidden with an unprocessable entity when the invite code is
-        return translateUserFriendlyErrorMessage(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS.UNABLE_TO_PROCESS_REQUEST);
+        return translateUserFriendlyErrorMessage(
+          ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS.UNABLE_TO_PROCESS_REQUEST
+        );
       }
       break;
   }

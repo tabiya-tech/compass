@@ -2,7 +2,7 @@
 import "src/_test_utilities/consoleMock";
 
 // Mock Sentry
-import "src/_test_utilities/sentryMock"
+import "src/_test_utilities/sentryMock";
 
 import React from "react";
 import { render, screen, fireEvent, act } from "src/_test_utilities/test-utils";
@@ -35,18 +35,21 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
 });
 
 // mock the RequestInvitationFormModal component
-jest.mock("src/auth/components/requestInvitationCode/requestInvitationCodeFormModal/RequestInvitationCodeFormModal", () => {
-  const actual = jest.requireActual(
-    "src/auth/components/requestInvitationCode/requestInvitationCodeFormModal/RequestInvitationCodeFormModal"
-  );
-  return {
-    ...actual,
-    __esModule: true,
-    default: jest.fn().mockImplementation(() => {
-      return <span data-testid={actual.DATA_TEST_ID.CONTAINER}></span>;
-    }),
-  };
-});
+jest.mock(
+  "src/auth/components/requestInvitationCode/requestInvitationCodeFormModal/RequestInvitationCodeFormModal",
+  () => {
+    const actual = jest.requireActual(
+      "src/auth/components/requestInvitationCode/requestInvitationCodeFormModal/RequestInvitationCodeFormModal"
+    );
+    return {
+      ...actual,
+      __esModule: true,
+      default: jest.fn().mockImplementation(() => {
+        return <span data-testid={actual.DATA_TEST_ID.CONTAINER}></span>;
+      }),
+    };
+  }
+);
 
 describe("RegistrationCodeFormModal", () => {
   test("renders correctly when modal is shown and call onSuccess with the provided code", () => {

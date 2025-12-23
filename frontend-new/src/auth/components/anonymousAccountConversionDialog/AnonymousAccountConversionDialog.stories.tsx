@@ -14,6 +14,6 @@ export const Shown: StoryObj<typeof AnonymousAccountConversionDialog> = {
   args: {
     isOpen: true,
     onClose: action("close"),
-    onSuccess: action("success")
+    onSuccess: action("success"),
   },
 };

@@ -1,4 +1,6 @@
-export type DebouncedFunction<T extends (...args: any[]) => any> = ((...args: Parameters<T>) => void) & { cancel: () => void };
+export type DebouncedFunction<T extends (...args: any[]) => any> = ((...args: Parameters<T>) => void) & {
+  cancel: () => void;
+};
 /**
  * debounce function that delays the execution of the provided function until after a specified delay.
  * */
@@ -15,4 +17,4 @@ export function debounce<T extends (...args: any[]) => any>(fn: T, delay: number
     timeout = null;
   };
   return debounced;
-} 
+}

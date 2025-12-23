@@ -45,7 +45,9 @@ describe("CancellableTypingChatMessage", () => {
     render(givenComponent);
 
     // THEN expect the message container to be visible
-    const cancellableTypingChatMessageContainer = screen.getByTestId(DATA_TEST_ID.CANCELLABLE_TYPING_CHAT_MESSAGE_CONTAINER);
+    const cancellableTypingChatMessageContainer = screen.getByTestId(
+      DATA_TEST_ID.CANCELLABLE_TYPING_CHAT_MESSAGE_CONTAINER
+    );
     expect(cancellableTypingChatMessageContainer).toBeInTheDocument();
     // AND expect the message bubble to be visible
     expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
@@ -71,7 +73,7 @@ describe("CancellableTypingChatMessage", () => {
     const customThinkingMessage = "Custom thinking message";
     const mockOnCancel = jest.fn();
     const givenComponent = (
-      <CancellableTypingChatMessage 
+      <CancellableTypingChatMessage
         message={customTypingMessage}
         thinkingMessage={customThinkingMessage}
         onCancel={mockOnCancel}
@@ -145,4 +147,4 @@ describe("CancellableTypingChatMessage", () => {
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();
   });
-}); 
+});

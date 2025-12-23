@@ -303,11 +303,20 @@ const Login: React.FC = () => {
         await handleLoginWithInvitationCode(inviteCode);
       } else if (activeLoginForm === ActiveForm.EMAIL && email && password) {
         await handleLoginWithEmail(email, password);
-       } else {
+      } else {
         enqueueSnackbar(t("auth.pages.login.fillInEmailAndPassword"), { variant: "error" });
       }
     },
-    [email, handleLoginWithInvitationCode, handleLoginWithEmail, activeLoginForm, inviteCode, password, enqueueSnackbar, t]
+    [
+      email,
+      handleLoginWithInvitationCode,
+      handleLoginWithEmail,
+      activeLoginForm,
+      inviteCode,
+      password,
+      enqueueSnackbar,
+      t,
+    ]
   );
 
   const handleStartNewConversation = useCallback(() => {
@@ -513,9 +522,7 @@ const Login: React.FC = () => {
         {!registrationDisabled && (
           <Typography variant="caption" data-testid={DATA_TEST_ID.REGISTER_LINK}>
             {t("auth.pages.login.dontHaveAnAccount")}
-            <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>
-              {t("common.buttons.register")}
-            </CustomLink>
+            <CustomLink onClick={() => navigate(routerPaths.REGISTER)}>{t("common.buttons.register")}</CustomLink>
           </Typography>
         )}
         {showRequestLoginCode && <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />}

@@ -9,11 +9,11 @@ interface ScreeningPageProps {
   autoLogin?: boolean;
 }
 
-const ScreeningPage: React.FC<ScreeningPageProps> = ({ 
-  email = "test@example.com", 
+const ScreeningPage: React.FC<ScreeningPageProps> = ({
+  email = "test@example.com",
   externalUserId = "test-user-123",
   showSnackbar = false,
-  autoLogin = false
+  autoLogin = false,
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -106,7 +106,7 @@ These are loaded from the screening config bucket.
       description: "Email address for the screening flow",
     },
     externalUserId: {
-      control: "text", 
+      control: "text",
       description: "External user ID for the screening flow",
     },
     showSnackbar: {

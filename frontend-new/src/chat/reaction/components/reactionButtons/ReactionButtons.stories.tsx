@@ -42,7 +42,7 @@ const mockData = (status: number, deleteStatus: number, delay: number = 0) => [
       id: nanoid(),
       message_id: nanoid(),
       session_id: 123,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     },
     delay: delay,
   },

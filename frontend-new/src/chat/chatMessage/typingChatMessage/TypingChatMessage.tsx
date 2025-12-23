@@ -48,14 +48,18 @@ const TypingChatMessage: React.FC<TypingChatMessageProps> = ({ waitBeforeThinkin
 
   useEffect(() => {
     // Change text after waitBeforeThinking duration
-    const textChangeTimer = setTimeout(() => {
-      setDisplayText(t(UI_TEXT_KEYS.THINKING));
-    }, waitBeforeThinking,t);
+    const textChangeTimer = setTimeout(
+      () => {
+        setDisplayText(t(UI_TEXT_KEYS.THINKING));
+      },
+      waitBeforeThinking,
+      t
+    );
 
     return () => {
       clearTimeout(textChangeTimer);
     };
-  }, [waitBeforeThinking,t]);
+  }, [waitBeforeThinking, t]);
 
   return (
     <AnimatePresence mode="wait" initial={false}>

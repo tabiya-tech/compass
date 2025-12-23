@@ -26,7 +26,7 @@ function getTestUserPreferences(): UserPreference {
     has_sensitive_personal_data: false,
     sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
     experiments: {},
-  }
+  };
 }
 
 describe("UserPreferencesService", () => {
@@ -75,7 +75,8 @@ describe("UserPreferencesService", () => {
       const actualUserPreferences = await service.getUserPreferences(givenResponseBody.user_id);
 
       // THEN expect it to make a GET request with correct headers and payload
-      expectCorrectFetchRequest(fetchSpy,
+      expectCorrectFetchRequest(
+        fetchSpy,
         `${givenApiServerUrl}/users/preferences?user_id=${givenResponseBody.user_id}`,
         {
           method: "GET",
@@ -87,13 +88,12 @@ describe("UserPreferencesService", () => {
           serviceFunction: "getUserPreferences",
           serviceName: "UserPreferencesService",
           expectedContentType: "application/json",
-        },
+        }
       );
 
       // AND expect it to return the user preferences
       expect(actualUserPreferences).toEqual(givenResponseBody);
     });
-
 
     test("getUserPreferences should update the client id in the user preferences if it does not exist for legacy users", async () => {
       const updateUserPreferencesSpy = jest.spyOn(UserPreferencesService.getInstance(), "updateUserPreferences");
@@ -114,14 +114,14 @@ describe("UserPreferencesService", () => {
       await service.getUserPreferences(givenResponseBody.user_id);
 
       // THEN expect it to make a GET request with correct headers and payload
-      expect(fetchSpy).toHaveBeenCalled()
+      expect(fetchSpy).toHaveBeenCalled();
 
       // AND updateUserPreferencesSpy should be called with the correct arguments
       expect(updateUserPreferencesSpy).toHaveBeenCalledWith({
         user_id: givenResponseBody.user_id,
         client_id: givenClientId,
       });
-    })
+    });
 
     test("getUserPreferences should update the client id if it mismatches with the one on the local client device", async () => {
       const updateUserPreferencesSpy = jest.spyOn(UserPreferencesService.getInstance(), "updateUserPreferences");
@@ -146,14 +146,14 @@ describe("UserPreferencesService", () => {
       await service.getUserPreferences(givenResponseBody.user_id);
 
       // THEN expect it to make a GET request with correct headers and payload
-      expect(fetchSpy).toHaveBeenCalled()
+      expect(fetchSpy).toHaveBeenCalled();
 
       // AND updateUserPreferencesSpy should be called with the correct arguments
       expect(updateUserPreferencesSpy).toHaveBeenCalledWith({
         user_id: givenResponseBody.user_id,
         client_id: givenClientId,
       });
-    })
+    });
 
     test("on fail to fetch, getUserPreferences should reject with the expected service error", async () => {
       // GIVEN fetch rejects with some unknown error
@@ -193,7 +193,7 @@ describe("UserPreferencesService", () => {
             StatusCodes.UNPROCESSABLE_ENTITY,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
-            "",
+            ""
           ),
           cause: expect.anything(),
         };
@@ -201,7 +201,7 @@ describe("UserPreferencesService", () => {
 
         // THEN expected it to reject with the error response
         await expect(getUserPreferencesCallback).rejects.toMatchObject(expectedError);
-      },
+      }
     );
   });
 
@@ -221,7 +221,7 @@ describe("UserPreferencesService", () => {
       const actualUserPreferences = await service.updateUserPreferences(givenUserPreferences);
 
       // THEN expect it to make a PATCH request with correct headers and payload
-      expectCorrectFetchRequest(fetchSpy,`${givenApiServerUrl}/users/preferences`, {
+      expectCorrectFetchRequest(fetchSpy, `${givenApiServerUrl}/users/preferences`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -278,7 +278,7 @@ describe("UserPreferencesService", () => {
             StatusCodes.UNPROCESSABLE_ENTITY,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
-            "",
+            ""
           ),
           cause: expect.anything(),
         };
@@ -291,7 +291,7 @@ describe("UserPreferencesService", () => {
 
         // THEN expected it to reject with the error response
         await expect(updateUserPreferencesCallback).rejects.toMatchObject(expectedError);
-      },
+      }
     );
   });
 
@@ -320,13 +320,17 @@ describe("UserPreferencesService", () => {
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         experiments: {},
       };
-      const fetchSpy = setupAPIServiceSpy(StatusCodes.CREATED, mockResponseFormBackend, "application/json;charset=UTF-8");
+      const fetchSpy = setupAPIServiceSpy(
+        StatusCodes.CREATED,
+        mockResponseFormBackend,
+        "application/json;charset=UTF-8"
+      );
 
       const service = UserPreferencesService.getInstance();
       const actualUserPreferences = await service.createUserPreferences(givenUserPreferences);
 
       // THEN expect it to make a POST request with correct headers and payload
-      expectCorrectFetchRequest(fetchSpy,`${givenApiServerUrl}/users/preferences`, {
+      expectCorrectFetchRequest(fetchSpy, `${givenApiServerUrl}/users/preferences`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -385,7 +389,9 @@ describe("UserPreferencesService", () => {
       "on 201, should reject with an error ERROR_CODE.API_ERROR if response %s",
       async (_description, givenResponse) => {
         // GIVEN the POST invitations REST API will respond with CREATED and some invalid response
-        setupAPIServiceSpy(StatusCodes.CREATED, {}, "application/json;charset=UTF-8").mockResolvedValueOnce(givenResponse);
+        setupAPIServiceSpy(StatusCodes.CREATED, {}, "application/json;charset=UTF-8").mockResolvedValueOnce(
+          givenResponse
+        );
 
         // WHEN the createUserPreferences function is called with the given user preferences
         const service = UserPreferencesService.getInstance();
@@ -398,7 +404,7 @@ describe("UserPreferencesService", () => {
             StatusCodes.UNPROCESSABLE_ENTITY,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
-            "",
+            ""
           ),
           cause: expect.anything(),
         };
@@ -411,7 +417,7 @@ describe("UserPreferencesService", () => {
 
         // THEN expected it to reject with the error response
         await expect(createUserPreferencesCallback).rejects.toMatchObject(expectedError);
-      },
+      }
     );
   });
 });

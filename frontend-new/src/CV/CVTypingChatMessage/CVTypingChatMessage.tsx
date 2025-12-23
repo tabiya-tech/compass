@@ -18,7 +18,6 @@ export const UI_TEXT = {
   CV_UPLOADED: "Your CV content is in the text field. Review it and send when ready.",
 };
 
-
 export const CV_UPLOADED_DISPLAY_TIME = 30 * 1000;
 
 export const CV_TYPING_CHAT_MESSAGE_TYPE = `cv-typing-message-${uniqueId}`;
@@ -45,7 +44,7 @@ const textVariants = {
 
 const CVTypingChatMessage: React.FC<CVTypingChatMessageProps> = ({ isUploaded = false }) => {
   const { t, i18n } = useTranslation();
-  const displayTextKey = isUploaded ?  "cv.cvTypingChatMessage.uploadedReady" : "cv.cvTypingChatMessage.uploading";
+  const displayTextKey = isUploaded ? "cv.cvTypingChatMessage.uploadedReady" : "cv.cvTypingChatMessage.uploading";
   const [displayText, setDisplayText] = useState(t(displayTextKey));
 
   useEffect(() => {

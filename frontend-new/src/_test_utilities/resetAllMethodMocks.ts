@@ -6,11 +6,7 @@ export function resetAllMethodMocks(instance) {
 
   // Iterate over all property names except the constructor.
   Object.getOwnPropertyNames(proto)
-    .filter(
-      (prop) =>
-        prop !== "constructor" &&
-        typeof instance[prop] === "function",
-    )
+    .filter((prop) => prop !== "constructor" && typeof instance[prop] === "function")
     .forEach((methodName) => {
       const method = instance[methodName];
       // Check if the method is a Jest mock (spyOn attaches the mock properties)

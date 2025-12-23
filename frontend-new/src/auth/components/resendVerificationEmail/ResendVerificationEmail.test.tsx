@@ -1,4 +1,4 @@
-import "src/_test_utilities/consoleMock"
+import "src/_test_utilities/consoleMock";
 import React from "react";
 import { render, screen, waitFor, act } from "src/_test_utilities/test-utils";
 import userEvent from "@testing-library/user-event";
@@ -198,7 +198,7 @@ describe("ResendVerificationEmail", () => {
       jest.advanceTimersByTime(1000);
     });
 
-    // THEN no timer updates should occur 
+    // THEN no timer updates should occur
     // we would see an error about trying to update state on an unmounted component if the timer was not cleared
     expect(screen.queryByTestId(DATA_TEST_ID.TIMER)).not.toBeInTheDocument();
 
@@ -206,4 +206,4 @@ describe("ResendVerificationEmail", () => {
     expect(console.warn).not.toHaveBeenCalled();
     expect(console.error).not.toHaveBeenCalled();
   });
-}); 
+});

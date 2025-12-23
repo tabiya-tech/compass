@@ -109,7 +109,7 @@ describe("EncryptionService", () => {
     // GIVEN a sensitive personal data object with the maximum possible size
     // Create a large object with many fields at maximum length to test the size limits
     const givenMaxSensitivePersonalData: Record<string, any> = {};
-    
+
     // Add multiple fields with maximum length to simulate a worst-case scenario
     for (let i = 0; i < MAX_FIELDS_COUNT; i++) {
       givenMaxSensitivePersonalData[`field${i}`] = getThreeBytesUTF8Char(MAX_FIELD_LENGTH);
@@ -136,7 +136,7 @@ describe("EncryptionService", () => {
     // AND not exceed the maximum expected length
     expect(encryptedSensitivePersonalData.aes_encrypted_data.length).toBeLessThanOrEqual(MaximumAESEncryptedDataSize);
     expect(encryptedSensitivePersonalData.aes_encryption_key.length).toBeLessThanOrEqual(MaximumAESEncryptedKeySize);
-    
+
     // AND the data should be decryptable
     const actualEncryptionKey = await decryptWithRSA(
       keyPair.privateKey,
@@ -155,7 +155,7 @@ describe("EncryptionService", () => {
 
     const actualDecryptedData = await decryptWithAES(encryptedData, iv, actualEncryptionKey);
     const actualPersonalData = JSON.parse(new TextDecoder().decode(actualDecryptedData));
-    
+
     // Verify the decrypted data matches the original
     expect(actualPersonalData).toEqual(givenMaxSensitivePersonalData);
   });

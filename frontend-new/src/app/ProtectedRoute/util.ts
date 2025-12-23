@@ -5,7 +5,8 @@ import {
 import { isValid } from "date-fns";
 
 export function isSensitiveDataValid(userPreferences: UserPreference): boolean {
-  const isSensitiveDataExpected = userPreferences.sensitive_personal_data_requirement !== SensitivePersonalDataRequirement.NOT_AVAILABLE;
+  const isSensitiveDataExpected =
+    userPreferences.sensitive_personal_data_requirement !== SensitivePersonalDataRequirement.NOT_AVAILABLE;
   const hasSensitiveData = userPreferences.has_sensitive_personal_data;
 
   return !isSensitiveDataExpected || hasSensitiveData;

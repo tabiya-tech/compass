@@ -21,13 +21,7 @@ describe("FirebaseError", () => {
       const givenCause = "cause";
 
       // WHEN creating a new FirebaseError
-      const error = new FirebaseError(
-        givenServiceName,
-        givenServiceFunction,
-        givenErrorCode,
-        givenMessage,
-        givenCause,
-      );
+      const error = new FirebaseError(givenServiceName, givenServiceFunction, givenErrorCode, givenMessage, givenCause);
 
       // THEN the FirebaseError should have all the properties
       expect(error.serviceName).toBe(givenServiceName);
@@ -47,13 +41,7 @@ describe("FirebaseError", () => {
       const givenCause = { key: "value" };
 
       // WHEN creating a new FirebaseError
-      const error = new FirebaseError(
-        givenServiceName,
-        givenServiceFunction,
-        givenErrorCode,
-        givenMessage,
-        givenCause,
-      );
+      const error = new FirebaseError(givenServiceName, givenServiceFunction, givenErrorCode, givenMessage, givenCause);
 
       // THEN the FirebaseError should have the parsed details
       expect(error.cause).toEqual(givenCause);
@@ -69,13 +57,7 @@ describe("FirebaseError", () => {
       const givenCause = { key: "value" };
 
       // WHEN creating a new FirebaseError
-      const error = new FirebaseError(
-        givenServiceName,
-        givenServiceFunction,
-        givenErrorCode,
-        givenMessage,
-        givenCause,
-      );
+      const error = new FirebaseError(givenServiceName, givenServiceFunction, givenErrorCode, givenMessage, givenCause);
 
       // THEN the FirebaseError should have the parsed details
       expect(error.cause).toEqual(givenCause);
@@ -88,8 +70,8 @@ describe("FirebaseError", () => {
     // If the user-friendly message is not found, use the default message
     const testCases = Object.values(FirebaseErrorCodes).map((errorCode) => [
       errorCode,
-        USER_FRIENDLY_FIREBASE_ERROR_I18N_KEYS[errorCode]  ||
-          USER_FRIENDLY_FIREBASE_ERROR_I18N_KEYS[FirebaseErrorCodes.INTERNAL_ERROR],
+      USER_FRIENDLY_FIREBASE_ERROR_I18N_KEYS[errorCode] ||
+        USER_FRIENDLY_FIREBASE_ERROR_I18N_KEYS[FirebaseErrorCodes.INTERNAL_ERROR],
     ]);
 
     testCases.push([

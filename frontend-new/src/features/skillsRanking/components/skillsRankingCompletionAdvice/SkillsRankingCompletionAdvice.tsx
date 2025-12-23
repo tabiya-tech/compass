@@ -89,7 +89,10 @@ const SkillsRankingCompletionAdvice: React.FC<Readonly<SkillsRankingCompletionAd
       gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
     >
       <Box sx={{ width: "100%" }}>
-        <ChatBubble message={<>{t("features.skillsRanking.components.skillsRankingCompletionAdvice.adviceMessage")}</>} sender={ConversationMessageSender.COMPASS} />
+        <ChatBubble
+          message={<>{t("features.skillsRanking.components.skillsRankingCompletionAdvice.adviceMessage")}</>}
+          sender={ConversationMessageSender.COMPASS}
+        />
 
         <ChatMessageFooterLayout sender={ConversationMessageSender.COMPASS}>
           <Timestamp

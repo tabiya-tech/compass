@@ -31,7 +31,7 @@ export default class InfoService {
         failureMessage: failureMessage,
         expectedContentType: "application/json",
         authRequired: false,
-        retryOnFailedToFetch: true
+        retryOnFailedToFetch: true,
       }).then(async (response) => {
         const data: VersionItem = await response.json();
         if (data === null) {

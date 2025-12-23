@@ -53,4 +53,4 @@ export const WithCustomMessages: Story = {
     thinkingMessage: "Analyzing the data",
     waitBeforeThinking: 2000,
   },
-}; 
+};

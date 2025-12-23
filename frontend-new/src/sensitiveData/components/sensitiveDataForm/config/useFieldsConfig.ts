@@ -83,7 +83,6 @@ export const useFieldsConfig = () => {
   return { fields, loading, error };
 };
 
-
 // Raw config as it appears in YAML, before localization.
 // It mirrors the data that will be passed into BaseFieldDefinition and its subclasses,
 // with the difference that some user-facing strings are stored as locale maps.
@@ -134,11 +133,7 @@ export const parseYamlConfig = (yamlText: string, lang: string, defaultLocale: s
         validation: field.validation
           ? {
               ...field.validation,
-              errorMessage: resolveLocale<string | undefined>(
-                field.validation.errorMessage,
-                lang,
-                defaultLocale,
-              ),
+              errorMessage: resolveLocale<string | undefined>(field.validation.errorMessage, lang, defaultLocale),
             }
           : undefined,
         values: resolveLocale<string[]>(field.values, lang, defaultLocale),

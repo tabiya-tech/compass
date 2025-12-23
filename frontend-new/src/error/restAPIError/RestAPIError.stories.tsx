@@ -31,7 +31,9 @@ const TestErrorDropdown = () => {
 
   const handleSelect = (event: React.MouseEvent<HTMLLIElement>) => {
     // @ts-ignore
-    enqueueSnackbar(t(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS[event.currentTarget.textContent]), { variant: "error" });
+    enqueueSnackbar(t(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS[event.currentTarget.textContent]), {
+      variant: "error",
+    });
   };
 
   return (

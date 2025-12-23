@@ -41,10 +41,7 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
    * @throws {Error} If token is missing from user credentials
    */
   async loginWithGoogle(): Promise<string> {
-    const firebaseErrorFactory = getFirebaseErrorFactory(
-      "SocialAuthService",
-      "loginWithGoogle"
-    );
+    const firebaseErrorFactory = getFirebaseErrorFactory("SocialAuthService", "loginWithGoogle");
 
     let userCredential;
     try {
@@ -143,7 +140,7 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
     const { isValid: isValidFirebaseToken, failureCause: firebaseTokenValidationFailureCause } =
       this.stdFirebaseAuthServiceInstance.isFirebaseTokenValid(
         decodedToken as FirebaseToken,
-        FirebaseTokenProvider.GOOGLE,
+        FirebaseTokenProvider.GOOGLE
       );
     if (!isValidFirebaseToken) {
       console.debug(
@@ -161,7 +158,7 @@ class FirebaseSocialAuthenticationService extends AuthenticationService {
    * @returns {boolean} True if an active session exists, false otherwise.
    */
   async isProviderSessionValid(): Promise<boolean> {
-    return await this.stdFirebaseAuthServiceInstance.isAuthSessionValid()
+    return await this.stdFirebaseAuthServiceInstance.isAuthSessionValid();
   }
 }
 

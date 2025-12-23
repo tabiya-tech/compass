@@ -2,12 +2,7 @@ export class ServiceError extends Error {
   serviceName: string;
   serviceFunction: string;
 
-  constructor(
-    serviceName: string,
-    serviceFunction: string,
-    message: string,
-    cause?: unknown
-  ) {
+  constructor(serviceName: string, serviceFunction: string, message: string, cause?: unknown) {
     super(message);
     this.serviceName = serviceName;
     this.serviceFunction = serviceFunction;

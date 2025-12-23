@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Box, DialogActions, Modal, TextField, Theme, Typography, useMediaQuery, useTheme } from "@mui/material";
-import FirebaseEmailAuthService
-  from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
+import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import CustomLink from "src/theme/CustomLink/CustomLink";
@@ -38,15 +37,11 @@ const style = {
   padding: (theme: Theme) => theme.fixedSpacing(theme.tabiyaSpacing.md),
 };
 
-
 interface ResetPasswordEmailSenderProps {
   initialCooldownSeconds?: number;
 }
 
-const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
-  {
-   initialCooldownSeconds = 0,
- }) => {
+const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = ({ initialCooldownSeconds = 0 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -70,7 +65,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
 
   const handleSendResetEmail = useCallback(async () => {
     setIsLoading(true);
-    if(!emailInput) {
+    if (!emailInput) {
       enqueueSnackbar(t("auth.components.passwordReset.pleaseEnterEmail"), { variant: "warning" });
       console.warn("Password reset attempt failed: email input missing.");
       setIsLoading(false);
@@ -82,7 +77,8 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
       enqueueSnackbar(t("auth.components.passwordReset.passwordResetEmailSent"), { variant: "success" });
       setCooldownSeconds(COOLDOWN_SECONDS);
     } catch (error) {
-      const message = error instanceof FirebaseError ? getUserFriendlyFirebaseErrorMessage(error) : (error as Error).message;
+      const message =
+        error instanceof FirebaseError ? getUserFriendlyFirebaseErrorMessage(error) : (error as Error).message;
       console.error("Password reset request failed:", message, error);
       enqueueSnackbar(`${t("auth.components.passwordReset.failedToSendResetEmail")}: ${message}`, { variant: "error" });
     } finally {
@@ -92,12 +88,21 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
   }, [emailInput, enqueueSnackbar, t]);
 
   return (
-    <Box data-testid={DATA_TEST_ID.CONTAINER} sx={{
-      display: "flex", flexDirection: "column", alignItems: "center", gap: theme.spacing(1), marginTop: theme.spacing(2),
-    }}>
-      {(cooldownSeconds !== initialCooldownSeconds) && <Typography variant="body2" color="info">
-        {t("auth.components.passwordReset.passwordResetLinkSent")}
-      </Typography>}
+    <Box
+      data-testid={DATA_TEST_ID.CONTAINER}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: theme.spacing(1),
+        marginTop: theme.spacing(2),
+      }}
+    >
+      {cooldownSeconds !== initialCooldownSeconds && (
+        <Typography variant="body2" color="info">
+          {t("auth.components.passwordReset.passwordResetLinkSent")}
+        </Typography>
+      )}
       <Box>
         <CustomLink
           onClick={() => setDialogOpen(true)}
@@ -121,9 +126,17 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
 
       <Modal open={dialogOpen} onClose={() => setDialogOpen(false)} data-testid={DATA_TEST_ID.DIALOG}>
         <Box
-          sx={{ ...style, padding: isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : theme.tabiyaSpacing.lg }}
+          sx={{
+            ...style,
+            padding: isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : theme.tabiyaSpacing.lg,
+          }}
         >
-          <Box display="flex" justifyContent="space-between" alignItems="start" sx={{ mb: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="start"
+            sx={{ mb: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}
+          >
             <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.DIALOG_TITLE}>
               {t("auth.components.passwordReset.resetPassword")}
             </Typography>
@@ -162,6 +175,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = (
         </Box>
       </Modal>
     </Box>
-  )};
+  );
+};
 
 export default ResetPasswordEmailSender;

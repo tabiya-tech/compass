@@ -14,6 +14,6 @@ type Story = StoryObj<typeof Timestamp>;
 
 export const Shown: Story = {
   args: {
-    sentAt: new Date().toISOString()
+    sentAt: new Date().toISOString(),
   },
 };

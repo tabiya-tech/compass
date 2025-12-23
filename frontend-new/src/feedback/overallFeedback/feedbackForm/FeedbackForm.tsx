@@ -97,10 +97,9 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding:
-              isSmallOrShortScreen
-                ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
-                : theme.fixedSpacing(theme.tabiyaSpacing.md),
+            padding: isSmallOrShortScreen
+              ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
+              : theme.fixedSpacing(theme.tabiyaSpacing.md),
             paddingBottom: 0,
           }}
         >
@@ -119,10 +118,9 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ isOpen, notifyOnClose }) =>
         <DialogContent
           data-testid={DATA_TEST_ID.FEEDBACK_FORM_DIALOG_CONTENT}
           sx={{
-            padding:
-              isSmallOrShortScreen
-                ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
-                : theme.fixedSpacing(theme.tabiyaSpacing.md),
+            padding: isSmallOrShortScreen
+              ? theme.fixedSpacing(theme.tabiyaSpacing.sm)
+              : theme.fixedSpacing(theme.tabiyaSpacing.md),
           }}
         >
           <FeedbackFormContent notifySubmit={handleFeedbackSubmit} />

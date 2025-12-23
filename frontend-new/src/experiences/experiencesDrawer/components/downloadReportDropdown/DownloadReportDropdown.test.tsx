@@ -23,7 +23,9 @@ import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 
 // mock the DownloadReportButton
 jest.mock("src/experiences/experiencesDrawer/components/downloadReportButton/DownloadReportButton", () => {
-  const actual = jest.requireActual("src/experiences/experiencesDrawer/components/downloadReportButton/DownloadReportButton");
+  const actual = jest.requireActual(
+    "src/experiences/experiencesDrawer/components/downloadReportButton/DownloadReportButton"
+  );
   return {
     __esModule: true,
     ...actual,
@@ -31,7 +33,7 @@ jest.mock("src/experiences/experiencesDrawer/components/downloadReportButton/Dow
       <button data-testid={actual.DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER} onClick={props.notifyOnDownloadPdf}>
         Download Report
       </button>
-    ))
+    )),
   };
 });
 
@@ -96,7 +98,7 @@ describe("DownloadReportDropdown", () => {
     // As a precaution, we reset all method mocks to ensure that no side effects are carried over between tests
     resetAllMethodMocks(UserPreferencesStateService.getInstance());
     resetAllMethodMocks(AuthenticationStateService.getInstance());
-  })
+  });
 
   test("should show the download report dropdown when the button is clicked", async () => {
     // GIVEN the component is rendered
@@ -139,44 +141,47 @@ describe("DownloadReportDropdown", () => {
     expect(console.warn).not.toHaveBeenCalled();
   });
 
-  test.each(
-    [
-      [CVFormat.PDF, MENU_ITEM_ID.PDF, PDFReportDownloadProvider],
-      [CVFormat.DOCX, MENU_ITEM_ID.DOCX, DocxReportDownloadProvider],
-  ]
-  )("should call the appropriate provider when the %s option is clicked", async ( givenFormat: CVFormat, givenMenuItem: string, expectedProvider) => {
-    // GIVEN there is an active session and user
-    const givenSessionId = 123;
-    jest.spyOn(UserPreferencesStateService.getInstance(), "getActiveSessionId").mockReturnValueOnce(givenSessionId);
-    const givenUserId = "foo-id";
-    jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValueOnce({ id: givenUserId } as TabiyaUser);
+  test.each([
+    [CVFormat.PDF, MENU_ITEM_ID.PDF, PDFReportDownloadProvider],
+    [CVFormat.DOCX, MENU_ITEM_ID.DOCX, DocxReportDownloadProvider],
+  ])(
+    "should call the appropriate provider when the %s option is clicked",
+    async (givenFormat: CVFormat, givenMenuItem: string, expectedProvider) => {
+      // GIVEN there is an active session and user
+      const givenSessionId = 123;
+      jest.spyOn(UserPreferencesStateService.getInstance(), "getActiveSessionId").mockReturnValueOnce(givenSessionId);
+      const givenUserId = "foo-id";
+      jest
+        .spyOn(AuthenticationStateService.getInstance(), "getUser")
+        .mockReturnValueOnce({ id: givenUserId } as TabiyaUser);
 
-    // AND the metrics service will successfully send the event
-    jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValueOnce();
+      // AND the metrics service will successfully send the event
+      jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValueOnce();
 
-    // AND the component is rendered
-    render(<DownloadReportDropdown {...mockData} />);
-    // AND the dropdown is shown
-    const downloadReportButton = screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER);
-    await userEvent.click(downloadReportButton);
+      // AND the component is rendered
+      render(<DownloadReportDropdown {...mockData} />);
+      // AND the dropdown is shown
+      const downloadReportButton = screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER);
+      await userEvent.click(downloadReportButton);
 
-    // WHEN the given option is clicked
-    await userEvent.click(screen.getByTestId(givenMenuItem));
+      // WHEN the given option is clicked
+      await userEvent.click(screen.getByTestId(givenMenuItem));
 
-    // THEN expect the expected provider should be called
-    expect(expectedProvider).toHaveBeenCalled();
-    // AND the metrics event should be sent
-    expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith({
-      event_type: EventType.CV_DOWNLOADED,
-      cv_format: givenFormat,
-      user_id: givenUserId,
-      session_id: givenSessionId,
-      timestamp: expect.any(String),
-    });
-    // AND no errors or warnings to have occurred
-    expect(console.error).not.toHaveBeenCalled();
-    expect(console.warn).not.toHaveBeenCalled();
-  });
+      // THEN expect the expected provider should be called
+      expect(expectedProvider).toHaveBeenCalled();
+      // AND the metrics event should be sent
+      expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith({
+        event_type: EventType.CV_DOWNLOADED,
+        cv_format: givenFormat,
+        user_id: givenUserId,
+        session_id: givenSessionId,
+        timestamp: expect.any(String),
+      });
+      // AND no errors or warnings to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    }
+  );
 
   test("should handle error when downloading Report", async () => {
     // GIVEN the download will fail
@@ -210,7 +215,9 @@ describe("DownloadReportDropdown", () => {
     await userEvent.click(screen.getByTestId(MENU_ITEM_ID.PDF));
 
     // THEN expect the error to be thrown
-    expect(console.error).toHaveBeenCalledWith(new MetricsError(`Unable to send CVDownload metrics: User id: undefined, Session id: undefined`));
+    expect(console.error).toHaveBeenCalledWith(
+      new MetricsError(`Unable to send CVDownload metrics: User id: undefined, Session id: undefined`)
+    );
   });
 
   test("should handle when session_id is not available", async () => {
@@ -226,6 +233,8 @@ describe("DownloadReportDropdown", () => {
     await userEvent.click(screen.getByTestId(MENU_ITEM_ID.PDF));
 
     // THEN expect the error to be thrown
-    expect(console.error).toHaveBeenCalledWith(new MetricsError(`Unable to send CVDownload metrics: User id: undefined, Session id: undefined`));
+    expect(console.error).toHaveBeenCalledWith(
+      new MetricsError(`Unable to send CVDownload metrics: User id: undefined, Session id: undefined`)
+    );
   });
 });

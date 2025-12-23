@@ -4,10 +4,10 @@ import debounce from "lodash.debounce";
 import { StringFieldDefinition, DEBOUNCE_TIME } from "src/sensitiveData/components/sensitiveDataForm/config/types";
 
 export const DATA_TEST_ID = {
-  STRING_FIELD: 'string-field',
-  STRING_FIELD_QUESTION_TEXT: 'string-field-question-text',
-  STRING_FIELD_INPUT: 'string-field-input',
-  STRING_FIELD_HELPER_TEXT: 'string-field-helper-text',
+  STRING_FIELD: "string-field",
+  STRING_FIELD_QUESTION_TEXT: "string-field-question-text",
+  STRING_FIELD_INPUT: "string-field-input",
+  STRING_FIELD_HELPER_TEXT: "string-field-helper-text",
 };
 
 interface StringFieldProps {
@@ -27,25 +27,25 @@ const StringField: React.FC<StringFieldProps> = ({ field, dataTestId, initialVal
   // Simple validation function
   const validate = (input: string): { isValid: boolean; errorMessage: string | null } => {
     // Check if empty when required
-    if (field.required && (!input || input.trim() === '')) {
-      return { 
-        isValid: false, 
-        errorMessage: 'This field is required' 
+    if (field.required && (!input || input.trim() === "")) {
+      return {
+        isValid: false,
+        errorMessage: "This field is required",
       };
     }
-    
+
     // Check pattern if provided and input is not empty
-    if (field.validation?.pattern && input.trim() !== '') {
+    if (field.validation?.pattern && input.trim() !== "") {
       // ensure unicode support for regex otherwise certain patterns wont work
-      const regex = new RegExp(field.validation.pattern, 'u');
+      const regex = new RegExp(field.validation.pattern, "u");
       if (!regex.test(input)) {
-        return { 
-          isValid: false, 
-          errorMessage: field.validation.errorMessage ?? 'Invalid format'
+        return {
+          isValid: false,
+          errorMessage: field.validation.errorMessage ?? "Invalid format",
         };
       }
     }
-    
+
     return { isValid: true, errorMessage: null };
   };
 
@@ -60,31 +60,31 @@ const StringField: React.FC<StringFieldProps> = ({ field, dataTestId, initialVal
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Get and process the new value
     let newValue = e.target.value.trimStart();
-    
+
     // Update the input value immediately for responsive feedback
     setValue(newValue);
-    
+
     // Trigger debounced validation
     debouncedValidate(newValue);
   };
 
   return (
-    <Box 
-      display="flex" 
-      flexDirection="column" 
-      gap={theme => theme.fixedSpacing(theme.tabiyaRounding.xs)}
+    <Box
+      display="flex"
+      flexDirection="column"
+      gap={(theme) => theme.fixedSpacing(theme.tabiyaRounding.xs)}
       data-testid={DATA_TEST_ID.STRING_FIELD}
     >
       {field.questionText && (
-        <Typography 
-          variant="caption" 
+        <Typography
+          variant="caption"
           color="text.secondary"
           data-testid={DATA_TEST_ID.STRING_FIELD_QUESTION_TEXT}
-          sx={{ 
-            display: 'block',
+          sx={{
+            display: "block",
             lineHeight: 1.5,
             mb: 0.5,
-            fontSize: '0.7rem'
+            fontSize: "0.7rem",
           }}
         >
           {field.questionText}
@@ -102,10 +102,10 @@ const StringField: React.FC<StringFieldProps> = ({ field, dataTestId, initialVal
         required={field.required}
         FormHelperTextProps={{
           // @ts-ignore - Adding data-testid for testing purposes
-          'data-testid': DATA_TEST_ID.STRING_FIELD_HELPER_TEXT
+          "data-testid": DATA_TEST_ID.STRING_FIELD_HELPER_TEXT,
         }}
         inputProps={{
-          'data-testid': dataTestId || DATA_TEST_ID.STRING_FIELD_INPUT,
+          "data-testid": dataTestId || DATA_TEST_ID.STRING_FIELD_INPUT,
         }}
       />
     </Box>

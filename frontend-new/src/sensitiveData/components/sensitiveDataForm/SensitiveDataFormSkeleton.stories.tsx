@@ -1,17 +1,17 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import SensitiveDataFormSkeleton from './SensitiveDataFormSkeleton'
+import type { Meta, StoryObj } from "@storybook/react";
+import SensitiveDataFormSkeleton from "./SensitiveDataFormSkeleton";
 
 const meta: Meta<typeof SensitiveDataFormSkeleton> = {
-  title: 'SensitiveData/SensitiveDataFormSkeleton',
+  title: "SensitiveData/SensitiveDataFormSkeleton",
   component: SensitiveDataFormSkeleton,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {},
-}
+};
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof SensitiveDataFormSkeleton>
+type Story = StoryObj<typeof SensitiveDataFormSkeleton>;
 
 export const Shown: Story = {
   args: {},
-}
+};

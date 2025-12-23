@@ -8,10 +8,17 @@ import { IChatMessage } from "src/chat/Chat.types";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
-import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
+import {
+  SkillsRankingExperimentGroups,
+  SkillsRankingPhase,
+  SkillsRankingState,
+} from "src/features/skillsRanking/types";
 import { skillsRankingHappyPathFull, skillsRankingHappyPathSkipped } from "./skillsRankingFlowGraph";
 
-type MessagePayload = { onContinue?: (state: any) => Promise<void> | void; onDone?: (state: any) => Promise<void> | void };
+type MessagePayload = {
+  onContinue?: (state: any) => Promise<void> | void;
+  onDone?: (state: any) => Promise<void> | void;
+};
 
 const DummyMessageComponent: React.FC<MessagePayload> = () => React.createElement("div");
 
@@ -24,14 +31,30 @@ const makeMessage = (id: string, payload: MessagePayload): IChatMessage<MessageP
 });
 
 jest.mock("src/features/skillsRanking/utils/createMessages", () => ({
-  createBriefingMessage: jest.fn((_s: unknown, next: unknown) => makeMessage("brief", { onContinue: next as MessagePayload["onContinue"] })),
-  createCompletionAdviceMessage: jest.fn((_s: unknown, onDone: unknown) => makeMessage("advice", { onDone: onDone as MessagePayload["onDone"] })),
-  createEffortMessage: jest.fn((_s: unknown, next: unknown) => makeMessage("effort", { onContinue: next as MessagePayload["onContinue"] })),
-  createJobMarketDisclosureMessage: jest.fn((_s: unknown, next: unknown) => makeMessage("market", { onContinue: next as MessagePayload["onContinue"] })),
-  createJobSeekerDisclosureMessage: jest.fn((_s: unknown, next: unknown) => makeMessage("jobseeker", { onContinue: next as MessagePayload["onContinue"] })),
-  createPerceivedRankMessage: jest.fn((_s: unknown, next: unknown) => makeMessage("perceived", { onContinue: next as MessagePayload["onContinue"] })),
-  createPromptMessage: jest.fn((_s: unknown, next: unknown) => makeMessage("prompt", { onContinue: next as MessagePayload["onContinue"] })),
-  createRetypedRankMessage: jest.fn((_s: unknown, next: unknown) => makeMessage("retyped", { onContinue: next as MessagePayload["onContinue"] })),
+  createBriefingMessage: jest.fn((_s: unknown, next: unknown) =>
+    makeMessage("brief", { onContinue: next as MessagePayload["onContinue"] })
+  ),
+  createCompletionAdviceMessage: jest.fn((_s: unknown, onDone: unknown) =>
+    makeMessage("advice", { onDone: onDone as MessagePayload["onDone"] })
+  ),
+  createEffortMessage: jest.fn((_s: unknown, next: unknown) =>
+    makeMessage("effort", { onContinue: next as MessagePayload["onContinue"] })
+  ),
+  createJobMarketDisclosureMessage: jest.fn((_s: unknown, next: unknown) =>
+    makeMessage("market", { onContinue: next as MessagePayload["onContinue"] })
+  ),
+  createJobSeekerDisclosureMessage: jest.fn((_s: unknown, next: unknown) =>
+    makeMessage("jobseeker", { onContinue: next as MessagePayload["onContinue"] })
+  ),
+  createPerceivedRankMessage: jest.fn((_s: unknown, next: unknown) =>
+    makeMessage("perceived", { onContinue: next as MessagePayload["onContinue"] })
+  ),
+  createPromptMessage: jest.fn((_s: unknown, next: unknown) =>
+    makeMessage("prompt", { onContinue: next as MessagePayload["onContinue"] })
+  ),
+  createRetypedRankMessage: jest.fn((_s: unknown, next: unknown) =>
+    makeMessage("retyped", { onContinue: next as MessagePayload["onContinue"] })
+  ),
   shouldSkipMarketDisclosure: jest.fn(() => false),
 }));
 
@@ -39,7 +62,12 @@ const createState = (group: SkillsRankingExperimentGroups, phases: SkillsRanking
   session_id: 1,
   experiment_group: group,
   phases: phases.map((name) => ({ name, time: new Date().toISOString() })),
-  score: { jobs_matching_rank: 0, comparison_rank: 0, comparison_label: "MIDDLE", calculated_at: new Date().toISOString() },
+  score: {
+    jobs_matching_rank: 0,
+    comparison_rank: 0,
+    comparison_label: "MIDDLE",
+    calculated_at: new Date().toISOString(),
+  },
   started_at: new Date().toISOString(),
 });
 
@@ -55,7 +83,6 @@ const advanceToNextPhase = async (options: {
   });
 };
 
-
 describe("useSkillsRanking", () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -64,7 +91,7 @@ describe("useSkillsRanking", () => {
   afterEach(() => {
     jest.useRealTimers();
   });
-  
+
   test("GROUP_1: fetch state, replay, and advance to completion advice", async () => {
     const givenExperimentGroup = SkillsRankingExperimentGroups.GROUP_1;
     const mockGetState = jest.fn().mockResolvedValue(createState(givenExperimentGroup, [SkillsRankingPhase.BRIEFING]));
@@ -88,37 +115,52 @@ describe("useSkillsRanking", () => {
 
     const brief = addedMessages.find((m) => m.type === "brief");
     await act(async () => {
-      await brief?.payload.onContinue?.(createState(givenExperimentGroup, [SkillsRankingPhase.BRIEFING, SkillsRankingPhase.PROOF_OF_VALUE]));
+      await brief?.payload.onContinue?.(
+        createState(givenExperimentGroup, [SkillsRankingPhase.BRIEFING, SkillsRankingPhase.PROOF_OF_VALUE])
+      );
     });
     expect(addedMessages.map((m) => m.type)).toContain("effort");
 
     const effort = addedMessages.find((m) => m.type === "effort");
     await act(async () => {
-      await effort?.payload.onContinue?.(createState(givenExperimentGroup, [SkillsRankingPhase.PROOF_OF_VALUE, SkillsRankingPhase.MARKET_DISCLOSURE]));
+      await effort?.payload.onContinue?.(
+        createState(givenExperimentGroup, [SkillsRankingPhase.PROOF_OF_VALUE, SkillsRankingPhase.MARKET_DISCLOSURE])
+      );
     });
     expect(addedMessages.map((m) => m.type)).toContain("market");
 
     const market = addedMessages.find((m) => m.type === "market");
     await act(async () => {
-      await market?.payload.onContinue?.(createState(givenExperimentGroup, [SkillsRankingPhase.MARKET_DISCLOSURE, SkillsRankingPhase.JOB_SEEKER_DISCLOSURE]));
+      await market?.payload.onContinue?.(
+        createState(givenExperimentGroup, [
+          SkillsRankingPhase.MARKET_DISCLOSURE,
+          SkillsRankingPhase.JOB_SEEKER_DISCLOSURE,
+        ])
+      );
     });
     expect(addedMessages.map((m) => m.type)).toContain("jobseeker");
 
     const jobseeker = addedMessages.find((m) => m.type === "jobseeker");
     await act(async () => {
-      await jobseeker?.payload.onContinue?.(createState(givenExperimentGroup, [SkillsRankingPhase.JOB_SEEKER_DISCLOSURE, SkillsRankingPhase.PERCEIVED_RANK]));
+      await jobseeker?.payload.onContinue?.(
+        createState(givenExperimentGroup, [SkillsRankingPhase.JOB_SEEKER_DISCLOSURE, SkillsRankingPhase.PERCEIVED_RANK])
+      );
     });
     expect(addedMessages.map((m) => m.type)).toContain("perceived");
 
     const perceived = addedMessages.find((m) => m.type === "perceived");
     await act(async () => {
-      await perceived?.payload.onContinue?.(createState(givenExperimentGroup, [SkillsRankingPhase.PERCEIVED_RANK, SkillsRankingPhase.RETYPED_RANK]));
+      await perceived?.payload.onContinue?.(
+        createState(givenExperimentGroup, [SkillsRankingPhase.PERCEIVED_RANK, SkillsRankingPhase.RETYPED_RANK])
+      );
     });
     expect(addedMessages.map((m) => m.type)).toContain("retyped");
 
     const retyped = addedMessages.find((m) => m.type === "retyped");
     await act(async () => {
-      await retyped?.payload.onContinue?.(createState(givenExperimentGroup, [SkillsRankingPhase.RETYPED_RANK, SkillsRankingPhase.COMPLETED]));
+      await retyped?.payload.onContinue?.(
+        createState(givenExperimentGroup, [SkillsRankingPhase.RETYPED_RANK, SkillsRankingPhase.COMPLETED])
+      );
     });
     expect(addedMessages.map((m) => m.type)).toContain("advice");
 
@@ -153,26 +195,34 @@ describe("useSkillsRanking", () => {
 
     const brief = addedMessages.find((m) => m.type === "brief");
     await act(async () => {
-      await brief?.payload.onContinue?.(createState(givenExperimentGroup, [SkillsRankingPhase.BRIEFING, SkillsRankingPhase.PROOF_OF_VALUE]));
+      await brief?.payload.onContinue?.(
+        createState(givenExperimentGroup, [SkillsRankingPhase.BRIEFING, SkillsRankingPhase.PROOF_OF_VALUE])
+      );
     });
     expect(addedMessages.map((m) => m.type)).toContain("effort");
 
     const effort = addedMessages.find((m) => m.type === "effort");
     await act(async () => {
-      await effort?.payload.onContinue?.(createState(givenExperimentGroup, [SkillsRankingPhase.PROOF_OF_VALUE, SkillsRankingPhase.JOB_SEEKER_DISCLOSURE]));
+      await effort?.payload.onContinue?.(
+        createState(givenExperimentGroup, [SkillsRankingPhase.PROOF_OF_VALUE, SkillsRankingPhase.JOB_SEEKER_DISCLOSURE])
+      );
     });
     // Group 2 skips market; should go directly to jobseeker
     expect(addedMessages.map((m) => m.type)).toContain("jobseeker");
 
     const jobseeker = addedMessages.find((m) => m.type === "jobseeker");
     await act(async () => {
-      await jobseeker?.payload.onContinue?.(createState(givenExperimentGroup, [SkillsRankingPhase.JOB_SEEKER_DISCLOSURE, SkillsRankingPhase.PERCEIVED_RANK]));
+      await jobseeker?.payload.onContinue?.(
+        createState(givenExperimentGroup, [SkillsRankingPhase.JOB_SEEKER_DISCLOSURE, SkillsRankingPhase.PERCEIVED_RANK])
+      );
     });
     expect(addedMessages.map((m) => m.type)).toContain("perceived");
 
     const perceived = addedMessages.find((m) => m.type === "perceived");
     await act(async () => {
-      await perceived?.payload.onContinue?.(createState(givenExperimentGroup, [SkillsRankingPhase.PERCEIVED_RANK, SkillsRankingPhase.COMPLETED]));
+      await perceived?.payload.onContinue?.(
+        createState(givenExperimentGroup, [SkillsRankingPhase.PERCEIVED_RANK, SkillsRankingPhase.COMPLETED])
+      );
     });
     // Group 2 skips retyped and goes to completed/advice
     expect(addedMessages.map((m) => m.type)).toContain("advice");
@@ -188,7 +238,9 @@ describe("useSkillsRanking", () => {
   test("should initialize when no state exists and stop on invalid phase path", async () => {
     // GIVEN no existing state and invalid phase path
     const mockGetState = jest.fn().mockResolvedValue(null);
-    const mockInit = jest.fn().mockResolvedValue(createState(SkillsRankingExperimentGroups.GROUP_2, [SkillsRankingPhase.INITIAL]));
+    const mockInit = jest
+      .fn()
+      .mockResolvedValue(createState(SkillsRankingExperimentGroups.GROUP_2, [SkillsRankingPhase.INITIAL]));
     jest.spyOn(SkillsRankingService, "getInstance").mockReturnValue({
       getSkillsRankingState: mockGetState,
       updateSkillsRankingState: mockInit,
@@ -223,7 +275,9 @@ describe("useSkillsRanking", () => {
           getSkillsRankingState: mockGetState,
           updateSkillsRankingState: jest.fn(),
         } as unknown as SkillsRankingService);
-        jest.spyOn(UserPreferencesStateService, "getInstance").mockReturnValue({ getActiveSessionId: () => 999 } as any);
+        jest
+          .spyOn(UserPreferencesStateService, "getInstance")
+          .mockReturnValue({ getActiveSessionId: () => 999 } as any);
 
         const addedMessages: Array<IChatMessage<MessagePayload>> = [];
         const addMessage = (m: IChatMessage<MessagePayload>) => addedMessages.push(m);
@@ -248,7 +302,9 @@ describe("useSkillsRanking", () => {
           [SkillsRankingPhase.COMPLETED]: "advice",
         };
         const lastPhase = givenPhases[givenPhases.length - 1];
-        expect(addedMessages.map((addedMessage) => addedMessage.type)).toContain(expectedReplayMessageTypeByPhase[lastPhase]);
+        expect(addedMessages.map((addedMessage) => addedMessage.type)).toContain(
+          expectedReplayMessageTypeByPhase[lastPhase]
+        );
 
         // AND when advancing via onContinue through the remaining phases, messages should be added accordingly
         const remainingPhases = path.slice(startIndex + 1);
@@ -275,5 +331,3 @@ describe("useSkillsRanking", () => {
     );
   });
 });
-
-

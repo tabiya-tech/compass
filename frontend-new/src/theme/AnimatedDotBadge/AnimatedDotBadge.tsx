@@ -51,5 +51,3 @@ const AnimatedDotBadge: React.FC<AnimatedDotBadgeProps> = ({ children, show }) =
 };
 
 export default AnimatedDotBadge;
-
-

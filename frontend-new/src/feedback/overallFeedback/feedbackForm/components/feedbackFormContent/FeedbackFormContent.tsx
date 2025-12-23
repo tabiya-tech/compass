@@ -34,10 +34,10 @@ export const DATA_TEST_ID = {
 const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  
+
   // Memoize the steps to avoid recreating on every render
   const feedbackFormContentSteps = useMemo(() => getFeedbackFormContentSteps(t), [t]);
-  
+
   const [activeStep, setActiveStep] = useState(0);
   const [answers, setAnswers] = useState<FeedbackItem[]>(() => {
     return PersistentStorageService.getOverallFeedback();
@@ -206,7 +206,9 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
             style={{ width: 100 }}
             data-testid={DATA_TEST_ID.FEEDBACK_FORM_NEXT_BUTTON}
           >
-            {activeStep === maxSteps - 1 ? t("common.buttons.submit") : t("feedback.overallFeedback.feedbackForm.components.feedbackFormContent.next")}
+            {activeStep === maxSteps - 1
+              ? t("common.buttons.submit")
+              : t("feedback.overallFeedback.feedbackForm.components.feedbackFormContent.next")}
           </PrimaryButton>
         }
         backButton={

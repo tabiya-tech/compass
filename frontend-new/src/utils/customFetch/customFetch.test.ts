@@ -22,7 +22,7 @@ import { TokenValidationFailureCause } from "src/auth/services/Authentication.se
 import { AuthenticationError } from "src/error/commonErrors";
 import { routerPaths } from "src/app/routerPaths";
 import brotliPromise from "brotli-wasm";
-import i18n from "src/i18n/i18n"; 
+import i18n from "src/i18n/i18n";
 
 // Mock the dynamic import
 jest.mock("src/auth/services/Authentication.service.factory", () => ({

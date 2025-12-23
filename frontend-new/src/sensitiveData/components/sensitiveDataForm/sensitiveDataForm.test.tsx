@@ -20,9 +20,7 @@ import {
   Language,
   SensitivePersonalDataRequirement,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import {
-  sensitivePersonalDataService,
-} from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
+import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePersonalDataService/errors";
 import { FieldDefinition, FieldType } from "./config/types";
 import * as useFieldsConfigModule from "./config/useFieldsConfig";

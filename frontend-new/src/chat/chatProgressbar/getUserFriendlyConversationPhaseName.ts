@@ -6,7 +6,7 @@ import i18n from "src/i18n/i18n";
 const getUserFriendlyPhaseNames = (): Record<ConversationPhase, string> => {
   return new Proxy({} as Record<ConversationPhase, string>, {
     get(target, prop: string | symbol) {
-      if (typeof prop !== 'string') return undefined;
+      if (typeof prop !== "string") return undefined;
 
       const phase = prop as ConversationPhase;
       const translationMap: Record<ConversationPhase, string> = {
@@ -19,7 +19,7 @@ const getUserFriendlyPhaseNames = (): Record<ConversationPhase, string> => {
       };
 
       return i18n.t(translationMap[phase] || translationMap[ConversationPhase.UNKNOWN]);
-    }
+    },
   });
 };
 

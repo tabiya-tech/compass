@@ -14,7 +14,6 @@ export enum DislikeReason {
   CONFUSING = "CONFUSING",
 }
 
-
 export const DislikeReasonTranslationKey = {
   [DislikeReason.INAPPROPRIATE_TONE]: "chat.reaction.components.dislikeReasonPopover.reasons.inappropriateTone",
   [DislikeReason.OFFENSIVE_LANGUAGE]: "chat.reaction.components.dislikeReasonPopover.reasons.offensiveLanguage",
@@ -45,7 +44,7 @@ export class LikeReaction extends BaseReaction {
 
   constructor() {
     super();
-    if(this.reasons.length > 0){
+    if (this.reasons.length > 0) {
       throw new ReactionError("Like Reactions should not have any reasons");
     }
   }
@@ -54,10 +53,10 @@ export class LikeReaction extends BaseReaction {
 // Dislike reaction class - includes reasons
 export class DislikeReaction extends BaseReaction {
   readonly kind = ReactionKind.DISLIKED;
-  
+
   constructor(public readonly reasons: DislikeReason[]) {
     super();
-    if(reasons.length === 0){
+    if (reasons.length === 0) {
       throw new ReactionError("Dislike Reactions should always have a reason");
     }
   }

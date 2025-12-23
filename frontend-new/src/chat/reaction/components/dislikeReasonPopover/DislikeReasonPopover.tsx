@@ -24,18 +24,12 @@ export const DATA_TEST_ID = {
   CLOSE_ICON_BUTTON: `dislike-reason-popover-close-icon-button-${uniqueId}`,
 };
 
-
-export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({
-  anchorEl,
-  open,
-  onClose,
-}) => {
+export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({ anchorEl, open, onClose }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const isOnline = useContext(IsOnlineContext)
+  const isOnline = useContext(IsOnlineContext);
 
-  const getDislikeReasonLabel = (reason: DislikeReason) =>
-    t(`${DislikeReasonTranslationKey[reason]}`);
+  const getDislikeReasonLabel = (reason: DislikeReason) => t(`${DislikeReasonTranslationKey[reason]}`);
 
   const handleReasonClick = (reason: DislikeReason) => {
     // for now, our ui only allows selecting one reason

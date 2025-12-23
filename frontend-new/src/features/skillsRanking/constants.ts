@@ -15,6 +15,8 @@ export const getJobPlatformUrl = () => SkillsRankingService.getInstance().getCon
 export const getCompensationAmount = () => SkillsRankingService.getInstance().getConfig().config.compensationAmount;
 
 // Typing duration config getters
-export const getShortTypingDurationMs = () => SkillsRankingService.getInstance().getConfig().config.shortTypingDurationMs;
-export const getDefaultTypingDurationMs = () => SkillsRankingService.getInstance().getConfig().config.defaultTypingDurationMs;
+export const getShortTypingDurationMs = () =>
+  SkillsRankingService.getInstance().getConfig().config.shortTypingDurationMs;
+export const getDefaultTypingDurationMs = () =>
+  SkillsRankingService.getInstance().getConfig().config.defaultTypingDurationMs;
 export const getLongTypingDurationMs = () => SkillsRankingService.getInstance().getConfig().config.longTypingDurationMs;

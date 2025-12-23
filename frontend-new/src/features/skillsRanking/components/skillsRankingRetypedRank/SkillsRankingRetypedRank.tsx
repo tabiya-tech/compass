@@ -122,7 +122,7 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           console.error("Failed to update state:", err);
           enqueueSnackbar(t("common.errors.generic"), { variant: "error" });
         }
-              }, getDefaultTypingDurationMs());
+      }, getDefaultTypingDurationMs());
 
       return () => clearTimeout(typingTimer);
     }
@@ -142,10 +142,11 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
           <ChatBubble
             sender={ConversationMessageSender.COMPASS}
             message={
-                <>
+              <>
                 {t("features.skillsRanking.components.skillsRankingRetypedRank.question_1")}{" "}
-                <strong>{t("features.skillsRanking.components.skillsRankingRetypedRank.question_2")}</strong>{t("features.skillsRanking.components.skillsRankingRetypedRank.question_3")}{" "}
-                {getJobPlatformUrl()}{t("features.skillsRanking.components.skillsRankingRetypedRank.question_4")}
+                <strong>{t("features.skillsRanking.components.skillsRankingRetypedRank.question_2")}</strong>
+                {t("features.skillsRanking.components.skillsRankingRetypedRank.question_3")} {getJobPlatformUrl()}
+                {t("features.skillsRanking.components.skillsRankingRetypedRank.question_4")}
               </>
             }
           >

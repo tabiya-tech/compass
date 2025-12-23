@@ -21,7 +21,6 @@ const LoginWithInviteCodeForm: React.FC<Readonly<LoginFormProps>> = ({
   notifyOnInviteCodeChanged,
   isDisabled,
 }) => {
-
   const { t } = useTranslation();
 
   const handleInviteCodeChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {

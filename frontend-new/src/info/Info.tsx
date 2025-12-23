@@ -31,11 +31,11 @@ const VersionInfoItem = ({ title, value, skeleton }: { title: string; value: str
 
 const VersionContainer = ({ dataTestId, title, info }: { dataTestId: string; title: string; info?: VersionItem }) => {
   const theme = useTheme();
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const versionItems = info
     ? [
-        { title: t("info.infoDrawer.versionInfo.date"), value: info.date , skeleton: false},
+        { title: t("info.infoDrawer.versionInfo.date"), value: info.date, skeleton: false },
         { title: t("info.infoDrawer.versionInfo.version"), value: info.branch, skeleton: false },
         { title: t("info.infoDrawer.versionInfo.buildNumber"), value: info.buildNumber, skeleton: false },
         { title: t("info.infoDrawer.versionInfo.gitSha"), value: info.sha, skeleton: false },
@@ -44,9 +44,13 @@ const VersionContainer = ({ dataTestId, title, info }: { dataTestId: string; tit
         { title: t("info.infoDrawer.versionInfo.date"), value: "0000-00-00T00:00:00.000Z", skeleton: true },
         { title: t("info.infoDrawer.versionInfo.version"), value: "foo", skeleton: true },
         { title: t("info.infoDrawer.versionInfo.buildNumber"), value: "000", skeleton: true },
-        { title: t("info.infoDrawer.versionInfo.gitSha"), value: "foofoofoofoofoofoofoofoofoofoofoofoofoo", skeleton: true },
+        {
+          title: t("info.infoDrawer.versionInfo.gitSha"),
+          value: "foofoofoofoofoofoofoofoofoofoofoofoofoo",
+          skeleton: true,
+        },
       ];
-return (
+  return (
     <Box display="flex" gap={theme.tabiyaSpacing.xl} data-testid={dataTestId}>
       <Typography variant="h6" sx={{ minWidth: "100px", maxWidth: "100px" }}>
         {title}
@@ -90,7 +94,11 @@ const ApplicationInfoMain = (props: { versions: Partial<Versions> }) => {
         info={props.versions.frontend}
         dataTestId={DATA_TEST_ID.VERSION_FRONTEND_ROOT}
       />
-      <VersionContainer title={t("info.infoDrawer.backendTitle")} info={props.versions.backend} dataTestId={DATA_TEST_ID.VERSION_BACKEND_ROOT} />
+      <VersionContainer
+        title={t("info.infoDrawer.backendTitle")}
+        info={props.versions.backend}
+        dataTestId={DATA_TEST_ID.VERSION_BACKEND_ROOT}
+      />
     </Box>
   );
 };

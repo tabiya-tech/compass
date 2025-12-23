@@ -12,6 +12,6 @@ export default meta;
 
 export const Shown = {
   args: {
-    title: "Experiences and Skills"
+    title: "Experiences and Skills",
   },
 };

@@ -33,13 +33,12 @@ interface ResendVerificationEmailProps {
 
 export const COOLDOWN_SECONDS = 60;
 
-const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({ 
-  email, 
-  password, 
+const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
+  email,
+  password,
   initialIsLoading = false,
-  initialCooldownSeconds = 0 
+  initialCooldownSeconds = 0,
 }) => {
-  
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(initialIsLoading);
   const [cooldownSeconds, setCooldownSeconds] = useState(initialCooldownSeconds);
@@ -65,7 +64,9 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
     try {
       const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
       await firebaseEmailAuthServiceInstance.resendVerificationEmail(email, password);
-      enqueueSnackbar(t("auth.components.resendVerificationEmail.resendVerificationEmailSuccess"), { variant: "success" });
+      enqueueSnackbar(t("auth.components.resendVerificationEmail.resendVerificationEmailSuccess"), {
+        variant: "success",
+      });
       setCooldownSeconds(COOLDOWN_SECONDS);
     } catch (error) {
       let errorMessage;
@@ -76,7 +77,12 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
         errorMessage = (error as Error).message;
         console.error("Failed to resend verification email (unknown error):", error);
       }
-      enqueueSnackbar(t("auth.components.resendVerificationEmail.resendVerificationEmailFailedWithMessage", { message: errorMessage }), { variant: "error" });
+      enqueueSnackbar(
+        t("auth.components.resendVerificationEmail.resendVerificationEmailFailedWithMessage", {
+          message: errorMessage,
+        }),
+        { variant: "error" }
+      );
     } finally {
       setIsLoading(false);
     }
@@ -100,7 +106,7 @@ const ResendVerificationEmail: React.FC<ResendVerificationEmailProps> = ({
             variant="caption"
             color="textSecondary"
             component="span"
-            sx={{ ml: theme => theme.spacing(theme.tabiyaSpacing.xs) }}
+            sx={{ ml: (theme) => theme.spacing(theme.tabiyaSpacing.xs) }}
             data-testid={DATA_TEST_ID.TIMER}
           >
             ({cooldownSeconds}s)

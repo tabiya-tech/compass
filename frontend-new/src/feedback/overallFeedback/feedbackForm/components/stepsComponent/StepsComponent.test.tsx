@@ -47,7 +47,7 @@ describe("StepsComponent", () => {
   const mockAnswers: FeedbackItem[] = [
     { question_id: "q1", simplified_answer: { selected_options_keys: ["option1"] } },
     { question_id: "q2", simplified_answer: { rating_numeric: 3 } },
-    { question_id: "q3", simplified_answer: { rating_boolean: true, comment: "Yes comment" }},
+    { question_id: "q3", simplified_answer: { rating_boolean: true, comment: "Yes comment" } },
   ];
 
   const mockOnChange = jest.fn();

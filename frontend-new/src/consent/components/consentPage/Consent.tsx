@@ -143,13 +143,16 @@ const Consent: React.FC = () => {
 
       sendMetricsEvent(prefs.user_id);
 
-  enqueueSnackbar(t("consent.components.consentPage.snackbarAgreementAccepted"), { variant: "success" });
+      enqueueSnackbar(t("consent.components.consentPage.snackbarAgreementAccepted"), { variant: "success" });
     } catch (e: unknown) {
       console.error(new AuthenticationError("Failed to update user preferences", e));
       if (e instanceof RestAPIError) {
         enqueueSnackbar(getUserFriendlyErrorMessage(e), { variant: "error" });
       } else {
-        enqueueSnackbar(`${t("consent.components.consentPage.snackbarFailedUpdatePreferences")}: ${(e as Error).message}` , { variant: "error" });
+        enqueueSnackbar(
+          `${t("consent.components.consentPage.snackbarFailedUpdatePreferences")}: ${(e as Error).message}`,
+          { variant: "error" }
+        );
       }
     } finally {
       setIsAccepting(false);
@@ -258,9 +261,7 @@ const Consent: React.FC = () => {
                     values={{ terms_and_conditions: termsAndConditionsLabel }}
                     components={[
                       <CustomLink
-                        onClick={() =>
-                          handleExternalNavigationOnNewTab("https://www.tabiya.org/compass-terms-privacy")
-                        }
+                        onClick={() => handleExternalNavigationOnNewTab("https://www.tabiya.org/compass-terms-privacy")}
                       />,
                     ]}
                   />
@@ -288,9 +289,7 @@ const Consent: React.FC = () => {
                     components={[
                       <CustomLink
                         onClick={() =>
-                          handleExternalNavigationOnNewTab(
-                            "https://tabiya.org/compass-terms-privacy/#privacy-policy"
-                          )
+                          handleExternalNavigationOnNewTab("https://tabiya.org/compass-terms-privacy/#privacy-policy")
                         }
                       />,
                     ]}
@@ -362,7 +361,9 @@ const Consent: React.FC = () => {
               {t("consent.components.consentPage.modalApology", {
                 terms_and_conditions: termsAndConditionsLabel,
                 privacy_policy: privacyPolicyLabel,
-              })} {t("consent.components.consentPage.modalCannotProceed")} <HighlightedSpan>{t("consent.components.consentPage.modalLoggedOutHighlight")}</HighlightedSpan>
+              })}{" "}
+              {t("consent.components.consentPage.modalCannotProceed")}{" "}
+              <HighlightedSpan>{t("consent.components.consentPage.modalLoggedOutHighlight")}</HighlightedSpan>
             </Typography>
             <Typography>{t("common.modal.areYouSureYouWantToExit")}</Typography>
           </Box>

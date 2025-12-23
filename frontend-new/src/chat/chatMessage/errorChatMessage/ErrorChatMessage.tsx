@@ -24,4 +24,4 @@ const ErrorChatMessage: React.FC<ErrorChatMessageProps> = ({ message, children }
   );
 };
 
-export default ErrorChatMessage; 
+export default ErrorChatMessage;

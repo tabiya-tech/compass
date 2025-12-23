@@ -7,11 +7,11 @@ import { StatusCodes } from "http-status-codes";
 describe("ReactionService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  })
+  });
   describe("sendReaction", () => {
     test.each([
-        ["like reaction", new LikeReaction()],
-        ["dislike reaction", new DislikeReaction([DislikeReason.BIASED])]
+      ["like reaction", new LikeReaction()],
+      ["dislike reaction", new DislikeReaction([DislikeReason.BIASED])],
     ])("should send %s successfully", async (_description, givenReaction) => {
       // GIVEN a reaction on a message with a given messageId in a session with a given SessionId
       const givenSessionId = 123;
@@ -24,20 +24,24 @@ describe("ReactionService", () => {
       await reactionService.sendReaction(givenSessionId, givenMessageId, givenReaction);
 
       // THEN expect the API to be called correctly
-      expectCorrectFetchRequest(fetchSpy, `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reactions`, {
-        method: "PUT",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          ...givenReaction,
-          kind: givenReaction.kind,
-          reasons: givenReaction.kind === ReactionKind.DISLIKED ? (givenReaction as DislikeReaction).reasons : [],
-        }),
-        expectedStatusCode: StatusCodes.CREATED,
-        serviceName: "ReactionService",
-        serviceFunction: "sendReaction",
-        failureMessage: `Failed to send reaction for message 456`,
-        expectedContentType: "application/json"
-      });
+      expectCorrectFetchRequest(
+        fetchSpy,
+        `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reactions`,
+        {
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            ...givenReaction,
+            kind: givenReaction.kind,
+            reasons: givenReaction.kind === ReactionKind.DISLIKED ? (givenReaction as DislikeReaction).reasons : [],
+          }),
+          expectedStatusCode: StatusCodes.CREATED,
+          serviceName: "ReactionService",
+          serviceFunction: "sendReaction",
+          failureMessage: `Failed to send reaction for message 456`,
+          expectedContentType: "application/json",
+        }
+      );
       // AND expect no errors or warnings to be logged
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
@@ -85,13 +89,17 @@ describe("ReactionService", () => {
       await reactionService.deleteReaction(givenSessionId, givenMessageId);
 
       // THEN expect the correct API call to be made
-      expectCorrectFetchRequest(fetchSpy, `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reactions`, {
-        method: "DELETE",
-        expectedStatusCode: StatusCodes.NO_CONTENT,
-        serviceName: "ReactionService",
-        serviceFunction: "deleteReaction",
-        failureMessage: `Failed to delete reaction for message 456`,
-      });
+      expectCorrectFetchRequest(
+        fetchSpy,
+        `${reactionService.reactionEndpointUrl}/${givenSessionId}/messages/${givenMessageId}/reactions`,
+        {
+          method: "DELETE",
+          expectedStatusCode: StatusCodes.NO_CONTENT,
+          serviceName: "ReactionService",
+          serviceFunction: "deleteReaction",
+          failureMessage: `Failed to delete reaction for message 456`,
+        }
+      );
       // AND expect no errors or warnings to be logged
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();

@@ -16,9 +16,9 @@ describe("ChatProgresBar", () => {
 
       // AND getUserFriendlyConversationPhaseName is mocked
       const givenReturnedUserFriendlyPhaseName = "given-returned-user-friendly-phase-name";
-      const mockedGetUserFriendlyConversationPhase =
-        jest.spyOn(GetUserFriendlyConversationPhaseNameModule, "getUserFriendlyConversationPhaseName")
-          .mockReturnValue(givenReturnedUserFriendlyPhaseName)
+      const mockedGetUserFriendlyConversationPhase = jest
+        .spyOn(GetUserFriendlyConversationPhaseNameModule, "getUserFriendlyConversationPhaseName")
+        .mockReturnValue(givenReturnedUserFriendlyPhaseName);
 
       // WHEN the ChatProgressBar is rendered
       render(<ChatProgressBar percentage={givenPercentage} phase={givenPhase} current={null} total={null} />);
@@ -51,10 +51,10 @@ describe("ChatProgresBar", () => {
       expect(progressBarElement).toBeInTheDocument();
       await waitFor(() => {
         expect(progressBarElement).toHaveStyle(`width: ${givenPercentage}%`);
-      })
+      });
 
       // AND container should match snapshot.
       expect(container).toMatchSnapshot();
-    })
-  })
+    });
+  });
 });

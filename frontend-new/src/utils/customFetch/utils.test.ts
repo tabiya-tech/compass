@@ -63,13 +63,16 @@ describe("getNextBackoff", () => {
     [1000, 4, 4000],
     [500, 2, 500],
     [500, 3, 1000],
-  ])("should calculate correct backoff for initial_backoff_ms=%i and attempt=%i", (initialBackoff, attempt, expected) => {
-    // GIVEN initial backoff and attempt values
-    // WHEN we calculate the next backoff
-    const result = getNextBackoff(initialBackoff, attempt);
-    // THEN it should return the expected value
-    expect(result).toBe(expected);
-  });
+  ])(
+    "should calculate correct backoff for initial_backoff_ms=%i and attempt=%i",
+    (initialBackoff, attempt, expected) => {
+      // GIVEN initial backoff and attempt values
+      // WHEN we calculate the next backoff
+      const result = getNextBackoff(initialBackoff, attempt);
+      // THEN it should return the expected value
+      expect(result).toBe(expected);
+    }
+  );
 });
 
 describe("calculateTimeToTokenExpiry", () => {
@@ -124,7 +127,7 @@ describe("calculateCompressionGainPercent", () => {
     [5, 1000, 950],
     [0, 1000, 1000],
     [0, 0, 0],
-    [-100, 1000, 2000]
+    [-100, 1000, 2000],
   ])("should return %i% for originalSize=%i and compressedSize=%i", (expected, originalSize, compressedSize) => {
     // GIVEN original and compressed sizes
     // WHEN we calculate the compression gain percent

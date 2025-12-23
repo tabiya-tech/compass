@@ -1,17 +1,17 @@
 import React, { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { 
-  FormControl, 
-  InputLabel, 
-  MenuItem, 
-  Select, 
-  FormHelperText, 
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  FormHelperText,
   SelectChangeEvent,
   IconButton,
   Typography,
-  Box
+  Box,
 } from "@mui/material";
-import ClearIcon from '@mui/icons-material/Clear';
+import ClearIcon from "@mui/icons-material/Clear";
 import { EnumFieldDefinition } from "src/sensitiveData/components/sensitiveDataForm/config/types";
 
 const uniqueId = "5dae7bed-8fbc-455e-8d3b-0bebd7c72749";
@@ -25,7 +25,7 @@ export const DATA_TEST_ID = {
   ENUM_FIELD_QUESTION_TEXT: `enum-field-question-text-${uniqueId}`,
   ENUM_FIELD_FORM_CONTROL: `enum-field-form-control-${uniqueId}`,
   ENUM_FIELD_MENU_ITEM: `enum-field-menu-item-${uniqueId}`,
-}
+};
 
 interface EnumFieldProps {
   field: EnumFieldDefinition;
@@ -43,17 +43,20 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
   const { t } = useTranslation();
 
   // Simple validation function
-  const validate = useCallback((selectedValue: string): { isValid: boolean; errorMessage: string | null } => {
-    // If required and empty, it's invalid
-    if (field.required && (!selectedValue || selectedValue === '')) {
-      return { 
-        isValid: false, 
-        errorMessage: t("sensitiveData.components.enumField.pleaseSelectX", { x: field.label.toLowerCase() })
-      };
-    }
-    
-    return { isValid: true, errorMessage: null };
-  }, [field.label, field.required, t]);
+  const validate = useCallback(
+    (selectedValue: string): { isValid: boolean; errorMessage: string | null } => {
+      // If required and empty, it's invalid
+      if (field.required && (!selectedValue || selectedValue === "")) {
+        return {
+          isValid: false,
+          errorMessage: t("sensitiveData.components.enumField.pleaseSelectX", { x: field.label.toLowerCase() }),
+        };
+      }
+
+      return { isValid: true, errorMessage: null };
+    },
+    [field.label, field.required, t]
+  );
 
   // Handle selection change
   const handleChange = (event: SelectChangeEvent<string>) => {
@@ -65,46 +68,42 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
     setError(errorMessage);
     onChange(newValue, isValid);
   };
-  
+
   // Handle clearing the selection
   const handleClear = () => {
-    setValue('');
-    
+    setValue("");
+
     // For non-required fields, empty is valid
     setError(null);
-    onChange('', true);
+    onChange("", true);
   };
 
   return (
-    <Box 
-      display="flex" 
-      flexDirection="column" 
-      gap={theme => theme.fixedSpacing(theme.tabiyaSpacing.xs)}
+    <Box
+      display="flex"
+      flexDirection="column"
+      gap={(theme) => theme.fixedSpacing(theme.tabiyaSpacing.xs)}
       data-testid={DATA_TEST_ID.ENUM_FIELD_WRAPPER}
     >
       {field.questionText && (
-        <Typography 
-          variant="caption" 
+        <Typography
+          variant="caption"
           color="text.secondary"
           data-testid={DATA_TEST_ID.ENUM_FIELD_QUESTION_TEXT}
-          sx={{ 
-            display: 'block',
+          sx={{
+            display: "block",
             lineHeight: 1.5,
             mb: 0.5,
-            fontSize: '0.7rem'
+            fontSize: "0.7rem",
           }}
         >
           {field.questionText}
         </Typography>
       )}
-      <FormControl 
-        fullWidth 
-        error={!!error}
-        data-testid={DATA_TEST_ID.ENUM_FIELD_FORM_CONTROL}
-      >
-        <InputLabel 
-          required={field.required} 
-          sx={{fontFamily:theme=> theme.typography.caption.fontFamily}} 
+      <FormControl fullWidth error={!!error} data-testid={DATA_TEST_ID.ENUM_FIELD_FORM_CONTROL}>
+        <InputLabel
+          required={field.required}
+          sx={{ fontFamily: (theme) => theme.typography.caption.fontFamily }}
           id={`${field.name}-select-label`}
           data-testid={DATA_TEST_ID.ENUM_FIELD_INPUT_LABEL}
         >
@@ -121,9 +120,10 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
           // else return undefined since the IconButton defaults to ArrowDropDownIcon
           IconComponent={!field.required && value !== "" ? () => null : undefined}
           endAdornment={
-            !field.required && value !== '' && (
-              <IconButton 
-                size="small" 
+            !field.required &&
+            value !== "" && (
+              <IconButton
+                size="small"
                 sx={{ padding: 0 }}
                 onClick={handleClear}
                 aria-label={t("sensitiveData.components.enumField.clearSelection")}
@@ -144,16 +144,10 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
             </MenuItem>
           ))}
         </Select>
-        {error && (
-          <FormHelperText 
-            data-testid={DATA_TEST_ID.ENUM_FIELD_FORM_HELPER_TEXT}
-          >
-            {error}
-          </FormHelperText>
-        )}
+        {error && <FormHelperText data-testid={DATA_TEST_ID.ENUM_FIELD_FORM_HELPER_TEXT}>{error}</FormHelperText>}
       </FormControl>
     </Box>
   );
 };
 
-export default EnumField; 
+export default EnumField;

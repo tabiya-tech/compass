@@ -2,7 +2,10 @@
 import "src/_test_utilities/consoleMock";
 
 import { render, screen, act } from "src/_test_utilities/test-utils";
-import TypingChatMessage, { DATA_TEST_ID, UI_TEXT_KEYS } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
+import TypingChatMessage, {
+  DATA_TEST_ID,
+  UI_TEXT_KEYS,
+} from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
 import { DATA_TEST_ID as CHAT_BUBBLE_DATA_TEST_ID } from "src/chat/chatMessage/components/chatBubble/ChatBubble";
 import i18n from "src/i18n/i18n";
 
@@ -49,8 +52,8 @@ describe("TypingChatMessage", () => {
     expect(typingChatMessageContainer).toBeInTheDocument();
     // AND expect the message bubble to be visible
     expect(screen.getByTestId(CHAT_BUBBLE_DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER)).toBeInTheDocument();
-  // AND expect the typing text to be displayed (translated)
-  expect(screen.getByText(i18n.t(UI_TEXT_KEYS.TYPING))).toBeInTheDocument();
+    // AND expect the typing text to be displayed (translated)
+    expect(screen.getByText(i18n.t(UI_TEXT_KEYS.TYPING))).toBeInTheDocument();
     // AND expect to find 3 dots (periods)
     const dots = screen.getAllByText(".");
     expect(dots).toHaveLength(3);
@@ -79,8 +82,8 @@ describe("TypingChatMessage", () => {
       jest.runAllTimers();
     });
 
-  // THEN expect the thinking text to be displayed (translated)
-  expect(screen.getByText(i18n.t(UI_TEXT_KEYS.THINKING))).toBeInTheDocument();
+    // THEN expect the thinking text to be displayed (translated)
+    expect(screen.getByText(i18n.t(UI_TEXT_KEYS.THINKING))).toBeInTheDocument();
     // AND expect to find 3 dots (periods)
     const dots = screen.getAllByText(".");
     expect(dots).toHaveLength(3);
@@ -99,20 +102,20 @@ describe("TypingChatMessage", () => {
     // WHEN the component is rendered
     render(givenComponent);
 
-  // THEN initially it should display the typing text (translated)
-  expect(screen.getByText(i18n.t(UI_TEXT_KEYS.TYPING))).toBeInTheDocument();
-  // AND the thinking text should not be displayed (translated)
-  expect(screen.queryByText(i18n.t(UI_TEXT_KEYS.THINKING))).not.toBeInTheDocument();
+    // THEN initially it should display the typing text (translated)
+    expect(screen.getByText(i18n.t(UI_TEXT_KEYS.TYPING))).toBeInTheDocument();
+    // AND the thinking text should not be displayed (translated)
+    expect(screen.queryByText(i18n.t(UI_TEXT_KEYS.THINKING))).not.toBeInTheDocument();
 
     // WHEN advancing time past the waitBeforeThinking time
     act(() => {
       jest.advanceTimersByTime(waitTime + 100);
     });
 
-  // THEN it should now display the thinking text (translated)
-  expect(screen.getByText(i18n.t(UI_TEXT_KEYS.THINKING))).toBeInTheDocument();
-  // AND the typing text should not be displayed (translated)
-  expect(screen.queryByText(i18n.t(UI_TEXT_KEYS.TYPING))).not.toBeInTheDocument();
+    // THEN it should now display the thinking text (translated)
+    expect(screen.getByText(i18n.t(UI_TEXT_KEYS.THINKING))).toBeInTheDocument();
+    // AND the typing text should not be displayed (translated)
+    expect(screen.queryByText(i18n.t(UI_TEXT_KEYS.TYPING))).not.toBeInTheDocument();
     // AND expect no errors or warnings to have occurred
     expect(console.error).not.toHaveBeenCalled();
     expect(console.warn).not.toHaveBeenCalled();

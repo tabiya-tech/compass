@@ -51,7 +51,7 @@ describe("InfoService", () => {
         failureMessage: `Failed to load info from ${someURL}`,
         expectedContentType: "application/json",
         authRequired: false,
-        retryOnFailedToFetch: true
+        retryOnFailedToFetch: true,
       });
       expect(actualResult).toMatchObject(expectedData);
     });
@@ -76,12 +76,12 @@ describe("InfoService", () => {
         failureMessage: `Failed to load info from ${someURL}`,
         expectedContentType: "application/json",
         authRequired: false,
-        retryOnFailedToFetch: true
+        retryOnFailedToFetch: true,
       });
       expect(actualResult).toMatchObject({ date: "", branch: "", buildNumber: "", sha: "" });
 
       // AND an error should be logged
-      expect(console.error).toHaveBeenCalled()
+      expect(console.error).toHaveBeenCalled();
     });
 
     test.each([{}, { foo: "bar" }, null])(
@@ -138,12 +138,12 @@ describe("InfoService", () => {
         failureMessage: `Failed to load info from ${someURL}`,
         expectedContentType: "application/json",
         authRequired: false,
-        retryOnFailedToFetch: true
+        retryOnFailedToFetch: true,
       });
       expect(actualResult).toMatchObject({ date: "", branch: "", buildNumber: "", sha: "" });
 
       // AND an error should be logged
-      expect(console.error).toHaveBeenCalled()
+      expect(console.error).toHaveBeenCalled();
     });
   });
 

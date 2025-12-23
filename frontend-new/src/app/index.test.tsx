@@ -339,8 +339,9 @@ describe("index", () => {
       expect(mockChannel.registerListener).toHaveBeenCalledWith(AuthChannelMessage.LOGIN_USER, expect.any(Function));
 
       // WHEN a login message is received
-      const loginListener =
-        mockChannel.registerListener.mock.calls.find((c: any[]) => c[0] === AuthChannelMessage.LOGIN_USER)?.[1];
+      const loginListener = mockChannel.registerListener.mock.calls.find(
+        (c: any[]) => c[0] === AuthChannelMessage.LOGIN_USER
+      )?.[1];
       await act(async () => {
         await loginListener();
       });

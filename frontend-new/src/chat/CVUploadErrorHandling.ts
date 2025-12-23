@@ -49,29 +49,29 @@ export const getCvUploadErrorMessageFromHttpStatus = (status: number, detail?: s
   switch (status) {
     case StatusCodes.UNAUTHORIZED:
       return CV_UPLOAD_ERROR_I18N_KEYS.UNAUTHORIZED;
-    
+
     case StatusCodes.FORBIDDEN:
       return CV_UPLOAD_ERROR_I18N_KEYS.MAX_UPLOADS_REACHED;
-    
+
     case StatusCodes.NOT_FOUND:
       return CV_UPLOAD_ERROR_I18N_KEYS.UPLOAD_NOT_FOUND;
-    
+
     case StatusCodes.REQUEST_TOO_LONG:
       return CV_UPLOAD_ERROR_I18N_KEYS.FILE_TOO_DENSE;
-    
+
     case StatusCodes.UNSUPPORTED_MEDIA_TYPE:
       return CV_UPLOAD_ERROR_I18N_KEYS.UNSUPPORTED_FILE_TYPE;
-    
+
     case StatusCodes.TOO_MANY_REQUESTS:
       return CV_UPLOAD_ERROR_I18N_KEYS.RATE_LIMIT_WAIT;
-    
+
     case StatusCodes.CONFLICT:
       return CV_UPLOAD_ERROR_I18N_KEYS.DUPLICATE_CV;
-    
+
     case StatusCodes.REQUEST_TIMEOUT:
     case StatusCodes.GATEWAY_TIMEOUT:
       return CV_UPLOAD_ERROR_I18N_KEYS.UPLOAD_TIMEOUT;
-    
+
     case StatusCodes.INTERNAL_SERVER_ERROR:
     default:
       // If backend provided a detail message, return it as-is (will be rendered literally)
@@ -85,35 +85,35 @@ export const getCvUploadErrorMessageFromHttpStatus = (status: number, detail?: s
  */
 export const getCvUploadErrorMessageFromErrorCode = (status: UploadStatus): string | null => {
   if (status.upload_process_state !== "FAILED") return null;
-  
+
   const errorCode = status.error_code;
   const errorDetail = status.error_detail;
-  
+
   switch (errorCode) {
     case "MARKDOWN_TOO_LONG":
       return CV_UPLOAD_ERROR_I18N_KEYS.CV_MARKDOWN_TOO_LONG;
-    
+
     case "EMPTY_CV_PARSE":
       return CV_UPLOAD_ERROR_I18N_KEYS.EMPTY_CV_PARSE;
-    
+
     case "FILE_TOO_DENSE":
       return CV_UPLOAD_ERROR_I18N_KEYS.FILE_TOO_DENSE;
-    
+
     case "RATE_LIMIT_WAIT":
       return CV_UPLOAD_ERROR_I18N_KEYS.RATE_LIMIT_WAIT;
-    
+
     case "MAX_UPLOADS_REACHED":
       return CV_UPLOAD_ERROR_I18N_KEYS.MAX_UPLOADS_REACHED;
-    
+
     case "DUPLICATE_CV":
       return CV_UPLOAD_ERROR_I18N_KEYS.DUPLICATE_CV;
-    
+
     case "UNSUPPORTED_FILE_TYPE":
       return CV_UPLOAD_ERROR_I18N_KEYS.UNSUPPORTED_FILE_TYPE;
-    
+
     case "UPLOAD_TIMEOUT":
       return CV_UPLOAD_ERROR_I18N_KEYS.UPLOAD_TIMEOUT;
-    
+
     default:
       return errorDetail || CV_UPLOAD_ERROR_I18N_KEYS.GENERIC_UPLOAD_ERROR;
   }

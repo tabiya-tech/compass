@@ -3,11 +3,9 @@ import { getDurationFromNow } from "./getDurationFromNow";
 
 function timeAgo({ days = 0, hours = 0, minutes = 0, seconds = 0 }) {
   const now = Date.now();
-  const totalMilliseconds =
-    (((days * 24 + hours) * 60 + minutes) * 60 + seconds) * 1000;
+  const totalMilliseconds = (((days * 24 + hours) * 60 + minutes) * 60 + seconds) * 1000;
   return new Date(now - totalMilliseconds);
 }
-
 
 const t = (key: string, opts?: any) => {
   const translations: Record<string, string> = {

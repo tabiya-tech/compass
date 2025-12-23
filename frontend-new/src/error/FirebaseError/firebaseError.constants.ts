@@ -43,9 +43,8 @@ export const USER_FRIENDLY_FIREBASE_ERROR_I18N_KEYS: Record<FirebaseErrorCodes, 
   [FirebaseErrorCodes.INVALID_REGISTRATION_TYPE]: "auth.errors.firebase.invalidRegistrationType",
   [FirebaseErrorCodes.POPUP_CLOSED_BY_USER]: "auth.errors.firebase.popupClosedByUser",
   [FirebaseErrorCodes.INVALID_LOGIN_METHOD]: "auth.errors.firebase.invalidLoginMethod",
-  [FirebaseErrorCodes.EMAIL_ALREADY_VERIFIED]: "auth.errors.firebase.emailAlreadyVerified"
+  [FirebaseErrorCodes.EMAIL_ALREADY_VERIFIED]: "auth.errors.firebase.emailAlreadyVerified",
 };
-
 
 export function isFirebaseErrorCode(value: string): value is FirebaseErrorCodes {
   return Object.values(FirebaseErrorCodes).includes(value as FirebaseErrorCodes);

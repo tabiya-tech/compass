@@ -3,7 +3,10 @@ import type { Meta, StoryObj } from "@storybook/react";
 import Chat from "./Chat";
 import { getBackendUrl } from "src/envService";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
-import { Language, SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import {
+  Language,
+  SensitivePersonalDataRequirement,
+} from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
 import { nanoid } from "nanoid";
 
@@ -11,7 +14,7 @@ const CONVERSATION_HISTORY_URL = getBackendUrl() + "/conversations/:session_id/m
 const NEW_SESSION_URL = getBackendUrl() + "/users/preferences/new-session";
 
 // Generate a timestamp relative to now
-const getTimestamp = (minutesAgo: number) => new Date(Date.now() - (minutesAgo * 60 * 1000)).toISOString();
+const getTimestamp = (minutesAgo: number) => new Date(Date.now() - minutesAgo * 60 * 1000).toISOString();
 
 const meta: Meta<typeof Chat> = {
   title: "Chat/Chat",
@@ -44,7 +47,7 @@ const meta: Meta<typeof Chat> = {
               sender: "COMPASS",
               sent_at: getTimestamp(3),
               reaction: null,
-            }
+            },
           ],
           conversation_completed: false,
           conversation_conducted_at: getTimestamp(3),
@@ -54,7 +57,7 @@ const meta: Meta<typeof Chat> = {
             percentage: 50,
             current: 2,
             total: 4,
-          }
+          },
         },
       },
       {
@@ -71,7 +74,7 @@ const meta: Meta<typeof Chat> = {
             percentage: 10,
             current: 1,
             total: 10,
-          }
+          },
         },
       },
       {
@@ -82,7 +85,7 @@ const meta: Meta<typeof Chat> = {
           id: nanoid(),
           message_id: nanoid(),
           session_id: 123,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         },
       },
       {
@@ -145,7 +148,7 @@ export const Shown: Story = {
             percentage: 10,
             current: 1,
             total: 10,
-          }
+          },
         },
       },
     ],
@@ -298,7 +301,7 @@ const generateRealisticConversation = (finished: boolean, includeExperiences: bo
           percentage: finished ? 100 : 50,
           current: finished ? null : 2,
           total: finished ? null : 4,
-        }
+        },
       },
     },
   ];
@@ -313,10 +316,7 @@ const generateRealisticConversation = (finished: boolean, includeExperiences: bo
 export const ShownWithUnfinishedConversation: Story = {
   args: { showInactiveSessionAlert: false, disableInactivityCheck: true },
   parameters: {
-    mockData: [
-      ...meta.parameters!.mockData,
-      ...generateRealisticConversation(false, false),
-    ],
+    mockData: [...meta.parameters!.mockData, ...generateRealisticConversation(false, false)],
     isLoading: true,
   },
 };
@@ -324,10 +324,7 @@ export const ShownWithUnfinishedConversation: Story = {
 export const ShownWithFinishedConversation: Story = {
   args: { showInactiveSessionAlert: false, disableInactivityCheck: true },
   parameters: {
-    mockData: [
-      ...meta.parameters!.mockData,
-      ...generateRealisticConversation(true, true),
-    ],
+    mockData: [...meta.parameters!.mockData, ...generateRealisticConversation(true, true)],
   },
 };
 
@@ -337,9 +334,6 @@ export const ShownWhenUserIsInactive: Story = {
     disableInactivityCheck: true,
   },
   parameters: {
-    mockData: [
-      ...meta.parameters!.mockData,
-      ...generateRealisticConversation(false, true),
-    ],
+    mockData: [...meta.parameters!.mockData, ...generateRealisticConversation(false, true)],
   },
 };

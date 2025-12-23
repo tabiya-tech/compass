@@ -4,7 +4,11 @@ import "src/_test_utilities/consoleMock";
 import React from "react";
 import { act, render, screen } from "src/_test_utilities/test-utils";
 import SkillsRankingBriefing, { DATA_TEST_ID } from "./SkillsRankingBriefing";
-import { SkillsRankingExperimentGroups, SkillsRankingPhase, SkillsRankingState } from "src/features/skillsRanking/types";
+import {
+  SkillsRankingExperimentGroups,
+  SkillsRankingPhase,
+  SkillsRankingState,
+} from "src/features/skillsRanking/types";
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { DATA_TEST_ID as TYPING_DATA_TEST_ID } from "src/chat/chatMessage/typingChatMessage/TypingChatMessage";
@@ -36,7 +40,12 @@ describe("SkillsRankingBriefing", () => {
     session_id: 1,
     experiment_group: group,
     phases: [{ name: phase, time: new Date().toISOString() }],
-    score: { jobs_matching_rank: 0, comparison_rank: 0, comparison_label: "MIDDLE", calculated_at: new Date().toISOString() },
+    score: {
+      jobs_matching_rank: 0,
+      comparison_rank: 0,
+      comparison_label: "MIDDLE",
+      calculated_at: new Date().toISOString(),
+    },
     started_at: new Date().toISOString(),
   });
 
@@ -46,9 +55,19 @@ describe("SkillsRankingBriefing", () => {
     const mockUpdate = jest.fn().mockResolvedValue({} as SkillsRankingState);
     jest.spyOn(SkillsRankingService, "getInstance").mockReturnValue({
       updateSkillsRankingState: mockUpdate,
-      getConfig: () => ({ config: { compensationAmount: "$1", jobPlatformUrl: "x", shortTypingDurationMs: 1, defaultTypingDurationMs: 1, longTypingDurationMs: 1 } }),
+      getConfig: () => ({
+        config: {
+          compensationAmount: "$1",
+          jobPlatformUrl: "x",
+          shortTypingDurationMs: 1,
+          defaultTypingDurationMs: 1,
+          longTypingDurationMs: 1,
+        },
+      }),
     } as unknown as SkillsRankingService);
-    jest.spyOn(UserPreferencesStateService, "getInstance").mockReturnValue({ getActiveSessionId: () => givenSessionId } as any);
+    jest
+      .spyOn(UserPreferencesStateService, "getInstance")
+      .mockReturnValue({ getActiveSessionId: () => givenSessionId } as any);
     const actualOnFinish = jest.fn().mockResolvedValue(undefined);
     const givenState = createState(SkillsRankingExperimentGroups.GROUP_2, SkillsRankingPhase.BRIEFING);
 
@@ -59,20 +78,26 @@ describe("SkillsRankingBriefing", () => {
     expect(screen.getByTestId(DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTAINER)).toBeInTheDocument();
 
     // WHEN advancing to show second message
-    act(() => { jest.runOnlyPendingTimers(); });
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
 
     // THEN second message with Continue should appear
     const givenContinueButtons = screen.getAllByTestId(DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON);
     expect(givenContinueButtons.length).toBeGreaterThanOrEqual(1);
 
     // WHEN clicking Continue
-    act(() => { givenContinueButtons[0].click(); });
+    act(() => {
+      givenContinueButtons[0].click();
+    });
     await flush();
 
     // THEN typing should appear
     expect(screen.getByTestId(TYPING_DATA_TEST_ID.TYPING_CHAT_MESSAGE_CONTAINER)).toBeInTheDocument();
     // WHEN typing duration elapses
-    act(() => { jest.runOnlyPendingTimers(); });
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
     await flush();
 
     // THEN service called with PROOF_OF_VALUE and onFinish invoked
@@ -88,9 +113,19 @@ describe("SkillsRankingBriefing", () => {
     const mockUpdate = jest.fn().mockResolvedValue({} as SkillsRankingState);
     jest.spyOn(SkillsRankingService, "getInstance").mockReturnValue({
       updateSkillsRankingState: mockUpdate,
-      getConfig: () => ({ config: { compensationAmount: "$1", jobPlatformUrl: "x", shortTypingDurationMs: 1, defaultTypingDurationMs: 1, longTypingDurationMs: 1 } }),
+      getConfig: () => ({
+        config: {
+          compensationAmount: "$1",
+          jobPlatformUrl: "x",
+          shortTypingDurationMs: 1,
+          defaultTypingDurationMs: 1,
+          longTypingDurationMs: 1,
+        },
+      }),
     } as unknown as SkillsRankingService);
-    jest.spyOn(UserPreferencesStateService, "getInstance").mockReturnValue({ getActiveSessionId: () => givenSessionId } as any);
+    jest
+      .spyOn(UserPreferencesStateService, "getInstance")
+      .mockReturnValue({ getActiveSessionId: () => givenSessionId } as any);
     const actualOnFinish = jest.fn().mockResolvedValue(undefined);
     const givenState = createState(SkillsRankingExperimentGroups.GROUP_1, SkillsRankingPhase.BRIEFING);
 
@@ -101,11 +136,15 @@ describe("SkillsRankingBriefing", () => {
     const givenContinueButtons = screen.getAllByTestId(DATA_TEST_ID.SKILLS_RANKING_BRIEFING_CONTINUE_BUTTON);
     expect(givenContinueButtons.length).toBeGreaterThanOrEqual(1);
     // WHEN clicking Continue -> typing shows
-    act(() => { givenContinueButtons[0].click(); });
+    act(() => {
+      givenContinueButtons[0].click();
+    });
     await flush();
     expect(screen.getByTestId(TYPING_DATA_TEST_ID.TYPING_CHAT_MESSAGE_CONTAINER)).toBeInTheDocument();
     // WHEN typing duration elapses
-    act(() => { jest.runOnlyPendingTimers(); });
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
     await flush();
 
     // THEN update and finish
@@ -117,7 +156,15 @@ describe("SkillsRankingBriefing", () => {
     // GIVEN no session id
     jest.spyOn(SkillsRankingService, "getInstance").mockReturnValue({
       updateSkillsRankingState: jest.fn(),
-      getConfig: () => ({ config: { compensationAmount: "$1", jobPlatformUrl: "x", shortTypingDurationMs: 1, defaultTypingDurationMs: 1, longTypingDurationMs: 1 } }),
+      getConfig: () => ({
+        config: {
+          compensationAmount: "$1",
+          jobPlatformUrl: "x",
+          shortTypingDurationMs: 1,
+          defaultTypingDurationMs: 1,
+          longTypingDurationMs: 1,
+        },
+      }),
     } as unknown as SkillsRankingService);
     jest.spyOn(UserPreferencesStateService, "getInstance").mockReturnValue({ getActiveSessionId: () => null } as any);
     const actualOnFinish = jest.fn();
@@ -138,9 +185,19 @@ describe("SkillsRankingBriefing", () => {
     const givenSessionId = 111;
     jest.spyOn(SkillsRankingService, "getInstance").mockReturnValue({
       updateSkillsRankingState: jest.fn().mockRejectedValue(new Error("boom")),
-      getConfig: () => ({ config: { compensationAmount: "$1", jobPlatformUrl: "x", shortTypingDurationMs: 1, defaultTypingDurationMs: 1, longTypingDurationMs: 1 } }),
+      getConfig: () => ({
+        config: {
+          compensationAmount: "$1",
+          jobPlatformUrl: "x",
+          shortTypingDurationMs: 1,
+          defaultTypingDurationMs: 1,
+          longTypingDurationMs: 1,
+        },
+      }),
     } as unknown as SkillsRankingService);
-    jest.spyOn(UserPreferencesStateService, "getInstance").mockReturnValue({ getActiveSessionId: () => givenSessionId } as any);
+    jest
+      .spyOn(UserPreferencesStateService, "getInstance")
+      .mockReturnValue({ getActiveSessionId: () => givenSessionId } as any);
     const actualOnFinish = jest.fn();
     const givenState = createState(SkillsRankingExperimentGroups.GROUP_1, SkillsRankingPhase.BRIEFING);
 
@@ -155,5 +212,3 @@ describe("SkillsRankingBriefing", () => {
     expect(actualOnFinish).not.toHaveBeenCalled();
   });
 });
-
-

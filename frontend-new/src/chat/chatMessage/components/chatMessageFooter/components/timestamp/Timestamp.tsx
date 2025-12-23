@@ -9,7 +9,7 @@ export const DATA_TEST_ID = {
 };
 
 export interface ChatMessageFooterProps {
-  sentAt: string
+  sentAt: string;
 }
 
 const TimeStamp = styled(Typography)(({ theme }) => ({
@@ -18,23 +18,22 @@ const TimeStamp = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(theme.tabiyaSpacing.xs),
 }));
 
-
 const Timestamp: React.FC<ChatMessageFooterProps> = ({ sentAt }) => {
   const { t } = useTranslation();
   let duration;
   try {
-    duration = getDurationFromNow(new Date(sentAt),t);
+    duration = getDurationFromNow(new Date(sentAt), t);
   } catch (e) {
     console.error(new Error("Failed to get message duration", { cause: e }));
   }
-  let sentText = duration ;
+  let sentText = duration;
 
   return (
     <TimeStamp data-testid={DATA_TEST_ID.TIMESTAMP} variant="caption">
-     {t("chat.chatMessage.sent")}           
-     {sentText}
+      {t("chat.chatMessage.sent")}
+      {sentText}
     </TimeStamp>
-  )
-}
+  );
+};
 
 export default Timestamp;

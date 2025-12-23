@@ -58,7 +58,10 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
   const docxsReportProvider = new DocxReportDownloadProvider();
   const pdfReportProvider = new PDFReportDownloadProvider();
 
-  const handleDownload = async (downloadProvider: { download: (props: ReportProps) => Promise<void> }, downloadFormat: CVFormat) => {
+  const handleDownload = async (
+    downloadProvider: { download: (props: ReportProps) => Promise<void> },
+    downloadFormat: CVFormat
+  ) => {
     setIsLoading(true);
     try {
       await downloadProvider.download(reportProps);
@@ -69,18 +72,19 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
       const user_id = AuthenticationStateService.getInstance().getUser()?.id;
       const session_id = UserPreferencesStateService.getInstance().getActiveSessionId();
 
-      if(user_id && session_id) {
+      if (user_id && session_id) {
         MetricsService.getInstance().sendMetricsEvent({
-              event_type: EventType.CV_DOWNLOADED,
-              cv_format: downloadFormat,
-              // the user id is required for the metrics event but is possibly null
-              user_id: user_id,
-              session_id: session_id,
-              timestamp: new Date().toISOString(),
-            }
-        )
+          event_type: EventType.CV_DOWNLOADED,
+          cv_format: downloadFormat,
+          // the user id is required for the metrics event but is possibly null
+          user_id: user_id,
+          session_id: session_id,
+          timestamp: new Date().toISOString(),
+        });
       } else {
-        console.error(new MetricsError(`Unable to send CVDownload metrics: User id: ${user_id}, Session id: ${session_id}`));
+        console.error(
+          new MetricsError(`Unable to send CVDownload metrics: User id: ${user_id}, Session id: ${session_id}`)
+        );
       }
     }
   };

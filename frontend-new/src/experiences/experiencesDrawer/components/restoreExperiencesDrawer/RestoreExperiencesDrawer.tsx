@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Box, Divider, Slide, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import ExperienceService from "src/experiences/experienceService/experienceService";
-import ExperiencesDrawerHeader
-  from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
+import ExperiencesDrawerHeader from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import { LoadingExperienceDrawerContent } from "../experiencesDrawerContent/ExperiencesDrawerContent";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { ExperienceError } from "src/error/commonErrors";
@@ -56,7 +55,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
     const fetchDeletedExperiences = async () => {
       setIsLoading(true);
       try {
-        const deletedExperiences = await ExperienceService.getInstance().getExperiences(sessionId,  true);
+        const deletedExperiences = await ExperienceService.getInstance().getExperiences(sessionId, true);
         setDeletedExperiences(deletedExperiences);
       } catch (error) {
         console.error(new ExperienceError("Failed to fetch deleted experiences", error));
@@ -79,9 +78,8 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
   // Sort all experiences by title
   const sortedExperiences = useMemo(
     () =>
-      deletedExperiences.toSorted?.(
-        (a, b) => (a.experience_title || "").localeCompare(b.experience_title || "")
-      ) ?? [...deletedExperiences].sort((a, b) => (a.experience_title || "").localeCompare(b.experience_title || "")),
+      deletedExperiences.toSorted?.((a, b) => (a.experience_title || "").localeCompare(b.experience_title || "")) ??
+      [...deletedExperiences].sort((a, b) => (a.experience_title || "").localeCompare(b.experience_title || "")),
     [deletedExperiences]
   );
 
@@ -138,7 +136,9 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
                     color={theme.palette.text.secondary}
                     data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_TITLE}
                   >
-                    {experience.experience_title ?? <i>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.untitled")}</i>}
+                    {experience.experience_title ?? (
+                      <i>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.untitled")}</i>
+                    )}
                   </Typography>
                   <Box
                     display="flex"
@@ -160,7 +160,9 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
                     disableWhenOffline
                     title={t("common.buttons.restore")}
                     data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_BUTTON}
-                    startIcon={<img src={`${process.env.PUBLIC_URL}/restore-icon.svg`} alt={t("common.buttons.restore")} />}
+                    startIcon={
+                      <img src={`${process.env.PUBLIC_URL}/restore-icon.svg`} alt={t("common.buttons.restore")} />
+                    }
                   >
                     {t("common.buttons.restore")}
                   </PrimaryButton>
@@ -201,7 +203,10 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
         height={"100%"}
         data-testid={DATA_TEST_ID.RESTORE_EXPERIENCES}
       >
-        <ExperiencesDrawerHeader notifyOnClose={onClose} title={t("experiences.experiencesDrawer.components.restoreExperiencesDrawer.title")} />
+        <ExperiencesDrawerHeader
+          notifyOnClose={onClose}
+          title={t("experiences.experiencesDrawer.components.restoreExperiencesDrawer.title")}
+        />
         <Divider />
         {renderContent()}
       </Box>

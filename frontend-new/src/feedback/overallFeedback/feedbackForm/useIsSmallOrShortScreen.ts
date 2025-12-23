@@ -1,7 +1,7 @@
 import { useMediaQuery, useTheme } from "@mui/material";
 
 export function useIsSmallOrShortScreen() {
-  const theme = useTheme()
+  const theme = useTheme();
 
   const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
 

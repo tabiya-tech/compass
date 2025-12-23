@@ -200,7 +200,7 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
    */
 
   async isProviderSessionValid(): Promise<boolean> {
-    return await this.stdFirebaseAuthServiceInstance.isAuthSessionValid()
+    return await this.stdFirebaseAuthServiceInstance.isAuthSessionValid();
   }
 }
 

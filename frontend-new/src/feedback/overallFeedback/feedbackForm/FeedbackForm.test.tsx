@@ -40,11 +40,13 @@ jest.mock("src/userPreferences/UserPreferencesStateService", () => ({
 
 // mock the feedback form content
 jest.mock("src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent", () => {
-  const actual = jest.requireActual("src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent");
+  const actual = jest.requireActual(
+    "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent"
+  );
   return {
     ...actual,
     __esModule: true,
-    default: jest.fn(() => <div data-testid={actual.DATA_TEST_ID.FEEDBACK_FORM_CONTENT}/>),
+    default: jest.fn(() => <div data-testid={actual.DATA_TEST_ID.FEEDBACK_FORM_CONTENT} />),
   };
 });
 
@@ -52,16 +54,18 @@ const mockFeedbackResponse: FeedbackResponse = {
   id: "foo",
   version: {
     frontend: "foo-frontend",
-    backend: "foo-backend"
+    backend: "foo-backend",
   },
-  feedback_items: [{
-    question_id: "foo-question_id",
-    simplified_answer: {
-      rating_numeric: 5
-    }
-  }],
-  created_at: new Date().toISOString()
-}
+  feedback_items: [
+    {
+      question_id: "foo-question_id",
+      simplified_answer: {
+        rating_numeric: 5,
+      },
+    },
+  ],
+  created_at: new Date().toISOString(),
+};
 
 describe("FeedbackForm", () => {
   test("should render component successfully", () => {
@@ -114,7 +118,7 @@ describe("FeedbackForm", () => {
 
     test("should call handleFeedbackSubmit when submit button is clicked", async () => {
       // GIVEN the feedback service will successfully send a feedback
-      jest.spyOn(OverallFeedbackService.getInstance(), "sendFeedback").mockResolvedValueOnce(mockFeedbackResponse)
+      jest.spyOn(OverallFeedbackService.getInstance(), "sendFeedback").mockResolvedValueOnce(mockFeedbackResponse);
       // AND the component is rendered
       const mockHandleClose = jest.fn();
       const givenFeedbackForm = <FeedbackForm isOpen={true} notifyOnClose={mockHandleClose} />;
@@ -126,10 +130,10 @@ describe("FeedbackForm", () => {
           {
             question_id: "foo-question",
             answer: {
-              comment: "foo-comment"
+              comment: "foo-comment",
             },
             is_answered: false,
-          }
+          },
         ]);
       });
 
@@ -139,9 +143,12 @@ describe("FeedbackForm", () => {
       expect(mockSendFeedback).toHaveBeenCalled();
       // AND the snackbar to have been called
       await waitFor(() =>
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(i18n.t("feedback.overallFeedback.feedbackForm.submitSuccess"), {
-          variant: "success",
-        })
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+          i18n.t("feedback.overallFeedback.feedbackForm.submitSuccess"),
+          {
+            variant: "success",
+          }
+        )
       );
     });
 
@@ -169,10 +176,10 @@ describe("FeedbackForm", () => {
           {
             question_id: "foo-question",
             answer: {
-              comment: "foo-comment"
+              comment: "foo-comment",
             },
             is_answered: false,
-          }
+          },
         ]);
       });
 

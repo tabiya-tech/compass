@@ -15,7 +15,8 @@ export function stopUploadPolling(handles?: UploadPollingHandles): void {
 
 export function getCvUploadDisplayMessage(status: UploadStatus): string {
   if (!status) return i18n.t("chat.cvUploadPolling.uploadingCv");
-  if (status.upload_process_state === "CANCELLED" || status.cancel_requested) return i18n.t("chat.cvUploadPolling.cancelled");
+  if (status.upload_process_state === "CANCELLED" || status.cancel_requested)
+    return i18n.t("chat.cvUploadPolling.cancelled");
   if (status.upload_process_state === "COMPLETED") return i18n.t("chat.cvUploadPolling.uploadedSuccessfully");
   switch (status.upload_process_state) {
     case "CONVERTING":

@@ -11,7 +11,7 @@ import {
   useTheme,
   styled,
   useMediaQuery,
-  Theme
+  Theme,
 } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
@@ -52,7 +52,7 @@ const style = {
   width: "100%",
   backgroundColor: "background.paper",
   boxShadow: 24,
-  borderRadius: 1
+  borderRadius: 1,
 };
 
 const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialogProps> = ({
@@ -80,10 +80,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
   }, []);
 
   const isEmailValid = useMemo(() => {
-    return email && 
-           emailConfirmation && 
-           email === emailConfirmation && 
-           validateEmail(email);
+    return email && emailConfirmation && email === emailConfirmation && validateEmail(email);
   }, [email, emailConfirmation]);
 
   const isFormValid = isEmailValid && isPasswordValid;
@@ -100,7 +97,9 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
     }
 
     if (!isPasswordValid) {
-      enqueueSnackbar(t("auth.components.anonymousAccountConversionDialog.passwordRequirementsNotMet"), { variant: "error" });
+      enqueueSnackbar(t("auth.components.anonymousAccountConversionDialog.passwordRequirementsNotMet"), {
+        variant: "error",
+      });
       return;
     }
 
@@ -109,21 +108,22 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
       const authService = FirebaseEmailAuthenticationService.getInstance();
       await authService.linkAnonymousAccount(email, password, email);
       console.info("Anonymous account successfully linked to a registered account.");
-      enqueueSnackbar(t("auth.components.anonymousAccountConversionDialog.registrationSuccess"), { variant: "success" });
-      enqueueSnackbar(
-        t("auth.components.anonymousAccountConversionDialog.verificationSentWithEmail", { email }),
-        {
+      enqueueSnackbar(t("auth.components.anonymousAccountConversionDialog.registrationSuccess"), {
+        variant: "success",
+      });
+      enqueueSnackbar(t("auth.components.anonymousAccountConversionDialog.verificationSentWithEmail", { email }), {
         variant: "info",
         persist: true,
-        autoHideDuration: null
-      }
-      );
+        autoHideDuration: null,
+      });
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error(new Error("Failed to link anonymous account"), { cause: error });
 
-      enqueueSnackbar(error.message || t("auth.components.anonymousAccountConversionDialog.registrationFailed"), { variant: "error" });
+      enqueueSnackbar(error.message || t("auth.components.anonymousAccountConversionDialog.registrationFailed"), {
+        variant: "error",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -152,18 +152,18 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
       >
         <CloseIcon />
       </PrimaryIconButton>
-      
+
       <DialogTitle>
         <Typography variant="h4" component="div" gutterBottom>
           {t("auth.components.anonymousAccountConversionDialog.registerAccount")}
         </Typography>
       </DialogTitle>
-      
+
       <DialogContent>
         <Typography variant="body2" gutterBottom>
-           {t("auth.components.anonymousAccountConversionDialog.registrationInfo")}
+          {t("auth.components.anonymousAccountConversionDialog.registrationInfo")}
         </Typography>
-        
+
         <HighlightedSpan>{t("auth.components.anonymousAccountConversionDialog.emailWarning")}</HighlightedSpan>
         <Box sx={{ mt: 2 }}>
           <TextField
@@ -179,7 +179,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
             error={email !== "" && !validateEmail(email)}
             helperText={email !== "" && !validateEmail(email) ? t("common.validation.validEmailRequired") : ""}
           />
-          
+
           <TextField
             fullWidth
             label={t("common.fields.confirmEmail")}
@@ -190,9 +190,11 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
             margin="normal"
             required
             error={emailConfirmation !== "" && email !== emailConfirmation}
-            helperText={emailConfirmation !== "" && email !== emailConfirmation ? t("common.validation.emailsDoNotMatch") : ""}
+            helperText={
+              emailConfirmation !== "" && email !== emailConfirmation ? t("common.validation.emailsDoNotMatch") : ""
+            }
           />
-          
+
           <PasswordInput
             fullWidth
             label={t("common.fields.password")}
@@ -204,7 +206,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
             onValidityChange={setIsPasswordValid}
           />
         </Box>
-        
+
         <Box sx={{ mt: 3 }}>
           <PrimaryButton
             onClick={handleSubmit}
