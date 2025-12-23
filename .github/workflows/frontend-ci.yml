@@ -26,6 +26,10 @@ jobs:
         run: yarn install
         working-directory: frontend-new
 
+      - name: Check Format
+        run: yarn run format:check
+        working-directory: frontend-new
+
       - name: Lint Frontend
         run: yarn run lint
         working-directory: frontend-new
