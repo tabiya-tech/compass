@@ -43,6 +43,8 @@ import {
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import { useSkillsRanking } from "src/features/skillsRanking/hooks/useSkillsRanking";
 import cvService from "src/CV/CVService/CVService";
+import { GTMService } from "src/utils/analytics/gtmService";
+import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import {
   getCvUploadDisplayMessage,
   getUploadErrorMessage,
@@ -565,6 +567,21 @@ return {
           }
         }
 
+        // Track the message sent event in GTM
+        GTMService.trackMessageSent(
+          sessionId,
+          response.current_phase.phase,
+          response.experiences_explored
+        );
+
+        // Track conversation completion if it just finished
+        if (response.conversation_completed) {
+          GTMService.trackConversationCompleted(
+            sessionId,
+            response.experiences_explored
+          );
+        }
+
         setConversationCompleted(response.conversation_completed);
         setConversationConductedAt(response.conversation_conducted_at);
 
@@ -597,6 +614,9 @@ return {
         if (!sessionId) {
           sessionId = await issueNewSession(userId);
           if (sessionId) {
+            // Clear the message counter for the new conversation
+            PersistentStorageService.clearMessageCount();
+            
             // Clear the messages if a new session is issued
             //  and add a typing message as the previous one will be removed
             setMessages([generateTypingMessage()]);

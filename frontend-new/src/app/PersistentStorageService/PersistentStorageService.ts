@@ -19,6 +19,8 @@ export const FEEDBACK_NOTIFICATION_KEY = `feedback_notification_${PERSISTENT_STO
 
 export const CLIENT_ID_KEY = `client_id_${PERSISTENT_STORAGE_VERSION}`;
 
+export const MESSAGE_COUNT_KEY = `message_count_${PERSISTENT_STORAGE_VERSION}`;
+
 /**
  * This class is used to store the tokens in the session storage.
  *   eg: refresh token
@@ -231,5 +233,32 @@ export class PersistentStorageService {
    */
   static setClientID(clientId: string): void {
     this.storage.setItem(CLIENT_ID_KEY, clientId);
+  }
+
+  /**
+   * Returns the message count from storage
+   * @returns number - The current message count (defaults to 0)
+   */
+  static getMessageCount(): number {
+    const count = this.storage.getItem(MESSAGE_COUNT_KEY);
+    return count ? parseInt(count, 10) : 0;
+  }
+
+  /**
+   * Increments the message count and returns the new count
+   * @returns number - The new message count
+   */
+  static incrementMessageCount(): number {
+    const currentCount = this.getMessageCount();
+    const newCount = currentCount + 1;
+    this.storage.setItem(MESSAGE_COUNT_KEY, newCount.toString());
+    return newCount;
+  }
+
+  /**
+   * Clears the message count from storage
+   */
+  static clearMessageCount(): void {
+    this.storage.removeItem(MESSAGE_COUNT_KEY);
   }
 }
