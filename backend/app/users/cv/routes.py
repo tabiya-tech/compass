@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Request, FastAPI
@@ -363,10 +364,17 @@ def add_public_report_routes(app: FastAPI):
     )
     async def get_public_report(
         user_id: str = Path(description="the unique identifier of the user", examples=["1"]),
+        token: str | None = None,
         user_preferences_repository: IUserPreferenceRepository = Depends(get_user_preferences_repository),
         experience_service: IExperienceService = Depends(get_experience_service),
     ) -> PublicReportResponse:
         try:
+            # 0. Validate Security Token if configured
+            sec_token = os.getenv("SEC_TOKEN_CV")
+            if sec_token and sec_token != token:
+                logger.warning("Invalid security token provided for user %s", user_id)
+                raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Invalid security token")
+
             # 1. Get user preferences to find the latest session
             preferences = await user_preferences_repository.get_user_preference_by_user_id(user_id)
             if not preferences or not preferences.sessions:

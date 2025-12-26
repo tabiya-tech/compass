@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { PublicReportData, PublicReportService } from "./publicReportService";
 import SkillReportPDF from "./reportPdf/SkillReportPDF";
 import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 
 const PublicReportPage: React.FC = () => {
     const { userid } = useParams<{ userid: string }>();
+    const location = useLocation();
     const [reportData, setReportData] = useState<PublicReportData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -16,15 +17,18 @@ const PublicReportPage: React.FC = () => {
 
     useEffect(() => {
         if (userid) {
+            const searchParams = new URLSearchParams(location.search);
+            const token = searchParams.get("token");
+
             PublicReportService.getInstance()
-                .getPublicReport(userid)
+                .getPublicReport(userid, token)
                 .then((data) => {
                     setReportData(data);
                     setLoading(false);
                 })
                 .catch((err) => {
                     console.error(err);
-                    setError(t("error.errorPage.unexpectedFailure"));
+                    setError(t("error.errorPage.defaultMessage"));
                     setLoading(false);
                 });
         }

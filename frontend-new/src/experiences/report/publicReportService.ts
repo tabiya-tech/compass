@@ -23,8 +23,12 @@ export class PublicReportService {
         return PublicReportService.instance;
     }
 
-    public async getPublicReport(userId: string): Promise<PublicReportData> {
-        const response = await customFetch(`${this.baseUrl}/${userId}`, {
+    public async getPublicReport(userId: string, token?: string | null): Promise<PublicReportData> {
+        let url = `${this.baseUrl}/${userId}`;
+        if (token) {
+            url += `?token=${encodeURIComponent(token)}`;
+        }
+        const response = await customFetch(url, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

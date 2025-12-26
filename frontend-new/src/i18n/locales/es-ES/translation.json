@@ -20,7 +20,8 @@
       "yes": "Sí",
       "no": "No",
       "skip": "Omitir",
-      "yesExit": "Sí, salir"
+      "yesExit": "Sí, salir",
+      "download": "Descargar"
     },
     "fields": {
       "email": "Correo electrónico",
