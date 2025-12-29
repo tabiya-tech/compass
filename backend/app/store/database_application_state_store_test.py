@@ -60,7 +60,6 @@ def generate_random_experience(index: int) -> ExperienceEntity:
         uuid=str(uuid4()),
         experience_title=f"Experience {index}",
         company=f"Company {index}",
-        location=f"Location {index}",
         timeline=Timeline(start=f"2020-01-{index}", end=f"2022-02-{index}"),
         work_type=random.choice(list(WorkType)),  # nosec B311 # random is used for testing purposes
         responsibilities=ResponsibilitiesData(responsibilities=[f"Responsibility {index}"]),
@@ -196,7 +195,6 @@ def generate_collected_data(index) -> CollectedData:
         defined_at_turn_number=index,
         experience_title=f"Experience {index}",
         company="Company",
-        location="Location",
         start_date="2020-01-01",
         end_date="2021-01-01",
         paid_work=True,

@@ -390,18 +390,15 @@ test_cases = [
                              WorkType.UNSEEN_UNPAID: (2, 2)},
         expected_experience_data=[
             {"experience_title": ContainsString("graphic design"),
-             "location": AnyOf(ContainsString("remote"), ContainsString("Joburg")),
              "timeline": DictContaining({"start": "2020/06", "end": ContainsString("present")}),
              "work_type": WorkType.SELF_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("English teacher"),
-             "location": ContainsString("Joburg"),
              "company": ContainsString("Community Center"),
              "timeline": DictContaining({"start": "2017/01", "end": "2020/08"}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
              },
             {"experience_title": ContainsString("Assist elderly people"),
-             "location": NON_EMPTY_STRING_REGEX,
              "company": ContainsString("nursing home"),
              "timeline": DictContaining({"start": "2020", "end": ContainsString("present")}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
@@ -446,13 +443,11 @@ test_cases = [
                              WorkType.UNSEEN_UNPAID: (0, 0)},
         expected_experience_data=[
             {"experience_title": ContainsString("delivery"),
-             "location": ContainsString("Paris"),
              "company": ContainsString("Uber Eats"),
              "timeline": DictContaining({"start": "2021", "end": ContainsString("2023")}),
              "work_type": AnyOf(WorkType.SELF_EMPLOYMENT.name, WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name),
              },
             {"experience_title": ContainsString("selling furniture"),
-             "location": AnyOf(ContainsString("Flea Market"), ContainsString("Jean Henri Fabre"), ContainsString("Paris")),
              "company": ContainsString("Flea Market"),
              "timeline": DictContaining({"start": "2019", "end": ContainsString("present")}),
              "work_type": AnyOf(WorkType.SELF_EMPLOYMENT.name, WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name),
@@ -480,13 +475,11 @@ test_cases = [
                              WorkType.UNSEEN_UNPAID: (0, 0)},
         expected_experience_data=[
             {"experience_title": ContainsString("delivery"),
-             "location": ContainsString("Paris"),
              "company": ContainsString("Uber Eats"),
              "timeline": DictContaining({"start": "2021", "end": ContainsString("2023")}),
              "work_type": AnyOf(WorkType.SELF_EMPLOYMENT.name, WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name),
              },
             {"experience_title": ContainsString("selling furniture"),
-             "location": AnyOf(ContainsString("Flea Market"), ContainsString("Jean Henri Fabre"), ContainsString("Paris")),
              "company": ContainsString("Flea Market"),
              "timeline": DictContaining({"start": "2019", "end": ContainsString("present")}),
              "work_type": AnyOf(WorkType.SELF_EMPLOYMENT.name, WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name),
@@ -511,7 +504,6 @@ test_cases = [
                              WorkType.UNSEEN_UNPAID: (0, 0)},
         expected_experience_data=[
             {"experience_title": ContainsString("dancer"),
-             "location": ContainsString("Nairobi"),
              "company": ContainsString("Chandaria"),
              "timeline": DictContaining({"start": "2018", "end": ContainsString("present")}),
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
@@ -538,7 +530,6 @@ test_cases = [
                              WorkType.UNSEEN_UNPAID: (0, 0)},
         expected_experience_data=[
             {"experience_title": ContainsString("dancer"),
-             "location": ContainsString("Nairobi"),
              "company": ContainsString("Chandaria"),
              "timeline": DictContaining({"start": "2018", "end": ContainsString("present")}),
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
@@ -563,7 +554,6 @@ test_cases = [
                              WorkType.UNSEEN_UNPAID: (1, 1)},
         expected_experience_data=[
             {"experience_title": ContainsString("blogging"),
-             "location": NON_EMPTY_STRING_REGEX,
              "company": NON_EMPTY_STRING_REGEX,
              "timeline": DictContaining({"start": "2018", "end": ContainsString("present")}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
@@ -599,43 +589,36 @@ test_cases = [
                              WorkType.UNSEEN_UNPAID: (2, 2)},
         expected_experience_data=[
             {"experience_title": ContainsString("project manager"),
-             "location": ContainsString("remote"),
              "company": ContainsString("University of Oxford"),
              "timeline": DictContaining({"start": "2018", "end": "2020"}),
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("software architect"),
-             "location": ContainsString("Berlin"),
              "company": ContainsString("ProUbis GmbH"),
              "timeline": DictContaining({"start": "2010", "end": "2018"}),
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("Owned a bar/restaurant"),
-             "location": ContainsString("Berlin"),
              "company": ContainsString("Dinner For Two"),
              "timeline": DictContaining({"start": "2010", "end": "2020"}),
              "work_type": WorkType.SELF_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("CEO"),
-             "location": ContainsString("DC"),
              "company": ContainsString("Acme Inc."),
              "timeline": DictContaining({"start": "2022", "end": AnyOf('', ContainsString("present"))}),
              "work_type": WorkType.SELF_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("Software Developer"),
-             "location": ContainsString("Berlin"),
              "company": ContainsString("Ubis GmbH"),
              "timeline": DictContaining({"start": ContainsString("1998"), "end": ContainsString("1998")}),
              "work_type": WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name,
              },
             {"experience_title": ContainsString("Teach coding"),
-             "location": ContainsString("Berlin"),
              "company": ContainsString("community center"),
              "timeline": DictContaining({"start": ContainsString("2015"), "end": ContainsString("2017")}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
              },
             {"experience_title": ContainsString("Help"),
-             "location": AnyValue(),
              "company": ContainsString("neighbor"),
              "timeline": DictContaining({"start": ContainsString("2019"), "end": AnyOf('', ContainsString("present"))}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
@@ -679,25 +662,21 @@ test_cases = [
         expected_experience_data=[
             # Final expectations after follow-up questions - should include all details
             {"experience_title": ContainsString("software developer"),
-             "location": ContainsString("Cape Town"),  # Provided in follow-up
              "company": ContainsString("TechCorp"),   # Provided in follow-up
              "timeline": DictContaining({"start": "2020", "end": "2022"}),
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("web design"),
-             "location": ContainsString("Johannesburg"),  # Provided in follow-up
              "company": AnyOf(ContainsString("small businesses"), ContainsString("startups"), ContainsString("clients")),
              "timeline": DictContaining({"start": "2023", "end": AnyOf("Present", "")}),
              "work_type": WorkType.SELF_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("volunteer"),
-             "location": ContainsString("Durban"),  # Provided in follow-up
              "company": ContainsString("Animal Rescue Center"),  # Provided in follow-up
              "timeline": DictContaining({"start": "2019", "end": "2021"}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
              },
             {"experience_title": ContainsString("family"),
-             "location": ContainsString("Pretoria"),  # Provided in follow-up
              "company": ContainsString("Mama's Kitchen"),  # Provided in follow-up
              "timeline": DictContaining({"start": "2018", "end": "2020"}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
@@ -741,19 +720,16 @@ test_cases = [
         expected_experience_data=[
             # Progressive disclosure expectations - information revealed in stages
             {"experience_title": ContainsString("software developer"),
-             "location": ContainsString("Cape Town"),  # Provided in follow-up
              "company": ContainsString("TechCorp"),   # Provided in follow-up
              "timeline": DictContaining({"start": "2020", "end": "2022"}),
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("web design"),
-             "location": ContainsString("Johannesburg"),  # Provided in follow-up
              "company": AnyOf(ContainsString("SmallBiz Solutions"), ContainsString("StartupXYZ"), ContainsString("clients")),
              "timeline": DictContaining({"start": "2023", "end": AnyOf("Present", "")}),
              "work_type": WorkType.SELF_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("volunteer"),
-             "location": ContainsString("Durban"),  # Provided in follow-up
              "company": ContainsString("Animal Rescue Center"),  # Provided in follow-up
              "timeline": DictContaining({"start": "2019", "end": "2021"}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
@@ -805,31 +781,26 @@ test_cases = [
                              WorkType.UNSEEN_UNPAID: (2, 2)},  # Animal Shelter + Family Restaurant
         expected_experience_data=[
             {"experience_title": ContainsString("software developer"),
-             "location": ContainsString("Cape Town"),
              "company": ContainsString("TechCorp"),
              "timeline": DictContaining({"start": "2020", "end": "2022"}),
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("web design"),
-             "location": AnyOf(ContainsString("Johannesburg"), ContainsString("remote")),
              "company": AnyOf(ContainsString("clients"), ContainsString("freelance")),
              "timeline": DictContaining({"start": "2022", "end": AnyOf("Present", "")}),
              "work_type": WorkType.SELF_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("volunteer"),
-             "location": ContainsString("Durban"),
              "company": ContainsString("animal shelter"),
              "timeline": DictContaining({"start": "2019", "end": "2021"}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
              },
             {"experience_title": ContainsString("tutor"),
-             "location": ContainsString("Pretoria"),
              "company": AnyOf(ContainsString("tutoring"), ContainsString("company")),
              "timeline": DictContaining({"start": "2021", "end": "2023"}),
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
              },
             {"experience_title": AnyOf(ContainsString("family"), ContainsString("restaurant")),
-             "location": AnyOf(ContainsString("Durban"), ContainsString("Cape Town"), ContainsString("Johannesburg"), ContainsString("Pretoria"), ContainsString("Gqeberha")),
              "company": AnyOf(ContainsString("family"), ContainsString("restaurant")),
              "timeline": DictContaining({"start": "2018", "end": "2020"}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
@@ -896,13 +867,11 @@ test_cases = [
                              WorkType.UNSEEN_UNPAID: (3, 3)},  # Animal Shelter + Family Restaurant + Community Center
         expected_experience_data=[
             {"experience_title": ContainsString("software developer"),
-             "location": ContainsString("Cape Town"),
              "company": ContainsString("TechCorp"),
              "timeline": DictContaining({"start": "2020", "end": "2022"}),
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("web design"),
-             "location": AnyOf(ContainsString("Johannesburg"), ContainsString("remote")),
              "company": AnyOf(ContainsString("clients"), ContainsString("freelance")),
              "timeline": DictContaining({"start": "2022", "end": AnyOf("Present", "")}),
              "work_type": WorkType.SELF_EMPLOYMENT.name,
@@ -920,37 +889,31 @@ test_cases = [
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
              },
             {"experience_title": AnyOf(ContainsString("family"), ContainsString("restaurant")),
-             "location": AnyOf(ContainsString("Durban"), ContainsString("Cape Town"), ContainsString("Johannesburg"), ContainsString("Pretoria"), ContainsString("Gqeberha")),
              "company": AnyOf(ContainsString("family"), ContainsString("restaurant")),
              "timeline": DictContaining({"start": "2018", "end": "2020"}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
              },
             {"experience_title": ContainsString("intern"),
-             "location": ContainsString("Johannesburg"),
              "company": ContainsString("marketing"),
              "timeline": DictContaining({"start": "2019", "end": "2019"}),
              "work_type": WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name,
              },
             {"experience_title": ContainsString("graphic design"),
-             "location": ContainsString("Cape Town"),
              "company": AnyOf(ContainsString("businesses"), ContainsString("clients")),
              "timeline": DictContaining({"start": "2021", "end": "2022"}),
              "work_type": WorkType.SELF_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("volunteer"),
-             "location": ContainsString("Durban"),
              "company": ContainsString("community"),
              "timeline": DictContaining({"start": "2020", "end": "2021"}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
              },
             {"experience_title": ContainsString("sales"),
-             "location": ContainsString("Pretoria"),
              "company": AnyOf(ContainsString("retail"), ContainsString("store")),
              "timeline": DictContaining({"start": "2018", "end": "2019"}),
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("content writer"),
-             "location": AnyOf(ContainsString("remote"), ContainsString("home")),
              "company": AnyOf(ContainsString("clients"), ContainsString("freelance")),
              "timeline": DictContaining({"start": "2023", "end": AnyOf("Present", "")}),
              "work_type": WorkType.SELF_EMPLOYMENT.name,
@@ -1015,7 +978,6 @@ test_cases = [
                     defined_at_turn_number=1,
                     experience_title="Software Developer",
                     company=None,  # Missing - should be filled in follow-up
-                    location=None,  # Missing - should be filled in follow-up
                     start_date="2020",
                     end_date="2022",
                     paid_work=True,
@@ -1027,7 +989,6 @@ test_cases = [
                     defined_at_turn_number=1,
                     experience_title="Freelance Web Designer",
                     company=None,  # Missing - should be filled in follow-up
-                    location=None,  # Missing - should be filled in follow-up
                     start_date="2023",
                     end_date="Present",
                     paid_work=True,
@@ -1039,7 +1000,6 @@ test_cases = [
                     defined_at_turn_number=1,
                     experience_title="Volunteer at Animal Shelter",
                     company=None,  # Missing - should be filled in follow-up
-                    location=None,  # Missing - should be filled in follow-up
                     start_date=None,  # Missing - should be filled in follow-up
                     end_date=None,  # Missing - should be filled in follow-up
                     paid_work=False,
@@ -1079,13 +1039,11 @@ test_cases = [
         expected_experience_data=[
             # Expectations for updated experiences with additional details
             {"experience_title": ContainsString("software developer"),
-             "location": ContainsString("Cape Town"),  # Now provided in follow-up
              "company": ContainsString("TechCorp"),   # Now provided in follow-up
              "timeline": DictContaining({"start": "2020", "end": "2022"}),
              "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("web design"),
-             "location": ContainsString("Johannesburg"),  # Now provided in follow-up
              "company": ContainsString("SmallBiz Solutions"),  # Now provided in follow-up
              "timeline": DictContaining({"start": "2023", "end": AnyOf("Present", "")}),
              "work_type": WorkType.SELF_EMPLOYMENT.name,
@@ -1102,7 +1060,6 @@ test_cases = [
                     defined_at_turn_number=1,
                     experience_title="Software Developer",
                     company=None,  # Missing - should be filled in follow-up
-                    location=None,  # Missing - should be filled in follow-up
                     start_date="2020",
                     end_date="2022",
                     paid_work=True,
@@ -1114,7 +1071,6 @@ test_cases = [
                     defined_at_turn_number=1,
                     experience_title="Freelance Web Designer",
                     company=None,  # Missing - should be filled in follow-up
-                    location=None,  # Missing - should be filled in follow-up
                     start_date="2023",
                     end_date="Present",
                     paid_work=True,

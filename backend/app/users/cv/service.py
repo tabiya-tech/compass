@@ -55,6 +55,15 @@ class ICVUploadService(ABC):
         :return: A list of the user's CV uploads.
         """
 
+    @abstractmethod
+    async def get_latest_user_cv(self, *, user_id: str) -> Optional[UserCVUpload]:
+        """
+        Get the latest completed CV uploaded by a specific user.
+
+        :param user_id: The ID of the user.
+        :return: The latest completed CV upload, or None if not found.
+        """
+
 
 class CVUploadService(ICVUploadService):
     """
@@ -304,3 +313,20 @@ class CVUploadService(ICVUploadService):
         except Exception as e:
             self._logger.exception(e)
             return []
+
+    async def get_latest_user_cv(self, *, user_id: str) -> Optional[UserCVUpload]:
+        """
+        Get the latest completed CV uploaded by a specific user.
+        """
+        try:
+            uploads = await self._repository.get_user_uploads(user_id=user_id)
+
+            if not uploads:
+                self._logger.debug("No completed CVs found for user {user_id=%s}", user_id)
+                return None
+
+            return uploads[0]
+
+        except Exception as e:
+            self._logger.exception(e)
+            return None

@@ -8,3 +8,4 @@ credentials*.json
 .run/
 .github/
 
+.specify

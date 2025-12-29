@@ -2,6 +2,7 @@ from types import SimpleNamespace
 from datetime import datetime, timezone
 from http import HTTPStatus
 from typing import Optional
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 import pytest_mock
@@ -57,6 +58,9 @@ def client_with_mocks() -> TestClientWithMocks:
                 },
 
             ]
+
+        async def get_latest_user_cv(self, *, user_id: str) -> Optional[dict]:
+            return None
 
     _instance_cv_service = MockCVService()
 
@@ -453,3 +457,65 @@ class TestGetUploadedCVs:
 
         # THEN 500 Internal Server Error
         assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+class TestPublicReportRoutes:
+    @pytest.mark.asyncio
+    async def test_get_public_report_with_valid_token(self, monkeypatch):
+        # GIVEN SEC_TOKEN_CV is configured
+        monkeypatch.setenv("SEC_TOKEN_CV", "secret-token-123")
+        
+        # AND mocked dependencies
+        from app.users.cv.routes import add_public_report_routes
+        from app.users.get_user_preferences_repository import get_user_preferences_repository
+        from app.conversations.experience.get_experience_service import get_experience_service
+        
+        mock_user_prefs_repo = MagicMock()
+        mock_user_prefs_repo.get_user_preference_by_user_id = AsyncMock(return_value=SimpleNamespace(
+            sessions=["session-1"],
+            accepted_tc=datetime(2025, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+        ))
+        
+        mock_experience_service = MagicMock()
+        mock_experience_service.get_experiences_by_session_id = AsyncMock(return_value=[])
+        
+        app = FastAPI()
+        app.dependency_overrides[get_user_preferences_repository] = lambda: mock_user_prefs_repo
+        app.dependency_overrides[get_experience_service] = lambda: mock_experience_service
+        add_public_report_routes(app)
+        
+        client = TestClient(app)
+        
+        # WHEN requesting report with valid token
+        resp = client.get("/reports/user-123?token=secret-token-123")
+        
+        # THEN 200 OK
+        assert resp.status_code == HTTPStatus.OK
+        assert resp.json()["user_id"] == "user-123"
+
+    @pytest.mark.asyncio
+    async def test_get_public_report_without_token_when_required(self, monkeypatch):
+        # GIVEN SEC_TOKEN_CV is configured
+        monkeypatch.setenv("SEC_TOKEN_CV", "secret-token-123")
+        
+        # AND mocked dependencies (though they won't be called)
+        from app.users.cv.routes import add_public_report_routes
+        from app.users.get_user_preferences_repository import get_user_preferences_repository
+        from app.conversations.experience.get_experience_service import get_experience_service
+        
+        mock_user_prefs_repo = MagicMock()
+        mock_experience_service = MagicMock()
+        
+        app = FastAPI()
+        app.dependency_overrides[get_user_preferences_repository] = lambda: mock_user_prefs_repo
+        app.dependency_overrides[get_experience_service] = lambda: mock_experience_service
+        add_public_report_routes(app)
+        
+        client = TestClient(app)
+        
+        # WHEN requesting report without token
+        resp = client.get("/reports/user-123")
+        
+        # THEN 401 Unauthorized
+        assert resp.status_code == HTTPStatus.UNAUTHORIZED
+        assert "Security token required" in resp.json()["detail"]

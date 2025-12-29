@@ -567,6 +567,8 @@ def _transition_instructions(*,
             It is not your responsibility to conduct the next step.
             
             You must perform the summarization and confirmation step before ending the conversation.
+            
+            YOU MUST ALWAYS: All the responses must be in {user_language} language. 
             """)
         return replace_placeholders_with_indent(summarize_and_confirm,
                                                 language_style=get_language_style(),

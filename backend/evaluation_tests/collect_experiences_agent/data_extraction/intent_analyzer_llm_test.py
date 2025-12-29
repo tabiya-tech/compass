@@ -11,7 +11,7 @@ from app.conversation_memory.conversation_memory_types import ConversationContex
 from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
-from evaluation_tests.matcher import ContainsString, check_actual_data_matches_expected
+from evaluation_tests.matcher import AnyOf, ContainsString, check_actual_data_matches_expected
 
 SILENCE_MESSAGE = "(silence)"
 
@@ -96,7 +96,6 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
                 uuid="test-uuid-1",
                 company="Acme Inc",
                 experience_title="Software Engineer",
-                location="New York",
                 start_date=None,
                 end_date=None,
                 paid_work=True,
@@ -221,6 +220,30 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
         collected_data_so_far=[],
         users_last_input="I like Nigerian Food",
         expected_operations=[]
+    ),
+    IntentAnalyzerToolTestCase(
+        name="argentina_multiple_experiences",
+        turns=[
+            (SILENCE_MESSAGE, "Contame sobre tus experiencias laborales o proyectos.")
+        ],
+        collected_data_so_far=[],
+        users_last_input=dedent("""
+            Che, te cuento mis laburos:
+            - Asistente de ventas en el local de mi viejo (2015-2022).
+            - Laburando en la casa de mi vieja ayudando con todo (2022-2025).
+            """),
+        expected_operations=[
+            {
+                "data_operation": ContainsString("add"),
+                "potential_new_experience_title": AnyOf(ContainsString("asistente"), ContainsString("ventas")),
+                "users_statement": ContainsString("Asistente de ventas en el local de mi viejo")
+            },
+            {
+                "data_operation": ContainsString("add"),
+                "potential_new_experience_title": AnyOf(ContainsString("casa"), ContainsString("vieja")),
+                "users_statement": ContainsString("Laburando en la casa de mi vieja")
+            }
+        ]
     ),
 ]
 

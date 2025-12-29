@@ -39,7 +39,7 @@ class _ConversationLLM:
             # Call the LLM to get the next message for the user.
             # Add some temperature and top_p variation to prompt the LLM to return different results on each retry.
             # Exponentially increase the temperature and top_p to avoid the LLM returning the same result every time.
-            temperature_config = get_config_variation(start_temperature=0.25, end_temperature=0.5,
+            temperature_config = get_config_variation(start_temperature=0.5, end_temperature=0.75,
                                                       start_top_p=0.8, end_top_p=1,
                                                       attempt=attempt, max_retries=max_retries)
             logger.debug("Calling _ConversationLLM with temperature: %s, top_p: %s",

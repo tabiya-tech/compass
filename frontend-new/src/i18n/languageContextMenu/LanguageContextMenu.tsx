@@ -65,7 +65,7 @@ const LanguageContextMenu: React.FC<LanguageContextMenuProps> = ({ removeMargin 
       action: () => changeLanguage(Locale.EN_GB),
     },
     {
-      id: MENU_ITEM_ID.AUTH_ENGLISH_SELECTOR + "-ar",
+      id: MENU_ITEM_ID.AUTH_ENGLISH_SELECTOR + "-US",
       text: MENU_ITEM_TEXT.ENGLISH,
       disabled: !supportedLanguages.includes(Locale.EN_US),
       action: () => changeLanguage(Locale.EN_US),
@@ -77,7 +77,7 @@ const LanguageContextMenu: React.FC<LanguageContextMenuProps> = ({ removeMargin 
       action: () => changeLanguage(Locale.ES_ES),
     },
     {
-      id: MENU_ITEM_ID.AUTH_SPANISH_SELECTOR + "-ar",
+      id: MENU_ITEM_ID.AUTH_SPANISH_SELECTOR + "-AR",
       text: MENU_ITEM_TEXT.SPANISH_ARGENTINA,
       disabled: !supportedLanguages.includes(Locale.ES_AR),
       action: () => changeLanguage(Locale.ES_AR),
@@ -86,6 +86,7 @@ const LanguageContextMenu: React.FC<LanguageContextMenuProps> = ({ removeMargin 
 
   // --- Filter out languages that are disabled
   let visibleMenuItems = allMenuItems.filter(item => !item.disabled);
+
 
   // --- Ensure at least English is included if nothing is present
   if (visibleMenuItems.length === 0) {

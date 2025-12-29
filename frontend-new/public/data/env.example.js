@@ -42,12 +42,11 @@ window.tabiyaConfig = {
   // #       Locales
   // ################################################################
   // Default locale (used as initial UI language if user preference not set)
-  FRONTEND_DEFAULT_LOCALE: btoa("en-US"),
-  FRONTEND_SUPPORTED_LOCALES: btoa(JSON.stringify(["en-US","es-US"])),
+  FRONTEND_DEFAULT_LOCALE: btoa("es-AR"),
+  FRONTEND_SUPPORTED_LOCALES: btoa(JSON.stringify(["es-AR", "en-US"])),
 
-  FRONTEND_SUPPORTED_LANGUAGES: btoa(JSON.stringify(["en-us","es-ar"])),
-  // Default locale (used as initial UI language if user preference not set)
-  FRONTEND_DEFAULT_LOCALE: btoa("en-gb"),
+  FRONTEND_SUPPORTED_LANGUAGES: btoa(JSON.stringify(["es-AR", "en-US"])),
+
 
   // Format for displaying dates target pattern (e.g., "YYYY-MM", "YYYY/MM", "MM-YYYY").
   FRONTEND_DATE_PATTERN: btoa("YYYY-MM"),

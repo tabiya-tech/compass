@@ -65,7 +65,6 @@ test_cases = [
         given_experience=ExperienceEntity(
             experience_title="Project Manager",
             company="University of Oxford",
-            location="Remote",
             timeline=Timeline(
                 start="2018",
                 end="2020"
@@ -91,7 +90,6 @@ test_cases = [
         given_experience=ExperienceEntity(
             experience_title="Cook",
             company="Dinner for Two",
-            location="Berlin",
             timeline=Timeline(
                 start="2018",
                 end="2020"
@@ -118,7 +116,6 @@ test_cases = [
         given_experience=ExperienceEntity(
             experience_title="Helping an older neighbor",
             company="Neighbor",
-            location="London",
             timeline=Timeline(
                 start="2018",
                 end="2020"
@@ -148,7 +145,6 @@ test_cases = [
         given_experience=ExperienceEntity(
             experience_title="",
             company=None,
-            location=None,
             timeline=None,
             work_type=None
         ),
@@ -157,5 +153,62 @@ test_cases = [
                                    'I cooked meals',
                                    'I helped with shopping',
                                    'I took care of the garden'],
+    ),
+    SkillsExplorerAgentTestCase(
+        conversation_rounds=10,
+        name='argentina_asistente_ventas',
+        simulated_user_prompt=dedent("""
+            Actúa como una persona joven de Argentina.
+            Trabajaste como asistente de ventas en el local de tu viejo.
+            Tus responsabilidades eran:
+            - Limpiar el lugar
+            - Manejar la guita
+            - Tratar con proveedores
+            - Contabilidad básica
+            - Venta de productos
+            - Empaquetar pedidos
+            Usa jerga argentina (laburo, guita, viejo).
+            No inventes información.
+            """),
+        evaluations=[Evaluation(type=EvaluationType.SINGLE_LANGUAGE, expected=100)],
+        given_experience=ExperienceEntity(
+            experience_title="Asistente de ventas",
+            company="Local de mi viejo",
+            timeline=Timeline(
+                start="2015",
+                end="2022"
+            ),
+            work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT
+        ),
+        country_of_user=Country.ARGENTINA,
+        expected_responsibilities=['Limpiar el lugar', 'Manejar la guita', 'Tratar con proveedores', 'Contabilidad básica', 'Venta de productos', 'Empaquetar pedidos'],
+    ),
+    SkillsExplorerAgentTestCase(
+        conversation_rounds=10,
+        name='argentina_casa_madre',
+        simulated_user_prompt=dedent("""
+            Actúa como una persona joven de Argentina.
+            Trabajaste en la casa de tu madre (voluntario).
+            Tus responsabilidades eran:
+            - Limpiar
+            - Comprar suministros
+            - Preparar la comida
+            - Barrer la casa
+            - Lavar la loza
+            Usa jerga argentina.
+            No inventes información.
+            """),
+        evaluations=[Evaluation(type=EvaluationType.SINGLE_LANGUAGE, expected=100)],
+        given_experience=ExperienceEntity(
+            experience_title="Trabajo en casa",
+            company="Casa de mi madre",
+            timeline=Timeline(
+                start="2022",
+                end="2025"
+            ),
+            work_type=WorkType.UNSEEN_UNPAID
+        ),
+        country_of_user=Country.ARGENTINA,
+        expected_responsibilities=['Limpiar', 'Comprar suministros', 'Preparar la comida', 'Barrer la casa', 'Lavar la loza'],
     ),
 ]

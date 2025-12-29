@@ -55,6 +55,7 @@ class BackendServiceConfig:
     experience_pipeline_config: Optional[str]
     cv_max_uploads_per_user: Optional[str]
     cv_rate_limit_per_minute: Optional[str]
+    sec_token_cv: Optional[str]
     default_locale: str
 
 
@@ -362,6 +363,9 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_CV_RATE_LIMIT_PER_MINUTE",
                             value=backend_service_cfg.cv_rate_limit_per_minute),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="SEC_TOKEN_CV",
+                            value=backend_service_cfg.sec_token_cv),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_DEFAULT_LOCALE",
                             value=backend_service_cfg.default_locale),

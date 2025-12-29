@@ -21,7 +21,6 @@
           "uuid": "e170edb3-1b87-4f57-bbfb-82fdb6863e74",
           "experience_title": "Baker",
           "company": "SampleCompanyA",
-          "location": "SampleCity",
           "timeline": {
             "start": "2020/01",
             "end": "2023/08"
@@ -49,7 +48,9 @@
               "description": "Description",
               "scopeNode": "ScopeNote",
               "originUUID": "86c1cd65-5e1e-4018-90cd-a8ef446e4bfc",
-              "UUIDHistory": ["86c1cd65-5e1e-4018-90cd-a8ef446e4bfc"],
+              "UUIDHistory": [
+                "86c1cd65-5e1e-4018-90cd-a8ef446e4bfc"
+              ],
               "score": 1,
               "skillType": "skill/competence"
             }
@@ -127,7 +128,6 @@
         "defined_at_turn_number": 4,
         "experience_title": "Baker",
         "company": "SampleCompanyA",
-        "location": "SampleCity",
         "start_date": "2020/01",
         "end_date": "2023/08",
         "paid_work": true,

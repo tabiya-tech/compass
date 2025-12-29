@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.svg" />
-    <meta name="theme-color" content="#fff" />
-    <script defer src="%PUBLIC_URL%/data/env.js"></script>
-    <meta
-      name="description"
-      content="Welcome to Brújula! An AI-powered career assistant that helps jobseekers identify and showcase their skills. Join now to create a digital profile and connect with new opportunities."
-    />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, interactive-widget=resizes-content" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/brujula.svg" />
-    <!--
+
+<head>
+  <meta charset="utf-8" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-W6CRXXRD');</script>
+  <!-- End Google Tag Manager -->
+  <link rel="icon" href="%PUBLIC_URL%/favicon.svg" />
+  <meta name="theme-color" content="#fff" />
+  <script defer src="%PUBLIC_URL%/data/env.js"></script>
+  <meta name="description"
+    content="Welcome to Brújula! An AI-powered career assistant that helps jobseekers identify and showcase their skills. Join now to create a digital profile and connect with new opportunities." />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, interactive-widget=resizes-content" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/brujula.svg" />
+  <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="stylesheet" href="%PUBLIC_URL%/styles/sentry.css" />
-    <!--
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <link rel="stylesheet" href="%PUBLIC_URL%/styles/sentry.css" />
+  <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
@@ -26,25 +33,30 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>Brújula</title>
+  <title>Brújula</title>
 
-    <!-- Pre-connect for faster font loading -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-    <!--
+  <!-- Pre-connect for faster font loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <!--
     Google Fonts: Inter and IBM Plex Mono
      We are loading the fonts with the media="print" attribute and changing it to "all" when the font is loaded.
      We do this to avoid blocking the rendering of the page while the font is being loaded.
      If javascript is disabled, the font will still load, but the page will be blocked until it is loaded.
     -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-      <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
-    </noscript>
-    <!-- JSON-LD Structured Data for SEO -->
-    <script type="application/ld+json">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"
+    media="print" onload="this.media='all'">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,500;0,600;0,700;1,300&display=swap"
+    rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,500;0,600;0,700;1,300&display=swap"
+      rel="stylesheet">
+  </noscript>
+  <!-- JSON-LD Structured Data for SEO -->
+  <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "WebApplication",
@@ -68,70 +80,100 @@
         }
       }
     </script>
-    <style>
-        /*
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-W6CRXXRD');</script>
+<!-- End Google Tag Manager -->
+
+
+  <style>
+    /*
           Moved from index.css to inline styles to avoid blocking rendering by loading css as an external file.
           We could not defer the loading of the css file because react adds it automatically to the head of the document.
           plus we dont want to defer the css since we dont want to make the body, html 100% height on page load
         */
 
-        /* The root element for the react app will be added later on the document,
+    /* The root element for the react app will be added later on the document,
            suppress the linter error that the selector was not used */
-        /* noinspection ALL */
-        #root,
-        body,
-        html {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        .dot-anim::after {
-            content: "";
-            display: inline-block;
-            animation: dots 2.25s steps(3, end) infinite;
-            width: 1ch;
-            text-align: left;
-        }
+    /* noinspection ALL */
+    #root,
+    body,
+    html {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
 
-        @keyframes dots {
-            0%   { content: ""; }
-            33%  { content: "."; }
-            66%  { content: ".."; }
-            100% { content: "..."; }
-        }
+    .dot-anim::after {
+      content: "";
+      display: inline-block;
+      animation: dots 2.25s steps(3, end) infinite;
+      width: 1ch;
+      text-align: left;
+    }
 
-        #loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            display: none; /* initially hide the loading screen */
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: #fff;
-            /*
+    @keyframes dots {
+      0% {
+        content: "";
+      }
+
+      33% {
+        content: ".";
+      }
+
+      66% {
+        content: "..";
+      }
+
+      100% {
+        content: "...";
+      }
+    }
+
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: none;
+      /* initially hide the loading screen */
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      /*
             * make sure the loading screen is on top of everything
             * since this loading is shown on every page load, there cannot be anything
             * in the app that has a z-index higher than this
             */
-            z-index: 99999;
-            font-family: Inter, sans-serif;
-        }
-        .brujula-logo {
-            height: 60px;
-        }
-    </style>
-  </head>
-  <body id="body">
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="loading">
-      <p>Cargando<span class="dot-anim">.</span></p>
-      <img src="%PUBLIC_URL%/logo.svg" alt="Brújula Logo" class="brujula-logo" />
-    </div>
-    <!--
+      z-index: 99999;
+      font-family: Inter, sans-serif;
+    }
+
+    .brujula-logo {
+      height: 60px;
+    }
+  </style>
+
+</head>
+
+<body id="body">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W6CRXXRD"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="loading">
+    <p>Cargando<span class="dot-anim">.</span></p>
+    <img src="%PUBLIC_URL%/logo.svg" alt="Brújula Logo" class="brujula-logo" />
+  </div>
+  <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
 
@@ -141,56 +183,58 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-    <script>
-      /**
-       * Show a loading screen while the main.js file is being loaded.
-       * While the screen is visible, the React app will not be mounted.
-       * Once the main.js file is loaded, the loading screen will be hidden, and the React app will be mounted.
-       *
-       * The loading screen should be displayed for a minimum duration (~3 seconds) to prevent it from flashing on and off too quickly.
-       *
-       * To avoid showing the loading screen on high-end clients with fast internet connections,
-       * the application will have a tolerance period (≤1 second). If it starts within this time,
-       * the splash screen will not be shown. Otherwise, the screen will be displayed for the minimum time.
-       */
+  <script>
+    /**
+     * Show a loading screen while the main.js file is being loaded.
+     * While the screen is visible, the React app will not be mounted.
+     * Once the main.js file is loaded, the loading screen will be hidden, and the React app will be mounted.
+     *
+     * The loading screen should be displayed for a minimum duration (~3 seconds) to prevent it from flashing on and off too quickly.
+     *
+     * To avoid showing the loading screen on high-end clients with fast internet connections,
+     * the application will have a tolerance period (≤1 second). If it starts within this time,
+     * the splash screen will not be shown. Otherwise, the screen will be displayed for the minimum time.
+     */
 
-      const APP_LOAD_TOLERANCE = 500; // the tolerance period in ms to allow the app to start before showing the loading screen
-      const LOADING_SCREEN_MINIMUM_TIME = 3000; // the minimum time in ms to show the loading screen, when it is shown
+    const APP_LOAD_TOLERANCE = 500; // the tolerance period in ms to allow the app to start before showing the loading screen
+    const LOADING_SCREEN_MINIMUM_TIME = 3000; // the minimum time in ms to show the loading screen, when it is shown
 
-      let _startTime = 0;
-      let _pageLoaded = false;
+    let _startTime = 0;
+    let _pageLoaded = false;
 
-      const _tolerance_timer = setTimeout(() => {
-        if(!_pageLoaded) {
-          // should show the loading screen
-          _startTime = Date.now();
-          document.getElementById('loading').style.display = 'flex'
-        }
-      }, APP_LOAD_TOLERANCE)
-
-      window.onload = () => {
-        _pageLoaded=true;
-        let delay = 0; // default to show the app immediately
-        if(_startTime) {
-          const loadingScreenHasBeenShowingFor = Date.now() - _startTime;
-          if(loadingScreenHasBeenShowingFor < LOADING_SCREEN_MINIMUM_TIME) {
-            delay = LOADING_SCREEN_MINIMUM_TIME - loadingScreenHasBeenShowingFor;
-            console.debug(`Loading screen has been showing for ${loadingScreenHasBeenShowingFor}ms and will be shown for an additional ${delay}ms`);
-          } else {
-            console.debug(`Loading screen has been showing for ${loadingScreenHasBeenShowingFor}ms and will be hidden immediately`);
-          }
-        }
-
-        setTimeout(() => {
-          clearTimeout(_tolerance_timer); // since the app has started, clear the tolerance timer
-          // Create the root element for the React app.
-          // In index.tsx, make sure the root element is created before mounting the app
-          // and hiding the loading screen.
-          const root = document.createElement('div');
-          root.id = 'root';
-          document.body.appendChild(root);
-        }, delay);
+    const _tolerance_timer = setTimeout(() => {
+      if (!_pageLoaded) {
+        // should show the loading screen
+        _startTime = Date.now();
+        document.getElementById('loading').style.display = 'flex'
       }
-    </script>
-  </body>
+    }, APP_LOAD_TOLERANCE)
+
+    window.onload = () => {
+      _pageLoaded = true;
+      let delay = 0; // default to show the app immediately
+      if (_startTime) {
+        const loadingScreenHasBeenShowingFor = Date.now() - _startTime;
+        if (loadingScreenHasBeenShowingFor < LOADING_SCREEN_MINIMUM_TIME) {
+          delay = LOADING_SCREEN_MINIMUM_TIME - loadingScreenHasBeenShowingFor;
+          console.debug(`Loading screen has been showing for ${loadingScreenHasBeenShowingFor}ms and will be shown for an additional ${delay}ms`);
+        } else {
+          console.debug(`Loading screen has been showing for ${loadingScreenHasBeenShowingFor}ms and will be hidden immediately`);
+        }
+      }
+
+      setTimeout(() => {
+        clearTimeout(_tolerance_timer); // since the app has started, clear the tolerance timer
+        // Create the root element for the React app.
+        // In index.tsx, make sure the root element is created before mounting the app
+        // and hiding the loading screen.
+        const root = document.createElement('div');
+        root.id = 'root';
+        document.body.appendChild(root);
+      }, delay);
+    }
+  </script>
+
+</body>
+
 </html>

@@ -1,42 +1,65 @@
 {
-  "welcome_agent_first_encounter": "Welcome! I’m Brújula, here to help you highlight your skills.\nHere’s how this process works:\n\n• First, I’ll ask for a short summary of your role and tasks (including volunteering or unpaid work).\n• Then, we’ll review each experience to capture the key details.\n\nIt usually takes about 10–15 minutes per work experience. You can create an account and return anytime.\n\nIf you have questions, just ask.\n\nReady to begin?",
-  "collect_experiences.did_not_understand": "Sorry, I didn't understand that. Can you please rephrase?",
-  "collect_experiences.move_to_other_experiences": "Let's move on to other work experiences.",
-  "collect_experiences.final_message": "Thank you for sharing your experiences. Let's move on to the next step.",
-  "collect_experiences.no_experience_collected": "No experience data has been collected yet",
-  "collect_experiences.all_fields_filled": "All fields have been filled.",
-  "collect_experiences.all_fields_not_filled": "All fields are not filled.",
-  "collect_experiences.work_type.formal_waged_description": "working for a company or someone else's business for money",
-  "collect_experiences.work_type.unpaid_trainee_description": "unpaid work as a trainee for a company or organization",
-  "collect_experiences.work_type.self_employment_description": "running my own business, doing freelance or contract work",
-  "collect_experiences.work_type.unseen_unpaid_description": "unpaid work such as community volunteering, caregiving for own or another family, helping in a household",
-  "collect_experiences.work_type.none_description": "no work experience",
-  "collect_experiences.fields.experience_title": "experience title",
-  "collect_experiences.fields.paid_work": "paid work",
-  "collect_experiences.fields.work_type": "work type",
-  "collect_experiences.fields.start_date": "start date",
-  "collect_experiences.fields.end_date": "end date",
-  "collect_experiences.fields.company": "company/receiver of work",
-  "collect_experiences.fields.location": "location",
-  "collect_experiences.ask_about_type": "Ask me about experiences that include: {experience_type}",
-  "collect_experiences.recap_prompt": "Let's recap, and give me a chance to correct any mistakes.",
-  "explore_experiences.no_more_experiences": "It looks like, there are no experiences to discuss further.",
-  "explore_experiences.skipped_experience_missing_details": "I have skipped your experience \"{experience_title}\" because you did not share enough details",
-  "explore_experiences.finished_all": "I have finished exploring all your experiences.",
-  "explore_experiences.no_skills_identified": "No skills identified",
-  "explore_experiences.link_and_rank.summary_message": "Based on the information provided about your experience as '{experience_title}', here’s a brief overview:\n\n{summary}\n\nTop {top_count} skills demonstrated:{skills_summary}",
-  "agent_director.final_message": "The conversation has finished!",
-  "agent_director.error_retry": "I am facing some difficulties right now, could you please repeat what you said?",
-  "agent_director.all_agents_done": "Conversation finished, all agents are done!",
-  "agent_director.forcefully_ended": "Conversation forcefully ended",
-  "experience.until": "until {end_date}",
-  "experience.no_title_provided_yet": "No title provided yet",
-  "experience.work_type.short.formal_sector_waged_employment": "Waged Employment",
-  "experience.work_type.short.formal_sector_unpaid_trainee_work": "Trainee",
-  "experience.work_type.short.self_employment": "Self-Employed",
-  "experience.work_type.short.unseen_unpaid": "Volunteer/Unpaid",
-  "explore_skills.final_message": "Thank you for sharing these details! I have all the information I need.",
-  "explore_skills.question.formal_waged": "What do you think is important when working in such a company?",
-  "explore_skills.question.self_employment": "What do you think is important when you are your own boss?",
-  "explore_skills.question.unseen_unpaid": "What do you think is most important when helping out in the community or caring for others?"
+  "welcomeAgentFirstEncounter": "Welcome! I’m Brújula, here to help you highlight your skills.\nHere’s how this process works:\n\n• First, I’ll ask for a short summary of your role and tasks (including volunteering or unpaid work).\n• Then, we’ll review each experience to capture the key details.\n\nIt usually takes about 10–15 minutes per work experience. You can create an account and return anytime.\n\nIf you have questions, just ask.\n\nReady to begin?",
+  "collectExperiences": {
+    "didNotUnderstand": "Sorry, I didn't understand that. Can you please rephrase?",
+    "moveToOtherExperiences": "Let's move on to other work experiences.",
+    "finalMessage": "Thank you for sharing your experiences. Let's move on to the next step.",
+    "noExperienceCollected": "No experience data has been collected yet",
+    "allFieldsFilled": "All fields have been filled.",
+    "allFieldsNotFilled": "All fields are not filled.",
+    "workType": {
+      "formalWagedDescription": "working for a company or someone else's business for money",
+      "unpaidTraineeDescription": "unpaid work as a trainee for a company or organization",
+      "selfEmploymentDescription": "running my own business, doing freelance or contract work",
+      "unseenUnpaidDescription": "unpaid work such as community volunteering, caregiving for own or another family, helping in a household",
+      "noneDescription": "no work experience",
+      "notSupported": "The work type is not supported"
+    },
+    "fields": {
+      "experienceTitle": "experience title",
+      "paidWork": "paid work",
+      "workType": "work type",
+      "startDate": "start date",
+      "endDate": "end date",
+      "company": "company/receiver of work",
+      "location": "location"
+    },
+    "askAboutType": "Ask me about experiences that include: {experience_type}",
+    "recapPrompt": "Let's recap, and give me a chance to correct any mistakes."
+  },
+  "exploreExperiences": {
+    "noMoreExperiences": "It looks like, there are no experiences to discuss further.",
+    "skippedExperienceMissingDetails": "I have skipped your experience \"{experience_title}\" because you did not share enough details",
+    "finishedAll": "I have finished exploring all your experiences.",
+    "noSkillsIdentified": "No skills identified",
+    "linkAndRank": {
+      "summaryMessage": "Based on the information provided about your experience as '{experience_title}', here’s a brief overview:\n\n{summary}\n\nTop {top_count} skills demonstrated:{skills_summary}"
+    }
+  },
+  "agentDirector": {
+    "finalMessage": "The conversation has finished!",
+    "errorRetry": "I am facing some difficulties right now, could you please repeat what you said?",
+    "allAgentsDone": "Conversation finished, all agents are done!",
+    "forcefullyEnded": "Conversation forcefully ended"
+  },
+  "experience": {
+    "until": "until {end_date}",
+    "noTitleProvidedYet": "No title provided yet",
+    "workType": {
+      "short": {
+        "formalSectorWagedEmployment": "Waged Employment",
+        "formalSectorUnpaidTraineeWork": "Trainee",
+        "selfEmployment": "Self-Employed",
+        "unseenUnpaid": "Volunteer/Unpaid"
+      }
+    }
+  },
+  "exploreSkills": {
+    "finalMessage": "Thank you for sharing these details! I have all the information I need.",
+    "question": {
+      "formalWaged": "What do you think is important when working in such a company?",
+      "selfEmployment": "What do you think is important when you are your own boss?",
+      "unseenUnpaid": "What do you think is most important when helping out in the community or caring for others?"
+    }
+  }
 }
