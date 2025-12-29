@@ -1,9 +1,7 @@
 import pytest
 from http import HTTPStatus
 from unittest.mock import AsyncMock, MagicMock
-from fastapi import FastAPI, Path, Depends, HTTPException
 from app.users.cv.routes import add_public_report_routes
-from app.users.cv.types import PublicReportResponse
 from fastapi import FastAPI
 from httpx import AsyncClient, ASGITransport
 from app.users.repositories import IUserPreferenceRepository
