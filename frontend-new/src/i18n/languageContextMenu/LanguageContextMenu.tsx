@@ -88,8 +88,6 @@ const LanguageContextMenu: React.FC<LanguageContextMenuProps> = ({ removeMargin 
   let visibleMenuItems = allMenuItems.filter(item => !item.disabled);
 
 
-  console.debug(supportedLanguages);
-
   // --- Ensure at least English is included if nothing is present
   if (visibleMenuItems.length === 0) {
     const englishItem = allMenuItems.find(item => item.text === MENU_ITEM_TEXT.ENGLISH);
