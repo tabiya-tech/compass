@@ -36,6 +36,15 @@ def _convert_open_api_3_to_2(openapi3: dict):
                     schema = param.pop('schema', {'type': None})
                     if schema and 'type' in schema:
                         param['type'] = schema['type']
+                    elif schema and any(key in schema for key in ['anyOf', 'oneOf', 'allOf']):
+                        # Handle complex schemas (nullable types, unions, etc.)
+                        # For nullable types or unions, extract the first non-null type
+                        for key in ['anyOf', 'oneOf', 'allOf']:
+                            if key in schema:
+                                types = [item.get('type') for item in schema[key] if isinstance(item, dict) and item.get('type') != 'null']
+                                if types:
+                                    param['type'] = types[0]
+                                    break
 
             # Add quota/rate-limiter
             metric_costs = {'metricCosts': {}}  # set the default value
