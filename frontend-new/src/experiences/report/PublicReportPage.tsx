@@ -32,7 +32,7 @@ const PublicReportPage: React.FC = () => {
                     setLoading(false);
                 });
         }
-    }, [userid, t]);
+    }, [userid, location.search, t]);
 
     if (loading) return <Backdrop isShown={loading} transparent={true} />;
 

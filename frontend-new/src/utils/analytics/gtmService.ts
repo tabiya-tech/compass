@@ -35,7 +35,6 @@ export class GTMService {
 
     window.dataLayer.push(event);
 
-    console.debug('[GTM] Message sent event tracked:', event);
   }
 
   /**
@@ -63,6 +62,5 @@ export class GTMService {
 
     window.dataLayer.push(event);
 
-    console.debug('[GTM] Conversation completed event tracked:', event);
   }
 }
