@@ -400,8 +400,8 @@ def add_public_report_routes(app: FastAPI):
                 for entity, phase in experience_entity_list
             ]
 
-            # Use the time of the latest session if available, or now
-            # In a real scenario, we might want to get the actual conversation end time
+            # TODO: Use the actual conversation end time when available.
+            # For now, we infer it from unrelated field `accepted_tc`.
             conducted_at = None
             if hasattr(preferences, "accepted_tc"): # Just a placeholder for some date
                  conducted_at = preferences.accepted_tc
