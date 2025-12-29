@@ -2,7 +2,6 @@ import asyncio
 import logging
 import os
 from textwrap import dedent
-from typing import Mapping, Optional
 
 import pytest
 
