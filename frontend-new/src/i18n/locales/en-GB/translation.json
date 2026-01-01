@@ -153,6 +153,13 @@
         "title": "Start New Conversation?",
         "content": "Once you start a new conversation, all messages from the current conversation will be lost forever.",
         "confirmation": "Are you sure you want to start a new conversation?"
+      },
+      "refreshConfirmationDialog": {
+        "title": "Are you sure you would like to refresh?",
+        "content": "Compass is typing and refreshing the page can cause issues. You may lose your current conversation progress.",
+        "question": "Would you like to wait for Compass to finish, or refresh anyway?",
+        "waitButton": "Wait for Compass",
+        "refreshButton": "Refresh"
       }
     },
     "chatProgressbar": {
