@@ -153,6 +153,13 @@
         "title": "¿Iniciar nueva conversación?",
         "content": "Una vez que inicies una nueva conversación, todos los mensajes de la conversación actual se perderán para siempre.",
         "confirmation": "¿Estás seguro de que deseas iniciar una nueva conversación?"
+      },
+      "refreshConfirmationDialog": {
+        "title": "¿Estás seguro de que querés actualizar?",
+        "content": "Compass está escribiendo y actualizar la página puede causar problemas. Podés perder el progreso de tu conversación actual.",
+        "question": "¿Querés esperar a que Compass termine o actualizar de todos modos?",
+        "waitButton": "Esperar a Compass",
+        "refreshButton": "Actualizar"
       }
     },
     "chatProgressbar": {

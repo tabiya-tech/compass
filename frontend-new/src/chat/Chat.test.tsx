@@ -2432,4 +2432,508 @@ describe("Chat", () => {
       });
     });
   });
+
+  describe("refresh confirmation dialog", () => {
+    const originalLocation = window.location;
+
+    beforeEach(() => {
+      // Mock window.location.reload while preserving other location properties needed by the router
+      Object.defineProperty(window, "location", {
+        value: {
+          ...originalLocation,
+          reload: jest.fn(),
+        },
+        writable: true,
+        configurable: true,
+      });
+
+      // Override the global mock with the actual component for refresh dialog tests
+      const actual = jest.requireActual("src/theme/confirmModalDialog/ConfirmModalDialog");
+      (ConfirmModalDialog as jest.Mock).mockImplementation(actual.default);
+    });
+
+    afterEach(() => {
+      // Restore original location
+      Object.defineProperty(window, "location", {
+        value: originalLocation,
+        writable: true,
+        configurable: true,
+      });
+
+      // Restore the global mock
+      (ConfirmModalDialog as jest.Mock).mockImplementation(() => (
+        <div data-testid={CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL}></div>
+      ));
+    });
+
+    // Helper function to set up a chat with Compass typing
+    async function setupChatWithTyping() {
+      const givenUser = getMockUser();
+      AuthenticationStateService.getInstance().setUser(givenUser);
+      const givenActiveSessionId = 123;
+      UserPreferencesStateService.getInstance().setUserPreferences(
+        getMockUserPreferences(givenUser, givenActiveSessionId)
+      );
+
+      const givenPreviousConversation: ConversationResponse = getMockConversationResponse(
+        [
+          {
+            message_id: nanoid(),
+            message: "Hello",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+            reaction: null,
+          },
+        ],
+        ConversationPhase.INTRO,
+        0
+      );
+      jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
+
+      let resolveSendMessage!: (value: ConversationResponse) => void;
+      const sendMessagePromise = new Promise<ConversationResponse>((resolve) => {
+        resolveSendMessage = resolve;
+      });
+      jest.spyOn(ChatService.getInstance(), "sendMessage").mockReturnValueOnce(sendMessagePromise);
+
+      render(<Chat />);
+      await assertChatInitialized();
+
+      const handleSend = (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].handleSend;
+      handleSend("test message");
+
+      await waitFor(() => {
+        expect((ChatMessageField as jest.Mock).mock.calls.at(-1)[0].aiIsTyping).toBe(true);
+      });
+
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      return { resolveSendMessage, sendMessagePromise };
+    }
+
+    // Test all refresh keyboard shortcuts
+    const refreshShortcuts = [
+      { key: "F5", code: "F5", ctrlKey: false, metaKey: false, shiftKey: false, description: "F5" },
+      { key: "r", code: "KeyR", ctrlKey: true, metaKey: false, shiftKey: false, description: "Ctrl+R" },
+      { key: "r", code: "KeyR", ctrlKey: false, metaKey: true, shiftKey: false, description: "Cmd+R (Mac)" },
+      { key: "R", code: "KeyR", ctrlKey: true, metaKey: false, shiftKey: true, description: "Ctrl+Shift+R" },
+      { key: "R", code: "KeyR", ctrlKey: false, metaKey: true, shiftKey: true, description: "Cmd+Shift+R (Mac)" },
+    ];
+
+    test.each(refreshShortcuts)(
+      "should show refresh confirmation dialog when Compass is typing and user presses $description",
+      async ({ key, code, ctrlKey, metaKey, shiftKey }) => {
+        // GIVEN a chat with Compass typing
+        const { resolveSendMessage, sendMessagePromise } = await setupChatWithTyping();
+
+        // AND user presses a refresh shortcut while Compass is typing
+        const keyboardEvent = new KeyboardEvent("keydown", {
+          key,
+          code,
+          ctrlKey,
+          metaKey,
+          shiftKey,
+          bubbles: true,
+          cancelable: true,
+        });
+        const preventDefaultSpy = jest.spyOn(keyboardEvent, "preventDefault");
+
+        await act(async () => {
+          window.dispatchEvent(keyboardEvent);
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        // Verify the event handler was called
+        expect(preventDefaultSpy).toHaveBeenCalled();
+
+        // THEN expect the refresh confirmation dialog to be visible
+        await waitFor(
+          () => {
+            expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_TITLE)).toBeInTheDocument();
+          },
+          { timeout: 3000 }
+        );
+
+        // Cleanup
+        await act(async () => {
+          resolveSendMessage!(getMockConversationResponse([], ConversationPhase.INTRO, 0));
+          await sendMessagePromise;
+        });
+      }
+    );
+
+    test("should not show refresh confirmation dialog when Compass is not typing", async () => {
+      // GIVEN a logged-in user and active session
+      const givenUser = getMockUser();
+      AuthenticationStateService.getInstance().setUser(givenUser);
+      const givenActiveSessionId = 123;
+      UserPreferencesStateService.getInstance().setUserPreferences(
+        getMockUserPreferences(givenUser, givenActiveSessionId)
+      );
+
+      // AND the conversation history has a welcome message
+      const givenPreviousConversation: ConversationResponse = getMockConversationResponse(
+        [
+          {
+            message_id: nanoid(),
+            message: "Hello",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+            reaction: null,
+          },
+        ],
+        ConversationPhase.INTRO,
+        0
+      );
+      jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
+
+      // WHEN the component is rendered
+      render(<Chat />);
+      await assertChatInitialized();
+
+      // AND Compass is NOT typing (no active message sending)
+      // AND user presses F5
+      const f5Event = new KeyboardEvent("keydown", {
+        key: "F5",
+        code: "F5",
+        bubbles: true,
+        cancelable: true,
+      });
+      window.dispatchEvent(f5Event);
+
+      // THEN expect the refresh confirmation dialog NOT to be visible
+      await waitFor(() => {
+        expect(screen.queryByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL)).not.toBeInTheDocument();
+      });
+    });
+
+    test("should cancel refresh when user clicks 'Wait for Compass'", async () => {
+      // GIVEN a logged-in user and active session
+      const givenUser = getMockUser();
+      AuthenticationStateService.getInstance().setUser(givenUser);
+      const givenActiveSessionId = 123;
+      UserPreferencesStateService.getInstance().setUserPreferences(
+        getMockUserPreferences(givenUser, givenActiveSessionId)
+      );
+
+      // AND the conversation history has a welcome message
+      const givenPreviousConversation: ConversationResponse = getMockConversationResponse(
+        [
+          {
+            message_id: nanoid(),
+            message: "Hello",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+            reaction: null,
+          },
+        ],
+        ConversationPhase.INTRO,
+        0
+      );
+      jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
+
+      // AND sendMessage will resolve after a delay
+      let resolveSendMessage: (value: ConversationResponse) => void;
+      const sendMessagePromise = new Promise<ConversationResponse>((resolve) => {
+        resolveSendMessage = resolve;
+      });
+      jest.spyOn(ChatService.getInstance(), "sendMessage").mockReturnValueOnce(sendMessagePromise);
+
+      // WHEN the component is rendered
+      render(<Chat />);
+      await assertChatInitialized();
+
+      // AND user sends a message
+      const handleSend = (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].handleSend;
+      handleSend("test message");
+
+      // Wait for aiIsTyping to be set
+      await waitFor(() => {
+        expect((ChatMessageField as jest.Mock).mock.calls.at(-1)[0].aiIsTyping).toBe(true);
+      });
+
+      // Wait a bit for the event listener to be attached
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // AND user presses F5
+      await act(async () => {
+        const f5Event = new KeyboardEvent("keydown", {
+          key: "F5",
+          code: "F5",
+          bubbles: true,
+          cancelable: true,
+        });
+        window.dispatchEvent(f5Event);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      // AND the refresh confirmation dialog is shown
+      await waitFor(
+        () => {
+          expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CANCEL)).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
+
+      // WHEN user clicks "Wait for Compass" (cancel button)
+      const cancelButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CANCEL);
+      await userEvent.click(cancelButton);
+
+      // THEN expect the dialog to be closed
+      await waitFor(() => {
+        expect(screen.queryByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL)).not.toBeInTheDocument();
+      });
+
+      // AND window.location.reload should NOT be called
+      expect(window.location.reload).not.toHaveBeenCalled();
+
+      // Cleanup
+      await act(async () => {
+        resolveSendMessage!(getMockConversationResponse([], ConversationPhase.INTRO, 0));
+        await sendMessagePromise;
+      });
+    });
+
+    test("should refresh page when user clicks 'Refresh'", async () => {
+      // GIVEN a logged-in user and active session
+      const givenUser = getMockUser();
+      AuthenticationStateService.getInstance().setUser(givenUser);
+      const givenActiveSessionId = 123;
+      UserPreferencesStateService.getInstance().setUserPreferences(
+        getMockUserPreferences(givenUser, givenActiveSessionId)
+      );
+
+      // AND the conversation history has a welcome message
+      const givenPreviousConversation: ConversationResponse = getMockConversationResponse(
+        [
+          {
+            message_id: nanoid(),
+            message: "Hello",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+            reaction: null,
+          },
+        ],
+        ConversationPhase.INTRO,
+        0
+      );
+      jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenPreviousConversation);
+
+      // AND sendMessage will resolve after a delay
+      let resolveSendMessage: (value: ConversationResponse) => void;
+      const sendMessagePromise = new Promise<ConversationResponse>((resolve) => {
+        resolveSendMessage = resolve;
+      });
+      jest.spyOn(ChatService.getInstance(), "sendMessage").mockReturnValueOnce(sendMessagePromise);
+
+      // WHEN the component is rendered
+      render(<Chat />);
+      await assertChatInitialized();
+
+      // AND user sends a message
+      const handleSend = (ChatMessageField as jest.Mock).mock.calls.at(-1)[0].handleSend;
+      handleSend("test message");
+
+      // Wait for aiIsTyping to be set
+      await waitFor(() => {
+        expect((ChatMessageField as jest.Mock).mock.calls.at(-1)[0].aiIsTyping).toBe(true);
+      });
+
+      // Wait a bit for the event listener to be attached
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // AND user presses F5
+      await act(async () => {
+        const f5Event = new KeyboardEvent("keydown", {
+          key: "F5",
+          code: "F5",
+          bubbles: true,
+          cancelable: true,
+        });
+        window.dispatchEvent(f5Event);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      // AND the refresh confirmation dialog is shown
+      await waitFor(
+        () => {
+          expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM)).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
+
+      // WHEN user clicks "Refresh" (confirm button)
+      const confirmButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM);
+      await userEvent.click(confirmButton);
+
+      // THEN expect window.location.reload to be called
+      await waitFor(() => {
+        expect(window.location.reload).toHaveBeenCalled();
+      });
+
+      // Cleanup
+      await act(async () => {
+        resolveSendMessage!(getMockConversationResponse([], ConversationPhase.INTRO, 0));
+        await sendMessagePromise;
+      });
+    });
+
+    describe("beforeunload event handler", () => {
+      test("should attach beforeunload listener when aiIsTyping is true", async () => {
+        // GIVEN a chat with Compass typing
+        const { resolveSendMessage, sendMessagePromise } = await setupChatWithTyping();
+
+        // THEN expect beforeunload listener to be attached
+        // We can verify this by dispatching a beforeunload event
+        const beforeUnloadEvent = new Event("beforeunload", { cancelable: true, bubbles: true }) as BeforeUnloadEvent;
+        Object.defineProperty(beforeUnloadEvent, "returnValue", {
+          writable: true,
+          value: "",
+        });
+        const preventDefaultSpy = jest.spyOn(beforeUnloadEvent, "preventDefault");
+
+        window.dispatchEvent(beforeUnloadEvent);
+
+        // Verify preventDefault was called (meaning the handler is attached and working)
+        expect(preventDefaultSpy).toHaveBeenCalled();
+        expect(beforeUnloadEvent.returnValue).toBe("");
+
+        // Cleanup
+        await act(async () => {
+          resolveSendMessage!(getMockConversationResponse([], ConversationPhase.INTRO, 0));
+          await sendMessagePromise;
+        });
+      });
+
+      test("should call preventDefault and set returnValue when allowRefreshRef is false", async () => {
+        // GIVEN a chat with Compass typing
+        const { resolveSendMessage, sendMessagePromise } = await setupChatWithTyping();
+
+        // WHEN beforeunload event is dispatched
+        const beforeUnloadEvent = new Event("beforeunload", { cancelable: true, bubbles: true }) as BeforeUnloadEvent;
+        Object.defineProperty(beforeUnloadEvent, "returnValue", {
+          writable: true,
+          value: "",
+        });
+        const preventDefaultSpy = jest.spyOn(beforeUnloadEvent, "preventDefault");
+
+        window.dispatchEvent(beforeUnloadEvent);
+
+        // THEN expect preventDefault to be called and returnValue to be set
+        expect(preventDefaultSpy).toHaveBeenCalled();
+        expect(beforeUnloadEvent.returnValue).toBe("");
+
+        // Cleanup
+        await act(async () => {
+          resolveSendMessage!(getMockConversationResponse([], ConversationPhase.INTRO, 0));
+          await sendMessagePromise;
+        });
+      });
+
+      test("should NOT call preventDefault when allowRefreshRef is true (after user confirms)", async () => {
+        // GIVEN a chat with Compass typing
+        const { resolveSendMessage, sendMessagePromise } = await setupChatWithTyping();
+
+        // AND user has confirmed refresh (this sets allowRefreshRef.current = true)
+        const f5Event = new KeyboardEvent("keydown", {
+          key: "F5",
+          code: "F5",
+          bubbles: true,
+          cancelable: true,
+        });
+        await act(async () => {
+          window.dispatchEvent(f5Event);
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        // Wait for dialog to appear
+        await waitFor(
+          () => {
+            expect(screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM)).toBeInTheDocument();
+          },
+          { timeout: 3000 }
+        );
+
+        // WHEN user confirms refresh
+        const confirmButton = screen.getByTestId(CONFIRM_MODAL_DIALOG_DATA_TEST_ID.CONFIRM_MODAL_CONFIRM);
+        await userEvent.click(confirmButton);
+
+        // Wait for state update
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        // AND beforeunload event is dispatched
+        const beforeUnloadEvent = new Event("beforeunload", { cancelable: true, bubbles: true }) as BeforeUnloadEvent;
+        Object.defineProperty(beforeUnloadEvent, "returnValue", {
+          writable: true,
+          value: "",
+        });
+        const preventDefaultSpy = jest.spyOn(beforeUnloadEvent, "preventDefault");
+
+        window.dispatchEvent(beforeUnloadEvent);
+
+        // THEN expect preventDefault NOT to be called (because allowRefreshRef is true)
+        // Note: The handler should still be attached, but it checks allowRefreshRef.current
+        // Since we confirmed refresh, allowRefreshRef.current should be true
+        expect(preventDefaultSpy).not.toHaveBeenCalled();
+
+        // Cleanup
+        await act(async () => {
+          resolveSendMessage!(getMockConversationResponse([], ConversationPhase.INTRO, 0));
+          await sendMessagePromise;
+        });
+      });
+
+      test("should remove beforeunload listener when aiIsTyping becomes false", async () => {
+        // GIVEN a chat with Compass typing
+        const { resolveSendMessage, sendMessagePromise } = await setupChatWithTyping();
+
+        // Verify listener is attached
+        const beforeUnloadEvent1 = new Event("beforeunload", { cancelable: true, bubbles: true }) as BeforeUnloadEvent;
+        Object.defineProperty(beforeUnloadEvent1, "returnValue", {
+          writable: true,
+          value: "",
+        });
+        const preventDefaultSpy1 = jest.spyOn(beforeUnloadEvent1, "preventDefault");
+        window.dispatchEvent(beforeUnloadEvent1);
+        expect(preventDefaultSpy1).toHaveBeenCalled();
+
+        // WHEN Compass finishes typing (aiIsTyping becomes false)
+        await act(async () => {
+          resolveSendMessage!(getMockConversationResponse([], ConversationPhase.INTRO, 0));
+          await sendMessagePromise;
+        });
+
+        // Wait for aiIsTyping to become false
+        await waitFor(() => {
+          expect((ChatMessageField as jest.Mock).mock.calls.at(-1)[0].aiIsTyping).toBe(false);
+        });
+
+        // Wait for useEffect cleanup to run
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        // THEN expect beforeunload listener to be removed
+        // We verify this by dispatching another event - it should not be handled
+        const beforeUnloadEvent2 = new Event("beforeunload", { cancelable: true, bubbles: true }) as BeforeUnloadEvent;
+        Object.defineProperty(beforeUnloadEvent2, "returnValue", {
+          writable: true,
+          value: "",
+        });
+        const preventDefaultSpy2 = jest.spyOn(beforeUnloadEvent2, "preventDefault");
+        window.dispatchEvent(beforeUnloadEvent2);
+
+        // The handler should not be called (listener removed)
+        // Note: This test verifies the cleanup function removes the listener
+        // In practice, the handler might still exist but won't be called because aiIsTyping is false
+        // However, since we reset allowRefreshRef in cleanup, the handler would still check it
+        // The key is that when aiIsTyping is false, the useEffect returns early and doesn't attach listeners
+        expect(preventDefaultSpy2).not.toHaveBeenCalled();
+      });
+    });
+  });
 });

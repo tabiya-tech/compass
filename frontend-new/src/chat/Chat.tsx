@@ -120,7 +120,9 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   const [showBackdrop, setShowBackdrop] = useState(showInactiveSessionAlert);
   const [lastActivityTime, setLastActivityTime] = React.useState<number>(Date.now());
   const [newConversationDialog, setNewConversationDialog] = React.useState<boolean>(false);
+  const [showRefreshConfirmDialog, setShowRefreshConfirmDialog] = React.useState<boolean>(false);
   const [exploredExperiencesNotification, setExploredExperiencesNotification] = useState<boolean>(false);
+  const allowRefreshRef = useRef<boolean>(false);
   const [activeSessionId, setActiveSessionId] = useState<number | null>(
     UserPreferencesStateService.getInstance().getActiveSessionId()
   );
@@ -861,6 +863,65 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     };
   }, [activeUploads]);
 
+  // Handle page refresh confirmation when Compass is typing
+  useEffect(() => {
+    if (!aiIsTyping) {
+      allowRefreshRef.current = false;
+      return;
+    }
+
+    allowRefreshRef.current = false;
+
+    // Intercept keyboard shortcuts for refresh (Ctrl+R, F5, etc.)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for refresh shortcuts: F5, Ctrl+R, Ctrl+Shift+R
+      if (
+        !allowRefreshRef.current &&
+        (e.key === "F5" ||
+          (e.key === "r" && (e.ctrlKey || e.metaKey)) ||
+          (e.key === "R" && (e.ctrlKey || e.metaKey) && e.shiftKey))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        setShowRefreshConfirmDialog(true);
+      }
+    };
+
+    // Handle browser refresh button and navigation attempts
+    // beforeunload can only show browser's default dialog due to security restrictions.
+    // We show our custom dialog for keyboard shortcuts, and browser's default for reload button.
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!allowRefreshRef.current) {
+        // Modern approach: call preventDefault() to trigger the dialog
+        // returnValue is deprecated but the docs say to set it for legacy support
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown, true);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown, true);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      allowRefreshRef.current = false;
+    };
+  }, [aiIsTyping]);
+
+  const handleConfirmRefresh = () => {
+    allowRefreshRef.current = true;
+    setShowRefreshConfirmDialog(false);
+    // Use setTimeout to ensure state updates are processed before reload
+    setTimeout(() => {
+      window.location.reload();
+    }, 0);
+  };
+
+  const handleCancelRefresh = () => {
+    setShowRefreshConfirmDialog(false);
+  };
+
   return (
     <Suspense fallback={<Backdrop isShown={true} transparent={true} />}>
       {isLoggingOut ? (
@@ -952,6 +1013,25 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
               onDismiss={() => setNewConversationDialog(false)}
               cancelButtonText={t("common.buttons.cancel")}
               confirmButtonText={t("common.buttons.confirm")}
+            />
+          )}
+          {showRefreshConfirmDialog && (
+            <ConfirmModalDialog
+              isOpen={showRefreshConfirmDialog}
+              title={t("chat.chat.refreshConfirmationDialog.title")}
+              content={
+                <>
+                  {t("chat.chat.refreshConfirmationDialog.content")}
+                  <br />
+                  <br />
+                  {t("chat.chat.refreshConfirmationDialog.question")}
+                </>
+              }
+              onCancel={handleCancelRefresh}
+              onConfirm={handleConfirmRefresh}
+              onDismiss={handleCancelRefresh}
+              cancelButtonText={t("chat.chat.refreshConfirmationDialog.waitButton")}
+              confirmButtonText={t("chat.chat.refreshConfirmationDialog.refreshButton")}
             />
           )}
         </ChatProvider>
