@@ -16,7 +16,7 @@ Implement per-user registration links that auto-fill and lock a "registration co
 **Target Platform**: Backend on Linux container/server; Web clients via frontend-new.  
 **Project Type**: Web application (backend + frontend-new).  
 **Performance Goals**: No added latency beyond existing invitation check; code auto-fill within ~1s of page load; avoid extra DB roundtrips in signup.  
-**Constraints**: Must keep existing shared invitation code flow intact; WCAG 2.0 A for UI changes; avoid exposing PII (use neutral label); enforce single-use by checking claimed codes in user data; last-link-wins persistence; handle both Google and email signup paths; gated registration links must validate the existing admin/report token before applying codes; admins should not require database access to mint codes.
+**Constraints**: Must keep existing shared invitation code flow intact; WCAG 2.0 A for UI changes; avoid exposing PII (use neutral label); enforce single-use by checking claimed codes in user data; last-link-wins persistence; handle both Google and email signup paths; gated registration links must validate the existing admin/report token before applying codes and carry only `reg_code` + token (never `invitation_code`); legacy `invitation_code` is typed manually when no secure link exists; admins should not require database access to mint codes.
 **Scale/Scope**: Supports per-user links at current user volumes; uniqueness enforced by rejecting duplicate `registration_code` claims rather than provisioning individual invitation documents.
 
 ## Constitution Check
