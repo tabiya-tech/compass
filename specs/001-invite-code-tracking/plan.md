@@ -5,7 +5,7 @@
 
 ## Summary
 
-Implement per-user registration links that auto-fill and lock a "registration code" (DNI alias), persist it across visits, enforce single-use uniqueness, store it on invitations and user data, and surface it for analytics and report lookup—reusing the existing invitation code system and following current frontend/backend patterns.
+Implement per-user registration links that auto-fill and lock a "registration code" (DNI alias), persist it across visits, enforce single-use uniqueness, and surface it for analytics/report lookup—while requiring the existing admin/report token on any code-bearing link. Admins do **not** pre-create invitation rows; any `reg_code` embedded in a tokenized link must be accepted (subject to uniqueness) and written directly to user data with optional audit logging. Legacy shared invitations remain for manual entry flows.
 
 ## Technical Context
 
@@ -16,16 +16,16 @@ Implement per-user registration links that auto-fill and lock a "registration co
 **Target Platform**: Backend on Linux container/server; Web clients via frontend-new.  
 **Project Type**: Web application (backend + frontend-new).  
 **Performance Goals**: No added latency beyond existing invitation check; code auto-fill within ~1s of page load; avoid extra DB roundtrips in signup.  
-**Constraints**: Must keep existing shared invitation code flow intact; WCAG 2.0 A for UI changes; avoid exposing PII (use neutral label); enforce single-use; last-link-wins persistence; handle both Google and email signup paths.  
-**Scale/Scope**: Supports per-user invitations at current user volumes; uniqueness enforced at invitation code level with allowed_usage=1 for personalized links.
+**Constraints**: Must keep existing shared invitation code flow intact; WCAG 2.0 A for UI changes; avoid exposing PII (use neutral label); enforce single-use by checking claimed codes in user data; last-link-wins persistence; handle both Google and email signup paths; gated registration links must validate the existing admin/report token before applying codes; admins should not require database access to mint codes.
+**Scale/Scope**: Supports per-user links at current user volumes; uniqueness enforced by rejecting duplicate `registration_code` claims rather than provisioning individual invitation documents.
 
 ## Constitution Check
 
-- Monorepo: touch backend and `frontend-new`; avoid legacy `frontend/` unless justified.
+- Monorepo: scope is strictly backend + `frontend-new`; changes to the legacy `frontend/` folder are out of bounds for this feature.
 - Security/Privacy: treat registration code as potentially sensitive; avoid exposing DNI wording; log without raw PII.
 - Accessibility-First: UI changes must meet WCAG 2.0 A (aria labels, focus, contrast, toast accessibility).
 - Conventional Commits: use `feat(...)`/`fix(...)` format.
-- Quality gate: plan for `./run-before-merge.sh` (pytest, lint, storybook a11y).
+- Quality gate: run the targeted backend + `frontend-new` lint/test commands manually; skip `./run-before-merge.sh` to avoid the long aggregate run.
 - IaC untouched; no infra drift.
 - Outcome: No violations anticipated; re-check after design to ensure frontend-new only and privacy mitigations stand.
 
@@ -48,7 +48,7 @@ specs/001-invite-code-tracking/
 ```text
 backend/
 ├── app/
-│   ├── invitations/        # invitation repo/types/routes used for code validation and capacity
+│   ├── invitations/        # invitation repo/types/routes used for code validation and legacy shared flows
 │   ├── users/              # user data/profile where registration code will be stored
 │   ├── conversations/      # unchanged
 │   └── middleware/         # auth/context as needed
@@ -63,7 +63,7 @@ frontend-new/
 └── test/                   # frontend tests
 ```
 
-**Structure Decision**: Web application spanning backend and `frontend-new`, reusing existing invitation validation route and signup flows; no new projects introduced.
+**Structure Decision**: Web application spanning backend and `frontend-new`; legacy invitation validation remains for manual flows, while secure-link validation now hinges on token + claimed-code checks; no new projects introduced.
 
 ## Complexity Tracking
 

@@ -1,20 +1,26 @@
 # API Contracts - Invite Code Tracking
 
-## 1) Validate registration code (reuse existing endpoint)
+## 1) Validate registration code (secure link aware)
 - **Endpoint**: `GET /user-invitations/check-status`
-- **Query**: `invitation_code` (string)
+- **Query**:
+  - `reg_code` (string, optional) — present for secure links
+  - `report_token` (string, optional) — required when `reg_code` is present
+  - `invitation_code` (string, optional) — provided only when a user manually types the shared legacy code (no secure link)
 - **Responses**:
-  - 200 VALID: `{ invitation_code, status: "VALID", invitation_type, sensitive_personal_data_requirement }`
-  - 200 INVALID: `{ invitation_code, status: "INVALID", sensitive_personal_data_requirement: "NOT_AVAILABLE" }`
+  - 200 VALID: `{ code: "40007310", status: "VALID", source: "secure_link", sensitive_personal_data_requirement }`
+  - 200 USED: `{ code: "40007310", status: "USED" }`
+  - 200 INVALID: `{ code: "40007310", status: "INVALID" }`
+  - 401/403: Missing or invalid token when `reg_code` supplied
   - 500: Error payload
-- **Notes**: Personalized codes are created with `allowed_usage=1`. Frontend blocks registration when status is INVALID. Backend decrements capacity on successful registration.
+- **Notes**: When `reg_code` + token are provided, backend checks whether the code is already claimed in user data. If unclaimed, respond `VALID` even if no invitation row exists. When no token is supplied, fall back to the legacy `invitation_code` validation path triggered by manual entry. Admins never embed `invitation_code` inside the URLs they share.
 
 ## 2) Registration with code (frontend-new + backend integration)
-- **Flow**: On registration submit (Google or email), frontend includes the active `registration_code` in the payload/headers used by the existing signup path so backend can persist it on user data and reduce invitation capacity.
+- **Flow**: On registration submit (Google or email), frontend includes the active `registration_code` and the original `report_token` (when present). For legacy/manual flows—where a user manually types the shared invitation code without any secure link—the frontend sends only `invitation_code`. Backend persists the applied code on user data and the secure-link claim log; legacy/manual invitation codes are unlimited and do not decrement capacity.
 - **Expected backend behavior**:
-  - Reject if invitation is invalid or already consumed (remaining_usage <= 0).
-  - On success, store `registration_code` on the user record and keep the invitation record for auditing; decrement `remaining_usage`.
-- **Notes**: Align with existing auth/signup endpoint naming (to be confirmed during implementation); no new endpoint is expected if current registration accepts invitation code metadata.
+  - Reject secure-link submissions when the token is missing/invalid or when the `registration_code` is already claimed.
+  - Reject manual/shared invitation submissions only when the invitation code itself is invalid or revoked; availability is no longer tied to usage counts.
+  - On success, store `registration_code` on the user record, persist/append the claim log (including source + timestamp), and leave invitation capacity untouched for the manual code path.
+- **Notes**: Existing signup endpoints remain; they simply accept the extra metadata to drive the secure-link logic.
 
 ## 3) Report retrieval by code or fallback id
 - **Endpoint**: Existing report fetch endpoint (token-protected) should accept `registration_code`; when a user was created under the shared/default invitation (no personalized code), it should also accept a fallback `user_id`. URL patterns: `#/reports/{registration_code}?token=...` or `#/reports/{user_id}?token=...`.

@@ -5,11 +5,17 @@
 **Status**: Draft  
 **Input**: Admins need personalized registration links carrying a per-user code (DNI alias) that auto-fills the invitation code, enforces uniqueness, and supports analytics/report lookup.
 
+## Clarifications
+
+### Session 2026-01-05
+- Q: Should the legacy manual registration path decrement invitation capacity per use? → A: No—shared invitation codes stay unlimited; never decrement capacity in the manual flow.
+- Q: Should admin-provided URLs ever include the legacy `invitation_code`? → A: No—secure links only carry `reg_code` + `report_token`; `invitation_code` is typed manually when no link exists.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Register via personalized link (Priority: P1)
 
-Admin shares a link with a per-user code; the invite field auto-fills, is locked, and the user completes signup (Google or email) with that code stored for reporting and analytics.
+Admin shares a link that carries both an arbitrary per-user code (chosen outside the system) and the existing admin token; the invite field auto-fills, is locked, and the user completes signup (Google or email) with that code stored for reporting and analytics as soon as the token is validated, even when no invitation record exists ahead of time.
 
 **Why this priority**: Core value is tying each user to a human-friendly external identifier for reports and tracking; must work for all sign-up methods.
 
@@ -17,9 +23,10 @@ Admin shares a link with a per-user code; the invite field auto-fills, is locked
 
 **Acceptance Scenarios**:
 
-1. **Given** a valid code in the registration URL, **When** the page loads, **Then** the invitation code field is auto-filled, locked, and a toast confirms the unique code was applied.
-2. **Given** an unused code provided via link, **When** the user completes signup with Google or email, **Then** the code is stored on the invitation record and user data and is available for later report lookup and analytics.
-3. **Given** a code already bound to another registered user, **When** a different user attempts to register with that code, **Then** registration is blocked with a clear message and no new account is created.
+1. **Given** a valid code and admin token in the registration URL, **When** the page loads, **Then** the invitation code field is auto-filled, locked, and a toast confirms the unique code was applied.
+2. **Given** a code provided via a secure link (token present) that has never been registered before, **When** the user completes signup with Google or email, **Then** the code is claimed on the user record (and optional audit log) without needing a pre-created invitation, and it becomes available for later report lookup and analytics.
+3. **Given** a code already bound to another registered user (whether it originated from an invitation or a secure link), **When** a different user attempts to register with that code, **Then** registration is blocked with a clear message and no new account is created.
+4. **Given** a link missing the admin token or carrying an invalid token, **When** a user opens it, **Then** the registration code is not applied and the user is shown an error that the secure link is invalid until they obtain a valid admin-provided link.
 
 ---
 
@@ -57,6 +64,8 @@ An admin uses either the personalized registration code or, if the user register
 ### Edge Cases
 
 - Missing code in URL: default invitation code flow remains available and editable.
+- Missing or invalid admin token on a link: treat the link as untrusted, show an error, and require the user to obtain a valid admin-provided link before the registration code is applied.
+- Token-present link whose code does not exist in Mongo: accept it as a new claim once uniqueness is confirmed; no admin data-seeding required.
 - Invalid code format or length: surface an error and keep registration blocked until a valid code is provided via link.
 - Code already used: block registration and prompt the user to request a new link.
 - Multiple links visited: the most recent link overrides previously stored codes (last link wins).
@@ -68,18 +77,20 @@ An admin uses either the personalized registration code or, if the user register
 
 ### Functional Requirements
 
-- **FR-001**: Accept a code parameter on registration and report URLs (displayed to users as a neutral label such as "registration code" instead of DNI) and treat it as the external identifier for that user.
-- **FR-002**: On landing at /register with a code, auto-fill the invitation code field with that code, display a toast confirming it was applied, and keep the field non-editable while a link code is present.
+- **FR-001**: Accept a `reg_code` parameter on registration/report URLs (displayed as "registration code") and treat it as the external identifier for that user, regardless of whether it already exists in backend storage.
+- **FR-002**: On landing at /register with a code, auto-fill the invitation/registration code field, display a toast confirming it was applied, and keep the field non-editable while a link code is present.
 - **FR-003**: Persist the latest link-supplied code in client storage so returning users see it pre-filled; when a new link is opened, the new code replaces the stored one (last link wins).
-- **FR-004**: Carry the code through both email/password and Google signup flows so that the same code is stored on the invitation record and user data upon successful registration.
-- **FR-005**: Enforce uniqueness: once a code is bound to a registered user, block additional registrations with that code and surface a clear error state without creating accounts.
-- **FR-006**: Retain the existing shared invitation code flow for users without a link code; when no code is present in the URL or storage, allow manual entry as today.
-- **FR-007**: Attach the code used at registration to user data (e.g., preferences/profile) and the invitation record so it can be referenced for reporting and downstream processes.
-- **FR-008**: Push the code into the analytics data layer (e.g., for first-visit and registration-complete events) so unique users can be tracked via GA/GTM.
-- **FR-009**: Validate code availability during registration (format and unused status) before account creation; if invalid or already used, prevent submission and instruct the user to obtain a new link.
-- **FR-010**: When a report URL is opened with a code and token, resolve the report corresponding to that code; if the code is unknown, show an error or empty state without leaking other data. When no personalized code exists (shared/default invite), allow a fallback identifier (e.g., user_id) with token to fetch the correct report.
-- **FR-011**: Log or surface operational errors (e.g., analytics push failures, code validation failures) for support without exposing sensitive identifiers to end users.
+- **FR-004**: Carry the code through both email/password and Google signup flows so that the same code is stored on user data (and optional audit logs) upon successful registration.
+- **FR-005**: Enforce uniqueness after claim: once any user profile stores a specific `registration_code`, block additional registrations with that code and surface a clear error state without creating accounts.
+- **FR-006**: Retain the existing shared invitation code flow for users without a link code; when no `reg_code` is present in the URL or storage, allow manual entry, keep the shared invitation code unlimited, and never decrement any invitation capacity for that legacy path.
+- **FR-007**: Attach the code used at registration to user data (preferences/profile) and record the claim (timestamp, token provenance) for reporting and downstream processes.
+- **FR-008**: Push the code into the analytics data layer (first-visit and registration-complete events) so unique users can be tracked via GA/GTM.
+- **FR-009**: Validate code availability during registration by checking (a) secure-link token presence/validity for arbitrary codes and (b) whether the code has already been claimed; manual entry without a token must still pass the invitation validation route.
+- **FR-010**: When a report URL is opened with a code and token, resolve the report corresponding to that code; if the code is unknown or unclaimed, show an error/empty state without leaking other data. When no personalized code exists, allow a fallback identifier (e.g., user_id) with token to fetch the correct report.
+- **FR-011**: Log or surface operational errors (analytics push failures, code validation failures) for support without exposing sensitive identifiers to end users.
 - **FR-012**: Ensure code handling does not depend on the random internal `user_id`; external code remains the primary admin-facing identifier for links, reports, and analytics.
+- **FR-013**: Require the existing public-report admin token on any registration link that supplies a registration code; validate the token server-side before locking or applying the code, and reject submissions lacking a valid token.
+- **FR-014**: Allow admins to mint arbitrary codes simply by including them in the secure link; backend must treat the token as authorization to accept the code (subject to uniqueness checks) without requiring pre-provisioned invitation records.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -92,6 +103,8 @@ An admin uses either the personalized registration code or, if the user register
 
 - The user-facing label for the code will be "registration code" (or similar) to avoid exposing DNI terminology.
 - The existing shared invitation code remains valid and unchanged for users without a personalized link.
+- Admin-provided links only include `reg_code` and `report_token`; the legacy `invitation_code` is entered manually when no secure link is present.
+- Admins cannot directly seed Mongo; any code included with the secure token must be accepted as long as it has not already been claimed.
 - Report token handling stays as currently implemented; this feature only aligns report lookup to the registration code.
 - GA/GTM data layer is available; if it is not, registration proceeds and failures are logged for later inspection.
 
