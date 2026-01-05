@@ -50,6 +50,11 @@ class UserPreferencesRepositoryUpdateRequest(BaseModel):
     invitation_code - The invitation code of the user
     """
 
+    registration_code: str | None = None
+    """
+    registration_code - The registration code applied during signup (secure link or manual)
+    """
+
     client_id: str | None = None
     """
     UUID - The client ID (UUID) assigned to the device client (Browser).
@@ -127,6 +132,7 @@ class UserPreferencesUpdateRequest(BaseModel):
 class UserPreferences(BaseModel):
     language: str | None = None
     invitation_code: str | None = None
+    registration_code: str | None = None
     accepted_tc: datetime | None = None
     client_id: str | None = None
     sessions: list[int] = Field(default_factory=list)  # not required
@@ -159,6 +165,7 @@ class UserPreferences(BaseModel):
             language=doc.get("language"),
             accepted_tc=doc.get("accepted_tc"),
             invitation_code=doc.get("invitation_code"),
+            registration_code=doc.get("registration_code"),
             client_id=doc.get("client_id"),
             sessions=doc.get("sessions"),
             sensitive_personal_data_requirement=doc.get(
@@ -205,9 +212,19 @@ class CreateUserPreferencesRequest(BaseModel):
     """
     The language of the user
     """
-    invitation_code: str
+    invitation_code: str | None = None
     """
-    Invitation code
+    Invitation code (manual/shared path)
+    """
+
+    registration_code: str | None = None
+    """
+    Registration code (secure link or manual). Optional for legacy users.
+    """
+
+    report_token: str | None = None
+    """
+    Report token required for secure links carrying registration_code
     """
 
     client_id: str
@@ -233,6 +250,11 @@ class UpdateUserPreferencesRequest(BaseModel):
     accepted_tc: datetime | None = None
     """
     Accepted terms and conditions date
+    """
+
+    registration_code: str | None = None
+    """
+    Registration code (set at signup; immutable for updates)
     """
 
     client_id: str | None = None

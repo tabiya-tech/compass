@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import os
+from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -9,7 +11,7 @@ from app.context_vars import user_id_ctx_var
 from app.conversations.feedback.repository import UserFeedbackRepository
 from app.conversations.feedback.services.service import UserFeedbackService, IUserFeedbackService
 from app.invitations.repository import UserInvitationRepository
-from app.invitations.types import InvitationType
+from app.invitations.types import InvitationType, ClaimSource, SecureLinkCodeClaim
 from app.metrics.services.get_metrics_service import get_metrics_service
 from app.metrics.services.service import IMetricsService
 from app.metrics.types import UserAccountCreatedEvent
@@ -19,9 +21,12 @@ from app.users.get_user_preferences_repository import get_user_preferences_repos
 from app.users.repositories import UserPreferenceRepository
 from app.users.sensitive_personal_data.routes import get_sensitive_personal_data_service
 from app.users.sensitive_personal_data.service import ISensitivePersonalDataService
+from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 from app.users.sessions import generate_new_session_id, SessionsService
 from app.users.types import UserPreferencesUpdateRequest, UserPreferences, \
     CreateUserPreferencesRequest, UserPreferencesRepositoryUpdateRequest, UsersPreferencesResponse
+from common_libs.time_utilities import get_now
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -86,22 +91,6 @@ async def _create_user_preferences(
         if preferences.user_id != authed_user.user_id:
             raise HTTPException(status_code=403, detail="forbidden")
 
-        # validation of invitation code.
-        invitation = await user_invitation_repository.get_valid_invitation_by_code(preferences.invitation_code)
-
-        if invitation is None:
-            raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
-
-        # an authenticated user can't use a login invitation code
-        if (invitation.invitation_type == InvitationType.LOGIN.value
-                and authed_user.sign_in_provider != SignInProvider.ANONYMOUS):
-            raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
-
-        # an anonymous user can't use a register invitation code because it requires user to register
-        if (invitation.invitation_type == InvitationType.REGISTER.value and
-                authed_user.sign_in_provider == SignInProvider.ANONYMOUS):
-            raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
-
         # Check if user preferences already exist
         user_already_exists = await repository.get_user_preference_by_user_id(preferences.user_id)
 
@@ -111,11 +100,51 @@ async def _create_user_preferences(
                 detail="user already exists"
             )
 
-        # Reduce the invitation code capacity
-        is_reduced = await user_invitation_repository.reduce_capacity(preferences.invitation_code)
+        secure_link_flow = preferences.registration_code is not None
 
-        if not is_reduced:
-            raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
+        invitation = None
+        if secure_link_flow:
+            sec_token = os.getenv("SEC_TOKEN_CV")
+            normalized_report_token = preferences.report_token.casefold() if preferences.report_token else None
+            normalized_sec_token = sec_token.casefold() if sec_token else None
+            if not normalized_report_token or not normalized_sec_token:
+                raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Security token required")
+            if normalized_report_token != normalized_sec_token:
+                raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Invalid security token")
+
+            # enforce uniqueness by checking claims and user data
+            existing_claim = await user_invitation_repository.get_claim_by_registration_code(preferences.registration_code)
+            if existing_claim is not None:
+                raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=INVALID_INVITATION_CODE_MESSAGE)
+
+            existing_user_with_code = await repository.get_user_preference_by_registration_code(preferences.registration_code)
+            if existing_user_with_code is not None:
+                raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=INVALID_INVITATION_CODE_MESSAGE)
+
+            # if invitation_code is provided, attempt to fetch to reuse SPD requirement; otherwise default
+            if preferences.invitation_code:
+                invitation = await user_invitation_repository.get_valid_invitation_by_code(preferences.invitation_code)
+        else:
+            if not preferences.invitation_code:
+                raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
+
+            invitation = await user_invitation_repository.get_valid_invitation_by_code(
+                preferences.invitation_code,
+                enforce_capacity=False
+            )
+
+            if invitation is None:
+                raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
+
+            # an authenticated user can't use a login invitation code
+            if (invitation.invitation_type == InvitationType.LOGIN.value
+                    and authed_user.sign_in_provider != SignInProvider.ANONYMOUS):
+                raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
+
+            # an anonymous user can't use a register invitation code because it requires user to register
+            if (invitation.invitation_type == InvitationType.REGISTER.value and
+                    authed_user.sign_in_provider == SignInProvider.ANONYMOUS):
+                raise HTTPException(status_code=400, detail=INVALID_INVITATION_CODE_MESSAGE)
 
         # Generating a 64-bit integer session ID
         session_id = generate_new_session_id()
@@ -125,10 +154,27 @@ async def _create_user_preferences(
         newly_created = await repository.insert_user_preference(preferences.user_id, UserPreferences(
             language=preferences.language,
             invitation_code=preferences.invitation_code,
+            registration_code=preferences.registration_code,
             client_id=preferences.client_id,
-            sensitive_personal_data_requirement=invitation.sensitive_personal_data_requirement,
+            sensitive_personal_data_requirement=(
+                invitation.sensitive_personal_data_requirement if invitation else SensitivePersonalDataRequirement.NOT_AVAILABLE
+            ),
             sessions=sessions
         ))
+
+        if preferences.registration_code:
+            token_hash = None
+            if preferences.report_token:
+                token_hash = hashlib.sha256(preferences.report_token.encode("utf-8")).hexdigest()
+            await user_invitation_repository.upsert_claim(SecureLinkCodeClaim(
+                registration_code=preferences.registration_code,
+                claimed_user_id=preferences.user_id,
+                claimed_at=get_now(),
+                claim_source=ClaimSource.SECURE_LINK,
+                report_token_hash=token_hash,
+                invitation_code_template=preferences.invitation_code,
+                metadata=None
+            ))
 
         # Record user account creation metric
         await metrics_service.record_event(UserAccountCreatedEvent(

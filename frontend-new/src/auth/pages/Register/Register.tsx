@@ -1,12 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Box, Container, Divider, TextField, Typography, useTheme } from "@mui/material";
+import { Box, Container, Divider, Typography, useTheme } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import RegisterWithEmailForm from "src/auth/pages/Register/components/RegisterWithEmailForm/RegisterWithEmailForm";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
+import InvitationCodeField from "src/auth/components/InvitationCodeField";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import FirebaseEmailAuthService from "src/auth/services/FirebaseAuthenticationService/emailAuth/FirebaseEmailAuthentication.service";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
@@ -20,6 +21,11 @@ import CustomLink from "src/theme/CustomLink/CustomLink";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
 import { getApplicationRegistrationCode, getSocialAuthDisabled } from "src/envService";
+import { REGISTRATION_CODE_FIELD_LABEL, REGISTRATION_CODE_QUERY_PARAM, REGISTRATION_CODE_TOAST_ID, REPORT_TOKEN_QUERY_PARAM } from "src/config/registrationCode";
+import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
+import { InvitationStatus } from "src/auth/services/invitationsService/invitations.types";
+import { registrationStore } from "src/state/registrationStore";
+import { GTMService } from "src/utils/analytics/gtmService";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -43,21 +49,41 @@ export const DATA_TEST_ID = {
 };
 
 const Register: React.FC = () => {
-  const [registrationCode, setRegistrationCode] = useState<string>("");
+  const initialRegistration = registrationStore.getState();
+  const [registrationCode, setRegistrationCode] = useState<string>(initialRegistration.code ?? "");
+  const [reportToken, setReportToken] = useState<string | undefined>(initialRegistration.reportToken);
+  const [codeLocked, setCodeLocked] = useState<boolean>(initialRegistration.locked);
+  const [codeStatus, setCodeStatus] = useState<InvitationStatus | null>(null);
   const theme = useTheme();
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const firstVisitTracked = useRef(false);
 
-  // Check for invitation code in URL params when component mounts
+  const applicationRegistrationCode = useMemo(() => {
+    return getApplicationRegistrationCode();
+  }, []);
+
+  // Check for registration code in URL params when component mounts
   useEffect(() => {
     const params = new URLSearchParams(location.search);
+    const linkCodeParam = params.get(REGISTRATION_CODE_QUERY_PARAM);
+    const linkReportToken = params.get(REPORT_TOKEN_QUERY_PARAM) ?? params.get("token") ?? undefined;
     const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
 
-    if (inviteCodeParam) {
-      setRegistrationCode(inviteCodeParam);
-      // Remove the invite code from the URL
+    const selectedCode = linkCodeParam || inviteCodeParam;
+    if (selectedCode) {
+      const nextState = linkCodeParam
+        ? registrationStore.setLinkCode(selectedCode, linkReportToken)
+        : registrationStore.setManualCode(selectedCode);
+      setRegistrationCode(nextState.code ?? "");
+      setReportToken(nextState.reportToken);
+      setCodeLocked(nextState.locked);
+      setCodeStatus(null);
       const newSearchParams = new URLSearchParams(location.search);
+      newSearchParams.delete(REGISTRATION_CODE_QUERY_PARAM);
+      newSearchParams.delete(REPORT_TOKEN_QUERY_PARAM);
+      newSearchParams.delete("token");
       newSearchParams.delete(INVITATIONS_PARAM_NAME);
       navigate(
         {
@@ -68,6 +94,16 @@ const Register: React.FC = () => {
       );
     }
   }, [location, navigate]);
+
+  useEffect(() => {
+    if (firstVisitTracked.current) {
+      return;
+    }
+    firstVisitTracked.current = true;
+    const activeCode = registrationCode || applicationRegistrationCode || null;
+    const source = codeLocked ? "secure_link" : activeCode ? "manual" : "unknown";
+    GTMService.trackRegistrationVisit(activeCode, source);
+  }, [registrationCode, applicationRegistrationCode, codeLocked]);
 
   // a state to determine if the user is currently registering with email
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -95,10 +131,6 @@ const Register: React.FC = () => {
     [enqueueSnackbar, t]
   );
 
-  const applicationRegistrationCode = useMemo(() => {
-    return getApplicationRegistrationCode();
-  }, []);
-
   const socialAuthDisabled = useMemo(() => {
     return getSocialAuthDisabled().toLowerCase() === "true";
   }, []);
@@ -106,9 +138,43 @@ const Register: React.FC = () => {
   /* -----------
    * callbacks to pass to the child components
    */
-  const handleRegistrationCodeChanged = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setRegistrationCode(event.target.value);
+  const handleRegistrationCodeChanged = (value: string) => {
+    if (codeLocked) {
+      return;
+    }
+    const updatedState = registrationStore.setManualCode(value || null);
+    setRegistrationCode(updatedState.code ?? "");
+    setReportToken(updatedState.reportToken);
+    setCodeLocked(updatedState.locked);
+    setCodeStatus(null);
   };
+
+  const validateCode = useCallback(async () => {
+    const codeToUse = registrationCode || applicationRegistrationCode;
+    if (!codeToUse) {
+      throw new Error(t("auth.errors.firebase.invalidRegistrationCode"));
+    }
+    const response = await invitationsService.checkInvitationCodeStatus(codeToUse, codeLocked ? reportToken : undefined);
+    setCodeStatus(response.status);
+    if (response.status !== InvitationStatus.VALID) {
+      throw new Error(t("auth.errors.firebase.invalidRegistrationCode"));
+    }
+    if (!codeLocked) {
+      enqueueSnackbar(`${t("auth.pages.register.registrationCode")}: ${codeToUse}`, {
+        variant: "success",
+        key: REGISTRATION_CODE_TOAST_ID,
+      });
+    }
+    return { codeToUse, reportTokenToUse: codeLocked ? reportToken : undefined } as const;
+  }, [registrationCode, applicationRegistrationCode, enqueueSnackbar, t, reportToken, codeLocked]);
+
+  useEffect(() => {
+    if (codeLocked && registrationCode) {
+      validateCode().catch(async (error) => {
+        await handleError(error as Error);
+      });
+    }
+  }, [codeLocked, registrationCode, validateCode, handleError]);
 
   /**
    * Handles what happens after social registration (same process as login)
@@ -148,10 +214,10 @@ const Register: React.FC = () => {
       setIsLoading(true);
       try {
         const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
-        // if the instance has application registration code set, we should use that instead of the one entered by the user.
-        const registrationCodeToUse = registrationCode || applicationRegistrationCode;
+        const { codeToUse, reportTokenToUse } = await validateCode();
         // We're using the mail as the username for now, since we don't have any use case in the app for it
-  await firebaseEmailAuthServiceInstance.register(email, password, email, registrationCodeToUse);
+        await firebaseEmailAuthServiceInstance.register(email, password, email, codeToUse, reportTokenToUse);
+        GTMService.trackRegistrationComplete("email", codeToUse || null);
   enqueueSnackbar(t("auth.verificationEmailSentShort"), { variant: "success" });
         // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
         // since if we don't do that, the user may be able to access the application without verifying their email
@@ -167,7 +233,7 @@ const Register: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [navigate, enqueueSnackbar, setIsLoading, registrationCode, handleError, applicationRegistrationCode, t]
+    [navigate, enqueueSnackbar, setIsLoading, handleError, validateCode, t]
   );
 
   /**
@@ -202,14 +268,12 @@ const Register: React.FC = () => {
         {!applicationRegistrationCode && (
           <React.Fragment>
             <Typography variant="subtitle2">{t("auth.pages.register.enterRegistrationCode")}</Typography>
-            <TextField
-              fullWidth
-              label={t("auth.pages.register.registrationCode")}
-              variant="outlined"
-              required
+            <InvitationCodeField
               value={registrationCode}
-              onChange={(e) => handleRegistrationCodeChanged(e)}
-              inputProps={{ "data-testid": DATA_TEST_ID.REGISTRATION_CODE_INPUT }}
+              locked={codeLocked}
+              label={t("auth.pages.register.registrationCode") || REGISTRATION_CODE_FIELD_LABEL}
+              onChange={handleRegistrationCodeChanged}
+              dataTestId={DATA_TEST_ID.REGISTRATION_CODE_INPUT}
             />
           </React.Fragment>
         )}
@@ -221,7 +285,7 @@ const Register: React.FC = () => {
           </Divider>
         )}
         <RegisterWithEmailForm
-          disabled={!registrationCode && !applicationRegistrationCode}
+          disabled={!registrationCode && !applicationRegistrationCode || codeStatus === InvitationStatus.INVALID || codeStatus === InvitationStatus.USED}
           notifyOnRegister={handleRegister}
           isRegistering={isLoading}
         />
@@ -229,10 +293,11 @@ const Register: React.FC = () => {
           <SocialAuth
             postLoginHandler={handlePostLogin}
             isLoading={isLoading}
-            disabled={!registrationCode && !applicationRegistrationCode}
+            disabled={!registrationCode && !applicationRegistrationCode || codeStatus === InvitationStatus.INVALID || codeStatus === InvitationStatus.USED}
             label={t("auth.pages.register.registerWithGoogle")}
             notifyOnLoading={notifyOnSocialLoading}
             registrationCode={registrationCode || applicationRegistrationCode}
+            reportToken={codeLocked ? reportToken : undefined}
           />
         )}
         <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>

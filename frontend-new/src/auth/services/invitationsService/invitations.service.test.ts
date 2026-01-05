@@ -6,6 +6,7 @@ import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
 import { Invitation, InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import * as CustomFetchModule from "src/utils/customFetch/customFetch";
+import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
 
 describe("InvitationsService", () => {
   // GIVEN a backend URL is returned by the envService
@@ -33,9 +34,11 @@ describe("InvitationsService", () => {
       // GIVEN the GET invitations REST API will respond with OK and a valid status
       const givenCode = "test-code";
       const givenResponseBody: Invitation = {
+        code: givenCode,
         invitation_code: givenCode,
         status: InvitationStatus.VALID,
         invitation_type: InvitationType.REGISTER,
+        source: null,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       };
 
@@ -47,7 +50,7 @@ describe("InvitationsService", () => {
 
       // THEN expect it to make a GET request with correct headers and payload
       expect(fetchSpy).toHaveBeenCalledWith(
-        `${givenApiServerUrl}/user-invitations/check-status?invitation_code=test-code`,
+        `${givenApiServerUrl}/user-invitations/check-status?${INVITATIONS_PARAM_NAME}=test-code`,
         {
           method: "GET",
           authRequired: false,

@@ -5,7 +5,6 @@ import Timestamp, {
 } from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/Timestamp";
 import { render, screen } from "src/_test_utilities/test-utils";
 import { getDurationFromNow } from "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/getDurationFromNow/getDurationFromNow";
-import { useTranslation } from "react-i18next";
 
 jest.mock(
   "src/chat/chatMessage/components/chatMessageFooter/components/timestamp/getDurationFromNow/getDurationFromNow",
@@ -17,7 +16,6 @@ jest.mock(
 );
 
 describe("render tests", () => {
-  const { t } = useTranslation();
   test("should render the Chat Message Timestamp without a child if none is passed", () => {
     // GIVEN a sent at time
     const givenSentAt: string = new Date().toISOString();

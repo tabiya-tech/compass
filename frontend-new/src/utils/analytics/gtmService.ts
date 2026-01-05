@@ -1,5 +1,5 @@
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { GTMChatMessageEvent, GTMConversationCompletedEvent } from "src/types/gtm";
+import { GTMChatMessageEvent, GTMConversationCompletedEvent, GTMRegistrationCompleteEvent, GTMRegistrationVisitEvent } from "src/types/gtm";
 
 /**
  * Service for tracking events in Google Tag Manager
@@ -62,5 +62,35 @@ export class GTMService {
 
     window.dataLayer.push(event);
 
+  }
+
+  static trackRegistrationVisit(registrationCode: string | null, source: GTMRegistrationVisitEvent["source"]): void {
+    try {
+      window.dataLayer = window.dataLayer || [];
+      const event: GTMRegistrationVisitEvent = {
+        event: "first_visit",
+        registration_code: registrationCode,
+        source,
+        timestamp: Date.now(),
+      };
+      window.dataLayer.push(event);
+    } catch (error) {
+      console.warn("Failed to push first_visit event", error);
+    }
+  }
+
+  static trackRegistrationComplete(authMethod: GTMRegistrationCompleteEvent["auth_method"], registrationCode: string | null): void {
+    try {
+      window.dataLayer = window.dataLayer || [];
+      const event: GTMRegistrationCompleteEvent = {
+        event: "registration_complete",
+        registration_code: registrationCode,
+        auth_method: authMethod,
+        timestamp: Date.now(),
+      };
+      window.dataLayer.push(event);
+    } catch (error) {
+      console.warn("Failed to push registration_complete event", error);
+    }
   }
 }

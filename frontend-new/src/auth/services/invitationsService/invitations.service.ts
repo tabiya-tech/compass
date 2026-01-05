@@ -1,7 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 import { getBackendUrl } from "src/envService";
-import { Invitation } from "./invitations.types";
+import { Invitation, InvitationStatus } from "./invitations.types";
 import { customFetch } from "src/utils/customFetch/customFetch";
+import { REGISTRATION_CODE_QUERY_PARAM, REPORT_TOKEN_QUERY_PARAM } from "src/config/registrationCode";
+import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
 
 export default class InvitationsService {
   private static instance: InvitationsService;
@@ -31,11 +33,18 @@ export default class InvitationsService {
    * @returns {Promise<Invitation>}
    * @throws {RestAPIError} If the invitation code is invalid
    */
-  async checkInvitationCodeStatus(code: string): Promise<Invitation> {
+  async checkInvitationCodeStatus(code: string, reportToken?: string): Promise<Invitation> {
     const serviceName = "InvitationsService";
     const serviceFunction = "checkInvitationCodeStatus";
     const method = "GET";
-    const endpointUrl = `${this.invitationStatusEndpointUrl}/check-status?invitation_code=${code}`;
+    const searchParams = new URLSearchParams();
+    if (reportToken) {
+      searchParams.append(REGISTRATION_CODE_QUERY_PARAM, code);
+      searchParams.append(REPORT_TOKEN_QUERY_PARAM, reportToken);
+    } else {
+      searchParams.append(INVITATIONS_PARAM_NAME, code);
+    }
+    const endpointUrl = `${this.invitationStatusEndpointUrl}/check-status?${searchParams.toString()}`;
       const response = await customFetch(endpointUrl, {
         method: method,
         expectedStatusCode: StatusCodes.OK,
@@ -48,8 +57,16 @@ export default class InvitationsService {
 
       const responseBody = await response.text();
       try {
-        const data: Invitation = JSON.parse(responseBody);
-        return data;
+        const parsed = JSON.parse(responseBody);
+        const invitation: Invitation = {
+          code: parsed.code ?? parsed.invitation_code ?? code,
+          status: parsed.status as InvitationStatus,
+          source: parsed.source ?? null,
+          invitation_type: parsed.invitation_type,
+          sensitive_personal_data_requirement: parsed.sensitive_personal_data_requirement,
+          invitation_code: parsed.invitation_code ?? parsed.code,
+        };
+        return invitation;
       } catch (err: any) {
         // Normalize JSON parse errors to stable messages expected by tests
         if (responseBody === "{") {

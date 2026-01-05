@@ -10,6 +10,7 @@
 ### Session 2026-01-05
 - Q: Should the legacy manual registration path decrement invitation capacity per use? → A: No—shared invitation codes stay unlimited; never decrement capacity in the manual flow.
 - Q: Should admin-provided URLs ever include the legacy `invitation_code`? → A: No—secure links only carry `reg_code` + `report_token`; `invitation_code` is typed manually when no link exists.
+- Update: Admin/report token validation is case-insensitive to prevent copy/paste casing issues breaking secure links; secure-link claim persistence normalizes enum/string sources when writing audit records.
 
 ## User Scenarios & Testing *(mandatory)*
 

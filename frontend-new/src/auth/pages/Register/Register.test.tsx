@@ -273,6 +273,7 @@ describe("Testing Register component", () => {
     // AND the user has a valid invitation code
     // AND check invitation code status returns a valid code
     jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue({
+      code: givenInvitationCode,
       invitation_type: InvitationType.REGISTER,
       status: InvitationStatus.VALID,
       invitation_code: givenInvitationCode,

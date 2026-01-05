@@ -12,12 +12,12 @@
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-- [ ] T003 Define registration code param/label constants (`reg_code`, display label "registration code") in frontend-new/src/config/registrationCode.ts
-- [ ] T004 Add registration_code field to backend user profile schema/model and serialization in backend/app/users (and related pydantic models)
-- [ ] T005 Define SecureLinkCodeClaim persistence in backend/app/invitations by extending the existing invitations collection (no new collection): add a claim record type with registration_code, claimed_user_id, claim_source, report_token_hash, and link from backend/app/users
-- [ ] T006 [P] Document secure-link vs manual/shared invitation flows (manual path unlimited uses, invitation_code manual-only) in backend/app/README.md and frontend-new docs
-- [ ] T007 Ensure `/user-invitations/check-status` exposes structured statuses (VALID/USED/INVALID/401) for both secure-link (`reg_code` + token) and manual `invitation_code` paths in backend/app/invitations/routes.py
-- [ ] T008 [P] Add fallback identifier note (registration_code preferred, user_id fallback) to backend/app/README.md and frontend-new docs
+- [x] T003 Define registration code param/label constants (`reg_code`, display label "registration code") in frontend-new/src/config/registrationCode.ts
+- [x] T004 Add registration_code field to backend user profile schema/model and serialization in backend/app/users (and related pydantic models)
+- [x] T005 Define SecureLinkCodeClaim persistence in backend/app/invitations by extending the existing invitations collection (no new collection): add a claim record type with registration_code, claimed_user_id, claim_source, report_token_hash, and link from backend/app/users
+- [x] T006 [P] Document secure-link vs manual/shared invitation flows (manual path unlimited uses, invitation_code manual-only) in backend/app/README.md and frontend-new docs
+- [x] T007 Ensure `/user-invitations/check-status` exposes structured statuses (VALID/USED/INVALID/401) for both secure-link (`reg_code` + token) and manual `invitation_code` paths in backend/app/invitations/routes.py
+- [x] T008 [P] Add fallback identifier note (registration_code preferred, user_id fallback) to backend/app/README.md and frontend-new docs
 
 **Checkpoint**: Foundation ready - user story work can start.
 
@@ -31,17 +31,17 @@
 
 ### Implementation
 
-- [ ] T009 [P] [US1] Parse `reg_code` + `report_token` from URL and store latest in state in frontend-new/src/pages/register/index.tsx
-- [ ] T010 [P] [US1] Auto-fill, lock field, and show toast on apply in frontend-new/src/components/auth/InvitationCodeField.tsx
-- [ ] T011 [US1] Call `/user-invitations/check-status` with `reg_code` + token before submit; surface VALID/USED/INVALID/missing-token states in frontend-new/src/services/invitationsClient.ts
-- [ ] T012 [US1] Pass registration_code through email/password signup payload in frontend-new/src/services/auth/emailSignup.ts
-- [ ] T013 [US1] Pass registration_code through Google signup payload in frontend-new/src/services/auth/googleSignup.ts
-- [ ] T014 [US1] Enforce code-required-when-present and disable manual edits when a link code exists in frontend-new/src/state/registrationStore.ts
-- [ ] T015 [US1] Enforce backend uniqueness for registration_code (secure-link path) while keeping manual/shared invitation codes unlimited in backend/app/users/routes.py (or signup handler)
-- [ ] T016 [US1] Store registration_code on user record and append SecureLink claim log with token provenance in backend/app/users (and claim storage)
-- [ ] T017 [US1] Push analytics events (`first_visit`, `registration_complete`) including registration_code in frontend-new/src/services/analytics/dataLayer.ts
-- [ ] T018 [US1] Maintain manual/shared invitation path: accept manual `invitation_code` without capacity decrement when no token/reg_code is present in backend/app/invitations/routes.py
-- [ ] T036 [US1] Validate `report_token` server-side for secure-link registration (check-status + signup handler) and block auto-fill/submit when invalid in backend/app/invitations/routes.py and backend/app/users/routes.py
+- [x] T009 [P] [US1] Parse `reg_code` + `report_token` from URL and store latest in state in frontend-new/src/pages/register/index.tsx
+- [x] T010 [P] [US1] Auto-fill, lock field, and show toast on apply in frontend-new/src/components/auth/InvitationCodeField.tsx
+- [x] T011 [US1] Call `/user-invitations/check-status` with `reg_code` + token before submit; surface VALID/USED/INVALID/missing-token states in frontend-new/src/services/invitationsClient.ts
+- [x] T012 [US1] Pass registration_code through email/password signup payload in frontend-new/src/services/auth/emailSignup.ts
+- [x] T013 [US1] Pass registration_code through Google signup payload in frontend-new/src/services/auth/googleSignup.ts
+- [x] T014 [US1] Enforce code-required-when-present and disable manual edits when a link code exists in frontend-new/src/state/registrationStore.ts
+- [x] T015 [US1] Enforce backend uniqueness for registration_code (secure-link path) while keeping manual/shared invitation codes unlimited in backend/app/users/routes.py (or signup handler)
+- [x] T016 [US1] Store registration_code on user record and append SecureLink claim log with token provenance in backend/app/users (and claim storage)
+- [x] T017 [US1] Push analytics events (`first_visit`, `registration_complete`) including registration_code in frontend-new/src/services/analytics/dataLayer.ts
+- [x] T018 [US1] Maintain manual/shared invitation path: accept manual `invitation_code` without capacity decrement when no token/reg_code is present in backend/app/invitations/routes.py
+- [x] T036 [US1] Validate `report_token` server-side for secure-link registration (check-status + signup handler) and block auto-fill/submit when invalid in backend/app/invitations/routes.py and backend/app/users/routes.py
 
 ### Tests (per spec expectations)
 

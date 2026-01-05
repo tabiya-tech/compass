@@ -14,7 +14,21 @@ export interface GTMConversationCompletedEvent {
   session_id: number;
 }
 
-type GTMEvent = GTMChatMessageEvent | GTMConversationCompletedEvent;
+export interface GTMRegistrationVisitEvent {
+  event: 'first_visit';
+  registration_code: string | null;
+  source: 'secure_link' | 'manual' | 'unknown';
+  timestamp: number;
+}
+
+export interface GTMRegistrationCompleteEvent {
+  event: 'registration_complete';
+  registration_code: string | null;
+  auth_method: 'email' | 'google' | 'unknown';
+  timestamp: number;
+}
+
+type GTMEvent = GTMChatMessageEvent | GTMConversationCompletedEvent | GTMRegistrationVisitEvent | GTMRegistrationCompleteEvent;
 
 declare global {
   interface Window {

@@ -130,7 +130,7 @@ abstract class AuthenticationService {
    * Updates the application state when a successful registration occurs
    * @throws {FirebaseError} If the user is not found after successful registration
    */
-  async onSuccessfulRegistration(token: string, registrationCode: string): Promise<void> {
+  async onSuccessfulRegistration(token: string, registrationCode: string, reportToken?: string): Promise<void> {
     const user = this.getUser(token);
     if (!user) {
       throw Error("User not found in the token");
@@ -141,6 +141,8 @@ abstract class AuthenticationService {
     // in order to do this, there needs to be a logged-in user in the persistent storage
     const prefs = await UserPreferencesService.getInstance().createUserPreferences({
       user_id: user.id,
+      registration_code: registrationCode,
+      report_token: reportToken,
       invitation_code: registrationCode,
       language: Language.en,
     });
