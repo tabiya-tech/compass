@@ -353,7 +353,7 @@ def add_public_report_routes(app: FastAPI):
     router = APIRouter(prefix="/reports", tags=["public-reports"])
 
     @router.get(
-        path="/{user_id}",
+        path="/{identifier}",
         status_code=HTTPStatus.OK,
         response_model=PublicReportResponse,
         responses={
@@ -363,7 +363,7 @@ def add_public_report_routes(app: FastAPI):
         description="Retrieve the latest CV report data for a user (Public)",
     )
     async def get_public_report(
-        user_id: str = Path(description="the unique identifier of the user", examples=["1"]),
+        identifier: str = Path(description="registration code or user id", examples=["reg-123", "user-1"]),
         token: str | None = Query(None, description="Security token for accessing the report"),
         user_preferences_repository: IUserPreferenceRepository = Depends(get_user_preferences_repository),
         experience_service: IExperienceService = Depends(get_experience_service),
@@ -373,16 +373,19 @@ def add_public_report_routes(app: FastAPI):
             sec_token = os.getenv("SEC_TOKEN_CV")
             if sec_token:
                 if token is None:
-                    logger.info("Security token required but not provided for user %s", user_id)
+                    logger.info("Security token required but not provided for identifier %s", identifier)
                     raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Security token required")
                 if sec_token != token:
-                    logger.warning("Invalid security token provided for user %s", user_id)
+                    logger.warning("Invalid security token provided for identifier %s", identifier)
                     raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Invalid security token")
 
-            # 1. Get user preferences to find the latest session
-            preferences = await user_preferences_repository.get_user_preference_by_user_id(user_id)
+            # 1. Resolve identifier to user preferences (prefer registration_code)
+            preferences = await user_preferences_repository.get_user_preference_by_registration_code(identifier)
+            if preferences is None:
+                preferences = await user_preferences_repository.get_user_preference_by_user_id(identifier)
+
             if not preferences or not preferences.sessions:
-                logger.warning("No preferences or sessions found for user {user_id=%s}", user_id)
+                logger.warning("No preferences or sessions found for identifier=%s", identifier)
                 raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="No report data found for this user")
 
             # 2. Use the latest session
@@ -407,7 +410,7 @@ def add_public_report_routes(app: FastAPI):
                  conducted_at = preferences.accepted_tc
 
             return PublicReportResponse(
-                user_id=user_id,
+                user_id=preferences.user_id or identifier,
                 experiences=experiences,
                 conversation_conducted_at=conducted_at
             )

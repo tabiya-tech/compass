@@ -8,7 +8,7 @@ import ErrorPage from "src/error/errorPage/ErrorPage";
 import { useTranslation } from "react-i18next";
 
 const PublicReportPage: React.FC = () => {
-    const { userid } = useParams<{ userid: string }>();
+    const { id } = useParams<{ id: string }>();
     const location = useLocation();
     const [reportData, setReportData] = useState<PublicReportData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -16,12 +16,12 @@ const PublicReportPage: React.FC = () => {
     const { t } = useTranslation();
 
     useEffect(() => {
-        if (userid) {
+        if (id) {
             const searchParams = new URLSearchParams(location.search);
             const token = searchParams.get("token");
 
             PublicReportService.getInstance()
-                .getPublicReport(userid, token)
+                .getPublicReport(id, token)
                 .then((data) => {
                     setReportData(data);
                     setLoading(false);
@@ -32,7 +32,7 @@ const PublicReportPage: React.FC = () => {
                     setLoading(false);
                 });
         }
-    }, [userid, location.search, t]);
+    }, [id, location.search, t]);
 
     if (loading) return <Backdrop isShown={loading} transparent={true} />;
 
@@ -65,7 +65,7 @@ const PublicReportPage: React.FC = () => {
                             conversationConductedAt={reportData.conversation_conducted_at}
                         />
                     }
-                    fileName={`cv-report-${userid}.pdf`}
+                    fileName={`cv-report-${id}.pdf`}
                     style={{
                         textDecoration: "none",
                         padding: "8px 16px",

@@ -83,6 +83,8 @@ class UserInvitationRepository:
 
         return {
             "document_type": cls.CLAIM_DOCUMENT_TYPE,
+            # invitation_code is indexed as unique in the collection; use registration_code to avoid null collisions
+            "invitation_code": claim.registration_code,
             "registration_code": claim.registration_code,
             "claimed_user_id": claim.claimed_user_id,
             "claimed_at": datetime_to_mongo_date(claim.claimed_at),

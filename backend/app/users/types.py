@@ -130,6 +130,7 @@ class UserPreferencesUpdateRequest(BaseModel):
 
 
 class UserPreferences(BaseModel):
+    user_id: str | None = None
     language: str | None = None
     invitation_code: str | None = None
     registration_code: str | None = None
@@ -162,6 +163,7 @@ class UserPreferences(BaseModel):
         """
 
         return UserPreferences(
+            user_id=doc.get("user_id"),
             language=doc.get("language"),
             accepted_tc=doc.get("accepted_tc"),
             invitation_code=doc.get("invitation_code"),

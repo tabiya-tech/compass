@@ -49,7 +49,7 @@ export const DATA_TEST_ID = {
 };
 
 const Register: React.FC = () => {
-  const initialRegistration = registrationStore.getState();
+  const initialRegistration = registrationStore.hydrateFromStorage();
   const [registrationCode, setRegistrationCode] = useState<string>(initialRegistration.code ?? "");
   const [reportToken, setReportToken] = useState<string | undefined>(initialRegistration.reportToken);
   const [codeLocked, setCodeLocked] = useState<boolean>(initialRegistration.locked);
@@ -71,11 +71,10 @@ const Register: React.FC = () => {
     const linkReportToken = params.get(REPORT_TOKEN_QUERY_PARAM) ?? params.get("token") ?? undefined;
     const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
 
-    const selectedCode = linkCodeParam || inviteCodeParam;
-    if (selectedCode) {
+    if (linkCodeParam || inviteCodeParam) {
       const nextState = linkCodeParam
-        ? registrationStore.setLinkCode(selectedCode, linkReportToken)
-        : registrationStore.setManualCode(selectedCode);
+        ? registrationStore.setLinkCode(linkCodeParam, linkReportToken)
+        : registrationStore.setManualCode(inviteCodeParam);
       setRegistrationCode(nextState.code ?? "");
       setReportToken(nextState.reportToken);
       setCodeLocked(nextState.locked);
@@ -92,6 +91,16 @@ const Register: React.FC = () => {
         },
         { replace: true }
       );
+      return;
+    }
+
+    // hydrate from storage if no new code provided
+    const hydrated = registrationStore.hydrateFromStorage();
+    if (hydrated.code) {
+      setRegistrationCode(hydrated.code ?? "");
+      setReportToken(hydrated.reportToken);
+      setCodeLocked(hydrated.locked);
+      setCodeStatus(null);
     }
   }, [location, navigate]);
 
