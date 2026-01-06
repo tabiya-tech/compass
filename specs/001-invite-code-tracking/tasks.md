@@ -45,11 +45,11 @@
 
 ### Tests (per spec expectations)
 
-- [ ] T019 [P] [US1] Backend test: secure-link signup stores registration_code, rejects duplicates, and leaves manual invitation capacity untouched in backend/tests/test_invitations_registration.py
-- [ ] T020 [P] [US1] Frontend test: auto-fill + lock + toast + VALID/USED/INVALID flows in frontend-new/test/register/registrationCode.test.tsx
-- [ ] T021 [P] [US1] Frontend test: missing/invalid token blocks code application in frontend-new/test/register/registrationCodeSecurity.test.tsx
-- [ ] T022 [P] [US1] Backend regression test: manual shared invitation path succeeds without token and without capacity decrement in backend/tests/test_invitations_registration.py
-- [ ] T037 [P] [US1] Backend test: missing/invalid `report_token` on secure-link registration is rejected in backend/tests/test_invitations_registration.py
+- [x] T019 [P] [US1] Backend test: secure-link signup stores registration_code, rejects duplicates, and leaves manual invitation capacity untouched in backend/app/users/test_registration_code_flows.py
+- [x] T020 [P] [US1] Frontend test: auto-fill + lock + toast + VALID/USED/INVALID flows in frontend-new/src/auth/pages/Register/Register.test.tsx
+- [x] T021 [P] [US1] Frontend test: missing/invalid token blocks code application in frontend-new/src/auth/pages/Register/Register.test.tsx
+- [x] T022 [P] [US1] Backend regression test: manual shared invitation path succeeds without token and without capacity decrement in backend/app/users/test_registration_code_flows.py
+- [x] T037 [P] [US1] Backend test: missing/invalid `report_token` on secure-link registration is rejected in backend/app/users/test_registration_code_flows.py
 
 **Checkpoint**: User Story 1 independently testable.
 
@@ -63,14 +63,14 @@
 
 ### Implementation
 
-- [ ] T023 [P] [US2] Persist registration_code to localStorage (`registrationCode`) on arrival; hydrate on load in frontend-new/src/state/registrationStore.ts
-- [ ] T024 [US2] Implement last-link-wins override and clear stale stored code when URL lacks reg_code in frontend-new/src/pages/register/index.tsx
-- [ ] T025 [US2] Keep field locked when stored/link code exists; allow manual entry only when none exists in frontend-new/src/components/auth/InvitationCodeField.tsx
+- [x] T023 [P] [US2] Persist registration_code to localStorage (`registrationCode`) on arrival; hydrate on load in frontend-new/src/state/registrationStore.ts
+- [x] T024 [US2] Implement last-link-wins override and clear stale stored code when URL lacks reg_code in frontend-new/src/pages/register/index.tsx
+- [x] T025 [US2] Keep field locked when stored/link code exists; allow manual entry only when none exists in frontend-new/src/components/auth/InvitationCodeField.tsx
 
 ### Tests (per spec expectations)
 
-- [ ] T026 [P] [US2] Frontend test: last-link-wins and persistence on revisit in frontend-new/test/register/registrationCodePersistence.test.tsx
-- [ ] T027 [P] [US2] Frontend test: storage unavailable/cleared falls back to manual invitation flow in frontend-new/test/register/registrationCodePersistence.test.tsx
+- [x] T026 [P] [US2] Frontend test: last-link-wins and persistence on revisit in frontend-new/test/register/registrationCodePersistence.test.tsx
+- [x] T027 [P] [US2] Frontend test: storage unavailable/cleared falls back to manual invitation flow in frontend-new/test/register/registrationCodePersistence.test.tsx
 
 **Checkpoint**: User Story 2 independently testable.
 
@@ -84,14 +84,14 @@
 
 ### Implementation
 
-- [ ] T028 [P] [US3] Update report API lookup to accept registration_code or fallback user_id, preferring registration_code, in backend/app/conversations/routes.py (or report handler)
-- [ ] T029 [US3] Ensure token validation unchanged and errors non-leaky in backend/app/conversations/routes.py
-- [ ] T030 [P] [US3] Update frontend-new report route to accept `reg_code` or `user_id` param and call updated endpoint in frontend-new/src/pages/reports/[id].tsx
+- [x] T028 [P] [US3] Update report API lookup to accept registration_code or fallback user_id, preferring registration_code, in backend/app/conversations/routes.py (or report handler)
+- [x] T029 [US3] Ensure token validation unchanged and errors non-leaky in backend/app/conversations/routes.py
+- [x] T030 [P] [US3] Update frontend-new report route to accept `reg_code` or `user_id` param and call updated endpoint in frontend-new/src/pages/reports/[id].tsx
 
 ### Tests (per spec expectations)
 
-- [ ] T031 [P] [US3] Backend test: report fetch by registration_code and fallback user_id in backend/tests/test_reports_by_registration_code.py
-- [ ] T032 [P] [US3] Frontend test: report fetch via registration_code and fallback user_id in frontend-new/test/reports/reportLookup.test.tsx
+- [x] T031 [P] [US3] Backend test: report fetch by registration_code and fallback user_id in backend/tests/test_reports_by_registration_code.py
+- [x] T032 [P] [US3] Frontend test: report fetch via registration_code and fallback user_id in frontend-new/test/reports/reportLookup.test.tsx
 
 **Checkpoint**: User Story 3 independently testable.
 

@@ -3,7 +3,7 @@
 ## Entities
 
 ### SecureLinkCodeClaim
-- Fields: `registration_code` (string, unique), `claimed_user_id`, `claimed_at`, `claim_source` (secure_link | invitation | manual), `report_token_hash`, optional `invitation_code_template` (for legacy shared invites), `metadata` (e.g., locale, campaign).
+- Fields: `registration_code` (string, unique), `invitation_code` (mirrors `registration_code` to satisfy the collection’s unique invitation_code index), `claimed_user_id`, `claimed_at`, `claim_source` (secure_link | invitation | manual), `report_token_hash`, optional `invitation_code_template` (for legacy shared invites), `metadata` (e.g., locale, campaign).
 - Notes: Secure links do **not** require pre-inserted DB rows; the first successful registration with a tokenized link creates/updates this claim record. Manual/shared invitations can still create claims originating from `invitation_code`.
 
 ### UserProfile

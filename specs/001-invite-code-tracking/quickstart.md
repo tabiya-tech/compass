@@ -9,7 +9,7 @@
 2. **Backend (FastAPI)**
    - Validate secure links by verifying the `report_token` and checking whether the requested `reg_code` is already claimed in user data; if unclaimed, allow the signup without requiring a pre-existing invitation row.
    - Continue to support manual/shared invitation flows by calling `/user-invitations/check-status` when no secure token is present; treat the shared invitation code as unlimited and never decrement invitation capacity in this legacy path.
-   - On successful registration, persist `registration_code` on the user record and append/update the SecureLink claim log so subsequent attempts with the same code are rejected; maintain report lookup that prefers `registration_code` with token, falling back to `user_id` for legacy users.
+   - On successful registration, persist `registration_code` on the user record and append/update the SecureLink claim log (store `invitation_code=registration_code` to satisfy the collection’s unique index) so subsequent attempts with the same code are rejected; maintain report lookup that prefers `registration_code` with token, falling back to `user_id` for legacy users.
 
 3. **Testing**
    - Backend: `poetry run pytest -v` (plus targeted tests for invitation validation/uniqueness).
