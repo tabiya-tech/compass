@@ -103,6 +103,11 @@
 - [ ] T034 Validate accessibility (focus, toast announcements, labels) for new UI via `yarn test-storybook` in frontend-new
 - [ ] T035 [P] Add logging for analytics push failures and code validation errors without leaking PII in backend/app/logger.py and frontend-new/src/services/analytics/dataLayer.ts
 
+## Phase 5b: Identifier Dominance (FR-012)
+
+- [ ] T038 [P] [FR-012] Enforce `registration_code` as the primary identifier in backend lookup paths (signup/report/analytics payloads), preferring it over `user_id` whenever present and rejecting mismatched pairs
+- [ ] T039 [FR-012] Backend test: assert `registration_code` takes precedence over `user_id` fallback and mismatched reg_code/user_id combinations are rejected (backend/tests/test_registration_code_dominance.py)
+
 ---
 
 ## Dependencies & Execution Order
