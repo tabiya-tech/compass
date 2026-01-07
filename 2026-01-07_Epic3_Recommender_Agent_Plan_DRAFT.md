@@ -1,8 +1,9 @@
 # Epic 3: Recommender/Advisor Agent - Implementation Plan (DRAFT)
 
 **Author:** Wilfred
-**Date:** January 4, 2026
-**Status:** Draft for Jasmin's review
+**Reviewer:** Jasmin
+**Date:** January 7, 2026
+**Status:** Jasmin has reviewed
 **Context:** This is based on our discussion about merging Mode 1 and Mode 2, prioritizing action over exploration
 
 ---
@@ -12,8 +13,8 @@
 After our conversation, here's what I understand we're building:
 
 1. **You (Jasmin) build**: Node2Vec algorithm (possibly with reasoning layer) that takes the preference vector and outputs occupation recommendations
-2. **I build**: Conversational agent that takes your Node2Vec output and motivates users to actually DO something (apply, train, explore)
-3. **Success metric**: User takes action (not just says "I like it")
+2. **I build**: Conversational agent that takes your Node2Vec output and motivates users to actually DO something (apply, train, explore), in the direction of the recommendations
+3. **Success metric**: User takes action in the direction of the recommendations (not just says "I like it")
 
 The user journey is:
 ```
@@ -32,7 +33,9 @@ Skills Elicitation (Epic 4)
 
 From the preference elicitation agent I built (Epic 2), here's the structure you'll receive:
 
-NOTE --> Since the preference .json input can change, I think it's better if I programmatically pick up the field from the input .json
+
+NOTE --> Since the preference .json input can change, I think it's better if I (Jasmin) programmatically pick up the field from the input .json
+How can we make a class flexible to looking different? (e.g. having remote_options all of the sudden, or job_security removed)
 
 ```python
 class PreferenceVector(BaseModel):
@@ -71,17 +74,19 @@ class PreferenceVector(BaseModel):
 Based on your brainstorming document, I understood you were planning to give **three types of recommendations**:
 1. **Occupation recommendations** - Career paths (e.g., "Data Analyst")
 2. **Opportunity recommendations** - Actual job postings/internships (e.g., "Internship at XYZ Foundation")
-3. **Skills training recommendations** - Training courses (e.g., "Advanced Econometrics on Coursera")
+[3. **Skills training recommendations** - Training courses (e.g., "Advanced Econometrics on Coursera")] --> This would be there in an ideal case, but I cannot promise that we will have this in our first iteration. Can we build the agent to be flexible on whether this is there or not.
+NOTE --> Basically, let's make this agent flow work even if only 1 or 2 of the above are available. (e.g. start with occupations, move to opportunities only if user is 'ready' and opportunity recommendations aren't NA, similarly with skill trainings)
 
-NOTE --> Let's make this agent flow work even if only 1 or 2 of the above are available. (e.g. start with occupations, move to opportunities only if user is 'ready' and opportunity recommendations aren't NA, similarly with skill trainings)
 
 Here's what I'm proposing for the schema so please let me know if this works:
+(Jasmin adapted some fields)
 
 ```python
 class OccupationRecommendation(BaseModel):
     """Career path recommendation"""
 
-    id: str  # e.g., "occ_001"
+    uuid: str  # using taxonomy uuid
+    originUuid: str  # using taxonomy origin uuid
     rank: int  # 1-N (1 = best match)
 
     occupation_id: str  # e.g., "ESCO_occupation_12345"
@@ -122,16 +127,16 @@ class OpportunityRecommendation(BaseModel):
 class SkillsTrainingRecommendation(BaseModel):
     """Training course recommendation"""
 
-    id: str  # e.g., "skill_001"
+    uuid: str  # # using taxonomy uuid
+    originUuid: str  # # using taxonomy origin uuid
     rank: int  # 1-N (1 = best match)
 
     skill: str  # e.g., "Advanced Econometrics"
-    provider: str  # e.g., "Coursera"
 
-    estimated_hours: int  # Time commitment
     justification: str  # Why this training is relevant
 
     # Optional - from DB4 (training database)
+    provider: Optional[str] = None  # e.g., "Coursera" (Jasmin moved this to optional)
     cost: Optional[str] = None
     location: Optional[str] = None  # "Online" / "Nairobi" / etc.
     delivery_mode: Optional[str] = None  # "online" / "in-person" / "hybrid"
@@ -184,6 +189,13 @@ class ConversationPhase(str, Enum):
     WRAPUP = "WRAPUP"                        # Summarize, confirm plan
     COMPLETE = "COMPLETE"                    # Session done
 ```
+
+### Note for all phases
+The overall idea is that all agents together optimize for user *effort* in the *direction of the recommendations*. This is common to all, and should be in the prompts as overarching goal (although we can still work on the exact phrasing). The instruction should be that although we provide guidance to the agents on how to behave/react, the LLM should primarily always be guided by this overarching goal and make decisions accordingly.
+
+The agent should internally treat success as applications submitted, steps taken, or persistence after first rejection; not stated agreement, or liking the recommendation
+
+Also common to all prompts: Clearly railguard the LLM to stay truthful, but also to be as persuasive as possible.
 
 ### Detailed Phases
 
@@ -316,16 +328,21 @@ class ResistanceType(str, Enum):
     EFFORT_BASED = "effort"      # "Applications are exhausting"
 ```
 
+Some things that might come up here that the agent might want to address:
+--Explain why higher effort now can pay off in the long-run, and that it's normal that (a) many applications lead to rejections and (b) a first job is never perfect but just a stepping stone for learning and career growth
+--Why retention and persisting in a job even when it's first hard is important
+--How/why the user might enjoy the recommended occupations more than they think (i.e. discuss tradeoffs; like "You may not love manufacturing, but the stability matters right now”)
+
 **Response strategies:**
 
 | Resistance Type | User Says | My Agent's Response |
 |-----------------|-----------|---------------------|
 | **Belief-based** | "I don't have the skills" | "Many people start here with similar backgrounds. The essential skills are X, Y, Z - you already have Y and Z. We can help you build X through training." |
 | **Belief-based** | "There are no jobs" | "Actually, this field has **high demand** in Kenya - [show DB2 data]. Companies are actively hiring." |
-| **Salience-based** | "My family won't respect this" | "Many families initially question non-traditional careers. What changes minds is stable income. In 2 years, you'd earn KES X, supporting your family well." |
+| **Salience-based** | "My family won't respect this" | "Many families initially question non-traditional careers. What changes minds is stable income. In 2 years, you might earn KES X, supporting your family well." |
 | **Effort-based** | "I'll get rejected anyway" | "Rejections are normal - most people apply to 10-15 jobs before an offer. It's part of the process, not your worth. Persistence matters." |
 
-**Hard railguards** (from your doc - no manipulation):
+**Hard railguards** (so that it stays persuasion, not manipulation):
 
 For example
 ```
@@ -346,6 +363,7 @@ Better alternatives:
 
 #### Phase 5: DISCUSS_TRADEOFFS
 When user prefers low-demand option but we have high-demand option recommended.
+Highlights upsides of the recommendations conditional on existing preferences
 
 **Example:**
 ```
@@ -405,6 +423,9 @@ Would building these skills make you feel more confident about career options? O
 
 #### Phase 7: ACTION_PLANNING
 Convert interest into concrete next steps. The action varies by what they're interested in:
+Help people build agency and get into action (e.g. if user says that all of their peers prefer to stay idle); The primary goal is motivate people to get going and choose a career or an occupation that makes sense --> the recommendations are well-informed so the agent should really motivate them to take those seriously and take action in direction of those (e.g. "This is hard, but worth pushing through")
+
+--> In addition to potentially showing real opportunities, this agent should be motivational and nudge the user to OFFLINE action. E.g. motivate user to talk to mentor about recommendations, to apply to a job related to recommendations, to look up more online related to recommendations etc.
 
 **For occupation interest:**
 ```
@@ -633,15 +654,15 @@ This measures actual intent to act (job application or training enrollment), not
 
 2. **Confirm the input** - is the `PreferenceVector` structure what you need? Do you need anything additional?
 
-3. **How many recommendations** will your algorithm return (top-K)? I'm planning for 5-10 but can adjust.
+3. **How many recommendations** will your algorithm return (top-K)? I'm planning for 5-10 but can adjust. --> this sounds right!
 
-4. **Score components** - can you provide the breakdown (`skills_match`, `preference_match`, `labor_demand`, `graph_proximity`) or should I just work with a single `total_score`?
+4. **Score components** - can you provide the breakdown (`skills_match`, `preference_match`, `labor_demand`, `graph_proximity`) or should I just work with a single `total_score`? --> I (Jasmin) can provide a breakdown! How would that change the output I need to create and your classes?
 
-5. **Labor demand data** - will this come from your algorithm or should I pull it separately from DB2 (Epic 1 contractor)?
+5. **Labor demand data** - will this come from your algorithm or should I pull it separately from DB2 (Epic 1 contractor)? --> I (Jasmin) can put it into the recommendations!
 
-6. **Timeline coordination** - when do you expect to have the Node2Vec algorithm ready? I can build the agent with mock data initially and plug yours in when ready.
+6. **Timeline coordination** - when do you expect to have the Node2Vec algorithm ready? I can build the agent with mock data initially and plug yours in when ready. --> I (Jasmin) will work on it this weekend, but it will surely still need tweaking along the way.
 
-7. **Any other thoughts** on the conversation flow or phases? Does this align with what you were envisioning?
+7. **Any other thoughts** on the conversation flow or phases? Does this align with what you were envisioning? --> See comments above. Broadly really really good and aligned! I just added some nuances, and I think the career path and skills_upgrade_pivot are still less clear. But let's backlog this for now, build out the rest and then tackle it.
 
 ---
 
@@ -653,7 +674,7 @@ Once we align on the data contracts, I'll:
 2. Build the state management (`state.py`)
 3. Create a stub interface to your Node2Vec (so I can develop in parallel)
 4. Start implementing the conversation phases
-5. Coordinate for DB1, DB2, DB4, DB6 access
+5. Coordinate for DB1, DB2, DB4, DB6 access --> DB1 does already exist, so please coordinate with Anselme how we would connect to it
 
 I know we're behind schedule (it's Jan 4 already), so I want to move quickly once we agree on the structure.
 
