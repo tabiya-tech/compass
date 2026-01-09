@@ -84,6 +84,14 @@
       .section-container {
           max-width: 50dvw;
           padding: 8px;
+
+          /*  SCROLL BEHAVIOUR  */
+          overflow-y: auto;
+          /*
+            The scrollable height, is the full width - 100px which is the width of the logo image.
+            Since the image is sticky.
+          */
+          max-height: calc(100dvh - 100px);
       }
 
       /*full width on mobile mode since we dont have space to waste*/
@@ -98,7 +106,7 @@
           font-weight: bold;
           color: var(--dark-blue);
           font-size: clamp(1.3rem, 0.5 * (1.23rem + 2dvh + 1.5dvw), 1.675rem);
-          line-height: 2.75rem;
+          line-height: 2.25rem;
           text-align: center;
       }
 
@@ -200,13 +208,6 @@
           margin-bottom: 3rem;
       }
 
-      /* Make research consent section scrollable */
-      #research-consent-section {
-          max-height: 100dvh;
-          overflow-y: auto;
-          padding: 0;
-      }
-
       @media (max-width: 768px) {
           #research-consent-section {
               max-height: 100dvh;
@@ -217,16 +218,16 @@
           padding: 8px;
       }
 
-      #research-consent-section::-webkit-scrollbar {
+      .section-container::-webkit-scrollbar {
           width: 8px;
       }
 
-      #research-consent-section::-webkit-scrollbar-track {
+      .section-container::-webkit-scrollbar-track {
           background: transparent;
           margin-top: 120px;
       }
 
-      #research-consent-section::-webkit-scrollbar-thumb {
+      .section-container::-webkit-scrollbar-thumb {
           background-color: #1E7166;
           border-radius: 4px;
       }
@@ -380,7 +381,7 @@
   <div class="container">
     <div class="content">
       <div class="logo-container">
-        <img src="/logo.svg" alt="Compass Logo" width="200" height="100" />
+        <img src="/logo.svg" alt="Compass Logo" width="200" height="70" />
       </div>
       <section id="chat-page-container">
         <div style="width: 100vw; height: 100vh;" id="chat-page-container-iframe">
@@ -495,6 +496,7 @@
               </div>
             </div>
           </div>
+        </div>
       </section>
 
       <section id="initial-question" class="section-container text-body" style="display: none;">
