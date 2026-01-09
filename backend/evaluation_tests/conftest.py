@@ -65,7 +65,7 @@ async def setup_search_services() -> SearchServices:
 def setup_multi_locale_app_config():
     """
     Ensure ApplicationConfig is set with multi-locale language config for evaluation tests.
-    Reuses existing ApplicationConfig if present, replacing language_config with EN_US and EN_GB entries.
+    Reuses existing ApplicationConfig if present, replacing language_config with EN_US, EN_GB, and ES_AR entries.
     """
     try:
         current = get_application_config()
@@ -77,6 +77,7 @@ def setup_multi_locale_app_config():
         available_locales=[
             LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY"),
             LocaleDateFormatEntry(locale=Locale.EN_GB, date_format="DD/MM/YYYY"),
+            LocaleDateFormatEntry(locale=Locale.ES_AR, date_format="DD/MM/YYYY"),
         ],
     )
 

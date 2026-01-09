@@ -33,7 +33,8 @@ async def test_main_app_chat(
         max_iterations: int,
         current_test_case: E2ETestCase | E2ESpecificTestCase,
         common_folder_path: str,
-        setup_search_services: Awaitable[SearchServices]
+        setup_search_services: Awaitable[SearchServices],
+        setup_multi_locale_app_config
 ):
     """
     E2E conversation test, based on the test cases specified above. It calls the same endpoint as the frontend

@@ -52,6 +52,15 @@ poetry install --sync
 > deactivate
 > ```
 
+#### Running the app locally
+
+To run the application locally after installing dependencies to the local virtual environment, run the command:
+
+```shell
+poetry run python app/server.py
+```
+
+
 ## Running the code locally
 
 The backend is a FastAPI app that serves the Compass API.
