@@ -1,3 +1,5 @@
+from typing import Optional
+
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentInput, AgentOutput
@@ -9,6 +11,7 @@ from app.conversation_memory.conversation_memory_types import ConversationContex
 from app.countries import Country
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from app.vector_search.vector_search_dependencies import SearchServices
+from evaluation_tests.baseline_metrics_collector import BaselineMetricsCollector
 
 
 class E2EChatExecutor:
@@ -16,7 +19,8 @@ class E2EChatExecutor:
                  session_id: int,
                  default_country_of_user: Country,
                  search_services: SearchServices,
-                 experience_pipeline_config: ExperiencePipelineConfig
+                 experience_pipeline_config: ExperiencePipelineConfig,
+                 metrics_collector: Optional[BaselineMetricsCollector] = None
                  ):
         self._state = ApplicationState.new_state(session_id=session_id, country_of_user=default_country_of_user)
         self._conversation_memory_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
@@ -31,6 +35,9 @@ class E2EChatExecutor:
         self._agent_director.get_explore_experiences_agent().get_collect_experiences_agent().set_state(
             self._state.collect_experience_state)
         self._agent_director.get_explore_experiences_agent().get_exploring_skills_agent().set_state(self._state.skills_explorer_agent_state)
+        
+        # Metrics collector (optional, for baseline testing)
+        self._metrics_collector = metrics_collector
 
     def get_experiences_discovered(self) -> list[ExperienceEntity]:
         """
@@ -70,7 +77,13 @@ class E2EChatExecutor:
         await self._agent_director.execute(agent_input)
         # get the context again after the history has been updated
         conversation_context = await self._conversation_memory_manager.get_conversation_context()
-        return self._get_message_for_user(from_index=current_index, context=conversation_context)
+        agent_output = self._get_message_for_user(from_index=current_index, context=conversation_context)
+        
+        # Record metrics if collector is available
+        if self._metrics_collector:
+            self._record_turn_metrics(agent_output)
+        
+        return agent_output
 
     @staticmethod
     def _get_message_for_user(*, from_index: int, context: ConversationContext) -> AgentOutput:
@@ -97,4 +110,61 @@ class E2EChatExecutor:
         """
         Checks if the conversation is complete
         """
-        return self._state.agent_director_state.current_phase == ConversationPhase.ENDED
+        is_complete = self._state.agent_director_state.current_phase == ConversationPhase.ENDED
+        
+        # Finalize metrics if conversation is complete
+        if is_complete and self._metrics_collector:
+            self._finalize_metrics()
+        
+        return is_complete
+    
+    def _record_turn_metrics(self, agent_output: AgentOutput):
+        """Record metrics for a conversation turn."""
+        phase = self._state.agent_director_state.current_phase.name
+        agent_type = agent_output.agent_type.name if hasattr(agent_output.agent_type, 'name') else str(agent_output.agent_type)
+        
+        # Record turn
+        self._metrics_collector.record_turn(phase, agent_type)
+        
+        # Record LLM calls
+        for llm_stat in agent_output.llm_stats:
+            self._metrics_collector.record_llm_call(
+                agent_type=agent_type,
+                phase=phase,
+                duration_sec=llm_stat.response_time_in_sec,
+                prompt_tokens=llm_stat.prompt_token_count,
+                response_tokens=llm_stat.response_token_count
+            )
+        
+        # Extract and record agent questions from the message
+        message = agent_output.message_for_user
+        if message and '?' in message:
+            # Simple extraction: split by common sentence endings and filter questions
+            sentences = message.replace('?\n', '?|').replace('. ', '.|').split('|')
+            for sentence in sentences:
+                sentence = sentence.strip()
+                if sentence.endswith('?'):
+                    self._metrics_collector.record_agent_question(sentence)
+    
+    def _finalize_metrics(self):
+        """Finalize metrics collection at end of conversation."""
+        # Record experience metrics
+        experiences_discovered = self.get_experiences_discovered()
+        experiences_explored = self.get_experiences_explored()
+        
+        skills_data = []
+        for exp in experiences_explored:
+            if hasattr(exp, 'top_skills') and exp.top_skills:
+                skills_data.append(len(exp.top_skills))
+        
+        self._metrics_collector.record_experiences(
+            experiences_discovered=len(experiences_discovered),
+            experiences_explored=len(experiences_explored),
+            skills_data=skills_data
+        )
+        
+        # Calculate repetition rate
+        self._metrics_collector.calculate_repetition_rate()
+        
+        # Finalize
+        self._metrics_collector.finalize()

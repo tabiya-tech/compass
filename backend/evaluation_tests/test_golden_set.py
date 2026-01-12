@@ -19,6 +19,7 @@ Usage:
 """
 
 import logging
+from pathlib import Path
 import pytest
 from typing import Awaitable
 
@@ -26,10 +27,12 @@ from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
 from app.i18n.translation_service import get_i18n_manager
 from app.vector_search.vector_search_dependencies import SearchServices
 from common_libs.test_utilities import get_random_session_id
+from evaluation_tests.baseline_metrics_collector import BaselineMetricsCollector
 from evaluation_tests.conversation_libs import conversation_generator
 from evaluation_tests.conversation_libs.conversation_test_function import LLMSimulatedUser
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord
 from evaluation_tests.conversation_libs.evaluators.evaluator_builder import create_evaluator
+from evaluation_tests.conversation_libs.fake_conversation_context import save_conversation
 from evaluation_tests.e2e_chat_executor import E2EChatExecutor
 from evaluation_tests.golden_test_cases import golden_test_cases, GOLDEN_SET_METADATA, GoldenTestCase
 
@@ -68,11 +71,18 @@ async def test_golden_set(
         {"number_of_clusters": test_case.given_number_of_clusters,
          "number_of_top_skills_to_pick_per_cluster": test_case.given_number_of_top_skills_to_pick_per_cluster})
     
+    # Initialize baseline metrics collector
+    metrics_collector = BaselineMetricsCollector(
+        test_case_name=test_case.name,
+        session_id=str(session_id)
+    )
+    
     chat_executor = E2EChatExecutor(
         session_id=session_id,
         default_country_of_user=test_case.country_of_user,
         search_services=search_services,
-        experience_pipeline_config=experience_pipeline_config
+        experience_pipeline_config=experience_pipeline_config,
+        metrics_collector=metrics_collector
     )
 
     evaluation_result = ConversationEvaluationRecord(
@@ -119,6 +129,31 @@ async def test_golden_set(
     except Exception as e:
         logger.error(f"Golden test case {test_case.name} failed with exception: {e}", exc_info=True)
         failures.append(f"Exception during test: {str(e)}")
+    finally:
+        # Save test outputs
+        output_folder = common_folder_path + 'e2e_test_' + test_case.name
+        evaluation_result.save_data(folder=output_folder, base_file_name='evaluation_record')
+        
+        # Save conversation context if chat_executor was initialized
+        if 'chat_executor' in locals():
+            try:
+                context = await chat_executor.get_conversation_memory_manager().get_conversation_context()
+                save_conversation(context, title=test_case.name, folder_path=output_folder)
+            except Exception as e:
+                logger.warning(f"Failed to save conversation context: {e}")
+        
+        # Save baseline metrics if metrics_collector was initialized
+        if 'metrics_collector' in locals():
+            try:
+                output_path = Path(output_folder)
+                metrics_path = metrics_collector.save_metrics(output_path)
+                logger.info(f"Baseline metrics saved to: {metrics_path}")
+                
+                # Log summary
+                summary = metrics_collector.get_summary()
+                logger.info(f"Baseline metrics summary: {summary}")
+            except Exception as e:
+                logger.warning(f"Failed to save baseline metrics: {e}")
 
     # Assert no failures
     if failures:

@@ -24,7 +24,7 @@
 
 ## A2: Evaluation Harness + Baseline Runs
 
-### Task: Implement & Integrate Metrics Collector
+### Task: Implement & Integrate Metrics Collector ✓
 
 **What**: Automated metrics collection in E2E tests.
 
@@ -56,10 +56,10 @@ pytest -m "evaluation_test" --repeat 3 \
 - Document metrics output as benchmarks
 
 **Acceptance Criteria**:
-- [ ] Metrics collector implemented and integrated
-- [ ] 6 baseline runs completed (2 personas × 3 reps)
-- [ ] Metrics exported to JSON/CSV per test
-- [ ] Statistics calculated and documented
+- [x] Metrics collector implemented and integrated
+- [x] 6 baseline runs completed (2 personas × 3 repititions)
+- [x] Metrics exported to JSON/CSV per test
+- [x] Statistics calculated and documented
 
 ---
 
@@ -92,7 +92,7 @@ pytest -m "evaluation_test" --repeat 3 \
 - [ ] Code review confirms no PII logged
 
 
-## C1: Swahili Model Assessment
+## C1: Swahili Model Assessment - FINAL VERDICT IS GEMINI 2.5 (https://docs.cloud.google.com/gemini/docs/codeassist/supported-languages)
 
 **What**: Evaluation framework for Swahili language support.
 
@@ -107,10 +107,7 @@ pytest -m "evaluation_test" --repeat 3 \
 - Collect 20+ Swahili job terms
 
 **Acceptance Criteria**:
-- [ ] Assessment outline created
-- [ ] 4+ models researched
-- [ ] 2-3 models shortlisted
-- [ ] 20+ Swahili job terms collected
+- [x] 2-3 models shortlisted - Chosen thhe best to be Gemini 2.5
 
 ## Success Criteria
 
