@@ -11,6 +11,17 @@ Invitation codes manage user access to the application and are categorized into 
    Enable **permanent user registration**, they are required for any user to create an account.
    - _Users with registration codes can log in, log out, and log back in while retaining their chat history._
 
+### Secure registration links
+
+- Tokenized links carry a `registration_code` plus a validation token backed by `SEC_TOKEN`; the UI auto-fills and locks the code and surfaces the backend validation result (missing/invalid tokens are blocked).
+- The last secure link opened in the session wins (persisted through the registration page) until the user switches to the manual path.
+- Duplicate `registration_code` submissions are rejected; successful signups store the code on the user profile and a secure-link claim entry.
+
+### Manual/shared invitations
+
+- When no tokenized link is present, users can enter a shared `invitation_code`; this path remains unlimited-use and editable.
+- Reporting and analytics prefer `registration_code` when available and fall back to `user_id` for legacy or manual-invitation users.
+
 ## Setting Up Invitation Codes
 
 To set up an invitation code, use the `import_invitations.py` python script found in [backend/scripts/setup_invitation_codes](backend/scripts/setup_invitation_codes). 

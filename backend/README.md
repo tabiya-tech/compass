@@ -174,6 +174,7 @@ The backend uses the following environment variables:
 - `TARGET_ENVIRONMENT`: (optional) The target environment where the backend is running. When set to `dev` or `local`, CORS will be set to allow all origins.
 - `BACKEND_FEATURES`: (optional) A JSON like dictionary with the features enabled status and configurations specific to each feature.
 - `BACKEND_EXPERIENCE_PIPELINE_CONFIG`: (optional) The configuration for the experience pipeline as a JSON like dictionary. See `class ExperiencePipelineConfig`.
+- `SEC_TOKEN`: Token used to validate secure registration links and report lookups.
   > Note: The `FRONTEND_URL` should be set irrespective of the `TARGET_ENVIRONMENT` value.
 
 
@@ -207,6 +208,7 @@ BACKEND_SENTRY_DSN=<BACKEND_SENTRY_DSN>
 BACKEND_SENTRY_CONFIG='{"tracesSampleRate": 0.2, "enableLogs": true, "logLevel": "info", "eventLevel": "error"}'
 BACKEND_FEATURES=<BACKEND_FEATURES>
 BACKEND_EXPERIENCE_PIPELINE_CONFIG=<BACKEND_EXPERIENCE_PIPELINE_CONFIG>
+SEC_TOKEN=<STRING>
 
 # CV storage and limits (optional; required to persist uploads)
 BACKEND_CV_STORAGE_BUCKET=<GCS_BUCKET_NAME>
@@ -217,6 +219,13 @@ BACKEND_CV_RATE_LIMIT_PER_MINUTE=<INTEGER>
 > ATTENTION: The .env file should be kept secure and not shared with others as it contains sensitive information.
 > It should not be committed to the repository.
 >
+
+### Registration and invitation flows
+
+- Secure registration links deliver a `registration_code` plus a token validated with `SEC_TOKEN`; the backend rejects missing/invalid tokens, enforces one-time claims per code, and records a secure-link claim alongside the user profile.
+- Manual/shared invitation codes stay unlimited-use and editable when no tokenized link is present.
+- The most recent secure link in a session wins (persisted through the registration page) and the UI locks the prefilled code while surfacing validation results.
+- Reporting and analytics prefer `registration_code` and fall back to `user_id` for users who registered via manual/shared invitations.
 
 ### Logging
 
