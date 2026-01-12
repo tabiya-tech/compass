@@ -47,48 +47,67 @@ _GLOSSARY = {
         """),
     Country.KENYA:
         dedent("""\
-        Askari - A security guard.
-        Boda Boda - A motorcycle taxi.
-        Nduthi - A motorcycle taxi.
-        Tuk tuk - A 3-wheeler taxi.
-        Choma - Roasted.
-        Nyama - Meat.
-        Nyama choma - Roasted meat.
-        mpishi - Cook
-        Fundi - Technician / Skilled Worker / artisan.
-        Fundi wa Gari / Mech - A mechanic.
-        Makanika - Mechanic.
+        Muuguzi - Nurse.
+        Daktari - Doctor.
+        Mhasibu - Accountant / Bookkeeper.
+        Karani - Clerk / Office worker.
+        Mwalimu - Teacher.
+        Mhandisi - Engineer.
+        Rubani - Pilot / Driver (can also mean captain).
+        Kiongozi - Leader / Manager.
+        Mzoefu - Trainer / Coach.
+        Muabiria - Passenger attendant / Tour guide.
         Hustler - Hard working person who does odd jobs to make ends meet (small and micro businesses).
         Casual - Works for a day/task and is paid on completion of the task or at the end of the day.
         Mama mboga - Vegetable seller.
-        Kiosk - A small shop that sells household essentials in small quantities e.g. soap, bread etc.
-        Housegirl - A housekeeper/ nanny.
-        Auntie - Domestic Worker / Housekeeper/ nanny.
-        Jua Kali - Informal sector of traders and businesses (it is the general term used for Kenya’s informal sector ranging from furniture making, pots, pans, autoparts, handicrafts etc.
-        Fundi - An artisan, a person who works with their hands.
-        Kinyozi / Barber.
-        Saloonist / Stylist / Braider - hairdresser.
-        Msanii - Artist (musician, actor etc).
-        Mziki - Music.
+        Mchuuzi / Hawker - A street vendor, informal trader.
+        Mchapa kazi - Laborer / General worker.
+        Msukule kazi - Handyman / Odd jobs person.
+        Muuzaji - Salesperson / Street vendor.
+        Mwenye Duka - Small shop owner.
+        Mjenzi - Builder / Mason (informal construction).
+        Mshonaji - Tailor / Seamstress.
+        Boda Boda - A motorcycle taxi.
+        Nduthi - A motorcycle taxi.
+        Tuk tuk - A 3-wheeler taxi.
         Makanga - A conductor of a matatu.
         Matatu - The main public transport it is private sector owned.
         Mathree / Ma3 - Matatu.
         Dereva - Driver.
-        Mchuuzi / Hawker - A street vendor, informal trader.
+        Askari - A security guard.
+        Watchie - Watchman / Security guard.
+        Housegirl - A housekeeper/ nanny.
+        Auntie - Domestic Worker / Housekeeper/ nanny.
+        Fundi - Technician / Skilled Worker / artisan.
+        Fundi wa Gari / Mech - A mechanic.
+        Makanika - Mechanic.
+        Seremala - Carpenter.
+        Kinyozi / Barber.
+        Saloonist / Stylist / Braider - hairdresser.
+        Mpishi - Cook.
+        Msanii - Artist (musician, actor etc).
+        Mziki - Music.
+        Mwanamuziki - Musician.
+        Mchezaji - Player / Athlete / Performer.
+        Mkulima - Farmer.
+        Shamba Boy / Shamba Girl - A farm worker.
+        Mpesa agent - Assist customers with the use of m-pesa services, receive deposits and give cash.
+        Kiosk - A small shop that sells household essentials in small quantities e.g. soap, bread etc.
+        Cyber - An internet café where people go to access computers with internet, printing services and technical assistance in accessing digital government services for a fee.
         Mjengo - A construction site often used to refer to a place where manual labour is needed/performed.
         Mtu wa mkono - Used in construction sites, it is the assistants who are usually employed to help the skilled workers (masons, painters etc).
-        Mkulima - Farmer.
-        Mwalimu - Teacher.
-        Mpesa - A mobile money transfer service.
-        Mpesa agent - Assist customers with the use of m-pesa services, receive deposits and give cash.
-        Shamba Boy / Shamba Girl - A farm worker.
+        Mchukuaji mizigo - Porter / Loader.
+        Jua Kali - Informal sector of traders and businesses (it is the general term used for Kenya's informal sector ranging from furniture making, pots, pans, autoparts, handicrafts etc.
+        Choma - Roasted.
+        Nyama - Meat.
+        Nyama choma - Roasted meat.
         Ugali / Sembe - A staple food in Kenya made from maize flour.
-        Cyber - An internet café where people go to access computers with internet, printing services and technical assistance in accessing digital government services for a fee.
+        Mpesa - A mobile money transfer service.
         Kanairo - Nairobi.
         Ocha - Village.
         Mtaa - Neighbourhood, refers to a specific area in the city.
-        Mtumba - Second hand clothes.
         Wathii - Market.
+        Mtumba - Second hand clothes.
         """),
     Country.ARGENTINA:
         dedent("""\

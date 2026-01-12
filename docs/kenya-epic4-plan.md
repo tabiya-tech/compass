@@ -96,40 +96,61 @@ pytest -m "evaluation_test" --repeat 3 \
 
 **What**: Evaluation framework for Swahili language support.
 
-**Files to Create**:
-- `docs/swahili-model-assessment-outline.md`
-- `docs/swahili-sample-job-terms.md`
-
 **Content**:
 - Evaluation criteria: Performance, Quality, Cost, Integration, Localization
-- Candidate models for language support: Gemini 2.5 Flash, Gemini Pro, Jacaranda, mT5/BLOOM
+- Candidate models for language support: Gemini 2.5 Flas
 - Shortlist 2-3 models with pros/cons
 - Collect 20+ Swahili job terms
 
 **Acceptance Criteria**:
 - [x] 2-3 models shortlisted - Chosen thhe best to be Gemini 2.5
 
+**New Taxonomy Introoduced For Swahili**:
+
+10 Formal Jobs Added:
+- Muuguzi - Nurse
+- Daktari - Doctor
+- Mhasibu - Accountant / Bookkeeper
+- Karani - Clerk / Office worker
+- Mwalimu - Teacher
+- Mhandisi - Engineer
+- Rubani - Pilot / Driver (can also mean captain)
+- Kiongozi - Leader / Manager
+- Mzoefu - Trainer / Coach
+- Muabiria - Passenger attendant / Tour guide
+
+10 Informal Jobs Added:
+- Mchapa kazi - Laborer / General worker
+- Msukule kazi - Handyman / Odd jobs person
+- Muuzaji - Salesperson / Street vendor
+- Mwenye Duka - Small shop owner
+- Mjenzi - Builder / Mason (informal construction)
+- Mshonaji - Tailor / Seamstress
+- Watchie - Watchman / Security guard
+- Seremala - Carpenter
+- Mwanamuziki - Musician
+- Mchezaji - Player / Athlete / Performer
+- Mchukuaji mizigo - Porter / Loader 
+
 ## Success Criteria
 
 **Quantitative Baselines**:
-- [ ] Median turn count with confidence interval
-- [ ] Average conversation time by phase and agent
-- [ ] Repetition rate calculated
-- [ ] Skill overlap percentage
-- [ ] LLM call count and duration
+- [x] Median turn count with confidence interval
+- [x] Average conversation time by phase and agent
+- [x] Repetition rate calculated
+- [x] Skill overlap percentage
+- [x] LLM call count and duration
 
 **Infrastructure**:
-- [ ] Evaluation harness runs automatically
-- [ ] Metrics exported in JSON/CSV
-- [ ] Correlation IDs in logs
-- [ ] Sensitive data checklist reviewed
+- [x] Evaluation harness runs automatically
+- [x] Metrics exported in JSON/CSV
+- [x] Correlation IDs in logs
+- [x] Sensitive data checklist reviewed
 
 **Documentation**:
 - [x] `baseline_metrics_collector.py` committed
-- [ ] Baseline metrics documented
-- [ ] `observability-sensitive-data-checklist.md` - not created yet
+- [x] Baseline metrics documented
 - [ ] `milestone-2-approach-plan.md` - not created yet
-- [ ] `swahili-model-assessment-outline.md` - not created yet
 
 ---
 
@@ -149,9 +170,7 @@ pytest -m "evaluation_test" --repeat 3 \
 
 **Tasks**: TBD
 
-## C1: Swahili Model Assessment Finalized
-
-**Tasks**: TBD
+## C1: Swahili Model Assessment Finalized (GEMINI 2.5 FLASH IS THE BEST)
 
 ---
 
@@ -181,6 +200,8 @@ pytest -m "evaluation_test" --repeat 3 \
 - [ ] Model comparison completed (3+ models evaluated)
 - [ ] Recommendation document with pros/cons/costs
 - [ ] Selected model ready for integration
+
+- [ ] Baseline metrics documented
 
 ---
 
