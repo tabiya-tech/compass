@@ -1,5 +1,5 @@
 {
-  "welcomeAgentFirstEncounter": "Welcome! I’m Brújula, here to help you highlight your skills.\nHere’s how this process works:\n\n• First, I’ll ask for a short summary of your role and tasks (including volunteering or unpaid work).\n• Then, we’ll review each experience to capture the key details.\n\nIt usually takes about 10–15 minutes per work experience. You can create an account and return anytime.\n\nIf you have questions, just ask.\n\nReady to begin?",
+  "welcomeAgentFirstEncounter": "Welcome to the Brújula chatbot!\n\nIn this conversation, I will help you identify your professional skills.\n\nFirst, I will ask you briefly about your work experiences (including unpaid jobs, volunteering, entrepreneurship, or family help).\n\nThen, when we have a complete list of your previous experiences, we will review each one in more detail and talk about your activities.\n\nEvery person is different, but the conversation usually lasts between 20 and 30 minutes. If you created an account when you registered, you can pause and come back whenever you want.\n\nReady to start?",
   "collectExperiences": {
     "didNotUnderstand": "Sorry, I didn't understand that. Can you please rephrase?",
     "moveToOtherExperiences": "Let's move on to other work experiences.",
