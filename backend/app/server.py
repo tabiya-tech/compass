@@ -20,6 +20,7 @@ from app.vector_search.skill_search_routes import add_skill_search_routes
 from app.vector_search.validate_taxonomy_model import validate_taxonomy_model
 from app.version.version_routes import add_version_routes
 from app.i18n.language_config import get_language_config
+from app.middleware.correlation_id_middleware import CorrelationIdMiddleware
 
 from contextlib import asynccontextmanager
 
@@ -306,6 +307,9 @@ app.state.shutdown_complete = asyncio.Event()
 
 # --- Add BrotliRequestMiddleware before other middlewares ---
 app.add_middleware(BrotliRequestMiddleware)
+
+# --- Add CorrelationIdMiddleware for request tracing ---
+app.add_middleware(CorrelationIdMiddleware)
 
 ############################################
 # Setup the CORS policy

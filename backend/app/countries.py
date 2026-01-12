@@ -53,16 +53,17 @@ _GLOSSARY = {
         Karani - Clerk / Office worker.
         Mwalimu - Teacher.
         Mhandisi - Engineer.
-        Rubani - Pilot / Driver (can also mean captain).
+        Rubani - Pilot.
+        Nahodha - Captain.
         Kiongozi - Leader / Manager.
-        Mzoefu - Trainer / Coach.
-        Muabiria - Passenger attendant / Tour guide.
+        Mkufunzi - Trainer / Coach.
+        Mhudumu - Attendant / Tour guide.
         Hustler - Hard working person who does odd jobs to make ends meet (small and micro businesses).
         Casual - Works for a day/task and is paid on completion of the task or at the end of the day.
         Mama mboga - Vegetable seller.
         Mchuuzi / Hawker - A street vendor, informal trader.
-        Mchapa kazi - Laborer / General worker.
-        Msukule kazi - Handyman / Odd jobs person.
+        Kibarua - Laborer / General worker.
+        Fundi mchundo - Handyman / Odd jobs person.
         Muuzaji - Salesperson / Street vendor.
         Mwenye Duka - Small shop owner.
         Mjenzi - Builder / Mason (informal construction).
@@ -75,7 +76,7 @@ _GLOSSARY = {
         Mathree / Ma3 - Matatu.
         Dereva - Driver.
         Askari - A security guard.
-        Watchie - Watchman / Security guard.
+        Mlinzi - Watchman / Security guard.
         Housegirl - A housekeeper/ nanny.
         Auntie - Domestic Worker / Housekeeper/ nanny.
         Fundi - Technician / Skilled Worker / artisan.

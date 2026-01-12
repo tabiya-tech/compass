@@ -1,7 +1,15 @@
 import json
 import logging
 
-from app.context_vars import session_id_ctx_var, user_id_ctx_var
+from app.context_vars import (
+    session_id_ctx_var,
+    user_id_ctx_var,
+    correlation_id_ctx_var,
+    turn_index_ctx_var,
+    agent_type_ctx_var,
+    phase_ctx_var,
+    llm_call_duration_ms_ctx_var
+)
 
 
 class SessionIdLogFilter(logging.Filter):
@@ -15,6 +23,13 @@ class SessionIdLogFilter(logging.Filter):
         # This will allow us to correlate log messages
         record.session_id = session_id_ctx_var.get()
         record.user_id = user_id_ctx_var.get()
+        
+        # Add new observability fields for Epic 4 tracking
+        record.correlation_id = correlation_id_ctx_var.get()
+        record.turn_index = turn_index_ctx_var.get()
+        record.agent_type = agent_type_ctx_var.get()
+        record.phase = phase_ctx_var.get()
+        record.llm_call_duration_ms = llm_call_duration_ms_ctx_var.get()
 
         return True
 
@@ -51,5 +66,11 @@ class JsonLogFormatter(logging.Formatter):
             "user_id": user_id,
             "logger_name": record.name,
             "session_id": str(session_id),
-            "timestamp": record.asctime
+            "timestamp": record.asctime,
+            # New observability fields for Epic 4
+            "correlation_id": getattr(record, 'correlation_id', ':none:'),
+            "turn_index": getattr(record, 'turn_index', -1),
+            "agent_type": getattr(record, 'agent_type', ':none:'),
+            "phase": getattr(record, 'phase', ':none:'),
+            "llm_call_duration_ms": getattr(record, 'llm_call_duration_ms', -1)
         })
