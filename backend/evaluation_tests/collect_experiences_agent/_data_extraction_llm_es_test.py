@@ -1,7 +1,6 @@
 import logging
 from copy import deepcopy
-from textwrap import dedent
-from typing import Optional, Awaitable
+from typing import Optional
 
 import pytest
 from pydantic import ConfigDict
@@ -117,7 +116,6 @@ test_cases_data_extraction = [
     _TestCaseDataExtraction(
         name="update_experience_es", # TODO: Failing frequently 2/3
         locale=Locale.ES_ES,
-        skip_force="force",
         summary="",
         turns=[
             ("(silence)",

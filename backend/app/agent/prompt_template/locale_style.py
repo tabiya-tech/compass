@@ -20,6 +20,13 @@ def _get_locale_section():
 
 
 def get_language_style(*, with_locale: bool = True) -> str:
+    """
+    Get the language style instructions.
+
+    :arg with_locale: Whether to include the locale section. Note that if this is set to True, we expect the locale to be set.
+                      Otherwise, an error will be raised.
+
+    """
     prompt = ""
     if with_locale:
         prompt += _get_locale_section()

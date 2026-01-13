@@ -6,6 +6,8 @@ import pytest
 from app.agent.experience.work_type import WorkType
 from app.agent.linking_and_ranking_pipeline import ExperiencePipeline, ExperiencePipelineConfig
 from app.countries import Country
+from app.i18n.translation_service import get_i18n_manager
+from app.i18n.types import Locale
 from app.vector_search.vector_search_dependencies import SearchServices
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
@@ -248,8 +250,10 @@ test_cases = [
         expected_top_skills=['guarantee customer satisfaction']
     ),
     ExperiencePipelineTestCase(
+        skip_force="force",
         name="argentina_asistente_ventas",
         given_experience_title="Asistente de ventas",
+        locale=Locale.ES_AR,
         given_company_name="Local de mi viejo",
         given_responsibilities=["Limpiar el lugar", "Manejar la guita", "Tratar con proveedores", "Contabilidad básica", "Venta de productos", "Empaquetar pedidos"],
         given_country_of_interest=Country.ARGENTINA,
@@ -257,7 +261,9 @@ test_cases = [
         expected_top_skills=[]
     ),
     ExperiencePipelineTestCase(
+        skip_force="force",
         name="argentina_casa_madre",
+        locale=Locale.ES_AR,
         given_experience_title="Trabajo en casa",
         given_company_name="Casa de mi madre",
         given_responsibilities=["Limpiar", "Comprar suministros", "Preparar la comida", "Barrer la casa", "Lavar la loza"],
@@ -279,6 +285,7 @@ async def test_experience_pipeline(test_case: ExperiencePipelineTestCase, setup_
         config=given_config,
         search_services=search_services
     )
+    get_i18n_manager().set_locale(test_case.locale)
 
     # Set the capl-og at the level in question - 1 to ensure that the root logger is set to the correct level.
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate

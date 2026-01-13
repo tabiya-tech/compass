@@ -9,6 +9,7 @@ from app.agent.collect_experiences_agent.data_extraction_llm import IntentAnalyz
 from app.agent.experience import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
 from app.i18n.translation_service import get_i18n_manager
+from app.i18n.types import Locale
 from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
@@ -225,6 +226,8 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
     ),
     IntentAnalyzerToolTestCase(
         name="argentina_multiple_experiences",
+        skip_force="force",
+        locale=Locale.ES_AR,
         turns=[
             (SILENCE_MESSAGE, "Contame sobre tus experiencias laborales o proyectos.")
         ],
