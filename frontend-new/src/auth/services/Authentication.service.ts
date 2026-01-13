@@ -141,9 +141,9 @@ abstract class AuthenticationService {
     // in order to do this, there needs to be a logged-in user in the persistent storage
     const prefs = await UserPreferencesService.getInstance().createUserPreferences({
       user_id: user.id,
-      registration_code: registrationCode,
-      report_token: reportToken,
       invitation_code: registrationCode,
+      registration_code: reportToken ? registrationCode : undefined,
+      report_token: reportToken,
       language: Language.en,
     });
     UserPreferencesStateService.getInstance().setUserPreferences(prefs);
