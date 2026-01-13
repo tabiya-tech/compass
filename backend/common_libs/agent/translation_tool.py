@@ -1,5 +1,6 @@
 import logging
 from textwrap import dedent
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -56,13 +57,27 @@ class TranslationTool:
                                 translation=translation)
 
     async def translate(self, text: str) -> str:
+        if not text:
+            self._logger.warning("Empty text to translate")
+            return ""
+
         llm_input = self._get_translate_prompt(user_input=text)
         translated_text, _llm_stats = await self._llm_caller.call_llm(llm_input=llm_input,
                                                                       llm=self._llm,
                                                                       logger=self._logger)
         return translated_text.text
 
-    async def compare(self, text: str, translation: str):
+    async def compare(self, text: str, translation: str) -> Literal["SIMILAR", "DIFFERENT"] | str:
+        if not text:
+            self._logger.warning("Empty text to translate")
+
+        if not translation:
+            self._logger.warning("Empty translation to compare")
+
+        if text == translation:
+            return "SIMILAR"
+
         llm_input = self._get_compare_prompt(user_input=text, translation=translation)
+        comparison: _Output | None
         comparison, _llm_stats = await self._llm_caller.call_llm(llm_input=llm_input, llm=self._llm, logger=self._logger)
         return comparison.text

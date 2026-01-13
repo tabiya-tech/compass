@@ -8,9 +8,9 @@ import pytest
 from app.agent.welcome_agent import WelcomeAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
+from app.countries import Country
 from app.i18n.translation_service import get_i18n_manager
 from app.i18n.types import Locale
-from app.countries import Country
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from common_libs.test_utilities import get_random_session_id
 from common_libs.test_utilities.guard_caplog import guard_caplog
@@ -126,15 +126,12 @@ test_cases = [
     ScriptedUserEvaluationTestCase(
         name='argentina_conversation_scripted',
         locale=Locale.ES_AR,
+        skip_force="force",
         country_of_user=Country.ARGENTINA,
         simulated_user_prompt=dedent("""
             Actúa como una persona joven de Argentina. Estás chateando con un bot para armar tu CV.
             Usa jerga argentina (laburo, guita, viejo/vieja, dale, buenísimo).
             Sé conciso.
-
-            Tus experiencias son:
-            1. Asistente de ventas en el local de tu viejo (Enero 2015 - Diciembre 2022).
-            2. Trabajando en la casa de mi madre (Marzo 2022 - Enero 2025). Es Voluntario.
 
             No tienes otras experiencias. 
             Responde "si" o "no" cuando corresponda. Di "asi esta bien" si te piden confirmar.

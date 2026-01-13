@@ -130,6 +130,7 @@ test_cases = [
         country_of_user=Country.UNSPECIFIED,
         conversation_rounds=50,
         name='single_experience_e2e',
+        skip_force="force",
         locale=Locale.ES_AR,
         simulated_user_prompt=dedent("""
             You're a Gen Y living alone. you have this single experience as an employee:
@@ -192,7 +193,7 @@ test_cases = [
         },
         matchers=["matcher"],
         expected_experience_data=[{
-            "location": AnyOf(ContainsString("Kigali")),
+            "location": ContainsString("Kigali"),
             "company": ContainsString("Kigali Shoes"),
             "timeline": {"start": ContainsString("2023"), "end": AnyOf(ContainsString("present"), "")},
         }]
@@ -429,6 +430,7 @@ test_cases = [
         country_of_user=Country.ARGENTINA,
         conversation_rounds=60,
         name='argentina_conversation_e2e',
+        skip_force="force",
         locale=Locale.ES_AR,
         simulated_user_prompt=dedent("""
             Actúa como una persona joven de Argentina. Estás chateando con un bot para armar tu CV.

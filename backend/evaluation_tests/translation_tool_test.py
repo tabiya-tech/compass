@@ -27,6 +27,12 @@ test_cases: list[_TestCase] = [
         expected_translations=["brújula"]
     ),
     _TestCase(
+        name="empty_text",
+        locale=Locale.ES_AR,
+        given_user_text="",
+        expected_translations=["", ""]
+    ),
+    _TestCase(
         name="food",
         locale=Locale.ES_AR,
         given_user_text="food",

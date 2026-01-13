@@ -98,12 +98,12 @@ async def _get_predictions(*, search_service: SimilaritySearchService, queries: 
     translation_tool = TranslationTool(_TARGET_LOCALE)
     for query in queries:
         translated_text = query
-        # Since the tests are in english, do not translate them
-        if _TARGET_LOCALE not in [Locale.EN_GB, Locale.ES_ES]:
+        # Since the tests are in English, do not translate them
+        if _TARGET_LOCALE not in [Locale.EN_GB, Locale.EN_US]:
             translated_text = await translation_tool.translate(query)
         result = await search_service.search(query=translated_text, k=k)
         predictions.append([_get_evaluated_field(e, evaluated_type) for e in result])
-        progress.update(1)
+        progress.update()
     progress.close()
     return predictions
 
@@ -132,7 +132,7 @@ def _get_vector_search_config(evaluated_type: Type) -> VectorSearchConfig:
 
 
 def store_data_as_json(*,
-                       data: any,
+                       data: Any,
                        output_file: str
                        ):
     output_folder = os.path.join(os.getcwd(), 'test_output/')

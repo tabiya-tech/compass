@@ -1,11 +1,12 @@
 from textwrap import dedent
 
-from app.agent.prompt_template.locale_style import get_language_style
-from app.agent.simple_llm_agent.simple_llm_agent import SimpleLLMAgent
 from app.agent.agent_types import AgentType, AgentInput, AgentOutput
+from app.agent.prompt_template.locale_style import get_language_style
 from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions, \
     get_conversation_finish_instructions
+from app.agent.simple_llm_agent.simple_llm_agent import SimpleLLMAgent
 from app.conversation_memory.conversation_memory_types import ConversationContext
+
 
 class FarewellAgent(SimpleLLMAgent):
     """
@@ -45,7 +46,7 @@ class FarewellAgent(SimpleLLMAgent):
             """)
 
         system_instructions = system_instructions_template.format(response_part=response_part,
-                                                                  language_style=get_language_style(with_locale=True),
+                                                                  language_style=get_language_style(),
                                                                   finish_instructions=finish_instructions)
         super().__init__(agent_type=AgentType.FAREWELL_AGENT,
                          system_instructions=system_instructions)

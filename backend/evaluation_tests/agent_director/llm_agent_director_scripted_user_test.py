@@ -16,6 +16,7 @@ from app.agent.welcome_agent import WelcomeAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
     ConversationMemoryManagerState
 from app.i18n.translation_service import get_i18n_manager
+from app.i18n.types import Locale
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from app.vector_search.vector_search_dependencies import SearchServices
 from common_libs.test_utilities import get_random_session_id
@@ -95,7 +96,8 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
                                           setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
                                               [LogCaptureFixture, ScriptedUserEvaluationTestCase],
                                               Coroutine[None, None, None]
-                                          ]]]):
+                                          ]]],
+                                          setup_multi_locale_app_config):
     """
     Conversation test, based on a scripted user.
     Asserts that the agent director routes the conversation and does not complete it.
@@ -115,6 +117,9 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
         evaluations=[]
     )
 
+    # Run the test in english
+    get_i18n_manager().set_locale(Locale.EN_GB)
+
     conversation_manager, agent_director_exec = await setup_agent_director
     await agent_director_exec(caplog, given_test_case)
 
@@ -131,7 +136,8 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
                                             setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
                                                 [LogCaptureFixture, ScriptedUserEvaluationTestCase],
                                                 Coroutine[None, None, None]
-                                            ]]]):
+                                            ]]],
+                                            setup_multi_locale_app_config):
     """
     Conversation test, based on a scripted user.
     Asserts that the agent director is able to complete the conversation.
@@ -158,6 +164,9 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
         ],
         evaluations=[]
     )
+
+    # AND the locale is set to EN_GB
+    get_i18n_manager().set_locale(Locale.EN_GB)
 
     conversation_manager, agent_director_exec = await setup_agent_director
     # Set the number of conversation rounds to the length of the scripted user
@@ -191,7 +200,8 @@ async def test_argentina_counseling_flow(caplog: LogCaptureFixture,
                                          setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
                                              [LogCaptureFixture, ScriptedUserEvaluationTestCase],
                                              Coroutine[None, None, None]
-                                         ]]]):
+                                         ]]],
+                                         setup_multi_locale_app_config):
     """
     Conversation test, based on a scripted user with Argentinian slang.
     Asserts that the agent director routes correctly between Welcome and Collect Experiences agents.
@@ -217,6 +227,9 @@ async def test_argentina_counseling_flow(caplog: LogCaptureFixture,
         ],
         evaluations=[]
     )
+
+    # AND the locale is set to ES_AR
+    get_i18n_manager().set_locale(Locale.ES_AR)
 
     conversation_manager, agent_director_exec = await setup_agent_director
     await agent_director_exec(caplog, given_test_case)

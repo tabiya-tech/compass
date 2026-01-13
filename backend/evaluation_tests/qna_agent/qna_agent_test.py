@@ -142,6 +142,7 @@ async def _execute_agent(context: FakeConversationContext, agent, agent_input):
 
 
 @pytest.mark.asyncio
+@pytest.mark.repeat(3)
 @pytest.mark.evaluation_test
 async def test_qna_agent_responds_to_multiple_questions_in_a_row(fake_conversation_context: FakeConversationContext,
                                                                  common_folder_path: str):
