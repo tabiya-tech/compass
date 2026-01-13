@@ -66,6 +66,7 @@ describe("AuthPersistentStorage class tests", () => {
     test("return correct previously set invitation", () => {
       // GIVEN The invitation is stored in the session storage
       const givenInvitation: Invitation = {
+        code: "foo",
         invitation_code: "foo",
         invitation_type: InvitationType.REGISTER,
         status: InvitationStatus.VALID,
@@ -94,6 +95,7 @@ describe("AuthPersistentStorage class tests", () => {
     test("clear invitation", () => {
       // GIVEN The invitation is stored in the session storage
       const givenInvitation: Invitation = {
+        code: "foo",
         invitation_code: "foo",
         invitation_type: InvitationType.REGISTER,
         status: InvitationStatus.VALID,
@@ -112,6 +114,7 @@ describe("AuthPersistentStorage class tests", () => {
     test("set invitation", () => {
       // GIVEN The invitation is not stored in the session storage
       const givenInvitation: Invitation = {
+        code: "foo",
         invitation_code: "foo",
         invitation_type: InvitationType.REGISTER,
         status: InvitationStatus.VALID,

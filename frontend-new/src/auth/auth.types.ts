@@ -23,4 +23,4 @@ export enum AuthenticationServices {
   FIREBASE_SOCIAL = "FIREBASE_SOCIAL",
 }
 
-export const INVITATIONS_PARAM_NAME = "invite-code";
+export const INVITATIONS_PARAM_NAME = "invitation_code";

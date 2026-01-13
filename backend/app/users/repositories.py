@@ -54,6 +54,15 @@ class IUserPreferenceRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    async def get_user_preference_by_registration_code(self, registration_code: str) -> UserPreferences | None:
+        """
+        Find a user preference by registration code, if present
+        :param registration_code: str - The registration code to search for
+        :return: UserPreferences | None
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
     async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: PossibleExperimentValues) -> None:
         """
         Set an experiment configuration for a given experiment ID in the user preferences
@@ -131,6 +140,18 @@ class UserPreferenceRepository(IUserPreferenceRepository):
         except Exception as e:
             logger.exception(e)
             raise UserPreferenceRepositoryError("Failed to get user experiments") from e
+
+    async def get_user_preference_by_registration_code(self, registration_code: str) -> UserPreferences | None:
+        try:
+            _doc = await self.collection.find_one({"registration_code": {"$eq": registration_code}})
+
+            if not _doc:
+                return None
+
+            return UserPreferences.from_document(_doc)
+        except Exception as e:
+            logger.exception(e)
+            raise UserPreferenceRepositoryError("Failed to get user preferences by registration code") from e
 
     async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: PossibleExperimentValues) -> None:
         try:

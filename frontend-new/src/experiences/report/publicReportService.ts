@@ -23,8 +23,8 @@ export class PublicReportService {
         return PublicReportService.instance;
     }
 
-    public async getPublicReport(userId: string, token?: string | null): Promise<PublicReportData> {
-        let url = `${this.baseUrl}/${userId}`;
+    public async getPublicReport(identifier: string, token?: string | null): Promise<PublicReportData> {
+        let url = `${this.baseUrl}/${identifier}`;
         if (token) {
             url += `?token=${encodeURIComponent(token)}`;
         }
@@ -37,7 +37,7 @@ export class PublicReportService {
             expectedStatusCode: 200,
             serviceName: "PublicReportService",
             serviceFunction: "getPublicReport",
-            failureMessage: `Failed to fetch public report for user ${userId}`,
+            failureMessage: `Failed to fetch public report for identifier ${identifier}`,
             expectedContentType: "application/json",
         });
 

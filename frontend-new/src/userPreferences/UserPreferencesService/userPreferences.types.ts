@@ -26,7 +26,9 @@ export type UserPreference = {
 
 export type CreateUserPreferencesSpec = {
   user_id: string;
-  invitation_code: string;
+  invitation_code?: string;
+  registration_code?: string;
+  report_token?: string;
   language: Language;
 };
 

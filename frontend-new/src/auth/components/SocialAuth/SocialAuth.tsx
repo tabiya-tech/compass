@@ -18,6 +18,7 @@ import { invitationsService } from "src/auth/services/invitationsService/invitat
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { getRegistrationDisabled } from "src/envService";
+import { GTMService } from "src/utils/analytics/gtmService";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
@@ -30,6 +31,7 @@ export const DATA_TEST_ID = {
 
 export interface SocialAuthProps {
   registrationCode?: string;
+  reportToken?: string;
   disabled?: boolean;
   label?: string;
   postLoginHandler: () => void;
@@ -39,6 +41,7 @@ export interface SocialAuthProps {
 
 const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
                                                            registrationCode,
+                                                           reportToken,
                                                            disabled = false,
                                                            label,
                                                            postLoginHandler,
@@ -51,6 +54,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
   const { enqueueSnackbar } = useSnackbar();
 
   const [_registrationCode, setRegistrationCode] = useState(registrationCode);
+  const [_reportToken, setReportToken] = useState(reportToken);
 
   const [showRegistrationCodeForm, setShowRegistrationCodeForm] = useState<RegistrationCodeFormModalState>(
     RegistrationCodeFormModalState.HIDE,
@@ -58,7 +62,8 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
 
   useEffect(() => {
     setRegistrationCode(registrationCode);
-  }, [registrationCode]);
+    setReportToken(reportToken);
+  }, [registrationCode, reportToken]);
 
   const handleError = useCallback(
     async (error: Error) => {
@@ -85,18 +90,18 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
   );
 
   const registerUser = useCallback(
-    async (registrationCode: string) => {
+    async (registrationCode: string, reportToken?: string) => {
       try {
         // first check if the invitation code is valid
         const _user = authStateService.getInstance().getUser();
         if (!_user) {
           throw new Error("Something went wrong: No user found");
         }
-        const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
-        if (invitation.status === InvitationStatus.INVALID) {
-          throw Error("The registration code is invalid");
+        const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode, reportToken);
+        if (invitation.status !== InvitationStatus.VALID) {
+          throw Error("The registration code is invalid or already used");
         }
-        if (invitation.invitation_type !== InvitationType.REGISTER) {
+        if (!invitation.source && invitation.invitation_type !== InvitationType.REGISTER) {
           throw Error("The invitation code is not for registration");
         }
 
@@ -104,10 +109,13 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
         // in order to do this, there needs to be a logged-in user in the persistent storage
         const prefs = await UserPreferencesService.getInstance().createUserPreferences({
           user_id: _user.id,
-          invitation_code: invitation.invitation_code,
+          invitation_code: invitation.invitation_code ?? registrationCode,
+          registration_code: registrationCode,
+          report_token: reportToken,
           language: Language.en,
         });
         UserPreferencesStateService.getInstance().setUserPreferences(prefs);
+        GTMService.trackRegistrationComplete("google", registrationCode);
       } catch (error: any) {
         await handleError(error);
       }
@@ -138,7 +146,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           setShowRegistrationCodeForm(RegistrationCodeFormModalState.SHOW);
           return;
         }
-        await registerUser(_registrationCode);
+        await registerUser(_registrationCode, _reportToken);
       } else {
         UserPreferencesStateService.getInstance().setUserPreferences(prefs);
       }
@@ -148,7 +156,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
     } finally {
       notifyOnLoading(false);
     }
-  }, [notifyOnLoading, postLoginHandler, _registrationCode, registerUser, enqueueSnackbar, handleError, t]);
+  }, [notifyOnLoading, postLoginHandler, _registrationCode, _reportToken, registerUser, enqueueSnackbar, handleError, t]);
 
   const handleRegistrationCodeSuccess = useCallback(
     async (registrationCode: string) => {

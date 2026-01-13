@@ -1,5 +1,6 @@
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import { GTMChatMessageEvent, GTMConversationCompletedEvent } from "src/types/gtm";
+import { pushToDataLayer } from "src/services/analytics/dataLayer";
+import { GTMChatMessageEvent, GTMConversationCompletedEvent, GTMRegistrationCompleteEvent, GTMRegistrationVisitEvent } from "src/types/gtm";
 
 /**
  * Service for tracking events in Google Tag Manager
@@ -21,10 +22,6 @@ export class GTMService {
     // Increment the persistent message counter
     const messageCount = PersistentStorageService.incrementMessageCount();
 
-    // Initialize dataLayer if it doesn't exist
-    window.dataLayer = window.dataLayer || [];
-
-    // Push the event to GTM
     const event: GTMChatMessageEvent = {
       event: 'chat_message_sent',
       message_count: messageCount,
@@ -32,8 +29,7 @@ export class GTMService {
       experiences_explored: experiencesExplored,
       session_id: sessionId,
     };
-
-    window.dataLayer.push(event);
+    pushToDataLayer(event, { session_id: sessionId });
 
   }
 
@@ -49,18 +45,39 @@ export class GTMService {
   ): void {
     const messageCount = PersistentStorageService.getMessageCount();
 
-    // Initialize dataLayer if it doesn't exist
-    window.dataLayer = window.dataLayer || [];
-
-    // Push the event to GTM
     const event: GTMConversationCompletedEvent = {
       event: 'conversation_completed',
       message_count: messageCount,
       experiences_explored: experiencesExplored,
       session_id: sessionId,
     };
+    pushToDataLayer(event, { session_id: sessionId });
 
-    window.dataLayer.push(event);
+  }
 
+  static trackRegistrationVisit(registrationCode: string | null, source: GTMRegistrationVisitEvent["source"]): void {
+    const event: GTMRegistrationVisitEvent = {
+      event: "first_visit",
+      registration_code: registrationCode,
+      source,
+      timestamp: Date.now(),
+    };
+    pushToDataLayer(event, {
+      registration_code_present: Boolean(registrationCode),
+      source,
+    });
+  }
+
+  static trackRegistrationComplete(authMethod: GTMRegistrationCompleteEvent["auth_method"], registrationCode: string | null): void {
+    const event: GTMRegistrationCompleteEvent = {
+      event: "registration_complete",
+      registration_code: registrationCode,
+      auth_method: authMethod,
+      timestamp: Date.now(),
+    };
+    pushToDataLayer(event, {
+      registration_code_present: Boolean(registrationCode),
+      auth_method: authMethod,
+    });
   }
 }

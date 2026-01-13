@@ -53,3 +53,44 @@ class JsonLogFormatter(logging.Formatter):
             "session_id": str(session_id),
             "timestamp": record.asctime
         })
+
+
+_logger = logging.getLogger(__name__)
+
+
+def _sanitize_context(context: dict | None) -> dict | None:
+    if not context:
+        return None
+
+    sanitized = {}
+    for key, value in context.items():
+        sanitized[key] = f"[redacted:{type(value).__name__}]"
+    return sanitized
+
+
+def _format_context(context: dict | None) -> str | None:
+    sanitized_context = _sanitize_context(context)
+    if sanitized_context is None:
+        return None
+
+    try:
+        return json.dumps(sanitized_context, ensure_ascii=True)
+    except Exception as exc:  # pylint: disable=broad-except
+        _logger.debug("Failed to JSON encode sanitized context", exc_info=exc)
+        return str(sanitized_context)
+
+
+def log_non_pii_warning(message: str, context: dict | None = None) -> None:
+    formatted_context = _format_context(context)
+    if formatted_context:
+        _logger.warning("%s | context=%s", message, formatted_context)
+    else:
+        _logger.warning(message)
+
+
+def log_non_pii_error(message: str, context: dict | None = None) -> None:
+    formatted_context = _format_context(context)
+    if formatted_context:
+        _logger.error("%s | context=%s", message, formatted_context)
+    else:
+        _logger.error(message)

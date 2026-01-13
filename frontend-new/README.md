@@ -88,6 +88,14 @@ The server will run on port 3000, and you can preview the application in your br
 The application currently uses Firebase for authentication. To read further about the authentication process, please refer to the [Authentication Hierarchy Documentation](authenticationHierarchyDoc.md).
 
 Currently, only invited users can access the application as part of the Authentication and Authorization process. Invitation codes play a key role in this setup. For more details, please refer to this [documentation](/invitations.md).
+
+### Registration code flows
+
+- **Secure links (reg_code + report_token)**: Tokenized links supply `reg_code` and `report_token`. The UI auto-fills and locks the registration code, surfaces validation states from `/user-invitations/check-status`, and blocks submission if the token is missing or invalid.
+- **Last-link-wins persistence**: The latest secure link in the session is stored (e.g., `registrationCode` in local storage) and reused on `/register`, keeping the field locked until a manual path is chosen.
+- **Manual/shared invitations**: When no secure link is present, users manually enter the shared `invitation_code`; this path remains unlimited-use and does not require the report token.
+- **Uniqueness feedback**: Duplicate `registration_code` attempts are blocked at submit time with the backend validation response.
+- **Identifier preference**: Reporting and analytics should prefer `registration_code` (sent on `first_visit` and `registration_complete`) and fall back to `user_id` for legacy or manual-invitation users.
 ## Storybook
 
 We use Storybook to test and demonstrate components in the browser. To run Storybook, execute the following command:

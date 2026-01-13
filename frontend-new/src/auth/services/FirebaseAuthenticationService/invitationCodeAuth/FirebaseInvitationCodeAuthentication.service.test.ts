@@ -98,6 +98,7 @@ describe("AuthService class tests", () => {
 
       // AND the registration code is valid
       const givenInvitation: Invitation = {
+        code: givenInvitationCode,
         status: InvitationStatus.VALID,
         invitation_type: InvitationType.LOGIN,
         invitation_code: givenInvitationCode,

@@ -14,15 +14,30 @@ from pydantic_settings import BaseSettings
 from app.invitations import UserInvitation, InvitationType, UserInvitationRepository
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 
+from dotenv import load_dotenv
+from pathlib import Path
+
+# Load .env from backend directory
+backend_dir = Path(__file__).parent.parent.parent
+load_dotenv(backend_dir / ".env")
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
 
 class ScriptSettings(BaseSettings):
-    mongodb_uri: str
-    db_name: str
+    mongodb_uri: str = ""
+    db_name: str = "compass-application-dev-brujula"
 
     class Config:
         env_prefix = "INVITATION_CODES_"
+        
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Fallback to APPLICATION_MONGODB_URI if INVITATION_CODES_MONGODB_URI not set
+        if not self.mongodb_uri:
+            self.mongodb_uri = os.getenv("APPLICATION_MONGODB_URI", "")
 
 
 async def import_invitations(repository: UserInvitationRepository, invitations_dicts: list[dict]):

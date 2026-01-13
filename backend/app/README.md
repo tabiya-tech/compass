@@ -30,6 +30,12 @@ We are using LLMAgentDirector in the main chat application.
 > [!NOTE]
 > From here below, the documentation is specific for the LLMAgentDirector.
 
+## Registration and invitation flows
+
+- **Secure links (registration_code + report_token)**: Secure registration links carry `reg_code` and `report_token`. The backend requires a valid token, checks for existing claims or users with the same `registration_code`, and blocks duplicates. On successful signup, the `registration_code` is written to the user preferences and a claim entry is stored in the existing `USER_INVITATIONS` collection (document type `SECURE_LINK_CLAIM`); no capacity decrement applies.
+- **Manual/shared invitations (invitation_code)**: When no secure link is present, users enter the shared `invitation_code`. This path stays unlimited-use and continues to rely on the legacy invitation documents without token requirements.
+- **Status checks**: `/user-invitations/check-status` reports VALID, USED, or INVALID for both secure links (via `reg_code` + token) and manual `invitation_code` lookups.
+- **Report lookup identifiers**: Reporting endpoints should prefer `registration_code` when available and fall back to `user_id` for legacy or manual-invitation users.
 
 Conversation phases currently implemented: `INTRO`, `CONSULTING`, `CHECKOUT`.
 

@@ -25,6 +25,8 @@ import { DATA_TEST_ID as REQUEST_INVITATION_CODE_DATA_TEST_ID } from "src/auth/c
 import * as ReactRouterDomModule from "react-router-dom";
 import * as EnvServiceModule from "src/envService";
 import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
+import { registrationStore } from "src/state/registrationStore";
+import { REGISTRATION_CODE_STORAGE_KEY, REGISTRATION_CODE_TOAST_ID } from "src/config/registrationCode";
 
 //mock the SocialAuth component
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
@@ -158,12 +160,26 @@ jest.mock("src/auth/components/requestInvitationCode/RequestInvitationCode", () 
   };
 });
 
+let checkStatusSpy: jest.SpyInstance;
+
 describe("Testing Register component", () => {
   beforeEach(() => {
     // Clear console mocks and mock functions
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
     jest.clearAllMocks();
+    registrationStore.clear();
+    window.localStorage.clear();
+    jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue("");
+    jest.spyOn(EnvServiceModule, "getSocialAuthDisabled").mockReturnValue("false");
+    checkStatusSpy = jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue({
+      code: "",
+      invitation_type: InvitationType.REGISTER,
+      status: InvitationStatus.VALID,
+      source: null,
+      invitation_code: "",
+      sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+    });
   });
 
   test("it should show register form successfully", async () => {
@@ -215,19 +231,19 @@ describe("Testing Register component", () => {
       target: { value: givenInvitationCode },
     });
 
+    await waitFor(() => {
+      expect(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT)).toHaveValue(givenInvitationCode);
+    });
+
     await act(async () => {
       // Simulate form submission
       const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
       await calls[calls.length - 1][0].notifyOnRegister(givenEmail, givenPassword);
     });
 
-    await waitFor(() => {
-      expect(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT)).toHaveValue(givenInvitationCode);
-    });
-
     // THEN the register function should have been called
     await waitFor(() => {
-      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenInvitationCode);
+      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenInvitationCode, undefined);
     });
 
     // AND the component should match the snapshot
@@ -243,7 +259,7 @@ describe("Testing Register component", () => {
     const givenInvitationCode = "test-invite-123";
     const mockLocation = {
       pathname: "/register",
-      search: `?invite-code=${givenInvitationCode}`,
+      search: `?${INVITATIONS_PARAM_NAME}=${givenInvitationCode}`,
     };
     // @ts-ignore
     jest.spyOn(ReactRouterDomModule, "useLocation").mockReturnValue(mockLocation);
@@ -273,6 +289,7 @@ describe("Testing Register component", () => {
     // AND the user has a valid invitation code
     // AND check invitation code status returns a valid code
     jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue({
+      code: givenInvitationCode,
       invitation_type: InvitationType.REGISTER,
       status: InvitationStatus.VALID,
       invitation_code: givenInvitationCode,
@@ -316,6 +333,10 @@ describe("Testing Register component", () => {
       target: { value: givenInvitationCode },
     });
 
+    await waitFor(() => {
+      expect(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT)).toHaveValue(givenInvitationCode);
+    });
+
     // AND the register form is submitted
     await act(async () => {
       const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
@@ -324,7 +345,7 @@ describe("Testing Register component", () => {
 
     // THEN expect the register function to have been called with the correct arguments
     await waitFor(() => {
-      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenInvitationCode);
+      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenInvitationCode, undefined);
     });
 
     // AND no errors or warning to have occurred
@@ -357,6 +378,10 @@ describe("Testing Register component", () => {
       target: { value: givenInvitationCode },
     });
 
+    await waitFor(() => {
+      expect(screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT)).toHaveValue(givenInvitationCode);
+    });
+
     // AND the register form is submitted
     await act(async () => {
       const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
@@ -365,7 +390,7 @@ describe("Testing Register component", () => {
 
     // THEN expect the register function to have been called with the correct arguments
     await waitFor(() => {
-      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenInvitationCode);
+      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenInvitationCode, undefined);
     });
 
     // AND the error message should be displayed
@@ -434,6 +459,9 @@ describe("Testing Register component", () => {
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_CONTAINER)).toMatchSnapshot();
 
     // AND WHEN the register form is submitted
+    await waitFor(() => {
+      expect((RegisterWithEmailForm as jest.Mock).mock.calls.length).toBeGreaterThan(0);
+    });
     await act(async () => {
       const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
       await calls[calls.length - 1][0].notifyOnRegister(givenEmail, givenPassword);
@@ -445,7 +473,8 @@ describe("Testing Register component", () => {
         givenEmail,
         givenPassword,
         givenEmail,
-        givenApplicationRegistrationCode
+        givenApplicationRegistrationCode,
+        undefined
       );
     });
   });
@@ -477,15 +506,29 @@ describe("Testing Register component", () => {
     // WHEN the component is rendered
     render(<Register />);
 
+    await waitFor(() => {
+      expect((RegisterWithEmailForm as jest.Mock).mock.calls.length).toBeGreaterThan(0);
+    });
+
     // AND WHEN the register form is submitted
     await act(async () => {
       const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
       await calls[calls.length - 1][0].notifyOnRegister(givenEmail, givenPassword);
     });
 
-    // THEN expect the register function to have been called with the correct arguments.
+    // THEN the code is validated and the registration proceeds
     await waitFor(() => {
-      expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenURLParamRegistrationCode);
+      expect(checkStatusSpy).toHaveBeenCalledWith(givenURLParamRegistrationCode, undefined);
+    });
+
+    await waitFor(() => {
+      expect(registerMock).toHaveBeenCalledWith(
+        givenEmail,
+        givenPassword,
+        givenEmail,
+        givenURLParamRegistrationCode,
+        undefined
+      );
     });
   });
 
@@ -502,5 +545,137 @@ describe("Testing Register component", () => {
     // AND expect no console warnings or errors
     expect(console.warn).not.toHaveBeenCalled();
     expect(console.error).not.toHaveBeenCalled();
+  });
+
+  test("secure-link code auto-fills, locks, and validates", async () => {
+    const givenRegistrationCode = "secure-123";
+    const givenReportToken = "rt-123";
+
+    const mockLocation = {
+      pathname: "/register",
+      search: `?reg_code=${givenRegistrationCode}&report_token=${givenReportToken}`,
+    };
+    // @ts-ignore
+    jest.spyOn(ReactRouterDomModule, "useLocation").mockReturnValue(mockLocation);
+
+    checkStatusSpy.mockResolvedValue({
+      code: givenRegistrationCode,
+      invitation_type: InvitationType.REGISTER,
+      status: InvitationStatus.VALID,
+      source: null,
+      invitation_code: givenRegistrationCode,
+      sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+    });
+
+    render(<Register />);
+
+    await waitFor(() => {
+      expect(checkStatusSpy).toHaveBeenCalledWith(givenRegistrationCode, givenReportToken);
+    });
+
+    const input = screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT) as HTMLInputElement;
+    expect(input).toBeDisabled();
+    expect(input).toHaveValue(givenRegistrationCode);
+
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.stringContaining("Registration code"), {
+      variant: "success",
+      key: REGISTRATION_CODE_TOAST_ID,
+    });
+  });
+
+  test("missing secure-link token blocks registration", async () => {
+    const givenRegistrationCode = "secure-missing-token";
+    const mockLocation = {
+      pathname: "/register",
+      search: `?reg_code=${givenRegistrationCode}`,
+    };
+    // @ts-ignore
+    jest.spyOn(ReactRouterDomModule, "useLocation").mockReturnValue(mockLocation);
+
+    checkStatusSpy.mockResolvedValue({
+      code: givenRegistrationCode,
+      invitation_type: InvitationType.REGISTER,
+      status: InvitationStatus.INVALID,
+      source: null,
+      invitation_code: givenRegistrationCode,
+      sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+    });
+
+    render(<Register />);
+
+    await waitFor(() => {
+      expect(checkStatusSpy).toHaveBeenCalledWith(givenRegistrationCode, undefined);
+    });
+
+    const calls = (RegisterWithEmailForm as jest.Mock).mock.calls;
+    const latestProps = calls[calls.length - 1][0];
+    expect(latestProps.disabled).toBe(true);
+    expect(console.error).toHaveBeenCalled();
+  });
+
+  test("restores stored code and locks field on load", async () => {
+    const stored = { code: "stored-code", reportToken: "rt-stored" };
+    window.localStorage.setItem(REGISTRATION_CODE_STORAGE_KEY, JSON.stringify(stored));
+
+    const mockLocation = {
+      pathname: "/register",
+      search: "",
+    };
+    // @ts-ignore
+    jest.spyOn(ReactRouterDomModule, "useLocation").mockReturnValue(mockLocation);
+
+    render(<Register />);
+
+    await waitFor(() => {
+      const input = screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT) as HTMLInputElement;
+      expect(input).toHaveValue(stored.code);
+      expect(input).toBeDisabled();
+    });
+  });
+
+  test("last link wins over stored code and persists", async () => {
+    window.localStorage.setItem(REGISTRATION_CODE_STORAGE_KEY, JSON.stringify({ code: "old", reportToken: "rt-old" }));
+
+    const mockLocation = {
+      pathname: "/register",
+      search: `?reg_code=new-code&report_token=rt-new`,
+    };
+    // @ts-ignore
+    jest.spyOn(ReactRouterDomModule, "useLocation").mockReturnValue(mockLocation);
+
+    render(<Register />);
+
+    await waitFor(() => {
+      const input = screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT) as HTMLInputElement;
+      expect(input).toHaveValue("new-code");
+      expect(input).toBeDisabled();
+    });
+
+    const persisted = JSON.parse(window.localStorage.getItem(REGISTRATION_CODE_STORAGE_KEY) as string);
+    expect(persisted.code).toBe("new-code");
+    expect(persisted.reportToken).toBe("rt-new");
+  });
+
+  test("falls back gracefully when storage is unavailable", async () => {
+    const getItemSpy = jest.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new Error("storage blocked");
+    });
+
+    const mockLocation = {
+      pathname: "/register",
+      search: "",
+    };
+    // @ts-ignore
+    jest.spyOn(ReactRouterDomModule, "useLocation").mockReturnValue(mockLocation);
+
+    render(<Register />);
+
+    await waitFor(() => {
+      const input = screen.getByTestId(DATA_TEST_ID.REGISTRATION_CODE_INPUT) as HTMLInputElement;
+      expect(input).toHaveValue("");
+      expect(input).not.toBeDisabled();
+    });
+
+    getItemSpy.mockRestore();
   });
 });

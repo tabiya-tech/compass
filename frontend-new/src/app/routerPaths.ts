@@ -8,5 +8,5 @@ export const routerPaths = {
   VERIFY_EMAIL: "/verify-email",
   CONSENT: "/consent",
   SENSITIVE_DATA: "/sensitive-data",
-  REPORT: "/report/:userid",
+  REPORT: "/report/:id",
 };

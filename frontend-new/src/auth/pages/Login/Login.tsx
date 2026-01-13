@@ -408,7 +408,7 @@ const Login: React.FC = () => {
    */
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
+    const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME) ?? params.get("invite-code");
     if (inviteCodeParam) {
       handleLoginWithInvitationCode(inviteCodeParam).then(() =>
         console.info("Invitation code login successful: " + inviteCodeParam)
@@ -416,6 +416,7 @@ const Login: React.FC = () => {
       // Remove the invite code from the URL
       const newSearchParams = new URLSearchParams(location.search);
       newSearchParams.delete(INVITATIONS_PARAM_NAME);
+      newSearchParams.delete("invite-code");
       navigate(
         {
           pathname: location.pathname,

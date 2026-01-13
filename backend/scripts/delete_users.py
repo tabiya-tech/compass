@@ -1,6 +1,9 @@
+import os
 import asyncio
 import json
 from dataclasses import dataclass
+from dotenv import load_dotenv
+load_dotenv()
 
 from motor.motor_asyncio import AsyncIOMotorCollection
 import firebase_admin
@@ -113,7 +116,8 @@ def is_anonymous_user(user: auth.UserRecord) -> bool:
 async def main(arguments: Arguments):
     try:
         # Initialize Firebase Admin SDK
-        cred = credentials.Certificate('keys/brujula-dev-425015-f110322c421b.json')
+        path_to_google_credentials = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+        cred = credentials.Certificate(path_to_google_credentials)
         firebase_admin.initialize_app(cred)
         # Get a database reference to our users
         application_db = await CompassDBProvider.get_application_db()

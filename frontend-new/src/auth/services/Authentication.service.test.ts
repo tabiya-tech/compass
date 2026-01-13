@@ -253,6 +253,8 @@ describe("AuthenticationService", () => {
       expect((UserPreferencesService.getInstance().createUserPreferences)).toHaveBeenCalledWith({
         user_id: givenUser.id,
         invitation_code: givenRegistrationCode,
+        registration_code: undefined,
+        report_token: undefined,
         language: Language.en,
       });
 
@@ -276,6 +278,30 @@ describe("AuthenticationService", () => {
 
       // THEN it should throw an error
       await expect(registrationPromise).rejects.toThrow("User not found in the token");
+    });
+
+    test("should send registration_code only when report token is present", async () => {
+      const givenRegistrationCode = "test-registration-code";
+      const givenReportToken = "report-token";
+      const givenToken = "test-token";
+      const givenUser = getTestUser();
+      jest.spyOn(service, "getUser").mockReturnValue(givenUser);
+
+      const givenReturnedPrefs: UserPreference = {
+        user_id: givenUser.id,
+        sessions: [],
+      } as unknown as UserPreference;
+      jest.spyOn(UserPreferencesService.getInstance(), "createUserPreferences").mockResolvedValueOnce(givenReturnedPrefs);
+
+      await service.onSuccessfulRegistration(givenToken, givenRegistrationCode, givenReportToken);
+
+      expect(UserPreferencesService.getInstance().createUserPreferences).toHaveBeenCalledWith({
+        user_id: givenUser.id,
+        invitation_code: givenRegistrationCode,
+        registration_code: givenRegistrationCode,
+        report_token: givenReportToken,
+        language: Language.en,
+      });
     });
   });
 
