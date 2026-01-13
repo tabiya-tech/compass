@@ -23,7 +23,34 @@ def app():
 
 @pytest.fixture(autouse=True)
 def clear_security_token(monkeypatch):
-    monkeypatch.delenv("SEC_TOKEN_CV", raising=False)
+    monkeypatch.delenv("SEC_TOKEN", raising=False)
+
+@pytest.mark.asyncio
+async def test_report_lookup_accepts_case_insensitive_token(app, monkeypatch):
+    monkeypatch.setenv("SEC_TOKEN", "SeCrEt")
+
+    mock_pref_repo = MagicMock(spec=IUserPreferenceRepository)
+    mock_pref = UserPreferences(
+        user_id="user-from-reg",
+        sessions=[987],
+        sensitive_personal_data_requirement=SensitivePersonalDataRequirement.NOT_AVAILABLE,
+    )
+    mock_pref_repo.get_user_preference_by_registration_code = AsyncMock(return_value=mock_pref)
+    mock_pref_repo.get_user_preference_by_user_id = AsyncMock(return_value=None)
+
+    mock_exp_service = MagicMock(spec=IExperienceService)
+    mock_exp_service.get_experiences_by_session_id = AsyncMock(return_value=[])
+
+    app.dependency_overrides[get_user_preferences_repository] = lambda: mock_pref_repo
+    app.dependency_overrides[get_experience_service] = lambda: mock_exp_service
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        response = await ac.get("/reports/reg-123?token=secret")
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json()["user_id"] == "user-from-reg"
+    mock_pref_repo.get_user_preference_by_registration_code.assert_awaited_once_with("reg-123")
+    mock_pref_repo.get_user_preference_by_user_id.assert_not_awaited()
 
 
 @pytest.mark.asyncio

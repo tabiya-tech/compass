@@ -259,7 +259,7 @@ describe("Testing Register component", () => {
     const givenInvitationCode = "test-invite-123";
     const mockLocation = {
       pathname: "/register",
-      search: `?invite-code=${givenInvitationCode}`,
+      search: `?${INVITATIONS_PARAM_NAME}=${givenInvitationCode}`,
     };
     // @ts-ignore
     jest.spyOn(ReactRouterDomModule, "useLocation").mockReturnValue(mockLocation);

@@ -52,7 +52,7 @@ async def test_secure_link_claim_and_duplicate_rejection(monkeypatch, in_memory_
     user_repo = UserPreferenceRepository(db)
     metrics = _NoopMetricsService()
 
-    monkeypatch.setenv("SEC_TOKEN_CV", "token-abc")
+    monkeypatch.setenv("SEC_TOKEN", "token-abc")
 
     create_request = CreateUserPreferencesRequest(
         user_id="user-1",
@@ -145,7 +145,7 @@ async def test_secure_link_requires_report_token(monkeypatch, in_memory_applicat
     user_repo = UserPreferenceRepository(db)
     metrics = _NoopMetricsService()
 
-    monkeypatch.setenv("SEC_TOKEN_CV", "token-abc")
+    monkeypatch.setenv("SEC_TOKEN", "token-abc")
 
     request = CreateUserPreferencesRequest(
         user_id="user-3",

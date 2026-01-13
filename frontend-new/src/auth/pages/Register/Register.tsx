@@ -69,7 +69,7 @@ const Register: React.FC = () => {
     const params = new URLSearchParams(location.search);
     const linkCodeParam = params.get(REGISTRATION_CODE_QUERY_PARAM);
     const linkReportToken = params.get(REPORT_TOKEN_QUERY_PARAM) ?? params.get("token") ?? undefined;
-    const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
+    const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME) ?? params.get("invite-code");
 
     if (linkCodeParam || inviteCodeParam) {
       const nextState = linkCodeParam
@@ -84,6 +84,7 @@ const Register: React.FC = () => {
       newSearchParams.delete(REPORT_TOKEN_QUERY_PARAM);
       newSearchParams.delete("token");
       newSearchParams.delete(INVITATIONS_PARAM_NAME);
+      newSearchParams.delete("invite-code");
       navigate(
         {
           pathname: location.pathname,

@@ -104,7 +104,7 @@ async def _create_user_preferences(
 
         invitation = None
         if secure_link_flow:
-            sec_token = os.getenv("SEC_TOKEN_CV")
+            sec_token = os.getenv("SEC_TOKEN")
             normalized_report_token = preferences.report_token.casefold() if preferences.report_token else None
             normalized_sec_token = sec_token.casefold() if sec_token else None
             if not normalized_report_token or not normalized_sec_token:

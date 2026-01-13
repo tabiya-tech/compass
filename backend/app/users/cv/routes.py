@@ -22,6 +22,7 @@ from app.users.cv.storage import _get_cv_storage_service, ICVCloudStorageService
 from app.users.cv.types import CVUploadStatusResponse, CVUploadResponseListItem, PublicReportResponse
 from app.users.get_user_preferences_repository import get_user_preferences_repository
 from app.users.repositories import IUserPreferenceRepository
+from app.logger import log_non_pii_warning
 from app.conversations.experience.get_experience_service import get_experience_service
 from app.conversations.experience.service import IExperienceService
 from app.conversations.experience._types import ExperienceResponse
@@ -370,19 +371,34 @@ def add_public_report_routes(app: FastAPI):
     ) -> PublicReportResponse:
         try:
             # 0. Validate Security Token if configured
-            sec_token = os.getenv("SEC_TOKEN_CV")
-            if sec_token:
-                if token is None:
-                    logger.info("Security token required but not provided for identifier %s", identifier)
+            sec_token = os.getenv("SEC_TOKEN")
+            normalized_token = token.casefold() if token else None
+            normalized_sec_token = sec_token.casefold() if sec_token else None
+            if normalized_sec_token:
+                if not normalized_token:
+                    log_non_pii_warning(
+                        "Security token required but not provided for public CV report",
+                        {"identifier_present": bool(identifier)},
+                    )
                     raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Security token required")
-                if sec_token != token:
-                    logger.warning("Invalid security token provided for identifier %s", identifier)
+                if normalized_sec_token != normalized_token:
+                    log_non_pii_warning(
+                        "Invalid security token provided for public CV report",
+                        {"identifier_present": bool(identifier)},
+                    )
                     raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail="Invalid security token")
 
             # 1. Resolve identifier to user preferences (prefer registration_code)
             preferences = await user_preferences_repository.get_user_preference_by_registration_code(identifier)
             if preferences is None:
                 preferences = await user_preferences_repository.get_user_preference_by_user_id(identifier)
+                registration_code = getattr(preferences, "registration_code", None) if preferences else None
+                if registration_code and registration_code != identifier:
+                    log_non_pii_warning(
+                        "Registration code mismatch when fetching public CV report via user_id",
+                        {"identifier_present": bool(identifier), "registration_code_present": True},
+                    )
+                    raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="No report data found for this user")
 
             if not preferences or not preferences.sessions:
                 logger.warning("No preferences or sessions found for identifier=%s", identifier)
@@ -406,8 +422,8 @@ def add_public_report_routes(app: FastAPI):
             # TODO: Use the actual conversation end time when available.
             # For now, we infer it from unrelated field `accepted_tc`.
             conducted_at = None
-            if hasattr(preferences, "accepted_tc"): # Just a placeholder for some date
-                 conducted_at = preferences.accepted_tc
+            if hasattr(preferences, "accepted_tc"):  # Just a placeholder for some date
+                conducted_at = preferences.accepted_tc
 
             return PublicReportResponse(
                 user_id=preferences.user_id or identifier,

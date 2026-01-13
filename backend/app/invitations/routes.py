@@ -50,7 +50,7 @@ def add_user_invitations_routes(app: FastAPI):
         try:
             # Secure-link validation path
             if reg_code:
-                sec_token = os.getenv("SEC_TOKEN_CV")
+                sec_token = os.getenv("SEC_TOKEN")
                 normalized_report_token = report_token.casefold() if report_token else None
                 normalized_sec_token = sec_token.casefold() if sec_token else None
                 if not normalized_report_token or not normalized_sec_token:
