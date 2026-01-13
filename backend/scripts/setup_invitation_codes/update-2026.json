@@ -1,0 +1,20 @@
+[
+  {
+    "allowed_usage": 999999,
+    "remaining_usage": 999999,
+    "invitation_code": "dev-brujula-login-2026",
+    "invitation_type": "LOGIN",
+    "sensitive_personal_data_requirement": "REQUIRED",
+    "valid_from": "2026-01-13T00:00:00.000Z",
+    "valid_until": "2026-06-30T23:59:59.999Z"
+  },
+  {
+    "allowed_usage": 999999,
+    "remaining_usage": 999999,
+    "invitation_code": "dev-brujula-register-2026",
+    "invitation_type": "REGISTER",
+    "sensitive_personal_data_requirement": "REQUIRED",
+    "valid_from": "2026-01-13T00:00:00.000Z",
+    "valid_until": "2026-06-30T23:59:59.999Z"
+  }
+]

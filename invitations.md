@@ -22,17 +22,41 @@ Invitation codes manage user access to the application and are categorized into 
 - When no tokenized link is present, users can enter a shared `invitation_code`; this path remains unlimited-use and editable.
 - Reporting and analytics prefer `registration_code` when available and fall back to `user_id` for legacy or manual-invitation users.
 
-## Setting Up Invitation Codes
+## Managing Invitation Codes
 
-To set up an invitation code, use the `import_invitations.py` python script found in [backend/scripts/setup_invitation_codes](backend/scripts/setup_invitation_codes). 
+Scripts are available in [backend/scripts/setup_invitation_codes](backend/scripts/setup_invitation_codes) to manage invitation codes. Ensure you have activated the backend virtual environment and installed required packages (see [backend/README.md](backend/README.md#installation)).
 
-To run the script you need to have activated the virtual environment of the backend and installed the required packages (see [backend/README.md](backend/README.md#installation)).
+### Import or Update Invitation Codes
 
-Run the following command to get help on the script:
+Use `import_invitations.py` to create new codes or update existing ones from a JSON file:
+
 ```bash
-# make sure you have activated the backend virtual environment
-cd backend/scripts/setup_invitation_codes
-python import_invitations.py --help
+cd backend
+# Dry-run (preview changes)
+poetry run python scripts/setup_invitation_codes/import_invitations.py --input-file <json-file>
+
+# Actually import/update codes
+poetry run python scripts/setup_invitation_codes/import_invitations.py --input-file <json-file> --hot-run
+```
+
+See [sample.json](backend/scripts/setup_invitation_codes/sample.json) for the expected JSON format.
+
+### List Invitation Codes
+
+View all invitation codes with their status:
+
+```bash
+cd backend
+poetry run python scripts/setup_invitation_codes/list_invitations.py
+```
+
+### Delete Invitation Codes
+
+Remove a specific invitation code:
+
+```bash
+cd backend
+poetry run python scripts/setup_invitation_codes/list_invitations.py --delete <invitation-code>
 ```
 
 ## Frontend Invitation Codes Settings
