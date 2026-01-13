@@ -46,7 +46,7 @@ class FarewellAgent(SimpleLLMAgent):
             """)
 
         system_instructions = system_instructions_template.format(response_part=response_part,
-                                                                  language_style=get_language_style(),
+                                                                  language_style=get_language_style(with_locale=False),
                                                                   finish_instructions=finish_instructions)
         super().__init__(agent_type=AgentType.FAREWELL_AGENT,
                          system_instructions=system_instructions)
