@@ -32,7 +32,11 @@ If gcloud prompts for auth, rerun the `activate-service-account` command. If imp
 
 ### 1) Build and Upload Artifacts
 
-Environment is taken from the active gcloud auth above.
+Environment is taken from the active gcloud auth above. Make sure to have created the virtual environment needed to run the scripts. 
+
+Also before running the upload-templates.sh script, ensure that you have added all required environment variables to the .env.template
+
+From the iac directory, run:
 
 ```bash
 # Frontend
