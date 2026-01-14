@@ -1,26 +1,26 @@
 import logging
 import time
-
 from textwrap import dedent
 from typing import Mapping, Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator
 
 from app.agent.agent import Agent
+from app.agent.agent_types import AgentType, AgentOutput, LLMStats, AgentInput
 from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
-from app.agent.agent_types import AgentType, AgentOutput, LLMStats, AgentInput
 from app.agent.simple_llm_agent.prompt_response_template import get_json_examples_instructions
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.countries import Country
+from app.i18n.translation_service import t
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import get_config_variation, LLMConfig, JSON_GENERATION_CONFIG
+from common_libs.llm.schema_builder import with_response_schema
 from common_libs.retry import Retry
 
-from app.i18n.translation_service import t
 
 class WelcomeAgentState(BaseModel):
     """
@@ -135,9 +135,11 @@ class WelcomeAgent(Agent):
 
         llm_stats: list[LLMStats] = []
 
-        llm_caller: LLMCaller[WelcomeAgentLLMResponse] = LLMCaller[WelcomeAgentLLMResponse](model_response_type=WelcomeAgentLLMResponse)
+        llm_caller: LLMCaller[WelcomeAgentLLMResponse] = LLMCaller[WelcomeAgentLLMResponse](
+            model_response_type=WelcomeAgentLLMResponse)
 
-        async def _callback(attempt: int, max_retries: int) -> tuple[WelcomeAgentLLMResponseWithLLMStats, float, BaseException | None]:
+        async def _callback(attempt: int, max_retries: int) -> tuple[
+            WelcomeAgentLLMResponseWithLLMStats, float, BaseException | None]:
             # Call the LLM to get the next message for the user
             # Add some temperature and top_p variation to prompt the LLM to return different results on each retry.
             # Exponentially increase the temperature and top_p to avoid the LLM returning the same result every time.
@@ -158,7 +160,9 @@ class WelcomeAgent(Agent):
             # Aggregate the LLM stats
             llm_stats.extend(_response.llm_stats)
             return _response, _penalty, _error
-        response, _, _ = await Retry[WelcomeAgentLLMResponseWithLLMStats].call_with_penalty(callback=_callback, logger=self._logger)
+
+        response, _, _ = await Retry[WelcomeAgentLLMResponseWithLLMStats].call_with_penalty(callback=_callback,
+                                                                                            logger=self._logger)
         if not self._state.user_started_discovery:
             # Set the value only the very first time, the user indicates that they are ready to start
             # After that, the agent will be executed only to answer questions and not to start the skill discovery/exploration session
@@ -179,7 +183,8 @@ class WelcomeAgent(Agent):
                                 user_input: str,
                                 context: ConversationContext,
                                 state: WelcomeAgentState,
-                                logger: logging.Logger) -> tuple[WelcomeAgentLLMResponseWithLLMStats, float, BaseException | None]:
+                                logger: logging.Logger) -> tuple[
+        WelcomeAgentLLMResponseWithLLMStats, float, BaseException | None]:
 
         model_response: WelcomeAgentLLMResponse | None
         llm_stats_list: list[LLMStats]
@@ -187,7 +192,7 @@ class WelcomeAgent(Agent):
         llm = GeminiGenerativeLLM(
             system_instructions=WelcomeAgent.get_system_instructions(state),
             config=LLMConfig(
-                generation_config=temperature_config | JSON_GENERATION_CONFIG,
+                generation_config=temperature_config | JSON_GENERATION_CONFIG | with_response_schema(WelcomeAgentLLMResponse)
             )
         )
         # Call the LLM to get the next message for the user, this will never
@@ -304,7 +309,8 @@ class WelcomeAgent(Agent):
         system_instructions = replace_placeholders_with_indent(system_instructions_template,
                                                                language_style=get_language_style(),
                                                                agent_character=STD_AGENT_CHARACTER,
-                                                               json_response_instructions=WelcomeAgent.get_json_response_instructions(state))
+                                                               json_response_instructions=WelcomeAgent.get_json_response_instructions(
+                                                                   state))
         return system_instructions
 
     @staticmethod

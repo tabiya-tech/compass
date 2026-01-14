@@ -1,18 +1,18 @@
 import pytest
 
 from app.conversation_memory.summarizer import Summarizer
-from common_libs.llm.models_utils import LLMConfig
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from evaluation_tests.conversation_libs.fake_conversation_context import FakeConversationContext
+from common_libs.llm.models_utils import LLMConfig
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationRecord, Actor, EvaluationType, \
     SummaryEvaluationRecord
+from evaluation_tests.conversation_libs.fake_conversation_context import FakeConversationContext
 from evaluation_tests.summarizer.summary_evaluator import SummaryCriteriaEvaluator
 
 SUMMARY_EVALUATION_TYPES = [EvaluationType.SUMMARY_CONSISTENCY, EvaluationType.SUMMARY_RELEVANCE]
 
 
 async def _evaluate_with_llm(prompt: str) -> str:
-    llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name="gemini-2.0-flash-001"))
+    llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name="gemini-2.5-pro"))
     return (await llm.generate_content(prompt)).text
 
 

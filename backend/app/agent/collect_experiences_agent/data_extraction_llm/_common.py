@@ -36,6 +36,9 @@ def clean_string_field(value: Optional[any]) -> Optional[any]:
     if value.lower() in ["none", "null"]:
         return None
 
+    if value == "None":
+        return ''
+
     return value
 
 

@@ -26,7 +26,8 @@ from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_collect_experiences_agent_simulated_user(test_case: CollectExperiencesAgentTestCase,
-                                                        caplog: LogCaptureFixture):
+                                                        caplog: LogCaptureFixture,
+                                                        setup_multi_locale_app_config):
     """
     Tests the welcome agent with a simulated user.
     """

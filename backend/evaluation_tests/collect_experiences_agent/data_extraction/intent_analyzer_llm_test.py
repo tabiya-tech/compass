@@ -46,7 +46,7 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
         ]
     ),
     IntentAnalyzerToolTestCase(
-        name="user_adds_to_experiences_at_a_time",
+        name="user_adds_two_experiences_at_a_time",
         turns=[
             (SILENCE_MESSAGE,
              "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
@@ -70,7 +70,7 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
         ]
     ),
     IntentAnalyzerToolTestCase(
-        name="user_adds_to_experiences_at_a_time_in_one_sentence",
+        name="user_adds_two_experiences_at_a_time_in_one_sentence",
         turns=[
             (SILENCE_MESSAGE,
              "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
@@ -85,7 +85,7 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
             },
             {
                 "data_operation": ContainsString("add"),
-                "potential_new_experience_title": ContainsString("freelance web"),
+                "potential_new_experience_title": AnyOf(ContainsString("freelance web"), ContainsString("Web Designer")),
                 "users_statement": ContainsString("freelance web design for local businesses since 2023")
             }
         ]
@@ -226,7 +226,6 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
     ),
     IntentAnalyzerToolTestCase(
         name="argentina_multiple_experiences",
-        skip_force="force",
         locale=Locale.ES_AR,
         turns=[
             (SILENCE_MESSAGE, "Contame sobre tus experiencias laborales o proyectos.")

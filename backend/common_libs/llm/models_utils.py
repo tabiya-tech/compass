@@ -3,11 +3,11 @@ import os
 from abc import ABC, abstractmethod
 
 import vertexai
-
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from vertexai.generative_models import HarmCategory, HarmBlockThreshold, SafetySetting
 
+from app.agent.config import AgentsConfig
 from common_libs.retry import RetryConfigWithExponentialBackOff, DEFAULT_RETRY_CONFIG_WITH_EXP_BACKOFF, Retry
 
 logger = logging.getLogger(__name__)
@@ -146,10 +146,7 @@ class LLMConfig(BaseModel):
     """
     Configuration for the LLM.
     """
-    # gemini-1.5-flash is an auto update version the points to the most recent stable version
-    # see https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versioning#auto-updated-version
-    # language_model_name: str = "gemini-1.5-flash-001"
-    language_model_name: str = "gemini-2.0-flash-001"
+    language_model_name: str = AgentsConfig.default_model
     location: str = DEFAULT_VERTEX_API_REGION
     generation_config: dict = DEFAULT_GENERATION_CONFIG
     safety_settings: frozenset[SafetySetting] = DEFAULT_SAFETY_SETTINGS
@@ -232,7 +229,7 @@ class BasicLLM(LLM):
                              self._resource_name, exc_info=True)
                 raise e
 
-        return await Retry[str].call_with_exponential_backoff(callback=_generate_content,logger=logger)
+        return await Retry[str].call_with_exponential_backoff(callback=_generate_content, logger=logger)
 
     @abstractmethod
     async def internal_generate_content(self, llm_input: LLMInput | str) -> LLMResponse:
