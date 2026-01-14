@@ -126,20 +126,25 @@ test_cases = [
     ScriptedUserEvaluationTestCase(
         name='argentina_conversation_scripted',
         locale=Locale.ES_AR,
-        skip_force="force",
         country_of_user=Country.ARGENTINA,
-        simulated_user_prompt=dedent("""
-            Actúa como una persona joven de Argentina. Estás chateando con un bot para armar tu CV.
-            Usa jerga argentina (laburo, guita, viejo/vieja, dale, buenísimo).
-            Sé conciso.
-
-            No tienes otras experiencias. 
-            Responde "si" o "no" cuando corresponda. Di "asi esta bien" si te piden confirmar.
-            """),
+        simulated_user_prompt=dedent(
+            """Actúa como una persona joven de Argentina. Estás chateando con un bot para armar tu CV."""),
         scripted_user=[
-            "Che, hola. ¿Cómo va? Busco laburo.",  # Greeting with slang
-            "Dale, buenísimo, me sirve lo del CV.",  # Agreeing to start
-            "Sí, empecemos."  # Confirming
+            "Che, hola. ¿Cómo va? Busco laburo.",
+            # Greeting with slang -> Hey, hi. How's it going? I'm looking for a job.
+        ],
+        evaluations=[Evaluation(type=EvaluationType.SINGLE_LANGUAGE, expected=100)]
+    ),
+    ScriptedUserEvaluationTestCase(
+        name='argentina_conversation_scripted_asks_a_lot_of_questions',
+        locale=Locale.ES_AR,
+        country_of_user=Country.ARGENTINA,
+        simulated_user_prompt=dedent(
+            """Actúa como una persona joven de Argentina. Estás chateando con un bot para armar tu CV."""),
+        scripted_user=[
+            "¿De qué trata esta app?",  # -> What is this app about?
+            "¿Quién te desarrolló?",  # -> who developed you
+            "Sigamos."  # -> Let's continue
         ],
         evaluations=[Evaluation(type=EvaluationType.SINGLE_LANGUAGE, expected=100)]
     ),
@@ -162,7 +167,7 @@ def event_loop():
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])

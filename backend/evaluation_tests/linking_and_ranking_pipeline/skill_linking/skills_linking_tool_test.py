@@ -7,6 +7,7 @@ from app.agent.experience.work_type import WorkType
 from app.agent.linking_and_ranking_pipeline.infer_occupation_tool import InferOccupationTool
 from app.agent.linking_and_ranking_pipeline.skill_linking_tool import SkillLinkingTool
 from app.countries import Country
+from app.i18n.translation_service import get_i18n_manager
 from app.vector_search.esco_entities import OccupationSkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
@@ -61,6 +62,7 @@ test_cases = [
 async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_search_services: Awaitable[SearchServices], caplog):
     search_services = await setup_search_services
     # Given the occupation with it's associated skills
+    get_i18n_manager().set_locale(test_case.locale)
     given_job_titles: list[str] = []
     given_occupations_with_skills: list[OccupationSkillEntity] = []
     if test_case.given_occupation_code:
@@ -68,7 +70,7 @@ async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_sea
             code=test_case.given_occupation_code,
         )
         given_occupations_with_skills.extend(given_occupation_skills)
-        given_job_titles.extend([occupation.preferredLabel for occupation in given_occupation_skills])
+        given_job_titles.extend([occupation.occupation.preferredLabel for occupation in given_occupation_skills])
 
     if test_case.given_occupation_title:
         tool = InferOccupationTool(

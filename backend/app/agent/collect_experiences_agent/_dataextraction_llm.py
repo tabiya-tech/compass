@@ -121,12 +121,12 @@ class _DataExtractionLLM:
         for command in commands:
             if command.data_operation.lower() == DataOperation.DELETE.value.lower():
                 if command.index is None:
-                    self.logger.error(f"Invalid experience to delete, {command}")
+                    self.logger.warning(f"Invalid experience to delete, {command}, skipping it")
                     continue
 
                 current_index = command.index
                 existing_experience = \
-                list(filter(lambda exp: exp.index == current_index, collected_experience_data_so_far))[0] or {}
+                    list(filter(lambda exp: exp.index == current_index, collected_experience_data_so_far))[0] or {}
                 operations.append(_CollectedDataWithReasoning(
                     **existing_experience.model_dump(exclude={"index"}),
                     data_operation=DataOperation.DELETE.value,
@@ -137,8 +137,13 @@ class _DataExtractionLLM:
                 if command.data_operation.lower() == DataOperation.ADD.value.lower():
                     new_experiences_counter += 1
 
+                index = command.index if command.data_operation.lower() == DataOperation.UPDATE.value.lower() else new_experiences_counter
+                if index is None:
+                    self.logger.error(f"Invalid experience to update, {command}")
+                    continue
+
                 update_tasks.append(self._get_extracted_experience_data(
-                    index=command.index if command.data_operation.lower() == DataOperation.UPDATE.value.lower() else new_experiences_counter,
+                    index=index,
                     turn_number=len(context.all_history.turns),
                     data_operation=DataOperation.from_string_key(command.data_operation),
                     experience_title=command.potential_new_experience_title,

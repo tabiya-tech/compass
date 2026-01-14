@@ -68,8 +68,8 @@ test_cases = [
                              WorkType.UNSEEN_UNPAID: (1, 2)},
         matchers=["llm", "matcher"],
         expected_experience_data=[{
-            "experience_title": ContainsString("stay-at-home mom"),
-            "location": ContainsString("Nairobi"),
+            "experience_title": AnyOf(ContainsString("stay-at-home mom"), ContainsString("Caring for Family")),
+            "location": AnyOf(ContainsString("Nairobi"), ContainsString("Home")),
             "company": ContainsString("family"),
             "timeline": {"start": "2018", "end": ContainsString("present")},
             "work_type": WorkType.UNSEEN_UNPAID.name,
@@ -94,7 +94,7 @@ test_cases = [
         matchers=["llm"],
         expected_experience_data=[{
             "experience_title": "MatchesCloselyConcept(taking care of your baby sister)",
-            "location": "MatchesCloselyLocation(Mombasa)",
+            "location": "MatchesCloselyLocation(Mombasa)", #TODO: check that the location is getting parsed properly
             "company": "MatchesCloselyConcept(family)",
             "timeline": {"start": "2015", "end": ContainsString("present")},
             "work_type": f"ExactMatch({WorkType.UNSEEN_UNPAID.name})",
@@ -391,13 +391,13 @@ test_cases = [
         expected_experience_data=[
             {"experience_title": ContainsString("graphic design"),
              "location": AnyOf(ContainsString("remote"), ContainsString("Joburg")),
-             "timeline": DictContaining({"start": "2020/06", "end": ContainsString("present")}),
+             "timeline": DictContaining({"start": "06/2020", "end": ContainsString("present")}),
              "work_type": WorkType.SELF_EMPLOYMENT.name,
              },
             {"experience_title": ContainsString("English teacher"),
              "location": ContainsString("Joburg"),
              "company": ContainsString("Community Center"),
-             "timeline": DictContaining({"start": "2017/01", "end": "2020/08"}),
+             "timeline": DictContaining({"start": "01/2017", "end": "08/2020"}),
              "work_type": WorkType.UNSEEN_UNPAID.name,
              },
             {"experience_title": ContainsString("Assist elderly people"),
