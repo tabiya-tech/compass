@@ -35,7 +35,7 @@ test_cases_to_run = get_test_cases_to_run(test_cases)
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.5-pro")
+@pytest.mark.evaluation_test("gemini-2.0-flash-001")
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize("case", test_cases_to_run, ids=[c.name for c in test_cases_to_run])
 async def test_cv_parser(case: CVParserTestCase, common_folder_path: str):
