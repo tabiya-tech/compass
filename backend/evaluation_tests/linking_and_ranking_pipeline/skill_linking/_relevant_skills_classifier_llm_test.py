@@ -4,7 +4,9 @@ import random
 import pytest
 from _pytest.logging import LogCaptureFixture
 
-from app.agent.linking_and_ranking_pipeline.skill_linking_tool._relevant_skills_classifier_llm import _RelevantSkillsClassifierLLM
+from app.agent.linking_and_ranking_pipeline.skill_linking_tool._relevant_skills_classifier_llm import \
+    _RelevantSkillsClassifierLLM
+from app.i18n.translation_service import get_i18n_manager
 from app.vector_search.esco_entities import SkillEntity
 from common_libs.test_utilities.guard_caplog import assert_log_error_warnings, guard_caplog
 from evaluation_tests.compass_test_case import CompassTestCase
@@ -169,6 +171,9 @@ async def test_relevance_classifier_llm(test_case: RelevantSkillsClassifierLLMTe
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.DEBUG):
+        # Set which language the test is running in
+        get_i18n_manager().set_locale(test_case.locale)
+
         # Guards to ensure that the loggers are correctly setup,
         guard_caplog(logger=relevant_skills_classifier._logger, caplog=caplog)
         caplog.records.clear()
