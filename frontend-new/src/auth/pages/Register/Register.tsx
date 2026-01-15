@@ -26,6 +26,7 @@ import { invitationsService } from "src/auth/services/invitationsService/invitat
 import { InvitationStatus } from "src/auth/services/invitationsService/invitations.types";
 import { registrationStore } from "src/state/registrationStore";
 import { GTMService } from "src/utils/analytics/gtmService";
+import { captureRegistrationCodeFromUrl, getStoredIdentity, setUserIdentityFromAuth } from "src/analytics/identity";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -66,6 +67,7 @@ const Register: React.FC = () => {
 
   // Check for registration code in URL params when component mounts
   useEffect(() => {
+    captureRegistrationCodeFromUrl(location.search, "secure_link");
     const params = new URLSearchParams(location.search);
     const linkCodeParam = params.get(REGISTRATION_CODE_QUERY_PARAM);
     const linkReportToken = params.get(REPORT_TOKEN_QUERY_PARAM) ?? params.get("token") ?? undefined;
@@ -227,8 +229,12 @@ const Register: React.FC = () => {
         const { codeToUse, reportTokenToUse } = await validateCode();
         // We're using the mail as the username for now, since we don't have any use case in the app for it
         await firebaseEmailAuthServiceInstance.register(email, password, email, codeToUse, reportTokenToUse);
+        const storedIdentity = getStoredIdentity();
+        if (storedIdentity?.user_id !== codeToUse) {
+          setUserIdentityFromAuth({ registrationCode: codeToUse, source: "secure_link" });
+        }
         GTMService.trackRegistrationComplete("email", codeToUse || null);
-  enqueueSnackbar(t("auth.verificationEmailSentShort"), { variant: "success" });
+        enqueueSnackbar(t("auth.verificationEmailSentShort"), { variant: "success" });
         // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
         // since if we don't do that, the user may be able to access the application without verifying their email
         // or accepting the dpa.

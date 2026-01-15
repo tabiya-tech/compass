@@ -9,29 +9,29 @@ Branch: `001-ga4-registration-tracking`
 - [ ] T003 Prepare frontend-new environment (env.js present) and run `yarn install` (log in specs/001-ga4-registration-tracking/quickstart.md)
 
 ## Phase 2 - Foundational
-- [ ] T004 Define analytics helper scaffold for user identity handling in frontend-new/src/analytics/identity.ts
-- [ ] T005 Add unit test scaffold for identity helper in frontend-new/src/analytics/identity.test.ts
-- [ ] T006 Verify authenticated user profile exposes `registration_code` (or equivalent) for secure-link users; document path or needed hook in specs/001-ga4-registration-tracking/quickstart.md
-- [ ] T007 Add profile-based identifier loader for post-first-login sessions in frontend-new/src/analytics/identity.ts (use profile when no URL code)
+- [x] T004 Define analytics helper scaffold for user identity handling in frontend-new/src/analytics/identity.ts
+- [x] T005 Add unit test scaffold for identity helper in frontend-new/src/analytics/identity.test.ts
+- [x] T006 Verify authenticated user profile exposes `registration_code` (or equivalent) for secure-link users; document path or needed hook in specs/001-ga4-registration-tracking/quickstart.md
+- [x] T007 Add profile-based identifier loader for post-first-login sessions in frontend-new/src/analytics/identity.ts (use profile when no URL code)
 
 ## Phase 3 - User Story 1 (P1) Secure-link registrant events carry registration_code
-- [ ] T008 [US1] Parse `registration_code` from secure-link URL and store in sessionStorage in frontend-new/src/analytics/identity.ts (ignore if missing/invalid)
-- [ ] T009 [US1] On auth success for secure-link users, push `user_identity_set` with `user_id=registration_code` to dataLayer in frontend-new/src/analytics/identity.ts
-- [ ] T010 [US1] On logout, clear session identity and push `user_identity_cleared` to dataLayer in frontend-new/src/analytics/identity.ts
+- [x] T008 [US1] Parse `registration_code` from secure-link URL and store in sessionStorage in frontend-new/src/analytics/identity.ts (ignore if missing/invalid)
+- [x] T009 [US1] On auth success for secure-link users, push `user_identity_set` with `user_id=registration_code` to dataLayer in frontend-new/src/analytics/identity.ts
+- [x] T010 [US1] On logout, clear session identity and push `user_identity_cleared` to dataLayer in frontend-new/src/analytics/identity.ts
 - [ ] T011 [US1] Ensure GA4 config tag picks up `user_id` via dataLayer variable (document GTM steps in specs/001-ga4-registration-tracking/contracts/ga4-user-id.md)
-- [ ] T012 [US1] Minimal test/QA: simulate secure-link login flow and assert dataLayer pushes include registration_code (frontend-new/src/analytics/identity.test.ts)
+- [x] T012 [US1] Minimal test/QA: simulate secure-link login flow and assert dataLayer pushes include registration_code (frontend-new/src/analytics/identity.test.ts)
 
 ## Phase 4 - User Story 2 (P2) Legacy invite tracking stays on internal user_id
-- [ ] T013 [US2] When no registration_code, set `user_id` from authenticated profile (internal user_id) and push `user_identity_set` in frontend-new/src/analytics/identity.ts
-- [ ] T014 [US2] Guard against mixing identifiers (do not attach registration_code for legacy) in frontend-new/src/analytics/identity.ts
-- [ ] T015 [US2] Minimal test/QA: simulate legacy login and assert dataLayer push uses internal user_id and no registration_code (frontend-new/src/analytics/identity.test.ts)
+- [x] T013 [US2] When no registration_code, set `user_id` from authenticated profile (internal user_id) and push `user_identity_set` in frontend-new/src/analytics/identity.ts
+- [x] T014 [US2] Guard against mixing identifiers (do not attach registration_code for legacy) in frontend-new/src/analytics/identity.ts
+- [x] T015 [US2] Minimal test/QA: simulate legacy login and assert dataLayer push uses internal user_id and no registration_code (frontend-new/src/analytics/identity.test.ts)
 
 ## Phase 5 - User Story 3 (P3) Analysts can filter and export journeys by registration_code
 - [ ] T016 [US3] Document GA4 User Explorer filter and BigQuery query snippet (events_* by user_id) in specs/001-ga4-registration-tracking/quickstart.md
 - [ ] T017 [US3] Validate GA4 DebugView/Realtime shows user_id for secure-link and legacy sessions (record checklist in specs/001-ga4-registration-tracking/quickstart.md)
 
 ## Final Phase - Polish & Cross-cutting
-- [ ] T018 Add short README note for analytics identity flow in frontend-new/src/analytics/README.md
+- [x] T018 Add short README note for analytics identity flow in frontend-new/src/analytics/README.md
 - [ ] T019 Run `yarn lint` and targeted `yarn test` for analytics identity files; record results in specs/001-ga4-registration-tracking/quickstart.md
 - [ ] T020 Add lightweight data-quality check: warn/log when `user_id` missing or conflicts with identifier_type in frontend-new/src/analytics/identity.ts; document in specs/001-ga4-registration-tracking/quickstart.md
 

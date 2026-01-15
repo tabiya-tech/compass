@@ -27,6 +27,7 @@ import * as EnvServiceModule from "src/envService";
 import SocialAuth from "src/auth/components/SocialAuth/SocialAuth";
 import { registrationStore } from "src/state/registrationStore";
 import { REGISTRATION_CODE_STORAGE_KEY, REGISTRATION_CODE_TOAST_ID } from "src/config/registrationCode";
+import { captureRegistrationCodeFromUrl, getStoredIdentity, setUserIdentityFromAuth } from "src/analytics/identity";
 
 //mock the SocialAuth component
 jest.mock("src/auth/components/SocialAuth/SocialAuth", () => {
@@ -148,6 +149,12 @@ jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
   };
 });
 
+jest.mock("src/analytics/identity", () => ({
+  captureRegistrationCodeFromUrl: jest.fn(),
+  getStoredIdentity: jest.fn().mockReturnValue(null),
+  setUserIdentityFromAuth: jest.fn(),
+}));
+
 // mock the RequestInvitationCode component
 jest.mock("src/auth/components/requestInvitationCode/RequestInvitationCode", () => {
   const actual = jest.requireActual("src/auth/components/requestInvitationCode/RequestInvitationCode");
@@ -168,6 +175,8 @@ describe("Testing Register component", () => {
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
     jest.clearAllMocks();
+    (setUserIdentityFromAuth as jest.Mock).mockClear();
+    (getStoredIdentity as jest.Mock).mockReturnValue(null);
     registrationStore.clear();
     window.localStorage.clear();
     jest.spyOn(EnvServiceModule, "getApplicationRegistrationCode").mockReturnValue("");
@@ -244,6 +253,13 @@ describe("Testing Register component", () => {
     // THEN the register function should have been called
     await waitFor(() => {
       expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenInvitationCode, undefined);
+    });
+
+    await waitFor(() => {
+      expect(setUserIdentityFromAuth).toHaveBeenCalledWith({
+        registrationCode: givenInvitationCode,
+        source: "secure_link",
+      });
     });
 
     // AND the component should match the snapshot

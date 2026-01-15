@@ -6,6 +6,12 @@ import UserPreferencesService from "src/userPreferences/UserPreferencesService/u
 import { Language, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
 import AuthenticationStateService from "./AuthenticationState.service";
+import {
+  clearUserIdentity,
+  getRegistrationState,
+  resolveAndSetUserIdentity,
+  setUserIdentityFromAuth,
+} from "src/analytics/identity";
 
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
@@ -16,6 +22,13 @@ import { nanoid } from "nanoid";
 // Mock jwt-decode
 jest.mock("jwt-decode", () => ({
   jwtDecode: jest.fn(),
+}));
+
+jest.mock("src/analytics/identity", () => ({
+  clearUserIdentity: jest.fn(),
+  getRegistrationState: jest.fn(),
+  resolveAndSetUserIdentity: jest.fn(),
+  setUserIdentityFromAuth: jest.fn(),
 }));
 
 // Mock PersistentStorageService
@@ -82,6 +95,11 @@ describe("AuthenticationService", () => {
     // As a good practice, we should the mock*Once() methods to avoid side effects between tests
     // As a precaution, we reset all method mocks to ensure that no side effects are carried over between tests
     resetAllMethodMocks(UserPreferencesService.getInstance());
+
+    (getRegistrationState as jest.Mock).mockReturnValue(undefined);
+    (resolveAndSetUserIdentity as jest.Mock).mockReset();
+    (setUserIdentityFromAuth as jest.Mock).mockReset();
+    (clearUserIdentity as jest.Mock).mockReset();
   });
 
   describe("onSuccessfulLogout", () => {
@@ -106,6 +124,8 @@ describe("AuthenticationService", () => {
 
       // AND the account conversion flag should be cleared from persistent storage
       expect(PersistentStorageService.clearAccountConverted).toHaveBeenCalled();
+
+      expect(clearUserIdentity).toHaveBeenCalled();
     });
   });
 
@@ -127,6 +147,8 @@ describe("AuthenticationService", () => {
         sessions:[]
       } as unknown as UserPreference;
       jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValueOnce(givenUserPreferences);
+      const givenRegistrationState = { code: "foo", locked: true, reportToken: undefined, source: "link" };
+      (getRegistrationState as jest.Mock).mockReturnValueOnce(givenRegistrationState);
 
       // WHEN onSuccessfulLogin is called
       await service.onSuccessfulLogin(givenToken);
@@ -139,6 +161,12 @@ describe("AuthenticationService", () => {
       expect(UserPreferencesService.getInstance().getUserPreferences).toHaveBeenCalledWith(givenUser.id);
       // AND the user preferences should be set in the state
       expect(UserPreferencesStateService.getInstance().getUserPreferences()).toEqual(givenUserPreferences);
+
+      expect(resolveAndSetUserIdentity).toHaveBeenCalledWith({
+        userId: givenUser.id,
+        userPreferences: givenUserPreferences,
+        registrationState: givenRegistrationState,
+      });
 
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
@@ -193,6 +221,11 @@ describe("AuthenticationService", () => {
       expect(console.info).toHaveBeenCalledWith(
         `User has not registered! Preferences could not be found for userId: ${givenUser.id}`,
       );
+      expect(resolveAndSetUserIdentity).toHaveBeenCalledWith({
+        userId: givenUser.id,
+        userPreferences: null,
+        registrationState: undefined,
+      });
       // AND no error should be logged
       expect(console.error).not.toHaveBeenCalled();
     });
@@ -215,6 +248,8 @@ describe("AuthenticationService", () => {
       // WHEN onSuccessfulLogin is called with the given token
       // THEN the error should be thrown
       await expect(service.onSuccessfulLogin(givenToken)).rejects.toThrow(givenError);
+
+      expect(resolveAndSetUserIdentity).not.toHaveBeenCalled();
     });
   });
 
@@ -261,6 +296,12 @@ describe("AuthenticationService", () => {
       // AND the preferences return from the service should be set in the state
       expect(UserPreferencesStateService.getInstance().getUserPreferences()).toEqual(givenReturnedPrefs);
 
+      expect(setUserIdentityFromAuth).toHaveBeenCalledWith({
+        registrationCode: givenRegistrationCode,
+        userId: givenUser.id,
+        source: "secure_link",
+      });
+
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
@@ -302,6 +343,12 @@ describe("AuthenticationService", () => {
         report_token: givenReportToken,
         language: Language.en,
       });
+
+      expect(setUserIdentityFromAuth).toHaveBeenCalledWith({
+        registrationCode: givenRegistrationCode,
+        userId: givenUser.id,
+        source: "secure_link",
+      });
     });
   });
 
@@ -316,6 +363,8 @@ describe("AuthenticationService", () => {
         }
         return null;
       });
+      const givenRegistrationState = { code: null, locked: false, reportToken: undefined, source: null };
+      (getRegistrationState as jest.Mock).mockReturnValueOnce(givenRegistrationState);
 
       // WHEN onSuccessfulRefresh is called for the given token
       await service.onSuccessfulRefresh(givenToken);
@@ -325,6 +374,12 @@ describe("AuthenticationService", () => {
 
       // AND the user should be set in the authentication state
       expect(AuthenticationStateService.getInstance().getUser()).toEqual(givenUser);
+
+      expect(resolveAndSetUserIdentity).toHaveBeenCalledWith({
+        userId: givenUser.id,
+        userPreferences: UserPreferencesStateService.getInstance().getUserPreferences(),
+        registrationState: givenRegistrationState,
+      });
 
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();

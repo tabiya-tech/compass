@@ -28,7 +28,27 @@ export interface GTMRegistrationCompleteEvent {
   timestamp: number;
 }
 
-type GTMEvent = GTMChatMessageEvent | GTMConversationCompletedEvent | GTMRegistrationVisitEvent | GTMRegistrationCompleteEvent;
+export interface GTMUserIdentitySetEvent {
+  event: 'user_identity_set';
+  user_id: string;
+  identifier_type: 'registration_code' | 'user_id';
+  registration_code?: string | null;
+  auth_state: 'logged_in';
+  source?: 'secure_link' | 'legacy' | 'unknown';
+}
+
+export interface GTMUserIdentityClearedEvent {
+  event: 'user_identity_cleared';
+  auth_state: 'logged_out';
+}
+
+type GTMEvent =
+  | GTMChatMessageEvent
+  | GTMConversationCompletedEvent
+  | GTMRegistrationVisitEvent
+  | GTMRegistrationCompleteEvent
+  | GTMUserIdentitySetEvent
+  | GTMUserIdentityClearedEvent;
 
 declare global {
   interface Window {

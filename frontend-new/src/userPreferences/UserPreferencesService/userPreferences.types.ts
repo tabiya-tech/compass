@@ -16,6 +16,9 @@ export type UserPreference = {
   user_id: string;
   language: Language;
   client_id?: string;
+  registration_code?: string | null;
+  invitation_code?: string | null;
+  report_token?: string | null;
   accepted_tc?: Date;
   sessions: number[];
   user_feedback_answered_questions: AnsweredQuestions;
