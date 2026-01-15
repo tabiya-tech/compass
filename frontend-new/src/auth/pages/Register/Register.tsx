@@ -229,6 +229,7 @@ const Register: React.FC = () => {
         const { codeToUse, reportTokenToUse } = await validateCode();
         // We're using the mail as the username for now, since we don't have any use case in the app for it
         await firebaseEmailAuthServiceInstance.register(email, password, email, codeToUse, reportTokenToUse);
+        // Keep this local guard so identity is set before we emit registration_complete; onSuccessfulRegistration also sets identity.
         const storedIdentity = getStoredIdentity();
         if (storedIdentity?.user_id !== codeToUse) {
           setUserIdentityFromAuth({ registrationCode: codeToUse, source: "secure_link" });

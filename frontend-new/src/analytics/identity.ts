@@ -168,6 +168,7 @@ export const clearUserIdentity = (): void => {
   const storage = safeSessionStorage();
   if (storage) {
     storage.removeItem(IDENTITY_STORAGE_KEY);
+    storage.removeItem(PENDING_REG_CODE_KEY);
   }
   const event: GTMUserIdentityClearedEvent = {
     event: "user_identity_cleared",
