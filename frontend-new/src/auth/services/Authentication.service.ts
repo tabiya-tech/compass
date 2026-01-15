@@ -3,6 +3,12 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
+import {
+  clearUserIdentity,
+  getRegistrationState,
+  resolveAndSetUserIdentity,
+  setUserIdentityFromAuth,
+} from "src/analytics/identity";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
@@ -91,6 +97,7 @@ abstract class AuthenticationService {
     // clear the personal info from the persistent storage only if the user is successfully logged out
     PersistentStorageService.clearPersonalInfo();
     PersistentStorageService.clearAccountConverted();
+    clearUserIdentity();
     // Dont clear the login method, we want to preserve the login method for other logins (e.g on a different tab)
     // the login method will be overwritten by the next login (doesnt need to be cleared)
   }
@@ -110,20 +117,25 @@ abstract class AuthenticationService {
     try {
       prefs = await UserPreferencesService.getInstance().getUserPreferences(user.id);
     } catch (error) {
-      if (error instanceof RestAPIError) {
+      if (error instanceof RestAPIError && error.statusCode === StatusCodes.NOT_FOUND) {
         // if the user preferences are not found by user id, but has a valid token, log an info and continue with the prefs as null
-        if (error.statusCode === StatusCodes.NOT_FOUND) {
-          console.info(`User has not registered! Preferences could not be found for userId: ${user.id}`);
-          return;
-        }
+        console.info(`User has not registered! Preferences could not be found for userId: ${user.id}`);
+        prefs = null;
+      } else {
+        // rethrow the error if it is not a 404 error
+        throw error;
       }
-      // rethrow the error if it is not a 404 error
-      throw error;
     }
     if (prefs !== null) {
       // set the local preferences "state" ( for lack of a better word )
       UserPreferencesStateService.getInstance().setUserPreferences(prefs);
     }
+
+    resolveAndSetUserIdentity({
+      userId: user.id,
+      userPreferences: prefs,
+      registrationState: getRegistrationState(),
+    });
   }
 
   /**
@@ -147,6 +159,7 @@ abstract class AuthenticationService {
       language: Language.en,
     });
     UserPreferencesStateService.getInstance().setUserPreferences(prefs);
+    setUserIdentityFromAuth({ registrationCode, userId: user.id, source: "secure_link" });
   }
 
   /**
@@ -160,6 +173,12 @@ abstract class AuthenticationService {
     }
     this.authenticationStateService.setUser(user);
     this.authenticationStateService.setToken(token)
+
+    resolveAndSetUserIdentity({
+      userId: user.id,
+      userPreferences: UserPreferencesStateService.getInstance().getUserPreferences(),
+      registrationState: getRegistrationState(),
+    });
   }
 
   /**

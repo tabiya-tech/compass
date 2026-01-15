@@ -19,6 +19,7 @@ import { InvitationStatus, InvitationType } from "src/auth/services/invitationsS
 import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { getRegistrationDisabled } from "src/envService";
 import { GTMService } from "src/utils/analytics/gtmService";
+import { setUserIdentityFromAuth } from "src/analytics/identity";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
@@ -115,6 +116,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           language: Language.en,
         });
         UserPreferencesStateService.getInstance().setUserPreferences(prefs);
+        setUserIdentityFromAuth({ registrationCode, userId: _user.id, source: "secure_link" });
         GTMService.trackRegistrationComplete("google", registrationCode);
       } catch (error: any) {
         await handleError(error);

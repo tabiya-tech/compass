@@ -15,9 +15,18 @@ import {
 import { TabiyaUser } from "src/auth/auth.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import * as EnvServiceModule from "src/envService";
+import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
+import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
+import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
+import { GTMService } from "src/utils/analytics/gtmService";
+import { setUserIdentityFromAuth } from "src/analytics/identity";
 
 // Mock the envService module
 import "src/_test_utilities/envServiceMock";
+
+jest.mock("src/analytics/identity", () => ({
+  setUserIdentityFromAuth: jest.fn(),
+}));
 
 // Mock the snackbar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
@@ -141,6 +150,60 @@ describe("SocialAuth tests", () => {
       expect(console.warn).not.toHaveBeenCalled();
     }
   );
+
+  test("sets GA4 identity before tracking social registration completion", async () => {
+    const registrationCode = "RC-GOOGLE";
+
+    jest.spyOn(FirebaseSocialAuthenticationService.getInstance(), "loginWithGoogle").mockResolvedValue("token");
+    jest.spyOn(EnvServiceModule, "getRegistrationDisabled").mockReturnValue("false");
+    jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue(null);
+    jest.spyOn(authStateService.getInstance(), "getUser").mockReturnValue({ id: "user-123" } as TabiyaUser);
+
+    jest.spyOn(invitationsService, "checkInvitationCodeStatus").mockResolvedValue({
+      status: InvitationStatus.VALID,
+      invitation_code: registrationCode,
+      invitation_type: InvitationType.REGISTER,
+      source: "link",
+    } as any);
+
+    jest.spyOn(UserPreferencesService.getInstance(), "createUserPreferences").mockResolvedValue({
+      user_id: "user-123",
+      registration_code: registrationCode,
+      invitation_code: registrationCode,
+      report_token: null,
+      language: Language.en,
+      sessions: [],
+      user_feedback_answered_questions: {},
+      accepted_tc: new Date(),
+      has_sensitive_personal_data: false,
+      sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+      experiments: {},
+    } as any);
+    jest.spyOn(UserPreferencesStateService.getInstance(), "setUserPreferences").mockImplementation(() => undefined);
+    const trackSpy = jest.spyOn(GTMService, "trackRegistrationComplete").mockImplementation();
+
+    render(
+      <SocialAuth
+        registrationCode={registrationCode}
+        postLoginHandler={jest.fn()}
+        isLoading={false}
+        notifyOnLoading={jest.fn()}
+      />
+    );
+
+    const loginButton = screen.getByTestId(DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON);
+    await userEvent.click(loginButton);
+
+    await waitFor(() => {
+      expect(trackSpy).toHaveBeenCalledWith("google", registrationCode);
+    });
+
+    expect(setUserIdentityFromAuth).toHaveBeenCalledWith({
+      registrationCode,
+      userId: "user-123",
+      source: "secure_link",
+    });
+  });
 
   test("should handle sign-in failure", async () => {
     // GIVEN a SocialAuth component

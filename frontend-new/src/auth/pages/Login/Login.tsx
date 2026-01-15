@@ -35,6 +35,7 @@ import {
   getSocialAuthDisabled,
 } from "src/envService";
 import PasswordReset from "src/auth/components/passwordReset/PasswordReset";
+import { captureRegistrationCodeFromUrl } from "src/analytics/identity";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -407,6 +408,7 @@ const Login: React.FC = () => {
    * Check if the user was invited with an invitation code in the URL
    */
   useEffect(() => {
+    captureRegistrationCodeFromUrl(location.search, "secure_link");
     const params = new URLSearchParams(location.search);
     const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME) ?? params.get("invite-code");
     if (inviteCodeParam) {

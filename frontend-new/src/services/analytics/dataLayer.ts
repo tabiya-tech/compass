@@ -3,13 +3,17 @@ import type {
   GTMConversationCompletedEvent,
   GTMRegistrationCompleteEvent,
   GTMRegistrationVisitEvent,
+  GTMUserIdentityClearedEvent,
+  GTMUserIdentitySetEvent,
 } from "src/types/gtm";
 
 export type DataLayerEvent =
   | GTMChatMessageEvent
   | GTMConversationCompletedEvent
   | GTMRegistrationVisitEvent
-  | GTMRegistrationCompleteEvent;
+  | GTMRegistrationCompleteEvent
+  | GTMUserIdentitySetEvent
+  | GTMUserIdentityClearedEvent;
 
 type LoggerContext = Record<string, unknown> | undefined;
 
