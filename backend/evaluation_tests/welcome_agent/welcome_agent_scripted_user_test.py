@@ -1,12 +1,14 @@
 import asyncio
 import logging
 import os
+from textwrap import dedent
 
 import pytest
 
 from app.agent.welcome_agent import WelcomeAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
+from app.countries import Country
 from app.i18n.translation_service import get_i18n_manager
 from app.i18n.types import Locale
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
@@ -90,7 +92,6 @@ test_cases = [
     ),
     ScriptedUserEvaluationTestCase(
         name='user_delays_questions_es',
-        skip_force="force",
         locale=Locale.ES_AR,
         simulated_user_prompt="Scripted user: user is uncertain and asks various questions",
         scripted_user=[
@@ -121,6 +122,26 @@ test_cases = [
             "Generate a CV",  # Expect to complete the conversation
         ],
         evaluations=[]
+    ),
+    ScriptedUserEvaluationTestCase(
+        name='argentina_conversation_scripted',
+        locale=Locale.ES_AR,
+        skip_force="force",
+        country_of_user=Country.ARGENTINA,
+        simulated_user_prompt=dedent("""
+            Actúa como una persona joven de Argentina. Estás chateando con un bot para armar tu CV.
+            Usa jerga argentina (laburo, guita, viejo/vieja, dale, buenísimo).
+            Sé conciso.
+
+            No tienes otras experiencias. 
+            Responde "si" o "no" cuando corresponda. Di "asi esta bien" si te piden confirmar.
+            """),
+        scripted_user=[
+            "Che, hola. ¿Cómo va? Busco laburo.",  # Greeting with slang
+            "Dale, buenísimo, me sirve lo del CV.",  # Agreeing to start
+            "Sí, empecemos."  # Confirming
+        ],
+        evaluations=[Evaluation(type=EvaluationType.SINGLE_LANGUAGE, expected=100)]
     ),
 ]
 

@@ -8,10 +8,12 @@ from app.agent.collect_experiences_agent import CollectedData
 from app.agent.collect_experiences_agent.data_extraction_llm import IntentAnalyzerTool
 from app.agent.experience import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
+from app.i18n.translation_service import get_i18n_manager
+from app.i18n.types import Locale
 from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
-from evaluation_tests.matcher import ContainsString, check_actual_data_matches_expected
+from evaluation_tests.matcher import ContainsString, check_actual_data_matches_expected, AnyOf
 
 SILENCE_MESSAGE = "(silence)"
 
@@ -222,6 +224,32 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
         users_last_input="I like Nigerian Food",
         expected_operations=[]
     ),
+    IntentAnalyzerToolTestCase(
+        name="argentina_multiple_experiences",
+        skip_force="force",
+        locale=Locale.ES_AR,
+        turns=[
+            (SILENCE_MESSAGE, "Contame sobre tus experiencias laborales o proyectos.")
+        ],
+        collected_data_so_far=[],
+        users_last_input=dedent("""
+            Che, te cuento mis laburos:
+            - Asistente de ventas en el local de mi viejo (2015-2022).
+            - Laburando en la casa de mi vieja ayudando con todo (2022-2025).
+            """),
+        expected_operations=[
+            {
+                "data_operation": ContainsString("add"),
+                "potential_new_experience_title": AnyOf(ContainsString("asistente"), ContainsString("ventas")),
+                "users_statement": ContainsString("Asistente de ventas en el local de mi viejo")
+            },
+            {
+                "data_operation": ContainsString("add"),
+                "potential_new_experience_title": AnyOf(ContainsString("casa"), ContainsString("vieja")),
+                "users_statement": ContainsString("Laburando en la casa de mi vieja")
+            }
+        ]
+    ),
 ]
 
 
@@ -234,6 +262,7 @@ async def test_intent_analyzer_tool(test_case: IntentAnalyzerToolTestCase, caplo
     logger = logging.getLogger()
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
+        get_i18n_manager().set_locale(test_case.locale)
 
         # GIVEN the previous conversation context
         context: ConversationContext = ConversationContext(

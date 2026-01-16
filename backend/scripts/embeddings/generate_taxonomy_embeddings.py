@@ -48,13 +48,16 @@ COMPASS_DB = (AsyncIOMotorClient(
     SCRIPT_SETTINGS.compass_taxonomy_db_uri, tlsAllowInvalidCertificates=True)
               .get_database(SCRIPT_SETTINGS.compass_taxonomy_db_name))
 
-
 ##########################
 # Types
 ##########################
 
+_DEFAULT_NUM_OF_DIMENSIONS = 768
+
+
 class Options(BaseModel):
     hot_run: bool = False
+    num_of_dimensions: int = _DEFAULT_NUM_OF_DIMENSIONS
     delete_existing: bool = False
     generate_embeddings: bool = True
     generate_indexes: bool = True
@@ -170,9 +173,10 @@ async def generate_and_save_embeddings(*,
         start_time = time.time()
         await COMPASS_DB[ctx.destination_collection].insert_many(insertable_documents)
         end_time = time.time()
-        logger.info(f"Time taken to insert documents in collection {ctx.destination_collection}: {end_time - start_time:.2f} seconds "
-                    f"for {len(insertable_documents)} documents, "
-                    f"{len(insertable_documents) / (end_time - start_time):.2f} documents/seconds")
+        logger.info(
+            f"Time taken to insert documents in collection {ctx.destination_collection}: {end_time - start_time:.2f} seconds "
+            f"for {len(insertable_documents)} documents, "
+            f"{len(insertable_documents) / (end_time - start_time):.2f} documents/seconds")
     else:
         logger.info(f"Would insert {len(insertable_documents)} documents in {ctx.destination_collection} collection")
 
@@ -191,7 +195,8 @@ async def process_schema(*, hot_run: bool, ctx: EmbeddingContext, embeddings_ser
     from_collection = PLATFORM_DB[ctx.source_collection]
     to_collection = COMPASS_DB[ctx.destination_collection]
 
-    logger.info(f"[1/2] copying the {ctx.collection_schema}s documents from {from_collection.name} to {to_collection.name}")
+    logger.info(
+        f"[1/2] copying the {ctx.collection_schema}s documents from {from_collection.name} to {to_collection.name}")
 
     # Define the search filter
     # check all ids in the to_collection where the embeddings are already generated
@@ -229,7 +234,8 @@ async def process_schema(*, hot_run: bool, ctx: EmbeddingContext, embeddings_ser
         batch = documents[i:i + batch_size]
         if batch:  # double-check just in case
             progress.update(len(batch))
-            await generate_and_save_embeddings(hot_run=hot_run, documents=batch, ctx=ctx, embeddings_service=embeddings_service)
+            await generate_and_save_embeddings(hot_run=hot_run, documents=batch, ctx=ctx,
+                                               embeddings_service=embeddings_service)
 
     # Close the progress bar
     progress.close()
@@ -241,7 +247,8 @@ async def _copy_model_info(*, hot_run: bool, embeddings_service: EmbeddingServic
     logger.info("[1/2] Copying the model info")
 
     # Get the model info document for the model_id from the PLATFORM_DB
-    from_model_info: dict = await PLATFORM_DB[PlatformCollections.MODEL_INFO.value].find_one({"_id": ObjectId(model_id)})
+    from_model_info: dict = await PLATFORM_DB[PlatformCollections.MODEL_INFO.value].find_one(
+        {"_id": ObjectId(model_id)})
     if not from_model_info:
         raise ValueError(f"Taxonomy model with modelid:{model_id} not found.")
 
@@ -256,10 +263,11 @@ async def _copy_model_info(*, hot_run: bool, embeddings_service: EmbeddingServic
             previous_model_name = previous_embeddings_service.get('model_name')
             if (previous_service_name != embeddings_service.service_name or
                     previous_model_name != embeddings_service.model_name):
-                error = ValueError(f"Model info for model_id:{model_id} already exists in the COMPASS_DB with embeddings from a different "
-                                   f"embeddings service: {previous_service_name} or model: {previous_model_name}. "
-                                   f"Use the same service and model as the existing embeddings, "
-                                   f"or delete the existing embeddings and regenerate them.")
+                error = ValueError(
+                    f"Model info for model_id:{model_id} already exists in the COMPASS_DB with embeddings from a different "
+                    f"embeddings service: {previous_service_name} or model: {previous_model_name}. "
+                    f"Use the same service and model as the existing embeddings, "
+                    f"or delete the existing embeddings and regenerate them.")
                 logger.error(error)
                 raise error
 
@@ -298,7 +306,8 @@ async def _copy_model_info(*, hot_run: bool, embeddings_service: EmbeddingServic
             upsert=True
         )
     else:
-        logger.info(f"Would upsert the model info document in {CompassEmbeddingsCollections.MODEL_INFO.value} collection")
+        logger.info(
+            f"Would upsert the model info document in {CompassEmbeddingsCollections.MODEL_INFO.value} collection")
 
 
 async def copy_relations_collection(*, hot_run: bool = False):
@@ -415,7 +424,8 @@ async def main(opts: Options):
             copy_relations_collection(hot_run=opts.hot_run),
 
             # [3/5] Process the occupations
-            process_schema(hot_run=opts.hot_run, ctx=_OCCUPATIONS_EMBEDDING_CONTEXT, embeddings_service=embeddings_service),
+            process_schema(hot_run=opts.hot_run, ctx=_OCCUPATIONS_EMBEDDING_CONTEXT,
+                           embeddings_service=embeddings_service),
 
             # [4/5] Process the skills
             process_schema(hot_run=opts.hot_run, ctx=_SKILLS_EMBEDDING_CONTEXT, embeddings_service=embeddings_service),
@@ -425,6 +435,7 @@ async def main(opts: Options):
     if opts.generate_indexes:
         await generate_indexes(hot_run=opts.hot_run,
                                db=COMPASS_DB,
+                               num_of_dimensions=opts.num_of_dimensions,
                                logger=logger)
 
 
@@ -456,6 +467,14 @@ if __name__ == "__main__":
             action="store_true",
             help="Delete existing embeddings before copying"
         )
+        options_group.add_argument(
+            "--num-of-dimensions",
+            type=int,
+            required=False,
+            default=_DEFAULT_NUM_OF_DIMENSIONS,
+            choices=[768, 3072],
+            help="The number of dimensions for the embeddings"
+        )
 
         args = parser.parse_args()
 
@@ -467,6 +486,7 @@ if __name__ == "__main__":
 
         _options = Options(
             hot_run=args.hot_run,
+            num_of_dimensions=args.num_of_dimensions,
             delete_existing=args.delete_existing,
             generate_embeddings=generate_embeddings,
             generate_indexes=True

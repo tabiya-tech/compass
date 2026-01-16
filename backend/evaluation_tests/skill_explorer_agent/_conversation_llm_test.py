@@ -4,14 +4,14 @@ from textwrap import dedent
 import pytest
 
 from app.agent.agent_types import AgentInput, AgentOutput
-from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
-from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState, ConversationContext, ConversationTurn
-from app.countries import Country
-from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from app.agent.experience import WorkType
 from app.agent.skill_explorer_agent._conversation_llm import _ConversationLLM, _FINAL_MESSAGE_KEY
-from app.i18n.translation_service import t
-
+from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
+from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState, ConversationContext, \
+    ConversationTurn
+from app.countries import Country
+from app.i18n.translation_service import t, get_i18n_manager
+from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from common_libs.test_utilities import get_random_session_id
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
@@ -163,7 +163,32 @@ test_cases = [
         experiences_explored=["Selling Kotas (Self-Employed), 2023/08 - Present, Joburg"],
         experience_title="Community Volunteering",
         work_type=WorkType.UNSEEN_UNPAID
-    )]
+    ),
+     _TestCaseConversation(
+        country_of_user=Country.ARGENTINA,
+        name="argentina",
+        summary="Te conté que laburo de asistente de ventas en el local de mi viejo y que también ayudo en la casa de mi vieja.",
+        turns=[("Sí, sigo laburando ahí.",
+                "Joya, entonces venís laburando como asistente de ventas desde enero de 2015 y seguís ahí. "
+                "Laburás en el local de tu viejo. "
+                "¿Querés agregar algo más o cambiar algo de esta experiencia?"),
+               ("No, así está bien.",
+                'Bárbaro, ¿me podés contar de alguna otra experiencia donde hayas ayudado a amigos o familiares sin que te paguen?'),
+               ("No, esa es la única.",
+                dedent("""\
+                                    Repasemos la información que juntamos hasta ahora:
+                                    • Asistente de ventas (Empleado), 2015/01 - 2022/12, Local del padre
+                                    • Trabajo voluntario en casa (Voluntario/No remunerado), 2022/03 - 2025/01, Casa de la madre
+                                    ¿Hay algo que quieras agregar o cambiar? Si te parece que alguna de las experiencias es la misma, podés pedirme que borre una.
+                                     """)),
+               ("Está todo bien.",
+                "Gracias por compartir tus experiencias. Sigamos con el siguiente paso.")
+               ],
+        experiences_explored=[],
+        experience_title="Asistente de ventas",
+        work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT
+    )
+    ]
 
 
 @pytest.mark.asyncio
@@ -181,6 +206,7 @@ async def test_skills_explorer_agent_first_message(test_case, caplog: pytest.Log
     with caplog.at_level(logging.INFO):
         # Guards to ensure that the loggers are correctly set up,
         guard_caplog(logger=logger, caplog=caplog)
+        get_i18n_manager().set_locale(test_case.locale)
 
         conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
         conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=get_random_session_id()))

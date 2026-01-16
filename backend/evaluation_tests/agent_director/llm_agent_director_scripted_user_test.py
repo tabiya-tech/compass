@@ -6,23 +6,25 @@ from typing import Coroutine, Callable, Awaitable
 import pytest
 from _pytest.logging import LogCaptureFixture
 
-from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
-from app.vector_search.vector_search_dependencies import SearchServices
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState
+from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentType
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
-from app.agent.agent_director.llm_agent_director import LLMAgentDirector
+from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
 from app.agent.welcome_agent import WelcomeAgentState
-from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, ConversationMemoryManagerState
+from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
+    ConversationMemoryManagerState
+from app.i18n.translation_service import get_i18n_manager
+from app.i18n.types import Locale
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
+from app.vector_search.vector_search_dependencies import SearchServices
+from common_libs.test_utilities import get_random_session_id
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.agent_director.agent_director_executors import AgentDirectorExecutor, \
     AgentDirectorGetConversationContextExecutor, AgentDirectorIsFinished
 from evaluation_tests.conversation_libs.conversation_test_function import conversation_test_function, \
     ConversationTestConfig, ScriptedUserEvaluationTestCase, ScriptedSimulatedUser
-
-from common_libs.test_utilities import get_random_session_id
 
 
 @pytest.fixture(scope="function")
@@ -51,6 +53,7 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
     async def agent_director_exec(caplog: LogCaptureFixture, test_case: ScriptedUserEvaluationTestCase):
         print(f"Running test case {test_case.name}")
 
+        get_i18n_manager().set_locale(test_case.locale)
         output_folder = os.path.join(os.getcwd(), 'test_output/llm_agent_director/scripted', test_case.name)
         execute_evaluated_agent = AgentDirectorExecutor(agent_director=agent_director)
 
@@ -93,7 +96,8 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
                                           setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
                                               [LogCaptureFixture, ScriptedUserEvaluationTestCase],
                                               Coroutine[None, None, None]
-                                          ]]]):
+                                          ]]],
+                                          setup_multi_locale_app_config):
     """
     Conversation test, based on a scripted user.
     Asserts that the agent director routes the conversation and does not complete it.
@@ -107,11 +111,14 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
             "yes",
             "yes",
             "yes",
-            "yes"
+            "yes",
             "nothing to add",  # this is not passed to the evaluated agent, see the internal logic of how the conversation is simulated
         ],
         evaluations=[]
     )
+
+    # Run the test in english
+    get_i18n_manager().set_locale(Locale.EN_GB)
 
     conversation_manager, agent_director_exec = await setup_agent_director
     await agent_director_exec(caplog, given_test_case)
@@ -129,7 +136,8 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
                                             setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
                                                 [LogCaptureFixture, ScriptedUserEvaluationTestCase],
                                                 Coroutine[None, None, None]
-                                            ]]]):
+                                            ]]],
+                                            setup_multi_locale_app_config):
     """
     Conversation test, based on a scripted user.
     Asserts that the agent director is able to complete the conversation.
@@ -157,6 +165,9 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
         evaluations=[]
     )
 
+    # AND the locale is set to EN_GB
+    get_i18n_manager().set_locale(Locale.EN_GB)
+
     conversation_manager, agent_director_exec = await setup_agent_director
     # Set the number of conversation rounds to the length of the scripted user
     await agent_director_exec(caplog, given_test_case)
@@ -175,6 +186,63 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
         AgentState(6, AgentType.COLLECT_EXPERIENCES_AGENT, False),  # No more to say
         AgentState(7, AgentType.WELCOME_AGENT, False),  # WelcomeAgent explains
         AgentState(8, AgentType.COLLECT_EXPERIENCES_AGENT, False),  # Job 1, update by COLLECT_EXPERIENCES_AGENT
+    ]
+    for i, expected_state in enumerate(expected_agent_states):
+        turn = context.all_history.turns[i]
+        actual_state = AgentState(i, turn.output.agent_type, turn.output.finished)
+        assert actual_state == expected_state, f"Agent actual state: {actual_state} did have the expected state: {expected_state}"
+
+
+@pytest.mark.asyncio
+@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.repeat(3)
+async def test_argentina_counseling_flow(caplog: LogCaptureFixture,
+                                         setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
+                                             [LogCaptureFixture, ScriptedUserEvaluationTestCase],
+                                             Coroutine[None, None, None]
+                                         ]]],
+                                         setup_multi_locale_app_config):
+    """
+    Conversation test, based on a scripted user with Argentinian slang.
+    Asserts that the agent director routes correctly between Welcome and Collect Experiences agents.
+    """
+
+    @dataclasses.dataclass
+    class AgentState:
+        index: int
+        agent_type: AgentType
+        finished: bool
+
+    given_test_case = ScriptedUserEvaluationTestCase(
+        name='argentina_counseling_flow',
+        simulated_user_prompt="Scripted user: Argentinian persona",
+        scripted_user=[
+            "Hola, ¿me explicás cómo funciona esto?",
+            "Dale, arranquemos",  # End of WelcomeAgent, Start of COLLECT_EXPERIENCES_AGENT
+            "Laburé como asistente de ventas en el local de mi viejo",  # Job 1
+            "Hacía de todo, limpieza, caja, atender gente",  # Details
+            "No, nada más por ahora",
+            "¿Me volvés a explicar el proceso?",  # WelcomeAgent
+            "Laburé en lo de mi vieja también ayudando en la casa",  # Job 2
+        ],
+        evaluations=[]
+    )
+
+    # AND the locale is set to ES_AR
+    get_i18n_manager().set_locale(Locale.ES_AR)
+
+    conversation_manager, agent_director_exec = await setup_agent_director
+    await agent_director_exec(caplog, given_test_case)
+
+    context = await conversation_manager.get_conversation_context()
+    expected_agent_states: list[AgentState] = [
+        AgentState(0, AgentType.WELCOME_AGENT, False),
+        AgentState(1, AgentType.WELCOME_AGENT, True),
+        AgentState(2, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+        AgentState(3, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+        AgentState(4, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+        AgentState(5, AgentType.WELCOME_AGENT, False),
+        AgentState(6, AgentType.COLLECT_EXPERIENCES_AGENT, False),
     ]
     for i, expected_state in enumerate(expected_agent_states):
         turn = context.all_history.turns[i]

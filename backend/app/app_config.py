@@ -6,8 +6,9 @@ from app.countries import Country
 from app.i18n.language_config import LanguageConfig
 from app.users.cv.constants import DEFAULT_MAX_UPLOADS_PER_USER, DEFAULT_RATE_LIMIT_PER_MINUTE
 from app.version.types import Version
-
 from features.types import FeatureSetupConfig
+
+_APPLICATION_NOT_CONFIGURED_ERROR_MESSAGE = "Application configuration is not setup."
 
 
 class ApplicationConfig(BaseModel):
@@ -86,7 +87,7 @@ def get_application_config() -> ApplicationConfig:
     :return:
     """
     if _application_config is None:
-        raise RuntimeError("Application configuration is not setup.")
+        raise RuntimeError(_APPLICATION_NOT_CONFIGURED_ERROR_MESSAGE)
     return _application_config
 
 
