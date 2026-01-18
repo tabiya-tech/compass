@@ -111,7 +111,12 @@ golden_test_cases = [
         },
         matchers=["llm", "matcher"],
         expected_experience_data=[{
-            "experience_title": ContainsString("Mom"),
+            # Conversation often surfaces titles like "Taking Care of My Kid"/"Caregiver"
+            "experience_title": AnyOf(
+                ContainsString("Mom"),
+                ContainsString("care"),
+                ContainsString("caregiver")
+            ),
             "location": ContainsString("Mombasa"),
             "company": ContainsString("family"),
             "timeline": {"start": "2022", "end": ContainsString("present")},

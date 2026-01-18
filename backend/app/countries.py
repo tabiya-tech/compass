@@ -48,11 +48,11 @@ _GLOSSARY = {
     Country.KENYA:
         dedent("""\
         Muuguzi - Nurse.
-        Daktari - Doctor.
+        Dokta - Doctor.
         Mhasibu - Accountant / Bookkeeper.
         Karani - Clerk / Office worker.
-        Mwalimu - Teacher.
-        Mhandisi - Engineer.
+        Mwal - Teacher.
+        Makani - Engineer.
         Rubani - Pilot.
         Nahodha - Captain.
         Kiongozi - Leader / Manager.
@@ -66,7 +66,7 @@ _GLOSSARY = {
         Fundi mchundo - Handyman / Odd jobs person.
         Muuzaji - Salesperson / Street vendor.
         Mwenye Duka - Small shop owner.
-        Mjenzi - Builder / Mason (informal construction).
+        Msee wa Mjengo - Builder / Mason (informal construction).
         Mshonaji - Tailor / Seamstress.
         Boda Boda - A motorcycle taxi.
         Nduthi - A motorcycle taxi.

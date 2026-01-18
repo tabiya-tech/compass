@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
@@ -12,6 +13,9 @@ from app.countries import Country
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from app.vector_search.vector_search_dependencies import SearchServices
 from evaluation_tests.baseline_metrics_collector import BaselineMetricsCollector
+
+
+logger = logging.getLogger(__name__)
 
 
 class E2EChatExecutor:
@@ -77,11 +81,15 @@ class E2EChatExecutor:
         await self._agent_director.execute(agent_input)
         # get the context again after the history has been updated
         conversation_context = await self._conversation_memory_manager.get_conversation_context()
-        agent_output = self._get_message_for_user(from_index=current_index, context=conversation_context)
         
-        # Record metrics if collector is available
+        # Record metrics PER TURN (before combining) to correctly attribute LLM calls
         if self._metrics_collector:
-            self._record_turn_metrics(agent_output)
+            self._record_turn_metrics_per_turn(
+                from_index=current_index, 
+                context=conversation_context
+            )
+        
+        agent_output = self._get_message_for_user(from_index=current_index, context=conversation_context)
         
         return agent_output
 
@@ -118,33 +126,77 @@ class E2EChatExecutor:
         
         return is_complete
     
-    def _record_turn_metrics(self, agent_output: AgentOutput):
-        """Record metrics for a conversation turn."""
-        phase = self._state.agent_director_state.current_phase.name
-        agent_type = agent_output.agent_type.name if hasattr(agent_output.agent_type, 'name') else str(agent_output.agent_type)
+    def _record_turn_metrics_per_turn(self, from_index: int, context: ConversationContext):
+        """
+        Record metrics for each individual turn in the conversation history.
         
-        # Record turn
-        self._metrics_collector.record_turn(phase, agent_type)
+        This correctly attributes LLM calls to the agent that made them, rather than
+        combining all stats and attributing them to the last agent (which was causing
+        the FAREWELL_AGENT to appear to make 64 LLM calls when it was actually
+        the experience pipeline running during the EXPLORE_EXPERIENCES_AGENT phase).
+        """
+        _hist = context.all_history
         
-        # Record LLM calls
-        for llm_stat in agent_output.llm_stats:
-            self._metrics_collector.record_llm_call(
-                agent_type=agent_type,
-                phase=phase,
-                duration_sec=llm_stat.response_time_in_sec,
-                prompt_tokens=llm_stat.prompt_token_count,
-                response_tokens=llm_stat.response_token_count
-            )
+        for turn in _hist.turns[from_index:]:
+            agent_output = turn.output
+            
+            # Get the actual agent type that produced this turn's output
+            agent_type = "UNKNOWN"
+            if agent_output.agent_type:
+                agent_type = agent_output.agent_type.name if hasattr(agent_output.agent_type, 'name') else str(agent_output.agent_type)
+            
+            # Determine the phase based on agent type (more accurate than current state)
+            # The current_phase in state reflects the END state, not the state during each turn
+            phase = self._infer_phase_from_agent(agent_type)
+            
+            # Record turn (only count non-artificial turns for user-facing metrics)
+            if not turn.input.is_artificial:
+                self._metrics_collector.record_turn(phase, agent_type)
+            
+            # Record LLM calls with correct agent attribution
+            for llm_stat in agent_output.llm_stats:
+                self._metrics_collector.record_llm_call(
+                    agent_type=agent_type,
+                    phase=phase,
+                    duration_sec=llm_stat.response_time_in_sec,
+                    prompt_tokens=llm_stat.prompt_token_count,
+                    response_tokens=llm_stat.response_token_count
+                )
+                # Lightweight observability for LLM calls (timing + tokens)
+                logger.info(
+                    "LLM_CALL agent=%s phase=%s dur=%.2fs prompt_tokens=%s resp_tokens=%s",
+                    agent_type,
+                    phase,
+                    llm_stat.response_time_in_sec,
+                    llm_stat.prompt_token_count,
+                    llm_stat.response_token_count
+                )
+            
+            # Extract and record agent questions from the message
+            message = agent_output.message_for_user
+            if message and '?' in message:
+                sentences = message.replace('?\n', '?|').replace('. ', '.|').split('|')
+                for sentence in sentences:
+                    sentence = sentence.strip()
+                    if sentence.endswith('?'):
+                        self._metrics_collector.record_agent_question(sentence)
+    
+    def _infer_phase_from_agent(self, agent_type: str) -> str:
+        """
+        Infer the conversation phase from the agent type.
         
-        # Extract and record agent questions from the message
-        message = agent_output.message_for_user
-        if message and '?' in message:
-            # Simple extraction: split by common sentence endings and filter questions
-            sentences = message.replace('?\n', '?|').replace('. ', '.|').split('|')
-            for sentence in sentences:
-                sentence = sentence.strip()
-                if sentence.endswith('?'):
-                    self._metrics_collector.record_agent_question(sentence)
+        This provides more accurate phase attribution than using current_phase,
+        which reflects the final state after all transitions.
+        """
+        phase_mapping = {
+            "WELCOME_AGENT": "INTRO",
+            "EXPLORE_EXPERIENCES_AGENT": "COUNSELING",
+            "COLLECT_EXPERIENCES_AGENT": "COUNSELING",
+            "EXPLORE_SKILLS_AGENT": "COUNSELING",
+            "INFER_OCCUPATIONS_AGENT": "COUNSELING",
+            "FAREWELL_AGENT": "CHECKOUT",
+        }
+        return phase_mapping.get(agent_type, "COUNSELING")
     
     def _finalize_metrics(self):
         """Finalize metrics collection at end of conversation."""

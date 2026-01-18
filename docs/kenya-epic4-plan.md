@@ -102,17 +102,17 @@ pytest -m "evaluation_test" --repeat 3 \
 - Collect 20+ Swahili job terms
 
 **Acceptance Criteria**:
-- [x] 2-3 models shortlisted - Chosen thhe best to be Gemini 2.5
+- [x] 2-3 models shortlisted - Chosen the best to be Gemini 2.5
 
-**New Taxonomy Introoduced For Swahili**:
+<!-- **New Taxonomy Introoduced For Swahili**:
 
 10 Formal Jobs Added:
 - Muuguzi - Nurse
-- Daktari - Doctor
+- Dokta - Doctor
 - Mhasibu - Accountant / Bookkeeper
 - Karani - Clerk / Office worker
-- Mwalimu - Teacher
-- Mhandisi - Engineer
+- Mwal - Teacher
+- Makani - Engineer
 - Rubani - Pilot / Driver (can also mean captain)
 - Kiongozi - Leader / Manager
 - Mzoefu - Trainer / Coach
@@ -123,13 +123,13 @@ pytest -m "evaluation_test" --repeat 3 \
 - Msukule kazi - Handyman / Odd jobs person
 - Muuzaji - Salesperson / Street vendor
 - Mwenye Duka - Small shop owner
-- Mjenzi - Builder / Mason (informal construction)
+- Msee wa Mjengo - Builder / Mason (informal construction)
 - Mshonaji - Tailor / Seamstress
 - Watchie - Watchman / Security guard
 - Seremala - Carpenter
 - Mwanamuziki - Musician
 - Mchezaji - Player / Athlete / Performer
-- Mchukuaji mizigo - Porter / Loader 
+- Mchukuaji mizigo - Porter / Loader  -->
 
 ## Success Criteria
 
@@ -149,7 +149,7 @@ pytest -m "evaluation_test" --repeat 3 \
 **Documentation**:
 - [x] `baseline_metrics_collector.py` committed
 - [x] Baseline metrics documented
-- [ ] `milestone-2-approach-plan.md` - not created yet
+- [x] Milestone 2 implementation plan documented (see M2 section below)
 
 ---
 
@@ -157,29 +157,118 @@ pytest -m "evaluation_test" --repeat 3 \
 
 **Objective**: Deliver measurable improvements in flow quality for both personas.
 
-## B1: Refactored Skills Elicitation Flow (Rewrite Prompts With Clearer Rules)
+**Baseline Metrics** (from M1):
+- Avg turns: 32.4 | LLM calls: 251 | Repetition rate: 11% | Starter diversity: 15.4%
+- Test case variance: 16 turns (best) to 70 turns (worst - formal verbose style)
+- Critical issue: FAREWELL_AGENT consuming 83% of processing time (64 LLM calls post-conversation)
 
-**Tasks**: TBD
+---
+
+## B1: Refactored Skills Elicitation Flow
+
+**Task 1.1: Debug FAREWELL_AGENT Performance Issue (P0)**
+- Investigate why FAREWELL_AGENT makes 64 LLM calls after conversation ends
+- Determine if user-facing or backend processing (job matching, skill extraction)
+- Fix or separate metrics for accurate timing data
+- Files: `llm_agent_director.py`, `farewell_agent.py`, `conversations/service.py`
+
+**Task 1.2: Reduce Starter Phrase Repetition (P0)**
+- Problem: "Okay" used in 27% of questions; diversity only 15.4%
+- Target: Top starter <15%, diversity >35%
+- Add varied acknowledgment phrases to prompts
+- Files: `collect_experiences_prompt.py`, `explore_skills_prompt.py`
+
+**Task 1.3: Increase Achievement Question Rate (P1)**
+- Problem: Only 1.9% achievement questions (target: >8%)
+- Add prompts for accomplishments, challenges overcome, improvements
+- Files: `explore_skills_prompt.py`
+
+**Task 1.4: Optimize Skills Exploration (P0)**
+- Reduce from 6 turns to 4 turns per experience
+- Consolidate questions, add exit criteria (8-12 skills OR 4 turns)
+- Files: `explore_skills_agent.py`, `explore_skills_prompt.py`
+
+**Task 1.5: Early Exit for Concise Users (P2)**
+- Detect rich, detailed responses and skip redundant follow-ups
+- Target: Concise users complete in <18 turns
+- Files: `llm_agent_director.py`
+
+---
 
 ## B2: Persona-Aware Flow Implementation
 
-**Tasks**: TBD
+**Important**: CV upload integration deferred to Milestone 4. Persona detection is verbal-only for M2.
+
+**Task 2.1: Implement Persona Detection (P0)**
+- Detect Persona 2 (Formal) via verbal cues: "title", "position", "department", "responsibilities"
+- Detect Persona 1 (Informal) via: "tasks", "daily work", "what I did"
+- Default to Persona 1 (safer for informal workers)
+- Create: `backend/app/agent/persona_detector.py`
+- Modify: `conversations/service.py`, `llm_agent_director.py`
+
+**Task 2.2: Persona 1 (Informal) Optimization (P1)**
+- Target: 18-22 turns (simple), ≤35 turns (multi-experience)
+- Use simpler language, more examples/scaffolding
+- Focus on "what did you do daily" → skills mapping
+- Files: `collect_experiences_prompt.py`, `explore_skills_prompt.py`
+
+**Task 2.3: Persona 2 (Formal) Optimization (P0 - Highest Impact)**
+- Problem: Formal verbose descriptions take 70 turns (!)
+- Target: ≤35 turns (down from 70)
+- Acknowledge formal info upfront, avoid redundant questions
+- Track information completeness per experience
+- Files: `collect_experiences_agent.py`, prompt files
+
+**Task 2.4: Multi-Experience Optimization (P1)**
+- Problem: 49 turns for 3+ experiences
+- Target: ≤35 turns for 3+ experiences
+- First experience: Full exploration (4-5 turns)
+- Subsequent: Focused exploration (3 turns)
+- Files: `llm_agent_director.py`, `conversations/service.py`
+
+---
 
 ## Golden Transcripts (English) + CI Gating
 
-**Tasks**: TBD
+**Task 3.1: Create Golden Transcripts (Based on Refactored Flow)**
+- Timing: Create AFTER B1 + B2 refactoring complete
+- 6 transcripts total (3 per persona):
+  - Persona 1: Simple single exp (18-20 turns), Multi-exp (30-35), Process questioner (20-25)
+  - Persona 2: Simple formal (20-25), Formal verbose (30-35), Career progression (35-40)
+- Create: `backend/evaluation_tests/golden_transcripts/persona_1/*.json`
+- Create: `backend/evaluation_tests/golden_transcripts/persona_2/*.json`
 
-## C1: Swahili Model Assessment Finalized (GEMINI 2.5 FLASH IS THE BEST)
+**Task 3.2: Implement CI Test Integration (P0)**
+- Metrics to Gate (Block PR): Turn count ±2, Repetition ≤8%, Skill overlap ≥85%
+- Metrics to Warn: Achievement Q rate ≥5%, Starter diversity ≥35%
+- Create: `golden_transcript_runner.py`, `check_metrics_thresholds.py`
+- Create: `.github/workflows/golden_transcript_tests.yml`
+
+---
+
+## C1: Swahili Model Documentation
+
+**Task 4.1: Document Gemini 2.5 Flash Selection**
+- Model comparison: Gemini 2.5 Flash vs GPT-4o vs Claude 3.5
+- Criteria: Swahili performance, cost, latency, integration
+- Selection rationale and cost analysis
+- Create: `docs/swahili-model-selection.md`
+
+**Task 4.2: Gemini Integration Preparation**
+- API setup checklist for M3
+- Environment variables, rate limits, pricing
+- Create: `docs/gemini-integration-checklist.md`
 
 ---
 
 ## Success Criteria
 
-**Performance Improvements**:
-- [ ] Turn count reduced by 15%+ vs baseline
-- [ ] Conversation time reduced by 20%+ vs baseline
-- [ ] Repetition rate reduced by 25%+ vs baseline
-- [ ] LLM calls reduced by 30%+ vs baseline
+**Performance Improvements** (vs Baseline: 32.4 turns, 11% repetition, 251 LLM calls):
+- [ ] Turn count reduced to ≤27 (17%+ reduction)
+- [ ] Repetition rate reduced to ≤8% (27%+ reduction)
+- [ ] Starter diversity increased to ≥35% (from 15.4%)
+- [ ] Achievement question rate ≥8% (from 1.9%)
+- [ ] LLM calls reduced to ≤200 (20%+ reduction)
 
 **Quality Maintained**:
 - [ ] Skill overlap maintained at 85%+
@@ -187,20 +276,19 @@ pytest -m "evaluation_test" --repeat 3 \
 - [ ] No regression in occupation accuracy
 
 **Persona-Aware Flows**:
-- [ ] Persona detection/selection implemented
-- [ ] Tailored question sets for both personas
-- [ ] Flow adapts based on persona type
+- [ ] Persona detection implemented (verbal-only, >90% accuracy)
+- [ ] Persona 1 (Informal): 18-22 turns simple, ≤35 multi-experience
+- [ ] Persona 2 (Formal): 20-25 turns simple, ≤35 turns verbose (down from 70!)
+- [ ] Flow adapts based on detected persona type
 
 **CI/CD Integration**:
-- [ ] Golden transcripts created for both personas
-- [ ] Automated tests run on every PR
+- [ ] 6 golden transcripts created (3 per persona)
+- [ ] Automated tests run on every PR with metric thresholds
+- [ ] Clear failure messages when quality gates violated
 
-**Swahili Assessment**:
-- [ ] Model comparison completed (3+ models evaluated)
-- [ ] Recommendation document with pros/cons/costs
-- [ ] Selected model ready for integration
-
-- [ ] Baseline metrics documented
+**Swahili Preparation**:
+- [ ] Gemini 2.5 Flash selection documented with rationale
+- [ ] Integration checklist ready for M3 (no blockers)
 
 ---
 
