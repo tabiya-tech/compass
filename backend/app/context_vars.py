@@ -1,5 +1,4 @@
 import contextvars
-from app.i18n.types import Locale
 
 # Define a context variable to store the session_id, which will be used to correlate log messages
 # every conversation with a user will have a unique session_id

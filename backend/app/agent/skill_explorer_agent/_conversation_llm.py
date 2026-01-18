@@ -1,5 +1,4 @@
 import logging
-
 import time
 from textwrap import dedent
 
@@ -11,14 +10,13 @@ from app.agent.prompt_template.format_prompt import replace_placeholders_with_in
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.countries import Country
+from app.i18n.translation_service import t
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
 from common_libs.retry import Retry
-from app.i18n.translation_service import t
-
 
 # centralize use for skill_explorer_agent and conversation_llm_test
-_FINAL_MESSAGE_KEY = "exploreExperiences.noMoreExperiences"
+_FINAL_MESSAGE_KEY = "exploreSkills.finalMessage"
 
 
 class _ConversationLLM:
@@ -146,10 +144,10 @@ class _ConversationLLM:
                 llm_stats=[llm_stats]), 100, ValueError("LLM response is empty")
 
         if llm_response.text == "<END_OF_CONVERSATION>":
-            llm_response.text = t("messages", "exploreSkills.finalMessage")
+            llm_response.text = t("messages", _FINAL_MESSAGE_KEY)
             finished = True
         if llm_response.text.find("<END_OF_CONVERSATION>") != -1:
-            llm_response.text = t("messages", "exploreSkills.finalMessage")
+            llm_response.text = t("messages", _FINAL_MESSAGE_KEY)
             finished = True
             logger.warning("The response contains '<END_OF_CONVERSATION>' and additional text: %s", llm_response.text)
 

@@ -5,6 +5,8 @@ import pytest
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.collect_experiences_agent.data_extraction_llm import EntityExtractionTool
 from app.conversation_memory.conversation_memory_types import ConversationTurn, ConversationContext, ConversationHistory
+from app.i18n.translation_service import get_i18n_manager
+from app.i18n.types import Locale
 from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
@@ -351,6 +353,35 @@ test_cases: list[EntityExtractionToolTestCase] = [
             "location": "",
         },
     )
+    ,
+    EntityExtractionToolTestCase(
+        name="argentina_asistente_ventas",
+        turns=[
+            (SILENCE_MESSAGE, "Contame de tu laburo más reciente")
+        ],
+        locale=Locale.ES_AR,
+        skip_force="force",
+        users_input="Laburé como asistente de ventas en el local de mi viejo en Buenos Aires",
+        expected_extracted_data={
+            "company": AnyOf(ContainsString("local"), ContainsString("viejo")),
+            "location": "Buenos Aires",
+            "experience_title": AnyOf(ContainsString("asistente"), ContainsString("ventas"))
+        }
+    ),
+    EntityExtractionToolTestCase(
+        name="argentina_casa_madre",
+        turns=[
+            (SILENCE_MESSAGE, "¿Hiciste algún laburo no pago en casa?")
+        ],
+        skip_force="force",
+        locale=Locale.ES_AR,
+        users_input="Sí, estuve laburando en la casa de mi madre, me encargaba de la limpieza y la comida",
+        expected_extracted_data={
+            "company": AnyOf(ContainsString("casa"), ContainsString("madre")),
+            "location": AnyOf(None, ContainsString("casa")),
+            "experience_title": AnyOf(ContainsString("limpieza"), ContainsString("comida"), ContainsString("casa"))
+        }
+    ),
 ]
 
 
@@ -363,6 +394,7 @@ async def test_entity_extraction_tool(test_case: EntityExtractionToolTestCase, c
     logger = logging.getLogger()
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
+        get_i18n_manager().set_locale(test_case.locale)
 
         # GIVEN users last input
         given_user_input = AgentInput(message=test_case.users_input)

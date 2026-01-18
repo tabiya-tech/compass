@@ -1004,9 +1004,9 @@ test_cases_data_extraction = [
 async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytest.LogCaptureFixture,
                                setup_multi_locale_app_config):
     logger = logging.getLogger()
-    get_i18n_manager().set_locale(test_case.locale)
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
+        get_i18n_manager().set_locale(test_case.locale)
 
         # GIVEN the previous conversation context
         context: ConversationContext = ConversationContext(

@@ -78,6 +78,7 @@ def setup_multi_locale_app_config():
             LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY"),
             LocaleDateFormatEntry(locale=Locale.EN_GB, date_format="DD/MM/YYYY"),
             LocaleDateFormatEntry(locale=Locale.ES_AR, date_format="DD/MM/YYYY"),
+            LocaleDateFormatEntry(locale=Locale.ES_ES, date_format="DD/MM/YYYY")
         ],
     )
 

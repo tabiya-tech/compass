@@ -30,7 +30,7 @@ def current_test_case(request) -> E2ETestCase:
 @pytest.mark.evaluation_test("gemini-2.0-flash-001/")
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize('current_test_case', get_test_cases_to_run(test_cases),
-                         ids=[case.name for case in get_test_cases_to_run(test_cases)])
+                         ids=[case.test_id for case in get_test_cases_to_run(test_cases)])
 async def test_main_app_chat(
         max_iterations: int,
         current_test_case: E2ETestCase | E2ESpecificTestCase,
@@ -43,9 +43,10 @@ async def test_main_app_chat(
     would call and does not mock any of the tested components.
     """
     logger = logging.getLogger()
-    logger.info(f"Running test case {current_test_case.name}")
+    logger.info(f"Running test case {current_test_case.test_id}")
     session_id = get_random_session_id()
-    get_i18n_manager().set_locale(current_test_case.locale)
+    locales_manager = get_i18n_manager()
+    locales_manager.set_locale(current_test_case.locale)
     search_services = await setup_search_services
     experience_pipeline_config = ExperiencePipelineConfig.model_validate(
         {"number_of_clusters": current_test_case.given_number_of_clusters,
@@ -67,12 +68,17 @@ async def test_main_app_chat(
     evaluation_result = ConversationEvaluationRecord(simulated_user_prompt=current_test_case.simulated_user_prompt,
                                                      test_case=current_test_case.name)
     failures = []
+
+    # Add the language instruction to the simulated user prompt
+    system_instruction = current_test_case.simulated_user_prompt
+    system_instruction += (f"\n\nVERY IMPORTANT: You are going to be chatting in {current_test_case.locale.label()}. "
+                           f"Never in any case reply to the LLM in a different language even though the instructions might contain 'English'")
     try:
         evaluation_result.add_conversation_records(
             await conversation_generator.generate(
                 max_iterations=current_test_case.conversation_rounds if current_test_case.conversation_rounds else max_iterations,
                 execute_simulated_user=LLMSimulatedUser(
-                    system_instructions=current_test_case.simulated_user_prompt),
+                    system_instructions=system_instruction),
                 execute_evaluated_agent=lambda agent_input: chat_executor.send_message(agent_input=agent_input),
                 is_finished=lambda agent_output: chat_executor.conversation_is_complete(agent_output=agent_output),
             ))

@@ -1,12 +1,12 @@
 import asyncio
-from typing import Literal, Sequence, Mapping, Any
+import logging.config
 import re
+from typing import Literal, Sequence, Mapping, Any
 
+from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
 from pydantic import BaseModel, Field
 from pymongo.errors import OperationFailure
 from pymongo.operations import SearchIndexModel
-import logging.config
-from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
 
 from _base_data_settings import CompassEmbeddingsCollections
 
@@ -90,7 +90,7 @@ async def _upsert_index(*,
         if ex.code == 85:
             logger.error(f"IndexOptionsConflict: '{collection.name}.{name}': {ex}")
     except Exception as ex:
-        logger.error(f"Failed to create index '{collection.name}.{name}': {ex}")
+        logger.exception(f"Failed to create index '{collection.name}.{name}': {ex}")
 
 
 async def _create_std_indexes(*, hot_run: bool,
@@ -136,6 +136,7 @@ async def _create_std_indexes(*, hot_run: bool,
 async def _create_vector_search_index(*,
                                       hot_run: bool,
                                       collection: AsyncIOMotorCollection,
+                                      num_of_dimensions: int,
                                       logger: logging.Logger,
                                       ):
     logger.info(f"Creating vector search index for collection:{collection.name}")
@@ -143,7 +144,7 @@ async def _create_vector_search_index(*,
     _vector_index_definition = {
         "fields": [
             {
-                "numDimensions": 768,
+                "numDimensions": num_of_dimensions,
                 "path": "embedding",
                 "similarity": "cosine",
                 "type": "vector"
@@ -245,6 +246,7 @@ async def create_relations_indexes(*, hot_run: bool,
 
 async def create_occupations_indexes(*, hot_run: bool,
                                      db: AsyncIOMotorDatabase,
+                                     num_of_dimensions: int,
                                      logger: logging.Logger,
                                      ):
     # Create the indexes
@@ -266,11 +268,13 @@ async def create_occupations_indexes(*, hot_run: bool,
     )
     await _create_vector_search_index(hot_run=hot_run,
                                       collection=collection,
+                                      num_of_dimensions=num_of_dimensions,
                                       logger=logger)
 
 
 async def create_skills_indexes(*, hot_run: bool,
                                 db: AsyncIOMotorDatabase,
+                                num_of_dimensions: int,
                                 logger: logging.Logger,
                                 ):
     # Create the indexes
@@ -283,10 +287,14 @@ async def create_skills_indexes(*, hot_run: bool,
                               )
     await _create_vector_search_index(hot_run=hot_run,
                                       collection=collection,
+                                      num_of_dimensions=num_of_dimensions,
                                       logger=logger)
 
 
-async def generate_indexes(*, hot_run: bool, db: AsyncIOMotorDatabase, logger: logging.Logger):
+async def generate_indexes(*, hot_run: bool,
+                           db: AsyncIOMotorDatabase,
+                           num_of_dimensions: int,
+                           logger: logging.Logger):
     await asyncio.gather(
         create_model_info_indexes(
             hot_run=hot_run,
@@ -303,7 +311,9 @@ async def generate_indexes(*, hot_run: bool, db: AsyncIOMotorDatabase, logger: l
     # vector search index creation to the end of the script and doing it sequentially
     await create_occupations_indexes(hot_run=hot_run,
                                      db=db,
+                                     num_of_dimensions=num_of_dimensions,
                                      logger=logger)
     await create_skills_indexes(hot_run=hot_run,
                                 db=db,
+                                num_of_dimensions=num_of_dimensions,
                                 logger=logger)

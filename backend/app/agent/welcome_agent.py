@@ -225,6 +225,9 @@ class WelcomeAgent(Agent):
         """
         Get the system instructions of the agent
         :return: The system instructions
+        
+        Note: The 50 minutes average mentioned in the instructions is based on a trial where 
+        the average number of experiences was 3.36.
         """
 
         system_instructions_template = dedent("""\
@@ -272,7 +275,7 @@ class WelcomeAgent(Agent):
               right corner of the screen.
             - I will be able to download the CV  as PDF, or as a DOCX file to edit it later. 
             - You are not conducting the exploration session, you are only welcoming me and forwarding me to the exploration session. 
-            - Each experience might take about 10 to 15 minutes in total, so please set aside enough time.
+            - The conversation takes about 50 minutes on average (could be longer depending on the number of experiences), so please set aside enough time.
               If needed, I can create an account and come back later to pick up where you left off.
             - I can create an account at the upper right corner of the screen, under "register".
             - If I do not create an account, I can still explore my work experiences and skills, but if I log out or close the browser, 

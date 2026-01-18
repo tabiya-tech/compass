@@ -7,6 +7,7 @@ from app.agent.agent_director._llm_router import LLMRouter
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
+from app.i18n.translation_service import get_i18n_manager
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
@@ -160,6 +161,29 @@ test_cases_router = [
         conversation_phase=ConversationPhase.COUNSELING,
         expected_agent_type=AgentType.WELCOME_AGENT
     ),
+    RouterTestCase(
+        name="argentina_route_to_explore",
+        summary="",
+        turns=[
+            ("(silence)", "¡Hola! Bienvenid@ a Brújula. Vamos a arrancar explorando tus experiencias. Decime 'empezar' cuando estés listo/a."),
+            ("Empezar", "¡Genial! Contame sobre tu primer laburo.")
+        ],
+        user_input="Laburé como asistente de ventas",
+        conversation_phase=ConversationPhase.COUNSELING,
+        expected_agent_type=AgentType.EXPLORE_EXPERIENCES_AGENT
+    ),
+    RouterTestCase(
+        name="argentina_route_to_welcome",
+        summary="",
+        turns=[
+            ("(silence)", "¡Hola! Bienvenid@ a Brújula. Vamos a arrancar explorando tus experiencias. Decime 'empezar' cuando estés listo/a."),
+            ("Empezar", "¡Genial! Contame sobre tu primer laburo."),
+            ("Laburé como asistente de ventas", "¿Qué hacías ahí?")
+        ],
+        user_input="Che, ¿me explicás de nuevo qué estamos haciendo?",
+        conversation_phase=ConversationPhase.COUNSELING,
+        expected_agent_type=AgentType.WELCOME_AGENT
+    ),
 ]
 
 
@@ -170,6 +194,7 @@ test_cases_router = [
                          ids=[case.name for case in get_test_cases_to_run(test_cases_router)])
 async def test_router_extraction(test_case: RouterTestCase, caplog: pytest.LogCaptureFixture):
     logger = logging.getLogger()
+    get_i18n_manager().set_locale(test_case.locale)
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
 

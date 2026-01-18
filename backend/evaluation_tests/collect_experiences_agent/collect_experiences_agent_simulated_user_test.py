@@ -6,6 +6,7 @@ from _pytest.logging import LogCaptureFixture
 
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
+from app.i18n.translation_service import get_i18n_manager
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from common_libs.test_utilities import get_random_session_id
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
@@ -60,6 +61,7 @@ async def test_collect_experiences_agent_simulated_user(test_case: CollectExperi
     with caplog.at_level(logging.DEBUG):
         # Guards to ensure that the loggers are correctly set up,
         guard_caplog(logger=execute_evaluated_agent._agent._logger, caplog=caplog)
+        get_i18n_manager().set_locale(test_case.locale)
 
         # Run the main test
         evaluation_result: ConversationEvaluationRecord = await conversation_test_function(

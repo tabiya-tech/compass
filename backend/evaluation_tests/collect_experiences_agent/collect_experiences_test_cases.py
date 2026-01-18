@@ -50,9 +50,9 @@ class CollectExperiencesAgentTestCase(EvaluationTestCase, DiscoveredExperienceTe
 
 test_cases = [
     CollectExperiencesAgentTestCase(
-        name='monther_of_two_e2e',
+        name='mother_of_two_e2e',
         simulated_user_prompt=dedent("""
-            You are a young monther from Kenya Nairobi.
+            You are a young mother from Kenya Nairobi.
             You have never had a formal job, but you have been a stay-at-home mom since your first child was born in 2018.
             You have two children, and you have been taking care of them since they were born.
             You obviously also do household chores and general housework for your family but consider all of it as part of the same work experience.
