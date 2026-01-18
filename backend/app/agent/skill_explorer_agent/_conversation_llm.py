@@ -169,67 +169,39 @@ class _ConversationLLM:
             You are a conversation partner helping me, a young person{country_of_user_segment},
             reflect on my experience as {experience_title}{work_type}.
             
-            I have already shared basic information about this experience and now are in the process 
-            where you are helping me reflect on my experience in more detail.
+            I have already shared basic information about this experience and we are now in the process 
+            of reflecting on my experience in more detail.
             
         {language_style}
         
         {agent_character}
 
-        #Questions you must ask me - OPTIMIZED FOR EFFICIENCY
-            You must ask me open-ended questions designed to elicit clear and comprehensive responses about my responsibilities,
-            without assuming any prior knowledge about my experience as {experience_title}{work_type}.
+        #Questions you must ask me
+            Ask open-ended questions about my responsibilities as {experience_title}{work_type}.
+            Ask 1-2 questions per turn. Complete in approximately 4 turns.
             
-            TARGET: Complete the exploration in approximately 4 conversation turns. Be efficient but thorough.
+            4-TURN FLOW:
+                1. Typical day and key responsibilities
+                2. Achievements or challenges (REQUIRED before ending)
+                3. Tasks NOT part of my role, or: {get_question_c}
+                4. Follow-up clarification if needed, then end
             
-            RECOMMENDED 4-TURN FLOW:
-                Turn 1: Ask about typical day and key responsibilities
-                Turn 2: Ask about achievements, challenges, or what I'm proud of
-                Turn 3: Ask about what tasks I DON'T do or the broader context ({get_question_c})
-                Turn 4: Any follow-up clarification if needed, then end
-            
-            Question categories to cover:
-            
-            (a) Experience details - ask about typical day and responsibilities:
-                - "Can you describe a typical day as {experience_title}? What are the most important things you do?"
-                (Combine typical day + important tasks in ONE question when possible)
-
-            (b) Achievements and challenges (REQUIRED - ask at least one):
-                - "What accomplishments are you most proud of?" or
-                - "What challenges did you face and how did you handle them?" or
-                - "What's something you improved or made better?"
-                If you have NOT asked an achievement/challenge question yet, ask one immediately before ending.
-
-            (c) Boundaries and context:
-                - "Are there tasks you specifically don't handle?" AND/OR
-                - {get_question_c}
-                (Can combine these in one turn)
-
-            EFFICIENCY RULES:
-            - Combine related questions naturally when appropriate
-            - If I give a detailed response, you may skip follow-up questions on that topic
-            - If I've already covered a topic in a previous response, don't ask about it again
-            - You can combine questions from different categories in a single turn
-            
-            EXIT CRITERIA - End the exploration when ANY of these are met:
-            - You have completed approximately 4 turns of questioning
-            - You have covered categories (a), (b), and at least part of (c)
-            - I indicate I have nothing more to share
-            - I have provided comprehensive information and more questions would be redundant
+            RULES:
+            - Skip topics I've already covered in detail
+            - Combine related questions when natural
+            - End when categories 1-3 are covered or I have nothing more to share
             
             Questions asked so far:
             <question_asked_until_now>
                 {question_asked_until_now}
             </question_asked_until_now>
-
-            Encourage descriptive responses, but don't over-probe. Quality over quantity.
         
         #Question to avoid asking
-            Do not ask me direct queries for specific details. For example questions like "What kind of ... do you make?" or "Do you use a ...", "How do you ..."
+            Avoid overly narrow, tool- or product-specific questions unless needed for clarification.
             
-            Do not deep dive into the specifics of the experience, stick to the general questions about the experience.
+            Stay at the level of responsibilities and outcomes; ask specifics only to clarify ambiguity or contradictions.
             
-            Do not ask me questions that can be answered with yes/no. For example questions line "Do you enjoy your job?" Instead, ask "What do you enjoy about your job?"
+            Do not ask me questions that can be answered with yes/no. For example, questions like "Do you enjoy your job?" Instead, ask "What do you enjoy about your job?"
             
             Do not ask me leading questions that suggest a specific answer. For example, "Do you find developing software tiring because it starts early in the morning?"
         
@@ -293,7 +265,7 @@ class _ConversationLLM:
             reflect on my experience as {experience_title}{work_type}. I have already shared very basic information about this experience.
             {experiences_explored_instructions}
                                  
-            Let's now begin the process and help me reflect on the experience as {experience_title} in nore detail.
+            Let's now begin the process and help me reflect on the experience as {experience_title} in more detail.
             
             Respond with something similar to this:
                 Explain that we will explore my experience as {experience_title}.
@@ -313,10 +285,10 @@ class _ConversationLLM:
         if len(experiences_explored) > 0:
             experiences_explored_instructions = dedent("""\
             
-            We have have already finished reflecting in detail the experiences:
+            We have already finished reflecting in detail on the experiences:
                 {experiences_explored}
             
-            Do not pay attention to was said before regarding the above experiences 
+            Do not pay attention to what was said before regarding the above experiences 
             as the focus is now on the experience as {experience_title}{work_type}.
             
             """)

@@ -1,6 +1,6 @@
 import textwrap
 
-from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE
+from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE, STD_LANGUAGE_STYLE_JSON
 from app.i18n.translation_service import get_i18n_manager
 
 
@@ -19,7 +19,7 @@ def _get_locale_section():
         """)
 
 
-def get_language_style(*, with_locale: bool = True) -> str:
+def get_language_style(*, with_locale: bool = True, for_json_output: bool = False) -> str:
     """
     Get the language style instructions.
 
@@ -31,6 +31,6 @@ def get_language_style(*, with_locale: bool = True) -> str:
     if with_locale:
         prompt += _get_locale_section()
 
-    prompt += STD_LANGUAGE_STYLE
+    prompt += STD_LANGUAGE_STYLE_JSON if for_json_output else STD_LANGUAGE_STYLE
 
     return prompt
