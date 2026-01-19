@@ -131,8 +131,8 @@ PASS — no changes required.
   - Ensure unique index on `child_skill_id` is created by the loader.
 
 6. **Tests (targeted)**
-  - Unit test mapping store lookup and fallback.
-  - Unit test experience response mapping (preferredLabel changed only when mapped).
+  - Minimal unit test for mapping store lookup and fallback.
+  - Minimal unit test for experience response mapping (preferredLabel changed only when mapped).
 
 7. **Documentation**
   - Update backend README or script docstring with loader usage.

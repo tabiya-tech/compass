@@ -92,11 +92,10 @@ As a user, I want results to still show a skill even if it is not in the mapping
 
 ### Functional Requirements
 
-- **FR-001**: System MUST map each extracted skill to exactly one parent skill using the provided mapping file (last 3 columns as the output level).
+- **FR-001**: System MUST map each extracted skill to exactly one parent skill using the stored mapping (derived from the provided CSV’s last 3 columns).
 - **FR-002**: System MUST display the mapped parent skill label in place of the extracted skill label when a mapping exists.
 - **FR-003**: System MUST keep and display the original extracted skill when no mapping exists.
 - **FR-004**: System MUST apply the same mapping rules consistently across all skill outputs in the current flow.
-- **FR-005**: System MUST surface the parent skill identifier and type from the mapping file wherever skill metadata is shown.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -105,13 +104,13 @@ As a user, I want results to still show a skill even if it is not in the mapping
 
 ### Assumptions
 
-- The provided mapping file is the source of truth for parent selection and already encodes the multi-parent resolution.
-- The mapping file covers the majority of extracted skills; unmapped skills are acceptable and should pass through unchanged.
-- The mapping file uses identifiers that match the identifiers produced by the current skill extraction flow.
+- The stored MongoDB mapping is the runtime source of truth and already encodes the multi-parent resolution from the CSV.
+- The mapping covers the majority of extracted skills; unmapped skills are acceptable and should pass through unchanged.
+- The mapping uses identifiers that match the identifiers produced by the current skill extraction flow.
 
 ### Dependencies
 
-- Availability of the mapping file in the deployment environment.
+- Availability of the mapping collection in the taxonomy MongoDB (populated via the loader script).
 
 ## Success Criteria *(mandatory)*
 
