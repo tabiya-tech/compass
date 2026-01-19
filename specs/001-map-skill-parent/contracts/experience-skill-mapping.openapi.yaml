@@ -1,0 +1,84 @@
+openapi: 3.0.3
+info:
+  title: Experience Skills Response (Mapped Parent Labels)
+  version: "1.0"
+  description: |
+    Documents the existing experiences endpoint with clarification that skill labels
+    may be mapped to a parent label when a mapping exists. Response shape is unchanged.
+paths:
+  /conversations/{session_id}/experiences:
+    get:
+      summary: Get experiences for a session
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of experiences with skills (mapped to parent labels when available).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExperienceResponse"
+components:
+  schemas:
+    SkillResponse:
+      type: object
+      required: [UUID, preferredLabel, altLabels, description, orderIndex]
+      properties:
+        UUID:
+          type: string
+          description: Child skill UUID (unchanged).
+        preferredLabel:
+          type: string
+          description: Parent label when mapping exists; otherwise child label.
+        altLabels:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+        orderIndex:
+          type: integer
+    ExperienceResponse:
+      type: object
+      required: [UUID, top_skills, remaining_skills, exploration_phase]
+      properties:
+        UUID:
+          type: string
+        experience_title:
+          type: string
+          nullable: true
+        company:
+          type: string
+          nullable: true
+        timeline:
+          type: object
+          nullable: true
+          properties:
+            start:
+              type: string
+              nullable: true
+            end:
+              type: string
+              nullable: true
+        work_type:
+          type: string
+          nullable: true
+        summary:
+          type: string
+          nullable: true
+        exploration_phase:
+          type: string
+        top_skills:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkillResponse"
+        remaining_skills:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkillResponse"
