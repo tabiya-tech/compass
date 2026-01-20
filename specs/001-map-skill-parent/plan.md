@@ -7,7 +7,7 @@
 
 ## Summary
 
-Map extracted skills to a one-level-up parent label using a MongoDB-backed mapping (Option A). A loader script imports the CSV and replaces the mapping collection. The backend applies the mapping only at response serialization, leaving extraction, ranking, and storage unchanged. The mapping is cached in memory to avoid per-request DB calls.
+Map extracted skills to a one-level-up parent label using a MongoDB-backed mapping (Option A) stored in the application database. A loader script imports the CSV and replaces the mapping collection. The backend applies the mapping only at response serialization, leaving extraction, ranking, and storage unchanged. The mapping is cached in memory to avoid per-request DB calls. Mapping lookups use `skillId` (child skill id) as the key.
 
 ## Technical Context
 
@@ -19,7 +19,7 @@ Map extracted skills to a one-level-up parent label using a MongoDB-backed mappi
 
 **Language/Version**: Python 3.11  
 **Primary Dependencies**: FastAPI, Motor (MongoDB), Pydantic, Poetry  
-**Storage**: MongoDB (taxonomy DB) for `skill_parent_mappings`  
+**Storage**: MongoDB (application DB) for `skill_parent_mappings`  
 **Testing**: pytest, pylint, bandit  
 **Target Platform**: Backend API service (FastAPI)  
 **Project Type**: Backend service (monorepo)  
@@ -108,7 +108,7 @@ PASS — no changes required.
 
 1. **Create mapping store**
   - Add `skill_parent_mapping_store.py` with:
-    - async `initialize()` to load mappings from taxonomy DB into dict.
+    - async `initialize()` to load mappings from application DB into dict.
     - sync `get_parent_label(child_skill_id)` lookup.
     - safe fallback when mappings are missing.
 
@@ -130,11 +130,15 @@ PASS — no changes required.
 5. **Indexes**
   - Ensure unique index on `child_skill_id` is created by the loader.
 
-6. **Tests (targeted)**
+6. **Apply mapping to chat summaries and deduplicate outputs**
+  - Ensure conversation summary skill lists use parent labels when available.
+  - De-duplicate skills after mapping so a parent label appears only once per summary or response payload.
+
+7. **Tests (targeted)**
   - Minimal unit test for mapping store lookup and fallback.
   - Minimal unit test for experience response mapping (preferredLabel changed only when mapped).
 
-7. **Documentation**
+8. **Documentation**
   - Update backend README or script docstring with loader usage.
 
 ## Complexity Tracking

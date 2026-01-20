@@ -4,7 +4,7 @@ info:
   version: "1.0"
   description: |
     Documents the existing experiences endpoint with clarification that skill labels
-    may be mapped to a parent label when a mapping exists. Response shape is unchanged.
+    may be mapped to a parent label when a stored mapping exists. Response shape is unchanged.
 paths:
   /conversations/{session_id}/experiences:
     get:

@@ -9,15 +9,15 @@
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-- [ ] T001 Ensure module init exists in backend/features/skills_granularity/__init__.py
+- [x] T001 Ensure module init exists in backend/features/skills_granularity/__init__.py
 
 ---
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-- [ ] T002 Add mapping collection constants in backend/features/skills_granularity/constants.py
-- [ ] T003 Implement in-memory mapping store in backend/features/skills_granularity/skill_parent_mapping_store.py (cache, initialize, lookup returning parent label)
-- [ ] T004 [P] Wire mapping store initialization on startup in backend/app/server.py with non-fatal logging on failure
+- [x] T002 Add mapping collection constants in backend/features/skills_granularity/constants.py
+- [x] T003 Implement in-memory mapping store in backend/features/skills_granularity/skill_parent_mapping_store.py (cache, initialize, lookup returning parent label)
+- [x] T004 [P] Wire mapping store initialization on startup in backend/app/server.py with non-fatal logging on failure
 
 **Checkpoint**: Mapping store available and initialized before any response mapping.
 
@@ -31,13 +31,13 @@
 
 ### Tests (minimal)
 
-- [ ] T005 [P] [US1] Add unit test for mapping store lookup/fallback in backend/app/conversations/experience/test_utils.py
-- [ ] T006 [P] [US1] Add unit test for response label mapping in backend/app/conversations/experience/test_service.py
+- [x] T005 [P] [US1] Add unit test for mapping store lookup/fallback in backend/app/conversations/experience/test_utils.py
+- [x] T006 [P] [US1] Add unit test for response label mapping in backend/app/conversations/experience/test_service.py
 
 ### Implementation
 
-- [ ] T007 [US1] Apply mapping in backend/app/conversations/experience/_types.py so SkillResponse.preferredLabel uses the parent label when mapping exists
-- [ ] T008 [P] [US1] Update contract docs in specs/001-map-skill-parent/contracts/experience-skill-mapping.openapi.yaml to document mapped label behavior
+- [x] T007 [US1] Apply mapping in backend/app/conversations/experience/_types.py so SkillResponse.preferredLabel uses the parent label when mapping exists
+- [x] T008 [P] [US1] Update contract docs in specs/001-map-skill-parent/contracts/experience-skill-mapping.openapi.yaml to document mapped label behavior
 
 **Checkpoint**: Mapped labels appear in responses without changing the API shape for existing clients.
 
@@ -47,12 +47,12 @@
 
 **Goal**: Provide a deterministic, replaceable mapping source via MongoDB.
 
-**Independent Test**: Run the loader on a CSV and confirm the mapping collection contains one entry per child skill.
+**Independent Test**: Run the loader on a CSV and confirm the mapping collection in the application DB contains one entry per child skill.
 
 ### Implementation
 
-- [ ] T009 [P] [US2] Build CSV loader in backend/scripts/skills_parent_mapping/load_mapping.py to delete/insert mappings and create unique index on child_skill_id
-- [ ] T010 [US2] Document loader usage in backend/scripts/skills_parent_mapping/load_mapping.py docstring
+- [x] T009 [P] [US2] Build CSV loader in backend/scripts/skills_parent_mapping/load_mapping.py to delete/insert mappings and create unique index on child_skill_id
+- [x] T010 [US2] Document loader usage in backend/scripts/skills_parent_mapping/load_mapping.py docstring
 
 **Checkpoint**: Mapping collection can be fully replaced by running the loader script.
 
@@ -66,7 +66,7 @@
 
 ### Implementation
 
-- [ ] T011 [US3] Ensure lookup fallback in backend/features/skills_granularity/skill_parent_mapping_store.py returns None and response mapping keeps original label
+- [x] T011 [US3] Ensure lookup fallback in backend/features/skills_granularity/skill_parent_mapping_store.py returns None and response mapping keeps original label
 
 **Checkpoint**: Unmapped skills pass through unchanged.
 
@@ -74,7 +74,15 @@
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T012 [P] Update specs/001-map-skill-parent/quickstart.md with final loader invocation command
+- [x] T012 [P] Update specs/001-map-skill-parent/quickstart.md with final loader invocation command
+
+---
+
+## Phase 7: Chat Summary & Dedup (New)
+
+- [x] T013 Apply parent-label mapping to chat experience summaries so “skills found” use parent labels when available
+- [x] T014 De-duplicate mapped skills in user-facing outputs (drawer, reports, chat summaries) to show each parent label once
+- [x] T015 Add/extend tests to cover chat summary mapping and deduplication behavior
 
 ---
 
@@ -90,10 +98,10 @@
 - T006 can be done in parallel with T005.
 
 ### User Story 2
-- T007 can be started as soon as T002 completes (collection name known).
+- T009 can be started as soon as T002 completes (collection name known).
 
 ### User Story 3
-- T009 can be done in parallel with any doc updates once T003 exists.
+- T011 can be done in parallel with any doc updates once T003 exists.
 
 ## Implementation Strategy
 

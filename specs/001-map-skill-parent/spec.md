@@ -32,6 +32,8 @@ As a user viewing extracted skills, I want to see a single parent-level skill fo
 
 1. **Given** extracted skills that exist in the mapping file, **When** results are displayed, **Then** each skill is shown as its mapped parent label.
 2. **Given** multiple extracted skills that map to different parents, **When** results are displayed, **Then** each skill is shown under its respective mapped parent label.
+3. **Given** a conversation summary listing “skills found,” **When** the summary is rendered, **Then** parent labels are shown wherever a mapping exists.
+4. **Given** multiple child skills that map to the same parent, **When** any user-facing list (drawer, report, chat summary) is shown, **Then** each parent skill appears only once.
 
 ---
 
@@ -95,7 +97,8 @@ As a user, I want results to still show a skill even if it is not in the mapping
 - **FR-001**: System MUST map each extracted skill to exactly one parent skill using the stored mapping (derived from the provided CSV’s last 3 columns).
 - **FR-002**: System MUST display the mapped parent skill label in place of the extracted skill label when a mapping exists.
 - **FR-003**: System MUST keep and display the original extracted skill when no mapping exists.
-- **FR-004**: System MUST apply the same mapping rules consistently across all skill outputs in the current flow.
+- **FR-004**: System MUST apply the same mapping rules consistently across all skill outputs in the current flow, including chat summaries.
+- **FR-005**: System MUST de-duplicate displayed skills after mapping so each parent label appears only once per response or summary.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -104,13 +107,13 @@ As a user, I want results to still show a skill even if it is not in the mapping
 
 ### Assumptions
 
-- The stored MongoDB mapping is the runtime source of truth and already encodes the multi-parent resolution from the CSV.
+- The stored MongoDB mapping in the application database is the runtime source of truth and already encodes the multi-parent resolution from the CSV.
 - The mapping covers the majority of extracted skills; unmapped skills are acceptable and should pass through unchanged.
 - The mapping uses identifiers that match the identifiers produced by the current skill extraction flow.
 
 ### Dependencies
 
-- Availability of the mapping collection in the taxonomy MongoDB (populated via the loader script).
+- Availability of the mapping collection in the application MongoDB (populated via the loader script).
 
 ## Success Criteria *(mandatory)*
 

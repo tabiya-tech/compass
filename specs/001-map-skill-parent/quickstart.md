@@ -3,13 +3,14 @@
 ## Prerequisites
 
 - Backend environment configured (see backend/README.md).
-- Access to taxonomy MongoDB.
+- Access to application MongoDB.
 - CSV file with columns: `ID`, `PARENTID`, `PARENTOBJECTTYPE`, `PARENTLABEL`.
 
 ## Load/Replace the Mapping
 
 1. Place the CSV file in a local path accessible to the backend.
-2. Run the loader script (to be added under `backend/scripts/skills_parent_mapping/`):
+2. Run the loader script:
+  - `poetry run python scripts/skills_parent_mapping/load_mapping.py --csv /path/to/skills_with_parent.csv`
    - The script deletes existing mappings and inserts the new set.
    - The output reports the number of mappings inserted and any skipped rows.
 

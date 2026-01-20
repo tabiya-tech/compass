@@ -22,6 +22,10 @@ Represents a one‑to‑one mapping from a child skill to a single parent label 
 - `SkillParentMapping.child_skill_id` refers to taxonomy skill documents by `skillId`.
 - `parent_id` refers to a taxonomy skill or skillgroup ID (as identified in the CSV).
 
+## Storage Location
+
+- Stored in the application MongoDB database for write access, while referencing taxonomy identifiers.
+
 ## Validation Rules
 
 - `child_skill_id` and `parent_id` must be non‑empty 24‑char hex strings.

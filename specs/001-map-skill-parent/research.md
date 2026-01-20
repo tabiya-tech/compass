@@ -9,14 +9,14 @@
 **Alternatives considered**:
 - Use `UUID` or `originUUID` as lookup keys. Rejected because the CSV does not include a single definitive UUID column (only `UUIDHISTORY`), and mapping to current UUIDs would require additional parsing and ambiguity handling.
 
-## Decision 2: Store the mapping in the taxonomy MongoDB
+## Decision 2: Store the mapping in the application MongoDB
 
-**Decision**: Persist mappings in a dedicated taxonomy collection (e.g., `skill_parent_mappings`) and treat it as taxonomy data.
+**Decision**: Persist mappings in a dedicated application collection (e.g., `skill_parent_mappings`).
 
-**Rationale**: The mapping is derived from taxonomy structure, not user data. Storing it alongside taxonomy reduces cross‑DB coupling and keeps application state untouched.
+**Rationale**: Write access is available on the application database. Keeping the mapping there avoids permission issues while still allowing a lightweight lookup cache.
 
 **Alternatives considered**:
-- Store in application DB. Rejected because this is not per‑user or conversation data.
+- Store in taxonomy DB. Rejected due to lack of write access.
 - Read directly from a CSV at runtime. Rejected due to deployment coupling and slower request processing.
 
 ## Decision 3: Apply mapping at response serialization only
