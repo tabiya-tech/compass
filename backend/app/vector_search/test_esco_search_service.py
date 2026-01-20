@@ -1,5 +1,3 @@
-import pytest
-
 from app.vector_search.esco_search_service import SkillSearchService
 
 

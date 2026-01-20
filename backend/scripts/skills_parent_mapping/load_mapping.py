@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Load skill parent mappings from a CSV into the taxonomy MongoDB.
+"""Load skill parent mappings from a CSV into the application MongoDB.
 
 Usage:
     poetry run python scripts/skills_parent_mapping/load_mapping.py --csv /path/to/skills_with_parent.csv
@@ -52,7 +52,7 @@ async def _load_mapping(*, csv_path: str, mongodb_uri: str, database_name: str) 
 
         now = datetime.now(timezone.utc)
         source_file = os.path.basename(csv_path)
-        documents: list[dict[str, str]] = []
+        documents: list[dict[str, str | datetime]] = []
         skipped = 0
 
         for row in reader:

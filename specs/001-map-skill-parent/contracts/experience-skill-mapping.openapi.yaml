@@ -44,6 +44,10 @@ components:
           type: string
         orderIndex:
           type: integer
+      description: |
+        When a mapping exists, only `preferredLabel` is replaced with the parent label.
+        The remaining fields (`UUID`, `altLabels`, `description`) still describe the child skill.
+        This preserves identity and compatibility with existing client behavior.
     ExperienceResponse:
       type: object
       required: [UUID, top_skills, remaining_skills, exploration_phase]

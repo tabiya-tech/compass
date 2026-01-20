@@ -261,7 +261,7 @@ async def lifespan(_app: FastAPI):
     )
 
     try:
-        await initialize_skill_parent_mapping_store(taxonomy_db=application_db, logger=logger)
+        await initialize_skill_parent_mapping_store(db=application_db, logger=logger)
     except Exception as exc:  # pylint: disable=broad-except
         logger.warning("Failed to initialize skill parent mappings; continuing without mapping: %s", exc)
 

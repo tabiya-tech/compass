@@ -34,3 +34,16 @@
 - Reduces overly granular lists without changing extraction logic.
 - Keeps UI outputs consistent across surfaces.
 - Avoids confusing repeats when multiple child skills share a parent.
+
+## Semantics Note (Current Behavior)
+
+- Only `preferredLabel` is replaced with the parent label.
+- `UUID`, `altLabels`, and `description` still refer to the child skill.
+
+**Why this choice**: We preserve existing identifiers and metadata to avoid breaking clients that rely on child UUIDs or expect the original skill metadata.
+
+## Possible Future Change
+
+- Option A: clear `altLabels`/`description` when the parent label is shown.
+- Option B: resolve parent metadata and replace all fields to match the parent skill.
+- Option C: include explicit parent metadata fields (e.g., `parentUUID`, `parentDescription`) while keeping child data.

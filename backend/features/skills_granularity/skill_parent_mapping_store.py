@@ -15,7 +15,7 @@ _initialized = False
 _lock = asyncio.Lock()
 
 
-async def initialize(*, taxonomy_db: AsyncIOMotorDatabase, logger: logging.Logger) -> None:
+async def initialize(*, db: AsyncIOMotorDatabase, logger: logging.Logger) -> None:
     global _initialized, _cache
     if _initialized:
         return
@@ -24,7 +24,7 @@ async def initialize(*, taxonomy_db: AsyncIOMotorDatabase, logger: logging.Logge
         if _initialized:
             return
 
-        collection = taxonomy_db.get_collection(SKILL_PARENT_MAPPING_COLLECTION)
+        collection = db.get_collection(SKILL_PARENT_MAPPING_COLLECTION)
         cursor = collection.find(
             {},
             {
