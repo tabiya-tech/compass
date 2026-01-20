@@ -306,8 +306,10 @@ class SkillSearchService(AbstractEscoSearchService[SkillEntity]):
         Convert a Document object to a SkillEntity object.
         """
 
+        skill_id = doc.get("skillId") or doc.get("_id") or doc.get("$skillId") or ""
+
         return SkillEntity(
-            id=str(doc.get("$skillId", "")),
+            id=str(skill_id),
             modelId=str(doc.get("modelId", "")),
             UUID=doc.get("UUID", ""),
             preferredLabel=doc.get("preferredLabel", ""),

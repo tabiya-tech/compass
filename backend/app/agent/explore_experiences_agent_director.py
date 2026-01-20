@@ -20,6 +20,20 @@ from app.countries import Country
 from app.vector_search.esco_entities import SkillEntity
 from app.i18n.translation_service import t
 from app.vector_search.vector_search_dependencies import SearchServices
+from features.skills_granularity.skill_parent_mapping_store import get_parent_label
+
+
+def _map_and_dedup_skill_labels(skills: list[SkillEntity]) -> list[str]:
+    """Return mapped parent labels (or original) with duplicates removed, preserving order."""
+    seen: set[str] = set()
+    labels: list[str] = []
+    for skill in skills:
+        mapped = get_parent_label(skill.id) or skill.preferredLabel
+        if mapped in seen:
+            continue
+        seen.add(mapped)
+        labels.append(mapped)
+    return labels
 
 
 class ConversationPhase(Enum):
@@ -387,13 +401,14 @@ class ExploreExperiencesAgentDirector(Agent):
         current_experience.top_skills = pipline_result.top_skills
         current_experience.remaining_skills = pipline_result.remaining_skills
 
-        # construct a summary of the skills
+        # construct a summary of the skills using mapped parent labels and removing duplicates
+        mapped_labels = _map_and_dedup_skill_labels(current_experience.top_skills)
         skills_summary = "\n"
-        if len(current_experience.top_skills) == 0:
+        if len(mapped_labels) == 0:
             skills_summary += f"• {t('messages', 'exploreExperiences.noSkillsIdentified')}\n"
         else:
-            for skill in current_experience.top_skills:
-                skills_summary += f"• {skill.preferredLabel}\n"
+            for label in mapped_labels:
+                skills_summary += f"• {label}\n"
 
         # construct a summary of the experience
         current_experience.summary = await ExperienceSummarizer().execute(
@@ -412,7 +427,7 @@ class ExploreExperiencesAgentDirector(Agent):
                 "exploreExperiences.linkAndRank.summaryMessage",
                 experience_title=current_experience.experience_title,
                 summary=current_experience.summary,
-                top_count=len(current_experience.top_skills),
+                top_count=len(mapped_labels),
                 skills_summary=skills_summary,
             ),
             finished=False,
