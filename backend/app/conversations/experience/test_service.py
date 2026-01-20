@@ -6,13 +6,14 @@ from app.agent.experience import ExperienceEntity, WorkType, Timeline
 from app.agent.explore_experiences_agent_director import DiveInPhase, ExperienceState, \
     ExploreExperiencesAgentDirectorState
 from app.application_state import ApplicationState
-from app.conversations.experience._types import UpdateExperienceRequest, SkillUpdate, TimelineUpdate
+from app.conversations.experience._types import UpdateExperienceRequest, SkillUpdate, TimelineUpdate, ExperienceResponse
 from app.conversations.experience.service import ExperienceService, ExperienceNotFoundError
 from app.countries import Country
 from app.metrics.application_state_metrics_recorder.recorder import IApplicationStateMetricsRecorder
 from app.metrics.types import ExperienceChangedEvent, SkillChangedEvent
 from app.vector_search.esco_entities import SkillEntity
 from common_libs.test_utilities import get_random_user_id, get_random_session_id, get_random_printable_string
+from features.skills_granularity.skill_parent_mapping_store import set_cache_for_tests, clear_cache_for_tests
 
 
 class EditableExperienceEntity(ExperienceEntity[tuple[int, SkillEntity]]):
@@ -216,6 +217,22 @@ class TestUpdateExperience:
         skill_changed = next((e for e in recorded_events if isinstance(e, SkillChangedEvent)), None)
         assert skill_changed.action == "EDITED"
         assert "skill1" in skill_changed.uuids
+
+
+class TestExperienceResponseSkillMapping:
+    def test_maps_preferred_label_when_mapping_exists(self):
+        # GIVEN a skill with a parent mapping
+        set_cache_for_tests({"child-1": "Parent Label"})
+        skill = _make_skill_entity("child-1", "Child Label")
+        experience = _make_experience_entity("exp-1", "Test Experience", [skill])
+
+        # WHEN creating a response
+        response = ExperienceResponse.from_experience_entity(experience, DiveInPhase.PROCESSED)
+
+        # THEN the preferred label is mapped to the parent label
+        assert response.top_skills[0].preferredLabel == "Parent Label"
+
+        clear_cache_for_tests()
 
     @pytest.mark.parametrize(
         "update_payload, expected_changes",

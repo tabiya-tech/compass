@@ -5,6 +5,7 @@ from pydantic import Field, BaseModel, field_serializer
 from app.agent.experience import ExperienceEntity, Timeline, WorkType
 from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.vector_search.esco_entities import SkillEntity
+from features.skills_granularity.skill_parent_mapping_store import get_parent_label
 
 
 # ------------------------- Utility Functions -------------------------
@@ -21,17 +22,28 @@ def convert_skill_entities_to_skills_response(skills_entities: list[SkillEntity 
         return []
 
     if isinstance(skills_entities[0], tuple):
-        return [
+        responses = [
             SkillResponse.from_skill_entity(skill_entity=skill_entity, order_index=idx)
             for idx, skill_entity in sorted(skills_entities, key=lambda x: x[0])
         ]
     else:
         # unexplored-experiences:
         # they don't have any skills, it is going to be an empty list.
-        return [
+        responses = [
             SkillResponse.from_skill_entity(skill_entity=skill_entity, order_index=0)
             for idx, skill_entity in enumerate(skills_entities)
         ]
+
+    # Deduplicate by mapped label to avoid repeated parents and normalize orderIndex
+    seen: set[str] = set()
+    deduped: list[SkillResponse] = []
+    for resp in responses:
+        if resp.preferredLabel in seen:
+            continue
+        seen.add(resp.preferredLabel)
+        deduped.append(resp)
+
+    return [resp.model_copy(update={"orderIndex": idx}) for idx, resp in enumerate(deduped)]
 
 # ------------------------- Response Models -------------------------
 
@@ -57,10 +69,10 @@ class SkillResponse(BaseModel):
         """
         Build a SkillResponse from a SkillEntity.
         """
-
+        parent_label = get_parent_label(skill_entity.id)
         return SkillResponse(
             UUID=skill_entity.UUID,
-            preferredLabel=skill_entity.preferredLabel,
+            preferredLabel=parent_label or skill_entity.preferredLabel,
             altLabels=skill_entity.altLabels,
             description=skill_entity.description,
             orderIndex=order_index,

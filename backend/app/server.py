@@ -29,6 +29,7 @@ from app.app_config import ApplicationConfig, set_application_config, get_applic
 from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
 from features.loader import FeatureLoader
+from features.skills_granularity.skill_parent_mapping_store import initialize as initialize_skill_parent_mapping_store
 from starlette.datastructures import State
 from app.middleware.brotli_request import BrotliRequestMiddleware
 from app.users.cv.constants import (
@@ -258,6 +259,11 @@ async def lifespan(_app: FastAPI):
                                 embeddings_service_name=app_cfg.embeddings_service_name,
                                 embeddings_model_name=app_cfg.embeddings_model_name),
     )
+
+    try:
+        await initialize_skill_parent_mapping_store(db=application_db, logger=logger)
+    except Exception as exc:  # pylint: disable=broad-except
+        logger.warning("Failed to initialize skill parent mappings; continuing without mapping: %s", exc)
 
     # We are initializing the feature loader here
     # so that plugins will be loaded after the application is initialized.

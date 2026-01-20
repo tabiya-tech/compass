@@ -3,7 +3,13 @@ from types import SimpleNamespace
 
 from ._types import SkillUpdate
 from .utils import _get_skills_update_value, compute_top_skill_changes
+from ._types import convert_skill_entities_to_skills_response
 from ...vector_search.esco_entities import SkillEntity
+from features.skills_granularity.skill_parent_mapping_store import (
+    get_parent_label,
+    set_cache_for_tests,
+    clear_cache_for_tests,
+)
 
 
 def _get_test_skill_entity(_id: str, preferred_label: str = "Test Skill") -> SkillEntity:
@@ -126,3 +132,54 @@ class TestComputeTopSkillChanges:
 
         # THEN the result should match the expected sets for ADDED, DELETED, and EDITED skills
         assert result == expected
+
+
+class TestConvertSkillEntitiesToSkillsResponse:
+    def test_deduplicates_after_parent_mapping(self):
+        # GIVEN two child skills mapping to the same parent
+        set_cache_for_tests({"child-1": "Parent Skill", "child-2": "Parent Skill"})
+
+        skills = [
+            SkillEntity(
+                id="child-1",
+                UUID="child-1",
+                preferredLabel="Child One",
+                altLabels=[],
+                description="",
+                score=1.0,
+                skillType="skill/competence",
+            ),
+            SkillEntity(
+                id="child-2",
+                UUID="child-2",
+                preferredLabel="Child Two",
+                altLabels=[],
+                description="",
+                score=0.9,
+                skillType="skill/competence",
+            ),
+        ]
+
+        # WHEN converting to responses
+        responses = convert_skill_entities_to_skills_response(skills)
+
+        # THEN only the mapped parent label appears once
+        assert len(responses) == 1
+        assert responses[0].preferredLabel == "Parent Skill"
+        assert responses[0].orderIndex == 0
+
+        clear_cache_for_tests()
+
+
+class TestSkillParentMappingStore:
+    def test_lookup_and_fallback(self):
+        # GIVEN a mapping cache with one entry
+        set_cache_for_tests({"child-1": "Parent Label"})
+
+        # WHEN looking up an existing child skill id
+        assert get_parent_label("child-1") == "Parent Label"
+
+        # THEN a missing child skill id returns None
+        assert get_parent_label("missing") is None
+
+        clear_cache_for_tests()
