@@ -17,7 +17,7 @@ async def _evaluate_with_llm(prompt: str) -> str:
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 async def test_summarizer_without_existing_summary(fake_conversation_context: FakeConversationContext,
                                                    common_folder_path: str):
@@ -70,7 +70,7 @@ async def test_summarizer_without_existing_summary(fake_conversation_context: Fa
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 async def test_summarizer_with_existing_summary(fake_conversation_context: FakeConversationContext,
                                                 common_folder_path: str):

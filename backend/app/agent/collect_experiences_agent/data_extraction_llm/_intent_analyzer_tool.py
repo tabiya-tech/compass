@@ -289,8 +289,9 @@ _SYSTEM_INSTRUCTIONS = """
                     ///Skip unrelated or tangential turns to preserve a coherent causal chain of associations.
                     ///You are filtering for semantic lineage rather than strictly temporal proximity.
                     Once you reach the Previously Extracted Experience Data, you will not follow the associations anymore.
-                    e.g. "user(`...`) -> model(`...`) -> ... -> user(`...`) -> model(`...`) -> Previously Extracted Experience Data(...)"
+                    e.g. "user(<answer>) -> model(<question>) -> ... -> user(<answer>) -> model(<question>) -> Previously Extracted Experience Data(...)"
                     Each step in the sequence should be a summarized version of the actual user or model turn.
+                    You are not expected to reach a maximum of 10 steps in this linear chain to avoid circular references.
                 - potential_new_experience_title: The potential experience title from the details described by the user in the 'User's Last Input'
                     This is like the title to be put on a CV when describing the experience title. 
                     If the experience already exists in <Previously Extracted Experience Data>, and the user is not updating it, return the existing title.

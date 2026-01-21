@@ -203,11 +203,10 @@ _SYSTEM_INSTRUCTIONS = """
         ///Skip unrelated or tangential turns to preserve a coherent causal chain of associations.
         ///You are filtering for semantic lineage rather than strictly temporal proximity.
         Once you reach the Previously Extracted Experience Data, you will not follow the associations anymore.
-        e.g. "user(`...`) -> model(`...`) -> ... -> user(`...`) -> model(`...`) -> Previously Extracted Experience Data(...)"
+        e.g. "user(<answer>) -> model(<question>) -> ... -> user(<answer>) -> model(<question>) -> Previously Extracted Experience Data(...)"
         Each step in the sequence should be a summarized version of the actual user or model turn.
-    
-    - experience_details: an Object of experience details you extracted from the user's statement and conversation history. 
-        
+        You are not expected to reach a maximum of 10 steps in this linear chain to avoid circular references.
+    - experience_details: an Object of experience details you extracted from the user's statement and conversation history.
         {{
             - data_extraction_references: a dictionary with short (up to 100 words) explanations in prose (not json) about 
                 what information you intend to collect based on the '<User's Last Input>' and the '<Conversation History>'.

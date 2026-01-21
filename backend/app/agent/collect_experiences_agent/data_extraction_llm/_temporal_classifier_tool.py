@@ -3,7 +3,7 @@ from datetime import datetime
 from textwrap import dedent
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from app.agent.agent_types import LLMStats
 from app.agent.collect_experiences_agent.data_extraction_llm import clean_string_field
@@ -58,7 +58,7 @@ class _ExtractedData(BaseModel):
 
 
 class _LLMOutput(BaseModel):
-    associations: Optional[str] = Field(description="")
+    associations: Optional[str] = None
     experience_details: Optional[_ExtractedData]
 
     class Config:
@@ -266,8 +266,9 @@ _SYSTEM_INSTRUCTIONS = """
         ///Skip unrelated or tangential turns to preserve a coherent causal chain of associations.
         ///You are filtering for semantic lineage rather than strictly temporal proximity.
         Once you reach the Previously Extracted Experience Data, you will not follow the associations anymore.
-        e.g. "user(`...`) -> model(`...`) -> ... -> user(`...`) -> model(`...`) -> Previously Extracted Experience Data(...)"
+        e.g. "user(<answer>) -> model(<question>) -> ... -> user(<answer>) -> model(<question>) -> Previously Extracted Experience Data(...)"
         Each step in the sequence should be a summarized version of the actual user or model turn.
+        You are not expected to reach a maximum of 10 steps in this linear chain to avoid circular references.
     
     - experience_details: an Object of experience details you extracted from the user's statement and conversation history. 
         {{

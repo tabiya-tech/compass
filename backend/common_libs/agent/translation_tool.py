@@ -7,7 +7,8 @@ from pydantic import BaseModel
 from app.agent.llm_caller import LLMCaller
 from app.i18n.types import Locale
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import JSON_GENERATION_CONFIG, LLMConfig
+from common_libs.llm.models_utils import LLMConfig
+from common_libs.llm.schema_builder import with_response_schema
 
 
 class _Output(BaseModel):
@@ -19,7 +20,7 @@ class TranslationTool:
         self._target_locale = target_locale
         self._llm_caller: LLMCaller[_Output] = LLMCaller[_Output](model_response_type=_Output)
         self._llm = GeminiGenerativeLLM(
-            config=LLMConfig(generation_config=JSON_GENERATION_CONFIG)
+            config=LLMConfig(generation_config=with_response_schema(_Output))
         )
 
         self._logger = logging.getLogger(self.__class__.__name__)
