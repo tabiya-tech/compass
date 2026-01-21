@@ -17,6 +17,7 @@ Detection Strategy:
 from enum import Enum
 from typing import Optional
 import re
+from textwrap import dedent
 
 
 class PersonaType(Enum):
@@ -161,3 +162,20 @@ def get_persona_prompt_hints(persona: PersonaType) -> dict[str, str]:
             "assumptions": "Can assume familiarity with formal employment concepts",
             "examples": "Include examples like 'job title', 'department', 'team'",
         }
+
+
+def get_persona_prompt_section(persona: PersonaType | None) -> str:
+    """
+    Return a prompt section that tailors the conversation to the detected persona.
+    """
+    if persona is None:
+        return ""
+    hints = get_persona_prompt_hints(persona)
+    return dedent(f"""\
+        #Persona Guidance
+            The user persona is {persona.value}.
+            - Language style: {hints["language_style"]}
+            - Question style: {hints["question_style"]}
+            - Assumptions: {hints["assumptions"]}
+            - Examples: {hints["examples"]}
+        """)

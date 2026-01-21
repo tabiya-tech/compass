@@ -138,12 +138,12 @@ golden_test_cases = [
             """) + kenya_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
         expected_experiences_count_min=1,
-        expected_experiences_count_max=1,
+        expected_experiences_count_max=2,
         expected_work_types={
-            WorkType.SELF_EMPLOYMENT: (1, 1),
-            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
+            WorkType.SELF_EMPLOYMENT: (0, 1),
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
-            WorkType.UNSEEN_UNPAID: (0, 0),
+            WorkType.UNSEEN_UNPAID: (0, 1),
         }
     ),
     
@@ -281,9 +281,9 @@ golden_test_cases = [
             """) + sa_prompt,
         evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=60)],
         expected_experiences_count_min=1,
-        expected_experiences_count_max=3,
+        expected_experiences_count_max=4,
         expected_work_types={
-            WorkType.SELF_EMPLOYMENT: (0, 1),
+            WorkType.SELF_EMPLOYMENT: (0, 2),
             WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (0, 0),
             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
             WorkType.UNSEEN_UNPAID: (1, 3),

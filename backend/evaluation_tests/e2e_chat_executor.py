@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Optional
 
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
@@ -13,6 +14,7 @@ from app.countries import Country
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from app.vector_search.vector_search_dependencies import SearchServices
 from evaluation_tests.baseline_metrics_collector import BaselineMetricsCollector
+from app.agent.persona_detector import detect_persona
 
 
 logger = logging.getLogger(__name__)
@@ -78,6 +80,15 @@ class E2EChatExecutor:
         """
         conversation_context = await self._conversation_memory_manager.get_conversation_context()
         current_index = len(conversation_context.all_history.turns)
+        # Detect persona using prior user messages + current input
+        history_messages = [
+            turn.input.message for turn in conversation_context.all_history.turns
+            if not turn.input.is_artificial and turn.input.message
+        ]
+        persona_type = detect_persona(agent_input.message, history_messages)
+        self._state.agent_director_state.persona_type = persona_type
+        self._state.collect_experience_state.persona_type = persona_type
+        self._state.skills_explorer_agent_state.persona_type = persona_type
         await self._agent_director.execute(agent_input)
         # get the context again after the history has been updated
         conversation_context = await self._conversation_memory_manager.get_conversation_context()
@@ -175,10 +186,11 @@ class E2EChatExecutor:
             # Extract and record agent questions from the message
             message = agent_output.message_for_user
             if message and '?' in message:
-                sentences = message.replace('?\n', '?|').replace('. ', '.|').split('|')
+                # Split on sentence-ending punctuation, even when questions are separated by only spaces.
+                sentences = re.split(r'(?<=[.?!])\s*', message)
                 for sentence in sentences:
                     sentence = sentence.strip()
-                    if sentence.endswith('?'):
+                    if sentence.endswith('?') and len(sentence) > 1:
                         self._metrics_collector.record_agent_question(sentence)
     
     def _infer_phase_from_agent(self, agent_type: str) -> str:

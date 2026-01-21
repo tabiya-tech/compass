@@ -1,0 +1,15 @@
+{
+  "name": "persona_1_process_questioner",
+  "persona": "informal",
+  "locale": "en-US",
+  "country_of_user": "Kenya",
+  "conversation_rounds": 60,
+  "simulated_user_prompt": "You are a young person from Kenya. You have one experience as a helper at a construction site in Mombasa from 2020 to 2022. You sometimes ask short questions about the process like 'What will we do after this step?' but you agree to continue. Provide concise answers and do not invent extra experiences.",
+  "metrics_thresholds": {
+    "max_turn_count": 25,
+    "max_repetition_rate": 0.08,
+    "min_starter_diversity": 0.35,
+    "min_achievement_rate": 0.08,
+    "max_llm_calls": 200
+  }
+}

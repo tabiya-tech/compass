@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.conversation_memory.conversation_memory_manager import IConversationMemoryManager
+from app.agent.persona_detector import PersonaType
 
 
 class ConversationPhase(Enum):
@@ -27,6 +28,7 @@ class AgentDirectorState(BaseModel):
     session_id: int
     current_phase: ConversationPhase = Field(default=ConversationPhase.INTRO)
     conversation_conducted_at: Optional[datetime] = None
+    persona_type: PersonaType = Field(default=PersonaType.INFORMAL)
 
     class Config:
         extra = "forbid"
@@ -53,6 +55,16 @@ class AgentDirectorState(BaseModel):
             return ConversationPhase[value]
         return value
 
+    @field_serializer("persona_type")
+    def serialize_persona_type(self, persona_type: PersonaType, _info):
+        return persona_type.name
+
+    @field_validator("persona_type", mode='before')
+    def deserialize_persona_type(cls, value: str | PersonaType) -> PersonaType:
+        if isinstance(value, str):
+            return PersonaType[value]
+        return value
+
     # Deserialize the conversation_conducted_at datetime and ensure it's interpreted as UTC
     @field_validator("conversation_conducted_at", mode='before')
     def deserialize_conversation_conducted_at(cls, value: Optional[datetime]) -> Optional[datetime]:
@@ -65,7 +77,8 @@ class AgentDirectorState(BaseModel):
                                   # The conversation_conducted_at field was introduced later, so it may not exist in all documents
                                   # For the documents that don't have this field, we'll default to None,
                                   # The implication being that the client will have to handle this case.
-                                  conversation_conducted_at=_doc.get("conversation_conducted_at", None))
+                                  conversation_conducted_at=_doc.get("conversation_conducted_at", None),
+                                  persona_type=_doc.get("persona_type", PersonaType.INFORMAL))
 
 
 def _parse_data(value: Optional[datetime | str]) -> Optional[datetime]:

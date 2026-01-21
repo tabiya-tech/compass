@@ -72,6 +72,45 @@ To contribute to our 100% code coverage goal, refer to our "Guidelines for Reada
 ### Guidelines for Snapshot Testing
 To ensure component stability, refer to our "Snapshot Testing Guidelines" in the **[snapshot-testing-guidelines.md](snapshot-testing-guidelines.md)**
 
+### Golden Tests & Evaluation Metrics
+
+Golden tests are end-to-end conversation tests that validate the agent's behavior against curated test cases representing different user personas and scenarios.
+
+**Run the golden test suite** (from `backend/`):
+
+```bash
+poetry run pytest -m "golden_test" evaluation_tests/test_golden_set.py
+```
+
+**Run specific golden tests**:
+
+```bash
+poetry run pytest -m "golden_test" evaluation_tests/test_golden_set.py \
+  -k "golden_simple_formal_employment or golden_volunteer_student"
+```
+
+**Generate a baseline metrics report** (for regression tracking):
+
+```bash
+poetry run python evaluation_tests/generate_baseline_report.py
+```
+
+**Run golden transcript replay and check thresholds** (CI gating):
+
+```bash
+# Replay transcripts and collect metrics
+poetry run python evaluation_tests/golden_transcript_runner.py \
+  --transcripts-dir evaluation_tests/golden_transcripts \
+  --output-dir evaluation_tests/golden_transcripts/output
+
+# Validate against thresholds
+poetry run python evaluation_tests/check_metrics_thresholds.py \
+  --transcripts-dir evaluation_tests/golden_transcripts \
+  --metrics-dir evaluation_tests/golden_transcripts/output
+```
+
+Test outputs are saved to `backend/evaluation_tests/test_output/` with timestamped folders for each run.
+
 ## Getting Started
 
 To work with this repository you should have a system with a bash compatible terminal (linux, macOS, cygwin) as most of the scripts are written for bash and will not work on windows cmd or powershell.

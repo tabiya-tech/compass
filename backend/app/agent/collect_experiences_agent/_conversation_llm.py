@@ -19,6 +19,7 @@ from app.i18n.translation_service import t, get_i18n_manager
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
 from common_libs.retry import Retry
+from app.agent.persona_detector import PersonaType, get_persona_prompt_section
 
 _NO_EXPERIENCE_COLLECTED = "No experience data has been collected yet"
 _FINAL_MESSAGE = "Thank you for sharing your experiences. Let's move on to the next step."
@@ -99,6 +100,7 @@ class _ConversationLLM:
                       first_time_visit: bool,
                       user_input: AgentInput,
                       country_of_user: Country,
+                      persona_type: PersonaType | None,
                       context: ConversationContext,
                       collected_data: list[CollectedData],
                       exploring_type: WorkType,
@@ -121,6 +123,7 @@ class _ConversationLLM:
                 first_time_visit=first_time_visit,
                 user_input=user_input,
                 country_of_user=country_of_user,
+                persona_type=persona_type,
                 context=context,
                 collected_data=collected_data,
                 exploring_type=exploring_type,
@@ -139,6 +142,7 @@ class _ConversationLLM:
                                 first_time_visit: bool,
                                 user_input: AgentInput,
                                 country_of_user: Country,
+                                persona_type: PersonaType | None,
                                 context: ConversationContext,
                                 collected_data: list[CollectedData],
                                 exploring_type: WorkType,
@@ -185,10 +189,12 @@ class _ConversationLLM:
                 ))
             llm_input = _ConversationLLM._get_first_time_generative_prompt(
                 country_of_user=country_of_user,
+                persona_type=persona_type,
                 exploring_type=exploring_type)
             llm_response = await llm.generate_content(llm_input=llm_input)
         else:
             system_instructions = _ConversationLLM._get_system_instructions(country_of_user=country_of_user,
+                                                                            persona_type=persona_type,
                                                                             collected_data=collected_data,
                                                                             exploring_type=exploring_type,
                                                                             unexplored_types=unexplored_types,
@@ -274,6 +280,7 @@ class _ConversationLLM:
     @staticmethod
     def _get_system_instructions(*,
                                  country_of_user: Country,
+                                 persona_type: PersonaType | None,
                                  collected_data: list[CollectedData],
                                  exploring_type: WorkType,
                                  unexplored_types: list[WorkType],
@@ -289,6 +296,8 @@ class _ConversationLLM:
             {language_style}
             
             {agent_character} 
+            
+            {persona_guidance}
                         
             #Stay Focused
                 Keep the conversation focused on the task at hand. If I ask you questions that are irrelevant to our subject
@@ -303,6 +312,7 @@ class _ConversationLLM:
                 
             #Do not repeat information unnecessarily
                 Review your previous questions and my answers. Avoid repeating the same question or restating collected details.
+                Use brief confirmations rather than full restatements.
                 Keep the conversation natural, concise, and non-redundant.
                     
             #Gather Details
@@ -324,6 +334,7 @@ class _ConversationLLM:
                 Do not ask me questions that are not related to the experience data fields listed above.
                 
                 Ask for one or two missing fields at a time. If I provide only one, follow up for the missing information.
+                If I say "I already shared the information" or similar, do not ask me to repeat it; use what you already have.
                 
                 Once you have gathered all the information for a work experience, you will respond with a summary of that work experience in plain text (no Markdown, JSON, bold, italics or other formatting) 
                 and by explicitly asking me if I would like to add or change anything to the specific work experience before moving on to another experience.
@@ -399,6 +410,7 @@ class _ConversationLLM:
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 agent_character=STD_AGENT_CHARACTER,
                                                 language_style=get_language_style(),
+                                                persona_guidance=get_persona_prompt_section(persona_type),
                                                 exploring_type_instructions=_get_explore_experiences_instructions(
                                                     collected_data=collected_data,
                                                     exploring_type=exploring_type,
@@ -425,6 +437,7 @@ class _ConversationLLM:
     @staticmethod
     def _get_first_time_generative_prompt(*,
                                           country_of_user: Country,
+                                          persona_type: PersonaType | None,
                                           exploring_type: WorkType):
         # Ideally, we want to include the language style in the prompt.
         # However, doing so seems to break the prompt.
@@ -435,6 +448,8 @@ class _ConversationLLM:
                     outline my work experiences.
                 
                 {language_style}
+                
+                {persona_guidance}
                                                 
                 Respond with something similar to this:
                     Explain that during this step you will only gather basic information about all my work experiences, 
@@ -447,6 +462,7 @@ class _ConversationLLM:
         return replace_placeholders_with_indent(first_time_generative_prompt,
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 language_style=get_language_style(),
+                                                persona_guidance=get_persona_prompt_section(persona_type),
                                                 question_to_ask=_ask_experience_type_question(exploring_type))
 
 
@@ -688,8 +704,9 @@ def _get_explore_experiences_instructions(*,
         
         Gather as many work experiences as possible that include '{experiences_in_type}', or until I explicitly state that I have no more to share.
         
-        If I provide you with multiple work experiences in a single input, you should ask me politely to slow down and 
-        tell me to provide one work experience at a time.
+        If I provide multiple work experiences in a single input, acknowledge that you received them.
+        Do not ask me to repeat the list. Instead, use the collected data and confirm each experience in order,
+        asking only for missing fields.
         
         Carefully review my work experiences and the information I provide to determine whether I am referring to a single work experience or multiple experiences. 
         A single work experience may involve multiple organizations or time periods.

@@ -1,6 +1,7 @@
 /.idea/
 *.iml
 *.env
+.DS_Store
 
 .vscode/
 
@@ -8,3 +9,5 @@ credentials*.json
 .run/
 
 ken-product/
+backend/*.log
+backend/evaluation_tests/.DS_Store

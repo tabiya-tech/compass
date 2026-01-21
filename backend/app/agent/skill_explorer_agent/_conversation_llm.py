@@ -11,6 +11,7 @@ from app.conversation_memory.conversation_formatter import ConversationHistoryFo
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.countries import Country
 from app.i18n.translation_service import t
+from app.agent.persona_detector import PersonaType, get_persona_prompt_section
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LLMResponse, get_config_variation, LLMInput
 from common_libs.retry import Retry
@@ -28,7 +29,10 @@ class _ConversationLLM:
                       question_asked_until_now: list[str],
                       user_input: AgentInput,
                       country_of_user: Country,
+                      persona_type: PersonaType | None,
                       context: ConversationContext,
+                      experience_index: int,
+                      rich_response: bool,
                       experience_title,
                       work_type: WorkType,
                       logger: logging.Logger) -> AgentOutput:
@@ -50,7 +54,10 @@ class _ConversationLLM:
                 question_asked_until_now=question_asked_until_now,
                 user_input=user_input,
                 country_of_user=country_of_user,
+                persona_type=persona_type,
                 context=context,
+                experience_index=experience_index,
+                rich_response=rich_response,
                 experience_title=experience_title,
                 work_type=work_type,
                 logger=logger
@@ -67,7 +74,10 @@ class _ConversationLLM:
                                 question_asked_until_now: list[str],
                                 user_input: AgentInput,
                                 country_of_user: Country,
+                                persona_type: PersonaType | None,
                                 context: ConversationContext,
+                                experience_index: int,
+                                rich_response: bool,
                                 experience_title,
                                 work_type: WorkType,
                                 logger: logging.Logger) -> tuple[AgentOutput, float, BaseException | None]:
@@ -102,8 +112,11 @@ class _ConversationLLM:
                 ))
             llm_input = _ConversationLLM.create_first_time_generative_prompt(
                 country_of_user=country_of_user,
+                persona_type=persona_type,
                 experiences_explored=experiences_explored,
                 experience_title=experience_title,
+                experience_index=experience_index,
+                rich_response=rich_response,
                 work_type=work_type
             )
             llm_response = await llm.generate_content(llm_input=llm_input)
@@ -111,7 +124,10 @@ class _ConversationLLM:
             system_instructions = _ConversationLLM._create_conversation_system_instructions(
                 question_asked_until_now=question_asked_until_now,
                 country_of_user=country_of_user,
+                persona_type=persona_type,
                 experience_title=experience_title,
+                experience_index=experience_index,
+                rich_response=rich_response,
                 work_type=work_type)
             llm = GeminiGenerativeLLM(
                 system_instructions=system_instructions,
@@ -162,8 +178,18 @@ class _ConversationLLM:
     def _create_conversation_system_instructions(*,
                                                  question_asked_until_now: list[str],
                                                  country_of_user: Country,
+                                                 persona_type: PersonaType | None,
                                                  experience_title: str,
+                                                 experience_index: int,
+                                                 rich_response: bool,
                                                  work_type: WorkType) -> str:
+        turn_target = 4 if experience_index == 0 else 3
+        experience_phase_hint = ("This is the first experience. Use the full 4-turn flow."
+                                 if experience_index == 0
+                                 else "This is a subsequent experience. Keep it concise and finish in 3 turns.")
+        rich_response_hint = ("The user has already provided rich detail. You may skip redundant follow-ups and end early "
+                              "after asking one achievement or challenge question."
+                              if rich_response else "Ask follow-up questions as needed to complete the flow.")
         system_instructions_template = dedent("""\
         #Role
             You are a conversation partner helping me, a young person{country_of_user_segment},
@@ -175,16 +201,21 @@ class _ConversationLLM:
         {language_style}
         
         {agent_character}
+        
+        {persona_guidance}
 
         #Questions you must ask me
             Ask open-ended questions about my responsibilities as {experience_title}{work_type}.
-            Ask 1-2 questions per turn. Complete in approximately 4 turns.
+            Ask 1-2 questions per turn. Complete in approximately {turn_target} turns.
+            {experience_phase_hint}
+            {rich_response_hint}
             
-            4-TURN FLOW:
+            TURN FLOW:
                 1. Typical day and key responsibilities
                 2. Achievements or challenges (REQUIRED before ending)
                 3. Tasks NOT part of my role, or: {get_question_c}
                 4. Follow-up clarification if needed, then end
+            If the target is 3 turns, you may skip step 4 unless it is needed for clarification.
             
             RULES:
             - Skip topics I've already covered in detail
@@ -227,7 +258,7 @@ class _ConversationLLM:
         
         #Transition
             End the exploration by saying <END_OF_CONVERSATION> when:
-            - You have completed approximately 4 turns of questioning, OR
+            - You have completed approximately {turn_target} turns of questioning, OR
             - You have covered the key categories (details, achievements, boundaries), OR
             - I have explicitly stated I don't want to share more, OR
             - Continuing would be redundant based on the information already provided
@@ -249,6 +280,10 @@ class _ConversationLLM:
             question_asked_until_now="\n".join(f"- \"{s}\"" for s in question_asked_until_now),
             agent_character=STD_AGENT_CHARACTER,
             language_style=get_language_style(),
+            persona_guidance=get_persona_prompt_section(persona_type),
+            turn_target=str(turn_target),
+            experience_phase_hint=experience_phase_hint,
+            rich_response_hint=rich_response_hint,
             experience_title=f"'{experience_title}'",
             work_type=f" ({WorkType.work_type_short(work_type)})" if work_type is not None else ""
         )
@@ -256,9 +291,19 @@ class _ConversationLLM:
     @staticmethod
     def create_first_time_generative_prompt(*,
                                             country_of_user: Country,
+                                            persona_type: PersonaType | None,
                                             experiences_explored: list[str],
                                             experience_title: str,
+                                            experience_index: int,
+                                            rich_response: bool,
                                             work_type: WorkType) -> str:
+        turn_target = 4 if experience_index == 0 else 3
+        experience_phase_hint = ("This is the first experience. Use the full 4-turn flow."
+                                 if experience_index == 0
+                                 else "This is a subsequent experience. Keep it concise and finish in 3 turns.")
+        rich_response_hint = ("If the user provides rich detail, you may skip redundant follow-ups and end early "
+                              "after asking one achievement or challenge question."
+                              if rich_response else "")
         prompt_template = dedent("""\
         #Role
             You are an interviewer helping me, a young person{country_of_user_segment},
@@ -266,6 +311,8 @@ class _ConversationLLM:
             {experiences_explored_instructions}
                                  
             Let's now begin the process and help me reflect on the experience as {experience_title} in more detail.
+            Target approximately {turn_target} turns. {experience_phase_hint}
+            {rich_response_hint}
             
             Respond with something similar to this:
                 Explain that we will explore my experience as {experience_title}.
@@ -280,6 +327,8 @@ class _ConversationLLM:
                 Ask me to describe a typical day as {experience_title}.
             
         {language_style}
+        
+        {persona_guidance}
         """)
         experiences_explored_instructions = ""
         if len(experiences_explored) > 0:
@@ -301,7 +350,11 @@ class _ConversationLLM:
                                                 experiences_explored_instructions=experiences_explored_instructions,
                                                 experience_title=f"'{experience_title}'",
                                                 work_type=f" ({WorkType.work_type_short(work_type)})" if work_type is not None else "",
+                                                turn_target=str(turn_target),
+                                                experience_phase_hint=experience_phase_hint,
+                                                rich_response_hint=rich_response_hint,
                                                 language_style=get_language_style(),
+                                                persona_guidance=get_persona_prompt_section(persona_type),
                                                 )
 
 

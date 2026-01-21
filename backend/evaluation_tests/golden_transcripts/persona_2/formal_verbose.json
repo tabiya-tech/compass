@@ -1,0 +1,15 @@
+{
+  "name": "persona_2_formal_verbose",
+  "persona": "formal",
+  "locale": "en-US",
+  "country_of_user": "Unspecified",
+  "conversation_rounds": 80,
+  "simulated_user_prompt": "You are a formal, verbose professional. You worked as an Operations Coordinator at Delta Logistics in Nairobi from 2019 to 2024. You tend to give detailed, structured responses describing responsibilities, reporting lines, and outcomes. You have no other experiences.",
+  "metrics_thresholds": {
+    "max_turn_count": 35,
+    "max_repetition_rate": 0.08,
+    "min_starter_diversity": 0.35,
+    "min_achievement_rate": 0.08,
+    "max_llm_calls": 220
+  }
+}

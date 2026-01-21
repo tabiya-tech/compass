@@ -264,30 +264,30 @@ pytest -m "evaluation_test" --repeat 3 \
 ## Success Criteria
 
 **Performance Improvements** (vs Baseline: 32.4 turns, 11% repetition, 251 LLM calls):
-- [ ] Turn count reduced to ≤27 (17%+ reduction)
-- [ ] Repetition rate reduced to ≤8% (27%+ reduction)
-- [ ] Starter diversity increased to ≥35% (from 15.4%)
-- [ ] Achievement question rate ≥8% (from 1.9%)
-- [ ] LLM calls reduced to ≤200 (20%+ reduction)
+- [x] Turn count reduced to ≤27 (17%+ reduction)
+- [x] Repetition rate reduced to ≤8% (27%+ reduction)
+- [x] Starter diversity increased to ≥35% (from 15.4%)
+- [x] Achievement question rate ≥8% (from 1.9%)
+- [x] LLM calls reduced to ≤200 (20%+ reduction)
 
 **Quality Maintained**:
-- [ ] Skill overlap maintained at 85%+
-- [ ] Experience completeness maintained at 95%+
-- [ ] No regression in occupation accuracy
+- [x] Skill overlap maintained at 85%+
+- [x] Experience completeness maintained at 95%+
+- [x] No regression in occupation accuracy
 
 **Persona-Aware Flows**:
-- [ ] Persona detection implemented (verbal-only, >90% accuracy)
-- [ ] Persona 1 (Informal): 18-22 turns simple, ≤35 multi-experience
-- [ ] Persona 2 (Formal): 20-25 turns simple, ≤35 turns verbose (down from 70!)
-- [ ] Flow adapts based on detected persona type
+- [x] Persona detection implemented (verbal-only, >90% accuracy)
+- [x] Persona 1 (Informal): 18-22 turns simple, ≤35 multi-experience
+- [x] Persona 2 (Formal): 20-25 turns simple, ≤35 turns verbose (down from 70!)
+- [x] Flow adapts based on detected persona type
 
 **CI/CD Integration**:
-- [ ] 6 golden transcripts created (3 per persona)
-- [ ] Automated tests run on every PR with metric thresholds
-- [ ] Clear failure messages when quality gates violated
+- [x] 6 golden transcripts created (3 per persona)
+- [x] Automated tests run on every PR with metric thresholds
+- [x] Clear failure messages when quality gates violated
 
 **Swahili Preparation**:
-- [ ] Gemini 2.5 Flash selection documented with rationale
+- [x] Gemini 2.5 Flash selection documented with rationale
 - [ ] Integration checklist ready for M3 (no blockers)
 
 ---
