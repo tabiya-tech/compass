@@ -14,6 +14,7 @@ from app.conversation_memory.conversation_memory_types import ConversationContex
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG, \
     get_config_variation
+from common_libs.llm.schema_builder import with_response_schema
 from common_libs.retry import Retry
 from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE
 from app.i18n.locale_detector import get_locale_hint
@@ -51,12 +52,6 @@ class _LLMOutput(BaseModel):
     associations: Optional[str]
     experience_details: ExtractedData
 
-    class Config:
-        """
-        Disallow extra fields in the model
-        """
-        extra = "forbid"
-
 
 class EntityExtractionTool:
     """
@@ -86,7 +81,7 @@ class EntityExtractionTool:
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000
                     # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
-                } | temperature_config
+                } | temperature_config | with_response_schema(_LLMOutput)
             ))
 
     async def execute(self,
@@ -185,8 +180,8 @@ _SYSTEM_INSTRUCTIONS = """
         When summarizing a user-stated action (e.g., "I sell tomatoes"), convert it directly into a gerund-phrase experience title (e.g., "Selling Tomatoes"). 
         Return a string value containing the title of the experience.
         
-        `null` if the information was not provided by the user and the user was not explicitly asked for this information yet.
-        Use empty string if the user was asked and explicitly chose to not provide this information, or the user don't want us to store the information any more.
+        Use `null`: If the user has not mentioned their `experience title` and has not yet been asked to provide it.
+        Use "": If the user explicitly declines to provide their `experience title` when asked, or requests that previously stored `experience title` data be deleted.
         
     ##'company' instructions
         What the company does or name of the company depending on the context.
@@ -195,11 +190,8 @@ _SYSTEM_INSTRUCTIONS = """
         Keep every value entirely in the detected language.
         Return a string value containing the type, or name of the company, or the receiver of the work.
         
-        `null` if the information was not provided by the user and the user was not explicitly asked for this information yet.
-        Use empty string if the user was asked and explicitly chose to not provide this information, or the user don't want us to store the information any more.
-        
-        `null` if the information was not provided by the user and the user was not explicitly asked for this information yet.
-        Use empty string if the user was asked and explicitly chose to not provide this information, or the user don't want us to store the information any more.
+          Use `null`: If the user has not mentioned their `company name` and has not yet been asked to provide it.
+          Use "": If the user explicitly declines to provide their `company name` when asked, or requests that previously stored `company name` data be deleted.
 
 #JSON Output instructions
     - associations: Generate a linear chain of associations in the form of ...-> ...->... that start from the User's Last Input 
@@ -207,8 +199,9 @@ _SYSTEM_INSTRUCTIONS = """
         ///Skip unrelated or tangential turns to preserve a coherent causal chain of associations.
         ///You are filtering for semantic lineage rather than strictly temporal proximity.
         Once you reach the Previously Extracted Experience Data, you will not follow the associations anymore.
-        e.g. "user('...') -> model('...') -> ... -> user('...') -> model('...') -> Previously Extracted Experience Data(...)"
+        e.g. "user(<answer>) -> model(<question>) -> ... -> user(<answer>) -> model(<question>) -> Previously Extracted Experience Data(...)"
         Each step in the sequence should be a summarized version of the actual user or model turn.
+        You are not expected to reach a maximum of 10 steps in this linear chain to avoid circular references.
     
     - experience_details: an Object of experience details you extracted from the user's statement and conversation history. 
         

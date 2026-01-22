@@ -12,6 +12,7 @@ from app.agent.prompt_template import sanitize_input, get_language_style
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
+from common_libs.llm.schema_builder import with_response_schema
 from app.agent.prompt_template.agent_prompt_template import STD_LANGUAGE_STYLE
 
 _TAGS_TO_FILTER = ["system instructions", "user's last input", "conversation history"]
@@ -37,8 +38,8 @@ class _ResponsibilitiesExtractionLLM:
             system_instructions=_ResponsibilitiesExtractionLLM._create_extraction_system_instructions(),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
-                    "max_output_tokens": 3000  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
-                }
+                    "max_output_tokens": 3000,  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
+                } | with_response_schema(ResponsibilitiesExtractionResponse)
             ))
         self.logger = logger
 

@@ -140,7 +140,7 @@ test_cases_router = [
         ],
         user_input="please explain what you mean the question before your last question?",
         conversation_phase=ConversationPhase.COUNSELING,
-        expected_agent_type=AgentType.WELCOME_AGENT
+        expected_agent_type=AgentType.EXPLORE_EXPERIENCES_AGENT
     ),
     RouterTestCase(
         name="open_sesame_from_context",

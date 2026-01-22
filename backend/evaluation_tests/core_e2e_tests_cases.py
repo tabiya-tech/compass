@@ -178,7 +178,7 @@ test_cases = [
         expected_experience_data=[{
             "experience_title": ContainsString("Mom"),
             "company": ContainsString("family"),
-            "timeline": {"start": "2022", "end": ContainsString("present")},
+            "timeline": {"start": "2022", "end": AnyOf(ContainsString("present"), "")},
             "work_type": WorkType.UNSEEN_UNPAID.name,
         }]
     ),

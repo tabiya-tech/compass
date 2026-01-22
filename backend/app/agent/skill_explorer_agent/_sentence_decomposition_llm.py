@@ -5,12 +5,14 @@ from pydantic import BaseModel, Field
 
 from app.agent.agent_types import LLMStats
 from app.agent.llm_caller import LLMCaller
-from app.agent.prompt_template import sanitize_input, get_language_style
+from app.agent.prompt_template import sanitize_input
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
+from common_libs.llm.schema_builder import with_response_schema
 from ...conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
+from ...i18n.translation_service import get_i18n_manager
 
 class _SentenceDecompositionResponse(BaseModel):
     decomposed_and_dereferenced: list[str] = Field(default_factory=list)
@@ -21,33 +23,29 @@ class _SentenceDecompositionResponse(BaseModel):
 
 
 class _SentenceDecompositionFirstPassResponse(BaseModel):
-    decomposed_sentences: list[str] = Field(default_factory=list)
-    """
+    decomposed_sentences: list[str] = Field(default_factory=list, description="""
     The decomposed sentences from the user's input.
     This is used to help the model complete the task in steps as dereferencing the pronouns is too complex for the model to do in one step.
-    """
+    """)
 
-    pronouns_indexing: list[str] = Field(default_factory=list)
-    """
+    pronouns_indexing: list[str] = Field(default_factory=list, description="""
     The pronouns from the user's input and their types.
     Helps the model to identify the pronouns and complete the task in steps.
     In some cases it is unclear if a word is a pronoun or not. For example:
     "He said that he will go to the store" - "that" is not a pronoun
-    """
+    """)
 
-    pronouns_antecedents: list[str] = Field(default_factory=list)
-    """
+    pronouns_antecedents: list[str] = Field(default_factory=list, description="""
     The pronouns from the user's input and their antecedents.
     This is used to help the model complete the task in steps.
-    """
+    """)
 
-    resolved_pronouns: list[str] = Field(default_factory=list)
-    """
+    resolved_pronouns: list[str] = Field(default_factory=list, description="""
     The resolved pronouns from the user's input. This is the final output of the first pass.
     The original sentences are decomposed into sub-sentences and the pronouns are resolved to their antecedents.
     However, models struggle to correctly frame the sentences in a natural way. This is due to the pronouns_antecedents 
     which condition the output to return expressions like "Ben helps Ben's" or "Ben uses Ben's hands".
-    """
+    """)
 
 
 class _SentenceDecompositionLLM:
@@ -73,8 +71,8 @@ class _SentenceDecompositionLLM:
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "top_p": 0.0,
-                    "max_output_tokens": 3000  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
-                }
+                    "max_output_tokens": 3000,  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
+                } | with_response_schema(_SentenceDecompositionFirstPassResponse)
             ))
         self._llm_caller_second_pass = LLMCaller[_SentenceDecompositionResponse](model_response_type=_SentenceDecompositionResponse)
         self.llm_second_pass = GeminiGenerativeLLM(
@@ -82,8 +80,8 @@ class _SentenceDecompositionLLM:
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "top_p": 0.0,
-                    "max_output_tokens": 3000  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
-                }
+                    "max_output_tokens": 3000,  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
+                } | with_response_schema(_SentenceDecompositionResponse)
             ))
         self.logger = logger
 
@@ -124,10 +122,8 @@ class _SentenceDecompositionLLM:
         system_instructions_template = dedent("""\
         <System Instructions>
         # Role
-            You are a language expert that decomposes complex sentences into sub-sentences.
-       
-        {language_style}
-                                              
+            You are ({language_name}) language expert that decomposes complex sentences into sub-sentences.
+                                                     
         # Do not interpret
             Do not infer the my responsibilities, skills, duties, tasks, actions, behaviour, activities, competencies, or knowledge based on your prior knowledge about the experience.
             Do not infer the experience and do not use that information in your task.
@@ -185,8 +181,9 @@ class _SentenceDecompositionLLM:
         </System Instructions>
         """)
 
+        language_name = get_i18n_manager().get_locale().label()
         return replace_placeholders_with_indent(system_instructions_template,
-                                                language_style=get_language_style())
+                            language_name=language_name)
 
     @staticmethod
     def _first_pass_prompt_template(context: ConversationContext, last_user_input: str) -> str:
@@ -217,7 +214,7 @@ class _SentenceDecompositionLLM:
         system_instructions_template = dedent("""\
         <System Instructions>
         # Role
-            You are a language expert that reviews sentences and fixes them.
+            You are ({language_name}) language expert that reviews sentences and fixes them.
             You will be given an input with a list of independent sentences.
             Your task is to review each sentence and fix it to ensure that it is grammatically correct, clear, concise and sounds natural.
             Pay attention to awkward phrasing, grammatical errors, and any other issues that may affect the clarity and readability of the sentence.
@@ -225,8 +222,6 @@ class _SentenceDecompositionLLM:
             Both the input and the fixed sentence should be interpreted in a different way review independently. 
             Each sentence from the input must fixed and added to the output in the decomposed_and_dereferenced list.
         
-        {language_style}
-                                              
         # Input Structure
             The input structure is a list of sentences:
             "sentences": list of sentences 
@@ -241,8 +236,9 @@ class _SentenceDecompositionLLM:
         </System Instructions>
         """)
 
+        language_name = get_i18n_manager().get_locale().label()
         return replace_placeholders_with_indent(system_instructions_template,
-                                                language_style=get_language_style())
+                            language_name=language_name)
 
     @staticmethod
     def _second_pass_prompt_template(sentences: list[str]) -> str:

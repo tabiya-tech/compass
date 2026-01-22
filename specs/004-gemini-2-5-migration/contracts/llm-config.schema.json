@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LLMConfigOverride",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "language_model_name": {
+      "type": "string",
+      "enum": [
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-flash",
+        "gemini-2.5-pro"
+      ]
+    },
+    "usage_context": {
+      "type": "string",
+      "enum": ["interactive", "background", "evaluation"]
+    },
+    "response_mime_type": {
+      "type": "string",
+      "const": "application/json"
+    },
+    "response_schema": {
+      "type": "object"
+    }
+  },
+  "required": ["language_model_name"],
+  "description": "Contract for configuring Gemini 2.5 model selection and structured response enforcement."
+}
