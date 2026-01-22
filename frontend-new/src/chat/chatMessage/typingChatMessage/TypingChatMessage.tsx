@@ -13,7 +13,7 @@ export const DATA_TEST_ID = {
 
 export const UI_TEXT = {
   TYPING: "Typing",
-  THINKING: "Please wait, I'm thinking. It might up to 2 minutes.",
+  THINKING: "Please wait, I'm thinking. It might be up to 2 minutes",
 };
 
 export const WAIT_BEFORE_THINKING = 15000;
