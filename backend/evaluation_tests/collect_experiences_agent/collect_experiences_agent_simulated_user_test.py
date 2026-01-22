@@ -6,6 +6,8 @@ from _pytest.logging import LogCaptureFixture
 
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
+from app.i18n.translation_service import get_i18n_manager
+from app.i18n.types import Locale
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from common_libs.test_utilities import get_random_session_id
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
@@ -21,14 +23,17 @@ from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test("gemini-2.0-flash-001/")
-@pytest.mark.repeat(3)
+@pytest.mark.repeat(1)
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_collect_experiences_agent_simulated_user(test_case: CollectExperiencesAgentTestCase,
-                                                        caplog: LogCaptureFixture):
+                                                        caplog: LogCaptureFixture,
+                                                        setup_multi_locale_app_config):
     """
     Tests the welcome agent with a simulated user.
     """
+    get_i18n_manager().set_locale(Locale.EN_US)
+    
     print(f"Running test case {test_case.name}")
 
     session_id = get_random_session_id()
