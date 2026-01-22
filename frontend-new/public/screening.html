@@ -1127,11 +1127,17 @@
       }
 
       const data = await response.json();
-      const { acceptedTc, rejectedTc, group } = data;
+      const { acceptedTc, rejectedTc, group, compassUserId } = data;
 
       if (acceptedTc && group) {
         // User has accepted and has a group redirect accordingly
         if (group === context.groups.USING_COMPASS) {
+        // check if credentials were created
+            if (!compassUserId) {
+                // User was randomized into compass but credentials weren't created, retry registration
+                return showSection(IDS.SECTIONS.INITIAL_QUESTION);
+            }
+          // user has credentials, redirect to compass
           window.location.replace("/#/");
         } else if (group === context.groups.NOT_USING_COMPASS) {
           redirectToControlGroup(context);
