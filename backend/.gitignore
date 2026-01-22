@@ -7,3 +7,5 @@ test_output/
 logs/
 feedback-reports/
 exports/
+evaluation_tests/test_output/
+evaluation_tests/golden_transcripts/output/

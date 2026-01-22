@@ -298,11 +298,31 @@ pytest -m "evaluation_test" --repeat 3 \
 
 ## C2: Localization/Synonym Mapping Module
 
-**Tasks**: TBD
+**Objective**: Normalize Swahili and code-switched inputs and map them to taxonomy terms.
+
+**Tasks**:
+- Build a Swahili term dictionary (50+ terms) including informal slang and code-switch variants.
+- Define a normalized mapping format (JSON/CSV) and load it at runtime.
+- Implement a mapping service to resolve Swahili terms before retrieval / skill extraction.
+- Add coverage + accuracy checks (mapping hit rate, false positives).
+- Document mapping sources and update process.
+
+**How RAG helps**:
+- Use a Swahili glossary + taxonomy snippets as retrieval context to disambiguate slang and code-switched terms.
+- Retrieve localized examples for prompts so the agent uses consistent Swahili phrasing and domain terms.
+- Support fallback mapping when exact synonym matches are missing, without overfitting prompts.
 
 ## C3: Swahili-Enabled Flows End-to-End
 
-**Tasks**: TBD
+**Objective**: Enable the full flow in Swahili with quality parity.
+
+**Tasks**:
+- Add Swahili locale to backend config and frontend supported locales.
+- Provide Swahili translations for core system messages and prompts.
+- Enforce Swahili responses in LLM prompt templates (no language drift).
+- Create Swahili E2E test cases (Persona 1 + Persona 2).
+- Create Swahili golden transcripts and integrate into CI.
+- Compare Swahili skill discovery accuracy to English baseline (≥80% parity).
 
 ---
 
