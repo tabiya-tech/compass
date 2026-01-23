@@ -74,6 +74,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasFinishedRef = useRef<boolean>(false);
   const lastMetricsRef = useRef<SkillsRankingMetrics | null>(null);
+  const autoCompletedRef = useRef<boolean>(false);
   const debouncedUpdaterRef = useRef<{
     update: (metrics: SkillsRankingMetrics) => void;
     forceUpdate: (metrics: SkillsRankingMetrics) => void;
@@ -111,6 +112,7 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
   useEffect(() => {
     if (currentPhase !== SkillsRankingPhase.PROOF_OF_VALUE) {
       hasFinishedRef.current = false;
+      autoCompletedRef.current = false;
     }
   }, [currentPhase]);
 
@@ -259,6 +261,15 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
     void handleComplete();
   }, [isDisabled, handleComplete]);
 
+  // Trigger puzzle completion if already solved (fixes infinite rerender loop)
+  const remainingPuzzles = Math.max(0, 6 - (skillsRankingState.metadata.puzzles_solved || 0));
+  useEffect(() => {
+    if (remainingPuzzles === 0 && !isReplay && !hasFinishedRef.current && !autoCompletedRef.current) {
+      autoCompletedRef.current = true;
+      handlePuzzleSuccess();
+    }
+  }, [remainingPuzzles, isReplay, handlePuzzleSuccess]);
+
   return (
     <MessageContainer
       origin={ConversationMessageSender.COMPASS}
@@ -268,10 +279,8 @@ const SkillsRankingProofOfValue: React.FC<SkillsRankingEffortProps> = ({ onFinis
     >
       <Box sx={{ width: "100%" }}>
         <ChatBubble message="" sender={ConversationMessageSender.COMPASS}>
-          {Math.max(0, 6 - (skillsRankingState.metadata.puzzles_solved || 0)) === 0 && !isReplay ? (
-            // If nothing remains and not in replay, immediately complete (no extra puzzle rendered)
-            (handlePuzzleSuccess() as any)
-          ) : (
+          {/*If nothing remains and not in replay, immediately complete (no extra puzzle rendered)*/}
+          {remainingPuzzles === 0 && !isReplay ? null : (
             <RotateToSolvePuzzle
               puzzles={Math.max(0, 6 - (skillsRankingState.metadata.puzzles_solved || 0))}
               disabled={isDisabled}
