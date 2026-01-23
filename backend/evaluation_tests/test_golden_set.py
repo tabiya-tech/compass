@@ -38,6 +38,7 @@ from evaluation_tests.golden_test_cases import golden_test_cases, GOLDEN_SET_MET
 
 
 @pytest.mark.asyncio
+@pytest.mark.evaluation_test    
 @pytest.mark.golden_test
 @pytest.mark.parametrize("test_case", golden_test_cases, ids=[tc.name for tc in golden_test_cases])
 async def test_golden_set(
