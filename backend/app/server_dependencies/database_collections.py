@@ -13,3 +13,4 @@ class Collections:
     COMPASS_METRICS = "metric_events"
     USER_CV_UPLOADS: str = "user_cv_uploads"
     JOBS: str = "jobs"
+    JOB_PREFERENCES: str = "job_preferences"

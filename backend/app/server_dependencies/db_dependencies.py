@@ -220,6 +220,11 @@ class CompassDBProvider:
                 ("session_id", 1)
             ])
 
+            # Create the job preferences indexes
+            await application_db.get_collection(Collections.JOB_PREFERENCES).create_index([
+                ("session_id", 1)
+            ], unique=True)
+
             logger.info("Finished creating indexes for the application database")
         except Exception as e:
             logger.exception(e)

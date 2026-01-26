@@ -12,6 +12,7 @@ from app.conversations.routes import add_conversation_routes
 from app.countries import Country, get_country_from_string
 from app.invitations import add_user_invitations_routes
 from app.jobs import add_jobs_routes
+from app.job_preferences import add_job_preferences_routes
 from app.metrics.routes.routes import add_metrics_routes
 from app.sentry_init import init_sentry, set_sentry_contexts
 from app.server_dependencies.db_dependencies import CompassDBProvider
@@ -362,6 +363,11 @@ add_user_invitations_routes(app)
 # TODO: added under the aassumption that jobs will be a top level route, if not, move to appropriate place
 ############################################
 add_jobs_routes(app)
+
+############################################
+# Add the job preferences routes
+############################################
+add_job_preferences_routes(app)
 
 ############################################
 # Add routes relevant for esco search
