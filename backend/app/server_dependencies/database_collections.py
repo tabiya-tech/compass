@@ -14,3 +14,4 @@ class Collections:
     USER_CV_UPLOADS: str = "user_cv_uploads"
     JOBS: str = "jobs"
     JOB_PREFERENCES: str = "job_preferences"
+    CAREER_PATH: str = "career_path"
