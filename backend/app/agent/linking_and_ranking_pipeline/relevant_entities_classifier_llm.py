@@ -8,6 +8,7 @@ from typing import Optional, TypeVar, Generic, Literal
 from pydantic import BaseModel
 
 from app.agent.agent_types import LLMStats
+from app.agent.config import AgentsConfig
 from app.agent.linking_and_ranking_pipeline.deduplicate_entities import deduplicate_entities
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty, get_penalty_for_multiple_errors
@@ -315,9 +316,12 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
         """
         return GeminiGenerativeLLM(
             system_instructions=RelevantEntitiesClassifierLLM._get_system_instructions(entity_type_singular=entity_type),
-            config=LLMConfig(generation_config=temperature_config | JSON_GENERATION_CONFIG | {
-                # "max_output_tokens": 3000  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
-            })
+            config=LLMConfig(
+                language_model_name=AgentsConfig.deep_reasoning_model,
+                generation_config=temperature_config | JSON_GENERATION_CONFIG | {
+                    # "max_output_tokens": 3000  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
+                }
+            )
         )
 
     @staticmethod

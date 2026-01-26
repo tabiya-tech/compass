@@ -15,6 +15,7 @@ from app.agent.explore_experiences_agent_director import ExploreExperiencesAgent
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.welcome_agent import WelcomeAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, ConversationMemoryManagerState
+from app.i18n.types import Locale
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.agent_director.agent_director_executors import AgentDirectorExecutor, \
@@ -87,7 +88,7 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
                                           setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
@@ -123,7 +124,7 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
                                             setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
@@ -183,7 +184,7 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 async def test_argentina_counseling_flow(caplog: LogCaptureFixture,
                                          setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
@@ -204,6 +205,7 @@ async def test_argentina_counseling_flow(caplog: LogCaptureFixture,
     given_test_case = ScriptedUserEvaluationTestCase(
         name='argentina_counseling_flow',
         simulated_user_prompt="Scripted user: Argentinian persona",
+        locale=Locale.ES_AR,
         scripted_user=[
             "Hola, ¿me explicás cómo funciona esto?",
             "Dale, arranquemos",  # End of WelcomeAgent, Start of COLLECT_EXPERIENCES_AGENT
@@ -222,14 +224,15 @@ async def test_argentina_counseling_flow(caplog: LogCaptureFixture,
     context = await conversation_manager.get_conversation_context()
     expected_agent_states: list[AgentState] = [
         AgentState(0, AgentType.WELCOME_AGENT, False),
-        AgentState(1, AgentType.WELCOME_AGENT, True),
-        AgentState(2, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+        AgentState(1, AgentType.WELCOME_AGENT, False),
+        AgentState(2, AgentType.WELCOME_AGENT, True),
         AgentState(3, AgentType.COLLECT_EXPERIENCES_AGENT, False),
         AgentState(4, AgentType.COLLECT_EXPERIENCES_AGENT, False),
-        AgentState(5, AgentType.WELCOME_AGENT, False),
+        AgentState(5, AgentType.COLLECT_EXPERIENCES_AGENT, False),
         AgentState(6, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+        AgentState(7, AgentType.WELCOME_AGENT, False),
     ]
     for i, expected_state in enumerate(expected_agent_states):
         turn = context.all_history.turns[i]
         actual_state = AgentState(i, turn.output.agent_type, turn.output.finished)
-        assert actual_state == expected_state, f"Agent actual state: {actual_state} did have the expected state: {expected_state}"
+        assert actual_state == expected_state, f"Agent actual state: {actual_state} did have the expected state: {expected_state} on state: {i}"

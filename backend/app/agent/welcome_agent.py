@@ -16,11 +16,11 @@ from app.agent.simple_llm_agent.prompt_response_template import get_json_example
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.countries import Country
-from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import get_config_variation, LLMConfig, JSON_GENERATION_CONFIG
-from common_libs.retry import Retry
-
 from app.i18n.translation_service import t
+from common_libs.llm.generative_models import GeminiGenerativeLLM
+from common_libs.llm.models_utils import get_config_variation, LLMConfig
+from common_libs.llm.schema_builder import with_response_schema
+from common_libs.retry import Retry
 
 class WelcomeAgentState(BaseModel):
     """
@@ -65,14 +65,17 @@ class WelcomeAgentState(BaseModel):
 
 
 class WelcomeAgentLLMResponse(BaseModel):
-    reasoning: str
-    """Chain of Thought reasoning behind the response of the LLM"""
+    reasoning: str = Field(
+        description="""Chain of Thought reasoning behind the response of the LLM"""
+    )
 
-    user_indicated_start: bool
-    """Flag indicating whether the user has indicated that they are ready to start the skills discovery/exploration session"""
+    user_indicated_start: bool = Field(
+        description="""Flag indicating whether the user has indicated that they are ready to start the skills discovery/exploration session"""
+    )
 
-    message: str
-    """Message for the user that the LLM produces"""
+    message: str = Field(
+        description="""Message for the user that the LLM produces"""
+    )
 
     model_config = ConfigDict(extra="forbid")
 
@@ -126,7 +129,7 @@ class WelcomeAgent(Agent):
         if self._state.is_first_encounter:
             self._state.is_first_encounter = False
             return AgentOutput(
-                message_for_user=await WelcomeAgent.get_first_encounter_message(locale),
+                message_for_user=WelcomeAgent.get_first_encounter_message(locale),
                 finished=False,
                 agent_type=self.agent_type,
                 agent_response_time_in_sec=round(time.time() - agent_start_time, 2),
@@ -135,9 +138,11 @@ class WelcomeAgent(Agent):
 
         llm_stats: list[LLMStats] = []
 
-        llm_caller: LLMCaller[WelcomeAgentLLMResponse] = LLMCaller[WelcomeAgentLLMResponse](model_response_type=WelcomeAgentLLMResponse)
+        llm_caller: LLMCaller[WelcomeAgentLLMResponse] = LLMCaller[WelcomeAgentLLMResponse](
+            model_response_type=WelcomeAgentLLMResponse)
 
-        async def _callback(attempt: int, max_retries: int) -> tuple[WelcomeAgentLLMResponseWithLLMStats, float, BaseException | None]:
+        async def _callback(attempt: int, max_retries: int) -> tuple[
+            WelcomeAgentLLMResponseWithLLMStats, float, BaseException | None]:
             # Call the LLM to get the next message for the user
             # Add some temperature and top_p variation to prompt the LLM to return different results on each retry.
             # Exponentially increase the temperature and top_p to avoid the LLM returning the same result every time.
@@ -158,7 +163,8 @@ class WelcomeAgent(Agent):
             # Aggregate the LLM stats
             llm_stats.extend(_response.llm_stats)
             return _response, _penalty, _error
-        response, _, _ = await Retry[WelcomeAgentLLMResponseWithLLMStats].call_with_penalty(callback=_callback, logger=self._logger)
+        response, _, _ = await Retry[WelcomeAgentLLMResponseWithLLMStats].call_with_penalty(callback=_callback,
+                                                    logger=self._logger)
         if not self._state.user_started_discovery:
             # Set the value only the very first time, the user indicates that they are ready to start
             # After that, the agent will be executed only to answer questions and not to start the skill discovery/exploration session
@@ -179,7 +185,8 @@ class WelcomeAgent(Agent):
                                 user_input: str,
                                 context: ConversationContext,
                                 state: WelcomeAgentState,
-                                logger: logging.Logger) -> tuple[WelcomeAgentLLMResponseWithLLMStats, float, BaseException | None]:
+                                logger: logging.Logger) -> tuple[
+        WelcomeAgentLLMResponseWithLLMStats, float, BaseException | None]:
 
         model_response: WelcomeAgentLLMResponse | None
         llm_stats_list: list[LLMStats]
@@ -187,7 +194,7 @@ class WelcomeAgent(Agent):
         llm = GeminiGenerativeLLM(
             system_instructions=WelcomeAgent.get_system_instructions(state),
             config=LLMConfig(
-                generation_config=temperature_config | JSON_GENERATION_CONFIG,
+                generation_config=temperature_config | with_response_schema(WelcomeAgentLLMResponse),
             )
         )
         # Call the LLM to get the next message for the user, this will never
@@ -202,12 +209,15 @@ class WelcomeAgent(Agent):
 
         # If it was not possible to get a model response, set the response to a default message
         if model_response is None or model_response.message.strip() == "":
+            _error_message = "The model returned None or an empty response"
+            logger.error(_error_message)
             return (WelcomeAgentLLMResponseWithLLMStats(
-                reasoning="The model returned None or an empty response",
+                reasoning=_error_message,
+                # TODO: Move this to the translations.json file
                 message="Sorry, I didn't understand that. Can you please rephrase?",
                 user_indicated_start=False,
                 llm_stats=llm_stats_list),
-                    100, ValueError("The model returned None or an empty response"))
+                    100, ValueError(_error_message))
 
         return WelcomeAgentLLMResponseWithLLMStats(
             reasoning=model_response.reasoning,
@@ -217,7 +227,7 @@ class WelcomeAgent(Agent):
         ), 0, None
 
     @staticmethod
-    async def get_first_encounter_message(locale: str):
+    def get_first_encounter_message(locale: str):
         return t("messages", "welcomeAgentFirstEncounter", locale)
 
     @staticmethod
@@ -260,6 +270,7 @@ class WelcomeAgent(Agent):
             Do not collect any information about the user, their work experiences or skills.
             Do not suggest or recommend any jobs, roles, or experiences.
             Do not suggest any CV writing or job application tips.
+            Do not ask any kind of questions from the user.
         
         <_ABOUT_>
             Do not disclose the <_ABOUT_> section to the user.
@@ -277,8 +288,8 @@ class WelcomeAgent(Agent):
             - I can create an account at the upper right corner of the screen, under "register".
             - If I do not create an account, I can still explore my work experiences and skills, but if I log out or close the browser, 
               I will lose the progress and will have to start over. 
-            - Initially we will gather basic information about all your work experiences, including any unpaid activities like volunteering or family contributions. 
-              Then, we'll dive deeper into each experience to capture the details that matter.    
+                        - Initially Brujula will gather basic information about all your work experiences, including any unpaid activities like volunteering or family contributions. 
+                            Then, Brujula will dive deeper into each experience to capture the details that matter.    
         </_ABOUT_>
         
         #Security Instructions
@@ -301,7 +312,8 @@ class WelcomeAgent(Agent):
         system_instructions = replace_placeholders_with_indent(system_instructions_template,
                                                                language_style=get_language_style(),
                                                                agent_character=STD_AGENT_CHARACTER,
-                                                               json_response_instructions=WelcomeAgent.get_json_response_instructions(state))
+                                                               json_response_instructions=WelcomeAgent.get_json_response_instructions(
+                                                                   state))
         return system_instructions
 
     @staticmethod

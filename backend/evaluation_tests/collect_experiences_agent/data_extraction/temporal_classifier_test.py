@@ -46,7 +46,7 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
         given_experience_title="Software Engineer",
         users_input="May 2021",
         expected_extracted_data={
-            "start_date": "2021/05",
+            "start_date": "05/2021",
             "end_date": AnyOf(None, ContainsString("present")),
             "paid_work": True,
             "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
@@ -59,7 +59,7 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
         ],
         users_input="June 2020",
         expected_extracted_data={
-            "end_date": "2020/06",
+            "end_date": "06/2020",
             "start_date": None,
         }
     ),
@@ -171,8 +171,8 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
         expected_extracted_data={
             "paid_work": False,
             "work_type": ContainsString("unpaid"),
-            "start_date": "2020/02",
-            "end_date": "2025/01"
+            "start_date": "02/2020",
+            "end_date": "01/2025"
         }
     ),
 
@@ -188,8 +188,8 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
         expected_extracted_data={
             "paid_work": False,
             "work_type": ContainsString("unpaid"),
-            "start_date": "2021/01",
-            "end_date": AnyOf("2021/04", "2021/05")  # Sometime, the LLM might do addition to the end date.
+            "start_date": "01/2021",
+            "end_date": AnyOf("04/2021", "05/2021")  # Sometime, the LLM might do addition to the end date.
         }
     ),
 
@@ -265,7 +265,7 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
 
 @pytest.mark.asyncio
 @pytest.mark.repeat(3)
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_temporal_and_work_type_classification(test_case: TemporalAndWorkTypeClassifierToolTestCase, caplog):
