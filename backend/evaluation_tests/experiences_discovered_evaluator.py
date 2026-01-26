@@ -5,11 +5,13 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from app.agent.config import AgentsConfig
 from app.agent.experience import ExperienceEntity
 from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, MEDIUM_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG
+from common_libs.llm.schema_builder import with_response_schema
 from evaluation_tests.matcher import encode_mixed
 
 
@@ -93,9 +95,8 @@ class ExperiencesDiscoveredEvaluator:
         # Use GeminiGenerativeLLM as the LLM for evaluation
         self.llm = GeminiGenerativeLLM(
             config=LLMConfig(
-                language_model_name="gemini-2.0-flash-001",
-                generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG
-
+                language_model_name=AgentsConfig.deep_reasoning_model,
+                generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | with_response_schema(MatchResult)
             ),
             system_instructions=_get_system_instructions()
         )

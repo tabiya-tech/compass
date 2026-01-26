@@ -1,10 +1,10 @@
-from textwrap import dedent
 import logging
+from textwrap import dedent
 
-from common_libs.llm.models_utils import LLMConfig
-from common_libs.llm.generative_models import GeminiGenerativeLLM
-from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
+from app.conversation_memory.conversation_memory_types import ConversationContext
+from common_libs.llm.generative_models import GeminiGenerativeLLM
+from common_libs.llm.models_utils import LLMConfig, HIGH_TEMPERATURE_GENERATION_CONFIG
 
 
 class Summarizer:
@@ -27,7 +27,7 @@ class Summarizer:
             Your response will be in a raw formatted non markdown text 
             It should be no longer than 100 words.
             """)
-        self._llm = GeminiGenerativeLLM(config=LLMConfig())
+        self._llm = GeminiGenerativeLLM(config=LLMConfig(generation_config=HIGH_TEMPERATURE_GENERATION_CONFIG))
         self._logger = logging.getLogger(self.__class__.__name__)
 
     async def summarize(self, context: ConversationContext) -> str:

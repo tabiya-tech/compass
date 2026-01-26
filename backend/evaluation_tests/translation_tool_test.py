@@ -42,7 +42,7 @@ test_cases: list[_TestCase] = [
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize('current_test_case', get_test_cases_to_run(test_cases),
                          ids=[case.test_id for case in get_test_cases_to_run(test_cases)])

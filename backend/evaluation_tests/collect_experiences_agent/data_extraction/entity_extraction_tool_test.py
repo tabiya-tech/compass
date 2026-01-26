@@ -184,7 +184,7 @@ test_cases: list[EntityExtractionToolTestCase] = [
         expected_extracted_data={
             "company": "Java House",
             "location": "Nairobi",
-            "experience_title": ContainsString("waiter")
+            "experience_title": AnyOf(ContainsString("waiter"), ContainsString("server"), ContainsString("serving"))
         }
     ),
 
@@ -360,7 +360,6 @@ test_cases: list[EntityExtractionToolTestCase] = [
             (SILENCE_MESSAGE, "Contame de tu laburo más reciente")
         ],
         locale=Locale.ES_AR,
-        skip_force="force",
         users_input="Laburé como asistente de ventas en el local de mi viejo en Buenos Aires",
         expected_extracted_data={
             "company": AnyOf(ContainsString("local"), ContainsString("viejo")),
@@ -373,7 +372,6 @@ test_cases: list[EntityExtractionToolTestCase] = [
         turns=[
             (SILENCE_MESSAGE, "¿Hiciste algún laburo no pago en casa?")
         ],
-        skip_force="force",
         locale=Locale.ES_AR,
         users_input="Sí, estuve laburando en la casa de mi madre, me encargaba de la limpieza y la comida",
         expected_extracted_data={

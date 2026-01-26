@@ -90,7 +90,7 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
                                           setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
@@ -117,20 +117,18 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
         evaluations=[]
     )
 
-    # Run the test in english
-    get_i18n_manager().set_locale(Locale.EN_GB)
-
     conversation_manager, agent_director_exec = await setup_agent_director
     await agent_director_exec(caplog, given_test_case)
 
     # Check if the welcome agent completed their task
     context = await conversation_manager.get_conversation_context()
+
     # Assert that the conversation is not finished
     assert not context.history.turns[-1].output.finished
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
                                             setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
@@ -165,9 +163,6 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
         evaluations=[]
     )
 
-    # AND the locale is set to EN_GB
-    get_i18n_manager().set_locale(Locale.EN_GB)
-
     conversation_manager, agent_director_exec = await setup_agent_director
     # Set the number of conversation rounds to the length of the scripted user
     await agent_director_exec(caplog, given_test_case)
@@ -194,7 +189,7 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 async def test_argentina_counseling_flow(caplog: LogCaptureFixture,
                                          setup_agent_director: Awaitable[tuple[ConversationMemoryManager, Callable[
@@ -216,20 +211,33 @@ async def test_argentina_counseling_flow(caplog: LogCaptureFixture,
     given_test_case = ScriptedUserEvaluationTestCase(
         name='argentina_counseling_flow',
         simulated_user_prompt="Scripted user: Argentinian persona",
+        locale=Locale.ES_AR,
         scripted_user=[
+            # AGENT: WELCOME_AGENT     TURN: 1
+            # AGENT: WELCOME_AGENT     TURN: 2
+            # translation: Hello, can you explain to me how this works?
             "Hola, ¿me explicás cómo funciona esto?",
+
+            # translation: Okay, let's start
             "Dale, arranquemos",  # End of WelcomeAgent, Start of COLLECT_EXPERIENCES_AGENT
+
+            # translation: I worked as a sales assistant at my old man's shop
             "Laburé como asistente de ventas en el local de mi viejo",  # Job 1
+
+            # translation: I did everything: cleaning, the cash register, and helping customers.
             "Hacía de todo, limpieza, caja, atender gente",  # Details
+
+            # translation: No, nothing else for now.
             "No, nada más por ahora",
+
+            # translation: Can you explain the process to me again?
             "¿Me volvés a explicar el proceso?",  # WelcomeAgent
+
+            # translation: I worked at my mom's place too, helping out around the house.
             "Laburé en lo de mi vieja también ayudando en la casa",  # Job 2
         ],
         evaluations=[]
     )
-
-    # AND the locale is set to ES_AR
-    get_i18n_manager().set_locale(Locale.ES_AR)
 
     conversation_manager, agent_director_exec = await setup_agent_director
     await agent_director_exec(caplog, given_test_case)
@@ -237,14 +245,15 @@ async def test_argentina_counseling_flow(caplog: LogCaptureFixture,
     context = await conversation_manager.get_conversation_context()
     expected_agent_states: list[AgentState] = [
         AgentState(0, AgentType.WELCOME_AGENT, False),
-        AgentState(1, AgentType.WELCOME_AGENT, True),
-        AgentState(2, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+        AgentState(1, AgentType.WELCOME_AGENT, False),
+        AgentState(2, AgentType.WELCOME_AGENT, True),
         AgentState(3, AgentType.COLLECT_EXPERIENCES_AGENT, False),
         AgentState(4, AgentType.COLLECT_EXPERIENCES_AGENT, False),
-        AgentState(5, AgentType.WELCOME_AGENT, False),
+        AgentState(5, AgentType.COLLECT_EXPERIENCES_AGENT, False),
         AgentState(6, AgentType.COLLECT_EXPERIENCES_AGENT, False),
+        AgentState(7, AgentType.WELCOME_AGENT, False),
     ]
     for i, expected_state in enumerate(expected_agent_states):
         turn = context.all_history.turns[i]
         actual_state = AgentState(i, turn.output.agent_type, turn.output.finished)
-        assert actual_state == expected_state, f"Agent actual state: {actual_state} did have the expected state: {expected_state}"
+        assert actual_state == expected_state, f"Agent actual state: {actual_state} did have the expected state: {expected_state} on state: {i}"

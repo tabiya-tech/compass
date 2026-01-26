@@ -17,6 +17,11 @@ class GeminiGenerativeLLM(BasicLLM):
                  system_instructions: list[str] | str | None = None,
                  config: LLMConfig = LLMConfig()):
         super().__init__(config=config)
+
+        if config.generation_config.get("response_mime_type") is not None and config.generation_config.get("response_schema") is None:
+            # TODO: Remove me
+            print("===")
+
         self._model = GenerativeModel(model_name=config.language_model_name,
                                       system_instruction=system_instructions,
                                       generation_config=GenerationConfig.from_dict(config.generation_config),

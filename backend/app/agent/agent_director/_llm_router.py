@@ -4,15 +4,16 @@ from textwrap import dedent
 from pydantic import BaseModel
 
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
-
 from app.agent.agent_types import AgentType, AgentInput
+from app.agent.config import AgentsConfig
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
 from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import get_config_variation, LLMConfig, JSON_GENERATION_CONFIG
+from common_libs.llm.models_utils import get_config_variation, LLMConfig
+from common_libs.llm.schema_builder import with_response_schema
 from common_libs.retry import Retry
 
 DEFAULT_AGENT = "DefaultAgent"
@@ -60,7 +61,8 @@ class LLMRouter:
 
     def __init__(self, logger: Logger):
         # initialize the router model
-        self._llm_caller: LLMCaller[RouterModelResponse] = LLMCaller[RouterModelResponse](model_response_type=RouterModelResponse)
+        self._llm_caller: LLMCaller[RouterModelResponse] = LLMCaller[RouterModelResponse](
+            model_response_type=RouterModelResponse)
         self._logger = logger
         # define the tasks that each agent is responsible for
         welcome_agent_tasks = AgentTasking(
@@ -126,9 +128,11 @@ class LLMRouter:
                                                       start_top_p=0.8, end_top_p=1,
                                                       attempt=attempt, max_retries=max_retries)
 
-            llm = GeminiGenerativeLLM(config=LLMConfig(generation_config=temperature_config | JSON_GENERATION_CONFIG | {
-                "max_output_tokens": 1000,  # Set a reasonable, but low value for the output tokens to avoid the repetition trap
-            }))
+            llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name=AgentsConfig.deep_reasoning_model,
+                                                       generation_config=temperature_config | with_response_schema(RouterModelResponse) | {
+                                                           # Set a reasonable, but low value for the output tokens to avoid the repetition trap
+                                                           "max_output_tokens": 1000,
+                                                       }))
 
             self._logger.debug("Calling LLM with temperature: %s, top_p: %s",
                                temperature_config["temperature"],
@@ -207,7 +211,8 @@ class LLMRouter:
 
         return AgentType(selected_agent_type), 0, None
 
-    def _get_system_instructions(self, *, user_input: str, context: ConversationContext, phase: ConversationPhase) -> str:
+    def _get_system_instructions(self, *, user_input: str, context: ConversationContext,
+                                 phase: ConversationPhase) -> str:
         """
         Get the system instructions for the router model for the given phase.
         :param phase:
@@ -249,6 +254,9 @@ class LLMRouter:
                  
                 The Model Name and the tasks it is responsible for are as follows:
                 {agent_responsible_for_phase_instructions}
+                
+                Note:
+                    - Each agent is responsible for clarifying the questions and doubts the user may have regarding its tasks.
         
                 {examples}
                 

@@ -137,6 +137,11 @@ class _DataExtractionLLM:
                 if command.data_operation.lower() == DataOperation.ADD.value.lower():
                     new_experiences_counter += 1
 
+                index = command.index if command.data_operation.lower() == DataOperation.UPDATE.value.lower() else new_experiences_counter
+                if index is None:
+                    self.logger.error(f"Invalid experience to update, {command}")
+                    continue
+
                 update_tasks.append(self._get_extracted_experience_data(
                     index=command.index if command.data_operation.lower() == DataOperation.UPDATE.value.lower() else new_experiences_counter,
                     turn_number=len(context.all_history.turns),
