@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 from app.agent.explore_experiences_agent_director import DiveInPhase
 from app.conversations.experience._types import UpdateExperienceRequest, ExperienceEntity
+from app.conversations.experience.repository import IExperiencesRepository
 from app.conversations.experience.utils import update_experience_entity, compute_top_skill_changes, \
     get_work_type_from_experience
 from app.metrics.application_state_metrics_recorder.recorder import IApplicationStateMetricsRecorder
@@ -27,6 +28,19 @@ class IExperienceService(ABC):
 
         :param session_id: int - id for the conversation session
         :return: List[Tuple[ExperienceEntity, DiveInPhase]] - an array containing tuples of (ExperienceEntity, DiveInPhase)
+        :raises Exception: if any error occurs
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_experiences_by_session_ids(
+            self,
+            session_ids: list[int]) -> dict[int, list[tuple[ExperienceEntity, DiveInPhase]]]:
+        """
+        Get all the experiences on the given conversation sessions.
+
+        :param session_ids: int - ids of the conversation sessions
+        :return: List[List[Tuple[ExperienceEntity, DiveInPhase]]] - an array containing sessions's tuples of (ExperienceEntity, DiveInPhase)
         :raises Exception: if any error occurs
         """
         raise NotImplementedError()
@@ -113,12 +127,15 @@ class IExperienceService(ABC):
 class ExperienceService(IExperienceService):
     def __init__(self, *,
                  application_state_metrics_recorder: IApplicationStateMetricsRecorder,
-                 metrics_service: IMetricsService):
+                 metrics_service: IMetricsService,
+                 experiences_repository: IExperiencesRepository):
         self._logger = logging.getLogger(ExperienceService.__name__)
         self._application_state_metrics_recorder = application_state_metrics_recorder
         self._metrics_service = metrics_service
+        self._experiences_repository = experiences_repository
 
-    async def _record_experience_change(self, user_id: str, session_id: int, work_type: str, edited_fields: list[str]) -> None:
+    async def _record_experience_change(self, user_id: str, session_id: int, work_type: str,
+                                        edited_fields: list[str]) -> None:
         """Record metrics for experience changes."""
         if not edited_fields:
             return
@@ -339,3 +356,9 @@ class ExperienceService(IExperienceService):
             self._logger.exception(f"Unexpected error recording metrics for experience delete: {str(e)}")
 
         return deleted_experience, DiveInPhase.PROCESSED
+
+    async def get_experiences_by_session_ids(
+            self,
+            session_ids: list[int]
+    ) -> dict[int, list[tuple[ExperienceEntity, DiveInPhase]]]:
+        return await self._experiences_repository.get_experiences_by_session_ids(session_ids=session_ids)

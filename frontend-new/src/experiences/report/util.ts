@@ -82,8 +82,33 @@ export const groupExperiencesByWorkType = (experiences: Experience[]) => {
   };
 };
 
+/**
+ * Global asset cache for bulk operations.
+ * When set, getBase64Image will use this cache instead of fetching.
+ */
+let globalAssetCache: Map<string, string> | null = null;
+
+/**
+ * Set the global asset cache for bulk operations.
+ * This allows getBase64Image to use preloaded assets.
+ */
+export const setGlobalAssetCache = (cache: Map<string, string> | null) => {
+  globalAssetCache = cache;
+};
+
 // Convert local image to base64
-export const getBase64Image = async (url: string) => {
+export const getBase64Image = async (url: string): Promise<string> => {
+  // If global cache is set and has the asset, use it
+  if (globalAssetCache) {
+    const cached = globalAssetCache.get(url);
+    if (cached) {
+      return cached;
+    }
+    // Asset not in cache, log warning and fall through to fetch
+    console.warn(`Asset not in global cache, fetching: ${url}`);
+  }
+
+  // Fetch the asset
   const response = await customFetch(url, {
     expectedStatusCode: [200, 204],
     serviceName: "SkillsReportService",

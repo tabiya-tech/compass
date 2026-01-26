@@ -30,6 +30,7 @@ const LazyLoadedSensitiveDataForm = lazyWithPreload(
 );
 const LazyLoadedChat = lazyWithPreload(() => import("src/chat/Chat"));
 const LazyLoadedPublicReport = lazyWithPreload(() => import("src/experiences/report/PublicReportPage"));
+const LazyLoadedBulkDownloadReports = lazyWithPreload(() => import("src/experiences/report/BulkDownloadReportPage"));
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouterV6(createHashRouter);
@@ -57,8 +58,6 @@ const NotFound: React.FC = () => {
 };
 
 const App = () => {
-
-
   const [loading, setLoading] = useState(true);
 
   const loadApplicationState = async () => {
@@ -110,7 +109,9 @@ const App = () => {
       // get the user from the token (validating again internally)
       const user = authenticationServiceInstance.getUser(token);
       if (!user) {
-        console.debug("Authentication token is not valid or user could not be extracted from token. Logging out the user.");
+        console.debug(
+          "Authentication token is not valid or user could not be extracted from token. Logging out the user."
+        );
         await authenticationServiceInstance.logout();
         return;
       }
@@ -134,9 +135,7 @@ const App = () => {
           console.warn("User has not registered but has a valid token. Logging out user.");
         } else {
           // Unexpected error while retrieving user preferences
-          console.error(
-            new AuthenticationError("Error retrieving user preferences. Logging out user.", error)
-          );
+          console.error(new AuthenticationError("Error retrieving user preferences. Logging out user.", error));
         }
 
         // Log out in both cases
@@ -269,15 +268,15 @@ const App = () => {
     ...(isRegistrationDisabled
       ? []
       : [
-        {
-          path: routerPaths.REGISTER,
-          element: (
-            <ProtectedRoute key={ProtectedRouteKeys.REGISTER}>
-              <Register />
-            </ProtectedRoute>
-          ),
-        },
-      ]),
+          {
+            path: routerPaths.REGISTER,
+            element: (
+              <ProtectedRoute key={ProtectedRouteKeys.REGISTER}>
+                <Register />
+              </ProtectedRoute>
+            ),
+          },
+        ]),
     {
       path: routerPaths.LOGIN,
       element: (
@@ -313,6 +312,10 @@ const App = () => {
     {
       path: routerPaths.REPORT,
       element: <LazyLoadedPublicReport />,
+    },
+    {
+      path: routerPaths.BULK_DOWNLOAD_REPORTS,
+      element: <LazyLoadedBulkDownloadReports />,
     },
     {
       path: "*",

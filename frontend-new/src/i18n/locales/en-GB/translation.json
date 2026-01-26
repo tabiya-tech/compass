@@ -522,9 +522,52 @@
       "topSkillsTitle": "Top Skills: ",
       "skillsDescriptionText": "Below, you will find a list of the skills discovered during your conversation with Brújula, along with their descriptions.",
       "disclaimer": {
-        "final": "This report summarizes the key information gathered during a conversation with Brújula on {{date}}. Brújula is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV."
+        "final": "This report summarizes the key information gathered during a conversation with Brújula on {{date}}. Brújula is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate's work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV."
       },
-      "bodyText": "This report summarizes the key information gathered during a conversation with Brújula on {{date}}. Brújula is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV."
+      "bodyText": "This report summarizes the key information gathered during a conversation with Brújula on {{date}}. Brújula is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate's work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV.",
+      "bulkDownload": {
+        "title": "Bulk Download Reports",
+        "description": "Download multiple skill reports as a zip file. Use the filters below to select which reports to download.",
+        "dateFilters": {
+          "startedAfter": {
+            "label": "Started After",
+            "helperText": "Only include reports from users who started after this date/time"
+          },
+          "startedBefore": {
+            "label": "Started Before",
+            "helperText": "Only include reports from users who started before this date/time"
+          }
+        },
+        "fileFormat": {
+          "label": "File Format",
+          "pdfOnly": "PDF Only",
+          "docxOnly": "DOCX Only",
+          "both": "Both"
+        },
+        "buttons": {
+          "download": "Download Reports",
+          "downloading": "Downloading..."
+        },
+        "status": {
+          "preloading": "Preloading assets (images, fonts)...",
+          "streaming": "Streaming reports from server... ({{count}} received)",
+          "generating": "Generating files... ({{processed}}/{{total}})",
+          "zipping": "Creating zip file...",
+          "complete": "Successfully downloaded {{count}} reports!",
+          "error": "Error: {{message}}"
+        },
+        "errors": {
+          "tokenRequired": "Security token is required",
+          "noReports": "No reports found matching the filters",
+          "unAuthorizedAccess": "Unauthorized access to reports"
+        },
+        "security": {
+          "warning": {
+            "title": "Security Notice",
+            "message": "This page contains a sensitive access token in the URL. Do not share this link with others. Close this tab when finished to prevent unauthorised access."
+          }
+        }
+      }
     }
   },
   "features": {

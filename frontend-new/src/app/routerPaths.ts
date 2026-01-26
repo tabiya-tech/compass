@@ -9,4 +9,5 @@ export const routerPaths = {
   CONSENT: "/consent",
   SENSITIVE_DATA: "/sensitive-data",
   REPORT: "/report/:id",
+  BULK_DOWNLOAD_REPORTS: "/bulk-download-reports",
 };

@@ -524,7 +524,50 @@
       "disclaimer": {
         "final": "Este informe resume la información clave recopilada durante una conversación con Brújula el {{date}}. Brújula es un chatbot de IA que ayuda a las personas que buscan empleo a explorar sus habilidades y experiencias. Esta información puede usarse para guiar la búsqueda de empleo y resaltar sus habilidades al postular, especialmente durante entrevistas con posibles empleadores."
       },
-      "bodyText": "Este informe resume la información clave recopilada durante una conversación con Brújula el {{date}}. Brújula es un chatbot de IA que ayuda a los buscadores de empleo a explorar sus habilidades y experiencias. Este informe presenta la experiencia laboral del candidato y las habilidades identificadas en cada experiencia. Esta información puede usarse para guiar la búsqueda de empleo y resaltar sus habilidades al postular, especialmente durante entrevistas con posibles empleadores. Puede ser un buen punto de partida para crear un CV completo."
+      "bodyText": "Este informe resume la información clave recopilada durante una conversación con Brújula el {{date}}. Brújula es un chatbot de IA que ayuda a los buscadores de empleo a explorar sus habilidades y experiencias. Este informe presenta la experiencia laboral del candidato y las habilidades identificadas en cada experiencia. Esta información puede usarse para guiar la búsqueda de empleo y resaltar sus habilidades al postular, especialmente durante entrevistas con posibles empleadores. Puede ser un buen punto de partida para crear un CV completo.",
+      "bulkDownload": {
+        "title": "Descarga masiva de informes",
+        "description": "Descarga múltiples informes de habilidades como un archivo zip. Usa los filtros a continuación para seleccionar qué informes descargar.",
+        "dateFilters": {
+          "startedAfter": {
+            "label": "Iniciado después de",
+            "helperText": "Solo incluir informes de usuarios que iniciaron después de esta fecha/hora"
+          },
+          "startedBefore": {
+            "label": "Iniciado antes de",
+            "helperText": "Solo incluir informes de usuarios que iniciaron antes de esta fecha/hora"
+          }
+        },
+        "fileFormat": {
+          "label": "Formato de archivo",
+          "pdfOnly": "Solo PDF",
+          "docxOnly": "Solo DOCX",
+          "both": "Ambos"
+        },
+        "buttons": {
+          "download": "Descargar informes",
+          "downloading": "Descargando..."
+        },
+        "status": {
+          "preloading": "Precargando recursos (imágenes, fuentes)...",
+          "streaming": "Transmitiendo informes desde el servidor... ({{count}} recibidos)",
+          "generating": "Generando archivos... ({{processed}}/{{total}})",
+          "zipping": "Creando archivo zip...",
+          "complete": "¡Se descargaron {{count}} informes correctamente!",
+          "error": "Error: {{message}}"
+        },
+        "errors": {
+          "tokenRequired": "Se requiere el token de seguridad",
+          "noReports": "No se encontraron informes que coincidan con los filtros",
+          "unAuthorizedAccess": "Acceso no autorizado a los informes"
+        },
+        "security": {
+          "warning": {
+            "title": "Aviso de Seguridad",
+            "message": "Esta página contiene un token de acceso sensible en la URL. No compartas este enlace con otros. Cierra esta pestaña cuando termines para evitar acceso no autorizado."
+          }
+        }
+      }
     }
   },
   "features": {

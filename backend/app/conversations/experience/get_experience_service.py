@@ -3,6 +3,8 @@ import asyncio
 from fastapi import Depends
 
 from app.application_state import ApplicationStateManager
+from app.conversations.experience.get_experience_repository import get_experience_repository
+from app.conversations.experience.repository import IExperiencesRepository
 from app.conversations.experience.service import IExperienceService, ExperienceService
 from app.metrics.application_state_metrics_recorder.recorder import ApplicationStateMetricsRecorder
 from app.metrics.services.get_metrics_service import get_metrics_service
@@ -15,6 +17,7 @@ _experience_service_lock = asyncio.Lock()
 
 async def get_experience_service(
         application_state_manager: ApplicationStateManager = Depends(get_application_state_manager),
+        experiences_repository: IExperiencesRepository = Depends(get_experience_repository),
         metrics_service: IMetricsService = Depends(get_metrics_service)) -> IExperienceService:
     global _experience_service_singleton
 
@@ -32,6 +35,7 @@ async def get_experience_service(
                 _experience_service_singleton = ExperienceService(
                     application_state_metrics_recorder=app_state_recorder,
                     metrics_service=metrics_service,
+                    experiences_repository=experiences_repository,
                 )
 
     return _experience_service_singleton

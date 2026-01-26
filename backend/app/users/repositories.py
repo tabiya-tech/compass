@@ -1,11 +1,14 @@
 import logging
 from abc import ABC, abstractmethod
+from datetime import datetime
+from typing import AsyncGenerator
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.server_dependencies.database_collections import Collections
 from common_libs.time_utilities import datetime_to_mongo_date, get_now
-from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest, Experiments, UserExperiments, PossibleExperimentValues
+from app.users.types import UserPreferences, UserPreferencesRepositoryUpdateRequest, Experiments, UserExperiments, \
+    PossibleExperimentValues
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +66,8 @@ class IUserPreferenceRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: PossibleExperimentValues) -> None:
+    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str,
+                                        experiment_config: PossibleExperimentValues) -> None:
         """
         Set an experiment configuration for a given experiment ID in the user preferences
         :param user_id: str - The user_id to set the experiment for
@@ -94,6 +98,17 @@ class IUserPreferenceRepository(ABC):
         :return: UserPreferences
             The updated user preferences
         :raises ValueError: if the user is not found - update failed
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def stream_user_preferences(self,
+                                      page_size: int,
+                                      started_before: datetime | None,
+                                      started_after: datetime | None) -> AsyncGenerator[list[UserPreferences], None]:
+        """
+        Stream all user preferences from the database
+        :return: Async generator yielding UserPreferences objects
         """
         raise NotImplementedError()
 
@@ -153,7 +168,8 @@ class UserPreferenceRepository(IUserPreferenceRepository):
             logger.exception(e)
             raise UserPreferenceRepositoryError("Failed to get user preferences by registration code") from e
 
-    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str, experiment_config: PossibleExperimentValues) -> None:
+    async def set_experiment_by_user_id(self, user_id: str, experiment_id: str,
+                                        experiment_config: PossibleExperimentValues) -> None:
         try:
             # Use $set with dot notation to update a specific field in the experiments dictionary
             await self.collection.update_one(
@@ -187,3 +203,28 @@ class UserPreferenceRepository(IUserPreferenceRepository):
         except Exception as e:
             logger.exception(e)
             raise UserPreferenceRepositoryError("Failed to update user preferences") from e
+
+    async def stream_user_preferences(self,
+                                      page_size: int,
+                                      started_before: datetime | None,
+                                      started_after: datetime | None) -> AsyncGenerator[list[UserPreferences], None]:
+        # Build query filter
+        query_filter = {}
+        if started_before or started_after:
+            query_filter["created_at"] = {}
+            if started_before:
+                query_filter["created_at"]["$lt"] = datetime_to_mongo_date(started_before)
+            if started_after:
+                query_filter["created_at"]["$gt"] = datetime_to_mongo_date(started_after)
+
+        cursor = self.collection.find(query_filter).batch_size(page_size)
+        batch = []
+
+        async for doc in cursor:
+            batch.append(UserPreferences.from_document(doc))
+            if len(batch) >= page_size:
+                yield batch
+                batch = []
+
+        if batch:
+            yield batch
