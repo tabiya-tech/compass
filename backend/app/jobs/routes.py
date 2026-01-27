@@ -11,7 +11,8 @@ def add_jobs_routes(app: FastAPI):
     :return: #TODO defne as needed
     """
     # TODO adjust path as needed
-    router = APIRouter(prefix="/jobs", tags=["jobs"])
+    # Also remove the include_in_schema=False once the route is working
+    router = APIRouter(prefix="/jobs", tags=["jobs"], include_in_schema=False)
 
     @router.post(
         path="/",

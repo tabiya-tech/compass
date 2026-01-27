@@ -10,7 +10,9 @@ def add_job_preferences_routes(app: FastAPI):
     :param app: FastAPI: The FastAPI app to add the routes to.
     :return:
     """
-    router = APIRouter(prefix="/job-preferences", tags=["job-preferences"])
+    # TODO adjust path as needed
+    # Also remove the include_in_schema=False once the route is working
+    router = APIRouter(prefix="/job-preferences", tags=["job-preferences"], include_in_schema=False)
 
     # TODO change the path and implement the logic as needed
     @router.post(
