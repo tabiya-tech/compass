@@ -1,5 +1,6 @@
 // custom Backdrop component
-import { Backdrop as OriginalBackdrop, CircularProgress, Grid, Typography, useTheme } from "@mui/material";
+import { Backdrop as OriginalBackdrop, CircularProgress, Typography, useTheme } from "@mui/material";
+import Grid from '@mui/material/Grid';
 import Paper from "@mui/material/Paper";
 import React from "react";
 import { Sloth } from "src/theme/Sloth/Sloth";
@@ -38,39 +39,39 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
             borderColor: "info.contrastText",
           }}
         >
-          <Grid
-            flexDirection={"row"}
-            height={"auto"}
-            width={"auto"}
-            container
-            justifyContent="center"
-            alignItems="center"
-            padding={theme.spacing(theme.tabiyaSpacing.md)}
-          >
-            {props.message && (
-              <Grid item>
-                <Typography
-                  variant="h6"
-                  color="info.contrastText"
-                  data-testid={DATA_TEST_ID.MESSAGE_ELEMENT}
-                  sx={{
-                    paddingRight: theme.spacing(theme.tabiyaSpacing.md),
-                    wordWrap: "break-word",
-                    textAlign: "center", // Align the text in the center
-                  }}
-                >
-                  {props.message}
-                </Typography>
-              </Grid>
-            )}
-            <Grid style={{ lineHeight: 0 }} item>
-              <CircularProgress
-                sx={{ color: (theme) => theme.palette.info.contrastText }}
-                size={2 * theme.typography.fontSize}
-                data-testid={DATA_TEST_ID.PROGRESS_ELEMENT}
-              />
-            </Grid>
-          </Grid>
+          {/*<Grid*/}
+          {/*  flexDirection={"row"}*/}
+          {/*  height={"auto"}*/}
+          {/*  width={"auto"}*/}
+          {/*  container*/}
+          {/*  justifyContent="center"*/}
+          {/*  alignItems="center"*/}
+          {/*  padding={theme.spacing(theme.tabiyaSpacing.md)}*/}
+          {/*>*/}
+          {/*  {props.message && (*/}
+          {/*    <Grid item>*/}
+          {/*      <Typography*/}
+          {/*        variant="h6"*/}
+          {/*        color="info.contrastText"*/}
+          {/*        data-testid={DATA_TEST_ID.MESSAGE_ELEMENT}*/}
+          {/*        sx={{*/}
+          {/*          paddingRight: theme.spacing(theme.tabiyaSpacing.md),*/}
+          {/*          wordWrap: "break-word",*/}
+          {/*          textAlign: "center", // Align the text in the center*/}
+          {/*        }}*/}
+          {/*      >*/}
+          {/*        {props.message}*/}
+          {/*      </Typography>*/}
+          {/*    </Grid>*/}
+          {/*  )}*/}
+          {/*  <Grid style={{ lineHeight: 0 }} item>*/}
+          {/*    <CircularProgress*/}
+          {/*      sx={{ color: (theme) => theme.palette.info.contrastText }}*/}
+          {/*      size={2 * theme.typography.fontSize}*/}
+          {/*      data-testid={DATA_TEST_ID.PROGRESS_ELEMENT}*/}
+          {/*    />*/}
+          {/*  </Grid>*/}
+          {/*</Grid>*/}
         </Paper>
       </Sloth>
     </OriginalBackdrop>

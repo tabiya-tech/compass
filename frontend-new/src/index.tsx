@@ -7,6 +7,7 @@ import applicationTheme, { ThemeMode } from "src/theme/applicationTheme/applicat
 import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import ViewPortWrapper from "src/app/ViewPortWrapper";
+import './styles/variables.css';
 
 import * as Sentry from "@sentry/react";
 import ErrorPage from "src/error/errorPage/ErrorPage";
@@ -14,6 +15,7 @@ import { useTranslation } from "react-i18next";
 
 import { initSentry } from "./sentryInit";
 import { ensureRequiredEnvVars } from "./envService";
+import { applyBrandingFromEnv } from "./branding/branding";
 
 import "./i18n/i18n";
 
@@ -28,6 +30,9 @@ initSentry();
 
 // Ensure all required environment variables are set
 ensureRequiredEnvVars();
+
+// Apply branding from env values (safe defaults prevent UI breaking if not set)
+applyBrandingFromEnv();
 
 export const MAX_WAIT_TIME_FOR_ROOT_ELEMENT = 10000; // it should be greater than the minimum time
 // the loading screen will be shown (see public/index.html)

@@ -24,6 +24,7 @@ import MetricsService from "src/metrics/metricsService";
 import { EventType } from "src/metrics/types";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
 import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
+import { getProductName } from "src/envService";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
@@ -86,6 +87,9 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   const isAnonymous = !user?.name || !user?.email;
   const { setIsAccountConverted, handleOpenExperiencesDrawer } = useChatContext();
   const [sentryEnabled, setSentryEnabled] = useState(false);
+
+  const productNameFromEnv = getProductName();
+  const appName = productNameFromEnv || t("app.appName");
 
   const handleLogout = useCallback(() => {
     if (isAnonymous) {
@@ -323,7 +327,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
           data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO}
         />
       </NavLink>
-      <Typography variant="h1">{t("app.appName")}</Typography>
+      <Typography variant="h1">{appName}</Typography>
       <Box
         sx={{
           display: "flex",

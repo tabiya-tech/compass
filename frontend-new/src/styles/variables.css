@@ -1,0 +1,29 @@
+:root {
+    /* =========================
+       Brand identity
+       ========================= */
+    --brand-primary: 238 255 65 !important;
+    --brand-secondary: 255 64 129 !important;
+
+
+    --brand-accent-yellow: #9609dc;
+    --brand-accent-blue: #002147;
+
+    /* =========================
+       Backgrounds
+       ========================= */
+
+    --bg-default: #f3f1ee;
+    --bg-paper: #ffffff;
+    --bg-paper-dark: #dfddd9;
+
+    /* =========================
+       Text
+       ========================= */
+
+    --text-primary: 9 220 171 !important;
+    --text-secondary: 150 9 220 !important;
+    --text-accent: #265ea7;
+    --text-white: #ffffff;
+    --text-black: #000000;
+}

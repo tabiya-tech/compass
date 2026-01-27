@@ -21,6 +21,10 @@ export enum EnvVariables {
   FRONTEND_DISABLE_SOCIAL_AUTH = "FRONTEND_DISABLE_SOCIAL_AUTH",
   FRONTEND_SUPPORTED_LOCALES = "FRONTEND_SUPPORTED_LOCALES",
   FRONTEND_DEFAULT_LOCALE = "FRONTEND_DEFAULT_LOCALE",
+  FRONTEND_PRODUCT_NAME = "FRONTEND_PRODUCT_NAME",
+  FRONTEND_BROWSER_TAB_TITLE = "FRONTEND_BROWSER_TAB_TITLE",
+  FRONTEND_LOGO_URL = "FRONTEND_LOGO_URL",
+  FRONTEND_FAVICON_URL = "FRONTEND_FAVICON_URL",
 }
 
 export const requiredEnvVariables = [
@@ -181,6 +185,11 @@ export const getSupportedLocales = () => {
 export const getDefaultLocale = () => {
   return getEnv(EnvVariables.FRONTEND_DEFAULT_LOCALE);
 };
+
+export const getProductName = () => getEnv(EnvVariables.FRONTEND_PRODUCT_NAME);
+export const getBrowserTabTitle = () => getEnv(EnvVariables.FRONTEND_BROWSER_TAB_TITLE);
+export const getLogoUrl = () => getEnv(EnvVariables.FRONTEND_LOGO_URL);
+export const getFaviconUrl = () => getEnv(EnvVariables.FRONTEND_FAVICON_URL);
 
 export const ensureRequiredEnvVars = () => {
   requiredEnvVariables.forEach((key: EnvVariables) => {

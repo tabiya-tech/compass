@@ -41,7 +41,7 @@ const TestErrorDropdown = () => {
       <FormLabel> Choose an error message to display in a notification:</FormLabel>
       <Select
         value={t(Object.values(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS)[0])}
-        placeholder={"Select an error message"}
+        // placeholder={"Select an error message"}
       >
         {Object.keys(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS).map((key: string) => (
           // @ts-ignore
