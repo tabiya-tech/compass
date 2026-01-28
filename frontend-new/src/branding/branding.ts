@@ -3,6 +3,7 @@ import {
   getFaviconUrl,
   getLogoUrl,
   getProductName,
+  getThemeCssVariables,
 } from "src/envService";
 
 const DEFAULTS = {
@@ -36,6 +37,8 @@ const setFavicon = (href: string) => {
  *
  * This is intentionally defensive:
  * - If env values are missing, it falls back to safe defaults.
+ * - CSS variables from applicationTheme are only set if provided via env vars,
+ *   otherwise they fall back to values defined in variables.css
  */
 export const applyBrandingFromEnv = (): void => {
   const productName = getProductName() || DEFAULTS.productName;
@@ -48,6 +51,13 @@ export const applyBrandingFromEnv = (): void => {
   setCssVar("--platform-browser-tab-title", browserTabTitle);
   setCssVar("--platform-logo-url", logoUrl);
   setCssVar("--platform-favicon-url", faviconUrl);
+
+  const themeCssVariables = getThemeCssVariables();
+  Object.entries(themeCssVariables).forEach(([key, value]) => {
+    if (value) {
+      setCssVar(`--${key}`, value);
+    }
+  });
 
   document.title = browserTabTitle;
   setFavicon(faviconUrl);
