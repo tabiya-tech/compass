@@ -87,6 +87,9 @@ const lightPalette: PaletteOptions = {
   contrastThreshold: 4.5, // WCAG 2.0 (AA) ensure color-contrast is at least 4.5:1
   primary: {
     main: "rgb(var(--brand-primary))",
+    light: "rgb(var(--brand-primary-light))",
+    dark: "rgb(var(--brand-primary-dark))",
+    contrastText: "rgb(var(--brand-primary-contrast-text))",
   },
   secondary: {
     main: "rgb(var(--brand-secondary))",
@@ -94,10 +97,10 @@ const lightPalette: PaletteOptions = {
   tabiyaYellow: augmentedThemeColor(TabiyaBasicColors.Yellow),
   tabiyaBlue: augmentedThemeColor(TabiyaBasicColors.DarkBlue),
   containerBackground: {
-    light: "#FFFFFF",
-    dark: "#DFDDD9",
-    main: TabiyaBasicColors.Gray,
-    contrastText: TabiyaBasicColors.GrayDark,
+    light: "rgb(var(--surface-container-light))",
+    dark: "rgb(var(--surface-container-dark))",
+    main: "rgb(var(--surface-default))",
+    contrastText: "rgb(var(--text-primary))",
   },
   error: {
     ...augmentedThemeColor("#FF5449"),
@@ -123,7 +126,7 @@ const lightPalette: PaletteOptions = {
   text: {
     primary: "rgb(var(--text-primary))",
     secondary: "rgb(var(--text-secondary))",
-    textAccent: TabiyaBasicColors.LightBlue,
+    textAccent: "rgb(var(--text-accent))",
     textWhite: "#FFFFFF",
     textBlack: "#000000",
     disabled: "#000000",
