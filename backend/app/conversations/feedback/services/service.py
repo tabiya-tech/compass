@@ -105,6 +105,22 @@ async def load_questions() -> Dict[str, Any]:
 
     return questions_cache
 
+def _format_field(value: str | None, app_name: str) -> str | None:
+    """
+    Safely format a question field that may contain {app_name}.
+    Returns the original value if formatting fails or if the value is None.
+    """
+    if value is None:
+        return None
+    try:
+        return value.format(app_name=app_name)
+    except (KeyError, ValueError):
+        return value
+
+def get_app_name() -> str:
+    cfg = get_application_config()
+    return cfg.app_name
+
 
 class IUserFeedbackService(ABC):
     """Interface for user feedback service operations."""
@@ -150,6 +166,7 @@ class UserFeedbackService(IUserFeedbackService):
         if not questions_data:
             raise QuestionsFileError("No questions data available")
         # Construct full feedback items with question text and description
+        app_name = get_app_name()
         feedback_items = []
         for item in feedback_spec.feedback_items_specs:
             question_id = item.question_id
@@ -157,12 +174,14 @@ class UserFeedbackService(IUserFeedbackService):
             if question is None:
                 raise InvalidQuestionError(question_id)
 
+            question_text = _format_field(questions_data[question_id]["question_text"],app_name)
+            description = _format_field(questions_data[question_id]["description"],app_name)
             # Create a full FeedbackItem with all required fields
             feedback_item = FeedbackItem(
                 question_id=item.question_id,
                 answer=item.simplified_answer.to_answer(question_id=question_id, available_options=question.get("options", {})),
-                question_text=questions_data[question_id]["question_text"],
-                description=questions_data[question_id]["description"]
+                question_text=question_text,
+                description=description
             )
             feedback_items.append(feedback_item)
 
