@@ -45,7 +45,7 @@ STD_LANGUAGE_STYLE = dedent("""\
 
 STD_LANGUAGE_STYLE_JSON = dedent("""\
 #Language 
-    - Stick to the language of the conversation. If the conversation is in English, it should continue in English. If it in Spanish, it should remain in Spanish.
+    - Stick to the language of the conversation. If the conversation is in English, it should continue in English. If it is in Spanish, it should remain in Spanish.
     - Any questions I tell you to ask me should also be in the same language as the conversation.
     - Any information or data you are asked to extract and provide should also be in the same language as the conversation.
 
