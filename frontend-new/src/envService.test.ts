@@ -25,6 +25,7 @@ import {
   getSocialAuthDisabled,
   getDefaultLocale,
   getSupportedLocales,
+  getRegistrationCodeDisabled,
 } from "./envService";
 import { getRandomString } from "./_test_utilities/specialCharacters";
 
@@ -57,7 +58,7 @@ describe.each([
   ["FRONTEND_LOGIN_CODE", getApplicationLoginCode],
   ["FRONTEND_REGISTRATION_CODE", getApplicationRegistrationCode],
 
-  ["FRONTEND_DISABLE_LOGIN_CODE", getLoginCodeDisabled],
+  ["GLOBAL_DISABLE_LOGIN_CODE", getLoginCodeDisabled],
   ["FRONTEND_DISABLE_REGISTRATION", getRegistrationDisabled],
   ["FRONTEND_DISABLE_SOCIAL_AUTH", getSocialAuthDisabled],
 
@@ -67,6 +68,7 @@ describe.each([
   ["FRONTEND_FEATURES", getFeatures],
   ["FRONTEND_SUPPORTED_LOCALES", getSupportedLocales],
   ["FRONTEND_DEFAULT_LOCALE", getDefaultLocale],
+  ["GLOBAL_DISABLE_REGISTRATION_CODE", getRegistrationCodeDisabled],
 ])("Env Getters", (ENV_KEY, getterFn) => {
   describe(`${ENV_KEY} Getter (${getterFn.name}) tests`, () => {
     test(`getAPI should not fail if the ${ENV_KEY} is not set`, () => {

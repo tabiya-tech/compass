@@ -196,6 +196,9 @@ except ValueError as e:
     logger.error(_error_message)
     raise ValueError(_error_message) from e
 
+# Read invitation code bypass settings
+_disable_registration_code = os.getenv("GLOBAL_DISABLE_REGISTRATION_CODE", "").lower() == "true"
+
 # set global application configuration
 _global_product_name = os.getenv("GLOBAL_PRODUCT_NAME")
 if _global_product_name is None:
@@ -217,9 +220,14 @@ application_config = ApplicationConfig(
     cv_rate_limit_per_minute=os.getenv("BACKEND_CV_RATE_LIMIT_PER_MINUTE") or DEFAULT_RATE_LIMIT_PER_MINUTE,
     language_config=language_config,
     app_name=_global_product_name.strip(),
+    disable_registration_code=_disable_registration_code,
 )
 
 set_application_config(application_config)
+
+# warning log when registration code bypass is enabled
+if _disable_registration_code:
+    logger.warning("GLOBAL_DISABLE_REGISTRATION_CODE is enabled - registered users can create preferences without invitation codes.")
 
 ##################
 # Set Sentry Context, after setting application config.

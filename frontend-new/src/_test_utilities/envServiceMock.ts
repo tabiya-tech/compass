@@ -21,4 +21,5 @@ jest.mock("src/envService", () => ({
   getFaviconUrl: jest.fn(() => "mock-favicon-url"),
   getAppIconUrl: jest.fn(() => "mock-app-icon-url"),
   getThemeCssVariables: jest.fn(() => "{}"),
+  getRegistrationCodeDisabled: jest.fn(() => "false"),
 }));

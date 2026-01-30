@@ -130,7 +130,7 @@ abstract class AuthenticationService {
    * Updates the application state when a successful registration occurs
    * @throws {FirebaseError} If the user is not found after successful registration
    */
-  async onSuccessfulRegistration(token: string, registrationCode: string): Promise<void> {
+  async onSuccessfulRegistration(token: string, registrationCode: string | undefined): Promise<void> {
     const user = this.getUser(token);
     if (!user) {
       throw Error("User not found in the token");

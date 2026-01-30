@@ -48,8 +48,10 @@ window.tabiyaConfig = {
   // ################################################################
   // #       Auth Settings.
   // ################################################################
-  FRONTEND_DISABLE_LOGIN_CODE: btoa("false"),
+  GLOBAL_DISABLE_LOGIN_CODE: btoa("false"),
   FRONTEND_DISABLE_REGISTRATION: btoa("false"),
+  // Hide the registration code input field without disabling registration entirely
+  GLOBAL_DISABLE_REGISTRATION_CODE: btoa("false"),
   FRONTEND_DISABLE_SOCIAL_AUTH: btoa("false"),
   FRONTEND_LOGIN_CODE: btoa("login_code"),
   FRONTEND_REGISTRATION_CODE: btoa("registration_code"),

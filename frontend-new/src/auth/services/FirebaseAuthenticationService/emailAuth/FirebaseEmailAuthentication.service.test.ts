@@ -11,9 +11,17 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { FirebaseError } from "src/error/FirebaseError/firebaseError";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
-import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
+import StdFirebaseAuthenticationService, {
+  FirebaseTokenValidationFailureCause,
+} from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import { AuthChannelMessage } from "src/auth/services/authBroadcastChannel/authBroadcastChannel";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
+import { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
+import { jwtDecode } from "jwt-decode";
+
+jest.mock("jwt-decode", () => ({
+  jwtDecode: jest.fn(),
+}));
 
 jest.mock("firebase/compat/app", () => {
   return {
@@ -352,6 +360,51 @@ describe("AuthService class tests", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
+    test("should register successfully without calling invitation service when registrationCode is undefined", async () => {
+      // GIVEN the registration credentials are correct
+      const mockUser = {
+        getIdToken: jest.fn().mockResolvedValue(givenTokenResponse),
+        updateProfile: jest.fn(),
+        sendEmailVerification: jest.fn(),
+      } as Partial<firebase.User>;
+
+      jest.spyOn(firebase.auth(), "createUserWithEmailAndPassword").mockResolvedValue({
+        user: mockUser,
+      } as firebase.auth.UserCredential);
+
+      // AND the token is decoded into a user
+      jest.spyOn(authService, "getUser").mockReturnValue(givenUser);
+
+      // AND the user preferences can be created
+      const givenUserPreferences: UserPreference = {
+        user_id: "foo-id",
+        sessions: [],
+      } as unknown as UserPreference;
+      jest
+        .spyOn(UserPreferencesService.getInstance(), "createUserPreferences")
+        .mockResolvedValueOnce(givenUserPreferences);
+
+      // WHEN the registration is attempted with undefined registrationCode
+      const actualToken = await authService.register(givenEmail, givenPassword, givenUserName, undefined);
+
+      // THEN the invitation service should NOT be called
+      expect(invitationsService.checkInvitationCodeStatus).not.toHaveBeenCalled();
+
+      // AND createUserPreferences should be called with invitation_code: undefined
+      expect(UserPreferencesService.getInstance().createUserPreferences).toHaveBeenCalledWith(
+        expect.objectContaining({
+          invitation_code: undefined,
+        })
+      );
+
+      // AND registerWithEmail should return the token
+      expect(actualToken).toEqual(givenTokenResponse);
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
     test("should throw an error on registration failure", async () => {
       // GIVEN the registration credentials are incorrect
       jest.spyOn(firebase.auth(), "createUserWithEmailAndPassword").mockRejectedValue({
@@ -412,6 +465,97 @@ describe("AuthService class tests", () => {
       await expect(emailLoginPromise).rejects.toThrow(
         "the invitation code is not for registration: " + givenRegistrationCode
       );
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should throw INVALID_REGISTRATION_CODE error when code status is INVALID", async () => {
+      // GIVEN the registration code has INVALID status
+      (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({
+        status: InvitationStatus.INVALID,
+        invitation_type: InvitationType.REGISTER,
+      });
+
+      // WHEN the registration is attempted
+      const emailLoginPromise = authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationCode);
+
+      // THEN the registration should throw a FirebaseError with INVALID_REGISTRATION_CODE
+      await expect(emailLoginPromise).rejects.toThrow(
+        new FirebaseError(
+          "EmailAuthService",
+          "handleRegister",
+          FirebaseErrorCodes.INVALID_REGISTRATION_CODE,
+          `the registration code is invalid: ${givenRegistrationCode}`
+        )
+      );
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should catch and rethrow error when updateProfile fails", async () => {
+      // GIVEN the registration credentials are correct
+      const mockUser = {
+        getIdToken: jest.fn().mockResolvedValue(givenTokenResponse),
+        updateProfile: jest.fn().mockRejectedValue({
+          code: "auth/internal-error",
+          message: "Profile update failed",
+        }),
+        sendEmailVerification: jest.fn(),
+      } as Partial<firebase.User>;
+
+      jest.spyOn(firebase.auth(), "createUserWithEmailAndPassword").mockResolvedValue({
+        user: mockUser,
+      } as firebase.auth.UserCredential);
+
+      // AND the registration code is valid
+      (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({
+        status: InvitationStatus.VALID,
+        invitation_type: InvitationType.REGISTER,
+        invitation_code: givenRegistrationCode,
+      });
+
+      // WHEN the registration is attempted
+      const registerPromise = authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationCode);
+
+      // THEN the error should be caught and rethrown as FirebaseError
+      await expect(registerPromise).rejects.toThrow("Profile update failed");
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should catch and rethrow error when sendEmailVerification fails", async () => {
+      // GIVEN the registration credentials are correct
+      const mockUser = {
+        getIdToken: jest.fn().mockResolvedValue(givenTokenResponse),
+        updateProfile: jest.fn(),
+        sendEmailVerification: jest.fn().mockRejectedValue({
+          code: "auth/internal-error",
+          message: "Email verification failed",
+        }),
+      } as Partial<firebase.User>;
+
+      jest.spyOn(firebase.auth(), "createUserWithEmailAndPassword").mockResolvedValue({
+        user: mockUser,
+      } as firebase.auth.UserCredential);
+
+      // AND the registration code is valid
+      (invitationsService.checkInvitationCodeStatus as jest.Mock).mockResolvedValueOnce({
+        status: InvitationStatus.VALID,
+        invitation_type: InvitationType.REGISTER,
+        invitation_code: givenRegistrationCode,
+      });
+
+      // WHEN the registration is attempted
+      const registerPromise = authService.register(givenEmail, givenPassword, givenUserName, givenRegistrationCode);
+
+      // THEN the error should be caught and rethrown as FirebaseError
+      await expect(registerPromise).rejects.toThrow("Email verification failed");
 
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
@@ -742,5 +886,341 @@ describe("AuthService class tests", () => {
         expect(console.warn).not.toHaveBeenCalled();
       }
     );
+  });
+
+  describe("cleanup", () => {
+    test("should delegate cleanup to StdFirebaseAuthenticationService", async () => {
+      // GIVEN the StdFirebaseAuthenticationService cleanup method is mocked
+      jest.spyOn(StdFirebaseAuthenticationService.getInstance(), "cleanup").mockImplementation(() => {});
+
+      // WHEN cleanup is called
+      await authService.cleanup();
+
+      // THEN StdFirebaseAuthenticationService cleanup should be called
+      expect(StdFirebaseAuthenticationService.getInstance().cleanup).toHaveBeenCalled();
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("refreshToken", () => {
+    test("should call onSuccessfulRefresh when token refresh succeeds", async () => {
+      // GIVEN the token refresh succeeds
+      const newToken = "new-token";
+      const givenUser = { id: "123", name: "Foo Bar", email: "foo@bar.baz" };
+      jest.spyOn(StdFirebaseAuthenticationService.getInstance(), "refreshToken").mockResolvedValue(newToken);
+      jest.spyOn(authService, "getUser").mockReturnValue(givenUser);
+      jest.spyOn(AuthenticationStateService.getInstance(), "setUser");
+      jest.spyOn(AuthenticationStateService.getInstance(), "setToken");
+
+      // WHEN refreshToken is called
+      await authService.refreshToken();
+
+      // THEN StdFirebaseAuthenticationService refreshToken should be called
+      expect(StdFirebaseAuthenticationService.getInstance().refreshToken).toHaveBeenCalled();
+
+      // AND the user should be set in authentication state
+      expect(AuthenticationStateService.getInstance().setUser).toHaveBeenCalledWith(givenUser);
+
+      // AND the token should be set in authentication state
+      expect(AuthenticationStateService.getInstance().setToken).toHaveBeenCalledWith(newToken);
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should log error but not rethrow when token refresh fails", async () => {
+      // GIVEN the token refresh fails
+      const error = new Error("Token refresh failed");
+      jest.spyOn(StdFirebaseAuthenticationService.getInstance(), "refreshToken").mockRejectedValue(error);
+
+      // WHEN refreshToken is called
+      await authService.refreshToken();
+
+      // THEN StdFirebaseAuthenticationService refreshToken should be called
+      expect(StdFirebaseAuthenticationService.getInstance().refreshToken).toHaveBeenCalled();
+
+      // AND the error should be logged
+      expect(console.error).toHaveBeenCalled();
+
+      // AND no warnings should be logged
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("getUser", () => {
+    beforeEach(() => {
+      jest.spyOn(Date, "now").mockReturnValue(1000 * 1000); // Mock current time
+      (jwtDecode as jest.Mock).mockClear().mockReset(); // Clear and reset jwtDecode mock
+      // Restore getUser to use actual implementation (spies from other tests may have mocked it)
+      jest.spyOn(authService, "getUser").mockRestore();
+    });
+
+    test("should return TabiyaUser when token is valid", () => {
+      // GIVEN a valid token
+      const givenToken = "valid-token";
+      const givenDecodedToken = {
+        sub: "user-id",
+        email: "user@example.com",
+        exp: 2000,
+        iat: 500,
+        firebase: { sign_in_provider: "password" },
+      };
+      const givenUser = { id: "user-id", name: "Test User", email: "user@example.com" };
+
+      // Mock jwtDecode to return valid token
+      (jwtDecode as jest.Mock)
+        .mockReturnValueOnce({
+          typ: "JWT",
+          alg: "RS256",
+          kid: "key-id",
+        })
+        .mockReturnValueOnce(givenDecodedToken);
+
+      // Mock firebase token validation
+      jest.spyOn(StdFirebaseAuthenticationService.getInstance(), "isFirebaseTokenValid").mockReturnValueOnce({
+        isValid: true,
+      });
+
+      // Mock getUserFromDecodedToken
+      jest
+        .spyOn(StdFirebaseAuthenticationService.getInstance(), "getUserFromDecodedToken")
+        .mockReturnValueOnce(givenUser);
+
+      // WHEN getUser is called
+      const result = authService.getUser(givenToken);
+
+      // THEN it should call getUserFromDecodedToken with the decoded token
+      expect(StdFirebaseAuthenticationService.getInstance().getUserFromDecodedToken).toHaveBeenCalledWith(
+        givenDecodedToken
+      );
+
+      // AND it should return the user
+      expect(result).toEqual(givenUser);
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should return null and log debug when token is expired", () => {
+      // GIVEN an expired token
+      const givenToken = "expired-token";
+
+      // Mock jwtDecode to return expired token
+      (jwtDecode as jest.Mock)
+        .mockReturnValueOnce({
+          typ: "JWT",
+          alg: "RS256",
+          kid: "key-id",
+        })
+        .mockReturnValueOnce({
+          exp: 500, // Past expiry (current time is 1000)
+          iat: 100,
+        });
+
+      // WHEN getUser is called
+      const result = authService.getUser(givenToken);
+
+      // THEN it should return null
+      expect(result).toBeNull();
+
+      // AND it should log a debug message
+      expect(console.debug).toHaveBeenCalled();
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should return null and log error when token is invalid", () => {
+      // GIVEN an invalid token (missing JWT type)
+      const givenToken = "invalid-token";
+
+      // Mock jwtDecode to return invalid header
+      (jwtDecode as jest.Mock).mockReturnValueOnce({
+        alg: "RS256",
+        kid: "key-id",
+        // Missing 'typ' field
+      });
+
+      // WHEN getUser is called
+      const result = authService.getUser(givenToken);
+
+      // THEN it should return null
+      expect(result).toBeNull();
+
+      // AND it should log an error (this comes from getUser when failureCause is not TOKEN_EXPIRED)
+      expect(console.error).toHaveBeenCalled();
+
+      // AND no warnings should be logged
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("isTokenValid", () => {
+    beforeEach(() => {
+      jest.spyOn(Date, "now").mockReturnValue(1000 * 1000); // Mock current time
+      (jwtDecode as jest.Mock).mockReset(); // Reset jwtDecode mock
+    });
+
+    test("should return isValid true for valid token", () => {
+      // GIVEN a valid token with correct structure and firebase provider
+      const givenToken = "valid-token";
+      const givenDecodedToken = {
+        sub: "user-id",
+        email: "test@example.com",
+        exp: 2000, // Future expiry
+        iat: 500, // Past issued time
+        firebase: { sign_in_provider: "password" },
+      };
+
+      // Mock jwtDecode to return valid header and token
+      (jwtDecode as jest.Mock)
+        .mockReturnValueOnce({
+          typ: "JWT",
+          alg: "RS256",
+          kid: "key-id",
+        })
+        .mockReturnValueOnce(givenDecodedToken);
+
+      // Mock firebase token validation
+      jest.spyOn(StdFirebaseAuthenticationService.getInstance(), "isFirebaseTokenValid").mockReturnValueOnce({
+        isValid: true,
+      });
+
+      // WHEN isTokenValid is called
+      const result = authService.isTokenValid(givenToken);
+
+      // THEN it should return isValid true
+      expect(result.isValid).toBe(true);
+
+      // AND it should return the decoded token
+      expect(result.decodedToken).toEqual(givenDecodedToken);
+
+      // AND it should not have a failure cause
+      expect(result.failureCause).toBeUndefined();
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should return isValid false for expired token", () => {
+      // GIVEN an expired token
+      const givenToken = "expired-token";
+
+      // Mock jwtDecode to return expired token
+      (jwtDecode as jest.Mock)
+        .mockReturnValueOnce({
+          typ: "JWT",
+          alg: "RS256",
+          kid: "key-id",
+        })
+        .mockReturnValueOnce({
+          exp: 500, // Past expiry (current time is 1000)
+          iat: 100,
+        });
+
+      // WHEN isTokenValid is called
+      const result = authService.isTokenValid(givenToken);
+
+      // THEN it should return isValid false
+      expect(result.isValid).toBe(false);
+
+      // AND it should return null for decoded token
+      expect(result.decodedToken).toBeNull();
+
+      // AND it should have TOKEN_EXPIRED as the failure cause
+      expect(result.failureCause).toBe(TokenValidationFailureCause.TOKEN_EXPIRED);
+
+      // AND it should log a debug message
+      expect(console.debug).toHaveBeenCalled();
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should return isValid false for malformed token", () => {
+      // GIVEN a malformed token (missing JWT type)
+      const givenToken = "malformed-token";
+
+      // Mock jwtDecode to return invalid header
+      (jwtDecode as jest.Mock).mockReturnValueOnce({
+        alg: "RS256",
+        kid: "key-id",
+        // Missing 'typ' field
+      });
+
+      // WHEN isTokenValid is called
+      const result = authService.isTokenValid(givenToken);
+
+      // THEN it should return isValid false
+      expect(result.isValid).toBe(false);
+
+      // AND it should return null for decoded token
+      expect(result.decodedToken).toBeNull();
+
+      // AND it should have TOKEN_NOT_A_JWT as the failure cause
+      expect(result.failureCause).toBe(TokenValidationFailureCause.TOKEN_NOT_A_JWT);
+
+      // AND it should log a debug message
+      expect(console.debug).toHaveBeenCalled();
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should return isValid false for wrong provider token", () => {
+      // GIVEN a token with wrong provider (not password)
+      const givenToken = "wrong-provider-token";
+      const givenDecodedToken = {
+        sub: "user-id",
+        email: "test@example.com",
+        exp: 2000,
+        iat: 500,
+        firebase: { sign_in_provider: "google.com" },
+      };
+
+      // Mock jwtDecode to return valid structure
+      (jwtDecode as jest.Mock)
+        .mockReturnValueOnce({
+          typ: "JWT",
+          alg: "RS256",
+          kid: "key-id",
+        })
+        .mockReturnValueOnce(givenDecodedToken);
+
+      // Mock firebase token validation to return invalid (wrong provider)
+      const givenFailureCause = FirebaseTokenValidationFailureCause.INVALID_FIREBASE_USER_ID;
+      jest.spyOn(StdFirebaseAuthenticationService.getInstance(), "isFirebaseTokenValid").mockReturnValueOnce({
+        isValid: false,
+        failureCause: FirebaseTokenValidationFailureCause.INVALID_FIREBASE_USER_ID,
+      });
+
+      // WHEN isTokenValid is called
+      const result = authService.isTokenValid(givenToken);
+
+      // THEN it should return isValid false
+      expect(result.isValid).toBe(false);
+
+      // AND it should return null for decoded token
+      expect(result.decodedToken).toBeNull();
+
+      // AND it should have WRONG_PROVIDER as the failure cause
+      expect(result.failureCause).toBe(givenFailureCause);
+
+      // AND it should log a debug message
+      expect(console.debug).toHaveBeenCalled();
+
+      // AND no errors or warnings should be logged
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
   });
 });

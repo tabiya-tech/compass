@@ -98,20 +98,29 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
    * @throws {FirebaseError} If user is not found after successful registration
    * @throws {FirebaseError} If registration code is invalid or wrong type
    */
-  async register(email: string, password: string, username: string, registrationCode: string): Promise<string> {
+  async register(
+    email: string,
+    password: string,
+    username: string,
+    registrationCode: string | undefined
+  ): Promise<string> {
     const firebaseErrorFactory = getFirebaseErrorFactory("EmailAuthService", "handleRegister");
-    const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
-    if (invitation.status === InvitationStatus.INVALID) {
-      throw firebaseErrorFactory(
-        FirebaseErrorCodes.INVALID_REGISTRATION_CODE,
-        `the registration code is invalid: ${registrationCode}`
-      );
-    }
-    if (invitation.invitation_type !== InvitationType.REGISTER) {
-      throw firebaseErrorFactory(
-        FirebaseErrorCodes.INVALID_REGISTRATION_TYPE,
-        `the invitation code is not for registration: ${registrationCode}`
-      );
+    let invitationCodeUsed: string | undefined;
+    if (registrationCode) {
+      const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
+      if (invitation.status === InvitationStatus.INVALID) {
+        throw firebaseErrorFactory(
+          FirebaseErrorCodes.INVALID_REGISTRATION_CODE,
+          `the registration code is invalid: ${registrationCode}`
+        );
+      }
+      if (invitation.invitation_type !== InvitationType.REGISTER) {
+        throw firebaseErrorFactory(
+          FirebaseErrorCodes.INVALID_REGISTRATION_TYPE,
+          `the invitation code is not for registration: ${registrationCode}`
+        );
+      }
+      invitationCodeUsed = invitation.invitation_code;
     }
 
     let userCredential;
@@ -150,7 +159,7 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
     // so once the preferences are created we will log the user out
     // we expect this to be done in the onSuccessfulRegistration method
     // by calling the parent class method once the user is successfully registered
-    await super.onSuccessfulRegistration(token, invitation.invitation_code);
+    await super.onSuccessfulRegistration(token, invitationCodeUsed);
     return token;
   }
 
