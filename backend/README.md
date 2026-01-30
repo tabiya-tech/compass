@@ -174,6 +174,10 @@ The backend uses the following environment variables:
 - `TARGET_ENVIRONMENT`: (optional) The target environment where the backend is running. When set to `dev` or `local`, CORS will be set to allow all origins.
 - `BACKEND_FEATURES`: (optional) A JSON like dictionary with the features enabled status and configurations specific to each feature.
 - `BACKEND_EXPERIENCE_PIPELINE_CONFIG`: (optional) The configuration for the experience pipeline as a JSON like dictionary. See `class ExperiencePipelineConfig`.
+- `GLOBAL_DISABLE_REGISTRATION_CODE`: (optional) Set to `True` to bypass registration code validation for authenticated user registration. When enabled, authenticated users can create user preferences without providing an invitation code. Defaults to `False`. 
+  > **Security Note:** This should only be enabled in controlled environments (testing, demos, or deployments with external access control).  
+  > **Coordination:** When enabling this setting, also set the corresponding frontend variable `GLOBAL_DISABLE_REGISTRATION_CODE` to hide the registration code input from users. Mismatched configuration (frontend hides input but backend requires code, or vice versa) will lead to confusing user errors.
+
   > Note: The `FRONTEND_URL` should be set irrespective of the `TARGET_ENVIRONMENT` value.
 
 
@@ -207,6 +211,7 @@ BACKEND_SENTRY_DSN=<BACKEND_SENTRY_DSN>
 BACKEND_SENTRY_CONFIG='{"tracesSampleRate": 0.2, "enableLogs": true, "logLevel": "info", "eventLevel": "error"}'
 BACKEND_FEATURES=<BACKEND_FEATURES>
 BACKEND_EXPERIENCE_PIPELINE_CONFIG=<BACKEND_EXPERIENCE_PIPELINE_CONFIG>
+GLOBAL_DISABLE_REGISTRATION_CODE=False
 
 # CV storage and limits (optional; required to persist uploads)
 BACKEND_CV_STORAGE_BUCKET=<GCS_BUCKET_NAME>

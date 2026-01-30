@@ -15,8 +15,8 @@ import RegistrationCodeFormModal, {
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
-import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
-import { getRegistrationDisabled } from "src/envService";
+import { Language, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { getRegistrationCodeDisabled, getRegistrationDisabled } from "src/envService";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
@@ -35,6 +35,8 @@ export interface SocialAuthProps {
   isLoading: boolean;
   notifyOnLoading: (loading: boolean) => void;
 }
+
+const registrationCodeDisabled = getRegistrationCodeDisabled().toLowerCase() === "true";
 
 const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
   registrationCode,
@@ -86,28 +88,37 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
   );
 
   const registerUser = useCallback(
-    async (registrationCode: string) => {
+    async (registrationCode: string | undefined) => {
+      let prefs: UserPreference;
       try {
-        // first check if the invitation code is valid
         const _user = authStateService.getInstance().getUser();
         if (!_user) {
           throw new Error("Something went wrong: No user found");
         }
-        const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
-        if (invitation.status === InvitationStatus.INVALID) {
-          throw Error("The registration code is invalid");
-        }
-        if (invitation.invitation_type !== InvitationType.REGISTER) {
-          throw Error("The invitation code is not for registration");
+
+        if (!registrationCode) {
+          prefs = await UserPreferencesService.getInstance().createUserPreferences({
+            user_id: _user.id,
+            language: Language.en,
+          });
+        } else {
+          const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
+          if (invitation.status === InvitationStatus.INVALID) {
+            throw Error("The registration code is invalid");
+          }
+          if (invitation.invitation_type !== InvitationType.REGISTER) {
+            throw Error("The invitation code is not for registration");
+          }
+
+          // create user preferences for the first time.
+          // in order to do this, there needs to be a logged-in user in the persistent storage
+          prefs = await UserPreferencesService.getInstance().createUserPreferences({
+            user_id: _user.id,
+            invitation_code: invitation.invitation_code,
+            language: Language.en,
+          });
         }
 
-        // create user preferences for the first time.
-        // in order to do this, there needs to be a logged-in user in the persistent storage
-        const prefs = await UserPreferencesService.getInstance().createUserPreferences({
-          user_id: _user.id,
-          invitation_code: invitation.invitation_code,
-          language: Language.en,
-        });
         UserPreferencesStateService.getInstance().setUserPreferences(prefs);
       } catch (error: any) {
         await handleError(error);
@@ -134,8 +145,8 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           return;
         }
 
-        // if no registration code was provided, show the registration code form
-        if (!_registrationCode) {
+        // if no registration code was provided, and the registration code is enabled, show the registration code form
+        if (!_registrationCode && !registrationCodeDisabled) {
           setShowRegistrationCodeForm(RegistrationCodeFormModalState.SHOW);
           return;
         }

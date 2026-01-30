@@ -126,6 +126,7 @@ def setup_env_vars(*, env_vars: dict[str, str] = None):
         'BACKEND_CV_RATE_LIMIT_PER_MINUTE': "10",
         "BACKEND_LANGUAGE_CONFIG": '{"default_locale":"en-US","available_locales":[{"locale":"en-US","date_format":"MM/DD/YYYY"}]}',
         "GLOBAL_PRODUCT_NAME": "foo",
+        'GLOBAL_DISABLE_REGISTRATION_CODE': 'false',
         # Add more environment variables as needed here
     }
 

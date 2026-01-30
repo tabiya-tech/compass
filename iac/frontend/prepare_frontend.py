@@ -112,7 +112,8 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     enable_metrics: str = getenv("FRONTEND_ENABLE_METRICS", False, False)
     login_code: Optional[str] = getenv("FRONTEND_LOGIN_CODE", False, False)
     registration_code: Optional[str] = getenv("FRONTEND_REGISTRATION_CODE", False, False)
-    disable_login_code: Optional[str] = getenv("FRONTEND_DISABLE_LOGIN_CODE", False, False)
+    disable_login_code: Optional[str] = getenv("GLOBAL_DISABLE_LOGIN_CODE", False, False)
+    disable_registration_code: Optional[str] = getenv("GLOBAL_DISABLE_REGISTRATION_CODE", False, False)
     disable_registration: Optional[str] = getenv("FRONTEND_DISABLE_REGISTRATION", False, False)
     disable_social_auth: Optional[str] = getenv("FRONTEND_DISABLE_SOCIAL_AUTH", False, False)
 
@@ -159,7 +160,8 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY": base64_encode(sensitive_personal_data_rsa_encryption_key),
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID": base64_encode(sensitive_personal_data_rsa_encryption_key_id),
         "FRONTEND_LOGIN_CODE": base64_encode(login_code),
-        "FRONTEND_DISABLE_LOGIN_CODE": base64_encode(disable_login_code),
+        "GLOBAL_DISABLE_LOGIN_CODE": base64_encode(disable_login_code),
+        "GLOBAL_DISABLE_REGISTRATION_CODE": base64_encode(disable_registration_code),
         "FRONTEND_REGISTRATION_CODE": base64_encode(registration_code),
         "FRONTEND_ENABLE_CV_UPLOAD": base64_encode(enable_cv_upload or ""),
         "FRONTEND_DISABLE_REGISTRATION": base64_encode(disable_registration),

@@ -20,7 +20,7 @@ const meta: Meta<typeof Landing> = {
         ...(window as any).tabiyaConfig,
         [EnvVariables.FRONTEND_LOGIN_CODE]: loginCode ? window.btoa(loginCode) : "",
         [EnvVariables.FRONTEND_DISABLE_REGISTRATION]: registrationDisabled ? window.btoa("true") : window.btoa("false"),
-        [EnvVariables.FRONTEND_DISABLE_LOGIN_CODE]: loginCodeDisabled ? window.btoa("true") : window.btoa("false"),
+        [EnvVariables.GLOBAL_DISABLE_LOGIN_CODE]: loginCodeDisabled ? window.btoa("true") : window.btoa("false"),
       };
 
       FirebaseInvitationCodeAuthenticationService.getInstance = () =>
