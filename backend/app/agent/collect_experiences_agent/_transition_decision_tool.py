@@ -41,8 +41,6 @@ class TransitionReasoning(BaseModel):
 
 class _LLMOutput(BaseModel):
     transition_decision: TransitionDecision
-    reasoning: Optional[str] = None
-    confidence: Optional[str] = None
 
     class Config:
         extra = "forbid"
@@ -156,7 +154,7 @@ class TransitionDecisionTool:
             return TransitionDecision.CONTINUE, llm_stats, get_penalty(no_response_penalty_level), _error
 
         decision = response_data.transition_decision
-        self._logger.debug("Transition decision: %s, Reasoning: %s", decision, response_data.reasoning)
+        self._logger.debug("Transition decision: %s", decision)
         
         return decision, llm_stats, 0, None
 
@@ -245,4 +243,10 @@ _PROMPT_TEMPLATE = """
            - Check if user wants changes → Return CONTINUE
     
     Return your decision as one of: CONTINUE, END_WORKTYPE, or END_CONVERSATION
+    
+    #Output Format
+    Your response must be a valid JSON object with only the following field:
+    - transition_decision: One of "CONTINUE", "END_WORKTYPE", or "END_CONVERSATION"
+    
+    Do not include any reasoning, explanation, or other fields. Only return the transition_decision.
 """
