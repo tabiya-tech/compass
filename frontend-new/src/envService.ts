@@ -21,6 +21,8 @@ export enum EnvVariables {
   FRONTEND_DISABLE_SOCIAL_AUTH = "FRONTEND_DISABLE_SOCIAL_AUTH",
   FRONTEND_SUPPORTED_LOCALES = "FRONTEND_SUPPORTED_LOCALES",
   FRONTEND_DEFAULT_LOCALE = "FRONTEND_DEFAULT_LOCALE",
+  FRONTEND_PRODUCT_NAME = "FRONTEND_PRODUCT_NAME",
+  FRONTEND_BROWSER_TAB_TITLE = "FRONTEND_BROWSER_TAB_TITLE",
 }
 
 export const requiredEnvVariables = [
@@ -180,6 +182,14 @@ export const getSupportedLocales = () => {
 
 export const getDefaultLocale = () => {
   return getEnv(EnvVariables.FRONTEND_DEFAULT_LOCALE);
+};
+
+export const getProductName = () => {
+  return getEnv(EnvVariables.FRONTEND_PRODUCT_NAME);
+};
+
+export const getBrowserTabTitle = () => {
+  return getEnv(EnvVariables.FRONTEND_BROWSER_TAB_TITLE);
 };
 
 export const ensureRequiredEnvVars = () => {

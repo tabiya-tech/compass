@@ -210,7 +210,8 @@ application_config = ApplicationConfig(
     cv_storage_bucket=os.getenv("BACKEND_CV_STORAGE_BUCKET"),
     cv_max_uploads_per_user=os.getenv("BACKEND_CV_MAX_UPLOADS_PER_USER") or DEFAULT_MAX_UPLOADS_PER_USER,
     cv_rate_limit_per_minute=os.getenv("BACKEND_CV_RATE_LIMIT_PER_MINUTE") or DEFAULT_RATE_LIMIT_PER_MINUTE,
-    language_config=language_config
+    language_config=language_config,
+    app_name=os.getenv("BACKEND_PRODUCT_NAME") or "Compass",
 )
 
 set_application_config(application_config)

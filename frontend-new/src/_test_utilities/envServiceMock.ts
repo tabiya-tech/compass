@@ -12,4 +12,5 @@ jest.mock("src/envService", () => ({
   getSocialAuthDisabled: jest.fn(() => "false"),
   getSupportedLocales: jest.fn(() => JSON.stringify(["en-US"])),
   getDefaultLocale: jest.fn(() => "en-US"),
+  getProductName: jest.fn(() => "mockProduct"),
 }));
