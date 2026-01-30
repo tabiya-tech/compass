@@ -295,7 +295,7 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
             >
               Terms and Conditions
             </a>
-             of Compass.
+             of {{appName}}.
           </p>
         </label>
         <label
@@ -337,7 +337,7 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
             >
               Privacy Policy
             </a>
-             of Compass.
+             of {{appName}}.
           </p>
         </label>
       </div>

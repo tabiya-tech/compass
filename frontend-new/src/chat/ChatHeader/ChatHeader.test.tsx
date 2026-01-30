@@ -32,6 +32,7 @@ import { SessionError } from "src/error/commonErrors";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
 import MetricsService from "src/metrics/metricsService";
 import { EventType } from "src/metrics/types";
+import * as EnvServiceModule from "src/envService";
 
 // Mock PersistentStorageService
 jest.mock("src/app/PersistentStorageService/PersistentStorageService");
@@ -123,6 +124,9 @@ describe("ChatHeader", () => {
     ["exploredExperiencesNotification shown", true],
     ["exploredExperiencesNotification not shown", false],
   ])("should render the Chat Header with %s", (desc, givenExploredExperiencesNotification) => {
+    // GIVEN the application name is set
+    const appName = "foobar";
+    jest.spyOn(EnvServiceModule, "getProductName").mockReturnValue(appName);
     // GIVEN a ChatHeader component
     const givenNotifyOnLogout = jest.fn();
     const givenStartNewConversation = jest.fn();
@@ -156,7 +160,7 @@ describe("ChatHeader", () => {
     // AND the chat header logo to be visible
     expect(screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_LOGO)).toBeInTheDocument();
     // AND the Compass text to be visible
-    expect(screen.getByText("Compass")).toBeInTheDocument();
+    expect(screen.getByText(appName)).toBeInTheDocument();
     // AND the user button to be shown with the user icon
     const chatHeaderButton = screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_BUTTON_USER);
     expect(chatHeaderButton).toBeInTheDocument();
@@ -176,6 +180,9 @@ describe("ChatHeader", () => {
   test("should show feedback button when sentry is initialized", () => {
     // GIVEN sentry is initialized
     (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
+
+    // AND the product name is mocked
+    jest.spyOn(EnvServiceModule, "getProductName").mockReturnValue("foobar");
 
     // WHEN the chat header is rendered
     const givenChatHeader = (

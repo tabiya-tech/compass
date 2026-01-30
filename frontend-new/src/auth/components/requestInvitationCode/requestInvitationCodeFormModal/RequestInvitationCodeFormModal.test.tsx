@@ -11,6 +11,7 @@ import RequestInvitationCodeFormModal, {
 
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { RequestInvitationCodeError } from "src/error/commonErrors";
+import i18n from "src/i18n/i18n";
 
 // mock the snack bar provider
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
@@ -110,7 +111,7 @@ describe("RequestInvitationCodeFormModal", () => {
     });
     // AND the notification should be displayed
     expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-      "Your request for access to Compass has been submitted successfully. We will get back to you soon.",
+      i18n.t("auth.components.requestInvitationCodeFormModal.invitationRequestSubmitSuccess"),
       { variant: "success" }
     );
   });

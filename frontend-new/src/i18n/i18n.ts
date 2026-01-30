@@ -5,6 +5,7 @@ import { DEFAULT_LOCALE, FALL_BACK_LOCALE, Locale, SupportedLocales } from "./co
 import { constructLocaleResources } from "./utils";
 import { ConfigurationError } from "../error/commonErrors";
 import { parseEnvSupportedLocales } from "./languageContextMenu/parseEnvSupportedLocales";
+import { getProductName } from "src/envService";
 
 // --- Import translations ---
 import enGb from "./locales/en-GB/translation.json";
@@ -46,8 +47,11 @@ if (!isValidDefaultLocale) {
   console.error(new ConfigurationError(errorMessage));
 }
 
-// Get supported locales from environment to restrict language detection
+// Get supported locales from the environment to restrict language detection
 const envSupportedLocales = parseEnvSupportedLocales();
+
+// Get product name from environment variable
+const productName = getProductName();
 
 i18n
   .use(LanguageDetector)
@@ -77,7 +81,12 @@ i18n
         return fallbackLocale;
       },
     },
-    interpolation: { escapeValue: false },
+    interpolation: {
+      escapeValue: false,
+      defaultVariables: {
+        appName: productName,
+      },
+    },
   });
 
 // After initialization, ensure the language is set to a supported locale

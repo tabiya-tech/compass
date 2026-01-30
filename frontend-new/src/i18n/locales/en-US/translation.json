@@ -105,7 +105,7 @@
       "viewExperiences": "View experiences",
       "feedbackMessage": "We'd love to hear your feedback on your experience so far!",
       "giveFeedback": "Give Feedback",
-      "feedbackMessagePlaceholder": "We'd love to hear your thoughts! Please share any feedback or suggestions you have for improving Compass.",
+      "feedbackMessagePlaceholder": "We'd love to hear your thoughts! Please share any feedback or suggestions you have for improving {{appName}}.",
       "sendFeedback": "Send Feedback",
       "feedbackSuccessMessage": "Thank you for your feedback!",
       "giveGeneralFeedback": "Give general feedback",
@@ -197,9 +197,9 @@
       },
       "refreshConfirmationDialog": {
         "title": "Are you sure you would like to refresh?",
-        "content": "Compass is typing and refreshing the page can cause issues. You may lose your current conversation progress.",
-        "question": "Would you like to wait for Compass to finish, or refresh anyway?",
-        "waitButton": "Wait for Compass",
+        "content": "{{appName}} is typing and refreshing the page can cause issues. You may lose your current conversation progress.",
+        "question": "Would you like to wait for {{appName}} to finish, or refresh anyway?",
+        "waitButton": "Wait for {{appName}}",
         "refreshButton": "Refresh"
       }
     },
@@ -219,7 +219,7 @@
     },
     "util": {
       "feedbackThankYou": "Thank you for taking the time to share your valuable feedback.",
-      "ratingThankYou": "Thank you for rating Compass.",
+      "ratingThankYou": "Thank you for rating {{appName}}.",
       "errorSomethingWentWrong": "I'm sorry, Something seems to have gone wrong on my end... Can you please refresh the page and try again?",
       "errorPleaseRepeat": "I'm sorry, Something seems to have gone wrong on my end... Can you please repeat that?",
       "messages": {
@@ -256,7 +256,7 @@
   "auth": {
     "pages": {
       "login": {
-        "welcomeTitle": "Welcome to Compass!",
+        "welcomeTitle": "Welcome to {{appName}}!",
         "welcomeBack": "Welcome back!",
         "loginToYourAccountToContinue": "Login to your account to continue",
         "loginUsing": "Login using",
@@ -275,7 +275,7 @@
         }
       },
       "register": {
-        "welcomeTitle": "Welcome to Compass!",
+        "welcomeTitle": "Welcome to {{appName}}!",
         "welcomeBack": "Welcome back!",
         "subtitle": "We need some information to get started",
         "registerWithGoogle": "Register with Google",
@@ -296,12 +296,12 @@
         "subtitleBody": "Uncover and articulate your skills through natural AI-guided conversations. Build your skill profile and download a CV to kickstart your job search. Create a free account to save your progress and revisit your conversation history.",
         "invitationCodeValid": "Invitation code is valid",
         "welcome": "Welcome!",
-        "welcomeTitle": "Welcome to Compass!",
+        "welcomeTitle": "Welcome to {{appName}}!",
         "or": "or",
         "loggingYouIn": "Logging you in..."
       },
       "verifyEmail": {
-        "registrationThankYou": "Thank you for registering to Compass.",
+        "registrationThankYou": "Thank you for registering to {{appName}}.",
         "verificationEmailSentMessage": "A verification email has been sent to your email address. To continue, please verify your email address first."
       }
     },
@@ -333,13 +333,13 @@
         "reachOut": "Reach out"
       },
       "requestInvitationCodeFormModal": {
-        "requestAccessTitle": "Request access to Compass",
-        "requestAccessSubtitle": "Please let us know how you plan to use Compass. We will carefully review your request and contact you shortly.",
+        "requestAccessTitle": "Request access to {{appName}}",
+        "requestAccessSubtitle": "Please let us know how you plan to use {{appName}}. We will carefully review your request and contact you shortly.",
         "closeRequestInvitationForm": "Close request invitation code form",
         "name": "Name",
         "message": "Message",
-        "messagePlaceholder": "Please share how you plan to use Compass",
-        "invitationRequestSubmitSuccess": "Your request for access to Compass has been submitted successfully. We will get back to you soon.",
+        "messagePlaceholder": "Please share how you plan to use {{appName}}",
+        "invitationRequestSubmitSuccess": "Your request for access to {{appName}} has been submitted successfully. We will get back to you soon.",
         "invitationRequestSubmitError": "Something went wrong while attempting to send your request"
       },
       "requestInvitationCode": {
@@ -445,7 +445,7 @@
             "delete": "Delete",
             "revert": "Revert"
           },
-          "actionsUnavailableUntilExplored": "These actions will become available once you have discussed the experience in detail with Compass.",
+          "actionsUnavailableUntilExplored": "These actions will become available once you have discussed the experience in detail with {{appName}}.",
           "moreOptionsTitle": "More options",
           "topSkillsLabel": "Top Skills",
           "topSkillsHelp": "Tap a skill to view more details.",
@@ -512,7 +512,7 @@
           "formalSectorWagedEmployment": "You have a paid job and work for an employer, company, or organization",
           "formalSectorUnpaidTraineeWork": "You're in a training or internship role to gain skills or experience",
           "unseenUnpaid": "You do unpaid work like caregiving, household tasks, or community volunteering",
-          "uncategorized": "Compass couldn't categorize this work type"
+          "uncategorized": "{{appName}} couldn't categorize this work type"
         },
         "errors": {
           "experienceTitleMaxLength": "Maximum {{max}} characters allowed.",
@@ -533,13 +533,13 @@
       "traineeWorkTitle": "Trainee Work",
       "uncategorizedTitle": "Uncategorized",
       "topSkillsTitle": "Top Skills: ",
-      "skillsDescriptionText": "Below, you will find a list of the skills discovered during your conversation with Compass, along with their descriptions.",
+      "skillsDescriptionText": "Below, you will find a list of the skills discovered during your conversation with {{appName}}, along with their descriptions.",
       "disclaimer": {
         "part1": "Disclaimer: ",
         "part2": "Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate. ",
-        "part3": "Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with Compass again or create a complete CV based on this report."
+        "part3": "Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with {{appName}} again or create a complete CV based on this report."
       },
-      "bodyText": "This report summarizes the key information gathered during a conversation with Compass on {{date}}. Compass is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV."
+      "bodyText": "This report summarizes the key information gathered during a conversation with {{appName}} on {{date}}. {{appName}} is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV."
     }
   },
   "features": {
@@ -613,8 +613,8 @@
         "introPart4": "Help us keep all AI interactions safe and positive! 😊",
         "termsAndConditions": "Terms and Conditions",
         "privacyPolicy": "Privacy Policy",
-        "checkboxTermsAndConditions": "I have read and accept the <0>{{terms_and_conditions}}</0> of Compass.",
-        "checkboxPrivacyPolicy": "I have read and accept the <0>{{privacy_policy}}</0> of Compass.",
+        "checkboxTermsAndConditions": "I have read and accept the <0>{{terms_and_conditions}}</0> of {{appName}}.",
+        "checkboxPrivacyPolicy": "I have read and accept the <0>{{privacy_policy}}</0> of {{appName}}.",
         "areYouReady": "Are you ready to start?",
         "acceptButton": "Sure, I am ready",
         "withSupportFrom": "With support from",
@@ -634,7 +634,7 @@
     "components": {
       "sensitiveDataForm": {
         "title": "Provide Your Information",
-        "subtitle": "We use your data to personalize your experience and may contact you about Compass.",
+        "subtitle": "We use your data to personalize your experience and may contact you about {{appName}}.",
         "unskippableSubtitle": "Please provide the following information to continue.",
         "skippableSubtitle": "You can skip this step.",
         "helpTipText": "Your information is encrypted using state-of-the-art, end-to-end encryption and stored securely.",
@@ -644,8 +644,8 @@
         "errorDefault": "The personal data could not be saved. Please try again and if the problem persists, clear your browser's cache and refresh the page.",
         "errorEncryptedDataTooLarge": "The personal data seems to be too large to be saved. Please try again by entering smaller values for the fields. If the problem persists, clear your browser's cache and refresh the page.",
         "collectionSkipped": "Personal data collection skipped.",
-        "rejectParagraph1": "We're sorry that you chose not to provide your data. Providing this information helps Compass deliver a more personalized experience for you. You will not be able to proceed and will be logged out.",
-        "skipParagraph1": "We're sorry that you prefer not to provide your data. Providing this information helps Compass deliver a more personalized experience for you. Please note that if you skip this step,",
+        "rejectParagraph1": "We're sorry that you chose not to provide your data. Providing this information helps {{appName}} deliver a more personalized experience for you. You will not be able to proceed and will be logged out.",
+        "skipParagraph1": "We're sorry that you prefer not to provide your data. Providing this information helps {{appName}} deliver a more personalized experience for you. Please note that if you skip this step,",
         "skipParagraph1Highlighted": " you won't be able to provide this information later.",
         "startConversation": "Start conversation",
         "areYouSureYouWantToSkip": "Are you sure you want to skip?",
@@ -665,7 +665,7 @@
       "feedbackForm": {
         "components": {
           "customerSatisfactionRating": {
-            "questionText": "Finally, we'd love to hear your thoughts on your experience so far! How satisfied are you with Compass?",
+            "questionText": "Finally, we'd love to hear your thoughts on your experience so far! How satisfied are you with {{appName}}?",
             "ratingLabelLow": "Unsatisfied",
             "ratingLabelHigh": "Satisfied",
             "submitSuccess": "Rating Feedback submitted successfully!",
@@ -690,7 +690,7 @@
   "error": {
     "errorPage": {
       "illustrationAlt": "error illustration",
-      "defaultMessage": "Something went wrong with Compass. Try reloading the page...",
+      "defaultMessage": "Something went wrong with {{appName}}. Try reloading the page...",
       "notFound": "404 Error - Page Not Found"
     },
     "restAPIError": {
@@ -703,8 +703,7 @@
       "offline": "You are offline",
       "backOnline": "You are back online"
     },
-    "appName": "Compass",
-    "compassLogoAlt": "Compass Logo"
+    "compassLogoAlt": "{{appName}} Logo"
   },
   "info": {
     "infoDrawer": {

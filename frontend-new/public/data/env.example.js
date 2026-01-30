@@ -62,4 +62,10 @@ window.tabiyaConfig = {
   // #       Optional Features settings
   // ################################################################
   FRONTEND_FEATURES: btoa("{}"),
+
+  // ################################################################
+  // #       Branding Settings
+  // ################################################################
+  FRONTEND_PRODUCT_NAME: btoa("Compass"),
+  FRONTEND_BROWSER_TAB_TITLE: btoa("Compass"),
 };

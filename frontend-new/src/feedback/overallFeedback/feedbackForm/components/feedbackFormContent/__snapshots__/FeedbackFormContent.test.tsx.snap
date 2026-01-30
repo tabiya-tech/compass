@@ -46,7 +46,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                   class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
                   data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
                 >
-                  Did you feel that Compass treated you unfairly by making assumptions about your background, language, or other personal characteristics? If so, please describe your experience.
+                  Did you feel that {{appName}} treated you unfairly by making assumptions about your background, language, or other personal characteristics? If so, please describe your experience.
                 </p>
               </legend>
               <div
@@ -170,7 +170,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                   class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
                   data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
                 >
-                  Were there any aspects of your work experience information identified by Compass that were inaccurate?
+                  Were there any aspects of your work experience information identified by {{appName}} that were inaccurate?
                 </p>
               </legend>
               <div
