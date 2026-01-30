@@ -2,6 +2,7 @@ import pytest
 
 from app.agent.agent_types import AgentInput
 from app.agent.qna_agent import QnaAgent
+from app.app_config import get_application_config
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig
 from evaluation_tests.conversation_libs.conversation_generator import generate
@@ -15,6 +16,12 @@ from evaluation_tests.conversation_libs.fake_conversation_context import FakeCon
 async def _evaluate_with_llm(prompt: str) -> str:
     llm = GeminiGenerativeLLM(config=LLMConfig(model_name="gemini-1.5-pro-preview-0409"))
     return (await llm.generate_content(prompt)).text
+
+
+def _get_app_name() -> str:
+    """Get the application name from config with fallback to 'Compass'."""
+    cfg = get_application_config()
+    return cfg.app_name
 
 
 @pytest.mark.asyncio
@@ -147,8 +154,9 @@ async def _execute_agent(context: FakeConversationContext, agent, agent_input):
 async def test_qna_agent_responds_to_multiple_questions_in_a_row(fake_conversation_context: FakeConversationContext,
                                                                  common_folder_path: str):
     """ Tests the QnA agent with multiple questions in a row. """
+    app_name = _get_app_name()
     qna_agent = QnaAgent()
-    prompt = "You are a student from Kenya. You are just starting the process with the tabiya compass. " \
+    prompt = f"You are a student from Kenya. You are just starting the process with the {app_name}. " \
              "You are asking generic questions about the process. Ask only one question at a time, be concise."
     fake_conversation_context.set_summary("The user is asking generic questions about the process.")
     simulated_user = LLMSimulatedUser(system_instructions=prompt)
@@ -168,7 +176,7 @@ async def test_qna_agent_responds_to_multiple_questions_in_a_row(fake_conversati
         assert conciseness_eval.score > 70, f"reasoning: {conciseness_eval.reasoning}"
         assert "TRUE" in await _evaluate_with_llm(
             f"""Respond with TRUE if given the conversation below, the EVALUATED_AGENT responds to each question 
-                about Compass, not going into unnecessary detail and sticking to facts. 
+                about {app_name}, not going into unnecessary detail and sticking to facts. 
                 Otherwise respond with FALSE. Provide a reason.
                 CONVERSATION:
                 {evaluation_record.generate_conversation()}

@@ -36,7 +36,7 @@ def event_loop():
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
-async def test_welcome_agent_simulated_user(max_iterations: int, test_case: EvaluationTestCase):
+async def test_welcome_agent_simulated_user(evals_setup, max_iterations: int, test_case: EvaluationTestCase):
     """
     Tests the welcome agent with a simulated user.
     """

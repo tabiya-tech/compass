@@ -54,7 +54,7 @@ exports[`Sensitive Data Form Form validation should enable submit button when al
         class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about Compass.
+        We use your data to personalize your experience and may contact you about {{appName}}.
          Please provide the following information to continue.
         <button
           aria-label="help"
@@ -187,7 +187,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should hand
         class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about Compass.
+        We use your data to personalize your experience and may contact you about {{appName}}.
          Please provide the following information to continue.
         <button
           aria-label="help"
@@ -301,7 +301,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about Compass.
+        We use your data to personalize your experience and may contact you about {{appName}}.
          Please provide the following information to continue.
         <button
           aria-label="help"
@@ -420,7 +420,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about Compass.
+        We use your data to personalize your experience and may contact you about {{appName}}.
          Please provide the following information to continue.
         <button
           aria-label="help"
@@ -539,7 +539,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about Compass.
+        We use your data to personalize your experience and may contact you about {{appName}}.
          Please provide the following information to continue.
         <button
           aria-label="help"
@@ -670,7 +670,7 @@ exports[`Sensitive Data Form Rendering fields based on configuration should rend
         class="MuiBox-root css-0"
         data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about Compass.
+        We use your data to personalize your experience and may contact you about {{appName}}.
          Please provide the following information to continue.
         <button
           aria-label="help"

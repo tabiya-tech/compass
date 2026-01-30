@@ -62,4 +62,19 @@ window.tabiyaConfig = {
   // #       Optional Features settings
   // ################################################################
   FRONTEND_FEATURES: btoa("{}"),
+
+  // ################################################################
+  // #       Branding Settings
+  // ################################################################
+  GLOBAL_PRODUCT_NAME: btoa("Compass"),
+  FRONTEND_BROWSER_TAB_TITLE: btoa("Compass"),
+  FRONTEND_META_DESCRIPTION: btoa("Welcome to Compass! An AI-powered career assistant that helps jobseekers identify and showcase their skills."),
+  FRONTEND_SEO: btoa(
+    JSON.stringify({
+      name: "Compass",
+      url: "https://www.example.org/compass",
+      image: "https://www.example.org/assets/logo.svg",
+      description: "Compass is an AI-powered career assistant that helps jobseekers discover and describe their skills.",
+    })
+  ),
 };

@@ -197,6 +197,11 @@ except ValueError as e:
     raise ValueError(_error_message) from e
 
 # set global application configuration
+_global_product_name = os.getenv("GLOBAL_PRODUCT_NAME")
+if _global_product_name is None:
+    logger.warning("GLOBAL_PRODUCT_NAME environment variable is not set! Defaulting to 'Compass'")
+    _global_product_name = "Compass"
+
 application_config = ApplicationConfig(
     environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
     version_info=load_version_info(),
@@ -210,7 +215,8 @@ application_config = ApplicationConfig(
     cv_storage_bucket=os.getenv("BACKEND_CV_STORAGE_BUCKET"),
     cv_max_uploads_per_user=os.getenv("BACKEND_CV_MAX_UPLOADS_PER_USER") or DEFAULT_MAX_UPLOADS_PER_USER,
     cv_rate_limit_per_minute=os.getenv("BACKEND_CV_RATE_LIMIT_PER_MINUTE") or DEFAULT_RATE_LIMIT_PER_MINUTE,
-    language_config=language_config
+    language_config=language_config,
+    app_name=_global_product_name.strip(),
 )
 
 set_application_config(application_config)
@@ -289,9 +295,9 @@ async def lifespan(_app: FastAPI):
 # and set the server URL to the backend URL so that Swagger UI can correctly call the backend paths
 app = FastAPI(
     # redirect_slashes is set False to prevent FastAPI from redirecting when a trailing slash is added.
-    title="Compass API",
+    title=f"{_global_product_name} API",
     version=get_application_config().version_info.to_version_string(),
-    description="The Compass API is used to interact with the Compass conversation agent.",
+    description=f"The {_global_product_name} API is used to interact with the {_global_product_name} conversation agent.",
     redirect_slashes=False,
     servers=[
         {
