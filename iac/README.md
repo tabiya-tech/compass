@@ -7,7 +7,7 @@ Platform (GCP) using Pulumi.
 
 ### Structural Diagram
 The diagram below shows a high level overview of the infrastructure architecture of the Compass project.
-![Compass IAC Structure Overview](https://lucid.app/publicSegments/view/63b26748-7dca-47eb-acfd-d7ecfd39bc14/image.png)
+![Compass IAC Structure Overview](https://lucid.app/publicSegments/view/fd859d0a-d6e4-44cc-8925-4e201941e77b/image.png)
 
 ### Keywords
 
