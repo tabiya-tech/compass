@@ -22,6 +22,10 @@ their skills and interests based on their lived experiences.
 
 - **[Sensitive Data Protection](sensitive-data-protection.md)**: Explore the sensitive data protection functionality for detailed insights about how we are safeguarding sensitive personal data.
 
+## Architecture Overview
+The image below shows a high level overview of the solution architecture of Compass.
+
+![Compass Architecture Overview](https://lucid.app/publicSegments/view/8acc8776-ee97-4c1f-adf8-861c59997ceb/image.png)
 
 ## Why Contribute?
 
