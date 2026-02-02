@@ -2,14 +2,14 @@
 
 exports[`PrimaryIconButton tests should render the icon button with default props 1`] = `
 <button
-  class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1npvq5k-MuiButtonBase-root-MuiIconButton-root"
+  class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-c25hu7-MuiButtonBase-root-MuiIconButton-root"
   data-testid="test-icon"
   tabindex="0"
   type="button"
 >
   <svg
     aria-hidden="true"
-    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-kpsn9l-MuiSvgIcon-root"
+    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1rovgv4-MuiSvgIcon-root"
     data-testid="CircleOutlinedIcon"
     focusable="false"
     viewBox="0 0 24 24"
@@ -18,9 +18,6 @@ exports[`PrimaryIconButton tests should render the icon button with default prop
       d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8"
     />
   </svg>
-  <span
-    class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-  />
 </button>
 `;
 

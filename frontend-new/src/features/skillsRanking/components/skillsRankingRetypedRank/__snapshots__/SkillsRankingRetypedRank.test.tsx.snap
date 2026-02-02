@@ -11,12 +11,12 @@ exports[`SkillsRankingRetypedRank snapshot: initial render in RETYPED_RANK (non-
       class="MuiBox-root css-8atqhb"
     >
       <div
-        class="MuiBox-root css-u9ttk8"
+        class="MuiBox-root css-uw2p1q"
         data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
         origin="COMPASS"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-13zm2uq-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-1ow0s3z-MuiTypography-root"
           data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
         >
           As a last question, let's recall what I told you further above just regarding your own fit with opportunities:
@@ -46,7 +46,7 @@ exports[`SkillsRankingRetypedRank snapshot: initial render in RETYPED_RANK (non-
               class="MuiBox-root css-k6jh9e"
             >
               <button
-                class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+                class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-1c68ceu-MuiButtonBase-root-MuiButton-root"
                 data-testid="skills-ranking-retyped-rank-submit-button-eb90de4c-2462-4b6d-8b9c-1b5c6ae64129"
                 disabled=""
                 tabindex="-1"
@@ -63,7 +63,7 @@ exports[`SkillsRankingRetypedRank snapshot: initial render in RETYPED_RANK (non-
         data-testid="chat-message-footer-layout-container-7772f20a-9d0c-4072-b24f-97eca2f43d7b"
       >
         <span
-          class="MuiTypography-root MuiTypography-caption css-1l3yql3-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-1nk71a8-MuiTypography-root"
           data-testid="chat-message-timestamp-c9253326-05ee-4bff-9d43-7852ca78a033"
         >
           sent 

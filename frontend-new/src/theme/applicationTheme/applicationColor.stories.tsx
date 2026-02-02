@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Box, rgbToHex, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { Palette, PaletteColor, Theme } from "@mui/material/styles";
 
 const meta: Meta = {
@@ -21,6 +21,18 @@ const groupedColorCategories = [
 ] as const;
 const colorCategories = groupedColorCategories.flat();
 type ColorCategory = (typeof colorCategories)[number];
+
+// Resolves CSS variable colors to their computed values
+const resolveCssColor = (value: string): string => {
+  if (globalThis.window === undefined || !value.includes("var(")) return value;
+
+  const match = /var\((--[^)]+)\)/.exec(value);
+  if (!match) return value;
+
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(match[1]).trim();
+
+  return raw?.includes(" ") ? `rgb(${raw})` : raw || value;
+};
 
 const PaletteElements = () => {
   const theme = useTheme();
@@ -86,17 +98,21 @@ const PaletteElements = () => {
       <Box>
         <Typography variant="h4">Text Colors</Typography>
         <Box sx={{ padding: theme.tabiyaSpacing.lg, gap: theme.tabiyaSpacing.md }}>
-          {Object.entries(theme.palette.text).map(([variant, color]) => (
-            <ColorBox
-              theme={theme}
-              color={variant === "textWhite" ? theme.palette.primary.main : theme.palette.common.white}
-              key={variant}
-            >
-              <Typography variant="subtitle1" color={color}>
-                {variant} : {color}
-              </Typography>
-            </ColorBox>
-          ))}
+          {Object.entries(theme.palette.text).map(([variant, color]) => {
+            const resolved = resolveCssColor(color);
+
+            return (
+              <ColorBox
+                theme={theme}
+                color={variant === "textWhite" ? theme.palette.primary.main : theme.palette.common.white}
+                key={variant}
+              >
+                <Typography variant="subtitle1" color={color}>
+                  {variant} : {resolved}
+                </Typography>
+              </ColorBox>
+            );
+          })}
         </Box>
       </Box>
       <Box>
@@ -129,18 +145,24 @@ interface ColorBoxProps {
 }
 
 const ColorBox = (props: ColorBoxProps) => {
-  let color: string;
-  let contrastText: string;
+  let backgroundColor: string;
+  let textColor: string;
+  let label: React.ReactNode;
 
   if (props.color) {
-    color = rgbToHex(props.color);
-    contrastText = props.theme.palette.getContrastText(color);
+    backgroundColor = props.color;
+    textColor = props.theme.palette.common.white;
+    label = props.children ?? props.color;
   } else if (props.category && props.variant) {
-    color = rgbToHex(props.theme.palette[props.category][props.variant]);
-    contrastText = props.theme.palette.getContrastText(color);
+    const paletteColor = props.theme.palette[props.category];
+
+    backgroundColor = paletteColor[props.variant];
+    textColor = paletteColor.contrastText;
+    label = props.variant;
   } else if (props.shade) {
-    color = rgbToHex(props.theme.palette.grey[props.shade]);
-    contrastText = props.theme.palette.getContrastText(color);
+    backgroundColor = props.theme.palette.grey[props.shade];
+    textColor = props.theme.palette.getContrastText(backgroundColor);
+    label = props.shade;
   } else {
     throw new Error("Invalid props provided to ColorBox");
   }
@@ -149,16 +171,16 @@ const ColorBox = (props: ColorBoxProps) => {
     <Box
       sx={{
         height: "2.5rem",
-        width: "16rem",
-        backgroundColor: color,
+        width: "20rem",
+        backgroundColor,
         display: "flex",
         alignItems: "center",
         justifyContent: "start",
         padding: props.theme.tabiyaSpacing.md,
       }}
     >
-      <Typography fontWeight={"bold"} color={contrastText}>
-        {props.children ? props.children : props.variant ?? props.shade ?? color}
+      <Typography fontWeight="bold" sx={{ color: textColor }}>
+        {label}
       </Typography>
     </Box>
   );

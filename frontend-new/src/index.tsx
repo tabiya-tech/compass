@@ -8,6 +8,8 @@ import SnackbarProvider from "src/theme/SnackbarProvider/SnackbarProvider";
 import { IsOnlineProvider } from "src/app/isOnlineProvider/IsOnlineProvider";
 import ViewPortWrapper from "src/app/ViewPortWrapper";
 
+import "src/styles/variables.css";
+
 import * as Sentry from "@sentry/react";
 import ErrorPage from "src/error/errorPage/ErrorPage";
 import { useTranslation } from "react-i18next";

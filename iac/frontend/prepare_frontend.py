@@ -127,6 +127,16 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     features = getenv("FRONTEND_FEATURES", False, False)
     enable_cv_upload: Optional[str] = getenv("FRONTEND_ENABLE_CV_UPLOAD", False, False)
 
+    # branding
+    global_product_name: Optional[str] = getenv("GLOBAL_PRODUCT_NAME", False, False)
+    frontend_browser_tab_title: Optional[str] = getenv("FRONTEND_BROWSER_TAB_TITLE", False, False)
+    frontend_meta_description: Optional[str] = getenv("FRONTEND_META_DESCRIPTION", False, False)
+    frontend_logo_url: Optional[str] = getenv("FRONTEND_LOGO_URL", False, False)
+    frontend_favicon_url: Optional[str] = getenv("FRONTEND_FAVICON_URL", False, False)
+    frontend_app_icon_url: Optional[str] = getenv("FRONTEND_APP_ICON_URL", False, False)
+    frontend_theme_css_variables: Optional[str] = getenv("FRONTEND_THEME_CSS_VARIABLES", False, False)
+    frontend_seo: Optional[str] = getenv("FRONTEND_SEO", False, False)
+
     # validations, apart from the keys are required, some values also need to be validated
     # the sensitive encryption key should be a valid RSA public key.
     _validate_rsa_public_key(sensitive_personal_data_rsa_encryption_key.encode("utf-8"))
@@ -157,6 +167,14 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "FRONTEND_FEATURES": base64_encode(features),
         "FRONTEND_SUPPORTED_LOCALES": base64_encode(supported_locales),
         "FRONTEND_DEFAULT_LOCALE": base64_encode(default_locale),
+        "GLOBAL_PRODUCT_NAME": base64_encode(global_product_name),
+        "FRONTEND_BROWSER_TAB_TITLE": base64_encode(frontend_browser_tab_title),
+        "FRONTEND_META_DESCRIPTION": base64_encode(frontend_meta_description),
+        "FRONTEND_LOGO_URL": base64_encode(frontend_logo_url),
+        "FRONTEND_FAVICON_URL": base64_encode(frontend_favicon_url),
+        "FRONTEND_APP_ICON_URL": base64_encode(frontend_app_icon_url),
+        "FRONTEND_THEME_CSS_VARIABLES": base64_encode(frontend_theme_css_variables),
+        "FRONTEND_SEO": base64_encode(frontend_seo),
     }
 
     env_json_content = f"""window.tabiyaConfig = {json.dumps(frontend_env_json, indent=4)};"""

@@ -16,7 +16,7 @@ exports[`CancellableTypingChatMessage should render the Cancellable Typing Chat 
         class="MuiBox-root css-x1sij0"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-19s6r5h-MuiTypography-root"
         >
           Typing
         </p>
@@ -24,17 +24,17 @@ exports[`CancellableTypingChatMessage should render the Cancellable Typing Chat 
           class="MuiBox-root css-sz63p1"
         >
           <span
-            class="MuiTypography-root MuiTypography-body1 css-18f2if6-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-aqob4v-MuiTypography-root"
           >
             .
           </span>
           <span
-            class="MuiTypography-root MuiTypography-body1 css-1dvtvwe-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-1kbk25g-MuiTypography-root"
           >
             .
           </span>
           <span
-            class="MuiTypography-root MuiTypography-body1 css-4a4pgt-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-1cya8iq-MuiTypography-root"
           >
             .
           </span>
@@ -42,13 +42,13 @@ exports[`CancellableTypingChatMessage should render the Cancellable Typing Chat 
       </div>
       <a
         aria-disabled="false"
-        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-179zpik-MuiTypography-root-MuiLink-root"
         data-testid="cancellable-typing-chat-message-cancel-button-6cbdaa24-09da-4c18-907c-7d98d210d2e9"
         style="display: inline-flex; flex-direction: row; gap: calc(clamp(2px, (2dvh + -8px + 1.5dvw + -10px)/2 , 8px) * 0.25); vertical-align: bottom;"
       >
         <svg
           aria-hidden="true"
-          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
           data-testid="HighlightOffIcon"
           focusable="false"
           viewBox="0 0 24 24"

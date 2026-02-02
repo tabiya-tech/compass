@@ -7,14 +7,14 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
     data-testid="rotate-to-solve-container-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
   >
     <p
-      class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body1 css-qxd0xq-MuiTypography-root"
       data-testid="rotate-to-solve-instruction-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
     >
       Rotate each letter until it’s upright. Select a letter by clicking on it, then rotate it clockwise with
        
       <svg
         aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1obd35y-MuiSvgIcon-root"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-2p2047-MuiSvgIcon-root"
         data-testid="RotateRightIcon"
         focusable="false"
         viewBox="0 0 24 24"
@@ -27,7 +27,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
        
       <svg
         aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1obd35y-MuiSvgIcon-root"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-2p2047-MuiSvgIcon-root"
         data-testid="RotateLeftIcon"
         focusable="false"
         viewBox="0 0 24 24"
@@ -39,105 +39,105 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
       .
     </p>
     <div
-      class="MuiBox-root css-qhfkxk"
+      class="MuiBox-root css-h8auxf"
       data-testid="rotate-to-solve-characters-container-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
     >
       <div
-        class="MuiBox-root css-1r3erjx"
+        class="MuiBox-root css-1eexuyl"
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-1gdmqfx-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-15lg8on-MuiTypography-root"
         >
           T
         </p>
       </div>
       <div
-        class="MuiBox-root css-1r3erjx"
+        class="MuiBox-root css-1eexuyl"
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-1gdmqfx-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-15lg8on-MuiTypography-root"
         >
           R
         </p>
       </div>
       <div
-        class="MuiBox-root css-1r3erjx"
+        class="MuiBox-root css-1eexuyl"
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-1gdmqfx-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-15lg8on-MuiTypography-root"
         >
           S
         </p>
       </div>
       <div
-        class="MuiBox-root css-1r3erjx"
+        class="MuiBox-root css-1eexuyl"
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-1gdmqfx-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-15lg8on-MuiTypography-root"
         >
           L
         </p>
       </div>
       <div
-        class="MuiBox-root css-1r3erjx"
+        class="MuiBox-root css-1eexuyl"
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-1gdmqfx-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-15lg8on-MuiTypography-root"
         >
           K
         </p>
       </div>
       <div
-        class="MuiBox-root css-1r3erjx"
+        class="MuiBox-root css-1eexuyl"
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-1gdmqfx-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-15lg8on-MuiTypography-root"
         >
           G
         </p>
       </div>
       <div
-        class="MuiBox-root css-1r3erjx"
+        class="MuiBox-root css-1eexuyl"
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-1gdmqfx-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-15lg8on-MuiTypography-root"
         >
           J
         </p>
       </div>
       <div
-        class="MuiBox-root css-1r3erjx"
+        class="MuiBox-root css-1eexuyl"
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-1gdmqfx-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-15lg8on-MuiTypography-root"
         >
           D
         </p>
       </div>
       <div
-        class="MuiBox-root css-1r3erjx"
+        class="MuiBox-root css-1eexuyl"
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-1gdmqfx-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-15lg8on-MuiTypography-root"
         >
           F
         </p>
       </div>
       <div
-        class="MuiBox-root css-1r3erjx"
+        class="MuiBox-root css-1eexuyl"
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-1gdmqfx-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-15lg8on-MuiTypography-root"
         >
           V
         </p>
@@ -148,14 +148,14 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
     >
       <button
         aria-label="Rotate character counterclockwise"
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeSmall css-g513fz-MuiButtonBase-root-MuiIconButton-root"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeSmall css-1qcd848-MuiButtonBase-root-MuiIconButton-root"
         data-testid="rotate-to-solve-rotate-left-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
         tabindex="0"
         type="button"
       >
         <svg
           aria-hidden="true"
-          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
           data-testid="RotateLeftIcon"
           focusable="false"
           viewBox="0 0 24 24"
@@ -164,20 +164,17 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
             d="M7.11 8.53 5.7 7.11C4.8 8.27 4.24 9.61 4.07 11h2.02c.14-.87.49-1.72 1.02-2.47M6.09 13H4.07c.17 1.39.72 2.73 1.62 3.89l1.41-1.42c-.52-.75-.87-1.59-1.01-2.47m1.01 5.32c1.16.9 2.51 1.44 3.9 1.61V17.9c-.87-.15-1.71-.49-2.46-1.03zM13 4.07V1L8.45 5.55 13 10V6.09c2.84.48 5 2.94 5 5.91s-2.16 5.43-5 5.91v2.02c3.95-.49 7-3.85 7-7.93s-3.05-7.44-7-7.93"
           />
         </svg>
-        <span
-          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-        />
       </button>
       <button
         aria-label="Rotate character clockwise"
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeSmall css-g513fz-MuiButtonBase-root-MuiIconButton-root"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeSmall css-1qcd848-MuiButtonBase-root-MuiIconButton-root"
         data-testid="rotate-to-solve-rotate-right-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
         tabindex="0"
         type="button"
       >
         <svg
           aria-hidden="true"
-          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
           data-testid="RotateRightIcon"
           focusable="false"
           viewBox="0 0 24 24"
@@ -186,24 +183,18 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
             d="M15.55 5.55 11 1v3.07C7.06 4.56 4 7.92 4 12s3.05 7.44 7 7.93v-2.02c-2.84-.48-5-2.94-5-5.91s2.16-5.43 5-5.91V10zM19.93 11c-.17-1.39-.72-2.73-1.62-3.89l-1.42 1.42c.54.75.88 1.6 1.02 2.47zM13 17.9v2.02c1.39-.17 2.74-.71 3.9-1.61l-1.44-1.44c-.75.54-1.59.89-2.46 1.03m3.89-2.42 1.42 1.41c.9-1.16 1.45-2.5 1.62-3.89h-2.02c-.14.87-.48 1.72-1.02 2.48"
           />
         </svg>
-        <span
-          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-        />
       </button>
     </div>
     <div
       class="MuiBox-root css-1r1fsmc"
     >
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-pidpjd-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-elczgs-MuiButtonBase-root-MuiButton-root"
         data-testid="rotate-to-solve-cancel-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
         tabindex="0"
         type="button"
       >
         Cancel
-        <span
-          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-        />
       </button>
     </div>
   </div>

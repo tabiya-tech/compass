@@ -25,6 +25,7 @@ import { EventType } from "src/metrics/types";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
 import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 import { getProductName } from "src/envService";
+import { getAppIconUrl } from "src/envService";
 
 export type ChatHeaderProps = {
   notifyOnLogout: () => void;
@@ -87,6 +88,9 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   const isAnonymous = !user?.name || !user?.email;
   const { setIsAccountConverted, handleOpenExperiencesDrawer } = useChatContext();
   const [sentryEnabled, setSentryEnabled] = useState(false);
+
+  const logoUrlFromEnv = getAppIconUrl();
+  const logoSrc = logoUrlFromEnv || `${process.env.PUBLIC_URL}/compass.svg`;
 
   const handleLogout = useCallback(() => {
     if (isAnonymous) {
@@ -320,7 +324,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
     >
       <NavLink style={{ lineHeight: 0 }} to={routerPaths.ROOT} data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO_LINK}>
         <img
-          src={`${process.env.PUBLIC_URL}/compass.svg`}
+          src={logoSrc}
           alt={t("app.compassLogoAlt")}
           height={12 * theme.tabiyaSpacing.xl} // xl wasn't quite big enough, we're going for ~48px
           data-testid={DATA_TEST_ID.CHAT_HEADER_LOGO}

@@ -1,6 +1,6 @@
 import React from "react";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import { Box, Typography, styled, alpha } from "@mui/material";
+import { Box, Typography, styled } from "@mui/material";
 
 export interface ChatBubbleProps {
   message: string | React.ReactNode;
@@ -25,7 +25,9 @@ const MessageBubble = styled(Box)<{ origin: ConversationMessageSender }>(({ them
   border: origin === ConversationMessageSender.USER ? `2px solid ${theme.palette.primary.light}` : "none",
   borderRadius: origin === ConversationMessageSender.USER ? "12px 0px 12px 12px" : "12px 12px 12px 0px",
   backgroundColor:
-    origin === ConversationMessageSender.USER ? alpha(theme.palette.primary.light, 0.16) : theme.palette.grey[100],
+    origin === ConversationMessageSender.USER
+      ? `color-mix(in srgb, ${theme.palette.primary.light} 16%, transparent)`
+      : theme.palette.grey[100],
   color: origin === ConversationMessageSender.USER ? theme.palette.primary.contrastText : theme.palette.text.primary,
   position: "relative",
   alignSelf: origin === ConversationMessageSender.USER ? "flex-end" : "flex-start",
