@@ -2,7 +2,7 @@
 
 exports[`Testing Register component it should show register form successfully 1`] = `
 <div
-  class="MuiContainer-root MuiContainer-maxWidthXs css-1ubnw5l-MuiContainer-root"
+  class="MuiContainer-root MuiContainer-maxWidthXs css-1tzl094-MuiContainer-root"
   data-testid="register-container-ab02918f-d559-47ba-9662-ea6b3a3606d0"
 >
   <div
@@ -12,46 +12,46 @@ exports[`Testing Register component it should show register form successfully 1`
       data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
     />
     <h6
-      class="MuiTypography-root MuiTypography-subtitle2 css-ohbpz3-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-subtitle2 css-ggg0vy-MuiTypography-root"
     >
       Enter your registration code
     </h6>
     <div
-      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-4c32m-MuiFormControl-root-MuiTextField-root"
+      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-yk5tdh-MuiFormControl-root-MuiTextField-root"
     >
       <label
-        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeMedium MuiInputLabel-outlined css-qn15mw-MuiFormLabel-root-MuiInputLabel-root"
+        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined css-ezse26-MuiFormLabel-root-MuiInputLabel-root"
         data-shrink="true"
-        for=":r0:"
-        id=":r0:-label"
+        for=":r1:"
+        id=":r1:-label"
       >
         Registration code
         <span
           aria-hidden="true"
-          class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-1th3aq5-MuiFormLabel-asterisk"
+          class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-gvy03r-MuiFormLabel-asterisk"
         >
            
           *
         </span>
       </label>
       <div
-        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1vdto9g-MuiInputBase-root-MuiOutlinedInput-root"
+        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-11ub2sa-MuiInputBase-root-MuiOutlinedInput-root"
       >
         <input
           aria-invalid="false"
-          class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+          class="MuiInputBase-input MuiOutlinedInput-input css-1y15kj-MuiInputBase-input-MuiOutlinedInput-input"
           data-testid="register-registration-code-input-ab02918f-d559-47ba-9662-ea6b3a3606d0"
-          id=":r0:"
+          id=":r1:"
           required=""
           type="text"
           value="foo-bar"
         />
         <fieldset
           aria-hidden="true"
-          class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+          class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
         >
           <legend
-            class="css-14lo706"
+            class="css-ex8a5f-MuiNotchedOutlined-root"
           >
             <span>
               Registration code
@@ -63,15 +63,16 @@ exports[`Testing Register component it should show register form successfully 1`
       </div>
     </div>
     <div
-      class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-1puturl-MuiDivider-root"
+      aria-orientation="horizontal"
+      class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-1ib53nm-MuiDivider-root"
       role="separator"
       style="width: 100%;"
     >
       <span
-        class="MuiDivider-wrapper css-8j2o7p-MuiDivider-wrapper"
+        class="MuiDivider-wrapper css-ijin0t-MuiDivider-wrapper"
       >
         <h6
-          class="MuiTypography-root MuiTypography-subtitle2 css-zq12aa-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-subtitle2 css-1xbqiv2-MuiTypography-root"
         >
           and either continue with
         </h6>
@@ -84,14 +85,14 @@ exports[`Testing Register component it should show register form successfully 1`
       data-testid="firebase-auth-container-f0324e97-83fd-49e6-95c3-1043751fa1db"
     />
     <span
-      class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-caption css-1q1mrxw-MuiTypography-root"
       data-testid="register-login-link-ab02918f-d559-47ba-9662-ea6b3a3606d0"
     >
       Already have an account?
        
       <a
         aria-disabled="false"
-        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-179zpik-MuiTypography-root-MuiLink-root"
       >
         Login
       </a>
@@ -105,7 +106,7 @@ exports[`Testing Register component it should show register form successfully 1`
   />
   <div
     aria-hidden="true"
-    class="MuiBackdrop-root css-1mfxwij-MuiBackdrop-root"
+    class="MuiBackdrop-root css-141wtso-MuiBackdrop-root"
     data-testid="backdrop-91b57774-d50c-4350-882d-363f80ac10e8"
     style="opacity: 0; visibility: hidden;"
   >
@@ -114,37 +115,38 @@ exports[`Testing Register component it should show register form successfully 1`
       style="position: relative; margin: 0px; padding: 0px;"
     >
       <div
-        class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-14c64kg-MuiPaper-root"
+        class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-1ronkt8-MuiPaper-root"
+        style="--Paper-shadow: var(--mui-shadows-24);"
       >
         <div
-          class="MuiGrid-root MuiGrid-container css-15vmx7d-MuiGrid-root"
+          class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-1yo0kkk-MuiGrid-root"
         >
           <div
-            class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+            class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
           >
             <h6
-              class="MuiTypography-root MuiTypography-h6 css-odley9-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-h6 css-j3d3zm-MuiTypography-root"
               data-testid="message-91b57774-d50c-4350-882d-363f80ac10e8"
             >
               Registering you...
             </h6>
           </div>
           <div
-            class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+            class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
             style="line-height: 0;"
           >
             <span
-              class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1tmrh9l-MuiCircularProgress-root"
+              class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-tka88f-MuiCircularProgress-root"
               data-testid="progress-91b57774-d50c-4350-882d-363f80ac10e8"
               role="progressbar"
               style="width: 32px; height: 32px;"
             >
               <svg
-                class="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
+                class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
                 viewBox="22 22 44 44"
               >
                 <circle
-                  class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-176wh8e-MuiCircularProgress-circle"
+                  class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
                   cx="44"
                   cy="44"
                   fill="none"
@@ -157,7 +159,7 @@ exports[`Testing Register component it should show register form successfully 1`
         </div>
       </div>
       <div
-        class="MuiContainer-root MuiContainer-maxWidthLg css-t4utv2-MuiContainer-root"
+        class="MuiContainer-root MuiContainer-maxWidthLg css-1ii9suo-MuiContainer-root"
       >
         <svg
           overflow="visible"
@@ -281,7 +283,7 @@ exports[`Testing Register component it should show register form successfully 1`
 
 exports[`Testing Register component should handle application registration code 1`] = `
 <div
-  class="MuiContainer-root MuiContainer-maxWidthXs css-1ubnw5l-MuiContainer-root"
+  class="MuiContainer-root MuiContainer-maxWidthXs css-1tzl094-MuiContainer-root"
   data-testid="register-container-ab02918f-d559-47ba-9662-ea6b3a3606d0"
 >
   <div
@@ -297,14 +299,14 @@ exports[`Testing Register component should handle application registration code 
       data-testid="firebase-auth-container-f0324e97-83fd-49e6-95c3-1043751fa1db"
     />
     <span
-      class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-caption css-1q1mrxw-MuiTypography-root"
       data-testid="register-login-link-ab02918f-d559-47ba-9662-ea6b3a3606d0"
     >
       Already have an account?
        
       <a
         aria-disabled="false"
-        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-179zpik-MuiTypography-root-MuiLink-root"
       >
         Login
       </a>
@@ -315,7 +317,7 @@ exports[`Testing Register component should handle application registration code 
   />
   <div
     aria-hidden="true"
-    class="MuiBackdrop-root css-1mfxwij-MuiBackdrop-root"
+    class="MuiBackdrop-root css-141wtso-MuiBackdrop-root"
     data-testid="backdrop-91b57774-d50c-4350-882d-363f80ac10e8"
     style="opacity: 0; visibility: hidden;"
   >
@@ -324,37 +326,38 @@ exports[`Testing Register component should handle application registration code 
       style="position: relative; margin: 0px; padding: 0px;"
     >
       <div
-        class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-14c64kg-MuiPaper-root"
+        class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-1ronkt8-MuiPaper-root"
+        style="--Paper-shadow: var(--mui-shadows-24);"
       >
         <div
-          class="MuiGrid-root MuiGrid-container css-15vmx7d-MuiGrid-root"
+          class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-1yo0kkk-MuiGrid-root"
         >
           <div
-            class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+            class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
           >
             <h6
-              class="MuiTypography-root MuiTypography-h6 css-odley9-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-h6 css-j3d3zm-MuiTypography-root"
               data-testid="message-91b57774-d50c-4350-882d-363f80ac10e8"
             >
               Registering you...
             </h6>
           </div>
           <div
-            class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+            class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
             style="line-height: 0;"
           >
             <span
-              class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1tmrh9l-MuiCircularProgress-root"
+              class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-tka88f-MuiCircularProgress-root"
               data-testid="progress-91b57774-d50c-4350-882d-363f80ac10e8"
               role="progressbar"
               style="width: 32px; height: 32px;"
             >
               <svg
-                class="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
+                class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
                 viewBox="22 22 44 44"
               >
                 <circle
-                  class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-176wh8e-MuiCircularProgress-circle"
+                  class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
                   cx="44"
                   cy="44"
                   fill="none"
@@ -367,7 +370,7 @@ exports[`Testing Register component should handle application registration code 
         </div>
       </div>
       <div
-        class="MuiContainer-root MuiContainer-maxWidthLg css-t4utv2-MuiContainer-root"
+        class="MuiContainer-root MuiContainer-maxWidthLg css-1ii9suo-MuiContainer-root"
       >
         <svg
           overflow="visible"

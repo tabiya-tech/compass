@@ -9,15 +9,16 @@ exports[`ChatMessageField should render correctly 1`] = `
     class="MuiBox-root css-zeiu9o"
   >
     <div
-      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1u4qoj3-MuiFormControl-root-MuiTextField-root"
+      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1at3x7m-MuiFormControl-root-MuiTextField-root"
     >
       <div
-        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedStart MuiInputBase-adornedEnd css-1q3i3t1-MuiInputBase-root-MuiOutlinedInput-root"
+        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedStart MuiInputBase-adornedEnd css-1g477uk-MuiInputBase-root-MuiOutlinedInput-root"
       >
         <div
-          class="MuiInputAdornment-root MuiInputAdornment-positionStart MuiInputAdornment-outlined MuiInputAdornment-sizeMedium css-ittuaa-MuiInputAdornment-root"
+          class="MuiInputAdornment-root MuiInputAdornment-positionStart MuiInputAdornment-outlined MuiInputAdornment-sizeMedium css-navhnp-MuiInputAdornment-root"
         >
           <span
+            aria-hidden="true"
             class="notranslate"
           >
             ​
@@ -27,19 +28,19 @@ exports[`ChatMessageField should render correctly 1`] = `
           >
             <button
               aria-label="add"
-              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeSmall css-1gp9nik-MuiButtonBase-root-MuiIconButton-root"
+              class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeSmall css-yirmw9-MuiButtonBase-root-MuiIconButton-root"
               data-testid="chat-message-field-plus-button-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
               tabindex="0"
               title="more actions"
               type="button"
             >
               <span
-                class="MuiBadge-root css-1c32n2y-MuiBadge-root"
+                class="MuiBadge-root css-63ezxx-MuiBadge-root"
                 data-testid="animated-dot-badge-c3f4e2d0-7b4b-4f2f-9c29-7f2e0b9a8a10"
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-ldtitb-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1d3v369-MuiSvgIcon-root"
                   data-testid="chat-message-field-plus-icon-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
                   focusable="false"
                   viewBox="0 0 24 24"
@@ -49,36 +50,33 @@ exports[`ChatMessageField should render correctly 1`] = `
                   />
                 </svg>
                 <span
-                  class="MuiBadge-badge MuiBadge-standard MuiBadge-invisible MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightCircular MuiBadge-overlapCircular css-1n89elg-MuiBadge-badge"
+                  class="MuiBadge-badge MuiBadge-standard MuiBadge-invisible MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightCircular MuiBadge-overlapCircular css-1bw2ep1-MuiBadge-badge"
                 />
               </span>
-              <span
-                class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-              />
             </button>
           </div>
         </div>
         <textarea
           aria-invalid="false"
-          class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedStart MuiInputBase-inputAdornedEnd css-1mf2yww-MuiInputBase-input-MuiOutlinedInput-input"
+          class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedStart MuiInputBase-inputAdornedEnd css-1foz4vt-MuiInputBase-input-MuiOutlinedInput-input"
           data-testid="chat-message-field-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
-          id=":r0:"
+          id=":r1:"
           maxlength="1100"
           placeholder="Type your message..."
           style="height: 0px; overflow: hidden;"
         />
         <textarea
           aria-hidden="true"
-          class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedStart MuiInputBase-inputAdornedEnd css-1mf2yww-MuiInputBase-input-MuiOutlinedInput-input"
+          class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline MuiInputBase-inputAdornedStart MuiInputBase-inputAdornedEnd css-1foz4vt-MuiInputBase-input-MuiOutlinedInput-input"
           readonly=""
           style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
           tabindex="-1"
         />
         <div
-          class="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeMedium css-1laqsz7-MuiInputAdornment-root"
+          class="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeMedium css-1t5wmfw-MuiInputAdornment-root"
         >
           <button
-            class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-sizeMedium css-1ifbsno-MuiButtonBase-root-MuiIconButton-root"
+            class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-sizeMedium css-ik2bs8-MuiButtonBase-root-MuiIconButton-root"
             data-testid="chat-message-field-send-button-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
             disabled=""
             tabindex="-1"
@@ -87,7 +85,7 @@ exports[`ChatMessageField should render correctly 1`] = `
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-6v3pcw-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-j0qjdl-MuiSvgIcon-root"
               data-testid="chat-message-field-send-icon-2a76494f-351d-409d-ba58-e1b2cfaf2a53"
               focusable="false"
               viewBox="0 0 24 24"
@@ -100,12 +98,13 @@ exports[`ChatMessageField should render correctly 1`] = `
         </div>
         <fieldset
           aria-hidden="true"
-          class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+          class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
         >
           <legend
-            class="css-ihdtdm"
+            class="css-1nf2c5d-MuiNotchedOutlined-root"
           >
             <span
+              aria-hidden="true"
               class="notranslate"
             >
               ​

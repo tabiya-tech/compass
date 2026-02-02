@@ -9,7 +9,7 @@ exports[`CustomRating should render component successfully 1`] = `
     class="MuiBox-root css-1w00lo4"
   >
     <p
-      class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body1 css-1pejuyu-MuiTypography-root"
       data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
     >
       How would you rate the overall experience?
@@ -18,21 +18,21 @@ exports[`CustomRating should render component successfully 1`] = `
       class="MuiBox-root css-a0ovpn"
     >
       <span
-        class="MuiRating-root MuiRating-sizeSmall css-cod5a2-MuiRating-root"
+        class="MuiRating-root MuiRating-sizeSmall css-5zcknv-MuiRating-root"
         data-testid="custom-rating-field-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
       >
         <label
-          class="css-dqr9h-MuiRating-label"
-          for=":r1:"
+          class="css-hlbajn-MuiRating-label"
+          for="overall_experience-:r2:"
         >
           <span
-            class="MuiRating-icon MuiRating-iconFilled css-7qmtgc-MuiRating-icon"
+            class="MuiRating-icon MuiRating-iconFilled css-1sagf1d-MuiRating-icon"
             data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
             value="1"
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1tnk0k-MuiSvgIcon-root"
               data-testid="StarIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -50,23 +50,23 @@ exports[`CustomRating should render component successfully 1`] = `
         </label>
         <input
           class="MuiRating-visuallyHidden"
-          id=":r1:"
+          id="overall_experience-:r2:"
           name="overall_experience"
           type="radio"
           value="1"
         />
         <label
-          class="css-dqr9h-MuiRating-label"
-          for=":r2:"
+          class="css-hlbajn-MuiRating-label"
+          for="overall_experience-:r3:"
         >
           <span
-            class="MuiRating-icon MuiRating-iconFilled css-7qmtgc-MuiRating-icon"
+            class="MuiRating-icon MuiRating-iconFilled css-1sagf1d-MuiRating-icon"
             data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
             value="2"
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1tnk0k-MuiSvgIcon-root"
               data-testid="StarIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -84,23 +84,23 @@ exports[`CustomRating should render component successfully 1`] = `
         </label>
         <input
           class="MuiRating-visuallyHidden"
-          id=":r2:"
+          id="overall_experience-:r3:"
           name="overall_experience"
           type="radio"
           value="2"
         />
         <label
-          class="css-dqr9h-MuiRating-label"
-          for=":r3:"
+          class="css-hlbajn-MuiRating-label"
+          for="overall_experience-:r4:"
         >
           <span
-            class="MuiRating-icon MuiRating-iconFilled css-7qmtgc-MuiRating-icon"
+            class="MuiRating-icon MuiRating-iconFilled css-1sagf1d-MuiRating-icon"
             data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
             value="3"
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1tnk0k-MuiSvgIcon-root"
               data-testid="StarIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -118,23 +118,23 @@ exports[`CustomRating should render component successfully 1`] = `
         </label>
         <input
           class="MuiRating-visuallyHidden"
-          id=":r3:"
+          id="overall_experience-:r4:"
           name="overall_experience"
           type="radio"
           value="3"
         />
         <label
-          class="css-dqr9h-MuiRating-label"
-          for=":r4:"
+          class="css-hlbajn-MuiRating-label"
+          for="overall_experience-:r5:"
         >
           <span
-            class="MuiRating-icon MuiRating-iconFilled css-7qmtgc-MuiRating-icon"
+            class="MuiRating-icon MuiRating-iconFilled css-1sagf1d-MuiRating-icon"
             data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
             value="4"
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1tnk0k-MuiSvgIcon-root"
               data-testid="StarIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -152,23 +152,23 @@ exports[`CustomRating should render component successfully 1`] = `
         </label>
         <input
           class="MuiRating-visuallyHidden"
-          id=":r4:"
+          id="overall_experience-:r5:"
           name="overall_experience"
           type="radio"
           value="4"
         />
         <label
-          class="css-dqr9h-MuiRating-label"
-          for=":r5:"
+          class="css-hlbajn-MuiRating-label"
+          for="overall_experience-:r6:"
         >
           <span
-            class="MuiRating-icon MuiRating-iconFilled css-7qmtgc-MuiRating-icon"
+            class="MuiRating-icon MuiRating-iconFilled css-1sagf1d-MuiRating-icon"
             data-testid="custom-rating-icon-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
             value="5"
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1mccn0v-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeInherit css-1tnk0k-MuiSvgIcon-root"
               data-testid="StarIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -186,13 +186,13 @@ exports[`CustomRating should render component successfully 1`] = `
         </label>
         <input
           class="MuiRating-visuallyHidden"
-          id=":r5:"
+          id="overall_experience-:r6:"
           name="overall_experience"
           type="radio"
           value="5"
         />
         <label
-          class="MuiRating-label MuiRating-pristine css-dqr9h-MuiRating-label"
+          class="MuiRating-label MuiRating-pristine css-hlbajn-MuiRating-label"
         >
           <input
             class="MuiRating-visuallyHidden"
@@ -212,13 +212,13 @@ exports[`CustomRating should render component successfully 1`] = `
         class="MuiBox-root css-jyedia"
       >
         <p
-          class="MuiTypography-root MuiTypography-body2 css-1ucn9pd-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body2 css-16obmg9-MuiTypography-root"
           data-testid="custom-rating-low-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
         >
           Very Difficult
         </p>
         <p
-          class="MuiTypography-root MuiTypography-body2 css-1ucn9pd-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body2 css-16obmg9-MuiTypography-root"
           data-testid="custom-rating-high-label-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
         >
           Very Easy
@@ -227,35 +227,36 @@ exports[`CustomRating should render component successfully 1`] = `
     </div>
   </div>
   <div
-    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-4c32m-MuiFormControl-root-MuiTextField-root"
+    class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-yk5tdh-MuiFormControl-root-MuiTextField-root"
   >
     <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-voxow3-MuiInputBase-root-MuiOutlinedInput-root"
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-cg662x-MuiInputBase-root-MuiOutlinedInput-root"
     >
       <textarea
         aria-invalid="false"
-        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-b5uwpx-MuiInputBase-input-MuiOutlinedInput-input"
         data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
-        id=":r6:"
+        id=":r7:"
         placeholder="Please provide your feedback here"
         rows="3"
         style="height: 0px; overflow: hidden;"
       />
       <textarea
         aria-hidden="true"
-        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+        class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-b5uwpx-MuiInputBase-input-MuiOutlinedInput-input"
         readonly=""
         style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
         tabindex="-1"
       />
       <fieldset
         aria-hidden="true"
-        class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+        class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
       >
         <legend
-          class="css-ihdtdm"
+          class="css-1nf2c5d-MuiNotchedOutlined-root"
         >
           <span
+            aria-hidden="true"
             class="notranslate"
           >
             ​

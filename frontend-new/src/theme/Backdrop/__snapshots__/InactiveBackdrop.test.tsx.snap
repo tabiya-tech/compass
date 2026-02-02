@@ -3,15 +3,16 @@
 exports[`InactiveBackdrop render tests should show InactiveBackdrop when isShown is true 1`] = `
 <div
   aria-hidden="true"
-  class="MuiBackdrop-root css-125pjs0-MuiBackdrop-root"
+  class="MuiBackdrop-root css-1dusans-MuiBackdrop-root"
   data-testid="inactive-backdrop-container-e9ca9c1e-3933-4c5b-b5fd-453601ee9947"
   style="opacity: 1; webkit-transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;"
 >
   <div
-    class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-1cir30c-MuiPaper-root"
+    class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-1y2kn1q-MuiPaper-root"
+    style="--Paper-shadow: var(--mui-shadows-24);"
   >
     <p
-      class="MuiTypography-root MuiTypography-body1 css-5u9vay-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body1 css-12qew4i-MuiTypography-root"
       data-testid="inactive-backdrop-message-e9ca9c1e-3933-4c5b-b5fd-453601ee9947"
     >
       Are you still here?

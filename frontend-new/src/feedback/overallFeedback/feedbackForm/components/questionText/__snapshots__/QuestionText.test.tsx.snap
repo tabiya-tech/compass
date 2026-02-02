@@ -2,7 +2,7 @@
 
 exports[`QuestionText should render component successfully 1`] = `
 <p
-  class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
+  class="MuiTypography-root MuiTypography-body1 css-1pejuyu-MuiTypography-root"
   data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
 >
   This is a random question text

@@ -25,6 +25,10 @@ export enum EnvVariables {
   FRONTEND_BROWSER_TAB_TITLE = "FRONTEND_BROWSER_TAB_TITLE",
   FRONTEND_META_DESCRIPTION = "FRONTEND_META_DESCRIPTION",
   FRONTEND_SEO = "FRONTEND_SEO",
+  FRONTEND_LOGO_URL = "FRONTEND_LOGO_URL",
+  FRONTEND_FAVICON_URL = "FRONTEND_FAVICON_URL",
+  FRONTEND_APP_ICON_URL = "FRONTEND_APP_ICON_URL",
+  FRONTEND_THEME_CSS_VARIABLES = "FRONTEND_THEME_CSS_VARIABLES",
 }
 
 export const requiredEnvVariables = [
@@ -201,6 +205,40 @@ export const getBrowserTabTitle = () => getEnv(EnvVariables.FRONTEND_BROWSER_TAB
 export const getMetaDescription = () => getEnv(EnvVariables.FRONTEND_META_DESCRIPTION);
 
 export const getSeoEnvVar = () => getEnv(EnvVariables.FRONTEND_SEO);
+
+export const getLogoUrl = () => getEnv(EnvVariables.FRONTEND_LOGO_URL);
+
+export const getFaviconUrl = () => getEnv(EnvVariables.FRONTEND_FAVICON_URL);
+
+export const getAppIconUrl = () => getEnv(EnvVariables.FRONTEND_APP_ICON_URL);
+
+export interface ThemeCssVariables {
+  "brand-primary"?: string;
+  "brand-primary-light"?: string;
+  "brand-primary-dark"?: string;
+  "brand-primary-contrast-text"?: string;
+  "brand-secondary"?: string;
+  "brand-secondary-light"?: string;
+  "brand-secondary-dark"?: string;
+  "brand-secondary-contrast-text"?: string;
+  "text-primary"?: string;
+  "text-secondary"?: string;
+  "text-accent"?: string;
+}
+
+export const getThemeCssVariables = (): ThemeCssVariables => {
+  const jsonString = getEnv(EnvVariables.FRONTEND_THEME_CSS_VARIABLES);
+  if (!jsonString) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(jsonString) as ThemeCssVariables;
+  } catch (e) {
+    console.error(new EnvError(`Error parsing FRONTEND_THEME_CSS_VARIABLES JSON`, e));
+    return {};
+  }
+};
 
 export const ensureRequiredEnvVars = () => {
   requiredEnvVariables.forEach((key: EnvVariables) => {

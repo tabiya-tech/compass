@@ -11,12 +11,12 @@ exports[`SkillsRankingProofOfValue snapshot: work-based initial render (non-repl
       class="MuiBox-root css-8atqhb"
     >
       <div
-        class="MuiBox-root css-u9ttk8"
+        class="MuiBox-root css-uw2p1q"
         data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
         origin="COMPASS"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-13zm2uq-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-1ow0s3z-MuiTypography-root"
           data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
         />
         <div
@@ -52,7 +52,7 @@ exports[`SkillsRankingProofOfValue snapshot: work-based initial render (non-repl
         data-testid="chat-message-footer-layout-container-7772f20a-9d0c-4072-b24f-97eca2f43d7b"
       >
         <span
-          class="MuiTypography-root MuiTypography-caption css-1l3yql3-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-1nk71a8-MuiTypography-root"
           data-testid="chat-message-timestamp-c9253326-05ee-4bff-9d43-7852ca78a033"
         >
           sent 

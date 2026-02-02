@@ -2,13 +2,13 @@
 
 exports[`SkillPopover render tests should render the SkillPopover with the given props 1`] = `
 <div
-  class="MuiPopover-root MuiModal-root css-1i0e6f3-MuiModal-root-MuiPopover-root"
+  class="MuiPopover-root MuiModal-root css-53rh41-MuiModal-root-MuiPopover-root"
   data-testid="skill-popover-0ee9a0ec-fd74-4628-9b77-0ed10d4413ae"
   role="presentation"
 >
   <div
     aria-hidden="true"
-    class="MuiBackdrop-root MuiBackdrop-invisible MuiModal-backdrop css-g3hgs1-MuiBackdrop-root-MuiModal-backdrop"
+    class="MuiBackdrop-root MuiBackdrop-invisible MuiModal-backdrop css-vl6bb4-MuiBackdrop-root-MuiModal-backdrop"
     style="opacity: 1; webkit-transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;"
   />
   <div
@@ -16,24 +16,24 @@ exports[`SkillPopover render tests should render the SkillPopover with the given
     tabindex="0"
   />
   <div
-    class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-1mnbuix-MuiPaper-root-MuiPopover-paper"
-    style="opacity: 1; transform: scale(1, 1); transition: opacity 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; top: 16px; left: 16px; transform-origin: -16px -16px;"
+    class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-19ent7r-MuiPaper-root-MuiPopover-paper"
+    style="--Paper-shadow: var(--mui-shadows-8); opacity: 1; transform: scale(1, 1); transition: opacity 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; top: 16px; left: 16px; transform-origin: -16px -16px;"
     tabindex="-1"
   >
     <div
-      class="MuiBox-root css-lvw62o"
+      class="MuiBox-root css-4rgnkr"
     >
       <div
         class="MuiBox-root css-1kkt86i"
       >
         <span
-          class="MuiTypography-root MuiTypography-caption css-1faky7c-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-xogqpz-MuiTypography-root"
           data-testid="skill-popover-label-0ee9a0ec-fd74-4628-9b77-0ed10d4413ae"
         >
           Skill Name
         </span>
         <span
-          class="MuiTypography-root MuiTypography-caption css-lljkun-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-1q1mrxw-MuiTypography-root"
           data-testid="skill-popover-description-0ee9a0ec-fd74-4628-9b77-0ed10d4413ae"
         >
           Skill Description
@@ -43,13 +43,13 @@ exports[`SkillPopover render tests should render the SkillPopover with the given
         class="MuiBox-root css-1kkt86i"
       >
         <span
-          class="MuiTypography-root MuiTypography-caption css-1faky7c-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-xogqpz-MuiTypography-root"
           data-testid="skill-popover-alt-labels-title-0ee9a0ec-fd74-4628-9b77-0ed10d4413ae"
         >
           Also known as:
         </span>
         <span
-          class="MuiTypography-root MuiTypography-caption css-z7l2mh-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-1s89ei4-MuiTypography-root"
           data-testid="skill-popover-alt-labels-0ee9a0ec-fd74-4628-9b77-0ed10d4413ae"
         >
           Foo, Bar, Baz

@@ -7,10 +7,10 @@ exports[`ChatList should render the Chat List and show the appropriate message t
   tabindex="0"
 >
   <ul
-    class="MuiList-root MuiList-padding css-1biuflb-MuiList-root"
+    class="MuiList-root MuiList-padding css-xdlnh8-MuiList-root"
   >
     <li
-      class="MuiListItem-root MuiListItem-gutters css-pck8cy-MuiListItem-root"
+      class="MuiListItem-root MuiListItem-gutters css-1cf4p5j-MuiListItem-root"
       style="opacity: 1; transform: none;"
     >
       <div
@@ -18,7 +18,7 @@ exports[`ChatList should render the Chat List and show the appropriate message t
       />
     </li>
     <li
-      class="MuiListItem-root MuiListItem-gutters css-pck8cy-MuiListItem-root"
+      class="MuiListItem-root MuiListItem-gutters css-1cf4p5j-MuiListItem-root"
       style="opacity: 1; transform: none;"
     >
       <div
@@ -26,7 +26,7 @@ exports[`ChatList should render the Chat List and show the appropriate message t
       />
     </li>
     <li
-      class="MuiListItem-root MuiListItem-gutters css-pck8cy-MuiListItem-root"
+      class="MuiListItem-root MuiListItem-gutters css-1cf4p5j-MuiListItem-root"
       style="opacity: 1; transform: none;"
     >
       <div
@@ -34,7 +34,7 @@ exports[`ChatList should render the Chat List and show the appropriate message t
       />
     </li>
     <li
-      class="MuiListItem-root MuiListItem-gutters css-pck8cy-MuiListItem-root"
+      class="MuiListItem-root MuiListItem-gutters css-1cf4p5j-MuiListItem-root"
       style="opacity: 1; transform: none;"
     >
       <div
@@ -42,7 +42,7 @@ exports[`ChatList should render the Chat List and show the appropriate message t
       />
     </li>
     <li
-      class="MuiListItem-root MuiListItem-gutters css-pck8cy-MuiListItem-root"
+      class="MuiListItem-root MuiListItem-gutters css-1cf4p5j-MuiListItem-root"
       style="opacity: 1; transform: none;"
     >
       <div
@@ -50,7 +50,7 @@ exports[`ChatList should render the Chat List and show the appropriate message t
       />
     </li>
     <li
-      class="MuiListItem-root MuiListItem-gutters css-pck8cy-MuiListItem-root"
+      class="MuiListItem-root MuiListItem-gutters css-1cf4p5j-MuiListItem-root"
       style="opacity: 1; transform: none;"
     >
       <div

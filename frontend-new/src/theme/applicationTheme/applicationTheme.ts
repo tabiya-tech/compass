@@ -1,4 +1,4 @@
-import { createTheme, PaletteOptions, ThemeOptions, SimplePaletteColorOptions } from "@mui/material/styles/";
+import { createTheme, PaletteOptions, ThemeOptions, SimplePaletteColorOptions } from "@mui/material/styles";
 import {
   CSSClampFnCalculatorPx,
   CSSClampFnCalculatorRem,
@@ -85,8 +85,18 @@ export const TabiyaIconStyles = {
 
 const lightPalette: PaletteOptions = {
   contrastThreshold: 4.5, // WCAG 2.0 (AA) ensure color-contrast is at least 4.5:1
-  primary: augmentedThemeColor(TabiyaBasicColors.Green),
-  secondary: augmentedThemeColor(TabiyaBasicColors.DarkGreen),
+  primary: {
+    main: "rgb(var(--brand-primary))",
+    light: "rgb(var(--brand-primary-light))",
+    dark: "rgb(var(--brand-primary-dark))",
+    contrastText: "rgb(var(--brand-primary-contrast-text))",
+  },
+  secondary: {
+    main: "rgb(var(--brand-secondary))",
+    light: "rgb(var(--brand-secondary-light))",
+    dark: "rgb(var(--brand-secondary-dark))",
+    contrastText: "rgb(var(--brand-secondary-contrast-text))",
+  },
   tabiyaYellow: augmentedThemeColor(TabiyaBasicColors.Yellow),
   tabiyaBlue: augmentedThemeColor(TabiyaBasicColors.DarkBlue),
   containerBackground: {
@@ -117,9 +127,9 @@ const lightPalette: PaletteOptions = {
   },
   grey: createGreyScale(),
   text: {
-    primary: TabiyaBasicColors.DarkBlue,
-    secondary: TabiyaBasicColors.GrayDark,
-    textAccent: TabiyaBasicColors.LightBlue,
+    primary: "rgb(var(--text-primary))",
+    secondary: "rgb(var(--text-secondary))",
+    textAccent: "rgb(var(--text-accent))",
     textWhite: "#FFFFFF",
     textBlack: "#000000",
     disabled: "#000000",
@@ -162,6 +172,7 @@ export const applicationTheme = (theme: ThemeMode) => {
 
   const activePalette: PaletteOptions = theme === ThemeMode.LIGHT ? lightPalette : darkPalette;
   const activeTheme: ThemeOptions = {
+    cssVariables: true,
     palette: activePalette,
     spacing: (factor: number) => `calc(${spacingClampFn} * ${factor})`,
     fixedSpacing: (factor: number) => `${factor * TabiyaBaseSizes.spacing}px`,

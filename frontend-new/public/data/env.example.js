@@ -77,4 +77,22 @@ window.tabiyaConfig = {
       description: "Compass is an AI-powered career assistant that helps jobseekers discover and describe their skills.",
     })
   ),
+  FRONTEND_LOGO_URL: btoa("/logo.svg"),
+  FRONTEND_FAVICON_URL: btoa("/favicon.svg"),
+  FRONTEND_APP_ICON_URL: btoa("/compass.svg"),
+  FRONTEND_THEME_CSS_VARIABLES: btoa(
+    JSON.stringify({
+      "brand-primary": "0 255 145",
+      "brand-primary-light": "51 255 167",
+      "brand-primary-dark": "0 178 101",
+      "brand-primary-contrast-text": "0 0 0",
+      "brand-secondary": "30 113 102",
+      "brand-secondary-light": "77 154 143",
+      "brand-secondary-dark": "21 79 71",
+      "brand-secondary-contrast-text": "0 0 0",
+      "text-primary": "0 33 71",
+      "text-secondary": "65 64 61",
+      "text-accent": "38 94 167",
+    })
+  ),
 };

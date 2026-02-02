@@ -18,6 +18,8 @@ import "./preview.css";
 //  If the font references by the application are not loaded via the above mechanism and they are not found locally on the system,
 //  the browser will use a default font.
 
+import "../src/styles/variables.css"
+
 import type { Preview, StoryFn } from "@storybook/react";
 import { IsOnlineContext } from "../src/app/isOnlineProvider/IsOnlineProvider";
 import { IChatMessage } from "../src/chat/Chat.types";
@@ -26,6 +28,9 @@ import i18n from "../src/i18n/i18n";
 import { initSentry } from "../src/sentryInit";
 import SnackbarProvider from "../src/theme/SnackbarProvider/SnackbarProvider";
 import { LocalesLabels, Locale } from "../src/i18n/constants";
+import { applyBrandingFromEnv } from "../src/branding/branding";
+
+applyBrandingFromEnv();
 
 type StorybookSelectOption = {
   value: string;

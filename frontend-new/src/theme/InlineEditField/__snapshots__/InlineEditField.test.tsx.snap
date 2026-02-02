@@ -3,8 +3,8 @@
 exports[`render tests should render correctly 1`] = `
 <input
   aria-invalid="false"
-  class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-  id=":r0:"
+  class="MuiInputBase-input MuiOutlinedInput-input css-1y15kj-MuiInputBase-input-MuiOutlinedInput-input"
+  id=":r1:"
   placeholder="foo bar"
   type="text"
   value=""
@@ -13,32 +13,33 @@ exports[`render tests should render correctly 1`] = `
 
 exports[`render tests should show badge when field is edited 1`] = `
 <span
-  class="MuiBadge-root css-7jfqov-MuiBadge-root"
+  class="MuiBadge-root css-mgbdgt-MuiBadge-root"
   data-testid="inline-edit-field-badge-be128c36-2209-4d9d-8557-648dcb14ca88"
 >
   <div
-    class="MuiFormControl-root MuiTextField-root css-1g03syv-MuiFormControl-root-MuiTextField-root"
+    class="MuiFormControl-root MuiTextField-root css-1ivr0fi-MuiFormControl-root-MuiTextField-root"
     data-testid="foo-testid"
   >
     <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-1ooyxc2-MuiInputBase-root-MuiOutlinedInput-root"
     >
       <input
         aria-invalid="false"
-        class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-        id=":r1:"
+        class="MuiInputBase-input MuiOutlinedInput-input css-1y15kj-MuiInputBase-input-MuiOutlinedInput-input"
+        id=":r3:"
         placeholder="foo"
         type="text"
         value=""
       />
       <fieldset
         aria-hidden="true"
-        class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+        class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
       >
         <legend
-          class="css-ihdtdm"
+          class="css-1nf2c5d-MuiNotchedOutlined-root"
         >
           <span
+            aria-hidden="true"
             class="notranslate"
           >
             ​
@@ -48,7 +49,7 @@ exports[`render tests should show badge when field is edited 1`] = `
     </div>
   </div>
   <span
-    class="MuiBadge-badge MuiBadge-dot MuiBadge-anchorOriginTopLeft MuiBadge-anchorOriginTopLeftRectangular MuiBadge-overlapRectangular css-1ecccjx-MuiBadge-badge"
+    class="MuiBadge-badge MuiBadge-dot MuiBadge-anchorOriginTopLeft MuiBadge-anchorOriginTopLeftRectangular MuiBadge-overlapRectangular css-n72uel-MuiBadge-badge"
   />
 </span>
 `;

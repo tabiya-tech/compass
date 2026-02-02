@@ -2,22 +2,22 @@
 
 exports[`Testing LoginWithInviteCodeForm component it should show login form 1`] = `
 <div
-  class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1vdto9g-MuiInputBase-root-MuiOutlinedInput-root"
+  class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-11ub2sa-MuiInputBase-root-MuiOutlinedInput-root"
 >
   <input
     aria-invalid="false"
-    class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
+    class="MuiInputBase-input MuiOutlinedInput-input css-1y15kj-MuiInputBase-input-MuiOutlinedInput-input"
     data-testid="login-inviteCode-input-300d373e-b913-4bd5-9045-3a28d490cf2c"
-    id=":r0:"
+    id=":r1:"
     type="text"
     value="invite-code"
   />
   <fieldset
     aria-hidden="true"
-    class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+    class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
   >
     <legend
-      class="css-14lo706"
+      class="css-ex8a5f-MuiNotchedOutlined-root"
     >
       <span>
         Login Code
