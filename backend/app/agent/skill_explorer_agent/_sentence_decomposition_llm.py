@@ -5,12 +5,15 @@ from pydantic import BaseModel, Field
 
 from app.agent.agent_types import LLMStats
 from app.agent.llm_caller import LLMCaller
-from app.agent.prompt_template import sanitize_input, get_language_style
+from app.agent.prompt_template import sanitize_input
+from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, ZERO_TEMPERATURE_GENERATION_CONFIG
+from common_libs.llm.schema_builder import with_response_schema
 from ...conversation_memory.conversation_formatter import ConversationHistoryFormatter
-from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
+from ...i18n.translation_service import get_i18n_manager
+
 
 class _SentenceDecompositionResponse(BaseModel):
     decomposed_and_dereferenced: list[str] = Field(default_factory=list)
@@ -21,33 +24,33 @@ class _SentenceDecompositionResponse(BaseModel):
 
 
 class _SentenceDecompositionFirstPassResponse(BaseModel):
-    decomposed_sentences: list[str] = Field(default_factory=list)
-    """
+    decomposed_sentences: list[str] = Field(default_factory=list, description=dedent("""
     The decomposed sentences from the user's input.
     This is used to help the model complete the task in steps as dereferencing the pronouns is too complex for the model to do in one step.
-    """
+    """))
 
-    pronouns_indexing: list[str] = Field(default_factory=list)
-    """
-    The pronouns from the user's input and their types.
+    pronouns_indexing: list[str] = Field(default_factory=list, description=dedent("""
+    The unique pronouns from the user's input and their types.
     Helps the model to identify the pronouns and complete the task in steps.
+    Each pronoun should appear only once in this list, even if it appears multiple times in the text.
+    Keep this list concise - only include pronouns that need to be resolved.
     In some cases it is unclear if a word is a pronoun or not. For example:
     "He said that he will go to the store" - "that" is not a pronoun
-    """
+    """))
 
-    pronouns_antecedents: list[str] = Field(default_factory=list)
-    """
-    The pronouns from the user's input and their antecedents.
+    pronouns_antecedents: list[str] = Field(default_factory=list, description=dedent("""
+    The unique pronouns from the user's input and their antecedents.
     This is used to help the model complete the task in steps.
-    """
+    Each pronoun should appear only once in this list, even if it appears multiple times in the text.
+    Keep this list concise - only include pronouns that need to be resolved.
+    """))
 
-    resolved_pronouns: list[str] = Field(default_factory=list)
-    """
+    resolved_pronouns: list[str] = Field(default_factory=list, description=dedent("""
     The resolved pronouns from the user's input. This is the final output of the first pass.
     The original sentences are decomposed into sub-sentences and the pronouns are resolved to their antecedents.
     However, models struggle to correctly frame the sentences in a natural way. This is due to the pronouns_antecedents 
     which condition the output to return expressions like "Ben helps Ben's" or "Ben uses Ben's hands".
-    """
+    """))
 
 
 class _SentenceDecompositionLLM:
@@ -73,8 +76,8 @@ class _SentenceDecompositionLLM:
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "top_p": 0.0,
-                    "max_output_tokens": 3000  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
-                }
+                    "max_output_tokens": 3000,  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
+                } | with_response_schema(_SentenceDecompositionFirstPassResponse)
             ))
         self._llm_caller_second_pass = LLMCaller[_SentenceDecompositionResponse](model_response_type=_SentenceDecompositionResponse)
         self.llm_second_pass = GeminiGenerativeLLM(
@@ -82,9 +85,10 @@ class _SentenceDecompositionLLM:
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "top_p": 0.0,
-                    "max_output_tokens": 3000  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
-                }
+                    "max_output_tokens": 3000,  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
+                } | with_response_schema(_SentenceDecompositionResponse)
             ))
+
         self.logger = logger
 
     async def execute(self, *, last_user_input: str, context: ConversationContext) \
@@ -99,6 +103,10 @@ class _SentenceDecompositionLLM:
                                                                                                  llm_input=_SentenceDecompositionLLM._first_pass_prompt_template(
                                                                                                      context=context, last_user_input=last_user_input),
                                                                                                  logger=self.logger)
+        if not llm_first_pass_output:
+            self.logger.warning("The LLM did not return any output for sentence decomposition first pass")
+            return _SentenceDecompositionResponse(decomposed_and_dereferenced=[]), llm_first_pass_stats
+        
         self.logger.debug("LLM first pass output: %s", llm_first_pass_output.model_dump())
         # Run the seconds pass
 
@@ -124,10 +132,8 @@ class _SentenceDecompositionLLM:
         system_instructions_template = dedent("""\
         <System Instructions>
         # Role
-            You are a language expert that decomposes complex sentences into sub-sentences.
-       
-        {language_style}
-                                              
+            You are ({language_name}) language expert that decomposes complex sentences into sub-sentences.
+                                                     
         # Do not interpret
             Do not infer the my responsibilities, skills, duties, tasks, actions, behaviour, activities, competencies, or knowledge based on your prior knowledge about the experience.
             Do not infer the experience and do not use that information in your task.
@@ -146,16 +152,20 @@ class _SentenceDecompositionLLM:
             Include all information about the action, including the subject, verb, and object.
             Place each sub-sentence in a separate JSON string in the 'decomposed_sentences' list.
         # 'pronouns_indexing' instructions
-            Identify all pronouns in <My Last Input> and <Conversation History>.
-            Include all possessive  reflexive, demonstrative, relative, interrogative, indefinite, reciprocal, and intensive pronouns.
+            Identify all unique pronouns in <My Last Input> and <Conversation History>.
+            Include all possessive, reflexive, demonstrative, relative, interrogative, indefinite, reciprocal, and intensive pronouns.
             Exclude first person pronouns (I, me, my, mine etc.) and second person pronouns (you, your, yours etc.) that refer to me.
             
-            For each pronoun provide the pronoun type in the format: "pronoun -> pronoun type"   
+            List each unique pronoun only once, even if it appears multiple times in the text.
+            For each pronoun provide the pronoun type in the format: "pronoun -> pronoun type".
+            Keep this list concise - only include pronouns that need to be resolved.
             If a word might be a pronoun but it is not clear, indicate that it is ambiguous.
         # 'pronouns_antecedents'  instructions  
-            Identify all pronouns in <My Last Input> and <Conversation History> and determine their antecedents.
+            Identify all unique pronouns in <My Last Input> and <Conversation History> and determine their antecedents.
             Exclude first person pronouns (I, me, my, mine etc.) and second person pronouns (you, your, yours etc.) that refer to me.
-            For each pronoun, provide the antecedent in the format: "pronoun -> antecedent" and explain the reasoning behind the choice of antecedent.
+            List each unique pronoun only once, even if it appears multiple times in the text.
+            For each pronoun, provide the antecedent in the format: "pronoun -> antecedent" and briefly explain the reasoning behind the choice of antecedent.
+            Keep this list concise - only include pronouns that need to be resolved.
             If a pronoun does not have a clear antecedent, indicate that it is ambiguous.
             
         # 'resolved_pronouns' instructions
@@ -168,25 +178,27 @@ class _SentenceDecompositionLLM:
         # JSON Output instructions
             Your response must always be a JSON object with the following schema:
             - 'decomposed_sentences': list of JSON strings
-            - 'pronouns_indexing': list of JSON strings in the format: pronoun -> pronoun type
-            - 'pronouns_antecedents': list of JSON strings in the format: pronoun -> antecedent
-            - 'resolved_pronouns': list of JSON strings
-            - 'final_output': list of JSON strings
+            - 'pronouns_indexing': list of JSON strings in the format: pronoun -> pronoun type (helper field, keep concise)
+            - 'pronouns_antecedents': list of JSON strings in the format: pronoun -> antecedent (helper field, keep concise)
+            - 'resolved_pronouns': list of JSON strings (this is the main output)
+            
+            IMPORTANT: Do not repeat entries in pronouns_indexing or pronouns_antecedents. Each unique pronoun should appear only once in each list.
+            These are helper fields to guide your reasoning - they should be brief and not repetitive.
         # Example
             conversation history: Ben makes the bread and sells it to the neighbours and gives me money for it.
             my last input: I help him do this.
             decomposed_sentences: ["I help him do this", "Ben makes the bread", "Ben sells it to the neighbours", "Ben gives me money for it"]
             pronouns_indexing: ["him -> third person pronoun", "it -> third person pronoun", "this -> demonstrative pronoun"]
-            pronouns_antecedents: ["him -> Ben", "it -> helping", "it -> the bread", "this -> the action of making and selling the bread"]
-            resolved_pronouns: ["I help Ben", "Ben makes the bread", "I help Ben sell the bread", "Ben sells the bread to the neighbours", "Ben gives I money for helping Ben"]
-            final_output: ["I help Ben", "Ben makes the bread", "I help Ben sell the bread", "Ben sells the bread to the neighbours", "Ben gives me money for helping him"]
+            pronouns_antecedents: ["him -> Ben", "it -> the bread", "this -> the action of making and selling the bread"]
+            resolved_pronouns: ["I help Ben", "Ben makes the bread", "I help Ben sell the bread", "Ben sells the bread to the neighbours", "Ben gives me money for helping him"]
             
         Your response must always be a JSON object with the schema above
         </System Instructions>
         """)
 
+        language_name = get_i18n_manager().get_locale().label()
         return replace_placeholders_with_indent(system_instructions_template,
-                                                language_style=get_language_style())
+                                                language_name=language_name)
 
     @staticmethod
     def _first_pass_prompt_template(context: ConversationContext, last_user_input: str) -> str:
@@ -217,16 +229,14 @@ class _SentenceDecompositionLLM:
         system_instructions_template = dedent("""\
         <System Instructions>
         # Role
-            You are a language expert that reviews sentences and fixes them.
+            You are ({language_name}) language expert that reviews sentences and fixes them.
             You will be given an input with a list of independent sentences.
             Your task is to review each sentence and fix it to ensure that it is grammatically correct, clear, concise and sounds natural.
             Pay attention to awkward phrasing, grammatical errors, and any other issues that may affect the clarity and readability of the sentence.
             Do not change the meaning of the sentence or add any new information.
             Both the input and the fixed sentence should be interpreted in a different way review independently. 
             Each sentence from the input must fixed and added to the output in the decomposed_and_dereferenced list.
-        
-        {language_style}
-                                              
+                       
         # Input Structure
             The input structure is a list of sentences:
             "sentences": list of sentences 
@@ -241,8 +251,9 @@ class _SentenceDecompositionLLM:
         </System Instructions>
         """)
 
+        language_name = get_i18n_manager().get_locale().label()
         return replace_placeholders_with_indent(system_instructions_template,
-                                                language_style=get_language_style())
+                                                language_name=language_name)
 
     @staticmethod
     def _second_pass_prompt_template(sentences: list[str]) -> str:

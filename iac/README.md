@@ -5,6 +5,10 @@ Platform (GCP) using Pulumi.
 
 ## IaC Codebase Components
 
+### Structural Diagram
+The diagram below shows a high level overview of the infrastructure architecture of the Compass project.
+![Compass IAC Structure Overview](https://lucid.app/publicSegments/view/fd859d0a-d6e4-44cc-8925-4e201941e77b/image.png)
+
 ### Keywords
 
 - **realm**: The top-level container of the organization's infrastructure for this project (compass).

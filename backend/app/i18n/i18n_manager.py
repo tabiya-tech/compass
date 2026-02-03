@@ -1,4 +1,3 @@
-
 import json
 import logging
 import os
@@ -8,6 +7,7 @@ from collections import defaultdict
 from app.i18n.types import Locale
 from app.i18n.constants import LOCALES_DIR, DEFAULT_FALLBACK_LOCALE
 from app.context_vars import user_language_ctx_var
+from app.app_config import get_application_config
 
 
 
@@ -82,6 +82,11 @@ class I18nManager:
 
         return fallback_message
 
+    @staticmethod
+    def _get_default_variables() -> Dict[str, Any]:
+        cfg = get_application_config()
+        return {"app_name": cfg.app_name}
+
     def t(self, domain: str, key: str, **kwargs) -> str:
         """
         Convenience method to get a translation using the current locale from the locale provider.
@@ -95,7 +100,14 @@ class I18nManager:
             The translated string.
         """
         locale = self.get_locale()
-        return self.get_translation(locale, domain, key)
+        value = self.get_translation(locale, domain, key)
+        if isinstance(value, str):
+            vars_ = {**self._get_default_variables(), **kwargs}
+            try:
+                return value.format(**vars_)
+            except (KeyError, ValueError) as e:
+                self._logger.warning(f"Failed to format translation {domain}.{key} for {locale.name}: {e}")
+        return value
 
     def verify_keys(self) -> bool:
         """
