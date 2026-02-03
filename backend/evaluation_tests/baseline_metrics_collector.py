@@ -178,7 +178,6 @@ class BaselineMetricsCollector:
             started_at=datetime.utcnow().isoformat()
         )
         self._current_phase: Optional[str] = None
-        self._turn_start_time: Optional[float] = None
     
     def record_turn(self, phase: str, agent_type: str):
         """Record a conversation turn."""
