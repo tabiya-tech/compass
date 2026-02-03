@@ -1,5 +1,8 @@
+import logging
+
 from fastapi import APIRouter, FastAPI
 
+from app.app_config import get_application_config
 from app.users.sensitive_personal_data.routes import add_user_sensitive_personal_data_routes
 from app.users.cv.routes import add_user_cv_routes
 from app.users.auth import Authentication
@@ -11,6 +14,8 @@ It includes the following:
 - User preferences routes
 ..and many more to come in the future.
 """
+
+logger = logging.getLogger(__name__)
 
 
 def add_users_routes(app: FastAPI, authentication: Authentication):
@@ -35,9 +40,14 @@ def add_users_routes(app: FastAPI, authentication: Authentication):
     # we can add more routes related to the users management here
 
     ############################################
-    # Add the user CV upload routes
+    # Add the user CV upload routes (conditionally)
     ############################################
-    add_user_cv_routes(users_router, authentication)
+    app_config = get_application_config()
+    if app_config.enable_cv_upload:
+        add_user_cv_routes(users_router, authentication)
+        logger.info("CV upload routes registered")
+    else:
+        logger.info("CV upload routes skipped")
 
     ############################################
     # Add the users router to the app

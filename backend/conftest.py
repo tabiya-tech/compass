@@ -14,6 +14,28 @@ from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.version.types import Version
 
 
+_mocked_application_config = ApplicationConfig(
+    environment_name="foo",
+    version_info=Version(
+        date="foo-date",
+        branch="foo-branch",
+        buildNumber="foo-build-number",
+        sha="foo-sha"),
+    default_country_of_user=Country.UNSPECIFIED,
+    enable_metrics=True,
+    taxonomy_model_id=str(ObjectId()),  # get a random object id.
+    embeddings_service_name="foo-service",
+    embeddings_model_name="bar-model",
+    cv_storage_bucket="foo-bucket",
+    features={},
+    enable_cv_upload=True,
+    language_config=LanguageConfig(
+        default_locale=Locale.EN_US,
+        available_locales=[LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY")]
+    ),
+    app_name="Compass"
+)
+
 @pytest.fixture(scope='session')
 def in_memory_mongo_server():
     """
@@ -77,6 +99,7 @@ async def in_memory_userdata_database(in_memory_mongo_server) -> AsyncIOMotorDat
     userdata_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
                                      tlsAllowInvalidCertificates=True).get_database(random_db_name())
 
+    set_application_config(_mocked_application_config)
     await CompassDBProvider.initialize_userdata_mongo_db(userdata_db, logger=logging.getLogger(__name__))
     logging.info(f"Created userdata database: {userdata_db.name}")
     return userdata_db
@@ -141,26 +164,7 @@ def setup_application_config() -> Generator[ApplicationConfig, Any, None]:
     Fixture to create an application config. For all tests that need to use the application config,
     they should use this fixture.
     """
-    config = ApplicationConfig(
-        environment_name="foo",
-        version_info=Version(
-            date="foo-date",
-            branch="foo-branch",
-            buildNumber="foo-build-number",
-            sha="foo-sha"),
-        default_country_of_user=Country.UNSPECIFIED,
-        enable_metrics=True,
-        taxonomy_model_id=str(ObjectId()),  # get a random object id.
-        embeddings_service_name="foo-service",
-        embeddings_model_name="bar-model",
-        cv_storage_bucket="foo-bucket",
-        features={},
-        language_config=LanguageConfig(
-            default_locale=Locale.EN_US,
-            available_locales=[LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY")]
-        ),
-        app_name="Compass"
-    )
+    config = _mocked_application_config
 
     set_application_config(config)
     # guard to ensure the config is set

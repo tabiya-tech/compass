@@ -54,6 +54,7 @@ class BackendServiceConfig:
     experience_pipeline_config: Optional[str]
     cv_max_uploads_per_user: Optional[str]
     cv_rate_limit_per_minute: Optional[str]
+    enable_cv_upload: Optional[str]
     language_config: str
     global_product_name: Optional[str]
 
@@ -368,6 +369,9 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="GLOBAL_PRODUCT_NAME",
                             value=backend_service_cfg.global_product_name),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="GLOBAL_ENABLE_CV_UPLOAD",
+                            value=backend_service_cfg.enable_cv_upload or "false"),
                         # Add more environment variables here
                     ],
                 )

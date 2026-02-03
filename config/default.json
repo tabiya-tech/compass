@@ -31,5 +31,8 @@
   "auth": {
     "disableLoginCode": true,
     "disableRegistrationCode": true
+  },
+  "cv": {
+    "enabled": true
   }
 }

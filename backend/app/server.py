@@ -205,6 +205,11 @@ if _global_product_name is None:
     logger.warning("GLOBAL_PRODUCT_NAME environment variable is not set! Defaulting to 'Compass'")
     _global_product_name = "Compass"
 
+# CV upload feature flag - defaults to False if not set
+_enable_cv_upload_str = os.getenv("GLOBAL_ENABLE_CV_UPLOAD", "false")
+_enable_cv_upload = _enable_cv_upload_str.lower() == "true"
+logger.info(f"GLOBAL_ENABLE_CV_UPLOAD: {_enable_cv_upload}")
+
 application_config = ApplicationConfig(
     environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
     version_info=load_version_info(),
@@ -215,7 +220,8 @@ application_config = ApplicationConfig(
     embeddings_model_name=os.getenv("EMBEDDINGS_MODEL_NAME"),
     features=backend_features_config,
     experience_pipeline_config=experience_pipeline_config,
-    cv_storage_bucket=os.getenv("BACKEND_CV_STORAGE_BUCKET"),
+    enable_cv_upload=_enable_cv_upload,
+    cv_storage_bucket=os.getenv("BACKEND_CV_STORAGE_BUCKET", ""),
     cv_max_uploads_per_user=os.getenv("BACKEND_CV_MAX_UPLOADS_PER_USER") or DEFAULT_MAX_UPLOADS_PER_USER,
     cv_rate_limit_per_minute=os.getenv("BACKEND_CV_RATE_LIMIT_PER_MINUTE") or DEFAULT_RATE_LIMIT_PER_MINUTE,
     language_config=language_config,

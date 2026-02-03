@@ -64,7 +64,7 @@ describe.each([
 
   ["FRONTEND_ENABLE_METRICS", getMetricsEnabled],
   ["FRONTEND_METRICS_CONFIG", getMetricsConfig],
-  ["FRONTEND_ENABLE_CV_UPLOAD", getCvUploadEnabled],
+  ["GLOBAL_ENABLE_CV_UPLOAD", getCvUploadEnabled],
   ["FRONTEND_FEATURES", getFeatures],
   ["FRONTEND_SUPPORTED_LOCALES", getSupportedLocales],
   ["FRONTEND_DEFAULT_LOCALE", getDefaultLocale],
