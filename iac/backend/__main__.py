@@ -85,6 +85,7 @@ def main():
 
         # Branding
         global_product_name=getenv("GLOBAL_PRODUCT_NAME", False, False),
+        enable_cv_upload=getenv("GLOBAL_ENABLE_CV_UPLOAD", False, False),
     )
 
     # version of the artifacts to deploy

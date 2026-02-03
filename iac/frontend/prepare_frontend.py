@@ -126,7 +126,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
 
     # features
     features = getenv("FRONTEND_FEATURES", False, False)
-    enable_cv_upload: Optional[str] = getenv("FRONTEND_ENABLE_CV_UPLOAD", False, False)
+    enable_cv_upload: Optional[str] = getenv("GLOBAL_ENABLE_CV_UPLOAD", False, False)
 
     # branding
     global_product_name: Optional[str] = getenv("GLOBAL_PRODUCT_NAME", False, False)
@@ -163,7 +163,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "GLOBAL_DISABLE_LOGIN_CODE": base64_encode(disable_login_code),
         "GLOBAL_DISABLE_REGISTRATION_CODE": base64_encode(disable_registration_code),
         "FRONTEND_REGISTRATION_CODE": base64_encode(registration_code),
-        "FRONTEND_ENABLE_CV_UPLOAD": base64_encode(enable_cv_upload or ""),
+        "GLOBAL_ENABLE_CV_UPLOAD": base64_encode(enable_cv_upload or ""),
         "FRONTEND_DISABLE_REGISTRATION": base64_encode(disable_registration),
         "FRONTEND_DISABLE_SOCIAL_AUTH": base64_encode(disable_social_auth),
         "FRONTEND_FEATURES": base64_encode(features),

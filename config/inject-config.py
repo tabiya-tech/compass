@@ -13,7 +13,10 @@ BACKEND_ENV_MAP: Dict[str, str] = {
     'GLOBAL_PRODUCT_NAME': 'branding.appName',
 
     # Invitation Codes
-    "GLOBAL_DISABLE_REGISTRATION_CODE": "auth.disableRegistrationCode"
+    "GLOBAL_DISABLE_REGISTRATION_CODE": "auth.disableRegistrationCode",
+
+    # CV Upload
+    "GLOBAL_ENABLE_CV_UPLOAD": "cv.enabled",
 
     # Add more backend env vars here
 }
@@ -31,7 +34,10 @@ FRONTEND_ENV_MAP: Dict[str, str] = {
 
     # Invitation Codes
     "GLOBAL_DISABLE_LOGIN_CODE": "auth.disableLoginCode",
-    "GLOBAL_DISABLE_REGISTRATION_CODE": "auth.disableRegistrationCode"
+    "GLOBAL_DISABLE_REGISTRATION_CODE": "auth.disableRegistrationCode",
+
+    # CV Upload
+    "GLOBAL_ENABLE_CV_UPLOAD": "cv.enabled",
 }
 
 FRONTEND_JSON_FIELDS = {

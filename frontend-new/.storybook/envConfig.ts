@@ -18,7 +18,7 @@ export const getEnvConfig = async (head: string | undefined = ''): Promise<strin
       enableLogs: false,
       levels: ["error"]
     })),
-    "FRONTEND_ENABLE_CV_UPLOAD": btoa("true")
+    "GLOBAL_ENABLE_CV_UPLOAD": btoa("true")
   };
   // Try to load env.js
   console.debug('[Storybook EnvConfig] Attempting to load env.js');

@@ -179,8 +179,7 @@ The backend uses the following environment variables:
   > **Coordination:** When enabling this setting, also set the corresponding frontend variable `GLOBAL_DISABLE_REGISTRATION_CODE` to hide the registration code input from users. Mismatched configuration (frontend hides input but backend requires code, or vice versa) will lead to confusing user errors.
 
   > Note: The `FRONTEND_URL` should be set irrespective of the `TARGET_ENVIRONMENT` value.
-
-
+- `GLOBAL_ENABLE_CV_UPLOAD`: (optional) Set to `True` to enable CV upload feature.
 
 The backend supports the use of a `.env` file to set the environment variables. Create a `.env` file in the root
 directory of the backend project and set the environment variables as follows:

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.countries import Country
 from app.i18n.language_config import LanguageConfig
@@ -66,8 +66,14 @@ class ApplicationConfig(BaseModel):
     This is a dictionary that can contain various settings for the pipeline.
     """
 
+    enable_cv_upload: bool = False
+    """
+    A flag to enable or disable the CV upload feature.
+    When disabled, CV upload routes will not be registered and CV indexes will not be created.
+    """
+
     # CV storage and upload limits
-    cv_storage_bucket: str
+    cv_storage_bucket: Optional[str] = ""
     cv_max_uploads_per_user: Optional[int] = Field(default=DEFAULT_MAX_UPLOADS_PER_USER, gt=0)
     cv_rate_limit_per_minute: Optional[int] = Field(default=DEFAULT_RATE_LIMIT_PER_MINUTE, gt=0)
 
@@ -85,6 +91,15 @@ class ApplicationConfig(BaseModel):
     """
     A flag to disable registration code validation for registered users.
     """
+
+    @model_validator(mode='after')
+    def check_cv_upload_configurations(self) -> "ApplicationConfig":
+        # Check that the CV upload configurations are valid.
+        # If the cv upload feature is enabled, then the cv_storage bucket should be provided
+        if self.enable_cv_upload and not self.cv_storage_bucket:
+            raise ValueError("The cv_storage_bucket must be provided when the cv upload feature is enabled.")
+
+        return self
 
 
 _application_config: ApplicationConfig | None = None
