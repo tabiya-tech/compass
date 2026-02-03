@@ -227,8 +227,5 @@ class E2EChatExecutor:
             skills_data=skills_data
         )
         
-        # Calculate repetition rate
-        self._metrics_collector.calculate_repetition_rate()
-        
-        # Finalize
+        # Finalize (includes repetition-rate calculation)
         self._metrics_collector.finalize()
