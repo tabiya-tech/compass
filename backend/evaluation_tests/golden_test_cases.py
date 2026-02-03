@@ -22,7 +22,6 @@ from textwrap import dedent
 
 from app.agent.experience import WorkType
 from app.countries import Country
-from app.i18n.types import Locale
 from evaluation_tests.conversation_libs.conversation_test_function import Evaluation
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
 from evaluation_tests.core_e2e_tests_cases import E2ESpecificTestCase
