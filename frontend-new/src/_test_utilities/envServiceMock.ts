@@ -16,6 +16,7 @@ jest.mock("src/envService", () => ({
   getBrowserTabTitle: jest.fn(() => "Mocked Browser Tab Title"),
   getMetaDescription: jest.fn(() => "Mocked Meta Description"),
   getSeoEnvVar: jest.fn(() => "{}"),
+  getSkillsReportOutputConfigEnvVar: jest.fn(() => "{}"),
   ensureRequiredEnvVars: jest.fn(() => {}),
   getLogoUrl: jest.fn(() => "mock-logo-url"),
   getFaviconUrl: jest.fn(() => "mock-favicon-url"),

@@ -30,6 +30,7 @@ import RestoreExperiencesDrawer from "src/experiences/experiencesDrawer/componen
 import { ExperienceError } from "src/error/commonErrors";
 import RestoreIcon from "src/theme/Icons/RestoreIcon";
 import { useTranslation } from "react-i18next";
+import { getSkillsReportOutputConfig } from "../report/config/getConfig";
 
 const LazyLoadedDownloadDropdown = lazyWithPreload(
   () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown")
@@ -291,6 +292,10 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     }
   };
 
+  const outputConfig = useMemo(() => {
+    return getSkillsReportOutputConfig();
+  }, []);
+
   // Group experiences by work type using experiences with filtered skills
   const groupedExperiences = useMemo(() => groupExperiencesByWorkType(sortedExperiences), [sortedExperiences]);
 
@@ -357,6 +362,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                   experiences={exploredExperiences}
                   conversationConductedAt={conversationConductedAt}
                   disabled={disableDownloadButton}
+                  outputConfig={outputConfig}
                 />
               </Suspense>
             </Box>

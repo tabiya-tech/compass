@@ -1,6 +1,7 @@
 import { Packer } from "docx";
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import { constructSkillReportDocument } from "src/experiences/report/reportDocx/constructSkillReportDocument";
+import { SkillsReportOutputConfig } from "src/experiences/report/config/types";
 
 interface SkillReportDocxProps {
   name: string;
@@ -9,6 +10,7 @@ interface SkillReportDocxProps {
   address: string;
   experiences: Experience[];
   conversationConductedAt: string | null;
+  config: SkillsReportOutputConfig;
 }
 
 const SkillReportDocx = async (props: SkillReportDocxProps): Promise<Blob> => {

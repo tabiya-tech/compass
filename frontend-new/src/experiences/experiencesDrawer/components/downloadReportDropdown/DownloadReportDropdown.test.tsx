@@ -12,7 +12,7 @@ import { mockExperiences } from "src/experiences/experienceService/_test_utiliti
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import { PDFReportDownloadProvider } from "src/experiences/report/reportPdf/provider";
 import { DocxReportDownloadProvider } from "src/experiences/report/reportDocx/provider";
-import { waitFor } from "@testing-library/react";
+import { waitFor, within } from "@testing-library/react";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
@@ -20,6 +20,7 @@ import MetricsService from "src/metrics/metricsService";
 import { EventType } from "src/metrics/types";
 import { MetricsError } from "src/error/commonErrors";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
+import { DownloadFormat, SkillsReportOutputConfig } from "src/experiences/report/config/types";
 
 // mock the DownloadReportButton
 jest.mock("src/experiences/experiencesDrawer/components/downloadReportButton/DownloadReportButton", () => {
@@ -82,6 +83,8 @@ jest.mock("src/experiences/report/reportDocx/provider", () => {
   };
 });
 
+const constructConfig = (downloadFormats: DownloadFormat[]) => ({ downloadFormats }) as SkillsReportOutputConfig;
+
 describe("DownloadReportDropdown", () => {
   const mockData = {
     name: "John Doe",
@@ -90,6 +93,7 @@ describe("DownloadReportDropdown", () => {
     address: "123 Main St",
     conversationConductedAt: "2021-06-01T00:00:00",
     experiences: mockExperiences,
+    outputConfig: { downloadFormats: [DownloadFormat.PDF, DownloadFormat.DOCX] } as SkillsReportOutputConfig,
   };
 
   beforeEach(() => {
@@ -236,5 +240,96 @@ describe("DownloadReportDropdown", () => {
     expect(console.error).toHaveBeenCalledWith(
       new MetricsError(`Unable to send CVDownload metrics: User id: undefined, Session id: undefined`)
     );
+  });
+
+  describe("Format Configuration", () => {
+    test("should only show PDF option when config has only PDF format", async () => {
+      // GIVEN a config with only PDF format
+      const givenEnabledFormats = [DownloadFormat.PDF];
+
+      // WHEN the component is rendered with the config
+      render(<DownloadReportDropdown {...mockData} outputConfig={constructConfig(givenEnabledFormats)} />);
+      // AND the dropdown is shown
+      const downloadReportButton = screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER);
+      await userEvent.click(downloadReportButton);
+
+      // THEN only the PDF option should be shown
+      expect(screen.getByTestId(MENU_ITEM_ID.PDF)).toBeInTheDocument();
+      expect(screen.queryByTestId(MENU_ITEM_ID.DOCX)).not.toBeInTheDocument();
+    });
+
+    test("should only show DOCX option when config has only DOCX format", async () => {
+      // GIVEN a config with only DOCX format
+      const givenEnabledFormats = [DownloadFormat.DOCX];
+
+      // WHEN the component is rendered with the config
+      render(<DownloadReportDropdown {...mockData} outputConfig={constructConfig(givenEnabledFormats)} />);
+
+      // AND the dropdown is shown
+      const downloadReportButton = screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER);
+      await userEvent.click(downloadReportButton);
+
+      // THEN only the DOCX option should be shown
+      expect(screen.getByTestId(MENU_ITEM_ID.DOCX)).toBeInTheDocument();
+      expect(screen.queryByTestId(MENU_ITEM_ID.PDF)).not.toBeInTheDocument();
+    });
+
+    test("should maintain format order from config (PDF first)", async () => {
+      // GIVEN a config with PDF first, then DOCX
+      const givenEnabledFormats = [DownloadFormat.PDF, DownloadFormat.DOCX];
+
+      // WHEN the component is rendered with the config
+      render(<DownloadReportDropdown {...mockData} outputConfig={constructConfig(givenEnabledFormats)} />);
+
+      // AND the dropdown is shown
+      const downloadReportButton = screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER);
+      await userEvent.click(downloadReportButton);
+
+      // THEN both options should be shown
+      const contextMenu = screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
+      const menuItemsContainer = within(contextMenu);
+      // AND PDF should be first, DOCX should be second
+      const pdfItem = menuItemsContainer.getByTestId(MENU_ITEM_ID.PDF);
+      const docxItem = menuItemsContainer.getByTestId(MENU_ITEM_ID.DOCX);
+      expect(pdfItem).toBeInTheDocument();
+      expect(docxItem).toBeInTheDocument();
+      // Verify order by comparing their positions in the DOM
+      expect(pdfItem.compareDocumentPosition(docxItem)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+
+    test("should maintain format order from config (DOCX first)", async () => {
+      // GIVEN a config with DOCX first, then PDF
+      const givenEnabledFormats = [DownloadFormat.DOCX, DownloadFormat.PDF];
+
+      // WHEN the component is rendered with the config
+      render(<DownloadReportDropdown {...mockData} outputConfig={constructConfig(givenEnabledFormats)} />);
+      // AND the dropdown is shown
+      const downloadReportButton = screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER);
+      await userEvent.click(downloadReportButton);
+
+      // THEN both options should be shown
+      const contextMenu = screen.getByTestId(CONTEXT_MENU_DATA_TEST_ID.MENU);
+      const menuItemsContainer = within(contextMenu);
+      // AND DOCX should be first, PDF should be second
+      const docxItem = menuItemsContainer.getByTestId(MENU_ITEM_ID.DOCX);
+      const pdfItem = menuItemsContainer.getByTestId(MENU_ITEM_ID.PDF);
+      expect(docxItem).toBeInTheDocument();
+      expect(pdfItem).toBeInTheDocument();
+      // Verify order by comparing their positions in the DOM
+      expect(docxItem.compareDocumentPosition(pdfItem)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+
+    test("should use default config when no config prop is provided", async () => {
+      // GIVEN the component is rendered without a config prop
+      render(<DownloadReportDropdown {...mockData} />);
+
+      // WHEN the dropdown is shown
+      const downloadReportButton = screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER);
+      await userEvent.click(downloadReportButton);
+
+      // THEN both PDF and DOCX options should be shown (default behavior)
+      expect(screen.getByTestId(MENU_ITEM_ID.PDF)).toBeInTheDocument();
+      expect(screen.getByTestId(MENU_ITEM_ID.DOCX)).toBeInTheDocument();
+    });
   });
 });

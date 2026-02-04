@@ -48,7 +48,9 @@ exports[`ExperiencesReportContent should render ExperiencesReportContent correct
           x="0"
           y="0"
         >
-          (New York, NY)
+          (
+          New York, NY
+          )
         </text>
       </view>
     </view>

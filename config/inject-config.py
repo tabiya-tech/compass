@@ -30,6 +30,10 @@ FRONTEND_ENV_MAP: Dict[str, str] = {
     'FRONTEND_APP_ICON_URL': 'branding.assets.appIcon',
     'FRONTEND_THEME_CSS_VARIABLES': 'branding.theme',
     'FRONTEND_SEO': 'branding.seo',
+
+    # Skills report
+    "FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG": "skillsReport",
+
     # Add more frontend env.js keys here
 
     # Invitation Codes
@@ -43,6 +47,7 @@ FRONTEND_ENV_MAP: Dict[str, str] = {
 FRONTEND_JSON_FIELDS = {
     'FRONTEND_THEME_CSS_VARIABLES',
     'FRONTEND_SEO',
+    'FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG',
     # Add more JSON.stringify fields here
 }
 

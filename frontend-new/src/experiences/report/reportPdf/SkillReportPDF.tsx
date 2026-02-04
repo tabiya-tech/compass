@@ -13,6 +13,7 @@ import Footer from "src/experiences/report/reportPdf/components/Footer";
 import ExperiencesReportContent from "src/experiences/report/reportPdf/components/experiencesReportContent/ExperiencesReportContent";
 import SkillsDescription from "src/experiences/report/reportPdf/components/SkillsDescription";
 import styles from "src/experiences/report/reportPdf/styles";
+import { SkillsReportOutputConfig } from "src/experiences/report/config/types";
 
 interface SkillReportProps {
   name: string;
@@ -21,6 +22,7 @@ interface SkillReportProps {
   address: string;
   experiences: Experience[];
   conversationConductedAt: string | null;
+  config: SkillsReportOutputConfig;
 }
 
 const uniqueId = "5a296552-f91f-4c38-b88f-542cacaced8e";
@@ -45,6 +47,7 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
   address,
   experiences,
   conversationConductedAt,
+  config,
 }) => {
   // Group experiences by work type
   const {
@@ -69,7 +72,7 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
           </Text>
         </View>
         {experiences.map((experience) => (
-          <ExperiencesReportContent key={experience.UUID} experience={experience} />
+          <ExperiencesReportContent key={experience.UUID} experience={experience} reportConfig={config.report} />
         ))}
       </View>
     ) : null;
@@ -95,12 +98,9 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
       <Page size="A4" style={styles.page}>
         <View style={styles.body} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY}>
           <View fixed style={styles.logoContainer}>
-            <Image
-              src={getBase64Image(ReportContent.IMAGE_URLS.COMPASS_LOGO)}
-              style={styles.compassImage}
-              source={undefined}
-            />
-            <Image src={getBase64Image(ReportContent.IMAGE_URLS.OXFORD_LOGO)} style={styles.image} source={undefined} />
+            {config.logos.map((logo, index) => (
+              <Image key={`logo-${index}`} src={getBase64Image(logo.url)} style={logo.pdfStyles} source={undefined} />
+            ))}
           </View>
           <Text x={0} y={0} style={styles.title} data-testid={DATA_TEST_ID.SKILL_REPORT_TITLE}>
             {ReportContent.SKILLS_REPORT_TITLE}
@@ -123,9 +123,11 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
 
             {renderPersonalInfo(email, ReportContent.IMAGE_URLS.EMAIL_ICON, DATA_TEST_ID.SKILL_REPORT_EMAIL)}
           </View>
-          <Text x={0} y={0} style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
-            {prettifyText(ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt)))}
-          </Text>
+          {config.report.summary.show && (
+            <Text x={0} y={0} style={styles.bodyText} data-testid={DATA_TEST_ID.SKILL_REPORT_BODY_TEXT}>
+              {prettifyText(ReportContent.REPORT_BODY_TEXT(formatDate(conversationConductedAt)))}
+            </Text>
+          )}
           <View style={styles.divider} />
           <Text x={0} y={0} style={styles.experiencesTitle} data-testid={DATA_TEST_ID.SKILL_REPORT_EXPERIENCES_TITLE}>
             {ReportContent.EXPERIENCES_TITLE}

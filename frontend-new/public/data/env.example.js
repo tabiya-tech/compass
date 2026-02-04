@@ -24,14 +24,15 @@ window.tabiyaConfig = {
   FRONTEND_METRICS_CONFIG: btoa(
     JSON.stringify({
       flushIntervalMs: 15000, // Interval (in ms) at which metrics are flushed.
-      events: {  // Turn on/off specific events
+      events: {
+        // Turn on/off specific events
         CV_DOWNLOADED: { enabled: true },
         DEMOGRAPHICS: { enabled: true },
         USER_LOCATION: { enabled: true },
         DEVICE_SPECIFICATION: { enabled: true },
         NETWORK_INFORMATION: { enabled: true },
-        UI_INTERACTION: { enabled: true }
-      }
+        UI_INTERACTION: { enabled: true },
+      },
     })
   ),
 
@@ -43,7 +44,7 @@ window.tabiyaConfig = {
   // ################################################################
   // Default locale (used as initial UI language if user preference not set)
   FRONTEND_DEFAULT_LOCALE: btoa("en-US"),
-  FRONTEND_SUPPORTED_LOCALES: btoa(JSON.stringify(["en-US","es-US"])),
+  FRONTEND_SUPPORTED_LOCALES: btoa(JSON.stringify(["en-US", "es-US"])),
 
   // ################################################################
   // #       Auth Settings.
@@ -70,13 +71,16 @@ window.tabiyaConfig = {
   // ################################################################
   GLOBAL_PRODUCT_NAME: btoa("Compass"),
   FRONTEND_BROWSER_TAB_TITLE: btoa("Compass"),
-  FRONTEND_META_DESCRIPTION: btoa("Welcome to Compass! An AI-powered career assistant that helps jobseekers identify and showcase their skills."),
+  FRONTEND_META_DESCRIPTION: btoa(
+    "Welcome to Compass! An AI-powered career assistant that helps jobseekers identify and showcase their skills."
+  ),
   FRONTEND_SEO: btoa(
     JSON.stringify({
       name: "Compass",
       url: "https://www.example.org/compass",
       image: "https://www.example.org/assets/logo.svg",
-      description: "Compass is an AI-powered career assistant that helps jobseekers discover and describe their skills.",
+      description:
+        "Compass is an AI-powered career assistant that helps jobseekers discover and describe their skills.",
     })
   ),
   FRONTEND_LOGO_URL: btoa("/logo.svg"),
@@ -95,6 +99,45 @@ window.tabiyaConfig = {
       "text-primary": "0 33 71",
       "text-secondary": "65 64 61",
       "text-accent": "38 94 167",
+    })
+  ),
+  FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG: btoa(
+    JSON.stringify({
+      logos: [
+        {
+          url: "/logo.png",
+          docxStyles: {
+            width: 250,
+            height: 62,
+          },
+          pdfStyles: {
+            height: 46,
+          },
+        },
+        {
+          url: "/oxford-logo.png",
+          docxStyles: {
+            width: 200,
+            height: 58,
+          },
+          pdfStyles: {
+            height: 42,
+          },
+        },
+      ],
+      downloadFormats: ["DOCX", "PDF"],
+      report: {
+        summary: {
+          show: true,
+        },
+        experienceDetails: {
+          title: true,
+          summary: true,
+          location: true,
+          dateRange: true,
+          companyName: true,
+        },
+      },
     })
   ),
 };
