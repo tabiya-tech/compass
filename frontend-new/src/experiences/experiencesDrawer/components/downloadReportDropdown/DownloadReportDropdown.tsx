@@ -12,6 +12,8 @@ import { EventType } from "src/metrics/types";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { MetricsError } from "src/error/commonErrors";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import { DownloadFormat, SkillsReportOutputConfig } from "src/experiences/report/config/types";
+import { getSkillsReportOutputConfig } from "src/experiences/report/config/getConfig";
 
 interface DownloadReportDropdownProps {
   name: string;
@@ -21,6 +23,7 @@ interface DownloadReportDropdownProps {
   experiences: Experience[];
   conversationConductedAt: string | null;
   disabled?: boolean;
+  outputConfig?: SkillsReportOutputConfig;
 }
 
 export enum CVFormat {
@@ -55,8 +58,9 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
     conversationConductedAt: props.conversationConductedAt ?? new Date().toISOString(),
   };
 
-  const docxsReportProvider = new DocxReportDownloadProvider();
-  const pdfReportProvider = new PDFReportDownloadProvider();
+  const outputConfig = props.outputConfig ?? getSkillsReportOutputConfig();
+  const docxsReportProvider = new DocxReportDownloadProvider(outputConfig);
+  const pdfReportProvider = new PDFReportDownloadProvider(outputConfig);
 
   const handleDownload = async (
     downloadProvider: { download: (props: ReportProps) => Promise<void> },
@@ -89,20 +93,26 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
     }
   };
 
-  const contextMenuItems: MenuItemConfig[] = [
-    {
+  // Define all available menu items
+  const allMenuItems: Record<DownloadFormat, MenuItemConfig> = {
+    [DownloadFormat.PDF]: {
       id: MENU_ITEM_ID.PDF,
       text: MENU_ITEM_TEXT.PDF,
       disabled: !isOnline,
       action: () => handleDownload(pdfReportProvider, CVFormat.PDF),
     },
-    {
+    [DownloadFormat.DOCX]: {
       id: MENU_ITEM_ID.DOCX,
       text: MENU_ITEM_TEXT.DOCX,
       disabled: !isOnline,
       action: () => handleDownload(docxsReportProvider, CVFormat.DOCX),
     },
-  ];
+  };
+
+  // Filter and order menu items based on config
+  const contextMenuItems: MenuItemConfig[] = outputConfig.downloadFormats
+    .map((format) => allMenuItems[format])
+    .filter((item): item is MenuItemConfig => Boolean(item));
 
   return (
     <>

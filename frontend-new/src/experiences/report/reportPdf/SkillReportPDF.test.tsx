@@ -5,6 +5,7 @@ import SkillReportPDF, { DATA_TEST_ID } from "src/experiences/report/reportPdf/S
 import { render, screen } from "src/_test_utilities/test-utils";
 import { mockExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
+import { defaultSkillsReportOutputConfig } from "src/experiences/report/config/default";
 
 describe("Report", () => {
   test("should render Report correctly", () => {
@@ -18,6 +19,7 @@ describe("Report", () => {
         address="1234 Main St"
         experiences={experiences}
         conversationConductedAt="2021-06-01T00:00:00Z"
+        config={defaultSkillsReportOutputConfig}
       />
     );
 

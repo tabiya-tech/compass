@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Default Config should match snapshot 1`] = `
+Object {
+  "downloadFormats": Array [
+    "DOCX",
+    "PDF",
+  ],
+  "logos": Array [
+    Object {
+      "docxStyles": Object {
+        "height": 62,
+        "width": 250,
+      },
+      "pdfStyles": Object {
+        "height": 46,
+      },
+      "url": "/logo.png",
+    },
+    Object {
+      "docxStyles": Object {
+        "height": 58,
+        "width": 200,
+      },
+      "pdfStyles": Object {
+        "height": 42,
+      },
+      "url": "/oxford-logo.png",
+    },
+  ],
+  "report": Object {
+    "experienceDetails": Object {
+      "companyName": true,
+      "dateRange": true,
+      "location": true,
+      "summary": true,
+      "title": true,
+    },
+    "summary": Object {
+      "show": true,
+    },
+  },
+}
+`;

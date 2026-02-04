@@ -4,6 +4,7 @@ import { generateExperience } from "./experiencesReportContent/ExperiencesReport
 import { COLORS, getBase64Image, groupExperiencesByWorkType } from "src/experiences/report/util";
 import { ReportContent } from "src/experiences/report/reportContent";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
+import { ReportConfig } from "src/experiences/report/config/types";
 
 // Create a paragraph with an image and text
 const createParagraphWithImageAndText = async (text: string, imageUrl: string) => {
@@ -53,7 +54,8 @@ const constructWorkTypeSection = async (
   paragraphs: Paragraph[],
   experiences: Experience[],
   title: string,
-  iconUrl: string
+  iconUrl: string,
+  reportConfig: ReportConfig
 ): Promise<void> => {
   if (experiences.length === 0) {
     return;
@@ -61,11 +63,15 @@ const constructWorkTypeSection = async (
 
   paragraphs.push(
     await createParagraphWithImageAndText(title, iconUrl),
-    ...experiences.flatMap((experience) => generateExperience(experience))
+    ...experiences.flatMap((experience) => generateExperience(experience, reportConfig))
   );
 };
 
-export const constructExperienceList = async (paragraphs: Paragraph[], experiences: Experience[]) => {
+export const constructExperienceList = async (
+  paragraphs: Paragraph[],
+  experiences: Experience[],
+  reportConfig: ReportConfig
+) => {
   constructExperiencesSectionHeader(paragraphs);
   // Group experiences by work type
   const {
@@ -81,34 +87,39 @@ export const constructExperienceList = async (paragraphs: Paragraph[], experienc
     paragraphs,
     selfEmploymentExperiences,
     ReportContent.SELF_EMPLOYMENT_TITLE,
-    ReportContent.IMAGE_URLS.SELF_EMPLOYMENT_ICON
+    ReportContent.IMAGE_URLS.SELF_EMPLOYMENT_ICON,
+    reportConfig
   );
 
   await constructWorkTypeSection(
     paragraphs,
     salaryWorkExperiences,
     ReportContent.SALARY_WORK_TITLE,
-    ReportContent.IMAGE_URLS.EMPLOYEE_ICON
+    ReportContent.IMAGE_URLS.EMPLOYEE_ICON,
+    reportConfig
   );
 
   await constructWorkTypeSection(
     paragraphs,
     unpaidWorkExperiences,
     ReportContent.UNPAID_WORK_TITLE,
-    ReportContent.IMAGE_URLS.COMMUNITY_WORK_ICON
+    ReportContent.IMAGE_URLS.COMMUNITY_WORK_ICON,
+    reportConfig
   );
 
   await constructWorkTypeSection(
     paragraphs,
     traineeWorkExperiences,
     ReportContent.TRAINEE_WORK_TITLE,
-    ReportContent.IMAGE_URLS.TRAINEE_WORK_ICON
+    ReportContent.IMAGE_URLS.TRAINEE_WORK_ICON,
+    reportConfig
   );
 
   await constructWorkTypeSection(
     paragraphs,
     uncategorizedExperiences,
     ReportContent.UNCATEGORIZED_TITLE,
-    ReportContent.IMAGE_URLS.QUIZ_ICON
+    ReportContent.IMAGE_URLS.QUIZ_ICON,
+    reportConfig
   );
 };

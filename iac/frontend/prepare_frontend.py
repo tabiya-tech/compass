@@ -137,6 +137,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     frontend_app_icon_url: Optional[str] = getenv("FRONTEND_APP_ICON_URL", False, False)
     frontend_theme_css_variables: Optional[str] = getenv("FRONTEND_THEME_CSS_VARIABLES", False, False)
     frontend_seo: Optional[str] = getenv("FRONTEND_SEO", False, False)
+    skills_report_config: Optional[str] = getenv("FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG", False, False)
 
     # validations, apart from the keys are required, some values also need to be validated
     # the sensitive encryption key should be a valid RSA public key.
@@ -177,6 +178,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "FRONTEND_APP_ICON_URL": base64_encode(frontend_app_icon_url),
         "FRONTEND_THEME_CSS_VARIABLES": base64_encode(frontend_theme_css_variables),
         "FRONTEND_SEO": base64_encode(frontend_seo),
+        "FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG": base64_encode(skills_report_config)
     }
 
     env_json_content = f"""window.tabiyaConfig = {json.dumps(frontend_env_json, indent=4)};"""

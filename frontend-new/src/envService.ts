@@ -30,6 +30,7 @@ export enum EnvVariables {
   FRONTEND_FAVICON_URL = "FRONTEND_FAVICON_URL",
   FRONTEND_APP_ICON_URL = "FRONTEND_APP_ICON_URL",
   FRONTEND_THEME_CSS_VARIABLES = "FRONTEND_THEME_CSS_VARIABLES",
+  FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG = "FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG",
 }
 
 export const requiredEnvVariables = [
@@ -210,6 +211,8 @@ export const getBrowserTabTitle = () => getEnv(EnvVariables.FRONTEND_BROWSER_TAB
 export const getMetaDescription = () => getEnv(EnvVariables.FRONTEND_META_DESCRIPTION);
 
 export const getSeoEnvVar = () => getEnv(EnvVariables.FRONTEND_SEO);
+
+export const getSkillsReportOutputConfigEnvVar = () => getEnv(EnvVariables.FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG);
 
 export const getLogoUrl = () => getEnv(EnvVariables.FRONTEND_LOGO_URL);
 

@@ -191,7 +191,9 @@ exports[`Report should render Report correctly 1`] = `
                     x="0"
                     y="0"
                   >
-                    (New York, NY)
+                    (
+                    New York, NY
+                    )
                   </text>
                 </view>
               </view>
@@ -301,7 +303,9 @@ exports[`Report should render Report correctly 1`] = `
                     x="0"
                     y="0"
                   >
-                    (New York, NY)
+                    (
+                    New York, NY
+                    )
                   </text>
                 </view>
               </view>

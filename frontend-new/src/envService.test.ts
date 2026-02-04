@@ -26,6 +26,7 @@ import {
   getDefaultLocale,
   getSupportedLocales,
   getRegistrationCodeDisabled,
+  getSkillsReportOutputConfigEnvVar,
 } from "./envService";
 import { getRandomString } from "./_test_utilities/specialCharacters";
 
@@ -69,6 +70,7 @@ describe.each([
   ["FRONTEND_SUPPORTED_LOCALES", getSupportedLocales],
   ["FRONTEND_DEFAULT_LOCALE", getDefaultLocale],
   ["GLOBAL_DISABLE_REGISTRATION_CODE", getRegistrationCodeDisabled],
+  ["FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG", getSkillsReportOutputConfigEnvVar],
 ])("Env Getters", (ENV_KEY, getterFn) => {
   describe(`${ENV_KEY} Getter (${getterFn.name}) tests`, () => {
     test(`getAPI should not fail if the ${ENV_KEY} is not set`, () => {

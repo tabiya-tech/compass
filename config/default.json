@@ -34,5 +34,42 @@
   },
   "cv": {
     "enabled": true
+  },
+  "skillsReport": {
+    "logos": [
+      {
+        "url": "/logo.png",
+        "docxStyles": {
+          "width": 250,
+          "height": 62
+        },
+        "pdfStyles": {
+          "height": 46
+        }
+      },
+      {
+        "url": "/oxford-logo.png",
+        "docxStyles": {
+          "width": 200,
+          "height": 58
+        },
+        "pdfStyles": {
+          "height": 42
+        }
+      }
+    ],
+    "downloadFormats": ["DOCX", "PDF"],
+    "report": {
+      "summary": {
+        "show": true
+      },
+      "experienceDetails": {
+        "title": true,
+        "summary": true,
+        "location": true,
+        "dateRange": true,
+        "companyName": true
+      }
+    }
   }
 }

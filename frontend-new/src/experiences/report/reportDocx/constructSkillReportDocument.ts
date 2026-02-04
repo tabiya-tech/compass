@@ -7,6 +7,7 @@ import constructSkillsDescription from "src/experiences/report/reportDocx/compon
 import HeaderComponent from "src/experiences/report/reportDocx/components/Header";
 import FooterComponent from "src/experiences/report/reportDocx/components/Footer";
 import { constructExperienceList } from "src/experiences/report/reportDocx/components/ConstructExperienceList";
+import { SkillsReportOutputConfig } from "src/experiences/report/config/types";
 
 export interface SkillReportDocumentProps {
   name: string;
@@ -15,6 +16,7 @@ export interface SkillReportDocumentProps {
   address: string;
   experiences: Experience[];
   conversationConductedAt: string | null;
+  config: SkillsReportOutputConfig;
 }
 
 // Create a paragraph with an image
@@ -124,7 +126,7 @@ const constructSectionDivider = (paragraphs: Paragraph[]): void => {
 };
 
 export const constructSkillReportDocument = async (props: SkillReportDocumentProps): Promise<Document> => {
-  const { name, email, phone, address, experiences, conversationConductedAt } = props;
+  const { name, email, phone, address, experiences, conversationConductedAt, config } = props;
 
   const paragraphs: Paragraph[] = [];
 
@@ -134,12 +136,15 @@ export const constructSkillReportDocument = async (props: SkillReportDocumentPro
   // Add personal information section
   await constructPersonalInformationSection(paragraphs, name, address, phone, email);
 
-  // Add report description
-  constructReportDescription(paragraphs, conversationConductedAt);
+  // Add report description only if it is enabled in config
+  if (config.report.summary.show) {
+    constructReportDescription(paragraphs, conversationConductedAt);
+  }
+
   constructSectionDivider(paragraphs);
 
   // Add the list of experiences
-  await constructExperienceList(paragraphs, experiences);
+  await constructExperienceList(paragraphs, experiences, config.report);
 
   // Add skills description (Glossary)
   constructSkillsDescription(paragraphs, experiences);
@@ -158,7 +163,7 @@ export const constructSkillReportDocument = async (props: SkillReportDocumentPro
     },
     sections: [
       {
-        headers: { default: await HeaderComponent() },
+        headers: { default: await HeaderComponent(config.logos) },
         footers: { default: await FooterComponent() },
         properties: {
           page: {

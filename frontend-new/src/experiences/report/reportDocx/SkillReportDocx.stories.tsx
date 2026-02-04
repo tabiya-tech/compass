@@ -3,6 +3,7 @@ import { Meta } from "@storybook/react";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { generateRandomExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import { DocxReportDownloadProvider } from "./provider";
+import { defaultSkillsReportOutputConfig } from "../config/default";
 
 const meta: Meta = {
   title: "Report/ReportDocx",
@@ -19,7 +20,7 @@ const mockedData = {
   experiences: generateRandomExperiences(2),
   conversationConductedAt: "2021-08-01T00:00:00Z",
 };
-const reportDownloadProvider = new DocxReportDownloadProvider();
+const reportDownloadProvider = new DocxReportDownloadProvider(defaultSkillsReportOutputConfig);
 
 export const Shown = () => (
   <PrimaryButton onClick={() => reportDownloadProvider.download(mockedData)}>Download Report Docx</PrimaryButton>

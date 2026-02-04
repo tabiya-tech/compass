@@ -2,6 +2,7 @@ import { Meta } from "@storybook/react";
 import { generateRandomExperiences } from "src/experiences/experienceService/_test_utilities/mockExperiencesResponses";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { PDFReportDownloadProvider } from "./provider";
+import { defaultSkillsReportOutputConfig } from "../config/default";
 
 const meta: Meta = {
   title: "Report/ReportPdf",
@@ -20,7 +21,7 @@ const mockedData = {
   conversationConductedAt: "2021-08-01T00:00:00Z",
 };
 
-const reportDownloadProvider = new PDFReportDownloadProvider();
+const reportDownloadProvider = new PDFReportDownloadProvider(defaultSkillsReportOutputConfig);
 
 export const Shown = () => (
   <PrimaryButton onClick={() => reportDownloadProvider.download(mockedData)}>Download Report Pdf</PrimaryButton>
