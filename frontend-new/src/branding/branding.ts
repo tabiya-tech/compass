@@ -4,6 +4,7 @@ import {
   getMetaDescription,
   getFaviconUrl,
   getThemeCssVariables,
+  getLogoUrl,
 } from "src/envService";
 import { getSeoConfig, SeoConfig } from "src/branding/seoConfig";
 
@@ -87,6 +88,14 @@ export const applyBrandingFromEnv = (): void => {
   const appIconUrl = getAppIconUrl();
   if (appIconUrl) {
     upsertLinkHref("apple-touch-icon", appIconUrl);
+  }
+
+  const logUrl = getLogoUrl();
+  if (logUrl) {
+    const img = document.getElementById("loading-logo");
+    if (img instanceof HTMLImageElement) {
+      img.src = logUrl;
+    }
   }
 
   // JSON-LD structured data overrides.
