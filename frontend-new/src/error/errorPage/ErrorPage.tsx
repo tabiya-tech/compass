@@ -2,6 +2,7 @@ import { Box, Typography } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
+import { getLogoUrl } from "src/envService";
 
 const uniqueId = "37d307ae-4f1e-4d8d-bafe-fd642f8af4ab";
 
@@ -17,6 +18,10 @@ interface ErrorPageProps {
 
 const ErrorPage: React.FC<ErrorPageProps> = ({ errorMessage }) => {
   const { t } = useTranslation();
+
+  const logoUrlFromEnv = getLogoUrl();
+  const logoSrc = logoUrlFromEnv || `${process.env.PUBLIC_URL}/logo.svg`;
+
   return (
     <Box
       sx={{
@@ -30,7 +35,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({ errorMessage }) => {
       data-testid={DATA_TEST_ID.ERROR_CONTAINER}
     >
       <img
-        src="/logo.svg"
+        src={logoSrc}
         alt={t("error.errorPage.illustrationAlt")}
         width="250px"
         data-testid={DATA_TEST_ID.ERROR_ILLUSTRATION}
