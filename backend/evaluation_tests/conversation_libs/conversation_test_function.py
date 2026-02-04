@@ -9,6 +9,7 @@ from pydantic import model_validator
 from pydantic.main import BaseModel
 from tqdm import tqdm
 
+from app.agent.config import AgentsConfig
 from app.conversation_memory.save_conversation_context import save_conversation_context_to_json, \
     save_conversation_context_to_markdown
 from app.countries import Country
@@ -172,6 +173,7 @@ class LLMSimulatedUser:
 
     def __init__(self, *, system_instructions: str, llm_input: LLMInput | None = None,
                  llm_config: LLMConfig = LLMConfig(
+                     language_model_name=AgentsConfig.deep_reasoning_model,
                      generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG)):
         """
         :param system_instructions: The system instructions to be used by the simulated user.

@@ -13,7 +13,8 @@ from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.countries import Country, get_country_glossary
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LLMConfig, get_config_variation, JSON_GENERATION_CONFIG
+from common_libs.llm.models_utils import LLMConfig, get_config_variation
+from common_libs.llm.schema_builder import with_response_schema
 from common_libs.retry import Retry
 
 
@@ -161,7 +162,7 @@ class _ContextualizationLLM:
     def _get_llm(self, number_of_titles: int, temperature_config: dict) -> GeminiGenerativeLLM:
         return GeminiGenerativeLLM(
             system_instructions=_get_system_instructions(self._country_of_interest, number_of_titles),
-            config=LLMConfig(generation_config=temperature_config | JSON_GENERATION_CONFIG)
+            config=LLMConfig(generation_config=temperature_config | with_response_schema(_ContextualizationLLMOutput))
         )
 
     async def _internal_execute(

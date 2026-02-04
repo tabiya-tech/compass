@@ -12,3 +12,6 @@ class Collections:
     REACTIONS = "reactions"
     COMPASS_METRICS = "metric_events"
     USER_CV_UPLOADS: str = "user_cv_uploads"
+    JOBS: str = "jobs"
+    JOB_PREFERENCES: str = "job_preferences"
+    CAREER_PATH: str = "career_path"

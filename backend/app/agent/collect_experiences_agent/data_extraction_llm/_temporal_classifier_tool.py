@@ -7,18 +7,20 @@ from pydantic import BaseModel
 
 from app.agent.agent_types import LLMStats
 from app.agent.collect_experiences_agent.data_extraction_llm import clean_string_field
+from app.agent.config import AgentsConfig
 from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
+from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template import sanitize_input
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
+from app.i18n.locale_date_format import get_locale_date_format, format_date_value_for_locale
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG, \
     get_config_variation
+from common_libs.llm.schema_builder import with_response_schema
 from common_libs.retry import Retry
-from app.agent.prompt_template import get_language_style
-from app.i18n.locale_date_format import get_locale_date_format, format_date_value_for_locale
 
 _TAGS_TO_FILTER = [
     "system instructions",
@@ -56,7 +58,7 @@ class _ExtractedData(BaseModel):
 
 
 class _LLMOutput(BaseModel):
-    associations: Optional[str]
+    associations: Optional[str] = None
     experience_details: Optional[_ExtractedData]
 
     class Config:
@@ -96,10 +98,11 @@ class TemporalAndWorkTypeClassifierTool:
         return GeminiGenerativeLLM(
             system_instructions=self._get_system_instructions(),
             config=LLMConfig(
+                language_model_name=AgentsConfig.deep_reasoning_model,
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000
                     # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
-                } | temperature_config
+                } | temperature_config | with_response_schema(_LLMOutput)
             ))
 
     async def execute(self,
@@ -193,7 +196,7 @@ _SYSTEM_INSTRUCTIONS = """
         
 #Extract data instructions
     Make sure you are extracting information about experiences that should be added to the 'experience_details' field.
-    And not information that should be ignored. (Especially irrelevant information)
+    Ignore irrelevant information.
     
     You will collect information for the following fields:-
     - paid_work
@@ -201,14 +204,18 @@ _SYSTEM_INSTRUCTIONS = """
     - start_date    
     - end_date    
     
+    ## General instructions.    
+        Use `null`: If the user has not mentioned respective details and has not yet been asked to provide it.
+        Use "": If the user explicitly declines to provide the respective details when asked, or requests that previously stored respective details data be deleted.
+    
     You will collect and place them to the output as instructed below:
     ##'paid_work' instructions
         Determine if the experience was for money or not you can base on the <Experience Title>> or the user's last statement.
         Boolean value indicating whether the work was paid or not.
         If it seems like a formal work experience the it should be marked as paid.
-        
-        `null` if the information was not provided by the user and the user was not explicitly asked for this information yet.
-        Use empty string if the user was asked and explicitly chose to not provide this information, or the user don't want us to store the information any more or the user doesn't remember.
+        Use `null`: If the user has not mentioned `paid_work` and has not yet been asked to provide it.
+        Use "": If the user explicitly declines to provide the `paid_work` when asked, or requests that previously stored `paid_work` data be deleted.
+
     
     ##'work_type' instructions
         Classify the type of work of the work experience provided by the user in the '<User's Last Input>' and the '<Conversation History>'.
@@ -216,9 +223,8 @@ _SYSTEM_INSTRUCTIONS = """
         Base also on the <Experience Title> and try to infer the work type from it.
         Choose one of the following values:
             {work_type_definitions}   
-        
-        `null` if the information was not provided by the user and the user was not explicitly asked for this information yet.
-        Use empty string if the user was asked and explicitly chose to not provide this information, or the user don't want us to store the information any more or the user doesn't remember.
+        Use `null`: If the user has not mentioned `work type` and has not yet been asked to provide it.
+        Use "": If the user explicitly declines to provide the `work type` when asked, or requests that previously stored `work type` data be deleted.
         
     ##Timeline instructions
         The user may provide the beginning and end of an experience at any order, 
@@ -226,6 +232,8 @@ _SYSTEM_INSTRUCTIONS = """
         The user may mention only one date, you may consider it as the start and the end of the experience.
         The user may provide unstructured dates like I worked in the first four months of 2020.
         If the user provides only one date and no additional context, do not infer or assume a second date.
+        Strictly maintain input date precision. Never infer or default specific dates (e.g., 01/01, 31/12) for partial timestamps like 'Year only' or 'Month-Year'.
+        
         For reference, my current date is {current_date}
         Always return dates using the user's locale-specific format:
             - Full date: {date_format_full}
@@ -242,17 +250,15 @@ _SYSTEM_INSTRUCTIONS = """
             If I provide a conversational date input for the start of an experience, you should accurately 
             calculate these based on my current date.
             Return a string value containing the start date using the locale-specific format described above.
-            
-            `null` It was not provided by the user and the user was not explicitly asked for this information yet.
-            Empty string if the user was asked and explicitly chose to not provide this information or the user doesn't remember the start date. 
+            Use `null`: If the user has not mentioned their `start date` and has not yet been asked to provide it.
+            Use "": If the user explicitly declines to provide their `start date` when asked, or requests that previously stored `start date` data be deleted.
             
         ###'end_date' instructions
             If I provide a conversational date input for the end of an experience, you should accurately 
             calculate these based on my current date. In case it is an ongoing experience, use the word "Present". 
             Return a string value containing the end date using the locale-specific format described above.
-            
-            `null` It was not provided by the user and the user was not explicitly asked for this information yet.
-            Empty string if the user was asked and explicitly chose to not provide this information or the user doesn't remember the end date. 
+            Use `null`: If the user has not mentioned their `end date` and has not yet been asked to provide it.
+            Use "": If the user explicitly declines to provide their `start date` when asked, or requests that previously stored `end date` data be deleted.
             
 #JSON Output instructions
     - associations: Generate a linear chain of associations in the form of ...-> ...->... that start from the User's Last Input 
@@ -260,8 +266,9 @@ _SYSTEM_INSTRUCTIONS = """
         ///Skip unrelated or tangential turns to preserve a coherent causal chain of associations.
         ///You are filtering for semantic lineage rather than strictly temporal proximity.
         Once you reach the Previously Extracted Experience Data, you will not follow the associations anymore.
-        e.g. "user('...') -> model('...') -> ... -> user('...') -> model('...') -> Previously Extracted Experience Data(...)"
+        e.g. "user(<answer>) -> model(<question>) -> ... -> user(<answer>) -> model(<question>) -> Previously Extracted Experience Data(...)"
         Each step in the sequence should be a summarized version of the actual user or model turn.
+        You are not expected to reach a maximum of 10 steps in this linear chain to avoid circular references.
     
     - experience_details: an Object of experience details you extracted from the user's statement and conversation history. 
         {{

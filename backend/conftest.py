@@ -158,7 +158,8 @@ def setup_application_config() -> Generator[ApplicationConfig, Any, None]:
         language_config=LanguageConfig(
             default_locale=Locale.EN_US,
             available_locales=[LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY")]
-        )
+        ),
+        app_name="Compass"
     )
 
     set_application_config(config)

@@ -21,12 +21,13 @@ from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_collect_experiences_agent_simulated_user(test_case: CollectExperiencesAgentTestCase,
-                                                        caplog: LogCaptureFixture):
+                                                        caplog: LogCaptureFixture,
+                                                        setup_multi_locale_app_config):
     """
     Tests the welcome agent with a simulated user.
     """

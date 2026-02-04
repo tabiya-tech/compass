@@ -1,6 +1,6 @@
 import json
-from textwrap import dedent
 import logging
+from textwrap import dedent
 from typing import Optional
 
 from pydantic import BaseModel
@@ -12,8 +12,9 @@ from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.countries import Country, get_country_glossary
 from app.vector_search.esco_entities import SkillEntity
-from common_libs.llm.models_utils import LLMConfig, get_config_variation, JSON_GENERATION_CONFIG
 from common_libs.llm.generative_models import GeminiGenerativeLLM
+from common_libs.llm.models_utils import LLMConfig, get_config_variation
+from common_libs.llm.schema_builder import with_response_schema
 from common_libs.retry import Retry
 
 
@@ -141,7 +142,7 @@ class ExperienceSummarizer:
     def get_llm(*, country_of_user: Country, temperature_config: dict) -> GeminiGenerativeLLM:
         return GeminiGenerativeLLM(
             system_instructions=ExperienceSummarizer.get_system_instructions(country_of_user=country_of_user),
-            config=LLMConfig(generation_config=temperature_config | JSON_GENERATION_CONFIG)
+            config=LLMConfig(generation_config=temperature_config | with_response_schema(ExperienceSummarizerResponse))
         )
 
     async def execute(

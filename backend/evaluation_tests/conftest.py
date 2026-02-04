@@ -105,3 +105,9 @@ def setup_multi_locale_app_config():
 
     # No teardown of ApplicationConfig to avoid affecting other fixtures; just clear the cache.
     reset_date_format_cache()
+
+
+
+@pytest.fixture(scope="function")
+def evals_setup(setup_application_config):
+    return True

@@ -76,6 +76,11 @@ class ApplicationConfig(BaseModel):
     The language configuration for the backend, including default locale and available locales with date formats.
     """
 
+    app_name: str
+    """
+    The name of the application.
+    """
+
 
 _application_config: ApplicationConfig | None = None
 

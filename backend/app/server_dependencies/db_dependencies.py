@@ -215,6 +215,21 @@ class CompassDBProvider:
                 ("message_id", 1)
             ], unique=True)
 
+            # TODO: add additional indexes as needed
+            await application_db.get_collection(Collections.JOBS).create_index([
+                ("session_id", 1)
+            ])
+
+            # Create the job preferences indexes
+            await application_db.get_collection(Collections.JOB_PREFERENCES).create_index([
+                ("session_id", 1)
+            ], unique=True)
+
+            # Create the career path indexes
+            await application_db.get_collection(Collections.CAREER_PATH).create_index([
+                ("id", 1)
+            ])
+
             logger.info("Finished creating indexes for the application database")
         except Exception as e:
             logger.exception(e)

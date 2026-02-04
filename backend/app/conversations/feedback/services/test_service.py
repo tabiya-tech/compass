@@ -155,7 +155,7 @@ class TestUpsertFeedback:
 
     @pytest.mark.asyncio
     async def test_upsert_feedback_invalid_question(self, _mock_feedback_repository: IUserFeedbackRepository,
-                                                    _mock_metrics_service: IMetricsService):
+                                                    _mock_metrics_service: IMetricsService, setup_application_config: ApplicationConfig):
         # GIVEN a feedback object with an invalid question ID
         given_feedback_specs = NewFeedbackSpec(
             feedback_items_specs=[
@@ -187,7 +187,7 @@ class TestUpsertFeedback:
 
     @pytest.mark.asyncio
     async def test_upsert_feedback_invalid_option(self, _mock_feedback_repository: IUserFeedbackRepository,
-                                                  _mock_metrics_service: IMetricsService):
+                                                  _mock_metrics_service: IMetricsService, setup_application_config: ApplicationConfig):
         # GIVEN a feedback object with an invalid option
         given_feedback_specs = NewFeedbackSpec(
             feedback_items_specs=[NewFeedbackItemSpec(**item) for item in given_feedback_item_specs_json],

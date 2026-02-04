@@ -4,7 +4,7 @@ import "src/_test_utilities/envServiceMock";
 
 import React from "react";
 import { render, screen, act, waitFor } from "src/_test_utilities/test-utils";
-import CustomerSatisfactionRating, { UI_TEXT, DATA_TEST_ID } from "./CustomerSatisfaction";
+import CustomerSatisfactionRating, { DATA_TEST_ID } from "./CustomerSatisfaction";
 import i18n from "src/i18n/i18n";
 import CustomRating, {
   DATA_TEST_ID as CUSTOM_RATING_DATA_TEST_ID,
@@ -106,11 +106,17 @@ describe("CustomerSatisfactionRating", () => {
     expect(CustomRating).toHaveBeenCalledWith(
       {
         questionId: QUESTION_KEYS.CUSTOMER_SATISFACTION,
-        questionText: UI_TEXT.CUSTOMER_SATISFACTION_QUESTION_TEXT,
+        questionText: i18n.t(
+          "feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.questionText"
+        ),
         ratingValue: null,
         notifyChange: expect.any(Function),
-        lowRatingLabel: UI_TEXT.RATING_LABEL_LOW,
-        highRatingLabel: UI_TEXT.RATING_LABEL_HIGH,
+        lowRatingLabel: i18n.t(
+          "feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.ratingLabelLow"
+        ),
+        highRatingLabel: i18n.t(
+          "feedback.overallFeedback.feedbackForm.components.customerSatisfactionRating.ratingLabelHigh"
+        ),
         maxRating: 5,
         disabled: false,
         type: QuestionType.Rating,

@@ -1,5 +1,6 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
 
 import { render, screen, within } from "@testing-library/react";
 import { MAX_WAIT_TIME_FOR_ROOT_ELEMENT, ROOT_ELEMENT_POLL_INTERVAL } from "./index";
