@@ -251,6 +251,198 @@ test_cases: list[TransitionDecisionToolTestCase] = [
         explored_types=[],
         expected_transition_decision=TransitionDecision.CONTINUE
     ),
+    TransitionDecisionToolTestCase(
+        name="empty_strings_should_not_be_considered_incomplete",
+        turns=[
+            (SILENCE_MESSAGE, "Have you run your own business, done freelance or contract work?"),
+            ("Yes, I sold chapati", "Great! Where did you sell chapati?"),
+            ("I sold it to the public", "What was the company name?"),
+            ("I don't have a company, I worked for myself", "Okay, when did you start and end?")
+        ],
+        users_last_input="I started in 2014 and ended in 2015",
+        collected_data=[
+            CollectedData(
+                index=0,
+                uuid="test-uuid-1",
+                experience_title="Selling Chapati",
+                company="",  # Empty string means user explicitly declined
+                location="Vihiga",
+                start_date="2014",
+                end_date="2015",
+                paid_work=True,
+                work_type=WorkType.SELF_EMPLOYMENT.name
+            )
+        ],
+        exploring_type=WorkType.SELF_EMPLOYMENT,
+        unexplored_types=[WorkType.SELF_EMPLOYMENT, WorkType.UNSEEN_UNPAID],
+        explored_types=[WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT],
+        expected_transition_decision=TransitionDecision.CONTINUE
+    ),
+    TransitionDecisionToolTestCase(
+        name="user_says_no_multiple_times_should_end_worktype",
+        turns=[
+            (SILENCE_MESSAGE, "Have you done unpaid work such as community volunteering, caregiving, helping in a household?"),
+            ("Yes, I volunteer at an orphanage", "Great! When did you start?"),
+            ("About 2 years ago", "When did you finish?"),
+            ("I'm still doing it", "Okay, thanks for confirming."),
+            ("No problem", "Do you have any other unpaid work experiences?"),
+        ],
+        users_last_input="No, that's it",
+        collected_data=[
+            CollectedData(
+                index=0,
+                uuid="test-uuid-1",
+                experience_title="Volunteering at Orphanage",
+                company="",  # Empty string means user declined or not applicable
+                location="",  # Empty string means user declined or not applicable
+                start_date="2024",
+                end_date="",  # Empty string for ongoing work (user explicitly said it's ongoing)
+                paid_work=False,
+                work_type=WorkType.UNSEEN_UNPAID.name
+            )
+        ],
+        exploring_type=WorkType.UNSEEN_UNPAID,
+        unexplored_types=[WorkType.UNSEEN_UNPAID],
+        explored_types=[
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+            WorkType.SELF_EMPLOYMENT,
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK
+        ],
+        expected_transition_decision=TransitionDecision.END_WORKTYPE
+    ),
+    TransitionDecisionToolTestCase(
+        name="user_asks_to_move_on_should_end_worktype_when_complete",
+        turns=[
+            (SILENCE_MESSAGE, "Have you run your own business, done freelance or contract work?"),
+            ("Yes, I sold chapati from 2014 to 2015", "Great! Where did you sell it?"),
+            ("In Vihiga", "Thanks! Do you have any other self-employment experiences?"),
+            ("No, that's all", "Okay, great!")
+        ],
+        users_last_input="Can we do skills exploration? We haven't finished",
+        collected_data=[
+            CollectedData(
+                index=0,
+                uuid="test-uuid-1",
+                experience_title="Selling Chapati",
+                company="",
+                location="Vihiga",
+                start_date="2014",
+                end_date="2015",
+                paid_work=True,
+                work_type=WorkType.SELF_EMPLOYMENT.name
+            )
+        ],
+        exploring_type=WorkType.SELF_EMPLOYMENT,
+        unexplored_types=[WorkType.SELF_EMPLOYMENT, WorkType.UNSEEN_UNPAID],
+        explored_types=[WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT],
+        expected_transition_decision=TransitionDecision.END_WORKTYPE
+    ),
+    TransitionDecisionToolTestCase(
+        name="user_confirms_done_with_that_s_it_should_end_worktype",
+        turns=[
+            (SILENCE_MESSAGE, "Have you been employed in a company or someone else's business for money?"),
+            ("Yes, I worked as a secretary at a school", "Great! Where was the school?"),
+            ("In Machakos", "When did you work there?"),
+            ("2016 for about 9 months", "Thanks! Do you have any other paid employment experiences?"),
+        ],
+        users_last_input="No, that's it",
+        collected_data=[
+            CollectedData(
+                index=0,
+                uuid="test-uuid-1",
+                experience_title="Secretary",
+                company="School",
+                location="Machakos",
+                start_date="2016",
+                end_date="2016",
+                paid_work=True,
+                work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+            )
+        ],
+        exploring_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+        unexplored_types=[WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT, WorkType.SELF_EMPLOYMENT],
+        explored_types=[],
+        expected_transition_decision=TransitionDecision.END_WORKTYPE
+    ),
+    TransitionDecisionToolTestCase(
+        name="user_confirms_done_with_no_that_s_cool_should_end_worktype",
+        turns=[
+            (SILENCE_MESSAGE, "Have you run your own business, done freelance or contract work?"),
+            ("Yes, I sold chapati", "Great! Tell me more about that."),
+            ("I sold chapati in Vihiga from 2014 to 2015", "Thanks! Does that sound right?"),
+        ],
+        users_last_input="No, that's cool",
+        collected_data=[
+            CollectedData(
+                index=0,
+                uuid="test-uuid-1",
+                experience_title="Selling Chapati",
+                company="",
+                location="Vihiga",
+                start_date="2014",
+                end_date="2015",
+                paid_work=True,
+                work_type=WorkType.SELF_EMPLOYMENT.name
+            )
+        ],
+        exploring_type=WorkType.SELF_EMPLOYMENT,
+        unexplored_types=[WorkType.SELF_EMPLOYMENT, WorkType.UNSEEN_UNPAID],
+        explored_types=[WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT],
+        expected_transition_decision=TransitionDecision.END_WORKTYPE
+    ),
+    TransitionDecisionToolTestCase(
+        name="recap_question_detected_user_confirms_should_end_conversation",
+        turns=[
+            (SILENCE_MESSAGE, "Let's recap the information we have collected so far"),
+            ("Let's recap: \n• Secretary at School in Machakos (2016-2016)\n• Selling Chapati in Vihiga (2014-2015)\n• Volunteering at Orphanage (2024-Present)\n\nDoes this summary capture all your work experiences accurately? Is there anything you would like to add or change?",
+             "Let's recap: \n• Secretary at School in Machakos (2016-2016)\n• Selling Chapati in Vihiga (2014-2015)\n• Volunteering at Orphanage (2024-Present)\n\nDoes this summary capture all your work experiences accurately? Is there anything you would like to add or change?")
+        ],
+        users_last_input="Yes it's ok now",
+        collected_data=[
+            CollectedData(
+                index=0,
+                uuid="test-uuid-1",
+                experience_title="Secretary",
+                company="School",
+                location="Machakos",
+                start_date="2016",
+                end_date="2016",
+                paid_work=True,
+                work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+            ),
+            CollectedData(
+                index=1,
+                uuid="test-uuid-2",
+                experience_title="Selling Chapati",
+                company="",
+                location="Vihiga",
+                start_date="2014",
+                end_date="2015",
+                paid_work=True,
+                work_type=WorkType.SELF_EMPLOYMENT.name
+            ),
+            CollectedData(
+                index=2,
+                uuid="test-uuid-3",
+                experience_title="Volunteering at Orphanage",
+                company="",  # Empty string means user declined or not applicable
+                location="",  # Empty string means user declined or not applicable
+                start_date="2024",
+                end_date="",  # Empty string for ongoing work
+                paid_work=False,
+                work_type=WorkType.UNSEEN_UNPAID.name
+            )
+        ],
+        exploring_type=None,
+        unexplored_types=[],
+        explored_types=[
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+            WorkType.SELF_EMPLOYMENT,
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK,
+            WorkType.UNSEEN_UNPAID
+        ],
+        expected_transition_decision=TransitionDecision.END_CONVERSATION
+    ),
 ]
 
 

@@ -80,7 +80,11 @@ class TransitionDecisionTool:
         # we make a rule based decision since we can check by code if there are incomplete experiences
         incomplete_experiences = _find_incomplete_experiences(collected_data)
         if incomplete_experiences:
-            self._logger.debug("Incomplete experiences found - returning CONTINUE")
+            self._logger.info(
+                "Incomplete experiences found - returning CONTINUE. "
+                "Incomplete experiences: %s",
+                [(idx, exp.experience_title, missing) for idx, exp, missing in incomplete_experiences]
+            )
             return TransitionDecision.CONTINUE, None, []
         
         cleaned_experience_dicts = []
@@ -133,6 +137,17 @@ class TransitionDecisionTool:
                 reasoning="LLM-based decision",
                 confidence="medium"
             )
+        
+        self._logger.info(
+            "Transition decision: %s. "
+            "Exploring type: %s, Unexplored types: %s, Explored types: %s, "
+            "Collected experiences: %d",
+            result,
+            exploring_type.name if exploring_type else "None",
+            [wt.name for wt in unexplored_types],
+            [wt.name for wt in explored_types],
+            len(collected_data)
+        )
         
         return result, reasoning, _llm_stats
 
@@ -199,6 +214,8 @@ Use END_CONVERSATION when ALL of the following are true:
     - "": User was asked but chose not to provide this information
     
     An experience is incomplete if it has a title but is missing important fields (start_date, end_date, company, or location).
+    IMPORTANT: Empty strings ("") mean the user explicitly declined to provide information, so they are NOT considered missing.
+    Only None values indicate missing information that hasn't been asked for yet.
 </System Instructions>
 """
 
@@ -228,19 +245,31 @@ _PROMPT_TEMPLATE = """
     2. Check if there are unexplored work types remaining
        - If yes, determine if current type is done:
          * Look at the conversation history to understand what question the user is responding to
-         * Check if user's last input is a negative response to a work type question
-         * If user said "no" (or similar) to having experiences of the current type → Return END_WORKTYPE
-         * If user provided experiences and confirmed they're done → Return END_WORKTYPE
-         * If user is still providing information → Return CONTINUE
+         * Check the LAST question asked by the agent - was it about the current work type?
+         * Common work type questions:
+           - "Have you been employed in a company or someone else's business for money?" (FORMAL_SECTOR_WAGED_EMPLOYMENT)
+           - "Have you run your own business, done freelance or contract work?" (SELF_EMPLOYMENT)
+           - "Have you worked as an unpaid trainee for a company or organization?" (FORMAL_SECTOR_UNPAID_TRAINEE_WORK)
+           - "Have you done unpaid work such as community volunteering, caregiving, helping in a household?" (UNSEEN_UNPAID)
+         * Common negative responses: "no", "nope", "none", "I don't have any", "that's all", "not really", "no more", "no that's it", "no that's cool", "no looks good", "nop"
+         * If the last agent question was about the current work type AND user said "no" (or similar) → Return END_WORKTYPE
+         * If user provided experiences for the current type and confirmed they're done (e.g., "that's it", "that's all", "no more", "no that's cool") → Return END_WORKTYPE
+         * If user is asking to move on (e.g., "can we do skills exploration?", "what next?", "we haven't finished", "that's it Compass, what next?") AND current type has been explored → Return END_WORKTYPE
+         * If user has already confirmed "no" multiple times for the same work type question → Return END_WORKTYPE
+         * If user is still providing information about experiences → Return CONTINUE
          * Otherwise → Return CONTINUE
     
     3. Check if all work types are explored
        - If yes, check if recap was asked:
-         * Look through conversation history for recap question (summarizing all experiences and asking if user wants to add/change)
+         * Look through conversation history for recap question patterns:
+           - Questions that summarize all experiences and ask if user wants to add/change anything
+           - Questions like "Does this summary capture all your work experiences accurately?"
+           - Questions asking "Is there anything you'd like to add or change?"
          * If recap was NOT asked yet → Return CONTINUE
          * If recap WAS asked:
-           - Check if user confirmed (no changes wanted) → Return END_CONVERSATION
+           - Check if user confirmed no changes wanted (e.g., "yes it's ok", "no that's cool", "yes", "no that's it", "no looks good") → Return END_CONVERSATION
            - Check if user wants changes → Return CONTINUE
+           - If user has confirmed multiple times they're done → Return END_CONVERSATION
     
     Return your decision as one of: CONTINUE, END_WORKTYPE, or END_CONVERSATION
     
