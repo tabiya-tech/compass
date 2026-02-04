@@ -150,32 +150,82 @@ class OperationsProcessor:
     def _apply_pending_adds(self, pending_add_payloads: list,
                             collected_experience_data_so_far: list[CollectedData],
                             current_turn_index: int):
-        """Apply all pending add operations."""
+        """Apply all pending add operations. Merges into an existing experience when same work_type and similar title."""
         next_available_index = (
                 max([existing_item.index for existing_item in collected_experience_data_so_far]) + 1
         ) if collected_experience_data_so_far else 0
 
         appended_add_count = 0
         for add_payload in pending_add_payloads:
-            new_index = next_available_index + appended_add_count
-            appended_add_count += 1
-            self.logger.info("Adding new experience with index: %s", new_index)
-
             work_type = WorkType.from_string_key(add_payload.work_type)
-            work_type = work_type.name if work_type is not None else None
+            work_type_str = work_type.name if work_type is not None else None
+
+            if CollectedData.all_fields_empty(CollectedData(
+                    index=0, experience_title=add_payload.experience_title, paid_work=add_payload.paid_work,
+                    work_type=work_type_str, start_date=add_payload.start_date, end_date=add_payload.end_date,
+                    company=add_payload.company, location=add_payload.location)):
+                self.logger.warning("Skipping completely empty experience from ADD operation: %s", add_payload)
+                continue
+
+            existing_index = self._find_same_experience_for_add(
+                add_payload, work_type_str, collected_experience_data_so_far)
+            if existing_index >= 0:
+                self._merge_add_into_existing(
+                    add_payload, work_type_str, collected_experience_data_so_far[existing_index], current_turn_index)
+                self.logger.info("ADD matched existing experience at index %s; merged instead of adding", existing_index)
+                continue
 
             new_item = CollectedData(
-                index=new_index,
+                index=next_available_index + appended_add_count,
                 defined_at_turn_number=current_turn_index,
                 experience_title=add_payload.experience_title,
                 paid_work=add_payload.paid_work,
-                work_type=work_type,
+                work_type=work_type_str,
                 start_date=add_payload.start_date,
                 end_date=add_payload.end_date,
                 company=add_payload.company,
                 location=add_payload.location
             )
+            new_index = next_available_index + appended_add_count
+            appended_add_count += 1
+            new_item.index = new_index
+            self.logger.info("Adding new experience with index: %s", new_index)
             collected_experience_data_so_far.append(new_item)
+
+    def _find_same_experience_for_add(self, add_payload: Operation, work_type_str: str | None,
+                                      collected: list[CollectedData]) -> int:
+        """Return index of an existing experience that is the same (same work_type, similar title), or -1."""
+        new_title = (add_payload.experience_title or "").strip().lower()
+        if not new_title:
+            return -1
+        for i, existing in enumerate(collected):
+            if (existing.work_type or "").strip() != (work_type_str or "").strip():
+                continue
+            existing_title = (existing.experience_title or "").strip().lower()
+            if not existing_title:
+                continue
+            if new_title == existing_title or new_title in existing_title or existing_title in new_title:
+                return i
+        return -1
+
+    @staticmethod
+    def _merge_add_into_existing(add_payload: Operation, work_type_str: str | None,
+                                 existing: CollectedData, _current_turn_index: int):
+        """Overwrite existing experience fields with non-None values from add_payload."""
+        if add_payload.experience_title is not None:
+            existing.experience_title = add_payload.experience_title
+        if add_payload.paid_work is not None:
+            existing.paid_work = add_payload.paid_work
+        if work_type_str is not None:
+            existing.work_type = work_type_str
+        if add_payload.start_date is not None:
+            existing.start_date = add_payload.start_date
+        if add_payload.end_date is not None:
+            existing.end_date = add_payload.end_date
+        if add_payload.company is not None:
+            existing.company = add_payload.company
+        if add_payload.location is not None:
+            existing.location = add_payload.location
 
     @staticmethod
     def _is_experience_empty(experience: CollectedData) -> bool:

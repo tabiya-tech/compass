@@ -54,11 +54,27 @@ class CollectExperienceAgentGetConversationContextExecutor:
 
 class CollectExperienceAgentIsFinished:
     """
-    Checks if the collect experience agent is finished
+    Checks if the collect experience agent is finished (collection phase complete).
+    Stops when all work types have been explored, not waiting for the entire conversation.
     """
+
+    def __init__(self, executor: Optional[CollectExperiencesAgentExecutor] = None):
+        self._executor = executor
 
     def __call__(self, agent_output: AgentOutput) -> bool:
         """
-        Checks if the collect experience agent is finished
+        Checks if the collect experience agent is finished.
+        Returns True if:
+        - Agent output indicates finished, OR
+        - (If executor provided) All work types have been explored (collection phase complete)
         """
-        return agent_output.finished
+        if agent_output.finished:
+            return True
+        
+        # If executor is provided, also check if collection is complete by verifying all work types are explored
+        if self._executor is not None:
+            agent_state = self._executor._agent._state
+            if agent_state and len(agent_state.unexplored_types) == 0:
+                return True
+        
+        return False

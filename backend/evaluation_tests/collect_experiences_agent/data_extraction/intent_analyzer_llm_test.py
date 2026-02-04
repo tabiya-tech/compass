@@ -251,7 +251,6 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
     ),
     IntentAnalyzerToolTestCase(
         name="single_message_add_update_delete_noop",
-        skip_force="force",
         turns=[
             (SILENCE_MESSAGE,
              "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
