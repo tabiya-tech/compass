@@ -146,6 +146,82 @@ docker run -v "$(pwd)/keys/credentials.json:/code/keys/credentials.json" \
 - [Conversation Export/Import](scripts/export_conversation/) - Tools for conversation data management
 - [Feedback Export](scripts/export_feedback.py) - Export user feedback to CSV
 
+## Preference Elicitation Agent
+
+The Preference Elicitation Agent uses vignette-based choice modeling with Bayesian inference to learn user job preferences.
+
+### System Architecture
+
+The agent uses a hybrid vignette system combining:
+- **Static vignettes** (beginning/end) - Manually curated for specific dimensions
+- **Adaptive vignettes** - D-optimal selection based on Bayesian posterior
+- **Best-Worst Scaling (BWS)** - Occupation ranking tasks
+
+### Offline Optimization
+
+Before using the agent in production, generate optimized vignette libraries:
+
+```bash
+cd app/agent/preference_elicitation_agent/offline_optimization
+python run_offline_optimization.py
+```
+
+This generates three JSON files in `app/agent/offline_output/`:
+- `static_vignettes_beginning.json` - Initial vignettes (5-10)
+- `static_vignettes_end.json` - Final vignettes (5-10)
+- `adaptive_vignettes_library.json` - D-optimal library (40 vignettes)
+
+### Configuration
+
+The agent automatically looks for vignette files in:
+```
+app/agent/offline_output/
+├── static_vignettes_beginning.json
+├── static_vignettes_end.json
+└── adaptive_vignettes_library.json
+```
+
+To use custom paths, initialize the agent with:
+```python
+agent = PreferenceElicitationAgent(
+    use_offline_with_personalization=True,
+    offline_output_dir="/path/to/offline_output"
+)
+```
+
+### Vignette Templates
+
+Default templates are in `app/config/vignette_templates.json`. Each template defines:
+- Trade-off dimensions (e.g., salary vs. flexibility)
+- Attribute constraints
+- Follow-up question prompts
+- Targeted preference dimensions
+
+### Testing the Agent
+
+Interactive testing:
+```bash
+python scripts/test_preference_agent_interactive.py
+```
+
+Automated testing:
+```bash
+poetry run pytest app/agent/preference_elicitation_agent/ -v
+```
+
+### Output
+
+The agent produces a 7-dimensional preference vector stored in the youth profile:
+- Financial compensation importance
+- Work environment importance
+- Career advancement importance
+- Work-life balance importance
+- Job security importance
+- Task preference importance
+- Social impact importance
+
+For more details, see [app/agent/preference_elicitation_agent/README.md](app/agent/preference_elicitation_agent/README.md).
+
 ## Environment Variables Reference
 
 ### Core Configuration
