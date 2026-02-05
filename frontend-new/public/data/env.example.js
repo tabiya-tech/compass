@@ -48,8 +48,10 @@ window.tabiyaConfig = {
   // ################################################################
   // #       Auth Settings.
   // ################################################################
-  FRONTEND_DISABLE_LOGIN_CODE: btoa("false"),
+  GLOBAL_DISABLE_LOGIN_CODE: btoa("false"),
   FRONTEND_DISABLE_REGISTRATION: btoa("false"),
+  // Hide the registration code input field without disabling registration entirely
+  GLOBAL_DISABLE_REGISTRATION_CODE: btoa("false"),
   FRONTEND_DISABLE_SOCIAL_AUTH: btoa("false"),
   FRONTEND_LOGIN_CODE: btoa("login_code"),
   FRONTEND_REGISTRATION_CODE: btoa("registration_code"),
@@ -75,6 +77,24 @@ window.tabiyaConfig = {
       url: "https://www.example.org/compass",
       image: "https://www.example.org/assets/logo.svg",
       description: "Compass is an AI-powered career assistant that helps jobseekers discover and describe their skills.",
+    })
+  ),
+  FRONTEND_LOGO_URL: btoa("/logo.svg"),
+  FRONTEND_FAVICON_URL: btoa("/favicon.svg"),
+  FRONTEND_APP_ICON_URL: btoa("/compass.svg"),
+  FRONTEND_THEME_CSS_VARIABLES: btoa(
+    JSON.stringify({
+      "brand-primary": "0 255 145",
+      "brand-primary-light": "51 255 167",
+      "brand-primary-dark": "0 178 101",
+      "brand-primary-contrast-text": "0 0 0",
+      "brand-secondary": "30 113 102",
+      "brand-secondary-light": "77 154 143",
+      "brand-secondary-dark": "21 79 71",
+      "brand-secondary-contrast-text": "0 0 0",
+      "text-primary": "0 33 71",
+      "text-secondary": "65 64 61",
+      "text-accent": "38 94 167",
     })
   ),
 };

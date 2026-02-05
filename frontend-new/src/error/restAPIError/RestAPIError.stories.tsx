@@ -3,6 +3,7 @@ import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import SnackbarProvider, { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { FormLabel, MenuItem, Select, Stack } from "@mui/material";
+import type { SelectChangeEvent } from "@mui/material/Select";
 import ErrorConstants from "./RestAPIError.constants";
 import { translateUserFriendlyErrorMessage } from "src/error/restAPIError/RestAPIError";
 
@@ -25,27 +26,39 @@ export default meta;
 
 type Story = StoryObj<typeof SnackbarProvider>;
 
+type ErrorKey = keyof typeof ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS;
+
 const TestErrorDropdown = () => {
   const { enqueueSnackbar } = useSnackbar();
   const t = translateUserFriendlyErrorMessage;
 
-  const handleSelect = (event: React.MouseEvent<HTMLLIElement>) => {
-    // @ts-ignore
-    enqueueSnackbar(t(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS[event.currentTarget.textContent]), {
-      variant: "error",
-    });
+  const [selectedKey, setSelectedKey] = React.useState<ErrorKey | "">("");
+
+  const handleChange = (event: SelectChangeEvent<ErrorKey | "">) => {
+    const key = event.target.value;
+    setSelectedKey(key);
+
+    if (!key) return;
+
+    const i18nKey = ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS[key];
+    enqueueSnackbar(t(i18nKey), { variant: "error" });
   };
 
   return (
     <Stack width={"fit-content"}>
       <FormLabel> Choose an error message to display in a notification:</FormLabel>
       <Select
-        value={t(Object.values(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS)[0])}
-        placeholder={"Select an error message"}
+        value={selectedKey}
+        onChange={handleChange}
+        displayEmpty
+        renderValue={(value) => value || "Select an error message"}
       >
-        {Object.keys(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS).map((key: string) => (
-          // @ts-ignore
-          <MenuItem onClick={handleSelect} key={key} value={t(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS[key])}>
+        <MenuItem value="" disabled>
+          Select an error message
+        </MenuItem>
+
+        {Object.keys(ErrorConstants.USER_FRIENDLY_ERROR_I18N_KEYS).map((key) => (
+          <MenuItem key={key} value={key}>
             {key}
           </MenuItem>
         ))}

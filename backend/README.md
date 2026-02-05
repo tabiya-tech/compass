@@ -79,6 +79,80 @@ Set your Google Cloud project:
 
 ```bash
 gcloud config set project <PROJECT_ID>
+### Environment Variables & Configuration
+
+The backend uses the following environment variables:
+
+- `GOOGLE_APPLICATION_CREDENTIALS`: The path to the service account key file.
+- `TAXONOMY_MONGODB_URI`: The URI of the MongoDB Atlas instance where the ESCO taxonomy data is stored.
+- `TAXONOMY_DATABASE_NAME`: The name of mongo db database where the ESCO taxonomy data with the embeddings is stored.
+- `TAXONOMY_MODEL_ID`: The model ID of the ESCO model in the compass taxonomy database.
+- `APPLICATION_MONGODB_URI`: The URI of the MongoDB Atlas instance for the application database.
+- `APPLICATION_DATABASE_NAME`: The name of mongo db database used by the application to store data.
+- `USERDATA_MONGODB_URI`: The URI of the MongoDB instance for the user data database.
+- `USERDATA_DATABASE_NAME`: The name of the mongo db database used by the application to store user data.
+- `METRICS_MONGODB_URI`: The URI of the MongoDB instance for the metrics database.
+- `METRICS_DATABASE_NAME`: The name of the mongo db database used by the application to store metrics data.
+- `VERTEX_API_REGION`: (optional) The region of the Vertex API to use. If not set defaults to `us-central1`.
+- `EMBEDDINGS_SERVICE_NAME`: The name of the embeddings service to use. Currently, the only supported service is `GOOGLE-VERTEX-AI`.
+- `EMBEDDINGS_MODEL_NAME`: The name of the embeddings model to use. See https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings#supported-models for the list of supported models.
+- `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
+- `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI and the CORS policy.
+- `FRONTEND_URL`: The URL of the frontend. It is used to set the CORS policy.
+- `BACKEND_ENABLE_METRICS`: Set to `True` to enable metrics tracking.
+- `BACKEND_ENABLE_SENTRY`: Set to `True` to enable Sentry error tracking. Set to `False`to disable locally or on CI/CD pipeline so that the unit tests can run successfully.
+- `BACKEND_SENTRY_DSN`: (optional) The Sentry Data Source Name used to track backend errors.
+- `BACKEND_SENTRY_CONFIG`: (optional) A JSON object controlling backend Sentry behavior. Supported fields:
+  - `tracesSampleRate` (number): Transaction tracing sample rate (default: 1.0)
+  - `enableLogs` (boolean): When true, LoggingIntegration is enabled
+  - `logLevel` (string): Capture Python logs at or above this level via LoggingIntegration (`debug|info|warning|error|critical`; default `info`)
+  - `eventLevel` (string): Send Python logs at or above this level to Sentry as events (`debug|info|warning|error|critical`; default `error`)
+- `TARGET_ENVIRONMENT`: (optional) The target environment where the backend is running. When set to `dev` or `local`, CORS will be set to allow all origins.
+- `BACKEND_FEATURES`: (optional) A JSON like dictionary with the features enabled status and configurations specific to each feature.
+- `BACKEND_EXPERIENCE_PIPELINE_CONFIG`: (optional) The configuration for the experience pipeline as a JSON like dictionary. See `class ExperiencePipelineConfig`.
+- `GLOBAL_DISABLE_REGISTRATION_CODE`: (optional) Set to `True` to bypass registration code validation for authenticated user registration. When enabled, authenticated users can create user preferences without providing an invitation code. Defaults to `False`. 
+  > **Security Note:** This should only be enabled in controlled environments (testing, demos, or deployments with external access control).  
+  > **Coordination:** When enabling this setting, also set the corresponding frontend variable `GLOBAL_DISABLE_REGISTRATION_CODE` to hide the registration code input from users. Mismatched configuration (frontend hides input but backend requires code, or vice versa) will lead to confusing user errors.
+
+  > Note: The `FRONTEND_URL` should be set irrespective of the `TARGET_ENVIRONMENT` value.
+
+
+
+The backend supports the use of a `.env` file to set the environment variables. Create a `.env` file in the root
+directory of the backend project and set the environment variables as follows:
+
+```dotenv
+# .env file
+GOOGLE_APPLICATION_CREDENTIALS=<PATH_TO_KEY_FILE>
+TAXONOMY_MONGODB_URI=<URI_TO_MONGODB>
+TAXONOMY_MODEL_ID=<TAXONOMY_MODEL_ID>
+TAXONOMY_DATABASE_NAME=<TAXONOMY_DATABASE_NAME>
+APPLICATION_MONGODB_URI=<URI_TO_MONGODB>
+APPLICATION_DATABASE_NAME=<APPLICATION_DATABASE_NAME>
+USERDATA_MONGODB_URI=<URI_TO_MONGODB>
+USERDATA_DATABASE_NAME=<USERDATA_DATABASE_NAME>
+METRICS_MONGODB_URI=<URI_TO_MONGODB>
+METRICS_DATABASE_NAME=<METRICS_DATABASE_NAME>
+VERTEX_API_REGION=<REGION>
+EMBEDDINGS_SERVICE_NAME=<EMBEDDINGS_SERVICE_NAME>
+EMBEDDINGS_MODEL_NAME=<EMBEDDINGS_MODEL_NAME>
+LOG_CONFIG_FILE=<YAML_FILE>
+BACKEND_URL=<URL>
+FRONTEND_URL=<URL>
+TARGET_ENVIRONMENT_NAME=<TARGET_ENVIRONMENT_NAME>
+TARGET_ENVIRONMENT_TYPE=<TARGET_ENVIRONMENT_TYPE>
+BACKEND_ENABLE_METRICS=False|True
+BACKEND_ENABLE_SENTRY=False|True
+BACKEND_SENTRY_DSN=<BACKEND_SENTRY_DSN>
+BACKEND_SENTRY_CONFIG='{"tracesSampleRate": 0.2, "enableLogs": true, "logLevel": "info", "eventLevel": "error"}'
+BACKEND_FEATURES=<BACKEND_FEATURES>
+BACKEND_EXPERIENCE_PIPELINE_CONFIG=<BACKEND_EXPERIENCE_PIPELINE_CONFIG>
+GLOBAL_DISABLE_REGISTRATION_CODE=False
+
+# CV storage and limits (optional; required to persist uploads)
+BACKEND_CV_STORAGE_BUCKET=<GCS_BUCKET_NAME>
+BACKEND_CV_MAX_UPLOADS_PER_USER=<INTEGER>
+BACKEND_CV_RATE_LIMIT_PER_MINUTE=<INTEGER>
 ```
 
 Required roles for the service account:

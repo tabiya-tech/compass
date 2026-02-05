@@ -9,7 +9,7 @@ exports[`UploadedCVsMenuContent render tests should render the Uploaded CVs Menu
     class="MuiBox-root css-t5n7v9"
   >
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-pawek1-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1ie2rrm-MuiButtonBase-root-MuiIconButton-root"
       data-testid="uploaded-cvs-menu-arrow-back-icon-e9b40dcc-8068-45ec-a96a-9feb823f1696"
       tabindex="0"
       title="Back to main menu"
@@ -17,7 +17,7 @@ exports[`UploadedCVsMenuContent render tests should render the Uploaded CVs Menu
     >
       <svg
         aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
         data-testid="ArrowBackIcon"
         focusable="false"
         viewBox="0 0 24 24"
@@ -26,12 +26,9 @@ exports[`UploadedCVsMenuContent render tests should render the Uploaded CVs Menu
           d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"
         />
       </svg>
-      <span
-        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-      />
     </button>
     <h6
-      class="MuiTypography-root MuiTypography-subtitle2 css-1rof9ss-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-subtitle2 css-1wpuha6-MuiTypography-root"
       data-testid="uploaded-cvs-menu-uploaded-text-e9b40dcc-8068-45ec-a96a-9feb823f1696"
     >
       Previously uploaded CVs (1)
@@ -48,7 +45,7 @@ exports[`UploadedCVsMenuContent render tests should render the Uploaded CVs Menu
     >
       <svg
         aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1de4ipc-MuiSvgIcon-root"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
         data-testid="uploaded-cvs-menu-description-icon-e9b40dcc-8068-45ec-a96a-9feb823f1696"
         focusable="false"
         viewBox="0 0 24 24"
@@ -61,13 +58,13 @@ exports[`UploadedCVsMenuContent render tests should render the Uploaded CVs Menu
         class="MuiBox-root css-j7qwjs"
       >
         <span
-          class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-ggd1p4-MuiTypography-root"
           data-testid="uploaded-cvs-menu-file-name-e9b40dcc-8068-45ec-a96a-9feb823f1696"
         >
           foo_bar.pdf
         </span>
         <span
-          class="MuiTypography-root MuiTypography-caption css-a6pqw0-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-1qvh9gk-MuiTypography-root"
           data-testid="uploaded-cvs-menu-upload-date-e9b40dcc-8068-45ec-a96a-9feb823f1696"
         >
           just now

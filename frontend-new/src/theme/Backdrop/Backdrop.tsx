@@ -1,5 +1,6 @@
 // custom Backdrop component
-import { Backdrop as OriginalBackdrop, CircularProgress, Grid, Typography, useTheme } from "@mui/material";
+import { Backdrop as OriginalBackdrop, CircularProgress, Typography, useTheme } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import React from "react";
 import { Sloth } from "src/theme/Sloth/Sloth";
@@ -39,16 +40,16 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
           }}
         >
           <Grid
+            container
             flexDirection={"row"}
             height={"auto"}
             width={"auto"}
-            container
             justifyContent="center"
             alignItems="center"
             padding={theme.spacing(theme.tabiyaSpacing.md)}
           >
             {props.message && (
-              <Grid item>
+              <Grid>
                 <Typography
                   variant="h6"
                   color="info.contrastText"
@@ -56,14 +57,14 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
                   sx={{
                     paddingRight: theme.spacing(theme.tabiyaSpacing.md),
                     wordWrap: "break-word",
-                    textAlign: "center", // Align the text in the center
+                    textAlign: "center",
                   }}
                 >
                   {props.message}
                 </Typography>
               </Grid>
             )}
-            <Grid style={{ lineHeight: 0 }} item>
+            <Grid style={{ lineHeight: 0 }}>
               <CircularProgress
                 sx={{ color: (theme) => theme.palette.info.contrastText }}
                 size={2 * theme.typography.fontSize}

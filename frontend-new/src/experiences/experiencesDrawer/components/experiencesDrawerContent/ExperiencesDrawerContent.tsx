@@ -1,5 +1,6 @@
 import React, { useContext, useMemo } from "react";
-import { Box, Chip, Grid, Skeleton, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Chip, Skeleton, Typography, useMediaQuery, useTheme } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import { DiveInPhase, Experience, Skill } from "src/experiences/experienceService/experiences.types";
 import { Theme } from "@mui/material/styles";
 import HelpTip from "src/theme/HelpTip/HelpTip";
@@ -240,15 +241,15 @@ export const LoadingExperienceDrawerContent = () => {
   const theme = useTheme();
 
   return (
-    <Grid container alignItems="top" data-testid={DATA_TEST_ID.LOADING_EXPERIENCES_DRAWER_CONTENT_CONTAINER}>
-      <Grid item xs={8}>
+    <Grid container alignItems="flex-start" data-testid={DATA_TEST_ID.LOADING_EXPERIENCES_DRAWER_CONTENT_CONTAINER}>
+      <Grid size={8}>
         <Box display="flex" flexDirection="column" gap={theme.tabiyaSpacing.md}>
           <Skeleton variant="text" width="60%" data-testid="skeleton-text" />
           <Skeleton variant="text" width="90%" data-testid="skeleton-text" />
         </Box>
-        <Grid item xs={4}>
-          <Skeleton variant="text" width="80%" data-testid="skeleton-text" />
-        </Grid>
+      </Grid>
+      <Grid size={4}>
+        <Skeleton variant="text" width="80%" data-testid="skeleton-text" />
       </Grid>
     </Grid>
   );

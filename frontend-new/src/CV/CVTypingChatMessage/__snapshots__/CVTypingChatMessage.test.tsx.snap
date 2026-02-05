@@ -13,7 +13,7 @@ exports[`CVTypingChatMessage should render the CV Typing Chat message correctly 
       class="MuiBox-root css-x1sij0"
     >
       <p
-        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-19s6r5h-MuiTypography-root"
       >
         Your CV content is in the text field. Review it and send when ready.
       </p>
@@ -35,7 +35,7 @@ exports[`CVTypingChatMessage should render the CV Typing Chat message correctly 
       class="MuiBox-root css-x1sij0"
     >
       <p
-        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-19s6r5h-MuiTypography-root"
       >
         Please wait while I upload and parse your CV
       </p>
@@ -43,17 +43,17 @@ exports[`CVTypingChatMessage should render the CV Typing Chat message correctly 
         class="MuiBox-root css-sz63p1"
       >
         <span
-          class="MuiTypography-root MuiTypography-body1 css-18f2if6-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-aqob4v-MuiTypography-root"
         >
           .
         </span>
         <span
-          class="MuiTypography-root MuiTypography-body1 css-1dvtvwe-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-1kbk25g-MuiTypography-root"
         >
           .
         </span>
         <span
-          class="MuiTypography-root MuiTypography-body1 css-4a4pgt-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-1cya8iq-MuiTypography-root"
         >
           .
         </span>

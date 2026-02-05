@@ -278,6 +278,97 @@ describe("AuthenticationService", () => {
       // THEN it should throw an error
       await expect(registrationPromise).rejects.toThrow("User not found in the token");
     });
+
+    test("should create user preferences with undefined invitation_code when registrationCode is undefined", async () => {
+      // GIVEN a token from a given user
+      const givenToken = "test-token";
+      const givenUser = getTestUser();
+      jest.spyOn(service, "getUser").mockImplementationOnce((token) => {
+        if (token === givenToken) {
+          return givenUser;
+        }
+        return null;
+      });
+
+      // AND user preferences will be created for the user
+      const givenReturnedPrefs: UserPreference = {
+        user_id: "foo-id",
+        sessions: [],
+      } as unknown as UserPreference;
+      jest
+        .spyOn(UserPreferencesService.getInstance(), "createUserPreferences")
+        .mockResolvedValueOnce(givenReturnedPrefs);
+
+      // WHEN onSuccessfulRegistration is called with undefined registrationCode
+      await service.onSuccessfulRegistration(givenToken, undefined);
+
+      // THEN the token should be stored
+      expect(PersistentStorageService.setToken).toHaveBeenCalledWith(givenToken);
+
+      // AND the user should be set in the authentication state
+      expect(AuthenticationStateService.getInstance().getUser()).toEqual(givenUser);
+
+      // AND new user preferences should be created with invitation_code: undefined
+      expect(UserPreferencesService.getInstance().createUserPreferences).toHaveBeenCalledWith({
+        user_id: givenUser.id,
+        invitation_code: undefined,
+        language: Language.en,
+      });
+
+      // AND the preferences returned from the service should be set in the state
+      expect(UserPreferencesStateService.getInstance().getUserPreferences()).toEqual(givenReturnedPrefs);
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should create user preferences with invitation_code when registrationCode is provided", async () => {
+      // GIVEN a registration code
+      const givenRegistrationCode = "REG-CODE-123";
+
+      // AND a token from a given user
+      const givenToken = "test-token";
+      const givenUser = getTestUser();
+      jest.spyOn(service, "getUser").mockImplementationOnce((token) => {
+        if (token === givenToken) {
+          return givenUser;
+        }
+        return null;
+      });
+
+      // AND user preferences will be created for the user
+      const givenReturnedPrefs: UserPreference = {
+        user_id: "foo-id",
+        sessions: [],
+      } as unknown as UserPreference;
+      jest
+        .spyOn(UserPreferencesService.getInstance(), "createUserPreferences")
+        .mockResolvedValueOnce(givenReturnedPrefs);
+
+      // WHEN onSuccessfulRegistration is called with a registration code
+      await service.onSuccessfulRegistration(givenToken, givenRegistrationCode);
+
+      // THEN the token should be stored
+      expect(PersistentStorageService.setToken).toHaveBeenCalledWith(givenToken);
+
+      // AND the user should be set in the authentication state
+      expect(AuthenticationStateService.getInstance().getUser()).toEqual(givenUser);
+
+      // AND new user preferences should be created with the registration code
+      expect(UserPreferencesService.getInstance().createUserPreferences).toHaveBeenCalledWith({
+        user_id: givenUser.id,
+        invitation_code: givenRegistrationCode,
+        language: Language.en,
+      });
+
+      // AND the preferences returned from the service should be set in the state
+      expect(UserPreferencesStateService.getInstance().getUserPreferences()).toEqual(givenReturnedPrefs);
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
   });
 
   describe("onSuccessfulRefresh", () => {

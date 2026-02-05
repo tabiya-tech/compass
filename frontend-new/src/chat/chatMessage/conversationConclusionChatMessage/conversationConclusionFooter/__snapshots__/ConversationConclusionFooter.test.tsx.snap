@@ -6,19 +6,19 @@ exports[`ConversationConclusionFooter render tests should render component succe
   data-testid="feedback-form-button-container-41675f8b-257c-4a63-9563-3fe9feb6a850"
 >
   <p
-    class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-body1 css-19s6r5h-MuiTypography-root"
   >
     You can now
      
     <a
       aria-disabled="false"
-      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-179zpik-MuiTypography-root-MuiLink-root"
       data-testid="feedback-form-experiences-drawer-button-41675f8b-257c-4a63-9563-3fe9feb6a850"
       style="display: inline-flex; flex-direction: row; gap: calc(clamp(2px, (2dvh + -8px + 1.5dvw + -10px)/2 , 8px) * 0.5); vertical-align: bottom;"
     >
       <svg
         aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
         data-testid="BadgeOutlinedIcon"
         focusable="false"
         viewBox="0 0 24 24"
@@ -44,7 +44,7 @@ exports[`ConversationConclusionFooter render tests should render component succe
     here.
   </p>
   <span
-    class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-body1 css-19s6r5h-MuiTypography-root"
   >
     <div
       data-testid="customer-satisfaction-rating-container-67447419-12c3-401d-a78f-00b5ea8f8d1f"

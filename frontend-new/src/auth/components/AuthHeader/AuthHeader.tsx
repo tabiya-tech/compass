@@ -1,6 +1,7 @@
 import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 import { Box, Typography } from "@mui/material";
 import React from "react";
+import { getLogoUrl } from "src/envService";
 
 const uniqueId = "40374529-6e2c-49d8-81d7-93f01603a648";
 
@@ -17,6 +18,9 @@ export interface AuthHeaderProps {
 }
 
 const AuthHeader: React.FC<Readonly<AuthHeaderProps>> = ({ title, subtitle }) => {
+  const logoUrlFromEnv = getLogoUrl();
+  const logoSrc = logoUrlFromEnv || `${process.env.PUBLIC_URL}/logo.svg`;
+
   return (
     <Box
       data-testid={DATA_TEST_ID.AUTH_HEADER_CONTAINER}
@@ -27,7 +31,7 @@ const AuthHeader: React.FC<Readonly<AuthHeaderProps>> = ({ title, subtitle }) =>
     >
       <Box display="flex" flexDirection="row" justifyContent="center" alignItems="center">
         <img
-          src={`${process.env.PUBLIC_URL}/logo.svg`}
+          src={logoSrc}
           alt="Logo"
           style={{ maxWidth: "60%", margin: "5% 10%" }}
           data-testid={DATA_TEST_ID.AUTH_HEADER_LOGO}

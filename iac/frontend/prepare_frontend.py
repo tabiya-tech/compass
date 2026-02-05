@@ -112,7 +112,8 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     enable_metrics: str = getenv("FRONTEND_ENABLE_METRICS", False, False)
     login_code: Optional[str] = getenv("FRONTEND_LOGIN_CODE", False, False)
     registration_code: Optional[str] = getenv("FRONTEND_REGISTRATION_CODE", False, False)
-    disable_login_code: Optional[str] = getenv("FRONTEND_DISABLE_LOGIN_CODE", False, False)
+    disable_login_code: Optional[str] = getenv("GLOBAL_DISABLE_LOGIN_CODE", False, False)
+    disable_registration_code: Optional[str] = getenv("GLOBAL_DISABLE_REGISTRATION_CODE", False, False)
     disable_registration: Optional[str] = getenv("FRONTEND_DISABLE_REGISTRATION", False, False)
     disable_social_auth: Optional[str] = getenv("FRONTEND_DISABLE_SOCIAL_AUTH", False, False)
 
@@ -126,6 +127,16 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     # features
     features = getenv("FRONTEND_FEATURES", False, False)
     enable_cv_upload: Optional[str] = getenv("FRONTEND_ENABLE_CV_UPLOAD", False, False)
+
+    # branding
+    global_product_name: Optional[str] = getenv("GLOBAL_PRODUCT_NAME", False, False)
+    frontend_browser_tab_title: Optional[str] = getenv("FRONTEND_BROWSER_TAB_TITLE", False, False)
+    frontend_meta_description: Optional[str] = getenv("FRONTEND_META_DESCRIPTION", False, False)
+    frontend_logo_url: Optional[str] = getenv("FRONTEND_LOGO_URL", False, False)
+    frontend_favicon_url: Optional[str] = getenv("FRONTEND_FAVICON_URL", False, False)
+    frontend_app_icon_url: Optional[str] = getenv("FRONTEND_APP_ICON_URL", False, False)
+    frontend_theme_css_variables: Optional[str] = getenv("FRONTEND_THEME_CSS_VARIABLES", False, False)
+    frontend_seo: Optional[str] = getenv("FRONTEND_SEO", False, False)
 
     # validations, apart from the keys are required, some values also need to be validated
     # the sensitive encryption key should be a valid RSA public key.
@@ -149,7 +160,8 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY": base64_encode(sensitive_personal_data_rsa_encryption_key),
         "SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID": base64_encode(sensitive_personal_data_rsa_encryption_key_id),
         "FRONTEND_LOGIN_CODE": base64_encode(login_code),
-        "FRONTEND_DISABLE_LOGIN_CODE": base64_encode(disable_login_code),
+        "GLOBAL_DISABLE_LOGIN_CODE": base64_encode(disable_login_code),
+        "GLOBAL_DISABLE_REGISTRATION_CODE": base64_encode(disable_registration_code),
         "FRONTEND_REGISTRATION_CODE": base64_encode(registration_code),
         "FRONTEND_ENABLE_CV_UPLOAD": base64_encode(enable_cv_upload or ""),
         "FRONTEND_DISABLE_REGISTRATION": base64_encode(disable_registration),
@@ -157,6 +169,14 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "FRONTEND_FEATURES": base64_encode(features),
         "FRONTEND_SUPPORTED_LOCALES": base64_encode(supported_locales),
         "FRONTEND_DEFAULT_LOCALE": base64_encode(default_locale),
+        "GLOBAL_PRODUCT_NAME": base64_encode(global_product_name),
+        "FRONTEND_BROWSER_TAB_TITLE": base64_encode(frontend_browser_tab_title),
+        "FRONTEND_META_DESCRIPTION": base64_encode(frontend_meta_description),
+        "FRONTEND_LOGO_URL": base64_encode(frontend_logo_url),
+        "FRONTEND_FAVICON_URL": base64_encode(frontend_favicon_url),
+        "FRONTEND_APP_ICON_URL": base64_encode(frontend_app_icon_url),
+        "FRONTEND_THEME_CSS_VARIABLES": base64_encode(frontend_theme_css_variables),
+        "FRONTEND_SEO": base64_encode(frontend_seo),
     }
 
     env_json_content = f"""window.tabiyaConfig = {json.dumps(frontend_env_json, indent=4)};"""

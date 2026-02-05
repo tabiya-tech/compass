@@ -11,12 +11,12 @@ exports[`RestoreExperiencesDrawer should render deleted experiences when availab
     data-testid="experiences-drawer-header-container-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
   >
     <h5
-      class="MuiTypography-root MuiTypography-h5 css-vmt1ul-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h5 css-xaask8-MuiTypography-root"
     >
       Restore Experiences
     </h5>
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-xu2vll-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-t88s4e-MuiButtonBase-root-MuiIconButton-root"
       data-testid="experiences-drawer-header-button-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
       tabindex="0"
       title="Close experiences"
@@ -24,7 +24,7 @@ exports[`RestoreExperiencesDrawer should render deleted experiences when availab
     >
       <svg
         aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
         data-testid="experiences-drawer-header-icon-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
         focusable="false"
         viewBox="0 0 24 24"
@@ -33,13 +33,10 @@ exports[`RestoreExperiencesDrawer should render deleted experiences when availab
           d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
         />
       </svg>
-      <span
-        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-      />
     </button>
   </div>
   <hr
-    class="MuiDivider-root MuiDivider-fullWidth css-9mgopn-MuiDivider-root"
+    class="MuiDivider-root MuiDivider-fullWidth css-ove2lz-MuiDivider-root"
   />
   <div
     class="MuiBox-root css-1kkt86i"
@@ -52,7 +49,7 @@ exports[`RestoreExperiencesDrawer should render deleted experiences when availab
         class="MuiBox-root css-1kkt86i"
       >
         <h6
-          class="MuiTypography-root MuiTypography-subtitle1 css-15jwqi5-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-subtitle1 css-123boj7-MuiTypography-root"
           data-testid="restore-experience-title-086216b2-a180-4a13-ac3c-cfd23f46153f"
         >
           Software Engineer
@@ -63,7 +60,7 @@ exports[`RestoreExperiencesDrawer should render deleted experiences when availab
         >
           <svg
             aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-14iokzf-MuiSvgIcon-root"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1pk66eg-MuiSvgIcon-root"
             data-testid="SchoolIcon"
             focusable="false"
             viewBox="0 0 24 24"
@@ -73,7 +70,7 @@ exports[`RestoreExperiencesDrawer should render deleted experiences when availab
             />
           </svg>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-ckgs5j-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-nseo62-MuiTypography-root"
           >
             Trainee Work
           </p>
@@ -83,14 +80,14 @@ exports[`RestoreExperiencesDrawer should render deleted experiences when availab
         class="MuiBox-root css-192qrng"
       >
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-1c68ceu-MuiButtonBase-root-MuiButton-root"
           data-testid="restore-experience-button-086216b2-a180-4a13-ac3c-cfd23f46153f"
           tabindex="0"
           title="Restore"
           type="button"
         >
           <span
-            class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1d6wzja-MuiButton-startIcon"
+            class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1sh91j5-MuiButton-startIcon"
           >
             <img
               alt="Restore"
@@ -98,14 +95,11 @@ exports[`RestoreExperiencesDrawer should render deleted experiences when availab
             />
           </span>
           Restore
-          <span
-            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
         </button>
       </div>
     </div>
     <span
-      class="MuiTypography-root MuiTypography-caption css-1s89n9g-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-caption css-1co0sb9-MuiTypography-root"
       data-testid="restore-experience-date-086216b2-a180-4a13-ac3c-cfd23f46153f"
     >
       2022 — Present

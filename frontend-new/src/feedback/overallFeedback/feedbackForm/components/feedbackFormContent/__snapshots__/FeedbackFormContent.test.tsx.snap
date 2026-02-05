@@ -18,7 +18,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
       variants="[object Object]"
     >
       <p
-        class="MuiTypography-root MuiTypography-body1 MuiTypography-gutterBottom css-1s8fdmd-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 MuiTypography-gutterBottom css-b6s7mk-MuiTypography-root"
         data-testid="feedback-form-content-title-07d1ed9d-6ced-4a24-912a-9b89199df67f"
       >
         Bias & Experience Accuracy
@@ -35,15 +35,15 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
             class="MuiBox-root css-0"
           >
             <fieldset
-              class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-1dwck73-MuiFormControl-root"
+              class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-v0fpfa-MuiFormControl-root"
               data-testid="yes-no-question-form-control-9803f91b-499a-41b3-9348-795de9e399a9"
             >
               <legend
-                class="MuiFormLabel-root MuiFormLabel-colorPrimary css-1bbwsov-MuiFormLabel-root"
+                class="MuiFormLabel-root MuiFormLabel-colorPrimary css-vdbahr-MuiFormLabel-root"
                 data-testid="yes-no-question-form-label-9803f91b-499a-41b3-9348-795de9e399a9"
               >
                 <p
-                  class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
+                  class="MuiTypography-root MuiTypography-body1 css-1pejuyu-MuiTypography-root"
                   data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
                 >
                   Did you feel that {{appName}} treated you unfairly by making assumptions about your background, language, or other personal characteristics? If so, please describe your experience.
@@ -51,28 +51,28 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
               </legend>
               <div
                 aria-label="perceived_bias"
-                class="MuiFormGroup-root MuiFormGroup-row MuiRadioGroup-root MuiRadioGroup-row css-106w5h1-MuiFormGroup-root"
+                class="MuiFormGroup-root MuiFormGroup-row MuiRadioGroup-root MuiRadioGroup-row css-b55mil-MuiFormGroup-root"
                 role="radiogroup"
               >
                 <label
-                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-2mfj4v-MuiFormControlLabel-root"
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-h4h2wa-MuiFormControlLabel-root"
                   data-testid="yes-no-question-radio-no-9803f91b-499a-41b3-9348-795de9e399a9"
                 >
                   <span
-                    class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-1inuqo-MuiButtonBase-root-MuiRadio-root"
+                    class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-30cddi-MuiButtonBase-root-MuiSwitchBase-root-MuiRadio-root"
                   >
                     <input
-                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
                       name="perceived_bias"
                       type="radio"
                       value="false"
                     />
                     <span
-                      class="css-hyxlzm"
+                      class="css-9oxshb-MuiRadioButtonIcon-root"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-wycp9y-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8m8t9x-MuiSvgIcon-root-MuiRadioButtonIcon-root"
                         data-testid="RadioButtonUncheckedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -83,7 +83,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                       </svg>
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-wyntia-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-14rshrk-MuiSvgIcon-root-MuiRadioButtonIcon-root"
                         data-testid="RadioButtonCheckedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -93,35 +93,32 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                         />
                       </svg>
                     </span>
-                    <span
-                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                    />
                   </span>
                   <span
-                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-19s6r5h-MuiTypography-root"
                   >
                     No
                   </span>
                 </label>
                 <label
-                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-2mfj4v-MuiFormControlLabel-root"
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-h4h2wa-MuiFormControlLabel-root"
                   data-testid="yes-no-question-radio-yes-9803f91b-499a-41b3-9348-795de9e399a9"
                 >
                   <span
-                    class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-1inuqo-MuiButtonBase-root-MuiRadio-root"
+                    class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-30cddi-MuiButtonBase-root-MuiSwitchBase-root-MuiRadio-root"
                   >
                     <input
-                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
                       name="perceived_bias"
                       type="radio"
                       value="true"
                     />
                     <span
-                      class="css-hyxlzm"
+                      class="css-9oxshb-MuiRadioButtonIcon-root"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-wycp9y-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8m8t9x-MuiSvgIcon-root-MuiRadioButtonIcon-root"
                         data-testid="RadioButtonUncheckedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -132,7 +129,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                       </svg>
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-wyntia-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-14rshrk-MuiSvgIcon-root-MuiRadioButtonIcon-root"
                         data-testid="RadioButtonCheckedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -142,12 +139,9 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                         />
                       </svg>
                     </span>
-                    <span
-                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                    />
                   </span>
                   <span
-                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-19s6r5h-MuiTypography-root"
                   >
                     Yes
                   </span>
@@ -159,38 +153,38 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
             class="MuiBox-root css-0"
           >
             <fieldset
-              class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-1m6dh8w-MuiFormControl-root"
+              class="MuiFormControl-root MuiFormControl-marginNormal MuiFormControl-fullWidth css-w21a37-MuiFormControl-root"
               data-testid="checkbox-with-textarea-form-control-989402f0-9fda-4400-958c-2d6c7bce9821"
             >
               <legend
-                class="MuiFormLabel-root MuiFormLabel-colorPrimary css-1bbwsov-MuiFormLabel-root"
+                class="MuiFormLabel-root MuiFormLabel-colorPrimary css-vdbahr-MuiFormLabel-root"
                 data-testid="checkbox-with-textarea-form-label-989402f0-9fda-4400-958c-2d6c7bce9821"
               >
                 <p
-                  class="MuiTypography-root MuiTypography-body1 css-1rdygw0-MuiTypography-root"
+                  class="MuiTypography-root MuiTypography-body1 css-1pejuyu-MuiTypography-root"
                   data-testid="question-text-bf2b8e40-5a77-4eac-a0ea-ba8af97a5d67"
                 >
                   Were there any aspects of your work experience information identified by {{appName}} that were inaccurate?
                 </p>
               </legend>
               <div
-                class="MuiFormGroup-root css-4ht0cc-MuiFormGroup-root"
+                class="MuiFormGroup-root css-1v80rad-MuiFormGroup-root"
               >
                 <label
-                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-19wfaq0-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-d7oazc-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
                     data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
                     <input
-                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
                       data-indeterminate="false"
                       type="checkbox"
                     />
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
                       data-testid="CheckBoxOutlineBlankIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -199,31 +193,28 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                         d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
                       />
                     </svg>
-                    <span
-                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                    />
                   </span>
                   <span
-                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-19s6r5h-MuiTypography-root"
                   >
                     Incorrect Experience title
                   </span>
                 </label>
                 <label
-                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-19wfaq0-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-d7oazc-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
                     data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
                     <input
-                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
                       data-indeterminate="false"
                       type="checkbox"
                     />
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
                       data-testid="CheckBoxOutlineBlankIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -232,31 +223,28 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                         d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
                       />
                     </svg>
-                    <span
-                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                    />
                   </span>
                   <span
-                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-19s6r5h-MuiTypography-root"
                   >
                     Incorrect start/end dates
                   </span>
                 </label>
                 <label
-                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-19wfaq0-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-d7oazc-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
                     data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
                     <input
-                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
                       data-indeterminate="false"
                       type="checkbox"
                     />
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
                       data-testid="CheckBoxOutlineBlankIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -265,31 +253,28 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                         d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
                       />
                     </svg>
-                    <span
-                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                    />
                   </span>
                   <span
-                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-19s6r5h-MuiTypography-root"
                   >
                     Incorrect location
                   </span>
                 </label>
                 <label
-                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-19wfaq0-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-d7oazc-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
                     data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
                     <input
-                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
                       data-indeterminate="false"
                       type="checkbox"
                     />
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
                       data-testid="CheckBoxOutlineBlankIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -298,31 +283,28 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                         d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
                       />
                     </svg>
-                    <span
-                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                    />
                   </span>
                   <span
-                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-19s6r5h-MuiTypography-root"
                   >
                     Duplicate Experiences
                   </span>
                 </label>
                 <label
-                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-19wfaq0-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-d7oazc-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
                     data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
                     <input
-                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
                       data-indeterminate="false"
                       type="checkbox"
                     />
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
                       data-testid="CheckBoxOutlineBlankIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -331,31 +313,28 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                         d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
                       />
                     </svg>
-                    <span
-                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                    />
                   </span>
                   <span
-                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-19s6r5h-MuiTypography-root"
                   >
                     Missing Experiences
                   </span>
                 </label>
                 <label
-                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1jbxyga-MuiFormControlLabel-root"
+                  class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-19wfaq0-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-50zv81-MuiButtonBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-d7oazc-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
                     data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
                     <input
-                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
                       data-indeterminate="false"
                       type="checkbox"
                     />
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
                       data-testid="CheckBoxOutlineBlankIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -364,12 +343,9 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                         d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
                       />
                     </svg>
-                    <span
-                      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-                    />
                   </span>
                   <span
-                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-1czz4sp-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-19s6r5h-MuiTypography-root"
                   >
                     Other
                   </span>
@@ -382,15 +358,16 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
     </div>
   </div>
   <hr
-    class="MuiDivider-root MuiDivider-fullWidth css-4rn412-MuiDivider-root"
+    class="MuiDivider-root MuiDivider-fullWidth css-q0cs3r-MuiDivider-root"
     color="primary"
     data-testid="feedback-form-content-divider-07d1ed9d-6ced-4a24-912a-9b89199df67f"
   />
   <div
-    class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiMobileStepper-root MuiMobileStepper-positionStatic css-ufcsdh-MuiPaper-root-MuiMobileStepper-root"
+    class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiMobileStepper-root MuiMobileStepper-positionStatic css-1mi13xg-MuiPaper-root-MuiMobileStepper-root"
+    style="--Paper-shadow: var(--mui-shadows-0);"
   >
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-187exs5-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-2a1kq0-MuiButtonBase-root-MuiButton-root"
       data-testid="feedback-form-back-button-07d1ed9d-6ced-4a24-912a-9b89199df67f"
       disabled=""
       tabindex="-1"
@@ -399,29 +376,26 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
       Previous
     </button>
     <div
-      class="MuiMobileStepper-dots css-1384nzf-MuiMobileStepper-dots"
+      class="MuiMobileStepper-dots css-13wf08b-MuiMobileStepper-dots"
     >
       <div
-        class="MuiMobileStepper-dot MuiMobileStepper-dotActive css-15nuweu-MuiMobileStepper-dot"
+        class="MuiMobileStepper-dot MuiMobileStepper-dotActive css-15f2xv0-MuiMobileStepper-dot"
       />
       <div
-        class="MuiMobileStepper-dot css-114p2tk-MuiMobileStepper-dot"
+        class="MuiMobileStepper-dot css-pqq8b7-MuiMobileStepper-dot"
       />
       <div
-        class="MuiMobileStepper-dot css-114p2tk-MuiMobileStepper-dot"
+        class="MuiMobileStepper-dot css-pqq8b7-MuiMobileStepper-dot"
       />
     </div>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-fph7a5-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-1c68ceu-MuiButtonBase-root-MuiButton-root"
       data-testid="feedback-form-next-button-07d1ed9d-6ced-4a24-912a-9b89199df67f"
       style="width: 100px;"
       tabindex="0"
       type="button"
     >
       Next
-      <span
-        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-      />
     </button>
   </div>
 </div>

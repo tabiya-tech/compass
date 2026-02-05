@@ -2,12 +2,12 @@
 
 exports[`AnimatedDotBadge should render the dot when show is true 1`] = `
 <span
-  class="MuiBadge-root css-1c32n2y-MuiBadge-root"
+  class="MuiBadge-root css-63ezxx-MuiBadge-root"
   data-testid="animated-dot-badge-c3f4e2d0-7b4b-4f2f-9c29-7f2e0b9a8a10"
 >
   <svg
     aria-hidden="true"
-    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
     data-testid="badge-icon"
     focusable="false"
     viewBox="0 0 24 24"
@@ -28,10 +28,10 @@ exports[`AnimatedDotBadge should render the dot when show is true 1`] = `
     />
   </svg>
   <span
-    class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightCircular MuiBadge-overlapCircular css-1xtbg9s-MuiBadge-badge"
+    class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightCircular MuiBadge-overlapCircular css-13zjp92-MuiBadge-badge"
   >
     <span
-      class="css-1pmps24"
+      class="css-nc8nih"
     />
   </span>
 </span>

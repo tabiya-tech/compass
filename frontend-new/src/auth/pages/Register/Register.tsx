@@ -19,7 +19,7 @@ import { InvitationType } from "src/auth/services/invitationsService/invitations
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
-import { getApplicationRegistrationCode, getSocialAuthDisabled } from "src/envService";
+import { getApplicationRegistrationCode, getSocialAuthDisabled, getRegistrationCodeDisabled } from "src/envService";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -49,12 +49,16 @@ const Register: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const registrationCodeDisabled = useMemo(() => {
+    return getRegistrationCodeDisabled().toLowerCase() === "true";
+  }, []);
+
   // Check for invitation code in URL params when component mounts
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const inviteCodeParam = params.get(INVITATIONS_PARAM_NAME);
 
-    if (inviteCodeParam) {
+    if (inviteCodeParam && !registrationCodeDisabled) {
       setRegistrationCode(inviteCodeParam);
       // Remove the invite code from the URL
       const newSearchParams = new URLSearchParams(location.search);
@@ -67,7 +71,7 @@ const Register: React.FC = () => {
         { replace: true }
       );
     }
-  }, [location, navigate]);
+  }, [location, navigate, registrationCodeDisabled]);
 
   // a state to determine if the user is currently registering with email
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -151,7 +155,12 @@ const Register: React.FC = () => {
         // if the instance has application registration code set, we should use that instead of the one entered by the user.
         const registrationCodeToUse = registrationCode || applicationRegistrationCode;
         // We're using the mail as the username for now, since we don't have any use case in the app for it
-        await firebaseEmailAuthServiceInstance.register(email, password, email, registrationCodeToUse);
+        await firebaseEmailAuthServiceInstance.register(
+          email,
+          password,
+          email,
+          !registrationCodeDisabled ? registrationCodeToUse : undefined
+        );
         enqueueSnackbar(t("auth.verificationEmailSentShort"), { variant: "success" });
         // IMPORTANT NOTE: after the preferences are added, or fail to be added, we should log the user out immediately,
         // since if we don't do that, the user may be able to access the application without verifying their email
@@ -167,7 +176,16 @@ const Register: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [navigate, enqueueSnackbar, setIsLoading, registrationCode, handleError, applicationRegistrationCode, t]
+    [
+      navigate,
+      enqueueSnackbar,
+      setIsLoading,
+      registrationCode,
+      handleError,
+      applicationRegistrationCode,
+      registrationCodeDisabled,
+      t,
+    ]
   );
 
   /**
@@ -199,7 +217,7 @@ const Register: React.FC = () => {
             </Typography>
           }
         />
-        {!applicationRegistrationCode && (
+        {!applicationRegistrationCode && !registrationCodeDisabled && (
           <React.Fragment>
             <Typography variant="subtitle2">{t("auth.pages.register.enterRegistrationCode")}</Typography>
             <TextField
@@ -213,7 +231,7 @@ const Register: React.FC = () => {
             />
           </React.Fragment>
         )}
-        {!applicationRegistrationCode && (
+        {!applicationRegistrationCode && !registrationCodeDisabled && (
           <Divider textAlign="center" style={{ width: "100%" }}>
             <Typography variant="subtitle2" padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
               {t("auth.pages.register.andEitherContinueWith")}
@@ -221,7 +239,7 @@ const Register: React.FC = () => {
           </Divider>
         )}
         <RegisterWithEmailForm
-          disabled={!registrationCode && !applicationRegistrationCode}
+          disabled={!registrationCode && !applicationRegistrationCode && !registrationCodeDisabled}
           notifyOnRegister={handleRegister}
           isRegistering={isLoading}
         />
@@ -229,7 +247,7 @@ const Register: React.FC = () => {
           <SocialAuth
             postLoginHandler={handlePostLogin}
             isLoading={isLoading}
-            disabled={!registrationCode && !applicationRegistrationCode}
+            disabled={!registrationCode && !applicationRegistrationCode && !registrationCodeDisabled}
             label={t("auth.pages.register.registerWithGoogle")}
             notifyOnLoading={notifyOnSocialLoading}
             registrationCode={registrationCode || applicationRegistrationCode}
@@ -239,7 +257,9 @@ const Register: React.FC = () => {
           {t("auth.pages.register.alreadyHaveAccount")}{" "}
           <CustomLink onClick={() => navigate(routerPaths.LOGIN)}>{t("common.buttons.login")}</CustomLink>
         </Typography>
-        {!applicationRegistrationCode && <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />}
+        {!applicationRegistrationCode && !registrationCodeDisabled && (
+          <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />
+        )}
       </Box>
       <BugReportButton bottomAlign={true} />
       <Backdrop isShown={isLoading} message={t("auth.pages.register.registeringYou")} />

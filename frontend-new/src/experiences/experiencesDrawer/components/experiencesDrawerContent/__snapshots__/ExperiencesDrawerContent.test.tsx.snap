@@ -12,7 +12,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
       class="MuiBox-root css-1lekzkb"
     >
       <p
-        class="MuiTypography-root MuiTypography-body1 css-vvbmpr-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-3bq9g5-MuiTypography-root"
         data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
       >
         Project Manager
@@ -21,7 +21,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
         class="MuiBox-root css-192qrng"
       >
         <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1672xf7-MuiButtonBase-root-MuiIconButton-root"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-bx6kva-MuiButtonBase-root-MuiIconButton-root"
           data-testid="experiences-drawer-more-button-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
           tabindex="0"
           title="More options"
@@ -29,7 +29,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
         >
           <svg
             aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
             data-testid="MoreVertIcon"
             focusable="false"
             viewBox="0 0 24 24"
@@ -38,14 +38,11 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
               d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
             />
           </svg>
-          <span
-            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
         </button>
       </div>
     </div>
     <span
-      class="MuiTypography-root MuiTypography-caption css-1s89n9g-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-caption css-1co0sb9-MuiTypography-root"
       data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
     >
       2022 — Present
@@ -57,7 +54,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     </span>
   </div>
   <p
-    class="MuiTypography-root MuiTypography-body2 css-1ndnk23-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-body2 css-vtq6gs-MuiTypography-root"
     data-testid="experiences-drawer-content-summary-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
   >
     Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
@@ -66,7 +63,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     class="MuiBox-root css-70qvj9"
   >
     <p
-      class="MuiTypography-root MuiTypography-body1 css-11iibhc-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body1 css-1c35wu1-MuiTypography-root"
       data-testid="experiences-drawer-content-skills-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
     >
       <b>
@@ -75,7 +72,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     </p>
     <button
       aria-label="help"
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1pqe0ky-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-qpnlj3-MuiButtonBase-root-MuiIconButton-root"
       data-mui-internal-clone-element="true"
       data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
       tabindex="0"
@@ -83,7 +80,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     >
       <svg
         aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8lbdna-MuiSvgIcon-root"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1dtfl3c-MuiSvgIcon-root"
         data-testid="InfoIcon"
         focusable="false"
         viewBox="0 0 24 24"
@@ -92,9 +89,6 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
           d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-6h2zm0-8h-2V7h2z"
         />
       </svg>
-      <span
-        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-      />
     </button>
   </div>
   <div
@@ -102,34 +96,28 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     data-testid="experiences-drawer-skills-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
   >
     <div
-      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1n9e303-MuiButtonBase-root-MuiChip-root"
+      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1ro4mrf-MuiButtonBase-root-MuiChip-root"
       data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
       role="button"
       tabindex="0"
     >
       <span
-        class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+        class="MuiChip-label MuiChip-labelMedium css-1glixai-MuiChip-label"
       >
         Management
       </span>
-      <span
-        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-      />
     </div>
     <div
-      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1n9e303-MuiButtonBase-root-MuiChip-root"
+      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1ro4mrf-MuiButtonBase-root-MuiChip-root"
       data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
       role="button"
       tabindex="0"
     >
       <span
-        class="MuiChip-label MuiChip-labelMedium css-1dybbl5-MuiChip-label"
+        class="MuiChip-label MuiChip-labelMedium css-1glixai-MuiChip-label"
       >
         Communication
       </span>
-      <span
-        class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-      />
     </div>
   </div>
   <div
@@ -169,35 +157,35 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
 
 exports[`ReportDrawerContent should render ExperiencesDrawerContent skeleton correctly 1`] = `
 <div
-  class="MuiGrid-root MuiGrid-container css-1w7ivyd-MuiGrid-root"
+  class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-1590qpt-MuiGrid-root"
   data-testid="experiences-drawer-content-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
 >
   <div
-    class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-8 css-vok43g-MuiGrid-root"
+    class="MuiGrid-root MuiGrid-direction-xs-row MuiGrid-grid-xs-8 css-1hw9i25-MuiGrid-root"
   >
     <div
       class="MuiBox-root css-yj95vr"
     >
       <span
-        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-qn5ikh-MuiSkeleton-root"
+        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-14e33k0-MuiSkeleton-root"
         data-testid="skeleton-text"
         style="width: 60%;"
       />
       <span
-        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-qn5ikh-MuiSkeleton-root"
+        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-14e33k0-MuiSkeleton-root"
         data-testid="skeleton-text"
         style="width: 90%;"
       />
     </div>
-    <div
-      class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-4 css-gj1fbr-MuiGrid-root"
-    >
-      <span
-        class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-qn5ikh-MuiSkeleton-root"
-        data-testid="skeleton-text"
-        style="width: 80%;"
-      />
-    </div>
+  </div>
+  <div
+    class="MuiGrid-root MuiGrid-direction-xs-row MuiGrid-grid-xs-4 css-1oxte1b-MuiGrid-root"
+  >
+    <span
+      class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-14e33k0-MuiSkeleton-root"
+      data-testid="skeleton-text"
+      style="width: 80%;"
+    />
   </div>
 </div>
 `;

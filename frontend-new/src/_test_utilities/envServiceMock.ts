@@ -17,4 +17,9 @@ jest.mock("src/envService", () => ({
   getMetaDescription: jest.fn(() => "Mocked Meta Description"),
   getSeoEnvVar: jest.fn(() => "{}"),
   ensureRequiredEnvVars: jest.fn(() => {}),
+  getLogoUrl: jest.fn(() => "mock-logo-url"),
+  getFaviconUrl: jest.fn(() => "mock-favicon-url"),
+  getAppIconUrl: jest.fn(() => "mock-app-icon-url"),
+  getThemeCssVariables: jest.fn(() => "{}"),
+  getRegistrationCodeDisabled: jest.fn(() => "false"),
 }));
