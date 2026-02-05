@@ -1,0 +1,15 @@
+{
+  "name": "persona_2_simple_formal",
+  "persona": "formal",
+  "locale": "en-US",
+  "country_of_user": "Unspecified",
+  "conversation_rounds": 60,
+  "simulated_user_prompt": "You are a professional with one formal role. You worked as a Customer Support Associate at BrightTech in Nairobi from 2021 to 2023. Provide structured, formal answers but keep them concise. You have no other jobs, internships, or volunteer roles.",
+  "metrics_thresholds": {
+    "max_turn_count": 25,
+    "max_repetition_rate": 0.08,
+    "min_starter_diversity": 0.35,
+    "min_achievement_rate": 0.08,
+    "max_llm_calls": 200
+  }
+}

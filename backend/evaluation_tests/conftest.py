@@ -65,7 +65,7 @@ async def setup_search_services() -> SearchServices:
 def setup_multi_locale_app_config():
     """
     Ensure ApplicationConfig is set with multi-locale language config for evaluation tests.
-    Reuses existing ApplicationConfig if present, replacing language_config with EN_US and EN_GB entries.
+    Reuses existing ApplicationConfig if present, replacing language_config with EN_US, EN_GB, and ES_AR entries.
     """
     try:
         current = get_application_config()

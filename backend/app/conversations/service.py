@@ -16,7 +16,8 @@ from app.conversations.utils import get_messages_from_conversation_manager, filt
     get_total_explored_experiences, get_current_conversation_phase_response
 from app.sensitive_filter import sensitive_filter
 from app.metrics.application_state_metrics_recorder.recorder import IApplicationStateMetricsRecorder
-
+from app.context_vars import turn_index_ctx_var
+from app.agent.persona_detector import detect_persona
 
 class ConversationAlreadyConcludedError(Exception):
     """
@@ -104,6 +105,20 @@ class ConversationService(IConversationService):
         context = await self._conversation_memory_manager.get_conversation_context()
         # get the current index in the conversation history, so that we can return only the new messages
         current_index = len(context.all_history.turns)
+        
+        # Set turn_index in context for observability logging
+        turn_index_ctx_var.set(current_index)
+
+        # Detect persona using prior user messages + current input
+        history_messages = [
+            turn.input.message for turn in context.all_history.turns
+            if not turn.input.is_artificial and turn.input.message
+        ]
+        persona_type = detect_persona(user_input.message, history_messages)
+        state.agent_director_state.persona_type = persona_type
+        state.collect_experience_state.persona_type = persona_type
+        state.skills_explorer_agent_state.persona_type = persona_type
+        
         await self._agent_director.execute(user_input=user_input)
         # get the context again after updating the history
         context = await self._conversation_memory_manager.get_conversation_context()

@@ -10,7 +10,7 @@ from app.conversation_memory.conversation_memory_manager import ConversationMemo
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.vector_search.vector_search_dependencies import SearchServices
 from app.i18n.translation_service import t
-
+from app.context_vars import phase_ctx_var, agent_type_ctx_var # for observability logging
 
 class LLMAgentDirector(AbstractAgentDirector):
     """
@@ -116,6 +116,10 @@ class LLMAgentDirector(AbstractAgentDirector):
         try:
             if self._state is None:
                 raise RuntimeError("AgentDirectorState must be set before executing")
+            
+            # Set initial phase in context for observability logging
+            phase_ctx_var.set(self._state.current_phase.value)
+            
             first_call: bool = True
             transitioned_to_new_phase: bool = False
             agent_output: AgentOutput | None = None
@@ -143,10 +147,15 @@ class LLMAgentDirector(AbstractAgentDirector):
                     phase=self._state.current_phase,
                     context=context)
                 self._logger.debug("Running agent: %s", {suitable_agent_type})
+                
+                # Set agent_type in context for observability logging
+                agent_type_ctx_var.set(suitable_agent_type.value if suitable_agent_type else ":none:")
+                
                 agent_for_task = self._agents[suitable_agent_type]
 
                 # Perform the task
                 agent_output = await agent_for_task.execute(clean_input, context)
+                
                 if not agent_for_task.is_responsible_for_conversation_history():
                     await self._conversation_manager.update_history(clean_input, agent_output)
 
@@ -161,6 +170,13 @@ class LLMAgentDirector(AbstractAgentDirector):
                         is_artificial=True
                     )
                     self._state.current_phase = new_phase
+                    
+                    # Update phase in context for observability logging
+                    phase_ctx_var.set(new_phase.value if new_phase else ":none:")
+                
+                # Clear agent_type after all operations and logging for this iteration
+                # This ensures observability logs capture the agent type throughout execution
+                agent_type_ctx_var.set(":none:")
 
             # return the last agent output in case
             return agent_output
