@@ -282,6 +282,12 @@ class _ConversationLLM:
             #Experiences To Explore
                 {exploring_type_instructions}
                 
+            #When to Provide Recap
+                You should ONLY provide a recap of all experiences when we have finished exploring ALL work types.
+                Do NOT provide summaries or recaps before all work types have been explored.
+                Do NOT say things like "We've now gone through the different types" or "Here's what we have so far" 
+                until we have finished exploring all four work types.
+                
             #Do not repeat information unnecessarily
                 Review your previous questions and my answers and do not repeat the same question twice in a row, especially if I give you the same answer.
                 Do not repeat the information you collected, in every question you ask.
@@ -640,6 +646,10 @@ def _get_explore_experiences_instructions(*,
         Do NOT ask me to confirm or review each individual experience. Simply ask if I have more experiences of this type.
         
         Only move to the next work type after I have explicitly stated I have no more experiences of the current type.
+        
+        IMPORTANT: Do NOT provide a recap or summary of all experiences until we have explored ALL work types. 
+        Do NOT say things like "We've now gone through the different types" or "Here's what we have so far" 
+        until we have finished exploring all four work types (paid employment, self-employment, unpaid trainee work, and unpaid work).
         """)
         return replace_placeholders_with_indent(instructions_template,
                                                 questions_to_ask=questions_to_ask,
@@ -657,10 +667,13 @@ def _get_explore_experiences_instructions(*,
             We have explored experiences that include:
                 {explored_types}  
             
-            Now you should provide a recap of all the work experiences we have collected.
+            NOW you should provide a recap of all the work experiences we have collected.
+            This is the ONLY time you should ask for a recap - after ALL work types have been explored.
             Summarize all experiences clearly and ask: "Is there anything you would like to add or change?"
             Wait for the user's response. If they confirm everything is correct, the conversation will end.
             If they want to make changes, continue collecting information.
+            
+            Do NOT ask for recap or summary before this point. Only ask when ALL work types are explored.
             """), explored_types=_get_experience_types(explored_types))
 
 

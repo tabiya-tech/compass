@@ -18,7 +18,7 @@ from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_
     get_config_variation
 from common_libs.llm.schema_builder import with_response_schema
 from common_libs.retry import Retry
-from ._conversation_llm import _find_incomplete_experiences
+from ._conversation_llm import _find_incomplete_experiences, _get_experience_type, _ask_experience_type_question
 from ._types import CollectedData
 
 _TAGS_TO_FILTER = [
@@ -26,6 +26,22 @@ _TAGS_TO_FILTER = [
     "conversation history",
     "collected experience data",
 ]
+
+
+def _generate_work_type_mapping() -> str:
+    """
+    Dynamically generate work type mapping from the WorkType enum.
+    This ensures we don't hardcode work types and can easily add/remove them.
+    """
+    mapping_lines = []
+    for work_type in WorkType:
+        description = _get_experience_type(work_type)
+        example_question = _ask_experience_type_question(work_type)
+        mapping_lines.append(
+            f"          - {work_type.name}: Questions about \"{description}\" "
+            f"(e.g., \"{example_question}\")"
+        )
+    return "\n".join(mapping_lines)
 
 
 class TransitionDecision(Enum):
@@ -39,7 +55,7 @@ class TransitionReasoning(BaseModel):
     confidence: str
 
 
-class _LLMOutput(BaseModel):
+class _TransitionDecisionOutput(BaseModel):
     transition_decision: TransitionDecision
 
     class Config:
@@ -50,7 +66,7 @@ class TransitionDecisionTool:
 
     def __init__(self, logger: logging.Logger):
         self._logger = logger
-        self._llm_caller = LLMCaller[_LLMOutput](model_response_type=_LLMOutput)
+        self._llm_caller = LLMCaller[_TransitionDecisionOutput](model_response_type=_TransitionDecisionOutput)
 
     @staticmethod
     def _get_llm(collected_data_json: str, temperature_config: Optional[dict] = None) -> GeminiGenerativeLLM:
@@ -65,7 +81,7 @@ class TransitionDecisionTool:
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 1000
-                } | temperature_config | with_response_schema(_LLMOutput)
+                } | temperature_config | with_response_schema(_TransitionDecisionOutput)
             ))
 
     async def execute(self,
@@ -77,7 +93,7 @@ class TransitionDecisionTool:
                       conversation_context: ConversationContext,
                       user_input: AgentInput) -> tuple[TransitionDecision, Optional[TransitionReasoning], list[LLMStats]]:
         
-        # we make a rule based decision since we can check by code if there are incomplete experiences
+        # Rule-based check 1: Incomplete experiences
         incomplete_experiences = _find_incomplete_experiences(collected_data)
         if incomplete_experiences:
             self._logger.info(
@@ -86,6 +102,7 @@ class TransitionDecisionTool:
                 [(idx, exp.experience_title, missing) for idx, exp, missing in incomplete_experiences]
             )
             return TransitionDecision.CONTINUE, None, []
+        
         
         cleaned_experience_dicts = []
         for collected_item in collected_data:
@@ -102,10 +119,16 @@ class TransitionDecisionTool:
         unexplored_types_str = ", ".join([wt.name for wt in unexplored_types])
         explored_types_str = ", ".join([wt.name for wt in explored_types])
         
+        exploring_type_description = _get_experience_type(exploring_type) if exploring_type else "None"
+        work_type_mapping = _generate_work_type_mapping()
+        
         prompt = _PROMPT_TEMPLATE.format(
             user_input=user_input.message,
             conversation_history=conversation_history,
             exploring_type=exploring_type_str,
+            exploring_type_enum=exploring_type.name if exploring_type else "None",
+            exploring_type_description=exploring_type_description,
+            work_type_mapping=work_type_mapping,
             unexplored_types=unexplored_types_str,
             explored_types=explored_types_str
         )
@@ -186,36 +209,30 @@ _SYSTEM_INSTRUCTIONS = """
 Use CONTINUE when:
 - There are incomplete experiences that need more information
 - The user is still providing information about experiences
-- The agent has not yet asked "Do you have any other [work type] experiences?" for the current type
+- The agent has not yet asked about the current work type
 - All work types are explored but the recap question has not been asked yet
 
 Use END_WORKTYPE when ALL of the following are true:
 - There are no incomplete experiences for the current work type
-- The agent has asked "Do you have any other [work type] experiences?" (or similar question asking if user has more experiences of the current type)
-- The user's response indicates they have no more experiences of the current type (negative response to "do you have more" question)
+- The agent has asked a question about the current work type
+- The user's response semantically indicates they have no (more) experiences of the current type
 - There are still unexplored work types remaining
 
 Use END_CONVERSATION when ALL of the following are true:
 - All work types have been explored (unexplored_types is empty)
 - There are no incomplete experiences
-- The recap question has been asked (agent summarized all experiences and asked if user wants to add/change anything)
-- The user has confirmed they have nothing to add or change (positive confirmation to recap question)
+- The recap question has been asked and the user confirmed they have nothing to add or change
 
 #Important Constraints
 - NEVER use END_WORKTYPE or END_CONVERSATION if there are incomplete experiences - always use CONTINUE
 - NEVER use END_CONVERSATION if there are unexplored work types - use END_WORKTYPE instead
-- END_WORKTYPE requires that the agent has explicitly asked if user has more experiences of the current type
-- END_CONVERSATION requires that the recap question has been explicitly asked
+- Use semantic understanding to detect negation - do NOT rely on specific phrases or keywords
     
 #Collected Experience Data
     {collected_data}
     
-    The values null and "" can be interpreted as follows:
-    - null: Information was not provided and not explicitly asked for yet
-    - "": User was asked but chose not to provide this information
-    
     An experience is incomplete if it has a title but is missing important fields (start_date, end_date, company, or location).
-    IMPORTANT: Empty strings ("") mean the user explicitly declined to provide information, so they are NOT considered missing.
+    Empty strings ("") mean the user explicitly declined to provide information, so they are NOT considered missing.
     Only None values indicate missing information that hasn't been asked for yet.
 </System Instructions>
 """
@@ -230,50 +247,31 @@ _PROMPT_TEMPLATE = """
 </User's Last Input>
 
 <Current State>
-- Currently exploring work type: {exploring_type}
+- Currently exploring work type: {exploring_type_enum} ({exploring_type_description})
 - Unexplored work types remaining: {unexplored_types}
 - Already explored work types: {explored_types}
 </Current State>
 
 #Task
-    Based on the conversation history, user's last input, and current state, decide which transition decision to make.
+    Decide which transition decision to make based on the conversation history, user's last input, and current state.
     
-    Follow this decision process in order:
+    Decision process:
     
-    1. Check for incomplete experiences
-       - If there are incomplete experiences → Return CONTINUE
+    1. If there are incomplete experiences → Return CONTINUE
     
-    2. Check if there are unexplored work types remaining
-       - If yes, check if the agent has asked "Do you have any other [work type] experiences?" (or similar question asking if user has more experiences of the current type)
-         * Look at the LAST question asked by the agent in the conversation history
-         * Determine if it's asking whether the user has more experiences of the current work type
-         * If the agent has NOT asked this question yet → Return CONTINUE (agent needs to ask first)
-         * If the agent HAS asked this question:
-           - Check if the user's last input is a negative response (indicating no more experiences)
-           - If user's response indicates they have no more experiences of this type → Return END_WORKTYPE
-           - If user's response indicates they have more experiences → Return CONTINUE
-           - If user's response is unclear → Return CONTINUE
+    2. If there are unexplored work types remaining:
+       - Check if the agent's LAST question asked about the current work type ({exploring_type_enum})
+       - Work type question patterns:
+{work_type_mapping}
+       - If agent asked about current work type AND user's response semantically indicates no (more) experiences → Return END_WORKTYPE
+       - If agent asked about current work type AND user provided an experience or said yes → Return CONTINUE
+       - If agent has NOT asked about current work type yet → Return CONTINUE
     
-    3. Check if all work types are explored
-       - If yes, check if recap was asked:
-         * Look through conversation history for a recap question:
-           - Agent summarizes all experiences collected
-           - Agent asks if user wants to add or change anything
-         * If recap was NOT asked yet → Return CONTINUE (agent needs to ask recap first)
-         * If recap WAS asked:
-           - Check if user's response indicates they're satisfied (no changes wanted) → Return END_CONVERSATION
-           - Check if user wants changes → Return CONTINUE
-    
-    Return your decision as one of: CONTINUE, END_WORKTYPE, or END_CONVERSATION
-    
-    #Important Notes
-    - Do not rely on hardcoded phrases. Use semantic understanding to determine user intent.
-    - A negative response to "do you have more?" means the user has no more experiences of that type.
-    - A positive response to recap means the user is satisfied and ready to move on.
+    3. If all work types are explored:
+       - If recap was asked AND user confirmed satisfied → Return END_CONVERSATION
+       - Otherwise → Return CONTINUE
     
     #Output Format
-    Your response must be a valid JSON object with only the following field:
+    Return a JSON object with only this field:
     - transition_decision: One of "CONTINUE", "END_WORKTYPE", or "END_CONVERSATION"
-    
-    Do not include any reasoning, explanation, or other fields. Only return the transition_decision.
 """
