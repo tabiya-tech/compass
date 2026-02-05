@@ -12,6 +12,10 @@ DEFAULT_FRONTEND_ENV_PATH = '../frontend-new/public/data/env.js'
 BACKEND_ENV_MAP: Dict[str, str] = {
     'GLOBAL_PRODUCT_NAME': 'branding.appName',
 
+    # i18n
+    "BACKEND_LANGUAGE_CONFIG": "i18n.conversation",
+
+
     # Invitation Codes
     "GLOBAL_DISABLE_REGISTRATION_CODE": "auth.disableRegistrationCode",
 
@@ -42,12 +46,17 @@ FRONTEND_ENV_MAP: Dict[str, str] = {
 
     # CV Upload
     "GLOBAL_ENABLE_CV_UPLOAD": "cv.enabled",
+
+    # i18n
+    "FRONTEND_DEFAULT_LOCALE": "i18n.ui.defaultLocale",
+    "FRONTEND_SUPPORTED_LOCALES": "i18n.ui.supportedLocales",
 }
 
 FRONTEND_JSON_FIELDS = {
     'FRONTEND_THEME_CSS_VARIABLES',
     'FRONTEND_SEO',
     'FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG',
+    'FRONTEND_SUPPORTED_LOCALES',
     # Add more JSON.stringify fields here
 }
 
