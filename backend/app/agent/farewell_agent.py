@@ -33,10 +33,9 @@ class FarewellAgent(SimpleLLMAgent):
             Do not make things up.
             Do not explore skills further. 
             Do not make any other suggestions.
-            Do not answer any of my questions.
             Do not format or style your response.
             There aren't any follow-up steps.
-            If I ask questions you are unsure, you will answer each time with a concise but different variation of:
+            If I ask a question, respond each time with a concise but different variation of:
                 "Sorry, I don't know how to help you with that."
             Ensure the total response does not exceed 100 words.          
             
@@ -46,7 +45,7 @@ class FarewellAgent(SimpleLLMAgent):
             """)
 
         system_instructions = system_instructions_template.format(response_part=response_part,
-                                                                  language_style=get_language_style(with_locale=False),
+                                                                  language_style=get_language_style(with_locale=False, for_json_output=True),
                                                                   finish_instructions=finish_instructions)
         super().__init__(agent_type=AgentType.FAREWELL_AGENT,
                          system_instructions=system_instructions)

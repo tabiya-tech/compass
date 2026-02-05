@@ -9,6 +9,7 @@ from app.agent.experience.experience_entity import ExperienceEntity, Responsibil
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.countries import Country
 from app.i18n.translation_service import t
+from app.agent.persona_detector import PersonaType
 from ._conversation_llm import _ConversationLLM, _FINAL_MESSAGE_KEY
 from ._responsibilities_extraction_tool import _ResponsibilitiesExtractionTool
 
@@ -26,6 +27,11 @@ class SkillsExplorerAgentState(BaseModel):
     country_of_user: Country = Field(default=Country.UNSPECIFIED)
     """
     The country of the user.
+    """
+
+    persona_type: PersonaType = Field(default=PersonaType.INFORMAL)
+    """
+    The detected persona type for adapting prompts.
     """
 
     first_time_for_experience: dict[str, bool] = Field(default_factory=dict)
@@ -76,12 +82,23 @@ class SkillsExplorerAgentState(BaseModel):
             return Country[value]
         return value
 
+    @field_serializer("persona_type")
+    def serialize_persona_type(self, persona_type: PersonaType, _info):
+        return persona_type.name
+
+    @field_validator("persona_type", mode='before')
+    def deserialize_persona_type(cls, value: str | PersonaType) -> PersonaType:
+        if isinstance(value, str):
+            return PersonaType[value]
+        return value
+
     @staticmethod
     def from_document(_doc: Mapping[str, Any]) -> "SkillsExplorerAgentState":
         return SkillsExplorerAgentState(session_id=_doc["session_id"],
                                         # For backward compatibility with old documents that don't have the country_of_user field,
                                         # set it to UNSPECIFIED
                                         country_of_user=_doc.get("country_of_user", Country.UNSPECIFIED),
+                                        persona_type=_doc.get("persona_type", PersonaType.INFORMAL),
                                         first_time_for_experience=_doc["first_time_for_experience"],
                                         experiences_explored=_doc["experiences_explored"],
                                         # For backward compatibility with old documents that don't have the question_asked_until_now field,
@@ -147,6 +164,8 @@ class SkillsExplorerAgent(Agent):
             self.state.answers_provided = []  # Reset the answers provided for this experience
 
         responsibilities_llm_stats = []
+        responsibilities_output = None
+        rich_response = False
         if user_input.message == "":
             # If the user input is empty, set it to "(silence)"
             # This is to avoid the agent failing to respond to an empty input
@@ -161,6 +180,10 @@ class SkillsExplorerAgent(Agent):
                               responsibilities_output)
             # Merge the extracted responsibilities data into the experience entity
             SkillsExplorerAgent._merge_responsibilities_data(self.experience_entity, responsibilities_output)
+            if responsibilities_output:
+                responsibilities_count = len(responsibilities_output.responsibilities)
+                word_count = len(user_input.message.split())
+                rich_response = responsibilities_count >= 5 or word_count >= 80
 
             # Update the state with the answers provided by the user
             # This input was the user's response to a previous question asked by the agent
@@ -174,7 +197,10 @@ class SkillsExplorerAgent(Agent):
                                                                question_asked_until_now=self.state.question_asked_until_now,
                                                                user_input=user_input,
                                                                country_of_user=self.state.country_of_user,
+                                                               persona_type=self.state.persona_type,
                                                                context=context,
+                                                               experience_index=len(self.state.experiences_explored),
+                                                               rich_response=rich_response,
                                                                experience_title=self.experience_entity.experience_title,
                                                                work_type=self.experience_entity.work_type,
                                                                logger=self.logger)

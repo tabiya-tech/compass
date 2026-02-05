@@ -48,6 +48,7 @@ google-genai="^1.26.0"
 google-cloud-storage = "^2.18.2"
 rich = "^14.2.0"
 openpyxl = "^3.1.5"
+pytest-html = "^4.2.0"
 
 [build-system]
 requires = ["poetry-core"]

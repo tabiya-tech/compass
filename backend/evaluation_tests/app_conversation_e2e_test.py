@@ -1,4 +1,5 @@
 import logging.config
+from pathlib import Path
 from typing import Awaitable
 
 import pytest
@@ -8,6 +9,7 @@ from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
 from app.i18n.translation_service import get_i18n_manager
 from app.vector_search.vector_search_dependencies import SearchServices
 from common_libs.test_utilities import get_random_session_id
+from evaluation_tests.baseline_metrics_collector import BaselineMetricsCollector
 from evaluation_tests.conversation_libs import conversation_generator
 from evaluation_tests.conversation_libs.conversation_test_function import LLMSimulatedUser
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import ConversationEvaluationRecord
@@ -34,7 +36,7 @@ async def test_main_app_chat(
         current_test_case: E2ETestCase | E2ESpecificTestCase,
         common_folder_path: str,
         setup_search_services: Awaitable[SearchServices],
-        setup_multi_locale_app_config,
+        setup_multi_locale_app_config
 ):
     """
     E2E conversation test, based on the test cases specified above. It calls the same endpoint as the frontend
@@ -50,10 +52,18 @@ async def test_main_app_chat(
         {"number_of_clusters": current_test_case.given_number_of_clusters,
          "number_of_top_skills_to_pick_per_cluster": current_test_case.given_number_of_top_skills_to_pick_per_cluster})
     logger.info(f"Experience pipeline config: {experience_pipeline_config}")
+    
+    # Initialize baseline metrics collector
+    metrics_collector = BaselineMetricsCollector(
+        test_case_name=current_test_case.name,
+        session_id=str(session_id)
+    )
+    
     chat_executor = E2EChatExecutor(session_id=session_id,
                                     default_country_of_user=current_test_case.country_of_user,
                                     search_services=search_services,
-                                    experience_pipeline_config=experience_pipeline_config)
+                                    experience_pipeline_config=experience_pipeline_config,
+                                    metrics_collector=metrics_collector)
 
     evaluation_result = ConversationEvaluationRecord(simulated_user_prompt=current_test_case.simulated_user_prompt,
                                                      test_case=current_test_case.name)
@@ -158,6 +168,15 @@ async def test_main_app_chat(
         evaluation_result.save_data(folder=output_folder, base_file_name='evaluation_record')
         context = await chat_executor.get_conversation_memory_manager().get_conversation_context()
         save_conversation(context, title=current_test_case.name, folder_path=output_folder)
+        
+        # Save baseline metrics
+        output_path = Path(output_folder)
+        metrics_path = metrics_collector.save_metrics(output_path)
+        logger.info(f"Baseline metrics saved to: {metrics_path}")
+        
+        # Log summary
+        summary = metrics_collector.get_summary()
+        logger.info(f"Baseline metrics summary: {summary}")
 
         if failures:
             failures = "\n  - ".join(failures)

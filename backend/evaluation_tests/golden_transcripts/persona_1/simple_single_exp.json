@@ -1,0 +1,15 @@
+{
+  "name": "persona_1_simple_single_exp",
+  "persona": "informal",
+  "locale": "en-US",
+  "country_of_user": "Kenya",
+  "conversation_rounds": 50,
+  "simulated_user_prompt": "You are a young person from Kenya with a single informal experience. You worked as a street vendor selling vegetables at a local market in Nairobi from 2022 to present. You never had any other job, internship, or volunteer work. Answer concisely and only provide details when asked.",
+  "metrics_thresholds": {
+    "max_turn_count": 22,
+    "max_repetition_rate": 0.08,
+    "min_starter_diversity": 0.35,
+    "min_achievement_rate": 0.08,
+    "max_llm_calls": 200
+  }
+}

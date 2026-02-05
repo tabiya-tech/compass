@@ -9,6 +9,7 @@ from app.agent.agent_types import LLMStats
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMInput
 from common_libs.text_formatters.extract_json import extract_json, ExtractJSONError
+from app.context_vars import llm_call_duration_ms_ctx_var
 
 # retries to call the LLM, if it fails to respond or with a valid JSON object.
 _MAX_ATTEMPTS = 3
@@ -94,6 +95,12 @@ class LLMCaller(Generic[RESPONSE_T]):
             llm_stats = LLMStats(prompt_token_count=llm_response.prompt_token_count,
                                  response_token_count=llm_response.response_token_count,
                                  response_time_in_sec=round(llm_end_time - llm_start_time, 2))
+            
+            # Set LLM duration in context for observability logging
+            duration_ms = round((llm_end_time - llm_start_time) * 1000, 2)
+            llm_call_duration_ms_ctx_var.set(duration_ms)
+            logger.info("LLM call completed")
+            
             response_text = llm_response.text
             try:
                 model_response = extract_json(response_text, self._model_response_type)
@@ -136,6 +143,11 @@ class LLMCaller(Generic[RESPONSE_T]):
         generation_config.frequency_penalty = original_frequency_penalty
         # Reset the temperature to the original value
         generation_config.temperature = original_temperature
+        
+        # Note: We intentionally do NOT reset llm_call_duration_ms_ctx_var here.
+        # The duration should remain set so that observability logs in calling code
+        # can capture the actual LLM call duration. It will be overwritten by the
+        # next LLM call or remain at its default value of -1 if no call is made.
 
         logger.debug("Model input: %s", llm_input)
         logger.debug("Model output: %s", model_response)

@@ -1,0 +1,15 @@
+{
+  "name": "persona_1_multi_experience",
+  "persona": "informal",
+  "locale": "en-US",
+  "country_of_user": "Kenya",
+  "conversation_rounds": 80,
+  "simulated_user_prompt": "You are a young person from Kenya with multiple informal experiences. You have worked as a boda boda rider since 2021, helped your family farm during harvest seasons from 2018 to 2020, and ran a small kiosk in your neighborhood in 2019. Answer one experience at a time when asked, and be concise.",
+  "metrics_thresholds": {
+    "max_turn_count": 35,
+    "max_repetition_rate": 0.08,
+    "min_starter_diversity": 0.35,
+    "min_achievement_rate": 0.08,
+    "max_llm_calls": 220
+  }
+}

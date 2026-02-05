@@ -5,6 +5,7 @@ from app.agent.simple_llm_agent.llm_response import ModelResponse
 from app.agent.agent_types import AgentType, AgentInput, AgentOutput
 from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions, \
     get_conversation_finish_instructions
+from app.agent.prompt_template.locale_style import get_language_style
 from app.conversation_memory.conversation_memory_types import ConversationContext
 
 class QnaAgent(SimpleLLMAgent):
@@ -23,8 +24,10 @@ class QnaAgent(SimpleLLMAgent):
         asked. If you are unsure and the user asks questions that contain information that is not explicitly related 
         to your task and can't be found in the _ABOUT_ section, you will answer each time with a concise but 
         different variation of: "Sorry, I don't know how to help you with that." Be clear and concise in your 
-        responses do not break character and do not make things up. Answer in no more than 100 words.
+        responses. Do not break character and do not make things up. Answer in no more than 100 words.
                     
+        {language_style}
+        
         _ABOUT_:
             Your name is Compass.
             You are a tool that helps users explore their skills and generate a CV.
@@ -40,6 +43,7 @@ class QnaAgent(SimpleLLMAgent):
         {finish_instructions}
         """)
         system_instructions = system_instructions_template.format(
+            language_style=get_language_style(for_json_output=True),
             response_part=response_part,
             finish_instructions=get_conversation_finish_instructions("When you have answered the user's question,"))
 

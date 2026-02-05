@@ -7,6 +7,7 @@ from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.agent_types import AgentType
 from app.agent.collect_experiences_agent._conversation_llm import _ConversationLLM, ConversationLLMAgentOutput, \
     _get_experience_type
+from app.agent.persona_detector import PersonaType
 from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtractionLLM
 from app.agent.collect_experiences_agent._transition_decision_tool import TransitionDecisionTool, TransitionDecision
 from app.agent.collect_experiences_agent._types import CollectedData
@@ -39,6 +40,11 @@ class CollectExperiencesAgentState(BaseModel):
     country_of_user: Country = Field(default=Country.UNSPECIFIED)
     """
     The country of the user.
+    """
+
+    persona_type: PersonaType = Field(default=PersonaType.INFORMAL)
+    """
+    The detected persona type for adapting prompts.
     """
 
     collected_data: list[CollectedData] = Field(default_factory=list)
@@ -80,6 +86,16 @@ class CollectExperiencesAgentState(BaseModel):
             return Country[value]
         return value
 
+    @field_serializer("persona_type")
+    def serialize_persona_type(self, persona_type: PersonaType, _info):
+        return persona_type.name
+
+    @field_validator("persona_type", mode='before')
+    def deserialize_persona_type(cls, value: str | PersonaType) -> PersonaType:
+        if isinstance(value, str):
+            return PersonaType[value]
+        return value
+
     # use a field serializer to serialize the explored_types
     # we use the name of the Enum instead of the value because that makes the code less brittle
     @field_serializer("explored_types")
@@ -109,6 +125,7 @@ class CollectExperiencesAgentState(BaseModel):
         return CollectExperiencesAgentState(session_id=_doc["session_id"],
                                             # For backward compatibility with old documents that don't have the country_of_user field, set it to UNSPECIFIED
                                             country_of_user=_doc.get("country_of_user", Country.UNSPECIFIED),
+                                            persona_type=_doc.get("persona_type", PersonaType.INFORMAL),
                                             collected_data=_doc["collected_data"],
                                             unexplored_types=_doc["unexplored_types"],
                                             explored_types=_doc["explored_types"],
@@ -161,6 +178,7 @@ class CollectExperiencesAgent(Agent):
             context=context,
             user_input=user_input,
             country_of_user=self._state.country_of_user,
+            persona_type=self._state.persona_type,
             collected_data=collected_data,
             last_referenced_experience_index=last_referenced_experience_index,
             exploring_type=exploring_type,
@@ -206,20 +224,19 @@ class CollectExperiencesAgent(Agent):
                     f"{user_input.message}\n"
                     f"{t('messages', 'collectExperiences.recapPrompt')}"
                 )
-            
-            conversation_llm_output = await conversation_llm.execute(
-                first_time_visit=self._state.first_time_visit,
-                context=context,
-                user_input=AgentInput(message=transition_message, is_artificial=True),
-                country_of_user=self._state.country_of_user,
-                collected_data=collected_data,
-                last_referenced_experience_index=last_referenced_experience_index,
-                exploring_type=next_exploring_type,
-                unexplored_types=self._state.unexplored_types,
-                explored_types=self._state.explored_types,
-                logger=self.logger)
-            
-            conversation_llm_output.llm_stats = data_extraction_llm_stats + conversation_llm_output.llm_stats + transition_llm_stats
+            conversation_llm_output = await conversion_llm.execute(first_time_visit=self._state.first_time_visit,
+                                                                   context=context,
+                                                                   user_input=AgentInput(message=transition_message, is_artificial=True),
+                                                                   country_of_user=self._state.country_of_user,
+                                                                   persona_type=self._state.persona_type,
+                                                                   collected_data=collected_data,
+                                                                   last_referenced_experience_index=last_referenced_experience_index,
+                                                                   exploring_type=exploring_type,
+                                                                   unexplored_types=self._state.unexplored_types,
+                                                                   explored_types=self._state.explored_types,
+                                                                   logger=self.logger)
+
+            conversation_llm_output.llm_stats = data_extraction_llm_stats + conversation_llm_output.llm_stats
         
         elif transition_decision == TransitionDecision.END_CONVERSATION:
             conversation_llm_output.finished = True
@@ -230,7 +247,7 @@ class CollectExperiencesAgent(Agent):
                 len(self._state.explored_types) == 4,
                 self._state.collected_data
             )
-        
+
         return conversation_llm_output
 
     def get_experiences(self) -> list[ExperienceEntity]:
