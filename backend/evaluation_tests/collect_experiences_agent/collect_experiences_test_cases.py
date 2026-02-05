@@ -1126,4 +1126,98 @@ test_cases = [
             first_time_visit=False  # Not first time since we have existing data
         )
     ),
+    CollectExperiencesAgentTestCase(
+        name='kenyan_user_multiple_experiences_transition_issues',
+        simulated_user_prompt=dedent("""
+            You are a young person from Kenya, Vihiga.
+            
+            You have the following work experiences:
+            
+            1. Childcare, cleaning, and cooking for a lady in Vihiga. You worked for about 18 months starting in 2014. 
+               This helped you get money to do a course. You can't remember the exact months, but it was around that time.
+               When asked multiple times about dates, you get frustrated and say things like "haven't we just discussed it?" 
+               or "i worked for her in 2014 for about 18 months" or "no can't remember, but it was around that time".
+            
+            2. Secretary at a school in Machakos in 2016 for about 9 months. The hours were too much so you decided to 
+               try to get into a bigger company. When asked about dates, you clarify "i worked for about 9 months so not 
+               sure it's 2016 to 2016" and "yes, i worked for about 9 months so not sure it's 2016 to 2016... but i can't 
+               tell you the exact month i started".
+            
+            3. Cooking and selling chapati in Vihiga on your off days from the childcare job. This was your own business 
+               from 2014 to 2015, same timeline as when you were taking care of the kids. When asked about this, you 
+               clarify "so the 1st gig is helping the lady..we've just talked about it ya. then on my off days, i used to 
+               cook and sell chapati". You emphasize "this was for myself" when asked about working for other people.
+            
+            4. Internship at Lukola Associates in their Thika office. This was during your course, so around the end of 2015. 
+               You started in September 2015 and it lasted 3 months (so ended around November 2015). It was unpaid but 
+               they gave you transport money.
+            
+            5. Volunteering at an orphanage near where you live. You've been doing it for the past 2 years (so started 
+               around February 2024) and continue to do so. You like helping the kids with their homework. They are orphans 
+               and so positive in life despite their experiences. When asked multiple times about volunteering, you get 
+               frustrated and say things like "i have volunteering at an orphanage just once... there are no 2 instances" 
+               or "i haven't stopped, i've been doing it for the past 2 years and continue to do so".
+            
+            IMPORTANT BEHAVIOR:
+            - When the agent asks repeated questions about things you've already discussed, you get frustrated
+            - You explicitly say things like "haven't we just discussed it?" when asked the same question multiple times
+            - When asked "can we do skills exploration? we haven't finished", you want to move on
+            - When asked multiple times if you have more experiences, you say "no", "nop", "no that's it", "no that's cool"
+            - You correct the agent when they repeat experiences (like selling chapati 3 times) - "you have repeated selling 
+              chapati 3 times.. it's the same thing"
+            - When the agent keeps asking about volunteering after you've confirmed, you say "i have volunteering at an 
+              orphanage just once... there are no 2 instances"
+            - You want the conversation to move forward, not get stuck asking the same questions
+            
+            Do not add additional information or invent information.
+            """) + kenya_prompt,
+        country_of_user=Country.KENYA,
+        evaluations=[Evaluation(type=EvaluationType.CONCISENESS, expected=30)],
+        expected_experiences_count_min=5,
+        expected_experiences_count_max=5,
+        expected_work_types={
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+            WorkType.SELF_EMPLOYMENT: (1, 1),
+            WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (1, 1),
+            WorkType.UNSEEN_UNPAID: (1, 1)
+        },
+        matchers=["llm", "matcher"],
+        expected_experience_data=[
+            {
+                "experience_title": AnyOf(ContainsString("childcare"), ContainsString("cleaning"), ContainsString("cooking"), ContainsString("lady")),
+                "location": ContainsString("Vihiga"),
+                "company": AnyOf(ContainsString("lady"), ContainsString("This Lady")),
+                "timeline": {"start": "2014", "end": ContainsString("2015")},
+                "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+            },
+            {
+                "experience_title": AnyOf(ContainsString("secretary"), ContainsString("Secretary")),
+                "location": ContainsString("Machakos"),
+                "company": ContainsString("school"),
+                "timeline": {"start": "2016", "end": "2016"},
+                "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
+            },
+            {
+                "experience_title": AnyOf(ContainsString("chapati"), ContainsString("selling")),
+                "location": ContainsString("Vihiga"),
+                "company": "",  # Empty string for self-employment
+                "timeline": {"start": "2014", "end": "2015"},
+                "work_type": WorkType.SELF_EMPLOYMENT.name,
+            },
+            {
+                "experience_title": AnyOf(ContainsString("internship"), ContainsString("Lukola")),
+                "location": ContainsString("Thika"),
+                "company": ContainsString("Lukola Associates"),
+                "timeline": {"start": ContainsString("2015"), "end": ContainsString("2015")},
+                "work_type": WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK.name,
+            },
+            {
+                "experience_title": AnyOf(ContainsString("volunteer"), ContainsString("orphanage")),
+                "location": NON_EMPTY_STRING_REGEX,  # Should have location
+                "company": "",  # Empty string for volunteering
+                "timeline": {"start": ContainsString("2024"), "end": ContainsString("present")},
+                "work_type": WorkType.UNSEEN_UNPAID.name,
+            }
+        ]
+    ),
 ]

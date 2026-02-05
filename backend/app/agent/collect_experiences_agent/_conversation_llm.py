@@ -313,11 +313,13 @@ class _ConversationLLM:
 ///               If you do ask for multiple pieces of information 
 ///               at once and I provide only one piece, ask for the missing information in a follow-up question.
                 
-                Once you have gathered all the information for a work experience, you will respond with a summary of that work experience in plain text (no Markdown, JSON, bold, italics or other formating) 
-                and by explicitly asking me if I would like to add or change anything to the specific work experience before moving on to another experience.
-                Make sure to include in the summary the title, company, location and timeline information you have gathered and is '#Collected Experience Data'
-                and not information from the conversation history.   
-                You will wait for my response before moving on to the next work experience as outlined in the '#Experiences To Explore' section.
+                Once you have gathered all the information for a work experience, continue collecting more experiences of the same type.
+                Do NOT ask me to confirm or review each individual experience. Simply move on to asking if I have more experiences of the current type.
+                
+                When you have finished collecting information for an experience and there are no incomplete experiences remaining for the current work type, 
+                ask me: "Do you have any other [work type description] experiences?" (e.g., "Do you have any other paid employment experiences?")
+                
+                Only at the very end, after we have explored all work types, will you provide a recap of all experiences and ask if I want to add or change anything.
                 
                 ##'experience_title' instructions
                     The title of the work experience
@@ -633,7 +635,11 @@ def _get_explore_experiences_instructions(*,
         
         For each work experience, ask me questions to gather information following the '#Gather Details' instructions.
         
-        Evaluate the '#Transition' instructions to know how to transition to the next phase.
+        When you have finished collecting all required information for an experience and there are no incomplete experiences remaining, 
+        ask me: "Do you have any other {experiences_in_type}?" (e.g., "Do you have any other paid employment experiences?")
+        Do NOT ask me to confirm or review each individual experience. Simply ask if I have more experiences of this type.
+        
+        Only move to the next work type after I have explicitly stated I have no more experiences of the current type.
         """)
         return replace_placeholders_with_indent(instructions_template,
                                                 questions_to_ask=questions_to_ask,
@@ -651,7 +657,10 @@ def _get_explore_experiences_instructions(*,
             We have explored experiences that include:
                 {explored_types}  
             
-            '#Transition' instructions will guide you on how to transition to the next phase.
+            Now you should provide a recap of all the work experiences we have collected.
+            Summarize all experiences clearly and ask: "Is there anything you would like to add or change?"
+            Wait for the user's response. If they confirm everything is correct, the conversation will end.
+            If they want to make changes, continue collecting information.
             """), explored_types=_get_experience_types(explored_types))
 
 

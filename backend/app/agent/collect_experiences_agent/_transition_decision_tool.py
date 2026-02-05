@@ -186,25 +186,26 @@ _SYSTEM_INSTRUCTIONS = """
 Use CONTINUE when:
 - There are incomplete experiences that need more information
 - The user is still providing information about experiences
-- You need to ask more questions to complete the current work type exploration
+- The agent has not yet asked "Do you have any other [work type] experiences?" for the current type
+- All work types are explored but the recap question has not been asked yet
 
-Use END_WORKTYPE when:
-- The user has explicitly stated they have no more experiences of the current type
-  Examples: "no", "none", "I don't have any", "that's all", "nope", "not really", "no more"
-- OR the user has provided experiences for the current type and confirmed they're done
-- AND all experiences for the current type are complete (not incomplete)
-- AND there are still unexplored work types remaining
+Use END_WORKTYPE when ALL of the following are true:
+- There are no incomplete experiences for the current work type
+- The agent has asked "Do you have any other [work type] experiences?" (or similar question asking if user has more experiences of the current type)
+- The user's response indicates they have no more experiences of the current type (negative response to "do you have more" question)
+- There are still unexplored work types remaining
 
 Use END_CONVERSATION when ALL of the following are true:
 - All work types have been explored (unexplored_types is empty)
-- The recap question has been explicitly asked in the conversation history
-- The user has confirmed they have nothing to add or change
 - There are no incomplete experiences
+- The recap question has been asked (agent summarized all experiences and asked if user wants to add/change anything)
+- The user has confirmed they have nothing to add or change (positive confirmation to recap question)
 
 #Important Constraints
 - NEVER use END_WORKTYPE or END_CONVERSATION if there are incomplete experiences - always use CONTINUE
 - NEVER use END_CONVERSATION if there are unexplored work types - use END_WORKTYPE instead
-- If all types are explored BUT the recap question has NOT been asked yet, you MUST use CONTINUE
+- END_WORKTYPE requires that the agent has explicitly asked if user has more experiences of the current type
+- END_CONVERSATION requires that the recap question has been explicitly asked
     
 #Collected Experience Data
     {collected_data}
@@ -243,35 +244,32 @@ _PROMPT_TEMPLATE = """
        - If there are incomplete experiences → Return CONTINUE
     
     2. Check if there are unexplored work types remaining
-       - If yes, determine if current type is done:
-         * Look at the conversation history to understand what question the user is responding to
-         * Check the LAST question asked by the agent - was it about the current work type?
-         * Common work type questions:
-           - "Have you been employed in a company or someone else's business for money?" (FORMAL_SECTOR_WAGED_EMPLOYMENT)
-           - "Have you run your own business, done freelance or contract work?" (SELF_EMPLOYMENT)
-           - "Have you worked as an unpaid trainee for a company or organization?" (FORMAL_SECTOR_UNPAID_TRAINEE_WORK)
-           - "Have you done unpaid work such as community volunteering, caregiving, helping in a household?" (UNSEEN_UNPAID)
-         * Common negative responses: "no", "nope", "none", "I don't have any", "that's all", "not really", "no more", "no that's it", "no that's cool", "no looks good", "nop"
-         * If the last agent question was about the current work type AND user said "no" (or similar) → Return END_WORKTYPE
-         * If user provided experiences for the current type and confirmed they're done (e.g., "that's it", "that's all", "no more", "no that's cool") → Return END_WORKTYPE
-         * If user is asking to move on (e.g., "can we do skills exploration?", "what next?", "we haven't finished", "that's it Compass, what next?") AND current type has been explored → Return END_WORKTYPE
-         * If user has already confirmed "no" multiple times for the same work type question → Return END_WORKTYPE
-         * If user is still providing information about experiences → Return CONTINUE
-         * Otherwise → Return CONTINUE
+       - If yes, check if the agent has asked "Do you have any other [work type] experiences?" (or similar question asking if user has more experiences of the current type)
+         * Look at the LAST question asked by the agent in the conversation history
+         * Determine if it's asking whether the user has more experiences of the current work type
+         * If the agent has NOT asked this question yet → Return CONTINUE (agent needs to ask first)
+         * If the agent HAS asked this question:
+           - Check if the user's last input is a negative response (indicating no more experiences)
+           - If user's response indicates they have no more experiences of this type → Return END_WORKTYPE
+           - If user's response indicates they have more experiences → Return CONTINUE
+           - If user's response is unclear → Return CONTINUE
     
     3. Check if all work types are explored
        - If yes, check if recap was asked:
-         * Look through conversation history for recap question patterns:
-           - Questions that summarize all experiences and ask if user wants to add/change anything
-           - Questions like "Does this summary capture all your work experiences accurately?"
-           - Questions asking "Is there anything you'd like to add or change?"
-         * If recap was NOT asked yet → Return CONTINUE
+         * Look through conversation history for a recap question:
+           - Agent summarizes all experiences collected
+           - Agent asks if user wants to add or change anything
+         * If recap was NOT asked yet → Return CONTINUE (agent needs to ask recap first)
          * If recap WAS asked:
-           - Check if user confirmed no changes wanted (e.g., "yes it's ok", "no that's cool", "yes", "no that's it", "no looks good") → Return END_CONVERSATION
+           - Check if user's response indicates they're satisfied (no changes wanted) → Return END_CONVERSATION
            - Check if user wants changes → Return CONTINUE
-           - If user has confirmed multiple times they're done → Return END_CONVERSATION
     
     Return your decision as one of: CONTINUE, END_WORKTYPE, or END_CONVERSATION
+    
+    #Important Notes
+    - Do not rely on hardcoded phrases. Use semantic understanding to determine user intent.
+    - A negative response to "do you have more?" means the user has no more experiences of that type.
+    - A positive response to recap means the user is satisfied and ready to move on.
     
     #Output Format
     Your response must be a valid JSON object with only the following field:
