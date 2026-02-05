@@ -11,6 +11,10 @@ DEFAULT_FRONTEND_ENV_PATH = '../frontend-new/public/data/env.js'
 
 BACKEND_ENV_MAP: Dict[str, str] = {
     'GLOBAL_PRODUCT_NAME': 'branding.appName',
+
+    # Invitation Codes
+    "GLOBAL_DISABLE_REGISTRATION_CODE": "auth.disableRegistrationCode"
+
     # Add more backend env vars here
 }
 
@@ -24,6 +28,10 @@ FRONTEND_ENV_MAP: Dict[str, str] = {
     'FRONTEND_THEME_CSS_VARIABLES': 'branding.theme',
     'FRONTEND_SEO': 'branding.seo',
     # Add more frontend env.js keys here
+
+    # Invitation Codes
+    "GLOBAL_DISABLE_LOGIN_CODE": "auth.disableLoginCode",
+    "GLOBAL_DISABLE_REGISTRATION_CODE": "auth.disableRegistrationCode"
 }
 
 FRONTEND_JSON_FIELDS = {
