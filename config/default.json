@@ -27,5 +27,9 @@
       "text-secondary": "65 64 61",
       "text-accent": "38 94 167"
     }
+  },
+  "auth": {
+    "disableLoginCode": true,
+    "disableRegistrationCode": true
   }
 }
