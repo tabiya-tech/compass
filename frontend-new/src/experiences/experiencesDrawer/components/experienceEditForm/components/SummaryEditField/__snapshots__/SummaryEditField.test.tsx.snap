@@ -2,16 +2,16 @@
 
 exports[`SummaryEditField should render with initial summary and no error 1`] = `
 <div
-  class="MuiFormControl-root MuiTextField-root css-1tbudcr-MuiFormControl-root-MuiTextField-root"
+  class="MuiFormControl-root MuiTextField-root css-6ij3tv-MuiFormControl-root-MuiTextField-root"
   data-testid="form-summary-b1a6b2cd-cfac-46ff-9c35-0298d87def6b"
 >
   <div
-    class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-multiline css-1fv69vb-MuiInputBase-root-MuiOutlinedInput-root"
+    class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-multiline css-1kwdddb-MuiInputBase-root-MuiOutlinedInput-root"
   >
     <textarea
       aria-invalid="false"
-      class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
-      id=":r0:"
+      class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-b5uwpx-MuiInputBase-input-MuiOutlinedInput-input"
+      id=":r1:"
       maxlength="1001"
       placeholder="Summary of experience"
       style="height: 0px; overflow: hidden;"
@@ -20,19 +20,20 @@ exports[`SummaryEditField should render with initial summary and no error 1`] = 
     </textarea>
     <textarea
       aria-hidden="true"
-      class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-cmpe59-MuiInputBase-input-MuiOutlinedInput-input"
+      class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-b5uwpx-MuiInputBase-input-MuiOutlinedInput-input"
       readonly=""
       style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
       tabindex="-1"
     />
     <fieldset
       aria-hidden="true"
-      class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+      class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
     >
       <legend
-        class="css-ihdtdm"
+        class="css-1nf2c5d-MuiNotchedOutlined-root"
       >
         <span
+          aria-hidden="true"
           class="notranslate"
         >
           ​

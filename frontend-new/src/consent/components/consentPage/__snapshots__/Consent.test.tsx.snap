@@ -2,12 +2,12 @@
 
 exports[`Testing Consent Page render tests it should show consent screen with both agreements 1`] = `
 <div
-  class="MuiContainer-root MuiContainer-maxWidthXs css-1ubnw5l-MuiContainer-root"
+  class="MuiContainer-root MuiContainer-maxWidthXs css-1tzl094-MuiContainer-root"
   data-testid="consent-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
 >
   <div
     aria-hidden="true"
-    class="MuiBackdrop-root css-1mfxwij-MuiBackdrop-root"
+    class="MuiBackdrop-root css-141wtso-MuiBackdrop-root"
     data-testid="backdrop-91b57774-d50c-4350-882d-363f80ac10e8"
     style="opacity: 0; visibility: hidden;"
   >
@@ -16,37 +16,38 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
       style="position: relative; margin: 0px; padding: 0px;"
     >
       <div
-        class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-14c64kg-MuiPaper-root"
+        class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-1ronkt8-MuiPaper-root"
+        style="--Paper-shadow: var(--mui-shadows-24);"
       >
         <div
-          class="MuiGrid-root MuiGrid-container css-15vmx7d-MuiGrid-root"
+          class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-1yo0kkk-MuiGrid-root"
         >
           <div
-            class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+            class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
           >
             <h6
-              class="MuiTypography-root MuiTypography-h6 css-odley9-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-h6 css-j3d3zm-MuiTypography-root"
               data-testid="message-91b57774-d50c-4350-882d-363f80ac10e8"
             >
               Logging you out...
             </h6>
           </div>
           <div
-            class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+            class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
             style="line-height: 0;"
           >
             <span
-              class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1tmrh9l-MuiCircularProgress-root"
+              class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-tka88f-MuiCircularProgress-root"
               data-testid="progress-91b57774-d50c-4350-882d-363f80ac10e8"
               role="progressbar"
               style="width: 32px; height: 32px;"
             >
               <svg
-                class="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
+                class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
                 viewBox="22 22 44 44"
               >
                 <circle
-                  class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-176wh8e-MuiCircularProgress-circle"
+                  class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
                   cx="44"
                   cy="44"
                   fill="none"
@@ -59,7 +60,7 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
         </div>
       </div>
       <div
-        class="MuiContainer-root MuiContainer-maxWidthLg css-t4utv2-MuiContainer-root"
+        class="MuiContainer-root MuiContainer-maxWidthLg css-1ii9suo-MuiContainer-root"
       >
         <svg
           overflow="visible"
@@ -191,11 +192,11 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
         <img
           alt="Logo"
           data-testid="auth-header-logo-40374529-6e2c-49d8-81d7-93f01603a648"
-          src="/logo.svg"
+          src="mock-logo-url"
           style="max-width: 60%; margin: 5% 10%;"
         />
         <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1trvwbj-MuiButtonBase-root-MuiIconButton-root"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-nhq5gd-MuiButtonBase-root-MuiIconButton-root"
           data-testid="language-context-menu-select-button-f4d06e4b-0e0c-49c7-ad93-924c5ac89070"
           tabindex="0"
           title="Language Selector"
@@ -203,7 +204,7 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
         >
           <svg
             aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
             data-testid="LanguageOutlinedIcon"
             focusable="false"
             viewBox="0 0 24 24"
@@ -212,13 +213,10 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
               d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2m6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56M12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96M4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56m2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8M12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96M14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2m.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56M16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2z"
             />
           </svg>
-          <span
-            class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
         </button>
       </div>
       <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1gc7ofh-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-h0hv7s-MuiTypography-root"
         data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
       >
         Before we begin...
@@ -232,7 +230,7 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
       class="MuiBox-root css-25rt61"
     >
       <p
-        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1amuzo8-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-1uwo74h-MuiTypography-root"
         data-testid="consent-agreement-body-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
       >
         We created this AI tool for you with care to help you and other young people like you explore their skills and discover new opportunities.
@@ -257,21 +255,21 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
         class="MuiBox-root css-1n10a4f"
       >
         <label
-          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-rrjmd8-MuiFormControlLabel-root"
+          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-ptu2ng-MuiFormControlLabel-root"
         >
           <span
-            class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-1rnrze5-MuiButtonBase-root-MuiCheckbox-root"
+            class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-rm2pxo-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
             data-testid="consent-accept-tc-checkbox-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
           >
             <input
               aria-label="Terms and Conditions"
-              class="PrivateSwitchBase-input css-1m9pwf3"
+              class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
               data-indeterminate="false"
               type="checkbox"
             />
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
               data-testid="CheckBoxOutlineBlankIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -280,18 +278,15 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
                 d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
               />
             </svg>
-            <span
-              class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-            />
           </span>
           <p
-            class="MuiTypography-root MuiTypography-body2 css-1ndnk23-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body2 css-vtq6gs-MuiTypography-root"
             data-testid="consent-accept-tc-text-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
           >
             I have read and accept the 
             <a
               aria-disabled="false"
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-179zpik-MuiTypography-root-MuiLink-root"
             >
               Terms and Conditions
             </a>
@@ -299,21 +294,21 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
           </p>
         </label>
         <label
-          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-rrjmd8-MuiFormControlLabel-root"
+          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-ptu2ng-MuiFormControlLabel-root"
         >
           <span
-            class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-1rnrze5-MuiButtonBase-root-MuiCheckbox-root"
+            class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-rm2pxo-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
             data-testid="consent-accept-consent-checkbox-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
           >
             <input
               aria-label="Privacy Policy"
-              class="PrivateSwitchBase-input css-1m9pwf3"
+              class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
               data-indeterminate="false"
               type="checkbox"
             />
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
               data-testid="CheckBoxOutlineBlankIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -322,18 +317,15 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
                 d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
               />
             </svg>
-            <span
-              class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-            />
           </span>
           <p
-            class="MuiTypography-root MuiTypography-body2 css-1ndnk23-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body2 css-vtq6gs-MuiTypography-root"
             data-testid="consent-accept-consent-text-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
           >
             I have read and accept the 
             <a
               aria-disabled="false"
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-179zpik-MuiTypography-root-MuiLink-root"
             >
               Privacy Policy
             </a>
@@ -342,7 +334,7 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
         </label>
       </div>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-1czz4sp-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-19s6r5h-MuiTypography-root"
       >
         Are you ready to start?
         <br />
@@ -353,13 +345,13 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
     >
       <a
         aria-disabled="false"
-        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1vjgeqq-MuiTypography-root-MuiLink-root"
+        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-179zpik-MuiTypography-root-MuiLink-root"
         data-testid="consent-reject-button-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
       >
         No, thank you
       </a>
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jkonhr-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-18qmiyb-MuiButtonBase-root-MuiButton-root"
         data-testid="consent-accept-button-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
         disabled=""
         tabindex="-1"
@@ -373,7 +365,7 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
       data-testid="consent-support-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
     >
       <p
-        class="MuiTypography-root MuiTypography-body1 css-2fnhl2-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-1lfo8g8-MuiTypography-root"
       >
         With support from
       </p>

@@ -205,9 +205,9 @@ class CreateUserPreferencesRequest(BaseModel):
     """
     The language of the user
     """
-    invitation_code: str
+    invitation_code: str | None = None
     """
-    Invitation code
+    Invitation code.
     """
 
     client_id: str

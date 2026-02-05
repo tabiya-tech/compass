@@ -58,9 +58,9 @@
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.11.16",
-    "@mui/material": "^5.15.12",
-    "@mui/system": "^5.15.15",
+    "@mui/icons-material": "^7.3.7",
+    "@mui/material": "^7.3.7",
+    "@mui/system": "^7.3.7",
     "@react-pdf/renderer": "^3.4.5",
     "@sentry/cli": "^2.39.1",
     "@sentry/react": "^9.41.0",

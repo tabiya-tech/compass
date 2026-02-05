@@ -3,7 +3,7 @@
 exports[`Backdrop render tests should be shown 1`] = `
 <div
   aria-hidden="true"
-  class="MuiBackdrop-root css-1mfxwij-MuiBackdrop-root"
+  class="MuiBackdrop-root css-141wtso-MuiBackdrop-root"
   data-testid="backdrop-91b57774-d50c-4350-882d-363f80ac10e8"
   style="opacity: 1; webkit-transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;"
 >
@@ -12,37 +12,38 @@ exports[`Backdrop render tests should be shown 1`] = `
     style="position: relative; margin: 0px; padding: 0px;"
   >
     <div
-      class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-14c64kg-MuiPaper-root"
+      class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-1ronkt8-MuiPaper-root"
+      style="--Paper-shadow: var(--mui-shadows-24);"
     >
       <div
-        class="MuiGrid-root MuiGrid-container css-15vmx7d-MuiGrid-root"
+        class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-1yo0kkk-MuiGrid-root"
       >
         <div
-          class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+          class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-odley9-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-j3d3zm-MuiTypography-root"
             data-testid="message-91b57774-d50c-4350-882d-363f80ac10e8"
           >
             foo-message
           </h6>
         </div>
         <div
-          class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+          class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
           style="line-height: 0;"
         >
           <span
-            class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1tmrh9l-MuiCircularProgress-root"
+            class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-tka88f-MuiCircularProgress-root"
             data-testid="progress-91b57774-d50c-4350-882d-363f80ac10e8"
             role="progressbar"
             style="width: 32px; height: 32px;"
           >
             <svg
-              class="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
+              class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
               viewBox="22 22 44 44"
             >
               <circle
-                class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-176wh8e-MuiCircularProgress-circle"
+                class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
                 cx="44"
                 cy="44"
                 fill="none"
@@ -55,7 +56,7 @@ exports[`Backdrop render tests should be shown 1`] = `
       </div>
     </div>
     <div
-      class="MuiContainer-root MuiContainer-maxWidthLg css-t4utv2-MuiContainer-root"
+      class="MuiContainer-root MuiContainer-maxWidthLg css-1ii9suo-MuiContainer-root"
     >
       <svg
         overflow="visible"
@@ -179,7 +180,7 @@ exports[`Backdrop render tests should be shown 1`] = `
 exports[`Backdrop render tests should rendered without message and not show any errors 1`] = `
 <div
   aria-hidden="true"
-  class="MuiBackdrop-root css-1mfxwij-MuiBackdrop-root"
+  class="MuiBackdrop-root css-141wtso-MuiBackdrop-root"
   data-testid="backdrop-91b57774-d50c-4350-882d-363f80ac10e8"
   style="opacity: 1; webkit-transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;"
 >
@@ -188,27 +189,28 @@ exports[`Backdrop render tests should rendered without message and not show any 
     style="position: relative; margin: 0px; padding: 0px;"
   >
     <div
-      class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-14c64kg-MuiPaper-root"
+      class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-1ronkt8-MuiPaper-root"
+      style="--Paper-shadow: var(--mui-shadows-24);"
     >
       <div
-        class="MuiGrid-root MuiGrid-container css-15vmx7d-MuiGrid-root"
+        class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-1yo0kkk-MuiGrid-root"
       >
         <div
-          class="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+          class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
           style="line-height: 0;"
         >
           <span
-            class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1tmrh9l-MuiCircularProgress-root"
+            class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-tka88f-MuiCircularProgress-root"
             data-testid="progress-91b57774-d50c-4350-882d-363f80ac10e8"
             role="progressbar"
             style="width: 32px; height: 32px;"
           >
             <svg
-              class="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
+              class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
               viewBox="22 22 44 44"
             >
               <circle
-                class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-176wh8e-MuiCircularProgress-circle"
+                class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
                 cx="44"
                 cy="44"
                 fill="none"
@@ -221,7 +223,7 @@ exports[`Backdrop render tests should rendered without message and not show any 
       </div>
     </div>
     <div
-      class="MuiContainer-root MuiContainer-maxWidthLg css-t4utv2-MuiContainer-root"
+      class="MuiContainer-root MuiContainer-maxWidthLg css-1ii9suo-MuiContainer-root"
     >
       <svg
         overflow="visible"

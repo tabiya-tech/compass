@@ -24,11 +24,16 @@ export type UserPreference = {
   experiments: UserPreferencesExperiments;
 };
 
-export type CreateUserPreferencesSpec = {
+type CreatePreferencesSpecBase = {
   user_id: string;
-  invitation_code: string;
   language: Language;
 };
+
+export type CreateUserPreferencesSpec =
+  | (CreatePreferencesSpecBase & {
+      invitation_code: string;
+    })
+  | CreatePreferencesSpecBase;
 
 export type CreateUserPreferencesResponse = Omit<UserPreference, "sensitive_personal_data_status">;
 

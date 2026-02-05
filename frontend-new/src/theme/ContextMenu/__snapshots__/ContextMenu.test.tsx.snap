@@ -2,13 +2,13 @@
 
 exports[`ContextMenu render tests renders correctly the menu open 1`] = `
 <div
-  class="MuiPopover-root MuiMenu-root MuiModal-root css-10nakn3-MuiModal-root-MuiPopover-root-MuiMenu-root"
+  class="MuiPopover-root MuiMenu-root MuiModal-root css-1k1um9w-MuiModal-root-MuiPopover-root-MuiMenu-root"
   data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu"
   role="presentation"
 >
   <div
     aria-hidden="true"
-    class="MuiBackdrop-root MuiBackdrop-invisible MuiModal-backdrop css-g3hgs1-MuiBackdrop-root-MuiModal-backdrop"
+    class="MuiBackdrop-root MuiBackdrop-invisible MuiModal-backdrop css-vl6bb4-MuiBackdrop-root-MuiModal-backdrop"
     style="opacity: 1; webkit-transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; transition: opacity 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;"
   />
   <div
@@ -16,101 +16,95 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
     tabindex="0"
   />
   <div
-    class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation2 MuiPopover-paper MuiMenu-paper MuiMenu-paper css-178dswp-MuiPaper-root-MuiPopover-paper-MuiMenu-paper"
-    style="opacity: 1; transform: scale(1, 1); transition: opacity 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; top: 16px; left: 16px; transform-origin: -16px -16px;"
+    class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation2 MuiPopover-paper MuiMenu-paper css-awyc6v-MuiPaper-root-MuiPopover-paper-MuiMenu-paper"
+    style="--Paper-shadow: var(--mui-shadows-2); opacity: 1; transform: scale(1, 1); transition: opacity 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 0ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; top: 16px; left: 16px; transform-origin: -16px -16px;"
     tabindex="-1"
   >
     <ul
-      class="MuiList-root MuiList-padding MuiMenu-list css-6hp17o-MuiList-root-MuiMenu-list"
+      class="MuiList-root MuiList-padding MuiMenu-list css-1toxriw-MuiList-root-MuiMenu-list"
       role="menu"
       tabindex="0"
     >
       <li
-        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-f908r0-MuiButtonBase-root-MuiMenuItem-root"
+        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-1ebies6-MuiButtonBase-root-MuiMenuItem-root"
         data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item"
         role="menuitem"
         tabindex="0"
       >
         <div
-          class="MuiListItemIcon-root css-cveggr-MuiListItemIcon-root"
+          class="MuiListItemIcon-root css-z4j2kf-MuiListItemIcon-root"
           data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-icon"
         >
           <span
             aria-hidden="true"
-            class="material-icons notranslate MuiIcon-root MuiIcon-fontSizeMedium css-1yuv9fp-MuiIcon-root"
+            class="material-icons notranslate MuiIcon-root MuiIcon-fontSizeMedium css-8exgcq-MuiIcon-root"
           >
             <div />
           </span>
         </div>
         <div
-          class="MuiListItemText-root css-tlelie-MuiListItemText-root"
+          class="MuiListItemText-root css-cfq8qh-MuiListItemText-root"
           data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-text"
         >
           <span
-            class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-1bcerjy-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-19s6r5h-MuiTypography-root"
           >
             <span
-              class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-caption css-ggd1p4-MuiTypography-root"
             >
               foo
             </span>
           </span>
         </div>
-        <span
-          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-        />
       </li>
       <li
-        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-f908r0-MuiButtonBase-root-MuiMenuItem-root"
+        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-1ebies6-MuiButtonBase-root-MuiMenuItem-root"
         data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item"
         role="menuitem"
         tabindex="-1"
       >
         <div
-          class="MuiListItemText-root css-tlelie-MuiListItemText-root"
+          class="MuiListItemText-root css-cfq8qh-MuiListItemText-root"
           data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-text"
         >
           <span
-            class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-1bcerjy-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-19s6r5h-MuiTypography-root"
           >
             <span
-              class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-caption css-ggd1p4-MuiTypography-root"
             >
               bar
             </span>
           </span>
         </div>
-        <span
-          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-        />
       </li>
       <li
         aria-disabled="true"
-        class="MuiButtonBase-root MuiMenuItem-root Mui-disabled MuiMenuItem-gutters Mui-disabled MuiMenuItem-root Mui-disabled MuiMenuItem-gutters css-f908r0-MuiButtonBase-root-MuiMenuItem-root"
+        class="MuiButtonBase-root MuiMenuItem-root Mui-disabled MuiMenuItem-gutters Mui-disabled MuiMenuItem-root Mui-disabled MuiMenuItem-gutters css-1ebies6-MuiButtonBase-root-MuiMenuItem-root"
         data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item"
         role="menuitem"
         tabindex="-1"
       >
         <div
-          class="MuiListItemIcon-root css-cveggr-MuiListItemIcon-root"
+          class="MuiListItemIcon-root css-z4j2kf-MuiListItemIcon-root"
           data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-icon"
         >
           <span
             aria-hidden="true"
-            class="material-icons notranslate MuiIcon-root MuiIcon-fontSizeMedium css-1yuv9fp-MuiIcon-root"
+            class="material-icons notranslate MuiIcon-root MuiIcon-fontSizeMedium css-8exgcq-MuiIcon-root"
           >
             <div />
           </span>
         </div>
         <div
-          class="MuiListItemText-root css-tlelie-MuiListItemText-root"
+          class="MuiListItemText-root css-cfq8qh-MuiListItemText-root"
           data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-text"
         >
           <span
-            class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-1bcerjy-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-19s6r5h-MuiTypography-root"
           >
             <span
-              class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-caption css-ggd1p4-MuiTypography-root"
             >
               baz
             </span>
@@ -118,50 +112,47 @@ exports[`ContextMenu render tests renders correctly the menu open 1`] = `
         </div>
       </li>
       <li
-        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-f908r0-MuiButtonBase-root-MuiMenuItem-root"
+        class="MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters MuiMenuItem-root MuiMenuItem-gutters css-1ebies6-MuiButtonBase-root-MuiMenuItem-root"
         data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item"
         role="menuitem"
         tabindex="-1"
       >
         <div
-          class="MuiListItemIcon-root css-cveggr-MuiListItemIcon-root"
+          class="MuiListItemIcon-root css-z4j2kf-MuiListItemIcon-root"
           data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-icon"
         >
           <span
             aria-hidden="true"
-            class="material-icons notranslate MuiIcon-root MuiIcon-fontSizeMedium css-1yuv9fp-MuiIcon-root"
+            class="material-icons notranslate MuiIcon-root MuiIcon-fontSizeMedium css-8exgcq-MuiIcon-root"
           >
             <div />
           </span>
         </div>
         <div
-          class="MuiListItemText-root css-tlelie-MuiListItemText-root"
+          class="MuiListItemText-root css-cfq8qh-MuiListItemText-root"
           data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-text"
         >
           <span
-            class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-1bcerjy-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-19s6r5h-MuiTypography-root"
           >
             <span
-              class="MuiTypography-root MuiTypography-caption css-1qx6boj-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-caption css-ggd1p4-MuiTypography-root"
             >
               qux
             </span>
           </span>
         </div>
         <div
-          class="MuiListItemIcon-root css-1fqgk7o-MuiListItemIcon-root"
+          class="MuiListItemIcon-root css-divupj-MuiListItemIcon-root"
           data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-item-trailing-icon"
         >
           <span
             aria-hidden="true"
-            class="material-icons notranslate MuiIcon-root MuiIcon-fontSizeMedium css-1yuv9fp-MuiIcon-root"
+            class="material-icons notranslate MuiIcon-root MuiIcon-fontSizeMedium css-8exgcq-MuiIcon-root"
           >
             <div />
           </span>
         </div>
-        <span
-          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-        />
       </li>
     </ul>
   </div>

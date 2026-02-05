@@ -2,12 +2,12 @@
 
 exports[`AnimatedBadge should render the badge for a large number 1`] = `
 <span
-  class="MuiBadge-root css-1c32n2y-MuiBadge-root"
+  class="MuiBadge-root css-63ezxx-MuiBadge-root"
   data-testid="animated-badge-a348462e-a393-4445-9a3b-c9603e878ce7"
 >
   <svg
     aria-hidden="true"
-    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
     data-testid="badge-icon"
     focusable="false"
     viewBox="0 0 24 24"
@@ -28,10 +28,10 @@ exports[`AnimatedBadge should render the badge for a large number 1`] = `
     />
   </svg>
   <span
-    class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-9cqolc-MuiBadge-badge"
+    class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-d3zjg8-MuiBadge-badge"
   >
     <span
-      class="css-1tmou61"
+      class="css-vty5v8"
     >
       99+
     </span>
@@ -41,12 +41,12 @@ exports[`AnimatedBadge should render the badge for a large number 1`] = `
 
 exports[`AnimatedBadge should render the badge with provided content 1`] = `
 <span
-  class="MuiBadge-root css-1c32n2y-MuiBadge-root"
+  class="MuiBadge-root css-63ezxx-MuiBadge-root"
   data-testid="animated-badge-a348462e-a393-4445-9a3b-c9603e878ce7"
 >
   <svg
     aria-hidden="true"
-    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-etbowg-MuiSvgIcon-root"
+    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
     data-testid="badge-icon"
     focusable="false"
     viewBox="0 0 24 24"
@@ -67,10 +67,10 @@ exports[`AnimatedBadge should render the badge with provided content 1`] = `
     />
   </svg>
   <span
-    class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-9cqolc-MuiBadge-badge"
+    class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular css-d3zjg8-MuiBadge-badge"
   >
     <span
-      class="css-1tmou61"
+      class="css-vty5v8"
     >
       2
     </span>

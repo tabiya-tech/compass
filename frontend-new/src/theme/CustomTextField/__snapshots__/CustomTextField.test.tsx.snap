@@ -6,34 +6,35 @@ exports[`Custom text field should render CustomTextField correctly 1`] = `
   data-testid="custom-text-field-container-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
 >
   <p
-    class="MuiTypography-root MuiTypography-body1 css-vvbmpr-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-body1 css-3bq9g5-MuiTypography-root"
     data-testid="custom-text-field-label-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
   >
     label
   </p>
   <div
-    class="MuiFormControl-root MuiTextField-root css-9olnt6-MuiFormControl-root-MuiTextField-root"
+    class="MuiFormControl-root MuiTextField-root css-1h4gfsl-MuiFormControl-root-MuiTextField-root"
     data-testid="custom-text-field-input-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
   >
     <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-13xhgd4-MuiInputBase-root-MuiOutlinedInput-root"
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-1ooyxc2-MuiInputBase-root-MuiOutlinedInput-root"
     >
       <input
         aria-invalid="false"
-        class="MuiInputBase-input MuiOutlinedInput-input css-kqqmrr-MuiInputBase-input-MuiOutlinedInput-input"
-        id=":r0:"
+        class="MuiInputBase-input MuiOutlinedInput-input css-1y15kj-MuiInputBase-input-MuiOutlinedInput-input"
+        id=":r1:"
         placeholder="Enter text here"
         type="text"
         value="Some text"
       />
       <fieldset
         aria-hidden="true"
-        class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+        class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
       >
         <legend
-          class="css-ihdtdm"
+          class="css-1nf2c5d-MuiNotchedOutlined-root"
         >
           <span
+            aria-hidden="true"
             class="notranslate"
           >
             ​

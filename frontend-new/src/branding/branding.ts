@@ -1,5 +1,30 @@
-import { getBrowserTabTitle, getMetaDescription } from "src/envService";
+import {
+  getAppIconUrl,
+  getBrowserTabTitle,
+  getMetaDescription,
+  getFaviconUrl,
+  getThemeCssVariables,
+} from "src/envService";
 import { getSeoConfig, SeoConfig } from "src/branding/seoConfig";
+
+const setCssVar = (name: string, value: string) => {
+  document.documentElement.style.setProperty(name, value);
+};
+
+const upsertLinkHref = (rel: string, href: string) => {
+  if (!href) return;
+
+  const existing = document.querySelector(`link[rel='${rel}']`);
+  if (existing instanceof HTMLLinkElement) {
+    existing.href = href;
+    return;
+  }
+
+  const link = document.createElement("link");
+  link.rel = rel;
+  link.href = href;
+  document.head.appendChild(link);
+};
 
 const updateJsonLd = (seo: SeoConfig, browserTabTitle: string) => {
   const jsonLdScript = document.getElementById("seo-jsonld");
@@ -22,11 +47,19 @@ const updateJsonLd = (seo: SeoConfig, browserTabTitle: string) => {
 
 /**
  * Apply branding overrides from environment variables.
- * This includes the browser tab title, Meta description, and JSON-LD structured data.
+ * This includes theme CSS variables, browser tab title, Meta description, and JSON-LD structured data.
  * Only the variables that are provided in the environment are applied.
  */
 export const applyBrandingFromEnv = (): void => {
-  // Browser tab title
+  // Theme variables (colors/text). We only set variables that are provided.
+  const themeCssVariables = getThemeCssVariables();
+  Object.entries(themeCssVariables).forEach(([key, value]) => {
+    if (value) {
+      setCssVar(`--${key}`, value);
+    }
+  });
+
+  // Browser tab title.
   const browserTabTitle = getBrowserTabTitle();
   if (browserTabTitle) {
     document.title = browserTabTitle;
@@ -43,6 +76,17 @@ export const applyBrandingFromEnv = (): void => {
     }
   } else {
     console.warn("Meta description not set, keeping the default");
+  }
+
+  // Icons.
+  const faviconUrl = getFaviconUrl();
+  if (faviconUrl) {
+    upsertLinkHref("icon", faviconUrl);
+  }
+
+  const appIconUrl = getAppIconUrl();
+  if (appIconUrl) {
+    upsertLinkHref("apple-touch-icon", appIconUrl);
   }
 
   // JSON-LD structured data overrides.
