@@ -178,6 +178,7 @@ class TestPreferenceExtractor:
         """Create a preference extractor for testing."""
         return PreferenceExtractor()
 
+    @pytest.mark.evaluation_test(label="integration")
     def test_update_preference_vector(self, preference_extractor):
         """Test updating preference vector with extraction result."""
         from app.agent.preference_elicitation_agent.preference_extractor import PreferenceExtractionResult
@@ -201,6 +202,7 @@ class TestPreferenceExtractor:
 
 
 # Integration tests would go here
+@pytest.mark.evaluation_test(label="integration")
 class TestPreferenceElicitationAgentIntegration:
     """Integration tests for the full agent."""
 
@@ -356,6 +358,7 @@ class TestDB6ClientStub:
 
 
 @pytest.mark.asyncio
+@pytest.mark.evaluation_test(label="integration")
 class TestAgentDB6Integration:
     """Tests for agent integration with DB6."""
 
@@ -741,6 +744,7 @@ class TestStateDB6Fields:
         assert state.use_db6_for_fresh_data is False
 
 
+@pytest.mark.evaluation_test(label="integration")
 class TestExperienceIntegration:
     """Tests for integration with existing Compass experiences."""
 
@@ -889,6 +893,7 @@ class TestExperienceIntegration:
 
 
 @pytest.mark.asyncio
+@pytest.mark.evaluation_test(label="integration")
 class TestPersonalizedVignettes:
     """Tests for personalized vignette generation."""
 
@@ -1041,6 +1046,7 @@ class TestPersonalizedVignettes:
         assert agent._user_context.current_role is not None
 
 
+@pytest.mark.evaluation_test(label="integration")
 class TestVignetteTemplates:
     """Tests for vignette template structure."""
 

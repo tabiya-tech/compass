@@ -5,6 +5,7 @@ Quick test to verify FIM is full rank with new 7D feature extraction.
 
 import sys
 import numpy as np
+import pytest
 from pathlib import Path
 
 # Add backend to path
@@ -22,7 +23,20 @@ def test_fim_full_rank():
     # Load offline vignettes
     print("\n1. Loading offline vignettes...")
     backend_root = Path(__file__).parent.parent
-    offline_dir = str(backend_root / "offline_output")
+    offline_dir = backend_root / "offline_output"
+
+    # Skip if offline vignettes don't exist
+    required_files = [
+        offline_dir / "static_vignettes_beginning.json",
+        offline_dir / "static_vignettes_end.json",
+        offline_dir / "adaptive_vignettes_library.json"
+    ]
+
+    for file_path in required_files:
+        if not file_path.exists():
+            pytest.skip(f"Offline vignette file not found: {file_path}. Run offline optimization first.")
+
+    offline_dir = str(offline_dir)
 
     engine = VignetteEngine(
         use_personalization=False,
