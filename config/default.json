@@ -71,5 +71,25 @@
         "companyName": true
       }
     }
+  },
+  "i18n": {
+    "ui": {
+      "defaultLocale": "en-US",
+      "supportedLocales": [
+        "en-US",
+        "en-GB",
+        "es-ES",
+        "es-AR"
+      ]
+    },
+    "conversation": {
+      "default_locale": "en-US",
+      "available_locales": [
+        {
+          "locale": "en-US",
+          "date_format": "YYYY/MM/DD"
+        }
+      ]
+    }
   }
 }
