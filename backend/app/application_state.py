@@ -8,6 +8,7 @@ from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
 from app.agent.skill_explorer_agent import SkillsExplorerAgentState
 from app.agent.welcome_agent import WelcomeAgentState
+from app.agent.preference_elicitation_agent import PreferenceElicitationAgentState
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
 from app.countries import Country
 
@@ -24,6 +25,7 @@ class ApplicationState(BaseModel):
     conversation_memory_manager_state: ConversationMemoryManagerState
     collect_experience_state: CollectExperiencesAgentState
     skills_explorer_agent_state: SkillsExplorerAgentState
+    preference_elicitation_agent_state: PreferenceElicitationAgentState
 
     def __init__(self, *,
                  session_id: int,
@@ -32,7 +34,8 @@ class ApplicationState(BaseModel):
                  explore_experiences_director_state: ExploreExperiencesAgentDirectorState,
                  conversation_memory_manager_state: ConversationMemoryManagerState,
                  collect_experience_state: CollectExperiencesAgentState,
-                 skills_explorer_agent_state: SkillsExplorerAgentState):
+                 skills_explorer_agent_state: SkillsExplorerAgentState,
+                 preference_elicitation_agent_state: PreferenceElicitationAgentState):
         if session_id != agent_director_state.session_id:
             raise ValueError("Session ID mismatch in Agent Director State")
         if session_id != welcome_agent_state.session_id:
@@ -45,6 +48,8 @@ class ApplicationState(BaseModel):
             raise ValueError("Session ID mismatch in Collect Experience State")
         if session_id != skills_explorer_agent_state.session_id:
             raise ValueError("Session ID mismatch in Skills Explorer Agent State")
+        if session_id != preference_elicitation_agent_state.session_id:
+            raise ValueError("Session ID mismatch in Preference Elicitation Agent State")
 
         super().__init__(session_id=session_id,
                          agent_director_state=agent_director_state,
@@ -52,7 +57,8 @@ class ApplicationState(BaseModel):
                          explore_experiences_director_state=explore_experiences_director_state,
                          conversation_memory_manager_state=conversation_memory_manager_state,
                          collect_experience_state=collect_experience_state,
-                         skills_explorer_agent_state=skills_explorer_agent_state
+                         skills_explorer_agent_state=skills_explorer_agent_state,
+                         preference_elicitation_agent_state=preference_elicitation_agent_state
                          )
 
     @classmethod
@@ -72,7 +78,8 @@ class ApplicationState(BaseModel):
             explore_experiences_director_state=ExploreExperiencesAgentDirectorState(session_id=session_id, country_of_user=country_of_user),
             conversation_memory_manager_state=ConversationMemoryManagerState(session_id=session_id),
             collect_experience_state=CollectExperiencesAgentState(session_id=session_id, country_of_user=country_of_user),
-            skills_explorer_agent_state=SkillsExplorerAgentState(session_id=session_id, country_of_user=country_of_user)
+            skills_explorer_agent_state=SkillsExplorerAgentState(session_id=session_id, country_of_user=country_of_user),
+            preference_elicitation_agent_state=PreferenceElicitationAgentState(session_id=session_id)
         )
 
 

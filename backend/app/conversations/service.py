@@ -9,6 +9,7 @@ from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentInput
 from app.agent.explore_experiences_agent_director import DiveInPhase
+from app.application_state import ApplicationState
 from app.conversation_memory.conversation_memory_manager import IConversationMemoryManager
 from app.conversations.reactions.repository import IReactionRepository
 from app.conversations.types import ConversationResponse
@@ -16,6 +17,8 @@ from app.conversations.utils import get_messages_from_conversation_manager, filt
     get_total_explored_experiences, get_current_conversation_phase_response
 from app.sensitive_filter import sensitive_filter
 from app.metrics.application_state_metrics_recorder.recorder import IApplicationStateMetricsRecorder
+from app.job_preferences.service import IJobPreferencesService
+from app.job_preferences.types import JobPreferences
 
 
 class ConversationAlreadyConcludedError(Exception):
@@ -67,12 +70,14 @@ class ConversationService(IConversationService):
                  application_state_metrics_recorder: IApplicationStateMetricsRecorder,
                  agent_director: LLMAgentDirector,
                  conversation_memory_manager: IConversationMemoryManager,
-                 reaction_repository: IReactionRepository):
+                 reaction_repository: IReactionRepository,
+                 job_preferences_service: IJobPreferencesService):
         self._logger = logging.getLogger(ConversationService.__name__)
         self._agent_director = agent_director
         self._application_state_metrics_recorder = application_state_metrics_recorder
         self._conversation_memory_manager = conversation_memory_manager
         self._reaction_repository = reaction_repository
+        self._job_preferences_service = job_preferences_service
 
     async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool,
                    filter_pii: bool) -> ConversationResponse:
@@ -98,6 +103,7 @@ class ConversationService(IConversationService):
             state.collect_experience_state)
         self._agent_director.get_explore_experiences_agent().get_exploring_skills_agent().set_state(
             state.skills_explorer_agent_state)
+        self._agent_director.get_preference_elicitation_agent().set_state(state.preference_elicitation_agent_state)
         self._conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
         # Handle the user input
@@ -108,6 +114,11 @@ class ConversationService(IConversationService):
         # get the context again after updating the history
         context = await self._conversation_memory_manager.get_conversation_context()
         response = await get_messages_from_conversation_manager(context, from_index=current_index)
+
+        # Save preference vector to JobPreferences if preference elicitation just completed
+        if self._should_save_preference_vector(state):
+            await self._save_preference_vector_to_job_preferences(state)
+
         # get the date when the conversation was conducted
         state.agent_director_state.conversation_conducted_at = datetime.now(timezone.utc)
 
@@ -144,3 +155,84 @@ class ConversationService(IConversationService):
             experiences_explored=experiences_explored,
             current_phase=get_current_conversation_phase_response(state, self._logger)
         )
+
+    def _should_save_preference_vector(self, state: ApplicationState) -> bool:
+        """
+        Check if preference elicitation just completed and needs saving to JobPreferences.
+
+        The preference vector is saved when the agent transitions to COMPLETE phase,
+        which happens after the WRAPUP phase shows the summary to the user.
+
+        Args:
+            state: Current application state after agent execution
+
+        Returns:
+            True if preferences should be saved, False otherwise
+        """
+        pref_state = state.preference_elicitation_agent_state
+
+        # Save when in COMPLETE phase and has a valid preference vector
+        return (pref_state.conversation_phase == "COMPLETE"
+                and pref_state.preference_vector.confidence_score > 0.0)
+
+    async def _save_preference_vector_to_job_preferences(self, state: ApplicationState) -> None:
+        """
+        Save completed preference vector to JobPreferences collection.
+
+        This creates a denormalized copy of the preference vector for quick access
+        by the Epic 3 recommender system. The preference vector is already saved in
+        the youth database (DB6) by the agent; this is an additional copy for performance.
+
+        Args:
+            state: Application state containing the completed preference vector
+        """
+        try:
+            pref_state = state.preference_elicitation_agent_state
+            pv = pref_state.preference_vector
+
+            # Convert PreferenceVector to JobPreferences format
+            job_prefs = JobPreferences(
+                session_id=pref_state.session_id,
+                # Core preference dimensions
+                financial_importance=pv.financial_importance,
+                work_environment_importance=pv.work_environment_importance,
+                career_advancement_importance=pv.career_advancement_importance,
+                work_life_balance_importance=pv.work_life_balance_importance,
+                job_security_importance=pv.job_security_importance,
+                task_preference_importance=pv.task_preference_importance,
+                social_impact_importance=pv.social_impact_importance,
+                # Quality metadata
+                confidence_score=pv.confidence_score,
+                n_vignettes_completed=pv.n_vignettes_completed,
+                per_dimension_uncertainty=pv.per_dimension_uncertainty,
+                # Bayesian metadata
+                posterior_mean=pv.posterior_mean,
+                posterior_covariance_diagonal=pv.posterior_covariance_diagonal,
+                fim_determinant=pv.fim_determinant,
+                # Qualitative insights
+                decision_patterns=pv.decision_patterns,
+                tradeoff_willingness=pv.tradeoff_willingness,
+                values_signals=pv.values_signals,
+                consistency_indicators=pv.consistency_indicators,
+                extracted_constraints=pv.extracted_constraints,
+                # Hard constraints (if extracted)
+                concrete_salary_min=pv.extracted_constraints.get("minimum_salary") if pv.extracted_constraints else None,
+                # Timestamp
+                last_updated=datetime.now(timezone.utc)
+            )
+
+            # Save to job_preferences collection (proper dependency injection via FastAPI)
+            await self._job_preferences_service.create_or_update(
+                session_id=pref_state.session_id,
+                preferences=job_prefs
+            )
+
+            self._logger.info(
+                f"Saved preference vector to JobPreferences for session {pref_state.session_id} "
+                f"(confidence: {pv.confidence_score:.2f})"
+            )
+
+        except Exception as e:
+            # Don't fail the conversation - just log the error
+            # This is a denormalized copy; the primary data is already in DB6
+            self._logger.error(f"Failed to save preference vector to JobPreferences: {e}", exc_info=True)

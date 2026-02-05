@@ -82,6 +82,15 @@ class LLMRouter:
             examples=["I worked as a software developer for 5 years.",
                       "I am ready to explore my skills."]
         )
+        preference_elicitation_agent_tasks = AgentTasking(
+            agent_type_name=AgentType.PREFERENCE_ELICITATION_AGENT.value,
+            tasks="Discover user's job and career preferences through conversational questions "
+                  "and scenario-based choices. Helps understand what matters most to the user "
+                  "in their ideal job (salary, work-life balance, career growth, etc.).",
+            examples=["I want to discover my job preferences.",
+                      "Help me understand what I'm looking for in a job.",
+                      "I'd like to explore career preferences."]
+        )
         farewell_agent_tasks = AgentTasking(
             agent_type_name=AgentType.FAREWELL_AGENT.value,
             tasks="Ends the conversation with the user.",
@@ -97,7 +106,7 @@ class LLMRouter:
         # Define the tasks for each phase
         self._agent_tasking_for_phase: dict[ConversationPhase, list[AgentTasking]] = {
             ConversationPhase.INTRO: [welcome_agent_tasks, default_agent_tasks],
-            ConversationPhase.COUNSELING: [welcome_agent_tasks, experiences_explorer_agent_tasks, default_agent_tasks],
+            ConversationPhase.COUNSELING: [welcome_agent_tasks, experiences_explorer_agent_tasks, preference_elicitation_agent_tasks, default_agent_tasks],
             ConversationPhase.CHECKOUT: [farewell_agent_tasks, default_agent_tasks]
         }
         # The default agent for each phase, if the model fails to respond or returns an invalid agent type,

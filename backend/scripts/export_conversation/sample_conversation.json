@@ -149,5 +149,45 @@
     "experiences_explored": [
       "Baker (), 2020/01 - 2023/08, Etsub Bakery, SampleCity\n"
     ]
+  },
+  "preference_elicitation_agent_state": {
+    "session_id": 1,
+    "initial_experiences_snapshot": null,
+    "use_db6_for_fresh_data": false,
+    "conversation_phase": "INTRO",
+    "completed_vignettes": [],
+    "current_vignette_id": null,
+    "vignette_responses": [],
+    "preference_vector": {
+      "financial": {},
+      "work_environment": {},
+      "job_security": {},
+      "career_advancement": {},
+      "work_life_balance": {},
+      "task_preferences": {},
+      "social_impact": {},
+      "industry_preferences": [],
+      "occupation_preferences": [],
+      "last_updated": "2025-04-10T15:50:42.210000Z",
+      "confidence_score": 0.0
+    },
+    "conversation_turn_count": 0,
+    "experience_based_preferences": {},
+    "categories_covered": [],
+    "categories_to_explore": [
+      "financial",
+      "work_environment",
+      "job_security",
+      "career_advancement",
+      "work_life_balance",
+      "task_preferences"
+    ],
+    "needs_follow_up": false,
+    "follow_up_question": null,
+    "follow_ups_asked": [],
+    "last_experience_question_asked": null,
+    "user_has_indicated_completion": false,
+    "minimum_vignettes_completed": 5,
+    "notes": ""
   }
 }
