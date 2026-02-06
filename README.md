@@ -22,6 +22,9 @@ their skills and interests based on their lived experiences.
 
 - **[Sensitive Data Protection](sensitive-data-protection.md)**: Explore the sensitive data protection functionality for detailed insights about how we are safeguarding sensitive personal data.
 
+- **[Customization Guide](config/CUSTOMIZATION.md)**: Explore the customization options for detailed insights about how partners can configure branding, themes, and feature availability.
+
+
 ## Architecture Overview
 The images below show a high level overview of the solution architecture of Compass.
 
