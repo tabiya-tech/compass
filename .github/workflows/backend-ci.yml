@@ -66,6 +66,15 @@ jobs:
         run: poetry run pytest -m 'not (evaluation_test or smoke_test)'
         working-directory: backend
 
+      # generate offline vignettes for deployment
+      - name: Generate offline vignettes
+        shell: bash
+        run: |
+          poetry run python app/agent/preference_elicitation_agent/offline_optimization/run_offline_optimization.py \
+            --output-dir offline_output \
+            --config app/agent/preference_elicitation_agent/offline_optimization/preference_parameters.json
+        working-directory: backend
+
       # build and upload artifacts
 
       - name: Authenticate to google cloud
