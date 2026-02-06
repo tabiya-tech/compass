@@ -8,6 +8,7 @@ class Collections:
     CONVERSATION_MEMORY_MANAGER_STATE = "conversation_memory_manager_state"
     COLLECT_EXPERIENCE_STATE = "collect_experience_state"
     SKILLS_EXPLORER_AGENT_STATE = "skills_explorer_agent_state"
+    PREFERENCE_ELICITATION_AGENT_STATE = "preference_elicitation_agent_state"
     USER_FEEDBACK = "user_feedback"
     REACTIONS = "reactions"
     COMPASS_METRICS = "metric_events"

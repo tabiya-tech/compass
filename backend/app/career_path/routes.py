@@ -10,9 +10,8 @@ def add_career_path_routes(app: FastAPI):
     :param app: FastAPI: The FastAPI app to add the routes to.
     :return:
     """
-    # TODO adjust path as needed
-    # Also remove the include_in_schema=False once the route is working
-    router = APIRouter(prefix="/career-path", tags=["career-path"], include_in_schema=False)
+    # TODO: Implement career path routes as needed for Epic 3
+    router = APIRouter(prefix="/career-path", tags=["career-path"])
 
     # TODO change the path and implement the logic as needed
     @router.post(

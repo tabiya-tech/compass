@@ -41,7 +41,8 @@ class E2EChatExecutor:
         self._agent_director.get_explore_experiences_agent().get_collect_experiences_agent().set_state(
             self._state.collect_experience_state)
         self._agent_director.get_explore_experiences_agent().get_exploring_skills_agent().set_state(self._state.skills_explorer_agent_state)
-        
+        self._agent_director.get_preference_elicitation_agent().set_state(self._state.preference_elicitation_agent_state)
+
         # Metrics collector (optional, for baseline testing)
         self._metrics_collector = metrics_collector
 

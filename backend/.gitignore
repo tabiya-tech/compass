@@ -7,5 +7,10 @@ test_output/
 logs/
 feedback-reports/
 exports/
+exports/session_logs/
+session_logs/
 evaluation_tests/test_output/
 evaluation_tests/golden_transcripts/output/
+
+# Generated offline optimization outputs
+offline_output/

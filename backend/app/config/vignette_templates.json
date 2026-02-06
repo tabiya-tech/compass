@@ -1,0 +1,402 @@
+[
+  {
+    "template_id": "job_security_vs_flexibility",
+    "category": "financial",
+    "trade_off": {
+      "dimension_a": "job_security",
+      "dimension_b": "income_flexibility"
+    },
+    "option_a": {
+      "high_dimensions": [
+        "job_security",
+        "income_stability"
+      ],
+      "low_dimensions": [
+        "schedule_flexibility",
+        "income_variability"
+      ],
+      "salary_range": [
+        95000,
+        115000
+      ],
+      "contract_type": "permanent",
+      "benefits": "full",
+      "work_location": "office",
+      "hours": "fixed"
+    },
+    "option_b": {
+      "high_dimensions": [
+        "schedule_flexibility",
+        "income_variability",
+        "autonomy"
+      ],
+      "low_dimensions": [
+        "job_security",
+        "income_stability"
+      ],
+      "salary_range": [
+        50000,
+        150000
+      ],
+      "contract_type": "freelance",
+      "benefits": "none",
+      "work_location": "varies",
+      "hours": "flexible"
+    },
+    "follow_up_prompts": [
+      "What was the most important factor in your choice?",
+      "If the stable job paid {salary_difference} KES less, would you still choose it?"
+    ],
+    "targeted_dimensions": [
+      "job_security.importance",
+      "job_security.income_stability_required",
+      "financial.bonus_commission_tolerance",
+      "work_life_balance.weekend_work_tolerance"
+    ],
+    "difficulty_level": "medium"
+  },
+  {
+    "template_id": "remote_vs_commute",
+    "category": "work_environment",
+    "trade_off": {
+      "dimension_a": "commute_tolerance",
+      "dimension_b": "remote_work_preference"
+    },
+    "option_a": {
+      "high_dimensions": [
+        "salary"
+      ],
+      "low_dimensions": [
+        "remote_work",
+        "commute_tolerance"
+      ],
+      "salary_range": [
+        90000,
+        110000
+      ],
+      "work_location": "office_far",
+      "commute_time_minutes": 90,
+      "hours": "fixed",
+      "contract_type": "permanent",
+      "benefits": "full"
+    },
+    "option_b": {
+      "high_dimensions": [
+        "remote_work",
+        "autonomy"
+      ],
+      "low_dimensions": [
+        "salary"
+      ],
+      "salary_range": [
+        65000,
+        85000
+      ],
+      "work_location": "remote",
+      "commute_time_minutes": 0,
+      "hours": "flexible_within_window",
+      "contract_type": "permanent",
+      "benefits": "full"
+    },
+    "follow_up_prompts": [
+      "How much would the remote job need to pay to be worth the same as the office job to you?",
+      "What if the office job was closer - would that change your decision?"
+    ],
+    "targeted_dimensions": [
+      "work_environment.remote_work_preference",
+      "work_environment.commute_tolerance_minutes",
+      "financial.salary_trade_offs.remote_work",
+      "work_environment.autonomy_importance"
+    ],
+    "difficulty_level": "medium"
+  },
+  {
+    "template_id": "growth_vs_immediate_income",
+    "category": "career_advancement",
+    "trade_off": {
+      "dimension_a": "immediate_income",
+      "dimension_b": "career_growth"
+    },
+    "option_a": {
+      "high_dimensions": [
+        "career_growth",
+        "learning_opportunities"
+      ],
+      "low_dimensions": [
+        "immediate_salary"
+      ],
+      "salary_range": [
+        55000,
+        70000
+      ],
+      "salary_progression": "high",
+      "training_provided": true,
+      "learning_opportunities": "high",
+      "work_location": "remote",
+      "contract_type": "permanent"
+    },
+    "option_b": {
+      "high_dimensions": [
+        "immediate_salary",
+        "job_security"
+      ],
+      "low_dimensions": [
+        "career_growth",
+        "learning_opportunities"
+      ],
+      "salary_range": [
+        95000,
+        110000
+      ],
+      "salary_progression": "none",
+      "training_provided": false,
+      "learning_opportunities": "low",
+      "work_location": "hybrid",
+      "contract_type": "permanent"
+    },
+    "follow_up_prompts": [
+      "What if the growth-oriented role started at even lower salary - where's your limit?",
+      "How important is it to you to learn new skills in your work?"
+    ],
+    "targeted_dimensions": [
+      "career_advancement.importance",
+      "career_advancement.learning_opportunities_value",
+      "career_advancement.time_horizon",
+      "financial.salary_trade_offs.learning_opportunities"
+    ],
+    "difficulty_level": "medium"
+  },
+  {
+    "template_id": "hours_vs_pay",
+    "category": "work_life_balance",
+    "trade_off": {
+      "dimension_a": "work_life_balance",
+      "dimension_b": "salary"
+    },
+    "option_a": {
+      "high_dimensions": [
+        "work_life_balance",
+        "schedule_predictability"
+      ],
+      "low_dimensions": [
+        "salary"
+      ],
+      "salary_range": [
+        75000,
+        90000
+      ],
+      "hours_per_week": 40,
+      "overtime": "never",
+      "weekend_work": "never",
+      "work_pace": "relaxed"
+    },
+    "option_b": {
+      "high_dimensions": [
+        "salary",
+        "career_progression"
+      ],
+      "low_dimensions": [
+        "work_life_balance",
+        "free_time"
+      ],
+      "salary_range": [
+        110000,
+        150000
+      ],
+      "hours_per_week": 50,
+      "overtime": "frequent",
+      "weekend_work": "1-2_per_month",
+      "work_pace": "fast",
+      "responsibility": "high"
+    },
+    "follow_up_prompts": [
+      "What's the main reason you chose that option?",
+      "Is there any amount of extra pay that would make you change your mind?"
+    ],
+    "targeted_dimensions": [
+      "work_life_balance.importance",
+      "work_life_balance.max_acceptable_hours_per_week",
+      "work_life_balance.weekend_work_tolerance",
+      "financial.salary_trade_offs.work_life_balance"
+    ],
+    "difficulty_level": "easy"
+  },
+  {
+    "template_id": "autonomy_vs_structure",
+    "category": "work_environment",
+    "trade_off": {
+      "dimension_a": "structure_guidance",
+      "dimension_b": "autonomy_independence"
+    },
+    "option_a": {
+      "high_dimensions": [
+        "structure",
+        "supervision",
+        "team_support"
+      ],
+      "low_dimensions": [
+        "autonomy",
+        "independence"
+      ],
+      "salary_range": [
+        50000,
+        55000
+      ],
+      "supervision": "close",
+      "autonomy": "low",
+      "structure": "high",
+      "team_size": "small"
+    },
+    "option_b": {
+      "high_dimensions": [
+        "autonomy",
+        "independence",
+        "income_potential"
+      ],
+      "low_dimensions": [
+        "structure",
+        "supervision"
+      ],
+      "salary_range": [
+        45000,
+        80000
+      ],
+      "supervision": "minimal",
+      "autonomy": "very_high",
+      "structure": "low",
+      "travel": "frequent"
+    },
+    "follow_up_prompts": [
+      "Do you prefer having clear guidance or figuring things out yourself?",
+      "How comfortable are you with working independently most of the time?"
+    ],
+    "targeted_dimensions": [
+      "work_environment.autonomy_importance",
+      "work_environment.supervision_preference",
+      "financial.bonus_commission_tolerance",
+      "work_environment.team_size_preference"
+    ],
+    "difficulty_level": "medium"
+  },
+  {
+    "template_id": "stability_vs_risk",
+    "category": "job_security",
+    "trade_off": {
+      "dimension_a": "stability",
+      "dimension_b": "growth_potential"
+    },
+    "option_a": {
+      "high_dimensions": [
+        "job_security",
+        "income_stability"
+      ],
+      "low_dimensions": [
+        "career_growth",
+        "excitement"
+      ],
+      "salary_range": [
+        95000,
+        115000
+      ],
+      "contract_type": "permanent",
+      "job_security": "very_high",
+      "salary_growth": "slow",
+      "work_pace": "slow"
+    },
+    "option_b": {
+      "high_dimensions": [
+        "growth_potential",
+        "learning",
+        "excitement"
+      ],
+      "low_dimensions": [
+        "job_security",
+        "stability"
+      ],
+      "salary_range": [
+        60000,
+        180000
+      ],
+      "contract_type": "contract",
+      "job_security": "medium",
+      "salary_growth": "potentially_high",
+      "work_pace": "fast",
+      "risk": "medium"
+    },
+    "follow_up_prompts": [
+      "What concerns you most about the option you didn't choose?",
+      "Do you have financial responsibilities that make stable income important?"
+    ],
+    "targeted_dimensions": [
+      "job_security.importance",
+      "job_security.risk_tolerance",
+      "career_advancement.importance",
+      "work_environment.work_pace_preference"
+    ],
+    "difficulty_level": "hard"
+  },
+  {
+    "template_id": "task_type_preference",
+    "category": "task_preferences",
+    "trade_off": {
+      "dimension_a": "social_interactive_tasks",
+      "dimension_b": "independent_analytical_tasks"
+    },
+    "option_a": {
+      "high_dimensions": [
+        "social_tasks",
+        "communication",
+        "teamwork",
+        "client_interaction"
+      ],
+      "low_dimensions": [
+        "routine_tasks",
+        "independence",
+        "analytical_work"
+      ],
+      "salary_range": [
+        80000,
+        95000
+      ],
+      "task_type": "client_facing",
+      "collaboration_level": "high",
+      "autonomy": "low",
+      "social_interaction": "frequent",
+      "work_pace": "dynamic"
+    },
+    "option_b": {
+      "high_dimensions": [
+        "cognitive_tasks",
+        "independence",
+        "analytical_work",
+        "problem_solving"
+      ],
+      "low_dimensions": [
+        "social_tasks",
+        "teamwork",
+        "client_interaction"
+      ],
+      "salary_range": [
+        75000,
+        90000
+      ],
+      "task_type": "technical_analytical",
+      "collaboration_level": "low",
+      "autonomy": "high",
+      "social_interaction": "minimal",
+      "work_pace": "self_directed"
+    },
+    "follow_up_prompts": [
+      "Do you prefer working directly with people or focusing on independent work?",
+      "How do you feel about tasks that require frequent collaboration versus working alone?"
+    ],
+    "targeted_dimensions": [
+      "task_preferences.social_tasks_preference",
+      "task_preferences.cognitive_tasks_preference",
+      "task_preferences.routine_tasks_tolerance",
+      "task_preferences.manual_tasks_preference",
+      "work_environment.autonomy_importance"
+    ],
+    "difficulty_level": "medium"
+  }
+]

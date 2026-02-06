@@ -15,6 +15,7 @@ class AgentType(Enum):
     COLLECT_EXPERIENCES_AGENT = "CollectExperiencesAgent"
     INFER_OCCUPATIONS_AGENT = "InferOccupationsAgent"
     EXPLORE_SKILLS_AGENT = "ExploreSkillsAgent"
+    PREFERENCE_ELICITATION_AGENT = "PreferenceElicitationAgent"
     FAREWELL_AGENT = "FarewellAgent"
     QNA_AGENT = "QnaAgent"
 
@@ -100,6 +101,9 @@ class AgentOutput(BaseModel):
 
     sent_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     """The sent_at of the message"""
+
+    metadata: Optional[dict] = None
+    """Optional metadata for structured UI rendering (e.g., BWS tasks, vignette options, interactive components)"""
 
     class Config:
         extra = "forbid"

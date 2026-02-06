@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from app.agent.agent import Agent
 from app.agent.agent_director._llm_router import LLMRouter
 from app.agent.agent_director.abstract_agent_director import AbstractAgentDirector, ConversationPhase
@@ -5,6 +7,7 @@ from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirector
 from app.agent.farewell_agent import FarewellAgent
 from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
+from app.agent.preference_elicitation_agent.agent import PreferenceElicitationAgent
 from app.agent.welcome_agent import WelcomeAgent
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
@@ -32,6 +35,11 @@ class LLMAgentDirector(AbstractAgentDirector):
                 search_services=search_services,
                 experience_pipeline_config=experience_pipeline_config
             ),
+            AgentType.PREFERENCE_ELICITATION_AGENT: PreferenceElicitationAgent(
+                use_personalized_vignettes=False,  # Disable default personalization
+                use_offline_with_personalization=True,  # Enable hybrid mode (offline D-optimal vignettes + LLM personalization)
+                offline_output_dir=str(Path(__file__).parent.parent.parent.parent / "offline_output")
+            ),
             AgentType.FAREWELL_AGENT: FarewellAgent()
         }
         self._llm_router = LLMRouter(self._logger)
@@ -48,6 +56,13 @@ class LLMAgentDirector(AbstractAgentDirector):
         agent = self._agents[AgentType.EXPLORE_EXPERIENCES_AGENT]
         if not isinstance(agent, ExploreExperiencesAgentDirector):
             raise ValueError("The agent is not an instance of ExploreExperiencesAgentDirector")
+        return agent
+
+    def get_preference_elicitation_agent(self) -> PreferenceElicitationAgent:
+        # cast the agent to the PreferenceElicitationAgent
+        agent = self._agents[AgentType.PREFERENCE_ELICITATION_AGENT]
+        if not isinstance(agent, PreferenceElicitationAgent):
+            raise ValueError("The agent is not an instance of PreferenceElicitationAgent")
         return agent
 
     async def get_suitable_agent_type(self, *,
