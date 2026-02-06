@@ -15,7 +15,7 @@ def add_career_path_routes(app: FastAPI):
 
     # TODO change the path and implement the logic as needed
     @router.post(
-        path="/",
+        path="",
         description="Create a new career path record",
         name="create career path"
     )

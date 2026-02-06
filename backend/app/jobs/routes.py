@@ -14,7 +14,7 @@ def add_jobs_routes(app: FastAPI):
     router = APIRouter(prefix="/jobs", tags=["jobs"])
 
     @router.post(
-        path="/",
+        path="",
         description="Create a new job credential record",
         name="create job"
     )
