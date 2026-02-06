@@ -26,6 +26,7 @@ WORKDIR /code
 COPY ./app ./app
 COPY ./features ./features
 COPY ./common_libs ./common_libs
+COPY ./offline_output ./offline_output
 
 EXPOSE 8080
 
