@@ -218,8 +218,16 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
                 state.explore_experiences_director_state.explored_experiences):
                 self._logger.info("upgrading state: populating preference agent initial_experiences_snapshot")
                 # Copy explored experiences to preference agent snapshot
+                # Note: explored_experiences has tuple-format skills [(score, skill), ...]
+                # but initial_experiences_snapshot needs plain ExperienceEntity with skills as dicts
+                # Strip the tuple wrapping from top_skills during the copy
+                from app.agent.experience.experience_entity import ExperienceEntity
                 state.preference_elicitation_agent_state.initial_experiences_snapshot = [
-                    exp for exp in state.explore_experiences_director_state.explored_experiences
+                    ExperienceEntity(
+                        **exp.model_dump(exclude={'top_skills'}),
+                        top_skills=[skill for _, skill in exp.top_skills] if exp.top_skills else []
+                    )
+                    for exp in state.explore_experiences_director_state.explored_experiences
                 ]
                 _changes = True
 

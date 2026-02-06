@@ -187,22 +187,37 @@ class PreferenceElicitationAgentState(BaseModel):
         Returns:
             Normalized experience dictionary safe for ExperienceEntity(**dict)
         """
-        # Make a copy to avoid mutating the input
-        normalized = exp_dict.copy()
+        # Check if normalization is actually needed
+        if "top_skills" not in exp_dict or not exp_dict["top_skills"]:
+            return exp_dict
 
-        # Handle top_skills if present
-        if "top_skills" in normalized and normalized["top_skills"]:
-            normalized_skills = []
-            for skill in normalized["top_skills"]:
-                # Check if skill is a tuple [score, skill_dict]
-                if isinstance(skill, list) and len(skill) == 2:
-                    # Extract just the skill dict, ignoring the score
-                    # (score is not part of ExperienceEntity schema for initial_experiences_snapshot)
-                    normalized_skills.append(skill[1])
-                else:
-                    # Already in correct format
-                    normalized_skills.append(skill)
-            normalized["top_skills"] = normalized_skills
+        # Check if any skills are in tuple format
+        needs_normalization = any(
+            isinstance(skill, list) and len(skill) == 2
+            and isinstance(skill[0], (int, float))  # First element is score
+            and isinstance(skill[1], dict)  # Second element is skill dict
+            for skill in exp_dict["top_skills"]
+        )
+
+        if not needs_normalization:
+            # No normalization needed, return as-is
+            return exp_dict
+
+        # Normalization needed - make a deep copy to avoid mutating the input
+        import copy
+        normalized = copy.deepcopy(exp_dict)
+
+        # Transform tuple-format skills to dict-only format
+        normalized_skills = []
+        for skill in normalized["top_skills"]:
+            if isinstance(skill, list) and len(skill) == 2:
+                # Extract just the skill dict, ignoring the score
+                # (score is not part of ExperienceEntity schema for initial_experiences_snapshot)
+                normalized_skills.append(skill[1])
+            else:
+                # Already in correct format
+                normalized_skills.append(skill)
+        normalized["top_skills"] = normalized_skills
 
         return normalized
 
