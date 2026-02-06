@@ -173,6 +173,40 @@ class PreferenceElicitationAgentState(BaseModel):
         extra = "forbid"
 
     @staticmethod
+    def _normalize_experience_for_deserialization(exp_dict: dict) -> dict:
+        """
+        Normalize experience dict for deserialization, handling tuple-format skills.
+
+        This handles backward compatibility where top_skills might be stored as:
+        - Old format: [[score, skill_dict], ...] (tuples from explored_experiences)
+        - New format: [skill_dict_with_score, ...] (plain dicts)
+
+        Args:
+            exp_dict: Raw experience dictionary from MongoDB
+
+        Returns:
+            Normalized experience dictionary safe for ExperienceEntity(**dict)
+        """
+        # Make a copy to avoid mutating the input
+        normalized = exp_dict.copy()
+
+        # Handle top_skills if present
+        if "top_skills" in normalized and normalized["top_skills"]:
+            normalized_skills = []
+            for skill in normalized["top_skills"]:
+                # Check if skill is a tuple [score, skill_dict]
+                if isinstance(skill, list) and len(skill) == 2:
+                    # Extract just the skill dict, ignoring the score
+                    # (score is not part of ExperienceEntity schema for initial_experiences_snapshot)
+                    normalized_skills.append(skill[1])
+                else:
+                    # Already in correct format
+                    normalized_skills.append(skill)
+            normalized["top_skills"] = normalized_skills
+
+        return normalized
+
+    @staticmethod
     def from_document(doc: Mapping[str, Any]) -> "PreferenceElicitationAgentState":
         """
         Create a PreferenceElicitationAgentState from a MongoDB document.
@@ -183,11 +217,17 @@ class PreferenceElicitationAgentState(BaseModel):
         Returns:
             PreferenceElicitationAgentState instance
         """
+        # Normalize experiences to handle tuple-format skills from explored_experiences
+        initial_experiences_snapshot = None
+        if doc.get("initial_experiences_snapshot"):
+            initial_experiences_snapshot = [
+                ExperienceEntity(**PreferenceElicitationAgentState._normalize_experience_for_deserialization(exp))
+                for exp in doc.get("initial_experiences_snapshot", [])
+            ]
+
         return PreferenceElicitationAgentState(
             session_id=doc["session_id"],
-            initial_experiences_snapshot=[
-                ExperienceEntity(**exp) for exp in doc.get("initial_experiences_snapshot", [])
-            ] if doc.get("initial_experiences_snapshot") else None,
+            initial_experiences_snapshot=initial_experiences_snapshot,
             use_db6_for_fresh_data=doc.get("use_db6_for_fresh_data", False),
             conversation_phase=doc.get("conversation_phase", "INTRO"),
             # BWS fields

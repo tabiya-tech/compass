@@ -16,6 +16,7 @@ import time
 from pathlib import Path
 from datetime import timedelta
 from typing import List, Optional
+import pytest
 
 # Rich imports
 from rich.console import Console
@@ -391,6 +392,7 @@ def display_state_info(state: PreferenceElicitationAgentState):
         console.print(history_table)
 
 
+@pytest.mark.asyncio
 async def test_vignette_engine():
     """Test the vignette engine component."""
     print_header("Testing Vignette Engine")
@@ -435,6 +437,7 @@ async def test_vignette_engine():
         traceback.print_exc()
 
 
+@pytest.mark.asyncio
 async def test_preference_vector():
     """Test preference vector creation and manipulation."""
     print_header("Testing Preference Vector")
@@ -465,6 +468,7 @@ async def test_preference_vector():
         traceback.print_exc()
 
 
+@pytest.mark.asyncio
 async def test_full_conversation(use_hybrid_mode: bool = False):
     """Test a full conversation with the agent."""
     if use_hybrid_mode:
@@ -726,6 +730,7 @@ async def test_full_conversation(use_hybrid_mode: bool = False):
         traceback.print_exc()
 
 
+@pytest.mark.asyncio
 async def test_vignette_selection():
     """Test vignette selection logic."""
     print_header("Testing Vignette Selection Logic")
@@ -775,6 +780,7 @@ async def test_vignette_selection():
         traceback.print_exc()
 
 
+@pytest.mark.asyncio
 async def test_state_management():
     """Test state management and persistence."""
     print_header("Testing State Management")
