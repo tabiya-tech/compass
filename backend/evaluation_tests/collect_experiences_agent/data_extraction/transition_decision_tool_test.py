@@ -8,7 +8,6 @@ from app.agent.collect_experiences_agent import CollectedData
 from app.agent.collect_experiences_agent._transition_decision_tool import TransitionDecisionTool, TransitionDecision
 from app.agent.experience import WorkType
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
-from app.i18n.translation_service import get_i18n_manager
 from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
@@ -455,7 +454,6 @@ async def test_transition_decision_tool(test_case: TransitionDecisionToolTestCas
     logger = logging.getLogger()
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
-        get_i18n_manager().set_locale(test_case.locale)
 
         # GIVEN user's last input
         given_user_input = AgentInput(message=test_case.users_last_input)

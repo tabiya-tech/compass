@@ -8,7 +8,6 @@ from _pytest.logging import LogCaptureFixture
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, \
     ConversationMemoryManagerState
 from app.countries import Country
-from app.i18n.translation_service import get_i18n_manager
 from app.server_config import UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE
 from common_libs.test_utilities import get_random_session_id
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
@@ -33,7 +32,6 @@ async def setup_collect_experiences_agent() -> tuple[
     async def collect_experiences_exec(caplog: LogCaptureFixture, test_case: ScriptedUserEvaluationTestCase, country: Country):
         print(f"Running test case {test_case.name}")
 
-        get_i18n_manager().set_locale(test_case.locale)
         output_folder = os.path.join(os.getcwd(), 'test_output/collect_experiences_agent/scripted', test_case.name)
         execute_evaluated_agent = CollectExperiencesAgentExecutor(
             conversation_manager=conversation_manager,

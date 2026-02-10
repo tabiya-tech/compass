@@ -9,7 +9,6 @@ from bson import ObjectId
 
 from app.agent.linking_and_ranking_pipeline.infer_occupation_tool._relevant_occupations_classifier_llm import \
     _RelevantOccupationsClassifierLLM
-from app.i18n.translation_service import get_i18n_manager
 from app.vector_search.esco_entities import OccupationEntity
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
@@ -228,8 +227,6 @@ async def test_relevant_occupations_classifier_llm(test_case: RelevantOccupation
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.DEBUG):
-        # Set the locale in which the test is running
-        get_i18n_manager().set_locale(test_case.locale)
 
         # Guards to ensure that the loggers are correctly setup,
         guard_caplog(logger=relevant_occupations_classifier._logger, caplog=caplog)
