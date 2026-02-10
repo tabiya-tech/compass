@@ -181,16 +181,20 @@ class CollectExperiencesAgent(Agent):
         
         conversation_llm_output.llm_stats = data_extraction_llm_stats + conversation_llm_output.llm_stats + transition_llm_stats
         
+        reasoning_text = transition_reasoning.reasoning if transition_reasoning else "No reasoning provided"
+        
         if transition_decision == TransitionDecision.END_WORKTYPE and self._state.unexplored_types:
             explored_type = self._state.unexplored_types.pop(0)
             self._state.explored_types.append(explored_type)
             self.logger.info(
                 "Transition decision: END_WORKTYPE - Explored work type: %s"
                 "\n  - remaining types: %s"
-                "\n  - discovered experiences so far: %s",
+                "\n  - discovered experiences so far: %s"
+                "\n  - reasoning: %s",
                 explored_type,
                 self._state.unexplored_types,
-                self._state.collected_data
+                self._state.collected_data,
+                reasoning_text
             )
             
             next_exploring_type = self._state.unexplored_types[0] if len(self._state.unexplored_types) > 0 else None
@@ -219,9 +223,23 @@ class CollectExperiencesAgent(Agent):
             self.logger.info(
                 "Transition decision: END_CONVERSATION"
                 "\n  - all work types explored: %s"
-                "\n  - discovered experiences: %s",
+                "\n  - discovered experiences: %s"
+                "\n  - reasoning: %s",
                 len(self._state.explored_types) == 4,
-                self._state.collected_data
+                self._state.collected_data,
+                reasoning_text
+            )
+        elif transition_decision == TransitionDecision.CONTINUE:
+            self.logger.info(
+                "Transition decision: CONTINUE"
+                "\n  - exploring type: %s"
+                "\n  - unexplored types: %s"
+                "\n  - collected experiences: %d"
+                "\n  - reasoning: %s",
+                exploring_type.name if exploring_type else "None",
+                [wt.name for wt in self._state.unexplored_types],
+                len(collected_data),
+                reasoning_text
             )
         
         return conversation_llm_output

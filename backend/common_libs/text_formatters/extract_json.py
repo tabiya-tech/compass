@@ -16,6 +16,18 @@ T = TypeVar('T', bound=BaseModel)
 _JSON_REGEX = r'\{.*\}'
 
 
+def _find_json_start(text: str) -> str:
+    """
+    Find the start of JSON in text by locating the first opening brace.
+    This handles cases where LLMs add explanatory text before the JSON.
+    Returns the text starting from the first '{' character, or original text if no '{' found.
+    """
+    first_brace_index = text.find('{')
+    if first_brace_index >= 0:
+        return text[first_brace_index:]
+    return text
+
+
 def extract_json(text: str, model: Type[T]) -> T:
     """
     Extract a JSON object from a text and validate it with a Pydantic model.
@@ -28,8 +40,20 @@ def extract_json(text: str, model: Type[T]) -> T:
     :raises InvalidJSON: If the extracted JSON is invalid
     :raises ValidationError: If the extracted JSON does not conform to the model
     """
-    match = re.search(_JSON_REGEX, text, re.DOTALL)
+    # Find JSON start by locating first '{' character (handles explanatory text before JSON)
+    text_with_json_start = _find_json_start(text)
+    
+    match = re.search(_JSON_REGEX, text_with_json_start, re.DOTALL)
     if not match:
+        # If no complete JSON found, try to repair partial JSON (e.g., truncated responses)
+        if text_with_json_start.startswith('{'):
+            try:
+                # Try to repair the partial JSON
+                data = try_fix_busted_json(text_with_json_start)
+                if data:
+                    return model(**data)
+            except InvalidJSON:
+                pass
         raise NoJSONFound(f"No JSON object found in the text: {text}")
 
     # This will not `IndexError` if no match, as we check for it above.

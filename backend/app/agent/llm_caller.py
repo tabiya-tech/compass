@@ -101,6 +101,9 @@ class LLMCaller(Generic[RESPONSE_T]):
             except ExtractJSONError as e:
                 log_message = f"Attempt {attempt_count} failed to extract JSON caused by: {e}"
                 llm_stats.error = log_message
+                logger.warning("Raw LLM response text (first 500 chars): %s", response_text[:500] if response_text else "None")
+                logger.warning("Raw LLM response text length: %d characters", len(response_text) if response_text else 0)
+                logger.warning("Response token count: %d, Max output tokens: %d", llm_stats.response_token_count, generation_config.max_output_tokens)
                 if attempt_count == _MAX_ATTEMPTS:
                     # The agent failed to respond with a JSON object after the last attempt,
                     logger.error(log_message)

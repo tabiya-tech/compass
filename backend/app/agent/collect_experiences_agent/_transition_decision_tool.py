@@ -6,6 +6,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, LLMStats
+from app.agent.config import AgentsConfig
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
 from app.agent.prompt_template import get_language_style
@@ -18,7 +19,7 @@ from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_
     get_config_variation
 from common_libs.llm.schema_builder import with_response_schema
 from common_libs.retry import Retry
-from ._conversation_llm import _find_incomplete_experiences
+from ._conversation_llm import _find_incomplete_experiences, _get_experience_type, _ask_experience_type_question
 from ._types import CollectedData
 
 _TAGS_TO_FILTER = [
@@ -26,6 +27,24 @@ _TAGS_TO_FILTER = [
     "conversation history",
     "collected experience data",
 ]
+
+MAX_REASONING_LENGTH = 100
+
+
+def _generate_work_type_mapping() -> str:
+    """
+    Dynamically generate work type mapping from the WorkType enum.
+    This ensures we don't hardcode work types and can easily add/remove them.
+    """
+    mapping_lines = []
+    for work_type in WorkType:
+        description = _get_experience_type(work_type)
+        example_question = _ask_experience_type_question(work_type)
+        mapping_lines.append(
+            f"          - {work_type.name}: Questions about \"{description}\" "
+            f"(e.g., \"{example_question}\")"
+        )
+    return "\n".join(mapping_lines)
 
 
 class TransitionDecision(Enum):
@@ -39,8 +58,10 @@ class TransitionReasoning(BaseModel):
     confidence: str
 
 
-class _LLMOutput(BaseModel):
-    transition_decision: TransitionDecision
+class _TransitionDecisionOutput(BaseModel):
+    continue_current_type: bool
+    done_with_collection: bool
+    reasoning: str
 
     class Config:
         extra = "forbid"
@@ -50,7 +71,7 @@ class TransitionDecisionTool:
 
     def __init__(self, logger: logging.Logger):
         self._logger = logger
-        self._llm_caller = LLMCaller[_LLMOutput](model_response_type=_LLMOutput)
+        self._llm_caller = LLMCaller[_TransitionDecisionOutput](model_response_type=_TransitionDecisionOutput)
 
     @staticmethod
     def _get_llm(collected_data_json: str, temperature_config: Optional[dict] = None) -> GeminiGenerativeLLM:
@@ -63,9 +84,11 @@ class TransitionDecisionTool:
                 language_style=get_language_style()
             ),
             config=LLMConfig(
-                generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
-                    "max_output_tokens": 1000
-                } | temperature_config | with_response_schema(_LLMOutput)
+                language_model_name=AgentsConfig.deep_reasoning_model,
+                generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG
+                | JSON_GENERATION_CONFIG
+                | temperature_config
+                | with_response_schema(_TransitionDecisionOutput)
             ))
 
     async def execute(self,
@@ -77,11 +100,16 @@ class TransitionDecisionTool:
                       conversation_context: ConversationContext,
                       user_input: AgentInput) -> tuple[TransitionDecision, Optional[TransitionReasoning], list[LLMStats]]:
         
-        # we make a rule based decision since we can check by code if there are incomplete experiences
+        # Rule-based check 1: Incomplete experiences
         incomplete_experiences = _find_incomplete_experiences(collected_data)
         if incomplete_experiences:
-            self._logger.debug("Incomplete experiences found - returning CONTINUE")
+            self._logger.info(
+                "Incomplete experiences found - returning CONTINUE. "
+                "Incomplete experiences: %s",
+                [(idx, exp.experience_title, missing) for idx, exp, missing in incomplete_experiences]
+            )
             return TransitionDecision.CONTINUE, None, []
+        
         
         cleaned_experience_dicts = []
         for collected_item in collected_data:
@@ -98,19 +126,26 @@ class TransitionDecisionTool:
         unexplored_types_str = ", ".join([wt.name for wt in unexplored_types])
         explored_types_str = ", ".join([wt.name for wt in explored_types])
         
+        exploring_type_description = _get_experience_type(exploring_type) if exploring_type else "None"
+        work_type_mapping = _generate_work_type_mapping()
+        
         prompt = _PROMPT_TEMPLATE.format(
             user_input=user_input.message,
             conversation_history=conversation_history,
             exploring_type=exploring_type_str,
+            exploring_type_enum=exploring_type.name if exploring_type else "None",
+            exploring_type_description=exploring_type_description,
+            work_type_mapping=work_type_mapping,
             unexplored_types=unexplored_types_str,
             explored_types=explored_types_str
         )
         
         _llm_stats = []
+        _reasoning = None
         
         async def _callback(attempt: int, max_retries: int) -> tuple[TransitionDecision, float, BaseException | None]:
-            temperature_config = get_config_variation(start_temperature=0.25, end_temperature=0.5,
-                                                      start_top_p=0.8, end_top_p=1,
+            temperature_config = get_config_variation(start_temperature=0.0, end_temperature=0.1,
+                                                      start_top_p=0.95, end_top_p=1.0,
                                                       attempt=attempt, max_retries=max_retries)
             
             llm = self._get_llm(collected_data_json=json_data, temperature_config=temperature_config)
@@ -118,8 +153,14 @@ class TransitionDecisionTool:
                                temperature_config["temperature"],
                                temperature_config["top_p"])
             
-            data, llm_stats, penalty, error = await self._internal_execute(llm=llm, prompt=prompt)
+            data, reasoning, llm_stats, penalty, error = await self._internal_execute(
+                llm=llm, 
+                prompt=prompt,
+                unexplored_types=unexplored_types
+            )
             
+            nonlocal _reasoning
+            _reasoning = reasoning
             _llm_stats.extend(llm_stats)
             
             return data, penalty, error
@@ -127,19 +168,46 @@ class TransitionDecisionTool:
         result, _result_penalty, _error = await Retry[TransitionDecision].call_with_penalty(
             callback=_callback, logger=self._logger)
         
-        reasoning = None
-        if result and _error is None:
+        reasoning = _reasoning
+        if reasoning is None:
             reasoning = TransitionReasoning(
-                reasoning="LLM-based decision",
-                confidence="medium"
+                reasoning="No reasoning provided - error occurred during LLM call",
+                confidence="low"
             )
         
+        # Additional validation: ensure END_CONVERSATION only when all types explored
+        if result == TransitionDecision.END_CONVERSATION and unexplored_types:
+            self._logger.warning(
+                "Invalid decision: END_CONVERSATION returned but unexplored_types is not empty: %s. "
+                "Forcing END_WORKTYPE instead. Original reasoning: %s",
+                [wt.name for wt in unexplored_types],
+                reasoning.reasoning if reasoning else "None"
+            )
+            result = TransitionDecision.END_WORKTYPE
+            reasoning = TransitionReasoning(
+                reasoning=f"Invalid END_CONVERSATION decision - unexplored_types not empty: {[wt.name for wt in unexplored_types]}. Original reasoning: {reasoning.reasoning if reasoning else 'None'}",
+                confidence="high"
+            )
+        
+        self._logger.info(
+            "Transition decision: %s. "
+            "Exploring type: %s, Unexplored types: %s, Explored types: %s, "
+            "Collected experiences: %d",
+            result,
+            exploring_type.name if exploring_type else "None",
+            [wt.name for wt in unexplored_types],
+            [wt.name for wt in explored_types],
+            len(collected_data),
+        )
+        self._logger.info("Transition decision reasoning: %s", reasoning.reasoning if reasoning else "None")
+
         return result, reasoning, _llm_stats
 
     async def _internal_execute(self,
                                 *,
                                 llm: GeminiGenerativeLLM,
-                                prompt: str) -> tuple[TransitionDecision, list[LLMStats], float, BaseException | None]:
+                                prompt: str,
+                                unexplored_types: list[WorkType]) -> tuple[TransitionDecision, TransitionReasoning, list[LLMStats], float, BaseException | None]:
         
         no_response_penalty_level = 3
         response_data, llm_stats = await self._llm_caller.call_llm(
@@ -151,54 +219,84 @@ class TransitionDecisionTool:
         if not response_data:
             _error = ValueError("LLM did not return any output")
             self._logger.error(_error, stack_info=True)
-            return TransitionDecision.CONTINUE, llm_stats, get_penalty(no_response_penalty_level), _error
+            reasoning = TransitionReasoning(
+                reasoning="LLM returned no output",
+                confidence="low"
+            )
+            return TransitionDecision.CONTINUE, reasoning, llm_stats, get_penalty(no_response_penalty_level), _error
 
-        decision = response_data.transition_decision
-        self._logger.debug("Transition decision: %s", decision)
+        continue_current_type = response_data.continue_current_type
+        done_with_collection = response_data.done_with_collection
+        reasoning_text = response_data.reasoning if hasattr(response_data, 'reasoning') else "No reasoning provided"
         
-        return decision, llm_stats, 0, None
+        # Truncate reasoning if too long to prevent bloat
+        if len(reasoning_text) > MAX_REASONING_LENGTH:
+            reasoning_text = reasoning_text[:MAX_REASONING_LENGTH].rsplit('.', 1)[0] + "."
+            self._logger.warning("Reasoning truncated from %d to %d characters", len(response_data.reasoning), len(reasoning_text))
+        
+        # Ensure reasoning doesn't exceed limit (safety check)
+        if len(reasoning_text) > MAX_REASONING_LENGTH:
+            reasoning_text = reasoning_text[:MAX_REASONING_LENGTH]
+        
+        # Validate done_with_collection against state (deterministic check)
+        if done_with_collection and unexplored_types:
+            self._logger.warning(
+                "Invalid done_with_collection=true when unexplored_types is not empty: %s. "
+                "Forcing done_with_collection=false. Original reasoning: %s",
+                [wt.name for wt in unexplored_types],
+                reasoning_text
+            )
+            done_with_collection = False
+        
+        # Map binary outputs to transition decision
+        if continue_current_type:
+            decision = TransitionDecision.CONTINUE
+        elif done_with_collection:
+            decision = TransitionDecision.END_CONVERSATION
+        else:
+            decision = TransitionDecision.END_WORKTYPE
+        
+        self._logger.debug("Transition decision: %s (continue_current_type=%s, done_with_collection=%s). Reasoning: %s", 
+                          decision, continue_current_type, done_with_collection, reasoning_text)
+        
+        reasoning = TransitionReasoning(
+            reasoning=reasoning_text,
+            confidence="medium"
+        )
+        
+        return decision, reasoning, llm_stats, 0, None
 
 
 _SYSTEM_INSTRUCTIONS = """
 <System Instructions>
 #Role
-    You are an expert who decides when to transition between phases in a work experience collection conversation.
-    
+You decide when to transition between phases in a work experience collection conversation.
+
 {language_style}
-    
-#Transition Decision Rules
 
-Use CONTINUE when:
-- There are incomplete experiences that need more information
-- The user is still providing information about experiences
-- You need to ask more questions to complete the current work type exploration
+#Decision Logic
+Answer two boolean questions:
 
-Use END_WORKTYPE when:
-- The user has explicitly stated they have no more experiences of the current type
-  Examples: "no", "none", "I don't have any", "that's all", "nope", "not really", "no more"
-- OR the user has provided experiences for the current type and confirmed they're done
-- AND all experiences for the current type are complete (not incomplete)
-- AND there are still unexplored work types remaining
+1. continue_current_type: Should we continue asking about the current work type?
+   - true: User providing info, agent asking questions, or haven't asked about this type yet
+   - false: User indicated no more experiences for this type
 
-Use END_CONVERSATION when ALL of the following are true:
-- All work types have been explored (unexplored_types is empty)
-- The recap question has been explicitly asked in the conversation history
-- The user has confirmed they have nothing to add or change
-- There are no incomplete experiences
+2. done_with_collection: Are we completely done collecting all work experiences?
+   - Only evaluate if continue_current_type is false
+   - true: All work types explored AND user confirmed satisfied with recap
+   - false: More work types remain or user wants changes
 
-#Important Constraints
-- NEVER use END_WORKTYPE or END_CONVERSATION if there are incomplete experiences - always use CONTINUE
-- NEVER use END_CONVERSATION if there are unexplored work types - use END_WORKTYPE instead
-- If all types are explored BUT the recap question has NOT been asked yet, you MUST use CONTINUE
-    
+#Constraints
+- Use semantic understanding, not keyword matching
+- If incomplete experiences exist, continue_current_type must be true
+- If unexplored_types is not empty, done_with_collection must be false
+
 #Collected Experience Data
-    {collected_data}
-    
-    The values null and "" can be interpreted as follows:
-    - null: Information was not provided and not explicitly asked for yet
-    - "": User was asked but chose not to provide this information
-    
-    An experience is incomplete if it has a title but is missing important fields (start_date, end_date, company, or location).
+{collected_data}
+
+An experience is incomplete if it has a title but missing start_date, end_date, company, or location.
+Empty strings ("") mean user declined to provide - these are complete.
+Only None values indicate missing information.
 </System Instructions>
 """
 
@@ -212,41 +310,26 @@ _PROMPT_TEMPLATE = """
 </User's Last Input>
 
 <Current State>
-- Currently exploring work type: {exploring_type}
-- Unexplored work types remaining: {unexplored_types}
-- Already explored work types: {explored_types}
+- Exploring work type: {exploring_type_enum} ({exploring_type_description})
+- Unexplored types: {unexplored_types}
+- Explored types: {explored_types}
 </Current State>
 
 #Task
-    Based on the conversation history, user's last input, and current state, decide which transition decision to make.
-    
-    Follow this decision process in order:
-    
-    1. Check for incomplete experiences
-       - If there are incomplete experiences → Return CONTINUE
-    
-    2. Check if there are unexplored work types remaining
-       - If yes, determine if current type is done:
-         * Look at the conversation history to understand what question the user is responding to
-         * Check if user's last input is a negative response to a work type question
-         * If user said "no" (or similar) to having experiences of the current type → Return END_WORKTYPE
-         * If user provided experiences and confirmed they're done → Return END_WORKTYPE
-         * If user is still providing information → Return CONTINUE
-         * Otherwise → Return CONTINUE
-    
-    3. Check if all work types are explored
-       - If yes, check if recap was asked:
-         * Look through conversation history for recap question (summarizing all experiences and asking if user wants to add/change)
-         * If recap was NOT asked yet → Return CONTINUE
-         * If recap WAS asked:
-           - Check if user confirmed (no changes wanted) → Return END_CONVERSATION
-           - Check if user wants changes → Return CONTINUE
-    
-    Return your decision as one of: CONTINUE, END_WORKTYPE, or END_CONVERSATION
-    
-    #Output Format
-    Your response must be a valid JSON object with only the following field:
-    - transition_decision: One of "CONTINUE", "END_WORKTYPE", or "END_CONVERSATION"
-    
-    Do not include any reasoning, explanation, or other fields. Only return the transition_decision.
+Answer both questions:
+
+1. continue_current_type: Keep asking about {exploring_type_enum}?
+   Work type patterns: {work_type_mapping}
+
+2. done_with_collection: Completely done? (only if continue_current_type is false)
+
+Reasoning: Brief 1-2 sentence explanation.
+
+Limit the output to 50 words (a single short JSON object).
+
+#Output
+Return complete valid JSON with all three fields. Start with {{:
+{{"continue_current_type": true, "done_with_collection": false, "reasoning": "Brief explanation here"}}
+
+You must complete the entire JSON object including the closing brace }}.
 """
