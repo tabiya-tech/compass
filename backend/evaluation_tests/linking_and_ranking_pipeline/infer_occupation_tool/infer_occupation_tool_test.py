@@ -7,7 +7,6 @@ from typing import Awaitable
 import pytest
 
 from app.agent.linking_and_ranking_pipeline.infer_occupation_tool import InferOccupationTool
-from app.i18n.translation_service import get_i18n_manager
 from app.vector_search.vector_search_dependencies import SearchServices
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
@@ -51,8 +50,6 @@ async def _test_occupation_inference_tool(test_case: InferOccupationToolTestCase
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.INFO):
-        get_i18n_manager().set_locale(test_case.locale)
-
         # Guards to ensure that the loggers are correctly set up,
         guard_caplog(logger=tool._logger, caplog=caplog)
         actual_tool_result = await tool.execute(

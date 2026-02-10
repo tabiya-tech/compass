@@ -7,7 +7,6 @@ from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, LLMStats
 from app.agent.llm_caller import LLMCaller
-from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template import sanitize_input
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext

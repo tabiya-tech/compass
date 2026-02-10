@@ -9,7 +9,6 @@ from app.agent.agent_types import AgentInput, LLMStats
 from app.agent.config import AgentsConfig
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
-from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template import sanitize_input
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
@@ -81,7 +80,6 @@ class TransitionDecisionTool:
         return GeminiGenerativeLLM(
             system_instructions=_SYSTEM_INSTRUCTIONS.format(
                 collected_data=collected_data_json,
-                language_style=get_language_style()
             ),
             config=LLMConfig(
                 language_model_name=AgentsConfig.deep_reasoning_model,
@@ -271,8 +269,6 @@ _SYSTEM_INSTRUCTIONS = """
 <System Instructions>
 #Role
 You decide when to transition between phases in a work experience collection conversation.
-
-{language_style}
 
 #Decision Logic
 Answer two boolean questions:
