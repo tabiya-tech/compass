@@ -222,6 +222,16 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
         users_last_input="I like Nigerian Food",
         expected_operations=[]
     ),
+    IntentAnalyzerToolTestCase(
+        name="single_message_add_update_delete_noop",
+        turns=[
+            (SILENCE_MESSAGE,
+             "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
+        ],
+        collected_data_so_far=[],
+        users_last_input="I worked at McDonald's. Actually, update that experience - it was at Wendy's. Actually, never mind, delete this experience.",
+        expected_operations=[]
+    ),
 ]
 
 
