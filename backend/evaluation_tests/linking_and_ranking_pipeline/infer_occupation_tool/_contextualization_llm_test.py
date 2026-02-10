@@ -8,6 +8,7 @@ from _pytest.logging import LogCaptureFixture
 from app.agent.experience import WorkType
 from app.agent.linking_and_ranking_pipeline.infer_occupation_tool._contextualization_llm import _ContextualizationLLM
 from app.countries import Country
+from app.i18n.translation_service import get_i18n_manager
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
@@ -93,7 +94,7 @@ test_cases = [
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.parametrize("test_case", get_test_cases_to_run(test_cases), ids=[test_case.name for test_case in get_test_cases_to_run(test_cases)])
 async def test_relevant_occupations_classifier_llm(test_case: ContextualizationTestCase, caplog: LogCaptureFixture):
     logger = logging.getLogger(__name__)
@@ -103,6 +104,9 @@ async def test_relevant_occupations_classifier_llm(test_case: ContextualizationT
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.DEBUG):
+        # Set the locale in which the test is running
+        get_i18n_manager().set_locale(test_case.locale)
+
         # Guards to ensure that the loggers are correctly setup,
         guard_caplog(logger=contextualization_llm._logger, caplog=caplog)
 

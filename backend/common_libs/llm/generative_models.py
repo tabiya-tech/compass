@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 from vertexai.generative_models import GenerativeModel, Content, Part, GenerationConfig
 from vertexai.language_models import TextGenerationModel
@@ -15,6 +16,7 @@ class GeminiGenerativeLLM(BasicLLM):
                  system_instructions: list[str] | str | None = None,
                  config: LLMConfig = LLMConfig()):
         super().__init__(config=config)
+
         self._model = GenerativeModel(model_name=config.language_model_name,
                                       system_instruction=system_instructions,
                                       generation_config=GenerationConfig.from_dict(config.generation_config),

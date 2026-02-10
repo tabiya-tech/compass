@@ -11,7 +11,7 @@ from app.conversation_memory.conversation_memory_types import ConversationContex
 from common_libs.test_utilities.guard_caplog import guard_caplog
 from evaluation_tests.compass_test_case import CompassTestCase
 from evaluation_tests.get_test_cases_to_run_func import get_test_cases_to_run
-from evaluation_tests.matcher import ContainsString, check_actual_data_matches_expected
+from evaluation_tests.matcher import ContainsString, check_actual_data_matches_expected, AnyOf
 
 SILENCE_MESSAGE = "(silence)"
 
@@ -44,7 +44,7 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
         ]
     ),
     IntentAnalyzerToolTestCase(
-        name="user_adds_to_experiences_at_a_time",
+        name="user_adds_two_experiences_at_a_time",
         turns=[
             (SILENCE_MESSAGE,
              "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
@@ -68,7 +68,7 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
         ]
     ),
     IntentAnalyzerToolTestCase(
-        name="user_adds_to_experiences_at_a_time_in_one_sentence",
+        name="user_adds_two_experiences_at_a_time_in_one_sentence",
         turns=[
             (SILENCE_MESSAGE,
              "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
@@ -83,7 +83,7 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
             },
             {
                 "data_operation": ContainsString("add"),
-                "potential_new_experience_title": ContainsString("freelance web"),
+                "potential_new_experience_title": AnyOf(ContainsString("freelance web"), ContainsString("Web Designer")),
                 "users_statement": ContainsString("freelance web design for local businesses since 2023")
             }
         ]
@@ -227,7 +227,7 @@ test_cases: list[IntentAnalyzerToolTestCase] = [
 
 @pytest.mark.asyncio
 @pytest.mark.repeat(3)
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_intent_analyzer_tool(test_case: IntentAnalyzerToolTestCase, caplog):
