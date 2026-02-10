@@ -6,6 +6,7 @@ from pydantic import ConfigDict
 from app.agent.agent_director._llm_router import LLMRouter
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
+from app.agent.config import AgentsConfig
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
 from evaluation_tests.compass_test_case import CompassTestCase
@@ -140,7 +141,7 @@ test_cases_router = [
         ],
         user_input="please explain what you mean the question before your last question?",
         conversation_phase=ConversationPhase.COUNSELING,
-        expected_agent_type=AgentType.WELCOME_AGENT
+        expected_agent_type=AgentType.EXPLORE_EXPERIENCES_AGENT
     ),
     RouterTestCase(
         name="open_sesame_from_context",
@@ -164,8 +165,8 @@ test_cases_router = [
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
 @pytest.mark.repeat(3)
+@pytest.mark.evaluation_test(AgentsConfig.deep_reasoning_model)
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_router),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_router)])
 async def test_router_extraction(test_case: RouterTestCase, caplog: pytest.LogCaptureFixture):

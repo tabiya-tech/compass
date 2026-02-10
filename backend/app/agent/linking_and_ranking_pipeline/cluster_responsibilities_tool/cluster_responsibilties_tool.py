@@ -1,7 +1,7 @@
 import json
 import logging
-from textwrap import dedent
 from collections import Counter
+from textwrap import dedent
 
 from pydantic import BaseModel
 
@@ -10,7 +10,8 @@ from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty, get_penalty_for_multiple_errors
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, get_config_variation
+from common_libs.llm.models_utils import LLMConfig, get_config_variation
+from common_libs.llm.schema_builder import with_response_schema
 from common_libs.retry import Retry
 
 
@@ -91,7 +92,7 @@ def _get_llm(temperature_config: dict) -> GeminiGenerativeLLM:
     """
     return GeminiGenerativeLLM(
         system_instructions=_get_system_instructions(),
-        config=LLMConfig(generation_config=temperature_config | JSON_GENERATION_CONFIG)
+        config=LLMConfig(generation_config=temperature_config | with_response_schema(ClusterResponsibilitiesLLMResponse))
     )
 
 

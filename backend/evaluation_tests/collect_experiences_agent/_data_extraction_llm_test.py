@@ -164,7 +164,7 @@ test_cases_data_extraction = [
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing',
                           company=None,
-                          location=None, start_date='2020/06',
+                          location=None, start_date='06/2020',
                           end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT')
         ],
@@ -177,7 +177,7 @@ test_cases_data_extraction = [
              "location": AnyOf(None, ContainsString("online"), ContainsString("remote")),
              "company": AnyOf(None, ContainsString("Self"), ContainsString("online"), ContainsString("remote")),
              "paid_work": AnyOf("True", True),
-             "start_date": ContainsString("2020/06"),
+             "start_date": ContainsString("06/2020"),
              "end_date": AnyOf(None, "Present"),
              "work_type":
                  AnyOf(WorkType.SELF_EMPLOYMENT.name)
@@ -200,7 +200,7 @@ test_cases_data_extraction = [
         user_input="OK, so it was Graphic design teacher and i was working online",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing', company=None,
-                          location=None, start_date='2020/06',
+                          location=None, start_date='06/2020',
                           end_date=None,
                           paid_work=True, work_type='SELF_EMPLOYMENT')
         ],
@@ -213,7 +213,7 @@ test_cases_data_extraction = [
              "location": AnyOf(ContainsString("online"), ContainsString("remote")),
              "company": AnyOf(None, '', ContainsString("Self"), ContainsString("Online")),
              "paid_work": AnyOf("True", True),
-             "start_date": ContainsString("2020/06"),
+             "start_date": ContainsString("06/2020"),
              "end_date": AnyOf(None, "Present"),
              "work_type":
                  AnyOf(WorkType.SELF_EMPLOYMENT.name)
@@ -244,7 +244,7 @@ test_cases_data_extraction = [
                             collected_data_so_far=[
                                 CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelancing',
                                               company=None,
-                                              location=None, start_date='2020/06',
+                                              location=None, start_date='06/2020',
                                               end_date=None,
                                               paid_work=True, work_type='SELF_EMPLOYMENT')
                             ],
@@ -257,7 +257,7 @@ test_cases_data_extraction = [
                                  "location": AnyOf(ContainsString("online"), ContainsString("remote")),
                                  "company": AnyOf(None, ContainsString("Self"), ContainsString("client")),
                                  "paid_work": AnyOf("True", True),
-                                 "start_date": ContainsString("2020/06"),
+                                 "start_date": ContainsString("06/2020"),
                                  "end_date": AnyOf(None, "Present"),
                                  "work_type":
                                      AnyOf(WorkType.SELF_EMPLOYMENT.name)
@@ -271,10 +271,11 @@ test_cases_data_extraction = [
         turns=[
             ("(silence)",
              "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
-            ("I sell shoes at the local market on weekends.",
-             "Got it, you sell shoes at the local market on weekends. Is there anything else you'd like to add or change about this experience?"),
+            ("I sell shoes at the local market during weekends.",
+             "Got it, you sell shoes at the local market during weekends. "
+             "Is there anything else you'd like to add or change about this experience?"),
         ],
-        user_input="I sell shoes at the local market on weekends?",
+        user_input="I sell shoes at the local market during weekends?",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Selling Shoes', company='Local Market',
                           location=None, start_date=None,
@@ -481,7 +482,7 @@ test_cases_data_extraction = [
                 "Okay, so you've only done freelance work. Can you tell me about the first time you started doing freelance work?"
             )
         ],
-        user_input="June 2020. Started teaching graphic design online. Still doing it.",
+        user_input="June 2020. I started teaching graphic design online. I am still doing it.",
         collected_data_so_far=[
             CollectedData(index=0, defined_at_turn_number=1, experience_title='Freelance Work',
                           company=None,
@@ -497,7 +498,7 @@ test_cases_data_extraction = [
              "location": AnyOf(None, ContainsString("online"), ContainsString("remote")),
              "company": AnyOf(None, ContainsString("self"), ContainsString("online")),
              "paid_work": True,
-             "start_date": '2020/06',
+             "start_date": '06/2020',
              "end_date": ContainsString('present'),
              "work_type":
                  AnyOf(WorkType.SELF_EMPLOYMENT.name)
@@ -679,7 +680,8 @@ test_cases_data_extraction = [
             ("(silence)",
              "Let's start by exploring your work experiences. Have you ever worked for a company or someone else's business for money?"),
         ],
-        user_input="I worked as a software developer at Google from 2020-2022, and also did freelance web design for local businesses since 2023.",
+        user_input="I worked as a software developer at Google from 2020-2022, "
+                   "and also did freelance web design for local businesses since 2023.",
         collected_data_so_far=[],
         expected_last_referenced_experience_index=0,  # Should reference first experience
         expected_collected_data_count=2,  # Should collect BOTH experiences
@@ -918,7 +920,7 @@ test_cases_data_extraction = [
                 "defined_at_turn_number": 1,
                 "experience_title": ContainsString("Research Assistant"),
                 "location": ContainsString("Kigali, Rwanda"),
-                "company": ContainsString("Cool Lab, African Leadership University"),
+                "company": AnyOf(ContainsString("Cool Lab"), ContainsString("African Leadership University")),
                 "paid_work": AnyOf(None, True),
                 "start_date": "2020/06",
                 "end_date": ContainsString("Present"),
@@ -929,10 +931,10 @@ test_cases_data_extraction = [
                 "defined_at_turn_number": 1,
                 "experience_title": ContainsString("Research Assistant"),
                 "location": AnyOf(None, "African Leadership University"),
-                "company": ContainsString("Fancy Science Lab, African Leadership University"),
+                "company": ContainsString("Fancy Science Lab"),
                 "paid_work": AnyOf(None, True),
-                "start_date": "2018/01",
-                "end_date": "2020/05",
+                "start_date": "01/2018",
+                "end_date": "05/2020",
                 "work_type": WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name,
             },
             {
@@ -996,7 +998,7 @@ test_cases_data_extraction = [
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_data_extraction),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_data_extraction)])

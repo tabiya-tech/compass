@@ -6,10 +6,10 @@ from app.agent.llm_caller import LLMCaller
 from app.agent.simple_llm_agent.llm_response import ModelResponse
 from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
-
 from app.conversation_memory.conversation_memory_manager import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, LOW_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG
+from common_libs.llm.schema_builder import with_response_schema
 
 
 class SimpleLLMAgent(Agent):
@@ -21,7 +21,7 @@ class SimpleLLMAgent(Agent):
                  agent_type: AgentType,
                  system_instructions: str,
                  config: LLMConfig = LLMConfig(
-                     generation_config=LOW_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG)):
+                     generation_config=LOW_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | with_response_schema(ModelResponse))):
         super().__init__(agent_type=agent_type, is_responsible_for_conversation_history=False)
         self._llm_config = config
         self._system_instructions = system_instructions

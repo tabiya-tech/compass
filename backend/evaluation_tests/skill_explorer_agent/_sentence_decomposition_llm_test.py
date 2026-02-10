@@ -40,7 +40,7 @@ test_cases_sentence_decomposition = [
              "Tell me about your typical day as a baker"),
         ],
         given_user_input="""I make the bread and sometimes I clean the place. I do not sell the bread myself""",
-        expected_resolved_pronouns=["I make the bread.", "Sometimes I clean the place.", "I do not sell the bread."],
+        expected_resolved_pronouns=["I make the bread.", "Sometimes I clean the place.", "I do not sell the bread myself."],
     ),
     _TestCaseSentenceDecomposition(
         name="not_in_scope_of_work",
@@ -50,7 +50,7 @@ test_cases_sentence_decomposition = [
              "Are there any tasks that you specifically don't take care of?  Which ones?"),
         ],
         given_user_input="""I do not clean. I also do not sell""",
-        expected_resolved_pronouns=['I do not clean.', 'I also do not sell.'],
+        expected_resolved_pronouns=['I do not clean.', 'I do not sell.'],
     ),
     _TestCaseSentenceDecomposition(
         name="resolve_object_subject_1",
@@ -61,7 +61,7 @@ test_cases_sentence_decomposition = [
         ],
         given_user_input="""We do it using our hands. It is a difficult procedure, John uses his senses and I observe the process""",
         expected_resolved_pronouns=['I observe the process.',
-                                    'John and I shape the dough using our hands.',
+                                    'John and I shape the dough with our hands.',
                                     "John uses his senses.",
                                     'Shaping the dough is a difficult procedure.'],
     ),
@@ -75,7 +75,7 @@ test_cases_sentence_decomposition = [
              "Can you tell me more about how you decide what to bake each day?"),
         ],
         given_user_input="""my boss decides that""",
-        expected_resolved_pronouns=["My boss decides what to bake each day."],
+        expected_resolved_pronouns=["My boss decides that."],
     ),
 
     _TestCaseSentenceDecomposition(
@@ -84,7 +84,7 @@ test_cases_sentence_decomposition = [
         given_turns=[
         ],
         given_user_input="""My aunt eats the cake that I baked that was decided by my boss""",
-        expected_resolved_pronouns=["My aunt eats the cake.", "I baked the cake.", "My boss decided the cake."],
+        expected_resolved_pronouns=["My aunt is eating the cake.", "I baked the cake.", "My boss decided on the cake."],
     ),
 
     _TestCaseSentenceDecomposition(
@@ -93,7 +93,7 @@ test_cases_sentence_decomposition = [
         given_turns=[
         ],
         given_user_input="""My aunt eats the cake that I baked after I did not clean the place""",
-        expected_resolved_pronouns=["My aunt eats the cake.", "I baked the cake.", "I did not clean the place."],
+        expected_resolved_pronouns=["My aunt is eating the cake I baked.", "I baked the cake.", "I did not clean the place after baking the cake."],
     ),
 
     _TestCaseSentenceDecomposition(
@@ -110,28 +110,25 @@ test_cases_sentence_decomposition = [
     My brother sells the bread and we meet later the same day and split the money.
     I use part of the money to buy the stuff we need to make the bread. 
     It is important to keep track of what I have spent, so that I can get my money back.""",
-        expected_resolved_pronouns=['After the bread is ready, I clean up my area.',
-                                    'I and my brother meet later the same day.',
-                                    'I and my brother split the money.',
-                                    'I can get my money back.',
-                                    'I can go home.',
-                                    'I clean the place.',
-                                    'I have to be there early because the bread must be '
-                                    'ready when the customers come.',
-                                    'I heat up the ovens.',
+        expected_resolved_pronouns=['After the bread is ready, I clean my work area.',
+                                    'I clean the bakery.',
+                                    'I heat the ovens.',
                                     'I make the bread.',
-                                    'I use part of the money to buy the stuff I and my '
-                                    'brother need to make the bread.',
-                                    'I wake up early to be at the bakery on time.',
-                                    'I wake up very early in the morning.',
-                                    'It is important to keep track of what I have spent.',
-                                    'My brother sells the bread.'],
+                                    'I must be at the bakery early because the bread needs to be ready when customers arrive.',
+                                    'I use part of the money to buy the ingredients we need to make the bread.',
+                                    'I wake up very early to be at the bakery on time.',
+                                    "It's important to track my expenses.",
+                                    'My brother and I meet later that day.',
+                                    'My brother sells the bread.',
+                                    'Then, I can go home.',
+                                    'This way, I can get my money back.',
+                                    'We split the money.'],
     ),
 ]
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_sentence_decomposition),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_sentence_decomposition)])

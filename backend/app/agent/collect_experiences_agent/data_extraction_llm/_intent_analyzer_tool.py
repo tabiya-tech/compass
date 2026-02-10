@@ -7,12 +7,14 @@ from pydantic import BaseModel
 
 from app.agent.agent_types import AgentInput, LLMStats
 from app.agent.llm_caller import LLMCaller
+from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template import sanitize_input
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG, \
     get_config_variation
+from common_libs.llm.schema_builder import with_response_schema
 from common_libs.retry import Retry
 from . import DataOperation
 from .._types import CollectedData
@@ -75,7 +77,7 @@ class IntentAnalyzerTool:
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000
                     # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
-                } | temperature_config
+                } | temperature_config | with_response_schema(_LLMOutput)
             ))
 
     async def execute(self,
@@ -257,6 +259,9 @@ _SYSTEM_INSTRUCTIONS = """
     - If the data provided to you in the '<User's Last Input>' does not relate to an experience that the user has
       you will not add it to the 'collected_operations' field of your output.
 
+# NOOP data handling
+    - If the experience the user wants to delete is not present in the '<Previously Extracted Experience Data>', ignore it and do not add it to the 'collected_operations' field.
+
 #Experience User statement handling
     - This is the unique user statement derived from  '<User's Last Input>' about the experience.
     - If the user described multiple (N) experiences either in one or multiple sentences, it means N elements in the 'collected_operations' 
@@ -284,8 +289,9 @@ _SYSTEM_INSTRUCTIONS = """
                     ///Skip unrelated or tangential turns to preserve a coherent causal chain of associations.
                     ///You are filtering for semantic lineage rather than strictly temporal proximity.
                     Once you reach the Previously Extracted Experience Data, you will not follow the associations anymore.
-                    e.g. "user('...') -> model('...') -> ... -> user('...') -> model('...') -> Previously Extracted Experience Data(...)"
+                    e.g. "user(<answer>) -> model(<question>) -> ... -> user(<answer>) -> model(<question>) -> Previously Extracted Experience Data(...)"
                     Each step in the sequence should be a summarized version of the actual user or model turn.
+                    You are not expected to reach a maximum of 10 steps in this linear chain to avoid circular references.
                 - potential_new_experience_title: The potential experience title from the details described by the user in the 'User's Last Input'
                     This is like the title to be put on a CV when describing the experience title. 
                     If the experience already exists in <Previously Extracted Experience Data>, and the user is not updating it, return the existing title.

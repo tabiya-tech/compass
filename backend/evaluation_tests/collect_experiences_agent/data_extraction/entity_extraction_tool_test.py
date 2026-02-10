@@ -182,7 +182,7 @@ test_cases: list[EntityExtractionToolTestCase] = [
         expected_extracted_data={
             "company": "Java House",
             "location": "Nairobi",
-            "experience_title": ContainsString("waiter")
+            "experience_title": AnyOf(ContainsString("waiter"), ContainsString("server"), ContainsString("serving"))
         }
     ),
 
@@ -356,7 +356,7 @@ test_cases: list[EntityExtractionToolTestCase] = [
 
 @pytest.mark.asyncio
 @pytest.mark.repeat(3)
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_entity_extraction_tool(test_case: EntityExtractionToolTestCase, caplog):

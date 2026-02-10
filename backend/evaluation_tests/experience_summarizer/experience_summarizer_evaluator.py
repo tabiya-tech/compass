@@ -1,20 +1,21 @@
 import json
-from textwrap import dedent
 import logging
+from textwrap import dedent
 from typing import Optional
 
-
+from app.agent.config import AgentsConfig
 from app.agent.experience import WorkType
 from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
 from app.countries import Country, get_country_glossary
 from app.vector_search.esco_entities import SkillEntity
-from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, MODERATE_TEMPERATURE_GENERATION_CONFIG
 from common_libs.llm.generative_models import GeminiGenerativeLLM
+from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, MODERATE_TEMPERATURE_GENERATION_CONFIG
+from common_libs.llm.schema_builder import with_response_schema
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationResult
 
 
-class ExperienceSummarizerEvalutionOutput(EvaluationResult):
+class ExperienceSummarizerEvaluationOutput(EvaluationResult):
     """
     The output from the ExperienceSummarizerEvaluator.
     Contains the evaluation of the summary and reasoning behind it.
@@ -33,12 +34,12 @@ class ExperienceSummarizerEvaluator:
 
     def __init__(self, country_of_user: Country):
         self._logger = logging.getLogger(self.__class__.__name__)
-        self._llm_caller: LLMCaller[ExperienceSummarizerEvalutionOutput] = LLMCaller[ExperienceSummarizerEvalutionOutput](
-            model_response_type=ExperienceSummarizerEvalutionOutput)
+        self._llm_caller: LLMCaller[ExperienceSummarizerEvaluationOutput] = LLMCaller[ExperienceSummarizerEvaluationOutput](
+            model_response_type=ExperienceSummarizerEvaluationOutput)
         self._llm = GeminiGenerativeLLM(
             system_instructions=ExperienceSummarizerEvaluator.get_system_instructions(country_of_user=country_of_user),
-            config=LLMConfig(language_model_name="gemini-2.5-pro",
-                             generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG)
+            config=LLMConfig(language_model_name=AgentsConfig.ultra_high_reasoning_model,
+                             generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | with_response_schema(ExperienceSummarizerEvaluationOutput))
         )
 
     @staticmethod
@@ -86,7 +87,7 @@ class ExperienceSummarizerEvaluator:
         
                 # JSON Output instructions
                     You will respond with a JSON object that contains the following fields:
-                        - reasoning: A free-text explanation of your judgment on how well the summary aligns with the task instructions, including any strengths or areas for improvement.
+                        - ExperienceSummarizerEvaluationOutput: A free-text explanation of your judgment on how well the summary aligns with the task instructions, including any strengths or areas for improvement.
                         - score: A numerical rating from 0 to 100 based on the overall quality and alignment of the summary, where:
                                 <=50 : Poor
                                  >50 : Fair
@@ -164,7 +165,7 @@ class ExperienceSummarizerEvaluator:
             top_skills: Optional[list[SkillEntity]] = None,
             questions_and_answers: list[tuple[str, str]],
             llm_summary: str = ""
-    ) -> ExperienceSummarizerEvalutionOutput:
+    ) -> ExperienceSummarizerEvaluationOutput:
         prompt = ExperienceSummarizerEvaluator.get_prompt(
             experience_title=experience_title,
             company=company,

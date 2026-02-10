@@ -37,9 +37,9 @@ inputs = list(_iter_input_files())
 
 @pytest.mark.asyncio
 @pytest.mark.evaluation_test
+@pytest.mark.repeat(3)
 @pytest.mark.parametrize("input_path", inputs if inputs else [None], ids=[p.name for p in inputs] if inputs else ["no-inputs"])
-@pytest.mark.parametrize("attempt", list(range(3)), ids=lambda i: f"run-{i+1}")
-async def test_parse_cv_on_real_files(input_path: Path | None, attempt: int):
+async def test_parse_cv_on_real_files(input_path: Path | None):
     # GIVEN a real CV file
     if input_path is None:
         pytest.skip("No input files found under evaluation_tests/cv_parser/test_inputs; add files to run this test")

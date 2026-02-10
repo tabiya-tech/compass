@@ -206,7 +206,7 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
         ],
         users_input="Sorry, this should be confidential, would you remove everything?. I don't want you to store anything.",
         expected_extracted_data={
-            "paid_work": "",
+            "paid_work": AnyOf(None, ""),  # it is nto clear if the work was paid or not
             "work_type": AnyOf(None, ""),
             "start_date": "",
             "end_date": ""
@@ -265,7 +265,7 @@ test_cases: list[TemporalAndWorkTypeClassifierToolTestCase] = [
 
 @pytest.mark.asyncio
 @pytest.mark.repeat(3)
-@pytest.mark.evaluation_test("gemini-2.0-flash-001/")
+@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases),
                          ids=[case.name for case in get_test_cases_to_run(test_cases)])
 async def test_temporal_and_work_type_classification(test_case: TemporalAndWorkTypeClassifierToolTestCase, caplog):
