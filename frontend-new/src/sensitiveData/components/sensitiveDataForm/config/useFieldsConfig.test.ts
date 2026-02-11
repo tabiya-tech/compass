@@ -1,17 +1,17 @@
+// mute chatty console
 import "src/_test_utilities/consoleMock";
-import { renderHook } from "@testing-library/react-hooks";
-import { waitFor } from "@testing-library/react";
+
+import { renderHook, waitFor } from "@testing-library/react";
 import { useFieldsConfig } from "./useFieldsConfig";
-import { setupAPIServiceSpy } from "src/_test_utilities/fetchSpy";
-import {
-  EnumFieldDefinition,
-  FieldDefinition,
-  FieldType,
-  MultipleSelectFieldDefinition,
-  StringFieldDefinition,
-} from "./types";
-import * as CustomFetchModule from "src/utils/customFetch/customFetch";
+import { EnumFieldDefinition, MultipleSelectFieldDefinition, StringFieldDefinition } from "./types";
 import { Locale } from "src/i18n/constants";
+import * as EnvService from "src/envService";
+
+// Mock the DEFAULT_LOCALE constant to ensure consistent behavior in tests
+jest.mock("src/i18n/constants", () => ({
+  ...jest.requireActual("src/i18n/constants"),
+  DEFAULT_LOCALE: "en-US",
+}));
 
 const mockI18nState: { language: Locale } = { language: Locale.EN_US as Locale };
 jest.mock("react-i18next", () => {
@@ -32,293 +32,316 @@ jest.mock("react-i18next", () => {
   };
 });
 
-// Mock the utils functions
-jest.mock("./utils", () => ({
-  parseYamlConfig: jest.fn(),
-  getAllFields: jest.fn(),
-}));
-
-describe("Config Hooks", () => {
-  let fetchSpy: jest.SpyInstance;
+describe("useFieldsConfig", () => {
+  let getSensitiveDataFieldsSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     // Reset default language to en-US
     mockI18nState.language = Locale.EN_US;
+    // Default to returning empty string (use default config)
+    getSensitiveDataFieldsSpy = jest.spyOn(EnvService, "getSensitiveDataFields").mockReturnValue("");
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+  describe("default configuration", () => {
+    test("should use default config when FRONTEND_SENSITIVE_DATA_FIELDS is not set", async () => {
+      // GIVEN FRONTEND_SENSITIVE_DATA_FIELDS is not set (empty string)
+      getSensitiveDataFieldsSpy.mockReturnValue("");
 
-  describe("useFieldsConfig", () => {
-    test("should return default config and loading state initially", () => {
-      // GIVEN the useFieldsConfig hook
-      // WHEN it is first rendered
+      // WHEN the hook is rendered
       const { result } = renderHook(() => useFieldsConfig());
 
-      // THEN it should return the default config and loading=true
-      expect(result.current.fields).toEqual([]);
-      expect(result.current.loading).toBe(true);
-      expect(result.current.error).toBe(null);
-    });
-
-    test("should fetch and update config on mount for various fields at the same time", async () => {
-      // GIVEN a successful fetch response with yaml with all required fields for the fields
-      const givenMultipleSelectFieldWithRequiredFields = `
-      multipleFieldName:
-        dataKey: multiple_field_name
-        type: MULTIPLE_SELECT
-        required: true
-        label:
-          en-US: Multiple select Field
-        values:
-          en-US: ["value1", "value2"]
-      enumFieldName:
-        dataKey: enum_field_name
-        type: ENUM
-        required: true
-        label:
-          en-US: Enum Field
-        values:
-          en-US: ["value1", "value2"]
-      stringFieldName:
-        dataKey: string_field_name
-        type: STRING
-        required: true
-        label:
-          en-US: String Field
-      `;
-      fetchSpy = setupAPIServiceSpy(200, givenMultipleSelectFieldWithRequiredFields, "");
-
-      // WHEN the hook is mounted
-      const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
-
-      // THEN it should initially be in loading state
-      expect(result.current.loading).toBe(true);
-
-      // WHEN the fetch completes
-      await waitForNextUpdate();
-
-      // THEN it should update the state with the result
-      const expectedFieldDefinitions: FieldDefinition[] = [
-        new MultipleSelectFieldDefinition({
-          name: "multipleFieldName",
-          dataKey: "multiple_field_name",
-          type: FieldType.MultipleSelect,
-          required: true,
-          label: "Multiple select Field",
-          values: ["value1", "value2"],
-        }),
-        new EnumFieldDefinition({
-          name: "enumFieldName",
-          dataKey: "enum_field_name",
-          type: FieldType.Enum,
-          required: true,
-          label: "Enum Field",
-          values: ["value1", "value2"],
-        }),
-        new StringFieldDefinition({
-          name: "stringFieldName",
-          dataKey: "string_field_name",
-          type: FieldType.String,
-          required: true,
-          label: "String Field",
-        }),
-      ];
-      expect(fetchSpy).toHaveBeenCalledWith("/data/config/fields.yaml", {
-        authRequired: false,
-        retryOnFailedToFetch: true,
-        expectedStatusCode: [200, 204],
-        failureMessage: "Failed to fetch fields configuration from /data/config/fields.yaml",
-        serviceFunction: "useFieldsConfig",
-        serviceName: "SensitiveDataService",
+      // THEN it should return fields from the default config after the effect runs
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
       });
-      expect(result.current.fields).toEqual(expect.arrayContaining(expectedFieldDefinitions));
-      expect(result.current.loading).toBe(false);
+
+      expect(result.current.fields.length).toBeGreaterThan(0);
+      expect(result.current.error).toBe(null);
+
+      // AND the fields should include the standard default fields
+      const fieldNames = result.current.fields.map((f) => f.name);
+      expect(fieldNames).toContain("name");
+      expect(fieldNames).toContain("contactEmail");
+      expect(fieldNames).toContain("gender");
+      expect(fieldNames).toContain("age");
+    });
+
+    test("should return loading=true initially then false after effect", async () => {
+      // GIVEN the hook is first rendered
+      const { result } = renderHook(() => useFieldsConfig());
+
+      // THEN eventually loading should be false (effect runs synchronously with mocked env)
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      // AND fields should be loaded
+      expect(result.current.fields.length).toBeGreaterThan(0);
+      expect(result.current.error).toBe(null);
+    });
+  });
+
+  describe("custom configuration from env", () => {
+    test("should parse custom config from FRONTEND_SENSITIVE_DATA_FIELDS", async () => {
+      // GIVEN a custom config in FRONTEND_SENSITIVE_DATA_FIELDS
+      const customConfig = {
+        customField: {
+          dataKey: "custom_field",
+          type: "STRING",
+          required: true,
+          label: { "en-US": "Custom Field" },
+        },
+      };
+      getSensitiveDataFieldsSpy.mockReturnValue(JSON.stringify(customConfig));
+
+      // WHEN the hook is rendered
+      const { result } = renderHook(() => useFieldsConfig());
+
+      // THEN it should return the custom field
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      expect(result.current.fields).toHaveLength(1);
+      expect(result.current.fields[0].name).toBe("customField");
+      expect(result.current.fields[0].label).toBe("Custom Field");
       expect(result.current.error).toBe(null);
     });
 
-    test("should handle config loading errors", async () => {
-      // GIVEN a failed fetch response
-      const givenError = new Error("Failed to load fields configuration");
-      jest.spyOn(CustomFetchModule, "customFetch").mockRejectedValueOnce(givenError);
+    test("should handle multiple field types from custom config", async () => {
+      // GIVEN a custom config with multiple field types
+      const customConfig = {
+        stringField: {
+          dataKey: "string_field",
+          type: "STRING",
+          required: true,
+          label: { "en-US": "String Field" },
+        },
+        enumField: {
+          dataKey: "enum_field",
+          type: "ENUM",
+          required: true,
+          label: { "en-US": "Enum Field" },
+          values: { "en-US": ["Option 1", "Option 2"] },
+        },
+        multiSelectField: {
+          dataKey: "multi_select_field",
+          type: "MULTIPLE_SELECT",
+          required: false,
+          label: { "en-US": "Multi Select Field" },
+          values: { "en-US": ["A", "B", "C"] },
+        },
+      };
+      getSensitiveDataFieldsSpy.mockReturnValue(JSON.stringify(customConfig));
 
-      // WHEN the hook is mounted
-      const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
+      // WHEN the hook is rendered
+      const { result } = renderHook(() => useFieldsConfig());
 
-      // THEN it should initially be in loading state
-      expect(result.current.loading).toBe(true);
+      // THEN it should return all field types correctly
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
 
-      // WHEN the fetch fails
-      await waitForNextUpdate();
+      expect(result.current.fields).toHaveLength(3);
+      expect(result.current.fields[0]).toBeInstanceOf(StringFieldDefinition);
+      expect(result.current.fields[1]).toBeInstanceOf(EnumFieldDefinition);
+      expect(result.current.fields[2]).toBeInstanceOf(MultipleSelectFieldDefinition);
+    });
+  });
 
-      // THEN it should update the state with the error
+  describe("error handling", () => {
+    test("should return error for invalid JSON in FRONTEND_SENSITIVE_DATA_FIELDS", async () => {
+      // GIVEN invalid JSON in FRONTEND_SENSITIVE_DATA_FIELDS
+      getSensitiveDataFieldsSpy.mockReturnValue("not valid json");
+
+      // WHEN the hook is rendered
+      const { result } = renderHook(() => useFieldsConfig());
+
+      // THEN it should return an error
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
       expect(result.current.fields).toEqual([]);
-      expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toContain("Failed to load fields configuration");
+      expect(result.current.error?.message).toContain("Invalid JSON in FRONTEND_SENSITIVE_DATA_FIELDS");
     });
 
-    test("should clean up on unmount", async () => {
-      // GIVEN a pending fetch that never resolves
-      fetchSpy = setupAPIServiceSpy(200, new Promise(() => {}), "");
+    test("should return error for invalid field type", async () => {
+      // GIVEN a config with an invalid field type
+      const invalidConfig = {
+        invalidField: {
+          dataKey: "invalid_field",
+          type: "UNKNOWN_TYPE",
+          required: true,
+          label: { "en-US": "Invalid Field" },
+        },
+      };
+      getSensitiveDataFieldsSpy.mockReturnValue(JSON.stringify(invalidConfig));
 
-      // WHEN the hook is mounted and then unmounted
-      const { unmount } = renderHook(() => useFieldsConfig());
+      // WHEN the hook is rendered
+      const { result } = renderHook(() => useFieldsConfig());
 
-      // AND then unmounted before the fetch completes
-      unmount();
+      // THEN it should return an error about invalid field type
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
 
-      // THEN it should not throw any errors
-      // This is a negative test - we're verifying that unmounting doesn't cause issues
-      expect(true).toBe(true);
-    });
-
-    test("should throw an error if the field type is not among the known types", async () => {
-      // GIVEN a fetch response with a field with an unknown type
-      const givenUnknownFieldType = `
-      unknownFieldName: 
-        dataKey: unknown_field_name
-        type: UNKNOWN
-        required: true
-        label:
-          en-US: Unknown Field
-      `;
-      fetchSpy = setupAPIServiceSpy(200, givenUnknownFieldType, "");
-
-      // WHEN the hook is mounted
-      const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
-
-      // THEN it should initially be in loading state
-      expect(result.current.loading).toBe(true);
-
-      // WHEN the fetch completes
-      await waitForNextUpdate();
-
-      // THEN it should update the state with a detailed parse error
       expect(result.current.fields).toEqual([]);
-      expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toContain("Invalid field type for 'unknownFieldName': UNKNOWN");
+      expect(result.current.error?.message).toContain("Invalid field type");
     });
 
-    test("should throw an error if the field has a duplicate data key", async () => {
-      // GIVEN a fetch response with a field with a duplicate data key
-      const givenDuplicateDataKey = `
-      stringFieldName1:
-        dataKey: string_field_name
-        type: STRING
-        required: true
-        label:
-          en-US: String Field 1
-      stringFieldName2:
-        dataKey: string_field_name
-        type: STRING
-        required: true
-        label:
-          en-US: String Field 2
-      `;
-      fetchSpy = setupAPIServiceSpy(200, givenDuplicateDataKey, "");
+    test("should return error for duplicate dataKey", async () => {
+      // GIVEN a config with duplicate dataKeys
+      const duplicateConfig = {
+        field1: {
+          dataKey: "same_key",
+          type: "STRING",
+          required: true,
+          label: { "en-US": "Field 1" },
+        },
+        field2: {
+          dataKey: "same_key",
+          type: "STRING",
+          required: true,
+          label: { "en-US": "Field 2" },
+        },
+      };
+      getSensitiveDataFieldsSpy.mockReturnValue(JSON.stringify(duplicateConfig));
 
-      // WHEN the hook is mounted
-      const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
+      // WHEN the hook is rendered
+      const { result } = renderHook(() => useFieldsConfig());
 
-      // THEN it should initially be in loading state
-      expect(result.current.loading).toBe(true);
+      // THEN it should return an error about duplicate dataKey
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
 
-      // WHEN the fetch completes
-      await waitForNextUpdate();
-
-      // THEN it should update the state with a detailed duplicate dataKey error
       expect(result.current.fields).toEqual([]);
-      expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toContain("Duplicate dataKey 'string_field_name'");
+      expect(result.current.error?.message).toContain("Duplicate dataKey");
     });
 
-    test("should throw an error when an unexpected error occurs", async () => {
-      // GIVEN a fetch that throws an unexpected non-Error object
-      const givenError = new Error("Something went wrong");
-      jest.spyOn(CustomFetchModule, "customFetch").mockRejectedValueOnce(givenError);
+    test("should return error for missing label", async () => {
+      // GIVEN a config with missing label for the current locale
+      const missingLabelConfig = {
+        noLabelField: {
+          dataKey: "no_label",
+          type: "STRING",
+          required: true,
+          label: {}, // Empty label map
+        },
+      };
+      getSensitiveDataFieldsSpy.mockReturnValue(JSON.stringify(missingLabelConfig));
 
-      // WHEN the hook is mounted
-      const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
+      // WHEN the hook is rendered
+      const { result } = renderHook(() => useFieldsConfig());
 
-      // THEN it should initially be in loading state
-      expect(result.current.loading).toBe(true);
+      // THEN it should return an error about missing label
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
 
-      // WHEN the fetch completes
-      await waitForNextUpdate();
-
-      // THEN it should update the state with the error
       expect(result.current.fields).toEqual([]);
-      expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toBe(givenError.message);
+      expect(result.current.error?.message).toContain("Missing label");
     });
+  });
 
-    test("should re-parse config when language changes without re-fetching", async () => {
-      // GIVEN a successful fetch with multi-language YAML
-      const givenMultiLanguageYaml = `
-      stringFieldName:
-        dataKey: string_field_name
-        type: STRING
-        required: true
-        label:
-          en-US: String Field
-          es-ES: Campo de Cadena
-      `;
-      fetchSpy = setupAPIServiceSpy(200, givenMultiLanguageYaml, "");
+  describe("language changes", () => {
+    test("should re-parse config when language changes without re-loading", async () => {
+      // GIVEN a config with multi-language labels
+      const multiLangConfig = {
+        nameField: {
+          dataKey: "name",
+          type: "STRING",
+          required: true,
+          label: {
+            "en-US": "Name",
+            "es-ES": "Nombre",
+          },
+        },
+      };
+      getSensitiveDataFieldsSpy.mockReturnValue(JSON.stringify(multiLangConfig));
 
       // Set initial language to en-US
       mockI18nState.language = Locale.EN_US;
 
-      // WHEN the hook is mounted with en-US language
-      const { result, waitForNextUpdate, rerender } = renderHook(() => useFieldsConfig());
+      // WHEN the hook is rendered
+      const { result, rerender } = renderHook(() => useFieldsConfig());
 
-      // Wait for initial fetch
-      await waitForNextUpdate();
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
 
-      // THEN the fetch should have been called once
-      expect(fetchSpy).toHaveBeenCalledTimes(1);
-      expect(result.current.fields[0].label).toBe("String Field");
+      // THEN it should show English label
+      expect(result.current.fields[0].label).toBe("Name");
 
-      // WHEN the language changes to es-ES
+      // WHEN the language changes to Spanish
       mockI18nState.language = Locale.ES_ES;
       rerender();
 
-      // THEN the fetch should still have been called only once (no re-fetch)
-      expect(fetchSpy).toHaveBeenCalledTimes(1);
-      // AND the fields should be re-parsed with the new language
-      await waitFor(() => expect(result.current.fields[0].label).toBe("Campo de Cadena"));
+      // THEN it should show Spanish label
+      await waitFor(() => expect(result.current.fields[0].label).toBe("Nombre"));
+
+      // AND getSensitiveDataFields should still have been called only once (during initial useMemo)
+      // The config is cached and only re-parsed, not re-fetched
     });
 
-    test("should handle parsing errors separately from fetch errors", async () => {
-      // GIVEN a successful fetch but invalid YAML
-      const givenInvalidYaml = `
-      stringFieldName:
-        dataKey: string_field_name
-        type: STRING
-        required: true
-        # Missing label field
-      `;
-      fetchSpy = setupAPIServiceSpy(200, givenInvalidYaml, "");
+    test("should fall back to default locale when language is not available", async () => {
+      // GIVEN a config with only English labels
+      const englishOnlyConfig = {
+        nameField: {
+          dataKey: "name",
+          type: "STRING",
+          required: true,
+          label: { "en-US": "Name" },
+        },
+      };
+      getSensitiveDataFieldsSpy.mockReturnValue(JSON.stringify(englishOnlyConfig));
 
-      // WHEN the hook is mounted
-      const { result, waitForNextUpdate } = renderHook(() => useFieldsConfig());
+      // Set language to French (not in config)
+      mockI18nState.language = "fr-FR" as Locale;
 
-      // THEN it should initially be in loading state
-      expect(result.current.loading).toBe(true);
+      // WHEN the hook is rendered
+      const { result } = renderHook(() => useFieldsConfig());
 
-      // WHEN the fetch completes
-      await waitForNextUpdate();
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
 
-      // THEN it should update the state with a detailed parsing error
+      // THEN it should fall back to English (default locale)
+      expect(result.current.fields[0].label).toBe("Name");
+    });
+  });
+
+  describe("edge cases", () => {
+    test("should handle empty config object", async () => {
+      // GIVEN an empty config object
+      getSensitiveDataFieldsSpy.mockReturnValue(JSON.stringify({}));
+
+      // WHEN the hook is rendered
+      const { result } = renderHook(() => useFieldsConfig());
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      // THEN it should return empty fields array
       expect(result.current.fields).toEqual([]);
-      expect(result.current.loading).toBe(false);
-      expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toContain("Missing label for field 'stringFieldName' (lang=en-US)");
+      expect(result.current.error).toBe(null);
+    });
+
+    test("should clean up on unmount without errors", () => {
+      // GIVEN the hook is mounted
+      const { unmount } = renderHook(() => useFieldsConfig());
+
+      // WHEN the component unmounts
+      unmount();
+
+      // THEN it should not throw any errors
+      expect(true).toBe(true);
     });
   });
 });

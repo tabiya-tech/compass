@@ -120,6 +120,20 @@ Compass supports multiple languages through configuration.
 
 For full translation setup, see the [Language Guide](../add-a-new-language.md).
 
+## Sensitive Data Fields Configuration
+
+The sensitive data form fields can be customized to collect different user information.
+
+- **sensitiveData.fields**: Configuration for sensitive data collection fields
+
+This allows customization of:
+- Which fields are displayed (name, email, gender, age, etc.)
+- Field types
+- Validation rules and error messages
+- Localized labels and values
+
+For the complete schema documentation and examples, see the [Sensitive Data Fields Configuration Guide](../frontend-new/sensitive-data-fields-config.md).
+
 ## Applying Configuration Locally
 
 The configuration is applied using the `inject-config.py` script.

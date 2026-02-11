@@ -65,7 +65,6 @@
     "@sentry/cli": "^2.39.1",
     "@sentry/react": "^9.41.0",
     "@sentry/webpack-plugin": "^2.22.6",
-    "@types/js-yaml": "^4.0.9",
     "brotli-wasm": "^3.0.1",
     "colorjs.io": "^0.5.2",
     "docx": "^8.5.0",
@@ -85,8 +84,7 @@
     "react-scripts": "^5.0.1",
     "react-swipeable": "^7.0.2",
     "source-map-explorer": "^2.5.3",
-    "web-vitals": "^2.1.4",
-    "yaml": "^2.7.0"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "analyze": "npx source-map-explorer 'build/static/js/*.js'",

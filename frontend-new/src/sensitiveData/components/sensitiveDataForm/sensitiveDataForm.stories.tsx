@@ -7,7 +7,6 @@ import {
   SensitivePersonalDataRequirement,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { getBackendUrl } from "src/envService";
-import { CONFIG_PATH } from "./config/useFieldsConfig";
 
 const meta: Meta<typeof SensitiveDataForm> = {
   title: "SensitiveData/SensitiveDataForm",
@@ -65,35 +64,4 @@ export const ShownWhenSkipping: StoryObj<typeof SensitiveDataForm> = {
     };
   },
   args: {},
-};
-
-export const ShownWithInvalidConfiguration: StoryObj<typeof SensitiveDataForm> = {
-  beforeEach: () => {
-    UserPreferencesStateService.getInstance().setUserPreferences({
-      user_id: "foo",
-      has_sensitive_personal_data: false,
-      accepted_tc: new Date(),
-      sessions: [],
-      sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
-      user_feedback_answered_questions: {},
-      language: Language.en,
-      experiments: {},
-    });
-    return () => {
-      UserPreferencesStateService.getInstance().clearUserPreferences();
-    };
-  },
-  args: {},
-  parameters: {
-    mockData: [
-      {
-        url: CONFIG_PATH,
-        method: "GET",
-        status: 200,
-        response: {
-          data: "invalid yaml",
-        },
-      },
-    ],
-  },
 };
