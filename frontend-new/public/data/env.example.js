@@ -40,6 +40,31 @@ window.tabiyaConfig = {
   SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID: btoa("key_id"),
 
   // ################################################################
+  // #       Sensitive Data Fields Configuration (Optional)
+  // ################################################################
+  FRONTEND_SENSITIVE_DATA_FIELDS: btoa(
+    JSON.stringify({
+      customName: {
+        dataKey: "custom_name",
+        type: "STRING",
+        required: true,
+        label: { "en-US": "Full Name", "es-ES": "Nombre Completo" },
+        validation: {
+          pattern: "^[\\p{L}\\s]{2,50}$",
+          errorMessage: { "en-US": "Name must be 2-50 letters", "es-ES": "El nombre debe tener 2-50 letras" },
+        },
+      },
+      customGender: {
+        dataKey: "custom_gender",
+        type: "ENUM",
+        required: true,
+        label: { "en-US": "Gender", "es-ES": "Género" },
+        values: { "en-US": ["Male", "Female", "Other"], "es-ES": ["Hombre", "Mujer", "Otro"] },
+      },
+    })
+  ),
+
+  // ################################################################
   // #       Locales
   // ################################################################
   // Default locale (used as initial UI language if user preference not set)

@@ -50,6 +50,9 @@ FRONTEND_ENV_MAP: Dict[str, str] = {
     # i18n
     "FRONTEND_DEFAULT_LOCALE": "i18n.ui.defaultLocale",
     "FRONTEND_SUPPORTED_LOCALES": "i18n.ui.supportedLocales",
+
+    # Sensitive data Fields
+    "FRONTEND_SENSITIVE_DATA_FIELDS": "sensitiveData.fields",
 }
 
 FRONTEND_JSON_FIELDS = {
@@ -57,6 +60,7 @@ FRONTEND_JSON_FIELDS = {
     'FRONTEND_SEO',
     'FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG',
     'FRONTEND_SUPPORTED_LOCALES',
+    'FRONTEND_SENSITIVE_DATA_FIELDS',
     # Add more JSON.stringify fields here
 }
 
@@ -98,9 +102,9 @@ def coerce_env_value(value: Any) -> Optional[str]:
         v = value.strip()
         return v if v != '' else None
 
-    # For dict/list: store JSON
+    # For dict/list: store JSON (ensure_ascii=False preserves unicode characters like accented letters)
     if isinstance(value, (dict, list)):
-        return json.dumps(value)
+        return json.dumps(value, ensure_ascii=False)
 
     return str(value)
 
@@ -195,7 +199,7 @@ def format_frontend_replacement(key: str, raw_value: Any, existing_content: str)
         else:
             merged = raw_value
 
-        formatted_json = json.dumps(merged, indent=2).replace('\n', '\n    ')
+        formatted_json = json.dumps(merged, indent=2, ensure_ascii=False).replace('\n', '\n    ')
         return f'{key}: btoa(\n    JSON.stringify({formatted_json})\n  ),', re.DOTALL
 
     if isinstance(raw_value, bool):

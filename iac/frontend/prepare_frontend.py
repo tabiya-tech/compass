@@ -139,6 +139,9 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     frontend_seo: Optional[str] = getenv("FRONTEND_SEO", False, False)
     skills_report_config: Optional[str] = getenv("FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG", False, False)
 
+    # sensitive data fields config
+    sensitive_data_fields_config = getenv("FRONTEND_SENSITIVE_DATA_FIELDS", False, False)
+
     # validations, apart from the keys are required, some values also need to be validated
     # the sensitive encryption key should be a valid RSA public key.
     _validate_rsa_public_key(sensitive_personal_data_rsa_encryption_key.encode("utf-8"))
@@ -178,7 +181,8 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "FRONTEND_APP_ICON_URL": base64_encode(frontend_app_icon_url),
         "FRONTEND_THEME_CSS_VARIABLES": base64_encode(frontend_theme_css_variables),
         "FRONTEND_SEO": base64_encode(frontend_seo),
-        "FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG": base64_encode(skills_report_config)
+        "FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG": base64_encode(skills_report_config),
+        "FRONTEND_SENSITIVE_DATA_FIELDS": base64_encode(sensitive_data_fields_config),
     }
 
     env_json_content = f"""window.tabiyaConfig = {json.dumps(frontend_env_json, indent=4)};"""

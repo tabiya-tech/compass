@@ -1,0 +1,243 @@
+import { FieldType } from "./types";
+
+/**
+ * Type definition for a raw field configuration before locale resolution.
+ * This matches the structure expected by parseFieldsConfig.
+ */
+
+export type RawFieldConfig = {
+  dataKey: string;
+  required: boolean;
+  label: Record<string, string>;
+  questionText?: Record<string, string>;
+  validation?: {
+    pattern: string;
+    errorMessage: Record<string, string>;
+  };
+  defaultValue?: string;
+} & (
+  | {
+      type: FieldType.String;
+    }
+  | {
+      type: FieldType.Enum | FieldType.MultipleSelect;
+      values: Record<string, string[]>;
+    }
+);
+
+/**
+ * Type for the complete fields configuration object.
+ * Keys are field names, values are RawFieldConfig objects.
+ */
+export type FieldsConfig = Record<string, RawFieldConfig>;
+
+/**
+ * Default sensitive data fields configuration.
+ *
+ * This configuration is used when FRONTEND_SENSITIVE_DATA_FIELDS is not provided in env.js.
+ * It contains the standard fields for collecting sensitive personal data:
+ * - name: User's full name
+ * - contactEmail: User's contact email address
+ * - gender: User's gender
+ * - age: User's age
+ * - educationStatus: Highest level of education completed
+ * - mainActivity: Main activity in terms of time spent in the last 30 days
+ *
+ * Each field supports multiple locales (en-GB, en-US, es-ES, es-AR).
+ */
+export const DEFAULT_FIELDS_CONFIG: FieldsConfig = {
+  name: {
+    dataKey: "name",
+    type: FieldType.String,
+    required: true,
+    label: {
+      "en-GB": "Name",
+      "en-US": "Name",
+      "es-ES": "Nombre",
+      "es-AR": "Nombre",
+    },
+    validation: {
+      // Pattern allows letters, spaces, and dots (max 4 dots, 2-50 chars)
+      // ^(?!\.) ensures that the name does not start with a dot
+      // (?!.*\.\.) ensures that the name does not contain two consecutive dots
+      // (?!.*(\..*){5,}) ensures that the name does not contain more than 4 dots
+      // [\p{L}\s\.]{2,50} ensures that the name contains only letters (Unicode), spaces, and dots and is between 2 and 50 characters long
+      // Unicode letter characters REQUIRES the 'u' flag in the regex e.g. /pattern/u
+      pattern: "^(?!\\.)(?!.*\\.\\.)(?!.*(\\..*){5,})[\\p{L}\\s\\.]{2,50}$",
+      errorMessage: {
+        "en-GB": "Name should contain only letters and be 2-50 characters long.",
+        "en-US": "Name should contain only letters and be 2-50 characters long.",
+        "es-ES": "El nombre debe contener solo letras y tener entre 2 y 50 caracteres.",
+        "es-AR": "El nombre debe contener solo letras y tener entre 2 y 50 caracteres.",
+      },
+    },
+  },
+  contactEmail: {
+    dataKey: "contact_email",
+    type: FieldType.String,
+    required: true,
+    label: {
+      "en-GB": "Contact email",
+      "en-US": "Contact email",
+      "es-ES": "Correo electrónico de contacto",
+      "es-AR": "Correo electrónico de contacto",
+    },
+    validation: {
+      // The limit for the length of an email is a maximum of 64 characters (octets)
+      //  in the "local part" (before the "@") and a maximum of 255 characters
+      //  (octets) in the domain part (after the "@") for a total length of 320 characters.
+      //  We've gone for a more conservative limit of 256 characters
+      // for more info see: https://www.rfc-editor.org/errata_search.php?rfc=3696
+      pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,256}$",
+      errorMessage: {
+        "en-GB": "Please enter a valid email address.",
+        "en-US": "Please enter a valid email address.",
+        "es-ES": "Por favor, ingrese una dirección de correo electrónico válida.",
+        "es-AR": "Por favor, ingrese una dirección de correo electrónico válida.",
+      },
+    },
+  },
+  gender: {
+    dataKey: "gender",
+    type: FieldType.Enum,
+    required: true,
+    label: {
+      "en-GB": "Gender",
+      "en-US": "Gender",
+      "es-ES": "Género",
+      "es-AR": "Género",
+    },
+    values: {
+      "en-GB": ["Male", "Female"],
+      "en-US": ["Male", "Female"],
+      "es-ES": ["Hombre", "Mujer"],
+      "es-AR": ["Hombre", "Mujer"],
+    },
+  },
+  age: {
+    dataKey: "age",
+    type: FieldType.String,
+    required: true,
+    label: {
+      "en-GB": "Age",
+      "en-US": "Age",
+      "es-ES": "Edad",
+      "es-AR": "Edad",
+    },
+    validation: {
+      // 1[6-9] covers numbers between 16 and 19
+      // [2-9][0-9] covers numbers between 20 and 99
+      // 1[01][0-9] covers numbers between 100 and 119
+      // and 120 covers the number 120
+      pattern: "^(?:1[6-9]|[2-9][0-9]|1[01][0-9]|120)$",
+      errorMessage: {
+        "en-GB": "Please enter a valid age. You must be at 16 years old or older to participate.",
+        "en-US": "Please enter a valid age. You must be at 16 years old or older to participate.",
+        "es-ES": "Por favor ingrese una edad válida. Debe tener 16 años o más para participar.",
+        "es-AR": "Por favor ingrese una edad válida. Debe tener 16 años o más para participar.",
+      },
+    },
+  },
+  educationStatus: {
+    dataKey: "education_status",
+    type: FieldType.Enum,
+    required: true,
+    label: {
+      "en-GB": "Education",
+      "en-US": "Education",
+      "es-ES": "Educación",
+      "es-AR": "Educación",
+    },
+    questionText: {
+      "en-GB": "What is the highest level of education you have completed?",
+      "en-US": "What is the highest level of education you have completed?",
+      "es-ES": "¿Cuál es el nivel educativo más alto que ha completado?",
+      "es-AR": "¿Cuál es el nivel educativo más alto que ha completado?",
+    },
+    values: {
+      "en-GB": [
+        "Less than primary / no formal education",
+        "Primary",
+        "Secondary",
+        "College / Diploma",
+        "University degree",
+        "Postgraduate degree",
+      ],
+      "en-US": [
+        "Less than primary / no formal education",
+        "Primary",
+        "Secondary",
+        "College / Diploma",
+        "University degree",
+        "Postgraduate degree",
+      ],
+      "es-ES": [
+        "Menos que primaria / sin educación formal",
+        "Primaria",
+        "Secundaria",
+        "Colegio / Diploma",
+        "Título universitario",
+        "Posgrado",
+      ],
+      "es-AR": [
+        "Menos que primaria / sin educación formal",
+        "Primaria",
+        "Secundaria",
+        "Colegio / Diploma",
+        "Título universitario",
+        "Posgrado",
+      ],
+    },
+  },
+  mainActivity: {
+    dataKey: "main_activity",
+    type: FieldType.Enum,
+    required: true,
+    label: {
+      "en-GB": "Main activity",
+      "en-US": "Main activity",
+      "es-ES": "Actividad principal",
+      "es-AR": "Actividad principal",
+    },
+    questionText: {
+      "en-GB": "In the last 30 days, what was your main activity in terms of time spent?",
+      "en-US": "In the last 30 days, what was your main activity in terms of time spent?",
+      "es-ES": "En los últimos 30 días, ¿cuál fue su actividad principal en términos de tiempo dedicado?",
+      "es-AR": "En los últimos 30 días, ¿cuál fue su actividad principal en términos de tiempo dedicado?",
+    },
+    values: {
+      "en-GB": [
+        "Worked for wages",
+        "Worked for my own account (trader, shopkeeper, barber, dressmaker)",
+        "Worked as a volunteer",
+        "Worked as intern or apprentice",
+        "In school, university, or training",
+        "Unemployed",
+      ],
+      "en-US": [
+        "Worked for wages",
+        "Worked for my own account (trader, shopkeeper, barber, dressmaker)",
+        "Worked as a volunteer",
+        "Worked as intern or apprentice",
+        "In school, university, or training",
+        "Unemployed",
+      ],
+      "es-ES": [
+        "Trabajé por salario",
+        "Trabajé por cuenta propia (comerciante, tendero, barbero, modista)",
+        "Trabajé como voluntario",
+        "Trabajé como pasante o aprendiz",
+        "Estuve en la escuela, universidad o capacitación",
+        "Desempleado",
+      ],
+      "es-AR": [
+        "Trabajé por salario",
+        "Trabajé por cuenta propia (comerciante, tendero, barbero, modista)",
+        "Trabajé como voluntario",
+        "Trabajé como pasante o aprendiz",
+        "Estuve en la escuela, universidad o capacitación",
+        "Desempleado",
+      ],
+    },
+  },
+};
