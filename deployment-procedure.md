@@ -555,7 +555,11 @@ flowchart
 
 The auth domains are configured automatically during the deployment process.
 
-However, to show the  `%APP_NAME%` in the email templates, for example, in the verification email you have to manually enable the consent-/branding-screen in the Google cloud console for the **environment project** and set the app name there. Even if the project uses a different OAuth project, the app name is taken from the environment project's consent screen (seems like a bug in the firebase).
+However, to show the  `%APP_NAME%` in the email templates, for example, in the verification email you have to manually enable the consent-/branding-screen in the Google Cloud console for the **environment project** and set the app name there. Even if the project uses a different OAuth project, the app name is taken from the environment project's consent screen (seems like a bug in the firebase).
+
+### Step 4.11: Add a backend NAT IP address into the MongoDB cluster access list.
+
+For security reasons, you can add a backend NAT IP address into the MongoDB cluster access list. It will be exported as an environment variable in the backend pulumi outputs.
 
 ## How to
 

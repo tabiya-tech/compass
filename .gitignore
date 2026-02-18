@@ -6,3 +6,6 @@
 
 credentials*.json
 .run/
+
+
+__pycache__/

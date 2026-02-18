@@ -199,7 +199,6 @@ def _get_fully_qualified_image_name(
         docker_repository: pulumi.Output[gcp.artifactregistry.Repository],
         tag: str
 ) -> pulumi.Output[str]:
-
     def _get_self_link(repository_info):
         # Get the latest docker image with this tag.
         # Given the actual tag may be assigned to another image, we need to get the latest image with this tag.
@@ -220,11 +219,58 @@ def _get_fully_qualified_image_name(
             project=repository_project_id
         )
 
-        pulumi.info("Deploying image with the link: "+ image.self_link)
+        pulumi.info("Deploying image with the link: " + image.self_link)
 
         return image.self_link
 
     return docker_repository.apply(_get_self_link)
+
+
+def _setup_nat_gateway(*,
+                       basic_config: ProjectBaseConfig
+                       ) -> tuple[gcp.compute.Network, gcp.compute.Subnetwork, list[pulumi.Resource]]:
+    """
+    Sets up a NAT Gateway in Google Cloud Platform.
+    This is used so that all our cloud run instances route their requests through this NAT gateway with a static ip address.
+    ref: https://docs.cloud.google.com/run/docs/configuring/static-outbound-ip
+    """
+    network = gcp.compute.Network(
+        get_resource_name(resource="nat-gateway", resource_type="network"),
+        auto_create_subnetworks=False,
+        opts=pulumi.ResourceOptions(provider=basic_config.provider))
+
+    sub_net = gcp.compute.Subnetwork(
+        get_resource_name(resource="nat-gateway", resource_type="sub-network"),
+        # Minimum /26 recommended for Cloud Run because ip addresses may change depending on the scaling of instances.
+        # ref: https://docs.cloud.google.com/run/docs/configuring/vpc-direct-vpc#scale_up_and_scale_down
+        ip_cidr_range="10.0.0.0/26",
+        region=basic_config.location,
+        network=network.id,
+        opts=pulumi.ResourceOptions(provider=basic_config.provider, depends_on=[network]))
+
+    static_ip = gcp.compute.Address(get_resource_name(resource="nat-gateway", resource_type="static-ip"),
+                                    region=basic_config.location,
+                                    opts=pulumi.ResourceOptions(provider=basic_config.provider))
+
+    router = gcp.compute.Router(
+        get_resource_name(resource="nat-gateway", resource_type="router"),
+        network=network.id,
+        region=basic_config.location,
+        opts=pulumi.ResourceOptions(provider=basic_config.provider, depends_on=[network])
+    )
+
+    router_nat = gcp.compute.RouterNat(
+        get_resource_name(resource="nat-gateway", resource_type="nat"),
+        router=router.name,
+        nat_ip_allocate_option="MANUAL_ONLY",
+        nat_ips=[static_ip.id],
+        region=basic_config.location,
+        source_subnetwork_ip_ranges_to_nat="ALL_SUBNETWORKS_ALL_IP_RANGES",
+        opts=pulumi.ResourceOptions(provider=basic_config.provider, depends_on=[router, sub_net, network]))
+
+    # export the static IP since it might be used two whitelist the cloud run instances.
+    pulumi.export("cloudrun_nat_gateway_egress_static_ip", static_ip.address)
+    return network, sub_net, [router_nat]
 
 
 # Deploy cloud run service
@@ -237,6 +283,8 @@ def _deploy_cloud_run_service(
         dependencies: list[pulumi.Resource],
         cv_bucket_name: Output[str],
 ):
+    nat_network, nat_sub_network, nat_dependencies = _setup_nat_gateway(basic_config=basic_config)
+
     # See https://cloud.google.com/run/docs/securing/service-identity#per-service-identity for more information
     # Create a service account for the Cloud Run service
     service_account = gcp.serviceaccount.Account(
@@ -377,8 +425,18 @@ def _deploy_cloud_run_service(
                 )
             ],
             service_account=service_account.email,
+            vpc_access=gcp.cloudrunv2.ServiceTemplateVpcAccessArgs(
+                network_interfaces=[
+                    gcp.cloudrunv2.ServiceTemplateVpcAccessNetworkInterfaceArgs(
+                        network=nat_network.id,
+                        subnetwork=nat_sub_network.id,
+                    )
+                ],
+                # All traffic in the system should pass through the network
+                egress="ALL_TRAFFIC",
+            )
         ),
-        opts=pulumi.ResourceOptions(depends_on=dependencies + [iam_member], provider=basic_config.provider),
+        opts=pulumi.ResourceOptions(depends_on=dependencies + nat_dependencies + [iam_member], provider=basic_config.provider),
     )
     pulumi.export("cloud_run_url", service.uri)
     return service, service_account

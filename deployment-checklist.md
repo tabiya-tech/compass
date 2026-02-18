@@ -39,3 +39,4 @@ This is a checklist for deploying a new realm and setting up the first environme
   - [ ] Run the setup_env.py script. [docs](deployment-procedure.md#step-48-run-the-setuppy-script)
   - [ ] Prepare and Deploy the Environment. [docs](deployment-procedure.md#step-49-prepare-and-deploy-the-environment)
   - [ ] Configure the Auth Domains & Email Templates. [docs](deployment-procedure.md#step-410-configure-the-auth-domains-and-email-templates-for-the-identity-platform)
+  - [ ] (Optional) Add a backend NAT IP address into the MongoDB cluster access list. [docs](deployment-procedure.md#step-411-add-a-backend-nat-ip-address-into-the-mongodb-cluster-access-list)
