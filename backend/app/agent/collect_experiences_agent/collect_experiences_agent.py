@@ -6,7 +6,7 @@ from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.agent_types import AgentType
 from app.agent.collect_experiences_agent._conversation_llm import _ConversationLLM, ConversationLLMAgentOutput, \
-    _get_experience_type
+    _get_experience_type, fill_incomplete_fields_as_declined
 from app.agent.collect_experiences_agent._dataextraction_llm import _DataExtractionLLM
 from app.agent.collect_experiences_agent._transition_decision_tool import TransitionDecisionTool, TransitionDecision
 from app.agent.collect_experiences_agent._types import CollectedData
@@ -184,21 +184,35 @@ class CollectExperiencesAgent(Agent):
         
         reasoning_text = transition_reasoning.reasoning if transition_reasoning else "No reasoning provided"
         
-        if transition_decision == TransitionDecision.END_WORKTYPE and self._state.unexplored_types:
-            explored_type = self._state.unexplored_types.pop(0)
-            self._state.explored_types.append(explored_type)
-            self.logger.info(
-                "Transition decision: END_WORKTYPE - Explored work type: %s"
-                "\n  - remaining types: %s"
-                "\n  - discovered experiences so far: %s"
-                "\n  - reasoning: %s",
-                explored_type,
-                self._state.unexplored_types,
-                self._state.collected_data,
-                reasoning_text
-            )
-            
-            next_exploring_type = self._state.unexplored_types[0] if len(self._state.unexplored_types) > 0 else None
+        if transition_decision == TransitionDecision.END_WORKTYPE:
+            did_update = False
+            # if decision is to end the exploration of the current work type, we update null fields to ""
+            if exploring_type is not None and exploring_type in self._state.unexplored_types:
+                fill_incomplete_fields_as_declined(
+                    self._state.collected_data, exploring_type
+                )
+                self._state.unexplored_types.remove(exploring_type)
+                self._state.explored_types.append(exploring_type)
+                did_update = True
+                self.logger.info(
+                    "Transition decision: END_WORKTYPE - Explored work type: %s"
+                    "\n  - remaining types: %s"
+                    "\n  - discovered experiences so far: %s"
+                    "\n  - reasoning: %s",
+                    exploring_type,
+                    self._state.unexplored_types,
+                    self._state.collected_data,
+                    reasoning_text
+                )
+            # exit if no unexplored types left
+            if not did_update and not self._state.unexplored_types:
+                conversation_llm_output.finished = True
+                self.logger.info(
+                    "Transition decision: END_WORKTYPE with no unexplored types - treating as END_CONVERSATION"
+                )
+                return conversation_llm_output
+
+            next_exploring_type = self._state.unexplored_types[0] if self._state.unexplored_types else None
             transition_message: str
             if next_exploring_type is not None:
                 transition_message = (

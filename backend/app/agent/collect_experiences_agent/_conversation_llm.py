@@ -38,6 +38,35 @@ def _find_incomplete_experiences(collected_data: list[CollectedData]) -> list[tu
     return incomplete_experiences
 
 
+def fill_incomplete_fields_as_declined(
+    collected_data: list[CollectedData],
+    work_type: WorkType | None,
+) -> None:
+    """
+    Set None to "" for completeness fields (start_date, end_date, company, location)
+    on experiences of the given work type. Treats missing data as user declined to provide.
+    Mutates the experiences in place.
+    """
+    if work_type is None:
+        return
+    logger = logging.getLogger(__name__)
+    key = work_type.name
+    for exp in collected_data:
+        if exp.work_type and exp.work_type.strip() == key:
+            if exp.start_date is None:
+                logger.warning("Filling incomplete start_date as declined for %s experience: %s", key, exp.experience_title)
+                exp.start_date = ""
+            if exp.end_date is None:
+                logger.warning("Filling incomplete end_date as declined for %s experience: %s", key, exp.experience_title)
+                exp.end_date = ""
+            if exp.company is None:
+                logger.warning("Filling incomplete company as declined for %s experience: %s", key, exp.experience_title)
+                exp.company = ""
+            if exp.location is None:
+                logger.warning("Filling incomplete location as declined for %s experience: %s", key, exp.experience_title)
+                exp.location = ""
+
+
 def _get_incomplete_experiences_instructions(collected_data: list[CollectedData]) -> str:
     """
     Generate instructions for handling incomplete experiences.

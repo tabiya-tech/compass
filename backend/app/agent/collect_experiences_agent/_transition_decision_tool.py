@@ -19,7 +19,7 @@ from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_
     get_config_variation
 from common_libs.llm.schema_builder import with_response_schema
 from common_libs.retry import Retry
-from ._conversation_llm import _find_incomplete_experiences, _get_experience_type, _ask_experience_type_question
+from ._conversation_llm import _get_experience_type, _ask_experience_type_question
 from ._types import CollectedData
 
 _TAGS_TO_FILTER = [
@@ -99,17 +99,6 @@ class TransitionDecisionTool:
                       explored_types: list[WorkType],
                       conversation_context: ConversationContext,
                       user_input: AgentInput) -> tuple[TransitionDecision, Optional[TransitionReasoning], list[LLMStats]]:
-        
-        # Rule-based check 1: Incomplete experiences
-        incomplete_experiences = _find_incomplete_experiences(collected_data)
-        if incomplete_experiences:
-            self._logger.info(
-                "Incomplete experiences found - returning CONTINUE. "
-                "Incomplete experiences: %s",
-                [(idx, exp.experience_title, missing) for idx, exp, missing in incomplete_experiences]
-            )
-            return TransitionDecision.CONTINUE, None, []
-        
         
         cleaned_experience_dicts = []
         for collected_item in collected_data:
@@ -288,7 +277,7 @@ Answer two boolean questions:
 
 #Constraints
 - Use semantic understanding, not keyword matching
-- If incomplete experiences exist, continue_current_type must be true
+- When the user clearly indicates no more experiences of this type (e.g. "no", "nope"), return continue_current_type=false
 - If unexplored_types is not empty, done_with_collection must be false
 
 #Collected Experience Data
