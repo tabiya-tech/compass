@@ -13,7 +13,6 @@ from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template import sanitize_input
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
-from app.agent.experience.work_type import WorkType
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG, \
     get_config_variation
@@ -21,6 +20,7 @@ from common_libs.llm.schema_builder import with_response_schema
 from common_libs.retry import Retry
 from ._conversation_llm import _get_experience_type, _ask_experience_type_question
 from ._types import CollectedData
+from ..experience import WorkType
 
 _TAGS_TO_FILTER = [
     "system instructions",
@@ -99,7 +99,15 @@ class TransitionDecisionTool:
                       explored_types: list[WorkType],
                       conversation_context: ConversationContext,
                       user_input: AgentInput) -> tuple[TransitionDecision, Optional[TransitionReasoning], list[LLMStats]]:
-        
+        incomplete_required = _find_incomplete_required_for_work_type(collected_data, exploring_type)
+        if incomplete_required:
+            self._logger.info(
+                "Incomplete required fields (title/work_type) - returning CONTINUE. "
+                "Incomplete experiences: %s",
+                [(idx, exp.experience_title, missing) for idx, exp, missing in incomplete_required]
+            )
+            return TransitionDecision.CONTINUE, None, []
+
         cleaned_experience_dicts = []
         for collected_item in collected_data:
             collected_item_dict = collected_item.model_dump(exclude={"defined_at_turn_number"})
@@ -322,3 +330,28 @@ Return complete valid JSON with all three fields. Start with {{:
 
 You must complete the entire JSON object including the closing brace }}.
 """
+
+
+def _find_incomplete_required_for_work_type(
+    collected_data: list[CollectedData],
+    exploring_type: WorkType | None,
+) -> list[tuple[int, CollectedData, list[str]]]:
+    """
+    Find experiences of the given work type that lack required fields (experience_title, work_type).
+    Used for early-exit: if any have missing required fields, we must CONTINUE to gather them.
+    Optional fields (start_date, end_date, company, location) are NOT checked here.
+    """
+    if exploring_type is None:
+        return []
+    key = exploring_type.name
+    result = []
+    for i, exp in enumerate (collected_data):
+        if exp.work_type and exp.work_type.strip() == key:
+            missing = []
+            if not (exp.experience_title and exp.experience_title.strip()):
+                missing.append("experience_title")
+            if not (exp.work_type and exp.work_type.strip()):
+                missing.append("work_type")
+            if missing:
+                result.append((i, exp, missing))
+    return result
