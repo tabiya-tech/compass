@@ -19,12 +19,15 @@ exports[`SkillsRankingJobMarketDisclosure snapshot: non-replay initial render (n
           class="MuiTypography-root MuiTypography-body1 css-1ow0s3z-MuiTypography-root"
           data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
         >
-          You meet the key skills for 
+          You meet the key skills for
+           
           <strong>
             42
             %
           </strong>
-           of opportunities advertised on 
+           
+          of opportunities advertised on
+           
           x
           . That’s a solid range of options!
         </p>
@@ -41,7 +44,8 @@ exports[`SkillsRankingJobMarketDisclosure snapshot: non-replay initial render (n
           class="MuiTypography-root MuiTypography-caption css-1nk71a8-MuiTypography-root"
           data-testid="chat-message-timestamp-c9253326-05ee-4bff-9d43-7852ca78a033"
         >
-          sent 
+          sent
+           
           just now
         </span>
       </div>

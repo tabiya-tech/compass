@@ -137,7 +137,7 @@
         "feedbackInProgressLinkText": "Completa tus comentarios",
         "feedbackInProgressSuffix": "para ayudarnos a mejorar tu experiencia!"
       },
-      "sent": "enviado "
+      "sent": "enviado"
     },
     "chat": {
       "notifications": {
@@ -532,11 +532,11 @@
       "unpaidWorkTitle": "Trabajo no remunerado",
       "traineeWorkTitle": "Trabajo como aprendiz",
       "uncategorizedTitle": "Sin categoría",
-      "topSkillsTitle": "Habilidades principales: ",
+      "topSkillsTitle": "Habilidades principales:",
       "skillsDescriptionText": "A continuación encontrarás una lista de las habilidades descubiertas durante tu conversación con {{appName}}, junto con sus descripciones.",
       "disclaimer": {
-        "part1": "Aviso: ",
-        "part2": "Las habilidades listadas se basan en una conversación con el candidato, no han sido verificadas o validadas por Tabiya y pueden ser inexactas. ",
+        "part1": "Aviso:",
+        "part2": "Las habilidades listadas se basan en una conversación con el candidato, no han sido verificadas o validadas por Tabiya y pueden ser inexactas.",
         "part3": "La información debe ser verificada antes de usarla para la búsqueda de empleo, entrevistas o para crear un CV. Para revisar esta información, vuelve a hablar con {{appName}} o crea un CV completo basado en este informe."
       },
       "bodyText": "Este informe resume la información clave recopilada durante una conversación con {{appName}} el {{date}}. {{appName}} es un chatbot de IA que ayuda a los buscadores de empleo a explorar sus habilidades y experiencias. Este informe presenta la experiencia laboral del candidato y las habilidades identificadas en cada experiencia. Esta información puede usarse para guiar la búsqueda de empleo y resaltar sus habilidades al postular, especialmente durante entrevistas con posibles empleadores. Puede ser un buen punto de partida para crear un CV completo."
@@ -564,8 +564,8 @@
         "skillsRankingRetypedRank": {
           "question_1": "Última pregunta: recordemos lo que te dije más arriba sobre tu propio encaje con las oportunidades:",
           "question_2": "vuelve a revisar lo que dije tres mensajes atrás, qué porcentaje de oportunidades",
-          "question_3": " en",
-          "question_4": " cumples con las habilidades clave?",
+          "question_3": "en",
+          "question_4": "cumples con las habilidades clave?",
           "sliderAria": "Control deslizante percentil de rango reescrito"
         },
         "skillsRankingPerceivedRank": {
@@ -575,15 +575,15 @@
         },
         "skillsRankingDisclosure": {
           "skillsRankingMarketDisclosure": {
-            "message_1": "Cumples las habilidades clave para el ",
-            "message_2": " de las oportunidades publicadas en ",
+            "message_1": "Cumples las habilidades clave para el",
+            "message_2": "de las oportunidades publicadas en",
             "message_3": ". ¡Es un rango sólido de opciones!"
           },
           "skillsRankingJobSeekerDisclosure": {
             "pendingMessage": "¡Gracias! Estamos verificando las últimas oportunidades de {{jobPlatformUrl}} para que los números sean precisos. Compartiremos tus resultados pronto o puedes preguntar por ellos cuando te llamemos para la encuesta telefónica.",
             "comparisonPart1_prefix": "Además, ",
             "comparisonPart1_main": "Comparado con otros usuarios de \n{{jobPlatformUrl}}\n, estás en el grupo [\n{{groupIndex}}\n] de \n{{groupTotal}}\n.",
-            "comparisonPart2_prefix": "Imagina alinear a 100 usuarios de \n{{jobPlatformUrl}}\n desde los que encajan con menos hasta los que encajan con más puestos. Dividimos la fila en cinco bloques de 20 personas. El bloque 1 (los 20 más altos) encaja con más puestos; el bloque 5 (los 20 más bajos) con menos. Estás en el bloque ",
+            "comparisonPart2_prefix": "Imagina alinear a 100 usuarios de \n{{jobPlatformUrl}}\n desde los que encajan con menos hasta los que encajan con más puestos. Dividimos la fila en cinco bloques de 20 personas. El bloque 1 (los 20 más altos) encaja con más puestos; el bloque 5 (los 20 más bajos) con menos. Estás en el bloque",
             "comparisonPart2_group": "[\n{{groupIndex}}\n]",
             "comparisonPart2_middle": ", que es el bloque ",
             "comparisonPart2_label": "[\n{{comparisonLabel}}\n]",
@@ -593,7 +593,7 @@
         },
         "rotateToSolve": {
           "instructions1": "Gira cada letra hasta que quede derecha. Selecciona una letra haciendo clic y luego gírala en sentido horario con",
-          "instructions2": " o antihorario con.",
+          "instructions2": "o antihorario con.",
           "allCompleteMessage": "¡Todos los rompecabezas completados! ¡Bien hecho!",
           "puzzleCompleteMessage": "¡Rompecabezas completado! Resuelve otro o cancela si no te interesa tanto la información.",
           "rotateLeftAria": "Rotar carácter en sentido antihorario",
@@ -646,7 +646,7 @@
         "collectionSkipped": "Se omitió la recopilación de datos personales.",
         "rejectParagraph1": "Lamentamos que hayas decidido no proporcionar tus datos. Proporcionar esta información ayuda a {{appName}} a ofrecerte una experiencia más personalizada. No podrás continuar y se cerrará tu sesión.",
         "skipParagraph1": "Lamentamos que prefieras no proporcionar tus datos. Proporcionar esta información ayuda a {{appName}} a ofrecerte una experiencia más personalizada. Ten en cuenta que si omites este paso,",
-        "skipParagraph1Highlighted": " no podrás proporcionar esta información más adelante.",
+        "skipParagraph1Highlighted": "no podrás proporcionar esta información más adelante.",
         "startConversation": "Iniciar conversación",
         "areYouSureYouWantToSkip": "¿Estás seguro de que quieres omitirlo?",
         "yesSkip": "Sí, omitir",

@@ -118,9 +118,9 @@ const SkillsRankingJobMarketDisclosure: React.FC<SkillsRankingJobMarketDisclosur
         <ChatBubble
           message={
             <>
-              {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message_1")}
-              <strong>{skillsRankingState.score.jobs_matching_rank}%</strong>
-              {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message_2")}
+              {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message_1")}{" "}
+              <strong>{skillsRankingState.score.jobs_matching_rank}%</strong>{" "}
+              {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message_2")}{" "}
               {getJobPlatformUrl()}
               {t("features.skillsRanking.components.skillsRankingDisclosure.skillsRankingMarketDisclosure.message_3")}
             </>

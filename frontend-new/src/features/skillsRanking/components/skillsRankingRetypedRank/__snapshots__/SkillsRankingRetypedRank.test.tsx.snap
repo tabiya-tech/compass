@@ -24,10 +24,12 @@ exports[`SkillsRankingRetypedRank snapshot: initial render in RETYPED_RANK (non-
           <strong>
             check again what I said three messages ago, how many percent of opportunities
           </strong>
-           on
+           
+          on
            
           x
-           do you meet the key skills for?
+           
+          do you meet the key skills for?
         </p>
         <div
           class="MuiBox-root css-0"
@@ -66,7 +68,8 @@ exports[`SkillsRankingRetypedRank snapshot: initial render in RETYPED_RANK (non-
           class="MuiTypography-root MuiTypography-caption css-1nk71a8-MuiTypography-root"
           data-testid="chat-message-timestamp-c9253326-05ee-4bff-9d43-7852ca78a033"
         >
-          sent 
+          sent
+           
           just now
         </span>
       </div>

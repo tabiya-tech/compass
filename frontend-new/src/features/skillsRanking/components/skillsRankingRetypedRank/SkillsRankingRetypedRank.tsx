@@ -144,8 +144,8 @@ const SkillsRankingRetypedRank: React.FC<Readonly<SkillsRankingRetypedRankProps>
             message={
               <>
                 {t("features.skillsRanking.components.skillsRankingRetypedRank.question_1")}{" "}
-                <strong>{t("features.skillsRanking.components.skillsRankingRetypedRank.question_2")}</strong>
-                {t("features.skillsRanking.components.skillsRankingRetypedRank.question_3")} {getJobPlatformUrl()}
+                <strong>{t("features.skillsRanking.components.skillsRankingRetypedRank.question_2")}</strong>{" "}
+                {t("features.skillsRanking.components.skillsRankingRetypedRank.question_3")} {getJobPlatformUrl()}{" "}
                 {t("features.skillsRanking.components.skillsRankingRetypedRank.question_4")}
               </>
             }

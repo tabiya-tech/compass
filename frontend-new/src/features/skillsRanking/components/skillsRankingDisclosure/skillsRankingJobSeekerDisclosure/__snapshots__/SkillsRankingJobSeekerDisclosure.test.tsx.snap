@@ -32,7 +32,8 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
           <br />
           Imagine lining up 100 
           x
-           users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You’re in block 
+           users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You’re in block
+           
           <strong>
             [
             3
@@ -44,7 +45,8 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
             MIDDLE
             ]
           </strong>
-           block.
+           
+          block.
           <br />
         </p>
         <div
@@ -173,7 +175,8 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
           class="MuiTypography-root MuiTypography-caption css-1nk71a8-MuiTypography-root"
           data-testid="chat-message-timestamp-c9253326-05ee-4bff-9d43-7852ca78a033"
         >
-          sent 
+          sent
+           
           just now
         </span>
       </div>

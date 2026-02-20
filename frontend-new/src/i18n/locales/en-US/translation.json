@@ -178,7 +178,7 @@
         "feedbackInProgressLinkText": "Complete your Feedback",
         "feedbackInProgressSuffix": "to help us improve your experience!"
       },
-      "sent": "sent "
+      "sent": "sent"
     },
     "chat": {
       "notifications": {
@@ -262,7 +262,7 @@
         "loginUsing": "Login using",
         "loggingYouIn": "Logging you in...",
         "loggingInAria": "Logging in",
-        "dontHaveAnAccount": "Don't have an account? ",
+        "dontHaveAnAccount": "Don't have an account?",
         "fillInEmailAndPassword": "Please fill in the email and password fields",
         "orLoginToYourAccountToContinue": "Or login to your account to continue",
         "or": "or",
@@ -532,11 +532,11 @@
       "unpaidWorkTitle": "Unpaid Work",
       "traineeWorkTitle": "Trainee Work",
       "uncategorizedTitle": "Uncategorized",
-      "topSkillsTitle": "Top Skills: ",
+      "topSkillsTitle": "Top Skills:",
       "skillsDescriptionText": "Below, you will find a list of the skills discovered during your conversation with {{appName}}, along with their descriptions.",
       "disclaimer": {
-        "part1": "Disclaimer: ",
-        "part2": "Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate. ",
+        "part1": "Disclaimer:",
+        "part2": "Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate.",
         "part3": "Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with {{appName}} again or create a complete CV based on this report."
       },
       "bodyText": "This report summarizes the key information gathered during a conversation with {{appName}} on {{date}}. {{appName}} is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV."
@@ -564,8 +564,8 @@
         "skillsRankingRetypedRank": {
           "question_1": "As a last question, let's recall what I told you further above just regarding your own fit with opportunities:",
           "question_2": "check again what I said three messages ago, how many percent of opportunities",
-          "question_3": " on",
-          "question_4": " do you meet the key skills for?",
+          "question_3": "on",
+          "question_4": "do you meet the key skills for?",
           "sliderAria": "Retyped rank percentile slider"
         },
         "skillsRankingPerceivedRank": {
@@ -575,25 +575,25 @@
         },
         "skillsRankingDisclosure": {
           "skillsRankingMarketDisclosure": {
-            "message_1": "You meet the key skills for ",
-            "message_2": " of opportunities advertised on ",
+            "message_1": "You meet the key skills for",
+            "message_2": "of opportunities advertised on",
             "message_3": ". That’s a solid range of options!"
           },
           "skillsRankingJobSeekerDisclosure": {
             "pendingMessage": "Thanks! We're double-checking the latest {{jobPlatformUrl}} opportunities so the numbers are accurate. We'll share your results soon or you can ask for them when we call you for the phone survey.",
             "comparisonPart1_prefix": "Moreover, ",
             "comparisonPart1_main": "Compared to other \n{{jobPlatformUrl}}\n users, you are in group [\n{{groupIndex}}\n] of \n{{groupTotal}}\n.",
-            "comparisonPart2_prefix": "Imagine lining up 100 \n{{jobPlatformUrl}}\n users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You're in block ",
+            "comparisonPart2_prefix": "Imagine lining up 100 \n{{jobPlatformUrl}}\n users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You're in block",
             "comparisonPart2_group": "[\n{{groupIndex}}\n]",
             "comparisonPart2_middle": ", which is the ",
             "comparisonPart2_label": "[\n{{comparisonLabel}}\n]",
-            "comparisonPart2_suffix": " block.",
+            "comparisonPart2_suffix": "block.",
             "updateError": "Failed to update skills ranking state. Please try again later."
           }
         },
         "rotateToSolve": {
           "instructions1": "Rotate each letter until it’s upright. Select a letter by clicking on it, then rotate it clockwise with",
-          "instructions2": " or counterclockwise with",
+          "instructions2": "or counterclockwise with",
           "allCompleteMessage": "All puzzles complete! Well done!",
           "puzzleCompleteMessage": "Puzzle complete! Please solve another one or cancel if you are not that interested in the information.",
           "rotateLeftAria": "Rotate character counterclockwise",
@@ -646,7 +646,7 @@
         "collectionSkipped": "Personal data collection skipped.",
         "rejectParagraph1": "We're sorry that you chose not to provide your data. Providing this information helps {{appName}} deliver a more personalized experience for you. You will not be able to proceed and will be logged out.",
         "skipParagraph1": "We're sorry that you prefer not to provide your data. Providing this information helps {{appName}} deliver a more personalized experience for you. Please note that if you skip this step,",
-        "skipParagraph1Highlighted": " you won't be able to provide this information later.",
+        "skipParagraph1Highlighted": "you won't be able to provide this information later.",
         "startConversation": "Start conversation",
         "areYouSureYouWantToSkip": "Are you sure you want to skip?",
         "yesSkip": "Yes, skip",
