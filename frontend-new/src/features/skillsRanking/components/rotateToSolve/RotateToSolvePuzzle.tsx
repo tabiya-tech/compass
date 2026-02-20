@@ -248,7 +248,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
     >
       <Typography variant="body1" color="text.secondary" data-testid={DATA_TEST_ID.INSTRUCTION_TEXT}>
         {t("features.skillsRanking.components.rotateToSolve.instructions1")}{" "}
-        <RotateRightIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />
+        <RotateRightIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />{" "}
         {t("features.skillsRanking.components.rotateToSolve.instructions2")}{" "}
         <RotateLeftIcon fontSize="inherit" sx={{ verticalAlign: "text-bottom" }} />.
       </Typography>

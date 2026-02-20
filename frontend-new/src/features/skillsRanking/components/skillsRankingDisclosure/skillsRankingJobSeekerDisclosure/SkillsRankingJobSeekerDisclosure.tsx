@@ -135,7 +135,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
               {
                 jobPlatformUrl: getJobPlatformUrl(),
               }
-            )}
+            )}{" "}
             <strong>
               {t(
                 "features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_group",
@@ -154,7 +154,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
                   comparisonLabel: selectedLabel,
                 }
               )}
-            </strong>
+            </strong>{" "}
             {t(
               "features.skillsRanking.components.skillsRankingDisclosure.skillsRankingJobSeekerDisclosure.comparisonPart2_suffix"
             )}

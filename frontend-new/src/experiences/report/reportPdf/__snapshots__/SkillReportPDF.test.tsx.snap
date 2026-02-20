@@ -211,7 +211,7 @@ exports[`Report should render Report correctly 1`] = `
                   x="0"
                   y="0"
                 >
-                  Top Skills: 
+                  Top Skills:
                 </text>
                 <view
                   data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
@@ -323,7 +323,7 @@ exports[`Report should render Report correctly 1`] = `
                   x="0"
                   y="0"
                 >
-                  Top Skills: 
+                  Top Skills:
                 </text>
                 <view
                   data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
@@ -435,14 +435,14 @@ exports[`Report should render Report correctly 1`] = `
           y="0"
         >
            
-          Disclaimer: 
+          Disclaimer:
            
           <text
             style="font-size: 9px; color: rgb(0, 0, 0);"
             x="0"
             y="0"
           >
-            Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate. 
+            Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate.
              
           </text>
           Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with {{appName}} again or create a complete CV based on this report.

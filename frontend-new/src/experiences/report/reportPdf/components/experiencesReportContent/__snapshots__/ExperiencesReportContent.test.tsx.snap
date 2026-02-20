@@ -68,7 +68,7 @@ exports[`ExperiencesReportContent should render ExperiencesReportContent correct
         x="0"
         y="0"
       >
-        Top Skills: 
+        Top Skills:
       </text>
       <view
         data-testid="experiences-content-report-skills-e1f12442-9771-4e78-b3c7-77cd3b2172f8"
