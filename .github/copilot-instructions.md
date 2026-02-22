@@ -4,6 +4,8 @@
 
 Compass is an AI-powered chatbot that helps job-seekers discover and articulate their skills using the ESCO (European Skills, Competences, Qualifications and Occupations) taxonomy. Users describe their work experiences in a conversational interface, and the system maps those experiences to standardized occupations and skills.
 
+> **Terminology note**: "Agent" in this codebase refers to a **Compass conversation agent** — a backend Python class that handles one phase of the user's chat conversation (e.g., welcome, experience collection, skills exploration, farewell). These are *not* AI coding agents. See the [backend instructions](copilot-instructions-backend.md) for the full agent architecture.
+
 ## Repository Structure
 
 This is a monorepo with three main packages:
@@ -16,9 +18,45 @@ compass/
 └── .github/workflows # CI/CD pipelines
 ```
 
-For package-specific instructions, see:
-- [Backend instructions](copilot-instructions-backend.md)
-- [Frontend instructions](copilot-instructions-frontend.md)
+Path-specific instructions are automatically applied by Copilot when working in the relevant directories:
+- [Backend instructions](instructions/backend.instructions.md) — applies to `backend/**`
+- [Frontend instructions](instructions/frontend.instructions.md) — applies to `frontend-new/**`
+
+## Domain Context
+
+### What is ESCO?
+
+ESCO (European Skills, Competences, Qualifications and Occupations) is a taxonomy developed by the European Commission that standardizes how occupations and skills are classified. It was chosen over alternatives like O*NET and ISCO because it offers:
+
+- **Global breadth** with local adaptability (multi-language, region-specific skills)
+- **Simpler skill descriptions** and "alternative labels" for occupations (e.g., "data engineer" as an alternative for "data scientist")
+- **Soft skills coverage** ("attitudes and values") absent from other frameworks
+- **Green and digital economy** skill frameworks built in
+- **Frequent updates** and growing adoption, especially in Latin America
+
+### Inclusive Livelihoods Taxonomy
+
+Compass uses Tabiya's **Inclusive Livelihoods Taxonomy**, which extends ESCO to cover the full spectrum of economic activities — including informal and unpaid work that traditional frameworks exclude. It classifies work into **four categories**:
+
+1. **Wage employment** — traditional salaried/hourly work
+2. **Self-employment** — independent/freelance work
+3. **Unpaid training** — internships, apprenticeships, volunteering
+4. **Unseen/unpaid work** — caregiving, household management, community work
+
+This equity focus is core to the product — Compass must recognize and validate skills from *all* types of work, not just formal employment.
+
+### Target Users
+
+- **Primary audience**: Job-seekers in emerging markets, particularly those with informal economy experience
+- **Device context**: Mobile-first, optimized for mid-range smartphones (Samsung Galaxy A23 as reference device)
+- **Language**: Moderate English proficiency expected; multi-language support is expanding
+- **Accessibility**: 88.9% of testers found Compass easy to use — maintain this standard
+
+### Product Mission
+
+Compass helps users discover skills they already have but may not know how to articulate. It does *not* answer career questions directly — instead, it **guides users through structured conversation** to extract, classify, and present their skills in a standardized format useful for CVs, job matching, and career development.
+
+---
 
 ## Tech Stack
 
@@ -28,7 +66,7 @@ For package-specific instructions, see:
 | LLM            | Google Vertex AI (Gemini), structured output with Pydantic       |
 | Database       | MongoDB (4 instances via Motor async driver)                     |
 | Vector Search  | MongoDB Atlas Search with Vertex AI embeddings                   |
-| Frontend       | React 18, TypeScript 5.4+, MUI 5, Webpack 5                     |
+| Frontend       | React 18, TypeScript 5.4+, MUI 7, Webpack 5                     |
 | Auth           | Firebase Authentication (email, Google OAuth, anonymous)         |
 | i18n           | i18next (backend + frontend), locales: en-GB, en-US, es-ES, etc |
 | Infra          | GCP (Cloud Run, Cloud Storage, API Gateway), Pulumi, Docker      |

@@ -3,6 +3,7 @@
 *.env
 
 .vscode/
+.claude/
 
 credentials*.json
 .run/
