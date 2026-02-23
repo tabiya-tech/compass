@@ -222,7 +222,11 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     } finally {
       setIsLoading(false);
     }
-  }, [enqueueSnackbar, activeSessionId, t]);
+    // Intentionally omitting `t` from dependencies:
+    // - This effect should only run when activeSessionId changes (conversation switching)
+    // - Including `t` would cause unnecessary conversation reloads on language change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enqueueSnackbar, activeSessionId]);
 
   // Opens the experiences drawer and get experiences if needed
   const handleOpenExperiencesDrawer = useCallback(async () => {
