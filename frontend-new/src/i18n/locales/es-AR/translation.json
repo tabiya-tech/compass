@@ -733,6 +733,12 @@
   "i18n": {
     "languageContextMenu": {
       "selector": "Selector de idioma"
+    },
+    "sync": {
+      "errors": {
+        "syncFailedWarning": "Idioma cambiado a {{locale}}, pero no pudimos guardar tu preferencia. Se revertirá en el próximo inicio de sesión.",
+        "changeFailed": "Error al cambiar el idioma. Por favor, intentá de nuevo."
+      }
     }
   },
   "_deprecated": {

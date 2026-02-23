@@ -15,8 +15,10 @@ import RegistrationCodeFormModal, {
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
-import { Language, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { getRegistrationCodeDisabled, getRegistrationDisabled } from "src/envService";
+import { validateLocale } from "src/i18n/constants";
+import i18n from "src/i18n/i18n";
 
 const uniqueId = "f0324e97-83fd-49e6-95c3-1043751fa1db";
 export const DATA_TEST_ID = {
@@ -96,10 +98,13 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           throw new Error("Something went wrong: No user found");
         }
 
+        // Use the current i18n locale instead of a hardcoded default
+        const currentLocale = validateLocale(i18n.language);
+
         if (!registrationCode) {
           prefs = await UserPreferencesService.getInstance().createUserPreferences({
             user_id: _user.id,
-            language: Language.en,
+            language: currentLocale,
           });
         } else {
           const invitation = await invitationsService.checkInvitationCodeStatus(registrationCode);
@@ -115,7 +120,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
           prefs = await UserPreferencesService.getInstance().createUserPreferences({
             user_id: _user.id,
             invitation_code: invitation.invitation_code,
-            language: Language.en,
+            language: currentLocale,
           });
         }
 

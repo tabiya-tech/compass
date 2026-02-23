@@ -13,9 +13,9 @@ import { InvitationStatus, InvitationType } from "src/auth/services/invitationsS
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import {
   SensitivePersonalDataRequirement,
-  Language,
   UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import { INVITATIONS_PARAM_NAME, TabiyaUser } from "src/auth/auth.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -301,7 +301,7 @@ describe("Testing Register component", () => {
     // AND the user preferences service is mocked to succeed
     jest.spyOn(UserPreferencesService.getInstance(), "createUserPreferences").mockResolvedValueOnce({
       user_id: "foo-bar-id",
-      language: Language.en,
+      language: Locale.EN_GB,
       sessions: [],
       user_feedback_answered_questions: {},
       accepted_tc: new Date(),

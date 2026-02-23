@@ -3,10 +3,10 @@ import "src/_test_utilities/consoleMock";
 
 import { issueNewSession } from "src/chat/issueNewSession";
 import {
-  Language,
   SensitivePersonalDataRequirement,
   UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { SessionError } from "src/error/commonErrors";
@@ -23,7 +23,7 @@ describe("issueNewSession", () => {
     // AND the user preferences service instance will return a new session for the given user ID and new session ID
     const givenUserPreferences: UserPreference = {
       user_id: givenUserId,
-      language: Language.en,
+      language: Locale.EN_GB,
       accepted_tc: new Date(),
       sessions: [givenNewSessionId],
       user_feedback_answered_questions: {},
@@ -54,7 +54,7 @@ describe("issueNewSession", () => {
     // GIVEN some user preferences
     const givenUserPreferences: UserPreference = {
       user_id: "foo",
-      language: Language.en,
+      language: Locale.EN_GB,
       accepted_tc: new Date(),
       sessions: [123],
       user_feedback_answered_questions: {},

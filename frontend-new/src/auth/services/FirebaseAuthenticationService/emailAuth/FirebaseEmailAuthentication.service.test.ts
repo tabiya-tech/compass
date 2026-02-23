@@ -19,6 +19,16 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 import { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
 import { jwtDecode } from "jwt-decode";
 
+// Mock LocaleSyncService to prevent actual backend calls
+jest.mock("src/i18n/LocaleSyncService", () => ({
+  __esModule: true,
+  default: {
+    getInstance: jest.fn().mockReturnValue({
+      syncOnLogin: jest.fn().mockResolvedValue(undefined),
+    }),
+  },
+}));
+
 jest.mock("jwt-decode", () => ({
   jwtDecode: jest.fn(),
 }));
@@ -587,6 +597,19 @@ describe("AuthService class tests", () => {
 
       // AND the user is currently logged in
       jest.spyOn(firebase.auth(), "currentUser", "get").mockReturnValue(mockAnonymousUser as any);
+
+      // AND getUser returns a valid user
+      const givenUser = { id: "123", name: givenUserName, email: givenEmail };
+      jest.spyOn(authService, "getUser").mockReturnValue(givenUser);
+
+      // AND the user has some preferences
+      const givenUserPreferences: UserPreference = {
+        user_id: "foo-id",
+        sessions: [],
+      } as unknown as UserPreference;
+      jest
+        .spyOn(UserPreferencesService.getInstance(), "getUserPreferences")
+        .mockResolvedValueOnce(givenUserPreferences);
 
       // WHEN linking the anonymous account
       const actualToken = await authService.linkAnonymousAccount(givenEmail, givenPassword, givenUserName);

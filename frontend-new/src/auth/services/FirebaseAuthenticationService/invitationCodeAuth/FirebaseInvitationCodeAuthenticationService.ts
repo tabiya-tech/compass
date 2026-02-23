@@ -10,11 +10,12 @@ import { AuthenticationServices, TabiyaUser } from "src/auth/auth.types";
 import { invitationsService } from "src/auth/services/invitationsService/invitations.service";
 import { InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import AuthenticationService from "src/auth/services/Authentication.service";
 import { formatTokenForLogging } from "src/auth/utils/formatTokenForLogging";
 import { TokenError } from "src/error/commonErrors";
+import { validateLocale } from "src/i18n/constants";
+import i18n from "src/i18n/i18n";
 
 class FirebaseInvitationCodeAuthenticationService extends AuthenticationService {
   private static instance: FirebaseInvitationCodeAuthenticationService;
@@ -92,10 +93,12 @@ class FirebaseInvitationCodeAuthenticationService extends AuthenticationService 
     this.authenticationStateService.setToken(token);
 
     // create user preferences for the first time.
+    // Use the current i18n locale instead of a hardcoded default
+    const currentLocale = validateLocale(i18n.language);
     const prefs = await UserPreferencesService.getInstance().createUserPreferences({
       user_id: _user.id,
       invitation_code: invitation.invitation_code,
-      language: Language.en,
+      language: currentLocale,
     });
     UserPreferencesStateService.getInstance().setUserPreferences(prefs);
 

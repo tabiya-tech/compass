@@ -1,12 +1,14 @@
 import AuthenticationStateService from "./AuthenticationState.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import { Language } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
+import { validateLocale } from "src/i18n/constants";
+import i18n from "src/i18n/i18n";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
+import LocaleSyncService from "src/i18n/LocaleSyncService";
 
 export const CLOCK_TOLERANCE = 10; // 10 second buffer for expiration and issuance time, in case of clock skew
 
@@ -121,8 +123,14 @@ abstract class AuthenticationService {
       throw error;
     }
     if (prefs !== null) {
-      // set the local preferences "state" ( for lack of a better word )
+      // set the local preferences "state" (for lack of a better word)
       UserPreferencesStateService.getInstance().setUserPreferences(prefs);
+
+      // Sync locale on login: if the frontend locale differs from the backend, update backend
+      // If a user logs in, we need to update the backend with the language they are using, so that it follows.
+      // It might be a bad idea to start on compass in English and realize you are having a conversation in Spanish
+      const frontendLocale = validateLocale(i18n.language);
+      await LocaleSyncService.getInstance().syncOnLogin(prefs.language, frontendLocale);
     }
   }
 
@@ -139,10 +147,12 @@ abstract class AuthenticationService {
     this.authenticationStateService.setToken(token);
     // create user preferences for the first time.
     // in order to do this, there needs to be a logged-in user in the persistent storage
+    // Use the current i18n locale instead of a hardcoded default
+    const currentLocale = validateLocale(i18n.language);
     const prefs = await UserPreferencesService.getInstance().createUserPreferences({
       user_id: user.id,
       invitation_code: registrationCode,
-      language: Language.en,
+      language: currentLocale,
     });
     UserPreferencesStateService.getInstance().setUserPreferences(prefs);
   }

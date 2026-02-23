@@ -3,10 +3,10 @@ import "src/_test_utilities/consoleMock";
 
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import {
-  Language,
   SensitivePersonalDataRequirement,
   UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import { nanoid } from "nanoid";
 import { QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
 
@@ -16,7 +16,7 @@ function getMockUserPreference(): UserPreference {
   const randomSessions = Array.from({ length: 3 }).map((_value, index) => random + index);
   return {
     user_id: nanoid(), // ensure a unique user id
-    language: Language.en,
+    language: Locale.EN_GB,
     sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
     has_sensitive_personal_data: true,
     accepted_tc: new Date(),

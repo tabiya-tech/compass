@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { Box, Container, Checkbox, styled, Typography, useTheme, FormControlLabel, useMediaQuery } from "@mui/material";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import { Language, UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { UpdateUserPreferencesSpec } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useNavigate } from "react-router-dom";
@@ -122,7 +122,6 @@ const Consent: React.FC = () => {
 
       const newUserPreferenceSpecs: UpdateUserPreferencesSpec = {
         user_id: user.id,
-        language: Language.en,
         accepted_tc: new Date(),
       };
       setIsAccepting(true);

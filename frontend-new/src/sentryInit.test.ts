@@ -1,4 +1,5 @@
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
 
 import * as Sentry from "@sentry/react";
 import { CompressionError, initSentry, SENTRY_CONFIG_DEFAULT, SentryConfig, sentryTransport } from "./sentryInit";
@@ -27,14 +28,6 @@ jest.mock("@sentry/react", () => ({
 
 jest.mock("@sentry/core", () => ({
   createTransport: jest.fn(),
-}));
-
-jest.mock("./envService", () => ({
-  getBackendUrl: jest.fn(),
-  getTargetEnvironmentName: jest.fn(),
-  getSentryDSN: jest.fn(),
-  getSentryEnabled: jest.fn(),
-  getSentryConfig: jest.fn(),
 }));
 
 jest.mock("brotli-wasm", () => ({

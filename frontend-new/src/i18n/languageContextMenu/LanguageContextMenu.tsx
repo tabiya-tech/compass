@@ -5,7 +5,10 @@ import { useTheme } from "@mui/material";
 import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { useTranslation } from "react-i18next";
 import { Locale, LocalesLabels } from "src/i18n/constants";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { parseEnvSupportedLocales } from "src/i18n/languageContextMenu/parseEnvSupportedLocales";
+import LocaleSyncService from "src/i18n/LocaleSyncService";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
 const uniqueId = "f4d06e4b-0e0c-49c7-ad93-924c5ac89070";
 
@@ -24,6 +27,7 @@ const LanguageContextMenu: React.FC<LanguageContextMenuProps> = ({ removeMargin 
 
   const theme = useTheme();
   const { t, i18n } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleLocaleChange = useCallback(
     (locale: Locale) => () => {
@@ -31,12 +35,26 @@ const LanguageContextMenu: React.FC<LanguageContextMenuProps> = ({ removeMargin 
         .changeLanguage(locale)
         .then(() => {
           console.debug(`Language changed to ${locale}`);
+          // Sync locale to backend if user is authenticated
+          const isAuthenticated = UserPreferencesStateService.getInstance().getUserPreferences() !== null;
+          if (!isAuthenticated) return;
+
+          LocaleSyncService.getInstance()
+            .syncLocaleToBackend(locale)
+            .catch((e) => {
+              // Notify the user that preference may not persist
+              enqueueSnackbar(t("i18n.sync.errors.syncFailedWarning", { locale: LocalesLabels[locale] }), {
+                variant: "warning",
+              });
+              console.debug("Locale sync to backend failed, will retry on next login");
+            });
         })
         .catch((e) => {
           console.error(`Failed to change language to ${locale}`, e);
+          enqueueSnackbar(t("i18n.sync.errors.changeFailed"), { variant: "error" });
         });
     },
-    [i18n]
+    [i18n, enqueueSnackbar, t]
   );
 
   const supportedLocales = useMemo(() => parseEnvSupportedLocales(), []);

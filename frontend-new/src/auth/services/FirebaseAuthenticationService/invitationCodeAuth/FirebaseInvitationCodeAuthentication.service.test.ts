@@ -6,10 +6,10 @@ import { invitationsService } from "src/auth/services/invitationsService/invitat
 import { Invitation, InvitationStatus, InvitationType } from "src/auth/services/invitationsService/invitations.types";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import {
-  Language,
   SensitivePersonalDataRequirement,
   UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -92,6 +92,9 @@ describe("AuthService class tests", () => {
       jest
         .spyOn(UserPreferencesService.getInstance(), "getUserPreferences")
         .mockResolvedValueOnce(givenReturnedPreferences);
+      jest
+        .spyOn(UserPreferencesService.getInstance(), "updateUserPreferences")
+        .mockResolvedValueOnce(givenReturnedPreferences);
 
       // AND the token is decoded into a user
       jest.spyOn(authService, "getUser").mockReturnValue(givenUser);
@@ -118,7 +121,7 @@ describe("AuthService class tests", () => {
       expect(UserPreferencesService.getInstance().createUserPreferences).toHaveBeenCalledWith({
         user_id: givenUser.id,
         invitation_code: givenInvitationCode,
-        language: Language.en,
+        language: Locale.EN_GB,
       });
 
       //  AND the user preferences should be set in the user preferences state

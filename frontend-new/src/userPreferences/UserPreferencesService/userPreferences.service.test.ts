@@ -9,16 +9,16 @@ import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import {
   CreateUserPreferencesSpec,
   SensitivePersonalDataRequirement,
-  Language,
   UpdateUserPreferencesSpec,
   UserPreference,
 } from "./userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
 function getTestUserPreferences(): UserPreference {
   return {
     user_id: "1",
-    language: Language.en,
+    language: Locale.EN_GB,
     accepted_tc: new Date(),
     sessions: [1234],
     client_id: getRandomString(10),
@@ -210,7 +210,7 @@ describe("UserPreferencesService", () => {
       // AND the PATCH models REST API will respond with OK and some models
       const givenUserPreferences: UpdateUserPreferencesSpec = {
         user_id: "1",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
       };
 
@@ -250,7 +250,7 @@ describe("UserPreferencesService", () => {
       let updateUserPreferencesCallback = async () =>
         await service.updateUserPreferences({
           user_id: "1",
-          language: Language.en,
+          language: Locale.EN_GB,
           accepted_tc: new Date(),
         });
 
@@ -285,7 +285,7 @@ describe("UserPreferencesService", () => {
         const updateUserPreferencesCallback = async () =>
           await service.updateUserPreferences({
             user_id: "1",
-            language: Language.en,
+            language: Locale.EN_GB,
             accepted_tc: new Date(),
           });
 
@@ -300,7 +300,7 @@ describe("UserPreferencesService", () => {
       // AND the POST models REST API will respond with OK and some models
       const givenUserPreferences: CreateUserPreferencesSpec = {
         user_id: "1",
-        language: Language.en,
+        language: Locale.EN_GB,
         invitation_code: "1234",
       };
 
@@ -374,7 +374,7 @@ describe("UserPreferencesService", () => {
       let createUserPreferencesCallback = async () =>
         await service.createUserPreferences({
           user_id: "1",
-          language: Language.en,
+          language: Locale.EN_GB,
           invitation_code: "1234",
         });
 
@@ -411,7 +411,7 @@ describe("UserPreferencesService", () => {
         const createUserPreferencesCallback = async () =>
           await service.createUserPreferences({
             user_id: "1",
-            language: Language.en,
+            language: Locale.EN_GB,
             invitation_code: "1234",
           });
 

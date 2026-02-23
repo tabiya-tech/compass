@@ -14,10 +14,10 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import {
-  Language,
   SensitivePersonalDataRequirement,
   UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import {
@@ -53,7 +53,7 @@ jest.mock("src/feedback/overallFeedback/feedbackForm/components/customRating/Cus
 const mockUserPreferences: UserPreference = {
   sessions: [123],
   user_id: "test-user",
-  language: Language.en,
+  language: Locale.EN_GB,
   user_feedback_answered_questions: {},
   sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
   has_sensitive_personal_data: false,

@@ -1,3 +1,5 @@
+import { Locale } from "src/i18n/constants";
+
 export enum SensitivePersonalDataRequirement {
   REQUIRED = "REQUIRED",
   NOT_REQUIRED = "NOT_REQUIRED",
@@ -14,7 +16,7 @@ export type UserPreferencesExperiments = Partial<Record<string, string | Record<
 
 export type UserPreference = {
   user_id: string;
-  language: Language;
+  language: Locale;
   client_id?: string;
   accepted_tc?: Date;
   sessions: number[];
@@ -26,7 +28,7 @@ export type UserPreference = {
 
 type CreatePreferencesSpecBase = {
   user_id: string;
-  language: Language;
+  language: Locale;
 };
 
 export type CreateUserPreferencesSpec =
@@ -39,13 +41,8 @@ export type CreateUserPreferencesResponse = Omit<UserPreference, "sensitive_pers
 
 export type UpdateUserPreferencesSpec = {
   user_id: string;
-  language?: Language;
+  language?: Locale;
   accepted_tc?: Date;
   client_id?: string;
   experiments?: UserPreferencesExperiments;
 };
-
-export enum Language {
-  en = "en",
-  // fr = 'fr', // French in the future
-}

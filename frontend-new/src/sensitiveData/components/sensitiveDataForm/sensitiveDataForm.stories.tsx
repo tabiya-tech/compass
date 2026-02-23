@@ -2,10 +2,8 @@ import { Meta, StoryObj } from "@storybook/react";
 
 import SensitiveDataForm from "src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import {
-  Language,
-  SensitivePersonalDataRequirement,
-} from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import { getBackendUrl } from "src/envService";
 
 const meta: Meta<typeof SensitiveDataForm> = {
@@ -37,7 +35,7 @@ export const Shown: StoryObj<typeof SensitiveDataForm> = {
       sessions: [],
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
       user_feedback_answered_questions: {},
-      language: Language.en,
+      language: Locale.EN_GB,
       experiments: {},
     });
     return () => {
@@ -56,7 +54,7 @@ export const ShownWhenSkipping: StoryObj<typeof SensitiveDataForm> = {
       sessions: [],
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       user_feedback_answered_questions: {},
-      language: Language.en,
+      language: Locale.EN_GB,
       experiments: {},
     });
     return () => {

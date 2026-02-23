@@ -19,3 +19,19 @@ export const LocalesLabels = {
 
 export const SupportedLocales: Locale[] = [Locale.EN_GB, Locale.EN_US, Locale.ES_ES, Locale.ES_AR];
 export const FALL_BACK_LOCALE = Locale.EN_GB;
+
+/**
+ * Validates and safely converts a string to a supported Locale.
+ * If the locale is not supported, falls back to FALL_BACK_LOCALE and logs a warning.
+ *
+ * @param locale - The locale string to validate (typically from i18n.language)
+ * @returns A valid Locale enum value
+ */
+export function validateLocale(locale: string): Locale {
+  const localeValue = locale as Locale;
+  if (SupportedLocales.includes(localeValue)) {
+    return localeValue;
+  }
+  console.warn(`[validateLocale] Invalid locale: ${locale}, falling back to ${FALL_BACK_LOCALE}`);
+  return FALL_BACK_LOCALE;
+}

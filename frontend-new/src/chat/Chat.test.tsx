@@ -27,10 +27,10 @@ import ExperiencesDrawer, {
 } from "src/experiences/experiencesDrawer/ExperiencesDrawer";
 import { DiveInPhase, WorkType } from "src/experiences/experienceService/experiences.types";
 import {
-  Language,
   SensitivePersonalDataRequirement,
   UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import ConfirmModalDialog, {
   DATA_TEST_ID as CONFIRM_MODAL_DIALOG_DATA_TEST_ID,
 } from "src/theme/confirmModalDialog/ConfirmModalDialog";
@@ -263,7 +263,7 @@ describe("Chat", () => {
       user_id: givenUser.id,
       accepted_tc: new Date(),
       has_sensitive_personal_data: false,
-      language: Language.en,
+      language: Locale.EN_GB,
       sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
       sessions: givenSessionId !== null ? [givenSessionId] : [],
       user_feedback_answered_questions: {},
@@ -804,7 +804,7 @@ describe("Chat", () => {
           user_id: givenUser.id,
           accepted_tc: new Date(),
           has_sensitive_personal_data: false,
-          language: Language.en,
+          language: Locale.EN_GB,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
           sessions: [givenNewSessionId],
           user_feedback_answered_questions: {},
@@ -929,7 +929,7 @@ describe("Chat", () => {
           sessions: [givenNewSessionId],
           user_feedback_answered_questions: {},
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
-          language: Language.en,
+          language: Locale.EN_GB,
           experiments: {},
         };
         jest.spyOn(UserPreferencesService.getInstance(), "getNewSession").mockResolvedValueOnce(givenUserPreferences);
@@ -988,7 +988,7 @@ describe("Chat", () => {
         const givenNewSessionId = 123;
         const givenUserPreferences: UserPreference = {
           user_id: givenUser.id,
-          language: Language.en,
+          language: Locale.EN_GB,
           accepted_tc: new Date(),
           has_sensitive_personal_data: false,
           sessions: [givenNewSessionId],
@@ -1201,7 +1201,9 @@ describe("Chat", () => {
       });
 
       // THEN expect the send message method to be called with the user's message
-      expect(ChatService.getInstance().sendMessage).toHaveBeenCalledWith(givenActiveSessionId, givenMessage);
+      await waitFor(() => {
+        expect(ChatService.getInstance().sendMessage).toHaveBeenCalledWith(givenActiveSessionId, givenMessage);
+      });
       // AND expect the user's message and a typing indicator to be shown in the chat
       await waitFor(() => {
         assertMessagesAreShown(
@@ -1428,7 +1430,9 @@ describe("Chat", () => {
       });
 
       // THEN expect the send message method to be called with the user's message
-      expect(ChatService.getInstance().sendMessage).toHaveBeenCalledWith(givenActiveSessionId, givenMessage);
+      await waitFor(() => {
+        expect(ChatService.getInstance().sendMessage).toHaveBeenCalledWith(givenActiveSessionId, givenMessage);
+      });
       // AND expect the user's message and a typing indicator to be shown in the chat
       await waitFor(() => {
         assertMessagesAreShown(
@@ -1628,8 +1632,14 @@ describe("Chat", () => {
       });
 
       // THEN expect the send message method to be called
-      expect(ChatService.getInstance().sendMessage).toHaveBeenCalledTimes(1);
-      expect(ChatService.getInstance().sendMessage).toHaveBeenLastCalledWith(givenActiveSessionId, givenMessage);
+      await waitFor(() => {
+        expect(ChatService.getInstance().sendMessage).toHaveBeenCalledTimes(1);
+      });
+
+      await waitFor(() => {
+        expect(ChatService.getInstance().sendMessage).toHaveBeenLastCalledWith(givenActiveSessionId, givenMessage);
+      });
+
       // AND expect an error to have been logged
       await waitFor(() => {
         expect(console.error).toHaveBeenCalledWith(new ChatError("Failed to send message:", givenError));
@@ -1840,7 +1850,7 @@ describe("Chat", () => {
         user_id: givenUser.id,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
-        language: Language.en,
+        language: Locale.EN_GB,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
         sessions: [givenNewSessionId, givenActiveSessionId],
         user_feedback_answered_questions: {},

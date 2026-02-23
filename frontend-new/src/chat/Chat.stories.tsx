@@ -11,10 +11,10 @@ import ExperienceService from "src/experiences/experienceService/experienceServi
 import { SkillsRankingService } from "src/features/skillsRanking/skillsRankingService/skillsRankingService";
 import cvService from "src/CV/CVService/CVService";
 import {
-  Language,
   SensitivePersonalDataRequirement,
   UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import { ConversationPhase } from "src/chat/chatProgressbar/types";
 import { ConversationMessageSender, ConversationResponse } from "./ChatService/ChatService.types";
 import { nanoid } from "nanoid";
@@ -36,7 +36,7 @@ const meta: Meta<typeof Chat> = {
         status: 201,
         response: {
           user_id: nanoid(),
-          language: Language.en,
+          language: Locale.EN_GB,
           sessions: [1],
           user_feedback_answered_questions: {},
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
@@ -124,7 +124,7 @@ const meta: Meta<typeof Chat> = {
       const mockUserPreferencesStateService = UserPreferencesStateService.getInstance();
       const defaultUserPreferences: UserPreference = {
         user_id: "1",
-        language: Language.en,
+        language: Locale.EN_GB,
         sessions: [123],
         user_feedback_answered_questions: {},
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
@@ -146,7 +146,7 @@ const meta: Meta<typeof Chat> = {
       // @ts-ignore
       mockUserPreferencesService.getNewSession = async (userId: string) => ({
         user_id: userId,
-        language: Language.en,
+        language: Locale.EN_GB,
         sessions: [123],
         user_feedback_answered_questions: {},
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
