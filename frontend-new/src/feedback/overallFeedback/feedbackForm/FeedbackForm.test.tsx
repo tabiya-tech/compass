@@ -8,10 +8,8 @@ import { act, fireEvent, waitFor } from "@testing-library/react";
 import FeedbackFormContent from "src/feedback/overallFeedback/feedbackForm/components/feedbackFormContent/FeedbackFormContent";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import {
-  SensitivePersonalDataRequirement,
-  Language,
-} from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import OverallFeedbackService from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service";
 import { FeedbackError } from "src/error/commonErrors";
 import { FeedbackResponse } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
@@ -159,7 +157,7 @@ describe("FeedbackForm", () => {
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         accepted_tc: new Date(),
         user_id: "0001",
-        language: Language.en,
+        language: Locale.EN_GB,
         sessions: [],
         user_feedback_answered_questions: {},
         has_sensitive_personal_data: false,

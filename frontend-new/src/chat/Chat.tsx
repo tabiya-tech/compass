@@ -21,6 +21,7 @@ import ChatMessageField from "./ChatMessageField/ChatMessageField";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
+import LocaleSyncService from "src/i18n/LocaleSyncService";
 import { ConversationMessage, ConversationMessageSender } from "./ChatService/ChatService.types";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import ExperiencesDrawer from "src/experiences/experiencesDrawer/ExperiencesDrawer";
@@ -570,6 +571,11 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         const message = generateUserMessage(userMessage, new Date().toISOString());
         addMessageToChat(message);
       }
+
+      // Ensure the locale is synced before sending a message
+      // If there is a pending update of the locale, wait for that first.
+      // This is that we have real-time like when they change language and how it is applied at the backend.
+      await LocaleSyncService.getInstance().waitForPendingSync();
 
       try {
         // Send the user's message

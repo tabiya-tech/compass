@@ -8,10 +8,8 @@ import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/
 import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import {
-  SensitivePersonalDataRequirement,
-  Language,
-} from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import { TabiyaUser } from "src/auth/auth.types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import * as EnvServiceModule from "src/envService";
@@ -111,7 +109,7 @@ describe("SocialAuth tests", () => {
       // AND the user preferences exist for the user
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: givenUser.id,
-        language: Language.en,
+        language: Locale.EN_GB,
         sessions: [1],
         user_feedback_answered_questions: {},
         accepted_tc: tc,
@@ -617,7 +615,7 @@ describe("SocialAuth tests", () => {
       const createUserPreferencesSpy = jest.spyOn(UserPreferencesService.getInstance(), "createUserPreferences");
       const mockPreferences = {
         user_id: givenUser.id,
-        language: Language.en,
+        language: Locale.EN_GB,
         invitation_code: "valid-code",
         sessions: [],
         user_feedback_answered_questions: {},
@@ -660,7 +658,7 @@ describe("SocialAuth tests", () => {
         expect(createUserPreferencesSpy).toHaveBeenCalledWith({
           user_id: givenUser.id,
           invitation_code: "valid-code",
-          language: Language.en,
+          language: Locale.EN_GB,
         });
       });
 
@@ -697,7 +695,7 @@ describe("SocialAuth tests", () => {
         require("src/userPreferences/UserPreferencesService/userPreferences.service").default;
       const mockPreferences = {
         user_id: givenUser.id,
-        language: Language.en,
+        language: Locale.EN_GB,
         invitation_code: "modal-code",
         sessions: [],
         user_feedback_answered_questions: {},

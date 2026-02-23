@@ -9,15 +9,16 @@ import * as AuthenticationFactoryModule from "src/auth/services/Authentication.s
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
 import { PersistentStorageService } from "./PersistentStorageService/PersistentStorageService";
 import {
-  Language,
   SensitivePersonalDataRequirement,
   UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import { DATA_TEST_ID as BACKDROP_DATA_TEST_ID } from "src/theme/Backdrop/Backdrop";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { routerPaths } from "src/app/routerPaths";
 import { AuthBroadcastChannel, AuthChannelMessage } from "src/auth/services/authBroadcastChannel/authBroadcastChannel";
+import LocaleSyncService from "src/i18n/LocaleSyncService";
 
 // mock the snackbar
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
@@ -93,6 +94,7 @@ describe("index", () => {
     // As a good practice, we should the mock*Once() methods to avoid side effects between tests
     // As a precaution, we reset all method mocks to ensure that no side effects are carried over between tests
     resetAllMethodMocks(UserPreferencesService.getInstance());
+    resetAllMethodMocks(LocaleSyncService.getInstance());
 
     unmockBrowserIsOnLine();
     // Mock the authenticationServiceFactory to return a mock instance of the authentication service
@@ -221,7 +223,7 @@ describe("index", () => {
 
       const mockPreferences = {
         user_id: "foo",
-        language: Language.en,
+        language: Locale.EN_GB,
         sessions: [123],
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
@@ -257,7 +259,7 @@ describe("index", () => {
 
       const mockPreferences = {
         user_id: "foo",
-        language: Language.en,
+        language: Locale.EN_GB,
         sessions: [123],
         user_feedback_answered_questions: {},
         accepted_tc: new Date(),
@@ -290,6 +292,44 @@ describe("index", () => {
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should apply backend locale on refresh", async () => {
+      // GIVEN a user with preferences containing a specific locale
+      jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValue("valid-token");
+
+      const applyBackendLocaleFn = jest
+        .spyOn(LocaleSyncService.getInstance(), "applyBackendLocale")
+        .mockResolvedValue();
+
+      const mockPreferences = {
+        user_id: "foo",
+        language: Locale.EN_US,
+        sessions: [123],
+        accepted_tc: new Date(),
+        has_sensitive_personal_data: false,
+        getActiveSessionId: jest.fn().mockReturnValue(123),
+        user_feedback_answered_questions: {},
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        experiments: {},
+      };
+
+      jest.spyOn(UserPreferencesService.getInstance(), "getUserPreferences").mockResolvedValue(mockPreferences);
+
+      // WHEN the app is rendered
+      render(<App />);
+
+      // THEN wait for the app to finish loading
+      await waitFor(() => {
+        expect(screen.queryByTestId(BACKDROP_DATA_TEST_ID.BACKDROP_CONTAINER)).not.toBeInTheDocument();
+      });
+
+      // AND expect no errors or warnings
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+
+      // AND expect the backend locale to be applied to the frontend
+      expect(applyBackendLocaleFn).toHaveBeenCalledWith(mockPreferences.language);
     });
   });
 

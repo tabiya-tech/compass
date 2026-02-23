@@ -1,9 +1,9 @@
 import {
   SensitivePersonalDataRequirement,
   UserPreference,
-  Language,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+import { Locale, SupportedLocales, FALL_BACK_LOCALE } from "src/i18n/constants";
 
 export default class UserPreferencesStateService {
   private static instance: UserPreferencesStateService;
@@ -103,9 +103,18 @@ export default class UserPreferencesStateService {
       if (key === "sensitive_personal_data_requirement") {
         return SensitivePersonalDataRequirement[value as keyof typeof SensitivePersonalDataRequirement];
       }
+
       if (key === "language") {
-        return Language[value as keyof typeof Language];
+        // Validate that the locale is supported, fall back to default if not
+        const locale = value as Locale;
+        if (SupportedLocales.includes(locale)) {
+          return locale;
+        }
+
+        console.warn(`Unsupported locale "${value}" received from backend, falling back to ${FALL_BACK_LOCALE}`);
+        return FALL_BACK_LOCALE;
       }
+
       return value;
     });
   }

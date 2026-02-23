@@ -1,8 +1,6 @@
 import { isAcceptedTCValid, isSensitiveDataValid } from "src/app/ProtectedRoute/util";
-import {
-  Language,
-  SensitivePersonalDataRequirement,
-} from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 
 describe("protected route util", () => {
   describe("isSensitiveDataValid", () => {
@@ -10,7 +8,7 @@ describe("protected route util", () => {
       // GIVEN a user required to provide sensitive personal data but does not have it
       const userPreferences = {
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
@@ -30,7 +28,7 @@ describe("protected route util", () => {
       // GIVEN a user required to provide sensitive personal data and has it
       const userPreferences = {
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: true,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
@@ -50,7 +48,7 @@ describe("protected route util", () => {
       // GIVEN a user not required to provide sensitive personal data
       const userPreferences = {
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
@@ -72,7 +70,7 @@ describe("protected route util", () => {
       // GIVEN a user without accepted_tc
       const userPreferences = {
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: undefined,
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
@@ -92,7 +90,7 @@ describe("protected route util", () => {
       // GIVEN a user with an invalid accepted_tc
       const userPreferences = {
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: "invalid date",
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
@@ -112,7 +110,7 @@ describe("protected route util", () => {
       // GIVEN a user with a valid accepted_tc
       const userPreferences = {
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,

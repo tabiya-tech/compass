@@ -3,7 +3,7 @@ import AuthenticationService, { CLOCK_TOLERANCE, TokenValidationFailureCause } f
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
-import { Language, UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { UserPreference } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { TabiyaUser, Token, TokenHeader } from "src/auth/auth.types";
 import AuthenticationStateService from "./AuthenticationState.service";
 
@@ -12,6 +12,17 @@ import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { nanoid } from "nanoid";
+import { Locale } from "src/i18n/constants";
+
+// Mock LocaleSyncService to prevent actual backend calls
+jest.mock("src/i18n/LocaleSyncService", () => ({
+  __esModule: true,
+  default: {
+    getInstance: jest.fn().mockReturnValue({
+      syncOnLogin: jest.fn().mockResolvedValue(undefined),
+    }),
+  },
+}));
 
 // Mock jwt-decode
 jest.mock("jwt-decode", () => ({
@@ -123,6 +134,7 @@ describe("AuthenticationService", () => {
       const givenUserPreferences: UserPreference = {
         user_id: "foo-id",
         sessions: [],
+        language: Locale.EN_GB,
       } as unknown as UserPreference;
       jest
         .spyOn(UserPreferencesService.getInstance(), "getUserPreferences")
@@ -236,6 +248,7 @@ describe("AuthenticationService", () => {
       const givenReturnedPrefs: UserPreference = {
         user_id: "foo-id",
         sessions: [],
+        language: Locale.EN_GB,
       } as unknown as UserPreference;
       jest
         .spyOn(UserPreferencesService.getInstance(), "createUserPreferences")
@@ -254,7 +267,7 @@ describe("AuthenticationService", () => {
       expect(UserPreferencesService.getInstance().createUserPreferences).toHaveBeenCalledWith({
         user_id: givenUser.id,
         invitation_code: givenRegistrationCode,
-        language: Language.en,
+        language: Locale.EN_GB,
       });
 
       // AND the preferences return from the service should be set in the state
@@ -294,6 +307,7 @@ describe("AuthenticationService", () => {
       const givenReturnedPrefs: UserPreference = {
         user_id: "foo-id",
         sessions: [],
+        language: Locale.EN_GB,
       } as unknown as UserPreference;
       jest
         .spyOn(UserPreferencesService.getInstance(), "createUserPreferences")
@@ -312,7 +326,7 @@ describe("AuthenticationService", () => {
       expect(UserPreferencesService.getInstance().createUserPreferences).toHaveBeenCalledWith({
         user_id: givenUser.id,
         invitation_code: undefined,
-        language: Language.en,
+        language: Locale.EN_GB,
       });
 
       // AND the preferences returned from the service should be set in the state
@@ -359,7 +373,7 @@ describe("AuthenticationService", () => {
       expect(UserPreferencesService.getInstance().createUserPreferences).toHaveBeenCalledWith({
         user_id: givenUser.id,
         invitation_code: givenRegistrationCode,
-        language: Language.en,
+        language: Locale.EN_GB,
       });
 
       // AND the preferences returned from the service should be set in the state

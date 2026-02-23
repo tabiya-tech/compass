@@ -11,6 +11,16 @@ import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenti
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { AuthChannelMessage } from "src/auth/services/authBroadcastChannel/authBroadcastChannel";
 
+// Mock LocaleSyncService to prevent actual backend calls
+jest.mock("src/i18n/LocaleSyncService", () => ({
+  __esModule: true,
+  default: {
+    getInstance: jest.fn().mockReturnValue({
+      syncOnLogin: jest.fn().mockResolvedValue(undefined),
+    }),
+  },
+}));
+
 jest.mock("firebase/compat/app", () => {
   const mockAuth = {
     initializeApp: jest.fn(),

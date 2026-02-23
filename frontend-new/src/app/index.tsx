@@ -19,6 +19,7 @@ import UserPreferencesService from "src/userPreferences/UserPreferencesService/u
 import { AuthenticationError } from "src/error/commonErrors";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { StatusCodes } from "http-status-codes";
+import LocaleSyncService from "src/i18n/LocaleSyncService";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
 import { TokenValidationFailureCause } from "src/auth/services/Authentication.service";
 import { AuthBroadcastChannel, AuthChannelMessage } from "src/auth/services/authBroadcastChannel/authBroadcastChannel";
@@ -148,6 +149,10 @@ const App = () => {
       }
 
       UserPreferencesStateService.getInstance().setUserPreferences(preferences);
+
+      // On page refresh, apply backend locale to frontend i18n
+      // This ensures the UI language matches the user's stored preference
+      await LocaleSyncService.getInstance().applyBackendLocale(preferences.language);
     } catch (error) {
       console.error(new AuthenticationError("Error initializing authentication and user preferences state", error));
       await AuthenticationServiceFactory.resetAuthenticationState();

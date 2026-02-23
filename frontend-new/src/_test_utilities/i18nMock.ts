@@ -116,8 +116,12 @@ jest.mock("react-i18next", () => {
 
 // Mock the initialized instance module so app code can import it without side effects
 jest.mock("src/i18n/i18n", () => {
+  const { Locale } = require("src/i18n/constants");
+
   const mock = {
+    language: Locale.EN_GB,
     t: stableT,
+    changeLanguage: jest.fn(),
     use: jest.fn().mockReturnThis(),
     init: jest.fn().mockReturnThis(),
   };

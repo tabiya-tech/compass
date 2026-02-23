@@ -733,6 +733,12 @@
   "i18n": {
     "languageContextMenu": {
       "selector": "Language Selector"
+    },
+    "sync": {
+      "errors": {
+        "syncFailedWarning": "Language changed to {{locale}}, but we couldn't save your preference. It will revert on next login.",
+        "changeFailed": "Failed to change language. Please try again."
+      }
     }
   },
   "_deprecated": {

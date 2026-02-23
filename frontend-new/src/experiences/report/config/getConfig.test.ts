@@ -1,13 +1,10 @@
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
 
 import * as envService from "src/envService";
 import { defaultSkillsReportOutputConfig } from "./default";
 import { DownloadFormat } from "./types";
 import { getSkillsReportOutputConfig } from "./getConfig";
-
-jest.mock("src/envService", () => ({
-  getSkillsReportOutputConfigEnvVar: jest.fn(),
-}));
 
 const defaultValue = defaultSkillsReportOutputConfig;
 

@@ -9,10 +9,10 @@ import { routerPaths } from "src/app/routerPaths";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 
 import {
-  Language,
   SensitivePersonalDataRequirement,
   UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 
 // mock the FirebaseSocialAuthentication service
 jest.mock("src/auth/services/FirebaseAuthenticationService/socialAuth/FirebaseSocialAuthentication.service", () => {
@@ -74,7 +74,7 @@ const getUserPreferences = (
 ) => {
   const givenPreferences: UserPreference = {
     user_id: "user1",
-    language: Language.en,
+    language: Locale.EN_GB,
     accepted_tc: acceptedTC,
     has_sensitive_personal_data: hasSensitiveData,
     sensitive_personal_data_requirement: sensitiveDataRequirement,

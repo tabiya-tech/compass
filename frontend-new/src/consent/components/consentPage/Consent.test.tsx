@@ -16,9 +16,9 @@ import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { routerPaths } from "src/app/routerPaths";
 import {
   SensitivePersonalDataRequirement,
-  Language,
   UserPreference,
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { DATA_TEST_ID as BACKDROP_TEST_ID } from "src/theme/Backdrop/Backdrop";
 import { AuthenticationError } from "src/error/commonErrors";
@@ -151,7 +151,7 @@ describe("Testing Consent Page", () => {
           // GIVEN the user preferences state service is mocked to set the user preferences
           const givenUserPreferences: UserPreference = {
             user_id: "foo-id",
-            language: Language.en,
+            language: Locale.EN_GB,
             accepted_tc: new Date(),
             sessions: [],
             user_feedback_answered_questions: {},
@@ -478,7 +478,7 @@ describe("Testing Consent Page", () => {
         // GIVEN the user preferences state service is mocked to set the user preferences
         jest.spyOn(UserPreferencesService.getInstance(), "updateUserPreferences").mockResolvedValue({
           user_id: "given user id",
-          language: Language.en,
+          language: Locale.EN_GB,
           accepted_tc: new Date(),
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_AVAILABLE,
@@ -527,7 +527,7 @@ describe("Testing Consent Page", () => {
         // GIVEN the user preferences state service is mocked to set the user preferences.
         jest.spyOn(UserPreferencesService.getInstance(), "updateUserPreferences").mockResolvedValue({
           user_id: "given user id",
-          language: Language.en,
+          language: Locale.EN_GB,
           accepted_tc: new Date(),
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
@@ -546,7 +546,7 @@ describe("Testing Consent Page", () => {
         // AND the user requires sensitive personal data.
         jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
           user_id: "given user id",
-          language: Language.en,
+          language: Locale.EN_GB,
           accepted_tc: new Date(),
           has_sensitive_personal_data: false,
           sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,

@@ -9,10 +9,8 @@ import {
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import {
-  SensitivePersonalDataRequirement,
-  Language,
-} from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { getBackendUrl } from "src/envService";
 import { FeedbackStatus } from "src/feedback/overallFeedback/feedbackForm/FeedbackForm";
@@ -75,7 +73,7 @@ const StorybookWrapper = ({
   UserPreferencesStateService.getInstance().setUserPreferences({
     sessions: [1],
     user_id: "test-user",
-    language: Language.en,
+    language: Locale.EN_GB,
     user_feedback_answered_questions: {
       1: answeredQuestions,
     },

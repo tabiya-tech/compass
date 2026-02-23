@@ -16,10 +16,8 @@ import * as RestAPIErrorModule from "src/error/restAPIError/RestAPIError";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
-import {
-  Language,
-  SensitivePersonalDataRequirement,
-} from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { SensitivePersonalDataRequirement } from "src/userPreferences/UserPreferencesService/userPreferences.types";
+import { Locale } from "src/i18n/constants";
 import { sensitivePersonalDataService } from "src/sensitiveData/services/sensitivePersonalDataService/sensitivePersonalData.service";
 import { EncryptedDataTooLarge } from "src/sensitiveData/services/sensitivePersonalDataService/errors";
 import { FieldDefinition, FieldType } from "./config/types";
@@ -153,7 +151,7 @@ const givenUserId = getTestString(10);
 
 const SAMPLE_USER_PREFERENCES = {
   user_id: givenUserId,
-  language: Language.en,
+  language: Locale.EN_GB,
   accepted_tc: new Date(),
   sessions: [],
   user_feedback_answered_questions: {},
@@ -206,7 +204,7 @@ describe("Sensitive Data Form", () => {
       // AND the user preferences state service is mocked to return user preferences with PII required
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
@@ -259,7 +257,7 @@ describe("Sensitive Data Form", () => {
       // AND the user preferences state service is mocked to return user preferences with PII required
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
@@ -312,7 +310,7 @@ describe("Sensitive Data Form", () => {
       // AND the user preferences state service is mocked to return user preferences with PII required
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
@@ -365,7 +363,7 @@ describe("Sensitive Data Form", () => {
       // AND the user preferences state service is mocked to return user preferences with PII required
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
@@ -419,7 +417,7 @@ describe("Sensitive Data Form", () => {
       // AND the user preferences state service is mocked to return user preferences with PII required
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
@@ -472,7 +470,7 @@ describe("Sensitive Data Form", () => {
       // AND the user preferences state service is mocked to return user preferences with PII required
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
@@ -508,7 +506,7 @@ describe("Sensitive Data Form", () => {
       // AND the user preferences state service is mocked to return user preferences with PII required
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
@@ -542,7 +540,7 @@ describe("Sensitive Data Form", () => {
       // AND the user preferences state service is mocked to return user preferences with PII required
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
@@ -811,7 +809,7 @@ describe("Sensitive Data Form", () => {
       // AND user preferences are set to show reject button
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: givenUserId,
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
@@ -931,7 +929,7 @@ describe("Sensitive Data Form", () => {
       // GIVEN the user preferences state service is mocked to return user preferences with PII required
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.REQUIRED,
@@ -977,7 +975,7 @@ describe("Sensitive Data Form", () => {
       // GIVEN the user preferences state service is mocked to return user preferences with PII not required
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
@@ -1008,7 +1006,7 @@ describe("Sensitive Data Form", () => {
       // AND the user preferences should be updated
       expect(UserPreferencesStateService.getInstance().setUserPreferences).toHaveBeenCalledWith({
         user_id: "given user id",
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: expect.any(Date),
         experiments: {},
         has_sensitive_personal_data: true,
@@ -1031,7 +1029,7 @@ describe("Sensitive Data Form", () => {
       // GIVEN sensitive personal data is not required
       const givenUserPreferences = {
         user_id: givenUserId,
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
@@ -1069,7 +1067,7 @@ describe("Sensitive Data Form", () => {
       // AND the sensitive personal data is not required
       const givenUserPreferences = {
         user_id: givenUserId,
-        language: Language.en,
+        language: Locale.EN_GB,
         accepted_tc: new Date(),
         has_sensitive_personal_data: false,
         sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
