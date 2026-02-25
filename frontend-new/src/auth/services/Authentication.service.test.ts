@@ -374,27 +374,55 @@ describe("AuthenticationService", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
-    test.each([
-      ["expired token", { iat: currentTime - CLOCK_TOLERANCE - 100, exp: currentTime - CLOCK_TOLERANCE - 1 }, "TOKEN_EXPIRED"],
-      ["future token", { iat: currentTime + CLOCK_TOLERANCE + 1, exp: currentTime + CLOCK_TOLERANCE + 100 }, "TOKEN_NOT_YET_VALID"],
-    ])("should return false for %s", (_, payload, expectedFailureCause) => {
-      // GIVEN a token with invalid timing
-      const givenToken = "invalid-token";
+    test("should return false for expired token", () => {
+      // GIVEN an expired token
+      const givenToken = "expired-token";
       (jwtDecode as jest.Mock)
         .mockReturnValueOnce({
           typ: "JWT",
           alg: "RS256",
           kid: "key-id",
         } as TokenHeader)
-        .mockReturnValueOnce(payload as Token);
+        .mockReturnValueOnce({
+          iat: currentTime - CLOCK_TOLERANCE - 100,
+          exp: currentTime - CLOCK_TOLERANCE - 1,
+        } as Token);
 
       // WHEN isTokenValid is called
       const result = service.isTokenValid(givenToken);
 
-      // THEN it should return false
+      // THEN it should return false with TOKEN_EXPIRED
       expect(result.isValid).toBe(false);
       expect(result.decodedToken).toBeNull();
-      expect(result.failureCause).toBe(expectedFailureCause);
+      expect(result.failureCause).toBe(TokenValidationFailureCause.TOKEN_EXPIRED);
+
+      // AND expect no errors or warning to have occurred
+      expect(console.error).not.toHaveBeenCalled();
+      expect(console.warn).not.toHaveBeenCalled();
+    });
+
+    test("should return true when iat is in the future due to client clock skew", () => {
+      // GIVEN a token where the server clock is ahead of the client (iat appears to be in the future)
+      // but the token has not yet expired
+      const givenToken = "clock-skewed-token";
+      (jwtDecode as jest.Mock)
+        .mockReturnValueOnce({
+          typ: "JWT",
+          alg: "RS256",
+          kid: "key-id",
+        } as TokenHeader)
+        .mockReturnValueOnce({
+          iat: currentTime + CLOCK_TOLERANCE + 1,
+          exp: currentTime + CLOCK_TOLERANCE + 100,
+        } as Token);
+
+      // WHEN isTokenValid is called
+      const result = service.isTokenValid(givenToken);
+
+      // THEN it should return true — iat is not checked client-side
+      expect(result.isValid).toBe(true);
+      expect(result.decodedToken).toBeDefined();
+      expect(result.failureCause).toBeUndefined();
 
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
