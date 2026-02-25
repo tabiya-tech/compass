@@ -119,7 +119,6 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isLoggingOut, setIsLoggingOut] = React.useState<boolean>(false);
   const [showBackdrop, setShowBackdrop] = useState(showInactiveSessionAlert);
-  const [lastActivityTime, setLastActivityTime] = React.useState<number>(Date.now());
   const [newConversationDialog, setNewConversationDialog] = React.useState<boolean>(false);
   const [showRefreshConfirmDialog, setShowRefreshConfirmDialog] = React.useState<boolean>(false);
   const [exploredExperiencesNotification, setExploredExperiencesNotification] = useState<boolean>(false);
@@ -136,6 +135,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     Map<string, { messageId: string; intervalId: NodeJS.Timeout; timeoutId: NodeJS.Timeout }>
   >(new Map());
 
+  const lastActivityRef = useRef(Date.now());
   const navigate = useNavigate();
 
   const initializingRef = useRef(false);
@@ -808,7 +808,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     if (disableInactivityCheck || conversationCompleted) return;
 
     const checkInactivity = () => {
-      if (Date.now() - lastActivityTime > INACTIVITY_TIMEOUT) {
+      if (Date.now() - lastActivityRef.current > INACTIVITY_TIMEOUT) {
         setShowBackdrop(true);
       }
     };
@@ -816,22 +816,24 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     const interval = setInterval(checkInactivity, CHECK_INACTIVITY_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [lastActivityTime, disableInactivityCheck, conversationCompleted]);
+  }, [disableInactivityCheck, conversationCompleted]);
 
-  // Close backdrop when user interacts with the page
+  // Close the backdrop when the user interacts with the page
   useEffect(() => {
     if (disableInactivityCheck) return;
 
     // Reset the timer when the user interacts with the page
     const resetTimer = () => {
-      setLastActivityTime(Date.now());
-      setShowBackdrop(false);
+      lastActivityRef.current = Date.now();
+      setShowBackdrop((prev) => (prev ? false : prev));
     };
 
     const events = ["mousedown", "keydown"];
-    events.forEach((event) => document.addEventListener(event, resetTimer));
+    events.forEach((event) => document.addEventListener(event, resetTimer, { passive: true }));
 
-    return () => events.forEach((event) => document.removeEventListener(event, resetTimer));
+    return () => {
+      events.forEach((e) => document.removeEventListener(e, resetTimer));
+    };
   }, [disableInactivityCheck]);
 
   // Preload the "Download Report" button when experiences are explored.
