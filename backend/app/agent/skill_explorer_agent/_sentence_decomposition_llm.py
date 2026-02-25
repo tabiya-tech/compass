@@ -196,7 +196,7 @@ class _SentenceDecompositionLLM:
         </System Instructions>
         """)
 
-        language_name = get_i18n_manager().get_locale().label()
+        language_name = get_i18n_manager().get_reporting_locale().label()
         return replace_placeholders_with_indent(system_instructions_template,
                                                 language_name=language_name)
 
@@ -251,7 +251,7 @@ class _SentenceDecompositionLLM:
         </System Instructions>
         """)
 
-        language_name = get_i18n_manager().get_locale().label()
+        language_name = get_i18n_manager().get_reporting_locale().label()
         return replace_placeholders_with_indent(system_instructions_template,
                                                 language_name=language_name)
 

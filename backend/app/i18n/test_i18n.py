@@ -48,15 +48,19 @@ def test_custom_provider_locale_setting():
     # GIVEN a fresh manager.
     manager = get_i18n_manager()
 
-    # AND a locale is set.
+    # AND locales are set.
     given_locale = Locale.EN_US
-    manager.set_locale(given_locale)
+    manager.set_locales(given_locale, given_locale)
 
-    # WHEN getting the acual locale
-    actual_locale = get_i18n_manager().get_locale()
+    # WHEN getting the conversation locale
+    actual_conversation_locale = get_i18n_manager().get_conversation_locale()
+    
+    # AND getting the reporting locale
+    actual_reporting_locale = get_i18n_manager().get_reporting_locale()
 
-    # THEN it should be the same as the one set.
-    assert actual_locale == given_locale
+    # THEN both should be the same as the one set.
+    assert actual_conversation_locale == given_locale
+    assert actual_reporting_locale == given_locale
 
 
 @pytest.mark.parametrize("given_locale", SUPPORTED_LOCALES)
@@ -97,8 +101,8 @@ def test_translation_service_nested_key(given_locale):
     Ensures that the global t() function can resolve nested keys.
     """
     manager = get_i18n_manager()
-    # Reset to en-US for consistency or use a specific locale
-    manager.set_locale(given_locale)
+    # Set both conversation and reporting locales to the given locale
+    manager.set_locales(given_locale, given_locale)
 
     # "experience.noTitleProvidedYet" should resolve to "No title provided yet" in en-US
     val = t("messages", "experience.noTitleProvidedYet")

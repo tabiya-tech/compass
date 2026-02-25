@@ -62,7 +62,7 @@ test_cases = [
 async def test_skill_linking_tool(test_case: SkillLinkingToolTestCase, setup_search_services: Awaitable[SearchServices], caplog):
     search_services = await setup_search_services
     # Given the occupation with it's associated skills
-    get_i18n_manager().set_locale(test_case.locale)
+    get_i18n_manager().set_locales(test_case.locale, test_case.locale)
     given_job_titles: list[str] = []
     given_occupations_with_skills: list[OccupationSkillEntity] = []
     if test_case.given_occupation_code:

@@ -88,7 +88,7 @@ class ExperienceSummarizer:
             """)
         return replace_placeholders_with_indent(
             _summarize_system_instructions,
-            language_style=get_language_style(),
+            language_style=get_language_style(prompt_intent="application_state"),
             country_instructions=_country_instructions
         )
 

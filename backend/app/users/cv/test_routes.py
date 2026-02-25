@@ -78,7 +78,7 @@ def client_with_mocks() -> TestClientWithMocks:
 
 class TestUploadCV:
     @pytest.mark.asyncio
-    @pytest.mark.parametrize("mime", tuple(ALLOWED_MIME_TYPES))
+    @pytest.mark.parametrize("mime", sorted(tuple(ALLOWED_MIME_TYPES)))
     async def test_success_allowed_mime_type(self, client_with_mocks: TestClientWithMocks, mime: str):
         client, _, mocked_user = client_with_mocks
         # GIVEN a valid file with an allowed MIME type and allowed extension
@@ -97,7 +97,7 @@ class TestUploadCV:
         assert response.json() == expected_response
 
     @pytest.mark.asyncio
-    @pytest.mark.parametrize("ext", tuple(ALLOWED_EXTENSIONS))
+    @pytest.mark.parametrize("ext", sorted(tuple(ALLOWED_EXTENSIONS)))
     async def test_success_allowed_extension(self, client_with_mocks: TestClientWithMocks, ext: str):
         client, _, mocked_user = client_with_mocks
         # GIVEN a valid file with an allowed extension and allowed MIME type

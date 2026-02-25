@@ -34,7 +34,7 @@ async def test_skills_explorer_agent_simulated_user(max_iterations: int, test_ca
     print(f"Running test case {test_case.name}")
 
     session_id = get_random_session_id()
-    get_i18n_manager().set_locale(test_case.locale)
+    get_i18n_manager().set_locales(test_case.locale, test_case.locale)
     output_folder = os.path.join(os.getcwd(), 'test_output/skills_explorer_agent/simulated_user/', test_case.name)
 
     # The conversation manager for this test

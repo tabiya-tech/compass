@@ -53,7 +53,7 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
     async def agent_director_exec(caplog: LogCaptureFixture, test_case: ScriptedUserEvaluationTestCase):
         print(f"Running test case {test_case.name}")
 
-        get_i18n_manager().set_locale(test_case.locale)
+        get_i18n_manager().set_locales(test_case.locale, test_case.locale)
         output_folder = os.path.join(os.getcwd(), 'test_output/llm_agent_director/scripted', test_case.name)
         execute_evaluated_agent = AgentDirectorExecutor(agent_director=agent_director)
 

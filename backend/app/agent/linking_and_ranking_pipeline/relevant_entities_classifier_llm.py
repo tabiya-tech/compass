@@ -370,7 +370,7 @@ class RelevantEntitiesClassifierLLM(Generic[T]):
 
         return replace_placeholders_with_indent(system_prompt_template,
                                                 entity_type_singular=entity_type_singular,
-                                                language_style=get_language_style(),
+                                                language_style=get_language_style(prompt_intent="application_state"),
                                                 entity_types_plural=entity_types_plural,
                                                 entity_types_plural_capitalized=entity_types_plural_capitalized)
 

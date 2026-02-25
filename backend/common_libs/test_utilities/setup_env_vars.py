@@ -73,13 +73,14 @@ This module ensures:
 - Can be used to set up environment variables for tests or other code
 - Can be used as a context manager to ensure teardown is always called
 """
-
+import json
 import os
 from contextlib import contextmanager
 
 from bson import ObjectId
 
 from app.countries import Country
+from app.i18n.types import Locale
 
 # local variable to store the original environment variables
 _original_env_vars = {}
@@ -98,6 +99,18 @@ def setup_env_vars(*, env_vars: dict[str, str] = None):
     if env_vars is None:
         env_vars = {}
     # setup the environment variables
+
+    language_config = json.dumps({
+        "reporting_locale": Locale.EN_US.value,
+        "conversation_fallback_locale": Locale.EN_US.value,
+        "available_locales": [
+            {
+                "locale": Locale.EN_US.value,
+                "date_format": "MM/DD/YYYY"
+            }
+        ]
+    })
+
     defaults = {
         'TAXONOMY_MONGODB_URI': "foo",
         'TAXONOMY_DATABASE_NAME': "foo",
@@ -124,7 +137,7 @@ def setup_env_vars(*, env_vars: dict[str, str] = None):
         'BACKEND_CV_STORAGE_BUCKET': "foo",
         'BACKEND_CV_MAX_UPLOADS_PER_USER': "5",
         'BACKEND_CV_RATE_LIMIT_PER_MINUTE': "10",
-        "BACKEND_LANGUAGE_CONFIG": '{"default_locale":"en-US","available_locales":[{"locale":"en-US","date_format":"MM/DD/YYYY"}]}',
+        "BACKEND_LANGUAGE_CONFIG": language_config,
         "GLOBAL_PRODUCT_NAME": "foo",
         'GLOBAL_DISABLE_REGISTRATION_CODE': 'false',
         # Add more environment variables as needed here

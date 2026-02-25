@@ -13,7 +13,10 @@ def get_i18n_manager() -> I18nManager:
 
 def t(domain: str, key: str, fallback_message: str = "", **kwargs) -> str:
     """
-    Retrieves a translated and formatted string.
+    Retrieves a translated and formatted string using the conversation locale.
+    
+    Uses the conversation locale by default since this is typically used for
+    user-facing messages.
 
     Args:
         domain: The translation domain (e.g., 'prompts', 'errors').
@@ -26,7 +29,7 @@ def t(domain: str, key: str, fallback_message: str = "", **kwargs) -> str:
     """
     i18n_manager = get_i18n_manager()
 
-    locale = i18n_manager.get_locale()
+    locale = i18n_manager.get_conversation_locale()
     raw_string = i18n_manager.get_translation(locale, domain, key, fallback_message=fallback_message)
 
     try:

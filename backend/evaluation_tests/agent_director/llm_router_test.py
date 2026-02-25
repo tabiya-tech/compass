@@ -195,7 +195,7 @@ test_cases_router = [
                          ids=[case.name for case in get_test_cases_to_run(test_cases_router)])
 async def test_router_extraction(test_case: RouterTestCase, caplog: pytest.LogCaptureFixture):
     logger = logging.getLogger()
-    get_i18n_manager().set_locale(test_case.locale)
+    get_i18n_manager().set_locales(test_case.locale, test_case.locale)
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
 

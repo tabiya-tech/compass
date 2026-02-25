@@ -3,16 +3,17 @@ This module contains the routes for the conversation module.
 """
 import logging
 from http import HTTPStatus
+from textwrap import dedent
 from typing import Annotated
 
-from fastapi import FastAPI, APIRouter, Request, Depends, HTTPException, Path
+from fastapi import FastAPI, APIRouter, Request, Response, Depends, HTTPException, Path
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.app_config import get_application_config
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
-from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var, user_language_ctx_var
+from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversations.constants import MAX_MESSAGE_LENGTH, UNEXPECTED_FAILURE_MESSAGE
 from app.conversations.experience.routes import add_experience_routes
@@ -31,7 +32,9 @@ from app.server_dependencies.application_state_dependencies import get_applicati
 from app.server_dependencies.conversation_manager_dependencies import get_conversation_memory_manager
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo
-from app.i18n.types import Locale
+from app.i18n.translation_service import get_i18n_manager
+from app.i18n.types import Locale, is_locale_supported
+from app.users.types import UserPreferences
 
 
 async def get_conversation_service(agent_director: LLMAgentDirector = Depends(get_agent_director),
@@ -49,6 +52,43 @@ async def get_conversation_service(agent_director: LLMAgentDirector = Depends(ge
                                    metrics_service=metrics_service),
                                conversation_memory_manager=conversation_memory_manager,
                                reaction_repository=ReactionRepository(db))
+
+
+logger = logging.getLogger(__name__)
+
+
+def set_user_conversation_language(user_preferences: UserPreferences) -> str:
+    """
+    Set the conversation and reporting locales based on the user preferences.
+
+    :return the language in which the conversation will be conducted.
+    """
+
+    # Set the conversation and reporting locales
+    app_config = get_application_config()
+
+    # Get reporting locale from configuration (always from config, never from user)
+    reporting_locale = app_config.language_config.reporting_locale
+
+    # Get conversation locale from user preferences, with fallback
+    try:
+        conversation_locale = Locale.from_locale_str(user_preferences.language)
+        if user_preferences.language is None or not is_locale_supported(conversation_locale):
+            logger.error(f"user preferences language {user_preferences.language} is not supported, using fallback")
+            conversation_locale = app_config.language_config.conversation_fallback_locale
+    except Exception as e:
+        logger.exception(e)
+        conversation_locale = app_config.language_config.conversation_fallback_locale
+
+    # Set both locales atomically in the context
+    logger.debug(dedent(f"""
+        Languages used to process the request:-
+            Reporting -> {reporting_locale.value}
+            Conversation -> {conversation_locale.value}"""))
+
+    get_i18n_manager().set_locales(conversation_locale, reporting_locale)
+
+    return conversation_locale.value
 
 
 def add_conversation_routes(app: FastAPI, authentication: Authentication):
@@ -72,7 +112,7 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
                                          HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse}},
                               # Internal server error, any server error
                               description="""The main conversation route used to interact with the agent.""")
-    async def _send_message(request: Request, body: ConversationInput, session_id: Annotated[
+    async def _send_message(request: Request, response: Response, body: ConversationInput, session_id: Annotated[
         int, Path(description="The session id for the conversation history.", examples=[123])],
                             clear_memory: bool = False, filter_pii: bool = False,
                             user_info: UserInfo = Depends(authentication.get_user_info()),
@@ -90,11 +130,6 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
         session_id_ctx_var.set(session_id)
         user_id_ctx_var.set(user_id)
 
-        # The user's language to send messages in.
-        # For now, it is using the backend default language from app_config.
-        app_config = get_application_config()
-        user_language_ctx_var.set(app_config.language_config.default_locale)
-
         # Do not allow user input that is too long,
         # as a basic measure to prevent abuse.
         if len(user_input) > MAX_MESSAGE_LENGTH:
@@ -108,6 +143,11 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
 
             # set the client_id in the context variable.
             client_id_ctx_var.set(current_user_preferences.client_id)
+
+            # Set up the language to have the conversation in.
+            # And set it into the headers for the Client, so that they know which language the response is in.
+            content_language = set_user_conversation_language(current_user_preferences)
+            response.headers["Content-Language"] = content_language
 
             return await service.send(user_id, session_id, user_input, clear_memory, filter_pii)
         except ConversationAlreadyConcludedError as e:

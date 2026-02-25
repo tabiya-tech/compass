@@ -14,7 +14,7 @@ from evaluation_tests.conversation_libs.fake_conversation_context import FakeCon
 
 
 async def _evaluate_with_llm(prompt: str) -> str:
-    llm = GeminiGenerativeLLM(config=LLMConfig(model_name="gemini-1.5-pro-preview-0409"))
+    llm = GeminiGenerativeLLM(config=LLMConfig())
     return (await llm.generate_content(prompt)).text
 
 
@@ -152,7 +152,8 @@ async def _execute_agent(context: FakeConversationContext, agent, agent_input):
 @pytest.mark.repeat(3)
 @pytest.mark.evaluation_test
 async def test_qna_agent_responds_to_multiple_questions_in_a_row(fake_conversation_context: FakeConversationContext,
-                                                                 common_folder_path: str):
+                                                                 common_folder_path: str,
+                                                                 evals_setup):
     """ Tests the QnA agent with multiple questions in a row. """
     app_name = _get_app_name()
     qna_agent = QnaAgent()

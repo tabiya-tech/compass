@@ -7,11 +7,11 @@ from typing import List, Optional
 from pydantic import BaseModel, field_validator, model_validator
 
 from app.i18n.types import Locale
+from app.i18n.types import is_locale_supported
 
 logger = logging.getLogger(__name__)
 
 _LANGUAGE_CONFIG_ENV = "BACKEND_LANGUAGE_CONFIG"
-
 
 # Matches:
 # - single token: YYYY | YY | MM | DD
@@ -66,13 +66,37 @@ class LocaleDateFormatEntry(BaseModel):
 
 
 class LanguageConfig(BaseModel):
-    default_locale: Locale
+    conversation_fallback_locale: Locale
+    """
+    Specifies the language to be used for the conversation.
+    All user-facing messages must be generated in this language.
+    """
+
+    reporting_locale: Locale
+    """
+    Defines the language used to generate and store report data (e.g., Experience and Skills Report) in the application state.
+    """
+
     available_locales: List[LocaleDateFormatEntry]
 
+    @staticmethod
+    def basic_locale_validation(cfg: "LanguageConfig", name: str, locale: Locale):
+        if not is_locale_supported(locale):
+            raise ValueError(f"{name} {locale.value} is not a supported locale")
+
+        if not any(entry.locale == cfg.__getattribute__(name) for entry in cfg.available_locales):
+            raise ValueError(
+                f"conversation_fallback_locale {cfg.conversation_fallback_locale.value} must be in available_locales"
+            )
+
     @model_validator(mode='after')
-    def ensure_default_locale_present(self) -> 'LanguageConfig':
-        if not any(entry.locale == self.default_locale for entry in self.available_locales):
-            raise ValueError(f"default_locale {self.default_locale} is not present in available_locales")
+    def ensure_locales_are_valid(self) -> 'LanguageConfig':
+        # Validate conversation_fallback_locale
+        LanguageConfig.basic_locale_validation(self, "conversation_fallback_locale", self.conversation_fallback_locale)
+
+        # Validate reporting_locale
+        LanguageConfig.basic_locale_validation(self, "reporting_locale", self.reporting_locale)
+
         return self
 
 
@@ -90,11 +114,16 @@ def _load_config_from_env() -> LanguageConfig:
         raise ValueError(f"Invalid JSON in {_LANGUAGE_CONFIG_ENV}: {e}") from e
 
     config = LanguageConfig.model_validate(parsed)
-    logger.info("Loaded BACKEND_LANGUAGE_CONFIG with %d available locales", len(config.available_locales))
+    logger.info(
+        "Loaded BACKEND_LANGUAGE_CONFIG with conversation_fallback_locale=%s, reporting_locale=%s, %d available locales",
+        config.conversation_fallback_locale.value,
+        config.reporting_locale.value,
+        len(config.available_locales)
+    )
     return config
 
 
-def get_language_config() -> LanguageConfig:
+def load_language_config_from_env() -> LanguageConfig:
     """
     Returns the language config loaded from BACKEND_LANGUAGE_CONFIG.
     Caches the result. Raises if missing or invalid to mirror default-locale strictness.
@@ -114,6 +143,3 @@ def reset_language_config_cache():
     """
     global _cached_config
     _cached_config = None
-
-
-

@@ -19,7 +19,7 @@ from app.vector_search.occupation_search_routes import add_occupation_search_rou
 from app.vector_search.skill_search_routes import add_skill_search_routes
 from app.vector_search.validate_taxonomy_model import validate_taxonomy_model
 from app.version.version_routes import add_version_routes
-from app.i18n.language_config import get_language_config
+from app.i18n.language_config import load_language_config_from_env
 
 from contextlib import asynccontextmanager
 
@@ -189,9 +189,9 @@ else:
 
 # Validate and load BACKEND_LANGUAGE_CONFIG environment variable
 try:
-    language_config = get_language_config()
-    logger.info(f"Loaded BACKEND_LANGUAGE_CONFIG with {len(language_config.available_locales)} available locales")
-    logger.info(f"Backend default locale: {language_config.default_locale}")
+    language_config = load_language_config_from_env()
+    logger.info(f"Backend reporting locale: {language_config.reporting_locale}")
+    logger.info(f"Backend conversation fallback language: {language_config.conversation_fallback_locale}")
 except RuntimeError as e:
     _error_message = f"BACKEND_LANGUAGE_CONFIG environment variable is not set! {e}"
     logger.error(_error_message)

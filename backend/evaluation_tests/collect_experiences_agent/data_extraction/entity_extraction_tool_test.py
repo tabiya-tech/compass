@@ -392,7 +392,7 @@ async def test_entity_extraction_tool(test_case: EntityExtractionToolTestCase, c
     logger = logging.getLogger()
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
-        get_i18n_manager().set_locale(test_case.locale)
+        get_i18n_manager().set_locales(test_case.locale, test_case.locale)
 
         # GIVEN users last input
         given_user_input = AgentInput(message=test_case.users_input)

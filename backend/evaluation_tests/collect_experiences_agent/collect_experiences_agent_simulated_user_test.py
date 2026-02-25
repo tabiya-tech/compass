@@ -62,7 +62,7 @@ async def test_collect_experiences_agent_simulated_user(test_case: CollectExperi
     with caplog.at_level(logging.DEBUG):
         # Guards to ensure that the loggers are correctly set up,
         guard_caplog(logger=execute_evaluated_agent._agent._logger, caplog=caplog)
-        get_i18n_manager().set_locale(test_case.locale)
+        get_i18n_manager().set_locales(test_case.locale, test_case.locale)
 
         # Run the main test
         evaluation_result: ConversationEvaluationRecord = await conversation_test_function(

@@ -73,13 +73,14 @@ def setup_multi_locale_app_config():
         current = None
 
     language_config = LanguageConfig(
-        default_locale=Locale.EN_US,
+        conversation_fallback_locale=Locale.EN_US,
+        reporting_locale=Locale.EN_US,
         available_locales=[
             LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY"),
             LocaleDateFormatEntry(locale=Locale.EN_GB, date_format="DD/MM/YYYY"),
             LocaleDateFormatEntry(locale=Locale.ES_AR, date_format="DD/MM/YYYY"),
             LocaleDateFormatEntry(locale=Locale.ES_ES, date_format="DD/MM/YYYY")
-        ],
+        ]
     )
 
     if current is None:
@@ -94,6 +95,7 @@ def setup_multi_locale_app_config():
             cv_storage_bucket="test",
             features={},
             language_config=language_config,
+            app_name="Compass Evaluation Tests"
         )
     else:
         config = current.model_copy(update={"language_config": language_config})

@@ -73,7 +73,7 @@ class IntentAnalyzerTool:
 
         return GeminiGenerativeLLM(
             system_instructions=_SYSTEM_INSTRUCTIONS.format(previously_extracted_data=previously_extracted_data,
-                                                            language_style=get_language_style()),
+                                                            language_style=get_language_style(prompt_intent="application_state")),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000

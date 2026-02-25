@@ -84,7 +84,7 @@ class TemporalAndWorkTypeClassifierTool:
         return _SYSTEM_INSTRUCTIONS.format(
             work_type_definitions=WORK_TYPE_DEFINITIONS_FOR_PROMPT,
             current_date=current_date_formatted,
-            language_style=get_language_style(),
+            language_style=get_language_style(prompt_intent="application_state"),
             date_format_full=date_formats.full,
             date_format_month_year=date_formats.month_year,
             date_format_year=date_formats.year_only,

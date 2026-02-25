@@ -33,7 +33,7 @@ async def setup_collect_experiences_agent() -> tuple[
     async def collect_experiences_exec(caplog: LogCaptureFixture, test_case: ScriptedUserEvaluationTestCase, country: Country):
         print(f"Running test case {test_case.name}")
 
-        get_i18n_manager().set_locale(test_case.locale)
+        get_i18n_manager().set_locales(test_case.locale, test_case.locale)
         output_folder = os.path.join(os.getcwd(), 'test_output/collect_experiences_agent/scripted', test_case.name)
         execute_evaluated_agent = CollectExperiencesAgentExecutor(
             conversation_manager=conversation_manager,

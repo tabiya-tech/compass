@@ -1,10 +1,10 @@
 import json
 import logging
 import os
-import argparse
 from typing import Dict, Any, Set, Optional
 from collections import defaultdict
 from app.i18n.types import Locale
+from app.i18n.locale_context import LocaleContext
 from app.i18n.constants import LOCALES_DIR, DEFAULT_FALLBACK_LOCALE
 from app.context_vars import user_language_ctx_var
 from app.app_config import get_application_config
@@ -17,24 +17,63 @@ class I18nManager:
         self.load_translations()
         self._logger = logging.getLogger(self.__class__.__name__)
 
-    def get_locale(self) -> Locale:
+    def get_conversation_locale(self) -> Locale:
+        """
+        Returns the conversation locale from the current request context.
+
+        Raises:
+            LookupError: If the locale context is not set
+        """
         try:
-            return user_language_ctx_var.get()
+            context = user_language_ctx_var.get()
+            return context.conversation_locale
         except LookupError as e:
-            self._logger.exception(e)
+            self._logger.error("Locale context not set. Call set_locales() first.")
             raise
 
-    def set_locale(self, locale: Locale) -> Locale:
-        self._logger.debug(f"Setting locale to {locale.name}")
-        user_language_ctx_var.set(locale)
-        return locale
+    def get_reporting_locale(self) -> Locale:
+        """
+        Returns the reporting locale from the current request context.
+
+        Raises:
+            LookupError: If the locale context is not set
+        """
+        try:
+            context = user_language_ctx_var.get()
+            return context.reporting_locale
+        except LookupError as e:
+            self._logger.error("Locale context not set. Call set_locales() first.")
+            raise
+
+    def set_locales(self, conversation: Locale, reporting: Locale) -> LocaleContext:
+        """
+        Sets both conversation and reporting locales atomically in the request context.
+        
+        Args:
+            conversation: The locale for user-facing messages and prompts
+            reporting: The locale for state updates and report generation
+            
+        Returns:
+            The LocaleContext that was set
+        """
+        self._logger.debug(
+            f"Setting locales: conversation={conversation.name}, reporting={reporting.name}"
+        )
+        
+        context = LocaleContext(
+            conversation_locale=conversation,
+            reporting_locale=reporting
+        )
+
+        user_language_ctx_var.set(context)
+        return context
 
     def load_translations(self):
         """
         Loads all translation files from the locales directory.
         """
         if not os.path.isdir(LOCALES_DIR):
-            self._logger.warning(f"Locales directory does not exist: {self.locales_dir}")
+            self._logger.warning(f"Locales directory does not exist: {LOCALES_DIR}")
             return
 
         for locale in os.listdir(LOCALES_DIR):
@@ -89,17 +128,20 @@ class I18nManager:
 
     def t(self, domain: str, key: str, **kwargs) -> str:
         """
-        Convenience method to get a translation using the current locale from the locale provider.
+        Convenience method to get a translation using the current conversation locale.
+        
+        Uses the conversation locale by default since this is typically used for
+        user-facing messages.
 
         Args:
             domain: The translation domain (e.g., 'prompts', 'errors').
             key: The translation key.
-            **kwargs: Currently unused, reserved for future string formatting support.
+            **kwargs: Variables for string formatting support.
 
         Returns:
             The translated string.
         """
-        locale = self.get_locale()
+        locale = self.get_conversation_locale()
         value = self.get_translation(locale, domain, key)
         if isinstance(value, str):
             vars_ = {**self._get_default_variables(), **kwargs}

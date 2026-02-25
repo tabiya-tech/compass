@@ -71,7 +71,7 @@ async def setup_agent_director(setup_search_services: Awaitable[SearchServices])
 
     async def agent_director_exec(caplog, test_case):
         print(f"Running test case {test_case.name}")
-        get_i18n_manager().set_locale(test_case.locale)
+        get_i18n_manager().set_locales(test_case.locale, test_case.locale)
         output_folder = os.path.join(os.getcwd(), 'test_output/agent_director/scripted', test_case.name)
 
         execute_evaluated_agent = AgentDirectorExecutor(agent_director=agent_director)
@@ -133,7 +133,7 @@ async def test_user_says_all_the_time_yes(caplog: LogCaptureFixture,
         evaluations=[]
     )
 
-    get_i18n_manager().set_locale(Locale.EN_GB)
+    get_i18n_manager().set_locales(Locale.EN_GB, Locale.EN_GB)
 
     conversation_manager, agent_director_exec = await setup_agent_director
     await agent_director_exec(caplog, given_test_case)
@@ -177,7 +177,7 @@ async def test_user_talks_about_occupations(caplog: LogCaptureFixture,
         evaluations=[]
     )
 
-    get_i18n_manager().set_locale(Locale.EN_GB)
+    get_i18n_manager().set_locales(Locale.EN_GB, Locale.EN_GB)
 
     conversation_manager, agent_director_exec = await setup_agent_director
     await agent_director_exec(caplog, given_test_case)
@@ -231,7 +231,7 @@ async def test_argentina_counseling_flow_simple(caplog: LogCaptureFixture,
         evaluations=[]
     )
 
-    get_i18n_manager().set_locale(Locale.ES_ES)
+    get_i18n_manager().set_locales(Locale.ES_ES, Locale.ES_ES)
 
     conversation_manager, agent_director_exec = await setup_agent_director
     await agent_director_exec(caplog, given_test_case)

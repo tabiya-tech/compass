@@ -150,7 +150,7 @@ test_cases_data_extraction = [
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_data_extraction),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_data_extraction)])
 async def test_data_extraction(test_case: _TestCaseDataExtraction):
-    get_i18n_manager().set_locale(test_case.locale)
+    get_i18n_manager().set_locales(test_case.locale, test_case.locale)
     context: ConversationContext = ConversationContext()
 
     # GIVEN the previous conversation context

@@ -86,7 +86,8 @@
       ]
     },
     "conversation": {
-      "default_locale": "en-US",
+      "conversation_fallback_locale":"en-US",
+      "reporting_locale":"en-US",
       "available_locales": [
         {
           "locale": "en-US",

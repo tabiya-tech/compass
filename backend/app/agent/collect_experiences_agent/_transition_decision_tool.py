@@ -9,7 +9,6 @@ from app.agent.agent_types import AgentInput, LLMStats
 from app.agent.config import AgentsConfig
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
-from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template import sanitize_input
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
@@ -81,14 +80,13 @@ class TransitionDecisionTool:
         return GeminiGenerativeLLM(
             system_instructions=_SYSTEM_INSTRUCTIONS.format(
                 collected_data=collected_data_json,
-                language_style=get_language_style()
             ),
             config=LLMConfig(
                 language_model_name=AgentsConfig.deep_reasoning_model,
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG
-                | JSON_GENERATION_CONFIG
-                | temperature_config
-                | with_response_schema(_TransitionDecisionOutput)
+                                  | JSON_GENERATION_CONFIG
+                                  | temperature_config
+                                  | with_response_schema(_TransitionDecisionOutput)
             ))
 
     async def execute(self,
@@ -98,7 +96,8 @@ class TransitionDecisionTool:
                       unexplored_types: list[WorkType],
                       explored_types: list[WorkType],
                       conversation_context: ConversationContext,
-                      user_input: AgentInput) -> tuple[TransitionDecision, Optional[TransitionReasoning], list[LLMStats]]:
+                      user_input: AgentInput) -> tuple[
+        TransitionDecision, Optional[TransitionReasoning], list[LLMStats]]:
         incomplete_required = _find_incomplete_required_for_work_type(collected_data, exploring_type)
         if incomplete_required:
             self._logger.info(
@@ -112,20 +111,20 @@ class TransitionDecisionTool:
         for collected_item in collected_data:
             collected_item_dict = collected_item.model_dump(exclude={"defined_at_turn_number"})
             cleaned_experience_dicts.append(collected_item_dict)
-        
+
         json_data = json.dumps(cleaned_experience_dicts, indent=2)
-        
+
         conversation_history = ConversationHistoryFormatter.format_history_for_agent_generative_prompt(
             conversation_context
         )
-        
+
         exploring_type_str = exploring_type.name if exploring_type else "None"
         unexplored_types_str = ", ".join([wt.name for wt in unexplored_types])
         explored_types_str = ", ".join([wt.name for wt in explored_types])
-        
+
         exploring_type_description = _get_experience_type(exploring_type) if exploring_type else "None"
         work_type_mapping = _generate_work_type_mapping()
-        
+
         prompt = _PROMPT_TEMPLATE.format(
             user_input=user_input.message,
             conversation_history=conversation_history,
@@ -136,42 +135,42 @@ class TransitionDecisionTool:
             unexplored_types=unexplored_types_str,
             explored_types=explored_types_str
         )
-        
+
         _llm_stats = []
         _reasoning = None
-        
+
         async def _callback(attempt: int, max_retries: int) -> tuple[TransitionDecision, float, BaseException | None]:
             temperature_config = get_config_variation(start_temperature=0.0, end_temperature=0.1,
                                                       start_top_p=0.95, end_top_p=1.0,
                                                       attempt=attempt, max_retries=max_retries)
-            
+
             llm = self._get_llm(collected_data_json=json_data, temperature_config=temperature_config)
             self._logger.debug("Calling transition decision LLM with temperature: %s, top_p: %s",
                                temperature_config["temperature"],
                                temperature_config["top_p"])
-            
+
             data, reasoning, llm_stats, penalty, error = await self._internal_execute(
-                llm=llm, 
+                llm=llm,
                 prompt=prompt,
                 unexplored_types=unexplored_types
             )
-            
+
             nonlocal _reasoning
             _reasoning = reasoning
             _llm_stats.extend(llm_stats)
-            
+
             return data, penalty, error
-        
+
         result, _result_penalty, _error = await Retry[TransitionDecision].call_with_penalty(
             callback=_callback, logger=self._logger)
-        
+
         reasoning = _reasoning
         if reasoning is None:
             reasoning = TransitionReasoning(
                 reasoning="No reasoning provided - error occurred during LLM call",
                 confidence="low"
             )
-        
+
         # Additional validation: ensure END_CONVERSATION only when all types explored
         if result == TransitionDecision.END_CONVERSATION and unexplored_types:
             self._logger.warning(
@@ -185,7 +184,7 @@ class TransitionDecisionTool:
                 reasoning=f"Invalid END_CONVERSATION decision - unexplored_types not empty: {[wt.name for wt in unexplored_types]}. Original reasoning: {reasoning.reasoning if reasoning else 'None'}",
                 confidence="high"
             )
-        
+
         self._logger.info(
             "Transition decision: %s. "
             "Exploring type: %s, Unexplored types: %s, Explored types: %s, "
@@ -204,15 +203,16 @@ class TransitionDecisionTool:
                                 *,
                                 llm: GeminiGenerativeLLM,
                                 prompt: str,
-                                unexplored_types: list[WorkType]) -> tuple[TransitionDecision, TransitionReasoning, list[LLMStats], float, BaseException | None]:
-        
+                                unexplored_types: list[WorkType]) -> tuple[
+        TransitionDecision, TransitionReasoning, list[LLMStats], float, BaseException | None]:
+
         no_response_penalty_level = 3
         response_data, llm_stats = await self._llm_caller.call_llm(
             llm=llm,
             llm_input=sanitize_input(prompt, _TAGS_TO_FILTER),
             logger=self._logger
         )
-        
+
         if not response_data:
             _error = ValueError("LLM did not return any output")
             self._logger.error(_error, stack_info=True)
@@ -225,16 +225,17 @@ class TransitionDecisionTool:
         continue_current_type = response_data.continue_current_type
         done_with_collection = response_data.done_with_collection
         reasoning_text = response_data.reasoning if hasattr(response_data, 'reasoning') else "No reasoning provided"
-        
+
         # Truncate reasoning if too long to prevent bloat
         if len(reasoning_text) > MAX_REASONING_LENGTH:
             reasoning_text = reasoning_text[:MAX_REASONING_LENGTH].rsplit('.', 1)[0] + "."
-            self._logger.warning("Reasoning truncated from %d to %d characters", len(response_data.reasoning), len(reasoning_text))
-        
+            self._logger.warning("Reasoning truncated from %d to %d characters", len(response_data.reasoning),
+                                 len(reasoning_text))
+
         # Ensure reasoning doesn't exceed limit (safety check)
         if len(reasoning_text) > MAX_REASONING_LENGTH:
             reasoning_text = reasoning_text[:MAX_REASONING_LENGTH]
-        
+
         # Validate done_with_collection against state (deterministic check)
         if done_with_collection and unexplored_types:
             self._logger.warning(
@@ -244,7 +245,7 @@ class TransitionDecisionTool:
                 reasoning_text
             )
             done_with_collection = False
-        
+
         # Map binary outputs to transition decision
         if continue_current_type:
             decision = TransitionDecision.CONTINUE
@@ -252,15 +253,15 @@ class TransitionDecisionTool:
             decision = TransitionDecision.END_CONVERSATION
         else:
             decision = TransitionDecision.END_WORKTYPE
-        
-        self._logger.debug("Transition decision: %s (continue_current_type=%s, done_with_collection=%s). Reasoning: %s", 
-                          decision, continue_current_type, done_with_collection, reasoning_text)
-        
+
+        self._logger.debug("Transition decision: %s (continue_current_type=%s, done_with_collection=%s). Reasoning: %s",
+                           decision, continue_current_type, done_with_collection, reasoning_text)
+
         reasoning = TransitionReasoning(
             reasoning=reasoning_text,
             confidence="medium"
         )
-        
+
         return decision, reasoning, llm_stats, 0, None
 
 
@@ -268,8 +269,6 @@ _SYSTEM_INSTRUCTIONS = """
 <System Instructions>
 #Role
 You decide when to transition between phases in a work experience collection conversation.
-
-{language_style}
 
 #Decision Logic
 Answer two boolean questions:
@@ -333,8 +332,8 @@ You must complete the entire JSON object including the closing brace }}.
 
 
 def _find_incomplete_required_for_work_type(
-    collected_data: list[CollectedData],
-    exploring_type: WorkType | None,
+        collected_data: list[CollectedData],
+        exploring_type: WorkType | None,
 ) -> list[tuple[int, CollectedData, list[str]]]:
     """
     Find experiences of the given work type that lack required fields (experience_title, work_type).
@@ -345,7 +344,7 @@ def _find_incomplete_required_for_work_type(
         return []
     key = exploring_type.name
     result = []
-    for i, exp in enumerate (collected_data):
+    for i, exp in enumerate(collected_data):
         if exp.work_type and exp.work_type.strip() == key:
             missing = []
             if not (exp.experience_title and exp.experience_title.strip()):

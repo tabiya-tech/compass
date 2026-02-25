@@ -30,8 +30,11 @@ _mocked_application_config = ApplicationConfig(
     features={},
     enable_cv_upload=True,
     language_config=LanguageConfig(
-        default_locale=Locale.EN_US,
-        available_locales=[LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY")]
+        conversation_fallback_locale=Locale.EN_US,
+        reporting_locale=Locale.EN_US,
+        available_locales=[
+            LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY")
+        ]
     ),
     app_name="Compass"
 )
