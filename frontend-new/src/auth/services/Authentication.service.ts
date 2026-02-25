@@ -14,7 +14,6 @@ export const CLOCK_TOLERANCE = 10; // 10 second buffer for expiration and issuan
 
 export enum TokenValidationFailureCause {
   TOKEN_EXPIRED = "TOKEN_EXPIRED",
-  TOKEN_NOT_YET_VALID = "TOKEN_NOT_YET_VALID",
   TOKEN_NOT_A_JWT = "TOKEN_NOT_A_JWT",
   TOKEN_NOT_SIGNED = "TOKEN_NOT_SIGNED",
   TOKEN_DOES_NOT_HAVE_A_KEY_ID = "TOKEN_DOES_NOT_HAVE_A_KEY_ID",
@@ -218,20 +217,6 @@ abstract class AuthenticationService {
         );
       }
 
-      // Check issued time with buffer
-      // similarly, we add a buffer to the issuance time to account for the potential time difference between the server and client clocks
-      if (currentTime < decodedToken.iat - CLOCK_TOLERANCE) {
-        console.debug("Token issued in the future: ", { iat: decodedToken.iat, currentTime });
-        return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_NOT_YET_VALID };
-      } else if (currentTime < decodedToken.iat) {
-        console.warn(
-          "Warning: token issued at time was after the current time, but within the acceptable tolerance period ",
-          {
-            iat: decodedToken.iat,
-            currentTime,
-          }
-        );
-      }
       return { isValid: true, decodedToken: decodedToken };
     } catch (error) {
       return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.ERROR_DECODING_TOKEN };
