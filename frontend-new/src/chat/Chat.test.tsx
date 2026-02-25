@@ -2259,6 +2259,58 @@ describe("Chat", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
+    test("should not re-render chat list on keydown when backdrop is already hidden", async () => {
+      // GIVEN a logged-in user with an active session
+      const givenUser: TabiyaUser = getMockUser();
+      AuthenticationStateService.getInstance().setUser(givenUser);
+      const givenActiveSessionId = 123;
+      UserPreferencesStateService.getInstance().setUserPreferences(
+        getMockUserPreferences(givenUser, givenActiveSessionId)
+      );
+
+      // AND a chat history with a message
+      const givenMessages: ConversationResponse = getMockConversationResponse(
+        [
+          {
+            message_id: nanoid(),
+            message: "hello",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.USER,
+            reaction: null,
+          },
+        ],
+        ConversationPhase.DIVE_IN,
+        75
+      );
+      jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenMessages);
+
+      // WHEN the component is mounted
+      render(<Chat />);
+
+      // AND the chat component is initialized
+      await assertChatInitialized();
+
+      // Capture the current render count after initialization settles
+      const initialRenderCount = (ChatList as jest.Mock).mock.calls.length;
+
+      // WHEN multiple keydown events are fired (user typing)
+      await act(async () => {
+        for (let i = 0; i < 5; i++) {
+          document.dispatchEvent(
+            new KeyboardEvent("keydown", {
+              key: "a",
+              code: "KeyA",
+              bubbles: true,
+              cancelable: true,
+            })
+          );
+        }
+      });
+
+      // THEN no additional ChatList renders should occur (no re-render per keystroke)
+      expect((ChatList as jest.Mock).mock.calls.length).toBe(initialRenderCount);
+    });
+
     test.each([
       [
         "click",
