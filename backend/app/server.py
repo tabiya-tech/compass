@@ -74,7 +74,8 @@ def setup_sentry():
         else:
             logging.warning("BACKEND_SENTRY_DSN environment variable is not set. Sentry will not be initialized")
     else:
-        logging.warning("BACKEND_ENABLE_SENTRY environment variable is not set to True.  Sentry will not be initialized")
+        logging.warning(
+            "BACKEND_ENABLE_SENTRY environment variable is not set to True.  Sentry will not be initialized")
 
 
 ############################################
@@ -107,24 +108,28 @@ backend_url = os.getenv("BACKEND_URL")
 logger.info(f"Backend URL: {backend_url}")
 
 if not os.getenv("TARGET_ENVIRONMENT_TYPE"):
-    raise ValueError("Mandatory TARGET_ENVIRONMENT_TYPE env variable is not set! Please set it to the target environment type as it is "
-                     "required to set the CORS policy correctly for allowing local development if it is set to 'local' or 'dev'.")
+    raise ValueError(
+        "Mandatory TARGET_ENVIRONMENT_TYPE env variable is not set! Please set it to the target environment type as it is "
+        "required to set the CORS policy correctly for allowing local development if it is set to 'local' or 'dev'.")
 
 target_environment_type = os.getenv("TARGET_ENVIRONMENT_TYPE")
 logger.info(f"Target environment: {target_environment_type}")
 
 if not os.getenv("TARGET_ENVIRONMENT_NAME"):
-    raise ValueError("Mandatory TARGET_ENVIRONMENT_NAME env variable is not set! Please set it to the target environment name as it is "
-                     "Required by sentry to know on which environment some Sentry Events occurred")
+    raise ValueError(
+        "Mandatory TARGET_ENVIRONMENT_NAME env variable is not set! Please set it to the target environment name as it is "
+        "Required by sentry to know on which environment some Sentry Events occurred")
 
 enable_sentry = os.getenv("BACKEND_ENABLE_SENTRY")
 if not enable_sentry:
-    raise ValueError("Mandatory BACKEND_ENABLE_SENTRY env variable is not set! Please set it to the either True or False")
+    raise ValueError(
+        "Mandatory BACKEND_ENABLE_SENTRY env variable is not set! Please set it to the either True or False")
 logger.info(f"BACKEND_ENABLE_SENTRY: {os.getenv('BACKEND_ENABLE_SENTRY')}")
 
 _metrics_enabled_str = os.getenv("BACKEND_ENABLE_METRICS")
 if not _metrics_enabled_str:
-    raise ValueError("Mandatory BACKEND_ENABLE_METRICS env variable is not set! Please set it to the either True or False")
+    raise ValueError(
+        "Mandatory BACKEND_ENABLE_METRICS env variable is not set! Please set it to the either True or False")
 logger.info(f"BACKEND_ENABLE_METRICS: {_metrics_enabled_str}")
 
 _default_country_of_user_str = os.getenv("DEFAULT_COUNTRY_OF_USER")
@@ -233,14 +238,14 @@ set_application_config(application_config)
 
 # warning log when registration code bypass is enabled
 if _disable_registration_code:
-    logger.warning("GLOBAL_DISABLE_REGISTRATION_CODE is enabled - registered users can create preferences without invitation codes.")
+    logger.warning(
+        "GLOBAL_DISABLE_REGISTRATION_CODE is enabled - registered users can create preferences without invitation codes.")
 
 ##################
 # Set Sentry Context, after setting application config.
 # because: some contexts depend on the application config variables.
 #################
 set_sentry_contexts()
-
 
 ############################################
 # Initialize Feature Loader
@@ -259,10 +264,12 @@ async def lifespan(_app: FastAPI):
     # Startup logic
     logger.info("Starting up...")
 
-    application_db = await CompassDBProvider.get_application_db()
-    taxonomy_db = await CompassDBProvider.get_taxonomy_db()
-    userdata_db = await CompassDBProvider.get_userdata_db()
-    metrics_db = await CompassDBProvider.get_metrics_db()
+    application_db, taxonomy_db, userdata_db, metrics_db = await asyncio.gather(
+        CompassDBProvider.get_application_db(),
+        CompassDBProvider.get_taxonomy_db(),
+        CompassDBProvider.get_userdata_db(),
+        CompassDBProvider.get_metrics_db()
+    )
 
     app_cfg = get_application_config()
     # Initialize the MongoDB databases
@@ -297,6 +304,7 @@ async def lifespan(_app: FastAPI):
 
     # close the database connections
     application_db.client.close()
+    taxonomy_db.client.close()
     userdata_db.client.close()
     metrics_db.client.close()
 
