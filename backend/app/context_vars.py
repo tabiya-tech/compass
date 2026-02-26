@@ -1,4 +1,5 @@
 import contextvars
+from app.i18n.locale_context import LocaleContext
 
 # Define a context variable to store the session_id, which will be used to correlate log messages
 # every conversation with a user will have a unique session_id
@@ -12,5 +13,5 @@ user_id_ctx_var = contextvars.ContextVar("user_id", default=":none:")
 # Client ID is optional, so we set a default value of None
 client_id_ctx_var = contextvars.ContextVar("client_id", default=None)
 
-# The language the user is speaking.
-user_language_ctx_var = contextvars.ContextVar("user_language")
+# The language context, used to determine which language used by the LLM to reply to the user.
+user_language_ctx_var: contextvars.ContextVar["LocaleContext"] = contextvars.ContextVar("user_language")

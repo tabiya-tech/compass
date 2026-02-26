@@ -188,7 +188,7 @@ async def test_skills_explorer_agent_loop_detection_scripted(
     print(f"Running test case {test_case.name}")
 
     session_id = get_random_session_id()
-    get_i18n_manager().set_locale(test_case.locale)
+    get_i18n_manager().set_locales(test_case.locale, test_case.locale)
     output_folder = os.path.join(
         os.getcwd(),
         "test_output/skills_explorer_agent/loop_detection_scripted/",

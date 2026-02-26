@@ -44,7 +44,7 @@ async def test_main_app_chat(
     logger.info(f"Running test case {current_test_case.test_id}")
     session_id = get_random_session_id()
     locales_manager = get_i18n_manager()
-    locales_manager.set_locale(current_test_case.locale)
+    locales_manager.set_locales(current_test_case.locale, current_test_case.locale)
     search_services = await setup_search_services
     experience_pipeline_config = ExperiencePipelineConfig.model_validate(
         {"number_of_clusters": current_test_case.given_number_of_clusters,

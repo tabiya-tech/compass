@@ -72,7 +72,7 @@ def _get_system_instructions(country_of_interest: Country, number_of_titles: int
         """)
     return replace_placeholders_with_indent(system_instructions_template,
                                             country_of_interest=country_of_interest.value,
-                                            language_style=get_language_style(),
+                                            language_style=get_language_style(prompt_intent="application_state"),
                                             work_type_names=", ".join([work_type.name for work_type in WorkType]),
                                             glossary=glossary_str,
                                             number_of_titles=f"{number_of_titles}")

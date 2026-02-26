@@ -1,7 +1,9 @@
 import logging
 import platform
+import resource
 from typing import Generator, Any
 
+import pymongo
 import pytest
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
@@ -30,11 +32,34 @@ _mocked_application_config = ApplicationConfig(
     features={},
     enable_cv_upload=True,
     language_config=LanguageConfig(
-        default_locale=Locale.EN_US,
-        available_locales=[LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY")]
+        conversation_fallback_locale=Locale.EN_US,
+        reporting_locale=Locale.EN_US,
+        available_locales=[
+            LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY")
+        ]
     ),
     app_name="Compass"
 )
+
+def _raise_open_file_limit(target: int = 10240):
+    """
+    Raise this process's open-file soft limit (RLIMIT_NO FILE) towards `target`, bounded by the hard limit.
+
+    The in-memory mongodb is launched as a subprocess and inherits this limit, so raising it here gives
+    mongodb enough file descriptors for WiredTiger's per-collection/per-index file handles. Never lowers
+    the limit and silently no-ops if the platform refuses the change.
+    """
+    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    desired = target if hard == resource.RLIM_INFINITY else min(target, hard)
+    new_soft = max(soft, desired)
+    if new_soft == soft:
+        return
+    try:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (new_soft, hard))
+        logging.info("Raised open-file soft limit from %s to %s (hard limit: %s)", soft, new_soft, hard)
+    except (ValueError, OSError) as e:
+        logging.warning("Could not raise open-file soft limit from %s: %s", soft, e)
+
 
 @pytest.fixture(scope='session')
 def in_memory_mongo_server():
@@ -47,6 +72,15 @@ def in_memory_mongo_server():
     """
     from pymongo_inmemory import Mongod
     from pymongo_inmemory.context import Context
+
+    # Raise the open-file soft limit before starting mongodb.
+    # The mongodb subprocess inherits this process's RLIMIT_NO FILE. On systems with a low default
+    # (e.g., macOS' 256) mongodb runs out of file descriptors part-way through the suite and crashes
+    # ("Too many open files" / dropped connections), because WiredTiger keeps a file handle per
+    # collection and per index. We bump the soft limit up to the hard limit (capped at a sane value)
+    # so the test run has enough headroom.
+    _raise_open_file_limit()
+    # -----
 
     # There is a bug in pymongo_inmemory where the for ubuntu and debian it will fall back to mongo v4.0.23
     # https://github.com/kaizendorks/pymongo_inmemory/issues/115
@@ -86,8 +120,29 @@ def random_db_name():
                                   k=10))  # nosec B311 # random is used for testing purposes
 
 
+def drop_database_and_close_client(client: AsyncIOMotorClient, connection_string: str, db_name: str):
+    """
+    Tear down a per-test database created against the session-scoped in-memory MongoDB server.
+
+    Every test creates a fresh database (see random_db_name()) with multiple collections and indexes.
+    Because the mongodb server lives for the whole test session, the WiredTiger file handles for those
+    collections/indexes keep accumulating and are never released until the database is dropped. On systems
+    with a low open-file limit (e.g., the macOS default of 256) this eventually causes mongod to fail with
+    "Too many open files" (TooManyFilesOpen / errno 24).
+
+    Dropping the database releases mongodb's file handles; closing the client releases client-side sockets.
+    A short-lived synchronous client is used so this can run from a (synchronous) pytest finalizer without
+    depending on an active event loop.
+    """
+    try:
+        with pymongo.MongoClient(connection_string, tlsAllowInvalidCertificates=True) as sync_client:
+            sync_client.drop_database(db_name)
+    finally:
+        client.close()
+
+
 @pytest.fixture(scope='function')
-async def in_memory_userdata_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
+async def in_memory_userdata_database(in_memory_mongo_server, request) -> AsyncIOMotorDatabase:
     """
     Fixture to create an in-memory userdata database.
 
@@ -96,9 +151,11 @@ async def in_memory_userdata_database(in_memory_mongo_server) -> AsyncIOMotorDat
     :return:  The mocked userdata database.
     """
 
-    userdata_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
-                                     tlsAllowInvalidCertificates=True).get_database(random_db_name())
-
+    client = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
+                                tlsAllowInvalidCertificates=True)
+    userdata_db = client.get_database(random_db_name())
+    request.addfinalizer(
+        lambda: drop_database_and_close_client(client, in_memory_mongo_server.connection_string, userdata_db.name))
     set_application_config(_mocked_application_config)
     await CompassDBProvider.initialize_userdata_mongo_db(userdata_db, logger=logging.getLogger(__name__))
     logging.info(f"Created userdata database: {userdata_db.name}")
@@ -106,7 +163,7 @@ async def in_memory_userdata_database(in_memory_mongo_server) -> AsyncIOMotorDat
 
 
 @pytest.fixture(scope='function')
-async def in_memory_taxonomy_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
+async def in_memory_taxonomy_database(in_memory_mongo_server, request) -> AsyncIOMotorDatabase:
     """
     Fixture to create an in-memory taxonomy database.
 
@@ -115,16 +172,18 @@ async def in_memory_taxonomy_database(in_memory_mongo_server) -> AsyncIOMotorDat
     :return:  The mocked taxonomy database.
     """
 
-    taxonomy_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
-                                     tlsAllowInvalidCertificates=True).get_database(random_db_name())
-
+    client = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
+                                tlsAllowInvalidCertificates=True)
+    taxonomy_db = client.get_database(random_db_name())
+    request.addfinalizer(
+        lambda: drop_database_and_close_client(client, in_memory_mongo_server.connection_string, taxonomy_db.name))
     await CompassDBProvider.initialize_application_mongo_db(taxonomy_db, logger=logging.getLogger(__name__))
     logging.info(f"Created application database: {taxonomy_db.name}")
     return taxonomy_db
 
 
 @pytest.fixture(scope='function')
-async def in_memory_application_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
+async def in_memory_application_database(in_memory_mongo_server, request) -> AsyncIOMotorDatabase:
     """
     Fixture to create an in-memory application database.
 
@@ -133,16 +192,18 @@ async def in_memory_application_database(in_memory_mongo_server) -> AsyncIOMotor
     :return:  The mocked application database.
     """
 
-    application_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
-                                        tlsAllowInvalidCertificates=True).get_database(random_db_name())
-
+    client = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
+                                tlsAllowInvalidCertificates=True)
+    application_db = client.get_database(random_db_name())
+    request.addfinalizer(
+        lambda: drop_database_and_close_client(client, in_memory_mongo_server.connection_string, application_db.name))
     await CompassDBProvider.initialize_application_mongo_db(application_db, logger=logging.getLogger(__name__))
     logging.info(f"Created application database: {application_db.name}")
     return application_db
 
 
 @pytest.fixture(scope='function')
-async def in_memory_metrics_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
+async def in_memory_metrics_database(in_memory_mongo_server, request) -> AsyncIOMotorDatabase:
     """
     Fixture to create an in-memory metrics database.
 
@@ -150,9 +211,11 @@ async def in_memory_metrics_database(in_memory_mongo_server) -> AsyncIOMotorData
     :param in_memory_mongo_server:  The in-memory MongoDB server.
     :return:  The mocked metrics database.
     """
-    metrics_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
-                                    tlsAllowInvalidCertificates=True).get_database(random_db_name())
-
+    client = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
+                                tlsAllowInvalidCertificates=True)
+    metrics_db = client.get_database(random_db_name())
+    request.addfinalizer(
+        lambda: drop_database_and_close_client(client, in_memory_mongo_server.connection_string, metrics_db.name))
     await CompassDBProvider.initialize_metrics_mongo_db(metrics_db, logger=logging.getLogger(__name__))
     logging.info(f"Created metrics database: {metrics_db.name}")
     return metrics_db

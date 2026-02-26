@@ -101,18 +101,18 @@ def reset_date_format_cache():
 
 def get_locale_date_format(locale: Optional[Locale] = None) -> LocaleDateFormat:
     """
-    Returns the date formats for the provided locale or the active locale if none is provided.
+    Returns the date formats for the provided locale or the active reporting locale if none is provided.
     Prefers configured formats (BACKEND_LANGUAGE_CONFIG) with validation, then built-in defaults.
     """
-    current_locale = locale or get_i18n_manager().get_locale()
+    current_locale = locale or get_i18n_manager().get_reporting_locale()
     configured_map = _load_configured_map()
 
     if current_locale in configured_map:
         return configured_map[current_locale]
 
     cfg = get_application_config().language_config
-    if cfg.default_locale in configured_map:
-        return configured_map[cfg.default_locale]
+    if cfg.reporting_locale in configured_map:
+        return configured_map[cfg.reporting_locale]
 
     return _DEFAULT_LOCALE_DATE_FORMAT
 

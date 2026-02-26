@@ -285,7 +285,7 @@ async def test_experience_pipeline(test_case: ExperiencePipelineTestCase, setup_
         config=given_config,
         search_services=search_services
     )
-    get_i18n_manager().set_locale(test_case.locale)
+    get_i18n_manager().set_locales(test_case.locale, test_case.locale)
 
     # Set the capl-og at the level in question - 1 to ensure that the root logger is set to the correct level.
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
