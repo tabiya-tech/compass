@@ -172,7 +172,7 @@ async def test_relevance_classifier_llm(test_case: RelevantSkillsClassifierLLMTe
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.DEBUG):
         # Set which language the test is running in
-        get_i18n_manager().set_locale(test_case.locale)
+        get_i18n_manager().set_locales(test_case.locale, test_case.locale)
 
         # Guards to ensure that the loggers are correctly setup,
         guard_caplog(logger=relevant_skills_classifier._logger, caplog=caplog)

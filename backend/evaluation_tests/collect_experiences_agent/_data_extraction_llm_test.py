@@ -1008,7 +1008,7 @@ async def test_data_extraction(test_case: _TestCaseDataExtraction, caplog: pytes
     logger = logging.getLogger()
     with caplog.at_level(logging.DEBUG):
         guard_caplog(logger=logger, caplog=caplog)
-        get_i18n_manager().set_locale(test_case.locale)
+        get_i18n_manager().set_locales(test_case.locale, test_case.locale)
 
         # GIVEN the previous conversation context
         context: ConversationContext = ConversationContext(

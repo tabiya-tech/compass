@@ -181,7 +181,7 @@ async def test_welcome_agent_scripted_user(evals_setup, max_iterations: int,
     as the agent is expected to complete the conversation at the last input from the user
     :return:
     """
-    get_i18n_manager().set_locale(test_case.locale)
+    get_i18n_manager().set_locales(test_case.locale, test_case.locale)
 
     print(f"Running test case {test_case.name}")
 

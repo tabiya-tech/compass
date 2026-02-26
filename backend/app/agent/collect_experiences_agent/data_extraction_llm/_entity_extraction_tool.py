@@ -74,8 +74,9 @@ class EntityExtractionTool:
         if temperature_config is None:
             temperature_config = {}
 
+        language_style = get_language_style(prompt_intent="application_state")
         return GeminiGenerativeLLM(
-            system_instructions=_SYSTEM_INSTRUCTIONS.format(language_style=get_language_style()),
+            system_instructions=_SYSTEM_INSTRUCTIONS.format(language_style=language_style),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 3000
@@ -113,7 +114,8 @@ class EntityExtractionTool:
 
             return data, penality, error
 
-        result, _result_penalty, _error = await Retry[ExtractedData].call_with_penalty(callback=_callback, logger=self._logger)
+        result, _result_penalty, _error = await Retry[ExtractedData].call_with_penalty(callback=_callback,
+                                                                                       logger=self._logger)
 
         return result, _llm_stats
 
@@ -176,8 +178,8 @@ _SYSTEM_INSTRUCTIONS = """
         Extract the title of the experience from the '<User's Last Input>'.
         For unpaid work, use the kind of work done (e.g. "Helping Neighbors", "Volunteering" etc).
         Make sure that the user is actually referring to an experience they have have.
-        When summarizing a user-stated action (e.g., "I sell tomatoes"), convert it directly into a gerund-phrase experience title (e.g., "Selling Tomatoes"). 
-        Return a string value containing the title of the experience.
+        When summarizing a user-stated action (e.g., "I sell tomatoes"), convert it directly into a gerund-phrase experience title (e.g., "Selling Tomatoes" in respective language). 
+        Return a string value containing the title of the experience in respective language.
         Use `null`: If the user has not mentioned their `experience title` and has not yet been asked to provide it.
         Use "": If the user explicitly declines to provide their `experience title` when explicitly asked, or requests that previously stored `experience title` data be deleted.
         
