@@ -19,8 +19,8 @@ compass/
 ```
 
 Path-specific instructions are automatically applied by Copilot when working in the relevant directories:
-- [Backend instructions](instructions/backend.instructions.md) — applies to `backend/**`
-- [Frontend instructions](instructions/frontend.instructions.md) — applies to `frontend-new/**`
+- [Backend instructions](backend/AGENTS.md) — applies to `backend/**`
+- [Frontend instructions](frontend-new/AGENTS.md) — applies to `frontend-new/**`
 
 ## Domain Context
 
