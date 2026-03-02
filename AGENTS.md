@@ -145,4 +145,4 @@ iac/
 
 - Backend: see `backend/.env.example`
 - Frontend: see env vars loaded in `frontend-new/src/envService.ts`
-- Infrastructure: see `iac/env.template` for full reference
+- Infrastructure: see `iac/templates/env.template` for full reference
