@@ -1,7 +1,3 @@
----
-applyTo: "frontend-new/**"
----
-
 # Compass Frontend — AI Agent Instructions
 
 ## Entry Point & Providers

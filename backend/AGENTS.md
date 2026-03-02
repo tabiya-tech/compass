@@ -1,7 +1,3 @@
----
-applyTo: "backend/**"
----
-
 # Compass Backend — AI Agent Instructions
 
 ## Entry Point & Server
