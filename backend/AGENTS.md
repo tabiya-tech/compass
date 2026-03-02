@@ -119,7 +119,7 @@ Connection management uses a singleton provider pattern (`CompassDBProvider`) wi
 ## Vector Search & Embeddings
 
 - **`backend/app/vector_search/`** — Template method pattern for occupation and skill search
-- Embeds user input via Vertex AI (`textembedding-gecko` models)
+- Embeds user input via Vertex AI (`text-embedding-005` model)
 - Searches MongoDB Atlas vector indexes
 - Async LRU cache for occupation-skill associations (up to ~223MB)
 
