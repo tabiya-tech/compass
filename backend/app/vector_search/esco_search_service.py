@@ -388,8 +388,14 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
         if cached_result is not None:
             return cached_result
 
-        skills = await self.relations_collection.aggregate([
+        pipeline = [
             {"$match": {"modelId": self._model_id, "requiringOccupationId": ObjectId(occupation.id)}},
+            {"$project": {
+                "requiredSkillId": 1,
+                "modelId": 1,
+                "relationType": 1,
+                "signallingValueLabel": 1,
+            }},
             {
                 "$lookup": {
                     "from": self.embedding_config.skill_collection_name,
@@ -397,42 +403,33 @@ class OccupationSkillSearchService(SimilaritySearchService[OccupationSkillEntity
                     "foreignField": "skillId",
                     "as": "skills",
                     "pipeline": [
-                        {"$match": {"modelId": self._model_id}}
+                        {"$match": {"modelId": self._model_id}},
+                        # Limit 1 of the skills (Note: each skill has 3 corresponding documents, pick the first.
+                        {"$limit": 1},
+                        # Exclude large/irrelevant fields from the result to reduce network transfer and improve latency
+                        {"$project": { "embedding": 0, "embedded_field": 0, "embedded_text": 0,  }}
                     ]
                 }
             },
-            {"$unwind": "$skills"},
-            {"$group": {"_id": "$skills.skillId",
-                        "modelId": {"$first": "$modelId"},
-                        "skillId": {"$first": "$skills.skillId"},
-                        "UUID": {"$first": "$skills.UUID"},
-                        "preferredLabel": {"$first": "$skills.preferredLabel"},
-                        "description": {"$first": "$skills.description"},
-                        "scopeNote": {"$first": "$skills.scopeNote"},
-                        "originUUID": {"$first": "$skills.originUUID"},
-                        "UUIDHistory": {"$first": "$skills.UUIDHistory"},
-                        "altLabels": {"$first": "$skills.altLabels"},
-                        "skillType": {"$first": "$skills.skillType"},
-                        "relationType": {"$first": "$relationType"},
-                        "signallingValueLabel": {"$first": "$signallingValueLabel"},
-                        }
-             }
-        ]).to_list(length=None)
+            {"$unwind": "$skills"}
+        ]
+
+        skills_relationships = await self.relations_collection.aggregate(pipeline).to_list(length=None)
         result = [AssociatedSkillEntity(
-            id=str(skill.get("skillId", "")),
-            modelId=str(skill.get("modelId", "")),
-            UUID=skill.get("UUID", ""),
-            preferredLabel=skill.get("preferredLabel", ""),
-            description=skill.get("description", ""),
-            scopeNote=skill.get("scopeNote", ""),
-            altLabels=skill.get("altLabels", []),
-            skillType=skill.get("skillType", ""),
-            originUUID=skill.get("originUUID", ""),
-            UUIDHistory=skill.get("UUIDHistory", []),
-            relationType=skill.get("relationType", ""),
-            signallingValueLabel=skill.get("signallingValueLabel", ""),
+            id=str(skill_relationship.get("skills").get("skillId", "")),
+            modelId=str(skill_relationship.get("modelId", "")),
+            UUID=skill_relationship.get("skills").get("UUID", ""),
+            preferredLabel=skill_relationship.get("skills").get("preferredLabel", ""),
+            description=skill_relationship.get("skills").get("description", ""),
+            scopeNote=skill_relationship.get("skills").get("scopeNote", ""),
+            altLabels=skill_relationship.get("skills").get("altLabels", []),
+            skillType=skill_relationship.get("skills").get("skillType", ""),
+            originUUID=skill_relationship.get("skills").get("originUUID", ""),
+            UUIDHistory=skill_relationship.get("skills").get("UUIDHistory", []),
+            relationType=skill_relationship.get("relationType", ""),
+            signallingValueLabel=skill_relationship.get("signallingValueLabel", ""),
             score=0.0
-        ) for skill in skills]
+        ) for skill_relationship in skills_relationships]
 
         # Cache the result
         await _skills_of_occupation_cache.set(occupation.id, result)
