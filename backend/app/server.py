@@ -298,6 +298,7 @@ async def lifespan(_app: FastAPI):
     # close the database connections
     application_db.client.close()
     userdata_db.client.close()
+    taxonomy_db.client.close()
     metrics_db.client.close()
 
     logger.info("Shutting down completed.")
