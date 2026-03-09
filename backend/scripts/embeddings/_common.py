@@ -285,6 +285,29 @@ async def create_skills_indexes(*, hot_run: bool,
                               id_field_name="skillId",
                               logger=logger,
                               )
+
+    # Create an index on (skillId, modelId).
+    # This index optimizes MongoDB $lookup operations where documents
+    # are searched by `skillId` within a specific `modelId`.
+    #
+    # The default compound index order (modelId, skillId) is not optimal
+    # for this query pattern because MongoDB can miss the index when the
+    # leading field is not used first. In some cases this causes the query
+    # planner to skip the index and perform a less efficient scan.
+    #
+    # Therefore, we explicitly create the index with `skillId` as the
+    # leading field to match the lookup access pattern.
+    await _upsert_index(
+        hot_run=hot_run,
+        collection=collection,
+        keys={
+            "skillId": 1,
+            "modelId": 1,
+        },
+        name="skill_id_model_id_index",
+        logger=logger,
+    )
+
     await _create_vector_search_index(hot_run=hot_run,
                                       collection=collection,
                                       num_of_dimensions=num_of_dimensions,
