@@ -314,6 +314,7 @@ app = FastAPI(
     version=get_application_config().version_info.to_version_string(),
     description=f"The {_global_product_name} API is used to interact with the {_global_product_name} conversation agent.",
     redirect_slashes=False,
+    swagger_ui_parameters={"docExpansion": "none"},
     servers=[
         {
             "url": backend_url or "/",
