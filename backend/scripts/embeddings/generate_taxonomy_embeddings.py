@@ -404,21 +404,21 @@ async def main(opts: Options):
     logger.info("Starting the main function")
     logger.info("Using options: " + opts.__str__())
 
-    if opts.delete_existing:
-        # Delete existing relations and model info collections
-        for collection in CompassEmbeddingsCollections:
-            await delete_existing(hot_run=opts.hot_run,
-                                  collection_name=collection.value,
-                                  model_id=SCRIPT_SETTINGS.tabiya_model_id)
-
-    embeddings_service = await get_embeddings_service(service_name=SCRIPT_SETTINGS.embeddings_service_name,
-                                                      model_name=SCRIPT_SETTINGS.embeddings_model_name)
-
     # [1/5] Copy the model info and validate for existing state, if it is compatible with the new state.
-    await _copy_model_info(hot_run=opts.hot_run, embeddings_service=embeddings_service)
-
-    # run the three tasks in parallel
     if opts.generate_embeddings:
+        if opts.delete_existing:
+            # Delete existing relations and model info collections
+            for collection in CompassEmbeddingsCollections:
+                await delete_existing(hot_run=opts.hot_run,
+                                      collection_name=collection.value,
+                                      model_id=SCRIPT_SETTINGS.tabiya_model_id)
+
+        embeddings_service = await get_embeddings_service(service_name=SCRIPT_SETTINGS.embeddings_service_name,
+                                                          model_name=SCRIPT_SETTINGS.embeddings_model_name)
+
+        await _copy_model_info(hot_run=opts.hot_run, embeddings_service=embeddings_service)
+
+        # run the three tasks in parallel
         await asyncio.gather(
             # [2/5] Copy the relations collection
             copy_relations_collection(hot_run=opts.hot_run),
@@ -438,8 +438,8 @@ async def main(opts: Options):
                                num_of_dimensions=opts.num_of_dimensions,
                                logger=logger)
 
+    logger.info("Script execution completed")
 
-logger.info("Script execution completed")
 
 if __name__ == "__main__":
     try:
