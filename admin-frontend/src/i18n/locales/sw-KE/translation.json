@@ -109,6 +109,15 @@
     "logout": "Logout",
     "user": "User"
   },
+  "navbar": {
+    "title": "{{appName}} Admin",
+    "profileMenu": "Menyu ya wasifu",
+    "logout": "Ondoka",
+    "role": {
+      "admin": "Msimamizi",
+      "institutionStaff": "Wafanyakazi wa Taasisi"
+    }
+  },
   "footer": {
     "privacyPolicy": "Privacy Policy",
     "termsOfUse": "Terms of Use",
@@ -334,5 +343,51 @@
     "message": "Page Not Found",
     "description": "The page you are looking for might have been removed or is temporarily unavailable.",
     "goHome": "Go to Dashboard"
+  },
+  "users": {
+    "title": "Watumiaji",
+    "addUser": "Ongeza Mtumiaji",
+    "table": {
+      "email": "Barua pepe",
+      "name": "Jina la Kuonyesha",
+      "role": "Jukumu",
+      "institutionId": "Kitambulisho cha Taasisi",
+      "status": "Hali",
+      "actions": "Vitendo",
+      "empty": "Hakuna watumiaji waliopatikana"
+    },
+    "status": {
+      "active": "Hai",
+      "inactive": "Si Hai"
+    },
+    "actions": {
+      "editRole": "Hariri Jukumu",
+      "delete": "Futa Mtumiaji"
+    },
+    "createModal": {
+      "title": "Ongeza Mtumiaji Mpya",
+      "email": "Barua pepe",
+      "name": "Jina la Kuonyesha",
+      "role": "Jukumu",
+      "institutionId": "Kitambulisho cha Taasisi",
+      "submit": "Unda Mtumiaji"
+    },
+    "updateRoleModal": {
+      "title": "Sasisha Jukumu",
+      "role": "Jukumu",
+      "institutionId": "Kitambulisho cha Taasisi",
+      "submit": "Sasisha Jukumu"
+    },
+    "deleteModal": {
+      "title": "Futa Mtumiaji",
+      "message": "Una uhakika unataka kufuta {{email}}? Kitendo hiki hakiwezi kurudishwa.",
+      "confirm": "Futa"
+    },
+    "error": {
+      "loadFailed": "Imeshindwa kupakia watumiaji",
+      "createFailed": "Imeshindwa kuunda mtumiaji",
+      "updateFailed": "Imeshindwa kusasisha jukumu",
+      "deleteFailed": "Imeshindwa kufuta mtumiaji"
+    }
   }
 }

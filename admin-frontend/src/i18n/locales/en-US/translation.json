@@ -107,7 +107,11 @@
   },
   "header": {
     "logout": "Logout",
-    "user": "User"
+    "user": "User",
+    "role": {
+      "admin": "Admin",
+      "institutionStaff": "Institution Staff"
+    }
   },
   "footer": {
     "privacyPolicy": "Privacy Policy",
@@ -333,5 +337,51 @@
     "message": "Page Not Found",
     "description": "The page you are looking for might have been removed or is temporarily unavailable.",
     "goHome": "Go to Dashboard"
+  },
+  "users": {
+    "title": "Users",
+    "addUser": "Add User",
+    "table": {
+      "email": "Email",
+      "name": "Display Name",
+      "role": "Role",
+      "institutionId": "Institution ID",
+      "status": "Status",
+      "actions": "Actions",
+      "empty": "No users found"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "editRole": "Edit Role",
+      "delete": "Delete User"
+    },
+    "createModal": {
+      "title": "Add New User",
+      "email": "Email",
+      "name": "Display Name",
+      "role": "Role",
+      "institutionId": "Institution ID",
+      "submit": "Create User"
+    },
+    "updateRoleModal": {
+      "title": "Update Role",
+      "role": "Role",
+      "institutionId": "Institution ID",
+      "submit": "Update Role"
+    },
+    "deleteModal": {
+      "title": "Delete User",
+      "message": "Are you sure you want to delete {{email}}? This action cannot be undone.",
+      "confirm": "Delete"
+    },
+    "error": {
+      "loadFailed": "Failed to load users",
+      "createFailed": "Failed to create user",
+      "updateFailed": "Failed to update role",
+      "deleteFailed": "Failed to delete user"
+    }
   }
 }

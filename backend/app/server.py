@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 
 from fastapi import FastAPI, APIRouter, Depends
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.admin.routes import get_admin_routes
 from app.conversations.routes import add_conversation_routes
 from app.countries import Country, get_country_from_string
 from app.invitations import add_user_invitations_routes
@@ -247,6 +249,7 @@ application_config = ApplicationConfig(
     matching_service_api_key=os.getenv("MATCHING_SERVICE_API_KEY"),
     inline_phase_transition=os.getenv("COMPASS_INLINE_PHASE_TRANSITION", "").lower() in ("1", "true"),
     career_explorer_config=parse_career_explorer_config(os.getenv("CAREER_EXPLORER_CONFIG")),
+    admin_firebase_tenant_id=os.getenv("ADMIN_FIREBASE_TENANT_ID", ""),
 )
 
 set_application_config(application_config)
@@ -472,6 +475,12 @@ add_teveta_routes(app)
 # Add POC chat routes
 ############################################
 add_poc_routes(app, auth)
+
+############################################
+# Add admin user management routes
+############################################
+admin_routes = get_admin_routes()
+app.include_router(admin_routes, prefix="/admin", tags=["Admin"])
 
 ############################################
 # Add other features routes

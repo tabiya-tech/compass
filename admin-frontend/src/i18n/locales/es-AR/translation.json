@@ -109,6 +109,15 @@
     "logout": "Logout",
     "user": "User"
   },
+  "navbar": {
+    "title": "{{appName}} Admin",
+    "profileMenu": "Menú de perfil",
+    "logout": "Cerrar sesión",
+    "role": {
+      "admin": "Administrador",
+      "institutionStaff": "Personal de Institución"
+    }
+  },
   "footer": {
     "privacyPolicy": "Privacy Policy",
     "termsOfUse": "Terms of Use",
@@ -334,5 +343,51 @@
     "message": "Page Not Found",
     "description": "The page you are looking for might have been removed or is temporarily unavailable.",
     "goHome": "Go to Dashboard"
+  },
+  "users": {
+    "title": "Usuarios",
+    "addUser": "Agregar Usuario",
+    "table": {
+      "email": "Correo electrónico",
+      "name": "Nombre",
+      "role": "Rol",
+      "institutionId": "ID de Institución",
+      "status": "Estado",
+      "actions": "Acciones",
+      "empty": "No se encontraron usuarios"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "actions": {
+      "editRole": "Editar Rol",
+      "delete": "Eliminar Usuario"
+    },
+    "createModal": {
+      "title": "Agregar Nuevo Usuario",
+      "email": "Correo electrónico",
+      "name": "Nombre",
+      "role": "Rol",
+      "institutionId": "ID de Institución",
+      "submit": "Crear Usuario"
+    },
+    "updateRoleModal": {
+      "title": "Actualizar Rol",
+      "role": "Rol",
+      "institutionId": "ID de Institución",
+      "submit": "Actualizar Rol"
+    },
+    "deleteModal": {
+      "title": "Eliminar Usuario",
+      "message": "¿Estás seguro de que querés eliminar a {{email}}? Esta acción no se puede deshacer.",
+      "confirm": "Eliminar"
+    },
+    "error": {
+      "loadFailed": "Error al cargar usuarios",
+      "createFailed": "Error al crear usuario",
+      "updateFailed": "Error al actualizar rol",
+      "deleteFailed": "Error al eliminar usuario"
+    }
   }
 }

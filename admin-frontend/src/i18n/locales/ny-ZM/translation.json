@@ -109,6 +109,15 @@
     "logout": "Logout",
     "user": "User"
   },
+  "navbar": {
+    "title": "{{appName}} Admin",
+    "profileMenu": "Menyu ya mbiri",
+    "logout": "Tulukani",
+    "role": {
+      "admin": "Woyang'anira",
+      "institutionStaff": "Wantchito wa Bungwe"
+    }
+  },
   "footer": {
     "privacyPolicy": "Privacy Policy",
     "termsOfUse": "Terms of Use",
@@ -334,5 +343,51 @@
     "message": "Page Not Found",
     "description": "The page you are looking for might have been removed or is temporarily unavailable.",
     "goHome": "Go to Dashboard"
+  },
+  "users": {
+    "title": "Ogwiritsa Ntchito",
+    "addUser": "Onjezani Wogwiritsa Ntchito",
+    "table": {
+      "email": "Imelo",
+      "name": "Dzina Lowonetsa",
+      "role": "Udindo",
+      "institutionId": "Nambala ya Bungwe",
+      "status": "Mkhalidwe",
+      "actions": "Zochita",
+      "empty": "Palibe ogwiritsa ntchito apezeka"
+    },
+    "status": {
+      "active": "Amagwira ntchito",
+      "inactive": "Samagwira ntchito"
+    },
+    "actions": {
+      "editRole": "Sinthani Udindo",
+      "delete": "Chotsani Wogwiritsa Ntchito"
+    },
+    "createModal": {
+      "title": "Onjezani Wogwiritsa Ntchito Watsopano",
+      "email": "Imelo",
+      "name": "Dzina Lowonetsa",
+      "role": "Udindo",
+      "institutionId": "Nambala ya Bungwe",
+      "submit": "Pangani Wogwiritsa Ntchito"
+    },
+    "updateRoleModal": {
+      "title": "Sinthani Udindo",
+      "role": "Udindo",
+      "institutionId": "Nambala ya Bungwe",
+      "submit": "Sinthani Udindo"
+    },
+    "deleteModal": {
+      "title": "Chotsani Wogwiritsa Ntchito",
+      "message": "Mukutsimikiza kuti mukufuna kuchotsa {{email}}? Izi sizitha kubwezedwa.",
+      "confirm": "Chotsani"
+    },
+    "error": {
+      "loadFailed": "Zalephera kukweza ogwiritsa ntchito",
+      "createFailed": "Zalephera kupanga wogwiritsa ntchito",
+      "updateFailed": "Zalephera kusintha udindo",
+      "deleteFailed": "Zalephera kuchotsa wogwiritsa ntchito"
+    }
   }
 }

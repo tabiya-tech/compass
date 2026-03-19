@@ -116,6 +116,12 @@ class ApplicationConfig(BaseModel):
     Loaded from CAREER_EXPLORER_CONFIG JSON env var.
     """
 
+    admin_firebase_tenant_id: str
+    """
+    The Firebase tenant ID for admin user management operations.
+    Loaded from the ADMIN_FIREBASE_TENANT_ID environment variable.
+    """
+
     @model_validator(mode='after')
     def check_cv_upload_configurations(self) -> "ApplicationConfig":
         # Check that the CV upload configurations are valid.
