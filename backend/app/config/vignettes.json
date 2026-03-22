@@ -108,7 +108,11 @@
       {
         "option_id": "A",
         "title": "Junior Data Analyst at Tech Company",
-        "description": "Junior data analyst at a tech company, 5,500 ZMW/month to start. The company will train you in data science, pay for online courses, and has a clear path: junior (ZMW 5,500) → analyst (ZMW 8,000) → senior (ZMW 12,000) over 3 years. Remote work, friendly team. You'll learn Python, SQL, data visualization.",
+<<<<<<< HEAD
+        "description": "Junior data analyst at a tech company, 5,500 ZMW/month to start. The company will train you in data science, pay for online courses, and has a clear path: junior (5,500 ZMW) → analyst (8,000 ZMW) → senior (12,000 ZMW) over 3 years. Remote work, friendly team. You'll learn Python, SQL, data visualization.",
+=======
+        "description": "Junior data analyst at a tech company, 5,500 ZMW/month to start. The company will train you in data science, pay for online courses, and has a clear path: junior (5,500) → analyst (8,000) → senior (12,000) over 3 years. Remote work, friendly team. You'll learn Python, SQL, data visualization.",
+>>>>>>> 0e355c7b (fix(zambia): localize vignettes, glossary, and agent prompts for Zambia)
         "attributes": {
           "salary": 5500,
           "salary_progression": [5500, 8000, 12000],

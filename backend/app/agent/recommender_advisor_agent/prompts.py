@@ -10,10 +10,9 @@ Epic 3: Recommender Agent Implementation
 
 from app.agent.prompt_template.agent_prompt_template import (
     STD_AGENT_CHARACTER,
-    STD_LANGUAGE_STYLE
+    STD_LANGUAGE_STYLE,
 )
 from app.countries import Country, get_country_glossary
-
 
 # ========== COUNTRY-SPECIFIC LABOR MARKET CONTEXT ==========
 
@@ -309,9 +308,13 @@ When the user's country is specified, adapt your conversation accordingly:
 - Be aware of **cultural factors** that may influence career decisions (family expectations, community standing)
 
 ### Examples
+
 ✅ Good: "Many people start in the informal sector — have you considered apprenticeships or piece work while building skills?" (adapt country name from context)
 ✅ Good: "This aligns well with the growing tech sector here — local telecom and fintech companies are hiring." (use specific companies from the labor market context block)
 ✅ Good: "I know informal work is common — let's find something more stable."
+✅ Good: "In Zambia, many people start in the informal sector - have you considered piece work or apprenticeships while building skills?"
+✅ Good: "This aligns well with the growing tech sector in Lusaka - companies like Airtel Zambia and MTN Zambia are hiring."
+✅ Good: "I know 'hustling' is common - let's find something more stable."
 ❌ Avoid: Overloading responses with local terms that feel unnatural
 ❌ Avoid: Making assumptions about the user based solely on their country
 ❌ Avoid: Mixing country-specific examples (e.g. Zambia and Kenya references in the same response)
@@ -320,7 +323,9 @@ When the user's country is specified, adapt your conversation accordingly:
 
 # ========== PHASE-SPECIFIC PROMPTS ==========
 
-INTRO_PHASE_PROMPT = BASE_RECOMMENDER_PROMPT + """
+INTRO_PHASE_PROMPT = (
+    BASE_RECOMMENDER_PROMPT
+    + """
 ## INTRO PHASE - SPECIFIC GUIDANCE
 
 Your task: Set expectations about the recommendation process.
@@ -341,9 +346,12 @@ Your task: Set expectations about the recommendation process.
 
 **Tone**: Warm, encouraging, conversational.
 """
+)
 
 
-PRESENT_RECOMMENDATIONS_PROMPT = BASE_RECOMMENDER_PROMPT + """
+PRESENT_RECOMMENDATIONS_PROMPT = (
+    BASE_RECOMMENDER_PROMPT
+    + """
 ## PRESENT RECOMMENDATIONS PHASE - SPECIFIC GUIDANCE
 
 Your task: Present occupation recommendations in a natural, conversational way while maintaining strict rank order.
@@ -408,9 +416,12 @@ When "What we learned about how this person thinks" is present in the context bl
 - Reference 1-2 of their strongest values in your opening sentence to signal you remember them:
   "Given how important [value] is to you, I've focused on options where that's strongest..."
 """
+)
 
 
-CAREER_EXPLORATION_PROMPT = BASE_RECOMMENDER_PROMPT + """
+CAREER_EXPLORATION_PROMPT = (
+    BASE_RECOMMENDER_PROMPT
+    + """
 ## CAREER EXPLORATION PHASE - SPECIFIC GUIDANCE
 
 Your task: Provide a deep-dive on the occupation the user selected, connecting it to their profile and building motivation.
@@ -494,9 +505,12 @@ Let's dive into **[Occupation]**:
 
 **IMPORTANT**: This is an ongoing conversation. Set `finished` to `false` - the user needs to respond to your question about their concerns. The conversation is NOT complete.
 """
+)
 
 
-ADDRESS_CONCERNS_PROMPT_CLASSIFICATION = BASE_RECOMMENDER_PROMPT + """
+ADDRESS_CONCERNS_PROMPT_CLASSIFICATION = (
+    BASE_RECOMMENDER_PROMPT
+    + """
 ## ADDRESS CONCERNS PHASE - STEP 1: CLASSIFY RESISTANCE
 
 Your task: Classify the type of resistance or acceptance the user is expressing.
@@ -561,9 +575,12 @@ Use these signals to sharpen your classification, not replace it. The user's act
 
 **Output**: Return the classification type and a brief summary.
 """
+)
 
 
-ADDRESS_CONCERNS_PROMPT_RESPONSE = BASE_RECOMMENDER_PROMPT + """
+ADDRESS_CONCERNS_PROMPT_RESPONSE = (
+    BASE_RECOMMENDER_PROMPT
+    + """
 ## ADDRESS CONCERNS PHASE - STEP 2: RESPOND TO RESISTANCE
 
 Your task: Address the user's concern with empathy, honesty, and constructive guidance.
@@ -658,9 +675,12 @@ If no qualitative context is present, respond using only the standard strategies
 
 **Tone**: Empathetic, honest, constructive, non-pushy.
 """
+)
 
 
-ACTION_PLANNING_PROMPT = BASE_RECOMMENDER_PROMPT + """
+ACTION_PLANNING_PROMPT = (
+    BASE_RECOMMENDER_PROMPT
+    + """
 ## ACTION PLANNING PHASE - SPECIFIC GUIDANCE
 
 Your task: Guide the user toward concrete, actionable next steps.
@@ -735,9 +755,12 @@ Great choice! Let's make this concrete.
 **When do you think you could [action]?** This week, or would next month be more realistic?
 ```
 """
+)
 
 
-DISCUSS_TRADEOFFS_PROMPT = BASE_RECOMMENDER_PROMPT + """
+DISCUSS_TRADEOFFS_PROMPT = (
+    BASE_RECOMMENDER_PROMPT
+    + """
 ## DISCUSS TRADEOFFS PHASE - SPECIFIC GUIDANCE
 
 Your task: Help user balance their preferences against labor market realities.
@@ -820,9 +843,12 @@ Both paths are valid. The question is: **what matters more to you right now** - 
 What's your gut telling you?
 ```
 """
+)
 
 
-FOLLOW_UP_PROMPT = BASE_RECOMMENDER_PROMPT + """
+FOLLOW_UP_PROMPT = (
+    BASE_RECOMMENDER_PROMPT
+    + """
 ## FOLLOW-UP PHASE - SPECIFIC GUIDANCE
 
 Your task: Clarify ambiguous or unclear user responses.
@@ -896,9 +922,12 @@ If you had to pick just ONE of these to learn more about today, which would it b
 - Or something else entirely?
 ```
 """
+)
 
 
-SKILLS_UPGRADE_PIVOT_PROMPT = BASE_RECOMMENDER_PROMPT + """
+SKILLS_UPGRADE_PIVOT_PROMPT = (
+    BASE_RECOMMENDER_PROMPT
+    + """
 ## SKILLS UPGRADE PIVOT PHASE - SPECIFIC GUIDANCE
 
 Your task: Present training/skills development recommendations after user has rejected occupation options.
@@ -984,9 +1013,12 @@ Looking at your interests, here are skill-building opportunities that could open
 **Which of these skills sounds most interesting to you?** Or is there something else you've been curious about learning?
 ```
 """
+)
 
 
-WRAPUP_PROMPT = BASE_RECOMMENDER_PROMPT + """
+WRAPUP_PROMPT = (
+    BASE_RECOMMENDER_PROMPT
+    + """
 ## WRAPUP PHASE - SPECIFIC GUIDANCE
 
 Your task: Summarize the session, confirm action commitment, and close gracefully.
@@ -1077,9 +1109,11 @@ If you need support or want to discuss how it went, I'm here anytime. You've got
 
 **Note**: The final message after WRAPUP (in COMPLETE phase) is just a brief farewell - keep it short and warm.
 """
+)
 
 
 # ========== HELPER FUNCTIONS ==========
+
 
 def get_phase_prompt(phase: str) -> str:
     """
@@ -1112,7 +1146,7 @@ def build_context_block(
     preference_vector: dict,
     recommendations_summary: str,
     conversation_history: str,
-    country_of_user: Country = Country.UNSPECIFIED
+    country_of_user: Country = Country.UNSPECIFIED,
 ) -> str:
     """
     Build a context block to prepend to prompts with user data.
@@ -1162,26 +1196,38 @@ Use these terms naturally when they fit the conversation. Don't force them - onl
     return f"""
 ## CONTEXT FOR THIS USER
 
-**User's Country**: {country_of_user.value if country_of_user != Country.UNSPECIFIED else 'Not specified'}
+**User's Country**: {
+        country_of_user.value
+        if country_of_user != Country.UNSPECIFIED
+        else "Not specified"
+    }
 
 {labor_market_context}
 {glossary_section}
 {localization_guidance}
 
 **User's Skills**:
-{', '.join(skills) if skills else 'No skills data available'}
+{", ".join(skills) if skills else "No skills data available"}
 
 **User's Preference Vector** (what they value in a job, 0.0-1.0 scale):
 {_format_preference_vector(preference_vector)}
 
-{f'''**What we learned about how this person thinks** (from preference conversation):
+{
+        f'''**What we learned about how this person thinks** (from preference conversation):
 {qualitative_block}
-''' if qualitative_block else ''}
+'''
+        if qualitative_block
+        else ""
+    }
 **Recommendations Available**:
 {recommendations_summary}
 
 **Conversation So Far**:
-{conversation_history if conversation_history else 'This is the start of the conversation.'}
+{
+        conversation_history
+        if conversation_history
+        else "This is the start of the conversation."
+    }
 
 ---
 """
@@ -1194,12 +1240,14 @@ def _format_preference_vector(pref_vec: dict) -> str:
 
     lines = []
     for key, value in pref_vec.items():
-        if key.endswith('_importance') and isinstance(value, (int, float)):
-            dimension = key.replace('_importance', '').replace('_', ' ').title()
-            importance_label = "High" if value >= 0.7 else "Moderate" if value >= 0.4 else "Low"
+        if key.endswith("_importance") and isinstance(value, (int, float)):
+            dimension = key.replace("_importance", "").replace("_", " ").title()
+            importance_label = (
+                "High" if value >= 0.7 else "Moderate" if value >= 0.4 else "Low"
+            )
             lines.append(f"  - {dimension}: {value:.2f} ({importance_label})")
 
-    return '\n'.join(lines) if lines else "No importance scores available"
+    return "\n".join(lines) if lines else "No importance scores available"
 
 
 def _format_qualitative_metadata(pref_vec: dict) -> str:
@@ -1221,9 +1269,7 @@ def _format_qualitative_metadata(pref_vec: dict) -> str:
     values_signals = pref_vec.get("values_signals", {})
     if isinstance(values_signals, dict):
         active_values = [
-            k.replace("_", " ")
-            for k, v in values_signals.items()
-            if v is True
+            k.replace("_", " ") for k, v in values_signals.items() if v is True
         ]
         if active_values:
             sections.append("  Values & motivations: " + ", ".join(active_values))
@@ -1232,14 +1278,10 @@ def _format_qualitative_metadata(pref_vec: dict) -> str:
     tradeoff_willingness = pref_vec.get("tradeoff_willingness", {})
     if isinstance(tradeoff_willingness, dict):
         willing = [
-            k.replace("_", " ")
-            for k, v in tradeoff_willingness.items()
-            if v is True
+            k.replace("_", " ") for k, v in tradeoff_willingness.items() if v is True
         ]
         unwilling = [
-            k.replace("_", " ")
-            for k, v in tradeoff_willingness.items()
-            if v is False
+            k.replace("_", " ") for k, v in tradeoff_willingness.items() if v is False
         ]
         if willing:
             sections.append("  Will sacrifice: " + ", ".join(willing))
@@ -1250,9 +1292,7 @@ def _format_qualitative_metadata(pref_vec: dict) -> str:
     extracted_constraints = pref_vec.get("extracted_constraints", {})
     if isinstance(extracted_constraints, dict):
         active_constraints = [
-            k.replace("_", " ")
-            for k, v in extracted_constraints.items()
-            if v is True
+            k.replace("_", " ") for k, v in extracted_constraints.items() if v is True
         ]
         if active_constraints:
             sections.append("  Hard constraints: " + ", ".join(active_constraints))
@@ -1261,9 +1301,7 @@ def _format_qualitative_metadata(pref_vec: dict) -> str:
     decision_patterns = pref_vec.get("decision_patterns", {})
     if isinstance(decision_patterns, dict):
         active_patterns = [
-            k.replace("_", " ")
-            for k, v in decision_patterns.items()
-            if v is True
+            k.replace("_", " ") for k, v in decision_patterns.items() if v is True
         ]
         if active_patterns:
             sections.append("  Decision style: " + ", ".join(active_patterns))
@@ -1274,7 +1312,13 @@ def _format_qualitative_metadata(pref_vec: dict) -> str:
         conviction = consistency_indicators.get("conviction_strength")
         consistency = consistency_indicators.get("response_consistency")
         if conviction is not None:
-            label = "strong" if conviction >= 0.7 else "moderate" if conviction >= 0.4 else "tentative"
+            label = (
+                "strong"
+                if conviction >= 0.7
+                else "moderate"
+                if conviction >= 0.4
+                else "tentative"
+            )
             sections.append(f"  Conviction strength: {conviction:.2f} ({label})")
         if consistency is not None:
             label = "consistent" if consistency >= 0.7 else "mixed signals"
