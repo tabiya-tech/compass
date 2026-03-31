@@ -11,6 +11,7 @@ from typing import Optional
 from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.preference_elicitation_agent.types import UserContext
 from app.agent.llm_caller import LLMCaller
+from app.countries import Country
 from common_libs.llm.models_utils import (
     BasicLLM,
     LLMConfig,
@@ -66,12 +67,13 @@ class UserContextExtractor:
     - Brief background summary
     """
 
-    def __init__(self, llm: BasicLLM):
+    def __init__(self, llm: BasicLLM, country_of_user: Country = Country.UNSPECIFIED):
         """
         Initialize the UserContextExtractor.
 
         Args:
             llm: Language model to use for extraction (base LLM without system instructions)
+            country_of_user: Country of the user for context-aware extraction
         """
         self._logger = logging.getLogger(self.__class__.__name__)
         self._base_llm = llm
@@ -79,7 +81,9 @@ class UserContextExtractor:
         # Create LLM with system instructions for context extraction
         from common_libs.llm.generative_models import GeminiGenerativeLLM
 
-        system_instructions = """
+        country_examples = self._build_country_examples(country_of_user)
+
+        system_instructions = f"""
 You are analyzing a user's work experience to extract key context for personalizing career guidance.
 
 Extract the following information:
@@ -93,12 +97,7 @@ Extract the following information:
 Be concise and focus on information that would help personalize job scenarios.
 If information is unclear or missing, make reasonable inferences based on what's available.
 
-For Zambian context, recognize local companies and roles:
-- Airtel Zambia, MTN Zambia, Zanaco, ZESCO, Zambeef = Technology/Finance/Energy/Agriculture
-- Teaching roles = Education
-- Shop/retail roles = Retail
-- Minibus conductor, driver = Transportation
-- Farming, agriculture roles = Agriculture
+{country_examples}
 
 Output Schema:
 You must return a JSON object with exactly these fields:
@@ -110,14 +109,14 @@ You must return a JSON object with exactly these fields:
 - all_backgrounds (array of strings): One "Role | Industry" string per experience, newest first (e.g., ["Software Developer | Technology", "Sales Associate | Retail", "Teacher | Education"])
 
 Example Output:
-{
+{{
   "current_role": "Freelance Web Designer",
   "industry": "Technology",
   "experience_level": "junior",
-  "key_experiences": ["Airtel Zambia", "Freelance Web Designer", "Local Retail Store"],
+  "key_experiences": ["Tech Company", "Freelance Web Designer", "Local Retail Store"],
   "background_summary": "A junior software developer transitioning into freelance web design after initial experience in retail and corporate tech.",
   "all_backgrounds": ["Freelance Web Designer | Technology", "Sales Associate | Retail", "Shop Assistant | Retail"]
-}
+}}
 """
 
         # Use proper JSON generation config
@@ -177,6 +176,33 @@ Example Output:
         except Exception as e:
             self._logger.error(f"Error extracting context: {e}, using default", exc_info=True)
             return UserContext()
+
+    @staticmethod
+    def _build_country_examples(country: Country) -> str:
+        """Build country-specific company/role recognition examples for the system instructions."""
+        if country == Country.ZAMBIA:
+            return (
+                "For Zambian context, recognize local companies and roles:\n"
+                "- Airtel Zambia, MTN Zambia, Zanaco, ZESCO, Zambeef = Technology/Finance/Energy/Agriculture\n"
+                "- Teaching roles = Education\n"
+                "- Shop/retail roles = Retail\n"
+                "- Minibus conductor, driver = Transportation\n"
+                "- Farming, agriculture roles = Agriculture"
+            )
+        if country == Country.KENYA:
+            return (
+                "For Kenyan context, recognize local companies and roles:\n"
+                "- Safaricom, KCB, Equity Bank, Kenya Airways = Telecoms/Finance/Aviation\n"
+                "- Teaching roles = Education\n"
+                "- Shop/retail roles = Retail\n"
+                "- Matatu conductor, boda boda driver = Transportation\n"
+                "- Farming, shamba roles = Agriculture\n"
+                "- Jua Kali (informal artisan) = Manufacturing/Artisan"
+            )
+        return (
+            "Recognize local companies, informal job titles, and sector-specific roles "
+            "based on the user's described location and context."
+        )
 
     def _format_experiences(self, experiences: list[ExperienceEntity]) -> str:
         """

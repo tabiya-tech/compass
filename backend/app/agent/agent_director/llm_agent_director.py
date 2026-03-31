@@ -13,6 +13,7 @@ from app.agent.recommender_advisor_agent.agent import RecommenderAdvisorAgent
 from app.agent.recommender_advisor_agent.matching_service_client import MatchingServiceClient
 from app.agent.welcome_agent import WelcomeAgent
 from app.app_config import get_application_config
+from app.countries import Country
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.vector_search.vector_search_dependencies import SearchServices
@@ -69,7 +70,8 @@ class LLMAgentDirector(AbstractAgentDirector):
             AgentType.PREFERENCE_ELICITATION_AGENT: PreferenceElicitationAgent(
                 use_personalized_vignettes=False,  # Disable default personalization
                 use_offline_with_personalization=True,  # Enable hybrid mode (offline D-optimal vignettes + LLM personalization)
-                offline_output_dir=str(Path(__file__).parent.parent.parent.parent / "offline_output")
+                offline_output_dir=str(Path(__file__).parent.parent.parent.parent / "offline_output"),
+                country_of_user=get_application_config().default_country_of_user,
             ),
             AgentType.RECOMMENDER_ADVISOR_AGENT: RecommenderAdvisorAgent(
                 db6_client=None,  # Optional: Youth database integration

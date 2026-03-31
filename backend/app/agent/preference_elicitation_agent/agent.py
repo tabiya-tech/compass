@@ -49,6 +49,7 @@ from app.agent.prompt_template.agent_prompt_template import (
     STD_LANGUAGE_STYLE
 )
 from app.agent.prompt_template.quick_reply_prompt import QUICK_REPLY_PROMPT
+from app.countries import Country
 
 # Adaptive D-efficiency imports
 try:
@@ -197,7 +198,8 @@ class PreferenceElicitationAgent(Agent):
         db6_client: Optional['DB6Client'] = None,
         use_personalized_vignettes: bool = True,
         use_offline_with_personalization: bool = False,
-        offline_output_dir: Optional[str] = None
+        offline_output_dir: Optional[str] = None,
+        country_of_user: 'Country' = None,
     ):
         """
         Initialize the Preference Elicitation Agent.
@@ -210,6 +212,7 @@ class PreferenceElicitationAgent(Agent):
             use_personalized_vignettes: Whether to use personalized vignette generation (default: True)
             use_offline_with_personalization: Whether to use hybrid mode (offline D-optimal + LLM personalization)
             offline_output_dir: Directory containing offline-optimized vignettes (required if use_offline_with_personalization=True)
+            country_of_user: Country of the user for localizing vignettes and context extraction
         """
         super().__init__(
             agent_type=AgentType.PREFERENCE_ELICITATION_AGENT,
@@ -219,6 +222,7 @@ class PreferenceElicitationAgent(Agent):
         self._state: Optional[PreferenceElicitationAgentState] = None
         self._db6_client = db6_client  # Optional youth database client
         self._user_context: Optional[UserContext] = None
+        self._country_of_user: Country = country_of_user if country_of_user is not None else Country.UNSPECIFIED
 
         # Personalization logging
         self._use_offline_with_personalization = use_offline_with_personalization
@@ -258,11 +262,12 @@ class PreferenceElicitationAgent(Agent):
             vignettes_config_path=vignettes_config_path,
             use_personalization=use_personalized_vignettes and not use_offline_with_personalization,
             use_offline_with_personalization=use_offline_with_personalization,
-            offline_output_dir=offline_output_dir
+            offline_output_dir=offline_output_dir,
+            country_of_user=self._country_of_user,
         )
 
         # User context extractor
-        self._context_extractor = UserContextExtractor(llm=self._shared_llm)
+        self._context_extractor = UserContextExtractor(llm=self._shared_llm, country_of_user=self._country_of_user)
 
         # Preference extractors (create their own LLMs with system instructions)
         self._preference_extractor = PreferenceExtractor()

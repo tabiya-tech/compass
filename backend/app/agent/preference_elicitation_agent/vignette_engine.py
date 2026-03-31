@@ -22,6 +22,7 @@ from app.agent.preference_elicitation_agent.types import (
 )
 from app.agent.preference_elicitation_agent.state import PreferenceElicitationAgentState
 from app.agent.preference_elicitation_agent.vignette_personalizer import VignettePersonalizer
+from app.countries import Country
 from common_libs.llm.models_utils import BasicLLM
 
 # NEW: Adaptive D-efficiency imports
@@ -47,7 +48,8 @@ class VignetteEngine:
         use_personalization: bool = True,
         use_adaptive_selection: bool = False,
         use_offline_with_personalization: bool = False,
-        offline_output_dir: Optional[str] = None
+        offline_output_dir: Optional[str] = None,
+        country_of_user: Country = Country.UNSPECIFIED,
     ):
         """
         Initialize the VignetteEngine.
@@ -59,6 +61,7 @@ class VignetteEngine:
             use_adaptive_selection: Whether to use D-optimal adaptive selection with offline vignettes (no personalization)
             use_offline_with_personalization: Whether to use offline vignettes WITH personalization (hybrid mode)
             offline_output_dir: Directory containing offline-generated vignettes (required if use_adaptive_selection=True or use_offline_with_personalization=True)
+            country_of_user: Country of the user for localizing personalized vignettes
         """
         self._logger = logging.getLogger(self.__class__.__name__)
         self._use_personalization = use_personalization
@@ -105,7 +108,7 @@ class VignetteEngine:
             # Initialize adaptive components for D-optimal selection
             self._init_adaptive_components()
             # Initialize personalizer for lazy personalization
-            self._personalizer = VignettePersonalizer(llm=llm)
+            self._personalizer = VignettePersonalizer(llm=llm, country_of_user=country_of_user)
 
             self._logger.info(
                 f"Initialized VignetteEngine with HYBRID mode (offline + personalization): "
@@ -131,7 +134,7 @@ class VignetteEngine:
         elif use_personalization:
             if llm is None:
                 raise ValueError("LLM is required when use_personalization=True")
-            self._personalizer = VignettePersonalizer(llm=llm)
+            self._personalizer = VignettePersonalizer(llm=llm, country_of_user=country_of_user)
             self._logger.info("Initialized VignetteEngine with personalization")
 
             # Validate all required categories have templates
