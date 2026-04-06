@@ -50,14 +50,16 @@ export default class InstitutionService {
     return InstitutionService.instance;
   }
 
-  async searchInstitutions(params: {
-    keywords?: string;
-    province?: string;
-    limit?: number;
-    cursor?: string;
-    include?: string;
-    fields?: string;
-  } = {}): Promise<InstitutionsApiResponse> {
+  async searchInstitutions(
+    params: {
+      keywords?: string;
+      province?: string;
+      limit?: number;
+      cursor?: string;
+      include?: string;
+      fields?: string;
+    } = {}
+  ): Promise<InstitutionsApiResponse> {
     const query = new URLSearchParams();
     if (params.keywords) query.set("keywords", params.keywords);
     if (params.province) query.set("province", params.province);

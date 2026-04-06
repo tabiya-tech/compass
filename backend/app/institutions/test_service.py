@@ -26,8 +26,8 @@ class _FakeInstitutionRepository(IInstitutionRepository):
         self.search_called_with: Optional[Dict[str, Any]] = None
         self.count_called = False
 
-    async def search_institutions(self, keywords, province, sector, offset, limit):
-        self.search_called_with = {"keywords": keywords, "province": province, "sector": sector, "offset": offset, "limit": limit}
+    async def search_institutions(self, keywords, province, sector, offset, limit, name_only=False):
+        self.search_called_with = {"keywords": keywords, "province": province, "sector": sector, "offset": offset, "limit": limit, "name_only": name_only}
         return self._docs
 
     async def count_institutions(self, keywords, province, sector):

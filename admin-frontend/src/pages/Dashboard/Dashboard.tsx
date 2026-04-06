@@ -1,5 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Autocomplete, Box, Container, FormControl, Grid, MenuItem, Select, Skeleton, TextField, Typography, useTheme } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  Container,
+  FormControl,
+  Grid,
+  MenuItem,
+  Select,
+  Skeleton,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material/Select";
 import { useTranslation } from "react-i18next";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -212,9 +224,7 @@ const Dashboard: React.FC = () => {
                             onChange={(_e, value) => {
                               setModuleFilters((prev) => ({ ...prev, institution: value ?? "" }));
                             }}
-                            renderInput={(params) => (
-                              <TextField {...params} placeholder={t(filter.labelKey)} />
-                            )}
+                            renderInput={(params) => <TextField {...params} placeholder={t(filter.labelKey)} />}
                           />
                         </Grid>
                       ) : (
