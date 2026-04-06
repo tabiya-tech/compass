@@ -75,8 +75,8 @@ const Home: React.FC = () => {
             zIndex: 1,
             marginTop: {
               xs: 0,
-              md: theme.spacing(-4),
-              lg: theme.spacing(-6),
+              md: theme.spacing(-3),
+              lg: theme.spacing(-4),
             },
             paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.lg),
           }}

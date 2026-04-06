@@ -64,7 +64,6 @@ const HomeHero: React.FC = () => {
           alignItems: "flex-end",
           position: "relative",
           zIndex: 2,
-          marginBottom: { sm: theme.spacing(-6) },
         }}
       >
         <Box
@@ -74,13 +73,14 @@ const HomeHero: React.FC = () => {
           data-testid={DATA_TEST_ID.HOME_HERO_ILLUSTRATION}
           sx={{
             width: "100%",
-            maxWidth: { xs: 320, sm: 460, md: 520 },
+            maxWidth: { xs: 320, sm: 480, md: 560 },
             height: "auto",
+            maxHeight: { xs: 240, sm: 320, md: 380 },
             display: "block",
             objectFit: "contain",
             objectPosition: "bottom center",
             pointerEvents: "none",
-            transform: { sm: "translateX(-6%)", lg: "translateX(-12%)" },
+            marginBottom: { xs: theme.fixedSpacing(theme.tabiyaSpacing.md), sm: 0 },
           }}
         />
       </Box>
