@@ -33,11 +33,13 @@ def add_institutions_routes(app: FastAPI):
         province: Optional[str] = Query(default=None, description="Filter by province"),
         sector: Optional[str] = Query(default=None, description="Filter by sector"),
         cursor: Optional[str] = Query(default=None, description="Pagination cursor from previous response"),
-        limit: Annotated[int, Query(ge=1, le=100, description="Max items per page")] = 20,
+        limit: Annotated[int, Query(ge=1, le=500, description="Max items per page")] = 20,
         include: Optional[str] = Query(default=None, description="Comma-separated: 'count' to include total"),
+        fields: Optional[str] = Query(default=None, description="Comma-separated: 'name' to return names only"),
         institution_service: IInstitutionService = Depends(get_institution_service),
     ):
         response.headers["Access-Control-Allow-Origin"] = "*"
+        name_only = fields is not None and "name" in fields.split(",")
         try:
             return await institution_service.search_institutions(
                 keywords=keywords,
@@ -46,6 +48,7 @@ def add_institutions_routes(app: FastAPI):
                 cursor=cursor,
                 limit=limit,
                 include=include,
+                name_only=name_only,
             )
         except HTTPException:
             raise

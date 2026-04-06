@@ -19,7 +19,7 @@ import { useModules } from "src/hooks/useModules";
 import { useInstructorStudents } from "src/hooks/useInstructorStudents";
 import { useDashboardStats } from "src/hooks/useDashboardStats";
 import UserStateService from "src/userState/UserStateService";
-import { MODULE_FILTER_INSTITUTIONS, MODULE_FILTER_LOCATIONS, MODULE_FILTER_YEARS } from "src/data/moduleFilterOptions";
+import { MODULE_FILTER_LOCATIONS, MODULE_FILTER_YEARS } from "src/data/moduleFilterOptions";
 import { decodeInstitutionId } from "src/utils/institutionUtils";
 
 const InstructorDashboard: React.FC = () => {
@@ -108,12 +108,6 @@ const InstructorDashboard: React.FC = () => {
       value: moduleFilters.location,
       onChange: handleModuleFilterChange("location"),
       options: MODULE_FILTER_LOCATIONS,
-    },
-    {
-      labelKey: "dashboard.modules.filters.allInstitutions",
-      value: moduleFilters.institution,
-      onChange: handleModuleFilterChange("institution"),
-      options: MODULE_FILTER_INSTITUTIONS,
     },
     {
       labelKey: "dashboard.modules.filters.allYears",

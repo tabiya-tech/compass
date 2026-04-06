@@ -39,6 +39,7 @@ class InstitutionRepository(IInstitutionRepository):
     """Handles MongoDB queries for the institutions collection."""
 
     _PROJECTION = {"_id": 0}
+    _NAME_ONLY_PROJECTION = {"_id": 0, "name": 1}
 
     def __init__(self, collection: AsyncIOMotorCollection):
         self._collection = collection
@@ -106,9 +107,11 @@ class InstitutionRepository(IInstitutionRepository):
         sector: Optional[str],
         offset: int,
         limit: int,
+        name_only: bool = False,
     ) -> List[Dict[str, Any]]:
         query = self._build_filter(keywords, province, sector)
-        cursor = self._collection.find(query, projection=self._PROJECTION).skip(offset).limit(limit + 1)
+        projection = self._NAME_ONLY_PROJECTION if name_only else self._PROJECTION
+        cursor = self._collection.find(query, projection=projection).skip(offset).limit(limit + 1)
         docs: List[Dict[str, Any]] = []
         async for doc in cursor:
             docs.append(doc)

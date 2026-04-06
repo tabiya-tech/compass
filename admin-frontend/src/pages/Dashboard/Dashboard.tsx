@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Box, Container, FormControl, Grid, MenuItem, Select, Skeleton, Typography, useTheme } from "@mui/material";
+import { Autocomplete, Box, Container, FormControl, Grid, MenuItem, Select, Skeleton, TextField, Typography, useTheme } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material/Select";
 import { useTranslation } from "react-i18next";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
@@ -15,8 +15,9 @@ import InstitutionsTable from "src/components/InstitutionsTable/InstitutionsTabl
 import ModuleCard from "src/components/ModuleCard/ModuleCard";
 import SkillsAnalytics from "src/components/SkillsAnalytics/SkillsAnalytics";
 import JobPostings from "src/components/JobPostings/JobPostings";
-import { MODULE_FILTER_INSTITUTIONS, MODULE_FILTER_LOCATIONS, MODULE_FILTER_YEARS } from "src/data/moduleFilterOptions";
+import { MODULE_FILTER_LOCATIONS, MODULE_FILTER_YEARS } from "src/data/moduleFilterOptions";
 import { useInstitutions } from "src/hooks/useInstitutions";
+import { useInstitutionFilterOptions } from "src/hooks/useInstitutionFilterOptions";
 import { useDashboardStats } from "src/hooks/useDashboardStats";
 import { useModules } from "src/hooks/useModules";
 import { useAdoptionTrends } from "src/hooks/useAdoptionTrends";
@@ -44,6 +45,7 @@ const Dashboard: React.FC = () => {
     error: institutionsError,
   } = useInstitutions();
   const { stats, loading: statsLoading, error: statsError } = useDashboardStats();
+  const { institutionNames } = useInstitutionFilterOptions();
   const [moduleFilters, setModuleFilters] = useState({
     location: "",
     institution: "",
@@ -98,7 +100,7 @@ const Dashboard: React.FC = () => {
       labelKey: "dashboard.modules.filters.allInstitutions" as const,
       value: moduleFilters.institution,
       onChange: handleModuleFilterChange("institution"),
-      options: MODULE_FILTER_INSTITUTIONS,
+      options: institutionNames,
     },
     {
       labelKey: "dashboard.modules.filters.allYears" as const,
@@ -199,25 +201,42 @@ const Dashboard: React.FC = () => {
                     spacing={theme.fixedSpacing(theme.tabiyaSpacing.md)}
                     sx={{ marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
                   >
-                    {moduleFiltersConfig.map((filter) => (
-                      <Grid key={filter.labelKey} size={{ xs: 12, sm: 6, md: 4 }}>
-                        <FormControl size="small" fullWidth>
-                          <Select
-                            value={filter.value}
-                            onChange={filter.onChange}
-                            displayEmpty
-                            aria-label={t(filter.labelKey)}
-                          >
-                            <MenuItem value="">{t(filter.labelKey)}</MenuItem>
-                            {filter.options.map((option) => (
-                              <MenuItem key={option} value={option}>
-                                {option}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                    ))}
+                    {moduleFiltersConfig.map((filter) =>
+                      filter.labelKey === "dashboard.modules.filters.allInstitutions" ? (
+                        <Grid key={filter.labelKey} size={{ xs: 12, sm: 6, md: 4 }}>
+                          <Autocomplete
+                            size="small"
+                            options={filter.options}
+                            value={filter.value || null}
+                            isOptionEqualToValue={(option, value) => option === value}
+                            onChange={(_e, value) => {
+                              setModuleFilters((prev) => ({ ...prev, institution: value ?? "" }));
+                            }}
+                            renderInput={(params) => (
+                              <TextField {...params} placeholder={t(filter.labelKey)} />
+                            )}
+                          />
+                        </Grid>
+                      ) : (
+                        <Grid key={filter.labelKey} size={{ xs: 12, sm: 6, md: 4 }}>
+                          <FormControl size="small" fullWidth>
+                            <Select
+                              value={filter.value}
+                              onChange={filter.onChange}
+                              displayEmpty
+                              aria-label={t(filter.labelKey)}
+                            >
+                              <MenuItem value="">{t(filter.labelKey)}</MenuItem>
+                              {filter.options.map((option) => (
+                                <MenuItem key={option} value={option}>
+                                  {option}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      )
+                    )}
                   </Grid>
                   <Box
                     sx={{ display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}

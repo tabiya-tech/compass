@@ -58,7 +58,7 @@
     "@mui/icons-material": "^7.3.7",
     "@mui/material": "^7.3.7",
     "@mui/system": "^7.3.7",
-    "@mui/x-charts": "^8.27.5",
+    "@mui/x-charts": "^8.28.2",
     "@sentry/cli": "^2.39.1",
     "@sentry/react": "^9.41.0",
     "@sentry/webpack-plugin": "^2.22.6",

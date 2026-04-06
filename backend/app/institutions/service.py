@@ -29,6 +29,7 @@ class IInstitutionService(ABC):
         cursor: Optional[str],
         limit: int,
         include: Optional[str],
+        name_only: bool = False,
     ) -> PaginatedListResponse[InstitutionDocument]:
         pass
 
@@ -65,6 +66,7 @@ class InstitutionService(IInstitutionService):
         cursor: Optional[str],
         limit: int,
         include: Optional[str],
+        name_only: bool = False,
     ) -> PaginatedListResponse[InstitutionDocument]:
         offset = self._parse_cursor_offset(cursor)
         include_count = self._include_total(include)
@@ -75,6 +77,7 @@ class InstitutionService(IInstitutionService):
             sector=sector,
             offset=offset,
             limit=limit,
+            name_only=name_only,
         )
 
         has_more = len(docs) > limit
