@@ -19,7 +19,7 @@ import { useModules } from "src/hooks/useModules";
 import { useInstructorStudents } from "src/hooks/useInstructorStudents";
 import { useDashboardStats } from "src/hooks/useDashboardStats";
 import UserStateService from "src/userState/UserStateService";
-import { MODULE_FILTER_LOCATIONS, MODULE_FILTER_YEARS } from "src/data/moduleFilterOptions";
+import { MODULE_FILTER_YEARS } from "src/data/moduleFilterOptions";
 import { decodeInstitutionId } from "src/utils/institutionUtils";
 
 const InstructorDashboard: React.FC = () => {
@@ -67,11 +67,7 @@ const InstructorDashboard: React.FC = () => {
       return t("instructorDashboard.header.institutionFallback");
     }
   }, [t]);
-  const [moduleFilters, setModuleFilters] = useState({
-    location: "",
-    institution: "",
-    year: "",
-  });
+  const [moduleFilters, setModuleFilters] = useState({ year: "" });
 
   const [tab, setTab] = useState<InstructorDashboardTabValue>("students");
   const {
@@ -79,7 +75,6 @@ const InstructorDashboard: React.FC = () => {
     loading: modulesLoading,
     error: modulesError,
   } = useModules({
-    location: moduleFilters.location || undefined,
     // Always scope to the instructor's own institution
     institution: institutionName,
     year: moduleFilters.year || undefined,
@@ -103,12 +98,6 @@ const InstructorDashboard: React.FC = () => {
   };
 
   const moduleFiltersConfig = [
-    {
-      labelKey: "dashboard.modules.filters.allLocations",
-      value: moduleFilters.location,
-      onChange: handleModuleFilterChange("location"),
-      options: MODULE_FILTER_LOCATIONS,
-    },
     {
       labelKey: "dashboard.modules.filters.allYears",
       value: moduleFilters.year,
