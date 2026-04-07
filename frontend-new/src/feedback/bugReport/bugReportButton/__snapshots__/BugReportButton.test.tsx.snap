@@ -9,7 +9,7 @@ exports[`BugReportButton component should render the bugReport button 1`] = `
     class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-bo4hau-MuiButtonBase-root-MuiButton-root"
     data-testid="bug-report-button-31d2b110-8308-4035-90a6-519e89e7f6fa"
     tabindex="0"
-    title="Report a bug."
+    title="Report a Bug."
     type="button"
   >
     <span
@@ -27,7 +27,7 @@ exports[`BugReportButton component should render the bugReport button 1`] = `
         />
       </svg>
     </span>
-    Report a bug
+    Report a Bug
   </button>
 </div>
 `;
