@@ -372,6 +372,11 @@ origins = [
 if admin_frontend_url:
     origins.append(admin_frontend_url)
 
+_extra_allowed_origins = os.getenv("EXTRA_ALLOWED_ORIGINS")
+if _extra_allowed_origins:
+    import json as _json
+    origins.extend(_json.loads(_extra_allowed_origins))
+
 if target_environment_type == "dev" or target_environment_type == "local":
     logger.info(f"Setting CORS to allow all origins for the {target_environment_type} environment.")
     origins.append("*")

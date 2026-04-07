@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -32,6 +33,13 @@ def main():
     admin_frontend_domain = getstackref(env_reference, "admin_frontend_domain")
     admin_frontend_url = getstackref(env_reference, "admin_frontend_url")
 
+    # Optional extra custom domain aliases for the frontend and admin frontend (JSON arrays).
+    # e.g. FRONTEND_CUSTOM_DOMAINS='["njila.ai"]'
+    _extra_frontend = os.getenv("FRONTEND_CUSTOM_DOMAINS")
+    _extra_admin = os.getenv("ADMIN_FRONTEND_CUSTOM_DOMAINS")
+    frontend_domains = [frontend_domain] + (json.loads(_extra_frontend) if _extra_frontend else [])
+    admin_frontend_domains = [admin_frontend_domain] + (json.loads(_extra_admin) if _extra_admin else [])
+
     # Get stack reference for dns
     dns_stack_ref = pulumi.StackReference(f"tabiya-tech/compass-dns/{stack_name}")
     dns_zone_name = getstackref(dns_stack_ref, "dns_zone_name")
@@ -56,12 +64,12 @@ def main():
         project=project,
         location=location,
         dns_zone_name=dns_zone_name,
-        frontend_domain=frontend_domain,
+        frontend_domains=frontend_domains,
         frontend_bucket_name=frontend_bucket_name,
         frontend_url=frontend_url,
         backend_url=backend_url,
         api_gateway_id=api_gateway_id,
-        admin_frontend_domain=admin_frontend_domain,
+        admin_frontend_domains=admin_frontend_domains,
         admin_frontend_url=admin_frontend_url,
         admin_frontend_bucket_name=admin_frontend_bucket_name)
 

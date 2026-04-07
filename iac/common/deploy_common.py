@@ -10,14 +10,22 @@ from lib.std_pulumi import get_resource_name, ProjectBaseConfig, get_project_bas
 def _setup_loadbalancer(*,
                         basic_config: ProjectBaseConfig,
                         dns_zone_name: pulumi.Output[str],
-                        frontend_domain: pulumi.Output[str],
+                        frontend_domains: list[str | pulumi.Output[str]],
                         frontend_url: pulumi.Output[str],
                         frontend_bucket_name: pulumi.Output[str],
                         backend_url: pulumi.Output[str],
                         api_gateway_id: pulumi.Output[str],
-                        admin_frontend_domain: pulumi.Output[str],
+                        admin_frontend_domains: list[str | pulumi.Output[str]],
                         admin_frontend_url: pulumi.Output[str],
                         admin_frontend_bucket_name: pulumi.Output[str]) -> pulumi.Resource:
+    # Normalize all domains to pulumi.Output so they're safe to use in .apply(), Output.all(), and host rules
+    frontend_domains = [pulumi.Output.from_input(d) for d in frontend_domains]
+    admin_frontend_domains = [pulumi.Output.from_input(d) for d in admin_frontend_domains]
+
+    # The primary domains are the first entries — used for DNS A records
+    frontend_domain = frontend_domains[0]
+    admin_frontend_domain = admin_frontend_domains[0]
+
     # Create a global IP address for the load balancer
     ipaddress = gcp.compute.GlobalAddress(
         get_resource_name(resource="lb", resource_type="global-ip-address"),
@@ -140,11 +148,11 @@ def _setup_loadbalancer(*,
         default_service=frontend_service_bucket.id,
         host_rules=[
             gcp.compute.URLMapHostRuleArgs(
-                hosts=[frontend_domain],
+                hosts=frontend_domains,
                 path_matcher="frontend-paths",
             ),
             gcp.compute.URLMapHostRuleArgs(
-                hosts=[admin_frontend_domain],
+                hosts=admin_frontend_domains,
                 path_matcher="admin-paths",
             ),
         ],
@@ -163,14 +171,15 @@ def _setup_loadbalancer(*,
         opts=pulumi.ResourceOptions(depends_on=[frontend_service_bucket, admin_frontend_service_bucket], provider=basic_config.provider),
     )
 
+    ssl_domains = pulumi.Output.all(*frontend_domains, *admin_frontend_domains).apply(
+        lambda args: [d + "." for d in args]
+    )
+
     ssl_certificate = gcp.compute.ManagedSslCertificate(
         resource_name=get_resource_name(resource="lb", resource_type="ssl-certificate"),
         project=basic_config.project,
         managed=gcp.compute.ManagedSslCertificateManagedArgs(
-            domains=[
-                frontend_domain.apply(lambda s: s + "."),
-                admin_frontend_domain.apply(lambda s: s + "."),
-            ],
+            domains=ssl_domains,
         ),
         opts=pulumi.ResourceOptions(provider=basic_config.provider, depends_on=[record_set, admin_record_set])
     )
@@ -234,12 +243,12 @@ def deploy_common(*,
                   project: pulumi.Output[str],
                   location: str,
                   dns_zone_name: pulumi.Output[str],
-                  frontend_domain: pulumi.Output[str],
+                  frontend_domains: list[str | pulumi.Output[str]],
                   frontend_url: pulumi.Output[str],
                   frontend_bucket_name: pulumi.Output[str],
                   backend_url: pulumi.Output[str],
                   api_gateway_id: pulumi.Output[str],
-                  admin_frontend_domain: pulumi.Output[str],
+                  admin_frontend_domains: list[str | pulumi.Output[str]],
                   admin_frontend_url: pulumi.Output[str],
                   admin_frontend_bucket_name: pulumi.Output[str]):
     basic_config = get_project_base_config(project=project, location=location)
@@ -248,11 +257,11 @@ def deploy_common(*,
     _setup_loadbalancer(
         basic_config=basic_config,
         dns_zone_name=dns_zone_name,
-        frontend_domain=frontend_domain,
+        frontend_domains=frontend_domains,
         frontend_url=frontend_url,
         frontend_bucket_name=frontend_bucket_name,
         backend_url=backend_url,
         api_gateway_id=api_gateway_id,
-        admin_frontend_domain=admin_frontend_domain,
+        admin_frontend_domains=admin_frontend_domains,
         admin_frontend_url=admin_frontend_url,
         admin_frontend_bucket_name=admin_frontend_bucket_name)

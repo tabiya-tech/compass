@@ -104,6 +104,7 @@ def main():
         # Career Explorer unified config (optional JSON: sectors, country)
         career_explorer_config=getenv("CAREER_EXPLORER_CONFIG", False, False),
         plain_personal_data_fields=getenv("PLAIN_PERSONAL_DATA_FIELDS", False, False),
+        extra_allowed_origins=getenv("EXTRA_ALLOWED_ORIGINS", False, False),
     )
 
     # version of the artifacts to deploy

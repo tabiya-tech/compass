@@ -68,6 +68,7 @@ class BackendServiceConfig:
     inline_phase_transition: Optional[str]
     career_explorer_config: Optional[str]
     plain_personal_data_fields: Optional[str]
+    extra_allowed_origins: Optional[str]
 
 
 """
@@ -409,6 +410,9 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="ADMIN_FRONTEND_URL",
                             value=backend_service_cfg.admin_frontend_url),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="EXTRA_ALLOWED_ORIGINS",
+                            value=backend_service_cfg.extra_allowed_origins),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_SENTRY_DSN",
                             value=backend_service_cfg.sentry_dsn),
