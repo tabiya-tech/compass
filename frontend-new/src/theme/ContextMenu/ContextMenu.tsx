@@ -1,7 +1,6 @@
 import {
   Box,
   Divider,
-  Icon,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -47,7 +46,7 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
 
   return (
     <Menu
-      elevation={2}
+      elevation={3}
       anchorOrigin={props.anchorOrigin ?? { vertical: "bottom", horizontal: "center" }}
       transformOrigin={props.transformOrigin ?? { vertical: "top", horizontal: "right" }}
       anchorEl={props.anchorEl}
@@ -56,7 +55,16 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
       onClose={props.notifyOnClose}
       data-testid={DATA_TEST_ID.MENU}
       slotProps={{
-        paper: { sx: props.paperSx },
+        paper: {
+          sx: {
+            borderRadius: "16px",
+            minWidth: 160,
+            maxWidth: 200,
+            px: 1,
+            py: 1,
+            ...props.paperSx,
+          },
+        },
       }}
     >
       {props.headerMessage && (
@@ -101,14 +109,24 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
             data-testid={DATA_TEST_ID.MENU_ITEM}
             disabled={item.disabled}
             key={item.id}
+            sx={{
+              borderRadius: "10px",
+              py: 1,
+              px: 1.5,
+              gap: 1.5,
+              "&:hover": { backgroundColor: theme.palette.action.hover },
+            }}
           >
             {item.icon && (
-              <ListItemIcon data-testid={DATA_TEST_ID.MENU_ITEM_ICON}>
-                <Icon sx={{ color: theme.palette.text.primary }}>{item.icon}</Icon>
+              <ListItemIcon
+                data-testid={DATA_TEST_ID.MENU_ITEM_ICON}
+                sx={{ minWidth: "unset", color: theme.palette.text.primary }}
+              >
+                {item.icon}
               </ListItemIcon>
             )}
             <ListItemText data-testid={DATA_TEST_ID.MENU_ITEM_TEXT}>
-              <Typography variant="caption" color={item.textColor ?? "primary"}>
+              <Typography variant="body2" color={item.textColor ?? "text.primary"} fontWeight={500}>
                 {item.text}
               </Typography>
               {item.description && (
@@ -118,8 +136,11 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
               )}
             </ListItemText>
             {item.trailingIcon && (
-              <ListItemIcon data-testid={DATA_TEST_ID.MENU_ITEM_TRAILING_ICON} sx={{ justifyContent: "flex-end" }}>
-                <Icon sx={{ color: theme.palette.text.primary }}>{item.trailingIcon}</Icon>
+              <ListItemIcon
+                data-testid={DATA_TEST_ID.MENU_ITEM_TRAILING_ICON}
+                sx={{ justifyContent: "flex-end", minWidth: "unset", color: theme.palette.text.primary }}
+              >
+                {item.trailingIcon}
               </ListItemIcon>
             )}
           </MenuItem>

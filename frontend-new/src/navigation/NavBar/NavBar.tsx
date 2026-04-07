@@ -13,7 +13,7 @@ import { getAppIconUrl } from "src/envService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { useTranslation } from "react-i18next";
 import type { TranslationKey } from "src/react-i18next";
-import { Search, LayoutDashboard, BookOpenText, Globe, Menu, ChevronRight } from "lucide-react";
+import { Search, LayoutDashboard, BookOpenText, Globe, Menu, ChevronRight, CircleUser, FileText, Bug, LogOut, UserPlus } from "lucide-react";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
@@ -156,31 +156,31 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
     () => [
       {
         id: MENU_ITEM_ID.VIEW_PROFILE,
-        text: t("chat.chatHeader.viewMyProfile").toLowerCase(),
+        text: t("chat.chatHeader.viewMyProfile"),
+        icon: <CircleUser size={18} />,
         disabled: false,
         action: navigateToProfile,
       },
       {
         id: MENU_ITEM_ID.VIEW_EXPERIENCES,
-        text: t("chat.chatHeader.viewExperiences").toLowerCase(),
+        text: t("chat.chatHeader.viewExperiences"),
+        icon: <FileText size={18} />,
         disabled: !isOnline,
         action: handleViewExperiences,
       },
-      ...(sentryEnabled
-        ? [
-            {
-              id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
-              text: t("feedback.bugReport.reportBug").toLowerCase(),
-              disabled: !isOnline,
-              action: handleReportBug,
-            },
-          ]
-        : []),
+      {
+        id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
+        text: t("feedback.bugReport.reportBug"),
+        icon: <Bug size={18} />,
+        disabled: !isOnline || !sentryEnabled,
+        action: handleReportBug,
+      },
       ...(isAnonymous
         ? [
             {
               id: MENU_ITEM_ID.REGISTER,
-              text: t("common.buttons.register").toLowerCase(),
+              text: t("common.buttons.register"),
+              icon: <UserPlus size={18} />,
               disabled: !isOnline,
               action: handleRegister,
             },
@@ -188,7 +188,8 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
         : []),
       {
         id: MENU_ITEM_ID.LOGOUT_BUTTON,
-        text: t("common.buttons.logout").toLowerCase(),
+        text: t("common.buttons.logout"),
+        icon: <LogOut size={18} />,
         disabled: !isOnline,
         action: () => {
           void handleLogout();
@@ -231,18 +232,21 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
       {
         id: MENU_ITEM_ID.VIEW_PROFILE,
         text: t("chat.chatHeader.viewMyProfile").toLowerCase(),
+        icon: <CircleUser size={18} />,
         disabled: false,
         action: navigateToProfile,
       },
       {
         id: MENU_ITEM_ID.VIEW_EXPERIENCES,
         text: t("chat.chatHeader.viewExperiences").toLowerCase(),
+        icon: <FileText size={18} />,
         disabled: !isOnline,
         action: handleViewExperiences,
       },
       {
         id: MENU_ITEM_ID.MOBILE_LANGUAGE,
         text: t("i18n.languageContextMenu.selector" as TranslationKey).toLowerCase(),
+        icon: <Globe size={18} />,
         disabled: false,
         action: () => {
           setLanguageSubmenuAnchorEl(anchorEl);
@@ -255,6 +259,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
             {
               id: MENU_ITEM_ID.REPORT_BUG_BUTTON,
               text: t("feedback.bugReport.reportBug").toLowerCase(),
+              icon: <Bug size={18} />,
               disabled: !isOnline,
               action: handleReportBug,
             },
@@ -265,6 +270,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
             {
               id: MENU_ITEM_ID.REGISTER,
               text: t("common.buttons.register").toLowerCase(),
+              icon: <UserPlus size={18} />,
               disabled: !isOnline,
               action: handleRegister,
             },
@@ -273,6 +279,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
       {
         id: MENU_ITEM_ID.LOGOUT_BUTTON,
         text: t("common.buttons.logout").toLowerCase(),
+        icon: <LogOut size={18} />,
         disabled: !isOnline,
         action: () => {
           void handleLogout();

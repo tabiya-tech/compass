@@ -102,7 +102,7 @@
   },
   "chat": {
     "chatHeader": {
-      "viewExperiences": "View experiences",
+      "viewExperiences": "My CV",
       "feedbackMessage": "We'd love to hear your feedback on your experience so far!",
       "giveFeedback": "Give Feedback",
       "feedbackMessagePlaceholder": "We'd love to hear your thoughts! Please share any feedback or suggestions you have for improving {{appName}}.",
@@ -110,7 +110,7 @@
       "feedbackSuccessMessage": "Thank you for your feedback!",
       "giveGeneralFeedback": "Give general feedback",
       "userInfo": "User info",
-      "viewMyProfile": "View my profile",
+      "viewMyProfile": "Profile",
       "userIconAlt": "User Icon",
       "beforeYouGo": "Before you go",
       "logoutConfirmationMessage": "Are you sure you want to log out?",
