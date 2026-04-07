@@ -13,7 +13,19 @@ import { getAppIconUrl } from "src/envService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { useTranslation } from "react-i18next";
 import type { TranslationKey } from "src/react-i18next";
-import { Search, LayoutDashboard, BookOpenText, Globe, Menu, ChevronRight, CircleUser, FileText, Bug, LogOut, UserPlus } from "lucide-react";
+import {
+  Search,
+  LayoutDashboard,
+  BookOpenText,
+  Globe,
+  Menu,
+  ChevronRight,
+  CircleUser,
+  FileText,
+  Bug,
+  LogOut,
+  UserPlus,
+} from "lucide-react";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
