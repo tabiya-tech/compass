@@ -13,12 +13,7 @@ import { getAppIconUrl } from "src/envService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { useTranslation } from "react-i18next";
 import type { TranslationKey } from "src/react-i18next";
-import SearchIcon from "@mui/icons-material/Search";
-import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
-import ViewListOutlinedIcon from "@mui/icons-material/ViewListOutlined";
-import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
+import { Search, LayoutDashboard, BookOpenText, Globe, Menu, ChevronRight } from "lucide-react";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import AnonymousAccountConversionDialog from "src/auth/components/anonymousAccountConversionDialog/AnonymousAccountConversionDialog";
@@ -253,7 +248,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
           setLanguageSubmenuAnchorEl(anchorEl);
         },
         closeMenuOnClick: false,
-        trailingIcon: <ChevronRightOutlinedIcon />,
+        trailingIcon: <ChevronRight size={18} />,
       },
       ...(sentryEnabled
         ? [
@@ -364,7 +359,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                 },
               }}
             >
-              <MenuIcon />
+              <Menu size={20} />
             </PrimaryIconButton>
           ) : (
             <>
@@ -375,7 +370,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                 sx={getNavLinkSx(false)}
                 data-testid={DATA_TEST_ID.NAVBAR_LINK_SEARCH}
               >
-                <SearchIcon sx={{ fontSize: 18 }} />
+                <Search size={18} />
                 {t("nav.search" as TranslationKey)}
               </Box>
               <Box
@@ -389,7 +384,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                 sx={getNavLinkSx(isOnDashboard)}
                 data-testid={DATA_TEST_ID.NAVBAR_LINK_DASHBOARD}
               >
-                <GridViewOutlinedIcon sx={{ fontSize: 18 }} />
+                <LayoutDashboard size={18} />
                 {t("nav.dashboard" as TranslationKey)}
               </Box>
               <Box
@@ -402,7 +397,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                 sx={getNavLinkSx(isOnPathways)}
                 data-testid={DATA_TEST_ID.NAVBAR_LINK_PATHWAYS}
               >
-                <ViewListOutlinedIcon sx={{ fontSize: 18 }} />
+                <BookOpenText size={18} />
                 {t("nav.pathways" as TranslationKey)}
               </Box>
 
@@ -411,7 +406,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                 onClick={(event: React.MouseEvent<HTMLElement>) => setLanguageAnchorEl(event.currentTarget)}
                 data-testid={DATA_TEST_ID.NAVBAR_LANGUAGE_BUTTON}
               >
-                <LanguageOutlinedIcon sx={{ fontSize: 18 }} />
+                <Globe size={18} />
                 {currentLocale}
               </Box>
 
