@@ -397,7 +397,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                   }}
                   data-testid={DATA_TEST_ID.NAVBAR_LINK_SEARCH}
                 >
-                  <SearchIcon sx={{ fontSize: 18 }} />
+                  <Search size={18} />
                   {t("nav.search" as TranslationKey)}
                 </Box>
               ) : (

@@ -3,6 +3,8 @@ import { Box, Container, useTheme } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import MarkdownReader from "src/knowledgeHub/components/MarkdownReader";
+import SectorProfile from "src/knowledgeHub/components/SectorProfile";
+import SECTOR_DATA from "src/knowledgeHub/components/SectorProfile/sectorStaticData";
 import { getDocumentById } from "src/knowledgeHub/documentLoader";
 import ErrorPage from "src/error/errorPage/ErrorPage";
 
@@ -29,6 +31,16 @@ const KnowledgeHubDocument: React.FC = () => {
     return <ErrorPage errorMessage={t("knowledgeHub.documentNotFound")} />;
   }
 
+  const sectorStaticData = documentId ? SECTOR_DATA[documentId] : undefined;
+
+  if (sectorStaticData) {
+    return (
+      <Box display="flex" height="100%" overflow="hidden" data-testid={DATA_TEST_ID.KNOWLEDGE_HUB_DOCUMENT_CONTAINER}>
+        <SectorProfile staticData={sectorStaticData} />
+      </Box>
+    );
+  }
+
   return (
     <Box
       display="flex"
@@ -46,7 +58,6 @@ const KnowledgeHubDocument: React.FC = () => {
         }}
       >
         <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-          {/* Document Content */}
           <Box
             data-testid={DATA_TEST_ID.KNOWLEDGE_HUB_DOCUMENT_CONTENT}
             sx={{

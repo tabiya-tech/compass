@@ -20,6 +20,7 @@ from app.career_explorer.routes import add_career_explorer_routes
 from app.career_explorer.config import parse_career_explorer_config
 from app.metrics.routes.routes import add_metrics_routes
 from app.analytics.routes import add_analytics_routes
+from app.teveta.routes import add_teveta_routes
 from app.sentry_init import init_sentry, set_sentry_contexts
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, ApiKeyAuth
@@ -461,6 +462,11 @@ add_metrics_routes(app)
 # Add analytics dashboard routes
 ############################################
 add_analytics_routes(app, auth)
+
+############################################
+# Add TEVETA knowledge hub routes
+############################################
+add_teveta_routes(app)
 
 ############################################
 # Add POC chat routes
