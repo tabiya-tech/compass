@@ -158,6 +158,7 @@ def _setup_identity_platform(
         environment_type: pulumi.Output[str],
         auth_domain: pulumi.Output[str],
         frontend_domain: pulumi.Output[str],
+        extra_authorized_domains: list[str],
         app_name: str,
         dependencies: list[pulumi.Resource]) -> IdentityPlatform:
     # for the development environment allow localhost
@@ -168,7 +169,7 @@ def _setup_identity_platform(
         if _environment_type == EnvironmentTypes.DEV.value:
             # add more domains here depending on how the application is accessed.
             _authorized_domains.append("localhost")
-
+        _authorized_domains.extend(extra_authorized_domains)
         return _authorized_domains
 
     authorized_domains = pulumi.Output.all(frontend_domain, environment_type).apply(_get_authorized_domains)
@@ -235,6 +236,7 @@ def deploy_auth(*,
                 domain_name: pulumi.Output[str],
                 auth_domain: pulumi.Output[str],
                 frontend_domain: pulumi.Output[str],
+                extra_authorized_domains: list[str],
                 gcp_oauth_client_id: str,
                 gcp_oauth_client_secret: str,
                 app_name: str):
@@ -271,6 +273,7 @@ def deploy_auth(*,
         environment_type=environment_type,
         auth_domain=auth_domain,
         frontend_domain=frontend_domain,
+        extra_authorized_domains=extra_authorized_domains,
         app_name=app_name,
         dependencies=record_sets
     )

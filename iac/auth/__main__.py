@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -39,6 +40,15 @@ def main():
     gcp_oauth_client_id = getenv("GCP_OAUTH_CLIENT_ID")
     gcp_oauth_client_secret = getenv("GCP_OAUTH_CLIENT_SECRET", secret=True)
 
+    # Optional extra authorized domains for Firebase Auth (e.g. custom domain aliases).
+    # e.g. FRONTEND_CUSTOM_DOMAINS='["njila.ai"]' ADMIN_FRONTEND_CUSTOM_DOMAINS='["admin.njila.ai"]'
+    _extra_frontend = os.getenv("FRONTEND_CUSTOM_DOMAINS")
+    _extra_admin = os.getenv("ADMIN_FRONTEND_CUSTOM_DOMAINS")
+    extra_authorized_domains = (
+        (json.loads(_extra_frontend) if _extra_frontend else []) +
+        (json.loads(_extra_admin) if _extra_admin else [])
+    )
+
     # Deploy the auth
     deploy_auth(
         location=location,
@@ -48,6 +58,7 @@ def main():
         domain_name=domain_name,
         auth_domain=auth_domain,
         frontend_domain=frontend_domain,
+        extra_authorized_domains=extra_authorized_domains,
         gcp_oauth_client_id=gcp_oauth_client_id,
         gcp_oauth_client_secret=gcp_oauth_client_secret,
         app_name=app_name,
