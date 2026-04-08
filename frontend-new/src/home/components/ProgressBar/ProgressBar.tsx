@@ -25,7 +25,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
   const navigate = useNavigate();
 
   // Clamp progress between 0 and 100
-  const clampedProgress = 40;
+  const clampedProgress = Math.min(100, Math.max(0, progress));
 
   const navigateToProfile = () => {
     startTransition(() => {
@@ -87,9 +87,10 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
         sx={{
           height: 20,
           borderRadius: theme.rounding(theme.tabiyaRounding.sm),
+          overflow: "hidden",
           backgroundColor: theme.palette.grey[300],
           "& .MuiLinearProgress-bar": {
-            borderRadius: theme.rounding(theme.tabiyaRounding.sm),
+            borderRadius: 0,
             backgroundColor: theme.palette.secondary.main,
           },
         }}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, useTheme } from "@mui/material";
 import Sidebar from "src/theme/Sidebar/Sidebar";
 import { useWorkSkills } from "src/experiences/hooks/useWorkSkills";
@@ -27,7 +27,14 @@ const HomeSidebar: React.FC<HomeSidebarProps> = ({ showViewCvButton = true }) =>
   const theme = useTheme();
   const { openExperiencesDrawer } = useExperiencesDrawer();
   const workSkills = useWorkSkills();
-  const programmeSkills = SidebarService.getInstance().getProgrammeSkillsSync();
+  const [programmeSkills, setProgrammeSkills] = useState<string[]>([]);
+
+  useEffect(() => {
+    SidebarService.getInstance()
+      .getProgrammeSkills()
+      .then(setProgrammeSkills)
+      .catch(() => {});
+  }, []);
 
   const accentColor = theme.palette.primary.main;
   const tealBg = theme.palette.brandAccent.light;

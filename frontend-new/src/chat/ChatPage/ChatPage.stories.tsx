@@ -21,6 +21,7 @@ import TypingChatMessage, {
 import Sidebar from "src/theme/Sidebar/Sidebar";
 import SidebarService from "src/home/components/Sidebar/SidebarService";
 import SkillsDiscoverySidebar from "src/home/components/Sidebar/SkillsDiscoverySidebar";
+import { ConversationPhase, defaultCurrentPhase } from "src/chat/chatProgressbar/types";
 import CareerExplorerSidebar from "src/home/components/Sidebar/CareerExplorerSidebar";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -204,7 +205,17 @@ export const WithSkillsSidebar: Story = {
         isChatFinished: false,
       },
     },
-    sidebar: <SkillsDiscoverySidebar />,
+    sidebar: (
+      <SkillsDiscoverySidebar
+        currentPhase={{
+          ...defaultCurrentPhase,
+          phase: ConversationPhase.COLLECT_EXPERIENCES,
+          percentage: 30,
+          current: 1,
+          total: 3,
+        }}
+      />
+    ),
   },
   parameters: {
     docs: {
@@ -315,7 +326,17 @@ export const ChatFinished: Story = {
         isChatFinished: true,
       },
     },
-    sidebar: <SkillsDiscoverySidebar />,
+    sidebar: (
+      <SkillsDiscoverySidebar
+        currentPhase={{
+          ...defaultCurrentPhase,
+          phase: ConversationPhase.COLLECT_EXPERIENCES,
+          percentage: 30,
+          current: 1,
+          total: 3,
+        }}
+      />
+    ),
   },
   parameters: {
     docs: {

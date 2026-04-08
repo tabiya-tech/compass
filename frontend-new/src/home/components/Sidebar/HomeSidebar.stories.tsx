@@ -55,7 +55,7 @@ export const Empty: Story = {
   name: "Empty — no skills yet",
   decorators: [
     (Story) => {
-      SidebarService.getInstance().getProgrammeSkillsSync = () => [];
+      SidebarService.getInstance().getProgrammeSkills = async () => [];
       return (
         <ExperiencesDrawerContext.Provider value={makeContext([])}>
           <Story />
@@ -69,7 +69,7 @@ export const WithWorkSkills: Story = {
   name: "With work skills",
   decorators: [
     (Story) => {
-      SidebarService.getInstance().getProgrammeSkillsSync = () => [];
+      SidebarService.getInstance().getProgrammeSkills = async () => [];
       return (
         <ExperiencesDrawerContext.Provider
           value={makeContext([
@@ -94,7 +94,7 @@ export const WithBothSkills: Story = {
   name: "With both skill sets",
   decorators: [
     (Story) => {
-      SidebarService.getInstance().getProgrammeSkillsSync = () => [
+      SidebarService.getInstance().getProgrammeSkills = async () => [
         "Professional communication",
         "CV writing",
         "Interview skills",

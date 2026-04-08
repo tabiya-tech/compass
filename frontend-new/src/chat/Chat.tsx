@@ -1123,7 +1123,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 />
               ) : undefined
             }
-            sidebar={<SkillsDiscoverySidebar />}
+            sidebar={<SkillsDiscoverySidebar currentPhase={currentPhase} />}
           />
         </Box>
         {showRefreshConfirmDialog && (

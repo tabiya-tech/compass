@@ -1,7 +1,7 @@
 import React from "react";
 import { CurrentPhase } from "./types";
 import { motion } from "framer-motion";
-import { Box, useTheme, Typography } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { getUserFriendlyConversationPhaseName } from "./getUserFriendlyConversationPhaseName";
 
 const uniqueId = "2a76494f-351d-409d-ba58-e1b2cfaf2a53";
@@ -19,64 +19,44 @@ const ChatProgressBar: React.FC<CurrentPhase> = (currentPhase) => {
   const userFriendlyConversationPhaseText = getUserFriendlyConversationPhaseName(currentPhase);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: theme.fixedSpacing(theme.tabiyaSpacing.xs),
-        width: "100%",
-      }}
-    >
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "6px", width: "100%" }}>
+      {/* Phase label + percentage */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box
+          data-testid={DATA_TEST_ID.PROGRESS_BAR_PHASE_TEXT}
+          sx={{ ...theme.typography.caption, color: theme.palette.text.secondary, lineHeight: 1.5 }}
+        >
+          {userFriendlyConversationPhaseText}
+        </Box>
+        <Box
+          data-testid={DATA_TEST_ID.PROGRESS_BAR_LABEL}
+          sx={{ ...theme.typography.caption, fontWeight: 600, color: theme.palette.primary.main, lineHeight: 1.5 }}
+        >
+          {percentageInText}
+        </Box>
+      </Box>
+
+      {/* Track */}
       <Box
         data-testid={DATA_TEST_ID.CONTAINER}
         sx={{
+          height: "4px",
+          borderRadius: theme.rounding(theme.tabiyaRounding.sm),
+          backgroundColor: theme.palette.grey[100],
           overflow: "hidden",
-          fontSize: theme.typography.overline.fontSize,
-          width: "100%",
-          backgroundColor: theme.palette.common.white,
-          borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-          border: `1px solid ${theme.palette.grey[300]}`,
-          display: "grid",
-          placeItems: "center start",
         }}
       >
         <motion.div
-          style={{
-            backgroundColor: theme.palette.primary.main,
-            height: "100%",
-            gridRow: 1,
-            borderRadius: theme.rounding(theme.tabiyaRounding.xs),
-            gridColumn: 1,
-          }}
-          initial={{
-            width: 0,
-          }}
-          animate={{
-            width: percentageInText,
-          }}
           data-testid={DATA_TEST_ID.PROGRESS_BAR}
-          transition={{
-            duration: 0.5,
-            ease: "easeOut",
+          style={{
+            height: "100%",
+            borderRadius: theme.rounding(theme.tabiyaRounding.sm),
+            backgroundColor: theme.palette.primary.main,
           }}
+          initial={{ width: 0 }}
+          animate={{ width: percentageInText }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
         />
-        <Box
-          sx={{
-            display: "flex",
-            width: "100%",
-            justifyContent: "space-between",
-            alignItems: "center",
-            paddingX: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-            paddingY: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
-            gridRow: 1,
-            gridColumn: 1,
-          }}
-        >
-          <Typography variant="progressBarText" lineHeight={1} data-testid={DATA_TEST_ID.PROGRESS_BAR_PHASE_TEXT}>
-            {userFriendlyConversationPhaseText}
-          </Typography>
-          <Box data-testid={DATA_TEST_ID.PROGRESS_BAR_LABEL}>{percentageInText}</Box>
-        </Box>
       </Box>
     </Box>
   );

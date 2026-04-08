@@ -9,6 +9,7 @@ import CareerExplorerService from "src/careerExplorer/services/CareerExplorerSer
 import type { UserSectorEngagementItem } from "src/careerExplorer/services/CareerExplorerService";
 import ChatService from "src/chat/ChatService/ChatService";
 import type { ModuleSummary } from "src/careerReadiness/types";
+import SidebarService from "src/home/components/Sidebar/SidebarService";
 
 export interface UserProfileData {
   name: string | null;
@@ -190,16 +191,29 @@ export const useUserProfile = (): UseUserProfileResult => {
     fetchProfileData();
   }, []);
 
-  // Effect 4: Fetch skills from experiences
+  // Effect 4: Fetch skills from experiences and programme skills
   useEffect(() => {
     const fetchSkillsData = async () => {
       try {
         setIsLoadingSkills(true);
         setErrors((prev) => ({ ...prev, skills: null }));
 
-        const skillsData = await fetchSkills();
+        const [skillsData, programmeSkillLabels] = await Promise.all([
+          fetchSkills(),
+          SidebarService.getInstance().getProgrammeSkills(),
+        ]);
+
         setSkills(skillsData.workSkills);
-        setEducationSkills(skillsData.educationSkills);
+
+        // Programme skills are education skills — merge them with experience-based education skills
+        const programmeSkillObjects: Skill[] = programmeSkillLabels.map((label, i) => ({
+          UUID: `programme-skill-${i}`,
+          preferredLabel: label,
+          altLabels: [],
+          description: "",
+          orderIndex: i,
+        }));
+        setEducationSkills([...skillsData.educationSkills, ...programmeSkillObjects]);
       } catch (error) {
         console.error("Error fetching skills:", error);
         setErrors((prev) => ({ ...prev, skills: error as Error }));

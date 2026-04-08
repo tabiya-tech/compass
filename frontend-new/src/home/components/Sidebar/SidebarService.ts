@@ -2,6 +2,10 @@ import CareerExplorerService from "src/careerExplorer/services/CareerExplorerSer
 import ExperienceService from "src/experiences/experienceService/experienceService";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
+import authenticationStateService from "src/auth/services/AuthenticationState.service";
+import { getBackendUrl } from "src/envService";
+import { customFetch } from "src/utils/customFetch/customFetch";
+import { StatusCodes } from "http-status-codes";
 
 // ─── Data types ───────────────────────────────────────────────────────────────
 
@@ -34,13 +38,6 @@ export interface ObjectivesData {
 }
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
-
-const MOCK_PROGRAMME_SKILLS: string[] = [
-  "Professional communication",
-  "CV writing",
-  "Interview skills",
-  "Cover letter writing",
-];
 
 const MOCK_OBJECTIVES: ObjectiveItem[] = [
   { label: "Describe yourself with 3 key strengths", status: "done" },
@@ -144,10 +141,27 @@ export default class SidebarService {
   }
 
   /**
-   * Home sidebar — programme skills earned through Career Readiness modules.
-   * TODO: replace mock with API when module completion tracking is available.
+   * Returns the ESCO skills mapped to the user's enrolled programme.
+   * Fetched from /users/{user_id}/programme-skills, seeded from the TEVETA xlsx.
    */
-  getProgrammeSkillsSync(): string[] {
-    return MOCK_PROGRAMME_SKILLS;
+  async getProgrammeSkills(): Promise<string[]> {
+    const user = authenticationStateService.getInstance().getUser();
+    if (!user) return [];
+    const url = `${getBackendUrl()}/users/${user.id}/programme-skills`;
+    try {
+      const response = await customFetch(url, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: "SidebarService",
+        serviceFunction: "getProgrammeSkills",
+        failureMessage: "Failed to fetch programme skills",
+        expectedContentType: "application/json",
+      });
+      const body = await response.json();
+      return body.skills ?? [];
+    } catch {
+      return [];
+    }
   }
 }
