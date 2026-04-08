@@ -71,7 +71,7 @@ def add_programme_skills_routes(users_router: APIRouter, auth: Authentication) -
         try:
             plain_data_repo = PlainPersonalDataRepository(user_db)
             personal_data = await plain_data_repo.find_by_user_id(user_id)
-            programme_name = (personal_data.data.get("programme_name") or personal_data.data.get("program") or "") if personal_data else ""
+            programme_name = (personal_data.data.get("programme_name") or "") if personal_data else ""
 
             if not programme_name:
                 return ProgrammeSkillsResponse(skills=[])

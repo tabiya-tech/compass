@@ -60,7 +60,7 @@ class TestGetUserProfile:
             _make_experience("Electrician", company="ABC Company", skill_labels=["Electrical Wiring", "Safety Checks"]),
             _make_experience("Plumber", company="XYZ Ltd", skill_labels=["Pipe Fitting", "Water Systems"]),
         ]
-        given_personal_data = {"program": "Engineering", "year": "2", "school": "UNZA"}
+        given_personal_data = {"programme_name": "Engineering", "school_year": "2", "institution_name": "UNZA"}
         mock_repo = _make_mock_repository(
             session_id=given_session_id,
             experiences=given_experiences,
@@ -112,7 +112,7 @@ class TestGetUserProfile:
     async def test_returns_profile_with_personal_data_only_when_no_session(self):
         # GIVEN a user with no session (so no experiences) but with personal data
         given_user_id = "user-personal-data-only"
-        given_personal_data = {"program": "Business", "school": "CBU"}
+        given_personal_data = {"programme_name": "Business", "institution_name": "CBU"}
         mock_repo = _make_mock_repository(
             session_id=None,
             personal_data=given_personal_data,
@@ -134,7 +134,7 @@ class TestGetUserProfile:
         # GIVEN a user with a session but no explored experiences, yet personal data exists
         given_user_id = "user-session-no-experiences"
         given_session_id = 789
-        given_personal_data = {"program": "IT", "year": "3", "school": "UNZA"}
+        given_personal_data = {"programme_name": "IT", "school_year": "3", "institution_name": "UNZA"}
         mock_repo = _make_mock_repository(
             session_id=given_session_id,
             experiences=None,
@@ -291,7 +291,7 @@ class TestFormatForPrompt:
                     skills=["Pipe Fitting", "Water Systems"],
                 ),
             ],
-            personal_data={"program": "Engineering", "year": "2", "school": "UNZA"},
+            personal_data={"programme_name": "Engineering", "school_year": "2", "institution_name": "UNZA"},
         )
         mock_repo = AsyncMock(spec=IUserProfileRepository)
         service = UserProfileService(repository=mock_repo)
@@ -338,7 +338,7 @@ class TestFormatForPrompt:
         # GIVEN a profile with personal data but no experiences
         given_profile = UserProfileData(
             experiences=[],
-            personal_data={"program": "IT", "year": "1", "school": "CBU"},
+            personal_data={"programme_name": "IT", "school_year": "1", "institution_name": "CBU"},
         )
         mock_repo = AsyncMock(spec=IUserProfileRepository)
         service = UserProfileService(repository=mock_repo)
@@ -380,7 +380,7 @@ class TestFormatForPrompt:
         # GIVEN any profile (even with minimal data)
         given_profile = UserProfileData(
             experiences=[],
-            personal_data={"program": "Science"},
+            personal_data={"programme_name": "Science"},
         )
         mock_repo = AsyncMock(spec=IUserProfileRepository)
         service = UserProfileService(repository=mock_repo)
@@ -396,7 +396,7 @@ class TestFormatForPrompt:
         # GIVEN a profile with only some personal data fields
         given_profile = UserProfileData(
             experiences=[],
-            personal_data={"program": "Nursing"},
+            personal_data={"programme_name": "Nursing"},
         )
         mock_repo = AsyncMock(spec=IUserProfileRepository)
         service = UserProfileService(repository=mock_repo)

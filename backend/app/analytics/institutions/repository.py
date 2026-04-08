@@ -16,7 +16,7 @@ from common_libs.time_utilities import datetime_to_mongo_date
 
 logger = logging.getLogger(__name__)
 
-PLAIN_DATA_SCHOOL_KEY = "school"
+PLAIN_DATA_SCHOOL_KEY = "institution_name"
 
 
 def _anonymize(user_id: str) -> str:
@@ -66,7 +66,6 @@ class InstitutionsRepository:
     async def _get_counts_by_institution(self) -> dict[str, tuple[int, set[str]]]:
         """
         Return a dict mapping institution name → (student_count, set_of_user_ids).
-        Fetches all plain_personal_data records that have a school field.
         """
         pipeline = [
             {"$match": {f"data.{PLAIN_DATA_SCHOOL_KEY}": {"$exists": True, "$ne": None, "$ne": ""}}},

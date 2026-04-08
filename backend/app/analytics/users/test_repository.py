@@ -25,17 +25,26 @@ def _make_prefs(user_id: str, *, accepted_tc: str | None = "2024-01-01", session
     return doc
 
 
-def _make_plain_data(user_id: str, *, school: str = "Unza", province: str = "Lusaka",
-                     program: str = "Engineering", year: str = "2", name: str = "Alice",
-                     gender: str = "female") -> dict:
+def _make_plain_data(
+    user_id: str,
+    *,
+    school: str = "Unza",
+    province: str = "Lusaka",
+    program: str = "Engineering",
+    year: str = "2",
+    first_name: str = "Alice",
+    last_name: str = "",
+    gender: str = "female",
+) -> dict:
     return {
         "user_id": user_id,
         "data": {
-            "name": name,
-            "school": school,
+            "first_name": first_name,
+            "last_name": last_name,
+            "institution_name": school,
             "province": province,
-            "program": program,
-            "year": year,
+            "programme_name": program,
+            "school_year": year,
             "gender": gender,
         }
     }
@@ -103,9 +112,9 @@ async def populated_repository(
 
     # PLAIN_PERSONAL_DATA (userdata_db)
     await userdata_db.get_collection(Collections.PLAIN_PERSONAL_DATA).insert_many([
-        _make_plain_data("user-a", school="Unza", province="Lusaka", program="Engineering", year="2", name="Alice", gender="female"),
-        _make_plain_data("user-b", school="Zesco", province="Copperbelt", program="Business", year="3", name="Bob", gender="male"),
-        _make_plain_data("user-c", school="Unza", province="Lusaka", program="Law", year="1", name="Carol", gender="female"),
+        _make_plain_data("user-a", school="Unza", province="Lusaka", program="Engineering", year="2", first_name="Alice", last_name="", gender="female"),
+        _make_plain_data("user-b", school="Zesco", province="Copperbelt", program="Business", year="3", first_name="Bob", last_name="", gender="male"),
+        _make_plain_data("user-c", school="Unza", province="Lusaka", program="Law", year="1", first_name="Carol", last_name="", gender="female"),
     ])
 
     # CAREER_READINESS_CONVERSATIONS (application_db)

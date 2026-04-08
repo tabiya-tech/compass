@@ -73,13 +73,13 @@ class SkillsDiscoveryAnalyticsRepository(ISkillsDiscoveryAnalyticsRepository):
         """
         match_filter: dict = {}
         if institution:
-            match_filter["data.school"] = {"$eq": institution}
+            match_filter["data.institution_name"] = {"$eq": institution}
         if location:
             match_filter["data.location"] = {"$eq": location}
         if program:
-            match_filter["data.program"] = {"$eq": program}
+            match_filter["data.programme_name"] = {"$eq": program}
         if year:
-            match_filter["data.year"] = {"$eq": year}
+            match_filter["data.school_year"] = {"$eq": year}
 
         if not match_filter:
             return None

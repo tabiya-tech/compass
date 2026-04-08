@@ -14,9 +14,6 @@ from app.analytics.types import User
 
 logger = logging.getLogger(__name__)
 
-SCHOOL_DATA_KEY = "school"
-
-
 def _anonymize(user_id: str) -> str:
     return hashlib.md5(user_id.encode(), usedforsecurity=False).hexdigest()
 
@@ -48,19 +45,18 @@ class UsersRepository:
         """
         filter_dict: dict = {}
         if institution is not None:
-            filter_dict[f"data.{SCHOOL_DATA_KEY}"] = institution
+            filter_dict["data.institution_name"] = institution
         if province is not None:
             filter_dict["data.province"] = province
         if programme is not None:
-            filter_dict["data.program"] = programme
+            filter_dict["data.programme_name"] = programme
         if year is not None:
-            filter_dict["data.year"] = year
+            filter_dict["data.school_year"] = year
         if search is not None:
-            # Search across school, program, and year fields
             filter_dict["$or"] = [
-                {f"data.{SCHOOL_DATA_KEY}": {"$regex": search, "$options": "i"}},
-                {"data.program": {"$regex": search, "$options": "i"}},
-                {"data.year": {"$regex": search, "$options": "i"}},
+                {"data.institution_name": {"$regex": search, "$options": "i"}},
+                {"data.programme_name": {"$regex": search, "$options": "i"}},
+                {"data.school_year": {"$regex": search, "$options": "i"}},
             ]
 
         if not filter_dict:
@@ -253,11 +249,11 @@ class UsersRepository:
             cr = cr_stats_map.get(user_id)
             items.append(User(
                 id=user_id,
-                name=plain.get("name"),
-                institution=plain.get(SCHOOL_DATA_KEY),
+                name=f"{plain.get('first_name', '')} {plain.get('last_name', '')}".strip() or None,
+                institution=plain.get("institution_name"),
                 province=plain.get("province"),
-                programme=plain.get("program"),
-                year=plain.get("year"),
+                programme=plain.get("programme_name"),
+                year=plain.get("school_year"),
                 gender=plain.get("gender"),
                 active=d.get("accepted_tc") is not None,
                 modules_explored=cr[0] if cr else None,

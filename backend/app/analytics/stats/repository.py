@@ -26,9 +26,9 @@ class DashboardStatsRepository:
         """Count institutions that have at least one registered user (from MongoDB activity)."""
         pipeline = [
             {"$match": {
-                "data.school": {"$exists": True, "$ne": None, "$ne": ""},
+                "data.institution_name": {"$exists": True, "$ne": None, "$ne": ""},
             }},
-            {"$group": {"_id": "$data.school"}},
+            {"$group": {"_id": "$data.institution_name"}},
             {"$count": "total"},
         ]
         result = await self._plain_data_collection.aggregate(pipeline).to_list(length=1)
@@ -40,7 +40,7 @@ class DashboardStatsRepository:
             return await self._prefs_collection.count_documents({})
         # Find user_ids belonging to this institution
         ppd = await self._plain_data_collection.find(
-            {"data.school": institution_name}, {"user_id": 1}
+            {"data.institution_name": institution_name}, {"user_id": 1}
         ).to_list(length=None)
         user_ids = [d["user_id"] for d in ppd if d.get("user_id")]
         if not user_ids:
@@ -57,7 +57,7 @@ class DashboardStatsRepository:
         if institution_name is not None:
             # Resolve user_ids for this institution, then anonymize for metrics lookup
             ppd = await self._plain_data_collection.find(
-                {"data.school": institution_name}, {"user_id": 1}
+                {"data.institution_name": institution_name}, {"user_id": 1}
             ).to_list(length=None)
             user_ids = [d["user_id"] for d in ppd if d.get("user_id")]
             if not user_ids:

@@ -34,7 +34,7 @@ async def _resolve_user_ids_for_institution(
 ) -> Optional[list[str]]:
     """Return user_ids belonging to a given institution, or None if no filter."""
     docs = await userdata_db.get_collection(Collections.PLAIN_PERSONAL_DATA).find(
-        {"data.school": institution_name}, {"user_id": 1}
+        {"data.institution_name": institution_name}, {"user_id": 1}
     ).to_list(length=None)
     return [d["user_id"] for d in docs if d.get("user_id")]
 

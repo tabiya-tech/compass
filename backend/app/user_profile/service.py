@@ -135,9 +135,9 @@ class UserProfileService(IUserProfileService):
     @staticmethod
     def _build_programme_line(personal_data: dict) -> str:
         """Build the programme line from personal data fields, or return empty string if none present."""
-        program = personal_data.get("program", "")
-        year = personal_data.get("year", "")
-        school = personal_data.get("school", "")
+        program = personal_data.get("programme_name", "")
+        year = personal_data.get("school_year", "")
+        school = personal_data.get("institution_name", "")
 
         if not program and not year and not school:
             return ""
