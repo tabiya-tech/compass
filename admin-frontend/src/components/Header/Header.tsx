@@ -8,7 +8,7 @@ import ContextMenu from "src/theme/ContextMenu/ContextMenu";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
 import { routerPaths } from "src/app/routerPaths";
-import { getAppIconUrl, getDarkLogoUrl, getLogoUrl } from "src/envService";
+import { getDarkLogoUrl, getLogoUrl } from "src/envService";
 import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import UserStateService from "src/userState/UserStateService";
@@ -29,7 +29,7 @@ const Header: React.FC = () => {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-  const logoFromEnv = getAppIconUrl() || getDarkLogoUrl() || getLogoUrl();
+  const logoFromEnv = getDarkLogoUrl() || getLogoUrl();
   const preferredLogoSrc = logoFromEnv || `${process.env.PUBLIC_URL}/njila-logo-dark.svg`;
   const localLogoFallback = `${process.env.PUBLIC_URL}/logo.svg`;
   const [logoSrc, setLogoSrc] = useState(preferredLogoSrc);
