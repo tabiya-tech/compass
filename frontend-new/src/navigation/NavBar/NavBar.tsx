@@ -40,6 +40,8 @@ import { useUserProfile } from "src/profile/hooks/useUserProfile";
 
 const uniqueId = "c3a8f1d2-7b4e-4c9a-a5d6-8e3f2b1c0d9e";
 
+const IS_NAV_SEARCH_DISABLED = true;
+
 export const DATA_TEST_ID = {
   NAVBAR_CONTAINER: `navbar-container-${uniqueId}`,
   NAVBAR_LOGO: `navbar-logo-${uniqueId}`,
@@ -382,16 +384,34 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
             </PrimaryIconButton>
           ) : (
             <>
-              <Box
-                component={NavLink}
-                to={routerPaths.ROOT}
-                end
-                sx={getNavLinkSx(false)}
-                data-testid={DATA_TEST_ID.NAVBAR_LINK_SEARCH}
-              >
-                <Search size={18} />
-                {t("nav.search" as TranslationKey)}
-              </Box>
+              {IS_NAV_SEARCH_DISABLED ? (
+                <Box
+                  component="span"
+                  aria-disabled
+                  sx={{
+                    ...getNavLinkSx(false),
+                    opacity: 0.45,
+                    cursor: "not-allowed",
+                    pointerEvents: "none",
+                    "&:hover": { opacity: 0.45 },
+                  }}
+                  data-testid={DATA_TEST_ID.NAVBAR_LINK_SEARCH}
+                >
+                  <SearchIcon sx={{ fontSize: 18 }} />
+                  {t("nav.search" as TranslationKey)}
+                </Box>
+              ) : (
+                <Box
+                  component={NavLink}
+                  to={routerPaths.ROOT}
+                  end
+                  sx={getNavLinkSx(false)}
+                  data-testid={DATA_TEST_ID.NAVBAR_LINK_SEARCH}
+                >
+                  <Search size={18} />
+                  {t("nav.search" as TranslationKey)}
+                </Box>
+              )}
               <Box
                 component={NavLink}
                 to={routerPaths.ROOT}
