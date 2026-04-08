@@ -108,6 +108,7 @@
   "header": {
     "logout": "Logout",
     "user": "User",
+    "users": "Users",
     "role": {
       "admin": "Admin",
       "institutionStaff": "Institution Staff"

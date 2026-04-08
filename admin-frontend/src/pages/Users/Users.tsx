@@ -1,10 +1,9 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { Alert, Box, Button, Container, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import AddIcon from "@mui/icons-material/Add";
-import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
-import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/FirebaseEmailAuthenticationService";
-import UserStateService from "src/userState/UserStateService";
+import Header from "src/components/Header/Header";
+import Footer from "src/components/Footer/Footer";
 import { UsersProvider } from "./UsersContext";
 import useUsers from "./useUsers";
 import UsersTable, { UsersTableSkeleton } from "./components/UsersTable";
@@ -73,17 +72,6 @@ const UsersContent: React.FC = () => {
 const Users: React.FC<UsersProps> = () => {
   const theme = useTheme();
 
-  const handleLogout = useCallback(async () => {
-    try {
-      await FirebaseEmailAuthenticationService.getInstance().logout();
-      AuthenticationStateService.getInstance().clearUser();
-      UserStateService.getInstance().clearUserState();
-      window.location.reload();
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  }, []);
-
   return (
     <Box
       sx={{
@@ -93,10 +81,11 @@ const Users: React.FC<UsersProps> = () => {
         backgroundColor: theme.palette.background.default,
       }}
     >
-      {/*<Navbar onLogout={handleLogout} />*/}
+      <Header />
       <Box sx={{ flex: 1 }}>
         <UsersContent />
       </Box>
+      <Footer />
     </Box>
   );
 };

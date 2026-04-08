@@ -108,6 +108,12 @@ const Header: React.FC = () => {
           </NavLink>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: theme.spacing(theme.tabiyaSpacing.md) }}>
+          <NavLink
+            to={routerPaths.USERS}
+            style={({ isActive }) => ({ fontWeight: isActive ? 600 : 400, textDecoration: "none", color: "inherit" })}
+          >
+            {t("header.users", "Users")}
+          </NavLink>
           <LanguageContextMenu removeMargin={true} />
           <PrimaryIconButton
             sx={{ color: theme.palette.common.black }}
