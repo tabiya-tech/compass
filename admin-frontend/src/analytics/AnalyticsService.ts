@@ -74,7 +74,7 @@ export default class AnalyticsService {
   async listInstitutions(limit = 100, cursor?: string): Promise<PaginatedResponse<InstitutionApiItem>> {
     const params = new URLSearchParams({ limit: String(limit) });
     if (cursor) params.set("cursor", cursor);
-    const url = `${this.baseUrl}/institutions?${params}`;
+    const url = `${this.baseUrl}/analytics/institutions?${params}`;
     const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "listInstitutions", "GET", url);
     const response = await customFetch(url, {
       method: "GET",

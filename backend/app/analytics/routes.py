@@ -18,15 +18,12 @@ logger = logging.getLogger(__name__)
 
 
 def add_analytics_routes(app: FastAPI, auth: Authentication):
-    institutions_router = APIRouter(prefix="/institutions", tags=["analytics", "institutions"])
-    add_institutions_routes(institutions_router, auth)
-    app.include_router(institutions_router)
-
     users_router = APIRouter(prefix="/students", tags=["analytics", "users"])
     add_users_routes(users_router, auth)
     app.include_router(users_router)
 
     analytics_router = APIRouter(prefix="/analytics", tags=["analytics"])
+    add_institutions_routes(analytics_router, auth)
     add_adoption_trends_routes(analytics_router, auth)
     add_stats_routes(analytics_router, auth)
     add_career_readiness_analytics_routes(analytics_router, auth)

@@ -22,24 +22,13 @@ export function useInstitutionFilterOptions(): InstitutionFilterOptions {
 
     async function fetchAll() {
       setLoading(true);
-      const names: string[] = [];
-      let cursor: string | undefined;
-
       try {
-        do {
-          const result = await InstitutionService.getInstance().searchInstitutions({
-            limit: 500,
-            cursor,
-            fields: "name",
-          });
-          for (const institution of result.data) {
-            names.push(institution.name);
-          }
-          cursor = result.meta.next_cursor ?? undefined;
-        } while (cursor);
-
+        const result = await InstitutionService.getInstance().searchInstitutions({
+          limit: 100,
+          fields: "name",
+        });
         if (isMounted) {
-          setInstitutionNames([...new Set(names)].sort());
+          setInstitutionNames(result.data.map((i) => i.name).sort());
           setError(null);
         }
       } catch (e) {

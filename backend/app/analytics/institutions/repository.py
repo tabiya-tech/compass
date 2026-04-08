@@ -68,7 +68,7 @@ class InstitutionsRepository:
         Return a dict mapping institution name → (student_count, set_of_user_ids).
         """
         pipeline = [
-            {"$match": {f"data.{PLAIN_DATA_SCHOOL_KEY}": {"$exists": True, "$ne": None, "$ne": ""}}},
+            {"$match": {f"data.{PLAIN_DATA_SCHOOL_KEY}": {"$exists": True, "$nin": [None, ""]}}},
             {"$group": {
                 "_id": f"$data.{PLAIN_DATA_SCHOOL_KEY}",
                 "user_ids": {"$addToSet": "$user_id"},

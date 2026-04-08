@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def add_institutions_routes(router: APIRouter, auth: Authentication):
     @router.get(
-        "",
+        "/institutions",
         response_model=PaginatedListResponse[Institution],
         responses={HTTPStatus.BAD_REQUEST: {"model": HTTPErrorResponse}, HTTPStatus.UNAUTHORIZED: {"model": HTTPErrorResponse}},
         description="List institutions with optional filters and cursor-based pagination. Requires authentication.",
