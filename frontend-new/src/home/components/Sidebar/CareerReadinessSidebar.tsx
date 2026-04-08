@@ -51,7 +51,7 @@ const ObjectiveRow: React.FC<ObjectiveRowProps> = ({ objective, accentColor }) =
           border: `2px solid ${isDone || isActive ? accentColor : theme.palette.divider}`,
           backgroundColor: isDone ? accentColor : "transparent",
           flexShrink: 0,
-          marginTop: "1px",
+          marginTop: "2px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

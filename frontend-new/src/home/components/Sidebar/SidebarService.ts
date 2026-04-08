@@ -6,6 +6,8 @@ import authenticationStateService from "src/auth/services/AuthenticationState.se
 import { getBackendUrl } from "src/envService";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { StatusCodes } from "http-status-codes";
+import CareerReadinessService from "src/careerReadiness/services/CareerReadinessService";
+import type { ModuleStatus } from "src/careerReadiness/types";
 
 // ─── Data types ───────────────────────────────────────────────────────────────
 
@@ -37,14 +39,6 @@ export interface ObjectivesData {
   objectives: ObjectiveItem[];
 }
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
-
-const MOCK_OBJECTIVES: ObjectiveItem[] = [
-  { label: "Describe yourself with 3 key strengths", status: "done" },
-  { label: "Back each strength with a real example", status: "active" },
-  { label: "Write a 2-sentence professional intro", status: "pending" },
-];
-
 // ─── Sector emoji map ─────────────────────────────────────────────────────────
 
 const SECTOR_EMOJI_MAP: Record<string, string> = {
@@ -70,6 +64,17 @@ const getSectorEmoji = (sectorName: string): string => {
     if (key.includes(word)) return emoji;
   }
   return "🏢";
+};
+
+const moduleStatusToObjectiveStatus = (status: ModuleStatus): ObjectiveStatus => {
+  switch (status) {
+    case "COMPLETED":
+      return "done";
+    case "IN_PROGRESS":
+      return "active";
+    default:
+      return "pending";
+  }
 };
 
 // ─── Service ──────────────────────────────────────────────────────────────────
@@ -133,11 +138,20 @@ export default class SidebarService {
   }
 
   /**
-   * Career Readiness — returns learning objectives.
-   * TODO: replace mock with module-specific API when available.
+   * Career Readiness — returns learning objectives derived from module progress.
    */
   async getObjectivesData(): Promise<ObjectivesData> {
-    return { objectives: MOCK_OBJECTIVES };
+    try {
+      const { modules } = await CareerReadinessService.getInstance().listModules();
+      const objectives: ObjectiveItem[] = modules.map((m) => ({
+        id: m.id,
+        label: m.title,
+        status: moduleStatusToObjectiveStatus(m.status),
+      }));
+      return { objectives };
+    } catch {
+      return { objectives: [] };
+    }
   }
 
   /**
