@@ -5,7 +5,6 @@ import AddIcon from "@mui/icons-material/Add";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/FirebaseEmailAuthenticationService";
 import UserStateService from "src/userState/UserStateService";
-import Navbar from "src/theme/Navbar/Navbar";
 import { UsersProvider } from "./UsersContext";
 import useUsers from "./useUsers";
 import UsersTable, { UsersTableSkeleton } from "./components/UsersTable";
@@ -94,7 +93,7 @@ const Users: React.FC<UsersProps> = () => {
         backgroundColor: theme.palette.background.default,
       }}
     >
-      <Navbar onLogout={handleLogout} />
+      {/*<Navbar onLogout={handleLogout} />*/}
       <Box sx={{ flex: 1 }}>
         <UsersContent />
       </Box>
