@@ -30,12 +30,17 @@ const HomeHero: React.FC = () => {
         position: "relative",
       }}
     >
-      <Box sx={{ flex: { sm: "1 1 48%" }, minWidth: 0, alignSelf: { sm: "center" } }}>
+      <Box sx={{ flex: { sm: "1 1 50%" }, minWidth: 0, alignSelf: { sm: "center" } }}>
         <Typography
           variant="h1"
           color="text.primary"
           data-testid={DATA_TEST_ID.HOME_HERO_HEADLINE}
-          sx={{ marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}
+          sx={{
+            marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.xs),
+            fontSize: { xs: "48px", lg: "64px" },
+            lineHeight: 0.9,
+            letterSpacing: "-0.06em",
+          }}
         >
           {t("home.hero.headline1")}
           <Box component="span" sx={{ color: theme.palette.brandAction.main }}>
@@ -46,19 +51,34 @@ const HomeHero: React.FC = () => {
           variant="h1"
           sx={{
             color: theme.palette.primary.main,
-            marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.md),
+            marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+            fontSize: { xs: "48px", lg: "64px" },
+            lineHeight: 0.9,
+            letterSpacing: "-0.06em",
+            textWrap: "wrap",
           }}
         >
           {t("home.hero.headline2")}
+          <Box component="span" marginLeft={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
+            .
+          </Box>
         </Typography>
-        <Typography variant="body1" data-testid={DATA_TEST_ID.HOME_HERO_BODY}>
+        <Typography
+          variant="body1"
+          data-testid={DATA_TEST_ID.HOME_HERO_BODY}
+          sx={{
+            fontWeight: 500,
+            lineHeight: 1.4,
+            marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+          }}
+        >
           {t("home.hero.body", { appName })}
         </Typography>
       </Box>
 
       <Box
         sx={{
-          flex: { sm: "1 1 52%" },
+          flex: { sm: "1 1 50%" },
           display: "flex",
           justifyContent: "center",
           alignItems: "flex-end",

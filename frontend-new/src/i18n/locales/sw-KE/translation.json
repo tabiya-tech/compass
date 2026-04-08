@@ -276,7 +276,7 @@
         "loginUsing": "Ingia ukitumia",
         "loggingYouIn": "Tunakuingiza...",
         "loggingInAria": "Inaingia",
-        "dontHaveAnAccount": "Huna akaunti? ",
+        "dontHaveAnAccount": "Huna akaunti?",
         "fillInEmailAndPassword": "Tafadhali jaza barua pepe na nenosiri",
         "orLoginToYourAccountToContinue": "Au ingia kwenye akaunti yako ili kuendelea",
         "or": "au",
@@ -284,7 +284,7 @@
         "continueAsGuest": "Endelea kama Mgeni",
         "appHero": {
           "discoverLine": "Gundua ako",
-          "skillsLine": "ujuzi na nguvu zako.",
+          "skillsLine": "ujuzi na nguvu zako",
           "subheadline": "Njia yako iliyoongozwa kutoka kwa ujuzi hadi kazi yako ya kwanza — imejengwa kulingana na unachojua, ulichofanya, na unapotaka kwenda.",
           "signInTitle": "Ingia",
           "cta": "Twende",
@@ -304,6 +304,7 @@
         }
       },
       "register": {
+        "signUpTitle": "Jisajili",
         "welcomeTitle": "Karibu kwenye {{appName}}!",
         "welcomeBack": "Karibu tena!",
         "subtitle": "Tunahitaji taarifa fulani ili kuanza",
@@ -381,7 +382,7 @@
         "resendVerificationEmailFailedWithMessage": "Imeshindikana kutuma barua pepe ya uthibitisho: {{message}}"
       },
       "socialAuth": {
-        "orContinueWith": "Au endelea na",
+        "orContinueWith": "Au",
         "loginWithGoogle": "Ingia na Google",
         "googleLoginIsNotAvailableWhenOffline": "Kuingia na Google hakupatikani ukiwa nje ya mtandao.",
         "socialFailedLoginWithMessage": "Imeshindikana kuingia: {{message}}",
@@ -854,7 +855,7 @@
     "whatToDoSubtitle": "Kila moduli ni mazungumzo yanayoongozwa na AI au rasilimali kukusaidia katika safari yako ya kazi.",
     "hero": {
       "headline1": "Hebu tugundue",
-      "headline2": "Ujuzi wako na nguvu zako.",
+      "headline2": "Ujuzi wako na nguvu zako",
       "body": "Njia yako iliyoongozwa kutoka kwa ujuzi hadi kazi yako ya kwanza. Anza kwa kugundua unachokileta — kisha chunguza kazi, unda CV yako, na upate fursa halisi nchini Zambia.",
       "illustrationAlt": "Mtu kwenye kigango cha njia, akichunguza mwelekeo wa kazi"
     },
@@ -941,7 +942,7 @@
       "termsOfUse": "Sheria za Matumizi",
       "accessibility": "Ufikiaji",
       "contact": "Wasiliana",
-      "collaboration": "{{appName}} ni ushirikiano kati ya Kikundi cha Benki ya Dunia na Tabiya."
+      "collaboration": "{{appName}} ni zana bila malipo ya kuongoza kazi iliyojengwa kwa ushirikiano kati ya Kundi la Benki ya Dunia na Tabiya."
     }
   },
   "knowledgeHub": {

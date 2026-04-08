@@ -1,15 +1,15 @@
 {
   "common": {
     "buttons": {
-      "login": "Login",
+      "login": "Sign In",
       "logout": "Logout",
       "submit": "Submit",
-      "register": "Register",
+      "register": "Sign Up",
       "startNewConversation": "Start new conversation",
       "settings": "Settings",
       "cancel": "Cancel",
       "confirm": "Yes, I'm sure",
-      "backToLogin": "Back to Login",
+      "backToLogin": "Back to Sign In",
       "save": "Save",
       "goBack": "Go Back",
       "restore": "Restore",
@@ -276,7 +276,7 @@
         "loginUsing": "Login using",
         "loggingYouIn": "Logging you in...",
         "loggingInAria": "Logging in",
-        "dontHaveAnAccount": "Don't have an account? ",
+        "dontHaveAnAccount": "Don't have an account?",
         "fillInEmailAndPassword": "Please fill in the email and password fields",
         "orLoginToYourAccountToContinue": "Or login to your account to continue",
         "or": "or",
@@ -284,7 +284,7 @@
         "continueAsGuest": "Continue as Guest",
         "appHero": {
           "discoverLine": "Discover your",
-          "skillsLine": "skills & strengths.",
+          "skillsLine": "skills & strengths",
           "subheadline": "Your guided path from skills to your first job — built around what you know, what you've done, and where you want to go.",
           "signInTitle": "Sign In",
           "cta": "Let's go",
@@ -304,6 +304,7 @@
         }
       },
       "register": {
+        "signUpTitle": "Sign Up",
         "welcomeTitle": "Welcome to {{appName}}!",
         "welcomeBack": "Welcome back!",
         "subtitle": "We need some information to get started",
@@ -381,7 +382,7 @@
         "resendVerificationEmailFailedWithMessage": "Failed to send verification email: {{message}}"
       },
       "socialAuth": {
-        "orContinueWith": "Or continue with",
+        "orContinueWith": "Or",
         "loginWithGoogle": "Login with Google",
         "googleLoginIsNotAvailableWhenOffline": "Google login is not available when offline.",
         "socialFailedLoginWithMessage": "Failed to login: {{message}}",
@@ -848,7 +849,7 @@
     "whatToDoSubtitle": "Each module is an AI-guided conversation or resource to help you on your career journey.",
     "hero": {
       "headline1": "Let's discover",
-      "headline2": "Your skills & strengths.",
+      "headline2": "Your skills & strengths",
       "body": "Your guided path from skills to your first job. Start by discovering what you bring to the table — then explore careers, build your CV, and find real opportunities in Zambia.",
       "illustrationAlt": "Person at a signpost on a path, exploring career directions"
     },
@@ -935,7 +936,7 @@
       "termsOfUse": "Terms of Use",
       "accessibility": "Accessibility",
       "contact": "Contact",
-      "collaboration": "{{appName}} is a collaboration between the World Bank Group and Tabiya."
+      "collaboration": "Njila is a free career guidance tool built in partnership between the World Bank Group and Tabiya."
     }
   },
   "careerExplorer": {

@@ -19,7 +19,6 @@ import { AuthenticationError } from "src/error/commonErrors";
 import ResendVerificationEmail from "src/auth/components/resendVerificationEmail/ResendVerificationEmail";
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
 import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
-import CustomLink from "src/theme/CustomLink/CustomLink";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
 import MetricsService from "src/metrics/metricsService";
 import { DeviceSpecificationEvent, EventType, UserLocationEvent } from "src/metrics/types";
@@ -29,7 +28,6 @@ import {
   getApplicationLoginCode,
   getApplicationRegistrationCode,
   getLoginCodeDisabled,
-  getRegistrationDisabled,
   getSocialAuthDisabled,
 } from "src/envService";
 import PasswordReset from "src/auth/components/passwordReset/PasswordReset";
@@ -186,10 +184,6 @@ const Login: React.FC = () => {
 
   const applicationRegistrationCode = useMemo(() => {
     return getApplicationRegistrationCode();
-  }, []);
-
-  const registrationDisabled = useMemo(() => {
-    return getRegistrationDisabled().toLowerCase() === "true";
   }, []);
 
   const socialAuthDisabled = useMemo(() => {
@@ -460,8 +454,8 @@ const Login: React.FC = () => {
           "& .MuiLink-root": { color: theme.palette.common.white },
         }}
       >
-        <Typography variant="h3" sx={{ fontWeight: 700, textTransform: "uppercase" }}>
-          Sign In
+        <Typography variant="h3" alignSelf="flex-start" textAlign="center" gutterBottom>
+          {t("auth.pages.login.appHero.signInTitle")}
         </Typography>
         <Box
           component="form"
@@ -534,24 +528,6 @@ const Login: React.FC = () => {
             notifyOnLoading={notifyOnSocialLoading}
             registrationCode={applicationRegistrationCode}
           />
-        )}
-        {!registrationDisabled && (
-          <Typography variant="caption" data-testid={DATA_TEST_ID.REGISTER_LINK}>
-            {t("auth.pages.login.dontHaveAnAccount")}
-            <CustomLink
-              onClick={() => navigate(routerPaths.REGISTER)}
-              sx={{
-                color: theme.palette.common.white,
-                fontWeight: 700,
-                "&:hover": {
-                  color: theme.palette.common.white,
-                  opacity: 0.75,
-                },
-              }}
-            >
-              {t("common.buttons.register")}
-            </CustomLink>
-          </Typography>
         )}
         {showRequestLoginCode && <RequestInvitationCode invitationCodeType={InvitationType.LOGIN} />}
       </Box>

@@ -10,7 +10,7 @@ exports[`Testing Login component Render tests should hide login code related ele
       class="MuiBox-root css-1hvnxas"
     >
       <h3
-        class="MuiTypography-root MuiTypography-h3 css-38wwff-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
       >
         Sign In
       </h3>
@@ -30,7 +30,7 @@ exports[`Testing Login component Render tests should hide login code related ele
           tabindex="-1"
           type="submit"
         >
-          Login
+          Sign In
           <div
             class="MuiBox-root css-piy7g0"
           >
@@ -51,18 +51,6 @@ exports[`Testing Login component Render tests should hide login code related ele
       <span
         data-testid="firebase-auth-container-f0324e97-83fd-49e6-95c3-1043751fa1db"
       />
-      <span
-        class="MuiTypography-root MuiTypography-caption css-c36qc7-MuiTypography-root"
-        data-testid="login-register-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
-      >
-        Don't have an account? 
-        <a
-          aria-disabled="false"
-          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-q5pagn-MuiTypography-root-MuiLink-root"
-        >
-          Register
-        </a>
-      </span>
     </div>
   </div>
 </div>
@@ -78,7 +66,7 @@ exports[`Testing Login component Render tests should hide login code related ele
       class="MuiBox-root css-1hvnxas"
     >
       <h3
-        class="MuiTypography-root MuiTypography-h3 css-38wwff-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
       >
         Sign In
       </h3>
@@ -98,7 +86,7 @@ exports[`Testing Login component Render tests should hide login code related ele
           tabindex="-1"
           type="submit"
         >
-          Login
+          Sign In
           <div
             class="MuiBox-root css-piy7g0"
           >
@@ -119,18 +107,6 @@ exports[`Testing Login component Render tests should hide login code related ele
       <span
         data-testid="firebase-auth-container-f0324e97-83fd-49e6-95c3-1043751fa1db"
       />
-      <span
-        class="MuiTypography-root MuiTypography-caption css-c36qc7-MuiTypography-root"
-        data-testid="login-register-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
-      >
-        Don't have an account? 
-        <a
-          aria-disabled="false"
-          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-q5pagn-MuiTypography-root-MuiLink-root"
-        >
-          Register
-        </a>
-      </span>
     </div>
   </div>
 </div>
@@ -146,7 +122,7 @@ exports[`Testing Login component Render tests should show continue as guest if l
       class="MuiBox-root css-1hvnxas"
     >
       <h3
-        class="MuiTypography-root MuiTypography-h3 css-38wwff-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
       >
         Sign In
       </h3>
@@ -190,7 +166,7 @@ exports[`Testing Login component Render tests should show continue as guest if l
           tabindex="-1"
           type="submit"
         >
-          Login
+          Sign In
           <div
             class="MuiBox-root css-piy7g0"
           >
@@ -211,18 +187,6 @@ exports[`Testing Login component Render tests should show continue as guest if l
       <span
         data-testid="firebase-auth-container-f0324e97-83fd-49e6-95c3-1043751fa1db"
       />
-      <span
-        class="MuiTypography-root MuiTypography-caption css-c36qc7-MuiTypography-root"
-        data-testid="login-register-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
-      >
-        Don't have an account? 
-        <a
-          aria-disabled="false"
-          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-q5pagn-MuiTypography-root-MuiLink-root"
-        >
-          Register
-        </a>
-      </span>
     </div>
   </div>
 </div>
@@ -237,7 +201,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
     class="MuiBox-root css-1hvnxas"
   >
     <h3
-      class="MuiTypography-root MuiTypography-h3 css-38wwff-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
     >
       Sign In
     </h3>
@@ -276,7 +240,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
         tabindex="-1"
         type="submit"
       >
-        Login
+        Sign In
         <div
           class="MuiBox-root css-piy7g0"
         >
@@ -298,18 +262,6 @@ exports[`Testing Login component it should show login form successfully 1`] = `
       data-testid="firebase-auth-container-f0324e97-83fd-49e6-95c3-1043751fa1db"
     />
     <span
-      class="MuiTypography-root MuiTypography-caption css-c36qc7-MuiTypography-root"
-      data-testid="login-register-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
-    >
-      Don't have an account? 
-      <a
-        aria-disabled="false"
-        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-q5pagn-MuiTypography-root-MuiLink-root"
-      >
-        Register
-      </a>
-    </span>
-    <span
       data-testid="request-invitation-code-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
     />
   </div>
@@ -325,7 +277,7 @@ exports[`Testing Login component should handle application login code 1`] = `
     class="MuiBox-root css-1hvnxas"
   >
     <h3
-      class="MuiTypography-root MuiTypography-h3 css-38wwff-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
     >
       Sign In
     </h3>
@@ -369,7 +321,7 @@ exports[`Testing Login component should handle application login code 1`] = `
         tabindex="-1"
         type="submit"
       >
-        Login
+        Sign In
         <div
           class="MuiBox-root css-piy7g0"
         >
@@ -390,18 +342,6 @@ exports[`Testing Login component should handle application login code 1`] = `
     <span
       data-testid="firebase-auth-container-f0324e97-83fd-49e6-95c3-1043751fa1db"
     />
-    <span
-      class="MuiTypography-root MuiTypography-caption css-c36qc7-MuiTypography-root"
-      data-testid="login-register-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
-    >
-      Don't have an account? 
-      <a
-        aria-disabled="false"
-        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-q5pagn-MuiTypography-root-MuiLink-root"
-      >
-        Register
-      </a>
-    </span>
   </div>
 </div>
 `;
@@ -416,7 +356,7 @@ exports[`Testing Login component should remove registration link if registration
       class="MuiBox-root css-1hvnxas"
     >
       <h3
-        class="MuiTypography-root MuiTypography-h3 css-38wwff-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
       >
         Sign In
       </h3>
@@ -455,7 +395,7 @@ exports[`Testing Login component should remove registration link if registration
           tabindex="-1"
           type="submit"
         >
-          Login
+          Sign In
           <div
             class="MuiBox-root css-piy7g0"
           >

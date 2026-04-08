@@ -14,7 +14,6 @@ import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthe
 import { useAuthPageContext } from "src/auth/components/AuthLayout/AuthPageContext";
 import RequestInvitationCode from "src/auth/components/requestInvitationCode/RequestInvitationCode";
 import { InvitationType } from "src/auth/services/invitationsService/invitations.types";
-import CustomLink from "src/theme/CustomLink/CustomLink";
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
 import { getApplicationRegistrationCode, getSocialAuthDisabled, getRegistrationCodeDisabled } from "src/envService";
@@ -210,8 +209,8 @@ const Register: React.FC = () => {
           "& .MuiLink-root": { color: theme.palette.common.white },
         }}
       >
-        <Typography variant="h3" sx={{ fontWeight: 700, textTransform: "uppercase" }}>
-          Sign Up
+        <Typography variant="h3" alignSelf="flex-start" textAlign="center" gutterBottom>
+          {t("auth.pages.register.signUpTitle")}
         </Typography>
         {!applicationRegistrationCode && !registrationCodeDisabled && (
           <React.Fragment>
@@ -257,22 +256,6 @@ const Register: React.FC = () => {
             registrationCode={registrationCode || applicationRegistrationCode}
           />
         )}
-        <Typography variant="caption" data-testid={DATA_TEST_ID.LOGIN_LINK}>
-          {t("auth.pages.register.alreadyHaveAccount")}{" "}
-          <CustomLink
-            onClick={() => navigate(routerPaths.LOGIN)}
-            sx={{
-              color: theme.palette.common.white,
-              fontWeight: 700,
-              "&:hover": {
-                color: theme.palette.common.white,
-                opacity: 0.75,
-              },
-            }}
-          >
-            {t("common.buttons.login")}
-          </CustomLink>
-        </Typography>
         {!applicationRegistrationCode && !registrationCodeDisabled && (
           <RequestInvitationCode invitationCodeType={InvitationType.REGISTER} />
         )}

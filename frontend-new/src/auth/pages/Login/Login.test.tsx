@@ -303,9 +303,6 @@ describe("Testing Login component", () => {
     // THEN the invite code login form should be displayed
     expect(LoginWithInviteCodeForm).toHaveBeenCalled();
 
-    // AND the link to register if of no user dosn't have an should be present
-    expect(screen.getByTestId(DATA_TEST_ID.REGISTER_LINK)).toBeInTheDocument();
-
     // AND the component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.LOGIN_CONTAINER)).toMatchSnapshot();
   });

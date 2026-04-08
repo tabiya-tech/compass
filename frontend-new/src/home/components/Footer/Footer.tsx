@@ -103,39 +103,52 @@ const Footer: React.FC<FooterProps> = ({ sx }) => {
               sx={{
                 fontSize: "0.8rem",
                 fontWeight: 500,
+                textDecoration: "None",
+                "&:hover": {
+                  textDecoration: "underline",
+                },
               }}
             >
               {t("home.footer.privacyPolicy")}
             </CustomLink>
-            •
             <CustomLink
               onClick={() => handleExternalNavigation(EXTERNAL_URLS.TERMS_OF_USE)}
               data-testid={DATA_TEST_ID.FOOTER_TERMS_LINK}
               sx={{
                 fontSize: "0.8rem",
                 fontWeight: 500,
+                textDecoration: "None",
+                "&:hover": {
+                  textDecoration: "underline",
+                },
               }}
             >
               {t("home.footer.termsOfUse")}
             </CustomLink>
-            •
             <CustomLink
               onClick={() => handleExternalNavigation(EXTERNAL_URLS.ACCESSIBILITY)}
               data-testid={DATA_TEST_ID.FOOTER_ACCESSIBILITY_LINK}
               sx={{
                 fontSize: "0.8rem",
                 fontWeight: 500,
+                textDecoration: "None",
+                "&:hover": {
+                  textDecoration: "underline",
+                },
               }}
             >
               {t("home.footer.accessibility")}
             </CustomLink>
-            •
             <CustomLink
               onClick={() => handleExternalNavigation(EXTERNAL_URLS.CONTACT)}
               data-testid={DATA_TEST_ID.FOOTER_CONTACT_LINK}
               sx={{
                 fontSize: "0.8rem",
                 fontWeight: 500,
+                textDecoration: "None",
+                "&:hover": {
+                  textDecoration: "underline",
+                },
               }}
             >
               {t("home.footer.contact")}

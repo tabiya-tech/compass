@@ -49,7 +49,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
     tabindex="-1"
     type="submit"
   >
-    Register
+    Sign Up
     <div
       class="MuiBox-root css-piy7g0"
     >

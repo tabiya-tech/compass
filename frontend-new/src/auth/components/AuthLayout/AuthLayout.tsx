@@ -2,31 +2,93 @@ import React, { useCallback, useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import AuthPageShell, { layoutContentColumnSx } from "src/auth/components/AuthPageShell/AuthPageShell";
 import Footer from "src/home/components/Footer/Footer";
-import { getDarkLogoUrl, getLogoUrl, getProductName } from "src/envService";
+import { getDarkLogoUrl, getLogoUrl, getProductName, getRegistrationDisabled } from "src/envService";
 import { AuthPageProvider } from "src/auth/components/AuthLayout/AuthPageContext";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
+import { routerPaths } from "src/app/routerPaths";
+import CustomLink from "src/theme/CustomLink/CustomLink";
 
-const FeatureColumn: React.FC<{ imageSrc: string; title: string; body: string }> = ({ imageSrc, title, body }) => (
-  <Box sx={{ textAlign: "center", px: { xs: 1, md: 0 } }}>
-    <Box component="img" src={imageSrc} alt="" sx={{ width: "100%", maxWidth: 160, height: "auto", mx: "auto" }} />
-    <Typography variant="h3" sx={{ mb: 1, maxWidth: 250, mx: "auto" }}>
+const FeatureColumn: React.FC<{
+  imageSrc: string;
+  title: string;
+  body: string;
+  imageMaxWidth?: { xs: number; md: number };
+}> = ({ imageSrc, title, body, imageMaxWidth = { xs: 220, md: 260 } }) => (
+  <Box
+    sx={{
+      width: "100%",
+      textAlign: "center",
+      px: { xs: 1, md: 0 },
+      display: "grid",
+      gridRow: { xs: "auto", md: "1 / -1" },
+      gridTemplateRows: { xs: "auto auto auto", md: "subgrid" },
+      justifyItems: "center",
+    }}
+  >
+    <Box
+      sx={{
+        width: "100%",
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "center",
+      }}
+    >
+      <Box
+        component="img"
+        src={imageSrc}
+        alt=""
+        sx={{
+          width: "auto",
+          maxWidth: imageMaxWidth,
+          maxHeight: "100%",
+          objectFit: "contain",
+        }}
+      />
+    </Box>
+    <Typography
+      variant="h3"
+      sx={{
+        mt: 0.5,
+        mb: 0,
+        maxWidth: 300,
+        textAlign: "center",
+        width: "100%",
+        alignSelf: "flex-start",
+      }}
+    >
       {title}
     </Typography>
-    <Typography variant="body1">{body}</Typography>
+    <Typography
+      variant="body2"
+      sx={{
+        maxWidth: 320,
+        lineHeight: 1.4,
+        letterSpacing: "-0.02em",
+        alignSelf: "start",
+        marginTop: 0.5,
+      }}
+    >
+      {body}
+    </Typography>
   </Box>
 );
 
 const AuthLayout: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [loadingState, setLoadingState] = useState({
     isLoading: false,
     loadingMessage: undefined as string | undefined,
   });
+  const registrationDisabled = getRegistrationDisabled().toLowerCase() === "true";
+  const showRegisterLink = location.pathname === routerPaths.LOGIN && !registrationDisabled;
+  const showLoginLink = location.pathname === routerPaths.REGISTER;
 
   const handleStateChange = useCallback(
     ({ isLoading, loadingMessage }: { isLoading: boolean; loadingMessage?: string }) => {
@@ -41,42 +103,80 @@ const AuthLayout: React.FC = () => {
   const whiteBandContent = (
     <Box
       sx={{
-        display: "grid",
+        display: "flex",
         position: "relative",
-        mt: { xs: 0, md: -4 },
-        gridTemplateColumns: {
-          xs: "1fr",
-          md: "minmax(0, 1fr) minmax(200px, 300px) minmax(280px, 420px)",
-        },
-        columnGap: { md: 2 },
-        rowGap: { xs: 3, md: 0 },
-        alignItems: { xs: "center", md: "flex-end" },
+        flexDirection: { xs: "column", md: "row" },
+        alignItems: "center",
+        gap: { xs: 3, md: 2, lg: 0 },
+        pt: { xs: 6, md: 2, lg: 1 },
       }}
     >
-      <Box sx={{ minWidth: 0, position: "relative", zIndex: 2 }}>
-        <Typography variant="h1" sx={{ marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}>
+      <Box
+        sx={{
+          position: "relative",
+          zIndex: 2,
+          width: "100%",
+          flex: { md: 1 },
+          maxWidth: { md: 320, lg: "none" },
+          pr: { lg: 4 },
+          mr: { md: "auto", lg: 0 },
+          minWidth: 0,
+        }}
+      >
+        <Typography
+          variant="h1"
+          sx={{
+            fontSize: { xs: "48px", lg: "64px" },
+            lineHeight: 0.9,
+            letterSpacing: "-0.06em",
+            whiteSpace: "normal",
+          }}
+        >
           {t("auth.pages.login.appHero.discoverLine")}
           <Box component="span" sx={{ color: theme.palette.brandAction.main }}>
             .
           </Box>
         </Typography>
-        <Typography variant="h1" sx={{ color: theme.palette.primary.dark }}>
+        <Typography
+          variant="h1"
+          sx={{
+            marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+            color: theme.palette.primary.main,
+            fontSize: { xs: "48px", lg: "64px" },
+            lineHeight: 0.9,
+            letterSpacing: "-0.06em",
+            whiteSpace: "normal",
+          }}
+        >
           {t("auth.pages.login.appHero.skillsLine")}
+          <Box component="span" marginLeft={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
+            .
+          </Box>
         </Typography>
-        <Typography variant="body1">{t("auth.pages.login.appHero.subheadline")}</Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: 500,
+            lineHeight: 1.4,
+            letterSpacing: "-0.02em",
+            maxWidth: 450,
+            whiteSpace: "normal",
+          }}
+        >
+          {t("auth.pages.login.appHero.subheadline")}
+        </Typography>
       </Box>
 
       <Box
         sx={{
-          position: "relative",
+          width: { xs: "100%", md: 360, lg: 420 },
+          minWidth: { md: 360, lg: 420 },
+          flexShrink: 0,
           display: "flex",
-          justifyContent: "center",
-          alignItems: { xs: "center", md: "flex-end" },
-          transform: { md: "translateX(40px)" },
-          minHeight: { md: 220 },
-          width: "100%",
-          maxWidth: { md: 300 },
-          zIndex: 3,
+          flexDirection: "column",
+          alignItems: "center",
+          position: "relative",
+          zIndex: 2,
         }}
       >
         <Box
@@ -84,44 +184,65 @@ const AuthLayout: React.FC = () => {
           src={`${process.env.PUBLIC_URL}/climber.svg`}
           alt=""
           sx={{
-            width: "100%",
-            maxWidth: { xs: 260, md: 280 },
-            height: "auto",
             display: "block",
-            position: { md: "absolute" },
-            left: { md: "50%" },
-            top: { md: "-20%" },
-            transform: { md: "translateX(-50%)" },
+            position: { xs: "static", md: "absolute" },
+            right: { md: "100%" },
+            bottom: { md: -85, lg: -95 },
+            width: { xs: "min(100%, 320px)", md: 320, lg: 360 },
+            maxWidth: "100%",
+            height: "auto",
+            maxHeight: { md: 420, lg: 540 },
             objectFit: "contain",
+            zIndex: 3,
+            mx: { xs: "auto", md: 0 },
+            mr: { md: -8, lg: -2.8 },
+            mb: { xs: 2, md: 0 },
           }}
         />
-      </Box>
-
-      <Box
-        sx={{
-          width: "100%",
-          maxWidth: "480px",
-          maxHeight: "520px",
-          mx: { xs: "auto", md: 0 },
-          transform: { md: "translateY(80px)" },
-          zIndex: 2,
-        }}
-      >
         <Box
           sx={{
             backgroundColor: theme.palette.brandAction.main,
             borderRadius: 2,
             p: theme.fixedSpacing(4),
-            height: "100%",
-            maxHeight: "100%",
+            width: "100%",
+            maxWidth: { xs: 420, md: 320, lg: 420 },
             overflowY: "auto",
             overflowX: "hidden",
             boxShadow: `0 8px 24px ${alpha(theme.palette.common.black, 0.12)}`,
             color: theme.palette.common.white,
+            position: "relative",
+            zIndex: 2,
           }}
         >
           <Outlet />
         </Box>
+        {(showRegisterLink || showLoginLink) && (
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 1.5,
+              display: "block",
+              width: "100%",
+              textAlign: "center",
+              color: theme.palette.text.primary,
+              fontWeight: 500,
+            }}
+          >
+            {showRegisterLink ? t("auth.pages.login.dontHaveAnAccount") : t("auth.pages.register.alreadyHaveAccount")}{" "}
+            <CustomLink
+              onClick={() => navigate(showRegisterLink ? routerPaths.REGISTER : routerPaths.LOGIN)}
+              sx={{
+                color: theme.palette.brandAction.main,
+                fontWeight: 700,
+                textDecorationColor: theme.palette.brandAction.main,
+                cursor: "pointer",
+                "&:hover": { color: theme.palette.brandAction.main, opacity: 0.75 },
+              }}
+            >
+              {showRegisterLink ? t("common.buttons.register") : t("common.buttons.login")}
+            </CustomLink>
+          </Typography>
+        )}
       </Box>
     </Box>
   );
@@ -132,7 +253,7 @@ const AuthLayout: React.FC = () => {
         <Box
           sx={{
             ...layoutContentColumnSx,
-            pt: { xs: 3, md: 6 },
+            pt: { xs: 8, md: 6 },
             pb: { xs: 3, md: 4 },
           }}
         >
@@ -147,15 +268,16 @@ const AuthLayout: React.FC = () => {
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
-              gap: { xs: 3, md: 4 },
-              mb: { xs: 2, md: 3 },
+              gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
+              gridTemplateRows: { xs: "repeat(9, auto)", md: "minmax(148px, auto) auto auto" },
+              rowGap: { xs: 4, md: 0 },
             }}
           >
             <FeatureColumn
               imageSrc={`${process.env.PUBLIC_URL}/conversation.svg`}
               title={t("auth.pages.login.appHero.feature1Title")}
               body={t("auth.pages.login.appHero.feature1Body")}
+              imageMaxWidth={{ xs: 300, md: 350 }}
             />
             <FeatureColumn
               imageSrc={`${process.env.PUBLIC_URL}/resume.svg`}

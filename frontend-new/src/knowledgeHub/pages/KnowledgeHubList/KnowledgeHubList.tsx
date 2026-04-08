@@ -97,7 +97,7 @@ const KnowledgeHubList: React.FC = () => {
     >
       <Box
         component="main"
-        sx={{ flex: 1, width: "100%", display: "flex", flexDirection: "column", pb: 10 }}
+        sx={{ flex: 1, width: "100%", display: "flex", flexDirection: "column" }}
         data-testid={DATA_TEST_ID.KNOWLEDGE_HUB_LIST_CONTENT}
       >
         <Box
@@ -207,6 +207,7 @@ const KnowledgeHubList: React.FC = () => {
             position: "relative",
             zIndex: 0,
             pt: { xs: 12, sm: 10, md: 8 },
+            pb: 16,
           }}
         >
           <Container
@@ -296,7 +297,7 @@ const KnowledgeHubList: React.FC = () => {
           </Container>
         </Box>
       </Box>
-      <Footer />
+      <Footer sx={{ backgroundColor: theme.palette.containerBackground.main }} />
     </Box>
   );
 };

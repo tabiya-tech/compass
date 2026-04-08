@@ -276,7 +276,7 @@
         "loginUsing": "Lowani pogwiritsa ntchito",
         "loggingYouIn": "Mukulowetsedwa...",
         "loggingInAria": "Kulowa",
-        "dontHaveAnAccount": "Mulibe akaunti? ",
+        "dontHaveAnAccount": "Mulibe akaunti?",
         "fillInEmailAndPassword": "Chonde lembani imelo ndi mawu achinsinsi",
         "orLoginToYourAccountToContinue": "Kapena lowani ku akaunti yanu kuti mupitilize",
         "or": "kapena",
@@ -284,7 +284,7 @@
         "continueAsGuest": "Pitilizani ngati Mnyamata",
         "appHero": {
           "discoverLine": "Senzani zanu",
-          "skillsLine": "nzeru ndi mphamvu zanu.",
+          "skillsLine": "nzeru ndi mphamvu zanu",
           "subheadline": "Njira yanu yomwe ikutsogoleredwa kuchokera ku nzeru mpaka ku ntchito yoyamba — yomangidwa pa zimene mumazidziwa, zimene mwachita, ndi komwe mukufuna kupita.",
           "signInTitle": "Lowani",
           "cta": "Tiyeni",
@@ -304,6 +304,7 @@
         }
       },
       "register": {
+        "signUpTitle": "Lembetsani",
         "welcomeTitle": "Takulandilani ku {{appName}}!",
         "welcomeBack": "Mwalandilidwa!",
         "subtitle": "Tikufuna zobisika zina kuti tiyambe",
@@ -381,7 +382,7 @@
         "resendVerificationEmailFailedWithMessage": "Kutumiza imelo yotsimikiza kunalephera: {{message}}"
       },
       "socialAuth": {
-        "orContinueWith": "Kapena pitilizani ndi",
+        "orContinueWith": "Kapena",
         "loginWithGoogle": "Lowani ndi Google",
         "googleLoginIsNotAvailableWhenOffline": "Kulowa ndi Google sikulipo pamene simuli pa intaneti.",
         "socialFailedLoginWithMessage": "Kulowa kunalephera: {{message}}",
@@ -854,7 +855,7 @@
     "whatToDoSubtitle": "Module iliyonse ndi kukambirana kotsogoleredwa ndi AI kapena chinthu chothandiza pa ulendo wanu wa ntchito.",
     "hero": {
       "headline1": "Let's discover",
-      "headline2": "Your skills & strengths.",
+      "headline2": "Your skills & strengths",
       "body": "Your guided path from skills to your first job. Start by discovering what you bring to the table — then explore careers, build your CV, and find real opportunities in Zambia.",
       "illustrationAlt": "Person at a signpost on a path, exploring career directions"
     },
@@ -941,7 +942,7 @@
       "termsOfUse": "Malamulo a Ntchito",
       "accessibility": "Kufikira",
       "contact": "Lumikizani",
-      "collaboration": "{{appName}} ndi chiyanjano pakati pa Gulu la Banki ya Dziko Lonse ndi Tabiya."
+      "collaboration": "{{appName}} ndi chida chosungira malangizo za ntchito chopanda malipiro, chapangidwa ndi mgwirizano pakati pa World Bank Group ndi Tabiya."
     }
   },
   "knowledgeHub": {

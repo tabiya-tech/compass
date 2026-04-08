@@ -669,25 +669,6 @@ describe("Testing Register component", () => {
     // The callback successfully updates the isLoading state
   });
 
-  test("should navigate to login page when login link is clicked", async () => {
-    // GIVEN a navigate mock
-    const mockNavigate = jest.fn();
-    jest.spyOn(ReactRouterDomModule, "useNavigate").mockReturnValue(mockNavigate);
-
-    // WHEN the component is rendered
-    render(<Register />);
-
-    // AND the login link is found and clicked
-    const loginLink = screen.getByTestId(DATA_TEST_ID.LOGIN_LINK);
-    const customLinkElement = loginLink.querySelector("a");
-    expect(customLinkElement).toBeInTheDocument();
-
-    fireEvent.click(customLinkElement!);
-
-    // THEN navigate should be called with the login route path
-    expect(mockNavigate).toHaveBeenCalledWith("/login");
-  });
-
   test("should handle application registration code", async () => {
     // GIVEN the application registration code is set
     const givenApplicationRegistrationCode = "app-reg-code";

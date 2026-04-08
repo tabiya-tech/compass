@@ -9,7 +9,7 @@ exports[`Testing Register component it should show register form successfully 1`
     class="MuiBox-root css-1hvnxas"
   >
     <h3
-      class="MuiTypography-root MuiTypography-h3 css-38wwff-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
     >
       Sign Up
     </h3>
@@ -87,19 +87,6 @@ exports[`Testing Register component it should show register form successfully 1`
       data-testid="firebase-auth-container-f0324e97-83fd-49e6-95c3-1043751fa1db"
     />
     <span
-      class="MuiTypography-root MuiTypography-caption css-c36qc7-MuiTypography-root"
-      data-testid="register-login-link-ab02918f-d559-47ba-9662-ea6b3a3606d0"
-    >
-      Already have an account?
-       
-      <a
-        aria-disabled="false"
-        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-q5pagn-MuiTypography-root-MuiLink-root"
-      >
-        Login
-      </a>
-    </span>
-    <span
       data-testid="request-invitation-code-link-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
     />
   </div>
@@ -115,7 +102,7 @@ exports[`Testing Register component should handle application registration code 
     class="MuiBox-root css-1hvnxas"
   >
     <h3
-      class="MuiTypography-root MuiTypography-h3 css-38wwff-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
     >
       Sign Up
     </h3>
@@ -125,19 +112,6 @@ exports[`Testing Register component should handle application registration code 
     <span
       data-testid="firebase-auth-container-f0324e97-83fd-49e6-95c3-1043751fa1db"
     />
-    <span
-      class="MuiTypography-root MuiTypography-caption css-c36qc7-MuiTypography-root"
-      data-testid="register-login-link-ab02918f-d559-47ba-9662-ea6b3a3606d0"
-    >
-      Already have an account?
-       
-      <a
-        aria-disabled="false"
-        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-q5pagn-MuiTypography-root-MuiLink-root"
-      >
-        Login
-      </a>
-    </span>
   </div>
 </div>
 `;

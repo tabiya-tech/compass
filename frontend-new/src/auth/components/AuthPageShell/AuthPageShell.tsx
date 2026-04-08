@@ -35,7 +35,7 @@ const AuthPageShell: React.FC<AuthPageShellProps> = ({ logoUrl, whiteBandContent
   const cream = theme.palette.common.cream;
 
   const pt = { xs: 4, md: 6 };
-  const pb = { xs: 5, md: 7 };
+  const pb = { xs: 6, md: 2 };
 
   return (
     <Box

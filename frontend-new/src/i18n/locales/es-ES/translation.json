@@ -304,6 +304,7 @@
         }
       },
       "register": {
+        "signUpTitle": "Registrarse",
         "welcomeTitle": "¡Bienvenido a {{appName}}!",
         "welcomeBack": "¡Bienvenido de nuevo!",
         "subtitle": "Necesitamos algo de información para comenzar",
@@ -381,7 +382,7 @@
         "resendVerificationEmailFailedWithMessage": "Error al enviar el correo de verificación: {{message}}"
       },
       "socialAuth": {
-        "orContinueWith": "O continúa con",
+        "orContinueWith": "O",
         "loginWithGoogle": "Inicia sesión con Google",
         "googleLoginIsNotAvailableWhenOffline": "El inicio de sesión con Google no funciona sin conexión a internet.",
         "socialFailedLoginWithMessage": "No se pudo iniciar sesión: {{message}}",
@@ -854,7 +855,7 @@
     "whatToDoSubtitle": "Cada módulo es una conversación guiada por IA o un recurso para ayudarte en tu camino profesional.",
     "hero": {
       "headline1": "Descubramos",
-      "headline2": "Tus habilidades y fortalezas.",
+      "headline2": "Tus habilidades y fortalezas",
       "body": "Tu camino guiado desde las habilidades hasta tu primer empleo. Empieza descubriendo lo que aportas: luego explora carreras, crea tu CV y encuentra oportunidades reales en Zambia.",
       "illustrationAlt": "Persona en un poste de señales en un camino, explorando direcciones profesionales"
     },
@@ -941,7 +942,7 @@
       "termsOfUse": "Términos de Uso",
       "accessibility": "Accesibilidad",
       "contact": "Contacto",
-      "collaboration": "{{appName}} es una colaboración entre el Grupo del Banco Mundial y Tabiya."
+      "collaboration": "{{appName}} es una herramienta gratuita de orientación profesional desarrollada en colaboración entre el Grupo del Banco Mundial y Tabiya."
     }
   },
   "knowledgeHub": {

@@ -93,9 +93,8 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = ({ ini
       sx={{
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "flex-start",
         gap: theme.spacing(1),
-        marginTop: theme.spacing(2),
       }}
     >
       {cooldownSeconds !== initialCooldownSeconds && (
@@ -109,8 +108,10 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = ({ ini
           disabled={isLoading || cooldownSeconds > 0 || !isOnline}
           data-testid={DATA_TEST_ID.RESET_LINK}
           sx={{
+            textDecoration: "None",
             "&:hover": {
               color: theme.palette.common.white,
+              textDecoration: "Underline",
               opacity: 0.75,
             },
           }}
