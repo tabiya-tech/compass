@@ -1,14 +1,11 @@
 import React, { useState, useMemo } from "react";
 import { Box, Tabs, Tab, Typography, useTheme, Chip, Alert } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import Footer from "src/home/components/Footer/Footer";
 import DataTable from "src/jobMatching/components/DataTable/DataTable";
 import type { ColumnDef } from "src/jobMatching/components/DataTable/DataTable";
 import JobDetailModal from "src/jobMatching/components/JobDetailModal/JobDetailModal";
 import { useJobs } from "src/jobMatching/hooks/useJobs";
 import type { JobFilters, JobRow } from "src/jobMatching/types";
-import BackButton from "src/knowledgeHub/components/BackButton";
-import { routerPaths } from "src/app/routerPaths";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -37,7 +34,6 @@ export const DATA_TEST_ID = {
 
 const JobMatchingPage: React.FC = () => {
   const theme = useTheme();
-  const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState(0);
   const [browseFilters, setBrowseFilters] = useState<JobFilters>(EMPTY_FILTERS);
@@ -207,9 +203,6 @@ const JobMatchingPage: React.FC = () => {
       sx={{ backgroundColor: theme.palette.containerBackground.light }}
       data-testid={DATA_TEST_ID.JOB_MATCHING_CONTAINER}
     >
-      <Box sx={{ px: "var(--layout-gutter-x)", pt: 2, pb: 1 }}>
-        <BackButton onClick={() => navigate(routerPaths.ROOT)} labelKey="home.backToDashboard" />
-      </Box>
       <Box
         sx={{
           flex: 1,

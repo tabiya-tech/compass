@@ -1,5 +1,5 @@
 import React, { startTransition } from "react";
-import { useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useTranslation } from "react-i18next";
 import { TranslationKey } from "src/react-i18next";
@@ -22,29 +22,39 @@ const BackButton: React.FC<BackButtonProps> = ({ onClick, labelKey, dataTestId }
   const { t } = useTranslation();
 
   return (
-    <CustomLink
-      onClick={() => {
-        startTransition(() => {
-          onClick();
-        });
-      }}
-      data-testid={DATA_TEST_ID.BACK_BUTTON}
+    <Box
       sx={{
-        display: "inline-flex",
-        alignItems: "flex-start",
-        gap: 0.5,
-        fontSize: "0.85rem",
-        color: theme.palette.secondary.dark,
-        textDecoration: "none",
-        "&:hover": {
-          color: theme.palette.secondary.main,
-          textDecoration: "underline",
-        },
+        width: "100%",
+        maxWidth: "var(--layout-content-max-width)",
+        mx: "auto",
+        px: "var(--layout-gutter-x)",
+        py: theme.spacing(theme.tabiyaSpacing.sm),
       }}
     >
-      <ArrowBackIcon sx={{ fontSize: "1rem" }} />
-      {t(labelKey as TranslationKey)}
-    </CustomLink>
+      <CustomLink
+        onClick={() => {
+          startTransition(() => {
+            onClick();
+          });
+        }}
+        data-testid={DATA_TEST_ID.BACK_BUTTON}
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 0.5,
+          fontSize: "0.9rem",
+          fontWeight: 500,
+          color: theme.palette.tabiyaGreen.dark,
+          textDecoration: "none",
+          "&:hover": {
+            textDecoration: "underline",
+          },
+        }}
+      >
+        <ArrowBackIcon sx={{ fontSize: "1rem" }} />
+        {t(labelKey as TranslationKey)}
+      </CustomLink>
+    </Box>
   );
 };
 

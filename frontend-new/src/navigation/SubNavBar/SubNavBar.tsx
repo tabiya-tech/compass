@@ -85,8 +85,6 @@ const SubNavBar: React.FC<SubNavBarProps> = ({
       <Box
         sx={{
           width: "100%",
-          maxWidth: "var(--layout-content-max-width)",
-          margin: "0 auto",
           paddingX: "var(--layout-gutter-x)",
           position: "relative",
           minHeight: isMobile ? undefined : 56,
