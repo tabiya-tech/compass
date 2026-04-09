@@ -3,7 +3,6 @@ import { Backdrop as OriginalBackdrop, CircularProgress, Typography, useTheme } 
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import React from "react";
-import { Bushbaby } from "src/theme/Bushbaby/Bushbaby";
 
 interface IBackdropProps {
   isShown: boolean;
@@ -30,50 +29,48 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
       data-testid={DATA_TEST_ID.BACKDROP_CONTAINER}
       open={props.isShown}
     >
-      <Bushbaby width={"96px"}>
-        <Paper
-          elevation={props.transparent ? 0 : 24}
-          sx={{
-            backgroundColor: "containerBackground.main",
-            border: props.transparent ? theme.tabiyaSpacing.md : 0,
-            borderColor: "info.contrastText",
-          }}
+      <Paper
+        elevation={props.transparent ? 0 : 24}
+        sx={{
+          backgroundColor: "containerBackground.main",
+          border: props.transparent ? theme.tabiyaSpacing.md : 0,
+          borderColor: "info.contrastText",
+        }}
+      >
+        <Grid
+          container
+          flexDirection={"row"}
+          height={"auto"}
+          width={"auto"}
+          justifyContent="center"
+          alignItems="center"
+          padding={theme.spacing(theme.tabiyaSpacing.md)}
         >
-          <Grid
-            container
-            flexDirection={"row"}
-            height={"auto"}
-            width={"auto"}
-            justifyContent="center"
-            alignItems="center"
-            padding={theme.spacing(theme.tabiyaSpacing.md)}
-          >
-            {props.message && (
-              <Grid>
-                <Typography
-                  variant="h6"
-                  color="info.contrastText"
-                  data-testid={DATA_TEST_ID.MESSAGE_ELEMENT}
-                  sx={{
-                    paddingRight: theme.spacing(theme.tabiyaSpacing.md),
-                    wordWrap: "break-word",
-                    textAlign: "center",
-                  }}
-                >
-                  {props.message}
-                </Typography>
-              </Grid>
-            )}
-            <Grid style={{ lineHeight: 0 }}>
-              <CircularProgress
-                sx={{ color: (theme) => theme.palette.info.contrastText }}
-                size={2 * theme.typography.fontSize}
-                data-testid={DATA_TEST_ID.PROGRESS_ELEMENT}
-              />
+          {props.message && (
+            <Grid>
+              <Typography
+                variant="h6"
+                color="info.contrastText"
+                data-testid={DATA_TEST_ID.MESSAGE_ELEMENT}
+                sx={{
+                  paddingRight: theme.spacing(theme.tabiyaSpacing.md),
+                  wordWrap: "break-word",
+                  textAlign: "center",
+                }}
+              >
+                {props.message}
+              </Typography>
             </Grid>
+          )}
+          <Grid style={{ lineHeight: 0 }}>
+            <CircularProgress
+              sx={{ color: (theme) => theme.palette.info.contrastText }}
+              size={2 * theme.typography.fontSize}
+              data-testid={DATA_TEST_ID.PROGRESS_ELEMENT}
+            />
           </Grid>
-        </Paper>
-      </Bushbaby>
+        </Grid>
+      </Paper>
     </OriginalBackdrop>
   );
 };
