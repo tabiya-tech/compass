@@ -3,4 +3,5 @@ export const routerPaths = {
   LOGIN: "/login",
   INSTRUCTOR: "/instructor",
   USERS: "/users",
+  PROFILE: "/profile",
 };

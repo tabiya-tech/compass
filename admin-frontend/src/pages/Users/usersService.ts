@@ -53,6 +53,17 @@ export interface DeleteUserResponse {
   deleted: boolean;
 }
 
+export interface UpdateProfileRequest {
+  name?: string;
+  email?: string;
+}
+
+export interface UpdateProfileResponse {
+  uid: string;
+  name: string | null;
+  email: string | null;
+}
+
 export class HttpError extends Error {
   constructor(
     public readonly status: number,
@@ -133,5 +144,15 @@ export const usersService = {
       body: JSON.stringify(request),
     });
     return handleResponse<UpdateRoleResponse>(response);
+  },
+
+  async updateProfile(userId: string, request: UpdateProfileRequest): Promise<UpdateProfileResponse> {
+    const base = getBackendUrl();
+    const response = await fetch(`${base}/admin/users/${encodeURIComponent(userId)}/profile`, {
+      method: "PATCH",
+      headers: getHeaders(),
+      body: JSON.stringify(request),
+    });
+    return handleResponse<UpdateProfileResponse>(response);
   },
 };

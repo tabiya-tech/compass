@@ -39,6 +39,17 @@ const Header: React.FC = () => {
   const contextMenuItems: MenuItemConfig[] = useMemo(
     () => [
       {
+        id: "profile",
+        text: t("header.profile", "profile"),
+        disabled: false,
+        action: () => {
+          setAnchorEl(null);
+          startTransition(() => {
+            navigate(routerPaths.PROFILE);
+          });
+        },
+      },
+      {
         id: "logout",
         text: t("header.logout").toLowerCase(),
         disabled: false,
