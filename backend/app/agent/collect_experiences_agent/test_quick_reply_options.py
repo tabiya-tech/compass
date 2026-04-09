@@ -84,6 +84,7 @@ def setup_application_config():
             available_locales=[LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY")],
         ),
         app_name="Compass",
+        admin_firebase_tenant_id="test-tenant-id",
     )
     set_application_config(config)
     # Set the locale context variable so t() can resolve translations

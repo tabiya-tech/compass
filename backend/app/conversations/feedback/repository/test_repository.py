@@ -60,7 +60,7 @@ def _get_feedback_item(*, question_id: str) -> FeedbackItem:
         question_text=get_random_printable_string(10),
         description=get_random_printable_string(10),
         answer=Answer(
-            selected_options={get_random_printable_string(10): get_random_printable_string(10)},
+            selected_options={get_random_user_id(): get_random_printable_string(10)},
             rating_numeric=random.randint(1, 5),  # nosec B311 # random is used for testing purposes
             rating_boolean=random.choice([True, False]),  # nosec B311 # random is used for testing purposes
             comment=get_random_printable_string(10)
@@ -101,7 +101,7 @@ def _get_new_feedback_doc() -> dict:
         "feedback_items": [{
             "question_id": get_random_printable_string(10),
             "answer": {
-                "selected_options": {get_random_printable_string(10): get_random_printable_string(10)},
+                "selected_options": {get_random_user_id(): get_random_printable_string(10)},
                 "rating_numeric": random.randint(1, 5),  # nosec B311 # random is used for testing purposes
                 "rating_boolean": random.choice([True, False]),  # nosec B311 # random is used for testing purposes
                 "comment": get_random_printable_string(10)
