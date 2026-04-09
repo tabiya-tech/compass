@@ -3,7 +3,7 @@
 exports[`render tests should render correctly 1`] = `
 <input
   aria-invalid="false"
-  class="MuiInputBase-input MuiOutlinedInput-input css-1y15kj-MuiInputBase-input-MuiOutlinedInput-input"
+  class="MuiInputBase-input MuiOutlinedInput-input css-ask1tn-MuiInputBase-input-MuiOutlinedInput-input"
   id=":r1:"
   placeholder="foo bar"
   type="text"
@@ -21,11 +21,11 @@ exports[`render tests should show badge when field is edited 1`] = `
     data-testid="foo-testid"
   >
     <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-z1olec-MuiInputBase-root-MuiOutlinedInput-root"
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-ybaiuy-MuiInputBase-root-MuiOutlinedInput-root"
     >
       <input
         aria-invalid="false"
-        class="MuiInputBase-input MuiOutlinedInput-input css-1y15kj-MuiInputBase-input-MuiOutlinedInput-input"
+        class="MuiInputBase-input MuiOutlinedInput-input css-ask1tn-MuiInputBase-input-MuiOutlinedInput-input"
         id=":r3:"
         placeholder="foo"
         type="text"

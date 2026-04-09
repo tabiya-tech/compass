@@ -3,6 +3,7 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useTranslation } from "react-i18next";
 import React, { useState } from "react";
 import PasswordInput from "src/theme/PasswordInput/PasswordInput";
+import { outlinedNoBorderSx } from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 
 const uniqueId = "6cf1a0fa-8d75-4342-bf6b-1203d5b114d7";
 
@@ -67,9 +68,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         disabled={isRegistering || disabled}
         variant="outlined"
         required
-        sx={{
-          "& .MuiInputBase-root": { backgroundColor: theme.palette.common.white },
-        }}
+        sx={outlinedNoBorderSx}
         onChange={(e) => handleEmailChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_INPUT }}
       />
@@ -83,9 +82,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         value={password}
         onValidityChange={setIsPasswordValid}
         inputProps={{ "data-testid": DATA_TEST_ID.PASSWORD_INPUT }}
-        sx={{
-          "& .MuiInputBase-root": { backgroundColor: theme.palette.common.white },
-        }}
+        sx={outlinedNoBorderSx}
       />
       <PrimaryButton
         fullWidth

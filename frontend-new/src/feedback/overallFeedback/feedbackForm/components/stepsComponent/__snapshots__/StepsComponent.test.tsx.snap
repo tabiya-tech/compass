@@ -92,11 +92,11 @@ exports[`StepsComponent should render component successfully 1`] = `
         class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-yk5tdh-MuiFormControl-root-MuiTextField-root"
       >
         <div
-          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline css-1vzk789-MuiInputBase-root-MuiOutlinedInput-root"
+          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline css-kt6jb1-MuiInputBase-root-MuiOutlinedInput-root"
         >
           <textarea
             aria-invalid="false"
-            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-b5uwpx-MuiInputBase-input-MuiOutlinedInput-input"
+            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-ejof33-MuiInputBase-input-MuiOutlinedInput-input"
             data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
             id=":r1:"
             rows="3"
@@ -104,7 +104,7 @@ exports[`StepsComponent should render component successfully 1`] = `
           />
           <textarea
             aria-hidden="true"
-            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-b5uwpx-MuiInputBase-input-MuiOutlinedInput-input"
+            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-ejof33-MuiInputBase-input-MuiOutlinedInput-input"
             readonly=""
             style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
             tabindex="-1"
@@ -480,11 +480,11 @@ exports[`StepsComponent should render component successfully 1`] = `
         class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-yk5tdh-MuiFormControl-root-MuiTextField-root"
       >
         <div
-          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-1vzk789-MuiInputBase-root-MuiOutlinedInput-root"
+          class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline css-kt6jb1-MuiInputBase-root-MuiOutlinedInput-root"
         >
           <textarea
             aria-invalid="false"
-            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-b5uwpx-MuiInputBase-input-MuiOutlinedInput-input"
+            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-ejof33-MuiInputBase-input-MuiOutlinedInput-input"
             data-testid="comment-text-field-ab74a074-67f6-4a8a-b2b2-a582d1d56c9c"
             id=":r9:"
             rows="3"
@@ -494,7 +494,7 @@ exports[`StepsComponent should render component successfully 1`] = `
           </textarea>
           <textarea
             aria-hidden="true"
-            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-b5uwpx-MuiInputBase-input-MuiOutlinedInput-input"
+            class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline css-ejof33-MuiInputBase-input-MuiOutlinedInput-input"
             readonly=""
             style="visibility: hidden; position: absolute; overflow: hidden; height: 0px; top: 0px; left: 0px; transform: translateZ(0); padding-top: 0px; padding-bottom: 0px; width: 100%;"
             tabindex="-1"

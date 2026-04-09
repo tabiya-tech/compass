@@ -11,6 +11,18 @@ export const DATA_TEST_ID = {
   EMAIL_LOGIN_FORM_PASSWORD_INPUT: `login-password-input-${uniqueId}`,
 };
 
+export const outlinedNoBorderSx = {
+  "& .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+  "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+};
+
 export interface LoginFormProps {
   email: string;
   password: string;
@@ -50,9 +62,7 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
         placeholder={t("common.fields.email")}
         type="email"
         variant="outlined"
-        sx={{
-          "& .MuiInputBase-root": { backgroundColor: theme.palette.common.white },
-        }}
+        sx={outlinedNoBorderSx}
         disabled={isDisabled}
         value={email}
         onChange={(e) => handleEmailChange(e)}
@@ -66,9 +76,7 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
         value={password}
         onChange={(e) => handlePasswordChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_LOGIN_FORM_PASSWORD_INPUT }}
-        sx={{
-          "& .MuiInputBase-root": { backgroundColor: theme.palette.common.white },
-        }}
+        sx={outlinedNoBorderSx}
         shouldValidatePassword={false} // no password validation necessary on login
       />
     </Box>

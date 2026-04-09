@@ -1,6 +1,7 @@
 import { TextField } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { outlinedNoBorderSx } from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 
 const uniqueId = "300d373e-b913-4bd5-9045-3a28d490cf2c";
 
@@ -34,6 +35,7 @@ const LoginWithInviteCodeForm: React.FC<Readonly<LoginFormProps>> = ({
       placeholder={t("auth.pages.login.components.loginWithInviteCodeForm.loginCode")}
       variant="outlined"
       sx={{
+        ...outlinedNoBorderSx,
         "& .MuiInputBase-root": { backgroundColor: "common.white" },
       }}
       value={inviteCode}

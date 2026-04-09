@@ -17,6 +17,7 @@ import { InvitationType } from "src/auth/services/invitationsService/invitations
 import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.constants";
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
 import { getApplicationRegistrationCode, getSocialAuthDisabled, getRegistrationCodeDisabled } from "src/envService";
+import { outlinedNoBorderSx } from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -222,10 +223,7 @@ const Register: React.FC = () => {
               required
               value={registrationCode}
               onChange={(e) => handleRegistrationCodeChanged(e)}
-              sx={{
-                "& .MuiInputBase-root": { backgroundColor: theme.palette.common.white },
-                "& .MuiInputLabel-root": { color: theme.palette.common.black },
-              }}
+              sx={outlinedNoBorderSx}
               inputProps={{ "data-testid": DATA_TEST_ID.REGISTRATION_CODE_INPUT }}
             />
           </React.Fragment>

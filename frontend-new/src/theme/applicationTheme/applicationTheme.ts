@@ -412,8 +412,25 @@ export const applicationTheme = (theme: ThemeMode) => {
             padding: "0",
           },
           input: {
-            fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust input text size
+            fontSize: CSSClampFnCalculatorRem(0.875, 1, screenSizeRem), // Adjust input text size
             padding: "0",
+            fontWeight: 500,
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            backgroundColor: activePalette.common!!.white,
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: activePalette.divider,
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: activePalette.text!!.textAccent,
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: activePalette.text!!.textAccent,
+            },
           },
         },
       },
