@@ -320,6 +320,7 @@ const Consent: React.FC = () => {
           <PrimaryButton
             fullWidth
             variant="contained"
+            showCircle
             color="primary"
             disabled={isAccepting || !isTCAccepted || !isDPAccepted || isRejecting}
             disableWhenOffline={true}
@@ -328,24 +329,6 @@ const Consent: React.FC = () => {
           >
             {t("consent.components.consentPage.acceptButton")}
           </PrimaryButton>
-        </Box>
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
-          sx={{
-            marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xl),
-          }}
-          data-testid={DATA_TEST_ID.SUPPORT_CONTAINER}
-        >
-          <Typography typography="body1">{t("consent.components.consentPage.withSupportFrom")}</Typography>
-          <img
-            src={`${process.env.PUBLIC_URL}/google-logo.svg`}
-            alt="Google.org Logo"
-            height={6 * theme.tabiyaSpacing.xl} // xl wasn't quite big enough, we're going for ~24px
-            data-testid={DATA_TEST_ID.GOOGLE_LOGO}
-          />
         </Box>
       </Box>
       <ConfirmModalDialog

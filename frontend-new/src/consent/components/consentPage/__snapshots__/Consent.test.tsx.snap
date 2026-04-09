@@ -228,30 +228,29 @@ exports[`Testing Consent Page render tests it should show consent screen with bo
         No, thank you
       </a>
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1jr5tc1-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-jyn10m-MuiButtonBase-root-MuiButton-root"
         data-testid="consent-accept-button-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
         disabled=""
         tabindex="-1"
         type="button"
       >
         Sure, I am ready
+        <div
+          class="MuiBox-root css-f2dt27"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1rwg863-MuiSvgIcon-root"
+            data-testid="ArrowForwardIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"
+            />
+          </svg>
+        </div>
       </button>
-    </div>
-    <div
-      class="MuiBox-root css-4ubj6j"
-      data-testid="consent-support-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
-    >
-      <p
-        class="MuiTypography-root MuiTypography-body1 css-12ian2o-MuiTypography-root"
-      >
-        With support from
-      </p>
-      <img
-        alt="Google.org Logo"
-        data-testid="consent-google-logo-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
-        height="24"
-        src="/google-logo.svg"
-      />
     </div>
   </div>
 </div>
