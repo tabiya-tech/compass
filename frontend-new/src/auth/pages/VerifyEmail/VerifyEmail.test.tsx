@@ -7,7 +7,6 @@ import VerifyEmail, { DATA_TEST_ID } from "./VerifyEmail";
 import { useNavigate } from "react-router-dom";
 import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/AuthHeader/AuthHeader";
 import * as Sentry from "@sentry/react";
-import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 
 // mock the router
 jest.mock("react-router-dom", () => {
@@ -72,9 +71,6 @@ describe("Testing Verify Email component", () => {
 
     // AND the back to login button should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.BACK_TO_LOGIN_BUTTON)).toBeInTheDocument();
-
-    // AND expect the bug report button to be rendered
-    expect(screen.getByTestId(BUG_REPORT_DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER)).toBeInTheDocument();
 
     // AND the component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.VERIFY_EMAIL_CONTAINER)).toMatchSnapshot();

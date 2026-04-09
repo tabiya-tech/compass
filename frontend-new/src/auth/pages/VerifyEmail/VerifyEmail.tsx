@@ -5,7 +5,6 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import { routerPaths } from "src/app/routerPaths";
 import { useNavigate } from "react-router-dom";
-import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
 
 const uniqueId = "f1228c6a-e447-4946-b810-0c7ddc8ca833";
 
@@ -53,7 +52,6 @@ const VerifyEmail: React.FC = () => {
           {t("common.buttons.backToLogin")}
         </PrimaryButton>
       </Box>
-      <BugReportButton bottomAlign={true} />
     </Container>
   );
 };

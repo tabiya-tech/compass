@@ -5,7 +5,6 @@ import "src/_test_utilities/consoleMock";
 import "src/_test_utilities/sentryMock";
 import { render, screen } from "src/_test_utilities/test-utils";
 import ErrorPage, { DATA_TEST_ID } from "src/error/errorPage/ErrorPage";
-import { DATA_TEST_ID as BUG_REPORT_DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import * as Sentry from "@sentry/react";
 
 // mock the bugReport component
@@ -42,8 +41,7 @@ describe("ErrorPage", () => {
     // AND the ErrorPage component message should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.ERROR_MESSAGE)).toBeInTheDocument();
     expect(screen.getByText(errorMessage)).toBeInTheDocument();
-    // AND expect the bug report button to be rendered
-    expect(screen.getByTestId(BUG_REPORT_DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER)).toBeInTheDocument();
+
     // AND the ErrorPage component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.ERROR_CONTAINER)).toMatchSnapshot();
   });
