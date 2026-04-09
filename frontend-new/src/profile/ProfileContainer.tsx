@@ -1,7 +1,10 @@
 import React from "react";
 import { Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { Profile } from "./Profile";
 import { useUserProfile } from "./hooks/useUserProfile";
+import BackButton from "src/knowledgeHub/components/BackButton";
+import { routerPaths } from "src/app/routerPaths";
 
 const uniqueId = "b3c5d7e9-4f6a-8b2c-1d3e-5f7a9b1c3d5e";
 
@@ -10,6 +13,7 @@ export const DATA_TEST_ID = {
 };
 
 const ProfileContainer: React.FC = () => {
+  const navigate = useNavigate();
   const {
     profileData,
     isLoadingSecurity,
@@ -27,6 +31,9 @@ const ProfileContainer: React.FC = () => {
       }}
       data-testid={DATA_TEST_ID.PROFILE_CONTAINER}
     >
+      <Box sx={{ px: "var(--layout-gutter-x)", pt: 2, pb: 1 }}>
+        <BackButton onClick={() => navigate(routerPaths.ROOT)} labelKey="home.backToDashboard" />
+      </Box>
       <Profile
         email={profileData.email}
         language={profileData.language}

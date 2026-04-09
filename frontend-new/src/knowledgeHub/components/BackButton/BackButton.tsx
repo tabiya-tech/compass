@@ -37,7 +37,7 @@ const BackButton: React.FC<BackButtonProps> = ({ onClick, labelKey, dataTestId }
         color: theme.palette.secondary.dark,
         textDecoration: "none",
         "&:hover": {
-          color: theme.palette.secondary.light,
+          color: theme.palette.secondary.main,
           textDecoration: "underline",
         },
       }}
