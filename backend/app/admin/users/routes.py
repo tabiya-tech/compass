@@ -16,6 +16,8 @@ from app.admin.users._types import (
     UpdateRoleRequest,
     UpdateRoleResponse,
     DeleteUserResponse,
+    UpdateProfileRequest,
+    UpdateProfileResponse,
 )
 from app.admin.users.service import UsersService, get_users_service
 from app.app_config import get_application_config
@@ -198,6 +200,46 @@ def get_admin_users_routes() -> APIRouter:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to update user role",
+            ) from e
+
+    @router.patch(
+        "/{user_id}/profile",
+        response_model=UpdateProfileResponse,
+        summary="Update user profile",
+        description="Update a user's display name and/or email in Firebase Authentication.",
+    )
+    async def update_user_profile(
+            user_id: str,
+            request: UpdateProfileRequest,
+            users_service: UsersService = Depends(get_users_service),
+    ) -> UpdateProfileResponse:
+        """
+        Update a user's profile.
+
+        This endpoint updates the user's display name and/or email in Firebase Authentication.
+
+        - **user_id**: The user ID to update
+        - **name**: Optional new display name
+        - **email**: Optional new email address
+        """
+        try:
+            tenant_id = get_application_config().admin_firebase_tenant_id
+            return await users_service.update_profile(
+                tenant_id=tenant_id,
+                user_id=user_id,
+                request=request,
+            )
+        except ValueError as e:
+            logger.error("Invalid request parameters: %s", e)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e),
+            ) from e
+        except Exception as e:
+            logger.error("Failed to update user profile: %s", e)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to update user profile",
             ) from e
 
     return router

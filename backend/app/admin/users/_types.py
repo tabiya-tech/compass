@@ -96,3 +96,20 @@ class DeleteUserResponse(BaseModel):
     deleted: bool = True
 
     model_config = {"extra": "forbid"}
+
+
+class UpdateProfileRequest(BaseModel):
+    """Request model for updating the current user's profile."""
+    name: Optional[str] = Field(default=None, description="User's display name", max_length=100)
+    email: Optional[EmailStr] = Field(default=None, description="User's email address")
+
+    model_config = {"extra": "forbid"}
+
+
+class UpdateProfileResponse(BaseModel):
+    """Response model for profile update."""
+    uid: str
+    name: Optional[str] = None
+    email: Optional[str] = None
+
+    model_config = {"extra": "forbid"}

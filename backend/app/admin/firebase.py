@@ -137,6 +137,32 @@ class FirebaseService:
         self._logger.info("Created Firebase user with UID: %s", user.uid)
         return user
 
+    def update_user(
+        self,
+        tenant_id: str,
+        user_id: str,
+        display_name: Optional[str] = None,
+        email: Optional[str] = None,
+    ) -> auth.UserRecord:
+        """
+        Update a user's profile in Firebase Authentication.
+
+        :param tenant_id: The Firebase tenant ID.
+        :param user_id: The user ID to update.
+        :param display_name: Optional new display name.
+        :param email: Optional new email address.
+        :return: Updated Firebase UserRecord.
+        """
+        auth_client = self._auth_clients.get_auth_client(tenant_id)
+        kwargs: dict = {}
+        if display_name is not None:
+            kwargs["display_name"] = display_name
+        if email is not None:
+            kwargs["email"] = email
+        user = auth_client.update_user(user_id, **kwargs)
+        self._logger.info("Updated Firebase user with UID: %s", user.uid)
+        return user
+
     def delete_user(self, tenant_id: str, user_id: str) -> None:
         """
         Delete a user from Firebase Authentication.

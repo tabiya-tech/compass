@@ -14,6 +14,8 @@ from app.admin.users._types import (
     UpdateRoleRequest,
     UpdateRoleResponse,
     DeleteUserResponse,
+    UpdateProfileRequest,
+    UpdateProfileResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -180,6 +182,38 @@ class UsersService:
             uid=user_id,
             role=request.role.value,
             institution_id=request.institution_id,
+        )
+
+
+    async def update_profile(
+            self,
+            tenant_id: str,
+            user_id: str,
+            request: UpdateProfileRequest,
+    ) -> UpdateProfileResponse:
+        """
+        Update a user's display name and/or email in Firebase Authentication.
+
+        :param tenant_id: The Firebase tenant ID.
+        :param user_id: The user ID to update.
+        :param request: UpdateProfileRequest containing the fields to update.
+        :return: UpdateProfileResponse with the updated user details.
+        """
+        logger.info("Updating profile for user: %s", user_id)
+
+        firebase_user = self._firebase.update_user(
+            tenant_id=tenant_id,
+            user_id=user_id,
+            display_name=request.name,
+            email=str(request.email) if request.email else None,
+        )
+
+        logger.info("Updated profile for user: %s", user_id)
+
+        return UpdateProfileResponse(
+            uid=firebase_user.uid,
+            name=firebase_user.display_name,
+            email=firebase_user.email,
         )
 
 
