@@ -1,7 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import { getLogoUrl } from "src/envService";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
@@ -51,7 +50,6 @@ const ErrorPage: React.FC<ErrorPageProps> = ({ errorMessage, showRefreshButton =
           {t("error.errorPage.refreshButton")}
         </PrimaryButton>
       )}
-      <BugReportButton bottomAlign={true} />
     </Box>
   );
 };

@@ -8,7 +8,6 @@ import Footer from "src/home/components/Footer/Footer";
 import { getDarkLogoUrl, getLogoUrl, getProductName, getRegistrationDisabled } from "src/envService";
 import { AuthPageProvider } from "src/auth/components/AuthLayout/AuthPageContext";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
-import BugReportButton from "src/feedback/bugReport/bugReportButton/BugReportButton";
 import { routerPaths } from "src/app/routerPaths";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 
@@ -294,7 +293,6 @@ const AuthLayout: React.FC = () => {
 
         <Footer sx={{ mt: "auto", backgroundColor: theme.palette.common.cream }} />
       </AuthPageShell>
-      <BugReportButton bottomAlign={true} />
       <Backdrop isShown={loadingState.isLoading} message={loadingState.loadingMessage} />
     </AuthPageProvider>
   );

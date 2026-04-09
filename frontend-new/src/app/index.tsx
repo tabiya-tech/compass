@@ -29,6 +29,7 @@ import { useTranslation } from "react-i18next";
 import Home from "src/home/Home";
 import { AppErrorFallback } from "src/error/errorPage/AppErrorFallback";
 import { ExperiencesDrawerProvider } from "src/experiences/ExperiencesDrawerProvider";
+import BugReportButton from "../feedback/bugReport/bugReportButton/BugReportButton";
 
 const LazyLoadedSensitiveDataForm = lazyWithPreload(
   () => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm")
@@ -458,9 +459,12 @@ const App = () => {
     },
   ]);
   return (
-    <ExperiencesDrawerProvider>
-      <RouterProvider router={router} />
-    </ExperiencesDrawerProvider>
+    <>
+      <ExperiencesDrawerProvider>
+        <RouterProvider router={router} />
+      </ExperiencesDrawerProvider>
+      <BugReportButton bottomAlign={true} />
+    </>
   );
 };
 
