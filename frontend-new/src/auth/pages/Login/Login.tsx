@@ -484,7 +484,7 @@ const Login: React.FC = () => {
           }
           <PrimaryButton
             fullWidth
-            variant="outlined"
+            variant="contained"
             color="brandAction"
             showCircle
             style={{ marginTop: 8 }}
@@ -495,16 +495,7 @@ const Login: React.FC = () => {
             sx={{
               textTransform: "uppercase",
               backgroundColor: theme.palette.common.cream,
-              border: "none",
               color: theme.palette.brandAction.main,
-              "&:hover:not(:disabled)": {
-                backgroundColor: theme.palette.common.cream,
-                border: "none",
-                opacity: 0.95,
-              },
-              "&.Mui-disabled": {
-                opacity: 0.8,
-              },
             }}
           >
             {isLoading ? (

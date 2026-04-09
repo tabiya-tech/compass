@@ -38,7 +38,7 @@ exports[`ReactionReasonPopover render tests should render the popover with disab
     class="MuiBox-root css-17outbb"
   >
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
       data-testid="dislike-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       disabled=""
       tabindex="-1"
@@ -48,7 +48,7 @@ exports[`ReactionReasonPopover render tests should render the popover with disab
       Inappropriate Tone
     </button>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
       data-testid="dislike-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       disabled=""
       tabindex="-1"
@@ -58,7 +58,7 @@ exports[`ReactionReasonPopover render tests should render the popover with disab
       Offensive Language
     </button>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
       data-testid="dislike-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       disabled=""
       tabindex="-1"
@@ -68,7 +68,7 @@ exports[`ReactionReasonPopover render tests should render the popover with disab
       Biased
     </button>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
       data-testid="dislike-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       disabled=""
       tabindex="-1"
@@ -78,7 +78,7 @@ exports[`ReactionReasonPopover render tests should render the popover with disab
       Incorrect Information
     </button>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
       data-testid="dislike-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       disabled=""
       tabindex="-1"
@@ -88,7 +88,7 @@ exports[`ReactionReasonPopover render tests should render the popover with disab
       Irrelevant
     </button>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
       data-testid="dislike-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       disabled=""
       tabindex="-1"
@@ -139,7 +139,7 @@ exports[`ReactionReasonPopover render tests should render the reaction reason po
     class="MuiBox-root css-17outbb"
   >
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
       data-testid="dislike-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       tabindex="0"
       title="Inappropriate Tone"
@@ -148,7 +148,7 @@ exports[`ReactionReasonPopover render tests should render the reaction reason po
       Inappropriate Tone
     </button>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
       data-testid="dislike-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       tabindex="0"
       title="Offensive Language"
@@ -157,7 +157,7 @@ exports[`ReactionReasonPopover render tests should render the reaction reason po
       Offensive Language
     </button>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
       data-testid="dislike-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       tabindex="0"
       title="Biased"
@@ -166,7 +166,7 @@ exports[`ReactionReasonPopover render tests should render the reaction reason po
       Biased
     </button>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
       data-testid="dislike-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       tabindex="0"
       title="Incorrect Information"
@@ -175,7 +175,7 @@ exports[`ReactionReasonPopover render tests should render the reaction reason po
       Incorrect Information
     </button>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
       data-testid="dislike-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       tabindex="0"
       title="Irrelevant"
@@ -184,7 +184,7 @@ exports[`ReactionReasonPopover render tests should render the reaction reason po
       Irrelevant
     </button>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
       data-testid="dislike-reason-popover-button-9f3e2d1c-8b7a-4c6d-a5e9-2f1d8c7b3a4e"
       tabindex="0"
       title="Confusing"

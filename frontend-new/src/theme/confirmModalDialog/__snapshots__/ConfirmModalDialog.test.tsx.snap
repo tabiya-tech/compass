@@ -71,7 +71,7 @@ exports[`ConfirmModalDialog should render component correctly 1`] = `
         class="MuiDialogActions-root MuiDialogActions-spacing css-ne9u2k-MuiDialogActions-root"
       >
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-1xzw70t-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-nb0bw1-MuiButtonBase-root-MuiButton-root"
           data-testid="confirm-modal-cancel-edc0ac15-67a7-4c1f-9934-94fa65757046"
           tabindex="0"
           type="button"
@@ -79,7 +79,7 @@ exports[`ConfirmModalDialog should render component correctly 1`] = `
           Cancel
         </button>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-jj973u-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
           data-testid="confirm-modal-confirm-edc0ac15-67a7-4c1f-9934-94fa65757046"
           tabindex="0"
           type="button"

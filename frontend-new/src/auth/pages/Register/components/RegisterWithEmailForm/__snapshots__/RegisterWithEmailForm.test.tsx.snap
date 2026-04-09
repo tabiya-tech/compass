@@ -42,7 +42,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
     data-testid="b7499b01-8082-4209-8667-c7d559a70cag-text-field"
   />
   <button
-    class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-brv9ui-MuiButtonBase-root-MuiButton-root"
+    class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-zur4l4-MuiButtonBase-root-MuiButton-root"
     data-testid="register-button-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
     disabled=""
     style="margin-top: 8px;"
@@ -51,7 +51,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
   >
     Sign Up
     <div
-      class="MuiBox-root css-piy7g0"
+      class="MuiBox-root css-15jaqqs"
     >
       <svg
         aria-hidden="true"

@@ -31,6 +31,34 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   const cream = theme.palette.common.cream;
   const paletteColor = theme.palette[color as keyof typeof theme.palette] as PaletteColor;
   const isOutlined = variant === "outlined";
+  const sxObject = sx as Record<string, unknown> | undefined;
+  const isSxObject = Boolean(sxObject && typeof sxObject === "object" && !Array.isArray(sxObject));
+  const safeSxObject = isSxObject ? sxObject : undefined;
+  const hasBackgroundOverride = Boolean(
+    safeSxObject && ("backgroundColor" in safeSxObject || "bgcolor" in safeSxObject)
+  );
+
+  const useFilledCircle = isOutlined || hasBackgroundOverride;
+  const circleBackgroundColor = useFilledCircle ? paletteColor.main : cream;
+  const circleIconColor = useFilledCircle ? cream : paletteColor.main;
+
+  const outlinedHoverSx = isOutlined
+    ? {
+        "&:hover:not(:disabled)": {
+          backgroundColor: paletteColor.light,
+          border: `2px solid ${paletteColor.main}`,
+        },
+      }
+    : {};
+
+  const containedOverrideHoverSx =
+    !isOutlined && hasBackgroundOverride
+      ? {
+          "&:hover:not(:disabled)": {
+            backgroundColor: paletteColor.light,
+          },
+        }
+      : {};
 
   return (
     <Button
@@ -39,28 +67,34 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       style={style}
       sx={{
         borderRadius: "999px",
-        fontWeight: 600,
+        fontFamily: "Bricolage Grotesque",
+        fontWeight: 700,
         fontSize: "1rem",
         lineHeight: 1,
         gap: showCircle ? 1.5 : 1,
         justifyContent: showCircle ? "space-between" : "center",
         ...(isOutlined && { border: `2px solid ${paletteColor.main}` }),
-        padding: showCircle ? "6px 16px 6px 16px" : "12px 24px",
+        padding: showCircle ? "6px 6px 6px 22px" : "12px 24px",
+        textTransform: "none",
+        cursor: "pointer",
         "&:focus-visible": {
           outline: `3px solid ${theme.palette.brandAccent.main}`,
           outlineOffset: "2px",
         },
-        ...(isOutlined && {
-          "&:hover:not(:disabled)": {
-            bgcolor: paletteColor.light,
-            border: `2px solid ${paletteColor.main}`,
-          },
-        }),
+        ...outlinedHoverSx,
+        ...containedOverrideHoverSx,
         "&.Mui-disabled": {
-          opacity: 0.38,
-          color: isOutlined ? paletteColor.main : paletteColor.contrastText,
-          bgcolor: isOutlined ? "transparent" : paletteColor.main,
+          opacity: hasBackgroundOverride ? 0.7 : 0.38,
+          color: isOutlined ? paletteColor.main : hasBackgroundOverride ? paletteColor.main : paletteColor.contrastText,
+          backgroundColor: isOutlined ? "transparent" : hasBackgroundOverride ? cream : paletteColor.main,
           ...(isOutlined && { border: `2px solid ${paletteColor.main}` }),
+          ...(showCircle &&
+            hasBackgroundOverride && {
+              "& > .MuiBox-root": {
+                backgroundColor: paletteColor.main,
+                color: cream,
+              },
+            }),
         },
         ...sx,
       }}
@@ -75,12 +109,16 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
             width: 36,
             height: 36,
             borderRadius: "50%",
-            bgcolor: isOutlined ? paletteColor.main : cream,
-            color: isOutlined ? cream : paletteColor.main,
+            backgroundColor: circleBackgroundColor,
+            color: circleIconColor,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
+            transition: "transform 0.2s ease",
+            "button:hover:not(:disabled) &": {
+              transform: "translateX(3px)",
+            },
           }}
         >
           <ArrowForwardIcon sx={{ fontSize: 18 }} />

@@ -28,7 +28,7 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
     <PrimaryButton
       variant="outlined"
       style={style}
-      sx={sx}
+      sx={{ alignSelf: "flex-start", ...sx }}
       disabled={Boolean(disabled || (disableWhenOffline && !isOnline))}
       {...props}
     >

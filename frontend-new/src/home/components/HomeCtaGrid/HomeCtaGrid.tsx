@@ -1,11 +1,11 @@
 import React, { startTransition } from "react";
 import { alpha } from "@mui/material/styles";
-import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
 
 const uniqueId = "b2c3d4e5-f6a7-8901-bcde-f23456789012";
 
@@ -39,20 +39,6 @@ const CtaTitle: React.FC<{ title: string; leadColor: string; tailColor: string }
   );
 };
 
-const circleIconSx = (bg: string, fg: string) => ({
-  width: 36,
-  height: 36,
-  borderRadius: "50%",
-  bgcolor: bg,
-  color: fg,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexShrink: 0,
-  transition: "transform 0.2s ease",
-  "button:hover:not(:disabled) &": { transform: "translateX(3px)" },
-});
-
 interface CtaCardProps {
   testKey: "profile" | "paths" | "jobs";
   edge?: "start" | "middle" | "end";
@@ -65,13 +51,12 @@ interface CtaCardProps {
   titleTailColor: string;
   descriptionColor: string;
   filledButton?: {
+    color: "primary" | "brandAction";
     bgColor: string;
     textColor: string;
   };
   outlinedButton?: {
     color: "brandAction" | "secondary";
-    bgColor: string;
-    textColor: string;
   };
 }
 
@@ -134,43 +119,23 @@ const HomeCtaCard: React.FC<CtaCardProps> = ({
         </Typography>
 
         {filledButton ? (
-          <Button
-            type="button"
-            variant="contained"
-            disableElevation
-            onClick={onClick}
-            sx={{
-              alignSelf: "flex-start",
-              borderRadius: "999px",
-              fontWeight: 600,
-              textTransform: "none",
-              gap: 1.5,
-              padding: "6px 6px 6px 22px",
-              bgcolor: filledButton.bgColor,
-              color: filledButton.textColor,
-              "&:hover": { bgcolor: theme.palette.grey[100] },
-            }}
-          >
-            {cta}
-            <Box sx={circleIconSx(filledButton.textColor, filledButton.bgColor)}>
-              <ArrowForwardIcon sx={{ fontSize: 18 }} />
-            </Box>
-          </Button>
-        ) : (
           <PrimaryButton
-            type="button"
-            color={outlinedButton?.color}
-            variant="outlined"
+            color={filledButton.color}
+            variant="contained"
             showCircle
             onClick={onClick}
             sx={{
               alignSelf: "flex-start",
-              bgcolor: outlinedButton?.bgColor,
-              color: outlinedButton?.textColor,
+              bgcolor: filledButton.bgColor,
+              color: filledButton.textColor,
             }}
           >
             {cta}
           </PrimaryButton>
+        ) : (
+          <SecondaryButton color={outlinedButton?.color} showCircle onClick={onClick}>
+            {cta}
+          </SecondaryButton>
         )}
       </Box>
     </Grid>
@@ -217,6 +182,7 @@ const HomeCtaGrid: React.FC = () => {
         titleTailColor={alpha(profileCardText, 0.8)}
         descriptionColor={profileCardText}
         filledButton={{
+          color: "primary",
           bgColor: theme.palette.common.cream,
           textColor: profileCardBg,
         }}
@@ -234,6 +200,7 @@ const HomeCtaGrid: React.FC = () => {
         titleTailColor={alpha(theme.palette.common.white, 0.8)}
         descriptionColor={theme.palette.common.white}
         filledButton={{
+          color: "brandAction",
           bgColor: theme.palette.common.cream,
           textColor: pathwaysCardBg,
         }}
@@ -252,8 +219,6 @@ const HomeCtaGrid: React.FC = () => {
         descriptionColor={theme.palette.text.primary}
         outlinedButton={{
           color: "secondary",
-          bgColor: theme.palette.common.cream,
-          textColor: theme.palette.secondary.main,
         }}
       />
     </Grid>

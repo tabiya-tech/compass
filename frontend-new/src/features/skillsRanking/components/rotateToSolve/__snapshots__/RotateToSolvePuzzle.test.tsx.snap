@@ -189,7 +189,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
       class="MuiBox-root css-1r1fsmc"
     >
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-m3dqjq-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-1707yo2-MuiButtonBase-root-MuiButton-root"
         data-testid="rotate-to-solve-cancel-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
         tabindex="0"
         type="button"
