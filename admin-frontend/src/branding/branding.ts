@@ -1,10 +1,10 @@
 import {
   getAppIconUrl,
   getBrowserTabTitle,
+  getDarkLogoUrl,
   getMetaDescription,
   getFaviconUrl,
   getThemeCssVariables,
-  getLogoUrl,
 } from "src/envService";
 import { getSeoConfig, SeoConfig } from "src/branding/seoConfig";
 
@@ -90,7 +90,7 @@ export const applyBrandingFromEnv = (): void => {
     upsertLinkHref("apple-touch-icon", appIconUrl);
   }
 
-  const logUrl = getLogoUrl();
+  const logUrl = getDarkLogoUrl();
   if (logUrl) {
     const img = document.getElementById("loading-logo");
     if (img instanceof HTMLImageElement) {
