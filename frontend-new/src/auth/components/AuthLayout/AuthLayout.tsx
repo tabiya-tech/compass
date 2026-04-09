@@ -132,9 +132,6 @@ const AuthLayout: React.FC = () => {
           }}
         >
           {t("auth.pages.login.appHero.discoverLine")}
-          <Box component="span" sx={{ color: theme.palette.brandAction.main }}>
-            .
-          </Box>
         </Typography>
         <Typography
           variant="h1"

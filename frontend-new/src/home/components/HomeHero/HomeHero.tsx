@@ -43,9 +43,6 @@ const HomeHero: React.FC = () => {
           }}
         >
           {t("home.hero.headline1")}
-          <Box component="span" sx={{ color: theme.palette.brandAction.main }}>
-            .
-          </Box>
         </Typography>
         <Typography
           variant="h1"
