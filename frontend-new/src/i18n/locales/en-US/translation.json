@@ -1,10 +1,12 @@
 {
   "common": {
     "buttons": {
-      "login": "Sign In",
+      "login": "Let's go",
+      "loginLink": "Sign In",
       "logout": "Logout",
       "submit": "Submit",
       "register": "Sign Up",
+      "registerLink": "Register here!",
       "startNewConversation": "Start new conversation",
       "settings": "Settings",
       "cancel": "Cancel",

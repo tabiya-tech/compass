@@ -239,7 +239,7 @@ const AuthLayout: React.FC = () => {
                 "&:hover": { color: theme.palette.brandAction.main, opacity: 0.75 },
               }}
             >
-              {showRegisterLink ? t("common.buttons.register") : t("common.buttons.login")}
+              {showRegisterLink ? t("common.buttons.registerLink") : t("common.buttons.loginLink")}
             </CustomLink>
           </Typography>
         )}

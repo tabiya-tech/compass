@@ -2,9 +2,11 @@
   "common": {
     "buttons": {
       "login": "Lowani",
+      "loginLink": "Lowani",
       "logout": "Tsekani",
       "submit": "Tumizani",
       "register": "Lembetsani",
+      "registerLink": "Lembetsani",
       "startNewConversation": "Yambani nkhani yatsopano",
       "settings": "Zokonda",
       "cancel": "Lambani",

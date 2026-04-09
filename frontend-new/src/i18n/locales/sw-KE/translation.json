@@ -2,9 +2,11 @@
   "common": {
     "buttons": {
       "login": "Ingia",
+      "loginLink": "Ingia",
       "logout": "Toka",
       "submit": "Wasilisha",
       "register": "Jisajili",
+      "registerLink": "Jisajili",
       "startNewConversation": "Anza mazungumzo mapya",
       "settings": "Mipangilio",
       "cancel": "Ghairi",

@@ -2,9 +2,11 @@
   "common": {
     "buttons": {
       "login": "Iniciar sesión",
+      "loginLink": "Iniciar sesión",
       "logout": "Cerrar sesión",
       "submit": "Enviar",
       "register": "Registrarse",
+      "registerLink": "Registrarse",
       "startNewConversation": "Iniciar nueva conversación",
       "settings": "Configuración",
       "cancel": "Cancelar",
