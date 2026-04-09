@@ -167,7 +167,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = ({ ini
             autoFocus
             data-testid={DATA_TEST_ID.INPUT}
           />
-          <DialogActions sx={{ paddingLeft: 0, paddingRight: 0}}>
+          <DialogActions sx={{ paddingLeft: 0, paddingRight: 0 }}>
             <PrimaryButton
               type="submit"
               disableWhenOffline={true}
