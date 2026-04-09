@@ -15,20 +15,26 @@ exports[`Footer should render the footer container, logos, links, and collaborat
       class="MuiBox-root css-o5x28k"
     >
       <div
-        class="MuiBox-root css-1hb1pxt"
+        class="MuiBox-root css-19h6y00"
         data-testid="footer-logos-container-a7f3d2b1-8e4c-4a9f-b6d5-3c1e2f7a8b9d"
       >
         <img
           alt="World Bank Group Logo"
           data-testid="footer-world-bank-logo-a7f3d2b1-8e4c-4a9f-b6d5-3c1e2f7a8b9d"
           src="/world-bank-logo.svg"
-          style="max-width: 40%;"
+          style="height: 28px; width: auto; object-fit: contain; margin-right: 10px;"
+        />
+        <img
+          alt="Ministry of Technology Logo"
+          data-testid="footer-ministry-tech-logo-a7f3d2b1-8e4c-4a9f-b6d5-3c1e2f7a8b9d"
+          src="/ministry-tech.png"
+          style="height: 36px; width: auto; object-fit: contain;"
         />
         <img
           alt="Tabiya Logo"
           data-testid="footer-tabiya-logo-a7f3d2b1-8e4c-4a9f-b6d5-3c1e2f7a8b9d"
           src="/tabiya-logo.svg"
-          style="max-width: 35%;"
+          style="height: 46px; width: auto; object-fit: contain;"
         />
       </div>
       <div

@@ -12,6 +12,7 @@ export const DATA_TEST_ID = {
   FOOTER_CONTAINER: `footer-container-${uniqueId}`,
   FOOTER_LOGOS_CONTAINER: `footer-logos-container-${uniqueId}`,
   FOOTER_WORLD_BANK_LOGO: `footer-world-bank-logo-${uniqueId}`,
+  FOOTER_MINISTRY_TECH_LOGO: `footer-ministry-tech-logo-${uniqueId}`,
   FOOTER_TABIYA_LOGO: `footer-tabiya-logo-${uniqueId}`,
   FOOTER_PRIVACY_LINK: `footer-privacy-link-${uniqueId}`,
   FOOTER_TERMS_LINK: `footer-terms-link-${uniqueId}`,
@@ -66,23 +67,38 @@ const Footer: React.FC<FooterProps> = ({ sx }) => {
           {/* Partner logos */}
           <Box
             sx={{
-              display: "flex",
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "repeat(3, max-content)" },
               alignItems: "center",
+              justifyItems: "center",
               justifyContent: "center",
-              gap: theme.spacing(theme.tabiyaSpacing.lg),
+              columnGap: theme.spacing(theme.tabiyaSpacing.md),
+              rowGap: theme.spacing(theme.tabiyaSpacing.md),
+              width: "fit-content",
+              marginX: "auto",
             }}
             data-testid={DATA_TEST_ID.FOOTER_LOGOS_CONTAINER}
           >
             <img
               src={`${process.env.PUBLIC_URL}/world-bank-logo.svg`}
               alt="World Bank Group Logo"
-              style={{ maxWidth: "40%" }}
+              style={{ height: 28, width: "auto", objectFit: "contain", marginRight: 10 }}
               data-testid={DATA_TEST_ID.FOOTER_WORLD_BANK_LOGO}
+            />
+            <img
+              src={`${process.env.PUBLIC_URL}/ministry-tech.png`}
+              alt="Ministry of Technology Logo"
+              style={{
+                height: 36,
+                width: "auto",
+                objectFit: "contain",
+              }}
+              data-testid={DATA_TEST_ID.FOOTER_MINISTRY_TECH_LOGO}
             />
             <img
               src={`${process.env.PUBLIC_URL}/tabiya-logo.svg`}
               alt="Tabiya Logo"
-              style={{ maxWidth: "35%" }}
+              style={{ height: 46, width: "auto", objectFit: "contain" }}
               data-testid={DATA_TEST_ID.FOOTER_TABIYA_LOGO}
             />
           </Box>
