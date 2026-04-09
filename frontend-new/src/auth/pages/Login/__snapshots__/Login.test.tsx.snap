@@ -30,7 +30,7 @@ exports[`Testing Login component Render tests should hide login code related ele
           tabindex="-1"
           type="submit"
         >
-          Sign In
+          Let's go
           <div
             class="MuiBox-root css-15jaqqs"
           >
@@ -86,7 +86,7 @@ exports[`Testing Login component Render tests should hide login code related ele
           tabindex="-1"
           type="submit"
         >
-          Sign In
+          Let's go
           <div
             class="MuiBox-root css-15jaqqs"
           >
@@ -166,7 +166,7 @@ exports[`Testing Login component Render tests should show continue as guest if l
           tabindex="-1"
           type="submit"
         >
-          Sign In
+          Let's go
           <div
             class="MuiBox-root css-15jaqqs"
           >
@@ -240,7 +240,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
         tabindex="-1"
         type="submit"
       >
-        Sign In
+        Let's go
         <div
           class="MuiBox-root css-15jaqqs"
         >
@@ -321,7 +321,7 @@ exports[`Testing Login component should handle application login code 1`] = `
         tabindex="-1"
         type="submit"
       >
-        Sign In
+        Let's go
         <div
           class="MuiBox-root css-15jaqqs"
         >
@@ -395,7 +395,7 @@ exports[`Testing Login component should remove registration link if registration
           tabindex="-1"
           type="submit"
         >
-          Sign In
+          Let's go
           <div
             class="MuiBox-root css-15jaqqs"
           >
