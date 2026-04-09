@@ -115,13 +115,11 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
               px: 1.5,
               gap: 1.5,
               "&:hover": { backgroundColor: theme.palette.action.hover },
+              "& .MuiListItemIcon-root": { minWidth: "unset" },
             }}
           >
             {item.icon && (
-              <ListItemIcon
-                data-testid={DATA_TEST_ID.MENU_ITEM_ICON}
-                sx={{ minWidth: "unset", color: theme.palette.text.primary }}
-              >
+              <ListItemIcon data-testid={DATA_TEST_ID.MENU_ITEM_ICON} sx={{ color: theme.palette.text.primary }}>
                 {item.icon}
               </ListItemIcon>
             )}
