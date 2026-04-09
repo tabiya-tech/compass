@@ -235,15 +235,13 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
         overflow: "hidden",
       }}
     >
-      {/* ── Scrollable content (centred, matches ChatPage pattern) ── */}
+      {/* ── Scrollable content ── */}
       <Box
         ref={scrollContainerRef}
         sx={{
           flex: 1,
           minHeight: 0,
           overflowY: "auto",
-          // leave room for the absolute sidebar on md+ screens
-          [theme.breakpoints.up("md")]: { paddingRight: "min(20rem, 25%)" },
         }}
       >
         <div
@@ -253,6 +251,10 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
             padding: "24px 32px 48px",
             lineHeight: 1.5,
             boxSizing: "border-box",
+            maxWidth: "var(--layout-content-max-width)",
+            marginLeft: "auto",
+            marginRight: "auto",
+            paddingRight: "calc(min(20rem, 25%) + 32px)", // the padding from above
           }}
         >
           {/* Loading skeleton */}
@@ -839,7 +841,7 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
         sx={{
           position: "absolute",
           top: 0,
-          right: 0,
+          right: "max(0px, calc((100% - var(--layout-content-max-width)) / 2))",
           height: "100%",
           width: "100%",
           maxWidth: "min(20rem, 25%)",

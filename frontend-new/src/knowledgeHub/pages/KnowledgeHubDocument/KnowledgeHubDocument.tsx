@@ -61,9 +61,10 @@ const KnowledgeHubDocument: React.FC = () => {
       data-testid={DATA_TEST_ID.KNOWLEDGE_HUB_DOCUMENT_CONTAINER}
     >
       <Container
-        maxWidth="md"
+        maxWidth={false}
         sx={{
           flex: 1,
+          maxWidth: "var(--layout-content-max-width)",
           padding: theme.spacing(theme.tabiyaSpacing.lg),
           paddingTop: theme.spacing(theme.tabiyaSpacing.md),
           overflowY: "auto",
