@@ -38,7 +38,11 @@ const ROLE_LABELS: Record<string, string> = {
 const CreateUserModal: React.FC = () => {
   const { t } = useTranslation();
   const { createModalOpen, setCreateModalOpen, fetchUsers } = useUsersContext();
-  const { options: institutionOptions, loading: institutionsLoading, error: institutionsError } = useInstitutionOptions();
+  const {
+    options: institutionOptions,
+    loading: institutionsLoading,
+    error: institutionsError,
+  } = useInstitutionOptions();
 
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");

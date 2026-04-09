@@ -90,7 +90,7 @@ const InstitutionAutocomplete: React.FC<InstitutionAutocompleteProps> = ({
       onChange={(_event, newValue) => {
         setSelectedOption(newValue);
         // Use id if present, fall back to name (backend stores this as a free-form string)
-        onChange(newValue ? (newValue.id || newValue.name) : "");
+        onChange(newValue ? newValue.id || newValue.name : "");
       }}
       loading={loading}
       disabled={disabled}

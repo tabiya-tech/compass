@@ -36,7 +36,11 @@ const ROLE_LABELS: Record<string, string> = {
 const UpdateRoleModal: React.FC = () => {
   const { t } = useTranslation();
   const { updateUser, setUpdateUser, fetchUsers } = useUsersContext();
-  const { options: institutionOptions, loading: institutionsLoading, error: institutionsError } = useInstitutionOptions();
+  const {
+    options: institutionOptions,
+    loading: institutionsLoading,
+    error: institutionsError,
+  } = useInstitutionOptions();
 
   const [role, setRole] = useState<Role>(Role.ADMIN);
   const [institutionId, setInstitutionId] = useState("");

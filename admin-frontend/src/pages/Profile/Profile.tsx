@@ -145,11 +145,11 @@ const Profile: React.FC = () => {
       if (firebaseErr?.code === "auth/wrong-password" || firebaseErr?.code === "auth/invalid-credential") {
         setPasswordError(t("profile.error.wrongPassword", "Current password is incorrect."));
       } else if (firebaseErr?.code === "auth/requires-recent-login") {
-        setPasswordError(t("profile.error.requiresRecentLogin", "Please log out and log back in before changing your password."));
-      } else {
         setPasswordError(
-          firebaseErr?.message ?? t("profile.error.passwordChangeFailed", "Failed to change password.")
+          t("profile.error.requiresRecentLogin", "Please log out and log back in before changing your password.")
         );
+      } else {
+        setPasswordError(firebaseErr?.message ?? t("profile.error.passwordChangeFailed", "Failed to change password."));
       }
     } finally {
       setPasswordLoading(false);
@@ -157,8 +157,7 @@ const Profile: React.FC = () => {
   };
 
   const isProfileChanged =
-    name.trim() !== (userStateService.getUserName() ?? "") ||
-    email.trim() !== (userStateService.getUserEmail() ?? "");
+    name.trim() !== (userStateService.getUserName() ?? "") || email.trim() !== (userStateService.getUserEmail() ?? "");
 
   return (
     <Box
