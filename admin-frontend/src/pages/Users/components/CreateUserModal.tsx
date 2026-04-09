@@ -16,6 +16,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { usersService, Role, CreateUserRequest, HttpError } from "../usersService";
 import { useUsersContext } from "../UsersContext";
+import InstitutionAutocomplete, { useInstitutionOptions } from "./InstitutionAutocomplete";
 
 const uniqueId = "create-user-modal-3a5c7e9f-1b2d-4f6a-8c0e-2d4f6a8b0c1e";
 
@@ -37,6 +38,7 @@ const ROLE_LABELS: Record<string, string> = {
 const CreateUserModal: React.FC = () => {
   const { t } = useTranslation();
   const { createModalOpen, setCreateModalOpen, fetchUsers } = useUsersContext();
+  const { options: institutionOptions, loading: institutionsLoading, error: institutionsError } = useInstitutionOptions();
 
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -139,15 +141,14 @@ const CreateUserModal: React.FC = () => {
           </Select>
         </FormControl>
         {role === Role.INSTITUTION_STAFF && (
-          <TextField
-            label={t("users.createModal.institutionId", "Institution ID")}
-            fullWidth
-            margin="normal"
+          <InstitutionAutocomplete
             value={institutionId}
-            onChange={(e) => setInstitutionId(e.target.value)}
+            onChange={setInstitutionId}
             required
             disabled={loading}
-            data-testid={DATA_TEST_ID.CREATE_USER_MODAL_INSTITUTION_ID}
+            options={institutionOptions}
+            loading={institutionsLoading}
+            error={institutionsError}
           />
         )}
       </DialogContent>

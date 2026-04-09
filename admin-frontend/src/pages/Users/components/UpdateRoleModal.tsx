@@ -11,12 +11,12 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  TextField,
   Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { usersService, Role, UpdateRoleRequest } from "../usersService";
 import { useUsersContext } from "../UsersContext";
+import InstitutionAutocomplete, { useInstitutionOptions } from "./InstitutionAutocomplete";
 
 const uniqueId = "update-role-modal-4b6d8e0a-2c3f-5a7b-9d1e-3f5a7b9c0d2e";
 
@@ -36,6 +36,7 @@ const ROLE_LABELS: Record<string, string> = {
 const UpdateRoleModal: React.FC = () => {
   const { t } = useTranslation();
   const { updateUser, setUpdateUser, fetchUsers } = useUsersContext();
+  const { options: institutionOptions, loading: institutionsLoading, error: institutionsError } = useInstitutionOptions();
 
   const [role, setRole] = useState<Role>(Role.ADMIN);
   const [institutionId, setInstitutionId] = useState("");
@@ -110,15 +111,14 @@ const UpdateRoleModal: React.FC = () => {
           </Select>
         </FormControl>
         {role === Role.INSTITUTION_STAFF && (
-          <TextField
-            label={t("users.updateRoleModal.institutionId", "Institution ID")}
-            fullWidth
-            margin="normal"
+          <InstitutionAutocomplete
             value={institutionId}
-            onChange={(e) => setInstitutionId(e.target.value)}
+            onChange={setInstitutionId}
             required
             disabled={loading}
-            data-testid={DATA_TEST_ID.UPDATE_ROLE_MODAL_INSTITUTION_ID}
+            options={institutionOptions}
+            loading={institutionsLoading}
+            error={institutionsError}
           />
         )}
       </DialogContent>
