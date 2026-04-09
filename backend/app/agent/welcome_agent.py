@@ -11,7 +11,7 @@ from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template.quick_reply_prompt import QUICK_REPLY_PROMPT
 from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER
-from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
+from app.agent.prompt_template.format_prompt import append_user_ctx, replace_placeholders_with_indent
 from app.agent.simple_llm_agent.prompt_response_template import get_json_examples_instructions
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
@@ -343,7 +343,9 @@ class WelcomeAgent(Agent):
                                                                json_response_instructions=WelcomeAgent.get_json_response_instructions(
                                                                    state),
                                                                quick_reply_prompt=QUICK_REPLY_PROMPT)
-        return system_instructions
+
+        # Prepend user profile context if available
+        return append_user_ctx(system_instructions)
 
     @staticmethod
     def get_json_response_instructions(state: WelcomeAgentState) -> str:

@@ -6,7 +6,7 @@ from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMStats
 from app.agent.experience.work_type import WorkType
 from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER
-from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
+from app.agent.prompt_template.format_prompt import append_user_ctx, replace_placeholders_with_indent
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.countries import Country
@@ -276,7 +276,7 @@ class _ConversationLLM:
             ask me once if I really want to stop. If I confirm, end the conversation.
         """)
 
-        return replace_placeholders_with_indent(
+        system_instructions = replace_placeholders_with_indent(
             system_instructions_template,
             country_of_user_segment=_get_country_of_user_segment(country_of_user),
             get_question_c=_get_question_c(work_type),
@@ -290,6 +290,9 @@ class _ConversationLLM:
             experience_title=f"'{experience_title}'",
             work_type=f" ({WorkType.work_type_short(work_type)})" if work_type is not None else ""
         )
+
+        # Prepend user profile context if available
+        return append_user_ctx(system_instructions)
 
     @staticmethod
     def create_first_time_generative_prompt(*,
@@ -348,7 +351,7 @@ class _ConversationLLM:
                 experiences_explored_instructions,
                 experiences_explored="\n".join(experiences_explored)
             )
-        return replace_placeholders_with_indent(prompt_template,
+        prompt = replace_placeholders_with_indent(prompt_template,
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 experiences_explored_instructions=experiences_explored_instructions,
                                                 experience_title=f"'{experience_title}'",
@@ -359,6 +362,9 @@ class _ConversationLLM:
                                                 language_style=get_language_style(),
                                                 persona_guidance=get_persona_prompt_section(persona_type),
                                                 )
+
+        # Prepend user profile context if available
+        return append_user_ctx(prompt)
 
 
 def _get_country_of_user_segment(country_of_user: Country) -> str:

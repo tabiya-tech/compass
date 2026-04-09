@@ -1,4 +1,5 @@
 import contextvars
+from typing import Optional
 
 # Define a context variable to store the session_id, which will be used to correlate log messages
 # every conversation with a user will have a unique session_id
@@ -28,7 +29,17 @@ agent_type_ctx_var = contextvars.ContextVar("agent_type", default=":none:")
 phase_ctx_var = contextvars.ContextVar("phase", default=":none:")
 
 # LLM call duration in milliseconds (for current operation)
-llm_call_duration_ms_ctx_var = contextvars.ContextVar("llm_call_duration_ms", default=-1)
+llm_call_duration_ms_ctx_var = contextvars.ContextVar(
+    "llm_call_duration_ms", default=-1
+)
 
 # Detected language for the current turn (ENGLISH, SWAHILI, or MIXED)
-detected_language_ctx_var = contextvars.ContextVar("detected_language", default="english")
+detected_language_ctx_var = contextvars.ContextVar(
+    "detected_language", default="english"
+)
+
+# User profile context for prompt injection (formatted string from plain personal data)
+# This context is injected into all conversation prompts so the LLM can have context about the user it is helping
+user_profile_context_var = contextvars.ContextVar[Optional[str]](
+    "user_profile_context", default=None
+)

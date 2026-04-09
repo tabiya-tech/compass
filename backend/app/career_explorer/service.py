@@ -8,6 +8,7 @@ from app.agent.agent_types import AgentInput, AgentOutput
 from app.agent.career_explorer_agent.agent import CareerExplorerAgent, _get_welcome_message, _get_welcome_metadata
 from app.career_explorer.context_builder import build_windowed_context
 from app.career_explorer.repository import ICareerExplorerConversationRepository
+from app.context_vars import user_profile_context_var
 from app.career_explorer.types import (
     CareerExplorerConversationDocument,
     CareerExplorerConversationResponse,
@@ -72,8 +73,17 @@ class CareerExplorerService:
         profile = await self._user_profile_service.get_user_profile(user_id)
         user_profile_context = self._user_profile_service.format_for_prompt(profile) if profile else None
 
+        # Combine user profile context with plain personal data context from context var
+        plain_personal_data_context = user_profile_context_var.get()
+        if plain_personal_data_context and user_profile_context:
+            combined_context = plain_personal_data_context + "\n\n" + user_profile_context
+        elif plain_personal_data_context:
+            combined_context = plain_personal_data_context
+        else:
+            combined_context = user_profile_context
+
         agent = self._agent_factory()
-        agent.set_user_profile_context(user_profile_context)
+        agent.set_user_profile_context(combined_context)
         agent_input = AgentInput(message=user_input, sent_at=now)
         agent_output = await agent.execute(
             agent_input,

@@ -13,7 +13,7 @@ from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT, Wor
 from app.agent.penalty import get_penalty
 from app.agent.prompt_template import get_language_style
 from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER
-from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
+from app.agent.prompt_template.format_prompt import append_user_ctx, replace_placeholders_with_indent
 from app.agent.prompt_template.quick_reply_prompt import QUICK_REPLY_PROMPT
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory
@@ -497,7 +497,7 @@ class _ConversationLLM:
         canonical_now = datetime.now().strftime("%Y-%m-%d")
         current_date_formatted = format_date_value_for_locale(canonical_now, locale=None)
 
-        return replace_placeholders_with_indent(system_instructions_template,
+        system_instructions = replace_placeholders_with_indent(system_instructions_template,
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 agent_character=STD_AGENT_CHARACTER,
                                                 language_style=get_language_style(),
@@ -520,6 +520,9 @@ class _ConversationLLM:
                                                 date_format_year=date_formats.year_only,
                                                 quick_reply_prompt=QUICK_REPLY_PROMPT,
                                                 )
+
+        # Prepend user profile context if available
+        return append_user_ctx(system_instructions)
 
     @staticmethod
     def _get_first_time_generative_prompt(*,
@@ -556,7 +559,7 @@ class _ConversationLLM:
 
                 {quick_reply_prompt}
                 """)
-        return replace_placeholders_with_indent(first_time_generative_prompt,
+        prompt = replace_placeholders_with_indent(first_time_generative_prompt,
                                                 country_of_user_segment=_get_country_of_user_segment(country_of_user),
                                                 language_style=get_language_style(),
                                                 persona_guidance=get_persona_prompt_section(persona_type),
@@ -564,6 +567,9 @@ class _ConversationLLM:
                                                 question_to_ask=question_to_ask,
                                                 paid_unpaid_instruction=paid_unpaid_instruction,
                                                 quick_reply_prompt=QUICK_REPLY_PROMPT)
+
+        # Prepend user profile context if available
+        return append_user_ctx(prompt)
 
 
 def _get_collected_experience_data(collected_data: list[CollectedData]) -> str:

@@ -21,6 +21,9 @@ from app.career_readiness.errors import (
 )
 from app.career_readiness.routes import add_career_readiness_routes, get_career_readiness_service
 from app.career_readiness.service import ICareerReadinessService
+from app.users.plain_personal_data.routes import get_plain_personal_data_service
+from app.users.plain_personal_data.service import IPlainPersonalDataService
+from app.users.plain_personal_data.types import PlainPersonalData
 from app.career_readiness.types import (
     CareerReadinessConversationResponse,
     CareerReadinessMessage,
@@ -81,6 +84,13 @@ def _make_conversation_response(
 def client_with_mocks() -> TestClientWithMocks:
     """Create a FastAPI test client with mocked service and auth."""
 
+    class MockPlainPersonalDataService(IPlainPersonalDataService):
+        async def upsert(self, user_id: str, data: dict) -> None:
+            return None
+
+        async def get(self, user_id: str) -> Optional[PlainPersonalData]:
+            return None
+
     class MockService(ICareerReadinessService):
         async def list_modules(self, user_id: str) -> ModuleListResponse:
             return ModuleListResponse(modules=[_make_module_summary()])
@@ -127,10 +137,12 @@ def client_with_mocks() -> TestClientWithMocks:
             return None
 
     mock_service = MockService()
+    mock_plain_personal_data_service = MockPlainPersonalDataService()
     mock_auth = MockAuth()
 
     app = FastAPI()
     app.dependency_overrides[get_career_readiness_service] = lambda: mock_service
+    app.dependency_overrides[get_plain_personal_data_service] = lambda: mock_plain_personal_data_service
 
     add_career_readiness_routes(app, authentication=mock_auth)
 

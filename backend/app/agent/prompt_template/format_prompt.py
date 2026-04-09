@@ -1,5 +1,20 @@
 import re
 
+from app.context_vars import user_profile_context_var
+
+
+def append_user_ctx(prompt: str) -> str:
+    """
+    Prepend user profile context to a prompt if available.
+
+    :param prompt: The original prompt string
+    :return: The prompt with user profile context prepended if available, otherwise the original prompt
+    """
+    user_profile_context = user_profile_context_var.get()
+    if user_profile_context:
+        return user_profile_context + "\n\n" + prompt
+    return prompt
+
 
 def replace_placeholders_with_indent(template_string: str, **replacements: str):
     """

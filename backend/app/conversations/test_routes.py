@@ -20,6 +20,9 @@ from fastapi import FastAPI
 from app.users.repositories import IUserPreferenceRepository
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 from app.users.types import UserPreferencesRepositoryUpdateRequest, UserPreferences
+from app.users.plain_personal_data.routes import get_plain_personal_data_service
+from app.users.plain_personal_data.service import IPlainPersonalDataService
+from app.users.plain_personal_data.types import PlainPersonalData
 from common_libs.test_utilities.mock_auth import MockAuth, UnauthenticatedMockAuth
 
 TestClientWithMocks = tuple[TestClient, IConversationService, IUserPreferenceRepository, UserInfo | None]
@@ -39,6 +42,19 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
     """
     Factory function to create a test client with mocked dependencies
     """
+
+    # mock the plain personal data service
+    class MockPlainPersonalDataService(IPlainPersonalDataService):
+        async def upsert(self, user_id: str, data: dict) -> None:
+            return None
+
+        async def get(self, user_id: str) -> PlainPersonalData | None:
+            return None
+
+    _instance_plain_personal_data_service = MockPlainPersonalDataService()
+
+    def _mocked_plain_personal_data_service() -> IPlainPersonalDataService:
+        return _instance_plain_personal_data_service
 
     # mock the conversation service
     class MockConversationService(IConversationService):
@@ -83,6 +99,7 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
     # Set up the app dependency overrides
     app.dependency_overrides[get_conversation_service] = _mocked_conversation_service
     app.dependency_overrides[get_user_preferences_repository] = get_mock_user_preferences_repository
+    app.dependency_overrides[get_plain_personal_data_service] = _mocked_plain_personal_data_service
 
     # Add the conversation routes to the app
     add_conversation_routes(app, authentication=auth)

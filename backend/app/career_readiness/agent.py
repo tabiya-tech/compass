@@ -15,6 +15,7 @@ from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMQuickRe
 from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template.locale_style import get_language_style
 from app.agent.prompt_template.quick_reply_prompt import QUICK_REPLY_PROMPT
+from app.agent.prompt_template.format_prompt import append_user_ctx
 from app.agent.simple_llm_agent.prompt_response_template import (
     get_json_response_instructions,
 )
@@ -229,23 +230,31 @@ class CareerReadinessAgent:
         self._logger = logging.getLogger(CareerReadinessAgent.__name__)
 
         if mode == ConversationMode.INSTRUCTION:
-            self._system_instructions = _build_instruction_mode_instructions(
+            self._base_system_instructions = _build_instruction_mode_instructions(
                 module_title, module_content, topics or [])
         else:
-            self._system_instructions = _build_support_mode_instructions(
+            self._base_system_instructions = _build_support_mode_instructions(
                 module_title, module_content)
 
-        config = LLMConfig(
+        self._config = LLMConfig(
             generation_config=LOW_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | with_response_schema(
                 CareerReadinessModelResponse)
         )
-        self._llm = GeminiGenerativeLLM(system_instructions=self._system_instructions, config=config)
         self._llm_caller: LLMCaller[CareerReadinessModelResponse] = LLMCaller[CareerReadinessModelResponse](
             model_response_type=CareerReadinessModelResponse)
 
     @property
+    def _system_instructions(self) -> str:
+        """Build system instructions with user profile context if available."""
+        return append_user_ctx(self._base_system_instructions)
+
+    def _get_llm(self) -> GeminiGenerativeLLM:
+        """Create LLM with current system instructions (including user profile context)."""
+        return GeminiGenerativeLLM(system_instructions=self._system_instructions, config=self._config)
+
+    @property
     def system_instructions(self) -> str:
-        return self._system_instructions
+        return self._base_system_instructions
 
     async def execute(self, user_input: AgentInput, context: ConversationContext) -> CareerReadinessAgentOutput:
         """
@@ -266,7 +275,7 @@ class CareerReadinessAgent:
 
         try:
             model_response, llm_stats_list = await self._llm_caller.call_llm(
-                llm=self._llm,
+                llm=self._get_llm(),
                 llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
                     model_response_instructions=get_json_response_instructions(),
                     context=context,
