@@ -2,6 +2,7 @@ import { Box, TextField, useTheme } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import PasswordInput from "src/theme/PasswordInput/PasswordInput";
+import { outlinedNoBorderSx } from "src/auth/pages/authInputStyles";
 
 const uniqueId = "8ab76120-a0d3-47b1-aac0-42d0169e0a58";
 
@@ -9,18 +10,6 @@ export const DATA_TEST_ID = {
   EMAIL_LOGIN_FORM_CONTAINER: `login-form-${uniqueId}`,
   EMAIL_LOGIN_FORM_EMAIL_INPUT: `login-email-input-${uniqueId}`,
   EMAIL_LOGIN_FORM_PASSWORD_INPUT: `login-password-input-${uniqueId}`,
-};
-
-export const outlinedNoBorderSx = {
-  "& .MuiOutlinedInput-notchedOutline": {
-    border: "none",
-  },
-  "&:hover .MuiOutlinedInput-notchedOutline": {
-    border: "none",
-  },
-  "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
-    border: "none",
-  },
 };
 
 export interface LoginFormProps {

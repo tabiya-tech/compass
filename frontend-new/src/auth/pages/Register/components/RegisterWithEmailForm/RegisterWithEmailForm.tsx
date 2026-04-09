@@ -3,7 +3,7 @@ import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useTranslation } from "react-i18next";
 import React, { useState } from "react";
 import PasswordInput from "src/theme/PasswordInput/PasswordInput";
-import { outlinedNoBorderSx } from "src/auth/pages/Login/components/LoginWithEmailForm/LoginWithEmailForm";
+import { outlinedNoBorderSx } from "src/auth/pages/authInputStyles";
 
 const uniqueId = "6cf1a0fa-8d75-4342-bf6b-1203d5b114d7";
 
