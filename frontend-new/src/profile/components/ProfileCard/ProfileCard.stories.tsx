@@ -1,10 +1,30 @@
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { ProfileCard } from "./ProfileCard";
+import { ExperiencesDrawerContext } from "src/experiences/ExperiencesDrawerProvider";
+import type { ExperiencesDrawerContextType } from "src/experiences/ExperiencesDrawerProvider";
+
+const experiencesDrawerStoryContext: ExperiencesDrawerContextType = {
+  openExperiencesDrawer: async () => {},
+  closeExperiencesDrawer: () => {},
+  isDrawerOpen: false,
+  experiences: [],
+  conversationConductedAt: null,
+  setConversationConductedAt: () => {},
+  fetchExperiences: async () => {},
+};
 
 const meta: Meta<typeof ProfileCard> = {
   title: "Profile/Components/ProfileCard",
   component: ProfileCard,
   tags: ["autodocs"],
+  decorators: [
+    (Story) => (
+      <ExperiencesDrawerContext.Provider value={experiencesDrawerStoryContext}>
+        <Story />
+      </ExperiencesDrawerContext.Provider>
+    ),
+  ],
 };
 
 export default meta;
@@ -13,11 +33,11 @@ type Story = StoryObj<typeof ProfileCard>;
 
 export const Default: Story = {
   args: {
-    name: "John Doe",
+    name: "John Banda",
     location: "Lusaka, Zambia",
-    school: "University of Zambia",
-    program: "Computer Science",
-    year: "Third Year",
+    school: "Lusaka TEVET College",
+    program: "General Agriculture",
+    year: "Year 2",
     isLoading: false,
   },
 };

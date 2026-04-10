@@ -100,9 +100,9 @@ describe("Profile Component", () => {
         email: "john.doe@example.com",
         termsAcceptedDate: new Date("2024-01-15"),
         language: "en",
-        location: "Lusaka",
-        school: "University of Zambia",
-        program: "Computer Science",
+        location: "baz",
+        school: "bar",
+        program: "foo",
         year: "2024",
         skills: [],
         modules: [makeModule("skills_discovery", "COMPLETED"), makeModule("career_discovery", "IN_PROGRESS")],
@@ -119,9 +119,9 @@ describe("Profile Component", () => {
       expect(ProfileCard).toHaveBeenCalledWith(
         {
           name: "John Doe",
-          location: "Lusaka",
-          school: "University of Zambia",
-          program: "Computer Science",
+          location: "baz",
+          school: "bar",
+          program: "foo",
           year: "2024",
           isLoading: false,
         },
@@ -141,6 +141,8 @@ describe("Profile Component", () => {
         {
           skills: [],
           educationSkills: [],
+          program: "foo",
+          school: "bar",
           isLoading: false,
         },
         expect.anything()

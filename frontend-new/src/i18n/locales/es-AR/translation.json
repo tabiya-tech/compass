@@ -892,6 +892,7 @@
     "quizPassedAgentMessage": "Obtuviste {{score}}/{{total}}. ¡Felicitaciones, aprobaste! Ahora podés seguir haciéndome preguntas de seguimiento sobre este tema.",
     "chatLockedUntilQuizPassed": "Podés seguir chateando después de aprobar el quiz.",
     "modulesTitle": "Módulos",
+    "modulesCompletedOfTotal": "{{completed}} de {{total}} módulos",
     "upNext": "Lo siguiente",
     "takes30Min": "Lleva ~30 min",
     "continue": "Continuar",
@@ -965,6 +966,10 @@
       "year": "Año",
       "notProvided": "No proporcionado",
       "notAvailable": "No disponible",
+      "viewMyCv": "Ver mi CV",
+      "share": "Compartir",
+      "shareProfileUnavailable": "Compartir no está disponible en este dispositivo.",
+      "linkCopied": "Enlace del perfil copiado al portapapeles",
       "skillsInterestsProgressTitle": "Progreso en Habilidades e Intereses",
       "skillsInterestsProgressDescription": "Hasta dónde has avanzado en tu conversación de descubrimiento de habilidades",
       "moduleCompleted": "completado",
@@ -975,7 +980,34 @@
       "noEducationSkillsYet": "Aún no se descubrieron habilidades educativas.",
       "careerExplorer": "Rutas laborales",
       "noSectorsYet": "Aún no se han explorado sectores.",
-      "sectorsExplored": "Has explorado {{count}} sector(es)"
+      "sectorsExplored": "Has explorado {{count}} sector(es)",
+      "profileStrength": "Fortaleza del perfil",
+      "careerPathways": "Trayectorias profesionales",
+      "browseAllPathways": "Ver todo →",
+      "skillsShowLess": "Mostrar menos",
+      "skillsShowAll": "Mostrar las {{count}} →",
+      "pathways": {
+        "mining": {
+          "title": "Minería",
+          "description": "Extracción subterránea, seguridad y operación de equipos"
+        },
+        "energy": {
+          "title": "Energía",
+          "description": "Generación eléctrica, solar y mantenimiento de redes"
+        },
+        "agriculture": {
+          "title": "Agricultura",
+          "description": "Agricultura, procesamiento de alimentos y agronegocios"
+        },
+        "hospitality": {
+          "title": "Hostelería",
+          "description": "Turismo, hoteles, catering y atención al cliente"
+        },
+        "water": {
+          "title": "Agua",
+          "description": "Gestión del agua, saneamiento e infraestructura"
+        }
+      }
     },
     "modules": {
       "skillsDiscovery": "Construí tu perfil",

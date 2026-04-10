@@ -1,16 +1,12 @@
 import React from "react";
 import { Box, Card, CardContent, Typography, LinearProgress, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import CheckCircleOutlined from "@mui/icons-material/CheckCircleOutlined";
-import { TranslationKey } from "src/react-i18next";
 
 const uniqueId = "module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b";
 
 export const DATA_TEST_ID = {
   MODULE_PROGRESS_CARD: `module-progress-card-${uniqueId}`,
   MODULE_PROGRESS_TITLE: `module-progress-title-${uniqueId}`,
-  MODULE_ITEM: (index: number) => `module-item-${index}-${uniqueId}`,
-  MODULE_NAME: (index: number) => `module-name-${index}-${uniqueId}`,
   MODULE_PROGRESS: (index: number) => `module-progress-${index}-${uniqueId}`,
 };
 
@@ -32,67 +28,113 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({ modules 
   const progress = module?.progress ?? 0;
 
   return (
-    <Card
-      sx={{ border: `1px solid ${theme.palette.divider}`, boxShadow: "none" }}
-      data-testid={DATA_TEST_ID.MODULE_PROGRESS_CARD}
-    >
-      <CardContent
+    <Box sx={{ display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}>
+      <Typography
+        variant="h4"
+        data-testid={DATA_TEST_ID.MODULE_PROGRESS_TITLE}
         sx={{
-          padding: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-          "&:last-child": { paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.lg) },
-          display: "flex",
-          flexDirection: "column",
-          gap: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+          color: theme.palette.text.primary,
+          fontWeight: 700,
         }}
       >
-        {/* Header row: title+description left, percentage right */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        {t("home.profile.profileStrength")}
+      </Typography>
+
+      <Card
+        sx={{ border: `1px solid ${theme.palette.divider}`, boxShadow: "none" }}
+        data-testid={DATA_TEST_ID.MODULE_PROGRESS_CARD}
+      >
+        <CardContent
+          sx={{
+            padding: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+            "&:last-child": { paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.lg) },
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
+          {/* Main Giant Progress */}
           <Box>
-            <Typography
-              variant="subtitle1"
-              fontWeight="bold"
-              color="text.primary"
-              data-testid={DATA_TEST_ID.MODULE_PROGRESS_TITLE}
-            >
-              {t("home.profile.skillsInterestsProgressTitle")}
+            <Typography variant="h5" fontWeight="bold" color="primary.main">
+              {progress}%
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t("home.profile.skillsInterestsProgressDescription")}
-            </Typography>
+            <LinearProgress
+              variant="determinate"
+              value={progress}
+              aria-label="Profile strength progress"
+              data-testid={DATA_TEST_ID.MODULE_PROGRESS(0)}
+              sx={{
+                height: 12,
+                mt: 1,
+                borderRadius: 999,
+                backgroundColor: theme.palette.divider,
+                "& .MuiLinearProgress-bar": { backgroundColor: theme.palette.primary.main },
+              }}
+            />
           </Box>
-          <Typography variant="body2" fontWeight="bold" color="primary.main" sx={{ flexShrink: 0, ml: 1 }}>
-            {progress}%
-          </Typography>
-        </Box>
 
-        {/* Progress bar */}
-        {module && (
-          <LinearProgress
-            variant="determinate"
-            aria-label={t(module.labelKey as TranslationKey)}
-            value={progress}
-            data-testid={DATA_TEST_ID.MODULE_PROGRESS(0)}
-            sx={{
-              height: 8,
-              borderRadius: theme.rounding(theme.tabiyaRounding.sm),
-              backgroundColor: theme.palette.grey[200],
-            }}
-          />
-        )}
-
-        {/* Stats */}
-        <Box sx={{ display: "flex", gap: theme.fixedSpacing(theme.tabiyaSpacing.lg), flexWrap: "wrap" }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <CheckCircleOutlined sx={{ fontSize: 18, color: theme.palette.secondary.main }} />
-            <Typography variant="body2" color="text.secondary">
-              <Typography component="span" variant="body2" fontWeight="bold" color="text.primary">
+          {/* Breakdowns */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
+                {t("home.profile.educationSkills" as any, { defaultValue: "Education Skills" })}
+              </Typography>
+              <LinearProgress
+                variant="determinate"
+                value={progress}
+                aria-label="Education skills progress"
+                sx={{
+                  flex: 1,
+                  height: 6,
+                  borderRadius: 999,
+                  backgroundColor: theme.palette.divider,
+                  "& .MuiLinearProgress-bar": {
+                    backgroundColor: theme.palette.primary.main,
+                    opacity: 0.6,
+                  },
+                }}
+              />
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                fontWeight="bold"
+                sx={{ width: 40, textAlign: "right" }}
+              >
                 {progress}%
-              </Typography>{" "}
-              {t("home.profile.moduleCompleted")}
-            </Typography>
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
+                {t("home.profile.workSkills" as any, { defaultValue: "Work & Other Skills" })}
+              </Typography>
+              <LinearProgress
+                variant="determinate"
+                value={progress}
+                aria-label="Work skills progress"
+                sx={{
+                  flex: 1,
+                  height: 6,
+                  borderRadius: 999,
+                  backgroundColor: theme.palette.divider,
+                  "& .MuiLinearProgress-bar": {
+                    backgroundColor: theme.palette.primary.main,
+                    opacity: 0.6,
+                  },
+                }}
+              />
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                fontWeight="bold"
+                sx={{ width: 40, textAlign: "right" }}
+              >
+                {progress}%
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };

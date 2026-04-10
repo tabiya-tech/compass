@@ -831,6 +831,7 @@
     "quizPassedAgentMessage": "You scored {{score}}/{{total}}. Congratulations, you passed! You can now continue to ask me any follow-up questions about this topic.",
     "chatLockedUntilQuizPassed": "You can continue chatting after you pass the quiz.",
     "modulesTitle": "Modules",
+    "modulesCompletedOfTotal": "{{completed}} of {{total}} modules",
     "upNext": "Up next",
     "takes30Min": "Takes ~30 min",
     "continue": "Continue",
@@ -908,13 +909,44 @@
       "year": "Year",
       "notProvided": "Not provided",
       "notAvailable": "Not available",
+      "viewMyCv": "View my CV",
+      "share": "Share",
+      "shareProfileUnavailable": "Sharing is not available on this device.",
+      "linkCopied": "Profile link copied to clipboard",
       "noSkillsYet": "No skills discovered yet. Start a conversation to discover your skills!",
       "workSkills": "Work & Other Skills",
       "educationSkills": "Education Skills",
       "noEducationSkillsYet": "No education skills discovered yet.",
       "careerExplorer": "Career Paths",
       "noSectorsYet": "No sectors explored yet. Start the Career Explorer to explore sectors!",
-      "sectorsExplored": "You've explored {{count}} sector(s)"
+      "sectorsExplored": "You've explored {{count}} sector(s)",
+      "profileStrength": "Profile Strength",
+      "careerPathways": "Career Pathways",
+      "browseAllPathways": "Browse all →",
+      "skillsShowLess": "Show less",
+      "skillsShowAll": "Show all {{count}} →",
+      "pathways": {
+        "mining": {
+          "title": "Mining",
+          "description": "Underground extraction, safety, equipment operation"
+        },
+        "energy": {
+          "title": "Energy",
+          "description": "Power generation, solar, grid maintenance"
+        },
+        "agriculture": {
+          "title": "Agriculture",
+          "description": "Farming, food processing, agribusiness"
+        },
+        "hospitality": {
+          "title": "Hospitality",
+          "description": "Tourism, hotels, catering, customer service"
+        },
+        "water": {
+          "title": "Water",
+          "description": "Water management, sanitation, infrastructure"
+        }
+      }
     },
     "modules": {
       "skillsDiscovery": "Build your profile",

@@ -837,6 +837,7 @@
     "quizPassedAgentMessage": "Mwapeza {{score}}/{{total}}. Mwayamikirika, mwapasa! Tsopano mungapitirize kundifunsa mafunso ena okhudza mutu uwu.",
     "chatLockedUntilQuizPassed": "Mungapitirize kucheza mukadutsa quiz.",
     "modulesTitle": "Mamodule",
+    "modulesCompletedOfTotal": "{{completed}} pa {{total}} mamodule",
     "upNext": "Otsatira",
     "takes30Min": "Imatenga ~30 mphindi",
     "continue": "Pitilizani",
@@ -910,6 +911,10 @@
       "year": "Chaka",
       "notProvided": "Sichinaperekedwe",
       "notAvailable": "Sichipezeka",
+      "viewMyCv": "Onani CV yanga",
+      "share": "Gawani",
+      "shareProfileUnavailable": "Kugawana sikupeneka pa chipangizo ichi.",
+      "linkCopied": "Linki la mbiri yanu likopedwa",
       "skillsInterestsProgressTitle": "Kupita kwa Luso ndi Zokonda",
       "skillsInterestsProgressDescription": "Motali mwafika m'kukambirana kwanu kwa kupeza luso",
       "moduleCompleted": "yathera",
@@ -920,7 +925,34 @@
       "noEducationSkillsYet": "Palibe luso la maphunziro lopezeka mpaka pano.",
       "careerExplorer": "Njira za ntchito",
       "noSectorsYet": "Palibe gawo lopezeka mpaka pano.",
-      "sectorsExplored": "Mwafufuza magawo {{count}}"
+      "sectorsExplored": "Mwafufuza magawo {{count}}",
+      "profileStrength": "Kulimba kwa mbiri",
+      "careerPathways": "Njira za ntchito",
+      "browseAllPathways": "Onani zonse →",
+      "skillsShowLess": "Siyanitsani",
+      "skillsShowAll": "Onani zonse {{count}} →",
+      "pathways": {
+        "mining": {
+          "title": "Migodi",
+          "description": "Kuchotsa pansika, chitetezo, kuwonjezera magalimoto"
+        },
+        "energy": {
+          "title": "Mphamvu",
+          "description": "Kupanga magetsi, solar, kusamalira magalimoto a magetsi"
+        },
+        "agriculture": {
+          "title": "Ulimi",
+          "description": "Ulimi, kukonza zakudya, bizinesi za ulimi"
+        },
+        "hospitality": {
+          "title": "Alendo ndi ulendo",
+          "description": "Alendo, ma hotelo, chakudya, ntchito ya makasitomala"
+        },
+        "water": {
+          "title": "Madzi ndi ukhondo",
+          "description": "Kusamalira madzi, ukhondo, zipangizo"
+        }
+      }
     },
     "modules": {
       "skillsDiscovery": "Pangani mbiri yanu",

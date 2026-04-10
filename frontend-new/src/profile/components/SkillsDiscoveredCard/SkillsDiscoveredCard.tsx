@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Card, CardContent, Typography, Skeleton, Chip, useTheme } from "@mui/material";
+import { Box, Typography, Skeleton, Chip, useTheme, Divider } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Skill } from "src/experiences/experienceService/experiences.types";
 
@@ -15,136 +15,168 @@ export const DATA_TEST_ID = {
 export interface SkillsDiscoveredCardProps {
   skills: Skill[];
   educationSkills: Skill[];
+  school?: string | null;
+  program?: string | null;
   isLoading: boolean;
 }
 
-const SkillChips: React.FC<{ skills: Skill[]; startIndex?: number }> = ({ skills, startIndex = 0 }) => {
-  const theme = useTheme();
-  return (
-    <Box sx={{ display: "flex", flexWrap: "wrap", gap: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}>
-      {skills.map((skill, index) => (
-        <Chip
-          key={skill.UUID}
-          label={skill.preferredLabel}
-          size="small"
-          data-testid={DATA_TEST_ID.SKILL_ITEM(startIndex + index)}
-          sx={{ borderRadius: theme.rounding(theme.tabiyaRounding.sm) }}
-        />
-      ))}
-    </Box>
-  );
-};
+const VISIBLE_LIMIT = 5;
 
 const SkillSection: React.FC<{
   title: string;
+  subtitle?: string | null;
   skills: Skill[];
   emptyText: string;
   isLoading: boolean;
   startIndex?: number;
   titleTestId?: string;
   emptyTestId?: string;
-}> = ({ title, skills, emptyText, isLoading, startIndex = 0, titleTestId, emptyTestId }) => {
+  chipBgColor: string;
+  chipTextColor: string;
+}> = ({
+  title,
+  subtitle,
+  skills,
+  emptyText,
+  isLoading,
+  startIndex = 0,
+  titleTestId,
+  emptyTestId,
+  chipBgColor,
+  chipTextColor,
+}) => {
   const theme = useTheme();
+  const { t } = useTranslation();
+  const [isExpanded, setIsExpanded] = React.useState(false);
+
+  const visibleSkills = isExpanded ? skills : skills.slice(0, VISIBLE_LIMIT);
+
   return (
-    <Box>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "baseline",
-          justifyContent: "space-between",
-          marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-        }}
-      >
-        <Typography variant="subtitle2" fontWeight="bold" color="text.secondary" data-testid={titleTestId}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}>
+      <Box>
+        <Typography variant="subtitle1" fontWeight="bold" color="text.secondary" data-testid={titleTestId}>
           {title}
         </Typography>
-        {!isLoading && skills.length > 0 && (
-          <Typography variant="body2" color="text.secondary">
-            {skills.length}
+        {subtitle && (
+          <Typography variant="body2" color="text.disabled" sx={{ mb: 0.5 }}>
+            {subtitle}
           </Typography>
         )}
       </Box>
+
       {isLoading ? (
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}>
           {[100, 80, 120, 90, 110].map((w, i) => (
-            <Skeleton
-              key={i}
-              variant="rectangular"
-              width={w}
-              height={28}
-              sx={{ borderRadius: theme.rounding(theme.tabiyaRounding.sm) }}
-            />
+            <Skeleton key={i} variant="rectangular" width={w} height={28} sx={{ borderRadius: 999 }} />
           ))}
         </Box>
       ) : skills.length === 0 ? (
-        <Typography variant="body2" color="text.disabled" data-testid={emptyTestId}>
+        <Typography variant="body2" color="text.secondary" data-testid={emptyTestId} sx={{ mt: 1 }}>
           {emptyText}
         </Typography>
       ) : (
-        <SkillChips skills={skills} startIndex={startIndex} />
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}>
+          {visibleSkills.map((skill, index) => (
+            <Chip
+              key={skill.UUID}
+              label={skill.preferredLabel}
+              size="small"
+              data-testid={DATA_TEST_ID.SKILL_ITEM(startIndex + index)}
+              sx={{
+                borderRadius: theme.rounding(theme.tabiyaRounding.lg),
+                backgroundColor: chipBgColor,
+                color: chipTextColor,
+                fontWeight: 400,
+                border: "none",
+                "& .MuiChip-label": {
+                  padding: `${theme.fixedSpacing(theme.tabiyaSpacing.xs * 1.25)} ${theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.5)}`,
+                  lineHeight: 1.4,
+                },
+              }}
+            />
+          ))}
+        </Box>
+      )}
+      {!isLoading && skills.length > VISIBLE_LIMIT && (
+        <Typography
+          variant="body2"
+          color="primary.main"
+          onClick={() => setIsExpanded(!isExpanded)}
+          sx={{
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            alignSelf: "flex-start",
+            mt: 0.5,
+          }}
+        >
+          {isExpanded ? t("home.profile.skillsShowLess") : t("home.profile.skillsShowAll", { count: skills.length })}
+        </Typography>
       )}
     </Box>
   );
 };
 
-export const SkillsDiscoveredCard: React.FC<SkillsDiscoveredCardProps> = ({ skills, educationSkills, isLoading }) => {
+export const SkillsDiscoveredCard: React.FC<SkillsDiscoveredCardProps> = ({
+  skills,
+  educationSkills,
+  school,
+  program,
+  isLoading,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const totalSkills = skills.length + educationSkills.length;
+
+  const educationSubtitle = [program, school].filter(Boolean).join(" \u00B7 ");
 
   return (
-    <Card
-      sx={{ border: `1px solid ${theme.palette.divider}`, boxShadow: "none" }}
-      data-testid={DATA_TEST_ID.SKILLS_CARD}
-    >
-      <CardContent
+    <Box sx={{ display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}>
+      <Typography
+        variant="h4"
+        data-testid={DATA_TEST_ID.SKILLS_TITLE}
         sx={{
-          padding: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-          "&:last-child": { paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.lg) },
+          color: theme.palette.text.primary,
+          fontWeight: 700,
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "baseline",
-            justifyContent: "space-between",
-            marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.md),
-          }}
-        >
-          <Typography
-            variant="subtitle1"
-            fontWeight="bold"
-            color="text.primary"
-            data-testid={DATA_TEST_ID.SKILLS_TITLE}
-          >
-            {t("home.profile.skillsDiscovered")}
-          </Typography>
-          {!isLoading && totalSkills > 0 && (
-            <Typography variant="body2" color="text.secondary">
-              {totalSkills}
-            </Typography>
-          )}
-        </Box>
+        {t("home.profile.skillsDiscovered")}
+      </Typography>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.md) }}>
-          <SkillSection
-            title={t("home.profile.workSkills")}
-            skills={skills}
-            emptyText={t("home.profile.noSkillsYet")}
-            isLoading={isLoading}
-            startIndex={0}
-            titleTestId={DATA_TEST_ID.SKILLS_TITLE}
-            emptyTestId={DATA_TEST_ID.SKILLS_EMPTY}
-          />
-          <SkillSection
-            title={t("home.profile.educationSkills")}
-            skills={educationSkills}
-            emptyText={t("home.profile.noEducationSkillsYet")}
-            isLoading={isLoading}
-            startIndex={skills.length}
-          />
-        </Box>
-      </CardContent>
-    </Card>
+      <Box
+        sx={{
+          borderRadius: theme.rounding(theme.tabiyaRounding.md),
+          border: `1px solid ${theme.palette.divider}`,
+          backgroundColor: theme.palette.background.paper,
+          padding: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+          display: "flex",
+          flexDirection: "column",
+        }}
+        data-testid={DATA_TEST_ID.SKILLS_CARD}
+      >
+        <SkillSection
+          title={t("home.profile.educationSkills")}
+          subtitle={educationSubtitle}
+          skills={educationSkills}
+          emptyText={t("home.profile.noEducationSkillsYet")}
+          isLoading={isLoading}
+          startIndex={0}
+          chipBgColor={theme.palette.common.cream}
+          chipTextColor={theme.palette.common.black}
+        />
+
+        <Divider sx={{ my: theme.fixedSpacing(theme.tabiyaSpacing.md) }} />
+
+        <SkillSection
+          title={t("home.profile.workSkills")}
+          skills={skills}
+          emptyText={t("home.profile.noSkillsYet")}
+          isLoading={isLoading}
+          startIndex={educationSkills.length}
+          chipBgColor={theme.palette.brandAccent.light}
+          chipTextColor={theme.palette.primary.main}
+          emptyTestId={DATA_TEST_ID.SKILLS_EMPTY}
+        />
+      </Box>
+    </Box>
   );
 };

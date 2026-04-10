@@ -22,7 +22,11 @@ const ProfileContainer: React.FC = () => {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        flex: 1,
+        width: "100%",
+        height: "100%",
+        minHeight: 0,
+        overflowY: "auto",
         backgroundColor: (theme) => theme.palette.background.default,
       }}
       data-testid={DATA_TEST_ID.PROFILE_CONTAINER}

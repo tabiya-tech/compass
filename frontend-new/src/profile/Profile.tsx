@@ -1,6 +1,5 @@
 import React from "react";
-import { Box, useTheme, useMediaQuery, Stack } from "@mui/material";
-import { Theme } from "@mui/material/styles";
+import { Box, useTheme, Stack } from "@mui/material";
 import { Skill } from "src/experiences/experienceService/experiences.types";
 import { SecurityCard } from "./components/SecurityCard/SecurityCard";
 import { PreferencesCard } from "./components/PreferencesCard/PreferencesCard";
@@ -60,14 +59,13 @@ export const Profile: React.FC<ProfileProps> = ({
   isLoadingCareerExplorer,
 }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
   return (
     <Box
       sx={{
-        paddingX: theme.fixedSpacing(isMobile ? theme.tabiyaSpacing.md : theme.tabiyaSpacing.lg),
-        paddingY: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-        maxWidth: 900,
+        padding: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+        maxWidth: "var(--layout-content-max-width, 80rem)",
+        width: "100%",
         margin: "0 auto",
       }}
       data-testid={DATA_TEST_ID.PROFILE_CONTENT}
@@ -83,38 +81,49 @@ export const Profile: React.FC<ProfileProps> = ({
           isLoading={isLoadingProfile}
         />
 
-        {/* Progress — two columns on md+ */}
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-            gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
+            gridTemplateColumns: { xs: "1fr", md: "420px 1fr" },
+            gap: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+            alignItems: "start",
           }}
         >
-          <ModuleProgressCard
-            modules={[
-              { id: "skills_discovery", labelKey: "home.modules.skillsDiscovery", progress: skillsInterestsProgress },
-            ]}
-          />
-          <CareerReadinessProgressBanner modules={modules} />
-        </Box>
+          <Stack spacing={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
+            <ModuleProgressCard
+              modules={[
+                { id: "skills_discovery", labelKey: "home.modules.skillsDiscovery", progress: skillsInterestsProgress },
+              ]}
+            />
+            <CareerReadinessProgressBanner modules={modules} />
+          </Stack>
 
-        {/* Career Explorer sectors */}
-        <CareerExplorerCard sectors={careerExplorerSectors} isLoading={isLoadingCareerExplorer} />
+          <Stack spacing={theme.fixedSpacing(theme.tabiyaSpacing.md)} sx={{ minWidth: 0 }}>
+            <SkillsDiscoveredCard
+              skills={skills}
+              educationSkills={educationSkills}
+              isLoading={isLoadingSkills}
+              school={school}
+              program={program}
+            />
+            <CareerExplorerCard sectors={careerExplorerSectors} isLoading={isLoadingCareerExplorer} />
 
-        {/* Skills discovered */}
-        <SkillsDiscoveredCard skills={skills} educationSkills={educationSkills} isLoading={isLoadingSkills} />
-
-        {/* Account info */}
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-            gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
-          }}
-        >
-          <SecurityCard email={email} isLoading={isLoadingSecurity} />
-          <PreferencesCard language={language} acceptedTcDate={termsAcceptedDate} isLoading={isLoadingPreferences} />
+            {/* Account info */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
+              }}
+            >
+              <SecurityCard email={email} isLoading={isLoadingSecurity} />
+              <PreferencesCard
+                language={language}
+                acceptedTcDate={termsAcceptedDate}
+                isLoading={isLoadingPreferences}
+              />
+            </Box>
+          </Stack>
         </Box>
       </Stack>
     </Box>

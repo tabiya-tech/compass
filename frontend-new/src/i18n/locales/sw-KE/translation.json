@@ -837,6 +837,7 @@
     "quizPassedAgentMessage": "Ulipata {{score}}/{{total}}. Hongera, umefaulu! Sasa unaweza kuendelea kuniuliza maswali ya kufuatilia kuhusu mada hii.",
     "chatLockedUntilQuizPassed": "Unaweza kuendelea kuchati baada ya kupita quiz.",
     "modulesTitle": "Moduli",
+    "modulesCompletedOfTotal": "{{completed}} kati ya {{total}} moduli",
     "upNext": "Inayofuata",
     "takes30Min": "Inachukua ~dakika 30",
     "continue": "Endelea",
@@ -910,6 +911,10 @@
       "year": "Mwaka",
       "notProvided": "Haijatolewa",
       "notAvailable": "Haipatikani",
+      "viewMyCv": "Tazama CV yangu",
+      "share": "Shiriki",
+      "shareProfileUnavailable": "Kushiriki hakupatikani kwenye kifaa hiki.",
+      "linkCopied": "Kiungo cha wasifu kimenakiliwa kwenye ubao wa kunakili",
       "skillsInterestsProgressTitle": "Maendeleo ya Ujuzi na Maslahi",
       "skillsInterestsProgressDescription": "Umbali uliofika katika mazungumzo yako ya kugundua ujuzi",
       "moduleCompleted": "imekamilika",
@@ -920,7 +925,34 @@
       "noEducationSkillsYet": "Hakuna ujuzi wa elimu uliogundulika bado.",
       "careerExplorer": "Njia za kazi",
       "noSectorsYet": "Hakuna sekta zilizochunguzwa bado.",
-      "sectorsExplored": "Umechunguza sekta {{count}}"
+      "sectorsExplored": "Umechunguza sekta {{count}}",
+      "profileStrength": "Nguvu ya wasifu",
+      "careerPathways": "Njia za kazi",
+      "browseAllPathways": "Tazama zote →",
+      "skillsShowLess": "Onyesha kidogo",
+      "skillsShowAll": "Onyesha zote {{count}} →",
+      "pathways": {
+        "mining": {
+          "title": "Uchimbaji madini",
+          "description": "Uchimbaji chini ya ardhi, usalama, uendeshaji wa vifaa"
+        },
+        "energy": {
+          "title": "Nishati",
+          "description": "Uzalishaji wa umeme, sola, matengenezo ya mitandao"
+        },
+        "agriculture": {
+          "title": "Kilimo",
+          "description": "Kilimo, usindikaji wa chakula, biashara za kilimo"
+        },
+        "hospitality": {
+          "title": "Utalii na hoteli",
+          "description": "Utalii, hoteli, huduma za chakula, huduma kwa wateja"
+        },
+        "water": {
+          "title": "Maji na usafi",
+          "description": "Usimamizi wa maji, usafi wa mazingira, miundombinu"
+        }
+      }
     },
     "modules": {
       "skillsDiscovery": "Jenga wasifu wako",

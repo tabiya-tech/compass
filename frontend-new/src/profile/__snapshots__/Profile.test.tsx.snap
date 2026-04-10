@@ -2,7 +2,7 @@
 
 exports[`Profile Component Rendering should render all profile sections with correct props 1`] = `
 <div
-  class="MuiBox-root css-1ijsi7y"
+  class="MuiBox-root css-1kxw3q2"
   data-testid="profile-content-a7f8e4b2-9c3d-4a1e-8f6b-2d3e4a5b6c7d"
 >
   <div
@@ -14,11 +14,11 @@ exports[`Profile Component Rendering should render all profile sections with cor
       ProfileCard: 
       John Doe
       , 
-      Lusaka
+      baz
       , 
-      University of Zambia
+      bar
       , 
-      Computer Science
+      foo
       , 
       2024
       ,
@@ -26,148 +26,397 @@ exports[`Profile Component Rendering should render all profile sections with cor
       loaded
     </div>
     <div
-      class="MuiBox-root css-538mhv"
+      class="MuiBox-root css-naj115"
     >
       <div
-        class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-b3t7h9-MuiPaper-root-MuiCard-root"
-        data-testid="module-progress-card-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
-        style="--Paper-shadow: var(--mui-shadows-1);"
+        class="MuiStack-root css-1sazv7p-MuiStack-root"
       >
         <div
-          class="MuiCardContent-root css-vcgegl-MuiCardContent-root"
+          class="MuiBox-root css-1821gv5"
         >
+          <h4
+            class="MuiTypography-root MuiTypography-h4 css-m9i02f-MuiTypography-root"
+            data-testid="module-progress-title-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
+          >
+            Profile Strength
+          </h4>
           <div
-            class="MuiBox-root css-69i1ev"
+            class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-b3t7h9-MuiPaper-root-MuiCard-root"
+            data-testid="module-progress-card-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
+            style="--Paper-shadow: var(--mui-shadows-1);"
           >
             <div
-              class="MuiBox-root css-0"
+              class="MuiCardContent-root css-12f09fc-MuiCardContent-root"
             >
-              <h6
-                class="MuiTypography-root MuiTypography-subtitle1 css-9rn6vr-MuiTypography-root"
-                data-testid="module-progress-title-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
+              <div
+                class="MuiBox-root css-0"
               >
-                Skills & Interests Progress
-              </h6>
-              <p
-                class="MuiTypography-root MuiTypography-body2 css-kkb5uy-MuiTypography-root"
-              >
-                How far you have progressed in your skills discovery conversation
-              </p>
-            </div>
-            <p
-              class="MuiTypography-root MuiTypography-body2 css-1adlzdl-MuiTypography-root"
-            >
-              0
-              %
-            </p>
-          </div>
-          <span
-            aria-label="Build your profile"
-            aria-valuemax="100"
-            aria-valuemin="0"
-            aria-valuenow="0"
-            class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-1bdkjyh-MuiLinearProgress-root"
-            data-testid="module-progress-0-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
-            role="progressbar"
-          >
-            <span
-              class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-184k4oh-MuiLinearProgress-bar1"
-              style="transform: translateX(-100%);"
-            />
-          </span>
-          <div
-            class="MuiBox-root css-1kskb09"
-          >
-            <div
-              class="MuiBox-root css-d08t8g"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1ppf0l6-MuiSvgIcon-root"
-                data-testid="CheckCircleOutlinedIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"
-                />
-              </svg>
-              <p
-                class="MuiTypography-root MuiTypography-body2 css-kkb5uy-MuiTypography-root"
-              >
-                <span
-                  class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                <h5
+                  class="MuiTypography-root MuiTypography-h5 css-1wd8mpp-MuiTypography-root"
                 >
                   0
                   %
+                </h5>
+                <span
+                  aria-label="Profile strength progress"
+                  aria-valuemax="100"
+                  aria-valuemin="0"
+                  aria-valuenow="0"
+                  class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-a4wr26-MuiLinearProgress-root"
+                  data-testid="module-progress-0-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
+                  role="progressbar"
+                >
+                  <span
+                    class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-184k4oh-MuiLinearProgress-bar1"
+                    style="transform: translateX(-100%);"
+                  />
                 </span>
-                 
-                completed
-              </p>
+              </div>
+              <div
+                class="MuiBox-root css-yj95vr"
+              >
+                <div
+                  class="MuiBox-root css-cbfadf"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1yzcis9-MuiTypography-root"
+                  >
+                    Education Skills
+                  </p>
+                  <span
+                    aria-label="Education skills progress"
+                    aria-valuemax="100"
+                    aria-valuemin="0"
+                    aria-valuenow="0"
+                    class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-11t7bkz-MuiLinearProgress-root"
+                    role="progressbar"
+                  >
+                    <span
+                      class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-184k4oh-MuiLinearProgress-bar1"
+                      style="transform: translateX(-100%);"
+                    />
+                  </span>
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-gkkh8m-MuiTypography-root"
+                  >
+                    0
+                    %
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-cbfadf"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1yzcis9-MuiTypography-root"
+                  >
+                    Work & Other Skills
+                  </p>
+                  <span
+                    aria-label="Work skills progress"
+                    aria-valuemax="100"
+                    aria-valuemin="0"
+                    aria-valuenow="0"
+                    class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-11t7bkz-MuiLinearProgress-root"
+                    role="progressbar"
+                  >
+                    <span
+                      class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-184k4oh-MuiLinearProgress-bar1"
+                      style="transform: translateX(-100%);"
+                    />
+                  </span>
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-gkkh8m-MuiTypography-root"
+                  >
+                    0
+                    %
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        <div
+          data-testid="career-readiness-progress-banner"
+        >
+          CareerReadinessProgressBanner: 
+          2
+           modules
+        </div>
       </div>
       <div
-        data-testid="career-readiness-progress-banner"
-      >
-        CareerReadinessProgressBanner: 
-        2
-         modules
-      </div>
-    </div>
-    <div
-      class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-b3t7h9-MuiPaper-root-MuiCard-root"
-      data-testid="career-explorer-card-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
-      style="--Paper-shadow: var(--mui-shadows-1);"
-    >
-      <div
-        class="MuiCardContent-root css-y966ta-MuiCardContent-root"
+        class="MuiStack-root css-1vsdrxv-MuiStack-root"
       >
         <div
-          class="MuiBox-root css-yc4e3d"
+          data-testid="skills-discovered-card"
         >
-          <h6
-            class="MuiTypography-root MuiTypography-subtitle1 css-9rn6vr-MuiTypography-root"
-            data-testid="career-explorer-title-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
-          >
-            Career Paths
-          </h6>
+          SkillsDiscoveredCard: 
+          0
+           skills, 
+          loaded
         </div>
-        <p
-          class="MuiTypography-root MuiTypography-body2 css-gjgqys-MuiTypography-root"
-          data-testid="career-explorer-empty-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+        <div
+          class="MuiBox-root css-1821gv5"
         >
-          No sectors explored yet. Start the Career Explorer to explore sectors!
-        </p>
-      </div>
-    </div>
-    <div
-      data-testid="skills-discovered-card"
-    >
-      SkillsDiscoveredCard: 
-      0
-       skills, 
-      loaded
-    </div>
-    <div
-      class="MuiBox-root css-c7fp9u"
-    >
-      <div
-        data-testid="security-card"
-      >
-        SecurityCard: 
-        john.doe@example.com
-        , 
-        loaded
-      </div>
-      <div
-        data-testid="preferences-card"
-      >
-        PreferencesCard: 
-        en
-        , 
-        loaded
+          <div
+            class="MuiBox-root css-h9yv4t"
+          >
+            <h4
+              class="MuiTypography-root MuiTypography-h4 css-m9i02f-MuiTypography-root"
+              data-testid="career-explorer-title-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+            >
+              Career Pathways
+            </h4>
+            <p
+              class="MuiTypography-root MuiTypography-body2 css-4efmwx-MuiTypography-root"
+            >
+              Browse all →
+            </p>
+          </div>
+          <div
+            class="MuiBox-root css-rzonq7"
+            data-testid="career-explorer-card-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+          >
+            <div
+              class="MuiBox-root css-j7qwjs"
+            >
+              <div
+                class="MuiBox-root css-1s6iw6g"
+                data-testid="career-explorer-sector-0-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-pn0rw6"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    ⛏️
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Mining
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Underground extraction, safety, equipment operation
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                class="MuiBox-root css-1s6iw6g"
+                data-testid="career-explorer-sector-1-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-1xg2n7c"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    ⚡️
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Energy
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Power generation, solar, grid maintenance
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                class="MuiBox-root css-1s6iw6g"
+                data-testid="career-explorer-sector-2-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-19xvcpf"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    🌾
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Agriculture
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Farming, food processing, agribusiness
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                class="MuiBox-root css-1s6iw6g"
+                data-testid="career-explorer-sector-3-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-ylbmmm"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    🏨
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Hospitality
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Tourism, hotels, catering, customer service
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                class="MuiBox-root css-tvy6wc"
+                data-testid="career-explorer-sector-4-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-cjz941"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    💧
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Water
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Water management, sanitation, infrastructure
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="MuiBox-root css-c7fp9u"
+        >
+          <div
+            data-testid="security-card"
+          >
+            SecurityCard: 
+            john.doe@example.com
+            , 
+            loaded
+          </div>
+          <div
+            data-testid="preferences-card"
+          >
+            PreferencesCard: 
+            en
+            , 
+            loaded
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -176,7 +425,7 @@ exports[`Profile Component Rendering should render all profile sections with cor
 
 exports[`Profile Component Rendering should render correctly with partial data 1`] = `
 <div
-  class="MuiBox-root css-1ijsi7y"
+  class="MuiBox-root css-1kxw3q2"
   data-testid="profile-content-a7f8e4b2-9c3d-4a1e-8f6b-2d3e4a5b6c7d"
 >
   <div
@@ -200,148 +449,397 @@ exports[`Profile Component Rendering should render correctly with partial data 1
       loaded
     </div>
     <div
-      class="MuiBox-root css-538mhv"
+      class="MuiBox-root css-naj115"
     >
       <div
-        class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-b3t7h9-MuiPaper-root-MuiCard-root"
-        data-testid="module-progress-card-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
-        style="--Paper-shadow: var(--mui-shadows-1);"
+        class="MuiStack-root css-1sazv7p-MuiStack-root"
       >
         <div
-          class="MuiCardContent-root css-vcgegl-MuiCardContent-root"
+          class="MuiBox-root css-1821gv5"
         >
+          <h4
+            class="MuiTypography-root MuiTypography-h4 css-m9i02f-MuiTypography-root"
+            data-testid="module-progress-title-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
+          >
+            Profile Strength
+          </h4>
           <div
-            class="MuiBox-root css-69i1ev"
+            class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-b3t7h9-MuiPaper-root-MuiCard-root"
+            data-testid="module-progress-card-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
+            style="--Paper-shadow: var(--mui-shadows-1);"
           >
             <div
-              class="MuiBox-root css-0"
+              class="MuiCardContent-root css-12f09fc-MuiCardContent-root"
             >
-              <h6
-                class="MuiTypography-root MuiTypography-subtitle1 css-9rn6vr-MuiTypography-root"
-                data-testid="module-progress-title-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
+              <div
+                class="MuiBox-root css-0"
               >
-                Skills & Interests Progress
-              </h6>
-              <p
-                class="MuiTypography-root MuiTypography-body2 css-kkb5uy-MuiTypography-root"
-              >
-                How far you have progressed in your skills discovery conversation
-              </p>
-            </div>
-            <p
-              class="MuiTypography-root MuiTypography-body2 css-1adlzdl-MuiTypography-root"
-            >
-              0
-              %
-            </p>
-          </div>
-          <span
-            aria-label="Build your profile"
-            aria-valuemax="100"
-            aria-valuemin="0"
-            aria-valuenow="0"
-            class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-1bdkjyh-MuiLinearProgress-root"
-            data-testid="module-progress-0-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
-            role="progressbar"
-          >
-            <span
-              class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-184k4oh-MuiLinearProgress-bar1"
-              style="transform: translateX(-100%);"
-            />
-          </span>
-          <div
-            class="MuiBox-root css-1kskb09"
-          >
-            <div
-              class="MuiBox-root css-d08t8g"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1ppf0l6-MuiSvgIcon-root"
-                data-testid="CheckCircleOutlinedIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"
-                />
-              </svg>
-              <p
-                class="MuiTypography-root MuiTypography-body2 css-kkb5uy-MuiTypography-root"
-              >
-                <span
-                  class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                <h5
+                  class="MuiTypography-root MuiTypography-h5 css-1wd8mpp-MuiTypography-root"
                 >
                   0
                   %
+                </h5>
+                <span
+                  aria-label="Profile strength progress"
+                  aria-valuemax="100"
+                  aria-valuemin="0"
+                  aria-valuenow="0"
+                  class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-a4wr26-MuiLinearProgress-root"
+                  data-testid="module-progress-0-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
+                  role="progressbar"
+                >
+                  <span
+                    class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-184k4oh-MuiLinearProgress-bar1"
+                    style="transform: translateX(-100%);"
+                  />
                 </span>
-                 
-                completed
-              </p>
+              </div>
+              <div
+                class="MuiBox-root css-yj95vr"
+              >
+                <div
+                  class="MuiBox-root css-cbfadf"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1yzcis9-MuiTypography-root"
+                  >
+                    Education Skills
+                  </p>
+                  <span
+                    aria-label="Education skills progress"
+                    aria-valuemax="100"
+                    aria-valuemin="0"
+                    aria-valuenow="0"
+                    class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-11t7bkz-MuiLinearProgress-root"
+                    role="progressbar"
+                  >
+                    <span
+                      class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-184k4oh-MuiLinearProgress-bar1"
+                      style="transform: translateX(-100%);"
+                    />
+                  </span>
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-gkkh8m-MuiTypography-root"
+                  >
+                    0
+                    %
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-cbfadf"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1yzcis9-MuiTypography-root"
+                  >
+                    Work & Other Skills
+                  </p>
+                  <span
+                    aria-label="Work skills progress"
+                    aria-valuemax="100"
+                    aria-valuemin="0"
+                    aria-valuenow="0"
+                    class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-11t7bkz-MuiLinearProgress-root"
+                    role="progressbar"
+                  >
+                    <span
+                      class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-184k4oh-MuiLinearProgress-bar1"
+                      style="transform: translateX(-100%);"
+                    />
+                  </span>
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-gkkh8m-MuiTypography-root"
+                  >
+                    0
+                    %
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        <div
+          data-testid="career-readiness-progress-banner"
+        >
+          CareerReadinessProgressBanner: 
+          0
+           modules
+        </div>
       </div>
       <div
-        data-testid="career-readiness-progress-banner"
-      >
-        CareerReadinessProgressBanner: 
-        0
-         modules
-      </div>
-    </div>
-    <div
-      class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-b3t7h9-MuiPaper-root-MuiCard-root"
-      data-testid="career-explorer-card-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
-      style="--Paper-shadow: var(--mui-shadows-1);"
-    >
-      <div
-        class="MuiCardContent-root css-y966ta-MuiCardContent-root"
+        class="MuiStack-root css-1vsdrxv-MuiStack-root"
       >
         <div
-          class="MuiBox-root css-yc4e3d"
+          data-testid="skills-discovered-card"
         >
-          <h6
-            class="MuiTypography-root MuiTypography-subtitle1 css-9rn6vr-MuiTypography-root"
-            data-testid="career-explorer-title-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
-          >
-            Career Paths
-          </h6>
+          SkillsDiscoveredCard: 
+          0
+           skills, 
+          loaded
         </div>
-        <p
-          class="MuiTypography-root MuiTypography-body2 css-gjgqys-MuiTypography-root"
-          data-testid="career-explorer-empty-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+        <div
+          class="MuiBox-root css-1821gv5"
         >
-          No sectors explored yet. Start the Career Explorer to explore sectors!
-        </p>
-      </div>
-    </div>
-    <div
-      data-testid="skills-discovered-card"
-    >
-      SkillsDiscoveredCard: 
-      0
-       skills, 
-      loaded
-    </div>
-    <div
-      class="MuiBox-root css-c7fp9u"
-    >
-      <div
-        data-testid="security-card"
-      >
-        SecurityCard: 
-        john@example.com
-        , 
-        loaded
-      </div>
-      <div
-        data-testid="preferences-card"
-      >
-        PreferencesCard: 
-        null
-        , 
-        loaded
+          <div
+            class="MuiBox-root css-h9yv4t"
+          >
+            <h4
+              class="MuiTypography-root MuiTypography-h4 css-m9i02f-MuiTypography-root"
+              data-testid="career-explorer-title-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+            >
+              Career Pathways
+            </h4>
+            <p
+              class="MuiTypography-root MuiTypography-body2 css-4efmwx-MuiTypography-root"
+            >
+              Browse all →
+            </p>
+          </div>
+          <div
+            class="MuiBox-root css-rzonq7"
+            data-testid="career-explorer-card-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+          >
+            <div
+              class="MuiBox-root css-j7qwjs"
+            >
+              <div
+                class="MuiBox-root css-1s6iw6g"
+                data-testid="career-explorer-sector-0-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-pn0rw6"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    ⛏️
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Mining
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Underground extraction, safety, equipment operation
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                class="MuiBox-root css-1s6iw6g"
+                data-testid="career-explorer-sector-1-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-1xg2n7c"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    ⚡️
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Energy
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Power generation, solar, grid maintenance
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                class="MuiBox-root css-1s6iw6g"
+                data-testid="career-explorer-sector-2-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-19xvcpf"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    🌾
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Agriculture
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Farming, food processing, agribusiness
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                class="MuiBox-root css-1s6iw6g"
+                data-testid="career-explorer-sector-3-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-ylbmmm"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    🏨
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Hospitality
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Tourism, hotels, catering, customer service
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                class="MuiBox-root css-tvy6wc"
+                data-testid="career-explorer-sector-4-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-cjz941"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    💧
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Water
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Water management, sanitation, infrastructure
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="MuiBox-root css-c7fp9u"
+        >
+          <div
+            data-testid="security-card"
+          >
+            SecurityCard: 
+            john@example.com
+            , 
+            loaded
+          </div>
+          <div
+            data-testid="preferences-card"
+          >
+            PreferencesCard: 
+            null
+            , 
+            loaded
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -350,7 +848,7 @@ exports[`Profile Component Rendering should render correctly with partial data 1
 
 exports[`Profile Component Rendering should render with null data showing 'Not available' 1`] = `
 <div
-  class="MuiBox-root css-1ijsi7y"
+  class="MuiBox-root css-1kxw3q2"
   data-testid="profile-content-a7f8e4b2-9c3d-4a1e-8f6b-2d3e4a5b6c7d"
 >
   <div
@@ -374,148 +872,397 @@ exports[`Profile Component Rendering should render with null data showing 'Not a
       loaded
     </div>
     <div
-      class="MuiBox-root css-538mhv"
+      class="MuiBox-root css-naj115"
     >
       <div
-        class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-b3t7h9-MuiPaper-root-MuiCard-root"
-        data-testid="module-progress-card-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
-        style="--Paper-shadow: var(--mui-shadows-1);"
+        class="MuiStack-root css-1sazv7p-MuiStack-root"
       >
         <div
-          class="MuiCardContent-root css-vcgegl-MuiCardContent-root"
+          class="MuiBox-root css-1821gv5"
         >
+          <h4
+            class="MuiTypography-root MuiTypography-h4 css-m9i02f-MuiTypography-root"
+            data-testid="module-progress-title-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
+          >
+            Profile Strength
+          </h4>
           <div
-            class="MuiBox-root css-69i1ev"
+            class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-b3t7h9-MuiPaper-root-MuiCard-root"
+            data-testid="module-progress-card-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
+            style="--Paper-shadow: var(--mui-shadows-1);"
           >
             <div
-              class="MuiBox-root css-0"
+              class="MuiCardContent-root css-12f09fc-MuiCardContent-root"
             >
-              <h6
-                class="MuiTypography-root MuiTypography-subtitle1 css-9rn6vr-MuiTypography-root"
-                data-testid="module-progress-title-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
+              <div
+                class="MuiBox-root css-0"
               >
-                Skills & Interests Progress
-              </h6>
-              <p
-                class="MuiTypography-root MuiTypography-body2 css-kkb5uy-MuiTypography-root"
-              >
-                How far you have progressed in your skills discovery conversation
-              </p>
-            </div>
-            <p
-              class="MuiTypography-root MuiTypography-body2 css-1adlzdl-MuiTypography-root"
-            >
-              0
-              %
-            </p>
-          </div>
-          <span
-            aria-label="Build your profile"
-            aria-valuemax="100"
-            aria-valuemin="0"
-            aria-valuenow="0"
-            class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-1bdkjyh-MuiLinearProgress-root"
-            data-testid="module-progress-0-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
-            role="progressbar"
-          >
-            <span
-              class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-184k4oh-MuiLinearProgress-bar1"
-              style="transform: translateX(-100%);"
-            />
-          </span>
-          <div
-            class="MuiBox-root css-1kskb09"
-          >
-            <div
-              class="MuiBox-root css-d08t8g"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1ppf0l6-MuiSvgIcon-root"
-                data-testid="CheckCircleOutlinedIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"
-                />
-              </svg>
-              <p
-                class="MuiTypography-root MuiTypography-body2 css-kkb5uy-MuiTypography-root"
-              >
-                <span
-                  class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                <h5
+                  class="MuiTypography-root MuiTypography-h5 css-1wd8mpp-MuiTypography-root"
                 >
                   0
                   %
+                </h5>
+                <span
+                  aria-label="Profile strength progress"
+                  aria-valuemax="100"
+                  aria-valuemin="0"
+                  aria-valuenow="0"
+                  class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-a4wr26-MuiLinearProgress-root"
+                  data-testid="module-progress-0-module-progress-card-b7e3f4a5-8c9d-1e2f-3a4b-5c6d7e8f9a1b"
+                  role="progressbar"
+                >
+                  <span
+                    class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-184k4oh-MuiLinearProgress-bar1"
+                    style="transform: translateX(-100%);"
+                  />
                 </span>
-                 
-                completed
-              </p>
+              </div>
+              <div
+                class="MuiBox-root css-yj95vr"
+              >
+                <div
+                  class="MuiBox-root css-cbfadf"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1yzcis9-MuiTypography-root"
+                  >
+                    Education Skills
+                  </p>
+                  <span
+                    aria-label="Education skills progress"
+                    aria-valuemax="100"
+                    aria-valuemin="0"
+                    aria-valuenow="0"
+                    class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-11t7bkz-MuiLinearProgress-root"
+                    role="progressbar"
+                  >
+                    <span
+                      class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-184k4oh-MuiLinearProgress-bar1"
+                      style="transform: translateX(-100%);"
+                    />
+                  </span>
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-gkkh8m-MuiTypography-root"
+                  >
+                    0
+                    %
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-cbfadf"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1yzcis9-MuiTypography-root"
+                  >
+                    Work & Other Skills
+                  </p>
+                  <span
+                    aria-label="Work skills progress"
+                    aria-valuemax="100"
+                    aria-valuemin="0"
+                    aria-valuenow="0"
+                    class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-11t7bkz-MuiLinearProgress-root"
+                    role="progressbar"
+                  >
+                    <span
+                      class="MuiLinearProgress-bar MuiLinearProgress-bar1 MuiLinearProgress-barColorPrimary MuiLinearProgress-bar1Determinate css-184k4oh-MuiLinearProgress-bar1"
+                      style="transform: translateX(-100%);"
+                    />
+                  </span>
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-gkkh8m-MuiTypography-root"
+                  >
+                    0
+                    %
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        <div
+          data-testid="career-readiness-progress-banner"
+        >
+          CareerReadinessProgressBanner: 
+          0
+           modules
+        </div>
       </div>
       <div
-        data-testid="career-readiness-progress-banner"
-      >
-        CareerReadinessProgressBanner: 
-        0
-         modules
-      </div>
-    </div>
-    <div
-      class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-b3t7h9-MuiPaper-root-MuiCard-root"
-      data-testid="career-explorer-card-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
-      style="--Paper-shadow: var(--mui-shadows-1);"
-    >
-      <div
-        class="MuiCardContent-root css-y966ta-MuiCardContent-root"
+        class="MuiStack-root css-1vsdrxv-MuiStack-root"
       >
         <div
-          class="MuiBox-root css-yc4e3d"
+          data-testid="skills-discovered-card"
         >
-          <h6
-            class="MuiTypography-root MuiTypography-subtitle1 css-9rn6vr-MuiTypography-root"
-            data-testid="career-explorer-title-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
-          >
-            Career Paths
-          </h6>
+          SkillsDiscoveredCard: 
+          0
+           skills, 
+          loaded
         </div>
-        <p
-          class="MuiTypography-root MuiTypography-body2 css-gjgqys-MuiTypography-root"
-          data-testid="career-explorer-empty-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+        <div
+          class="MuiBox-root css-1821gv5"
         >
-          No sectors explored yet. Start the Career Explorer to explore sectors!
-        </p>
-      </div>
-    </div>
-    <div
-      data-testid="skills-discovered-card"
-    >
-      SkillsDiscoveredCard: 
-      0
-       skills, 
-      loaded
-    </div>
-    <div
-      class="MuiBox-root css-c7fp9u"
-    >
-      <div
-        data-testid="security-card"
-      >
-        SecurityCard: 
-        null
-        , 
-        loaded
-      </div>
-      <div
-        data-testid="preferences-card"
-      >
-        PreferencesCard: 
-        null
-        , 
-        loaded
+          <div
+            class="MuiBox-root css-h9yv4t"
+          >
+            <h4
+              class="MuiTypography-root MuiTypography-h4 css-m9i02f-MuiTypography-root"
+              data-testid="career-explorer-title-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+            >
+              Career Pathways
+            </h4>
+            <p
+              class="MuiTypography-root MuiTypography-body2 css-4efmwx-MuiTypography-root"
+            >
+              Browse all →
+            </p>
+          </div>
+          <div
+            class="MuiBox-root css-rzonq7"
+            data-testid="career-explorer-card-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+          >
+            <div
+              class="MuiBox-root css-j7qwjs"
+            >
+              <div
+                class="MuiBox-root css-1s6iw6g"
+                data-testid="career-explorer-sector-0-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-pn0rw6"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    ⛏️
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Mining
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Underground extraction, safety, equipment operation
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                class="MuiBox-root css-1s6iw6g"
+                data-testid="career-explorer-sector-1-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-1xg2n7c"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    ⚡️
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Energy
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Power generation, solar, grid maintenance
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                class="MuiBox-root css-1s6iw6g"
+                data-testid="career-explorer-sector-2-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-19xvcpf"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    🌾
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Agriculture
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Farming, food processing, agribusiness
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                class="MuiBox-root css-1s6iw6g"
+                data-testid="career-explorer-sector-3-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-ylbmmm"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    🏨
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Hospitality
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Tourism, hotels, catering, customer service
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div
+                class="MuiBox-root css-tvy6wc"
+                data-testid="career-explorer-sector-4-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
+              >
+                <div
+                  class="MuiBox-root css-cjz941"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body1 css-ylamzw-MuiTypography-root"
+                  >
+                    💧
+                  </p>
+                </div>
+                <div
+                  class="MuiBox-root css-1fjtzvx"
+                >
+                  <p
+                    class="MuiTypography-root MuiTypography-body2 css-1psesu5-MuiTypography-root"
+                  >
+                    Water
+                  </p>
+                  <span
+                    class="MuiTypography-root MuiTypography-caption css-xh0bww-MuiTypography-root"
+                  >
+                    Water management, sanitation, infrastructure
+                  </span>
+                </div>
+                <div
+                  class="MuiBox-root css-1u8mn1f"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+                    data-testid="ChevronRightIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="MuiBox-root css-c7fp9u"
+        >
+          <div
+            data-testid="security-card"
+          >
+            SecurityCard: 
+            null
+            , 
+            loaded
+          </div>
+          <div
+            data-testid="preferences-card"
+          >
+            PreferencesCard: 
+            null
+            , 
+            loaded
+          </div>
+        </div>
       </div>
     </div>
   </div>
