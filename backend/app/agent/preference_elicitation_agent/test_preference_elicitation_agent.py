@@ -18,7 +18,7 @@ from app.agent.preference_elicitation_agent.types import (
 from app.agent.preference_elicitation_agent.state import PreferenceElicitationAgentState
 from app.agent.preference_elicitation_agent.vignette_engine import VignetteEngine
 from app.agent.preference_elicitation_agent.preference_extractor import PreferenceExtractor
-from app.agent.preference_elicitation_agent.agent import PreferenceElicitationAgent
+from app.agent.preference_elicitation_agent.agent import PreferenceElicitationAgent, ConversationResponse
 from app.agent.experience.experience_entity import ExperienceEntity
 
 
@@ -742,6 +742,235 @@ class TestStateDB6Fields:
         assert state.session_id == 123
         assert state.initial_experiences_snapshot is None
         assert state.use_db6_for_fresh_data is False
+
+
+@pytest.mark.asyncio
+class TestExtractionFailureHandling:
+    """Tests for CORE-278: graceful handling of preference extraction failures.
+
+    Verifies that when extract_preferences() raises (e.g., LLM schema mismatch when
+    a follow-up answer is fed to a prompt that expects an A/B vignette choice), the
+    agent records the vignette with zero confidence and advances rather than calling
+    _create_error_response(finished=False) and trapping the user in an error loop.
+    """
+
+    def _make_vignette(self, vignette_id: str = "financial_001") -> Vignette:
+        return Vignette(
+            vignette_id=vignette_id,
+            category="financial",
+            scenario_text="Job A pays more. Job B is more flexible. Which do you prefer?",
+            options=[
+                VignetteOption(
+                    option_id="A",
+                    title="High-pay role",
+                    description="ZMW 35 000/month",
+                    attributes={"salary": 35000, "location": "office"}
+                ),
+                VignetteOption(
+                    option_id="B",
+                    title="Flexible role",
+                    description="ZMW 20 000/month, remote",
+                    attributes={"salary": 20000, "location": "remote"}
+                ),
+            ]
+        )
+
+    async def test_vignettes_phase_records_zero_confidence_on_extraction_failure(self):
+        """CORE-278: extraction failure in vignettes phase records vignette with zero confidence
+        instead of crashing.
+        """
+        # GIVEN an agent in VIGNETTES phase with a pending vignette
+        agent = PreferenceElicitationAgent(use_personalized_vignettes=False)
+        state = PreferenceElicitationAgentState(session_id=1)
+        state.conversation_phase = "VIGNETTES"
+        state.current_vignette_id = "financial_001"
+        agent.set_state(state)
+
+        vignette = self._make_vignette("financial_001")
+
+        # AND extract_preferences raises a schema-mismatch exception
+        agent._preference_extractor = Mock()
+        agent._preference_extractor.extract_preferences = AsyncMock(
+            side_effect=Exception("Schema validation error: chosen_option_id is required")
+        )
+
+        # AND supporting collaborators are mocked to isolate the unit under test
+        agent._vignette_engine = Mock()
+        agent._vignette_engine.get_vignette_by_id = Mock(return_value=vignette)
+        # Return None so the phase moves on (avoids real LLM calls for next-vignette presentation)
+        agent._vignette_engine.select_next_vignette = AsyncMock(return_value=None)
+
+        agent._build_conversation_history_for_extraction = Mock(return_value="")
+        agent._update_qualitative_metadata = AsyncMock()
+        agent._update_bayesian_posterior = AsyncMock()
+        # Return False so we don't enter the follow-up branch (not what this test covers)
+        agent._should_ask_follow_up = Mock(return_value=False)
+        # Stub out GATE so the method can return cleanly
+        agent._handle_gate_phase = AsyncMock(return_value=(
+            ConversationResponse(
+                reasoning="gate stub",
+                message="What matters most to you in a job?",
+                finished=False
+            ),
+            []
+        ))
+
+        # WHEN the vignettes phase handler processes the user's answer
+        response, _stats = await agent._handle_vignettes_phase("the second one", Mock())
+
+        # THEN the vignette is recorded with zero confidence (not discarded)
+        assert len(agent._state.vignette_responses) == 1
+        recorded = agent._state.vignette_responses[0]
+        assert recorded.vignette_id == "financial_001"
+        assert recorded.chosen_option_id == "unknown"
+        assert recorded.confidence == 0.0
+
+        # AND the vignette is marked as completed so it won't be shown again
+        assert "financial_001" in agent._state.completed_vignettes
+
+        # AND the response is NOT the error-loop message
+        assert "trouble" not in response.message.lower()
+
+    async def test_vignettes_phase_does_not_return_error_response_on_extraction_failure(self):
+        """CORE-278: extraction failure must NOT produce the 'I'm having some trouble' error
+        message that caused the infinite loop.
+        """
+        # GIVEN an agent in VIGNETTES phase with a pending vignette
+        agent = PreferenceElicitationAgent(use_personalized_vignettes=False)
+        state = PreferenceElicitationAgentState(session_id=2)
+        state.conversation_phase = "VIGNETTES"
+        state.current_vignette_id = "financial_001"
+        agent.set_state(state)
+
+        vignette = self._make_vignette("financial_001")
+
+        agent._preference_extractor = Mock()
+        agent._preference_extractor.extract_preferences = AsyncMock(
+            side_effect=ValueError("Pydantic validation error")
+        )
+
+        agent._vignette_engine = Mock()
+        agent._vignette_engine.get_vignette_by_id = Mock(return_value=vignette)
+        agent._vignette_engine.select_next_vignette = AsyncMock(return_value=None)
+
+        agent._build_conversation_history_for_extraction = Mock(return_value="")
+        agent._update_qualitative_metadata = AsyncMock()
+        agent._update_bayesian_posterior = AsyncMock()
+        agent._should_ask_follow_up = Mock(return_value=False)
+        agent._handle_gate_phase = AsyncMock(return_value=(
+            ConversationResponse(reasoning="gate stub", message="Next question?", finished=False),
+            []
+        ))
+
+        # WHEN the phase handler processes the user's answer
+        # THEN it must not raise — it returns normally
+        response, _stats = await agent._handle_vignettes_phase("i like the second", Mock())
+
+        # AND the response is a valid ConversationResponse (not the _create_error_response path)
+        assert isinstance(response, ConversationResponse)
+
+    async def test_follow_up_phase_advances_on_extraction_failure(self):
+        """CORE-278: extraction failure in follow-up phase skips preference refinement
+        and transitions back to VIGNETTES instead of crashing.
+        """
+        # GIVEN an agent in FOLLOW_UP phase after a vignette has been answered
+        agent = PreferenceElicitationAgent(use_personalized_vignettes=False)
+        state = PreferenceElicitationAgentState(session_id=3)
+        state.conversation_phase = "FOLLOW_UP"
+
+        # Simulate a vignette_response already recorded (from the initial A/B choice)
+        prior_response = VignetteResponse(
+            vignette_id="financial_001",
+            chosen_option_id="B",
+            user_reasoning="the second",
+            extracted_preferences={},
+            confidence=0.3
+        )
+        state.vignette_responses.append(prior_response)
+        agent.set_state(state)
+
+        vignette = self._make_vignette("financial_001")
+
+        # AND extract_preferences raises when given the follow-up answer
+        agent._preference_extractor = Mock()
+        agent._preference_extractor.extract_preferences = AsyncMock(
+            side_effect=Exception("LLM returned unexpected schema for follow-up text")
+        )
+
+        agent._vignette_engine = Mock()
+        agent._vignette_engine.get_vignette_by_id = Mock(return_value=vignette)
+
+        # Stub _handle_vignettes_phase so we don't need to mock the full vignette selection chain
+        agent._handle_vignettes_phase = AsyncMock(return_value=(
+            ConversationResponse(
+                reasoning="next vignette stub",
+                message="Here is the next scenario: ...",
+                finished=False
+            ),
+            []
+        ))
+        agent._prewarm_next_vignette = AsyncMock()
+
+        # WHEN the follow-up phase handler processes the follow-up answer
+        response, _stats = await agent._handle_follow_up_phase(
+            "that it is with digital and social media", Mock()
+        )
+
+        # THEN the phase transitions back to VIGNETTES (not stuck in FOLLOW_UP or ENDED)
+        assert agent._state.conversation_phase == "VIGNETTES"
+
+        # AND the original vignette response is preserved (not lost)
+        assert len(agent._state.vignette_responses) == 1
+        assert agent._state.vignette_responses[0].vignette_id == "financial_001"
+
+        # AND the follow-up is marked as asked (so it won't be asked again)
+        assert "financial_001" in agent._state.follow_ups_asked
+
+        # AND the response is NOT the error-loop message
+        assert "trouble" not in response.message.lower()
+
+    async def test_follow_up_phase_does_not_lose_original_vignette_data_on_failure(self):
+        """CORE-278: after a follow-up extraction failure, the original vignette choice
+        (recorded during the vignettes phase) is preserved in state.
+        """
+        # GIVEN an agent in FOLLOW_UP phase
+        agent = PreferenceElicitationAgent(use_personalized_vignettes=False)
+        state = PreferenceElicitationAgentState(session_id=4)
+        state.conversation_phase = "FOLLOW_UP"
+
+        prior_response = VignetteResponse(
+            vignette_id="work_env_001",
+            chosen_option_id="A",
+            user_reasoning="i want to work in tech",
+            extracted_preferences={"work_environment_importance": 0.8},
+            confidence=0.45
+        )
+        state.vignette_responses.append(prior_response)
+        agent.set_state(state)
+
+        vignette = self._make_vignette("work_env_001")
+
+        agent._preference_extractor = Mock()
+        agent._preference_extractor.extract_preferences = AsyncMock(
+            side_effect=Exception("Unexpected schema")
+        )
+        agent._vignette_engine = Mock()
+        agent._vignette_engine.get_vignette_by_id = Mock(return_value=vignette)
+        agent._handle_vignettes_phase = AsyncMock(return_value=(
+            ConversationResponse(reasoning="stub", message="Next vignette", finished=False), []
+        ))
+        agent._prewarm_next_vignette = AsyncMock()
+
+        # WHEN the follow-up handler processes the answer
+        await agent._handle_follow_up_phase("I enjoy working with computers", Mock())
+
+        # THEN the original vignette data is unchanged
+        assert len(agent._state.vignette_responses) == 1
+        saved = agent._state.vignette_responses[0]
+        assert saved.chosen_option_id == "A"
+        assert saved.user_reasoning == "i want to work in tech"
+        assert saved.confidence == 0.45
+        assert saved.extracted_preferences == {"work_environment_importance": 0.8}
 
 
 @pytest.mark.evaluation_test(label="integration")
