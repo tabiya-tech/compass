@@ -10,20 +10,31 @@ from textwrap import dedent
 from google import genai
 from google.genai import types
 from google.genai.types import GenerateContentConfig, GoogleSearch, HttpOptions, Tool, GroundingMetadata
+from pydantic import BaseModel
+
+from app.agent.agent_types import LLMStats, LLMQuickReplyOption
+from app.agent.config import AgentsConfig
+from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER
+from app.agent.prompt_template.locale_style import get_language_style
+from app.agent.prompt_template.quick_reply_prompt import QUICK_REPLY_PROMPT
+from app.agent.simple_llm_agent.prompt_response_template import get_conversation_finish_instructions, get_json_response_instructions
+from app.app_config import get_application_config
+from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
+from app.i18n.translation_service import t
+from common_libs.llm.models_utils import DEFAULT_VERTEX_API_REGION
+from common_libs.llm.utils import extract_grounding_metadata_from_genai_response
 from common_libs.text_formatters import extract_json
 from common_libs.text_formatters.extract_json import ExtractJSONError
 
-from app.agent.agent_types import LLMStats
-from app.agent.prompt_template.locale_style import get_language_style
-from app.agent.prompt_template.agent_prompt_template import STD_AGENT_CHARACTER
-from app.agent.simple_llm_agent.llm_response import ModelResponse
-from app.agent.simple_llm_agent.prompt_response_template import get_conversation_finish_instructions, get_json_response_instructions
-from app.app_config import get_application_config
-from app.i18n.translation_service import t
-from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
-from app.agent.config import AgentsConfig
-from common_libs.llm.utils import extract_grounding_metadata_from_genai_response
-from common_libs.llm.models_utils import DEFAULT_VERTEX_API_REGION
+
+class _NonPrioritySectorResponse(BaseModel):
+    reasoning: str
+    finished: bool
+    message: str
+    quick_reply_options: list[LLMQuickReplyOption] | None = None
+
+    class Config:
+        extra = "forbid"
 
 
 def _build_non_priority_instructions() -> str:
@@ -36,6 +47,7 @@ def _build_non_priority_instructions() -> str:
     finish_instructions = get_conversation_finish_instructions(
         "When the user explicitly indicates they are done or want to exit"
     )
+    escaped_quick_reply = QUICK_REPLY_PROMPT.replace("{", "{{").replace("}", "}}")
     return dedent(f"""\
         <system_instructions>
         # Role
@@ -80,6 +92,8 @@ def _build_non_priority_instructions() -> str:
             detailed local data for {country_name}?"
 
         {finish_instructions}
+
+        {escaped_quick_reply}
         </system_instructions>
     """).format(sector_list_str=sector_list_str)
 
@@ -121,15 +135,20 @@ class NonPrioritySectorExplorer:
         context,
         pending_sectors: list[dict] | None = None,
         user_profile_context: str | None = None,
-    ) -> tuple[str, bool, str, list[LLMStats], GroundingMetadata | None]:
+    ) -> tuple[str, bool, str, list[LLMStats], dict | None]:
         full_instructions = _build_non_priority_instructions()
         full_instructions += _build_pending_sectors_section(pending_sectors)
         if user_profile_context:
             full_instructions = user_profile_context + "\n\n" + full_instructions
-        example_response = ModelResponse(
+        example_response = _NonPrioritySectorResponse(
             reasoning="The user asked about a non-priority sector, so I used Google Search to find current information and provided a substantive answer.",
             finished=False,
             message="Software development is a growing field in Zambia with opportunities in web development, mobile apps, and enterprise software. According to recent job postings, roles include Software Developer, Full-Stack Developer, and Mobile App Developer.",
+            quick_reply_options=[
+                LLMQuickReplyOption(label="Tell me about salaries"),
+                LLMQuickReplyOption(label="What skills are needed?"),
+                LLMQuickReplyOption(label="Explore a priority sector"),
+            ],
         )
         llm_input = ConversationHistoryFormatter.format_for_agent_generative_prompt(
             model_response_instructions=get_json_response_instructions(examples=[example_response]),
@@ -155,7 +174,7 @@ class NonPrioritySectorExplorer:
 
         llm_stats: list[LLMStats] = []
         grounding_metadata: GroundingMetadata | None = None
-        model_response: ModelResponse | None = None
+        model_response: _NonPrioritySectorResponse | None = None
 
         try:
             response = await client.aio.models.generate_content(
@@ -174,7 +193,7 @@ class NonPrioritySectorExplorer:
             self._logger.debug("Raw LLM response text (first 500 chars): %.500s", raw_text)
             if raw_text:
                 try:
-                    model_response = extract_json.extract_json(raw_text, ModelResponse)
+                    model_response = extract_json.extract_json(raw_text, _NonPrioritySectorResponse)
                     self._logger.debug("Parsed model_response — finished: %s | message (first 200): %.200s",
                                        model_response.finished, model_response.message)
                 except ExtractJSONError:
@@ -182,11 +201,11 @@ class NonPrioritySectorExplorer:
                     # Try wrapping in {} and re-parsing before falling back to raw text.
                     wrapped = "{" + raw_text.strip() + "}"
                     try:
-                        model_response = extract_json.extract_json(wrapped, ModelResponse)
+                        model_response = extract_json.extract_json(wrapped, _NonPrioritySectorResponse)
                         self._logger.info("Recovered model_response by wrapping raw text in braces")
                     except Exception as recovery_err:  # pylint: disable=broad-except
                         self._logger.warning("No JSON found in LLM response, using raw text as message: %s", recovery_err)
-                        model_response = ModelResponse(
+                        model_response = _NonPrioritySectorResponse(
                             reasoning="",
                             finished=False,
                             message=raw_text.strip(),
@@ -204,9 +223,9 @@ class NonPrioritySectorExplorer:
                 "Web search for query '%s': search_queries=%s, sources_count=%d",
                 user_input,
                 grounding_metadata.web_search_queries,
-                len(grounding_metadata.grounding_chunks),
+                len(grounding_metadata.grounding_chunks or []),
             )
-            for i, chunk in enumerate(grounding_metadata.grounding_chunks[:5]):
+            for i, chunk in enumerate((grounding_metadata.grounding_chunks or [])[:5]):
                 if chunk.web:
                     uri = chunk.web.uri
                     title = chunk.web.title
@@ -224,7 +243,7 @@ class NonPrioritySectorExplorer:
         # response format inside the message), unwrap and replace the full model_response.
         if message.startswith("{") and '"message"' in message:
             try:
-                inner = extract_json.extract_json(message, ModelResponse)
+                inner = extract_json.extract_json(message, _NonPrioritySectorResponse)
                 if inner.message:
                     model_response = inner
                     message = inner.message.strip('"').strip()
@@ -250,7 +269,7 @@ class NonPrioritySectorExplorer:
                 "Attempting recovery. Message (first 500 chars): %.500s", message
             )
             try:
-                recovered = extract_json.extract_json("{" + message + "}", ModelResponse)
+                recovered = extract_json.extract_json("{" + message + "}", _NonPrioritySectorResponse)
                 if recovered.message:
                     message = recovered.message.strip('"').strip()
                     model_response = recovered
@@ -267,10 +286,18 @@ class NonPrioritySectorExplorer:
             error_msg = t("messages", "careerExplorer.errorRetry", "I'm having trouble right now. Could you try again?")
             return error_msg, False, "", llm_stats, None
 
+        metadata: dict | None = None
+        if model_response.quick_reply_options or grounding_metadata:
+            metadata = {}
+            if model_response.quick_reply_options:
+                metadata["quick_reply_options"] = [opt.model_dump() for opt in model_response.quick_reply_options]
+            if grounding_metadata:
+                metadata["grounding_metadata"] = grounding_metadata.model_dump(mode="json")
+
         return (
             message,
             model_response.finished,
             model_response.reasoning,
             llm_stats,
-            grounding_metadata,
+            metadata,
         )
