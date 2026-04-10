@@ -11,7 +11,7 @@ from google import genai
 from google.genai import types
 from google.genai.types import GenerateContentConfig, GoogleSearch, HttpOptions, Tool, GroundingMetadata
 from common_libs.text_formatters import extract_json
-from common_libs.text_formatters.extract_json import NoJSONFound
+from common_libs.text_formatters.extract_json import ExtractJSONError
 
 from app.agent.agent_types import LLMStats
 from app.agent.prompt_template.locale_style import get_language_style
@@ -171,18 +171,29 @@ class NonPrioritySectorExplorer:
                 )
             )
             raw_text = response.text
+            self._logger.debug("Raw LLM response text (first 500 chars): %.500s", raw_text)
             if raw_text:
                 try:
                     model_response = extract_json.extract_json(raw_text, ModelResponse)
-                except NoJSONFound:
-                    model_response = ModelResponse(
-                        reasoning="",
-                        finished=False,
-                        message=raw_text.strip(),
-                    )
-            
+                    self._logger.debug("Parsed model_response — finished: %s | message (first 200): %.200s",
+                                       model_response.finished, model_response.message)
+                except ExtractJSONError:
+                    # The LLM sometimes returns JSON fields without the wrapping braces.
+                    # Try wrapping in {} and re-parsing before falling back to raw text.
+                    wrapped = "{" + raw_text.strip() + "}"
+                    try:
+                        model_response = extract_json.extract_json(wrapped, ModelResponse)
+                        self._logger.info("Recovered model_response by wrapping raw text in braces")
+                    except Exception as recovery_err:  # pylint: disable=broad-except
+                        self._logger.warning("No JSON found in LLM response, using raw text as message: %s", recovery_err)
+                        model_response = ModelResponse(
+                            reasoning="",
+                            finished=False,
+                            message=raw_text.strip(),
+                        )
+
             grounding_metadata = extract_grounding_metadata_from_genai_response(response)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             self._logger.exception("Non-priority explorer LLM call failed: %s", e)
             llm_stats.append(
                 LLMStats(error=str(e), prompt_token_count=0, response_token_count=0, response_time_in_sec=0)
@@ -223,7 +234,33 @@ class NonPrioritySectorExplorer:
                     error_msg = t("messages", "careerExplorer.errorRetry", "I'm having trouble right now. Could you try again?")
                     return error_msg, False, "", llm_stats, None
             except Exception as unwrap_err:  # pylint: disable=broad-except
-                self._logger.debug("Message field is not a nested JSON blob, using as-is: %s", unwrap_err)
+                self._logger.warning(
+                    "Guard: message starts with '{' and contains '\"message\"' but failed to unwrap as JSON. "
+                    "This may cause raw JSON/reasoning to leak to the user. Error: %s | Message content: %.500s",
+                    unwrap_err, message
+                )
+
+        # Final safety check: if the message looks like leaked JSON structure
+        # (contains BOTH "reasoning" and "finished" markers — a single marker alone
+        # could appear in legitimate career-related prose), attempt recovery.
+        _json_markers_found = sum(1 for m in ['"reasoning"', '"finished"'] if m in message)
+        if _json_markers_found >= 2:
+            self._logger.warning(
+                "REASONING LEAK DETECTED: outgoing message contains JSON structure markers. "
+                "Attempting recovery. Message (first 500 chars): %.500s", message
+            )
+            try:
+                recovered = extract_json.extract_json("{" + message + "}", ModelResponse)
+                if recovered.message:
+                    message = recovered.message.strip('"').strip()
+                    model_response = recovered
+                    self._logger.info("Recovered clean message from leaked content")
+            except Exception as recover_err:  # pylint: disable=broad-except
+                # Last resort: return error rather than leaking reasoning
+                self._logger.error("Could not recover from reasoning leak, returning error fallback: %s", recover_err)
+                error_msg = t("messages", "careerExplorer.errorRetry",
+                              "I'm having trouble right now. Could you try again?")
+                return error_msg, False, "", llm_stats, grounding_metadata
 
         if not message:
             self._logger.warning("Model returned empty message, using fallback")
