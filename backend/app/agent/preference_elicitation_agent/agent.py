@@ -968,14 +968,30 @@ class PreferenceElicitationAgent(Agent):
                 # Build conversation history context for extraction
                 conversation_history = self._build_conversation_history_for_extraction(context)
 
-                # Extract preferences from user's response
-                extraction_result, extraction_stats = await self._preference_extractor.extract_preferences(
-                    vignette=vignette,
-                    user_response=user_input,
-                    current_preference_vector=self._state.preference_vector,
-                    conversation_history=conversation_history
-                )
-                all_llm_stats.extend(extraction_stats)
+                # Extract preferences from user's response.
+                # If extraction fails (LLM error, schema mismatch, etc.) we record the vignette
+                # with zero confidence and move forward rather than crashing the whole flow.
+                try:
+                    extraction_result, extraction_stats = await self._preference_extractor.extract_preferences(
+                        vignette=vignette,
+                        user_response=user_input,
+                        current_preference_vector=self._state.preference_vector,
+                        conversation_history=conversation_history
+                    )
+                    all_llm_stats.extend(extraction_stats)
+                except Exception as e:
+                    self.logger.warning(
+                        "Preference extraction failed for vignette %s, recording with zero confidence and advancing: %s",
+                        vignette.vignette_id, e
+                    )
+                    extraction_result = PreferenceExtractionResult(
+                        reasoning="Extraction failed — recorded with zero confidence",
+                        chosen_option_id="unknown",
+                        stated_reasons=[],
+                        inferred_preferences={},
+                        confidence=0.0,
+                        suggested_follow_up=""
+                    )
 
                 # Create vignette response record
                 vignette_response = VignetteResponse(
@@ -1283,35 +1299,44 @@ Keep it conversational, not interrogative.
         vignette = self._vignette_engine.get_vignette_by_id(last_response.vignette_id)
 
         if vignette:
-            # Extract additional preferences from follow-up response
-            extraction_result, extraction_stats = await self._preference_extractor.extract_preferences(
-                vignette=vignette,
-                user_response=f"{last_response.user_reasoning}\n\nFollow-up response: {user_input}",
-                current_preference_vector=self._state.preference_vector
-            )
-            all_llm_stats.extend(extraction_stats)
-
-            # Update preference vector with refined preferences
-            self._state.preference_vector = self._preference_extractor.update_preference_vector(
-                self._state.preference_vector,
-                extraction_result
-            )
-
-            self.logger.info(
-                f"Updated preferences from follow-up (new confidence: {extraction_result.confidence:.2f})"
-            )
-
-            # Check if we should now mark the category as covered (after follow-up improved confidence)
-            if extraction_result.confidence > 0.6:
-                self.logger.info(
-                    f"✅ Marking category '{vignette.category}' as covered after follow-up "
-                    f"(confidence: {extraction_result.confidence:.2f}, vignette: {vignette.vignette_id})"
+            # Extract additional preferences from follow-up response.
+            # Follow-up answers don't contain an A/B choice so extraction can fail — if it does
+            # we skip the refinement step and advance to the next vignette with whatever signal
+            # was already captured from the original vignette answer.
+            try:
+                extraction_result, extraction_stats = await self._preference_extractor.extract_preferences(
+                    vignette=vignette,
+                    user_response=f"{last_response.user_reasoning}\n\nFollow-up response: {user_input}",
+                    current_preference_vector=self._state.preference_vector
                 )
-                self._state.mark_category_covered(vignette.category)
-            else:
+                all_llm_stats.extend(extraction_stats)
+
+                # Update preference vector with refined preferences
+                self._state.preference_vector = self._preference_extractor.update_preference_vector(
+                    self._state.preference_vector,
+                    extraction_result
+                )
+
+                self.logger.info(
+                    f"Updated preferences from follow-up (new confidence: {extraction_result.confidence:.2f})"
+                )
+
+                # Check if we should now mark the category as covered (after follow-up improved confidence)
+                if extraction_result.confidence > 0.6:
+                    self.logger.info(
+                        f"✅ Marking category '{vignette.category}' as covered after follow-up "
+                        f"(confidence: {extraction_result.confidence:.2f}, vignette: {vignette.vignette_id})"
+                    )
+                    self._state.mark_category_covered(vignette.category)
+                else:
+                    self.logger.warning(
+                        f"⚠️  NOT marking category '{vignette.category}' as covered after follow-up - confidence still too low "
+                        f"(confidence: {extraction_result.confidence:.2f}, threshold: 0.6, vignette: {vignette.vignette_id})"
+                    )
+            except Exception as e:
                 self.logger.warning(
-                    f"⚠️  NOT marking category '{vignette.category}' as covered after follow-up - confidence still too low "
-                    f"(confidence: {extraction_result.confidence:.2f}, threshold: 0.6, vignette: {vignette.vignette_id})"
+                    "Follow-up preference extraction failed for vignette %s, skipping refinement and advancing: %s",
+                    vignette.vignette_id, e
                 )
 
         # Mark that we've asked follow-up for this vignette
