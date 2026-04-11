@@ -6,7 +6,7 @@ components including vignette engine, preference extractor, and agent logic.
 """
 
 import pytest
-from unittest.mock import Mock, AsyncMock
+from unittest.mock import Mock, AsyncMock, patch
 
 from app.agent.preference_elicitation_agent.types import (
     PreferenceVector,
@@ -753,6 +753,14 @@ class TestExtractionFailureHandling:
     agent records the vignette with zero confidence and advances rather than calling
     _create_error_response(finished=False) and trapping the user in an error loop.
     """
+
+    @pytest.fixture(autouse=True)
+    def mock_gemini_llm(self):
+        """Prevent GeminiGenerativeLLM from triggering Google Auth during __init__.
+        The LLMs themselves are replaced by mocks in each test, so no real calls are made.
+        """
+        with patch("app.agent.preference_elicitation_agent.agent.GeminiGenerativeLLM"):
+            yield
 
     def _make_vignette(self, vignette_id: str = "financial_001") -> Vignette:
         return Vignette(
