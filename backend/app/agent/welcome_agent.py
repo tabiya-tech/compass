@@ -310,10 +310,10 @@ class WelcomeAgent(Agent):
             - I will be able to download the CV  as PDF, or as a DOCX file to edit it later. 
             - You are not conducting the exploration session, you are only welcoming me and forwarding me to the exploration session. 
             - The conversation takes about 50 minutes on average (could be longer depending on the number of experiences), so please set aside enough time.
-              If needed, I can create an account and come back later to pick up where you left off.
-            - I can create an account at the upper right corner of the screen, under "register".
-            - If I do not create an account, I can still explore my work experiences and skills, but if I log out or close the browser, 
-              I will lose the progress and will have to start over. 
+              If needed, I can use my account details to come back later to pick up where you left off.
+            - I can create an account by clicking the menu in the upper right corner of the screen and selecting "register".
+            - If I do not create an account, I can still explore my work experiences and skills, but if I log out or close the browser,
+              I will lose the progress and will have to start over.
             - Initially {app_name} will gather basic information about all your work experiences, including any unpaid activities like volunteering or family contributions. 
               Then, {app_name} will dive deeper into each experience to capture the details that matter.    
         </_ABOUT_>
