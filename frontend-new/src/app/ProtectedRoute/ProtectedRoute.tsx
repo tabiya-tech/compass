@@ -48,6 +48,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <>{children}</>;
   }
 
+  if (targetPath === routerPaths.PRIVACY_POLICY || targetPath === routerPaths.TERMS_OF_USE) {
+    return <>{children}</>;
+  }
+
   if (!user || !userPreferences) {
     if (targetPath === routerPaths.LOGIN || targetPath === routerPaths.REGISTER || targetPath === routerPaths.LANDING) {
       console.debug("redirecting from landing/login/register --> landing/login/register because no user");

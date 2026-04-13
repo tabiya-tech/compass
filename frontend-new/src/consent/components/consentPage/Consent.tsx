@@ -206,8 +206,8 @@ const Consent: React.FC = () => {
   const termsAndConditionsLabel = t("consent.components.consentPage.termsAndConditions");
   const privacyPolicyLabel = t("consent.components.consentPage.privacyPolicy");
 
-  const handleExternalNavigationOnNewTab = (url: string) => {
-    window.open(url, "_blank", "noopener,noreferrer");
+  const openLegalDocumentInNewTab = (routePath: string) => {
+    window.open(`${window.location.origin}/#${routePath}`, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -259,11 +259,7 @@ const Consent: React.FC = () => {
                   <Trans
                     i18nKey="consent.components.consentPage.checkboxTermsAndConditions"
                     values={{ terms_and_conditions: termsAndConditionsLabel }}
-                    components={[
-                      <CustomLink
-                        onClick={() => handleExternalNavigationOnNewTab("https://www.tabiya.org/compass-terms-privacy")}
-                      />,
-                    ]}
+                    components={[<CustomLink onClick={() => openLegalDocumentInNewTab(routerPaths.TERMS_OF_USE)} />]}
                   />
                 </Typography>
               }
@@ -286,13 +282,7 @@ const Consent: React.FC = () => {
                   <Trans
                     i18nKey="consent.components.consentPage.checkboxPrivacyPolicy"
                     values={{ privacy_policy: privacyPolicyLabel }}
-                    components={[
-                      <CustomLink
-                        onClick={() =>
-                          handleExternalNavigationOnNewTab("https://tabiya.org/compass-terms-privacy/#privacy-policy")
-                        }
-                      />,
-                    ]}
+                    components={[<CustomLink onClick={() => openLegalDocumentInNewTab(routerPaths.PRIVACY_POLICY)} />]}
                   />
                 </Typography>
               }

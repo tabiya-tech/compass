@@ -254,6 +254,32 @@ describe("ProtectedRoute test", () => {
     });
   });
 
+  describe("public legal documents", () => {
+    test.each([
+      ["privacy policy", routerPaths.PRIVACY_POLICY, "Privacy policy page"],
+      ["terms of use", routerPaths.TERMS_OF_USE, "Terms of use page"],
+    ])("should render the %s without login or consent flow", (_label, path, pageText) => {
+      getUserPreferences(new Date(), true, SensitivePersonalDataRequirement.NOT_REQUIRED);
+
+      const router = createMemoryRouter(
+        [
+          {
+            path,
+            element: (
+              <ProtectedRoute>
+                <div>{pageText}</div>
+              </ProtectedRoute>
+            ),
+          },
+        ],
+        { initialEntries: [path] }
+      );
+      render(<RouterProvider router={router} />);
+
+      expect(screen.getByText(pageText)).toBeInTheDocument();
+    });
+  });
+
   describe("consent page", () => {
     test("should redirect to the consent page when the user has not accepted the terms and conditions", () => {
       // GIVEN a user is logged in

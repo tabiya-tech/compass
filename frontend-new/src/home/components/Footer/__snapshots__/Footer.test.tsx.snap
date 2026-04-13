@@ -44,6 +44,9 @@ exports[`Footer should render the footer container, logos, links, and collaborat
           aria-disabled="false"
           class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1l1mpms-MuiTypography-root-MuiLink-root"
           data-testid="footer-privacy-link-a7f3d2b1-8e4c-4a9f-b6d5-3c1e2f7a8b9d"
+          href="http://localhost/#/privacy-policy"
+          rel="noopener noreferrer"
+          target="_blank"
         >
           Privacy Policy
         </a>
@@ -51,20 +54,19 @@ exports[`Footer should render the footer container, logos, links, and collaborat
           aria-disabled="false"
           class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1l1mpms-MuiTypography-root-MuiLink-root"
           data-testid="footer-terms-link-a7f3d2b1-8e4c-4a9f-b6d5-3c1e2f7a8b9d"
+          href="http://localhost/#/terms-of-use"
+          rel="noopener noreferrer"
+          target="_blank"
         >
           Terms of Use
         </a>
         <a
           aria-disabled="false"
           class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1l1mpms-MuiTypography-root-MuiLink-root"
-          data-testid="footer-accessibility-link-a7f3d2b1-8e4c-4a9f-b6d5-3c1e2f7a8b9d"
-        >
-          Accessibility
-        </a>
-        <a
-          aria-disabled="false"
-          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1l1mpms-MuiTypography-root-MuiLink-root"
           data-testid="footer-contact-link-a7f3d2b1-8e4c-4a9f-b6d5-3c1e2f7a8b9d"
+          href="mailto:hi@tabiya.org"
+          rel="noopener noreferrer"
+          target="_blank"
         >
           Contact
         </a>

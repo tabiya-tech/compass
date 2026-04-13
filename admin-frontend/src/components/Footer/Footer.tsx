@@ -14,7 +14,6 @@ export const DATA_TEST_ID = {
   FOOTER_TABIYA_LOGO: `footer-tabiya-logo-${uniqueId}`,
   FOOTER_PRIVACY_LINK: `footer-privacy-link-${uniqueId}`,
   FOOTER_TERMS_LINK: `footer-terms-link-${uniqueId}`,
-  FOOTER_ACCESSIBILITY_LINK: `footer-accessibility-link-${uniqueId}`,
   FOOTER_CONTACT_LINK: `footer-contact-link-${uniqueId}`,
   FOOTER_COLLABORATION: `footer-collaboration-${uniqueId}`,
 };
@@ -22,7 +21,6 @@ export const DATA_TEST_ID = {
 export const EXTERNAL_URLS = {
   PRIVACY_POLICY: "https://tabiya.org/compass-terms-privacy/#privacy-policy",
   TERMS_OF_USE: "https://tabiya.org/compass-terms-privacy/#terms-and-conditions",
-  ACCESSIBILITY: "https://tabiya.org/compass-terms-privacy/#accessibility",
   CONTACT: "mailto:hi@tabiya.org",
 };
 
@@ -113,17 +111,6 @@ const Footer: React.FC = () => {
               }}
             >
               {t("footer.termsOfUse")}
-            </CustomLink>
-            •
-            <CustomLink
-              onClick={() => handleExternalNavigation(EXTERNAL_URLS.ACCESSIBILITY)}
-              data-testid={DATA_TEST_ID.FOOTER_ACCESSIBILITY_LINK}
-              sx={{
-                fontSize: "0.8rem",
-                fontWeight: 500,
-              }}
-            >
-              {t("footer.accessibility")}
             </CustomLink>
             •
             <CustomLink

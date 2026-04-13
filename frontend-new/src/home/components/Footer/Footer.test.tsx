@@ -2,18 +2,11 @@ import "src/_test_utilities/consoleMock";
 import "src/_test_utilities/envServiceMock";
 
 import React from "react";
-import { render, screen, userEvent } from "src/_test_utilities/test-utils";
+import { render, screen } from "src/_test_utilities/test-utils";
+import { routerPaths } from "src/app/routerPaths";
 import Footer, { DATA_TEST_ID, EXTERNAL_URLS } from "./Footer";
 
 describe("Footer", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    Object.defineProperty(window, "open", {
-      value: jest.fn(),
-      writable: true,
-    });
-  });
-
   test("should render the footer container, logos, links, and collaboration text", () => {
     // GIVEN the Footer component
     const givenComponent = <Footer />;
@@ -36,8 +29,6 @@ describe("Footer", () => {
     expect(screen.getByTestId(DATA_TEST_ID.FOOTER_PRIVACY_LINK)).toBeInTheDocument();
     // AND the term link is in the document
     expect(screen.getByTestId(DATA_TEST_ID.FOOTER_TERMS_LINK)).toBeInTheDocument();
-    // AND the accessibility link is in the document
-    expect(screen.getByTestId(DATA_TEST_ID.FOOTER_ACCESSIBILITY_LINK)).toBeInTheDocument();
     // AND the contact link is in the document
     expect(screen.getByTestId(DATA_TEST_ID.FOOTER_CONTACT_LINK)).toBeInTheDocument();
     // AND the collaboration section is in the document
@@ -46,26 +37,25 @@ describe("Footer", () => {
     expect(footerContainer).toMatchSnapshot();
   });
 
-  test("should open all external links in new tabs", async () => {
-    // GIVEN the Footer is rendered
+  test("should open privacy, terms, and contact in a new tab via href", () => {
     render(<Footer />);
-    // AND the expected URLs for each link
-    const privacyUrl = EXTERNAL_URLS.PRIVACY_POLICY;
-    const termsUrl = EXTERNAL_URLS.TERMS_OF_USE;
-    const accessibilityUrl = EXTERNAL_URLS.ACCESSIBILITY;
-    const contactUrl = EXTERNAL_URLS.CONTACT;
+    const privacyHref = `${window.location.origin}/#${routerPaths.PRIVACY_POLICY}`;
+    const termsHref = `${window.location.origin}/#${routerPaths.TERMS_OF_USE}`;
 
-    // WHEN the external links are clicked
-    await userEvent.click(screen.getByTestId(DATA_TEST_ID.FOOTER_PRIVACY_LINK));
-    await userEvent.click(screen.getByTestId(DATA_TEST_ID.FOOTER_TERMS_LINK));
-    await userEvent.click(screen.getByTestId(DATA_TEST_ID.FOOTER_ACCESSIBILITY_LINK));
-    await userEvent.click(screen.getByTestId(DATA_TEST_ID.FOOTER_CONTACT_LINK));
+    const privacyLink = screen.getByTestId(DATA_TEST_ID.FOOTER_PRIVACY_LINK);
+    const termsLink = screen.getByTestId(DATA_TEST_ID.FOOTER_TERMS_LINK);
+    const contactLink = screen.getByTestId(DATA_TEST_ID.FOOTER_CONTACT_LINK);
 
-    // THEN window.open is called with the correct URLs
-    expect(window.open).toHaveBeenCalledTimes(4);
-    expect(window.open).toHaveBeenCalledWith(privacyUrl, "_blank", "noopener,noreferrer");
-    expect(window.open).toHaveBeenCalledWith(termsUrl, "_blank", "noopener,noreferrer");
-    expect(window.open).toHaveBeenCalledWith(accessibilityUrl, "_blank", "noopener,noreferrer");
-    expect(window.open).toHaveBeenCalledWith(contactUrl, "_blank", "noopener,noreferrer");
+    expect(privacyLink).toHaveAttribute("href", privacyHref);
+    expect(privacyLink).toHaveAttribute("target", "_blank");
+    expect(privacyLink).toHaveAttribute("rel", "noopener noreferrer");
+
+    expect(termsLink).toHaveAttribute("href", termsHref);
+    expect(termsLink).toHaveAttribute("target", "_blank");
+    expect(termsLink).toHaveAttribute("rel", "noopener noreferrer");
+
+    expect(contactLink).toHaveAttribute("href", EXTERNAL_URLS.CONTACT);
+    expect(contactLink).toHaveAttribute("target", "_blank");
+    expect(contactLink).toHaveAttribute("rel", "noopener noreferrer");
   });
 });

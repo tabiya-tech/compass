@@ -30,6 +30,7 @@ import Home from "src/home/Home";
 import { AppErrorFallback } from "src/error/errorPage/AppErrorFallback";
 import { ExperiencesDrawerProvider } from "src/experiences/ExperiencesDrawerProvider";
 import BugReportButton from "../feedback/bugReport/bugReportButton/BugReportButton";
+import LegalDocumentPage from "src/legal/pages/LegalDocumentPage";
 
 const LazyLoadedSensitiveDataForm = lazyWithPreload(
   () => import("src/sensitiveData/components/sensitiveDataForm/SensitiveDataForm")
@@ -440,6 +441,14 @@ const App = () => {
               <LazyLoadedSensitiveDataForm />
             </ProtectedRoute>
           ),
+        },
+        {
+          path: routerPaths.PRIVACY_POLICY,
+          element: <LegalDocumentPage variant="privacy" />,
+        },
+        {
+          path: routerPaths.TERMS_OF_USE,
+          element: <LegalDocumentPage variant="terms" />,
         },
         {
           path: "*",

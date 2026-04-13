@@ -4,6 +4,7 @@ import type { SxProps } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import CustomLink from "src/theme/CustomLink/CustomLink";
 import { getProductName } from "src/envService";
+import { routerPaths } from "src/app/routerPaths";
 import type { Theme } from "@mui/material/styles";
 
 const uniqueId = "a7f3d2b1-8e4c-4a9f-b6d5-3c1e2f7a8b9d";
@@ -16,16 +17,12 @@ export const DATA_TEST_ID = {
   FOOTER_TABIYA_LOGO: `footer-tabiya-logo-${uniqueId}`,
   FOOTER_PRIVACY_LINK: `footer-privacy-link-${uniqueId}`,
   FOOTER_TERMS_LINK: `footer-terms-link-${uniqueId}`,
-  FOOTER_ACCESSIBILITY_LINK: `footer-accessibility-link-${uniqueId}`,
   FOOTER_CONTACT_LINK: `footer-contact-link-${uniqueId}`,
   FOOTER_COPYRIGHT: `footer-copyright-${uniqueId}`,
   FOOTER_COLLABORATION: `footer-collaboration-${uniqueId}`,
 };
 
 export const EXTERNAL_URLS = {
-  PRIVACY_POLICY: "https://tabiya.org/compass-terms-privacy/#privacy-policy",
-  TERMS_OF_USE: "https://tabiya.org/compass-terms-privacy/#terms-and-conditions",
-  ACCESSIBILITY: "https://tabiya.org/compass-terms-privacy/#accessibility",
   CONTACT: "mailto:hi@tabiya.org",
 };
 
@@ -38,9 +35,8 @@ const Footer: React.FC<FooterProps> = ({ sx }) => {
   const { t } = useTranslation();
   const appName = getProductName() || "";
 
-  const handleExternalNavigation = (url: string) => {
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
+  const privacyHref = `${window.location.origin}/#${routerPaths.PRIVACY_POLICY}`;
+  const termsHref = `${window.location.origin}/#${routerPaths.TERMS_OF_USE}`;
 
   return (
     <Box component="footer" data-testid={DATA_TEST_ID.FOOTER_CONTAINER} sx={sx}>
@@ -114,7 +110,9 @@ const Footer: React.FC<FooterProps> = ({ sx }) => {
             }}
           >
             <CustomLink
-              onClick={() => handleExternalNavigation(EXTERNAL_URLS.PRIVACY_POLICY)}
+              href={privacyHref}
+              target="_blank"
+              rel="noopener noreferrer"
               data-testid={DATA_TEST_ID.FOOTER_PRIVACY_LINK}
               sx={{
                 fontSize: "0.8rem",
@@ -128,7 +126,9 @@ const Footer: React.FC<FooterProps> = ({ sx }) => {
               {t("home.footer.privacyPolicy")}
             </CustomLink>
             <CustomLink
-              onClick={() => handleExternalNavigation(EXTERNAL_URLS.TERMS_OF_USE)}
+              href={termsHref}
+              target="_blank"
+              rel="noopener noreferrer"
               data-testid={DATA_TEST_ID.FOOTER_TERMS_LINK}
               sx={{
                 fontSize: "0.8rem",
@@ -142,21 +142,9 @@ const Footer: React.FC<FooterProps> = ({ sx }) => {
               {t("home.footer.termsOfUse")}
             </CustomLink>
             <CustomLink
-              onClick={() => handleExternalNavigation(EXTERNAL_URLS.ACCESSIBILITY)}
-              data-testid={DATA_TEST_ID.FOOTER_ACCESSIBILITY_LINK}
-              sx={{
-                fontSize: "0.8rem",
-                fontWeight: 500,
-                textDecoration: "None",
-                "&:hover": {
-                  textDecoration: "underline",
-                },
-              }}
-            >
-              {t("home.footer.accessibility")}
-            </CustomLink>
-            <CustomLink
-              onClick={() => handleExternalNavigation(EXTERNAL_URLS.CONTACT)}
+              href={EXTERNAL_URLS.CONTACT}
+              target="_blank"
+              rel="noopener noreferrer"
               data-testid={DATA_TEST_ID.FOOTER_CONTACT_LINK}
               sx={{
                 fontSize: "0.8rem",
