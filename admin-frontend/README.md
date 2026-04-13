@@ -101,6 +101,7 @@ Create a `env.js` file in `public/data/` based on `env.example.js`. All values s
 | `FRONTEND_LOGO_URL` | No | Logo URL |
 | `FRONTEND_FAVICON_URL` | No | Favicon URL |
 | `FRONTEND_THEME_CSS_VARIABLES` | No | Theme color overrides JSON |
+| `LEGAL_SITE_BASE_URL` | No | Public origin of the learner (frontend-new) app, no trailing slash. Footer privacy/terms links open `LEGAL_SITE_BASE_URL/#/privacy-policy` and `.../#/terms-of-use`. When unset, links fall back to `window.location.origin` (set explicitly if admin and learner are on different hosts). |
 
 Example encoding:
 ```javascript

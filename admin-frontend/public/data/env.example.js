@@ -32,6 +32,7 @@ window.tabiyaConfig = {
   // ################################################################
   // #       Branding Settings
   // ################################################################
+  LEGAL_SITE_BASE_URL: btoa("https://foo.bar"),
   GLOBAL_PRODUCT_NAME: btoa("Compass Admin"),
   FRONTEND_BROWSER_TAB_TITLE: btoa("Compass Admin"),
   FRONTEND_META_DESCRIPTION: btoa("Compass Admin Portal - Manage and configure Compass platform settings."),

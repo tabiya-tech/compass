@@ -125,6 +125,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     frontend_favicon_url: Optional[str] = getenv("FRONTEND_FAVICON_URL", False, False)
     frontend_app_icon_url: Optional[str] = getenv("FRONTEND_APP_ICON_URL", False, False)
     frontend_theme_css_variables: Optional[str] = getenv("FRONTEND_THEME_CSS_VARIABLES", False, False)
+    legal_site_base_url: Optional[str] = getenv("LEGAL_SITE_BASE_URL", False, False)
 
     print(f"Constructing the env.js file... for the run: {stack_name}")
 
@@ -151,6 +152,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "FRONTEND_FAVICON_URL": base64_encode(frontend_favicon_url),
         "FRONTEND_APP_ICON_URL": base64_encode(frontend_app_icon_url),
         "FRONTEND_THEME_CSS_VARIABLES": base64_encode(frontend_theme_css_variables),
+        "LEGAL_SITE_BASE_URL": base64_encode(legal_site_base_url),
     }
 
     env_json_content = f"""window.tabiyaConfig = {json.dumps(frontend_env_json, indent=4)};"""
