@@ -41,6 +41,8 @@ const LanguageContextMenu: React.FC<LanguageContextMenuProps> = ({ removeMargin 
 
   const supportedLocales = useMemo(() => parseEnvSupportedLocales(), []);
 
+  const hasMultipleLocales = supportedLocales.length > 1;
+
   const menuOptions = useMemo(() => {
     return supportedLocales.map((locale) => ({
       id: `${DATA_TEST_ID.LANGUAGE_CONTEXT_MENU_ITEM}-${locale}`,
@@ -50,6 +52,10 @@ const LanguageContextMenu: React.FC<LanguageContextMenuProps> = ({ removeMargin 
       action: handleLocaleChange(locale),
     }));
   }, [handleLocaleChange, supportedLocales]);
+
+  if (!hasMultipleLocales) {
+    return null;
+  }
 
   return (
     <>

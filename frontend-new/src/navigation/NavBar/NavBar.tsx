@@ -224,6 +224,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
   );
 
   const supportedLocales = useMemo(() => parseEnvSupportedLocales(), []);
+  const hasMultipleLocales = supportedLocales.length > 1;
 
   const localeMenuItems: MenuItemConfig[] = useMemo(
     () =>
@@ -257,17 +258,21 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
         disabled: !isOnline,
         action: handleViewExperiences,
       },
-      {
-        id: MENU_ITEM_ID.MOBILE_LANGUAGE,
-        text: t("i18n.languageContextMenu.selector" as TranslationKey).toLowerCase(),
-        icon: <Globe size={18} />,
-        disabled: false,
-        action: () => {
-          setLanguageSubmenuAnchorEl(anchorEl);
-        },
-        closeMenuOnClick: false,
-        trailingIcon: <ChevronRight size={18} />,
-      },
+      ...(hasMultipleLocales
+        ? [
+            {
+              id: MENU_ITEM_ID.MOBILE_LANGUAGE,
+              text: t("i18n.languageContextMenu.selector" as TranslationKey).toLowerCase(),
+              icon: <Globe size={18} />,
+              disabled: false,
+              action: () => {
+                setLanguageSubmenuAnchorEl(anchorEl);
+              },
+              closeMenuOnClick: false,
+              trailingIcon: <ChevronRight size={18} />,
+            },
+          ]
+        : []),
       ...(sentryEnabled
         ? [
             {
@@ -312,6 +317,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
     handleRegister,
     anchorEl,
     handleLogout,
+    hasMultipleLocales,
   ]);
 
   const getNavLinkSx = (isActive: boolean) => ({
@@ -440,14 +446,16 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                 {t("nav.pathways" as TranslationKey)}
               </Box>
 
-              <Box
-                sx={{ ...getNavLinkSx(false), cursor: "pointer" }}
-                onClick={(event: React.MouseEvent<HTMLElement>) => setLanguageAnchorEl(event.currentTarget)}
-                data-testid={DATA_TEST_ID.NAVBAR_LANGUAGE_BUTTON}
-              >
-                <Globe size={18} />
-                {currentLocale}
-              </Box>
+              {hasMultipleLocales && (
+                <Box
+                  sx={{ ...getNavLinkSx(false), cursor: "pointer" }}
+                  onClick={(event: React.MouseEvent<HTMLElement>) => setLanguageAnchorEl(event.currentTarget)}
+                  data-testid={DATA_TEST_ID.NAVBAR_LANGUAGE_BUTTON}
+                >
+                  <Globe size={18} />
+                  {currentLocale}
+                </Box>
+              )}
 
               <Box sx={{ width: "1px", height: 20, backgroundColor: textColor, opacity: 0.3, mx: 0.5 }} />
 
