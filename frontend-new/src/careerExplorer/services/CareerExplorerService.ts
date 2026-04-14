@@ -93,6 +93,7 @@ export default class CareerExplorerService {
       serviceFunction: "getSectorEngagementForUser",
       failureMessage: "Failed to fetch sector engagement",
       expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
     });
     const body = await response.text();
     try {
@@ -116,6 +117,7 @@ export default class CareerExplorerService {
       serviceFunction: "getConversation",
       failureMessage: "Failed to get conversation",
       expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
     });
     const body = await response.text();
     try {

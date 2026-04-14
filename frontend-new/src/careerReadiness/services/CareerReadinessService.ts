@@ -51,6 +51,7 @@ export default class CareerReadinessService {
       serviceFunction: "listModules",
       failureMessage: "Failed to list career readiness modules",
       expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
     });
     const body = await response.text();
     return parseJson<ModuleListResponse>(body, errorFactory);
@@ -67,6 +68,7 @@ export default class CareerReadinessService {
       serviceFunction: "getModule",
       failureMessage: `Failed to get module ${moduleId}`,
       expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
     });
     const body = await response.text();
     return parseJson<ModuleDetail>(body, errorFactory);
@@ -99,6 +101,7 @@ export default class CareerReadinessService {
       serviceFunction: "getConversationHistory",
       failureMessage: `Failed to get conversation history for module ${moduleId}`,
       expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
     });
     const body = await response.text();
     return parseJson<CareerReadinessConversationResponse>(body, errorFactory);
@@ -137,6 +140,7 @@ export default class CareerReadinessService {
       serviceFunction: "getQuiz",
       failureMessage: `Failed to get quiz for module ${moduleId}`,
       expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
     });
     const body = await response.text();
     return parseJson<QuizResponse>(body, errorFactory);
