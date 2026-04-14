@@ -62,7 +62,6 @@ interface CtaCardProps {
 
 const HomeCtaCard: React.FC<CtaCardProps> = ({
   testKey,
-  edge = "middle",
   title,
   description,
   cta,
@@ -76,8 +75,6 @@ const HomeCtaCard: React.FC<CtaCardProps> = ({
 }) => {
   const theme = useTheme();
   const contentPadding = theme.fixedSpacing(theme.tabiyaSpacing.lg);
-  const alignedEdgeInset =
-    "min(calc(max((100vw - var(--layout-content-max-width)) / 2, 0px) + var(--layout-gutter-x)), calc(100% - 320px))";
 
   return (
     <Grid size={{ xs: 12, md: 4 }}>
@@ -88,16 +85,7 @@ const HomeCtaCard: React.FC<CtaCardProps> = ({
           borderRadius: 0,
           paddingTop: contentPadding,
           paddingBottom: contentPadding,
-          paddingLeft: {
-            xs: "var(--layout-gutter-x)",
-            sm: contentPadding,
-            md: edge === "start" ? alignedEdgeInset : contentPadding,
-          },
-          paddingRight: {
-            xs: "var(--layout-gutter-x)",
-            sm: contentPadding,
-            md: edge === "end" ? alignedEdgeInset : contentPadding,
-          },
+          paddingX: "var(--layout-gutter-x)",
           minHeight: { xs: "auto", sm: 240 },
           display: "flex",
           flexDirection: "column",
@@ -158,70 +146,85 @@ const HomeCtaGrid: React.FC = () => {
   const pathwaysCardBg = theme.palette.brandAction.main;
 
   return (
-    <Grid
-      container
-      spacing={0}
-      data-testid={DATA_TEST_ID.HOME_CTA_GRID}
-      sx={{
-        position: "relative",
-        zIndex: 0,
-        width: { xs: "100%", md: "100vw" },
-        marginLeft: { xs: 0, md: "calc(50% - 50vw)" },
-        marginRight: { xs: 0, md: "calc(50% - 50vw)" },
-      }}
-    >
-      <HomeCtaCard
-        testKey="profile"
-        edge="start"
-        title={t("home.cta.buildProfileTitle")}
-        description={t("home.cta.buildProfileDesc")}
-        cta={t("home.cta.buildProfileCta")}
-        onClick={() => go(routerPaths.SKILLS_INTERESTS)}
-        backgroundColor={profileCardBg}
-        titleLeadColor={profileCardText}
-        titleTailColor={alpha(profileCardText, 0.8)}
-        descriptionColor={profileCardText}
-        filledButton={{
-          color: "primary",
-          bgColor: theme.palette.common.cream,
-          textColor: profileCardBg,
+    <Box sx={{ display: "flex", width: "100%" }}>
+      {/* Left Spacer - Extends the first card background to the left edge */}
+      <Box
+        sx={{
+          flex: 1,
+          backgroundColor: profileCardBg,
+          display: { xs: "none", md: "block" },
         }}
       />
 
-      <HomeCtaCard
-        testKey="paths"
-        edge="middle"
-        title={t("home.cta.explorePathsTitle")}
-        description={t("home.cta.explorePathsDesc")}
-        cta={t("home.cta.explorePathsCta")}
-        onClick={() => go(routerPaths.CAREER_EXPLORER)}
-        backgroundColor={pathwaysCardBg}
-        titleLeadColor={theme.palette.common.white}
-        titleTailColor={alpha(theme.palette.common.white, 0.8)}
-        descriptionColor={theme.palette.common.white}
-        filledButton={{
-          color: "brandAction",
-          bgColor: theme.palette.common.cream,
-          textColor: pathwaysCardBg,
+      {/* Main Content Area - Centered and limited by max-width */}
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: "var(--layout-content-max-width)",
+          mx: "auto",
         }}
-      />
+      >
+        <Grid container spacing={0} data-testid={DATA_TEST_ID.HOME_CTA_GRID}>
+          <HomeCtaCard
+            testKey="profile"
+            title={t("home.cta.buildProfileTitle")}
+            description={t("home.cta.buildProfileDesc")}
+            cta={t("home.cta.buildProfileCta")}
+            onClick={() => go(routerPaths.SKILLS_INTERESTS)}
+            backgroundColor={profileCardBg}
+            titleLeadColor={profileCardText}
+            titleTailColor={alpha(profileCardText, 0.8)}
+            descriptionColor={profileCardText}
+            filledButton={{
+              color: "primary",
+              bgColor: theme.palette.common.cream,
+              textColor: profileCardBg,
+            }}
+          />
 
-      <HomeCtaCard
-        testKey="jobs"
-        edge="end"
-        title={t("home.cta.jobMatchesTitle")}
-        description={t("home.cta.jobMatchesDesc")}
-        cta={t("home.cta.jobMatchesCta")}
-        onClick={() => go(routerPaths.JOB_MATCHING)}
-        backgroundColor={theme.palette.common.cream}
-        titleLeadColor={theme.palette.secondary.main}
-        titleTailColor={theme.palette.secondary.main}
-        descriptionColor={theme.palette.text.primary}
-        outlinedButton={{
-          color: "secondary",
+          <HomeCtaCard
+            testKey="paths"
+            title={t("home.cta.explorePathsTitle")}
+            description={t("home.cta.explorePathsDesc")}
+            cta={t("home.cta.explorePathsCta")}
+            onClick={() => go(routerPaths.CAREER_EXPLORER)}
+            backgroundColor={pathwaysCardBg}
+            titleLeadColor={theme.palette.common.white}
+            titleTailColor={alpha(theme.palette.common.white, 0.8)}
+            descriptionColor={theme.palette.common.white}
+            filledButton={{
+              color: "brandAction",
+              bgColor: theme.palette.common.cream,
+              textColor: pathwaysCardBg,
+            }}
+          />
+
+          <HomeCtaCard
+            testKey="jobs"
+            title={t("home.cta.jobMatchesTitle")}
+            description={t("home.cta.jobMatchesDesc")}
+            cta={t("home.cta.jobMatchesCta")}
+            onClick={() => go(routerPaths.JOB_MATCHING)}
+            backgroundColor={theme.palette.common.cream}
+            titleLeadColor={theme.palette.secondary.main}
+            titleTailColor={theme.palette.secondary.main}
+            descriptionColor={theme.palette.text.primary}
+            outlinedButton={{
+              color: "secondary",
+            }}
+          />
+        </Grid>
+      </Box>
+
+      {/* Right Spacer - Extends last card background to the right edge */}
+      <Box
+        sx={{
+          flex: 1,
+          backgroundColor: theme.palette.common.cream,
+          display: { xs: "none", md: "block" },
         }}
       />
-    </Grid>
+    </Box>
   );
 };
 

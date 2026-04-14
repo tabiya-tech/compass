@@ -81,16 +81,7 @@ const Home: React.FC = () => {
             paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.lg),
           }}
         >
-          <Box
-            sx={{
-              width: "100%",
-              maxWidth: "var(--layout-content-max-width)",
-              mx: "auto",
-              px: "var(--layout-gutter-x)",
-            }}
-          >
-            <HomeCtaGrid />
-          </Box>
+          <HomeCtaGrid />
         </Box>
 
         <Box
