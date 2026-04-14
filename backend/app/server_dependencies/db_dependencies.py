@@ -271,15 +271,9 @@ class CompassDBProvider:
             ], unique=True)
 
             # Create the institutions indexes
-            await application_db.get_collection(Collections.INSTITUTIONS).create_index(
-                [
-                    ("name", "text"),
-                    ("sectors_covered", "text"),
-                    ("programmes.name", "text"),
-                ],
-                name="institutions_text_search",
-                default_language="english",
-            )
+            # Note: keyword search uses an Atlas Search index ("institutions_search") which must
+            # be created manually in the Atlas UI or via the Atlas Admin API — see repository.py
+            # for the required index definition.
             await application_db.get_collection(Collections.INSTITUTIONS).create_index(
                 [("reg_no", 1)], sparse=True
             )
