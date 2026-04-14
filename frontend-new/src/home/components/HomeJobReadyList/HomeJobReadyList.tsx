@@ -97,8 +97,8 @@ const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading,
           gap: theme.fixedSpacing(theme.tabiyaSpacing.sm),
           flexWrap: "wrap",
           marginBottom: {
-            xs: theme.fixedSpacing(theme.tabiyaSpacing.md),
-            sm: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+            xs: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+            sm: theme.fixedSpacing(theme.tabiyaSpacing.xl),
           },
         }}
       >
@@ -150,14 +150,6 @@ const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading,
 
           return (
             <Box key={module.id} component="li">
-              {index > 0 && (
-                <Divider
-                  sx={{
-                    borderColor: `color-mix(in srgb, ${secondary.main} 35%, transparent)`,
-                    my: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-                  }}
-                />
-              )}
               {isExpanded ? (
                 <Box
                   data-testid={`${DATA_TEST_ID.HOME_JOB_READY_ROW}-${module.id}`}
@@ -165,8 +157,8 @@ const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading,
                     border: `2px solid ${secondary.main}`,
                     borderRadius: theme.rounding(theme.tabiyaRounding.sm),
                     padding: {
-                      xs: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-                      sm: theme.fixedSpacing(theme.tabiyaSpacing.md),
+                      xs: theme.fixedSpacing(theme.tabiyaSpacing.md),
+                      sm: theme.fixedSpacing(theme.tabiyaSpacing.lg),
                     },
                   }}
                 >
@@ -239,10 +231,13 @@ const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading,
                     flexDirection: { xs: "column", sm: "row" },
                     alignItems: { xs: "stretch", sm: "center" },
                     gap: {
+                      xs: theme.fixedSpacing(theme.tabiyaSpacing.xs),
+                      sm: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+                    },
+                    py: {
                       xs: theme.fixedSpacing(theme.tabiyaSpacing.sm),
                       sm: theme.fixedSpacing(theme.tabiyaSpacing.md),
                     },
-                    py: { xs: 0, sm: theme.fixedSpacing(theme.tabiyaSpacing.xs) },
                     cursor: "pointer",
                     borderRadius: theme.rounding(theme.tabiyaRounding.sm),
                   }}
@@ -286,6 +281,15 @@ const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading,
                   </Box>
                 </Box>
               )}
+              {index < sorted.length - 1 &&
+                module.id !== expandedModuleId &&
+                sorted[index + 1]?.id !== expandedModuleId && (
+                  <Divider
+                    sx={{
+                      borderColor: `color-mix(in srgb, ${secondary.main} 35%, transparent)`,
+                    }}
+                  />
+                )}
             </Box>
           );
         })}

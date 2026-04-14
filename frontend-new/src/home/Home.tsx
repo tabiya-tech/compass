@@ -91,7 +91,7 @@ const Home: React.FC = () => {
             flex: 1,
             backgroundColor: theme.palette.containerBackground.main,
             paddingTop: theme.fixedSpacing(theme.tabiyaSpacing.xl),
-            paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+            paddingBottom: theme.fixedSpacing(16),
           }}
         >
           <Box
