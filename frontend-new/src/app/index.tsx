@@ -304,7 +304,7 @@ const App = () => {
               handle: {
                 title: "home.modules.skillsDiscovery",
                 subtitle: "home.modules.skillsDiscoverySubtitle",
-                headerColor: "secondary",
+                headerColor: "primary",
               },
               element: (
                 <ProtectedRoute key={ProtectedRouteKeys.SKILLS_INTERESTS}>
@@ -354,7 +354,7 @@ const App = () => {
             {
               path: routerPaths.CAREER_READINESS_MODULE,
               handle: {
-                headerColor: "primary",
+                headerColor: "secondary",
               },
               element: (
                 <ProtectedRoute key={ProtectedRouteKeys.CAREER_READINESS_MODULE}>

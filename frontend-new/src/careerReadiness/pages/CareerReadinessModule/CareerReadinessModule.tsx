@@ -104,7 +104,7 @@ const CareerReadinessModule: React.FC = () => {
           <SubNavBar
             title={subNavTitle}
             subtitle={moduleDetail.title}
-            headerColor="brandColor"
+            headerColor="secondary"
             labelAbove
             backLabelKey="careerReadiness.backToModules"
             backTo={routerPaths.CAREER_READINESS}
