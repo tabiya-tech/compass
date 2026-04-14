@@ -28,7 +28,7 @@ def format_plain_personal_data_for_prompt(
         return ""
 
     sections: list[str] = ["## USER'S PERSONAL DATA"]
-    sections.append("Here is the current user's context:")
+    sections.append("The following personal data has already been provided by the user. Do NOT ask about any of these fields.")
     sections.append("{")
 
     for key, value in plain_personal_data.data.items():
