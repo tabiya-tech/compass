@@ -75,6 +75,8 @@ def main():
         gcp_oauth_client_id=getenv("GCP_OAUTH_CLIENT_ID"),
         language_config=getenv("BACKEND_LANGUAGE_CONFIG", False, True),
 
+        admin_tenant_id=getenv("ADMIN_FRONTEND_FIREBASE_TENANT_ID", True, True),
+
         cloudrun_max_instance_request_concurrency=cloudrun_max_instance_request_concurrency,
         cloudrun_min_instance_count=cloudrun_min_instance_count,
         cloudrun_max_instance_count=cloudrun_max_instance_count,

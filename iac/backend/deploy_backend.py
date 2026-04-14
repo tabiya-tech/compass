@@ -62,6 +62,7 @@ class BackendServiceConfig:
     cv_rate_limit_per_minute: Optional[str]
     enable_cv_upload: Optional[str]
     language_config: str
+    admin_tenant_id: str
     global_product_name: Optional[str]
     matching_service_url: Optional[str]
     matching_service_api_key: Optional[str]
@@ -465,6 +466,9 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="CAREER_EXPLORER_CONFIG",
                             value=backend_service_cfg.career_explorer_config or "{}"),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="ADMIN_FIREBASE_TENANT_ID",
+                            value=backend_service_cfg.admin_tenant_id or ""),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="PLAIN_PERSONAL_DATA_FIELDS",
                             value=backend_service_cfg.plain_personal_data_fields or "{}"),
