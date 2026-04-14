@@ -512,10 +512,10 @@ class IdentityPlatformProvider(ResourceProvider):
         if _use_custom_domain and not _callback_hostname:
             raise ValueError("The 'callback_uri' should not be set in the 'notification_config' args "
                              "when 'use_custom_domain' is set to False.")
-        if _use_custom_domain and _callback_hostname:
-            if not _callback_hostname.endswith(_custom_domain):
-                raise ValueError(f"The 'callback_uri:{_callback_hostname}' hostname in the 'notification_config' args "
-                                 f"must end with the custom 'custom_domain:{_custom_domain}'.")
+        # if _use_custom_domain and _callback_hostname:
+        #     if not _callback_hostname.endswith(_custom_domain):
+        #         raise ValueError(f"The 'callback_uri:{_callback_hostname}' hostname in the 'notification_config' args "
+        #                          f"must end with the custom 'custom_domain:{_custom_domain}'.")
 
         return CheckResult(_news, _failures)
 

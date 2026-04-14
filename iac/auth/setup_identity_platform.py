@@ -173,13 +173,14 @@ def _setup_identity_platform(
         return _authorized_domains
 
     authorized_domains = pulumi.Output.all(frontend_domain, environment_type).apply(_get_authorized_domains)
+    firebase_custom_domain = "njila.ai" if app_name == "Njila.ai" else frontend_domain
     idp_config = IdentityPlatform(
         get_resource_name(resource="identity-platform", resource_type="default-config"),
         notification_config=NotificationConfigArgs(
             send_email=SendEmailArgs(
                 callback_uri=auth_domain.apply(lambda s: f"https://{s}/__/auth/action"),
                 dns_info=DNSInfoArgs(
-                    custom_domain=frontend_domain,
+                    custom_domain=firebase_custom_domain,
                     use_custom_domain=True,
                 ),
                 verify_email_template=EmailTemplateArgs(
@@ -289,4 +290,3 @@ def deploy_auth(*,
         gcp_oauth_client_secret=gcp_oauth_client_secret,
         dependencies=[idp_cfg]  # Wait for the identity platform to be setup first
     )
-
