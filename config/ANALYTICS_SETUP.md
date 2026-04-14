@@ -14,8 +14,8 @@ The process is largely automated by `backend/scripts/analytics/setup_analytics.p
 │       ├── pushToDataLayer("user_registered", { method: "email" })        │
 │       └── pushToDataLayer("user_login", { method: "google" })            │
 │                                                                          │
-│  dataLayer.push() ──▶ GTM Container ──▶ GA4 Property                    │
-│                       (tags/triggers)    (reports/dashboards)             │
+│  dataLayer.push() ──▶ GTM Container ──▶ GA4 Property                     │
+│                       (tags/triggers)    (reports/dashboards)            │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -239,6 +239,21 @@ config/default.json
       → envService.ts (decoded at runtime)
         → gtmInit.ts (reads env vars, loads GTM)
 ```
+
+### Environment-Specific IDs
+
+Each deployment has its own GA4 property and GTM container to keep analytics data isolated.
+
+| | Development (`dev-njila.compass.tabiya.tech`) | Production (`njila.ai`) |
+|---|---|---|
+| **GA4 Account ID** | `387253059` | `387253059` |
+| **GA4 Property ID** | `528078871` | `532850500` |
+| **GA4 Measurement ID** | `G-722MET383C` | `G-BBV5W2M0FB` |
+| **GTM Account ID** | `6343687890` | `6343687890` |
+| **GTM Container ID** | `GTM-K3QPRR2W` | `GTM-TT62SLCK` |
+
+- `config/default.json` contains the **development** IDs (used for local dev and the dev-njila deployment).
+- **Production** IDs are configured via environment variables (`FRONTEND_GTM_CONTAINER_ID`, `FRONTEND_GTM_ENABLED`) in GCP Secret Manager and injected at deploy time by `iac/frontend/prepare_frontend.py`.
 
 ### Disabling Analytics
 
