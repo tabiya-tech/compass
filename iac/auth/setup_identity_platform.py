@@ -201,6 +201,9 @@ def _setup_identity_platform(
             mfa=gcp.identityplatform.ConfigMfaArgs(
                 state="DISABLED",
             ),
+            multi_tenant=gcp.identityplatform.ConfigMultiTenantArgs(
+                allow_tenants=True,
+            ),
             sign_in=gcp.identityplatform.ConfigSignInArgs(
                 # Accounts using the same email will be linked together, Otherwise we can't see the account identifier.
                 allow_duplicate_emails=False,
