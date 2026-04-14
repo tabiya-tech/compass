@@ -4,6 +4,14 @@ Tests for NonPrioritySectorExplorer.
 Covers the bug where the agent leaks its chain-of-thought JSON (including the
 'reasoning' field) directly to the user instead of returning only the 'message'
 field.
+
+Two-stage design
+----------------
+Stage 1 (Google Search) is mocked via patching genai.Client.
+Stage 2 (structured reformat) is mocked via patching _reformat_to_structured on the
+explorer instance, since it requires Vertex AI credentials unavailable in unit tests.
+The reformat stage returns a ModelResponse directly, simulating what response_schema
+enforcement guarantees at runtime.
 """
 
 import json
@@ -11,6 +19,7 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, PropertyMock, patch
 
 from app.agent.career_explorer_agent.non_priority_sector_explorer import NonPrioritySectorExplorer
+from app.agent.simple_llm_agent.llm_response import ModelResponse
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.context_vars import user_language_ctx_var
 from app.i18n.types import Locale
@@ -62,6 +71,31 @@ def _make_mock_response(text: str) -> MagicMock:
     return mock_response
 
 
+def _make_reformat_mock(raw_text: str) -> AsyncMock:
+    """
+    Build a mock for _reformat_to_structured that parses the raw_text as if
+    Stage 2 (response_schema enforcement) had run successfully.
+
+    If raw_text is valid ModelResponse JSON, returns the parsed model.
+    Otherwise returns a plain ModelResponse with raw_text as the message,
+    simulating the LLM returning clean prose (no JSON).
+    """
+    try:
+        data = json.loads(raw_text)
+        model_response = ModelResponse(
+            reasoning=data.get("reasoning", ""),
+            finished=data.get("finished", False),
+            message=data.get("message", raw_text),
+        )
+    except (json.JSONDecodeError, KeyError):
+        model_response = ModelResponse(reasoning="", finished=False, message=raw_text)
+
+    async def _reformat(raw: str, stats: list) -> ModelResponse:  # pylint: disable=unused-argument
+        return model_response
+
+    return AsyncMock(side_effect=_reformat)
+
+
 def _make_empty_context() -> ConversationContext:
     return ConversationContext()
 
@@ -104,6 +138,7 @@ class TestNonPrioritySectorExplorer:
 
         The 'message' returned to the caller must contain only the user-facing
         text -- NOT the raw JSON blob that includes the 'reasoning' field.
+        Stage 2 (_reformat_to_structured) is mocked to simulate response_schema enforcement.
         """
         # GIVEN a raw LLM response containing the full chain-of-thought JSON
         given_raw_text = _BUG_REPORT_RAW_TEXT
@@ -118,6 +153,7 @@ class TestNonPrioritySectorExplorer:
             mock_client = AsyncMock()
             mock_client.aio.models.generate_content = AsyncMock(return_value=given_mock_response)
             mock_genai.Client.return_value = mock_client
+            explorer._reformat_to_structured = _make_reformat_mock(given_raw_text)
 
             # WHEN the explorer processes the response
             actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
@@ -162,6 +198,7 @@ class TestNonPrioritySectorExplorer:
             mock_client = AsyncMock()
             mock_client.aio.models.generate_content = AsyncMock(return_value=given_mock_response)
             mock_genai.Client.return_value = mock_client
+            explorer._reformat_to_structured = _make_reformat_mock(given_raw_text)
 
             # WHEN the explorer processes the response
             actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
@@ -196,6 +233,7 @@ class TestNonPrioritySectorExplorer:
             mock_client = AsyncMock()
             mock_client.aio.models.generate_content = AsyncMock(return_value=given_mock_response)
             mock_genai.Client.return_value = mock_client
+            explorer._reformat_to_structured = _make_reformat_mock(given_plain_text)
 
             # WHEN the explorer processes the response
             actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
@@ -239,6 +277,12 @@ class TestNonPrioritySectorExplorer:
             mock_client = AsyncMock()
             mock_client.aio.models.generate_content = AsyncMock(return_value=given_mock_response)
             mock_genai.Client.return_value = mock_client
+            # Stage 2 receives the raw text and returns only the message field
+            explorer._reformat_to_structured = AsyncMock(return_value=ModelResponse(
+                reasoning="The user asked about construction careers in Zambia.",
+                finished=False,
+                message="Construction offers many opportunities in Zambia including civil engineering and architecture.",
+            ))
 
             # WHEN the explorer processes the response
             actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
@@ -276,6 +320,7 @@ class TestNonPrioritySectorExplorer:
             mock_client = AsyncMock()
             mock_client.aio.models.generate_content = AsyncMock(return_value=given_mock_response)
             mock_genai.Client.return_value = mock_client
+            explorer._reformat_to_structured = _make_reformat_mock(given_raw_text)
 
             # WHEN the explorer processes the response
             actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
@@ -314,6 +359,11 @@ class TestNonPrioritySectorExplorer:
             mock_client = AsyncMock()
             mock_client.aio.models.generate_content = AsyncMock(return_value=given_mock_response)
             mock_genai.Client.return_value = mock_client
+            explorer._reformat_to_structured = AsyncMock(return_value=ModelResponse(
+                reasoning="I searched for ICT Data Engineer roles.",
+                finished=False,
+                message="ICT Data Engineers in Zambia earn around 220,900 ZMW per year.",
+            ))
 
             # WHEN the explorer processes the response
             actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
@@ -360,6 +410,11 @@ class TestNonPrioritySectorExplorer:
             mock_client = AsyncMock()
             mock_client.aio.models.generate_content = AsyncMock(return_value=given_mock_response)
             mock_genai.Client.return_value = mock_client
+            explorer._reformat_to_structured = AsyncMock(return_value=ModelResponse(
+                reasoning="The user asked about ICT, a non-priority sector. I searched.",
+                finished=False,
+                message="ICT is a fast-growing sector in Zambia with many opportunities.",
+            ))
 
             # WHEN the explorer processes the response
             actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
@@ -408,6 +463,12 @@ class TestNonPrioritySectorExplorer:
             mock_client = AsyncMock()
             mock_client.aio.models.generate_content = AsyncMock(return_value=given_mock_response)
             mock_genai.Client.return_value = mock_client
+            # Stage 2 extracts the innermost human-readable message, discarding the nested JSON
+            explorer._reformat_to_structured = AsyncMock(return_value=ModelResponse(
+                reasoning="I searched and found relevant information.",
+                finished=False,
+                message="An ICT Data Engineer in Zambia is responsible for designing data pipelines.",
+            ))
 
             # WHEN the explorer processes the response
             actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
@@ -497,6 +558,7 @@ class TestNonPrioritySectorExplorerQuickReply:
             mock_client = AsyncMock()
             mock_client.aio.models.generate_content = AsyncMock(return_value=mock_response)
             mock_genai.Client.return_value = mock_client
+            explorer._reformat_to_structured = _make_reformat_mock(given_raw_text)
 
             # WHEN the explorer processes the response
             message, finished, reasoning, llm_stats, actual_metadata = await explorer.explore(
@@ -532,6 +594,7 @@ class TestNonPrioritySectorExplorerQuickReply:
             mock_client = AsyncMock()
             mock_client.aio.models.generate_content = AsyncMock(return_value=mock_response)
             mock_genai.Client.return_value = mock_client
+            explorer._reformat_to_structured = _make_reformat_mock(given_raw_text)
 
             # WHEN the explorer processes the response
             message, finished, reasoning, llm_stats, actual_metadata = await explorer.explore(
@@ -571,6 +634,7 @@ class TestNonPrioritySectorExplorerQuickReply:
             mock_client = AsyncMock()
             mock_client.aio.models.generate_content = AsyncMock(return_value=mock_response)
             mock_genai.Client.return_value = mock_client
+            explorer._reformat_to_structured = _make_reformat_mock(given_raw_text)
 
             # WHEN the explorer processes the response
             message, finished, reasoning, llm_stats, actual_metadata = await explorer.explore(
@@ -602,6 +666,7 @@ class TestNonPrioritySectorExplorerQuickReply:
             mock_client = AsyncMock()
             mock_client.aio.models.generate_content = AsyncMock(return_value=mock_response)
             mock_genai.Client.return_value = mock_client
+            explorer._reformat_to_structured = _make_reformat_mock(given_plain_text)
 
             # WHEN the explorer processes the response
             message, finished, reasoning, llm_stats, actual_metadata = await explorer.explore(
