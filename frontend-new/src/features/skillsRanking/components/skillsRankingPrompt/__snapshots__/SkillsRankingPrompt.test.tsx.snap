@@ -102,11 +102,11 @@ exports[`SkillsRankingPrompt snapshot: initial render in INITIAL phase (non-repl
             </svg>
           </div>
           <div
-            class="MuiBox-root css-tein1s"
+            class="MuiBox-root css-1cj7geb"
             data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
           >
-            <p
-              class="MuiTypography-root MuiTypography-body1 css-n76poq-MuiTypography-root"
+            <div
+              class="MuiBox-root css-1kxrhf3"
               data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
             />
             <div

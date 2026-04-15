@@ -1,6 +1,8 @@
 import React from "react";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { Box, Typography, styled } from "@mui/material";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export interface ChatBubbleProps {
   message: string | React.ReactNode;
@@ -37,18 +39,32 @@ const MessageBubble = styled(Box, {
   alignSelf: origin === ConversationMessageSender.USER ? "flex-end" : "flex-start",
   display: "flex",
   flexDirection: "column",
+  // Markdown styles for AI chat messages
+  "& p": { margin: 0 },
+  "& strong": { fontWeight: 700 },
+  "& em": { fontStyle: "italic" },
+  "& ul, & ol": { paddingLeft: theme.fixedSpacing(theme.tabiyaSpacing.md), margin: 0 },
+  "& li": { marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.xxs) },
 }));
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({ message, sender, children, fillColor }) => {
+  const isCompassMessage = sender === ConversationMessageSender.COMPASS && typeof message === "string";
+
   return (
     <MessageBubble origin={sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER} fillColor={fillColor}>
-      <Typography
-        whiteSpace="pre-line"
+      <Box
+        whiteSpace="pre-wrap"
         data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT}
         color={sender === ConversationMessageSender.USER ? "#FFF" : undefined}
       >
-        {message}
-      </Typography>
+        {isCompassMessage ? (
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{message as string}</ReactMarkdown>
+        ) : (
+          <Typography whiteSpace="pre-line" color={sender === ConversationMessageSender.USER ? "#FFF" : undefined}>
+            {message}
+          </Typography>
+        )}
+      </Box>
       <Box data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_FOOTER_CONTAINER}>{children}</Box>
     </MessageBubble>
   );

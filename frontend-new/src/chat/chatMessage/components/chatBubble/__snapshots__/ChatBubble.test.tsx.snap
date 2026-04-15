@@ -2,15 +2,17 @@
 
 exports[`render tests should render the Chat Bubble with a child if one is passed 1`] = `
 <div
-  class="MuiBox-root css-tein1s"
+  class="MuiBox-root css-1cj7geb"
   data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
 >
-  <p
-    class="MuiTypography-root MuiTypography-body1 css-n76poq-MuiTypography-root"
+  <div
+    class="MuiBox-root css-1kxrhf3"
     data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
   >
-    Hello, I'm Compass
-  </p>
+    <div>
+      Hello, I'm Compass
+    </div>
+  </div>
   <div
     class="MuiBox-root css-0"
     data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
@@ -26,15 +28,17 @@ exports[`render tests should render the Chat Bubble with a child if one is passe
 
 exports[`render tests should render the Chat Bubble without a child if none is passed 1`] = `
 <div
-  class="MuiBox-root css-tein1s"
+  class="MuiBox-root css-1cj7geb"
   data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
 >
-  <p
-    class="MuiTypography-root MuiTypography-body1 css-n76poq-MuiTypography-root"
+  <div
+    class="MuiBox-root css-1kxrhf3"
     data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
   >
-    Hello, I'm Compass
-  </p>
+    <div>
+      Hello, I'm Compass
+    </div>
+  </div>
   <div
     class="MuiBox-root css-0"
     data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"

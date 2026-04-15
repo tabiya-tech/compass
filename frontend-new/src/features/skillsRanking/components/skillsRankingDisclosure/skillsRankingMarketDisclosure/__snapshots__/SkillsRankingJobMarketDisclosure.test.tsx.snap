@@ -49,22 +49,26 @@ exports[`SkillsRankingJobMarketDisclosure snapshot: non-replay initial render (n
       class="MuiBox-root css-8atqhb"
     >
       <div
-        class="MuiBox-root css-tein1s"
+        class="MuiBox-root css-1cj7geb"
         data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
       >
-        <p
-          class="MuiTypography-root MuiTypography-body1 css-n76poq-MuiTypography-root"
+        <div
+          class="MuiBox-root css-1kxrhf3"
           data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
         >
-          You meet the key skills for 
-          <strong>
-            42
-            %
-          </strong>
-           of opportunities advertised on 
-          x
-          . That’s a solid range of options!
-        </p>
+          <p
+            class="MuiTypography-root MuiTypography-body1 css-n76poq-MuiTypography-root"
+          >
+            You meet the key skills for 
+            <strong>
+              42
+              %
+            </strong>
+             of opportunities advertised on 
+            x
+            . That’s a solid range of options!
+          </p>
+        </div>
         <div
           class="MuiBox-root css-0"
           data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"

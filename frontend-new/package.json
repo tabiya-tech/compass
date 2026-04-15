@@ -125,7 +125,7 @@
     "resetMocks": false,
     "clearMocks": false,
     "transformIgnorePatterns": [
-      "node_modules/(?!p-limit)/"
+      "node_modules/(?!p-limit|react-markdown|remark-gfm|remark-parse|remark-rehype|rehype-react|unified|vfile|vfile-message|unist-util-visit|unist-util-stringify-position|micromark|micromark-core-commonmark|hast-util-to-jsx-runtime|devlop)/"
     ],
     "transform": {
       "^.+\\.md$": "<rootDir>/src/_test_utilities/rawLoaderTransformer.js"

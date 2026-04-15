@@ -49,41 +49,45 @@ exports[`SkillsRankingJobSeekerDisclosure snapshot: non-replay initial render 1`
       class="MuiBox-root css-8atqhb"
     >
       <div
-        class="MuiBox-root css-tein1s"
+        class="MuiBox-root css-1cj7geb"
         data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
       >
-        <p
-          class="MuiTypography-root MuiTypography-body1 css-n76poq-MuiTypography-root"
+        <div
+          class="MuiBox-root css-1kxrhf3"
           data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
         >
-          Moreover, 
-          <strong>
-            Compared to other 
+          <p
+            class="MuiTypography-root MuiTypography-body1 css-n76poq-MuiTypography-root"
+          >
+            Moreover, 
+            <strong>
+              Compared to other 
             x
              users, you are in group [
             3
             ] of 
             5
             .
-          </strong>
-          <br />
-          Imagine lining up 100 
+            </strong>
+            <br />
+            Imagine lining up 100 
           x
            users from the fewest to the most jobs they fit. We cut the line into five blocks of 20 people. Block 1 (highest 20) fit the most jobs; block 5 (lowest 20) fit the fewest. You’re in block 
-          <strong>
-            [
+            <strong>
+              [
             3
             ]
-          </strong>
-          , which is the 
-          <strong>
-            [
+            </strong>
+            , which is the 
+            <strong>
+              [
             MIDDLE
             ]
-          </strong>
-           block.
-          <br />
-        </p>
+            </strong>
+             block.
+            <br />
+          </p>
+        </div>
         <div
           class="MuiBox-root css-0"
           data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
