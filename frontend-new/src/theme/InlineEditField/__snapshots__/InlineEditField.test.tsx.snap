@@ -3,7 +3,7 @@
 exports[`render tests should render correctly 1`] = `
 <input
   aria-invalid="false"
-  class="MuiInputBase-input MuiOutlinedInput-input css-ask1tn-MuiInputBase-input-MuiOutlinedInput-input"
+  class="MuiInputBase-input MuiOutlinedInput-input css-p1mqw2-MuiInputBase-input-MuiOutlinedInput-input"
   id=":r1:"
   placeholder="foo bar"
   type="text"
@@ -17,15 +17,15 @@ exports[`render tests should show badge when field is edited 1`] = `
   data-testid="inline-edit-field-badge-be128c36-2209-4d9d-8557-648dcb14ca88"
 >
   <div
-    class="MuiFormControl-root MuiTextField-root css-1afne40-MuiFormControl-root-MuiTextField-root"
+    class="MuiFormControl-root MuiTextField-root css-pvvc64-MuiFormControl-root-MuiTextField-root"
     data-testid="foo-testid"
   >
     <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-ybaiuy-MuiInputBase-root-MuiOutlinedInput-root"
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-4f049d-MuiInputBase-root-MuiOutlinedInput-root"
     >
       <input
         aria-invalid="false"
-        class="MuiInputBase-input MuiOutlinedInput-input css-ask1tn-MuiInputBase-input-MuiOutlinedInput-input"
+        class="MuiInputBase-input MuiOutlinedInput-input css-p1mqw2-MuiInputBase-input-MuiOutlinedInput-input"
         id=":r3:"
         placeholder="foo"
         type="text"

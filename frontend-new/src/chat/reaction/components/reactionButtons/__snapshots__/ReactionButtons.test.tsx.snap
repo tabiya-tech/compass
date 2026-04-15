@@ -6,7 +6,7 @@ exports[`ReactionButtons render tests should render correctly when no reaction i
   data-testid="reaction-buttons-container-8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e"
 >
   <button
-    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-3krhg7-MuiButtonBase-root-MuiIconButton-root"
+    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12ux9aj-MuiButtonBase-root-MuiIconButton-root"
     data-testid="reaction-button-like-8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e"
     tabindex="0"
     title="like"
@@ -25,7 +25,7 @@ exports[`ReactionButtons render tests should render correctly when no reaction i
     </svg>
   </button>
   <button
-    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-3krhg7-MuiButtonBase-root-MuiIconButton-root"
+    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12ux9aj-MuiButtonBase-root-MuiIconButton-root"
     data-testid="reaction-button-dislike-8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e"
     tabindex="0"
     title="dislike"
@@ -52,7 +52,7 @@ exports[`ReactionButtons render tests should render the reaction buttons and sho
   data-testid="reaction-buttons-container-8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e"
 >
   <button
-    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-3krhg7-MuiButtonBase-root-MuiIconButton-root"
+    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12ux9aj-MuiButtonBase-root-MuiIconButton-root"
     data-testid="reaction-button-like-8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e"
     tabindex="0"
     title="like"
@@ -71,7 +71,7 @@ exports[`ReactionButtons render tests should render the reaction buttons and sho
     </svg>
   </button>
   <button
-    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-3krhg7-MuiButtonBase-root-MuiIconButton-root"
+    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12ux9aj-MuiButtonBase-root-MuiIconButton-root"
     data-testid="reaction-button-dislike-8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e"
     tabindex="0"
     title="dislike"
@@ -98,7 +98,7 @@ exports[`ReactionButtons render tests should render the reaction buttons and sho
   data-testid="reaction-buttons-container-8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e"
 >
   <button
-    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-3krhg7-MuiButtonBase-root-MuiIconButton-root"
+    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12ux9aj-MuiButtonBase-root-MuiIconButton-root"
     data-testid="reaction-button-like-8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e"
     tabindex="0"
     title="like"
@@ -117,7 +117,7 @@ exports[`ReactionButtons render tests should render the reaction buttons and sho
     </svg>
   </button>
   <button
-    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-3krhg7-MuiButtonBase-root-MuiIconButton-root"
+    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12ux9aj-MuiButtonBase-root-MuiIconButton-root"
     data-testid="reaction-button-dislike-8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e"
     tabindex="0"
     title="dislike"
@@ -144,7 +144,7 @@ exports[`ReactionButtons render tests should render the reaction buttons as disa
   data-testid="reaction-buttons-container-8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e"
 >
   <button
-    class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-3krhg7-MuiButtonBase-root-MuiIconButton-root"
+    class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12ux9aj-MuiButtonBase-root-MuiIconButton-root"
     data-testid="reaction-button-like-8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e"
     disabled=""
     tabindex="-1"
@@ -164,7 +164,7 @@ exports[`ReactionButtons render tests should render the reaction buttons as disa
     </svg>
   </button>
   <button
-    class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-3krhg7-MuiButtonBase-root-MuiIconButton-root"
+    class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12ux9aj-MuiButtonBase-root-MuiIconButton-root"
     data-testid="reaction-button-dislike-8d4e6f2c-9a3b-4c5d-b1e7-5f9d8a2b3c4e"
     disabled=""
     tabindex="-1"

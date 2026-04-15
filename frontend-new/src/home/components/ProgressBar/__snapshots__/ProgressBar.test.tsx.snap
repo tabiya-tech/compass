@@ -2,21 +2,21 @@
 
 exports[`ProgressBar should render container, progress bar, profile strength text, see profile link, and hint 1`] = `
 <div
-  class="MuiBox-root css-y83a77"
+  class="MuiBox-root css-avek6i"
   data-testid="progress-bar-container-31a67579-b5e1-40dc-9ab1-eeffa3fc0207"
 >
   <div
-    class="MuiBox-root css-2uhc0n"
+    class="MuiBox-root css-1q05bek"
   >
     <p
-      class="MuiTypography-root MuiTypography-body2 css-1bucngc-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body2 css-1eipkta-MuiTypography-root"
       data-testid="progress-bar-strength-text-31a67579-b5e1-40dc-9ab1-eeffa3fc0207"
     >
       Your current profile strength is 40%.
     </p>
     <a
       aria-disabled="false"
-      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-w9ndgo-MuiTypography-root-MuiLink-root"
+      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1x16sms-MuiTypography-root-MuiLink-root"
       data-testid="progress-bar-see-profile-link-31a67579-b5e1-40dc-9ab1-eeffa3fc0207"
     >
       See profile →
@@ -37,7 +37,7 @@ exports[`ProgressBar should render container, progress bar, profile strength tex
     />
   </span>
   <p
-    class="MuiTypography-root MuiTypography-body2 css-kkb5uy-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-body2 css-jhgeqe-MuiTypography-root"
     data-testid="progress-bar-hint-31a67579-b5e1-40dc-9ab1-eeffa3fc0207"
   >
     That's a strong start — try My Skills & Interests to surface more about what you know and enjoy.

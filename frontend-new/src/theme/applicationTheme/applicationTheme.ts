@@ -1,5 +1,6 @@
 import { createTheme, PaletteOptions, ThemeOptions, SimplePaletteColorOptions } from "@mui/material/styles";
 import {
+  supportsDynamicViewportUnits,
   CSSClampFnCalculatorPx,
   CSSClampFnCalculatorRem,
   ScreenSize,
@@ -191,9 +192,15 @@ export const applicationTheme = (theme: ThemeMode) => {
     maxHeight: screenSizePx.maxHeight / TabiyaBaseSizes.font,
   };
 
+  const useDynamicViewport = supportsDynamicViewportUnits();
+  const clampPx = (minValue: number, maxValue: number, size: ScreenSize) =>
+    CSSClampFnCalculatorPx(minValue, maxValue, size, useDynamicViewport);
+  const clampRem = (minValue: number, maxValue: number, size: ScreenSize) =>
+    CSSClampFnCalculatorRem(minValue, maxValue, size, useDynamicViewport);
+
   // cache the clamp functions to avoid recalculating them
-  const spacingClampFn = CSSClampFnCalculatorPx(TabiyaBaseSizes.spacing / 4, TabiyaBaseSizes.spacing, screenSizePx);
-  const roundingClampFn = CSSClampFnCalculatorPx(TabiyaBaseSizes.rounding / 4, TabiyaBaseSizes.rounding, screenSizePx);
+  const spacingClampFn = clampPx(TabiyaBaseSizes.spacing / 4, TabiyaBaseSizes.spacing, screenSizePx);
+  const roundingClampFn = clampPx(TabiyaBaseSizes.rounding / 4, TabiyaBaseSizes.rounding, screenSizePx);
 
   const activePalette: PaletteOptions = theme === ThemeMode.LIGHT ? lightPalette : darkPalette;
   const activeTheme: ThemeOptions = {
@@ -248,90 +255,90 @@ export const applicationTheme = (theme: ThemeMode) => {
       h1: {
         fontFamily: '"Bricolage Grotesque", sans-serif',
         fontWeight: "800",
-        fontSize: CSSClampFnCalculatorRem(1.875, 3, screenSizeRem),
+        fontSize: clampRem(1.875, 3, screenSizeRem),
         letterSpacing: "-0.02em",
         color: activePalette.text!!.primary,
       },
       h2: {
         fontFamily: '"Bricolage Grotesque", sans-serif',
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.5, 2.25, screenSizeRem),
+        fontSize: clampRem(1.5, 2.25, screenSizeRem),
         letterSpacing: "-0.02em",
         color: activePalette.text!!.primary,
       },
       h3: {
         fontFamily: '"Bricolage Grotesque", sans-serif',
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.25, 1.875, screenSizeRem),
+        fontSize: clampRem(1.25, 1.875, screenSizeRem),
         letterSpacing: "-0.01em",
         color: activePalette.text!!.primary,
       },
       h4: {
         fontFamily: '"Bricolage Grotesque", sans-serif',
         fontWeight: "600",
-        fontSize: CSSClampFnCalculatorRem(1.25, 1.5, screenSizeRem),
+        fontSize: clampRem(1.25, 1.5, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h5: {
         fontFamily: '"Bricolage Grotesque", sans-serif',
         fontWeight: "600",
-        fontSize: CSSClampFnCalculatorRem(1.125, 1.25, screenSizeRem),
+        fontSize: clampRem(1.125, 1.25, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h6: {
         fontFamily: '"Bricolage Grotesque", sans-serif',
         fontWeight: "600",
-        fontSize: CSSClampFnCalculatorRem(1, 1.125, screenSizeRem),
+        fontSize: clampRem(1, 1.125, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       subtitle1: {
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         fontWeight: "600",
-        fontSize: CSSClampFnCalculatorRem(1.125, 1.25, screenSizeRem),
+        fontSize: clampRem(1.125, 1.25, screenSizeRem),
         color: activePalette.text!!.textAccent,
       },
       subtitle2: {
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         fontWeight: "600",
-        fontSize: CSSClampFnCalculatorRem(1, 1.125, screenSizeRem),
+        fontSize: clampRem(1, 1.125, screenSizeRem),
         color: activePalette.text!!.textAccent,
       },
       body1: {
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         fontWeight: "400",
-        fontSize: CSSClampFnCalculatorRem(1, 1.125, screenSizeRem),
+        fontSize: clampRem(1, 1.125, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       body2: {
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         fontWeight: "400",
-        fontSize: CSSClampFnCalculatorRem(0.875, 1, screenSizeRem),
+        fontSize: clampRem(0.875, 1, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       button: {
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         fontWeight: "500",
-        fontSize: CSSClampFnCalculatorRem(0.875, 1, screenSizeRem),
+        fontSize: clampRem(0.875, 1, screenSizeRem),
         color: activePalette.text!!.primary,
         textTransform: "none",
       },
       caption: {
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         fontWeight: "400",
-        fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem),
+        fontSize: clampRem(0.75, 0.875, screenSizeRem),
         color: activePalette.text!!.secondary,
       },
       overline: {
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         fontWeight: "600",
-        fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem),
+        fontSize: clampRem(0.75, 0.875, screenSizeRem),
         textTransform: "uppercase",
         color: activePalette.text!!.secondary,
       },
       progressBarText: {
         fontFamily: '"Bricolage Grotesque", sans-serif',
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem),
+        fontSize: clampRem(0.75, 0.875, screenSizeRem),
         color: activePalette.text!!.primary,
       },
     },
@@ -381,7 +388,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       MuiChip: {
         styleOverrides: {
           root: {
-            fontSize: CSSClampFnCalculatorRem(0.75, 1, screenSizeRem),
+            fontSize: clampRem(0.75, 1, screenSizeRem),
           },
           colorSecondary: {
             textTransform: "none",
@@ -396,7 +403,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       MuiTextField: {
         styleOverrides: {
           root: {
-            fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust text size
+            fontSize: clampRem(0.75, 0.875, screenSizeRem), // Adjust text size
             padding: "0",
 
             "& .Mui-disabled": {
@@ -408,11 +415,11 @@ export const applicationTheme = (theme: ThemeMode) => {
       MuiInputBase: {
         styleOverrides: {
           root: {
-            fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust text size
+            fontSize: clampRem(0.75, 0.875, screenSizeRem), // Adjust text size
             padding: "0",
           },
           input: {
-            fontSize: CSSClampFnCalculatorRem(0.875, 1, screenSizeRem), // Adjust input text size
+            fontSize: clampRem(0.875, 1, screenSizeRem), // Adjust input text size
             padding: "0",
             fontWeight: 500,
           },
@@ -437,7 +444,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       MuiInputLabel: {
         styleOverrides: {
           root: {
-            fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust label text size
+            fontSize: clampRem(0.75, 0.875, screenSizeRem), // Adjust label text size
             padding: "0",
             color: activePalette.text!.secondary,
             opacity: 0.7,

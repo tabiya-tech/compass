@@ -1,5 +1,6 @@
 import { createTheme, PaletteOptions, ThemeOptions, SimplePaletteColorOptions } from "@mui/material/styles";
 import {
+  supportsDynamicViewportUnits,
   CSSClampFnCalculatorPx,
   CSSClampFnCalculatorRem,
   ScreenSize,
@@ -168,9 +169,15 @@ export const applicationTheme = (theme: ThemeMode) => {
     maxHeight: screenSizePx.maxHeight / TabiyaBaseSizes.font,
   };
 
+  const useDynamicViewport = supportsDynamicViewportUnits();
+  const clampPx = (minValue: number, maxValue: number, size: ScreenSize) =>
+    CSSClampFnCalculatorPx(minValue, maxValue, size, useDynamicViewport);
+  const clampRem = (minValue: number, maxValue: number, size: ScreenSize) =>
+    CSSClampFnCalculatorRem(minValue, maxValue, size, useDynamicViewport);
+
   // cache the clamp functions to avoid recalculating them
-  const spacingClampFn = CSSClampFnCalculatorPx(TabiyaBaseSizes.spacing / 4, TabiyaBaseSizes.spacing, screenSizePx);
-  const roundingClampFn = CSSClampFnCalculatorPx(TabiyaBaseSizes.rounding / 4, TabiyaBaseSizes.rounding, screenSizePx);
+  const spacingClampFn = clampPx(TabiyaBaseSizes.spacing / 4, TabiyaBaseSizes.spacing, screenSizePx);
+  const roundingClampFn = clampPx(TabiyaBaseSizes.rounding / 4, TabiyaBaseSizes.rounding, screenSizePx);
 
   const activePalette: PaletteOptions = theme === ThemeMode.LIGHT ? lightPalette : darkPalette;
   const activeTheme: ThemeOptions = {
@@ -225,85 +232,85 @@ export const applicationTheme = (theme: ThemeMode) => {
       h1: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.45, 2.125, screenSizeRem),
+        fontSize: clampRem(1.45, 2.125, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h2: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.4, 1.975, screenSizeRem),
+        fontSize: clampRem(1.4, 1.975, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h3: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.35, 1.825, screenSizeRem),
+        fontSize: clampRem(1.35, 1.825, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h4: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.3, 1.675, screenSizeRem),
+        fontSize: clampRem(1.3, 1.675, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h5: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.25, 1.525, screenSizeRem),
+        fontSize: clampRem(1.25, 1.525, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       h6: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(1.2, 1.375, screenSizeRem),
+        fontSize: clampRem(1.2, 1.375, screenSizeRem),
         color: activePalette.text!!.primary,
       },
       subtitle1: {
         fontFamily: "Inter",
         fontWeight: "500",
-        fontSize: CSSClampFnCalculatorRem(1, 1.125, screenSizeRem),
+        fontSize: clampRem(1, 1.125, screenSizeRem),
 
         color: activePalette.text!!.textAccent,
       },
       subtitle2: {
         fontFamily: "Inter",
         fontWeight: "500",
-        fontSize: CSSClampFnCalculatorRem(0.75, 1, screenSizeRem),
+        fontSize: clampRem(0.75, 1, screenSizeRem),
         color: activePalette.text!!.textAccent,
       },
       body1: {
         fontFamily: "Inter",
         fontWeight: "400",
-        fontSize: CSSClampFnCalculatorRem(0.875, 1, screenSizeRem),
+        fontSize: clampRem(0.875, 1, screenSizeRem),
         color: activePalette.text!!.secondary,
       },
       body2: {
         fontFamily: "Inter",
         fontWeight: "400",
-        fontSize: CSSClampFnCalculatorRem(0.75, 1, screenSizeRem),
+        fontSize: clampRem(0.75, 1, screenSizeRem),
         color: activePalette.text!!.secondary,
       },
       button: {
         fontFamily: "Inter",
         fontWeight: "500",
-        fontSize: CSSClampFnCalculatorRem(1, 1.125, screenSizeRem),
+        fontSize: clampRem(1, 1.125, screenSizeRem),
         color: activePalette.text!!.primary,
         textTransform: "none",
       },
       caption: {
         fontFamily: "Inter",
         fontWeight: "400",
-        fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem),
+        fontSize: clampRem(0.75, 0.875, screenSizeRem),
       },
       overline: {
         fontFamily: "Inter",
         fontWeight: "400",
-        fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem),
+        fontSize: clampRem(0.75, 0.875, screenSizeRem),
       },
       progressBarText: {
         fontFamily: "IBM Plex Mono",
         fontWeight: "700",
-        fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem),
+        fontSize: clampRem(0.75, 0.875, screenSizeRem),
         color: activePalette.text!!.primary,
       },
     },
@@ -353,7 +360,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       MuiChip: {
         styleOverrides: {
           root: {
-            fontSize: CSSClampFnCalculatorRem(0.75, 1, screenSizeRem),
+            fontSize: clampRem(0.75, 1, screenSizeRem),
           },
           colorSecondary: {
             textTransform: "none",
@@ -368,7 +375,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       MuiTextField: {
         styleOverrides: {
           root: {
-            fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust text size
+            fontSize: clampRem(0.75, 0.875, screenSizeRem), // Adjust text size
             padding: "0",
 
             "& .Mui-disabled": {
@@ -380,11 +387,11 @@ export const applicationTheme = (theme: ThemeMode) => {
       MuiInputBase: {
         styleOverrides: {
           root: {
-            fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust text size
+            fontSize: clampRem(0.75, 0.875, screenSizeRem), // Adjust text size
             padding: "0",
           },
           input: {
-            fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust input text size
+            fontSize: clampRem(0.75, 0.875, screenSizeRem), // Adjust input text size
             padding: "0",
           },
         },
@@ -392,7 +399,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       MuiInputLabel: {
         styleOverrides: {
           root: {
-            fontSize: CSSClampFnCalculatorRem(0.75, 0.875, screenSizeRem), // Adjust label text size
+            fontSize: clampRem(0.75, 0.875, screenSizeRem), // Adjust label text size
             padding: "0",
             color: activePalette.text!.secondary,
             opacity: 0.7,

@@ -23,7 +23,7 @@ exports[`Chat render tests should render the Chat component with all its childre
         data-testid="chat-view-container-8f4e2b1a-9c3d-4a5e-b6f7-8a9b0c1d2e3f"
       >
         <div
-          class="MuiBox-root css-nr46lu"
+          class="MuiBox-root css-jlvwdz"
           data-testid="chat-view-messages-area-8f4e2b1a-9c3d-4a5e-b6f7-8a9b0c1d2e3f"
         >
           <div
@@ -31,7 +31,7 @@ exports[`Chat render tests should render the Chat component with all its childre
           />
         </div>
         <div
-          class="MuiBox-root css-13n284c"
+          class="MuiBox-root css-cmhdnq"
           data-testid="chat-view-input-area-8f4e2b1a-9c3d-4a5e-b6f7-8a9b0c1d2e3f"
         >
           <div

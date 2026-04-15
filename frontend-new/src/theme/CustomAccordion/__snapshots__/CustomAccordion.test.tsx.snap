@@ -15,7 +15,7 @@ exports[`CustomAccordion should render CustomAccordion correctly 1`] = `
       <button
         aria-controls="panel-content"
         aria-expanded="false"
-        class="MuiButtonBase-root MuiAccordionSummary-root MuiAccordionSummary-gutters css-1t37t65-MuiButtonBase-root-MuiAccordionSummary-root"
+        class="MuiButtonBase-root MuiAccordionSummary-root MuiAccordionSummary-gutters css-1kh1rau-MuiButtonBase-root-MuiAccordionSummary-root"
         data-testid="custom-accordion-summary-34d24bf6-1b9b-40f1-93b3-baf68ab03da4"
         id="panel-header"
         tabindex="0"
@@ -25,7 +25,7 @@ exports[`CustomAccordion should render CustomAccordion correctly 1`] = `
           class="MuiAccordionSummary-content MuiAccordionSummary-contentGutters css-yfrx4k-MuiAccordionSummary-content"
         >
           <p
-            class="MuiTypography-root MuiTypography-body1 css-s3vkbt-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-11im02d-MuiTypography-root"
           >
             foo
           </p>
@@ -66,7 +66,7 @@ exports[`CustomAccordion should render CustomAccordion correctly 1`] = `
           role="region"
         >
           <div
-            class="MuiAccordionDetails-root css-a9mhnd-MuiAccordionDetails-root"
+            class="MuiAccordionDetails-root css-1bf0vw9-MuiAccordionDetails-root"
             data-testid="custom-accordion-details-34d24bf6-1b9b-40f1-93b3-baf68ab03da4"
           >
             <div>

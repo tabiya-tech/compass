@@ -17,18 +17,18 @@ exports[`Landing Page Continue as Guest button should not show guest button when
           class="MuiBox-root css-0"
         >
           <h3
-            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1dmbll0-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1xwepto-MuiTypography-root"
           >
             Welcome to mockProduct!
           </h3>
           <h5
-            class="MuiTypography-root MuiTypography-h5 css-20tucl-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h5 css-1s13cad-MuiTypography-root"
           >
             Discover your Full Potential
           </h5>
         </div>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1hc22ms-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-3i7nh4-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-login-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -36,7 +36,7 @@ exports[`Landing Page Continue as Guest button should not show guest button when
           Let's go
         </button>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1w7rcxi-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-16s3isr-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-signup-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -66,18 +66,18 @@ exports[`Landing Page Continue as Guest button should not show guest button when
           class="MuiBox-root css-0"
         >
           <h3
-            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1dmbll0-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1xwepto-MuiTypography-root"
           >
             Welcome to mockProduct!
           </h3>
           <h5
-            class="MuiTypography-root MuiTypography-h5 css-20tucl-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h5 css-1s13cad-MuiTypography-root"
           >
             Discover your Full Potential
           </h5>
         </div>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1hc22ms-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-3i7nh4-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-login-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -85,7 +85,7 @@ exports[`Landing Page Continue as Guest button should not show guest button when
           Let's go
         </button>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1w7rcxi-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-16s3isr-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-signup-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -115,18 +115,18 @@ exports[`Landing Page Continue as Guest button should not show guest button when
           class="MuiBox-root css-0"
         >
           <h3
-            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1dmbll0-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1xwepto-MuiTypography-root"
           >
             Welcome to mockProduct!
           </h3>
           <h5
-            class="MuiTypography-root MuiTypography-h5 css-20tucl-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h5 css-1s13cad-MuiTypography-root"
           >
             Discover your Full Potential
           </h5>
         </div>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1hc22ms-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-3i7nh4-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-login-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -134,7 +134,7 @@ exports[`Landing Page Continue as Guest button should not show guest button when
           Let's go
         </button>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1w7rcxi-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-16s3isr-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-signup-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -164,18 +164,18 @@ exports[`Landing Page Continue as Guest button should show guest button when app
           class="MuiBox-root css-0"
         >
           <h3
-            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1dmbll0-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1xwepto-MuiTypography-root"
           >
             Welcome to mockProduct!
           </h3>
           <h5
-            class="MuiTypography-root MuiTypography-h5 css-20tucl-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h5 css-1s13cad-MuiTypography-root"
           >
             Discover your Full Potential
           </h5>
         </div>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1hc22ms-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-3i7nh4-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-login-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -183,7 +183,7 @@ exports[`Landing Page Continue as Guest button should show guest button when app
           Let's go
         </button>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1w7rcxi-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-16s3isr-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-signup-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -191,19 +191,19 @@ exports[`Landing Page Continue as Guest button should show guest button when app
           Sign Up
         </button>
         <div
-          class="MuiBox-root css-12w8oaz"
+          class="MuiBox-root css-n085to"
         >
           <div
             aria-orientation="horizontal"
-            class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-1wok58u-MuiDivider-root"
+            class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-10fz4te-MuiDivider-root"
             data-testid="landing-divider-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
             role="separator"
           >
             <span
-              class="MuiDivider-wrapper css-ijin0t-MuiDivider-wrapper"
+              class="MuiDivider-wrapper css-ev540k-MuiDivider-wrapper"
             >
               <h6
-                class="MuiTypography-root MuiTypography-subtitle2 css-4pjt2s-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-subtitle2 css-lvh0bk-MuiTypography-root"
               >
                 or
               </h6>
@@ -240,18 +240,18 @@ exports[`Landing Page Register button should not show register link when registr
           class="MuiBox-root css-0"
         >
           <h3
-            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1dmbll0-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1xwepto-MuiTypography-root"
           >
             Welcome to mockProduct!
           </h3>
           <h5
-            class="MuiTypography-root MuiTypography-h5 css-20tucl-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h5 css-1s13cad-MuiTypography-root"
           >
             Discover your Full Potential
           </h5>
         </div>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1hc22ms-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-3i7nh4-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-login-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -259,19 +259,19 @@ exports[`Landing Page Register button should not show register link when registr
           Let's go
         </button>
         <div
-          class="MuiBox-root css-12w8oaz"
+          class="MuiBox-root css-n085to"
         >
           <div
             aria-orientation="horizontal"
-            class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-1wok58u-MuiDivider-root"
+            class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-10fz4te-MuiDivider-root"
             data-testid="landing-divider-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
             role="separator"
           >
             <span
-              class="MuiDivider-wrapper css-ijin0t-MuiDivider-wrapper"
+              class="MuiDivider-wrapper css-ev540k-MuiDivider-wrapper"
             >
               <h6
-                class="MuiTypography-root MuiTypography-subtitle2 css-4pjt2s-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-subtitle2 css-lvh0bk-MuiTypography-root"
               >
                 or
               </h6>
@@ -308,18 +308,18 @@ exports[`Landing Page Register button should not show register link when registr
           class="MuiBox-root css-0"
         >
           <h3
-            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1dmbll0-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1xwepto-MuiTypography-root"
           >
             Welcome to mockProduct!
           </h3>
           <h5
-            class="MuiTypography-root MuiTypography-h5 css-20tucl-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h5 css-1s13cad-MuiTypography-root"
           >
             Discover your Full Potential
           </h5>
         </div>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1hc22ms-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-3i7nh4-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-login-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -327,19 +327,19 @@ exports[`Landing Page Register button should not show register link when registr
           Let's go
         </button>
         <div
-          class="MuiBox-root css-12w8oaz"
+          class="MuiBox-root css-n085to"
         >
           <div
             aria-orientation="horizontal"
-            class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-1wok58u-MuiDivider-root"
+            class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-10fz4te-MuiDivider-root"
             data-testid="landing-divider-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
             role="separator"
           >
             <span
-              class="MuiDivider-wrapper css-ijin0t-MuiDivider-wrapper"
+              class="MuiDivider-wrapper css-ev540k-MuiDivider-wrapper"
             >
               <h6
-                class="MuiTypography-root MuiTypography-subtitle2 css-4pjt2s-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-subtitle2 css-lvh0bk-MuiTypography-root"
               >
                 or
               </h6>
@@ -376,18 +376,18 @@ exports[`Landing Page Register button should show register link when registratio
           class="MuiBox-root css-0"
         >
           <h3
-            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1dmbll0-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1xwepto-MuiTypography-root"
           >
             Welcome to mockProduct!
           </h3>
           <h5
-            class="MuiTypography-root MuiTypography-h5 css-20tucl-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h5 css-1s13cad-MuiTypography-root"
           >
             Discover your Full Potential
           </h5>
         </div>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1hc22ms-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-3i7nh4-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-login-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -395,7 +395,7 @@ exports[`Landing Page Register button should show register link when registratio
           Let's go
         </button>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1w7rcxi-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-16s3isr-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-signup-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -403,19 +403,19 @@ exports[`Landing Page Register button should show register link when registratio
           Sign Up
         </button>
         <div
-          class="MuiBox-root css-12w8oaz"
+          class="MuiBox-root css-n085to"
         >
           <div
             aria-orientation="horizontal"
-            class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-1wok58u-MuiDivider-root"
+            class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-10fz4te-MuiDivider-root"
             data-testid="landing-divider-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
             role="separator"
           >
             <span
-              class="MuiDivider-wrapper css-ijin0t-MuiDivider-wrapper"
+              class="MuiDivider-wrapper css-ev540k-MuiDivider-wrapper"
             >
               <h6
-                class="MuiTypography-root MuiTypography-subtitle2 css-4pjt2s-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-subtitle2 css-lvh0bk-MuiTypography-root"
               >
                 or
               </h6>
@@ -452,18 +452,18 @@ exports[`Landing Page Register button should show register link when registratio
           class="MuiBox-root css-0"
         >
           <h3
-            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1dmbll0-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1xwepto-MuiTypography-root"
           >
             Welcome to mockProduct!
           </h3>
           <h5
-            class="MuiTypography-root MuiTypography-h5 css-20tucl-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h5 css-1s13cad-MuiTypography-root"
           >
             Discover your Full Potential
           </h5>
         </div>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1hc22ms-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-3i7nh4-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-login-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -471,7 +471,7 @@ exports[`Landing Page Register button should show register link when registratio
           Let's go
         </button>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1w7rcxi-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-16s3isr-MuiButtonBase-root-MuiButton-root"
           data-testid="landing-signup-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           tabindex="0"
           type="button"
@@ -479,19 +479,19 @@ exports[`Landing Page Register button should show register link when registratio
           Sign Up
         </button>
         <div
-          class="MuiBox-root css-12w8oaz"
+          class="MuiBox-root css-n085to"
         >
           <div
             aria-orientation="horizontal"
-            class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-1wok58u-MuiDivider-root"
+            class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-10fz4te-MuiDivider-root"
             data-testid="landing-divider-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
             role="separator"
           >
             <span
-              class="MuiDivider-wrapper css-ijin0t-MuiDivider-wrapper"
+              class="MuiDivider-wrapper css-ev540k-MuiDivider-wrapper"
             >
               <h6
-                class="MuiTypography-root MuiTypography-subtitle2 css-4pjt2s-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-subtitle2 css-lvh0bk-MuiTypography-root"
               >
                 or
               </h6>
@@ -527,18 +527,18 @@ exports[`Landing Page should render landing page successfully 1`] = `
         class="MuiBox-root css-0"
       >
         <h3
-          class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1dmbll0-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1xwepto-MuiTypography-root"
         >
           Welcome to mockProduct!
         </h3>
         <h5
-          class="MuiTypography-root MuiTypography-h5 css-20tucl-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-h5 css-1s13cad-MuiTypography-root"
         >
           Discover your Full Potential
         </h5>
       </div>
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1hc22ms-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-3i7nh4-MuiButtonBase-root-MuiButton-root"
         data-testid="landing-login-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
         tabindex="0"
         type="button"
@@ -546,7 +546,7 @@ exports[`Landing Page should render landing page successfully 1`] = `
         Let's go
       </button>
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-1w7rcxi-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-16s3isr-MuiButtonBase-root-MuiButton-root"
         data-testid="landing-signup-button-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
         tabindex="0"
         type="button"
@@ -554,19 +554,19 @@ exports[`Landing Page should render landing page successfully 1`] = `
         Sign Up
       </button>
       <div
-        class="MuiBox-root css-12w8oaz"
+        class="MuiBox-root css-n085to"
       >
         <div
           aria-orientation="horizontal"
-          class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-1wok58u-MuiDivider-root"
+          class="MuiDivider-root MuiDivider-fullWidth MuiDivider-withChildren css-10fz4te-MuiDivider-root"
           data-testid="landing-divider-e9c346bb-bcc6-4aaa-aaa9-d24d09274925"
           role="separator"
         >
           <span
-            class="MuiDivider-wrapper css-ijin0t-MuiDivider-wrapper"
+            class="MuiDivider-wrapper css-ev540k-MuiDivider-wrapper"
           >
             <h6
-              class="MuiTypography-root MuiTypography-subtitle2 css-4pjt2s-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-subtitle2 css-lvh0bk-MuiTypography-root"
             >
               or
             </h6>

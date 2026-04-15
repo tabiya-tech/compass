@@ -2,7 +2,7 @@
 
 exports[`render tests should render the User Chat message with a ChatBubble 1`] = `
 <div
-  class="MuiBox-root css-1oo776r"
+  class="MuiBox-root css-1rg1cuu"
   data-testid="chat-message-container-41e9f8a5-be6f-406a-9958-13e9bcc853a9"
   origin="USER"
 >

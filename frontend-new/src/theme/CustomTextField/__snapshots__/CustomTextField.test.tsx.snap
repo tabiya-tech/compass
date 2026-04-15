@@ -2,25 +2,25 @@
 
 exports[`Custom text field should render CustomTextField correctly 1`] = `
 <div
-  class="MuiBox-root css-101s3jr"
+  class="MuiBox-root css-qpcjfc"
   data-testid="custom-text-field-container-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
 >
   <p
-    class="MuiTypography-root MuiTypography-body1 css-s3vkbt-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-body1 css-11im02d-MuiTypography-root"
     data-testid="custom-text-field-label-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
   >
     label
   </p>
   <div
-    class="MuiFormControl-root MuiTextField-root css-1h4gfsl-MuiFormControl-root-MuiTextField-root"
+    class="MuiFormControl-root MuiTextField-root css-xplq9r-MuiFormControl-root-MuiTextField-root"
     data-testid="custom-text-field-input-f4b3b3b3-4b3b-4b3b-4b3b-4b3b4b3b4b3b"
   >
     <div
-      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-ybaiuy-MuiInputBase-root-MuiOutlinedInput-root"
+      class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-4f049d-MuiInputBase-root-MuiOutlinedInput-root"
     >
       <input
         aria-invalid="false"
-        class="MuiInputBase-input MuiOutlinedInput-input css-ask1tn-MuiInputBase-input-MuiOutlinedInput-input"
+        class="MuiInputBase-input MuiOutlinedInput-input css-p1mqw2-MuiInputBase-input-MuiOutlinedInput-input"
         id=":r1:"
         placeholder="Enter text here"
         type="text"

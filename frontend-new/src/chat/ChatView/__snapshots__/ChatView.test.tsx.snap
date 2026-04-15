@@ -6,7 +6,7 @@ exports[`ChatView should match snapshot with messages and quick replies 1`] = `
   data-testid="chat-view-container-8f4e2b1a-9c3d-4a5e-b6f7-8a9b0c1d2e3f"
 >
   <div
-    class="MuiBox-root css-nr46lu"
+    class="MuiBox-root css-jlvwdz"
     data-testid="chat-view-messages-area-8f4e2b1a-9c3d-4a5e-b6f7-8a9b0c1d2e3f"
   >
     <div
@@ -17,11 +17,11 @@ exports[`ChatView should match snapshot with messages and quick replies 1`] = `
     </div>
   </div>
   <div
-    class="MuiBox-root css-13n284c"
+    class="MuiBox-root css-cmhdnq"
     data-testid="chat-view-input-area-8f4e2b1a-9c3d-4a5e-b6f7-8a9b0c1d2e3f"
   >
     <div
-      class="MuiBox-root css-9iyoh4"
+      class="MuiBox-root css-1k3m48o"
       data-testid="chat-view-quick-replies-container-8f4e2b1a-9c3d-4a5e-b6f7-8a9b0c1d2e3f"
     >
       <div

@@ -17,22 +17,22 @@ exports[`Testing Info component it should show frontend info successfully 1`] = 
   />
   <div
     aria-modal="true"
-    class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation16 MuiDrawer-paper MuiDrawer-paperAnchorRight css-1ruep9f-MuiPaper-root-MuiDrawer-paper"
+    class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation16 MuiDrawer-paper MuiDrawer-paperAnchorRight css-ruovjy-MuiPaper-root-MuiDrawer-paper"
     role="dialog"
     style="--Paper-shadow: var(--mui-shadows-16);"
     tabindex="-1"
   >
     <div
-      class="MuiBox-root css-1qocf1k"
+      class="MuiBox-root css-15iga1d"
       data-testid="version-drawer-header-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
     >
       <h5
-        class="MuiTypography-root MuiTypography-h5 css-4lkl0k-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h5 css-1qy0vqe-MuiTypography-root"
       >
         Application Information
       </h5>
       <button
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-4n970b-MuiButtonBase-root-MuiIconButton-root"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-rui4hx-MuiButtonBase-root-MuiIconButton-root"
         data-testid="version-drawer-header-button-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
         tabindex="0"
         title="Close application information"
@@ -56,31 +56,31 @@ exports[`Testing Info component it should show frontend info successfully 1`] = 
       data-testid="version-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
     >
       <div
-        class="MuiBox-root css-x9cgh6"
+        class="MuiBox-root css-v9uiu8"
         tabindex="0"
       >
         <div
-          class="MuiBox-root css-1c0x74f"
+          class="MuiBox-root css-1ec5brm"
           data-testid="version-frontend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-1fhgtoe-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-d6la45-MuiTypography-root"
           >
             Frontend
           </h6>
           <div
-            class="MuiBox-root css-1w00lo4"
+            class="MuiBox-root css-ota23g"
           >
             <div
               class="MuiBox-root css-0"
             >
               <h6
-                class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
               >
                 Date
               </h6>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
               >
                 <span
                   class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -93,12 +93,12 @@ exports[`Testing Info component it should show frontend info successfully 1`] = 
               class="MuiBox-root css-0"
             >
               <h6
-                class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
               >
                 Version
               </h6>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
               >
                 <span
                   class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -111,12 +111,12 @@ exports[`Testing Info component it should show frontend info successfully 1`] = 
               class="MuiBox-root css-0"
             >
               <h6
-                class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
               >
                 Build Number
               </h6>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
               >
                 <span
                   class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -129,12 +129,12 @@ exports[`Testing Info component it should show frontend info successfully 1`] = 
               class="MuiBox-root css-0"
             >
               <h6
-                class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
               >
                 GIT SHA
               </h6>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
               >
                 <span
                   class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -146,27 +146,27 @@ exports[`Testing Info component it should show frontend info successfully 1`] = 
           </div>
         </div>
         <div
-          class="MuiBox-root css-1c0x74f"
+          class="MuiBox-root css-1ec5brm"
           data-testid="version-backend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-1fhgtoe-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-d6la45-MuiTypography-root"
           >
             Backend
           </h6>
           <div
-            class="MuiBox-root css-1w00lo4"
+            class="MuiBox-root css-ota23g"
           >
             <div
               class="MuiBox-root css-0"
             >
               <h6
-                class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
               >
                 Date
               </h6>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
               >
                 <span
                   class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -179,12 +179,12 @@ exports[`Testing Info component it should show frontend info successfully 1`] = 
               class="MuiBox-root css-0"
             >
               <h6
-                class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
               >
                 Version
               </h6>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
               >
                 <span
                   class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -197,12 +197,12 @@ exports[`Testing Info component it should show frontend info successfully 1`] = 
               class="MuiBox-root css-0"
             >
               <h6
-                class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
               >
                 Build Number
               </h6>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
               >
                 <span
                   class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -215,12 +215,12 @@ exports[`Testing Info component it should show frontend info successfully 1`] = 
               class="MuiBox-root css-0"
             >
               <h6
-                class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
               >
                 GIT SHA
               </h6>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
               >
                 <span
                   class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -247,31 +247,31 @@ exports[`Testing Info component it should show frontend info successfully: versi
   data-testid="version-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
 >
   <div
-    class="MuiBox-root css-x9cgh6"
+    class="MuiBox-root css-v9uiu8"
     tabindex="0"
   >
     <div
-      class="MuiBox-root css-1c0x74f"
+      class="MuiBox-root css-1ec5brm"
       data-testid="version-frontend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-1fhgtoe-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-d6la45-MuiTypography-root"
       >
         Frontend
       </h6>
       <div
-        class="MuiBox-root css-1w00lo4"
+        class="MuiBox-root css-ota23g"
       >
         <div
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
           >
             Date
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
           >
             <span
               class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -284,12 +284,12 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
           >
             Version
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
           >
             <span
               class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -302,12 +302,12 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
           >
             Build Number
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
           >
             <span
               class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -320,12 +320,12 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
           >
             GIT SHA
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
           >
             <span
               class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -337,27 +337,27 @@ exports[`Testing Info component it should show frontend info successfully: versi
       </div>
     </div>
     <div
-      class="MuiBox-root css-1c0x74f"
+      class="MuiBox-root css-1ec5brm"
       data-testid="version-backend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-1fhgtoe-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-d6la45-MuiTypography-root"
       >
         Backend
       </h6>
       <div
-        class="MuiBox-root css-1w00lo4"
+        class="MuiBox-root css-ota23g"
       >
         <div
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
           >
             Date
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
           >
             <span
               class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -370,12 +370,12 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
           >
             Version
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
           >
             <span
               class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -388,12 +388,12 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
           >
             Build Number
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
           >
             <span
               class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -406,12 +406,12 @@ exports[`Testing Info component it should show frontend info successfully: versi
           class="MuiBox-root css-0"
         >
           <h6
-            class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
           >
             GIT SHA
           </h6>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
           >
             <span
               class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -428,27 +428,27 @@ exports[`Testing Info component it should show frontend info successfully: versi
 
 exports[`Testing Info component it should show frontend info successfully: version-backend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc 1`] = `
 <div
-  class="MuiBox-root css-1c0x74f"
+  class="MuiBox-root css-1ec5brm"
   data-testid="version-backend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
 >
   <h6
-    class="MuiTypography-root MuiTypography-h6 css-1fhgtoe-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h6 css-d6la45-MuiTypography-root"
   >
     Backend
   </h6>
   <div
-    class="MuiBox-root css-1w00lo4"
+    class="MuiBox-root css-ota23g"
   >
     <div
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
       >
         Date
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
       >
         <span
           class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -461,12 +461,12 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
       >
         Version
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
       >
         <span
           class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -479,12 +479,12 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
       >
         Build Number
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
       >
         <span
           class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -497,12 +497,12 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
       >
         GIT SHA
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
       >
         <span
           class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -517,27 +517,27 @@ exports[`Testing Info component it should show frontend info successfully: versi
 
 exports[`Testing Info component it should show frontend info successfully: version-frontend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc 1`] = `
 <div
-  class="MuiBox-root css-1c0x74f"
+  class="MuiBox-root css-1ec5brm"
   data-testid="version-frontend-37d307ae-4f1e-4d8d-bafe-fd642f8af4dc"
 >
   <h6
-    class="MuiTypography-root MuiTypography-h6 css-1fhgtoe-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-h6 css-d6la45-MuiTypography-root"
   >
     Frontend
   </h6>
   <div
-    class="MuiBox-root css-1w00lo4"
+    class="MuiBox-root css-ota23g"
   >
     <div
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
       >
         Date
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
       >
         <span
           class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -550,12 +550,12 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
       >
         Version
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
       >
         <span
           class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -568,12 +568,12 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
       >
         Build Number
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
       >
         <span
           class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"
@@ -586,12 +586,12 @@ exports[`Testing Info component it should show frontend info successfully: versi
       class="MuiBox-root css-0"
     >
       <h6
-        class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
       >
         GIT SHA
       </h6>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
       >
         <span
           class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse MuiSkeleton-withChildren MuiSkeleton-fitContent MuiSkeleton-heightAuto css-1nd7a9v-MuiSkeleton-root"

@@ -24,38 +24,38 @@ exports[`TextConfirmModalDialog should render component correctly with expected 
     <div
       aria-labelledby="confirm-modal"
       aria-modal="true"
-      class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthSm css-zt0lyh-MuiPaper-root-MuiDialog-paper"
+      class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthSm css-nzjgjo-MuiPaper-root-MuiDialog-paper"
       role="dialog"
       style="--Paper-shadow: var(--mui-shadows-24);"
     >
       <h2
-        class="MuiTypography-root MuiTypography-h2 MuiDialogTitle-root css-g0p5w1-MuiTypography-root-MuiDialogTitle-root"
+        class="MuiTypography-root MuiTypography-h2 MuiDialogTitle-root css-1xe9v7a-MuiTypography-root-MuiDialogTitle-root"
         data-testid="confirm-modal-title-edc0ac15-67a7-4c1f-9934-94fa65757046"
         id="confirm-modal-title"
       >
         <span
-          class="MuiTypography-root MuiTypography-h6 css-1fosj8d-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-h6 css-erpy6n-MuiTypography-root"
         >
           Sample Title?
         </span>
       </h2>
       <div
-        class="MuiDialogContent-root css-89g849-MuiDialogContent-root"
+        class="MuiDialogContent-root css-18tdlso-MuiDialogContent-root"
         data-testid="confirm-modal-content-edc0ac15-67a7-4c1f-9934-94fa65757046"
       >
         <div
-          class="MuiBox-root css-yj95vr"
+          class="MuiBox-root css-160qnla"
           data-testid="text-confirm-modal-content-e2c24e08-1225-4aa0-9fdf-95ac6f0c81c3"
           tabindex="0"
         >
           <p
-            class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
             data-testid="text-confirm-modal-paragraph-e2c24e08-1225-4aa0-9fdf-95ac6f0c81c3"
           >
             This is a sample body text for the TextConfirmModalDialog component.
           </p>
           <p
-            class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
             data-testid="text-confirm-modal-paragraph-e2c24e08-1225-4aa0-9fdf-95ac6f0c81c3"
           >
             Are you sure you want to proceed?
@@ -63,10 +63,10 @@ exports[`TextConfirmModalDialog should render component correctly with expected 
         </div>
       </div>
       <div
-        class="MuiDialogActions-root MuiDialogActions-spacing css-ne9u2k-MuiDialogActions-root"
+        class="MuiDialogActions-root MuiDialogActions-spacing css-lvai81-MuiDialogActions-root"
       >
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-nb0bw1-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-12r53wk-MuiButtonBase-root-MuiButton-root"
           data-testid="confirm-modal-cancel-edc0ac15-67a7-4c1f-9934-94fa65757046"
           tabindex="0"
           type="button"
@@ -74,7 +74,7 @@ exports[`TextConfirmModalDialog should render component correctly with expected 
           Cancel
         </button>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-b3s09g-MuiButtonBase-root-MuiButton-root"
           data-testid="confirm-modal-confirm-edc0ac15-67a7-4c1f-9934-94fa65757046"
           tabindex="0"
           type="button"

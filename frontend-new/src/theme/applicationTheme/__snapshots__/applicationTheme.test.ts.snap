@@ -2,7 +2,7 @@
 
 exports[`dark theme mode call fixedSpacing function (non-responsive) 1`] = `"16px"`;
 
-exports[`dark theme mode call responsiveBorderRounding function (responsive) 1`] = `"calc(clamp(2px, (2dvh + -8px + 1.5dvw + -10px)/2 , 8px) * 2)"`;
+exports[`dark theme mode call responsiveBorderRounding function (responsive) 1`] = `"calc(clamp(2px, calc((2vh + -8px + 1.5vw + -10px)/2), 8px) * 2)"`;
 
 exports[`dark theme mode call responsiveBorderRounding function with 'full' rounding (responsive) 1`] = `"50%"`;
 
@@ -10,7 +10,7 @@ exports[`dark theme mode call rounding function (non-responsive) 1`] = `"16px"`;
 
 exports[`dark theme mode call rounding function with 'full' rounding (non-responsive) 1`] = `"50%"`;
 
-exports[`dark theme mode call spacing function (responsive) 1`] = `"calc(clamp(2px, (2dvh + -8px + 1.5dvw + -10px)/2 , 8px) * 2)"`;
+exports[`dark theme mode call spacing function (responsive) 1`] = `"calc(clamp(2px, calc((2vh + -8px + 1.5vw + -10px)/2), 8px) * 2)"`;
 
 exports[`dark theme mode should return the dark theme 1`] = `
 Object {
@@ -358,7 +358,7 @@ Object {
           "whiteSpace": "nowrap",
         },
         "root": Object {
-          "fontSize": "clamp(0.75rem, (1.33dvh + 0.33rem + 1dvw + 0.25rem)/2 , 1rem)",
+          "fontSize": "clamp(0.75rem, calc((1.33vh + 0.33rem + 1vw + 0.25rem)/2), 1rem)",
         },
       },
     },
@@ -413,12 +413,12 @@ Object {
     "MuiInputBase": Object {
       "styleOverrides": Object {
         "input": Object {
-          "fontSize": "clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)",
+          "fontSize": "clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)",
           "fontWeight": 500,
           "padding": "0",
         },
         "root": Object {
-          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "fontSize": "clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)",
           "padding": "0",
         },
       },
@@ -430,7 +430,7 @@ Object {
             "color": "rgb(var(--text-primary))",
           },
           "color": "rgb(var(--text-secondary))",
-          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "fontSize": "clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)",
           "opacity": 0.7,
           "padding": "0",
         },
@@ -486,7 +486,7 @@ Object {
           "& .Mui-disabled": Object {
             "opacity": 0.5,
           },
-          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "fontSize": "clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)",
           "padding": "0",
         },
       },
@@ -499,21 +499,21 @@ Object {
   "direction": "ltr",
   "fixedSpacing": [Function],
   "font": Object {
-    "body1": "400 clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)/1.5 \\"Plus Jakarta Sans\\", sans-serif",
-    "body2": "400 clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)/1.43 \\"Plus Jakarta Sans\\", sans-serif",
-    "button": "500 clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif",
-    "caption": "400 clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)/1.66 \\"Plus Jakarta Sans\\", sans-serif",
-    "h1": "800 clamp(1.875rem, (6dvh + 0rem + 4.5dvw + -0.37rem)/2 , 3rem)/1.167 \\"Bricolage Grotesque\\", sans-serif",
-    "h2": "700 clamp(1.5rem, (4dvh + 0.25rem + 3dvw + 0rem)/2 , 2.25rem)/1.2 \\"Bricolage Grotesque\\", sans-serif",
-    "h3": "700 clamp(1.25rem, (3.33dvh + 0.21rem + 2.5dvw + 0rem)/2 , 1.875rem)/1.167 \\"Bricolage Grotesque\\", sans-serif",
-    "h4": "600 clamp(1.25rem, (1.33dvh + 0.83rem + 1dvw + 0.75rem)/2 , 1.5rem)/1.235 \\"Bricolage Grotesque\\", sans-serif",
-    "h5": "600 clamp(1.125rem, (0.67dvh + 0.92rem + 0.5dvw + 0.88rem)/2 , 1.25rem)/1.334 \\"Bricolage Grotesque\\", sans-serif",
-    "h6": "600 clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)/1.6 \\"Bricolage Grotesque\\", sans-serif",
+    "body1": "400 clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)/1.5 \\"Plus Jakarta Sans\\", sans-serif",
+    "body2": "400 clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)/1.43 \\"Plus Jakarta Sans\\", sans-serif",
+    "button": "500 clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif",
+    "caption": "400 clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)/1.66 \\"Plus Jakarta Sans\\", sans-serif",
+    "h1": "800 clamp(1.875rem, calc((6vh + 0rem + 4.5vw + -0.37rem)/2), 3rem)/1.167 \\"Bricolage Grotesque\\", sans-serif",
+    "h2": "700 clamp(1.5rem, calc((4vh + 0.25rem + 3vw + 0rem)/2), 2.25rem)/1.2 \\"Bricolage Grotesque\\", sans-serif",
+    "h3": "700 clamp(1.25rem, calc((3.33vh + 0.21rem + 2.5vw + 0rem)/2), 1.875rem)/1.167 \\"Bricolage Grotesque\\", sans-serif",
+    "h4": "600 clamp(1.25rem, calc((1.33vh + 0.83rem + 1vw + 0.75rem)/2), 1.5rem)/1.235 \\"Bricolage Grotesque\\", sans-serif",
+    "h5": "600 clamp(1.125rem, calc((0.67vh + 0.92rem + 0.5vw + 0.88rem)/2), 1.25rem)/1.334 \\"Bricolage Grotesque\\", sans-serif",
+    "h6": "600 clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)/1.6 \\"Bricolage Grotesque\\", sans-serif",
     "inherit": "inherit inherit/inherit inherit",
-    "overline": "600 clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)/2.66 \\"Plus Jakarta Sans\\", sans-serif",
-    "progressBarText": "700 clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)\\"Bricolage Grotesque\\", sans-serif",
-    "subtitle1": "600 clamp(1.125rem, (0.67dvh + 0.92rem + 0.5dvw + 0.88rem)/2 , 1.25rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif",
-    "subtitle2": "600 clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)/1.57 \\"Plus Jakarta Sans\\", sans-serif",
+    "overline": "600 clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)/2.66 \\"Plus Jakarta Sans\\", sans-serif",
+    "progressBarText": "700 clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)\\"Bricolage Grotesque\\", sans-serif",
+    "subtitle1": "600 clamp(1.125rem, calc((0.67vh + 0.92rem + 0.5vw + 0.88rem)/2), 1.25rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif",
+    "subtitle2": "600 clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)/1.57 \\"Plus Jakarta Sans\\", sans-serif",
   },
   "generateSpacing": [Function],
   "generateStyleSheets": [Function],
@@ -914,21 +914,21 @@ Object {
     "body1": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)",
+      "fontSize": "clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)",
       "fontWeight": "400",
       "lineHeight": 1.5,
     },
     "body2": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)",
+      "fontSize": "clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)",
       "fontWeight": "400",
       "lineHeight": 1.43,
     },
     "button": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)",
+      "fontSize": "clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)",
       "fontWeight": "500",
       "lineHeight": 1.75,
       "textTransform": "none",
@@ -936,7 +936,7 @@ Object {
     "caption": Object {
       "color": "rgb(var(--text-secondary))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+      "fontSize": "clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)",
       "fontWeight": "400",
       "lineHeight": 1.66,
     },
@@ -949,7 +949,7 @@ Object {
     "h1": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(1.875rem, (6dvh + 0rem + 4.5dvw + -0.37rem)/2 , 3rem)",
+      "fontSize": "clamp(1.875rem, calc((6vh + 0rem + 4.5vw + -0.37rem)/2), 3rem)",
       "fontWeight": "800",
       "letterSpacing": "-0.02em",
       "lineHeight": 1.167,
@@ -957,7 +957,7 @@ Object {
     "h2": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(1.5rem, (4dvh + 0.25rem + 3dvw + 0rem)/2 , 2.25rem)",
+      "fontSize": "clamp(1.5rem, calc((4vh + 0.25rem + 3vw + 0rem)/2), 2.25rem)",
       "fontWeight": "700",
       "letterSpacing": "-0.02em",
       "lineHeight": 1.2,
@@ -965,7 +965,7 @@ Object {
     "h3": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(1.25rem, (3.33dvh + 0.21rem + 2.5dvw + 0rem)/2 , 1.875rem)",
+      "fontSize": "clamp(1.25rem, calc((3.33vh + 0.21rem + 2.5vw + 0rem)/2), 1.875rem)",
       "fontWeight": "700",
       "letterSpacing": "-0.01em",
       "lineHeight": 1.167,
@@ -973,21 +973,21 @@ Object {
     "h4": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(1.25rem, (1.33dvh + 0.83rem + 1dvw + 0.75rem)/2 , 1.5rem)",
+      "fontSize": "clamp(1.25rem, calc((1.33vh + 0.83rem + 1vw + 0.75rem)/2), 1.5rem)",
       "fontWeight": "600",
       "lineHeight": 1.235,
     },
     "h5": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(1.125rem, (0.67dvh + 0.92rem + 0.5dvw + 0.88rem)/2 , 1.25rem)",
+      "fontSize": "clamp(1.125rem, calc((0.67vh + 0.92rem + 0.5vw + 0.88rem)/2), 1.25rem)",
       "fontWeight": "600",
       "lineHeight": 1.334,
     },
     "h6": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)",
+      "fontSize": "clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)",
       "fontWeight": "600",
       "lineHeight": 1.6,
     },
@@ -1002,7 +1002,7 @@ Object {
     "overline": Object {
       "color": "rgb(var(--text-secondary))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+      "fontSize": "clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)",
       "fontWeight": "600",
       "lineHeight": 2.66,
       "textTransform": "uppercase",
@@ -1010,21 +1010,21 @@ Object {
     "progressBarText": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+      "fontSize": "clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)",
       "fontWeight": "700",
     },
     "pxToRem": [Function],
     "subtitle1": Object {
       "color": "rgb(var(--text-accent))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(1.125rem, (0.67dvh + 0.92rem + 0.5dvw + 0.88rem)/2 , 1.25rem)",
+      "fontSize": "clamp(1.125rem, calc((0.67vh + 0.92rem + 0.5vw + 0.88rem)/2), 1.25rem)",
       "fontWeight": "600",
       "lineHeight": 1.75,
     },
     "subtitle2": Object {
       "color": "rgb(var(--text-accent))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)",
+      "fontSize": "clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)",
       "fontWeight": "600",
       "lineHeight": 1.57,
     },
@@ -1306,21 +1306,21 @@ Object {
   },
   "vars": Object {
     "font": Object {
-      "body1": "var(--mui-font-body1, 400 clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)/1.5 \\"Plus Jakarta Sans\\", sans-serif)",
-      "body2": "var(--mui-font-body2, 400 clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)/1.43 \\"Plus Jakarta Sans\\", sans-serif)",
-      "button": "var(--mui-font-button, 500 clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif)",
-      "caption": "var(--mui-font-caption, 400 clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)/1.66 \\"Plus Jakarta Sans\\", sans-serif)",
-      "h1": "var(--mui-font-h1, 800 clamp(1.875rem, (6dvh + 0rem + 4.5dvw + -0.37rem)/2 , 3rem)/1.167 \\"Bricolage Grotesque\\", sans-serif)",
-      "h2": "var(--mui-font-h2, 700 clamp(1.5rem, (4dvh + 0.25rem + 3dvw + 0rem)/2 , 2.25rem)/1.2 \\"Bricolage Grotesque\\", sans-serif)",
-      "h3": "var(--mui-font-h3, 700 clamp(1.25rem, (3.33dvh + 0.21rem + 2.5dvw + 0rem)/2 , 1.875rem)/1.167 \\"Bricolage Grotesque\\", sans-serif)",
-      "h4": "var(--mui-font-h4, 600 clamp(1.25rem, (1.33dvh + 0.83rem + 1dvw + 0.75rem)/2 , 1.5rem)/1.235 \\"Bricolage Grotesque\\", sans-serif)",
-      "h5": "var(--mui-font-h5, 600 clamp(1.125rem, (0.67dvh + 0.92rem + 0.5dvw + 0.88rem)/2 , 1.25rem)/1.334 \\"Bricolage Grotesque\\", sans-serif)",
-      "h6": "var(--mui-font-h6, 600 clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)/1.6 \\"Bricolage Grotesque\\", sans-serif)",
+      "body1": "var(--mui-font-body1, 400 clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)/1.5 \\"Plus Jakarta Sans\\", sans-serif)",
+      "body2": "var(--mui-font-body2, 400 clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)/1.43 \\"Plus Jakarta Sans\\", sans-serif)",
+      "button": "var(--mui-font-button, 500 clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif)",
+      "caption": "var(--mui-font-caption, 400 clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)/1.66 \\"Plus Jakarta Sans\\", sans-serif)",
+      "h1": "var(--mui-font-h1, 800 clamp(1.875rem, calc((6vh + 0rem + 4.5vw + -0.37rem)/2), 3rem)/1.167 \\"Bricolage Grotesque\\", sans-serif)",
+      "h2": "var(--mui-font-h2, 700 clamp(1.5rem, calc((4vh + 0.25rem + 3vw + 0rem)/2), 2.25rem)/1.2 \\"Bricolage Grotesque\\", sans-serif)",
+      "h3": "var(--mui-font-h3, 700 clamp(1.25rem, calc((3.33vh + 0.21rem + 2.5vw + 0rem)/2), 1.875rem)/1.167 \\"Bricolage Grotesque\\", sans-serif)",
+      "h4": "var(--mui-font-h4, 600 clamp(1.25rem, calc((1.33vh + 0.83rem + 1vw + 0.75rem)/2), 1.5rem)/1.235 \\"Bricolage Grotesque\\", sans-serif)",
+      "h5": "var(--mui-font-h5, 600 clamp(1.125rem, calc((0.67vh + 0.92rem + 0.5vw + 0.88rem)/2), 1.25rem)/1.334 \\"Bricolage Grotesque\\", sans-serif)",
+      "h6": "var(--mui-font-h6, 600 clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)/1.6 \\"Bricolage Grotesque\\", sans-serif)",
       "inherit": "var(--mui-font-inherit, inherit inherit/inherit inherit)",
-      "overline": "var(--mui-font-overline, 600 clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)/2.66 \\"Plus Jakarta Sans\\", sans-serif)",
-      "progressBarText": "var(--mui-font-progressBarText, 700 clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)\\"Bricolage Grotesque\\", sans-serif)",
-      "subtitle1": "var(--mui-font-subtitle1, 600 clamp(1.125rem, (0.67dvh + 0.92rem + 0.5dvw + 0.88rem)/2 , 1.25rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif)",
-      "subtitle2": "var(--mui-font-subtitle2, 600 clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)/1.57 \\"Plus Jakarta Sans\\", sans-serif)",
+      "overline": "var(--mui-font-overline, 600 clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)/2.66 \\"Plus Jakarta Sans\\", sans-serif)",
+      "progressBarText": "var(--mui-font-progressBarText, 700 clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)\\"Bricolage Grotesque\\", sans-serif)",
+      "subtitle1": "var(--mui-font-subtitle1, 600 clamp(1.125rem, calc((0.67vh + 0.92rem + 0.5vw + 0.88rem)/2), 1.25rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif)",
+      "subtitle2": "var(--mui-font-subtitle2, 600 clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)/1.57 \\"Plus Jakarta Sans\\", sans-serif)",
     },
     "opacity": Object {
       "inputPlaceholder": "var(--mui-opacity-inputPlaceholder, 0.42)",
@@ -1693,7 +1693,7 @@ Object {
 
 exports[`light theme mode call fixedSpacing function (non-responsive) 1`] = `"16px"`;
 
-exports[`light theme mode call responsiveBorderRounding function (responsive) 1`] = `"calc(clamp(2px, (2dvh + -8px + 1.5dvw + -10px)/2 , 8px) * 2)"`;
+exports[`light theme mode call responsiveBorderRounding function (responsive) 1`] = `"calc(clamp(2px, calc((2vh + -8px + 1.5vw + -10px)/2), 8px) * 2)"`;
 
 exports[`light theme mode call responsiveBorderRounding function with 'full' rounding (responsive) 1`] = `"50%"`;
 
@@ -1701,7 +1701,7 @@ exports[`light theme mode call rounding function (non-responsive) 1`] = `"16px"`
 
 exports[`light theme mode call rounding function with 'full' rounding (non-responsive) 1`] = `"50%"`;
 
-exports[`light theme mode call spacing function (responsive) 1`] = `"calc(clamp(2px, (2dvh + -8px + 1.5dvw + -10px)/2 , 8px) * 2)"`;
+exports[`light theme mode call spacing function (responsive) 1`] = `"calc(clamp(2px, calc((2vh + -8px + 1.5vw + -10px)/2), 8px) * 2)"`;
 
 exports[`light theme mode should return the light theme 1`] = `
 Object {
@@ -2049,7 +2049,7 @@ Object {
           "whiteSpace": "nowrap",
         },
         "root": Object {
-          "fontSize": "clamp(0.75rem, (1.33dvh + 0.33rem + 1dvw + 0.25rem)/2 , 1rem)",
+          "fontSize": "clamp(0.75rem, calc((1.33vh + 0.33rem + 1vw + 0.25rem)/2), 1rem)",
         },
       },
     },
@@ -2104,12 +2104,12 @@ Object {
     "MuiInputBase": Object {
       "styleOverrides": Object {
         "input": Object {
-          "fontSize": "clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)",
+          "fontSize": "clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)",
           "fontWeight": 500,
           "padding": "0",
         },
         "root": Object {
-          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "fontSize": "clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)",
           "padding": "0",
         },
       },
@@ -2121,7 +2121,7 @@ Object {
             "color": "rgb(var(--text-primary))",
           },
           "color": "rgb(var(--text-secondary))",
-          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "fontSize": "clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)",
           "opacity": 0.7,
           "padding": "0",
         },
@@ -2177,7 +2177,7 @@ Object {
           "& .Mui-disabled": Object {
             "opacity": 0.5,
           },
-          "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+          "fontSize": "clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)",
           "padding": "0",
         },
       },
@@ -2190,21 +2190,21 @@ Object {
   "direction": "ltr",
   "fixedSpacing": [Function],
   "font": Object {
-    "body1": "400 clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)/1.5 \\"Plus Jakarta Sans\\", sans-serif",
-    "body2": "400 clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)/1.43 \\"Plus Jakarta Sans\\", sans-serif",
-    "button": "500 clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif",
-    "caption": "400 clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)/1.66 \\"Plus Jakarta Sans\\", sans-serif",
-    "h1": "800 clamp(1.875rem, (6dvh + 0rem + 4.5dvw + -0.37rem)/2 , 3rem)/1.167 \\"Bricolage Grotesque\\", sans-serif",
-    "h2": "700 clamp(1.5rem, (4dvh + 0.25rem + 3dvw + 0rem)/2 , 2.25rem)/1.2 \\"Bricolage Grotesque\\", sans-serif",
-    "h3": "700 clamp(1.25rem, (3.33dvh + 0.21rem + 2.5dvw + 0rem)/2 , 1.875rem)/1.167 \\"Bricolage Grotesque\\", sans-serif",
-    "h4": "600 clamp(1.25rem, (1.33dvh + 0.83rem + 1dvw + 0.75rem)/2 , 1.5rem)/1.235 \\"Bricolage Grotesque\\", sans-serif",
-    "h5": "600 clamp(1.125rem, (0.67dvh + 0.92rem + 0.5dvw + 0.88rem)/2 , 1.25rem)/1.334 \\"Bricolage Grotesque\\", sans-serif",
-    "h6": "600 clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)/1.6 \\"Bricolage Grotesque\\", sans-serif",
+    "body1": "400 clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)/1.5 \\"Plus Jakarta Sans\\", sans-serif",
+    "body2": "400 clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)/1.43 \\"Plus Jakarta Sans\\", sans-serif",
+    "button": "500 clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif",
+    "caption": "400 clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)/1.66 \\"Plus Jakarta Sans\\", sans-serif",
+    "h1": "800 clamp(1.875rem, calc((6vh + 0rem + 4.5vw + -0.37rem)/2), 3rem)/1.167 \\"Bricolage Grotesque\\", sans-serif",
+    "h2": "700 clamp(1.5rem, calc((4vh + 0.25rem + 3vw + 0rem)/2), 2.25rem)/1.2 \\"Bricolage Grotesque\\", sans-serif",
+    "h3": "700 clamp(1.25rem, calc((3.33vh + 0.21rem + 2.5vw + 0rem)/2), 1.875rem)/1.167 \\"Bricolage Grotesque\\", sans-serif",
+    "h4": "600 clamp(1.25rem, calc((1.33vh + 0.83rem + 1vw + 0.75rem)/2), 1.5rem)/1.235 \\"Bricolage Grotesque\\", sans-serif",
+    "h5": "600 clamp(1.125rem, calc((0.67vh + 0.92rem + 0.5vw + 0.88rem)/2), 1.25rem)/1.334 \\"Bricolage Grotesque\\", sans-serif",
+    "h6": "600 clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)/1.6 \\"Bricolage Grotesque\\", sans-serif",
     "inherit": "inherit inherit/inherit inherit",
-    "overline": "600 clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)/2.66 \\"Plus Jakarta Sans\\", sans-serif",
-    "progressBarText": "700 clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)\\"Bricolage Grotesque\\", sans-serif",
-    "subtitle1": "600 clamp(1.125rem, (0.67dvh + 0.92rem + 0.5dvw + 0.88rem)/2 , 1.25rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif",
-    "subtitle2": "600 clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)/1.57 \\"Plus Jakarta Sans\\", sans-serif",
+    "overline": "600 clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)/2.66 \\"Plus Jakarta Sans\\", sans-serif",
+    "progressBarText": "700 clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)\\"Bricolage Grotesque\\", sans-serif",
+    "subtitle1": "600 clamp(1.125rem, calc((0.67vh + 0.92rem + 0.5vw + 0.88rem)/2), 1.25rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif",
+    "subtitle2": "600 clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)/1.57 \\"Plus Jakarta Sans\\", sans-serif",
   },
   "generateSpacing": [Function],
   "generateStyleSheets": [Function],
@@ -2605,21 +2605,21 @@ Object {
     "body1": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)",
+      "fontSize": "clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)",
       "fontWeight": "400",
       "lineHeight": 1.5,
     },
     "body2": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)",
+      "fontSize": "clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)",
       "fontWeight": "400",
       "lineHeight": 1.43,
     },
     "button": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)",
+      "fontSize": "clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)",
       "fontWeight": "500",
       "lineHeight": 1.75,
       "textTransform": "none",
@@ -2627,7 +2627,7 @@ Object {
     "caption": Object {
       "color": "rgb(var(--text-secondary))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+      "fontSize": "clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)",
       "fontWeight": "400",
       "lineHeight": 1.66,
     },
@@ -2640,7 +2640,7 @@ Object {
     "h1": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(1.875rem, (6dvh + 0rem + 4.5dvw + -0.37rem)/2 , 3rem)",
+      "fontSize": "clamp(1.875rem, calc((6vh + 0rem + 4.5vw + -0.37rem)/2), 3rem)",
       "fontWeight": "800",
       "letterSpacing": "-0.02em",
       "lineHeight": 1.167,
@@ -2648,7 +2648,7 @@ Object {
     "h2": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(1.5rem, (4dvh + 0.25rem + 3dvw + 0rem)/2 , 2.25rem)",
+      "fontSize": "clamp(1.5rem, calc((4vh + 0.25rem + 3vw + 0rem)/2), 2.25rem)",
       "fontWeight": "700",
       "letterSpacing": "-0.02em",
       "lineHeight": 1.2,
@@ -2656,7 +2656,7 @@ Object {
     "h3": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(1.25rem, (3.33dvh + 0.21rem + 2.5dvw + 0rem)/2 , 1.875rem)",
+      "fontSize": "clamp(1.25rem, calc((3.33vh + 0.21rem + 2.5vw + 0rem)/2), 1.875rem)",
       "fontWeight": "700",
       "letterSpacing": "-0.01em",
       "lineHeight": 1.167,
@@ -2664,21 +2664,21 @@ Object {
     "h4": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(1.25rem, (1.33dvh + 0.83rem + 1dvw + 0.75rem)/2 , 1.5rem)",
+      "fontSize": "clamp(1.25rem, calc((1.33vh + 0.83rem + 1vw + 0.75rem)/2), 1.5rem)",
       "fontWeight": "600",
       "lineHeight": 1.235,
     },
     "h5": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(1.125rem, (0.67dvh + 0.92rem + 0.5dvw + 0.88rem)/2 , 1.25rem)",
+      "fontSize": "clamp(1.125rem, calc((0.67vh + 0.92rem + 0.5vw + 0.88rem)/2), 1.25rem)",
       "fontWeight": "600",
       "lineHeight": 1.334,
     },
     "h6": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)",
+      "fontSize": "clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)",
       "fontWeight": "600",
       "lineHeight": 1.6,
     },
@@ -2693,7 +2693,7 @@ Object {
     "overline": Object {
       "color": "rgb(var(--text-secondary))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+      "fontSize": "clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)",
       "fontWeight": "600",
       "lineHeight": 2.66,
       "textTransform": "uppercase",
@@ -2701,21 +2701,21 @@ Object {
     "progressBarText": Object {
       "color": "rgb(var(--text-primary))",
       "fontFamily": "\\"Bricolage Grotesque\\", sans-serif",
-      "fontSize": "clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)",
+      "fontSize": "clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)",
       "fontWeight": "700",
     },
     "pxToRem": [Function],
     "subtitle1": Object {
       "color": "rgb(var(--text-accent))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(1.125rem, (0.67dvh + 0.92rem + 0.5dvw + 0.88rem)/2 , 1.25rem)",
+      "fontSize": "clamp(1.125rem, calc((0.67vh + 0.92rem + 0.5vw + 0.88rem)/2), 1.25rem)",
       "fontWeight": "600",
       "lineHeight": 1.75,
     },
     "subtitle2": Object {
       "color": "rgb(var(--text-accent))",
       "fontFamily": "\\"Plus Jakarta Sans\\", sans-serif",
-      "fontSize": "clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)",
+      "fontSize": "clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)",
       "fontWeight": "600",
       "lineHeight": 1.57,
     },
@@ -2997,21 +2997,21 @@ Object {
   },
   "vars": Object {
     "font": Object {
-      "body1": "var(--mui-font-body1, 400 clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)/1.5 \\"Plus Jakarta Sans\\", sans-serif)",
-      "body2": "var(--mui-font-body2, 400 clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)/1.43 \\"Plus Jakarta Sans\\", sans-serif)",
-      "button": "var(--mui-font-button, 500 clamp(0.875rem, (0.67dvh + 0.67rem + 0.5dvw + 0.63rem)/2 , 1rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif)",
-      "caption": "var(--mui-font-caption, 400 clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)/1.66 \\"Plus Jakarta Sans\\", sans-serif)",
-      "h1": "var(--mui-font-h1, 800 clamp(1.875rem, (6dvh + 0rem + 4.5dvw + -0.37rem)/2 , 3rem)/1.167 \\"Bricolage Grotesque\\", sans-serif)",
-      "h2": "var(--mui-font-h2, 700 clamp(1.5rem, (4dvh + 0.25rem + 3dvw + 0rem)/2 , 2.25rem)/1.2 \\"Bricolage Grotesque\\", sans-serif)",
-      "h3": "var(--mui-font-h3, 700 clamp(1.25rem, (3.33dvh + 0.21rem + 2.5dvw + 0rem)/2 , 1.875rem)/1.167 \\"Bricolage Grotesque\\", sans-serif)",
-      "h4": "var(--mui-font-h4, 600 clamp(1.25rem, (1.33dvh + 0.83rem + 1dvw + 0.75rem)/2 , 1.5rem)/1.235 \\"Bricolage Grotesque\\", sans-serif)",
-      "h5": "var(--mui-font-h5, 600 clamp(1.125rem, (0.67dvh + 0.92rem + 0.5dvw + 0.88rem)/2 , 1.25rem)/1.334 \\"Bricolage Grotesque\\", sans-serif)",
-      "h6": "var(--mui-font-h6, 600 clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)/1.6 \\"Bricolage Grotesque\\", sans-serif)",
+      "body1": "var(--mui-font-body1, 400 clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)/1.5 \\"Plus Jakarta Sans\\", sans-serif)",
+      "body2": "var(--mui-font-body2, 400 clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)/1.43 \\"Plus Jakarta Sans\\", sans-serif)",
+      "button": "var(--mui-font-button, 500 clamp(0.875rem, calc((0.67vh + 0.67rem + 0.5vw + 0.63rem)/2), 1rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif)",
+      "caption": "var(--mui-font-caption, 400 clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)/1.66 \\"Plus Jakarta Sans\\", sans-serif)",
+      "h1": "var(--mui-font-h1, 800 clamp(1.875rem, calc((6vh + 0rem + 4.5vw + -0.37rem)/2), 3rem)/1.167 \\"Bricolage Grotesque\\", sans-serif)",
+      "h2": "var(--mui-font-h2, 700 clamp(1.5rem, calc((4vh + 0.25rem + 3vw + 0rem)/2), 2.25rem)/1.2 \\"Bricolage Grotesque\\", sans-serif)",
+      "h3": "var(--mui-font-h3, 700 clamp(1.25rem, calc((3.33vh + 0.21rem + 2.5vw + 0rem)/2), 1.875rem)/1.167 \\"Bricolage Grotesque\\", sans-serif)",
+      "h4": "var(--mui-font-h4, 600 clamp(1.25rem, calc((1.33vh + 0.83rem + 1vw + 0.75rem)/2), 1.5rem)/1.235 \\"Bricolage Grotesque\\", sans-serif)",
+      "h5": "var(--mui-font-h5, 600 clamp(1.125rem, calc((0.67vh + 0.92rem + 0.5vw + 0.88rem)/2), 1.25rem)/1.334 \\"Bricolage Grotesque\\", sans-serif)",
+      "h6": "var(--mui-font-h6, 600 clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)/1.6 \\"Bricolage Grotesque\\", sans-serif)",
       "inherit": "var(--mui-font-inherit, inherit inherit/inherit inherit)",
-      "overline": "var(--mui-font-overline, 600 clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)/2.66 \\"Plus Jakarta Sans\\", sans-serif)",
-      "progressBarText": "var(--mui-font-progressBarText, 700 clamp(0.75rem, (0.67dvh + 0.54rem + 0.5dvw + 0.5rem)/2 , 0.875rem)\\"Bricolage Grotesque\\", sans-serif)",
-      "subtitle1": "var(--mui-font-subtitle1, 600 clamp(1.125rem, (0.67dvh + 0.92rem + 0.5dvw + 0.88rem)/2 , 1.25rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif)",
-      "subtitle2": "var(--mui-font-subtitle2, 600 clamp(1rem, (0.67dvh + 0.79rem + 0.5dvw + 0.75rem)/2 , 1.125rem)/1.57 \\"Plus Jakarta Sans\\", sans-serif)",
+      "overline": "var(--mui-font-overline, 600 clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)/2.66 \\"Plus Jakarta Sans\\", sans-serif)",
+      "progressBarText": "var(--mui-font-progressBarText, 700 clamp(0.75rem, calc((0.67vh + 0.54rem + 0.5vw + 0.5rem)/2), 0.875rem)\\"Bricolage Grotesque\\", sans-serif)",
+      "subtitle1": "var(--mui-font-subtitle1, 600 clamp(1.125rem, calc((0.67vh + 0.92rem + 0.5vw + 0.88rem)/2), 1.25rem)/1.75 \\"Plus Jakarta Sans\\", sans-serif)",
+      "subtitle2": "var(--mui-font-subtitle2, 600 clamp(1rem, calc((0.67vh + 0.79rem + 0.5vw + 0.75rem)/2), 1.125rem)/1.57 \\"Plus Jakarta Sans\\", sans-serif)",
     },
     "opacity": Object {
       "inputPlaceholder": "var(--mui-opacity-inputPlaceholder, 0.42)",

@@ -15,7 +15,7 @@ exports[`Footer should render the footer container, logos, links, and collaborat
       class="MuiBox-root css-5uxyq9"
     >
       <div
-        class="MuiBox-root css-19h6y00"
+        class="MuiBox-root css-12e79r5"
         data-testid="footer-logos-container-a7f3d2b1-8e4c-4a9f-b6d5-3c1e2f7a8b9d"
       >
         <img
@@ -38,7 +38,7 @@ exports[`Footer should render the footer container, logos, links, and collaborat
         />
       </div>
       <div
-        class="MuiBox-root css-cwtzif"
+        class="MuiBox-root css-13jox0a"
       >
         <a
           aria-disabled="false"
@@ -72,7 +72,7 @@ exports[`Footer should render the footer container, logos, links, and collaborat
         </a>
       </div>
       <p
-        class="MuiTypography-root MuiTypography-body1 css-1v6dcpo-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body1 css-q2sysl-MuiTypography-root"
         data-testid="footer-collaboration-a7f3d2b1-8e4c-4a9f-b6d5-3c1e2f7a8b9d"
       >
         Njila is a free career guidance tool built in partnership between the World Bank Group and Tabiya.

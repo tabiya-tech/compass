@@ -6,7 +6,7 @@ exports[`Bushbaby should render the bushbaby with given props 1`] = `
   style="display: flex; flex-direction: column; margin: 0px; padding: 0px;"
 >
   <div
-    class="MuiContainer-root MuiContainer-maxWidthLg css-uczlwd-MuiContainer-root"
+    class="MuiContainer-root MuiContainer-maxWidthLg css-1rihai0-MuiContainer-root"
     style="flex-shrink: 0; height: calc(100px * 190 / 209); position: relative; overflow: visible;"
   >
     <svg
@@ -159,7 +159,7 @@ exports[`Bushbaby should render the bushbaby with the default props 1`] = `
   style="display: flex; flex-direction: column; margin: 0px; padding: 0px;"
 >
   <div
-    class="MuiContainer-root MuiContainer-maxWidthLg css-uczlwd-MuiContainer-root"
+    class="MuiContainer-root MuiContainer-maxWidthLg css-1rihai0-MuiContainer-root"
     style="flex-shrink: 0; height: calc(48px * 190 / 209); position: relative; overflow: visible;"
   >
     <svg

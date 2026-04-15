@@ -10,7 +10,7 @@ exports[`Testing Login component Render tests should hide login code related ele
       class="MuiBox-root css-1hvnxas"
     >
       <h3
-        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
       >
         Sign In
       </h3>
@@ -23,7 +23,7 @@ exports[`Testing Login component Render tests should hide login code related ele
           data-testid="reset-password-email-container"
         />
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-zur4l4-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
           data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           disabled=""
           style="margin-top: 8px;"
@@ -66,7 +66,7 @@ exports[`Testing Login component Render tests should hide login code related ele
       class="MuiBox-root css-1hvnxas"
     >
       <h3
-        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
       >
         Sign In
       </h3>
@@ -79,7 +79,7 @@ exports[`Testing Login component Render tests should hide login code related ele
           data-testid="reset-password-email-container"
         />
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-zur4l4-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
           data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           disabled=""
           style="margin-top: 8px;"
@@ -122,7 +122,7 @@ exports[`Testing Login component Render tests should show continue as guest if l
       class="MuiBox-root css-1hvnxas"
     >
       <h3
-        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
       >
         Sign In
       </h3>
@@ -131,7 +131,7 @@ exports[`Testing Login component Render tests should show continue as guest if l
         data-testid="login-form-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
       >
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-x84a3-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-tkmmo2-MuiButtonBase-root-MuiButton-root"
           data-testid="login-start-new-conversation-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           tabindex="0"
           type="button"
@@ -145,10 +145,10 @@ exports[`Testing Login component Render tests should show continue as guest if l
           style="width: 100%;"
         >
           <span
-            class="MuiDivider-wrapper css-ijin0t-MuiDivider-wrapper"
+            class="MuiDivider-wrapper css-ev540k-MuiDivider-wrapper"
           >
             <h6
-              class="MuiTypography-root MuiTypography-subtitle2 css-ymle3q-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-subtitle2 css-1cbttgf-MuiTypography-root"
             >
               Or login to your account to continue
             </h6>
@@ -159,7 +159,7 @@ exports[`Testing Login component Render tests should show continue as guest if l
           data-testid="reset-password-email-container"
         />
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-zur4l4-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
           data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           disabled=""
           style="margin-top: 8px;"
@@ -201,7 +201,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
     class="MuiBox-root css-1hvnxas"
   >
     <h3
-      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
     >
       Sign In
     </h3>
@@ -219,10 +219,10 @@ exports[`Testing Login component it should show login form successfully 1`] = `
         style="width: 100%;"
       >
         <span
-          class="MuiDivider-wrapper css-ijin0t-MuiDivider-wrapper"
+          class="MuiDivider-wrapper css-ev540k-MuiDivider-wrapper"
         >
           <h6
-            class="MuiTypography-root MuiTypography-subtitle2 css-ymle3q-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-subtitle2 css-1cbttgf-MuiTypography-root"
           >
             or
           </h6>
@@ -233,7 +233,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
         data-testid="reset-password-email-container"
       />
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-zur4l4-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
         data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
         disabled=""
         style="margin-top: 8px;"
@@ -277,7 +277,7 @@ exports[`Testing Login component should handle application login code 1`] = `
     class="MuiBox-root css-1hvnxas"
   >
     <h3
-      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
     >
       Sign In
     </h3>
@@ -286,7 +286,7 @@ exports[`Testing Login component should handle application login code 1`] = `
       data-testid="login-form-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
     >
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-x84a3-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-tkmmo2-MuiButtonBase-root-MuiButton-root"
         data-testid="login-start-new-conversation-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
         tabindex="0"
         type="button"
@@ -300,10 +300,10 @@ exports[`Testing Login component should handle application login code 1`] = `
         style="width: 100%;"
       >
         <span
-          class="MuiDivider-wrapper css-ijin0t-MuiDivider-wrapper"
+          class="MuiDivider-wrapper css-ev540k-MuiDivider-wrapper"
         >
           <h6
-            class="MuiTypography-root MuiTypography-subtitle2 css-ymle3q-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-subtitle2 css-1cbttgf-MuiTypography-root"
           >
             Or login to your account to continue
           </h6>
@@ -314,7 +314,7 @@ exports[`Testing Login component should handle application login code 1`] = `
         data-testid="reset-password-email-container"
       />
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-zur4l4-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
         data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
         disabled=""
         style="margin-top: 8px;"
@@ -356,7 +356,7 @@ exports[`Testing Login component should remove registration link if registration
       class="MuiBox-root css-1hvnxas"
     >
       <h3
-        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
       >
         Sign In
       </h3>
@@ -374,10 +374,10 @@ exports[`Testing Login component should remove registration link if registration
           style="width: 100%;"
         >
           <span
-            class="MuiDivider-wrapper css-ijin0t-MuiDivider-wrapper"
+            class="MuiDivider-wrapper css-ev540k-MuiDivider-wrapper"
           >
             <h6
-              class="MuiTypography-root MuiTypography-subtitle2 css-ymle3q-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-subtitle2 css-1cbttgf-MuiTypography-root"
             >
               or
             </h6>
@@ -388,7 +388,7 @@ exports[`Testing Login component should remove registration link if registration
           data-testid="reset-password-email-container"
         />
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-zur4l4-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
           data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           disabled=""
           style="margin-top: 8px;"

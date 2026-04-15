@@ -7,7 +7,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
     data-testid="rotate-to-solve-container-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
   >
     <p
-      class="MuiTypography-root MuiTypography-body1 css-108z9x7-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body1 css-830vgx-MuiTypography-root"
       data-testid="rotate-to-solve-instruction-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
     >
       Rotate each letter until it’s upright. Select a letter by clicking on it, then rotate it clockwise with
@@ -39,7 +39,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
       .
     </p>
     <div
-      class="MuiBox-root css-kdbi9m"
+      class="MuiBox-root css-1ojpars"
       data-testid="rotate-to-solve-characters-container-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
     >
       <div
@@ -47,7 +47,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-xwquyb-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-197uzk9-MuiTypography-root"
         >
           T
         </p>
@@ -57,7 +57,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-xwquyb-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-197uzk9-MuiTypography-root"
         >
           R
         </p>
@@ -67,7 +67,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-xwquyb-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-197uzk9-MuiTypography-root"
         >
           S
         </p>
@@ -77,7 +77,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-xwquyb-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-197uzk9-MuiTypography-root"
         >
           L
         </p>
@@ -87,7 +87,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-xwquyb-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-197uzk9-MuiTypography-root"
         >
           K
         </p>
@@ -97,7 +97,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-xwquyb-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-197uzk9-MuiTypography-root"
         >
           G
         </p>
@@ -107,7 +107,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-xwquyb-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-197uzk9-MuiTypography-root"
         >
           J
         </p>
@@ -117,7 +117,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-xwquyb-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-197uzk9-MuiTypography-root"
         >
           D
         </p>
@@ -127,7 +127,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-xwquyb-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-197uzk9-MuiTypography-root"
         >
           F
         </p>
@@ -137,18 +137,18 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
         data-testid="rotate-to-solve-character-box-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
       >
         <p
-          class="MuiTypography-root MuiTypography-body1 css-xwquyb-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body1 css-197uzk9-MuiTypography-root"
         >
           V
         </p>
       </div>
     </div>
     <div
-      class="MuiBox-root css-1h9lnxw"
+      class="MuiBox-root css-1oryh6c"
     >
       <button
         aria-label="Rotate character counterclockwise"
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeSmall css-5jg1uu-MuiButtonBase-root-MuiIconButton-root"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeSmall css-hgi2ik-MuiButtonBase-root-MuiIconButton-root"
         data-testid="rotate-to-solve-rotate-left-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
         tabindex="0"
         type="button"
@@ -167,7 +167,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
       </button>
       <button
         aria-label="Rotate character clockwise"
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeSmall css-5jg1uu-MuiButtonBase-root-MuiIconButton-root"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeSmall css-hgi2ik-MuiButtonBase-root-MuiIconButton-root"
         data-testid="rotate-to-solve-rotate-right-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
         tabindex="0"
         type="button"
@@ -189,7 +189,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
       class="MuiBox-root css-1r1fsmc"
     >
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-1707yo2-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-1ugp99z-MuiButtonBase-root-MuiButton-root"
         data-testid="rotate-to-solve-cancel-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
         tabindex="0"
         type="button"

@@ -27,13 +27,13 @@ exports[`SkillPopover render tests should render the SkillPopover with the given
         class="MuiBox-root css-1kkt86i"
       >
         <span
-          class="MuiTypography-root MuiTypography-caption css-c8ypey-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-nm2v85-MuiTypography-root"
           data-testid="skill-popover-label-0ee9a0ec-fd74-4628-9b77-0ed10d4413ae"
         >
           Skill Name
         </span>
         <span
-          class="MuiTypography-root MuiTypography-caption css-2pnxsr-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-d57ar7-MuiTypography-root"
           data-testid="skill-popover-description-0ee9a0ec-fd74-4628-9b77-0ed10d4413ae"
         >
           Skill Description
@@ -43,13 +43,13 @@ exports[`SkillPopover render tests should render the SkillPopover with the given
         class="MuiBox-root css-1kkt86i"
       >
         <span
-          class="MuiTypography-root MuiTypography-caption css-c8ypey-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-nm2v85-MuiTypography-root"
           data-testid="skill-popover-alt-labels-title-0ee9a0ec-fd74-4628-9b77-0ed10d4413ae"
         >
           Also known as:
         </span>
         <span
-          class="MuiTypography-root MuiTypography-caption css-uun7zr-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-1mmzr7u-MuiTypography-root"
           data-testid="skill-popover-alt-labels-0ee9a0ec-fd74-4628-9b77-0ed10d4413ae"
         >
           Foo, Bar, Baz

@@ -57,7 +57,7 @@ exports[`SkillsRankingJobMarketDisclosure snapshot: non-replay initial render (n
           data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
         >
           <p
-            class="MuiTypography-root MuiTypography-body1 css-n76poq-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body1 css-12bta19-MuiTypography-root"
           >
             You meet the key skills for 
             <strong>
@@ -79,7 +79,7 @@ exports[`SkillsRankingJobMarketDisclosure snapshot: non-replay initial render (n
         data-testid="chat-message-footer-layout-container-7772f20a-9d0c-4072-b24f-97eca2f43d7b"
       >
         <span
-          class="MuiTypography-root MuiTypography-caption css-1s25usk-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-caption css-1a8rcnj-MuiTypography-root"
           data-testid="chat-message-timestamp-c9253326-05ee-4bff-9d43-7852ca78a033"
         >
           sent 

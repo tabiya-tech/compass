@@ -23,7 +23,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
     tabindex="-1"
   >
     <div
-      class="MuiBox-root css-x0xl6j"
+      class="MuiBox-root css-y8wow1"
     >
       <div
         class="MuiBox-root css-6r2fzw"
@@ -33,7 +33,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
           data-testid="experiences-drawer-header-container-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
         >
           <button
-            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1g8qx5h-MuiButtonBase-root-MuiIconButton-root"
+            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-uyl2wj-MuiButtonBase-root-MuiIconButton-root"
             data-testid="experiences-drawer-header-button-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
             tabindex="0"
             title="Close experiences"
@@ -55,13 +55,13 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
             class="MuiBox-root css-dvxtzn"
           >
             <h5
-              class="MuiTypography-root MuiTypography-h5 css-zu09xb-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-h5 css-1qphcdc-MuiTypography-root"
               data-testid="experiences-drawer-header-title-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
             >
               Your Njila CV
             </h5>
             <span
-              class="MuiTypography-root MuiTypography-caption css-cm5kyy-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-caption css-mpr014-MuiTypography-root"
               data-testid="experiences-drawer-header-subtitle-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
             >
               Last updated: 
@@ -82,30 +82,30 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
         </div>
       </div>
       <div
-        class="MuiBox-root css-1ym0f2g"
+        class="MuiBox-root css-12kyb2o"
         data-testid="personal-information-title-df5ab5c0-a109-4b6d-ba3f-a46975e5511b"
       >
         <h4
-          class="MuiTypography-root MuiTypography-h4 css-ru29tr-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-h4 css-1druwgg-MuiTypography-root"
         >
           Jane Doe
         </h4>
         <p
-          class="MuiTypography-root MuiTypography-body2 css-iufzw0-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body2 css-1b6s3xn-MuiTypography-root"
         >
           jane@example.com
         </p>
         <p
-          class="MuiTypography-root MuiTypography-body2 css-iufzw0-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-body2 css-1b6s3xn-MuiTypography-root"
         >
           Lusaka
         </p>
       </div>
       <div
-        class="MuiBox-root css-1w00lo4"
+        class="MuiBox-root css-ota23g"
       >
         <span
-          class="MuiTypography-root MuiTypography-overline css-x83q9y-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-overline css-1wqy8qz-MuiTypography-root"
         >
           EDUCATION
         </span>
@@ -113,7 +113,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
           class="MuiBox-root css-0"
         >
           <p
-            class="MuiTypography-root MuiTypography-body2 css-oh40v8-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-body2 css-1sldguw-MuiTypography-root"
           >
             <b>
               Example University
@@ -123,24 +123,24 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
         </div>
       </div>
       <div
-        class="MuiBox-root css-7qwnnv"
+        class="MuiBox-root css-11vd7vv"
       >
         <div
           class="MuiBox-root css-0"
         >
           <span
-            class="MuiTypography-root MuiTypography-overline css-x83q9y-MuiTypography-root"
+            class="MuiTypography-root MuiTypography-overline css-1wqy8qz-MuiTypography-root"
           >
             EXPERIENCES AND SKILLS
           </span>
           <div
-            class="MuiBox-root css-7qxaao"
+            class="MuiBox-root css-78gxje"
           >
             <div
-              class="MuiBox-root css-yj95vr"
+              class="MuiBox-root css-160qnla"
             >
               <div
-                class="MuiBox-root css-1elaak3"
+                class="MuiBox-root css-l389zj"
               >
                 <svg
                   aria-hidden="true"
@@ -154,13 +154,13 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                   />
                 </svg>
                 <span
-                  class="MuiTypography-root MuiTypography-overline css-htrxt1-MuiTypography-root"
+                  class="MuiTypography-root MuiTypography-overline css-cjb9fg-MuiTypography-root"
                 >
                   Unpaid Work
                 </span>
               </div>
               <div
-                class="MuiBox-root css-c4dei4"
+                class="MuiBox-root css-pxpff1"
               >
                 <div
                   class="MuiBox-root css-yd8sa2"
@@ -173,7 +173,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                       class="MuiBox-root css-1lekzkb"
                     >
                       <p
-                        class="MuiTypography-root MuiTypography-body2 css-13siplz-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 css-1j9lmhu-MuiTypography-root"
                         data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                       >
                         Project Manager
@@ -183,7 +183,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                         class="MuiBox-root css-192qrng"
                       >
                         <button
-                          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-3krhg7-MuiButtonBase-root-MuiIconButton-root"
+                          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12ux9aj-MuiButtonBase-root-MuiIconButton-root"
                           data-testid="experiences-drawer-more-button-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                           tabindex="0"
                           title="More options"
@@ -204,7 +204,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                       </div>
                     </div>
                     <span
-                      class="MuiTypography-root MuiTypography-caption css-jul78o-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-caption css-16ph65h-MuiTypography-root"
                       data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                     >
                       2022 — Present
@@ -215,7 +215,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     </span>
                   </div>
                   <p
-                    class="MuiTypography-root MuiTypography-body2 css-oh40v8-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body2 css-1sldguw-MuiTypography-root"
                     data-testid="experiences-drawer-content-summary-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                   >
                     Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
@@ -224,7 +224,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     class="MuiBox-root css-70qvj9"
                   >
                     <p
-                      class="MuiTypography-root MuiTypography-body1 css-13y9ohf-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body1 css-p6o7v3-MuiTypography-root"
                       data-testid="experiences-drawer-content-skills-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                     >
                       <b>
@@ -233,7 +233,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     </p>
                     <button
                       aria-label="help"
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-qa2dlw-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1ydffzf-MuiButtonBase-root-MuiIconButton-root"
                       data-mui-internal-clone-element="true"
                       data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
                       tabindex="0"
@@ -241,7 +241,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1dtfl3c-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1i4nhn6-MuiSvgIcon-root"
                         data-testid="InfoIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -253,11 +253,11 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     </button>
                   </div>
                   <div
-                    class="MuiBox-root css-147bxu4"
+                    class="MuiBox-root css-cq0t6m"
                     data-testid="experiences-drawer-skills-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                   >
                     <div
-                      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1siu9yo-MuiButtonBase-root-MuiChip-root"
+                      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1fptgix-MuiButtonBase-root-MuiChip-root"
                       data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                       role="button"
                       tabindex="0"
@@ -269,7 +269,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                       </span>
                     </div>
                     <div
-                      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1siu9yo-MuiButtonBase-root-MuiChip-root"
+                      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1fptgix-MuiButtonBase-root-MuiChip-root"
                       data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                       role="button"
                       tabindex="0"
@@ -305,10 +305,10 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
               </div>
             </div>
             <div
-              class="MuiBox-root css-yj95vr"
+              class="MuiBox-root css-160qnla"
             >
               <div
-                class="MuiBox-root css-1elaak3"
+                class="MuiBox-root css-l389zj"
               >
                 <svg
                   aria-hidden="true"
@@ -322,13 +322,13 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                   />
                 </svg>
                 <span
-                  class="MuiTypography-root MuiTypography-overline css-htrxt1-MuiTypography-root"
+                  class="MuiTypography-root MuiTypography-overline css-cjb9fg-MuiTypography-root"
                 >
                   Trainee Work
                 </span>
               </div>
               <div
-                class="MuiBox-root css-c4dei4"
+                class="MuiBox-root css-pxpff1"
               >
                 <div
                   class="MuiBox-root css-yd8sa2"
@@ -341,7 +341,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                       class="MuiBox-root css-1lekzkb"
                     >
                       <p
-                        class="MuiTypography-root MuiTypography-body2 css-13siplz-MuiTypography-root"
+                        class="MuiTypography-root MuiTypography-body2 css-1j9lmhu-MuiTypography-root"
                         data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                       >
                         Software Engineer
@@ -351,7 +351,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                         class="MuiBox-root css-192qrng"
                       >
                         <button
-                          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-3krhg7-MuiButtonBase-root-MuiIconButton-root"
+                          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12ux9aj-MuiButtonBase-root-MuiIconButton-root"
                           data-testid="experiences-drawer-more-button-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                           tabindex="0"
                           title="More options"
@@ -372,7 +372,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                       </div>
                     </div>
                     <span
-                      class="MuiTypography-root MuiTypography-caption css-jul78o-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-caption css-16ph65h-MuiTypography-root"
                       data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                     >
                       2022 — Present
@@ -383,7 +383,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     </span>
                   </div>
                   <p
-                    class="MuiTypography-root MuiTypography-body2 css-oh40v8-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body2 css-1sldguw-MuiTypography-root"
                     data-testid="experiences-drawer-content-summary-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                   >
                     Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
@@ -392,7 +392,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     class="MuiBox-root css-70qvj9"
                   >
                     <p
-                      class="MuiTypography-root MuiTypography-body1 css-13y9ohf-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-body1 css-p6o7v3-MuiTypography-root"
                       data-testid="experiences-drawer-content-skills-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                     >
                       <b>
@@ -401,7 +401,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     </p>
                     <button
                       aria-label="help"
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-qa2dlw-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1ydffzf-MuiButtonBase-root-MuiIconButton-root"
                       data-mui-internal-clone-element="true"
                       data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
                       tabindex="0"
@@ -409,7 +409,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1dtfl3c-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1i4nhn6-MuiSvgIcon-root"
                         data-testid="InfoIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -421,11 +421,11 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
                     </button>
                   </div>
                   <div
-                    class="MuiBox-root css-147bxu4"
+                    class="MuiBox-root css-cq0t6m"
                     data-testid="experiences-drawer-skills-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                   >
                     <div
-                      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1siu9yo-MuiButtonBase-root-MuiChip-root"
+                      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1fptgix-MuiButtonBase-root-MuiChip-root"
                       data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
                       role="button"
                       tabindex="0"

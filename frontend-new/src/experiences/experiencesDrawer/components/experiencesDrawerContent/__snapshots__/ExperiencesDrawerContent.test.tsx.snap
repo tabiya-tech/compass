@@ -12,7 +12,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
       class="MuiBox-root css-1lekzkb"
     >
       <p
-        class="MuiTypography-root MuiTypography-body2 css-13siplz-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-body2 css-1j9lmhu-MuiTypography-root"
         data-testid="experiences-drawer-content-occupation-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
       >
         Project Manager
@@ -22,7 +22,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
         class="MuiBox-root css-192qrng"
       >
         <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-3krhg7-MuiButtonBase-root-MuiIconButton-root"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12ux9aj-MuiButtonBase-root-MuiIconButton-root"
           data-testid="experiences-drawer-more-button-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
           tabindex="0"
           title="More options"
@@ -43,7 +43,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
       </div>
     </div>
     <span
-      class="MuiTypography-root MuiTypography-caption css-jul78o-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-caption css-16ph65h-MuiTypography-root"
       data-testid="experiences-drawer-content-date-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
     >
       2022 — Present
@@ -54,7 +54,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     </span>
   </div>
   <p
-    class="MuiTypography-root MuiTypography-body2 css-oh40v8-MuiTypography-root"
+    class="MuiTypography-root MuiTypography-body2 css-1sldguw-MuiTypography-root"
     data-testid="experiences-drawer-content-summary-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
   >
     Managed multiple projects simultaneously, ensuring timely delivery and client satisfaction. Coordinated cross-functional teams of developers, designers, and stakeholders to achieve project milestones. Implemented agile methodologies that improved delivery efficiency by 30%. Conducted regular client meetings to gather feedback and ensure alignment with business objectives. Resolved critical issues during development cycles to prevent delays and maintain quality standards.
@@ -63,7 +63,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     class="MuiBox-root css-70qvj9"
   >
     <p
-      class="MuiTypography-root MuiTypography-body1 css-13y9ohf-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-body1 css-p6o7v3-MuiTypography-root"
       data-testid="experiences-drawer-content-skills-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
     >
       <b>
@@ -72,7 +72,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     </p>
     <button
       aria-label="help"
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-qa2dlw-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-1ydffzf-MuiButtonBase-root-MuiIconButton-root"
       data-mui-internal-clone-element="true"
       data-testid="help-icon-4b757f12-fb67-4a59-94b1-b8a2498a7a49"
       tabindex="0"
@@ -80,7 +80,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     >
       <svg
         aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1dtfl3c-MuiSvgIcon-root"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1i4nhn6-MuiSvgIcon-root"
         data-testid="InfoIcon"
         focusable="false"
         viewBox="0 0 24 24"
@@ -92,11 +92,11 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     </button>
   </div>
   <div
-    class="MuiBox-root css-147bxu4"
+    class="MuiBox-root css-cq0t6m"
     data-testid="experiences-drawer-skills-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
   >
     <div
-      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1siu9yo-MuiButtonBase-root-MuiChip-root"
+      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1fptgix-MuiButtonBase-root-MuiChip-root"
       data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
       role="button"
       tabindex="0"
@@ -108,7 +108,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
       </span>
     </div>
     <div
-      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1siu9yo-MuiButtonBase-root-MuiChip-root"
+      class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1fptgix-MuiButtonBase-root-MuiChip-root"
       data-testid="experiences-drawer-chip-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
       role="button"
       tabindex="0"
@@ -157,7 +157,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
 
 exports[`ReportDrawerContent should render ExperiencesDrawerContent skeleton correctly 1`] = `
 <div
-  class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-1wikqt5-MuiGrid-root"
+  class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-qy95ig-MuiGrid-root"
   data-testid="experiences-drawer-content-container-34a59a9e-e7f6-4a10-8b72-0fd401c727de"
 >
   <div
@@ -191,7 +191,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent skeleton cor
         style="width: 80%;"
       />
       <div
-        class="MuiBox-root css-1elaak3"
+        class="MuiBox-root css-l389zj"
       >
         <span
           class="MuiSkeleton-root MuiSkeleton-text MuiSkeleton-pulse css-1p5kt1h-MuiSkeleton-root"
@@ -205,7 +205,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent skeleton cor
         />
       </div>
       <div
-        class="MuiBox-root css-b7renb"
+        class="MuiBox-root css-2qq0iq"
       >
         <span
           class="MuiSkeleton-root MuiSkeleton-rounded MuiSkeleton-pulse css-q8rahw-MuiSkeleton-root"

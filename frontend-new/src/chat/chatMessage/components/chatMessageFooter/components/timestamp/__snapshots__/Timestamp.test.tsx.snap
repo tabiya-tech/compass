@@ -2,7 +2,7 @@
 
 exports[`render tests should render the Chat Message Timestamp without a child if none is passed 1`] = `
 <span
-  class="MuiTypography-root MuiTypography-caption css-1s25usk-MuiTypography-root"
+  class="MuiTypography-root MuiTypography-caption css-1a8rcnj-MuiTypography-root"
   data-testid="chat-message-timestamp-c9253326-05ee-4bff-9d43-7852ca78a033"
 >
   sent 

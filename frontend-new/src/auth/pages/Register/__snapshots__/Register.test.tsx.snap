@@ -9,20 +9,20 @@ exports[`Testing Register component it should show register form successfully 1`
     class="MuiBox-root css-1hvnxas"
   >
     <h3
-      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
     >
       Sign Up
     </h3>
     <h6
-      class="MuiTypography-root MuiTypography-subtitle2 css-r245rg-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-subtitle2 css-ogiz19-MuiTypography-root"
     >
       Enter your registration code
     </h6>
     <div
-      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1e8fpaq-MuiFormControl-root-MuiTextField-root"
+      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-14ngfea-MuiFormControl-root-MuiTextField-root"
     >
       <label
-        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined css-st6o5v-MuiFormLabel-root-MuiInputLabel-root"
+        class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined css-pw7yny-MuiFormLabel-root-MuiInputLabel-root"
         data-shrink="true"
         for=":r1:"
         id=":r1:-label"
@@ -37,11 +37,11 @@ exports[`Testing Register component it should show register form successfully 1`
         </span>
       </label>
       <div
-        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-hkjgae-MuiInputBase-root-MuiOutlinedInput-root"
+        class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-rdckqg-MuiInputBase-root-MuiOutlinedInput-root"
       >
         <input
           aria-invalid="false"
-          class="MuiInputBase-input MuiOutlinedInput-input css-ask1tn-MuiInputBase-input-MuiOutlinedInput-input"
+          class="MuiInputBase-input MuiOutlinedInput-input css-p1mqw2-MuiInputBase-input-MuiOutlinedInput-input"
           data-testid="register-registration-code-input-ab02918f-d559-47ba-9662-ea6b3a3606d0"
           id=":r1:"
           required=""
@@ -71,10 +71,10 @@ exports[`Testing Register component it should show register form successfully 1`
       style="width: 100%;"
     >
       <span
-        class="MuiDivider-wrapper css-ijin0t-MuiDivider-wrapper"
+        class="MuiDivider-wrapper css-ev540k-MuiDivider-wrapper"
       >
         <h6
-          class="MuiTypography-root MuiTypography-subtitle2 css-ymle3q-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-subtitle2 css-1cbttgf-MuiTypography-root"
         >
           and either continue with
         </h6>
@@ -102,7 +102,7 @@ exports[`Testing Register component should handle application registration code 
     class="MuiBox-root css-1hvnxas"
   >
     <h3
-      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-hztf2l-MuiTypography-root"
+      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
     >
       Sign Up
     </h3>

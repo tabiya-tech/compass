@@ -12,13 +12,13 @@ exports[`Backdrop render tests should be shown 1`] = `
     style="--Paper-shadow: var(--mui-shadows-24);"
   >
     <div
-      class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-1yo0kkk-MuiGrid-root"
+      class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-14t0h3l-MuiGrid-root"
     >
       <div
         class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
       >
         <h6
-          class="MuiTypography-root MuiTypography-h6 css-65dhei-MuiTypography-root"
+          class="MuiTypography-root MuiTypography-h6 css-143jn3d-MuiTypography-root"
           data-testid="message-91b57774-d50c-4350-882d-363f80ac10e8"
         >
           foo-message
@@ -66,7 +66,7 @@ exports[`Backdrop render tests should rendered without message and not show any 
     style="--Paper-shadow: var(--mui-shadows-24);"
   >
     <div
-      class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-1yo0kkk-MuiGrid-root"
+      class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-14t0h3l-MuiGrid-root"
     >
       <div
         class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"

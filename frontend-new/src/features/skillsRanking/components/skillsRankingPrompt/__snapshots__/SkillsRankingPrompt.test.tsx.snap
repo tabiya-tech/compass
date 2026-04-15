@@ -117,7 +117,7 @@ exports[`SkillsRankingPrompt snapshot: initial render in INITIAL phase (non-repl
                 class="MuiBox-root css-x1sij0"
               >
                 <p
-                  class="MuiTypography-root MuiTypography-body1 css-l8pgdq-MuiTypography-root"
+                  class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
                 >
                   Typing
                 </p>
@@ -125,17 +125,17 @@ exports[`SkillsRankingPrompt snapshot: initial render in INITIAL phase (non-repl
                   class="MuiBox-root css-sz63p1"
                 >
                   <span
-                    class="MuiTypography-root MuiTypography-body1 css-1nc0off-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body1 css-1aelj6c-MuiTypography-root"
                   >
                     .
                   </span>
                   <span
-                    class="MuiTypography-root MuiTypography-body1 css-mx9yh4-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body1 css-y1kmai-MuiTypography-root"
                   >
                     .
                   </span>
                   <span
-                    class="MuiTypography-root MuiTypography-body1 css-ci6704-MuiTypography-root"
+                    class="MuiTypography-root MuiTypography-body1 css-13ysxbd-MuiTypography-root"
                   >
                     .
                   </span>
