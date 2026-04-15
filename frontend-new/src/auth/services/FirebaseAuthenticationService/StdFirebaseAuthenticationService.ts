@@ -131,6 +131,28 @@ class StdFirebaseAuthenticationService {
     const oldToken = AuthenticationStateService.getInstance().getToken();
     console.debug("Old token", "..." + oldToken?.slice(-20));
 
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY_MS = 1000;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        return await this._refreshTokenOnce();
+      } catch (error) {
+        const isNetworkError = error instanceof Error && (error as any).code === "auth/network-request-failed";
+        if (isNetworkError && attempt < MAX_RETRIES) {
+          console.warn(`Token refresh attempt ${attempt} failed due to network error, retrying...`);
+          await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS * attempt));
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    // Should never be reached, but TypeScript requires a return
+    throw new Error("Token refresh failed after max retries");
+  }
+
+  private _refreshTokenOnce(): Promise<string> {
     // We need to use a one-time auth state listener because firebaseAuth.currentUser
     // might not be available immediately on page load. Its not perfectly documented that this will be triggered on
     // subscribing to onAuthStateChanged, but it seems to be the case. And this is the recommended way to handle auth state changes in Firebase.
