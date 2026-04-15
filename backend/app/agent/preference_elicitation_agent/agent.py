@@ -1024,7 +1024,9 @@ class PreferenceElicitationAgent(Agent):
                 # Adaptive D-efficiency: Update Bayesian posterior
                 # This is needed for BOTH adaptive mode and hybrid mode (offline + personalization)
                 # Bayesian update is the PRIMARY method for learning preferences
-                if self._state.use_adaptive_selection or self._use_offline_with_personalization:
+                # Skip if no option was chosen (user found both acceptable — no preference signal)
+                if (self._state.use_adaptive_selection or self._use_offline_with_personalization) \
+                        and extraction_result.chosen_option_id is not None:
                     await self._update_bayesian_posterior(vignette, extraction_result.chosen_option_id, user_input)
 
                 # Update qualitative metadata (every 3 vignettes)

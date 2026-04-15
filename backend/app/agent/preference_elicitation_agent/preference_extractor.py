@@ -36,8 +36,8 @@ class PreferenceExtractionResult(BaseModel):
     reasoning: str
     """Chain of thought reasoning about the user's choice"""
 
-    chosen_option_id: str
-    """Which option the user chose (A, B, etc.)"""
+    chosen_option_id: str | None = None
+    """Which option the user chose (A, B, etc.), or None if the user found both acceptable"""
 
     stated_reasons: list[str]
     """Explicit reasons the user gave for their choice"""
