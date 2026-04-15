@@ -188,40 +188,10 @@ abstract class AuthenticationService {
       }
 
       // Decode the token and validate it
+      // Note: we intentionally do not check expiry or issuance time here.
+      // Device clocks can be skewed (ahead or behind), which causes false negatives.
+      // Instead, we rely on the server returning 401 to trigger a token refresh.
       const decodedToken: Token = jwtDecode(token);
-      // The tolerance must be at lest greater than the precision loss by the Math.floor function (1 second)
-      const currentTime = Math.floor(Date.now() / 1000);
-
-      // Check expiration with buffer
-      // ideally this would be a simple check, but since there is a chance that the server and client clocks are not perfectly synchronized,
-      // we add a buffer to the expiration time to account for the potential time difference
-      if (currentTime > decodedToken.exp + CLOCK_TOLERANCE) {
-        console.debug("Token is expired: ", { exp: decodedToken.exp, currentTime });
-        return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_EXPIRED };
-      } else if (currentTime > decodedToken.exp) {
-        console.warn(
-          "Warning: token expiration time has elapsed, but is still within the acceptable tolerance period",
-          {
-            exp: decodedToken.exp,
-            currentTime,
-          }
-        );
-      }
-
-      // Check issued time with buffer
-      // similarly, we add a buffer to the issuance time to account for the potential time difference between the server and client clocks
-      if (currentTime < decodedToken.iat - CLOCK_TOLERANCE) {
-        console.debug("Token issued in the future: ", { iat: decodedToken.iat, currentTime });
-        return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.TOKEN_NOT_YET_VALID };
-      } else if (currentTime < decodedToken.iat) {
-        console.warn(
-          "Warning: token issued at time was after the current time, but within the acceptable tolerance period ",
-          {
-            iat: decodedToken.iat,
-            currentTime,
-          }
-        );
-      }
       return { isValid: true, decodedToken: decodedToken };
     } catch (error) {
       return { isValid: false, decodedToken: null, failureCause: TokenValidationFailureCause.ERROR_DECODING_TOKEN };

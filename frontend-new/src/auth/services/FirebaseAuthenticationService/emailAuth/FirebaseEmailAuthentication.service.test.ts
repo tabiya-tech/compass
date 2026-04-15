@@ -1006,30 +1006,42 @@ describe("AuthService class tests", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
-    test("should return null and log debug when token is expired", () => {
-      // GIVEN an expired token
-      const givenToken = "expired-token";
+    test("should return user even when token is past its exp claim (device clock may be skewed)", () => {
+      // GIVEN a token whose exp is in the past relative to the mocked device clock
+      const givenToken = "past-exp-token";
+      const givenDecodedToken = {
+        sub: "user-id",
+        email: "test@example.com",
+        exp: 500, // Past expiry (current time is 1000)
+        iat: 100,
+        firebase: { sign_in_provider: "password" },
+      };
+      const givenUser = { id: "user-id", email: "test@example.com", name: "Test User" };
 
-      // Mock jwtDecode to return expired token
+      // Mock jwtDecode to return the token
       (jwtDecode as jest.Mock)
         .mockReturnValueOnce({
           typ: "JWT",
           alg: "RS256",
           kid: "key-id",
         })
-        .mockReturnValueOnce({
-          exp: 500, // Past expiry (current time is 1000)
-          iat: 100,
-        });
+        .mockReturnValueOnce(givenDecodedToken);
+
+      // Mock firebase token validation to accept the token
+      jest.spyOn(StdFirebaseAuthenticationService.getInstance(), "isFirebaseTokenValid").mockReturnValueOnce({
+        isValid: true,
+      });
+
+      // Mock getUserFromDecodedToken to return a user
+      jest
+        .spyOn(StdFirebaseAuthenticationService.getInstance(), "getUserFromDecodedToken")
+        .mockReturnValueOnce(givenUser);
 
       // WHEN getUser is called
       const result = authService.getUser(givenToken);
 
-      // THEN it should return null
-      expect(result).toBeNull();
-
-      // AND it should log a debug message
-      expect(console.debug).toHaveBeenCalled();
+      // THEN it should return the user — time-based rejection is handled server-side via 401
+      expect(result).toEqual(givenUser);
 
       // AND no errors or warnings should be logged
       expect(console.error).not.toHaveBeenCalled();
@@ -1053,7 +1065,7 @@ describe("AuthService class tests", () => {
       // THEN it should return null
       expect(result).toBeNull();
 
-      // AND it should log an error (this comes from getUser when failureCause is not TOKEN_EXPIRED)
+      // AND it should log an error
       expect(console.error).toHaveBeenCalled();
 
       // AND no warnings should be logged
@@ -1109,36 +1121,42 @@ describe("AuthService class tests", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
-    test("should return isValid false for expired token", () => {
-      // GIVEN an expired token
-      const givenToken = "expired-token";
+    test("should return isValid true for token past its exp claim (device clock may be skewed)", () => {
+      // GIVEN a token whose exp is in the past relative to the mocked device clock
+      const givenToken = "past-exp-token";
+      const givenDecodedToken = {
+        sub: "user-id",
+        email: "test@example.com",
+        exp: 500, // Past expiry (current time is 1000)
+        iat: 100,
+        firebase: { sign_in_provider: "password" },
+      };
 
-      // Mock jwtDecode to return expired token
+      // Mock jwtDecode to return the token
       (jwtDecode as jest.Mock)
         .mockReturnValueOnce({
           typ: "JWT",
           alg: "RS256",
           kid: "key-id",
         })
-        .mockReturnValueOnce({
-          exp: 500, // Past expiry (current time is 1000)
-          iat: 100,
-        });
+        .mockReturnValueOnce(givenDecodedToken);
+
+      // Mock firebase token validation to accept the token
+      jest.spyOn(StdFirebaseAuthenticationService.getInstance(), "isFirebaseTokenValid").mockReturnValueOnce({
+        isValid: true,
+      });
 
       // WHEN isTokenValid is called
       const result = authService.isTokenValid(givenToken);
 
-      // THEN it should return isValid false
-      expect(result.isValid).toBe(false);
+      // THEN it should return isValid true — time-based rejection is handled server-side via 401
+      expect(result.isValid).toBe(true);
 
-      // AND it should return null for decoded token
-      expect(result.decodedToken).toBeNull();
+      // AND it should return the decoded token
+      expect(result.decodedToken).toEqual(givenDecodedToken);
 
-      // AND it should have TOKEN_EXPIRED as the failure cause
-      expect(result.failureCause).toBe(TokenValidationFailureCause.TOKEN_EXPIRED);
-
-      // AND it should log a debug message
-      expect(console.debug).toHaveBeenCalled();
+      // AND it should not have a failure cause
+      expect(result.failureCause).toBeUndefined();
 
       // AND no errors or warnings should be logged
       expect(console.error).not.toHaveBeenCalled();

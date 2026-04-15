@@ -1,5 +1,5 @@
 import "src/_test_utilities/consoleMock";
-import AuthenticationService, { CLOCK_TOLERANCE, TokenValidationFailureCause } from "./Authentication.service";
+import AuthenticationService, { TokenValidationFailureCause } from "./Authentication.service";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
@@ -467,19 +467,11 @@ describe("AuthenticationService", () => {
     });
 
     test.each([
-      [
-        "expired token",
-        { iat: currentTime - CLOCK_TOLERANCE - 100, exp: currentTime - CLOCK_TOLERANCE - 1 },
-        "TOKEN_EXPIRED",
-      ],
-      [
-        "future token",
-        { iat: currentTime + CLOCK_TOLERANCE + 1, exp: currentTime + CLOCK_TOLERANCE + 100 },
-        "TOKEN_NOT_YET_VALID",
-      ],
-    ])("should return false for %s", (_, payload, expectedFailureCause) => {
-      // GIVEN a token with invalid timing
-      const givenToken = "invalid-token";
+      ["expired token", { iat: currentTime - 100, exp: currentTime - 1 }],
+      ["future token", { iat: currentTime + 1, exp: currentTime + 100 }],
+    ])("should return true for %s (time checks are deferred to server-side 401)", (_, payload) => {
+      // GIVEN a token whose timing would previously have been rejected client-side
+      const givenToken = "time-skewed-token";
       (jwtDecode as jest.Mock)
         .mockReturnValueOnce({
           typ: "JWT",
@@ -491,10 +483,10 @@ describe("AuthenticationService", () => {
       // WHEN isTokenValid is called
       const result = service.isTokenValid(givenToken);
 
-      // THEN it should return false
-      expect(result.isValid).toBe(false);
-      expect(result.decodedToken).toBeNull();
-      expect(result.failureCause).toBe(expectedFailureCause);
+      // THEN it should return true — device clock skew must not block the user
+      expect(result.isValid).toBe(true);
+      expect(result.decodedToken).toBeDefined();
+      expect(result.failureCause).toBeUndefined();
 
       // AND expect no errors or warning to have occurred
       expect(console.error).not.toHaveBeenCalled();
