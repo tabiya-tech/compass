@@ -1,5 +1,5 @@
 import "src/_test_utilities/consoleMock";
-import AuthenticationService, { CLOCK_TOLERANCE, TokenValidationFailureCause } from "./Authentication.service";
+import AuthenticationService, { TokenValidationFailureCause } from "./Authentication.service";
 import { jwtDecode } from "jwt-decode";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import UserPreferencesService from "src/userPreferences/UserPreferencesService/userPreferences.service";
@@ -480,52 +480,24 @@ describe("AuthenticationService", () => {
       expect(console.warn).not.toHaveBeenCalled();
     });
 
-    test("should return false for expired token", () => {
-      // GIVEN an expired token
-      const givenToken = "expired-token";
+    test.each([
+      ["expired token", { iat: currentTime - 100, exp: currentTime - 1 }],
+      ["future token", { iat: currentTime + 1, exp: currentTime + 100 }],
+    ])("should return true for %s (time checks are deferred to server-side 401)", (_, payload) => {
+      // GIVEN a token whose timing would previously have been rejected client-side
+      const givenToken = "time-skewed-token";
       (jwtDecode as jest.Mock)
         .mockReturnValueOnce({
           typ: "JWT",
           alg: "RS256",
           kid: "key-id",
         } as TokenHeader)
-        .mockReturnValueOnce({
-          iat: currentTime - CLOCK_TOLERANCE - 100,
-          exp: currentTime - CLOCK_TOLERANCE - 1,
-        } as Token);
+        .mockReturnValueOnce(payload as Token);
 
       // WHEN isTokenValid is called
       const result = service.isTokenValid(givenToken);
 
-      // THEN it should return false with TOKEN_EXPIRED
-      expect(result.isValid).toBe(false);
-      expect(result.decodedToken).toBeNull();
-      expect(result.failureCause).toBe(TokenValidationFailureCause.TOKEN_EXPIRED);
-
-      // AND expect no errors or warning to have occurred
-      expect(console.error).not.toHaveBeenCalled();
-      expect(console.warn).not.toHaveBeenCalled();
-    });
-
-    test("should return true when iat is in the future due to client clock skew", () => {
-      // GIVEN a token where the server clock is ahead of the client (iat appears to be in the future)
-      // but the token has not yet expired
-      const givenToken = "clock-skewed-token";
-      (jwtDecode as jest.Mock)
-        .mockReturnValueOnce({
-          typ: "JWT",
-          alg: "RS256",
-          kid: "key-id",
-        } as TokenHeader)
-        .mockReturnValueOnce({
-          iat: currentTime + CLOCK_TOLERANCE + 1,
-          exp: currentTime + CLOCK_TOLERANCE + 100,
-        } as Token);
-
-      // WHEN isTokenValid is called
-      const result = service.isTokenValid(givenToken);
-
-      // THEN it should return true — iat is not checked client-side
+      // THEN it should return true — device clock skew must not block the user
       expect(result.isValid).toBe(true);
       expect(result.decodedToken).toBeDefined();
       expect(result.failureCause).toBeUndefined();
