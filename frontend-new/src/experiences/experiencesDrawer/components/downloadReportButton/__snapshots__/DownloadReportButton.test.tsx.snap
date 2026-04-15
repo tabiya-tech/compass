@@ -2,66 +2,74 @@
 
 exports[`DownloadReportButton should render DownloadReportButton correctly when disabled is false 1`] = `
 <div
-  class="MuiBox-root css-0"
+  class="MuiBox-root css-70qvj9"
   data-testid="download-report-button-container-f5553dac-adb7-440f-9549-c3567b22dc76"
 >
-  <button
-    class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
-    data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
-    tabindex="0"
-    title="Download CV"
-    type="button"
+  <div
+    class="MuiBox-root css-1rr4qq7"
   >
-    <span
-      class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1sh91j5-MuiButton-startIcon"
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1yzkonp-MuiButtonBase-root-MuiButton-root"
+      data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
+      tabindex="0"
+      title="Download CV"
+      type="button"
     >
-      <svg
-        aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1dc7581-MuiSvgIcon-root"
-        data-testid="download-report-icon-f5553dac-adb7-440f-9549-c3567b22dc76"
-        focusable="false"
-        viewBox="0 0 24 24"
+      <span
+        class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1sh91j5-MuiButton-startIcon"
       >
-        <path
-          d="M19 9h-4V3H9v6H5l7 7zM5 18v2h14v-2z"
-        />
-      </svg>
-    </span>
-    Download CV
-  </button>
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1dc7581-MuiSvgIcon-root"
+          data-testid="download-report-icon-f5553dac-adb7-440f-9549-c3567b22dc76"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M19 9h-4V3H9v6H5l7 7zM5 18v2h14v-2z"
+          />
+        </svg>
+      </span>
+      Download CV
+    </button>
+  </div>
 </div>
 `;
 
 exports[`DownloadReportButton should render DownloadReportButton correctly when disabled is true 1`] = `
 <div
-  class="MuiBox-root css-0"
+  class="MuiBox-root css-70qvj9"
   data-testid="download-report-button-container-f5553dac-adb7-440f-9549-c3567b22dc76"
 >
-  <button
-    class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
-    data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
-    disabled=""
-    tabindex="-1"
-    title="Download CV"
-    type="button"
+  <div
+    class="MuiBox-root css-1rr4qq7"
   >
-    <span
-      class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1sh91j5-MuiButton-startIcon"
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1yzkonp-MuiButtonBase-root-MuiButton-root"
+      data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
+      disabled=""
+      tabindex="-1"
+      title="Download CV"
+      type="button"
     >
-      <svg
-        aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1dc7581-MuiSvgIcon-root"
-        data-testid="download-report-icon-f5553dac-adb7-440f-9549-c3567b22dc76"
-        focusable="false"
-        viewBox="0 0 24 24"
+      <span
+        class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1sh91j5-MuiButton-startIcon"
       >
-        <path
-          d="M19 9h-4V3H9v6H5l7 7zM5 18v2h14v-2z"
-        />
-      </svg>
-    </span>
-    Download CV
-  </button>
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1dc7581-MuiSvgIcon-root"
+          data-testid="download-report-icon-f5553dac-adb7-440f-9549-c3567b22dc76"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M19 9h-4V3H9v6H5l7 7zM5 18v2h14v-2z"
+          />
+        </svg>
+      </span>
+      Download CV
+    </button>
+  </div>
   <div
     data-testid="download-report-help-tip-f5553dac-adb7-440f-9549-c3567b22dc76"
   />
@@ -70,41 +78,45 @@ exports[`DownloadReportButton should render DownloadReportButton correctly when 
 
 exports[`DownloadReportButton should render DownloadReportButton correctly when isLoading is true 1`] = `
 <div
-  class="MuiBox-root css-0"
+  class="MuiBox-root css-70qvj9"
   data-testid="download-report-button-container-f5553dac-adb7-440f-9549-c3567b22dc76"
 >
-  <button
-    class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-j3c03m-MuiButtonBase-root-MuiButton-root"
-    data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
-    disabled=""
-    tabindex="-1"
-    title="Download CV"
-    type="button"
+  <div
+    class="MuiBox-root css-1rr4qq7"
   >
-    <span
-      class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1sh91j5-MuiButton-startIcon"
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1yzkonp-MuiButtonBase-root-MuiButton-root"
+      data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
+      disabled=""
+      tabindex="-1"
+      title="Download CV"
+      type="button"
     >
       <span
-        class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1em95tl-MuiCircularProgress-root"
-        data-testid="download-report-progress-icon-f5553dac-adb7-440f-9549-c3567b22dc76"
-        role="progressbar"
+        class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1sh91j5-MuiButton-startIcon"
       >
-        <svg
-          class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
-          viewBox="22 22 44 44"
+        <span
+          class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-1em95tl-MuiCircularProgress-root"
+          data-testid="download-report-progress-icon-f5553dac-adb7-440f-9549-c3567b22dc76"
+          role="progressbar"
         >
-          <circle
-            class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
-            cx="44"
-            cy="44"
-            fill="none"
-            r="20.2"
-            stroke-width="3.6"
-          />
-        </svg>
+          <svg
+            class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
+            viewBox="22 22 44 44"
+          >
+            <circle
+              class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
+              cx="44"
+              cy="44"
+              fill="none"
+              r="20.2"
+              stroke-width="3.6"
+            />
+          </svg>
+        </span>
       </span>
-    </span>
-    Downloading
-  </button>
+      Downloading
+    </button>
+  </div>
 </div>
 `;

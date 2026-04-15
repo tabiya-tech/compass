@@ -143,12 +143,15 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
       <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Typography
-            variant="body1"
+            variant="body2"
             fontWeight="bold"
             data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_OCCUPATION}
           >
             {displayTitle ? (
-              displayTitle
+              <>
+                {displayTitle}
+                {experience.company && ` — ${experience.company}`}
+              </>
             ) : (
               <i>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.untitled")}</i>
             )}
@@ -164,23 +167,15 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
             </PrimaryIconButton>
           </Box>
         </Box>
-        <Typography
-          variant="caption"
-          sx={{ color: theme.palette.text.secondary }}
-          data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_DATE}
-        >
+        <Typography variant="caption" fontWeight={500} data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_DATE}>
           {/* display the start and end dates */}
           {experience.timeline.end && experience.timeline.start
             ? `${experience.timeline.start} — ${experience.timeline.end}`
             : experience.timeline.start || experience.timeline.end}
 
-          {(experience.timeline.start || experience.timeline.end) && experience.company && ", "}
-
-          {/* display the company if it exists */}
-          {experience?.company}
-
-          {/* display the location if it exists */}
-          {experience.location && <i>{` (${experience.location})`}</i>}
+          {/* display location separated by pipe */}
+          {(experience.timeline.start || experience.timeline.end) && experience.location && " | "}
+          {experience.location && <i>{experience.location}</i>}
         </Typography>
       </Box>
       {experience.summary && (
@@ -215,7 +210,7 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
             <Chip
               key={skill.UUID}
               label={capitalizeFirstLetter(skill.preferredLabel)}
-              sx={{ color: theme.palette.text.secondary, backgroundColor: theme.palette.grey[100] }}
+              sx={{ color: theme.palette.text.primary, backgroundColor: theme.palette.grey[100] }}
               onClick={(event) => handleChipClick(event, skill)}
               data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CHIP}
             />

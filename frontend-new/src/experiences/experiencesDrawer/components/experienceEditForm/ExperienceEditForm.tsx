@@ -499,14 +499,14 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                 >
                   <Box display="flex" alignItems="center" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
                     {React.cloneElement(getWorkTypeIcon(formValues.work_type), {
-                      sx: { color: theme.palette.text.secondary },
+                      sx: { color: theme.palette.text.primary },
                     })}
-                    <Typography variant="body1" fontWeight="bold" color={theme.palette.text.secondary}>
+                    <Typography variant="body2" fontWeight="bold" color={theme.palette.text.primary}>
                       {getWorkTypeTitle(formValues.work_type)}
                     </Typography>
                   </Box>
                   <ArrowDropDownIcon
-                    sx={{ color: theme.palette.text.secondary }}
+                    sx={{ color: theme.palette.text.primary }}
                     data-testid={DATA_TEST_ID.FORM_WORK_TYPE_DROPDOWN}
                   />
                 </Box>
@@ -532,6 +532,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                 {fieldErrors.experience_title && (
                   <Typography
                     variant="caption"
+                    color="text.primary"
                     sx={{ color: theme.palette.error.main, width: "100%" }}
                     data-testid={DATA_TEST_ID.FORM_EXPERIENCE_TITLE_ERROR}
                   >
@@ -715,7 +716,11 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                               }}
                             >
                               {/* xl wasn't quite big enough, we're going for ~16px*/}
-                              <RestoreIcon width={theme.tabiyaSpacing.xl * 4} height={theme.tabiyaSpacing.xl * 4} />
+                              <RestoreIcon
+                                width={theme.tabiyaSpacing.xl * 4}
+                                height={theme.tabiyaSpacing.xl * 4}
+                                color={theme.palette.text.primary}
+                              />
                             </Box>
                           ) : (
                             <DeleteIcon
@@ -730,7 +735,7 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                         </Box>
                       }
                       sx={{
-                        color: theme.palette.text.secondary,
+                        color: theme.palette.text.primary,
                         backgroundColor: theme.palette.grey[100],
                         cursor: "pointer",
                       }}
@@ -750,12 +755,12 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                   disabled={!isOnline || filteredRemainingSkills.length === 0}
                   sx={{
                     backgroundColor: theme.palette.primary.main,
-                    color: theme.palette.common.black,
+                    color: theme.palette.common.white,
                     "&:hover": {
                       backgroundColor: theme.palette.primary.dark,
                     },
                     ".MuiChip-icon": {
-                      color: theme.palette.common.black,
+                      color: theme.palette.common.white,
                     },
                     "&.Mui-disabled": {
                       backgroundColor: theme.palette.grey[400],

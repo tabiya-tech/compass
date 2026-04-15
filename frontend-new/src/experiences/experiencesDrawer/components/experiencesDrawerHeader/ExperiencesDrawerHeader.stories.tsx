@@ -15,3 +15,5 @@ export const Shown = {
     title: "Experiences and Skills",
   },
 };
+
+export const ShownWithLastUpdated = { args: { title: "Experiences and Skills", lastUpdated: "2024-01-01" } };

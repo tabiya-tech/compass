@@ -101,7 +101,7 @@ const StyledTextField = styled(TextField, {
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
         borderColor: color,
-        borderRadius: theme.fixedSpacing(theme.tabiyaRounding.lg),
+        borderRadius: theme.fixedSpacing(theme.tabiyaRounding.sm),
         borderWidth: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
       },
       "&:hover fieldset": {

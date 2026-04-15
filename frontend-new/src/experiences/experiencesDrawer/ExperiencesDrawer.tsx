@@ -1,10 +1,9 @@
 import React, { Suspense, useMemo, useState } from "react";
-import { Box, Divider, Drawer, Skeleton, Slide, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Drawer, Skeleton, Slide, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import ExperiencesDrawerHeader from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
 import { LoadingExperienceDrawerContent } from "src/experiences/experiencesDrawer/components/experiencesDrawerContent/ExperiencesDrawerContent";
 import { DiveInPhase, Experience } from "src/experiences/experienceService/experiences.types";
-import CustomAccordion from "src/theme/CustomAccordion/CustomAccordion";
 import { groupExperiencesByWorkType } from "src/experiences/report/util";
 import { sortSkillsByOrderIndex } from "src/experiences/experiencesDrawer/util";
 import { ReportContent } from "src/experiences/report/reportContent";
@@ -54,7 +53,6 @@ const uniqueId = "df5ab5c0-a109-4b6d-ba3f-a46975e5511b";
 export const DATA_TEST_ID = {
   EXPERIENCES_DRAWER_CONTAINER: `experiences-drawer-container-${uniqueId}`,
   EXPERIENCES_DRAWER_CONTENT_LOADER: `experiences-drawer-content-loader-${uniqueId}`,
-  EXPERIENCES_DIVIDER: `experiences-divider-${uniqueId}`,
   UNSAVED_CHANGES_DIALOG: `unsaved-changes-dialog-${uniqueId}`,
   DELETE_EXPERIENCE_DIALOG: `delete-experience-dialog-${uniqueId}`,
   RESTORE_TO_ORIGINAL_CONFIRM_DIALOG: `restore-to-original-confirm-dialog-${uniqueId}`,
@@ -288,27 +286,6 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
     return sortedExperiences.filter((experience) => experience.exploration_phase === DiveInPhase.PROCESSED);
   }, [sortedExperiences]);
 
-  const tooltipText = t("experiences.experiencesDrawer.personalInfoTooltip");
-
-  const personalInfoFields = [
-    {
-      label: t("experiences.experiencesDrawer.personalInfo.nameLabel"),
-      value: profileDisplay.name,
-    },
-    {
-      label: t("experiences.experiencesDrawer.personalInfo.emailLabel"),
-      value: profileDisplay.email,
-    },
-    {
-      label: t("experiences.experiencesDrawer.personalInfo.locationLabel"),
-      value: profileDisplay.location,
-    },
-    {
-      label: t("experiences.experiencesDrawer.personalInfo.educationLabel"),
-      value: [profileDisplay.program, profileDisplay.school].filter(Boolean).join(" · "),
-    },
-  ];
-
   // Disable download button if no explored experiences are available
   const disableDownloadButton = useMemo(() => exploredExperiences.length < 1, [exploredExperiences.length]);
 
@@ -344,21 +321,31 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
           display="flex"
           flexDirection="column"
           padding={isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : theme.tabiyaSpacing.xl}
-          gap={theme.fixedSpacing(isSmallMobile ? theme.tabiyaSpacing.lg : theme.tabiyaSpacing.xl)}
+          gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
           sx={{ minHeight: "100%" }}
         >
-          <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
+          <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xl)}>
             <ExperiencesDrawerHeader
               notifyOnClose={handleClose}
-              title={t("experiences.experiencesDrawer.andSkillsTitle")}
+              title="Your Njila CV"
+              lastUpdated={conversationConductedAt}
             />
-            <Box
-              display="flex"
-              flexDirection="row"
-              alignItems="center"
-              justifyContent="flex-end"
-              gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
-            >
+            <Box display="flex" flexDirection="row" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)} width="100%">
+              <Suspense fallback={<Skeleton variant="rectangular" height={40} width="100%" sx={{ borderRadius: 1 }} />}>
+                <Box flex={1}>
+                  <LazyLoadedDownloadDropdown
+                    name={profileDisplay.name}
+                    email={profileDisplay.email}
+                    location={profileDisplay.location}
+                    school={profileDisplay.school}
+                    program={profileDisplay.program}
+                    experiences={exploredExperiences}
+                    conversationConductedAt={conversationConductedAt}
+                    disabled={disableDownloadButton}
+                    outputConfig={outputConfig}
+                  />
+                </Box>
+              </Suspense>
               <ShareReportButton
                 name={profileDisplay.name}
                 email={profileDisplay.email}
@@ -370,75 +357,63 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                 disabled={disableDownloadButton}
                 outputConfig={outputConfig}
               />
-              <Suspense
-                fallback={
-                  <Skeleton variant="rectangular" height={40} width={theme.spacing(20)} sx={{ borderRadius: 1 }} />
-                }
-              >
-                <LazyLoadedDownloadDropdown
-                  name={profileDisplay.name}
-                  email={profileDisplay.email}
-                  location={profileDisplay.location}
-                  school={profileDisplay.school}
-                  program={profileDisplay.program}
-                  experiences={exploredExperiences}
-                  conversationConductedAt={conversationConductedAt}
-                  disabled={disableDownloadButton}
-                  outputConfig={outputConfig}
-                />
-              </Suspense>
             </Box>
           </Box>
-          <Box display="flex" flexDirection="column" gap={2}>
-            <CustomAccordion
-              title={t("experiences.experiencesDrawer.personalInformationTitle")}
-              tooltipText={tooltipText}
-            >
-              <Typography variant="h6" data-testid={DATA_TEST_ID.PERSONAL_INFORMATION_TITLE} sx={{ display: "none" }}>
-                {t("experiences.experiencesDrawer.personalInformationTitle")}
+          <Box display="flex" flexDirection="column" gap={0.5} data-testid={DATA_TEST_ID.PERSONAL_INFORMATION_TITLE}>
+            <Typography variant="h4" fontWeight="bold">
+              {profileDisplay.name}
+            </Typography>
+            <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+              {profileDisplay.email}
+            </Typography>
+            <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+              {profileDisplay.location}
+            </Typography>
+          </Box>
+          {profileDisplay.school && (
+            <Box display="flex" flexDirection="column" gap={theme.tabiyaSpacing.sm}>
+              <Typography variant="overline" fontWeight="800" color={theme.palette.text.secondary}>
+                EDUCATION
               </Typography>
-              <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-                {personalInfoFields.map(
-                  (field) =>
-                    field.value && (
-                      <Box key={field.label} display="flex" flexDirection="row" gap={0.5} alignItems="baseline">
-                        <Typography variant="body1" fontWeight="bold">
-                          {field.label}
-                        </Typography>
-                        <Typography variant="body1">{field.value}</Typography>
-                      </Box>
-                    )
-                )}
+              <Box>
+                <Typography variant="body2">
+                  <b>
+                    {profileDisplay.school}
+                    {profileDisplay.program && ` — ${profileDisplay.program}`}
+                  </b>
+                </Typography>
               </Box>
-            </CustomAccordion>
-            <Divider
-              color="primary"
-              sx={{ height: "0.2rem", marginY: isSmallMobile ? 8 : 2, marginRight: 1 }}
-              data-testid={DATA_TEST_ID.EXPERIENCES_DIVIDER}
-            />
-            <Box display="flex" flexDirection="column" gap={isSmallMobile ? 10 : 6}>
-              {/* LOADING STATE */}
-              {isLoading && (
-                <Box data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_LOADER}>
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <LoadingExperienceDrawerContent key={index} />
-                  ))}
-                </Box>
-              )}
+            </Box>
+          )}
+          <Box display="flex" flexDirection="column" gap={isSmallMobile ? 10 : 6}>
+            {/* LOADING STATE */}
+            {isLoading && (
+              <Box data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_CONTENT_LOADER}>
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <LoadingExperienceDrawerContent key={index} />
+                ))}
+              </Box>
+            )}
 
-              {/* EMPTY STATE */}
-              {experiences.length === 0 && !isLoading && (
-                <Box sx={{ fontSize: theme.typography.body1.fontSize, fontWeight: "bold" }}>
-                  <Typography variant="h1" textAlign={"center"}>
-                    🤷‍♀️
+            {/* EMPTY STATE */}
+            {experiences.length === 0 && !isLoading && (
+              <Box sx={{ fontSize: theme.typography.body1.fontSize, fontWeight: "bold", paddingTop: theme.spacing(8) }}>
+                <Typography variant="h1" textAlign={"center"}>
+                  🤷‍♀️
+                </Typography>
+                <Typography textAlign="center">{t("experiences.experiencesDrawer.emptyStateMessage")}</Typography>
+              </Box>
+            )}
+
+            {/* EXPERIENCES */}
+            {!isLoading && (
+              <Box>
+                {experiences.length > 0 && (
+                  <Typography variant="overline" fontWeight="800" color={theme.palette.text.secondary}>
+                    EXPERIENCES AND SKILLS
                   </Typography>
-                  <Typography>{t("experiences.experiencesDrawer.emptyStateMessage")}</Typography>
-                </Box>
-              )}
-
-              {/* EXPERIENCES */}
-              {!isLoading && (
-                <Box display="flex" flexDirection="column" gap={isSmallMobile ? 10 : 6}>
+                )}
+                <Box display="flex" flexDirection="column" gap={isSmallMobile ? 8 : 4} paddingTop={2}>
                   <ExperienceCategory
                     icon={<WorkIcon />}
                     title={ReportContent.SALARY_WORK_TITLE}
@@ -473,8 +448,8 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                     onRestoreToOriginalExperience={handleRequestRestoreToOriginalExperience}
                   />
                 </Box>
-              )}
-            </Box>
+              </Box>
+            )}
           </Box>
           <Box
             sx={{

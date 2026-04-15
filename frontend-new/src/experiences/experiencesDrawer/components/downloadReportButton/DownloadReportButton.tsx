@@ -26,29 +26,33 @@ const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({ disabled, i
   const { t } = useTranslation();
 
   return (
-    <Box data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER}>
-      <PrimaryButton
-        title={t("experiences.experiencesDrawer.components.downloadReportButton.downloadCv")}
-        disabled={disabled || isLoading}
-        disableWhenOffline
-        startIcon={
-          isLoading ? (
-            <CircularProgress
-              sx={{ color: theme.palette.tabiyaBlue.main, marginRight: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}
-              size={theme.spacing(3)}
-              data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_PROGRESS_ICON}
-            />
-          ) : (
-            <FileDownloadIcon sx={{ lineHeight: 0 }} data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_ICON} />
-          )
-        }
-        onClick={notifyOnDownloadPdf}
-        data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON}
-      >
-        {isLoading
-          ? t("experiences.experiencesDrawer.components.downloadReportButton.downloading")
-          : t("experiences.experiencesDrawer.components.downloadReportButton.downloadCv")}
-      </PrimaryButton>
+    <Box data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER} sx={{ display: "flex", alignItems: "center" }}>
+      <Box sx={{ flex: 1 }}>
+        <PrimaryButton
+          title={t("experiences.experiencesDrawer.components.downloadReportButton.downloadCv")}
+          disabled={disabled || isLoading}
+          disableWhenOffline
+          fullWidth
+          sx={{ height: 48 }}
+          startIcon={
+            isLoading ? (
+              <CircularProgress
+                sx={{ color: theme.palette.tabiyaBlue.main, marginRight: theme.fixedSpacing(theme.tabiyaSpacing.xs) }}
+                size={theme.spacing(3)}
+                data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_PROGRESS_ICON}
+              />
+            ) : (
+              <FileDownloadIcon sx={{ lineHeight: 0 }} data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_ICON} />
+            )
+          }
+          onClick={notifyOnDownloadPdf}
+          data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON}
+        >
+          {isLoading
+            ? t("experiences.experiencesDrawer.components.downloadReportButton.downloading")
+            : t("experiences.experiencesDrawer.components.downloadReportButton.downloadCv")}
+        </PrimaryButton>
+      </Box>
       {disabled && (
         <HelpTip icon={<InfoIcon />} data-testid={DATA_TEST_ID.DOWNLOAD_REPORT_HELP_TIP}>
           {t("experiences.experiencesDrawer.components.downloadReportButton.helpTipBlockedMessage")}

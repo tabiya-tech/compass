@@ -4,6 +4,9 @@ import { generateRandomExperiences } from "src/experiences/experienceService/_te
 import { DiveInPhase } from "src/experiences/experienceService/experiences.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import ExperienceService from "src/experiences/experienceService/experienceService";
+import authenticationStateService from "src/auth/services/AuthenticationState.service";
+import PlainPersonalDataService from "src/userPreferences/plainPersonalDataService/plainPersonalData.service";
+import SidebarService from "src/home/components/Sidebar/SidebarService";
 import { faker } from "@faker-js/faker";
 
 const meta: Meta<typeof ExperiencesDrawer> = {
@@ -16,8 +19,41 @@ const meta: Meta<typeof ExperiencesDrawer> = {
   decorators: [
     (Story) => {
       // Mock AuthenticationStateService
+      const mockAuthService = authenticationStateService.getInstance();
+      mockAuthService.getUser = () =>
+        ({
+          id: "1234",
+          email: "john.doe@email.com",
+          name: "John Doe",
+        }) as any;
+
+      // Mock UserPreferencesStateService
       const mockUserPreferencesStateService = UserPreferencesStateService.getInstance();
       mockUserPreferencesStateService.getActiveSessionId = () => 1234;
+      mockUserPreferencesStateService.getUserPreferences = () =>
+        ({
+          accepted_tc: new Date(),
+          language: "en",
+        }) as any;
+
+      // Mock PlainPersonalDataService
+      const mockPlainPersonalDataService = PlainPersonalDataService.getInstance();
+      mockPlainPersonalDataService.getPlainPersonalData = async () =>
+        ({
+          data: {
+            first_name: "John",
+            last_name: "Doe",
+            province: "Lusaka, Copperbelt Province",
+            institution_name: "Lusaka TEVET College",
+            programme_name: "Electrical Engineering",
+            school_year: "2026",
+            phone_number: "+260 97 123 4567",
+          },
+        }) as any;
+
+      // Mock SidebarService for programme skills (Education skills)
+      const mockSidebarService = SidebarService.getInstance();
+      mockSidebarService.getProgrammeSkills = async () => ["Circuit Design", "Power Systems", "Site Safety"];
 
       const mockExperienceService = {
         getOriginalExperience: () => ({

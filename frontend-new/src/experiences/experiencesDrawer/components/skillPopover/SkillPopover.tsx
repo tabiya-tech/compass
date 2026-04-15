@@ -45,23 +45,34 @@ const SkillPopover: React.FC<SkillPopoverProps> = ({ open, anchorEl, onClose, sk
         flexDirection="column"
         gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
         maxWidth={500}
-        color={theme.palette.text.secondary}
+        color={theme.palette.text.primary}
         padding={theme.fixedSpacing(theme.tabiyaSpacing.md)}
       >
         <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
-          <Typography variant="caption" fontWeight="bold" data-testid={DATA_TEST_ID.SKILL_POPOVER_LABEL}>
+          <Typography
+            variant="caption"
+            fontWeight="bold"
+            color="text.primary"
+            data-testid={DATA_TEST_ID.SKILL_POPOVER_LABEL}
+          >
             {capitalizeFirstLetter(skill?.preferredLabel ?? "")}
           </Typography>
-          <Typography variant="caption" data-testid={DATA_TEST_ID.SKILL_POPOVER_DESCRIPTION}>
+          <Typography variant="caption" color="text.primary" data-testid={DATA_TEST_ID.SKILL_POPOVER_DESCRIPTION}>
             {skill?.description}
           </Typography>
         </Box>
         <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
-          <Typography variant="caption" fontWeight="bold" data-testid={DATA_TEST_ID.SKILL_POPOVER_ALT_LABELS_TITLE}>
+          <Typography
+            variant="caption"
+            fontWeight="bold"
+            color="text.primary"
+            data-testid={DATA_TEST_ID.SKILL_POPOVER_ALT_LABELS_TITLE}
+          >
             {t("experiences.experiencesDrawer.components.skillPopover.alsoKnownAs")}
           </Typography>
           <Typography
             variant="caption"
+            color="text.primary"
             sx={{ wordBreak: "break-word" }}
             data-testid={DATA_TEST_ID.SKILL_POPOVER_ALT_LABELS}
           >

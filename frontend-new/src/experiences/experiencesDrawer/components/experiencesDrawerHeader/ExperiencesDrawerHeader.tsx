@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 export interface ExperiencesDrawerHeaderProps {
   title: string;
+  lastUpdated?: string | null;
   notifyOnClose: () => void;
 }
 
@@ -15,6 +16,8 @@ export const DATA_TEST_ID = {
   EXPERIENCES_DRAWER_HEADER_CONTAINER: `experiences-drawer-header-container-${uniqueId}`,
   EXPERIENCES_DRAWER_HEADER_BUTTON: `experiences-drawer-header-button-${uniqueId}`,
   EXPERIENCES_DRAWER_HEADER_ICON: `experiences-drawer-header-icon-${uniqueId}`,
+  EXPERIENCES_DRAWER_HEADER_TITLE: `experiences-drawer-header-title-${uniqueId}`,
+  EXPERIENCES_DRAWER_HEADER_SUBTITLE: `experiences-drawer-header-subtitle-${uniqueId}`,
 };
 
 const ExperiencesDrawerHeader: React.FC<ExperiencesDrawerHeaderProps> = (props) => {
@@ -24,16 +27,17 @@ const ExperiencesDrawerHeader: React.FC<ExperiencesDrawerHeaderProps> = (props) 
   return (
     <Box
       display="flex"
-      justifyContent="space-between"
+      alignItems="center"
+      justifyContent="center"
       width="100%"
-      gap={theme.tabiyaSpacing.lg}
+      position="relative"
       data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_CONTAINER}
     >
-      <Typography variant="h5">{props.title}</Typography>
       <PrimaryIconButton
         sx={{
           color: theme.palette.common.black,
-          alignSelf: "center",
+          position: "absolute",
+          left: 0,
         }}
         title={t("experiences.experiencesDrawer.components.experiencesDrawerHeader.closeTitle")}
         onClick={props.notifyOnClose}
@@ -41,6 +45,21 @@ const ExperiencesDrawerHeader: React.FC<ExperiencesDrawerHeaderProps> = (props) 
       >
         <CloseIcon data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_ICON} />
       </PrimaryIconButton>
+
+      <Box display="flex" flexDirection="column" alignItems="center">
+        <Typography variant="h5" fontWeight="bold" data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_TITLE}>
+          {props.title}
+        </Typography>
+        {props.lastUpdated && (
+          <Typography
+            variant="caption"
+            sx={{ color: theme.palette.text.secondary }}
+            data-testid={DATA_TEST_ID.EXPERIENCES_DRAWER_HEADER_SUBTITLE}
+          >
+            Last updated: {new Date(props.lastUpdated).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+          </Typography>
+        )}
+      </Box>
     </Box>
   );
 };

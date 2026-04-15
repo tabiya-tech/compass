@@ -151,8 +151,6 @@ describe("ExperiencesDrawer", () => {
       EXPERIENCES_DRAWER_HEADER_TEST_ID.EXPERIENCES_DRAWER_HEADER_CONTAINER
     );
     expect(experiencesDrawerHeaderContainer).toBeInTheDocument();
-    // AND the divider to be in the document
-    expect(screen.getByTestId(DATA_TEST_ID.EXPERIENCES_DIVIDER)).toBeInTheDocument();
     // AND the experiences drawer content to be in the document
     const experiencesDrawerContentContainer = screen.getAllByTestId(
       EXPERIENCES_DRAWER_CONTENT_TEST_ID.EXPERIENCES_DRAWER_CONTENT_CONTAINER
@@ -247,8 +245,8 @@ describe("ExperiencesDrawer", () => {
     expect(screen.getByText("jane@example.com")).toBeInTheDocument();
     // AND profile location to be displayed
     expect(screen.getByText("Lusaka")).toBeInTheDocument();
-    // AND education (program · school) to be displayed
-    expect(screen.getByText("BSc Computer Science · Example University")).toBeInTheDocument();
+    // AND education (school — program) to be displayed
+    expect(screen.getByText("Example University — BSc Computer Science")).toBeInTheDocument();
     // AND phone field must not be present
     expect(screen.queryByText("Phone:")).not.toBeInTheDocument();
   });

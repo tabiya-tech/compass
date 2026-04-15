@@ -84,7 +84,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
           >
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1bt6319-MuiSvgIcon-root"
               data-testid="VolunteerActivismIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -94,14 +94,14 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
               />
             </svg>
             <p
-              class="MuiTypography-root MuiTypography-body1 css-nnkc57-MuiTypography-root"
+              class="MuiTypography-root MuiTypography-body2 css-h8exi7-MuiTypography-root"
             >
               Unpaid Work
             </p>
           </div>
           <svg
             aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-8qu4nc-MuiSvgIcon-root"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1bt6319-MuiSvgIcon-root"
             data-testid="experience-edit-form-work-type-dropdown-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
             focusable="false"
             viewBox="0 0 24 24"
@@ -225,7 +225,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
           class="MuiBadge-root css-1bfoz1g-MuiBadge-root"
         >
           <div
-            class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1a5wb9i-MuiButtonBase-root-MuiChip-root"
+            class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-hft226-MuiButtonBase-root-MuiChip-root"
             data-testid="experience-edit-form-skill-chip-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
             role="button"
             tabindex="0"
@@ -274,7 +274,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
           class="MuiBadge-root css-1bfoz1g-MuiBadge-root"
         >
           <div
-            class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1a5wb9i-MuiButtonBase-root-MuiChip-root"
+            class="MuiButtonBase-root MuiChip-root MuiChip-filled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-hft226-MuiButtonBase-root-MuiChip-root"
             data-testid="experience-edit-form-skill-chip-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
             role="button"
             tabindex="0"
@@ -321,7 +321,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
         </span>
         <div
           aria-disabled="true"
-          class="MuiButtonBase-root Mui-disabled MuiChip-root MuiChip-filled Mui-disabled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-1x334ut-MuiButtonBase-root-MuiChip-root"
+          class="MuiButtonBase-root Mui-disabled MuiChip-root MuiChip-filled Mui-disabled MuiChip-sizeMedium MuiChip-colorDefault MuiChip-clickable MuiChip-clickableColorDefault MuiChip-filledDefault css-13gooh0-MuiButtonBase-root-MuiChip-root"
           data-testid="experience-edit-form-add-skill-button-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
           role="button"
           tabindex="-1"

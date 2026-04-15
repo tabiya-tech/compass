@@ -33,15 +33,15 @@ const ExperienceCategory: React.FC<ExperienceCategoryProps> = ({
   if (experiences.length === 0) return null;
 
   return (
-    <Box display="flex" flexDirection="column" gap={3}>
+    <Box display="flex" flexDirection="column" gap={2}>
       <Box display="flex" alignItems="center" gap={isSmallMobile ? 2 : 1}>
         {React.cloneElement(icon as React.ReactElement, { sx: { color: theme.palette.text.secondary } })}
-        <Typography variant="subtitle1" fontWeight="bold" color={theme.palette.text.secondary}>
+        <Typography variant="overline" fontWeight="bold" color={theme.palette.text.secondary}>
           {title ?? <i>{t("experiences.experiencesDrawer.components.experiencesDrawerContent.untitled")}</i>}
         </Typography>
         {tooltipText && <HelpTip icon={<InfoIcon />}>{tooltipText}</HelpTip>}
       </Box>
-      <Box display="flex" flexDirection="column" gap={isSmallMobile ? 8 : 4}>
+      <Box display="flex" flexDirection="column" gap={isSmallMobile ? 6 : 4}>
         {experiences.map((experience, index) => (
           <ExperiencesDrawerContent
             key={index}

@@ -139,15 +139,13 @@ const ShareReportButton: React.FC<ShareReportButtonProps> = ({
               sx={{ color: theme.palette.text.secondary }}
               data-testid={DATA_TEST_ID.SHARE_REPORT_LOADING}
             />
-          ) : undefined
+          ) : (
+            <ShareIcon data-testid={DATA_TEST_ID.SHARE_REPORT_ICON} />
+          )
         }
         data-testid={DATA_TEST_ID.SHARE_REPORT_BUTTON}
       >
-        {isSharing ? (
-          t("experiences.experiencesDrawer.components.shareReportButton.preparingPdf")
-        ) : (
-          <ShareIcon data-testid={DATA_TEST_ID.SHARE_REPORT_ICON} />
-        )}
+        {isSharing ? t("experiences.experiencesDrawer.components.shareReportButton.preparingPdf") : "Share"}
       </SecondaryButton>
     </Box>
   );

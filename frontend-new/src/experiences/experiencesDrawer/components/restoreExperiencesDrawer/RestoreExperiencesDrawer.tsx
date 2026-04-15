@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, Divider, Slide, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Slide, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import ExperienceService from "src/experiences/experienceService/experienceService";
 import ExperiencesDrawerHeader from "src/experiences/experiencesDrawer/components/experiencesDrawerHeader/ExperiencesDrawerHeader";
@@ -141,7 +141,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
                   <Typography
                     variant="subtitle1"
                     fontWeight="bold"
-                    color={theme.palette.text.secondary}
+                    color={theme.palette.text.primary}
                     data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_TITLE}
                   >
                     {experience.normalized_experience_title ?? experience.experience_title ?? (
@@ -155,9 +155,9 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
                     data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_WORK_TYPE}
                   >
                     {getWorkTypeIcon(experience.work_type, {
-                      sx: { color: theme.palette.text.secondary, fontSize: TabiyaIconStyles.fontSizeSmall },
+                      sx: { color: theme.palette.text.primary, fontSize: TabiyaIconStyles.fontSizeSmall },
                     })}
-                    <Typography variant="body1" fontWeight="bold" color={theme.palette.text.secondary}>
+                    <Typography variant="body1" fontWeight="bold" color={theme.palette.text.primary}>
                       {getWorkTypeTitle(experience.work_type)}
                     </Typography>
                   </Box>
@@ -169,7 +169,11 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
                     title={t("common.buttons.restore")}
                     data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_BUTTON}
                     startIcon={
-                      <img src={`${process.env.PUBLIC_URL}/restore-icon.svg`} alt={t("common.buttons.restore")} />
+                      <img
+                        src={`${process.env.PUBLIC_URL}/restore-icon.svg`}
+                        alt={t("common.buttons.restore")}
+                        style={{ filter: "brightness(0) invert(1)" }}
+                      />
                     }
                   >
                     {t("common.buttons.restore")}
@@ -178,7 +182,7 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
               </Box>
               <Typography
                 variant="caption"
-                sx={{ color: theme.palette.text.secondary }}
+                sx={{ color: theme.palette.grey[800] }}
                 data-testid={DATA_TEST_ID.RESTORE_EXPERIENCE_DATE}
               >
                 {/* display the start and end dates */}
@@ -215,7 +219,6 @@ const RestoreExperiencesDrawer: React.FC<RestoreExperiencesDrawerProps> = ({
           notifyOnClose={onClose}
           title={t("experiences.experiencesDrawer.components.restoreExperiencesDrawer.title")}
         />
-        <Divider />
         {renderContent()}
       </Box>
     </Slide>

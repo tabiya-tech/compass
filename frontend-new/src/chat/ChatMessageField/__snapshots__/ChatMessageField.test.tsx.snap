@@ -9,7 +9,7 @@ exports[`ChatMessageField should render correctly 1`] = `
     class="MuiBox-root css-1kxonj9"
   >
     <div
-      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1uzp91q-MuiFormControl-root-MuiTextField-root"
+      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-1bvswud-MuiFormControl-root-MuiTextField-root"
     >
       <div
         class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth Mui-focused MuiInputBase-formControl MuiInputBase-multiline MuiInputBase-adornedStart MuiInputBase-adornedEnd css-1ydzbky-MuiInputBase-root-MuiOutlinedInput-root"

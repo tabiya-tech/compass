@@ -2,7 +2,7 @@
 
 exports[`SummaryEditField should render with initial summary and no error 1`] = `
 <div
-  class="MuiFormControl-root MuiTextField-root css-gnhf5r-MuiFormControl-root-MuiTextField-root"
+  class="MuiFormControl-root MuiTextField-root css-cu4mbg-MuiFormControl-root-MuiTextField-root"
   data-testid="form-summary-b1a6b2cd-cfac-46ff-9c35-0298d87def6b"
 >
   <div
