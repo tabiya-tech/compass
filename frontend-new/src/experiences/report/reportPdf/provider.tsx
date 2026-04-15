@@ -35,7 +35,7 @@ export class PDFReportDownloadProvider implements IReportFormatProvider {
 
   async download(props: ReportProps) {
     try {
-      const fileName = "compass-cv.pdf";
+      const fileName = "njila-cv.pdf";
       const blob = await this.generateBlob(props);
       saveAs(blob, fileName);
     } catch (error) {

@@ -10,22 +10,12 @@ Object {
     Object {
       "docxStyles": Object {
         "height": 62,
-        "width": 250,
+        "width": 120,
       },
       "pdfStyles": Object {
         "height": 46,
       },
-      "url": "/logo.png",
-    },
-    Object {
-      "docxStyles": Object {
-        "height": 58,
-        "width": 200,
-      },
-      "pdfStyles": Object {
-        "height": 42,
-      },
-      "url": "/oxford-logo.png",
+      "url": "/njila-logo-dark.svg",
     },
   ],
   "report": Object {

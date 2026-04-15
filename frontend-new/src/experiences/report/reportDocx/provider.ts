@@ -8,7 +8,7 @@ export class DocxReportDownloadProvider implements IReportFormatProvider {
 
   async download(props: ReportProps) {
     try {
-      const fileName = "compass-cv.docx";
+      const fileName = "njila-cv.docx";
       const blob = await SkillReportDocx({
         name: props.name,
         email: props.email,

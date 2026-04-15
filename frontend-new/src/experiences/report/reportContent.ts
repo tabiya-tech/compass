@@ -43,7 +43,7 @@ export const ReportContent = {
   },
   REPORT_BODY_TEXT: (currentDate: string) => i18n.t("experiences.report.bodyText", { date: currentDate }),
   IMAGE_URLS: {
-    COMPASS_LOGO: `${process.env.PUBLIC_URL}/logo.png`,
+    NJILA_LOGO: `${process.env.PUBLIC_URL}/njila-logo-dark.svg`,
     OXFORD_LOGO: `${process.env.PUBLIC_URL}/oxford-logo.png`,
     LOCATION_ICON: `${process.env.PUBLIC_URL}/location.png`,
     PHONE_ICON: `${process.env.PUBLIC_URL}/phone.png`,

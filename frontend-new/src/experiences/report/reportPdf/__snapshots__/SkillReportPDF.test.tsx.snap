@@ -18,10 +18,6 @@ exports[`Report should render Report correctly 1`] = `
           src="[object Promise]"
           style="height: 46px;"
         />
-        <image
-          src="[object Promise]"
-          style="height: 42px;"
-        />
       </view>
       <text
         data-testid="skill-report-title-5a296552-f91f-4c38-b88f-542cacaced8e"

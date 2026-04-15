@@ -15,7 +15,7 @@ type Story = StoryObj<typeof AuthPageShell>;
 
 export const Default: Story = {
   args: {
-    logoUrl: `${process.env.PUBLIC_URL}/njila_logo-red.svg`,
+    logoUrl: `${process.env.PUBLIC_URL}/njila-logo-dark.svg`,
     whiteBandContent: (
       <Box sx={{ pt: 3 }}>
         <Typography variant="h2">White band content</Typography>

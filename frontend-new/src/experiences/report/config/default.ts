@@ -4,23 +4,13 @@ import { ReportContent } from "src/experiences/report/reportContent";
 export const defaultSkillsReportOutputConfig: SkillsReportOutputConfig = {
   logos: [
     {
-      url: ReportContent.IMAGE_URLS.COMPASS_LOGO,
+      url: ReportContent.IMAGE_URLS.NJILA_LOGO,
       docxStyles: {
-        width: 250,
+        width: 120,
         height: 62,
       },
       pdfStyles: {
         height: 46,
-      },
-    },
-    {
-      url: ReportContent.IMAGE_URLS.OXFORD_LOGO,
-      docxStyles: {
-        width: 200,
-        height: 58,
-      },
-      pdfStyles: {
-        height: 42,
       },
     },
   ],

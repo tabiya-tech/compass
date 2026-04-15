@@ -96,7 +96,7 @@ const AuthLayout: React.FC = () => {
     []
   );
 
-  const logoSrc = getDarkLogoUrl() || getLogoUrl() || `${process.env.PUBLIC_URL}/njila_logo-red.svg`;
+  const logoSrc = getDarkLogoUrl() || getLogoUrl() || `${process.env.PUBLIC_URL}/njila-logo-dark.svg`;
   const appName = getProductName() || "Njila";
 
   const whiteBandContent = (
