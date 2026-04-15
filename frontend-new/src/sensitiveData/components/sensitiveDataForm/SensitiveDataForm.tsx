@@ -388,6 +388,7 @@ const SensitiveDataForm: React.FC = () => {
                   fullWidth
                   required
                   label="First Name"
+                  autoComplete="given-name"
                   value={firstName}
                   onChange={(e) => {
                     const val = e.target.value.trimStart();
@@ -401,6 +402,7 @@ const SensitiveDataForm: React.FC = () => {
                   fullWidth
                   required
                   label="Last Name"
+                  autoComplete="family-name"
                   value={lastName}
                   onChange={(e) => {
                     const val = e.target.value.trimStart();
