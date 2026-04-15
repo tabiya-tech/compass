@@ -58,6 +58,7 @@ def main():
     backend_stack_ref = pulumi.StackReference(f"tabiya-tech/compass-backend/{stack_name}")
     api_gateway_id = getstackref(backend_stack_ref, "apigateway_id")
     api_gateway_id.apply(lambda _id: print(f"Using API gateway id: {_id}"))
+    backend_location = getstackref(backend_stack_ref, "location")
 
     # Deploy common
     deploy_common(
@@ -67,6 +68,7 @@ def main():
         frontend_domains=frontend_domains,
         frontend_bucket_name=frontend_bucket_name,
         frontend_url=frontend_url,
+        backend_location=backend_location,
         backend_url=backend_url,
         api_gateway_id=api_gateway_id,
         admin_frontend_domains=admin_frontend_domains,

@@ -22,6 +22,7 @@ def main():
     # Get the config values
     location = getconfig("region", "gcp")
     pulumi.info(f'Using location: {location}')
+    pulumi.export("location", location)
 
     cloudrun_max_instance_request_concurrency: int = int(getconfig("max_instance_request_concurrency", "cloudrun"))
     cloudrun_min_instance_count: int = int(getconfig("min_instance_count", "cloudrun"))
