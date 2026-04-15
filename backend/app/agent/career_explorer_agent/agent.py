@@ -112,10 +112,9 @@ class CareerExplorerAgent(Agent):
                 msg, context, pending_sectors=effective_pending or None, user_profile_context=self._user_profile_context
             )
         else:
-            message, finished, reasoning, explorer_stats, grounding_metadata = await self._non_priority_explorer.explore(
+            message, finished, reasoning, explorer_stats, metadata = await self._non_priority_explorer.explore(
                 msg, context, pending_sectors=effective_pending or None, user_profile_context=self._user_profile_context
             )
-            metadata = {"grounding_metadata": grounding_metadata.model_dump()} if grounding_metadata else None
 
         all_stats = classifier_stats + explorer_stats
 

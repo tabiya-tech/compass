@@ -13,6 +13,12 @@ QUICK_REPLY_PROMPT = """\
     - "Do you have any other X?" questions: [{"label": "Yes"}, {"label": "No, that's all"}]
     - Starters: [{"label": "Let's start!"}, {"label": "What can you help with?"}]
 
+    CRITICAL: When your message text contains a short list of options (bulleted, numbered,
+    or separated by "or"), you MUST also populate quick_reply_options with those same options.
+    For example, if your message says "Are you interested in:\n* Option A?\n* Option B?\n* Option C?",
+    set quick_reply_options to [{"label": "Option A"}, {"label": "Option B"}, {"label": "Option C"}].
+    Never list options in the message text without also including them in quick_reply_options.
+
     Do NOT include quick_reply_options when:
     - The question requires a detailed, personal, or free-text answer (e.g. "What was your job title?", "Where did you work?")
     - The options would be long paragraphs

@@ -120,11 +120,12 @@ class TestNonPrioritySectorExplorer:
             mock_genai.Client.return_value = mock_client
 
             # WHEN the explorer processes the response
-            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_grounding = \
+            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
                 await explorer.explore(
                     user_input="What does an ICT Data Engineer do in Zambia?",
                     context=_make_empty_context(),
                 )
+
 
         # THEN the user-facing message must be only the human-readable text
         assert actual_message == _EXPECTED_MESSAGE, (
@@ -163,11 +164,12 @@ class TestNonPrioritySectorExplorer:
             mock_genai.Client.return_value = mock_client
 
             # WHEN the explorer processes the response
-            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_grounding = \
+            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
                 await explorer.explore(
                     user_input="Tell me about software jobs in Zambia.",
                     context=_make_empty_context(),
                 )
+
 
         # THEN only the message field is returned
         assert actual_message == "Software development is a growing field in Zambia."
@@ -196,11 +198,12 @@ class TestNonPrioritySectorExplorer:
             mock_genai.Client.return_value = mock_client
 
             # WHEN the explorer processes the response
-            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_grounding = \
+            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
                 await explorer.explore(
                     user_input="Tell me about data engineering.",
                     context=_make_empty_context(),
                 )
+
 
         # THEN the plain text is used as the message
         assert actual_message == given_plain_text
@@ -238,7 +241,7 @@ class TestNonPrioritySectorExplorer:
             mock_genai.Client.return_value = mock_client
 
             # WHEN the explorer processes the response
-            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_grounding = \
+            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
                 await explorer.explore(
                     user_input="Tell me about construction careers.",
                     context=_make_empty_context(),
@@ -275,11 +278,12 @@ class TestNonPrioritySectorExplorer:
             mock_genai.Client.return_value = mock_client
 
             # WHEN the explorer processes the response
-            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_grounding = \
+            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
                 await explorer.explore(
                     user_input="Tell me about careers.",
                     context=_make_empty_context(),
                 )
+
 
         # THEN no reasoning leaks
         assert actual_finished is False
@@ -312,11 +316,12 @@ class TestNonPrioritySectorExplorer:
             mock_genai.Client.return_value = mock_client
 
             # WHEN the explorer processes the response
-            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_grounding = \
+            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
                 await explorer.explore(
                     user_input="What does an ICT Data Engineer do in Zambia?",
                     context=_make_empty_context(),
                 )
+
 
         # THEN reasoning must NOT leak into the user-facing message
         assert '"reasoning"' not in actual_message, (
@@ -357,11 +362,12 @@ class TestNonPrioritySectorExplorer:
             mock_genai.Client.return_value = mock_client
 
             # WHEN the explorer processes the response
-            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_grounding = \
+            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
                 await explorer.explore(
                     user_input="Tell me about ICT in Zambia.",
                     context=_make_empty_context(),
                 )
+
 
         # THEN only the clean message is returned
         assert actual_message == "ICT is a fast-growing sector in Zambia with many opportunities."
@@ -404,11 +410,12 @@ class TestNonPrioritySectorExplorer:
             mock_genai.Client.return_value = mock_client
 
             # WHEN the explorer processes the response
-            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_grounding = \
+            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
                 await explorer.explore(
                     user_input="What does an ICT Data Engineer do in Zambia?",
                     context=_make_empty_context(),
                 )
+
 
         # THEN the raw JSON must NOT reach the user
         assert '"reasoning"' not in actual_message, (
@@ -450,7 +457,7 @@ class TestNonPrioritySectorExplorer:
             mock_genai.Client.return_value = mock_client
 
             # WHEN the explorer processes the response
-            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_grounding = \
+            actual_message, actual_finished, actual_reasoning, actual_llm_stats, actual_metadata = \
                 await explorer.explore(
                     user_input="Tell me about data engineering.",
                     context=_make_empty_context(),
@@ -461,3 +468,149 @@ class TestNonPrioritySectorExplorer:
         assert '"reasoning"' not in actual_message
         # AND the error is recorded in llm_stats
         assert len(actual_llm_stats) > 0 and actual_llm_stats[-1].error is not None
+
+
+class TestNonPrioritySectorExplorerQuickReply:
+    """Tests for quick-reply options support in NonPrioritySectorExplorer."""
+
+    @pytest.mark.asyncio
+    async def test_quick_reply_options_returned_when_llm_includes_them(self, explorer, mock_app_config):
+        """should return quick_reply_options in metadata when the LLM includes them in JSON"""
+        # GIVEN LLM returns JSON with quick_reply_options
+        given_raw_text = json.dumps({
+            "reasoning": "The user asked about IT careers.",
+            "finished": False,
+            "message": "IT is a growing field. Would you like to know about salaries or required skills?",
+            "quick_reply_options": [
+                {"label": "Tell me about salaries"},
+                {"label": "What skills are needed?"},
+            ],
+        })
+        mock_response = _make_mock_response(given_raw_text)
+
+        with patch("app.agent.career_explorer_agent.non_priority_sector_explorer.get_application_config",
+                   return_value=mock_app_config), \
+             patch("app.agent.career_explorer_agent.non_priority_sector_explorer.genai") as mock_genai, \
+             patch("app.agent.career_explorer_agent.non_priority_sector_explorer."
+                   "extract_grounding_metadata_from_genai_response", return_value=None):
+
+            mock_client = AsyncMock()
+            mock_client.aio.models.generate_content = AsyncMock(return_value=mock_response)
+            mock_genai.Client.return_value = mock_client
+
+            # WHEN the explorer processes the response
+            message, finished, reasoning, llm_stats, actual_metadata = await explorer.explore(
+                user_input="Tell me about IT jobs in Zambia.",
+                context=_make_empty_context(),
+            )
+
+        # THEN the metadata should contain quick_reply_options
+        assert actual_metadata is not None
+        assert "quick_reply_options" in actual_metadata
+        actual_options = actual_metadata["quick_reply_options"]
+        assert len(actual_options) == 2
+        assert actual_options[0]["label"] == "Tell me about salaries"
+        assert actual_options[1]["label"] == "What skills are needed?"
+
+    @pytest.mark.asyncio
+    async def test_no_quick_reply_options_when_llm_omits_them(self, explorer, mock_app_config):
+        """should NOT have quick_reply_options in metadata when LLM returns JSON without them"""
+        # GIVEN LLM returns JSON without quick_reply_options
+        given_raw_text = json.dumps({
+            "reasoning": "The user asked about data engineering.",
+            "finished": False,
+            "message": "Data engineering is a growing field in Zambia.",
+        })
+        mock_response = _make_mock_response(given_raw_text)
+
+        with patch("app.agent.career_explorer_agent.non_priority_sector_explorer.get_application_config",
+                   return_value=mock_app_config), \
+             patch("app.agent.career_explorer_agent.non_priority_sector_explorer.genai") as mock_genai, \
+             patch("app.agent.career_explorer_agent.non_priority_sector_explorer."
+                   "extract_grounding_metadata_from_genai_response", return_value=None):
+
+            mock_client = AsyncMock()
+            mock_client.aio.models.generate_content = AsyncMock(return_value=mock_response)
+            mock_genai.Client.return_value = mock_client
+
+            # WHEN the explorer processes the response
+            message, finished, reasoning, llm_stats, actual_metadata = await explorer.explore(
+                user_input="Tell me about data engineering.",
+                context=_make_empty_context(),
+            )
+
+        # THEN metadata should be None (no quick_reply_options and no grounding metadata)
+        assert actual_metadata is None
+
+    @pytest.mark.asyncio
+    async def test_quick_reply_options_coexist_with_grounding_metadata(self, explorer, mock_app_config):
+        """should include both quick_reply_options and grounding_metadata in metadata when both are present"""
+        # GIVEN LLM returns JSON with quick_reply_options
+        given_raw_text = json.dumps({
+            "reasoning": "The user asked about IT.",
+            "finished": False,
+            "message": "IT careers in Zambia include developer and analyst roles.",
+            "quick_reply_options": [
+                {"label": "Tell me more"},
+            ],
+        })
+        mock_response = _make_mock_response(given_raw_text)
+
+        # AND grounding metadata is present from web search
+        given_grounding = MagicMock()
+        given_grounding.model_dump.return_value = {"web_search_queries": ["IT careers Zambia"]}
+        given_grounding.web_search_queries = ["IT careers Zambia"]
+        given_grounding.grounding_chunks = []
+
+        with patch("app.agent.career_explorer_agent.non_priority_sector_explorer.get_application_config",
+                   return_value=mock_app_config), \
+             patch("app.agent.career_explorer_agent.non_priority_sector_explorer.genai") as mock_genai, \
+             patch("app.agent.career_explorer_agent.non_priority_sector_explorer."
+                   "extract_grounding_metadata_from_genai_response", return_value=given_grounding):
+
+            mock_client = AsyncMock()
+            mock_client.aio.models.generate_content = AsyncMock(return_value=mock_response)
+            mock_genai.Client.return_value = mock_client
+
+            # WHEN the explorer processes the response
+            message, finished, reasoning, llm_stats, actual_metadata = await explorer.explore(
+                user_input="Tell me about IT jobs.",
+                context=_make_empty_context(),
+            )
+
+        # THEN metadata should contain both quick_reply_options and grounding_metadata
+        assert actual_metadata is not None
+        assert "quick_reply_options" in actual_metadata
+        assert len(actual_metadata["quick_reply_options"]) == 1
+        assert actual_metadata["quick_reply_options"][0]["label"] == "Tell me more"
+        assert "grounding_metadata" in actual_metadata
+        assert actual_metadata["grounding_metadata"]["web_search_queries"] == ["IT careers Zambia"]
+
+    @pytest.mark.asyncio
+    async def test_quick_reply_options_absent_on_plain_text_fallback(self, explorer, mock_app_config):
+        """should NOT have quick_reply_options when LLM returns plain text (NoJSONFound fallback)"""
+        # GIVEN LLM returns plain prose with no JSON
+        given_plain_text = "Data engineering in Zambia is a growing field."
+        mock_response = _make_mock_response(given_plain_text)
+
+        with patch("app.agent.career_explorer_agent.non_priority_sector_explorer.get_application_config",
+                   return_value=mock_app_config), \
+             patch("app.agent.career_explorer_agent.non_priority_sector_explorer.genai") as mock_genai, \
+             patch("app.agent.career_explorer_agent.non_priority_sector_explorer."
+                   "extract_grounding_metadata_from_genai_response", return_value=None):
+
+            mock_client = AsyncMock()
+            mock_client.aio.models.generate_content = AsyncMock(return_value=mock_response)
+            mock_genai.Client.return_value = mock_client
+
+            # WHEN the explorer processes the response
+            message, finished, reasoning, llm_stats, actual_metadata = await explorer.explore(
+                user_input="Tell me about data engineering.",
+                context=_make_empty_context(),
+            )
+
+        # THEN metadata should be None (plain text fallback has no quick_reply_options)
+        assert actual_metadata is None
+        # AND the message should still be the plain text
+        assert message == given_plain_text
+
