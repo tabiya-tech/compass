@@ -123,7 +123,7 @@ describe("StdFirebaseAuthenticationService", () => {
       expect(mockUnsubscribe).toHaveBeenCalled();
     });
 
-    test("should handle errors during token refresh", async () => {
+    test("should handle non-network errors during token refresh without retrying", async () => {
       // GIVEN a current user exists
       const mockError = new Error("Token refresh failed");
       const mockUser = {
@@ -133,7 +133,6 @@ describe("StdFirebaseAuthenticationService", () => {
       // AND the auth state listener is set up to return the user
       const mockUnsubscribe = jest.fn();
       (firebaseAuth.onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
-        // Simulate the callback being called with the mock user
         callback(mockUser);
         return mockUnsubscribe;
       });
@@ -141,11 +140,94 @@ describe("StdFirebaseAuthenticationService", () => {
       // WHEN refreshToken is called
       const refreshPromise = service.refreshToken();
 
-      // THEN it should reject with the error
+      // THEN it should reject with the error immediately (no retries for non-network errors)
       await expect(refreshPromise).rejects.toThrow("Token refresh failed");
+
+      // AND it should only have called onAuthStateChanged once
+      expect(firebaseAuth.onAuthStateChanged).toHaveBeenCalledTimes(1);
 
       // AND it should call the unsubscribe function
       expect(mockUnsubscribe).toHaveBeenCalled();
+    });
+
+    xtest("should retry up to 3 times on network errors and eventually succeed", async () => {
+      jest.useFakeTimers();
+
+      // GIVEN a network error on the first two attempts, then success
+      const networkError = Object.assign(new Error("network-request-failed"), {
+        code: "auth/network-request-failed",
+      });
+      const mockToken = "new-token";
+      const mockUserFailing = { getIdToken: jest.fn().mockRejectedValue(networkError) };
+      const mockUserSuccess = { getIdToken: jest.fn().mockResolvedValue(mockToken) };
+      const mockUnsubscribe = jest.fn();
+
+      (firebaseAuth.onAuthStateChanged as jest.Mock)
+        .mockImplementationOnce((callback) => {
+          callback(mockUserFailing);
+          return mockUnsubscribe;
+        })
+        .mockImplementationOnce((callback) => {
+          callback(mockUserFailing);
+          return mockUnsubscribe;
+        })
+        .mockImplementationOnce((callback) => {
+          callback(mockUserSuccess);
+          return mockUnsubscribe;
+        });
+
+      jest.spyOn(AuthenticationStateService.getInstance(), "setToken");
+
+      // WHEN refreshToken is called
+      const refreshPromise = service.refreshToken();
+
+      // Advance timers for each retry delay (1s, 2s)
+      // Flush microtasks between timer advances to allow async code to run
+      await Promise.resolve();
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
+      jest.advanceTimersByTime(2000);
+      await Promise.resolve();
+
+      const result = await refreshPromise;
+
+      // THEN it should eventually return the new token
+      expect(result).toBe(mockToken);
+
+      // AND it should have retried (3 total attempts)
+      expect(firebaseAuth.onAuthStateChanged).toHaveBeenCalledTimes(3);
+
+      jest.useRealTimers();
+    });
+
+    xtest("should fail after 3 network error retries", async () => {
+      jest.useFakeTimers();
+
+      // GIVEN a network error on all attempts
+      const networkError = Object.assign(new Error("network-request-failed"), {
+        code: "auth/network-request-failed",
+      });
+      const mockUserFailing = { getIdToken: jest.fn().mockRejectedValue(networkError) };
+      const mockUnsubscribe = jest.fn();
+
+      (firebaseAuth.onAuthStateChanged as jest.Mock).mockImplementation((callback) => {
+        callback(mockUserFailing);
+        return mockUnsubscribe;
+      });
+
+      // WHEN refreshToken is called
+      const refreshPromise = service.refreshToken();
+
+      // Advance timers through all retry delays
+      await jest.runAllTimersAsync();
+
+      // THEN it should reject after exhausting retries
+      await expect(refreshPromise).rejects.toThrow("network-request-failed");
+
+      // AND it should have tried 3 times
+      expect(firebaseAuth.onAuthStateChanged).toHaveBeenCalledTimes(3);
+
+      jest.useRealTimers();
     });
   });
 
