@@ -232,24 +232,24 @@ Answer: B
 
 2. What is the first thing you should do when evaluating a business idea?
 A. Immediately register the business
-B. Determine whether there is real demand for your product or service
-C. Design a logo and brand name
+B. Design a logo and brand name
+C. Determine whether there is real demand for your product or service
 D. Hire employees
-Answer: B
+Answer: C
 
 3. What does PACRA stand for in Zambia?
-A. People's Association for Community Resource Allocation
-B. Patents and Companies Registration Agency
+A. Patents and Companies Registration Agency
+B. People's Association for Community Resource Allocation
 C. Provincial Agency for Corporate Regulatory Affairs
 D. Public Authority for Commerce and Revenue Administration
-Answer: B
+Answer: A
 
 4. Why is it important to separate business and personal finances?
 A. It is not important — mixing them saves time
-B. It helps you accurately track business performance and manage cash flow
-C. Banks require it by law for all businesses
-D. It makes your business look bigger than it is
-Answer: B
+B. Banks require it by law for all businesses
+C. It makes your business look bigger than it is
+D. It helps you accurately track business performance and manage cash flow
+Answer: D
 
 5. What is a value chain?
 A. A chain of shops in a shopping centre
@@ -259,25 +259,25 @@ D. The price history of your product
 Answer: B
 
 6. What is the main purpose of creating a prototype?
-A. To create a perfect final product immediately
-B. To test your core idea, get feedback, and improve before investing heavily
+A. To test your core idea, get feedback, and improve before investing heavily
+B. To create a perfect final product immediately
 C. To impress investors with a finished product
 D. To avoid talking to customers
-Answer: B
+Answer: A
 
 7. Which of the following is a common pricing mistake?
 A. Researching what competitors charge
-B. Setting prices too low and failing to cover your costs
-C. Calculating all your costs before setting a price
-D. Considering what customers are willing to pay
-Answer: B
+B. Calculating all your costs before setting a price
+C. Considering what customers are willing to pay
+D. Setting prices too low and failing to cover your costs
+Answer: D
 
 8. What is the purpose of a business pitch?
 A. To entertain an audience with a long presentation
-B. To persuasively explain your business idea to investors, partners, or customers
-C. To show off your technical skills
+B. To show off your technical skills
+C. To persuasively explain your business idea to investors, partners, or customers
 D. To avoid having to write a business plan
-Answer: B
+Answer: C
 
 9. What does customer discovery involve?
 A. Guessing what customers want based on your own preferences
@@ -288,7 +288,7 @@ Answer: B
 
 10. Which of the following is good advice for managing a business ethically?
 A. Pay bribes to speed up permits and licences
-B. Be honest with customers, avoid corruption, and follow fair labour practices
-C. Hide some income to reduce your tax bill
-D. Charge different prices based on how wealthy a customer looks
-Answer: B
+B. Hide some income to reduce your tax bill
+C. Charge different prices based on how wealthy a customer looks
+D. Be honest with customers, avoid corruption, and follow fair labour practices
+Answer: D
