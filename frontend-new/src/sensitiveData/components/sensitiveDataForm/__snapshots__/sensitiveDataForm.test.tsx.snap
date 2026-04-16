@@ -65,6 +65,7 @@ exports[`Sensitive Data Form Rendering static fields should render First Name, L
           >
             <input
               aria-invalid="false"
+              autocomplete="given-name"
               class="MuiInputBase-input MuiOutlinedInput-input css-p1mqw2-MuiInputBase-input-MuiOutlinedInput-input"
               id=":r1:"
               required=""
@@ -110,6 +111,7 @@ exports[`Sensitive Data Form Rendering static fields should render First Name, L
           >
             <input
               aria-invalid="false"
+              autocomplete="family-name"
               class="MuiInputBase-input MuiOutlinedInput-input css-p1mqw2-MuiInputBase-input-MuiOutlinedInput-input"
               id=":r2:"
               required=""
