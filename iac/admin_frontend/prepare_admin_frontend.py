@@ -117,6 +117,9 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     supported_locales = getenv("FRONTEND_SUPPORTED_LOCALES", False, True)
     default_locale = getenv("FRONTEND_DEFAULT_LOCALE", False, True)
 
+    # Optional backend URL override
+    custom_backend_url: Optional[str] = getenv("CUSTOM_BACKEND_URL", False, False)
+
     # Branding
     global_product_name: Optional[str] = getenv("GLOBAL_PRODUCT_NAME", False, False)
     frontend_browser_tab_title: Optional[str] = getenv("FRONTEND_BROWSER_TAB_TITLE", False, False)
@@ -133,12 +136,17 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     _, env_name = get_realm_and_env_name_from_stack(stack_name)
     firebase_project_id = environment_outputs["project_id"].value
 
+    if custom_backend_url and custom_backend_url.strip():
+        backend_url = custom_backend_url
+    else:
+        backend_url = environment_outputs["backend_url"].value
+
     frontend_env_json = {
         "ADMIN_FRONTEND_FIREBASE_API_KEY": base64_encode(admin_firebase_api_key),
         "ADMIN_FRONTEND_FIREBASE_AUTH_DOMAIN": base64_encode(admin_firebase_auth_domain),
         "ADMIN_FRONTEND_FIREBASE_TENANT_ID": base64_encode(admin_firebase_tenant_id),
         "ADMIN_FRONTEND_FIREBASE_PROJECT_ID": base64_encode(firebase_project_id),
-        "BACKEND_URL": base64_encode(environment_outputs["backend_url"].value),
+        "BACKEND_URL": base64_encode(backend_url),
         "TARGET_ENVIRONMENT_NAME": base64_encode(env_name),
         "FRONTEND_ENABLE_SENTRY": base64_encode(enable_sentry),
         "FRONTEND_SENTRY_DSN": base64_encode(sentry_dsn),

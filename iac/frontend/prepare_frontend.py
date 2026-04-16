@@ -147,6 +147,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     # analytics / GTM
     frontend_gtm_container_id: Optional[str] = getenv("FRONTEND_GTM_CONTAINER_ID", False, False)
     frontend_gtm_enabled: Optional[str] = getenv("FRONTEND_GTM_ENABLED", False, False)
+    custom_backend_url: Optional[str] = getenv("CUSTOM_BACKEND_URL", False, False)
 
     # validations, apart from the keys are required, some values also need to be validated
     # the sensitive encryption key should be a valid RSA public key.
@@ -158,10 +159,15 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     auth_outputs = get_pulumi_stack_outputs(stack_name=stack_name, module="auth")
     _, env_name = get_realm_and_env_name_from_stack(stack_name)
 
+    if custom_backend_url and custom_backend_url.strip():
+        backend_url = custom_backend_url
+    else:
+        backend_url = environment_outputs["backend_url"].value
+
     frontend_env_json = {
         "FIREBASE_API_KEY": base64_encode(auth_outputs["identity_platform_client_api_key"].value),
         "FIREBASE_AUTH_DOMAIN": base64_encode(environment_outputs["auth_domain"].value),
-        "BACKEND_URL": base64_encode(environment_outputs["backend_url"].value),
+        "BACKEND_URL": base64_encode(backend_url),
         "TARGET_ENVIRONMENT_NAME": base64_encode(env_name),
         "FRONTEND_ENABLE_SENTRY": base64_encode(enable_sentry),
         "FRONTEND_SENTRY_DSN": base64_encode(sentry_dsn),
