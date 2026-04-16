@@ -398,7 +398,7 @@
       "registerFailedWithMessage": "Registration Failed: {{message}}",
       "preferencesFetchFailedWithMessage": "An error occurred while trying to get your preferences: {{message}}",
       "firebase": {
-        "emailAlreadyInUse": "The email address is already in use by another account.",
+        "emailAlreadyInUse": "An account with this email already exists. If you signed up with Google, please use the 'Sign in with Google' button to log in.",
         "emailNotVerified": "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
         "invalidCredential": "The email/password provided is invalid.",
         "invalidEmail": "The email address is not valid.",

@@ -398,7 +398,7 @@
       "registerFailedWithMessage": "Error de registro: {{message}}",
       "preferencesFetchFailedWithMessage": "Se produjo un error al obtener tus preferencias: {{message}}",
       "firebase": {
-        "emailAlreadyInUse": "La dirección de correo ya está en uso por otra cuenta.",
+        "emailAlreadyInUse": "Ya existe una cuenta con este correo electrónico. Si te registraste con Google, usá el botón 'Iniciar sesión con Google' para ingresar.",
         "emailNotVerified": "El correo que estás usando está registrado, pero aún no ha sido verificado. Por favor verificá tu correo para continuar.",
         "invalidCredential": "El correo/contraseña proporcionados no son válidos.",
         "invalidEmail": "La dirección de correo no es válida.",

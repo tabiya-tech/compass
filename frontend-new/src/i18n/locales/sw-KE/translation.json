@@ -398,7 +398,7 @@
       "registerFailedWithMessage": "Usajili Umeshindikana: {{message}}",
       "preferencesFetchFailedWithMessage": "Kosa limetokea wakati wa kujaribu kupata mapendeleo yako: {{message}}",
       "firebase": {
-        "emailAlreadyInUse": "Anwani ya barua pepe tayari inatumika na akaunti nyingine.",
+        "emailAlreadyInUse": "Akaunti yenye barua pepe hii tayari ipo. Ikiwa ulijiandikisha kwa Google, tafadhali tumia kitufe cha 'Ingia na Google' kuingia.",
         "emailNotVerified": "Barua pepe unayotumia imesajiliwa, lakini bado hujaithibitisha. Tafadhali thibitisha barua pepe yako ili kuendelea.",
         "invalidCredential": "Barua pepe/nenosiri iliyotolewa si sahihi.",
         "invalidEmail": "Anwani ya barua pepe si sahihi.",

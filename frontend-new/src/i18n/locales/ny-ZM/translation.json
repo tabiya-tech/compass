@@ -398,7 +398,7 @@
       "registerFailedWithMessage": "Kulembetsa Kunalephera: {{message}}",
       "preferencesFetchFailedWithMessage": "Cholakwika chachitika pamene tinayesa kutenga zokonda zanu: {{message}}",
       "firebase": {
-        "emailAlreadyInUse": "Imelo yokhayo ikugwiritsidwa ndi akaunti ina.",
+        "emailAlreadyInUse": "Akaunti yokhala ndi imelo iyi ilipo kale. Ngati munalembetsa ndi Google, chonde gwiritsani ntchito batani la 'Lowani ndi Google' kulowa.",
         "emailNotVerified": "Imelo yomwe mukugwiritsa ntchito yalembetsedwa, koma simunatsimikiza. Chonde tsimikizani imelo yanu kuti mupitilize.",
         "invalidCredential": "Imelo/mawu achinsinsi omwe mwatumiza ndi ovutika.",
         "invalidEmail": "Imelo yokhayo ndi yovutika.",
