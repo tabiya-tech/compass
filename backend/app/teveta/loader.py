@@ -19,6 +19,14 @@ SECTOR_KEY_MAP = {
     "Water": "Water",
 }
 
+# Institution records use different sector names than critical_skills/programmes.
+# Keys must match the teveta_key values from SECTOR_KEY_MAP (not the hub sector names).
+# TODO: consider normalizing sector names in teveta-master.json to eliminate this mapping
+INSTITUTION_SECTOR_MAP = {
+    "Energy": "Electricity & Gas",
+    "Water": "Water & Waste",
+}
+
 
 def get_data() -> dict:
     global _data
@@ -54,9 +62,10 @@ def get_sector_data(sector: str) -> Optional[dict]:
         p for p in data["priority_curriculum"]
         if p.get("sector") == teveta_key
     ]
+    institution_key = INSTITUTION_SECTOR_MAP.get(teveta_key, teveta_key)
     institutions = [
         i for i in data["institutions"]
-        if teveta_key in i.get("sectors", [])
+        if institution_key in i.get("sectors", [])
     ]
 
     return {
