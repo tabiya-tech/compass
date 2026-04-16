@@ -55,6 +55,28 @@ CAREER_READINESS_COLLECTION = "career_readiness_conversations"
 CAREER_EXPLORER_COLLECTION = "career_explorer_conversations"
 
 
+async def preview_conversation(db, collection: str, query: dict):
+    """Show message count and last exchange for a conversation document."""
+    doc = await db[collection].find_one(query)
+    if not doc:
+        print("  (no document found)")
+        return
+    messages = doc.get("messages", [])
+    print(f"  Messages: {len(messages)}")
+    if not messages:
+        return
+    # Show the last two messages (typically user + agent)
+    last_msgs = messages[-2:] if len(messages) >= 2 else messages
+    print("  Last exchange:")
+    for msg in last_msgs:
+        sender = msg.get("sender", msg.get("role", "?"))
+        text = msg.get("message", msg.get("content", ""))
+        if isinstance(text, dict):
+            text = text.get("content", "")
+        text = str(text).replace("\n", " ")[:120]
+        print(f"    [{sender}] {text}")
+
+
 async def reset_skills(app_db, session_id: int) -> int:
     """Reset all skills & interest conversation state for a session."""
     deleted = 0
@@ -232,6 +254,7 @@ async def main():
             if args.dry_run:
                 print(f"Would delete career readiness conversations for user_id={args.user_id}")
                 print(f"  Collection: {CAREER_READINESS_COLLECTION}")
+                await preview_conversation(app_db, CAREER_READINESS_COLLECTION, {"user_id": args.user_id})
             else:
                 count = await reset_career_readiness(app_db, args.user_id)
                 total_deleted += count
@@ -241,6 +264,7 @@ async def main():
             if args.dry_run:
                 print(f"Would delete career explorer conversation for user_id={args.user_id}")
                 print(f"  Collection: {CAREER_EXPLORER_COLLECTION}")
+                await preview_conversation(ce_db, CAREER_EXPLORER_COLLECTION, {"user_id": args.user_id})
             else:
                 count = await reset_career_explorer(ce_db, args.user_id)
                 total_deleted += count

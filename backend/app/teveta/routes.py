@@ -8,6 +8,7 @@ from app.teveta.types import SectorData
 
 
 def add_teveta_routes(app: FastAPI) -> None:
+    # TODO: add route-level tests (404 for unknown sector, 200 with Pydantic serialization)
     router = APIRouter(prefix="/teveta", tags=["teveta"])
 
     @router.get(
