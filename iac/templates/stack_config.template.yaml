@@ -43,6 +43,10 @@ backend:
     # See https://cloud.google.com/endpoints/docs/openapi/openapi-extensions#deadline
     # In seconds as a double e.g. 15.0
     api_gateway:timeout: <api_gateway_timeout>
+    # See https://cloud.google.com/endpoints/docs/openapi/quotas-configure
+    # Requests per minute rate limit for the API (Combined).
+    # <i>This means that regardless of the paths, it is the same api </i>
+    api_gateway:rate_limit: <api_gateway_rate_limit>
     ############################
 
 frontend:

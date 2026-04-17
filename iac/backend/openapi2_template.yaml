@@ -22,7 +22,7 @@ x-google-management:
         metric: "request-metric"
         unit: "1/min/{project}"
         values:
-          STANDARD: 3600 # requests per minute
+          STANDARD: __API_GATEWAY_RATE_LIMIT__ # requests per minute
 x-google-backend:
   address: "__BACKEND_URI__"
   deadline: "__API_GATEWAY_TIMEOUT__" # timeout as the cloud run container may take a while to start, and some requests may take a while to process. Reference: https://cloud.google.com/endpoints/docs/openapi/openapi-extensions#deadline

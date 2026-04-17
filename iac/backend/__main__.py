@@ -32,6 +32,7 @@ def main():
     cloudrun_cpu_limit: str = str(getconfig("cpu_limit", "cloudrun"))
 
     api_gateway_timeout: str = str(getconfig("timeout", "api_gateway"))
+    api_gateway_rate_limit: str = str(getconfig("rate_limit", "api_gateway"))
 
     # Get stack references
     env_reference = pulumi.StackReference(f"tabiya-tech/compass-environment/{stack_name}")
@@ -85,6 +86,7 @@ def main():
         cloudrun_memory_limit=cloudrun_memory_limit,
         cloudrun_cpu_limit=cloudrun_cpu_limit,
         api_gateway_timeout=api_gateway_timeout,
+        api_gateway_rate_limit=api_gateway_rate_limit,
 
         features=getenv("BACKEND_FEATURES", True, False),
         experience_pipeline_config=getenv("BACKEND_EXPERIENCE_PIPELINE_CONFIG", False, False),

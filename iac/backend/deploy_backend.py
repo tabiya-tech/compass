@@ -56,6 +56,7 @@ class BackendServiceConfig:
     cloudrun_memory_limit: str
     cloudrun_cpu_limit: str
     api_gateway_timeout: str
+    api_gateway_rate_limit: str
     features: Optional[str]
     experience_pipeline_config: Optional[str]
     cv_max_uploads_per_user: Optional[str]
@@ -128,6 +129,9 @@ def _setup_api_gateway(*,
 
         # replace the environment name in the api gateway config
         .replace("__ENVIRONMENT_NAME__", backend_service_cfg.target_environment_name)
+
+        # replace the api gateway rate limit
+        .replace("__API_GATEWAY_RATE_LIMIT__", backend_service_cfg.api_gateway_rate_limit)
     )
 
     apigw_config_yaml_b64encoded = apigw_config_yaml.apply(lambda yaml: base64.b64encode(yaml.encode()).decode())
