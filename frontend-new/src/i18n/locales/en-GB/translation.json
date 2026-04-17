@@ -839,7 +839,15 @@
     "chat": "Chat",
     "heroTitle": "Get Job Ready",
     "heroDescription": "Six modules to get you ready for the job market — CV writing, interviews, workplace skills, and more. Work through them at your own pace.",
-    "illustration": "Illustration"
+    "illustration": "Illustration",
+    "moduleTitles": {
+      "whoYouAre": "Who You Are as a Professional",
+      "buildingCv": "Building Your CV",
+      "coverLetters": "Cover Letters & Motivation Statements",
+      "interviewPreparation": "Interview Preparation",
+      "workplaceReadiness": "Workplace Readiness",
+      "entrepreneurship": "Entrepreneurship & Enterprise"
+    }
   },
   "home": {
     "dashboard": "Your Career Hub",
@@ -876,6 +884,9 @@
       "continueLearning": "CONTINUE LEARNING",
       "chat": "Chat",
       "startChat": "Start Profile Chat",
+      "continueProfileChat": "Continue Profile Chat",
+      "completedLearning": "COMPLETED",
+      "viewModule": "View module",
       "locked": "Locked",
       "empty": "No course modules are available yet.",
       "loadError": "We couldn't load your course progress. Try again later.",

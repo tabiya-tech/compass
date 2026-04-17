@@ -845,7 +845,15 @@
     "chat": "Yankhulani",
     "heroTitle": "Konzekerani Kugwira Ntchito",
     "heroDescription": "Mamodule asanu ndi limodzi akukuthandizira kukonzekera msika wa ntchito — kulemba CV, zakuyankhula, luso la ntchito, ndi zambiri. Yendani mwachangu wanu.",
-    "illustration": "Chithunzi"
+    "illustration": "Chithunzi",
+    "moduleTitles": {
+      "whoYouAre": "Inu muli ndani monga katswiri",
+      "buildingCv": "Kupanga CV yanu",
+      "coverLetters": "Makalata oyambira ndi mawu olimbikitsa",
+      "interviewPreparation": "Kukonzekera mafunso antchito",
+      "workplaceReadiness": "Kukonzekera malo a ntchito",
+      "entrepreneurship": "Kudzitangira ntchito ndi bizinesi"
+    }
   },
   "home": {
     "dashboard": "Malo Anu a Ntchito",
@@ -882,6 +890,9 @@
       "continueLearning": "CONTINUE LEARNING",
       "chat": "Chat",
       "startChat": "Start Profile Chat",
+      "continueProfileChat": "Continue Profile Chat",
+      "completedLearning": "COMPLETED",
+      "viewModule": "View module",
       "locked": "Locked",
       "empty": "No course modules are available yet.",
       "loadError": "We couldn't load your course progress. Try again later.",

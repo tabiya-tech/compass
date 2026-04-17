@@ -61,6 +61,7 @@ export const MENU_ITEM_ID = {
   REGISTER: `navbar-register-${uniqueId}`,
   VIEW_PROFILE: `navbar-view-profile-${uniqueId}`,
   VIEW_EXPERIENCES: `navbar-view-experiences-${uniqueId}`,
+  PATHWAYS: `navbar-mobile-pathways-${uniqueId}`,
   MOBILE_LANGUAGE: `navbar-mobile-language-${uniqueId}`,
 };
 
@@ -161,6 +162,11 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
     [navigate]
   );
 
+  const navigateToPathways = useCallback(() => {
+    setAnchorEl(null);
+    navigateWithTransition(routerPaths.KNOWLEDGE_HUB);
+  }, [navigateWithTransition]);
+
   const handleViewExperiences = useCallback(() => {
     setAnchorEl(null);
     openExperiencesDrawer();
@@ -258,6 +264,13 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
         disabled: !isOnline,
         action: handleViewExperiences,
       },
+      {
+        id: MENU_ITEM_ID.PATHWAYS,
+        text: t("nav.pathways" as TranslationKey).toLowerCase(),
+        icon: <BookOpenText size={18} />,
+        disabled: false,
+        action: navigateToPathways,
+      },
       ...(hasMultipleLocales
         ? [
             {
@@ -311,6 +324,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
     isOnline,
     navigateToProfile,
     handleViewExperiences,
+    navigateToPathways,
     sentryEnabled,
     handleReportBug,
     isAnonymous,
@@ -465,7 +479,13 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
               >
                 <Typography
                   variant="body2"
-                  sx={{ color: textColor, fontWeight: 500, whiteSpace: "nowrap" }}
+                  sx={{
+                    color: textColor,
+                    fontWeight: 500,
+                    whiteSpace: "normal",
+                    textAlign: "right",
+                    wordBreak: "break-word",
+                  }}
                   data-testid={DATA_TEST_ID.NAVBAR_USER_NAME}
                 >
                   {userName || t("chat.chatHeader.userInfo")}

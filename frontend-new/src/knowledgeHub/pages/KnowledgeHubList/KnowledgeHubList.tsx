@@ -74,6 +74,7 @@ const KnowledgeHubList: React.FC = () => {
     maxWidth: 640,
     mx: "auto",
     textAlign: "left" as const,
+    px: "var(--layout-gutter-x)",
   };
 
   const textAlignGrid = {

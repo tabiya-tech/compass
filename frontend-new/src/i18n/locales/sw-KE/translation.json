@@ -845,7 +845,15 @@
     "chat": "Zungumza",
     "heroTitle": "Jiandae Kupata Kazi",
     "heroDescription": "Moduli sita za kukusaidia kujiandaa kwa soko la kazi — kuandika CV, mahojiano, ujuzi wa mahali pa kazi, na zaidi. Fanya kwa kasi yako mwenyewe.",
-    "illustration": "Mchoro"
+    "illustration": "Mchoro",
+    "moduleTitles": {
+      "whoYouAre": "Wewe ni nani kama mtaalamu",
+      "buildingCv": "Kutengeneza CV yako",
+      "coverLetters": "Barua za maombi na kauli za motisha",
+      "interviewPreparation": "Maandalizi ya mahojiano",
+      "workplaceReadiness": "Utayari wa mahali pa kazi",
+      "entrepreneurship": "Ujasiriamali na biashara"
+    }
   },
   "home": {
     "dashboard": "Kituo Chako cha Kazi",
@@ -882,6 +890,9 @@
       "continueLearning": "ENDELEA KUJIFUNZA",
       "chat": "Mazungumzo",
       "startChat": "Anza mazungumzo ya wasifu",
+      "continueProfileChat": "Endelea na mazungumzo ya wasifu",
+      "completedLearning": "IMEKAMILIKA",
+      "viewModule": "Angalia moduli",
       "locked": "Imefungwa",
       "empty": "Hakuna moduli za kozi bado.",
       "loadError": "Hatukuweza kupakia maendeleo ya kozi yako. Jaribu tena baadaye.",

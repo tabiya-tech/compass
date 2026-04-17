@@ -208,7 +208,7 @@ const JobMatchingPage: React.FC = () => {
           flex: 1,
           width: { xs: "100%", md: "60%" },
           margin: { xs: "0", md: "0 auto" },
-          paddingX: theme.spacing(theme.tabiyaSpacing.md),
+          paddingX: "var(--layout-gutter-x)",
           paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.md),
           paddingTop: theme.fixedSpacing(theme.tabiyaSpacing.sm),
         }}

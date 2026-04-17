@@ -244,17 +244,18 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
           overflowY: "auto",
         }}
       >
-        <div
-          style={{
+        <Box
+          sx={{
             fontFamily: "'DM Sans', system-ui, sans-serif",
             color: BLACK,
-            padding: "24px 32px 48px",
+            py: theme.fixedSpacing(5),
+            px: "var(--layout-gutter-x)",
+            pr: { md: "calc(min(20rem, 25%) + 32px)" },
             lineHeight: 1.5,
             boxSizing: "border-box",
-            maxWidth: "var(--layout-content-max-width)",
-            marginLeft: "auto",
-            marginRight: "auto",
-            paddingRight: "calc(min(20rem, 25%) + 32px)", // the padding from above
+            maxWidth: { xs: "100%", md: "var(--layout-content-max-width)" },
+            mx: { xs: 0, md: "auto" },
+            width: "100%",
           }}
         >
           {/* Loading skeleton */}
@@ -285,17 +286,18 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
           ) : (
             <>
               {/* ── Hero ── */}
-              <div
-                style={{
+              <Box
+                sx={{
                   background: c,
-                  borderRadius: 16,
-                  padding: "36px 40px",
-                  marginBottom: 32,
+                  borderRadius: 2,
+                  p: { xs: 3, md: "36px 40px" },
+                  mb: 4,
                   color: WHITE,
                   display: "flex",
+                  flexDirection: { xs: "column", md: "row" },
                   justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: 32,
+                  alignItems: { xs: "stretch", md: "center" },
+                  gap: { xs: 3, md: 4 },
                 }}
               >
                 <div>
@@ -327,8 +329,16 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
                     {staticData.heroText} <span style={{ color: WHITE }}>{staticData.heroHighlight}</span>
                   </div>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 16, flexShrink: 0 }}>
-                  <div style={{ textAlign: "right" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                    flexShrink: 0,
+                    alignItems: { xs: "stretch", md: "flex-end" },
+                  }}
+                >
+                  <Box sx={{ textAlign: { xs: "left", md: "right" } }}>
                     <div
                       style={{
                         fontFamily: "'Bricolage Grotesque', sans-serif",
@@ -352,8 +362,8 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
                     >
                       {t("knowledgeHub.avgMonthlyEarnings")}
                     </div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
+                  </Box>
+                  <Box sx={{ textAlign: { xs: "left", md: "right" } }}>
                     <div
                       style={{
                         fontFamily: "'Bricolage Grotesque', sans-serif",
@@ -377,8 +387,8 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
                     >
                       {t("knowledgeHub.criticalOccupations")}
                     </div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
+                  </Box>
+                  <Box sx={{ textAlign: { xs: "left", md: "right" } }}>
                     <div
                       style={{
                         fontFamily: "'Bricolage Grotesque', sans-serif",
@@ -402,9 +412,9 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
                     >
                       {t("knowledgeHub.tevetProgrammes")}
                     </div>
-                  </div>
-                </div>
-              </div>
+                  </Box>
+                </Box>
+              </Box>
 
               {/* ── Where the jobs are ── */}
               <div
@@ -425,7 +435,7 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
                 >
                   {staticData.geoLabel}
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 2.5 }}>
                   <div
                     style={{
                       background: WHITE,
@@ -487,7 +497,7 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
                       </div>
                     ))}
                   </div>
-                </div>
+                </Box>
               </div>
 
               {/* ── TEVET Programmes ── */}
@@ -788,7 +798,7 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
                 >
                   {t("knowledgeHub.keepInMind")}
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 2 }}>
                   {staticData.considerations.map((item, i) => (
                     <div
                       key={i}
@@ -813,7 +823,7 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
                       <p style={{ fontSize: 13, color: STONE, lineHeight: 1.5, margin: 0 }}>{item.body}</p>
                     </div>
                   ))}
-                </div>
+                </Box>
               </div>
 
               {/* ── Sources ── */}
@@ -831,7 +841,7 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
               </div>
             </>
           )}
-        </div>
+        </Box>
       </Box>
 
       {/* ── Absolute right sidebar (matches ChatPage pattern) ── */}

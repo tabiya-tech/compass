@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Container, Divider, Typography, useTheme } from "@mui/material";
+import { Box, Container, Divider, Typography, useMediaQuery, useTheme } from "@mui/material";
 import type { SxProps } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import CustomLink from "src/theme/CustomLink/CustomLink";
@@ -34,30 +34,31 @@ const Footer: React.FC<FooterProps> = ({ sx }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const appName = getProductName() || "";
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
 
-  const privacyHref = `${window.location.origin}/#${routerPaths.PRIVACY_POLICY}`;
-  const termsHref = `${window.location.origin}/#${routerPaths.TERMS_OF_USE}`;
+  const privacyHref = `${globalThis.location.origin}/#${routerPaths.PRIVACY_POLICY}`;
+  const termsHref = `${globalThis.location.origin}/#${routerPaths.TERMS_OF_USE}`;
 
   return (
     <Box component="footer" data-testid={DATA_TEST_ID.FOOTER_CONTAINER} sx={sx}>
-      <Divider sx={{ borderColor: theme.palette.grey[300] }} />
       <Container
         maxWidth={false}
+        disableGutters
         sx={{
           width: "100%",
           maxWidth: "var(--layout-content-max-width)",
           marginX: "auto",
-          paddingTop: theme.spacing(theme.tabiyaSpacing.lg),
-          paddingBottom: theme.spacing(theme.tabiyaSpacing.lg),
+          paddingY: theme.fixedSpacing(theme.tabiyaSpacing.lg),
           paddingX: "var(--layout-gutter-x)",
         }}
       >
+        <Divider sx={{ borderColor: theme.palette.grey[300], marginBottom: theme.fixedSpacing(isMobile ? 4 : 8) }} />
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: theme.spacing(theme.tabiyaSpacing.md),
+            gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
           }}
         >
           {/* Partner logos */}

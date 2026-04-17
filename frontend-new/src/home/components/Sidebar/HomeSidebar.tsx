@@ -43,7 +43,7 @@ const HomeSidebar: React.FC<HomeSidebarProps> = ({ showViewCvButton = true }) =>
   const handleViewCV = () => void openExperiencesDrawer();
 
   return (
-    <Sidebar width="100%">
+    <Sidebar width="100%" disablePadding>
       <Box>
         <SectionTitle>Skills From Work</SectionTitle>
         <ChipList

@@ -19,7 +19,7 @@ export const DATA_TEST_ID = {
 
 const Home: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const { profileData, isLoadingModules, errors } = useUserProfile();
 
   const modulesLoadError = Boolean(errors?.modules);
@@ -91,7 +91,7 @@ const Home: React.FC = () => {
             flex: 1,
             backgroundColor: theme.palette.containerBackground.main,
             paddingTop: theme.fixedSpacing(theme.tabiyaSpacing.xl),
-            paddingBottom: theme.fixedSpacing(16),
+            paddingBottom: theme.fixedSpacing(isMobile ? 8 : 12),
           }}
         >
           <Box
@@ -100,24 +100,21 @@ const Home: React.FC = () => {
               maxWidth: "var(--layout-content-max-width)",
               mx: "auto",
               px: "var(--layout-gutter-x)",
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              alignItems: "flex-start",
-              gap: {
-                xs: theme.fixedSpacing(theme.tabiyaSpacing.xl),
-                md: theme.spacing(6),
-                lg: theme.spacing(10),
-              },
+              display: "grid",
+              gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "minmax(0, 2fr) minmax(0, 1fr)" },
+              columnGap: { xs: 0, md: theme.fixedSpacing(10) },
+              rowGap: { xs: theme.fixedSpacing(6), md: 0 },
+              alignItems: "start",
             }}
           >
-            <Box sx={{ flex: { md: "1 1 56%" }, minWidth: 0, width: "100%" }}>
+            <Box sx={{ minWidth: 0 }}>
               <HomeJobReadyList
                 modules={careerReadinessModules}
                 isLoading={isLoadingModules}
                 loadError={modulesLoadError}
               />
             </Box>
-            <Box sx={{ flex: { md: "1 1 36%" }, minWidth: 0, width: "100%", maxWidth: { md: 420 } }}>
+            <Box sx={{ minWidth: 0 }}>
               <HomeSidebar />
             </Box>
           </Box>

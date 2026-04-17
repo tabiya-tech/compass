@@ -62,12 +62,14 @@ const ModuleRow: React.FC<ModuleRowProps> = ({ module, index }) => {
           borderRadius: "50%",
           border: `2px solid ${theme.palette.careerReadiness.main}`,
           backgroundColor: isDone ? theme.palette.careerReadiness.main : "transparent",
-          color: isDone ? theme.palette.common.white : theme.palette.careerReadiness.main,
+          color: isDone ? theme.palette.careerReadiness.contrastText : theme.palette.careerReadiness.main,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
-          ...theme.typography.caption,
+          fontFamily: theme.typography.caption.fontFamily,
+          fontSize: theme.typography.caption.fontSize,
+          lineHeight: 1,
           fontWeight: 700,
         }}
       >
@@ -95,15 +97,21 @@ const ModuleRow: React.FC<ModuleRowProps> = ({ module, index }) => {
         )}
       </Box>
 
-      {isActive ? (
+      {isActive && (
         <PrimaryButton color="careerReadiness" sx={pillSx}>
           {t("careerReadiness.continue")} →
         </PrimaryButton>
-      ) : !isDone ? (
+      )}
+      {!isActive && !isDone && (
         <PrimaryButton variant="outlined" color="careerReadiness" sx={pillSx}>
           {t("careerReadiness.chat")}
         </PrimaryButton>
-      ) : null}
+      )}
+      {isDone && (
+        <PrimaryButton color="careerReadiness" sx={pillSx}>
+          {t("careerReadiness.statusDone")}
+        </PrimaryButton>
+      )}
     </Box>
   );
 };

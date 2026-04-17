@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import type { Theme } from "@mui/material/styles";
 import type { ModuleSummary } from "src/careerReadiness/types";
 import Footer from "src/home/components/Footer/Footer";
 import HomeSidebar from "src/home/components/Sidebar/HomeSidebar";
@@ -23,6 +24,7 @@ const CareerReadinessList: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const [modules, setModules] = useState<ModuleSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -57,6 +59,7 @@ const CareerReadinessList: React.FC = () => {
         sx={{
           flex: 1,
           backgroundColor: theme.palette.containerBackground.main,
+          paddingBottom: theme.fixedSpacing(8),
         }}
         data-testid={DATA_TEST_ID.CAREER_READINESS_LIST_CONTENT}
       >
@@ -69,7 +72,7 @@ const CareerReadinessList: React.FC = () => {
             display: "flex",
             flexDirection: { xs: "column", md: "row" },
             alignItems: "stretch",
-            gap: theme.fixedSpacing(theme.tabiyaSpacing.lg * 2),
+            gap: theme.fixedSpacing(isMobile ? theme.tabiyaSpacing.lg : theme.tabiyaSpacing.xl * 2),
           }}
         >
           <Box
@@ -111,6 +114,7 @@ const CareerReadinessList: React.FC = () => {
             sx={{
               width: { xs: "100%", md: 320 },
               flexShrink: 0,
+              paddingTop: theme.fixedSpacing(isMobile ? theme.tabiyaSpacing.xs : theme.tabiyaSpacing.lg),
             }}
           >
             <HomeSidebar showViewCvButton={false} />

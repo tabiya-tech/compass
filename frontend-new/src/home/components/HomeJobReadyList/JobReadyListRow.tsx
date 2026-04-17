@@ -1,0 +1,300 @@
+import React, { startTransition } from "react";
+import { Box, Divider, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Theme } from "@mui/material/styles";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import type { TranslationKey } from "src/react-i18next";
+import { routerPaths } from "src/app/routerPaths";
+import { mapModuleStatusToDisplay } from "src/careerReadiness/types";
+import type { ModuleSummary } from "src/careerReadiness/types";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
+
+function getJobReadyLearningLabel(isDone: boolean, isInProgress: boolean, t: (key: TranslationKey) => string): string {
+  if (isDone) return t("home.jobReadySection.completedLearning");
+  return t(isInProgress ? "home.jobReadySection.continueLearning" : "home.jobReadySection.startLearning");
+}
+
+function getJobReadyPrimaryCtaLabel(
+  isDone: boolean,
+  isInProgress: boolean,
+  t: (key: TranslationKey) => string
+): string | null {
+  if (isDone) return t("home.jobReadySection.viewModule");
+  return t(isInProgress ? "home.jobReadySection.continueProfileChat" : "home.jobReadySection.startChat");
+}
+
+function shouldShowRowDivider(
+  index: number,
+  currentModuleId: string,
+  sorted: ModuleSummary[],
+  expandedModuleId: string | null
+): boolean {
+  return (
+    index < sorted.length - 1 && currentModuleId !== expandedModuleId && sorted[index + 1]?.id !== expandedModuleId
+  );
+}
+
+interface JobReadyListRowProps {
+  module: ModuleSummary;
+  moduleIndex: number;
+  sorted: ModuleSummary[];
+  expandedModuleId: string | null;
+  setExpandedModuleId: React.Dispatch<React.SetStateAction<string | null>>;
+  rowTestIdPrefix: string;
+}
+
+const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
+  module,
+  moduleIndex,
+  sorted,
+  expandedModuleId,
+  setExpandedModuleId,
+  rowTestIdPrefix,
+}) => {
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const isSmallMobile = useMediaQuery((th: Theme) => th.breakpoints.down("sm"));
+  const secondary = theme.palette.secondary;
+
+  const n = moduleIndex + 1;
+  const isExpanded = module.id === expandedModuleId;
+  const statusDisplay = mapModuleStatusToDisplay(module.status);
+  const isDone = statusDisplay === "done";
+  const isInProgress = statusDisplay === "in_progress";
+  const isUnlocked = statusDisplay === "unlocked";
+
+  const learningLabel = getJobReadyLearningLabel(isDone, isInProgress, t);
+  const primaryCtaLabel = getJobReadyPrimaryCtaLabel(isDone, isInProgress, t);
+
+  const goToModule = (id: string) => {
+    startTransition(() => {
+      navigate(`${routerPaths.CAREER_READINESS}/${id}`);
+    });
+  };
+
+  return (
+    <Box component="li">
+      {isExpanded ? (
+        <Box
+          data-testid={`${rowTestIdPrefix}-${module.id}`}
+          sx={{
+            border: `2px solid ${secondary.main}`,
+            borderRadius: theme.rounding(theme.tabiyaRounding.sm),
+            padding: {
+              xs: theme.fixedSpacing(theme.tabiyaSpacing.md),
+              sm: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+            },
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: {
+                xs: theme.fixedSpacing(theme.tabiyaSpacing.md),
+                md: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+              },
+            }}
+          >
+            <Box
+              sx={{
+                width: theme.fixedSpacing(isSmallMobile ? theme.tabiyaSpacing.xl * 1.2 : theme.tabiyaSpacing.xl * 1.5),
+                height: theme.fixedSpacing(isSmallMobile ? theme.tabiyaSpacing.xl * 1.2 : theme.tabiyaSpacing.xl * 1.5),
+                borderRadius: "50%",
+                bgcolor: secondary.main,
+                color: secondary.contrastText,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "bold",
+                flexShrink: 0,
+                fontSize: isSmallMobile ? "1.5rem" : "2rem",
+                lineHeight: 1,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {n}
+            </Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography
+                variant="caption"
+                color="text.primary"
+                letterSpacing="0.08em"
+                sx={{
+                  textTransform: "uppercase",
+                  display: "block",
+                  marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.md),
+                }}
+              >
+                {learningLabel}
+              </Typography>
+              <Typography
+                variant="body1"
+                fontWeight="bold"
+                color="text.primary"
+                sx={{
+                  lineHeight: 1.2,
+                  marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                }}
+              >
+                {module.title}
+              </Typography>
+              {isInProgress && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  <AccessTimeIcon sx={{ fontSize: 14, color: "inherit" }} />
+                  <Typography variant="body2" color="inherit" fontWeight={400}>
+                    {t("careerReadiness.takes30Min")}
+                  </Typography>
+                </Box>
+              )}
+              {primaryCtaLabel !== null && (
+                <PrimaryButton
+                  color="secondary"
+                  showCircle
+                  onClick={() => goToModule(module.id)}
+                  sx={{
+                    alignSelf: "flex-start",
+                    marginTop: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+                  }}
+                >
+                  {primaryCtaLabel}
+                </PrimaryButton>
+              )}
+            </Box>
+          </Box>
+        </Box>
+      ) : (
+        <Box
+          data-testid={`${rowTestIdPrefix}-${module.id}`}
+          onClick={() => setExpandedModuleId(module.id)}
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "stretch",
+            gap: {
+              xs: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+              sm: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+            },
+            py: {
+              xs: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+              sm: theme.fixedSpacing(theme.tabiyaSpacing.md),
+            },
+            cursor: "pointer",
+            borderRadius: theme.rounding(theme.tabiyaRounding.sm),
+          }}
+        >
+          <Box
+            sx={{
+              width: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+              height: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+              borderRadius: "50%",
+              border: `2px solid ${secondary.main}`,
+              color: isDone ? secondary.contrastText : secondary.main,
+              bgcolor: isDone ? secondary.main : "transparent",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: "bold",
+              flexShrink: 0,
+              alignSelf: "center",
+            }}
+          >
+            {n}
+          </Box>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography
+              variant="body1"
+              fontWeight={isInProgress ? 700 : 400}
+              color="text.primary"
+              sx={{ overflowWrap: "anywhere", wordBreak: "break-word" }}
+            >
+              {module.title}
+            </Typography>
+            {isInProgress && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+                  marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+                }}
+              >
+                <AccessTimeIcon sx={{ fontSize: 12, color: theme.palette.text.secondary }} />
+                <Typography sx={{ ...theme.typography.caption, color: theme.palette.text.secondary }}>
+                  {t("careerReadiness.takes30Min")}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexShrink: 0,
+              minWidth: "fit-content",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {isInProgress && (
+              <PrimaryButton
+                color="secondary"
+                onClick={() => goToModule(module.id)}
+                sx={{
+                  fontSize: theme.typography.caption.fontSize,
+                  padding: `${theme.fixedSpacing(theme.tabiyaSpacing.xs)} ${theme.fixedSpacing(theme.tabiyaSpacing.sm)}`,
+                  flexShrink: 0,
+                  lineHeight: 1.2,
+                }}
+              >
+                {t("careerReadiness.continue")} →
+              </PrimaryButton>
+            )}
+            {isUnlocked && (
+              <SecondaryButton
+                color="secondary"
+                onClick={() => goToModule(module.id)}
+                sx={{
+                  fontSize: theme.typography.caption.fontSize,
+                  padding: `${theme.fixedSpacing(theme.tabiyaSpacing.xs)} ${theme.fixedSpacing(theme.tabiyaSpacing.md)}`,
+                }}
+              >
+                {t("careerReadiness.chat")}
+              </SecondaryButton>
+            )}
+            {isDone && (
+              <PrimaryButton
+                color="secondary"
+                onClick={() => goToModule(module.id)}
+                sx={{
+                  fontSize: theme.typography.caption.fontSize,
+                  padding: `${theme.fixedSpacing(theme.tabiyaSpacing.xs)} ${theme.fixedSpacing(theme.tabiyaSpacing.md)}`,
+                }}
+              >
+                {t("careerReadiness.statusDone")}
+              </PrimaryButton>
+            )}
+          </Box>
+        </Box>
+      )}
+      {shouldShowRowDivider(moduleIndex, module.id, sorted, expandedModuleId) && (
+        <Divider
+          sx={{
+            borderColor: `color-mix(in srgb, ${secondary.main} 35%, transparent)`,
+          }}
+        />
+      )}
+    </Box>
+  );
+};
+
+export default JobReadyListRow;

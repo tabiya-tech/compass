@@ -13,13 +13,14 @@ export interface SidebarProps {
   title?: React.ReactNode;
   children: React.ReactNode;
   width?: number | string;
+  disablePadding?: boolean;
 }
 
 /**
  * Generic sidebar shell — handles layout, scroll, border, spacing, and title style.
  * Domain-specific content is passed via children.
  */
-const Sidebar: React.FC<SidebarProps> = ({ title, children, width = 280 }) => {
+const Sidebar: React.FC<SidebarProps> = ({ title, children, width = 280, disablePadding = false }) => {
   const theme = useTheme();
 
   return (
@@ -33,7 +34,9 @@ const Sidebar: React.FC<SidebarProps> = ({ title, children, width = 280 }) => {
         flexDirection: "column",
         borderLeft: "none",
         overflowY: "auto",
-        padding: `${theme.fixedSpacing(theme.tabiyaSpacing.md * 1.125)} ${theme.fixedSpacing(theme.tabiyaSpacing.md)}`,
+        padding: disablePadding
+          ? 0
+          : `${theme.fixedSpacing(theme.tabiyaSpacing.md * 1.125)} ${theme.fixedSpacing(theme.tabiyaSpacing.md)}`,
         gap: theme.fixedSpacing(theme.tabiyaSpacing.lg * 1.25),
       }}
     >
@@ -52,7 +55,7 @@ const Sidebar: React.FC<SidebarProps> = ({ title, children, width = 280 }) => {
       )}
       <Box
         data-testid={DATA_TEST_ID.SIDEBAR_CONTENT}
-        sx={{ display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.md * 1.25) }}
+        sx={{ display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.lg * 1.25) }}
       >
         {children}
       </Box>

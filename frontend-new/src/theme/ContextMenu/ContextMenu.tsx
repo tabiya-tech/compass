@@ -60,8 +60,7 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
             borderRadius: "16px",
             minWidth: 160,
             maxWidth: 200,
-            px: 1,
-            py: 1,
+            p: theme.fixedSpacing(theme.tabiyaSpacing.sm),
             ...props.paperSx,
           },
         },
@@ -110,10 +109,10 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
             disabled={item.disabled}
             key={item.id}
             sx={{
-              borderRadius: "10px",
-              py: 1,
-              px: 1.5,
-              gap: 1.5,
+              borderRadius: theme.tabiyaRounding.sm,
+              py: { xs: theme.fixedSpacing(theme.tabiyaSpacing.xs), sm: theme.fixedSpacing(theme.tabiyaSpacing.sm) },
+              px: theme.fixedSpacing(theme.tabiyaSpacing.md),
+              gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
               "&:hover": { backgroundColor: theme.palette.action.hover },
               "& .MuiListItemIcon-root": { minWidth: "unset" },
             }}

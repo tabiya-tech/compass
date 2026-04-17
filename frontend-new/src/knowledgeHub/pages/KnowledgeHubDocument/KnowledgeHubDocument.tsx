@@ -57,10 +57,13 @@ const KnowledgeHubDocument: React.FC = () => {
     >
       <Container
         maxWidth={false}
+        disableGutters
         sx={{
           flex: 1,
-          maxWidth: "var(--layout-content-max-width)",
-          padding: theme.spacing(theme.tabiyaSpacing.lg),
+          maxWidth: { xs: "100%", md: "var(--layout-content-max-width)" },
+          mx: { xs: 0, md: "auto" },
+          px: { xs: "var(--layout-gutter-x)", md: theme.spacing(theme.tabiyaSpacing.lg) },
+          py: theme.spacing(theme.tabiyaSpacing.lg),
           overflowY: "auto",
         }}
       >

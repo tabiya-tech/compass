@@ -3,9 +3,12 @@ import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { getBackendUrl } from "src/envService";
+import i18n from "src/i18n/i18n";
+import type { TranslationKey } from "src/react-i18next";
 import type {
   ModuleListResponse,
   ModuleDetail,
+  ModuleSummary,
   CareerReadinessConversationResponse,
   CareerReadinessConversationInput,
   QuizResponse,
@@ -13,6 +16,23 @@ import type {
 } from "src/careerReadiness/types";
 
 const SERVICE_NAME = "CareerReadinessService";
+const OVERRIDE_MODULE_TITLE_KEYS_BY_ORDER: Record<number, TranslationKey> = {
+  1: "careerReadiness.moduleTitles.whoYouAre",
+  2: "careerReadiness.moduleTitles.buildingCv",
+  3: "careerReadiness.moduleTitles.coverLetters",
+  4: "careerReadiness.moduleTitles.interviewPreparation",
+  5: "careerReadiness.moduleTitles.workplaceReadiness",
+  6: "careerReadiness.moduleTitles.entrepreneurship",
+};
+
+function applyModuleTitleOverride<T extends ModuleSummary>(module: T): T {
+  const overrideTitleKey = OVERRIDE_MODULE_TITLE_KEYS_BY_ORDER[module.sort_order];
+  if (!overrideTitleKey) return module;
+  return {
+    ...module,
+    title: i18n.t(overrideTitleKey),
+  };
+}
 
 function parseJson<T>(responseBody: string, errorFactory: RestAPIErrorFactory): T {
   try {
@@ -54,7 +74,11 @@ export default class CareerReadinessService {
       retryOnFailedToFetch: true,
     });
     const body = await response.text();
-    return parseJson<ModuleListResponse>(body, errorFactory);
+    const parsed = parseJson<ModuleListResponse>(body, errorFactory);
+    return {
+      ...parsed,
+      modules: parsed.modules.map((module) => applyModuleTitleOverride(module)),
+    };
   }
 
   async getModule(moduleId: string): Promise<ModuleDetail> {
@@ -71,7 +95,8 @@ export default class CareerReadinessService {
       retryOnFailedToFetch: true,
     });
     const body = await response.text();
-    return parseJson<ModuleDetail>(body, errorFactory);
+    const parsed = parseJson<ModuleDetail>(body, errorFactory);
+    return applyModuleTitleOverride(parsed);
   }
 
   async createConversation(moduleId: string): Promise<CareerReadinessConversationResponse> {

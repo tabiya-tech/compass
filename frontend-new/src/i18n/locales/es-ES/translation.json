@@ -845,7 +845,15 @@
     "chat": "Chat",
     "heroTitle": "Prepárate para trabajar",
     "heroDescription": "Seis módulos para prepararte para el mercado laboral — redacción de CV, entrevistas, habilidades laborales y más. Trabájalos a tu propio ritmo.",
-    "illustration": "Ilustración"
+    "illustration": "Ilustración",
+    "moduleTitles": {
+      "whoYouAre": "Quién eres como profesional",
+      "buildingCv": "Construcción de tu CV",
+      "coverLetters": "Cartas de presentación y declaraciones de motivación",
+      "interviewPreparation": "Preparación para entrevistas",
+      "workplaceReadiness": "Preparación para el entorno laboral",
+      "entrepreneurship": "Emprendimiento y empresa"
+    }
   },
   "home": {
     "dashboard": "Tu Centro de Carrera",
@@ -882,6 +890,9 @@
       "continueLearning": "SEGUIR APRENDIENDO",
       "chat": "Chat",
       "startChat": "Iniciar chat del perfil",
+      "continueProfileChat": "Continuar chat del perfil",
+      "completedLearning": "COMPLETADO",
+      "viewModule": "Ver módulo",
       "locked": "Bloqueado",
       "empty": "Aún no hay módulos del curso disponibles.",
       "loadError": "No pudimos cargar tu progreso del curso. Inténtalo más tarde.",
