@@ -6,6 +6,7 @@ the career readiness business logic.
 """
 import logging
 import math
+import re
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Callable
@@ -54,6 +55,14 @@ SILENCE_MESSAGE = "(silence)"
 def _filter_silence(messages: list[CareerReadinessMessage]) -> list[CareerReadinessMessage]:
     """Filter out synthetic silence messages before returning to the frontend."""
     return [m for m in messages if m.message != SILENCE_MESSAGE]
+
+
+def _normalize_topic(topic: str) -> str:
+    """Normalize a topic name for comparison only (lowercases, strips trailing punctuation, collapses whitespace)."""
+    s = topic.lower().strip()
+    s = re.sub(r"[?!.:;]+$", "", s)
+    s = re.sub(r"\s+", " ", s)
+    return s
 
 
 class ICareerReadinessService(ABC):
@@ -369,7 +378,26 @@ class CareerReadinessService(ICareerReadinessService):
         context = _build_conversation_context(all_messages)
         agent = self._agent_factory(module, ConversationMode.INSTRUCTION)
         agent_input = AgentInput(message=user_input, sent_at=now)
-        agent_result: CareerReadinessAgentOutput = await agent.execute(agent_input, context)
+
+        # Compute authoritative remaining topics BEFORE the agent turn so the LLM
+        # doesn't have to re-derive global coverage state from conversation history.
+        if module.topics:
+            normalized_covered = set(map(_normalize_topic, conversation.covered_topics))
+            remaining_topics = [
+                t for t in module.topics
+                if _normalize_topic(t) not in normalized_covered
+            ]
+        else:
+            remaining_topics = []
+
+        self._logger.info(
+            "Career readiness turn: conversation=%s module=%s remaining_topics=%s",
+            conversation.conversation_id, conversation.module_id, remaining_topics,
+        )
+
+        agent_result: CareerReadinessAgentOutput = await agent.execute(
+            agent_input, context, remaining_topics=remaining_topics,
+        )
 
         # Accumulate covered topics
         new_covered = set(conversation.covered_topics) | set(agent_result.topics_covered)
@@ -388,10 +416,12 @@ class CareerReadinessService(ICareerReadinessService):
         await self._repository.append_message(conversation.conversation_id, agent_message)
         response_messages = all_messages + [agent_message]
 
-        # Check if all topics are covered AND agent says finished → deliver quiz
+        # Trigger the quiz whenever the agent reports finished=true. The LLM's
+        # judgment drives this — server-side coverage tracking is telemetry only,
+        # because topics_covered is itself LLM-reported and can under-report.
         quiz_available = conversation.quiz_delivered and not conversation.quiz_passed
-        all_topics_covered = set(module.topics).issubset(new_covered) if module.topics else True
-        if (all_topics_covered and agent_output.finished
+
+        if (agent_output.finished
                 and module.quiz is not None and not conversation.quiz_delivered):
             marker_message = CareerReadinessMessage(
                 message_id=str(ObjectId()),

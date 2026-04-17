@@ -5,7 +5,7 @@ description: Learn to write compelling cover letters and motivation statements t
 icon: letter
 sort_order: 3
 input_placeholder: Ask about cover letters...
-topics: What is a Cover Letter, Cover Letter Structure, Motivation Statement vs Cover Letter, Writing Tips, Common Mistakes to Avoid
+topics: What is a Cover Letter?, Cover Letter Structure, Motivation Statement vs Cover Letter, Writing Tips, Common Mistakes to Avoid
 ---
 
 # Cover Letter & Motivation Statement

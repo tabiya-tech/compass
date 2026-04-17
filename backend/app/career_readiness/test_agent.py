@@ -1,9 +1,11 @@
 """
 Tests for the career readiness agent.
 """
+from enum import Enum
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from pydantic import ValidationError
 
 from app.agent.agent_types import AgentInput, AgentType, LLMStats
 from app.career_readiness.agent import (
@@ -11,13 +13,16 @@ from app.career_readiness.agent import (
     CareerReadinessAgentOutput,
     CareerReadinessModelResponse,
     _build_instruction_mode_instructions,
+    _build_module_response_model,
     _build_support_mode_instructions,
+    _safe_enum_member_name,
 )
 from app.career_readiness.types import ConversationMode
 from app.conversation_memory.conversation_memory_types import (
     ConversationContext,
     ConversationHistory,
 )
+from common_libs.llm.schema_builder import with_response_schema
 
 
 class TestBuildInstructionModeInstructions:
@@ -52,6 +57,9 @@ class TestBuildInstructionModeInstructions:
         # AND minimal-response handling instructions are present
         assert "minimal" in actual_instructions.lower()
         assert "demonstrate" in actual_instructions.lower()
+        # AND off-topic-response handling instructions are present
+        assert "off-topic" in actual_instructions.lower()
+        assert "fabricate" in actual_instructions.lower()
         # AND comprehension check techniques are mentioned
         assert "explain" in actual_instructions.lower()
         assert "application" in actual_instructions.lower()
@@ -258,3 +266,156 @@ class TestCareerReadinessAgent:
         assert len(actual_options) == 2
         assert actual_options[0]["label"] == "Yes"
         assert actual_options[1]["label"] == "No"
+
+
+class TestSafeEnumMemberName:
+    """Tests for the _safe_enum_member_name helper."""
+
+    def test_converts_spaces_and_punctuation_to_underscores(self):
+        # GIVEN a topic with spaces and punctuation
+        given_topic = "What is a CV?"
+
+        # WHEN the enum member name is built
+        actual_name = _safe_enum_member_name(given_topic, 0)
+
+        # THEN the name is a valid Python identifier
+        expected_name = "WHAT_IS_A_CV_0"
+        assert actual_name == expected_name
+
+    def test_prefixes_digit_starting_topics(self):
+        # GIVEN a topic that starts with a digit
+        given_topic = "3 Pillars of Confidence"
+
+        # WHEN the enum member name is built
+        actual_name = _safe_enum_member_name(given_topic, 0)
+
+        # THEN the name starts with T_ to be a valid identifier
+        assert actual_name.startswith("T_")
+        assert actual_name.isidentifier()
+
+    def test_index_makes_collisions_unique(self):
+        # GIVEN two topics that would collapse to the same identifier
+        given_topic_a = "What is a CV"
+        given_topic_b = "What is a CV?"
+
+        # WHEN member names are built with different indices
+        actual_name_a = _safe_enum_member_name(given_topic_a, 0)
+        actual_name_b = _safe_enum_member_name(given_topic_b, 1)
+
+        # THEN the names are distinct
+        assert actual_name_a != actual_name_b
+
+
+class TestBuildModuleResponseModel:
+    """Tests for the _build_module_response_model helper."""
+
+    def test_returns_base_class_when_topics_empty(self):
+        # GIVEN an empty topic list
+        given_topics: list[str] = []
+
+        # WHEN the response model is built
+        actual_model = _build_module_response_model(given_topics)
+
+        # THEN the base class is returned unchanged
+        assert actual_model is CareerReadinessModelResponse
+
+    def test_accepts_valid_topic_values(self):
+        # GIVEN a topic list
+        given_topics = ["What is a CV?", "CV Structure"]
+
+        # WHEN the dynamic model is built
+        actual_model = _build_module_response_model(given_topics)
+
+        # THEN an instance can be constructed with a valid topic string
+        actual_instance = actual_model(
+            reasoning="ok",
+            finished=False,
+            message="hi",
+            topics_covered=["What is a CV?"],
+        )
+
+        # AND the value round-trips to the original string
+        actual_values = [
+            t.value if isinstance(t, Enum) else t
+            for t in actual_instance.topics_covered
+        ]
+        assert actual_values == ["What is a CV?"]
+
+    def test_rejects_invalid_topic_values(self):
+        # GIVEN a dynamic model built for specific topics
+        given_topics = ["Topic A", "Topic B"]
+        actual_model = _build_module_response_model(given_topics)
+
+        # WHEN an instance is constructed with a topic outside the enum
+        # THEN Pydantic raises a ValidationError
+        with pytest.raises(ValidationError):
+            actual_model(
+                reasoning="r",
+                finished=False,
+                message="m",
+                topics_covered=["Topic C"],
+            )
+
+    def test_handles_punctuation_variants_as_distinct_values(self):
+        # GIVEN topics that collide on identifier but differ on value
+        given_topics = ["What is a CV?", "What is a CV"]
+        actual_model = _build_module_response_model(given_topics)
+
+        # WHEN an instance is constructed with both values
+        actual_instance = actual_model(
+            reasoning="r",
+            finished=False,
+            message="m",
+            topics_covered=["What is a CV?", "What is a CV"],
+        )
+
+        # THEN both values are accepted
+        actual_values = [
+            t.value if isinstance(t, Enum) else t
+            for t in actual_instance.topics_covered
+        ]
+        assert actual_values == ["What is a CV?", "What is a CV"]
+
+    def test_handles_topic_starting_with_digit(self):
+        # GIVEN a topic that starts with a digit
+        given_topics = ["3 Pillars of Confidence"]
+
+        # WHEN the dynamic model is built and used
+        actual_model = _build_module_response_model(given_topics)
+        actual_instance = actual_model(
+            reasoning="r",
+            finished=False,
+            message="m",
+            topics_covered=["3 Pillars of Confidence"],
+        )
+
+        # THEN the topic is accepted without raising
+        assert len(actual_instance.topics_covered) == 1
+
+    def test_json_schema_contains_enum_constraint(self):
+        # GIVEN a dynamic model built for specific topics
+        given_topics = ["Alpha", "Beta"]
+        actual_model = _build_module_response_model(given_topics)
+
+        # WHEN the JSON schema is generated
+        actual_schema_str = str(actual_model.model_json_schema())
+
+        # THEN the schema references the topic values as enum members
+        assert "enum" in actual_schema_str
+        assert "Alpha" in actual_schema_str
+        assert "Beta" in actual_schema_str
+
+    def test_with_response_schema_preserves_enum_after_vertex_cleaning(self):
+        # GIVEN a dynamic model built for specific topics
+        given_topics = ["Alpha", "Beta"]
+        actual_model = _build_module_response_model(given_topics)
+
+        # WHEN the Vertex-shaped schema is built
+        actual_schema = with_response_schema(actual_model)
+
+        # THEN the cleaned schema still carries an enum on topics_covered items
+        actual_topics_items = (
+            actual_schema["response_schema"]["properties"]["topics_covered"]["items"]
+        )
+        assert set(actual_topics_items.get("enum", [])) == {"Alpha", "Beta"}
+

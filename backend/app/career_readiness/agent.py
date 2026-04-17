@@ -5,11 +5,14 @@ Uses composition to wrap a SimpleLLMAgent — this agent is standalone and is
 NOT part of the AgentDirector pipeline.
 """
 import logging
+import re
 import time
 from dataclasses import dataclass, field
+from enum import Enum
 from textwrap import dedent
+from typing import Type
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, create_model
 
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMQuickReplyOption, LLMStats, AgentOutputWithReasoning
 from app.agent.llm_caller import LLMCaller
@@ -33,9 +36,10 @@ class CareerReadinessModelResponse(BaseModel):
 
     Order matters for model prediction quality:
     1. reasoning — sets context
-    2. finished — depends on reasoning
-    3. message — depends on reasoning + finished
-    4. topics_covered — depends on the conversation turn
+    2. topics_covered — what was addressed this turn
+    3. finished — whether all topics have been covered
+    4. message — depends on finished
+    5. quick_reply_options — optional follow-up buttons
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -43,14 +47,14 @@ class CareerReadinessModelResponse(BaseModel):
     reasoning: str
     """Chain of Thought reasoning behind the response"""
 
+    topics_covered: list[str] = []
+    """Topics from the module's topic list that were addressed in this turn"""
+
     finished: bool
     """Whether the agent judges all topics have been sufficiently covered"""
 
     message: str
     """Message for the user"""
-
-    topics_covered: list[str] = []
-    """Topics from the module's topic list that were addressed in this turn"""
 
     quick_reply_options: list[LLMQuickReplyOption] | None = None
     """Optional quick-reply button labels"""
@@ -67,6 +71,44 @@ class CareerReadinessAgentOutput:
     """Topics reported as covered in this turn"""
 
 
+def _safe_enum_member_name(topic: str, index: int) -> str:
+    """Build a valid Python identifier for an Enum member from an arbitrary topic string."""
+    cleaned = re.sub(r"[^0-9A-Za-z]+", "_", topic).strip("_").upper()
+    if not cleaned or cleaned[0].isdigit():
+        cleaned = f"T_{cleaned}" if cleaned else "T"
+    return f"{cleaned}_{index}"
+
+
+_module_response_model_cache: dict[tuple[str, ...], Type[CareerReadinessModelResponse]] = {}
+
+
+def _build_module_response_model(
+    topics: list[str],
+) -> Type[CareerReadinessModelResponse]:
+    """Build a per-module response model whose topics_covered is enum-constrained to the module's topics (cached by topics tuple)."""
+    if not topics:
+        return CareerReadinessModelResponse
+
+    cache_key = tuple(topics)
+    cached_model = _module_response_model_cache.get(cache_key)
+    if cached_model is not None:
+        return cached_model
+
+    enum_members = {
+        _safe_enum_member_name(topic, i): topic
+        for i, topic in enumerate(topics)
+    }
+    topics_enum = Enum("TopicsEnum", enum_members, type=str)
+
+    dynamic_model = create_model(
+        "CareerReadinessModelResponseWithTopicEnum",
+        __base__=CareerReadinessModelResponse,
+        topics_covered=(list[topics_enum], Field(default_factory=list)),
+    )
+    _module_response_model_cache[cache_key] = dynamic_model
+    return dynamic_model
+
+
 def _build_instruction_mode_instructions(module_title: str, module_content: str, topics: list[str]) -> str:
     """Build system instructions for instruction mode (scaffolded Socratic tutoring)."""
     topics_list = "\n".join(f"- {topic}" for topic in topics)
@@ -77,15 +119,15 @@ def _build_instruction_mode_instructions(module_title: str, module_content: str,
         You must respond with valid JSON matching this exact schema:
         {
             "reasoning": "Your internal chain-of-thought reasoning (not shown to the user)",
+            "topics_covered": ["Topic Name 1"],
             "finished": true/false,
-            "message": "Your message to the student",
-            "topics_covered": ["Topic Name 1", "Topic Name 2"]
+            "message": "Your message to the student"
         }
 
         - "reasoning": Explain your pedagogical reasoning — what the student knows, what to cover next, which scaffolding level to use.
-        - "finished": Set to true ONLY when you judge that ALL topics have been sufficiently covered and the student has demonstrated understanding. Do not set finished to true prematurely.
+        - "topics_covered": List ONLY topic names from the module topic list where the STUDENT provided content that directly addresses that specific topic THIS turn. The student's content must match the topic — an off-topic answer (substantive content, but about a different topic than the one asked) does NOT count as covering the topic you asked about. If you only briefly mentioned a topic yourself without substantive student engagement, do not include it. Never fabricate coverage — if the topic was not actually discussed by the student, do not list it.
+        - "finished": Set to true ONLY when the `Topics still remaining to cover` state block (injected at the end of these instructions) is empty AND the student has demonstrated understanding. That state block is authoritative — do not derive coverage from your own prior messages. When topics still remain, `finished` MUST be false.
         - "message": Your response to the student. Do not format with markdown. Keep under 200 words.
-        - "topics_covered": List ONLY topic names from the module topic list that you meaningfully addressed in THIS turn. Use exact topic names from the list above. If you only briefly mentioned a topic, do not include it.
         - "quick_reply_options": An optional array of quick-reply button options. Each option is an object with a "label" field (the button text). Only include when your message asks a question with limited clear answers.""")
 
     template = dedent("""\
@@ -118,9 +160,33 @@ def _build_instruction_mode_instructions(module_title: str, module_content: str,
         Only mark a topic in topics_covered when the student has given a substantive response
         that shows genuine understanding — not just agreement.
 
+        # Handling Off-Topic Responses
+        Sometimes the student will give a substantive answer that does not actually address the
+        topic you asked about — they answer about a different topic instead. In that case:
+        - DO NOT mark the topic you asked about as covered in topics_covered — the student has
+          not demonstrated understanding of it.
+        - You MAY mark the topic the student ACTUALLY addressed as covered (if it is on the
+          module topic list) provided their content shows genuine understanding of that topic.
+        - Acknowledge what the student said, then politely redirect to the original question.
+          Example pattern: "Those are good points about [topic the student actually covered] —
+          we can come back to those. First though, let's stay with what I asked:
+          [re-ask the original question]."
+        Never paper over the mismatch by claiming both topics are covered when only one was
+        actually discussed.
+
         # Module Topics
         You must cover ALL of the following topics before setting "finished" to true:
         {topics_list}
+
+        # Before Marking finished=true — Mandatory Pre-Check
+        Before you set `finished` to true, perform this explicit check on EVERY turn:
+        1. Look at the "Topics still remaining to cover" block injected at the end of these instructions.
+        2. If that list is non-empty, you MUST set `finished` to false. Do NOT write a farewell or
+           "well done" message. Instead, pick one topic from that list and ask the student about it.
+        3. Only if that list is literally empty may you consider setting `finished` to true, and
+           only then after the student has demonstrated understanding.
+        Do not skip this check. Do not rely on your own sense of how much you've covered.
+        The injected list is the single source of truth.
 
         # Grounding Content
         Use the following content as your curriculum guide — it defines the topics and structure
@@ -169,13 +235,13 @@ def _build_support_mode_instructions(module_title: str, module_content: str) -> 
         You must respond with valid JSON matching this exact schema:
         {
             "reasoning": "Your internal reasoning (not shown to the user)",
+            "topics_covered": [],
             "finished": false,
-            "message": "Your response to the student",
-            "topics_covered": []
+            "message": "Your response to the student"
         }
 
-        - "finished": Always set to false in support mode.
         - "topics_covered": Always set to an empty list in support mode.
+        - "finished": Always set to false in support mode.
         - "message": Your response to the student. Do not format with markdown. Keep under 200 words.
         - "quick_reply_options": An optional array of quick-reply button options. Each option is an object with a "label" field (the button text). Only include when your message asks a question with limited clear answers.""")
 
@@ -229,39 +295,56 @@ class CareerReadinessAgent:
                  topics: list[str] | None = None):
         self._logger = logging.getLogger(CareerReadinessAgent.__name__)
 
+        resolved_topics = topics or []
+
         if mode == ConversationMode.INSTRUCTION:
             self._base_system_instructions = _build_instruction_mode_instructions(
-                module_title, module_content, topics or [])
+                module_title, module_content, resolved_topics)
         else:
             self._base_system_instructions = _build_support_mode_instructions(
                 module_title, module_content)
 
+        # Build a per-module response model so Vertex AI structured output only
+        # permits topic values from the module's topics list. Falls back to the
+        # base class when topics is empty.
+        self._response_model: Type[CareerReadinessModelResponse] = (
+            _build_module_response_model(resolved_topics)
+        )
+
         self._config = LLMConfig(
             generation_config=LOW_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | with_response_schema(
-                CareerReadinessModelResponse)
+                self._response_model)
         )
         self._llm_caller: LLMCaller[CareerReadinessModelResponse] = LLMCaller[CareerReadinessModelResponse](
-            model_response_type=CareerReadinessModelResponse)
+            model_response_type=self._response_model)
 
     @property
     def _system_instructions(self) -> str:
         """Build system instructions with user profile context if available."""
         return append_user_ctx(self._base_system_instructions)
 
-    def _get_llm(self) -> GeminiGenerativeLLM:
-        """Create LLM with current system instructions (including user profile context)."""
-        return GeminiGenerativeLLM(system_instructions=self._system_instructions, config=self._config)
+    def _get_llm(self, remaining_topics: list[str] | None = None) -> GeminiGenerativeLLM:
+        """Create LLM with current system instructions (including user profile context and per-turn remaining topics)."""
+        instructions = self._system_instructions
+        if remaining_topics is not None:
+            topic_list = ", ".join(remaining_topics) if remaining_topics else "(all topics have been covered)"
+            instructions = f"{instructions}\n\n# Current Conversation State (authoritative — from server)\nTopics still remaining to cover: {topic_list}"
+        return GeminiGenerativeLLM(system_instructions=instructions, config=self._config)
 
     @property
     def system_instructions(self) -> str:
         return self._base_system_instructions
 
-    async def execute(self, user_input: AgentInput, context: ConversationContext) -> CareerReadinessAgentOutput:
+    async def execute(self, user_input: AgentInput, context: ConversationContext,
+                      remaining_topics: list[str] | None = None) -> CareerReadinessAgentOutput:
         """
         Process user input and return the agent's response with topic tracking.
 
         :param user_input: The user's message
         :param context: The conversation context with history
+        :param remaining_topics: Authoritative list of module topics not yet covered (from server).
+            When provided, injected into system instructions for this call so the LLM
+            doesn't have to re-derive global coverage state from conversation history.
         :return: The agent's output with topics_covered
         """
         agent_start_time = time.time()
@@ -275,7 +358,7 @@ class CareerReadinessAgent:
 
         try:
             model_response, llm_stats_list = await self._llm_caller.call_llm(
-                llm=self._get_llm(),
+                llm=self._get_llm(remaining_topics),
                 llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
                     model_response_instructions=get_json_response_instructions(),
                     context=context,
@@ -312,7 +395,10 @@ class CareerReadinessAgent:
 
         return CareerReadinessAgentOutput(
             agent_output=agent_output,
-            topics_covered=model_response.topics_covered,
+            topics_covered=[
+                t.value if isinstance(t, Enum) else t
+                for t in model_response.topics_covered
+            ],
         )
 
     async def generate_intro_message(self, context: ConversationContext) -> CareerReadinessAgentOutput:

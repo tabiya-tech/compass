@@ -5,7 +5,7 @@ description: Understand your professional identity and categorize your skills in
 icon: identity
 sort_order: 1
 input_placeholder: Ask about skills and professional identity...
-topics: What is Professional Identity, Types of Skills, How to Identify Your Skills, Articulating Your Professional Identity
+topics: What is Professional Identity?, Types of Skills, How to Identify Your Skills, Articulating Your Professional Identity
 ---
 
 # Professional Identity & Skills Mapping

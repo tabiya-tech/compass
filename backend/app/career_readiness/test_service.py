@@ -23,6 +23,7 @@ from app.career_readiness.service import (
     _build_conversation_context,
     _derive_module_statuses,
     _evaluate_quiz,
+    _normalize_topic,
 )
 from app.career_readiness.types import (
     CareerReadinessConversationDocument,
@@ -209,7 +210,8 @@ class MockCareerReadinessAgent:
     async def generate_intro_message(self, context):
         return _make_mock_agent_output(message=self._intro_message)
 
-    async def execute(self, user_input, context):
+    async def execute(self, user_input, context, remaining_topics=None):
+        self.last_remaining_topics = remaining_topics
         return _make_mock_agent_output(
             message=self._response_message,
             finished=self._finished,
@@ -361,6 +363,87 @@ class TestEvaluateQuiz:
         assert actual_score == 1
         assert actual_total == 2
         assert actual_results == [True, False]
+
+
+class TestNormalizeTopic:
+    """Tests for the _normalize_topic helper."""
+
+    def test_strips_trailing_question_mark(self):
+        # GIVEN a topic name with a trailing question mark
+        given_topic = "What is a CV?"
+
+        # WHEN the topic is normalized
+        actual_normalized = _normalize_topic(given_topic)
+
+        # THEN the trailing question mark is removed
+        expected_normalized = "what is a cv"
+        assert actual_normalized == expected_normalized
+
+    def test_strips_multiple_trailing_punctuation(self):
+        # GIVEN a topic name with multiple trailing punctuation characters
+        given_topic = "Really?!"
+
+        # WHEN the topic is normalized
+        actual_normalized = _normalize_topic(given_topic)
+
+        # THEN all trailing punctuation is removed
+        expected_normalized = "really"
+        assert actual_normalized == expected_normalized
+
+    def test_preserves_internal_punctuation(self):
+        # GIVEN a topic name with internal punctuation
+        given_topic = "Motivation Statement vs. Cover Letter"
+
+        # WHEN the topic is normalized
+        actual_normalized = _normalize_topic(given_topic)
+
+        # THEN internal punctuation is preserved
+        expected_normalized = "motivation statement vs. cover letter"
+        assert actual_normalized == expected_normalized
+
+    def test_collapses_extra_whitespace_and_strips_ends(self):
+        # GIVEN a topic name with leading, trailing, and internal whitespace
+        given_topic = "  What  is   a   CV  "
+
+        # WHEN the topic is normalized
+        actual_normalized = _normalize_topic(given_topic)
+
+        # THEN whitespace is collapsed and trimmed
+        expected_normalized = "what is a cv"
+        assert actual_normalized == expected_normalized
+
+    def test_lowercases_mixed_case(self):
+        # GIVEN a topic name with mixed casing
+        given_topic = "CV Writing Tips"
+
+        # WHEN the topic is normalized
+        actual_normalized = _normalize_topic(given_topic)
+
+        # THEN the result is lowercased
+        expected_normalized = "cv writing tips"
+        assert actual_normalized == expected_normalized
+
+    def test_frontmatter_and_section_header_variants_normalize_to_same_value(self):
+        # GIVEN two representations of the same topic — one from frontmatter, one from a section header
+        given_frontmatter_topic = "What is a CV"
+        given_header_topic = "What is a CV?"
+
+        # WHEN both are normalized
+        actual_frontmatter_normalized = _normalize_topic(given_frontmatter_topic)
+        actual_header_normalized = _normalize_topic(given_header_topic)
+
+        # THEN they produce the same normalized value
+        assert actual_frontmatter_normalized == actual_header_normalized
+
+    def test_empty_string_returns_empty(self):
+        # GIVEN an empty topic string
+        given_topic = ""
+
+        # WHEN the topic is normalized
+        actual_normalized = _normalize_topic(given_topic)
+
+        # THEN an empty string is returned
+        assert actual_normalized == ""
 
 
 # ---------------------------------------------------------------------------
@@ -584,6 +667,64 @@ class TestSendMessage:
         # AND the last message is a marker indicating quiz is ready
         assert "quiz" in actual_result.messages[-1].message.lower()
         # AND quiz_delivered is set on the conversation
+        actual_conv = await repo.find_by_conversation_id(given_conversation.conversation_id)
+        assert actual_conv is not None
+        assert actual_conv.quiz_delivered is True
+
+    @pytest.mark.asyncio
+    async def test_quiz_triggers_when_topics_differ_by_casing(self):
+        # GIVEN a module with properly-cased topic names
+        given_module = _make_module_config(topics=["Topic A", "Topic B"])
+        # AND the LLM reports the remaining topic with different casing
+        given_agent = MockCareerReadinessAgent(
+            response_message="Great, we've covered everything!",
+            topics_covered=["topic b"],
+            finished=True,
+        )
+        service, repo = _make_service(modules=[given_module], agent=given_agent)
+        # AND an earlier turn accumulated the other topic with different casing
+        given_conversation = _make_conversation(
+            user_id="user_abc", module_id="cv-development",
+            covered_topics=["TOPIC A"],
+        )
+        await repo.create(given_conversation)
+
+        # WHEN a message is sent
+        actual_result = await service.send_message(
+            "user_abc", "cv-development", given_conversation.conversation_id, "I understand now",
+        )
+
+        # THEN quiz_available is True despite the casing mismatch
+        assert actual_result.quiz_available is True
+
+    @pytest.mark.asyncio
+    async def test_instruction_mode_triggers_quiz_on_finished_even_if_server_coverage_incomplete(self):
+        # GIVEN a module where one topic is still uncovered on the server side
+        given_module = _make_module_config(topics=["Topic A", "Topic B"])
+        # AND the agent reports finished=true without marking every topic this turn
+        given_agent = MockCareerReadinessAgent(
+            response_message="Great work!",
+            topics_covered=[],
+            finished=True,
+        )
+        service, repo = _make_service(modules=[given_module], agent=given_agent)
+        # AND only one of two topics has been covered according to server-side tracking
+        given_conversation = _make_conversation(
+            user_id="user_abc", module_id="cv-development",
+            covered_topics=["Topic A"],
+        )
+        await repo.create(given_conversation)
+
+        # WHEN a message is sent
+        actual_result = await service.send_message(
+            "user_abc", "cv-development", given_conversation.conversation_id, "done",
+        )
+
+        # THEN the quiz IS delivered — the LLM's finished=true is authoritative
+        assert actual_result.quiz_available is True
+        # AND a quiz-marker message was appended
+        assert any("quiz" in m.message.lower() for m in actual_result.messages)
+        # AND quiz_delivered is True in the DB
         actual_conv = await repo.find_by_conversation_id(given_conversation.conversation_id)
         assert actual_conv is not None
         assert actual_conv.quiz_delivered is True

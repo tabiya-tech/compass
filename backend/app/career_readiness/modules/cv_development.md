@@ -5,7 +5,7 @@ description: Learn to build and tailor a professional CV that highlights your sk
 icon: cv
 sort_order: 2
 input_placeholder: Ask about CVs...
-topics: What is a CV, CV Structure, CV Writing Tips, Common Mistakes to Avoid
+topics: What is a CV?, CV Structure, CV Writing Tips, Common Mistakes to Avoid
 ---
 
 # CV Development
