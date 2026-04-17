@@ -66,6 +66,51 @@ export function createUserPreferences({
   return { sessionId: sessions[0], res };
 }
 
+export function acceptTermsAndConditions({ baseUrl, userId, idToken, language }) {
+  const res = http.patch(
+    `${baseUrl}/users/preferences`,
+    JSON.stringify({
+      user_id: userId,
+      language,
+      accepted_tc: new Date().toISOString(),
+    }),
+    {
+      headers: authHeaders(idToken),
+      tags: { endpoint: 'accept_tc' },
+    },
+  );
+
+  const ok = check(res, {
+    'PATCH /users/preferences status is 200': (r) => r.status === 200,
+    'PATCH /users/preferences has accepted_tc': (r) => {
+      try {
+        return Boolean(r.json('accepted_tc'));
+      } catch (_) {
+        return false;
+      }
+    },
+  });
+
+  return { ok, res };
+}
+
+export function submitPlainPersonalData({ baseUrl, userId, idToken, personalData }) {
+  const res = http.post(
+    `${baseUrl}/users/${userId}/plain-personal-data`,
+    JSON.stringify({ data: personalData }),
+    {
+      headers: authHeaders(idToken),
+      tags: { endpoint: 'personal_data' },
+    },
+  );
+
+  const ok = check(res, {
+    'POST /users/:id/plain-personal-data status is 200': (r) => r.status === 200,
+  });
+
+  return { ok, res };
+}
+
 export function sendChatMessage({ baseUrl, sessionId, idToken, userInput }) {
   const res = http.post(
     `${baseUrl}/conversations/${sessionId}/messages`,

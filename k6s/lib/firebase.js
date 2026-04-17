@@ -4,8 +4,8 @@
 // `frontend-new/src/auth/services/FirebaseAuthenticationService/invitationCodeAuth/FirebaseInvitationCodeAuthenticationService.ts:63-73`.
 //
 // The returned `idToken` is a short-lived JWT (~1h) that the backend accepts
-// as `Authorization: Bearer <idToken>`. Because each k6 iteration signs in
-// fresh, we never need to refresh it.
+// as `Authorization: Bearer <idToken>`. Auth is cached per-VU (not per-iteration),
+// so we never need to refresh within typical test durations (~1–6 min).
 
 import http from 'k6/http';
 import { check, fail } from 'k6';
