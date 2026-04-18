@@ -14,6 +14,8 @@ from app.career_readiness.types import (
     CareerReadinessMessage,
     CareerReadinessMessageSender,
     ConversationMode,
+    TopicStatus,
+    TopicStatusRecord,
 )
 
 
@@ -225,24 +227,33 @@ class TestDeleteByConversationId:
         assert await repo.find_by_conversation_id(given_conversation.conversation_id) is None
 
 
-class TestUpdateCoveredTopics:
-    """Tests for updating covered topics on a conversation."""
+class TestUpdateTopicStatus:
+    """Tests for updating the per-topic coverage state on a conversation."""
 
     @pytest.mark.asyncio
-    async def test_updates_covered_topics(self, get_repository: Awaitable[CareerReadinessConversationRepository]):
+    async def test_updates_topic_status(self, get_repository: Awaitable[CareerReadinessConversationRepository]):
         # GIVEN a repository with a conversation
         repo = await get_repository
         given_conversation = _make_conversation()
         await repo.create(given_conversation)
 
-        # WHEN covered topics are updated
-        given_topics = ["Topic A", "Topic B"]
-        await repo.update_covered_topics(given_conversation.conversation_id, given_topics)
+        # WHEN topic_status is updated with a full per-topic list
+        given_topic_status = [
+            TopicStatusRecord(topic_id="Topic A", status=TopicStatus.COVERED, evidence="student explained it"),
+            TopicStatusRecord(topic_id="Topic B", status=TopicStatus.PARTIAL, evidence="brief mention"),
+            TopicStatusRecord(topic_id="Topic C", status=TopicStatus.NOT_COVERED, evidence=""),
+        ]
+        await repo.update_topic_status(given_conversation.conversation_id, given_topic_status)
 
-        # THEN the conversation has the updated topics
+        # THEN the conversation round-trips the topic_status through MongoDB
         actual_result = await repo.find_by_conversation_id(given_conversation.conversation_id)
         assert actual_result is not None
-        assert actual_result.covered_topics == given_topics
+        assert len(actual_result.topic_status) == 3
+        by_id = {r.topic_id: r for r in actual_result.topic_status}
+        assert by_id["Topic A"].status == TopicStatus.COVERED
+        assert by_id["Topic A"].evidence == "student explained it"
+        assert by_id["Topic B"].status == TopicStatus.PARTIAL
+        assert by_id["Topic C"].status == TopicStatus.NOT_COVERED
 
 
 class TestUpdateQuizDelivered:

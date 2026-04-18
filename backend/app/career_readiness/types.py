@@ -21,6 +21,41 @@ class CareerReadinessMessageSender(str, Enum):
     AGENT = "AGENT"
 
 
+class TopicStatus(str, Enum):
+    """Coverage status of a single module topic within a career readiness conversation."""
+
+    COVERED = "covered"
+    PARTIAL = "partial"
+    NOT_COVERED = "not_covered"
+
+
+class TopicStatusRecord(BaseModel):
+    """Records the current coverage status of one module topic."""
+
+    topic_id: str
+    """The canonical topic name, matching a value from the module's topic list"""
+
+    status: TopicStatus
+    """Whether the topic has been covered, partially addressed, or not yet discussed"""
+
+    evidence: str
+    """Quote or paraphrase of the student's relevant statement; required non-empty for covered/partial, must be empty string for not_covered"""
+
+    @model_validator(mode="after")
+    def _evidence_matches_status(self) -> "TopicStatusRecord":
+        if self.status in (TopicStatus.COVERED, TopicStatus.PARTIAL):
+            if not self.evidence.strip():
+                raise ValueError(
+                    f"evidence must be non-empty when status is {self.status.value}"
+                )
+        elif self.evidence != "":
+            raise ValueError("evidence must be empty string when status is not_covered")
+        return self
+
+    class Config:
+        extra = "forbid"
+
+
 class ModuleSummary(BaseModel):
     """
     Summary of a career readiness module, used in listing endpoints.
@@ -278,7 +313,12 @@ class CareerReadinessConversationDocument(BaseModel):
     """The current conversation mode (INSTRUCTION during teaching, SUPPORT after quiz pass)"""
 
     covered_topics: list[str] = Field(default_factory=list)
-    """Topics the agent has covered so far in the conversation"""
+    """Legacy: flat list of topic names the agent marked as covered. Read-only after the
+    per-topic-status refactor — new writes go to `topic_status`. Retained so in-flight
+    pre-migration documents still deserialize cleanly."""
+
+    topic_status: list[TopicStatusRecord] = Field(default_factory=list)
+    """Per-topic coverage state; one entry per canonical module topic"""
 
     quiz_delivered: bool = False
     """Whether the quiz has been presented to the user"""
@@ -317,6 +357,7 @@ class CareerReadinessConversationDocument(BaseModel):
             messages=[CareerReadinessMessage(**msg) for msg in _dict.get("messages", [])],
             conversation_mode=ConversationMode(_dict.get("conversation_mode", ConversationMode.INSTRUCTION)),
             covered_topics=_dict.get("covered_topics", []),
+            topic_status=[TopicStatusRecord(**r) for r in _dict.get("topic_status", [])],
             quiz_delivered=_dict.get("quiz_delivered", False),
             quiz_passed=_dict.get("quiz_passed", False),
             created_at=_dict["created_at"],

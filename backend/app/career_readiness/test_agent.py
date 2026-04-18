@@ -17,7 +17,11 @@ from app.career_readiness.agent import (
     _build_support_mode_instructions,
     _safe_enum_member_name,
 )
-from app.career_readiness.types import ConversationMode
+from app.career_readiness.types import (
+    ConversationMode,
+    TopicStatus,
+    TopicStatusRecord,
+)
 from app.conversation_memory.conversation_memory_types import (
     ConversationContext,
     ConversationHistory,
@@ -49,8 +53,18 @@ class TestBuildInstructionModeInstructions:
         assert "HINT" in actual_instructions
         assert "EXPLAIN" in actual_instructions
         assert "FADE" in actual_instructions
-        # AND topics_covered is referenced in the response schema
-        assert "topics_covered" in actual_instructions
+        # AND the new per-topic status contract is explained in the prompt
+        assert "topic_status" in actual_instructions
+        assert "topic_id" in actual_instructions
+        assert "evidence" in actual_instructions.lower()
+        assert "covered" in actual_instructions
+        assert "partial" in actual_instructions
+        assert "not_covered" in actual_instructions
+        # AND it explains the monotonic update rule
+        assert "upgrade" in actual_instructions.lower() or "UPGRADE" in actual_instructions
+        assert "downgrade" in actual_instructions.lower()
+        # AND it defers completion to the server rather than the LLM
+        assert "server" in actual_instructions.lower()
         # AND quiz concealment instructions are present
         assert "quiz" in actual_instructions.lower()
         assert "do not" in actual_instructions.lower()
@@ -59,10 +73,14 @@ class TestBuildInstructionModeInstructions:
         assert "demonstrate" in actual_instructions.lower()
         # AND off-topic-response handling instructions are present
         assert "off-topic" in actual_instructions.lower()
-        assert "fabricate" in actual_instructions.lower()
         # AND comprehension check techniques are mentioned
         assert "explain" in actual_instructions.lower()
         assert "application" in actual_instructions.lower()
+        # AND obsolete signals are no longer present
+        assert "topics_covered" not in actual_instructions
+        assert "topics_remaining" not in actual_instructions
+        assert "Mandatory Pre-Check" not in actual_instructions
+        assert '"finished"' not in actual_instructions
 
 
 class TestBuildSupportModeInstructions:
@@ -79,11 +97,14 @@ class TestBuildSupportModeInstructions:
         # THEN the module title and content are included
         assert given_title in actual_instructions
         assert given_content in actual_instructions
-        # AND it instructs finished to always be false
-        assert "false" in actual_instructions.lower()
-        assert "finished" in actual_instructions.lower()
+        # AND it instructs topic_status to always be empty
+        assert "topic_status" in actual_instructions
+        assert "empty list" in actual_instructions.lower()
         # AND there is an instruction not to re-initiate the lesson plan
         assert "lesson plan" in actual_instructions.lower()
+        # AND the legacy signals are no longer in the support prompt
+        assert "topics_covered" not in actual_instructions
+        assert '"finished"' not in actual_instructions
 
 
 @patch("app.career_readiness.agent.GeminiGenerativeLLM")
@@ -126,11 +147,14 @@ class TestCareerReadinessAgent:
         given_agent = CareerReadinessAgent(
             module_title="Test Module", module_content="Test content.",
             topics=["Topic A", "Topic B"])
+        given_topic_status = [
+            TopicStatusRecord(topic_id="Topic A", status=TopicStatus.COVERED, evidence="student explained it"),
+            TopicStatusRecord(topic_id="Topic B", status=TopicStatus.NOT_COVERED, evidence=""),
+        ]
         given_model_response = CareerReadinessModelResponse(
             reasoning="The user asked about Topic A.",
-            finished=False,
             message="Let's start with Topic A. What do you already know?",
-            topics_covered=["Topic A"],
+            topic_status=given_topic_status,
         )
         given_llm_stats = [LLMStats(
             prompt_token_count=100,
@@ -153,10 +177,12 @@ class TestCareerReadinessAgent:
         assert isinstance(actual_output, CareerReadinessAgentOutput)
         # AND the agent output contains the expected message
         assert actual_output.agent_output.message_for_user == "Let's start with Topic A. What do you already know?"
-        # AND the finished flag matches the model response
+        # AND the agent output finished flag is always False (server decides completion now)
         assert actual_output.agent_output.finished is False
-        # AND the topics_covered are propagated
-        assert actual_output.topics_covered == ["Topic A"]
+        # AND the proposed_topic_status is propagated
+        assert len(actual_output.proposed_topic_status) == 2
+        assert actual_output.proposed_topic_status[0].topic_id == "Topic A"
+        assert actual_output.proposed_topic_status[0].status == TopicStatus.COVERED
         # AND the agent type is correct
         assert actual_output.agent_output.agent_type == AgentType.CAREER_READINESS_AGENT
 
@@ -167,9 +193,8 @@ class TestCareerReadinessAgent:
             module_title="Test Module", module_content="Test content.", topics=["Topic A"])
         given_model_response = CareerReadinessModelResponse(
             reasoning="The user sent empty input, I will greet them.",
-            finished=False,
             message="Hello! How can I help you today?",
-            topics_covered=[],
+            topic_status=[],
         )
         given_agent._llm_caller.call_llm = AsyncMock(return_value=(given_model_response, []))
 
@@ -206,10 +231,10 @@ class TestCareerReadinessAgent:
 
         # THEN a fallback error message is returned
         assert "difficulties" in actual_output.agent_output.message_for_user
-        # AND the agent does not claim to be finished
+        # AND the agent output does not claim finished
         assert actual_output.agent_output.finished is False
-        # AND topics_covered is empty
-        assert actual_output.topics_covered == []
+        # AND proposed_topic_status is empty (service merge treats as no-op)
+        assert actual_output.proposed_topic_status == []
 
     @pytest.mark.asyncio
     async def test_generate_intro_message_sends_artificial_input(self, mock_llm_cls):
@@ -218,9 +243,8 @@ class TestCareerReadinessAgent:
             module_title="Test Module", module_content="Test content.", topics=["Topic A"])
         given_model_response = CareerReadinessModelResponse(
             reasoning="Starting a new conversation, introducing the module.",
-            finished=False,
             message="Welcome to the CV Development module!",
-            topics_covered=[],
+            topic_status=[],
         )
         given_agent._llm_caller.call_llm = AsyncMock(return_value=(given_model_response, []))
 
@@ -247,9 +271,8 @@ class TestCareerReadinessAgent:
         given_quick_reply_options = [{"label": "Yes"}, {"label": "No"}]
         given_model_response = CareerReadinessModelResponse(
             reasoning="Asking a yes/no question.",
-            finished=False,
             message="Would you like to learn more about Topic A?",
-            topics_covered=[],
+            topic_status=[],
             quick_reply_options=given_quick_reply_options,
         )
         given_agent._llm_caller.call_llm = AsyncMock(return_value=(given_model_response, []))
@@ -266,6 +289,7 @@ class TestCareerReadinessAgent:
         assert len(actual_options) == 2
         assert actual_options[0]["label"] == "Yes"
         assert actual_options[1]["label"] == "No"
+
 
 
 class TestSafeEnumMemberName:
@@ -306,6 +330,63 @@ class TestSafeEnumMemberName:
         assert actual_name_a != actual_name_b
 
 
+def _full_status(topic_ids: list[str], status: TopicStatus = TopicStatus.NOT_COVERED) -> list[dict]:
+    """Helper: build a topic_status list with the given status for each topic id."""
+    evidence = "" if status == TopicStatus.NOT_COVERED else "student said something relevant"
+    return [{"topic_id": tid, "status": status.value, "evidence": evidence} for tid in topic_ids]
+
+
+class TestTopicStatusRecord:
+    """Tests for the evidence/status validator on TopicStatusRecord."""
+
+    def test_accepts_covered_with_evidence(self):
+        # GIVEN a covered record with non-empty evidence
+        # WHEN it is constructed
+        actual = TopicStatusRecord(topic_id="T", status=TopicStatus.COVERED, evidence="student explained X")
+
+        # THEN no error and the fields round-trip
+        assert actual.status == TopicStatus.COVERED
+        assert actual.evidence == "student explained X"
+
+    def test_accepts_partial_with_evidence(self):
+        # GIVEN a partial record with non-empty evidence
+        # WHEN constructed
+        actual = TopicStatusRecord(topic_id="T", status=TopicStatus.PARTIAL, evidence="brief mention")
+
+        # THEN no error
+        assert actual.status == TopicStatus.PARTIAL
+
+    def test_accepts_not_covered_with_empty_evidence(self):
+        # GIVEN a not_covered record with empty evidence
+        # WHEN constructed
+        actual = TopicStatusRecord(topic_id="T", status=TopicStatus.NOT_COVERED, evidence="")
+
+        # THEN no error
+        assert actual.status == TopicStatus.NOT_COVERED
+        assert actual.evidence == ""
+
+    def test_rejects_covered_with_empty_evidence(self):
+        # GIVEN a covered record with empty evidence
+        # WHEN constructed
+        # THEN Pydantic raises ValidationError
+        with pytest.raises(ValidationError):
+            TopicStatusRecord(topic_id="T", status=TopicStatus.COVERED, evidence="")
+
+    def test_rejects_partial_with_empty_evidence(self):
+        # GIVEN a partial record with empty evidence
+        # WHEN constructed
+        # THEN Pydantic raises ValidationError
+        with pytest.raises(ValidationError):
+            TopicStatusRecord(topic_id="T", status=TopicStatus.PARTIAL, evidence="   ")
+
+    def test_rejects_not_covered_with_nonempty_evidence(self):
+        # GIVEN a not_covered record with evidence
+        # WHEN constructed
+        # THEN Pydantic raises ValidationError
+        with pytest.raises(ValidationError):
+            TopicStatusRecord(topic_id="T", status=TopicStatus.NOT_COVERED, evidence="something")
+
+
 class TestBuildModuleResponseModel:
     """Tests for the _build_module_response_model helper."""
 
@@ -319,41 +400,76 @@ class TestBuildModuleResponseModel:
         # THEN the base class is returned unchanged
         assert actual_model is CareerReadinessModelResponse
 
-    def test_accepts_valid_topic_values(self):
+    def test_accepts_valid_full_topic_status(self):
         # GIVEN a topic list
         given_topics = ["What is a CV?", "CV Structure"]
 
         # WHEN the dynamic model is built
         actual_model = _build_module_response_model(given_topics)
 
-        # THEN an instance can be constructed with a valid topic string
+        # THEN a response with one record per topic can be constructed
         actual_instance = actual_model(
             reasoning="ok",
-            finished=False,
             message="hi",
-            topics_covered=["What is a CV?"],
+            topic_status=_full_status(given_topics, TopicStatus.NOT_COVERED),
         )
 
-        # AND the value round-trips to the original string
+        # AND topic_id values round-trip to the original strings
         actual_values = [
-            t.value if isinstance(t, Enum) else t
-            for t in actual_instance.topics_covered
+            r.topic_id.value if isinstance(r.topic_id, Enum) else r.topic_id
+            for r in actual_instance.topic_status
         ]
-        assert actual_values == ["What is a CV?"]
+        assert actual_values == given_topics
 
-    def test_rejects_invalid_topic_values(self):
+    def test_rejects_unknown_topic_id(self):
         # GIVEN a dynamic model built for specific topics
         given_topics = ["Topic A", "Topic B"]
         actual_model = _build_module_response_model(given_topics)
 
-        # WHEN an instance is constructed with a topic outside the enum
+        # WHEN a topic_status entry names a topic outside the enum
         # THEN Pydantic raises a ValidationError
         with pytest.raises(ValidationError):
             actual_model(
                 reasoning="r",
-                finished=False,
                 message="m",
-                topics_covered=["Topic C"],
+                topic_status=[
+                    {"topic_id": "Topic A", "status": "not_covered", "evidence": ""},
+                    {"topic_id": "Topic B", "status": "not_covered", "evidence": ""},
+                    {"topic_id": "Topic C", "status": "not_covered", "evidence": ""},
+                ],
+            )
+
+    def test_rejects_missing_topic(self):
+        # GIVEN a dynamic model built for two topics
+        given_topics = ["Topic A", "Topic B"]
+        actual_model = _build_module_response_model(given_topics)
+
+        # WHEN topic_status is missing a canonical topic
+        # THEN the one-entry-per-topic validator raises
+        with pytest.raises(ValidationError):
+            actual_model(
+                reasoning="r",
+                message="m",
+                topic_status=[
+                    {"topic_id": "Topic A", "status": "not_covered", "evidence": ""},
+                ],
+            )
+
+    def test_rejects_duplicate_topic_id(self):
+        # GIVEN a dynamic model built for two topics
+        given_topics = ["Topic A", "Topic B"]
+        actual_model = _build_module_response_model(given_topics)
+
+        # WHEN topic_status repeats a topic id instead of covering both
+        # THEN the one-entry-per-topic validator raises
+        with pytest.raises(ValidationError):
+            actual_model(
+                reasoning="r",
+                message="m",
+                topic_status=[
+                    {"topic_id": "Topic A", "status": "not_covered", "evidence": ""},
+                    {"topic_id": "Topic A", "status": "partial", "evidence": "x"},
+                ],
             )
 
     def test_handles_punctuation_variants_as_distinct_values(self):
@@ -361,20 +477,19 @@ class TestBuildModuleResponseModel:
         given_topics = ["What is a CV?", "What is a CV"]
         actual_model = _build_module_response_model(given_topics)
 
-        # WHEN an instance is constructed with both values
+        # WHEN a response is constructed with both values
         actual_instance = actual_model(
             reasoning="r",
-            finished=False,
             message="m",
-            topics_covered=["What is a CV?", "What is a CV"],
+            topic_status=_full_status(given_topics, TopicStatus.NOT_COVERED),
         )
 
-        # THEN both values are accepted
+        # THEN both values are accepted and preserved
         actual_values = [
-            t.value if isinstance(t, Enum) else t
-            for t in actual_instance.topics_covered
+            r.topic_id.value if isinstance(r.topic_id, Enum) else r.topic_id
+            for r in actual_instance.topic_status
         ]
-        assert actual_values == ["What is a CV?", "What is a CV"]
+        assert set(actual_values) == set(given_topics)
 
     def test_handles_topic_starting_with_digit(self):
         # GIVEN a topic that starts with a digit
@@ -384,13 +499,12 @@ class TestBuildModuleResponseModel:
         actual_model = _build_module_response_model(given_topics)
         actual_instance = actual_model(
             reasoning="r",
-            finished=False,
             message="m",
-            topics_covered=["3 Pillars of Confidence"],
+            topic_status=_full_status(given_topics, TopicStatus.NOT_COVERED),
         )
 
         # THEN the topic is accepted without raising
-        assert len(actual_instance.topics_covered) == 1
+        assert len(actual_instance.topic_status) == 1
 
     def test_json_schema_contains_enum_constraint(self):
         # GIVEN a dynamic model built for specific topics
@@ -413,9 +527,10 @@ class TestBuildModuleResponseModel:
         # WHEN the Vertex-shaped schema is built
         actual_schema = with_response_schema(actual_model)
 
-        # THEN the cleaned schema still carries an enum on topics_covered items
-        actual_topics_items = (
-            actual_schema["response_schema"]["properties"]["topics_covered"]["items"]
+        # THEN the cleaned schema still carries an enum constraint on topic_status[].topic_id
+        actual_topic_status_items = (
+            actual_schema["response_schema"]["properties"]["topic_status"]["items"]
         )
-        assert set(actual_topics_items.get("enum", [])) == {"Alpha", "Beta"}
+        actual_topic_id_schema = actual_topic_status_items["properties"]["topic_id"]
+        assert set(actual_topic_id_schema.get("enum", [])) == {"Alpha", "Beta"}
 

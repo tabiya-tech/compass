@@ -23,7 +23,9 @@ from app.career_readiness.service import (
     _build_conversation_context,
     _derive_module_statuses,
     _evaluate_quiz,
+    _merge_topic_status,
     _normalize_topic,
+    _synthesize_topic_status,
 )
 from app.career_readiness.types import (
     CareerReadinessConversationDocument,
@@ -31,6 +33,8 @@ from app.career_readiness.types import (
     CareerReadinessMessageSender,
     ConversationMode,
     ModuleStatus,
+    TopicStatus,
+    TopicStatusRecord,
 )
 
 
@@ -91,6 +95,7 @@ def _make_conversation(
     messages: list[CareerReadinessMessage] | None = None,
     conversation_mode: ConversationMode = ConversationMode.INSTRUCTION,
     covered_topics: list[str] | None = None,
+    topic_status: list[TopicStatusRecord] | None = None,
     quiz_delivered: bool = False,
     quiz_passed: bool = False,
 ) -> CareerReadinessConversationDocument:
@@ -102,11 +107,37 @@ def _make_conversation(
         messages=messages or [_make_message()],
         conversation_mode=conversation_mode,
         covered_topics=covered_topics or [],
+        topic_status=topic_status or [],
         quiz_delivered=quiz_delivered,
         quiz_passed=quiz_passed,
         created_at=now,
         updated_at=now,
     )
+
+
+def _full_topic_status(
+    topics: list[str],
+    covered: list[str] | None = None,
+    partial: list[str] | None = None,
+) -> list[TopicStatusRecord]:
+    """Build a topic_status list with the given covered/partial assignments; the rest NOT_COVERED."""
+    covered_set = set(covered or [])
+    partial_set = set(partial or [])
+    result: list[TopicStatusRecord] = []
+    for topic in topics:
+        if topic in covered_set:
+            result.append(TopicStatusRecord(
+                topic_id=topic, status=TopicStatus.COVERED, evidence="student explained it",
+            ))
+        elif topic in partial_set:
+            result.append(TopicStatusRecord(
+                topic_id=topic, status=TopicStatus.PARTIAL, evidence="brief mention",
+            ))
+        else:
+            result.append(TopicStatusRecord(
+                topic_id=topic, status=TopicStatus.NOT_COVERED, evidence="",
+            ))
+    return result
 
 
 class MockRepository(ICareerReadinessConversationRepository):
@@ -136,10 +167,10 @@ class MockRepository(ICareerReadinessConversationRepository):
             conv.messages.append(message)
             conv.updated_at = datetime.now(timezone.utc)
 
-    async def update_covered_topics(self, conversation_id: str, topics: list[str]) -> None:
+    async def update_topic_status(self, conversation_id: str, topic_status: list[TopicStatusRecord]) -> None:
         conv = self._conversations.get(conversation_id)
         if conv:
-            conv.covered_topics = topics
+            conv.topic_status = list(topic_status)
             conv.updated_at = datetime.now(timezone.utc)
 
     async def update_quiz_delivered(self, conversation_id: str, delivered: bool) -> None:
@@ -179,13 +210,12 @@ class MockModuleRegistry(ModuleRegistry):
 
 def _make_mock_agent_output(
     message: str = "Agent response",
-    finished: bool = False,
-    topics_covered: list[str] | None = None,
+    proposed_topic_status: list[TopicStatusRecord] | None = None,
 ) -> CareerReadinessAgentOutput:
     agent_output = AgentOutput(
         message_id=str(ObjectId()),
         message_for_user=message,
-        finished=finished,
+        finished=False,
         agent_type=AgentType.CAREER_READINESS_AGENT,
         agent_response_time_in_sec=0.5,
         llm_stats=[],
@@ -193,7 +223,7 @@ def _make_mock_agent_output(
     )
     return CareerReadinessAgentOutput(
         agent_output=agent_output,
-        topics_covered=topics_covered or [],
+        proposed_topic_status=proposed_topic_status or [],
     )
 
 
@@ -201,21 +231,20 @@ class MockCareerReadinessAgent:
     """Mock agent that returns canned responses without calling an LLM."""
 
     def __init__(self, intro_message: str = "Welcome!", response_message: str = "Agent response",
-                 topics_covered: list[str] | None = None, finished: bool = False):
+                 proposed_topic_status: list[TopicStatusRecord] | None = None):
         self._intro_message = intro_message
         self._response_message = response_message
-        self._topics_covered = topics_covered or []
-        self._finished = finished
+        self._proposed_topic_status = proposed_topic_status or []
+        self.last_current_topic_status: list[TopicStatusRecord] | None = None
 
     async def generate_intro_message(self, context):
         return _make_mock_agent_output(message=self._intro_message)
 
-    async def execute(self, user_input, context, remaining_topics=None):
-        self.last_remaining_topics = remaining_topics
+    async def execute(self, user_input, context, current_topic_status=None):
+        self.last_current_topic_status = current_topic_status
         return _make_mock_agent_output(
             message=self._response_message,
-            finished=self._finished,
-            topics_covered=self._topics_covered,
+            proposed_topic_status=self._proposed_topic_status,
         )
 
 
@@ -446,6 +475,143 @@ class TestNormalizeTopic:
         assert actual_normalized == ""
 
 
+class TestMergeTopicStatus:
+    """Tests for the _merge_topic_status monotonic-merge helper."""
+
+    def _logger(self):
+        import logging
+        return logging.getLogger(__name__)
+
+    def test_upgrade_from_not_covered_to_partial(self):
+        # GIVEN current status is NOT_COVERED
+        given_current = [TopicStatusRecord(topic_id="A", status=TopicStatus.NOT_COVERED, evidence="")]
+        # AND proposed is PARTIAL
+        given_proposed = [TopicStatusRecord(topic_id="A", status=TopicStatus.PARTIAL, evidence="student mentioned it")]
+
+        # WHEN merged
+        actual_merged = _merge_topic_status(
+            given_current, given_proposed, logger=self._logger(), conversation_id="c1",
+        )
+
+        # THEN the proposed upgrade is applied and its evidence is kept
+        assert actual_merged[0].status == TopicStatus.PARTIAL
+        assert actual_merged[0].evidence == "student mentioned it"
+
+    def test_upgrade_from_partial_to_covered(self):
+        # GIVEN current is PARTIAL
+        given_current = [TopicStatusRecord(topic_id="A", status=TopicStatus.PARTIAL, evidence="earlier")]
+        # AND proposed is COVERED
+        given_proposed = [TopicStatusRecord(topic_id="A", status=TopicStatus.COVERED, evidence="now explained fully")]
+
+        # WHEN merged
+        actual_merged = _merge_topic_status(
+            given_current, given_proposed, logger=self._logger(), conversation_id="c1",
+        )
+
+        # THEN the upgrade applies and the proposed evidence replaces the prior evidence
+        assert actual_merged[0].status == TopicStatus.COVERED
+        assert actual_merged[0].evidence == "now explained fully"
+
+    def test_downgrade_rejected_and_state_retained(self):
+        # GIVEN current is COVERED
+        given_current = [TopicStatusRecord(topic_id="A", status=TopicStatus.COVERED, evidence="prior evidence")]
+        # AND proposed is NOT_COVERED (an attempted downgrade)
+        given_proposed = [TopicStatusRecord(topic_id="A", status=TopicStatus.NOT_COVERED, evidence="")]
+
+        # WHEN merged
+        actual_merged = _merge_topic_status(
+            given_current, given_proposed, logger=self._logger(), conversation_id="c1",
+        )
+
+        # THEN current is retained
+        assert actual_merged[0].status == TopicStatus.COVERED
+        assert actual_merged[0].evidence == "prior evidence"
+
+    def test_missing_proposed_retains_current(self):
+        # GIVEN current has two topics
+        given_current = [
+            TopicStatusRecord(topic_id="A", status=TopicStatus.COVERED, evidence="ok"),
+            TopicStatusRecord(topic_id="B", status=TopicStatus.PARTIAL, evidence="brief"),
+        ]
+        # AND proposed only mentions topic A
+        given_proposed = [TopicStatusRecord(topic_id="A", status=TopicStatus.COVERED, evidence="still ok")]
+
+        # WHEN merged
+        actual_merged = _merge_topic_status(
+            given_current, given_proposed, logger=self._logger(), conversation_id="c1",
+        )
+
+        # THEN both topics are in the result
+        assert len(actual_merged) == 2
+        by_id = {r.topic_id: r for r in actual_merged}
+        # AND topic B retains its partial status
+        assert by_id["B"].status == TopicStatus.PARTIAL
+
+    def test_preserves_order_of_current(self):
+        # GIVEN a specific order in current
+        given_current = [
+            TopicStatusRecord(topic_id="A", status=TopicStatus.NOT_COVERED, evidence=""),
+            TopicStatusRecord(topic_id="B", status=TopicStatus.NOT_COVERED, evidence=""),
+            TopicStatusRecord(topic_id="C", status=TopicStatus.NOT_COVERED, evidence=""),
+        ]
+        # AND proposed in a different order
+        given_proposed = [
+            TopicStatusRecord(topic_id="C", status=TopicStatus.COVERED, evidence="c"),
+            TopicStatusRecord(topic_id="B", status=TopicStatus.COVERED, evidence="b"),
+            TopicStatusRecord(topic_id="A", status=TopicStatus.COVERED, evidence="a"),
+        ]
+
+        # WHEN merged
+        actual_merged = _merge_topic_status(
+            given_current, given_proposed, logger=self._logger(), conversation_id="c1",
+        )
+
+        # THEN the output follows current's order
+        assert [r.topic_id for r in actual_merged] == ["A", "B", "C"]
+
+
+class TestSynthesizeTopicStatus:
+    """Tests for _synthesize_topic_status (legacy-migration bootstrap)."""
+
+    def test_empty_legacy_produces_all_not_covered(self):
+        # GIVEN module topics and no legacy coverage
+        given_topics = ["Topic A", "Topic B"]
+
+        # WHEN synthesized
+        actual = _synthesize_topic_status(given_topics, [])
+
+        # THEN every record is NOT_COVERED with empty evidence
+        assert len(actual) == 2
+        for r in actual:
+            assert r.status == TopicStatus.NOT_COVERED
+            assert r.evidence == ""
+
+    def test_legacy_entries_become_covered_with_migrated_evidence(self):
+        # GIVEN module topics and a legacy list naming one
+        given_topics = ["Topic A", "Topic B"]
+        given_legacy = ["Topic A"]
+
+        # WHEN synthesized
+        actual = _synthesize_topic_status(given_topics, given_legacy)
+
+        # THEN Topic A becomes COVERED with migrated evidence; Topic B stays NOT_COVERED
+        by_id = {r.topic_id: r for r in actual}
+        assert by_id["Topic A"].status == TopicStatus.COVERED
+        assert by_id["Topic A"].evidence == "(migrated)"
+        assert by_id["Topic B"].status == TopicStatus.NOT_COVERED
+
+    def test_legacy_entries_match_with_case_and_punctuation_tolerance(self):
+        # GIVEN module topics with punctuation and a legacy entry without it
+        given_topics = ["What is a CV?"]
+        given_legacy = ["What is a CV"]
+
+        # WHEN synthesized
+        actual = _synthesize_topic_status(given_topics, given_legacy)
+
+        # THEN the legacy entry matches via normalization and becomes COVERED
+        assert actual[0].status == TopicStatus.COVERED
+
+
 # ---------------------------------------------------------------------------
 # Tests — Service methods
 # ---------------------------------------------------------------------------
@@ -619,11 +785,11 @@ class TestSendMessage:
 
     @pytest.mark.asyncio
     async def test_instruction_mode_normal_response(self):
-        # GIVEN a service with a conversation in instruction mode
-        given_module = _make_module_config()
+        # GIVEN a service with a conversation in instruction mode and an agent that marks Topic A covered
+        given_module = _make_module_config(topics=["Topic A", "Topic B"])
         given_agent = MockCareerReadinessAgent(
             response_message="Let's discuss Topic A.",
-            topics_covered=["Topic A"],
+            proposed_topic_status=_full_topic_status(given_module.topics, covered=["Topic A"]),
         )
         service, repo = _make_service(modules=[given_module], agent=given_agent)
         given_conversation = _make_conversation(user_id="user_abc", module_id="cv-development")
@@ -636,24 +802,29 @@ class TestSendMessage:
 
         # THEN the response includes the user message and agent response
         assert actual_result.messages[-1].message == "Let's discuss Topic A."
-        # AND topics are accumulated in the conversation
+        # AND the response's covered_topics (derived from topic_status) includes Topic A
+        assert "Topic A" in actual_result.covered_topics
+        # AND the conversation's topic_status reflects Topic A covered, Topic B not yet
         actual_conv = await repo.find_by_conversation_id(given_conversation.conversation_id)
         assert actual_conv is not None
-        assert "Topic A" in actual_conv.covered_topics
+        by_id = {r.topic_id: r for r in actual_conv.topic_status}
+        assert by_id["Topic A"].status == TopicStatus.COVERED
+        assert by_id["Topic B"].status == TopicStatus.NOT_COVERED
 
     @pytest.mark.asyncio
-    async def test_instruction_mode_triggers_quiz_when_all_topics_covered_and_finished(self):
-        # GIVEN a conversation where all topics are already covered except the agent says finished this turn
+    async def test_quiz_triggers_when_all_topics_become_covered(self):
+        # GIVEN a conversation where Topic A is already covered and the agent now marks Topic B covered too
         given_module = _make_module_config(topics=["Topic A", "Topic B"])
         given_agent = MockCareerReadinessAgent(
             response_message="Great, we've covered everything!",
-            topics_covered=["Topic B"],
-            finished=True,
+            proposed_topic_status=_full_topic_status(
+                given_module.topics, covered=["Topic A", "Topic B"],
+            ),
         )
         service, repo = _make_service(modules=[given_module], agent=given_agent)
         given_conversation = _make_conversation(
             user_id="user_abc", module_id="cv-development",
-            covered_topics=["Topic A"],
+            topic_status=_full_topic_status(given_module.topics, covered=["Topic A"]),
         )
         await repo.create(given_conversation)
 
@@ -672,62 +843,114 @@ class TestSendMessage:
         assert actual_conv.quiz_delivered is True
 
     @pytest.mark.asyncio
-    async def test_quiz_triggers_when_topics_differ_by_casing(self):
-        # GIVEN a module with properly-cased topic names
+    async def test_quiz_does_not_trigger_when_any_topic_is_partial(self):
+        # GIVEN two topics where Topic B is only partial after this turn
         given_module = _make_module_config(topics=["Topic A", "Topic B"])
-        # AND the LLM reports the remaining topic with different casing
         given_agent = MockCareerReadinessAgent(
-            response_message="Great, we've covered everything!",
-            topics_covered=["topic b"],
-            finished=True,
+            response_message="Let's keep going.",
+            proposed_topic_status=_full_topic_status(
+                given_module.topics, covered=["Topic A"], partial=["Topic B"],
+            ),
         )
         service, repo = _make_service(modules=[given_module], agent=given_agent)
-        # AND an earlier turn accumulated the other topic with different casing
         given_conversation = _make_conversation(
             user_id="user_abc", module_id="cv-development",
-            covered_topics=["TOPIC A"],
+            topic_status=_full_topic_status(given_module.topics, covered=["Topic A"]),
         )
         await repo.create(given_conversation)
 
         # WHEN a message is sent
         actual_result = await service.send_message(
-            "user_abc", "cv-development", given_conversation.conversation_id, "I understand now",
+            "user_abc", "cv-development", given_conversation.conversation_id, "I think I get it",
         )
 
-        # THEN quiz_available is True despite the casing mismatch
-        assert actual_result.quiz_available is True
+        # THEN the quiz is NOT delivered
+        assert actual_result.quiz_available is False
+        actual_conv = await repo.find_by_conversation_id(given_conversation.conversation_id)
+        assert actual_conv is not None
+        assert actual_conv.quiz_delivered is False
 
     @pytest.mark.asyncio
-    async def test_instruction_mode_triggers_quiz_on_finished_even_if_server_coverage_incomplete(self):
-        # GIVEN a module where one topic is still uncovered on the server side
+    async def test_quiz_does_not_trigger_when_any_topic_is_not_covered(self):
+        # GIVEN two topics where Topic B is still not_covered after this turn
         given_module = _make_module_config(topics=["Topic A", "Topic B"])
-        # AND the agent reports finished=true without marking every topic this turn
         given_agent = MockCareerReadinessAgent(
-            response_message="Great work!",
-            topics_covered=[],
-            finished=True,
+            response_message="Let me explain Topic B.",
+            proposed_topic_status=_full_topic_status(given_module.topics, covered=["Topic A"]),
         )
         service, repo = _make_service(modules=[given_module], agent=given_agent)
-        # AND only one of two topics has been covered according to server-side tracking
+        given_conversation = _make_conversation(
+            user_id="user_abc", module_id="cv-development",
+            topic_status=_full_topic_status(given_module.topics, covered=["Topic A"]),
+        )
+        await repo.create(given_conversation)
+
+        # WHEN a message is sent
+        actual_result = await service.send_message(
+            "user_abc", "cv-development", given_conversation.conversation_id, "hmm",
+        )
+
+        # THEN the quiz is NOT delivered
+        assert actual_result.quiz_available is False
+
+    @pytest.mark.asyncio
+    async def test_agent_downgrade_attempt_is_rejected_and_state_retained(self):
+        # GIVEN a conversation where Topic A is already covered on the server side
+        given_module = _make_module_config(topics=["Topic A", "Topic B"])
+        # AND the agent attempts to downgrade Topic A back to not_covered
+        given_agent = MockCareerReadinessAgent(
+            response_message="Let's revisit.",
+            proposed_topic_status=_full_topic_status(given_module.topics),  # all not_covered
+        )
+        service, repo = _make_service(modules=[given_module], agent=given_agent)
+        given_conversation = _make_conversation(
+            user_id="user_abc", module_id="cv-development",
+            topic_status=_full_topic_status(given_module.topics, covered=["Topic A"]),
+        )
+        await repo.create(given_conversation)
+
+        # WHEN a message is sent
+        await service.send_message(
+            "user_abc", "cv-development", given_conversation.conversation_id, "go back",
+        )
+
+        # THEN Topic A remains covered in the stored topic_status
+        actual_conv = await repo.find_by_conversation_id(given_conversation.conversation_id)
+        assert actual_conv is not None
+        by_id = {r.topic_id: r for r in actual_conv.topic_status}
+        assert by_id["Topic A"].status == TopicStatus.COVERED
+
+    @pytest.mark.asyncio
+    async def test_inflight_conversation_with_legacy_covered_topics_is_migrated_on_read(self):
+        # GIVEN a legacy conversation that has covered_topics but no topic_status
+        given_module = _make_module_config(topics=["Topic A", "Topic B"])
+        given_agent = MockCareerReadinessAgent(
+            response_message="Next up, Topic B.",
+            proposed_topic_status=_full_topic_status(given_module.topics, covered=["Topic A"]),
+        )
+        service, repo = _make_service(modules=[given_module], agent=given_agent)
         given_conversation = _make_conversation(
             user_id="user_abc", module_id="cv-development",
             covered_topics=["Topic A"],
+            topic_status=[],  # simulating legacy pre-migration shape
         )
         await repo.create(given_conversation)
 
         # WHEN a message is sent
-        actual_result = await service.send_message(
-            "user_abc", "cv-development", given_conversation.conversation_id, "done",
+        await service.send_message(
+            "user_abc", "cv-development", given_conversation.conversation_id, "ok",
         )
 
-        # THEN the quiz IS delivered — the LLM's finished=true is authoritative
-        assert actual_result.quiz_available is True
-        # AND a quiz-marker message was appended
-        assert any("quiz" in m.message.lower() for m in actual_result.messages)
-        # AND quiz_delivered is True in the DB
+        # THEN the agent received a fully migrated current_topic_status (Topic A covered)
+        assert given_agent.last_current_topic_status is not None
+        by_id_received = {r.topic_id: r for r in given_agent.last_current_topic_status}
+        assert by_id_received["Topic A"].status == TopicStatus.COVERED
+        assert by_id_received["Topic A"].evidence == "(migrated)"
+        assert by_id_received["Topic B"].status == TopicStatus.NOT_COVERED
+        # AND the DB now has the per-topic-status representation
         actual_conv = await repo.find_by_conversation_id(given_conversation.conversation_id)
         assert actual_conv is not None
-        assert actual_conv.quiz_delivered is True
+        assert len(actual_conv.topic_status) == 2
 
     @pytest.mark.asyncio
     async def test_chat_during_active_quiz_sets_quiz_available(self):

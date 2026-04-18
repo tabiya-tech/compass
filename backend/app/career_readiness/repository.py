@@ -13,6 +13,7 @@ from app.career_readiness.types import (
     CareerReadinessConversationDocument,
     CareerReadinessMessage,
     ConversationMode,
+    TopicStatusRecord,
 )
 from app.server_dependencies.database_collections import Collections
 
@@ -46,8 +47,8 @@ class ICareerReadinessConversationRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def update_covered_topics(self, conversation_id: str, topics: list[str]) -> None:
-        """Update the list of covered topics for a conversation."""
+    async def update_topic_status(self, conversation_id: str, topic_status: list[TopicStatusRecord]) -> None:
+        """Update the per-topic coverage state for a conversation."""
         raise NotImplementedError()
 
     @abstractmethod
@@ -117,11 +118,16 @@ class CareerReadinessConversationRepository(ICareerReadinessConversationReposito
             },
         )
 
-    async def update_covered_topics(self, conversation_id: str, topics: list[str]) -> None:
+    async def update_topic_status(self, conversation_id: str, topic_status: list[TopicStatusRecord]) -> None:
         now = datetime.now(timezone.utc).isoformat()
         await self._collection.update_one(
             {"conversation_id": {"$eq": conversation_id}},
-            {"$set": {"covered_topics": topics, "updated_at": now}},
+            {
+                "$set": {
+                    "topic_status": [r.model_dump(mode="json") for r in topic_status],
+                    "updated_at": now,
+                },
+            },
         )
 
     async def update_quiz_delivered(self, conversation_id: str, delivered: bool) -> None:

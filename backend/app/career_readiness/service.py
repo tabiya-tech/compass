@@ -40,6 +40,8 @@ from app.career_readiness.types import (
     QuizQuestionResult,
     QuizResponse,
     QuizSubmissionResponse,
+    TopicStatus,
+    TopicStatusRecord,
 )
 from app.conversation_memory.conversation_memory_types import (
     ConversationContext,
@@ -58,11 +60,100 @@ def _filter_silence(messages: list[CareerReadinessMessage]) -> list[CareerReadin
 
 
 def _normalize_topic(topic: str) -> str:
-    """Normalize a topic name for comparison only (lowercases, strips trailing punctuation, collapses whitespace)."""
+    """Normalize a topic name for legacy-migration comparison only (lowercases, strips trailing punctuation, collapses whitespace)."""
     s = topic.lower().strip()
     s = re.sub(r"[?!.:;]+$", "", s)
     s = re.sub(r"\s+", " ", s)
     return s
+
+
+_TOPIC_STATUS_RANK: dict[TopicStatus, int] = {
+    TopicStatus.NOT_COVERED: 0,
+    TopicStatus.PARTIAL: 1,
+    TopicStatus.COVERED: 2,
+}
+
+
+def _synthesize_topic_status(
+    module_topics: list[str],
+    legacy_covered_topics: list[str],
+) -> list[TopicStatusRecord]:
+    """Build a topic_status list for a conversation with no stored topic_status.
+
+    Legacy covered_topics entries become COVERED with synthetic "(migrated)" evidence;
+    any module topic not in the legacy list becomes NOT_COVERED. Case/punctuation
+    variants in the legacy field are matched via _normalize_topic.
+    """
+    legacy_normalized = {_normalize_topic(t) for t in legacy_covered_topics}
+    result: list[TopicStatusRecord] = []
+    for topic in module_topics:
+        if _normalize_topic(topic) in legacy_normalized:
+            result.append(TopicStatusRecord(
+                topic_id=topic,
+                status=TopicStatus.COVERED,
+                evidence="(migrated)",
+            ))
+        else:
+            result.append(TopicStatusRecord(
+                topic_id=topic,
+                status=TopicStatus.NOT_COVERED,
+                evidence="",
+            ))
+    return result
+
+
+def _merge_topic_status(
+    current: list[TopicStatusRecord],
+    proposed: list[TopicStatusRecord],
+    *,
+    logger: logging.Logger,
+    conversation_id: str,
+) -> list[TopicStatusRecord]:
+    """Apply monotonic updates to current topic_status.
+
+    - Upgrades (NOT_COVERED → PARTIAL → COVERED) are accepted; proposed evidence is kept.
+    - Downgrades are rejected with a warning; the prior record is retained.
+    - Topics present in current but missing from proposed retain their prior record.
+    - Extra topics in proposed not present in current are ignored (the dynamic schema's
+      one-entry-per-topic validator prevents this in practice, but we are defensive).
+    Preserves the order of `current` (which itself tracks the canonical module order).
+    """
+    proposed_by_id = {r.topic_id: r for r in proposed}
+    merged: list[TopicStatusRecord] = []
+    for cur in current:
+        prop = proposed_by_id.get(cur.topic_id)
+        if prop is None:
+            merged.append(cur)
+            continue
+        if _TOPIC_STATUS_RANK[prop.status] >= _TOPIC_STATUS_RANK[cur.status]:
+            merged.append(prop)
+        else:
+            logger.warning(
+                "Career readiness: rejected topic_status downgrade on conversation=%s topic=%s current=%s proposed=%s",
+                conversation_id, cur.topic_id, cur.status.value, prop.status.value,
+            )
+            merged.append(cur)
+    return merged
+
+
+def _derive_covered_topic_names(
+    topic_status: list[TopicStatusRecord],
+    legacy_covered_topics: list[str],
+) -> list[str]:
+    """Derive a flat covered_topics list for the HTTP response, preferring topic_status when present."""
+    if topic_status:
+        return [r.topic_id for r in topic_status if r.status == TopicStatus.COVERED]
+    return list(legacy_covered_topics)
+
+
+def _load_topic_status(
+    conversation: "CareerReadinessConversationDocument",
+    module_topics: list[str],
+) -> list[TopicStatusRecord]:
+    """Return the conversation's current topic_status, migrating from legacy covered_topics if needed."""
+    if conversation.topic_status:
+        return list(conversation.topic_status)
+    return _synthesize_topic_status(module_topics, conversation.covered_topics)
 
 
 class ICareerReadinessService(ABC):
@@ -360,7 +451,7 @@ class CareerReadinessService(ICareerReadinessService):
         conversation: CareerReadinessConversationDocument,
         user_input: str,
     ) -> CareerReadinessConversationResponse:
-        """Handle a message in instruction mode with topic tracking and quiz trigger."""
+        """Handle a message in instruction mode with per-topic coverage tracking and server-side quiz trigger."""
         existing_messages = list(conversation.messages)
 
         # Build and persist user message
@@ -379,30 +470,34 @@ class CareerReadinessService(ICareerReadinessService):
         agent = self._agent_factory(module, ConversationMode.INSTRUCTION)
         agent_input = AgentInput(message=user_input, sent_at=now)
 
-        # Compute authoritative remaining topics BEFORE the agent turn so the LLM
-        # doesn't have to re-derive global coverage state from conversation history.
-        if module.topics:
-            normalized_covered = set(map(_normalize_topic, conversation.covered_topics))
-            remaining_topics = [
-                t for t in module.topics
-                if _normalize_topic(t) not in normalized_covered
-            ]
-        else:
-            remaining_topics = []
+        # Authoritative current topic_status — migrates legacy covered_topics if needed.
+        current_topic_status = _load_topic_status(conversation, module.topics)
 
         self._logger.info(
-            "Career readiness turn: conversation=%s module=%s remaining_topics=%s",
-            conversation.conversation_id, conversation.module_id, remaining_topics,
+            "Career readiness turn: conversation=%s module=%s current_topic_status=%s",
+            conversation.conversation_id, conversation.module_id,
+            [(r.topic_id, r.status.value) for r in current_topic_status],
         )
 
         agent_result: CareerReadinessAgentOutput = await agent.execute(
-            agent_input, context, remaining_topics=remaining_topics,
+            agent_input, context, current_topic_status=current_topic_status,
         )
 
-        # Accumulate covered topics
-        new_covered = set(conversation.covered_topics) | set(agent_result.topics_covered)
-        covered_topics_list = sorted(new_covered)
-        await self._repository.update_covered_topics(conversation.conversation_id, covered_topics_list)
+        # Merge the LLM's proposal monotonically and persist the new authoritative state.
+        merged_topic_status = _merge_topic_status(
+            current_topic_status,
+            agent_result.proposed_topic_status,
+            logger=self._logger,
+            conversation_id=conversation.conversation_id,
+        )
+        await self._repository.update_topic_status(
+            conversation.conversation_id, merged_topic_status,
+        )
+
+        # Server computes completion deterministically from the merged state.
+        finished = bool(module.topics) and all(
+            r.status == TopicStatus.COVERED for r in merged_topic_status
+        )
 
         # Build and persist agent response
         agent_output = agent_result.agent_output
@@ -416,12 +511,9 @@ class CareerReadinessService(ICareerReadinessService):
         await self._repository.append_message(conversation.conversation_id, agent_message)
         response_messages = all_messages + [agent_message]
 
-        # Trigger the quiz whenever the agent reports finished=true. The LLM's
-        # judgment drives this — server-side coverage tracking is telemetry only,
-        # because topics_covered is itself LLM-reported and can under-report.
         quiz_available = conversation.quiz_delivered and not conversation.quiz_passed
 
-        if (agent_output.finished
+        if (finished
                 and module.quiz is not None and not conversation.quiz_delivered):
             marker_message = CareerReadinessMessage(
                 message_id=str(ObjectId()),
@@ -439,7 +531,7 @@ class CareerReadinessService(ICareerReadinessService):
             conversation_id=conversation.conversation_id,
             module_id=conversation.module_id,
             messages=_filter_silence(response_messages),
-            covered_topics=covered_topics_list,
+            covered_topics=_derive_covered_topic_names(merged_topic_status, conversation.covered_topics),
             conversation_mode=ConversationMode.INSTRUCTION,
             quiz_available=quiz_available,
         )
@@ -481,7 +573,9 @@ class CareerReadinessService(ICareerReadinessService):
             conversation_id=conversation.conversation_id,
             module_id=conversation.module_id,
             messages=_filter_silence(all_messages + [agent_message]),
-            covered_topics=conversation.covered_topics,
+            covered_topics=_derive_covered_topic_names(
+                conversation.topic_status, conversation.covered_topics,
+            ),
             quiz_passed=True,
             conversation_mode=ConversationMode.SUPPORT,
         )
@@ -496,7 +590,9 @@ class CareerReadinessService(ICareerReadinessService):
             conversation_id=conversation.conversation_id,
             module_id=conversation.module_id,
             messages=_filter_silence(list(conversation.messages)),
-            covered_topics=conversation.covered_topics,
+            covered_topics=_derive_covered_topic_names(
+                conversation.topic_status, conversation.covered_topics,
+            ),
             conversation_mode=conversation.conversation_mode,
             quiz_passed=conversation.quiz_passed if conversation.quiz_delivered else None,
             quiz_available=conversation.quiz_delivered and not conversation.quiz_passed,
