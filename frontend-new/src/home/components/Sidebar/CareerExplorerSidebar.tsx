@@ -14,8 +14,6 @@ export const DATA_TEST_ID = {
   CAREER_EXPLORER_SIDEBAR_EMPTY: `career-explorer-sidebar-empty-${uniqueId}`,
 };
 
-const POLL_INTERVAL_MS = 30_000;
-
 interface SectorCardProps {
   sector: SectorItem;
   accentColor: string;
@@ -85,7 +83,11 @@ const SectorCard: React.FC<SectorCardProps> = ({ sector, accentColor }) => {
   );
 };
 
-const CareerExplorerSidebar: React.FC = () => {
+interface CareerExplorerSidebarProps {
+  refreshToken?: number;
+}
+
+const CareerExplorerSidebar: React.FC<CareerExplorerSidebarProps> = ({ refreshToken = 0 }) => {
   const theme = useTheme();
   const [data, setData] = useState<SectorData | null>(null);
   const cancelledRef = useRef(false);
@@ -100,12 +102,10 @@ const CareerExplorerSidebar: React.FC = () => {
   useEffect(() => {
     cancelledRef.current = false;
     void load();
-    const timer = setInterval(() => void load(), POLL_INTERVAL_MS);
     return () => {
       cancelledRef.current = true;
-      clearInterval(timer);
     };
-  }, [load]);
+  }, [load, refreshToken]);
 
   const sectors = data?.sectors ?? [];
 

@@ -28,6 +28,7 @@ const CareerExplorerChat: React.FC<CareerExplorerChatProps> = ({
   const [aiIsTyping, setAiIsTyping] = useState(false);
   const [chatFinished, setChatFinished] = useState(false);
   const [failedSendDraft, setFailedSendDraft] = useState<string | null>(null);
+  const [sidebarRefreshToken, setSidebarRefreshToken] = useState(0);
 
   const handleSendRef = useRef<(msg: string) => void>(() => {});
 
@@ -77,6 +78,7 @@ const CareerExplorerChat: React.FC<CareerExplorerChatProps> = ({
           mapCareerExplorerMessagesToChatMessages(res.messages, theme.palette.brandAction.main, handleQuickReply)
         );
         setChatFinished(res.finished);
+        setSidebarRefreshToken((t) => t + 1);
       } catch (e) {
         console.error("Failed to send message", e);
         setMessages((prev) => prev.filter((msg) => msg.message_id !== optimisticId));
@@ -112,7 +114,7 @@ const CareerExplorerChat: React.FC<CareerExplorerChatProps> = ({
           fillColor: theme.palette.brandAction.main,
         },
       }}
-      sidebar={<CareerExplorerSidebar />}
+      sidebar={<CareerExplorerSidebar refreshToken={sidebarRefreshToken} />}
     />
   );
 };

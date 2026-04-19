@@ -14,7 +14,6 @@ export const DATA_TEST_ID = {
   SKILLS_DISCOVERY_SIDEBAR_EXPAND_BUTTON: `skills-discovery-sidebar-expand-button-${uniqueId}`,
 };
 
-const POLL_INTERVAL_MS = 30_000;
 const COLLAPSE_AFTER = 8;
 
 // Style guide tokens (hardcoded to avoid MUI theme indirection)
@@ -54,9 +53,10 @@ const tagSx = (bg: string, color: string) => ({
 
 interface SkillsDiscoverySidebarProps {
   currentPhase: CurrentPhase;
+  refreshToken?: number;
 }
 
-const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ currentPhase }) => {
+const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ currentPhase, refreshToken = 0 }) => {
   const [data, setData] = useState<SkillsData | null>(null);
   const [programmeSkills, setProgrammeSkills] = useState<string[]>([]);
   const [expanded, setExpanded] = useState(false);
@@ -76,12 +76,10 @@ const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ current
   useEffect(() => {
     cancelledRef.current = false;
     void load();
-    const timer = setInterval(() => void load(), POLL_INTERVAL_MS);
     return () => {
       cancelledRef.current = true;
-      clearInterval(timer);
     };
-  }, [load]);
+  }, [load, refreshToken]);
 
   const workSkills = data?.skills ?? [];
   const hasMore = workSkills.length > COLLAPSE_AFTER;

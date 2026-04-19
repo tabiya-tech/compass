@@ -53,6 +53,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
   const [aiIsTyping, setAiIsTyping] = useState(false);
   const [isChatLockedForQuiz, setIsChatLockedForQuiz] = useState(false);
   const [failedSendDraft, setFailedSendDraft] = useState<string | null>(null);
+  const [sidebarRefreshToken, setSidebarRefreshToken] = useState(0);
 
   const handleSendRef = useRef<(msg: string) => void>(() => {});
 
@@ -224,6 +225,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
         if (submission.passed) {
           enqueueSnackbar(t("careerReadiness.quizPassedNotification"), { variant: "success" });
           setIsChatLockedForQuiz(false);
+          setSidebarRefreshToken((t) => t + 1);
         } else {
           enqueueSnackbar(t("careerReadiness.quizFailedNotification"), { variant: "error" });
           setIsChatLockedForQuiz(true);
@@ -431,6 +433,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
         }
 
         setMessages(chatMessages);
+        setSidebarRefreshToken((t) => t + 1);
         const completed = res.module_completed;
         if (completed) onModuleCompleted?.();
       } catch (e) {
@@ -480,7 +483,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
           fillColor: theme.palette.secondary.main,
         },
       }}
-      sidebar={<CareerReadinessSidebar />}
+      sidebar={<CareerReadinessSidebar refreshToken={sidebarRefreshToken} />}
     />
   );
 };

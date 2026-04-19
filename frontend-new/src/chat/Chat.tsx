@@ -124,6 +124,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   );
   const [currentUserId] = useState<string | null>(authenticationStateService.getInstance().getUser()?.id ?? null);
   const [currentPhase, setCurrentPhase] = useState<CurrentPhase>(defaultCurrentPhase);
+  const [sidebarRefreshToken, setSidebarRefreshToken] = useState(0);
   // CV upload states
   const [isUploadingCv, setIsUploadingCv] = useState<boolean>(false);
   const [cvUploadError, setCvUploadError] = useState<string | null>(null);
@@ -718,6 +719,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
 
         setConversationCompleted(response.conversation_completed);
         setConversationConductedAt(response.conversation_conducted_at);
+        setSidebarRefreshToken((t) => t + 1);
 
         // Set the current conversation phase
         setCurrentPhase((_previousCurrentPhase) => {
@@ -1137,7 +1139,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 />
               ) : undefined
             }
-            sidebar={<SkillsDiscoverySidebar currentPhase={currentPhase} />}
+            sidebar={<SkillsDiscoverySidebar currentPhase={currentPhase} refreshToken={sidebarRefreshToken} />}
           />
         </Box>
         {showRefreshConfirmDialog && (

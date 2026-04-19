@@ -13,8 +13,6 @@ export const DATA_TEST_ID = {
   CAREER_READINESS_SIDEBAR_OBJECTIVE_INDICATOR: `career-readiness-sidebar-objective-indicator-${uniqueId}`,
 };
 
-const POLL_INTERVAL_MS = 30_000;
-
 interface ObjectiveRowProps {
   objective: ObjectiveItem;
   accentColor: string;
@@ -68,7 +66,11 @@ const ObjectiveRow: React.FC<ObjectiveRowProps> = ({ objective, accentColor }) =
   );
 };
 
-const CareerReadinessSidebar: React.FC = () => {
+interface CareerReadinessSidebarProps {
+  refreshToken?: number;
+}
+
+const CareerReadinessSidebar: React.FC<CareerReadinessSidebarProps> = ({ refreshToken = 0 }) => {
   const theme = useTheme();
   const [data, setData] = useState<ObjectivesData | null>(null);
   const cancelledRef = useRef(false);
@@ -83,12 +85,10 @@ const CareerReadinessSidebar: React.FC = () => {
   useEffect(() => {
     cancelledRef.current = false;
     void load();
-    const timer = setInterval(() => void load(), POLL_INTERVAL_MS);
     return () => {
       cancelledRef.current = true;
-      clearInterval(timer);
     };
-  }, [load]);
+  }, [load, refreshToken]);
 
   const objectives = data?.objectives ?? [];
   const completedCount = objectives.filter((o) => o.status === "done").length;
