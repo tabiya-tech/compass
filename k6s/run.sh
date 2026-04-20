@@ -1,41 +1,25 @@
 #!/usr/bin/env bash
-#
-# Runner for the k6 stress test. Loads k6s/.env (gitignored) and forwards the
-# required/optional vars to `k6 run` via explicit -e flags, because k6 itself
-# does not auto-load .env files and (since v0.38) does not expose system env
-# vars to __ENV by default.
-#
-# Usage:
-#   ./run.sh                                  # use everything from .env
-#   ./run.sh -e STAGES_PROFILE=spike          # override a var for this run
-#   ./run.sh --summary-export=results/x.json  # pass any extra k6 flag
-#
-# Any extra arguments are forwarded verbatim to `k6 run`.
 
-set -euo pipefail
+set -xe
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+mkdir -p results
 
-if [ -f .env ]; then
-  set -a
-  # shellcheck disable=SC1091
-  source .env
-  set +a
-fi
+#test_cases=(get-version check-invitation-code e2e-skills-elicitation-chat)
+test_cases=(e2e-skills-elicitation-chat)
 
-: "${BASE_URL:?BASE_URL is required. Set it in k6s/.env (see .env.example) or export it.}"
-: "${FIREBASE_API_KEY:?FIREBASE_API_KEY is required. Set it in k6s/.env or export it.}"
-: "${INVITATION_CODE:?INVITATION_CODE is required. Set it in k6s/.env or export it.}"
+for i in "${!test_cases[@]}"; do
+  test_case="${test_cases[$i]}"
+  start=$SECONDS
+  echo "testing ${test_case}"
+  k6 run --out json="./results/${test_case}.out.jsonl" --summary-export="./results/${test_case}.summary.json" "./src/tests/${test_case}.js"
+  echo "done testing ${test_case}"
 
-exec k6 run \
-  -e BASE_URL="$BASE_URL" \
-  -e FIREBASE_API_KEY="$FIREBASE_API_KEY" \
-  -e INVITATION_CODE="$INVITATION_CODE" \
-  ${STAGES_PROFILE:+-e STAGES_PROFILE="$STAGES_PROFILE"} \
-  ${VUSERS:+-e VUSERS="$VUSERS"} \
-  ${DURATION:+-e DURATION="$DURATION"} \
-  ${LANGUAGE:+-e LANGUAGE="$LANGUAGE"} \
-  ${MAX_MESSAGES_PER_VU:+-e MAX_MESSAGES_PER_VU="$MAX_MESSAGES_PER_VU"} \
-  "$@" \
-  stress-chat-flow.js
+  if (( i < ${#test_cases[@]} - 1 )); then
+    elapsed=$(( SECONDS - start ))
+    remaining=$(( 60 - elapsed ))
+    if (( remaining > 0 )); then
+      echo "sleeping for ${remaining}s"
+      sleep "$remaining"
+    fi
+  fi
+done
