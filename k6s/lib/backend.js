@@ -111,6 +111,36 @@ export function submitPlainPersonalData({ baseUrl, userId, idToken, personalData
   return { ok, res };
 }
 
+export function fetchInitialData({ baseUrl, sessionId, userId, idToken }) {
+  const authed = { headers: authHeaders(idToken) };
+  // Some endpoints may return 404 for fresh users with no data yet.
+  // Tell k6 not to count 404s as HTTP failures, but still catch 429, 5xx, etc.
+  const okOrNotFound = { responseCallback: http.expectedStatuses(200, 404) };
+
+  const responses = http.batch([
+    ['GET', `${baseUrl}/analytics/sector-engagement/me`,          null, { ...authed, ...okOrNotFound, tags: { endpoint: 'fetch_sector_engagement' } }],
+    ['GET', `${baseUrl}/career-readiness/modules`,                null, { ...authed, ...okOrNotFound, tags: { endpoint: 'fetch_career_readiness' } }],
+    ['GET', `${baseUrl}/conversations/${sessionId}/messages`,     null, { ...authed, ...okOrNotFound, tags: { endpoint: 'fetch_messages' } }],
+    ['GET', `${baseUrl}/users/${userId}/programme-skills`,        null, { ...authed, ...okOrNotFound, tags: { endpoint: 'fetch_programme_skills' } }],
+    ['GET', `${baseUrl}/version`,                                 null, { ...okOrNotFound, tags: { endpoint: 'fetch_version' } }],
+    ['GET', `${baseUrl}/users/preferences?user_id=${userId}`,     null, { ...authed, ...okOrNotFound, tags: { endpoint: 'fetch_preferences' } }],
+    ['GET', `${baseUrl}/users/${userId}/plain-personal-data`,     null, { ...authed, ...okOrNotFound, tags: { endpoint: 'fetch_personal_data' } }],
+    ['GET', `${baseUrl}/conversations/${sessionId}/experiences?deleted=false`, null, { ...authed, ...okOrNotFound, tags: { endpoint: 'fetch_experiences' } }],
+  ]);
+
+  const isOk = (r) => r.status === 200 || r.status === 404;
+  check(responses[0], { 'GET /analytics/sector-engagement/me ok': isOk });
+  check(responses[1], { 'GET /career-readiness/modules ok':       isOk });
+  check(responses[2], { 'GET /conversations/:id/messages ok':     isOk });
+  check(responses[3], { 'GET /users/:id/programme-skills ok':     isOk });
+  check(responses[4], { 'GET /version ok':                        isOk });
+  check(responses[5], { 'GET /users/preferences ok':              isOk });
+  check(responses[6], { 'GET /users/:id/plain-personal-data ok':  isOk });
+  check(responses[7], { 'GET /conversations/:id/experiences ok':  isOk });
+
+  return responses;
+}
+
 export function sendChatMessage({ baseUrl, sessionId, idToken, userInput }) {
   const res = http.post(
     `${baseUrl}/conversations/${sessionId}/messages`,

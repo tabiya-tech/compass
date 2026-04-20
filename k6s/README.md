@@ -6,9 +6,10 @@ Stress tests the full user journey against any Compass backend environment:
 2. `POST /users/preferences` — creates a session.
 3. `PATCH /users/preferences` — accepts Terms & Conditions.
 4. `POST /users/{user_id}/plain-personal-data` — submits personal data (name, institution, programme, school year).
-5. `POST /conversations/{session_id}/messages` — scripted career-guidance dialogue (~6 turns per VU).
+5. **Batch GET** — fetches initial page data (8 endpoints in parallel via `http.batch()`).
+6. `POST /conversations/{session_id}/messages` — scripted career-guidance dialogue (~6 turns per VU).
 
-Each k6 VU signs in to Firebase, creates a session, accepts T&C, and submits personal data **once**, then runs the chat journey on every iteration, so VUs at steady-state represent the number of *concurrent users* the backend is serving.
+Each k6 VU signs in to Firebase, creates a session, accepts T&C, submits personal data, and fetches initial page data **once**, then runs the chat journey on every iteration, so VUs at steady-state represent the number of *concurrent users* the backend is serving.
 
 ## Install k6
 
@@ -129,17 +130,18 @@ Defined in `stress-chat-flow.js`. A run **fails** (non-zero exit code) if any br
 - `http_req_duration{endpoint:preferences}: p(95)<2s`.
 - `http_req_duration{endpoint:accept_tc}: p(95)<2s`.
 - `http_req_duration{endpoint:personal_data}: p(95)<2s`.
+- `http_req_duration{endpoint:fetch_*}: p(95)<1–3s` (8 initial page-data fetches, batched in parallel).
 - `http_req_duration{endpoint:chat}: p(95)<15s` (LLM latency is the bottleneck).
 
 Adjust these to match the SLO you're testing against.
 
 ## Reading the summary
 
-k6 prints per-endpoint stats because each request is tagged with `endpoint: firebase_signup | preferences | accept_tc | personal_data | chat`. Look for:
+k6 prints per-endpoint stats because each request is tagged with `endpoint: firebase_signup | preferences | accept_tc | personal_data | fetch_* | chat`. Look for:
 
 - Per-tag `http_req_duration` percentiles — is chat latency stable as VUs ramp?
 - `http_req_failed{endpoint:chat}` — rising means the backend is saturating.
-- Custom counters `user_flows_started`, `user_flows_completed`, `chat_messages_sent`, `tc_accepted`, `personal_data_submitted`.
+- Custom counters `user_flows_started`, `user_flows_completed`, `chat_messages_sent`, `tc_accepted`, `personal_data_submitted`, `initial_data_fetched`.
 
 ## Notes
 

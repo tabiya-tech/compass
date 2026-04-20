@@ -3,7 +3,8 @@
 //   2) POST /users/preferences  -> creates a session (once per VU, cached)
 //   3) PATCH /users/preferences -> accepts Terms & Conditions (once per VU, cached)
 //   4) POST /users/{id}/plain-personal-data -> submits personal data (once per VU, cached)
-//   5) Loop POST /conversations/{session_id}/messages with scripted prompts
+//   5) Batch GET — fetches initial page data (8 endpoints in parallel via http.batch())
+//   6) Loop POST /conversations/{session_id}/messages with scripted prompts
 //
 // Run:
 //   ./run.sh                        # loads k6s/.env and invokes `k6 run`
@@ -20,11 +21,16 @@ import {
   createUserPreferences,
   acceptTermsAndConditions,
   submitPlainPersonalData,
+  fetchInitialData,
   sendChatMessage,
   uuidv4,
 } from './lib/backend.js';
 import { CONVERSATION_SCRIPT, TOTAL_STEPS, pickPrompt } from './lib/prompts.js';
 import { pickPersonalData } from './lib/userdata.js';
+
+// Number of initial-data batch fetches to fire before each chat message,
+// mimicking the frontend re-polling its sidebar/context data.
+const FETCH_REPEAT_PER_STEP = 3;
 
 // Per-VU cached state. Each VU gets its own JS runtime, so these
 // variables are naturally scoped per virtual user — no shared state.
@@ -40,6 +46,7 @@ const chatMessagesSent = new Counter('chat_messages_sent');
 const firebaseSignins = new Counter('firebase_signins');
 const tcAccepted = new Counter('tc_accepted');
 const personalDataSubmitted = new Counter('personal_data_submitted');
+const initialDataFetched = new Counter('initial_data_fetched');
 
 export const options = {
   stages: getStages(),
@@ -53,6 +60,14 @@ export const options = {
     'http_req_duration{endpoint:preferences}': ['p(95)<2000'],
     'http_req_duration{endpoint:accept_tc}': ['p(95)<2000'],
     'http_req_duration{endpoint:personal_data}': ['p(95)<2000'],
+    'http_req_duration{endpoint:fetch_sector_engagement}': ['p(95)<3000'],
+    'http_req_duration{endpoint:fetch_career_readiness}': ['p(95)<3000'],
+    'http_req_duration{endpoint:fetch_messages}': ['p(95)<3000'],
+    'http_req_duration{endpoint:fetch_programme_skills}': ['p(95)<3000'],
+    'http_req_duration{endpoint:fetch_version}': ['p(95)<1000'],
+    'http_req_duration{endpoint:fetch_preferences}': ['p(95)<2000'],
+    'http_req_duration{endpoint:fetch_personal_data}': ['p(95)<2000'],
+    'http_req_duration{endpoint:fetch_experiences}': ['p(95)<3000'],
     'http_req_duration{endpoint:chat}': ['p(95)<15000'],
     // At least 90% of started flows should finish.
     'user_flows_completed': ['count>0'],
@@ -65,7 +80,7 @@ export function setup() {
   validateEnv();
   console.log(
     `[setup] target=${config.baseUrl} profile=${config.stagesProfile} ` +
-      `maxMessagesPerVu=${config.maxMessagesPerVu}`,
+    `maxMessagesPerVu=${config.maxMessagesPerVu}`,
   );
   return { startedAt: new Date().toISOString() };
 }
@@ -139,6 +154,15 @@ export default function () {
   let conversationCompleted = false;
 
   for (let step = 0; step < maxSteps; step++) {
+    for (let i = 0; i < FETCH_REPEAT_PER_STEP; i++) {
+      fetchInitialData({
+        baseUrl: config.baseUrl,
+        sessionId,
+        userId,
+        idToken,
+      });
+      initialDataFetched.add(1);
+    }
     const userInput = pickPrompt(step, vu, iter);
     const { body, ok } = sendChatMessage({
       baseUrl: config.baseUrl,
