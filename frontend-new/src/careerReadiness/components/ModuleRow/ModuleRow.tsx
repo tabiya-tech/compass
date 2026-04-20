@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { mapModuleStatusToDisplay } from "src/careerReadiness/types";
 import type { ModuleSummary } from "src/careerReadiness/types";
 import { routerPaths } from "src/app/routerPaths";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const uniqueId = "c3d4e5f6-a7b8-9012-cdef-123456789012";
@@ -80,21 +80,26 @@ const ModuleRow: React.FC<ModuleRowProps> = ({ module, index }) => {
         <Typography variant="body2" fontWeight={isActive ? 700 : 400} color="text.primary">
           {module.title}
         </Typography>
-        {isActive && (
-          <Box
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+            marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+          }}
+        >
+          <HourglassEmptyIcon
             sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
-              marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+              fontSize: 16,
+              color: theme.palette.text.secondary,
+              stroke: "currentColor",
+              strokeWidth: 1,
             }}
-          >
-            <AccessTimeIcon sx={{ fontSize: 12, color: theme.palette.text.secondary }} />
-            <Typography sx={{ ...theme.typography.caption, color: theme.palette.text.secondary }}>
-              {t("careerReadiness.takes30Min")}
-            </Typography>
-          </Box>
-        )}
+          />
+          <Typography sx={{ ...theme.typography.caption, color: theme.palette.text.secondary, fontWeight: 500 }}>
+            {t("careerReadiness.approx30Min")}
+          </Typography>
+        </Box>
       </Box>
 
       {isActive && (

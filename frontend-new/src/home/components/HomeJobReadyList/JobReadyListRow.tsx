@@ -1,7 +1,7 @@
 import React, { startTransition } from "react";
 import { Box, Divider, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { TranslationKey } from "src/react-i18next";
@@ -142,21 +142,26 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
               >
                 {module.title}
               </Typography>
-              {isInProgress && (
-                <Box
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+                  color: theme.palette.text.secondary,
+                }}
+              >
+                <HourglassEmptyIcon
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
-                    color: theme.palette.text.secondary,
+                    color: "inherit",
+                    fontSize: 18,
+                    stroke: "currentColor",
+                    strokeWidth: 1,
                   }}
-                >
-                  <AccessTimeIcon sx={{ fontSize: 14, color: "inherit" }} />
-                  <Typography variant="body2" color="inherit" fontWeight={400}>
-                    {t("careerReadiness.takes30Min")}
-                  </Typography>
-                </Box>
-              )}
+                />
+                <Typography variant="caption" color="inherit" fontWeight={500}>
+                  {t("careerReadiness.takes30Min")}
+                </Typography>
+              </Box>
               {primaryCtaLabel !== null && (
                 <PrimaryButton
                   color="secondary"
@@ -220,21 +225,26 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
             >
               {module.title}
             </Typography>
-            {isInProgress && (
-              <Box
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+                marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+              }}
+            >
+              <HourglassEmptyIcon
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
-                  marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
+                  fontSize: 16,
+                  color: theme.palette.text.secondary,
+                  stroke: "currentColor",
+                  strokeWidth: 1,
                 }}
-              >
-                <AccessTimeIcon sx={{ fontSize: 12, color: theme.palette.text.secondary }} />
-                <Typography sx={{ ...theme.typography.caption, color: theme.palette.text.secondary }}>
-                  {t("careerReadiness.takes30Min")}
-                </Typography>
-              </Box>
-            )}
+              />
+              <Typography sx={{ ...theme.typography.caption, color: theme.palette.text.secondary, fontWeight: 500 }}>
+                {t("careerReadiness.approx30Min")}
+              </Typography>
+            </Box>
           </Box>
           <Box
             sx={{

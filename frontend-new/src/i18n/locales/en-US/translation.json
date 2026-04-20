@@ -835,6 +835,7 @@
     "modulesCompletedOfTotal": "{{completed}} of {{total}} modules",
     "upNext": "Up next",
     "takes30Min": "Takes ~30 min",
+    "approx30Min": "~30 min",
     "continue": "Continue",
     "chat": "Chat",
     "heroTitle": "Get Job Ready",

@@ -841,6 +841,7 @@
     "modulesCompletedOfTotal": "{{completed}} de {{total}} módulos",
     "upNext": "Lo siguiente",
     "takes30Min": "Tarda ~30 min",
+    "approx30Min": "~30 min",
     "continue": "Continuar",
     "chat": "Chat",
     "heroTitle": "Prepárate para trabajar",

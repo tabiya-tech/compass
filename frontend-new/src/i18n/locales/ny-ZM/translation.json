@@ -841,6 +841,7 @@
     "modulesCompletedOfTotal": "{{completed}} pa {{total}} mamodule",
     "upNext": "Otsatira",
     "takes30Min": "Imatenga ~30 mphindi",
+    "approx30Min": "~30 mphindi",
     "continue": "Pitilizani",
     "chat": "Yankhulani",
     "heroTitle": "Konzekerani Kugwira Ntchito",
