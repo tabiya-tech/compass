@@ -154,6 +154,7 @@
       "uploadCvOtherPhase": "Upakiaji wa CV unapatikana tu wakati wa ukusanyaji wa uzoefu",
       "uploadCvLabel": "Pakia CV",
       "viewUploadedLabel": "CV zilizopakiwa awali",
+      "sendFailed": "Hatukuweza kutuma ujumbe wako. Tafadhali jaribu tena.",
       "placeholders": {
         "chatFinished": "Mazungumzo yamekamilika. Huwezi kutuma ujumbe zaidi.",
         "aiTyping": "AI inaandika..., subiri ikamilishe.",

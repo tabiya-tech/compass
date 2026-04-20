@@ -608,23 +608,11 @@ describe("Chat", () => {
           assertTypingMessageWasShown();
           // AND expect an empty message to be sent to the chat service
           expect(ChatService.getInstance().sendMessage).toHaveBeenCalledWith(givenActiveSessionId, "");
-          // AND an error message to be shown in the chat list
-          expect(ChatList as jest.Mock).toHaveBeenLastCalledWith(
-            expect.objectContaining({
-              messages: expect.arrayContaining([
-                {
-                  message_id: expect.any(String),
-                  type: ERROR_CHAT_MESSAGE_TYPE,
-                  sender: ConversationMessageSender.COMPASS,
-                  component: expect.any(Function),
-                  payload: {
-                    message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
-                  },
-                },
-              ]),
-            }),
-            {}
-          );
+          // AND no in-chat error bubble is added when the kickoff send fails
+          await waitFor(() => {
+            const msgs = (ChatList as jest.Mock).mock.calls.at(-1)?.[0]?.messages ?? [];
+            expect(msgs.some((m: IChatMessage<any>) => m.type === ERROR_CHAT_MESSAGE_TYPE)).toBe(false);
+          });
           // AND expect that a snackbar notification is not shown
           expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
           // AND expect input field to have enabled
@@ -990,21 +978,11 @@ describe("Chat", () => {
         assertTypingMessageWasShown();
         // AND expect the getUserPreferences method to be called
         expect(UserPreferencesService.getInstance().getUserPreferences).toHaveBeenCalled();
-        // AND expect a message to be shown in the chat
-        assertMessagesAreShown(
-          [
-            {
-              message_id: expect.any(String),
-              sender: ConversationMessageSender.COMPASS,
-              type: ERROR_CHAT_MESSAGE_TYPE,
-              payload: {
-                message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
-              },
-              component: expect.any(Function),
-            },
-          ],
-          true
-        );
+        // AND no in-chat error bubble is added when the kickoff send fails
+        await waitFor(() => {
+          const msgs = (ChatList as jest.Mock).mock.calls.at(-1)?.[0]?.messages ?? [];
+          expect(msgs.some((m: IChatMessage<any>) => m.type === ERROR_CHAT_MESSAGE_TYPE)).toBe(false);
+        });
         // AND expect input field to have be enabled
         expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
           expect.objectContaining({ isChatFinished: false, aiIsTyping: false }),
@@ -1649,40 +1627,35 @@ describe("Chat", () => {
       await waitFor(() => {
         expect(console.error).toHaveBeenCalledWith(new ChatError("Failed to send message:", givenError));
       });
-      // AND expect an error message to be the last shown in the chat
+      // AND expect the optimistic user bubble to be removed — no in-chat error message
       await waitFor(() => {
         assertMessagesAreShown(
-          [
-            ...givenPreviousConversation.messages.map((message) => ({
-              message_id: expect.any(String),
-              type: expect.any(String),
-              sender: message.sender,
-              payload:
-                message.sender === ConversationMessageSender.COMPASS
-                  ? {
-                      message_id: expect.any(String),
-                      message: message.message,
-                      sent_at: message.sent_at,
-                      reaction: message.reaction,
-                    }
-                  : {
-                      message: message.message,
-                      sent_at: message.sent_at,
-                      fill_color: expect.any(String),
-                    },
-              component: expect.any(Function),
-            })),
-            {
-              message_id: expect.any(String),
-              type: ERROR_CHAT_MESSAGE_TYPE,
-              sender: ConversationMessageSender.COMPASS,
-              payload: {
-                message: FIXED_MESSAGES_TEXT.PLEASE_REPEAT,
-              },
-              component: expect.any(Function),
-            },
-          ],
+          givenPreviousConversation.messages.map((message) => ({
+            message_id: expect.any(String),
+            type: expect.any(String),
+            sender: message.sender,
+            payload:
+              message.sender === ConversationMessageSender.COMPASS
+                ? {
+                    message_id: expect.any(String),
+                    message: message.message,
+                    sent_at: message.sent_at,
+                    reaction: message.reaction,
+                  }
+                : {
+                    message: message.message,
+                    sent_at: message.sent_at,
+                    fill_color: expect.any(String),
+                  },
+            component: expect.any(Function),
+          })),
           true
+        );
+      });
+      await waitFor(() => {
+        expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
+          expect.objectContaining({ failedSendDraft: givenMessage, isChatFinished: false, aiIsTyping: false }),
+          {}
         );
       });
 

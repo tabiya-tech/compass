@@ -9,6 +9,7 @@ import ChatMessageField, {
   MAX_FILE_SIZE_BYTES,
   MAX_FILE_SIZE_MB,
   MAX_MARKDOWN_CHARS,
+  SEND_FAILED_MESSAGE_KEY,
 } from "./ChatMessageField";
 import { render, screen, fireEvent, act, userEvent, waitFor } from "src/_test_utilities/test-utils";
 import { mockBrowserIsOnLine, unmockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
@@ -428,8 +429,10 @@ describe("ChatMessageField", () => {
         // AND the chat message field to be disabled
         const chatMessageField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
         expect(chatMessageField).toBeDisabled();
-        // AND the placeholder should have specific text
-        expect(chatMessageField).toHaveAttribute("placeholder", i18n.t("chat.chatMessageField.placeholders.offline"));
+        // AND the placeholder should have default text
+        expect(chatMessageField).toHaveAttribute("placeholder", i18n.t("chat.chatMessageField.placeholders.default"));
+        // AND the offline text should be displayed as an error
+        expect(screen.getByText(i18n.t("chat.chatMessageField.placeholders.offline"))).toBeInTheDocument();
         // AND no errors or warnings to have occurred
         expect(console.error).not.toHaveBeenCalled();
         expect(console.warn).not.toHaveBeenCalled();
@@ -1321,6 +1324,80 @@ describe("ChatMessageField", () => {
       // AND the input field should not show error state
       const inputField = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
       expect(inputField).not.toHaveAttribute("aria-invalid", "true");
+    });
+  });
+
+  describe("failed send draft recovery", () => {
+    test("should restore message and show send failed helper when failedSendDraft is set", () => {
+      // GIVEN a handleSend callback
+      const handleSend = jest.fn();
+      // AND a failed-send draft message
+      const draft = "Skills needed";
+      // AND ChatMessageField rendered without a failedSendDraft
+      const { rerender } = render(
+        <ChatMessageField
+          handleSend={handleSend}
+          aiIsTyping={false}
+          isChatFinished={false}
+          currentPhase={ConversationPhase.INTRO}
+          failedSendDraft={null}
+        />
+      );
+
+      // WHEN failedSendDraft is later provided by the parent
+      rerender(
+        <ChatMessageField
+          handleSend={handleSend}
+          aiIsTyping={false}
+          isChatFinished={false}
+          currentPhase={ConversationPhase.INTRO}
+          failedSendDraft={draft}
+        />
+      );
+
+      // THEN the input value is restored
+      const input = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+      expect(input).toHaveValue(draft);
+      // AND the send-failed helper message is shown
+      expect(screen.getByText(i18n.t(SEND_FAILED_MESSAGE_KEY))).toBeInTheDocument();
+      // AND the field is marked invalid
+      expect(input).toHaveAttribute("aria-invalid", "true");
+    });
+
+    test("should clear send failed helper when failedSendDraft becomes null", () => {
+      // GIVEN a handleSend callback
+      const handleSend = jest.fn();
+      const draft = "Skills needed";
+      // AND ChatMessageField rendered with a failedSendDraft
+      const { rerender } = render(
+        <ChatMessageField
+          handleSend={handleSend}
+          aiIsTyping={false}
+          isChatFinished={false}
+          currentPhase={ConversationPhase.INTRO}
+          failedSendDraft={draft}
+        />
+      );
+
+      // THEN the send-failed helper message is shown
+      expect(screen.getByText(i18n.t(SEND_FAILED_MESSAGE_KEY))).toBeInTheDocument();
+
+      // WHEN failedSendDraft is cleared by the parent
+      rerender(
+        <ChatMessageField
+          handleSend={handleSend}
+          aiIsTyping={false}
+          isChatFinished={false}
+          currentPhase={ConversationPhase.INTRO}
+          failedSendDraft={null}
+        />
+      );
+
+      // THEN the send-failed helper message is removed
+      expect(screen.queryByText(i18n.t(SEND_FAILED_MESSAGE_KEY))).toBeNull();
+      // AND the field is no longer marked invalid
+      const input = screen.getByTestId(DATA_TEST_ID.CHAT_MESSAGE_FIELD);
+      expect(input).not.toHaveAttribute("aria-invalid", "true");
     });
   });
 });

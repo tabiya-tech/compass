@@ -118,7 +118,8 @@
       "uploadCvCollectExperiences": "PDF, DOCX, TXT • Máximo {{MAX_FILE_SIZE_MB}} MB • {{MAX_MARKDOWN_CHARS}} caracteres como límite",
       "uploadCvOtherPhase": "La subida de CV solo está disponible durante la recopilación de experiencias",
       "uploadCvLabel": "Subir CV",
-      "viewUploadedLabel": "CVs subidos anteriormente"
+      "viewUploadedLabel": "CVs subidos anteriormente",
+      "sendFailed": "No se pudo enviar tu mensaje. Por favor, inténtalo de nuevo."
     },
     "chatMessage": {
       "typingChatMessage": {

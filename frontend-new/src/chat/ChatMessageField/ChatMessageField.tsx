@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { KeyboardEvent, MouseEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Box, IconButton, InputAdornment, styled, TextField, Typography, useTheme } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowUpwardSharpIcon from "@mui/icons-material/ArrowUpwardSharp";
@@ -31,6 +31,7 @@ export interface ChatMessageFieldProps {
   onUploadCv?: (file: File) => Promise<string[]>; // returns array of experience lines
   currentPhase?: ConversationPhase;
   prefillMessage?: string | null; // optional prefill content for the input field
+  failedSendDraft?: string | null;
   cvUploadError?: string | null; // CV upload error message from polling process
   placeholderKey?: TranslationKey; // optional override for default placeholder
   showCvUpload?: boolean; // when false, hides the plus button and CV upload menu (default true)
@@ -74,6 +75,8 @@ export const PLACEHOLDER_TEXTS = {
   DEFAULT: "chat.chatMessageField.placeholders.default",
   UPLOADING: "chat.chatMessageField.placeholders.uploading",
 } as const;
+
+export const SEND_FAILED_MESSAGE_KEY = "chat.chatMessageField.sendFailed" as const;
 
 export const CHARACTER_LIMIT_ERROR_MESSAGES = {
   MESSAGE_LIMIT: "common.chat.errors.messageLimit",
@@ -139,6 +142,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
   const [uploadedCVs, setUploadedCVs] = useState<CVListItem[]>([]);
   const [isLoadingCVs, setIsLoadingCVs] = useState(false);
   const [menuView, setMenuView] = useState<"main" | "cvList">("main");
+  const appliedSendFailureRef = useRef(false);
 
   const isCvUploadEnabled = getCvUploadEnabled().toLowerCase() === "true";
   const showCvUpload = props.showCvUpload !== false;
@@ -264,6 +268,29 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       setErrorMessage("");
     }
   }, [props.cvUploadError]);
+
+  // Restore draft and inline error after parent reports a failed send (skills-discovery chat)
+  useEffect(() => {
+    if (props.failedSendDraft === undefined) {
+      return;
+    }
+    if (props.failedSendDraft !== null) {
+      appliedSendFailureRef.current = true;
+      setMessage(props.failedSendDraft);
+      if (props.failedSendDraft.trim().length > CHAT_MESSAGE_MAX_LENGTH) {
+        setErrorMessage(t(CHARACTER_LIMIT_ERROR_MESSAGES.MESSAGE_LIMIT, { max: CHAT_MESSAGE_MAX_LENGTH }));
+      } else {
+        setErrorMessage(t(SEND_FAILED_MESSAGE_KEY));
+      }
+    } else if (appliedSendFailureRef.current) {
+      appliedSendFailureRef.current = false;
+      if (props.cvUploadError) {
+        setErrorMessage(props.cvUploadError);
+      } else {
+        setErrorMessage("");
+      }
+    }
+  }, [props.failedSendDraft, props.cvUploadError, t]);
 
   // Handle Enter key press to send message or add new line depending on the platform
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -446,9 +473,6 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     if (props.aiIsTyping) {
       return t(PLACEHOLDER_TEXTS.AI_TYPING);
     }
-    if (!isOnline) {
-      return t(PLACEHOLDER_TEXTS.OFFLINE);
-    }
     if (props.placeholderKey) {
       return t(props.placeholderKey);
     }
@@ -456,15 +480,14 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       return props.customPlaceholder.trim();
     }
     return t(PLACEHOLDER_TEXTS.DEFAULT);
-  }, [
-    props.aiIsTyping,
-    props.isChatFinished,
-    props.isUploadingCv,
-    props.customPlaceholder,
-    props.placeholderKey,
-    isOnline,
-    t,
-  ]);
+  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, props.customPlaceholder, props.placeholderKey, t]);
+
+  const displayErrorMessage = useMemo(() => {
+    if (!isOnline) {
+      return t(PLACEHOLDER_TEXTS.OFFLINE);
+    }
+    return errorMessage;
+  }, [isOnline, errorMessage, t]);
 
   // Check if the send button should be disabled
   const sendIsDisabled = useCallback(() => {
@@ -562,8 +585,8 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           inputRef={inputRef}
-          error={!!errorMessage}
-          helperText={errorMessage}
+          error={!!displayErrorMessage}
+          helperText={displayErrorMessage}
           fillColor={props.fillColor}
           InputProps={{
             startAdornment: (

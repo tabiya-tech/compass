@@ -8,7 +8,6 @@ import {
   generateCancellableCVTypingMessage,
   generateCompassMessage,
   generateConversationConclusionMessage,
-  generatePleaseRepeatMessage,
   generateSomethingWentWrongMessage,
   generateTypingMessage,
   generateUserMessage,
@@ -113,6 +112,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   const [exploredExperiences, setExploredExperiences] = useState<number>(0);
   const [aiIsTyping, setAiIsTyping] = useState<boolean>(false);
   const [prefillMessage, setPrefillMessage] = React.useState<string | null>(null);
+  const [failedSendDraft, setFailedSendDraft] = useState<string | null>(null);
   const [showBackdrop, setShowBackdrop] = useState(showInactiveSessionAlert);
   const [lastActivityTime, setLastActivityTime] = React.useState<number>(Date.now());
   const [showRefreshConfirmDialog, setShowRefreshConfirmDialog] = React.useState<boolean>(false);
@@ -618,9 +618,15 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
       );
       // displayMessage="" suppresses the bubble; undefined = use userMessage as display
       const chatText = displayMessage !== undefined ? displayMessage : userMessage;
+      let optimisticMessageId: string | undefined;
       if (chatText) {
-        // optimistically add the user's message for a more responsive feel
-        const message = generateUserMessage(chatText, new Date().toISOString(), theme.palette.secondary.main);
+        optimisticMessageId = nanoid();
+        const message = generateUserMessage(
+          chatText,
+          new Date().toISOString(),
+          theme.palette.secondary.main,
+          optimisticMessageId
+        );
         addMessageToChat(message);
       }
 
@@ -629,6 +635,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
 
       try {
         // Send the user's message
+        setFailedSendDraft(null);
         const response = await ChatService.getInstance().sendMessage(sessionId, userMessage);
         const endTimeMs = typeof performance !== "undefined" && performance.now ? performance.now() : Date.now();
         const durationMs = Math.round(endTimeMs - startTimeMs);
@@ -718,7 +725,12 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         });
       } catch (error) {
         console.error(new ChatError("Failed to send message:", error));
-        addMessageToChat(generatePleaseRepeatMessage());
+        if (optimisticMessageId) {
+          removeMessageFromChat(optimisticMessageId);
+        }
+        if (chatText) {
+          setFailedSendDraft(chatText);
+        }
       } finally {
         setAiIsTyping(false);
       }
@@ -726,6 +738,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     [
       theme,
       addMessageToChat,
+      removeMessageFromChat,
       exploredExperiences,
       fetchExperiences,
       activeSessionId,
@@ -1110,6 +1123,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 onUploadCv: handleUploadCv,
                 currentPhase: currentPhase.phase,
                 prefillMessage,
+                failedSendDraft,
                 cvUploadError,
                 fillColor: theme.palette.secondary.main,
               },

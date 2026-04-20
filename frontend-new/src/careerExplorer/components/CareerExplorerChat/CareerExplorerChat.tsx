@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTheme } from "@mui/material";
 import ChatPage from "src/chat/ChatPage/ChatPage";
 import CareerExplorerSidebar from "src/home/components/Sidebar/CareerExplorerSidebar";
-import { generateSomethingWentWrongMessage, generateUserMessage } from "src/chat/util";
+import { generateUserMessage } from "src/chat/util";
 import type { IChatMessage } from "src/chat/Chat.types";
 import type { TranslationKey } from "src/react-i18next";
 import CareerExplorerService from "src/careerExplorer/services/CareerExplorerService";
@@ -27,6 +27,7 @@ const CareerExplorerChat: React.FC<CareerExplorerChatProps> = ({
   );
   const [aiIsTyping, setAiIsTyping] = useState(false);
   const [chatFinished, setChatFinished] = useState(false);
+  const [failedSendDraft, setFailedSendDraft] = useState<string | null>(null);
 
   const handleSendRef = useRef<(msg: string) => void>(() => {});
 
@@ -60,14 +61,16 @@ const CareerExplorerChat: React.FC<CareerExplorerChatProps> = ({
           return msg;
         })
       );
+      const optimisticId = `optimistic-${Date.now()}`;
       const optimisticUserMessage = generateUserMessage(
         userMessage,
         new Date().toISOString(),
         theme.palette.brandAction.main,
-        `optimistic-${Date.now()}`
+        optimisticId
       );
       setMessages((prev) => [...prev, optimisticUserMessage]);
       setAiIsTyping(true);
+      setFailedSendDraft(null);
       try {
         const res = await CareerExplorerService.getInstance().sendMessage(userMessage);
         setMessages(
@@ -76,7 +79,8 @@ const CareerExplorerChat: React.FC<CareerExplorerChatProps> = ({
         setChatFinished(res.finished);
       } catch (e) {
         console.error("Failed to send message", e);
-        setMessages((prev) => [...prev, generateSomethingWentWrongMessage()]);
+        setMessages((prev) => prev.filter((msg) => msg.message_id !== optimisticId));
+        setFailedSendDraft(userMessage);
       } finally {
         setAiIsTyping(false);
       }
@@ -102,6 +106,7 @@ const CareerExplorerChat: React.FC<CareerExplorerChatProps> = ({
           handleSend,
           aiIsTyping,
           isChatFinished: chatFinished,
+          failedSendDraft,
           placeholderKey,
           showCvUpload: false,
           fillColor: theme.palette.brandAction.main,

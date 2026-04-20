@@ -154,6 +154,7 @@
       "uploadCvOtherPhase": "Kukena CV kulipo pokha pamene tikukusanyira zochitika",
       "uploadCvLabel": "Kenani CV",
       "viewUploadedLabel": "CV zidakenedwa kale",
+      "sendFailed": "Kutuma uthenga kunalephera. Chonde, yesaninso.",
       "placeholders": {
         "chatFinished": "Nkhani yatha. Simungatume uthenga wina.",
         "aiTyping": "AI ikulemba..., dikirani imalize.",

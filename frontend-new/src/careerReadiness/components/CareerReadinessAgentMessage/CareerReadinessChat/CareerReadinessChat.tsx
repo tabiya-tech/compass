@@ -52,6 +52,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
   const [isLoadingHistory, setIsLoadingHistory] = useState(Boolean(initialConversationId));
   const [aiIsTyping, setAiIsTyping] = useState(false);
   const [isChatLockedForQuiz, setIsChatLockedForQuiz] = useState(false);
+  const [failedSendDraft, setFailedSendDraft] = useState<string | null>(null);
 
   const handleSendRef = useRef<(msg: string) => void>(() => {});
 
@@ -399,9 +400,11 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
           return msg;
         })
       );
-      const optimisticUserMessage = buildUserMessage(userMessage, `optimistic-${Date.now()}`);
+      const optimisticId = `optimistic-${Date.now()}`;
+      const optimisticUserMessage = buildUserMessage(userMessage, optimisticId);
       setMessages((prev) => [...prev, optimisticUserMessage]);
       setAiIsTyping(true);
+      setFailedSendDraft(null);
       try {
         const res = await CareerReadinessService.getInstance().sendMessage(moduleId, conversationId, userMessage);
         let chatMessages = mapCareerReadinessMessagesToChatMessages(
@@ -432,7 +435,8 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
         if (completed) onModuleCompleted?.();
       } catch (e) {
         console.error("Failed to send message", e);
-        setMessages((prev) => [...prev, generateSomethingWentWrongMessage()]);
+        setMessages((prev) => prev.filter((msg) => msg.message_id !== optimisticId));
+        setFailedSendDraft(userMessage);
       } finally {
         setAiIsTyping(false);
       }
@@ -471,6 +475,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
           isInputDisabled: isChatLockedForQuiz,
           isChatFinished: false,
           isUploadingCv: false,
+          failedSendDraft,
           customPlaceholder: isChatLockedForQuiz ? t("careerReadiness.chatLockedUntilQuizPassed") : inputPlaceholder,
           fillColor: theme.palette.primary.main,
         },
