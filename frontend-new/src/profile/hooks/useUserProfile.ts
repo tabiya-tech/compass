@@ -22,6 +22,7 @@ export interface UserProfileData {
   year: string | null;
   skills: Skill[];
   educationSkills: Skill[];
+  programmeSkills: string[];
   modules: ModuleSummary[];
   skillsInterestsProgress: number;
   careerExplorerSectors: UserSectorEngagementItem[];
@@ -81,6 +82,7 @@ export const useUserProfile = (): UseUserProfileResult => {
   const [isLoadingCareerExplorer, setIsLoadingCareerExplorer] = useState(true);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [educationSkills, setEducationSkills] = useState<Skill[]>([]);
+  const [programmeSkills, setProgrammeSkills] = useState<string[]>([]);
   const [modules, setModules] = useState<ModuleSummary[]>([]);
   const [skillsInterestsProgress, setSkillsInterestsProgress] = useState<number>(0);
   const [careerExplorerSectors, setCareerExplorerSectors] = useState<UserSectorEngagementItem[]>([]);
@@ -204,6 +206,7 @@ export const useUserProfile = (): UseUserProfileResult => {
         ]);
 
         setSkills(skillsData.workSkills);
+        setProgrammeSkills(programmeSkillLabels);
 
         // Programme skills are education skills — merge them with experience-based education skills
         const programmeSkillObjects: Skill[] = programmeSkillLabels.map((label, i) => ({
@@ -301,6 +304,7 @@ export const useUserProfile = (): UseUserProfileResult => {
     year: personalData.year,
     skills,
     educationSkills,
+    programmeSkills,
     modules,
     skillsInterestsProgress,
     careerExplorerSectors,

@@ -19,11 +19,12 @@ import AuthenticationStateService from "src/auth/services/AuthenticationState.se
 import { routerPaths } from "src/app/routerPaths";
 import { AuthBroadcastChannel, AuthChannelMessage } from "src/auth/services/authBroadcastChannel/authBroadcastChannel";
 
-// Mock useUserProfile so route content
-jest.mock("src/profile/hooks/useUserProfile", () => ({
-  useUserProfile: () => ({
-    profileData: jest.fn(),
+// Mock UserProfileContext so route content renders without API calls
+jest.mock("src/profile/UserProfileContext", () => ({
+  useUserProfileContext: () => ({
+    profileData: {},
   }),
+  UserProfileProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // mock the snackbar

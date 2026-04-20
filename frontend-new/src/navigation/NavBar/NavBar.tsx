@@ -36,7 +36,7 @@ import { useSentryFeedbackForm } from "src/feedback/hooks/useSentryFeedbackForm"
 import { parseEnvSupportedLocales } from "src/i18n/languageContextMenu/parseEnvSupportedLocales";
 import { LocalesLabels } from "src/i18n/constants";
 import { useExperiencesDrawer } from "src/experiences/ExperiencesDrawerProvider";
-import { useUserProfile } from "src/profile/hooks/useUserProfile";
+import { useUserProfileContext } from "src/profile/UserProfileContext";
 
 const uniqueId = "c3a8f1d2-7b4e-4c9a-a5d6-8e3f2b1c0d9e";
 
@@ -98,7 +98,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
 
   const user = authenticationStateService.getInstance().getUser();
   const isAnonymous = !user?.name || !user?.email;
-  const { profileData } = useUserProfile();
+  const { profileData } = useUserProfileContext();
   const userName = profileData.name || "";
 
   const paletteColor = theme.palette[headerColor as keyof typeof theme.palette] as PaletteColor;

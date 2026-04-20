@@ -31,8 +31,8 @@ jest.mock("src/theme/CustomTextField/CustomTextField", () => {
   });
 });
 
-jest.mock("src/profile/hooks/useUserProfile", () => ({
-  useUserProfile: jest.fn(() => ({
+jest.mock("src/profile/UserProfileContext", () => ({
+  useUserProfileContext: jest.fn(() => ({
     profileData: {
       name: "Jane Doe",
       email: "jane@example.com",
@@ -41,6 +41,7 @@ jest.mock("src/profile/hooks/useUserProfile", () => ({
       program: "BSc Computer Science",
     },
   })),
+  UserProfileProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // mock DownloadReportDropdown

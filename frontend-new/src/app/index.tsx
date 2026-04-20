@@ -1,4 +1,4 @@
-import React, { startTransition, useEffect, useState } from "react";
+import React, { startTransition, useEffect, useMemo, useState } from "react";
 import { createHashRouter, Outlet, RouterProvider, useRouteError } from "react-router-dom";
 import Layout from "src/app/Layout";
 import Login from "src/auth/pages/Login/Login";
@@ -28,7 +28,6 @@ import { getRegistrationDisabled } from "src/envService";
 import { useTranslation } from "react-i18next";
 import Home from "src/home/Home";
 import { AppErrorFallback } from "src/error/errorPage/AppErrorFallback";
-import { ExperiencesDrawerProvider } from "src/experiences/ExperiencesDrawerProvider";
 import BugReportButton from "../feedback/bugReport/bugReportButton/BugReportButton";
 import LegalDocumentPage from "src/legal/pages/LegalDocumentPage";
 
@@ -276,192 +275,195 @@ const App = () => {
     };
   }, []);
 
-  if (loading) return <Backdrop isShown={loading} transparent={true} />;
-
   // Check if registration is disabled
   const isRegistrationDisabled = getRegistrationDisabled().toLowerCase() === "true";
 
-  const router = sentryCreateBrowserRouter([
-    {
-      path: routerPaths.ROOT,
-      element: <Outlet />,
-      errorElement: <RouterErrorBoundary />,
-      children: [
-        // Authenticated routes with Layout (NavBar + SubNavBar)
+  const router = useMemo(
+    () =>
+      sentryCreateBrowserRouter([
         {
-          element: <Layout />,
+          path: routerPaths.ROOT,
+          element: <Outlet />,
+          errorElement: <RouterErrorBoundary />,
           children: [
+            // Authenticated routes with Layout (NavBar + SubNavBar)
             {
-              index: true,
-              element: (
-                <ProtectedRoute key={ProtectedRouteKeys.ROOT}>
-                  <Home />
-                </ProtectedRoute>
-              ),
-            },
-            {
-              path: routerPaths.SKILLS_INTERESTS,
-              handle: {
-                title: "home.modules.skillsDiscovery",
-                subtitle: "home.modules.skillsDiscoverySubtitle",
-                headerColor: "primary",
-              },
-              element: (
-                <ProtectedRoute key={ProtectedRouteKeys.SKILLS_INTERESTS}>
-                  <LazyLoadedChat />
-                </ProtectedRoute>
-              ),
-            },
-            {
-              path: routerPaths.KNOWLEDGE_HUB,
-              handle: {},
-              element: (
-                <ProtectedRoute key={ProtectedRouteKeys.KNOWLEDGE_HUB}>
-                  <LazyLoadedKnowledgeHubList />
-                </ProtectedRoute>
-              ),
-            },
-            {
-              path: routerPaths.KNOWLEDGE_HUB_DOCUMENT,
-              handle: {},
-              element: (
-                <ProtectedRoute key={ProtectedRouteKeys.KNOWLEDGE_HUB_DOCUMENT}>
-                  <LazyLoadedKnowledgeHubDocument />
-                </ProtectedRoute>
-              ),
-            },
-            {
-              path: routerPaths.CAREER_EXPLORER,
-              handle: {
-                title: "careerExplorer.title",
-                subtitle: "careerExplorer.subtitle",
-                headerColor: "brandAction",
-              },
-              element: (
-                <ProtectedRoute key={ProtectedRouteKeys.CAREER_EXPLORER}>
-                  <LazyLoadedCareerExplorer />
-                </ProtectedRoute>
-              ),
-            },
-            {
-              path: routerPaths.CAREER_READINESS,
-              element: (
-                <ProtectedRoute key={ProtectedRouteKeys.CAREER_READINESS}>
-                  <LazyLoadedCareerReadinessList />
-                </ProtectedRoute>
-              ),
-            },
-            {
-              path: routerPaths.CAREER_READINESS_MODULE,
-              handle: {
-                headerColor: "secondary",
-              },
-              element: (
-                <ProtectedRoute key={ProtectedRouteKeys.CAREER_READINESS_MODULE}>
-                  <LazyLoadedCareerReadinessModule />
-                </ProtectedRoute>
-              ),
-            },
-            {
-              path: routerPaths.PROFILE,
-              handle: {
-                headerColor: "primary",
-              },
-              element: (
-                <ProtectedRoute key={ProtectedRouteKeys.PROFILE}>
-                  <LazyLoadedProfile />
-                </ProtectedRoute>
-              ),
-            },
-            {
-              path: routerPaths.JOB_MATCHING,
-              handle: {},
-              element: (
-                <ProtectedRoute key={ProtectedRouteKeys.JOB_MATCHING}>
-                  <LazyLoadedJobMatching />
-                </ProtectedRoute>
-              ),
-            },
-          ],
-        },
-        // Unauthenticated routes (no Layout)
-        {
-          element: <AuthLayout />,
-          children: [
-            {
-              path: routerPaths.LANDING,
-              element: (
-                <ProtectedRoute key={ProtectedRouteKeys.LANDING}>
-                  <Landing />
-                </ProtectedRoute>
-              ),
-            },
-            {
-              path: routerPaths.LOGIN,
-              element: (
-                <ProtectedRoute key={ProtectedRouteKeys.LOGIN}>
-                  <Login />
-                </ProtectedRoute>
-              ),
-            },
-            ...(isRegistrationDisabled
-              ? []
-              : [
-                  {
-                    path: routerPaths.REGISTER,
-                    element: (
-                      <ProtectedRoute key={ProtectedRouteKeys.REGISTER}>
-                        <Register />
-                      </ProtectedRoute>
-                    ),
+              element: <Layout />,
+              children: [
+                {
+                  index: true,
+                  element: (
+                    <ProtectedRoute key={ProtectedRouteKeys.ROOT}>
+                      <Home />
+                    </ProtectedRoute>
+                  ),
+                },
+                {
+                  path: routerPaths.SKILLS_INTERESTS,
+                  handle: {
+                    title: "home.modules.skillsDiscovery",
+                    subtitle: "home.modules.skillsDiscoverySubtitle",
+                    headerColor: "primary",
                   },
-                ]),
+                  element: (
+                    <ProtectedRoute key={ProtectedRouteKeys.SKILLS_INTERESTS}>
+                      <LazyLoadedChat />
+                    </ProtectedRoute>
+                  ),
+                },
+                {
+                  path: routerPaths.KNOWLEDGE_HUB,
+                  handle: {},
+                  element: (
+                    <ProtectedRoute key={ProtectedRouteKeys.KNOWLEDGE_HUB}>
+                      <LazyLoadedKnowledgeHubList />
+                    </ProtectedRoute>
+                  ),
+                },
+                {
+                  path: routerPaths.KNOWLEDGE_HUB_DOCUMENT,
+                  handle: {},
+                  element: (
+                    <ProtectedRoute key={ProtectedRouteKeys.KNOWLEDGE_HUB_DOCUMENT}>
+                      <LazyLoadedKnowledgeHubDocument />
+                    </ProtectedRoute>
+                  ),
+                },
+                {
+                  path: routerPaths.CAREER_EXPLORER,
+                  handle: {
+                    title: "careerExplorer.title",
+                    subtitle: "careerExplorer.subtitle",
+                    headerColor: "brandAction",
+                  },
+                  element: (
+                    <ProtectedRoute key={ProtectedRouteKeys.CAREER_EXPLORER}>
+                      <LazyLoadedCareerExplorer />
+                    </ProtectedRoute>
+                  ),
+                },
+                {
+                  path: routerPaths.CAREER_READINESS,
+                  element: (
+                    <ProtectedRoute key={ProtectedRouteKeys.CAREER_READINESS}>
+                      <LazyLoadedCareerReadinessList />
+                    </ProtectedRoute>
+                  ),
+                },
+                {
+                  path: routerPaths.CAREER_READINESS_MODULE,
+                  handle: {
+                    headerColor: "secondary",
+                  },
+                  element: (
+                    <ProtectedRoute key={ProtectedRouteKeys.CAREER_READINESS_MODULE}>
+                      <LazyLoadedCareerReadinessModule />
+                    </ProtectedRoute>
+                  ),
+                },
+                {
+                  path: routerPaths.PROFILE,
+                  handle: {
+                    headerColor: "primary",
+                  },
+                  element: (
+                    <ProtectedRoute key={ProtectedRouteKeys.PROFILE}>
+                      <LazyLoadedProfile />
+                    </ProtectedRoute>
+                  ),
+                },
+                {
+                  path: routerPaths.JOB_MATCHING,
+                  handle: {},
+                  element: (
+                    <ProtectedRoute key={ProtectedRouteKeys.JOB_MATCHING}>
+                      <LazyLoadedJobMatching />
+                    </ProtectedRoute>
+                  ),
+                },
+              ],
+            },
+            // Unauthenticated routes (no Layout)
+            {
+              element: <AuthLayout />,
+              children: [
+                {
+                  path: routerPaths.LANDING,
+                  element: (
+                    <ProtectedRoute key={ProtectedRouteKeys.LANDING}>
+                      <Landing />
+                    </ProtectedRoute>
+                  ),
+                },
+                {
+                  path: routerPaths.LOGIN,
+                  element: (
+                    <ProtectedRoute key={ProtectedRouteKeys.LOGIN}>
+                      <Login />
+                    </ProtectedRoute>
+                  ),
+                },
+                ...(isRegistrationDisabled
+                  ? []
+                  : [
+                      {
+                        path: routerPaths.REGISTER,
+                        element: (
+                          <ProtectedRoute key={ProtectedRouteKeys.REGISTER}>
+                            <Register />
+                          </ProtectedRoute>
+                        ),
+                      },
+                    ]),
+              ],
+            },
+            {
+              path: routerPaths.VERIFY_EMAIL,
+              element: (
+                <ProtectedRoute key={ProtectedRouteKeys.VERIFY_EMAIL}>
+                  <VerifyEmail />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: routerPaths.CONSENT,
+              element: (
+                <ProtectedRoute key={ProtectedRouteKeys.CONSENT}>
+                  <Consent />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: routerPaths.SENSITIVE_DATA,
+              element: (
+                <ProtectedRoute key={ProtectedRouteKeys.SENSITIVE_DATA}>
+                  <LazyLoadedSensitiveDataForm />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: routerPaths.PRIVACY_POLICY,
+              element: <LegalDocumentPage variant="privacy" />,
+            },
+            {
+              path: routerPaths.TERMS_OF_USE,
+              element: <LegalDocumentPage variant="terms" />,
+            },
+            {
+              path: "*",
+              element: <NotFound />,
+            },
           ],
         },
-        {
-          path: routerPaths.VERIFY_EMAIL,
-          element: (
-            <ProtectedRoute key={ProtectedRouteKeys.VERIFY_EMAIL}>
-              <VerifyEmail />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: routerPaths.CONSENT,
-          element: (
-            <ProtectedRoute key={ProtectedRouteKeys.CONSENT}>
-              <Consent />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: routerPaths.SENSITIVE_DATA,
-          element: (
-            <ProtectedRoute key={ProtectedRouteKeys.SENSITIVE_DATA}>
-              <LazyLoadedSensitiveDataForm />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: routerPaths.PRIVACY_POLICY,
-          element: <LegalDocumentPage variant="privacy" />,
-        },
-        {
-          path: routerPaths.TERMS_OF_USE,
-          element: <LegalDocumentPage variant="terms" />,
-        },
-        {
-          path: "*",
-          element: <NotFound />,
-        },
-      ],
-    },
-  ]);
+      ]),
+    [isRegistrationDisabled]
+  );
+
+  if (loading) return <Backdrop isShown={loading} transparent={true} />;
+
   return (
     <>
-      <ExperiencesDrawerProvider>
-        <RouterProvider router={router} />
-      </ExperiencesDrawerProvider>
+      <RouterProvider router={router} />
       <BugReportButton bottomAlign={true} />
     </>
   );

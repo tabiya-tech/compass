@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import { Profile } from "./Profile";
-import { useUserProfile } from "./hooks/useUserProfile";
+import { useUserProfileContext } from "./UserProfileContext";
 
 const uniqueId = "b3c5d7e9-4f6a-8b2c-1d3e-5f7a9b1c3d5e";
 
@@ -17,7 +17,7 @@ const ProfileContainer: React.FC = () => {
     isLoadingProfile,
     isLoadingSkills,
     isLoadingCareerExplorer,
-  } = useUserProfile();
+  } = useUserProfileContext();
 
   return (
     <Box

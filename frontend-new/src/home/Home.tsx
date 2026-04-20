@@ -7,7 +7,7 @@ import HomeHero from "src/home/components/HomeHero/HomeHero";
 import HomeCtaGrid from "src/home/components/HomeCtaGrid/HomeCtaGrid";
 import HomeJobReadyList from "src/home/components/HomeJobReadyList/HomeJobReadyList";
 import HomeSidebar from "src/home/components/Sidebar/HomeSidebar";
-import { useUserProfile } from "src/profile/hooks/useUserProfile";
+import { useUserProfileContext } from "src/profile/UserProfileContext";
 
 const uniqueId = "f1a2b3c4-5d6e-7f8a-9b0c-1d2e3f4a5b6c";
 
@@ -20,7 +20,7 @@ export const DATA_TEST_ID = {
 const Home: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
-  const { profileData, isLoadingModules, errors } = useUserProfile();
+  const { profileData, isLoadingModules, errors } = useUserProfileContext();
 
   const modulesLoadError = Boolean(errors?.modules);
   const careerReadinessModules = profileData?.modules ?? [];

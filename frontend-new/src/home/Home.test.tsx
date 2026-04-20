@@ -28,15 +28,17 @@ const mockProfileData = {
     altLabels: string[];
     orderIndex: number;
   }[],
+  programmeSkills: [] as string[],
 };
 
-jest.mock("src/profile/hooks/useUserProfile", () => ({
-  useUserProfile: () => ({
+jest.mock("src/profile/UserProfileContext", () => ({
+  useUserProfileContext: () => ({
     profileData: mockProfileData,
     isLoadingModules: false,
     isLoadingSkills: false,
     errors: { modules: null },
   }),
+  UserProfileProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 describe("Home", () => {

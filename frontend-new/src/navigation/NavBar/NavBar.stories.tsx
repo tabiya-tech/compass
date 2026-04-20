@@ -1,6 +1,43 @@
+import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import NavBar from "src/navigation/NavBar/NavBar";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
+import { UserProfileContext } from "src/profile/UserProfileContext";
+import type { UseUserProfileResult } from "src/profile/hooks/useUserProfile";
+
+const mockProfileContext: UseUserProfileResult = {
+  profileData: {
+    name: "Bupe Phiri",
+    email: "bupe.phiri@example.com",
+    termsAcceptedDate: null,
+    language: null,
+    location: null,
+    school: null,
+    program: null,
+    year: null,
+    skills: [],
+    educationSkills: [],
+    programmeSkills: [],
+    modules: [],
+    skillsInterestsProgress: 0,
+    careerExplorerSectors: [],
+  },
+  isLoading: false,
+  isLoadingSecurity: false,
+  isLoadingPreferences: false,
+  isLoadingProfile: false,
+  isLoadingSkills: false,
+  isLoadingModules: false,
+  isLoadingCareerExplorer: false,
+  errors: {
+    security: null,
+    preferences: null,
+    profile: null,
+    skills: null,
+    modules: null,
+    careerExplorer: null,
+  },
+};
 
 const meta: Meta<typeof NavBar> = {
   title: "Navigation/NavBar",
@@ -13,7 +50,11 @@ const meta: Meta<typeof NavBar> = {
         name: "Bupe Phiri",
         email: "bupe.phiri@example.com",
       });
-      return <Story />;
+      return (
+        <UserProfileContext.Provider value={mockProfileContext}>
+          <Story />
+        </UserProfileContext.Provider>
+      );
     },
   ],
 };

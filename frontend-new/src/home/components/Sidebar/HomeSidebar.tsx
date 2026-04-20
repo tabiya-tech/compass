@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Box, useTheme } from "@mui/material";
 import Sidebar from "src/theme/Sidebar/Sidebar";
 import { useWorkSkills } from "src/experiences/hooks/useWorkSkills";
 import { useExperiencesDrawer } from "src/experiences/ExperiencesDrawerProvider";
-import SidebarService from "src/home/components/Sidebar/SidebarService";
+import { useUserProfileContext } from "src/profile/UserProfileContext";
 import SectionTitle from "src/home/components/Sidebar/SectionTitle";
 import ChipList from "src/home/components/Sidebar/ChipList";
 import ViewCVCard from "src/home/components/Sidebar/ViewCVCard";
@@ -27,14 +27,8 @@ const HomeSidebar: React.FC<HomeSidebarProps> = ({ showViewCvButton = true }) =>
   const theme = useTheme();
   const { openExperiencesDrawer } = useExperiencesDrawer();
   const workSkills = useWorkSkills();
-  const [programmeSkills, setProgrammeSkills] = useState<string[]>([]);
-
-  useEffect(() => {
-    SidebarService.getInstance()
-      .getProgrammeSkills()
-      .then(setProgrammeSkills)
-      .catch(() => {});
-  }, []);
+  const { profileData } = useUserProfileContext();
+  const programmeSkills = profileData.programmeSkills;
 
   const accentColor = theme.palette.primary.main;
   const tealBg = theme.palette.brandAccent.light;

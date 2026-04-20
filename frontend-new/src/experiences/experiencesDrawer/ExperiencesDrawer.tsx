@@ -27,7 +27,7 @@ import RestoreIcon from "src/theme/Icons/RestoreIcon";
 import { useTranslation } from "react-i18next";
 import { getSkillsReportOutputConfig } from "../report/config/getConfig";
 import ShareReportButton from "src/experiences/experiencesDrawer/components/shareReportButton/ShareReportButton";
-import { useUserProfile } from "src/profile/hooks/useUserProfile";
+import { useUserProfileContext } from "src/profile/UserProfileContext";
 
 const LazyLoadedDownloadDropdown = lazyWithPreload(
   () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown")
@@ -78,7 +78,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   const { t } = useTranslation();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
-  const { profileData } = useUserProfile();
+  const { profileData } = useUserProfileContext();
 
   const profileDisplay = useMemo(
     () => ({
