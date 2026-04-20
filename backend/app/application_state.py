@@ -176,6 +176,9 @@ class ApplicationStateManager(IApplicationStateManager):
         self.logger = logging.getLogger(self.__class__.__name__)
 
     async def get_state(self, session_id: int) -> ApplicationState:
+        # The store returns None only for genuinely-new sessions; partial
+        # state is healed by the store itself. Do not weaken this to
+        # new_state+save_state on non-None, or surviving data gets wiped.
         state = await self._store.get_state(session_id)
         if state is None:
             # When creating a new state, use the default country of the user

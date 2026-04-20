@@ -36,7 +36,9 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
 
     async def get_state(self, session_id: int) -> ApplicationState | None:
         """
-        Get the application state for a session from the databaseProtected Attributes and memory.
+        Returns None only when the session has no state; partial state is
+        healed by filling the missing parts with defaults to preserve
+        the surviving user data.
         """
         try:
 
@@ -79,17 +81,21 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
                 return None
 
             missing_parts = [name for name, result in zip(collection_names, results) if result is None]
+            present_parts = [name for name, result in zip(collection_names, results) if result is not None]
             # Allow recommender_advisor_agent_state to be missing for backward compatibility
             critical_missing_parts = [name for name in missing_parts if name != Collections.RECOMMENDER_ADVISOR_AGENT_STATE]
             if critical_missing_parts:
                 self._logger.error(
                     "Missing critical application state part(s) for session ID %s. Missing part(s): %s",
                     session_id,
-                    critical_missing_parts
+                    critical_missing_parts,
+                    extra={
+                        "session_id": session_id,
+                        "critical_missing_parts": critical_missing_parts,
+                        "present_parts": present_parts,
+                    },
                 )
-                return None
 
-            # Successfully retrieved all states
             (agent_director_state,
              welcome_agent_state,
              explore_experiences_director_state,
@@ -106,18 +112,78 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
             else:
                 recommender_advisor_agent_state_obj = RecommenderAdvisorAgentState.from_document(recommender_advisor_agent_state)
 
-            state = ApplicationState(session_id=session_id,
-                                     agent_director_state=AgentDirectorState.from_document(agent_director_state),
-                                     welcome_agent_state=WelcomeAgentState.from_document(welcome_agent_state),
-                                     explore_experiences_director_state=ExploreExperiencesAgentDirectorState.from_document(explore_experiences_director_state),
-                                     conversation_memory_manager_state=ConversationMemoryManagerState.from_document(conversation_memory_manager_state),
-                                     collect_experience_state=CollectExperiencesAgentState.from_document(collect_experience_state),
-                                     skills_explorer_agent_state=SkillsExplorerAgentState.from_document(skills_explorer_agent_state),
-                                     preference_elicitation_agent_state=PreferenceElicitationAgentState.from_document(preference_elicitation_agent_state),
-                                     recommender_advisor_agent_state=recommender_advisor_agent_state_obj)
+            state = ApplicationState(
+                session_id=session_id,
+                agent_director_state=(
+                    AgentDirectorState.from_document(agent_director_state)
+                    if agent_director_state is not None
+                    else AgentDirectorState(session_id=session_id)
+                ),
+                welcome_agent_state=(
+                    WelcomeAgentState.from_document(welcome_agent_state)
+                    if welcome_agent_state is not None
+                    else WelcomeAgentState(session_id=session_id)
+                ),
+                explore_experiences_director_state=(
+                    ExploreExperiencesAgentDirectorState.from_document(explore_experiences_director_state)
+                    if explore_experiences_director_state is not None
+                    else ExploreExperiencesAgentDirectorState(session_id=session_id)
+                ),
+                conversation_memory_manager_state=(
+                    ConversationMemoryManagerState.from_document(conversation_memory_manager_state)
+                    if conversation_memory_manager_state is not None
+                    else ConversationMemoryManagerState(session_id=session_id)
+                ),
+                collect_experience_state=(
+                    CollectExperiencesAgentState.from_document(collect_experience_state)
+                    if collect_experience_state is not None
+                    else CollectExperiencesAgentState(session_id=session_id)
+                ),
+                skills_explorer_agent_state=(
+                    SkillsExplorerAgentState.from_document(skills_explorer_agent_state)
+                    if skills_explorer_agent_state is not None
+                    else SkillsExplorerAgentState(session_id=session_id)
+                ),
+                preference_elicitation_agent_state=(
+                    PreferenceElicitationAgentState.from_document(preference_elicitation_agent_state)
+                    if preference_elicitation_agent_state is not None
+                    else PreferenceElicitationAgentState(session_id=session_id)
+                ),
+                recommender_advisor_agent_state=recommender_advisor_agent_state_obj,
+            )
 
-            # Upgrade the state if necessary
+            # Upgrade before the heal-save so both land in one write.
             state = await self._upgrade_state(state)
+
+            if critical_missing_parts:
+                try:
+                    await self.save_state(state)
+                    self._logger.warning(
+                        "Healing partial application state for session ID %s. "
+                        "Filled with defaults: %s",
+                        session_id,
+                        critical_missing_parts,
+                        extra={
+                            "session_id": session_id,
+                            "healed_parts": critical_missing_parts,
+                            "present_parts": present_parts,
+                        },
+                    )
+                except Exception as save_err:  # pylint: disable=broad-except
+                    # A save failure must not demote the return to None, which would
+                    # re-trigger the upstream destructive-recovery path.
+                    self._logger.warning(
+                        "Healed partial application state in memory for session ID %s "
+                        "but failed to persist (DB stays partial; will retry next read): %s",
+                        session_id,
+                        save_err,
+                        exc_info=save_err,
+                        extra={
+                            "session_id": session_id,
+                            "healed_parts": critical_missing_parts,
+                            "present_parts": present_parts,
+                        },
+                    )
 
             return state
 
@@ -144,22 +210,48 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
                 raise ValueError("All states must have the same session_id")
             # Write the component states to the database
             # Using $eq to prevent NoSQL injection
-            await asyncio.gather(
-                self._agent_director_collection.update_one({"session_id": {"$eq": session_id}}, {"$set": state.agent_director_state.model_dump()}, upsert=True),
-                self._welcome_agent_state.update_one({"session_id": {"$eq": session_id}}, {"$set": state.welcome_agent_state.model_dump()}, upsert=True),
-                self._explore_experiences_director_state_collection.update_one({"session_id": {"$eq": session_id}},
-                                                                               {"$set": state.explore_experiences_director_state.model_dump()}, upsert=True),
-                self._conversation_memory_manager_state_collection.update_one({"session_id": {"$eq": session_id}},
-                                                                              {"$set": state.conversation_memory_manager_state.model_dump()}, upsert=True),
-                self._collect_experience_state_collection.update_one({"session_id": {"$eq": session_id}}, {"$set": state.collect_experience_state.model_dump()},
-                                                                     upsert=True),
-                self._skills_explorer_agent_state_collection.update_one({"session_id": {"$eq": session_id}},
-                                                                        {"$set": state.skills_explorer_agent_state.model_dump()}, upsert=True),
-                self._preference_elicitation_agent_state_collection.update_one({"session_id": {"$eq": session_id}},
-                                                                               {"$set": state.preference_elicitation_agent_state.model_dump()}, upsert=True),
-                self._recommender_advisor_agent_state_collection.update_one({"session_id": {"$eq": session_id}},
-                                                                            {"$set": state.recommender_advisor_agent_state.model_dump()}, upsert=True)
+            write_targets = [
+                (Collections.AGENT_DIRECTOR_STATE, self._agent_director_collection, state.agent_director_state),
+                (Collections.WELCOME_AGENT_STATE, self._welcome_agent_state, state.welcome_agent_state),
+                (Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE, self._explore_experiences_director_state_collection, state.explore_experiences_director_state),
+                (Collections.CONVERSATION_MEMORY_MANAGER_STATE, self._conversation_memory_manager_state_collection, state.conversation_memory_manager_state),
+                (Collections.COLLECT_EXPERIENCE_STATE, self._collect_experience_state_collection, state.collect_experience_state),
+                (Collections.SKILLS_EXPLORER_AGENT_STATE, self._skills_explorer_agent_state_collection, state.skills_explorer_agent_state),
+                (Collections.PREFERENCE_ELICITATION_AGENT_STATE, self._preference_elicitation_agent_state_collection, state.preference_elicitation_agent_state),
+                (Collections.RECOMMENDER_ADVISOR_AGENT_STATE, self._recommender_advisor_agent_state_collection, state.recommender_advisor_agent_state),
+            ]
+            results = await asyncio.gather(
+                *(
+                    collection.update_one(
+                        {"session_id": {"$eq": session_id}},
+                        {"$set": part_state.model_dump()},
+                        upsert=True,
+                    )
+                    for _, collection, part_state in write_targets
+                ),
+                return_exceptions=True,
             )
+
+            failed_parts: list[str] = []
+            for (coll_name, _, _), result in zip(write_targets, results):
+                if isinstance(result, BaseException):
+                    failed_parts.append(coll_name)
+                    self._logger.error(
+                        "save_state: collection '%s' failed for session ID %s: %s",
+                        coll_name,
+                        session_id,
+                        result,
+                        exc_info=result,
+                        extra={
+                            "session_id": session_id,
+                            "failing_state_collection": coll_name,
+                        },
+                    )
+
+            if failed_parts:
+                raise RuntimeError(
+                    f"save_state failed for session ID {session_id}; failing collections: {failed_parts}"
+                )
 
         except Exception as e:  # pylint: disable=broad-except
             # Log the error and raise an exception so that the caller can handle it

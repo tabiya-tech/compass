@@ -375,14 +375,16 @@ class TestDatabaseApplicationStateStore:
         Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE,
         Collections.CONVERSATION_MEMORY_MANAGER_STATE,
         Collections.COLLECT_EXPERIENCE_STATE,
-        Collections.SKILLS_EXPLORER_AGENT_STATE
+        Collections.SKILLS_EXPLORER_AGENT_STATE,
+        Collections.PREFERENCE_ELICITATION_AGENT_STATE,
     ], ids=[
         "agent_director_state",
         "welcome_agent_state",
         "explore_experiences_agent_director_state",
         "conversation_memory_manager_state",
         "collect_experience_state",
-        "skills_explorer_agent_state"
+        "skills_explorer_agent_state",
+        "preference_elicitation_agent_state",
     ])
     async def test_missing_partial_state(self, in_memory_db: AsyncIOMotorDatabase, database_application_state_store: DatabaseApplicationStateStore,
                                          collection_name: str,
@@ -390,25 +392,163 @@ class TestDatabaseApplicationStateStore:
         with caplog.at_level(logging.WARNING):
             guard_caplog(database_application_state_store._logger, caplog)
 
-            # GIVEN a session_id that exists in the database
+            # GIVEN a session_id that exists in the database with a full state saved
             given_session_id = generate_new_session_id()
-            # Create a state with unique data
-            state = get_test_application_state(given_session_id)
-            # Save the state
-            await database_application_state_store.save_state(state)
+            given_saved_state = get_test_application_state(given_session_id)
+            await database_application_state_store.save_state(given_saved_state)
 
-            # AND a state is missing for the given particular collection
-            # Delete the state for the given collection
+            # AND a snapshot of every surviving collection's document
+            given_surviving_docs: dict[str, dict] = {}
+            for name in [
+                Collections.AGENT_DIRECTOR_STATE,
+                Collections.WELCOME_AGENT_STATE,
+                Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE,
+                Collections.CONVERSATION_MEMORY_MANAGER_STATE,
+                Collections.COLLECT_EXPERIENCE_STATE,
+                Collections.SKILLS_EXPLORER_AGENT_STATE,
+                Collections.PREFERENCE_ELICITATION_AGENT_STATE,
+            ]:
+                if name == collection_name:
+                    continue
+                doc = await in_memory_db.get_collection(name).find_one(
+                    {"session_id": given_session_id}, {"_id": False}
+                )
+                assert doc is not None
+                given_surviving_docs[name] = doc
+
+            # AND the document for one collection is removed (partial-state shape)
             await in_memory_db.get_collection(collection_name).delete_one({"session_id": given_session_id})
 
             # WHEN getting the state for that session_id
             actual_fetched_state = await database_application_state_store.get_state(given_session_id)
 
-            # THEN the returned state is None
-            assert actual_fetched_state is None
+            # THEN a healed state is returned
+            assert actual_fetched_state is not None
+            assert actual_fetched_state.session_id == given_session_id
 
-            # AND an error is logged
-            assert len(caplog.records) == 1
-            assert caplog.records[0].levelname == "ERROR"
-            assert caplog.records[
-                       0].message == f"Missing critical application state part(s) for session ID {given_session_id}. Missing part(s): ['{collection_name}']"
+            # AND every state part carries the correct session_id
+            for actual_part in [
+                actual_fetched_state.agent_director_state,
+                actual_fetched_state.welcome_agent_state,
+                actual_fetched_state.explore_experiences_director_state,
+                actual_fetched_state.conversation_memory_manager_state,
+                actual_fetched_state.collect_experience_state,
+                actual_fetched_state.skills_explorer_agent_state,
+                actual_fetched_state.preference_elicitation_agent_state,
+            ]:
+                assert actual_part.session_id == given_session_id
+
+            # AND the partial-state error is logged
+            error_records = [r for r in caplog.records if r.levelname == "ERROR"
+                             and r.message.startswith("Missing critical application state part(s)")]
+            assert len(error_records) == 1
+            assert error_records[0].message == (
+                f"Missing critical application state part(s) for session ID {given_session_id}. "
+                f"Missing part(s): ['{collection_name}']"
+            )
+
+            # AND a distinct healing log is emitted
+            heal_records = [r for r in caplog.records if r.levelname == "WARNING"
+                            and r.message.startswith("Healing partial application state")]
+            assert len(heal_records) == 1
+            assert heal_records[0].message == (
+                f"Healing partial application state for session ID {given_session_id}. "
+                f"Filled with defaults: ['{collection_name}']"
+            )
+
+            # AND the previously-missing collection is refilled
+            actual_refilled_doc = await in_memory_db.get_collection(collection_name).find_one(
+                {"session_id": given_session_id}, {"_id": False}
+            )
+            assert actual_refilled_doc is not None
+            assert actual_refilled_doc["session_id"] == given_session_id
+
+            # AND the surviving collections' documents are not overwritten
+            for name, given_doc in given_surviving_docs.items():
+                actual_doc = await in_memory_db.get_collection(name).find_one(
+                    {"session_id": given_session_id}, {"_id": False}
+                )
+                assert actual_doc is not None
+                assert actual_doc["session_id"] == given_doc["session_id"]
+                for field_name, given_value in given_doc.items():
+                    # explored_experiences is populated by the upgrade path; skip to avoid flakes.
+                    if field_name == "explored_experiences":
+                        continue
+                    assert actual_doc.get(field_name) == given_value, (
+                        f"Field '{field_name}' on surviving collection '{name}' was overwritten: "
+                        f"given={given_value!r}, after_heal={actual_doc.get(field_name)!r}"
+                    )
+
+    @pytest.mark.asyncio
+    async def test_multiple_missing_parts_are_healed_together(self,
+                                                              in_memory_db: AsyncIOMotorDatabase,
+                                                              database_application_state_store: DatabaseApplicationStateStore,
+                                                              caplog: pytest.LogCaptureFixture):
+        with caplog.at_level(logging.WARNING):
+            guard_caplog(database_application_state_store._logger, caplog)
+
+            # GIVEN a session with a full state saved
+            given_session_id = generate_new_session_id()
+            given_saved_state = get_test_application_state(given_session_id)
+            await database_application_state_store.save_state(given_saved_state)
+
+            # AND three critical collections are deleted
+            given_deleted_collections = [
+                Collections.COLLECT_EXPERIENCE_STATE,
+                Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE,
+                Collections.PREFERENCE_ELICITATION_AGENT_STATE,
+            ]
+            for name in given_deleted_collections:
+                await in_memory_db.get_collection(name).delete_one({"session_id": given_session_id})
+
+            # WHEN getting the state for that session_id
+            actual_fetched_state = await database_application_state_store.get_state(given_session_id)
+
+            # THEN a healed state is returned
+            assert actual_fetched_state is not None
+            assert actual_fetched_state.session_id == given_session_id
+
+            # AND all three previously-missing collections are refilled
+            for name in given_deleted_collections:
+                actual_doc = await in_memory_db.get_collection(name).find_one(
+                    {"session_id": given_session_id}, {"_id": False}
+                )
+                assert actual_doc is not None, f"Collection {name} was not refilled"
+
+    @pytest.mark.asyncio
+    async def test_save_failure_during_heal_does_not_demote_return_to_none(self,
+                                                                           in_memory_db: AsyncIOMotorDatabase,
+                                                                           database_application_state_store: DatabaseApplicationStateStore,
+                                                                           caplog: pytest.LogCaptureFixture,
+                                                                           mocker):
+        with caplog.at_level(logging.WARNING):
+            guard_caplog(database_application_state_store._logger, caplog)
+
+            # GIVEN a session with a full state saved
+            given_session_id = generate_new_session_id()
+            given_saved_state = get_test_application_state(given_session_id)
+            await database_application_state_store.save_state(given_saved_state)
+
+            # AND one critical collection has been deleted
+            await in_memory_db.get_collection(Collections.COLLECT_EXPERIENCE_STATE).delete_one(
+                {"session_id": given_session_id}
+            )
+
+            # AND save_state will fail
+            mocker.patch.object(
+                database_application_state_store,
+                "save_state",
+                side_effect=RuntimeError("simulated transient mongo failure during heal"),
+            )
+
+            # WHEN getting the state for that session_id
+            actual_fetched_state = await database_application_state_store.get_state(given_session_id)
+
+            # THEN the in-memory healed state is still returned
+            assert actual_fetched_state is not None
+            assert actual_fetched_state.session_id == given_session_id
+
+            # AND the failure is logged as a warning
+            failure_records = [r for r in caplog.records if r.levelname == "WARNING"
+                               and r.message.startswith("Healed partial application state in memory")]
+            assert len(failure_records) == 1
