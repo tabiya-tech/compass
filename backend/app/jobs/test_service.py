@@ -17,7 +17,14 @@ class _FakeJobRepository(IJobRepository):
         self.last_limit: Optional[int] = None
         self.count_called = False
 
-    async def list_jobs(self, filter_query: Dict[str, Any], offset: int, limit: int) -> List[Dict[str, Any]]:
+    async def list_jobs(
+        self,
+        filter_query: Dict[str, Any],
+        offset: int,
+        limit: int,
+        sort_by: Optional[str] = None,
+        sort_dir: str = "asc",
+    ) -> List[Dict[str, Any]]:
         self.last_filter_query = filter_query
         self.last_offset = offset
         self.last_limit = limit
@@ -41,20 +48,23 @@ class TestJobService:
 
         # WHEN list_jobs is called with limit=2 and include=count
         result = await service.list_jobs(
+            search=None,
             category="Engineering",
             employment_type="Full-time",
             location="Lusaka",
             days=7,
             cursor="3",
             limit=2,
+            sort_by=None,
+            sort_dir="asc",
             include="count",
         )
 
         # THEN filter, paging, and count metadata are correct
         assert repo.last_filter_query is not None
-        assert repo.last_filter_query["category"] == "Engineering"
+        assert repo.last_filter_query["category"] == {"$regex": "Engineering", "$options": "i"}
         assert repo.last_filter_query["employment_type"] == "Full-time"
-        assert repo.last_filter_query["location"] == "Lusaka"
+        assert repo.last_filter_query["location"] == {"$regex": "Lusaka", "$options": "i"}
         assert "posted_date" in repo.last_filter_query
         assert repo.last_offset == 3
         assert repo.last_limit == 2
@@ -75,12 +85,15 @@ class TestJobService:
 
         # WHEN include=count is not requested
         result = await service.list_jobs(
+            search=None,
             category=None,
             employment_type=None,
             location=None,
             days=None,
             cursor=None,
             limit=20,
+            sort_by=None,
+            sort_dir="asc",
             include=None,
         )
 
@@ -91,6 +104,31 @@ class TestJobService:
         assert result.meta.next_cursor is None
 
     @pytest.mark.asyncio
+    async def test_list_jobs_builds_case_insensitive_space_tolerant_filters(self):
+        # GIVEN category/location queries with mixed case and extra spaces
+        repo = _FakeJobRepository(docs=[], total=0)
+        service = JobService(repository=repo)
+
+        # WHEN list_jobs is called
+        await service.list_jobs(
+            search=None,
+            category="accounting   auditing",
+            employment_type=None,
+            location="ka fue",
+            days=None,
+            cursor=None,
+            limit=20,
+            sort_by=None,
+            sort_dir="asc",
+            include=None,
+        )
+
+        # THEN filters support partial matching and spacing tolerance
+        assert repo.last_filter_query is not None
+        assert repo.last_filter_query["category"] == {"$regex": "accounting.*auditing", "$options": "i"}
+        assert repo.last_filter_query["location"] == {"$regex": "ka.*fue", "$options": "i"}
+
+    @pytest.mark.asyncio
     async def test_list_jobs_with_invalid_cursor_raises_400(self):
         # GIVEN a non-numeric cursor
         repo = _FakeJobRepository(docs=[], total=0)
@@ -99,12 +137,15 @@ class TestJobService:
         # WHEN list_jobs is called
         with pytest.raises(HTTPException) as exc_info:
             await service.list_jobs(
+                search=None,
                 category=None,
                 employment_type=None,
                 location=None,
                 days=None,
                 cursor="not-a-number",
                 limit=20,
+                sort_by=None,
+                sort_dir="asc",
                 include=None,
             )
 

@@ -4,7 +4,16 @@ import { MODULE_FILTER_PROGRAMMES } from "src/data/moduleFilterOptions";
 import { lastLoginDisplayMatchesFilter } from "src/hooks/instructorStudentsLastLoginFilter";
 import type { InstructorStudentRow } from "src/types";
 
-export type StudentsSortKey = "modulesExplored" | "careerReady" | "skillsInterestsExplored";
+export type StudentsSortKey =
+  | "studentName"
+  | "programme"
+  | "year"
+  | "gender"
+  | "lastLogin"
+  | "lastActiveModuleId"
+  | "modulesExplored"
+  | "careerReady"
+  | "skillsInterestsExplored";
 type SortDir = "asc" | "desc";
 
 type UseInstructorStudentsTableStateOptions = {
@@ -16,6 +25,11 @@ type UseInstructorStudentsTableStateOptions = {
 
 const KNOWN_GENDERS = ["Male", "Female"] as const;
 const DEFAULT_PAGE_SIZE = 20;
+
+const isMissingText = (value: string): boolean => {
+  const trimmed = value.trim();
+  return trimmed.length === 0 || trimmed === PLACEHOLDER_SYMBOL;
+};
 
 function useDebouncedValue<T>(value: T, delayMs: number): T {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -33,10 +47,28 @@ function useDebouncedValue<T>(value: T, delayMs: number): T {
 
 const fracRatio = (value: string): number => {
   const matched = value.trim().match(/^(\d+)\s*\/\s*(\d+)$/);
-  if (!matched) return -1;
+  if (!matched) return Number.NaN;
   const numerator = Number(matched[1]);
   const denominator = Number(matched[2]);
-  return denominator > 0 ? numerator / denominator : -1;
+  return denominator > 0 ? numerator / denominator : Number.NaN;
+};
+
+const normalizeText = (value: string): string | null => (isMissingText(value) ? null : value.trim().toLowerCase());
+
+const normalizeYear = (value: string): number | null => {
+  if (isMissingText(value)) return null;
+  const numericYear = Number.parseInt(value, 10);
+  return Number.isNaN(numericYear) ? null : numericYear;
+};
+
+const normalizeLastLogin = (value: string): number | null => {
+  const trimmed = value.trim();
+  if (trimmed === "Today") return 0;
+  if (trimmed === "Yesterday") return 1;
+  if (trimmed === "Never" || isMissingText(trimmed)) return null;
+  const dayMatch = trimmed.match(/^(\d+)\s*days?\s*ago$/i);
+  if (!dayMatch) return null;
+  return Number(dayMatch[1]);
 };
 
 export function useInstructorStudentsTableState(
@@ -97,16 +129,35 @@ export function useInstructorStudentsTableState(
       return filteredRows;
     }
 
-    const getValue = (row: InstructorStudentRow, key: StudentsSortKey): number => {
+    const getValue = (row: InstructorStudentRow, key: StudentsSortKey): number | string | null => {
+      if (key === "studentName") return normalizeText(row.studentName);
+      if (key === "programme") return normalizeText(row.programme);
+      if (key === "year") return normalizeYear(row.year);
+      if (key === "gender") return normalizeText(row.gender);
+      if (key === "lastLogin") return normalizeLastLogin(row.lastLogin);
+      if (key === "lastActiveModuleId") return normalizeText(row.lastActiveModuleId);
       if (key === "modulesExplored") return row.modulesExplored;
-      if (key === "careerReady") return fracRatio(row.careerReady);
+      if (key === "careerReady") {
+        const ratio = fracRatio(row.careerReady);
+        return Number.isNaN(ratio) ? null : ratio;
+      }
       return row.skillsInterestsExplored;
     };
 
     return [...filteredRows].sort((a, b) => {
       const left = getValue(a, sortKey);
       const right = getValue(b, sortKey);
-      const comparison = left < right ? -1 : left > right ? 1 : 0;
+      if (left === null && right === null) return 0;
+      if (left === null) return 1;
+      if (right === null) return -1;
+      const comparison =
+        typeof left === "string" && typeof right === "string"
+          ? left.localeCompare(right)
+          : left < right
+            ? -1
+            : left > right
+              ? 1
+              : 0;
       return sortDir === "asc" ? comparison : -comparison;
     });
   }, [filteredRows, sortDir, sortKey]);
@@ -130,12 +181,17 @@ export function useInstructorStudentsTableState(
     }
   }, [hasMoreRows, loadingRows, onLoadMoreRows, pageStart, sortedRows.length]);
 
-  const handleSort = (key: StudentsSortKey) => {
+  const handleSort = (key: StudentsSortKey, dir?: SortDir) => {
     if (sortKey === key) {
-      setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
+      setSortDir((prev) => dir ?? (prev === "asc" ? "desc" : "asc"));
       return;
     }
     setSortKey(key);
+    setSortDir(dir ?? "asc");
+  };
+
+  const clearSort = () => {
+    setSortKey(null);
     setSortDir("asc");
   };
 
@@ -155,6 +211,7 @@ export function useInstructorStudentsTableState(
     sortKey,
     sortDir,
     handleSort,
+    clearSort,
     nameSearch,
     setNameSearch,
     programme,

@@ -10,10 +10,14 @@ export interface UseInstitutionsResult {
   loading: boolean;
   error: Error | null;
   page: number;
+  sortKey: keyof InstitutionRow | null;
+  sortDir: "asc" | "desc";
   hasNextPage: boolean;
   hasPrevPage: boolean;
   goToNextPage: () => void;
   goToPrevPage: () => void;
+  onSortChange: (key: keyof InstitutionRow, dir?: "asc" | "desc") => void;
+  onSortClear: () => void;
 }
 
 function mapApiItemToRow(item: InstitutionApiItem): InstitutionRow {
@@ -30,10 +34,27 @@ function mapApiItemToRow(item: InstitutionApiItem): InstitutionRow {
   };
 }
 
+function mapSortKeyToApiField(key: keyof InstitutionRow): string {
+  const keyMap: Record<keyof InstitutionRow, string> = {
+    id: "name",
+    institution: "name",
+    students: "students",
+    active7Days: "active_7_days",
+    skillsDiscoveryStartedPct: "skills_discovery_started_pct",
+    skillsDiscoveryCompletedPct: "skills_discovery_completed_pct",
+    careerReadinessStartedPct: "career_readiness_started_pct",
+    careerReadinessCompletedPct: "career_readiness_completed_pct",
+    careerExplorerStartedPct: "career_explorer_started_pct",
+  };
+  return keyMap[key];
+}
+
 export function useInstitutions(): UseInstitutionsResult {
   // cursor stack: index 0 = page 1 (no cursor), index N = cursor for page N+1
   const [cursorStack, setCursorStack] = useState<(string | undefined)[]>([undefined]);
   const [pageIndex, setPageIndex] = useState(0);
+  const [sortKey, setSortKey] = useState<keyof InstitutionRow | null>(null);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [institutions, setInstitutions] = useState<InstitutionRow[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,8 +67,9 @@ export function useInstitutions(): UseInstitutionsResult {
     let isMounted = true;
     setLoading(true);
     const cursor = cursorStackRef.current[pageIndex];
+    const apiSortBy = sortKey ? mapSortKeyToApiField(sortKey) : undefined;
     AnalyticsService.getInstance()
-      .listInstitutions(PAGE_SIZE, cursor)
+      .listInstitutions(PAGE_SIZE, cursor, apiSortBy, sortKey ? sortDir : undefined)
       .then((data) => {
         if (!isMounted) return;
         setInstitutions(data.data.map(mapApiItemToRow));
@@ -72,7 +94,7 @@ export function useInstitutions(): UseInstitutionsResult {
     return () => {
       isMounted = false;
     };
-  }, [pageIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [pageIndex, sortDir, sortKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const goToNextPage = useCallback(() => {
     if (nextCursor) setPageIndex((p) => p + 1);
@@ -82,14 +104,40 @@ export function useInstitutions(): UseInstitutionsResult {
     setPageIndex((p) => Math.max(0, p - 1));
   }, []);
 
+  const onSortChange = useCallback((key: keyof InstitutionRow, dir?: "asc" | "desc") => {
+    setSortKey((prevSortKey) => {
+      const isSameKey = prevSortKey !== null && prevSortKey === key;
+      if (dir) {
+        setSortDir(dir);
+      } else {
+        setSortDir((prevDir) => (isSameKey ? (prevDir === "asc" ? "desc" : "asc") : "asc"));
+      }
+      return key;
+    });
+    setPageIndex(0);
+    setCursorStack([undefined]);
+    setNextCursor(null);
+  }, []);
+
+  const onSortClear = useCallback(() => {
+    setSortKey(null);
+    setPageIndex(0);
+    setCursorStack([undefined]);
+    setNextCursor(null);
+  }, []);
+
   return {
     institutions,
     loading,
     error,
     page: pageIndex + 1,
+    sortKey,
+    sortDir,
     hasNextPage: Boolean(nextCursor),
     hasPrevPage: pageIndex > 0,
     goToNextPage,
     goToPrevPage,
+    onSortChange,
+    onSortClear,
   };
 }

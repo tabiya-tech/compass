@@ -137,6 +137,9 @@
       "skillsAnalytics": "Skills Analytics",
       "jobPostings": "Job Postings"
     },
+    "dataTable": {
+      "clearSorting": "Clear sorting"
+    },
     "dailyAdoptionTrend": {
       "title": "Daily Adoption Trend",
       "noData": "Palibe deta ilipo",

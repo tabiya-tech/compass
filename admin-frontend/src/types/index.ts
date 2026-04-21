@@ -85,21 +85,13 @@ export interface JobPostingStats {
   sourcePlatformsCount: number;
 }
 
-export interface JobPostingFilters {
-  search: string;
-  sector: string;
-  location: string;
-  platform: string;
-  zqfLevel: string;
-}
-
 export interface JobPostingRow {
   id: string;
-  jobTitle: string;
-  sector: string;
-  location: string;
+  jobTitle: string | null;
+  sector: string | null;
+  location: string | null;
   zqfLevel: string;
-  platform: string;
+  platform: string | null;
   skills: string[];
   candidatePool: number;
   jobUrl: string;

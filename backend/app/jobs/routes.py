@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from http import HTTPStatus
-from typing import Annotated, Optional
+from typing import Annotated, Literal, Optional
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Response
 from app.analytics.types import PaginatedListResponse
@@ -47,12 +47,18 @@ def add_jobs_routes(app: FastAPI):
     )
     async def list_jobs(
         response: Response,
+        search: Optional[str] = Query(default=None, description="Search by job title"),
         category: Optional[str] = Query(default=None, description="Filter by job category"),
         employment_type: Optional[str] = Query(default=None, description="Filter by employment type"),
         location: Optional[str] = Query(default=None, description="Filter by job location"),
         days: Optional[int] = Query(default=None, ge=1, le=3650, description="Only include jobs posted within the last N days"),
         cursor: Optional[str] = Query(default=None, description="Pagination cursor from previous response"),
         limit: Annotated[int, Query(ge=1, le=100, description="Max items per page")] = 20,
+        sort_by: Literal["title", "category", "location", "source_platform", "posted_date"] | None = Query(
+            default=None,
+            description="Sort field",
+        ),
+        sort_dir: Literal["asc", "desc"] = Query(default="asc", description="Sort direction"),
         include: Optional[str] = Query(default=None, description="Comma-separated: 'count' to include total"),
         job_service: IJobService = Depends(get_job_service),
     ):
@@ -65,12 +71,15 @@ def add_jobs_routes(app: FastAPI):
         response.headers["Access-Control-Allow-Origin"] = "*"
         try:
             return await job_service.list_jobs(
+                search=search,
                 category=category,
                 employment_type=employment_type,
                 location=location,
                 days=days,
                 cursor=cursor,
                 limit=limit,
+                sort_by=sort_by,
+                sort_dir=sort_dir,
                 include=include,
             )
         except HTTPException:

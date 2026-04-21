@@ -8,10 +8,14 @@ export interface InstitutionsTableProps {
   rows: InstitutionRow[];
   loading?: boolean;
   page?: number;
+  sortKey?: keyof InstitutionRow | null;
+  sortDir?: "asc" | "desc";
   hasNextPage?: boolean;
   hasPrevPage?: boolean;
   onNextPage?: () => void;
   onPrevPage?: () => void;
+  onSortChange?: (key: keyof InstitutionRow, dir?: "asc" | "desc") => void;
+  onSortClear?: () => void;
 }
 
 const GROUP_COLORS = {
@@ -24,10 +28,14 @@ const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
   rows,
   loading = false,
   page,
+  sortKey,
+  sortDir,
   hasNextPage,
   hasPrevPage,
   onNextPage,
   onPrevPage,
+  onSortChange,
+  onSortClear,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -70,6 +78,7 @@ const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
       key: "institution",
       label: t("dashboard.institutionsTable.headers.institution"),
       sortable: true,
+      sortType: "text",
       align: "center",
       minWidth: 180,
       render: renderInstitution,
@@ -79,6 +88,7 @@ const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
       key: "students",
       label: t("dashboard.institutionsTable.headers.students"),
       sortable: true,
+      sortType: "number",
       align: "center",
       minWidth: 76,
       render: renderNum,
@@ -88,6 +98,7 @@ const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
       key: "active7Days",
       label: t("dashboard.institutionsTable.headers.active7Days"),
       sortable: true,
+      sortType: "number",
       align: "center",
       minWidth: 90,
       render: renderNum,
@@ -97,6 +108,7 @@ const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
       key: "skillsDiscoveryStartedPct",
       label: `${t("dashboard.institutionsTable.subHeaders.started")}\n${t("dashboard.institutionsTable.subHeaders.ofReg")}`,
       sortable: true,
+      sortType: "number",
       align: "center",
       minWidth: 80,
       group: "skillsDiscovery",
@@ -106,6 +118,7 @@ const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
       key: "skillsDiscoveryCompletedPct",
       label: `${t("dashboard.institutionsTable.subHeaders.completed")}\n${t("dashboard.institutionsTable.subHeaders.ofStarted")}`,
       sortable: true,
+      sortType: "number",
       align: "center",
       minWidth: 80,
       group: "skillsDiscovery",
@@ -116,6 +129,7 @@ const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
       key: "careerReadinessStartedPct",
       label: `${t("dashboard.institutionsTable.subHeaders.started")}\n${t("dashboard.institutionsTable.subHeaders.ofReg")}`,
       sortable: true,
+      sortType: "number",
       align: "center",
       minWidth: 80,
       group: "careerReadiness",
@@ -125,6 +139,7 @@ const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
       key: "careerReadinessCompletedPct",
       label: `${t("dashboard.institutionsTable.subHeaders.completed")}\n${t("dashboard.institutionsTable.subHeaders.ofStarted")}`,
       sortable: true,
+      sortType: "number",
       align: "center",
       minWidth: 80,
       group: "careerReadiness",
@@ -135,6 +150,7 @@ const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
       key: "careerExplorerStartedPct",
       label: `${t("dashboard.institutionsTable.subHeaders.started")}\n${t("dashboard.institutionsTable.subHeaders.ofReg")}`,
       sortable: true,
+      sortType: "number",
       align: "center",
       minWidth: 80,
       group: "careerExplorer",
@@ -171,8 +187,11 @@ const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
       loading={loading}
       skeletonRows={8}
       emptyMessage={t("dashboard.institutionsTable.empty")}
-      initialSortKey="institution"
-      initialSortDir="asc"
+      externalSortKey={sortKey}
+      externalSortDir={sortDir}
+      onSortChange={onSortChange}
+      onSortClear={onSortClear}
+      sortClearLabel={onSortClear ? t("dashboard.dataTable.clearSorting") : undefined}
       ariaLabel="institutions table"
       tableMinWidth={960}
       page={page}

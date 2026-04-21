@@ -76,16 +76,13 @@ const toInstructorStudentRow = (
 
 export function useInstructorStudents(): UseInstructorStudentsResult {
   const [students, setStudents] = useState<InstructorStudentRow[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [isFetching, setIsFetching] = useState(false);
-  const nextCursorRef = useRef<string | null>(null);
   const isFetchingRef = useRef(false);
-  nextCursorRef.current = nextCursor;
   isFetchingRef.current = isFetching;
 
-  const fetchBatch = useCallback(async (cursor?: string, append = true) => {
+  const fetchAllRows = useCallback(async () => {
     if (isFetchingRef.current) return;
     setIsFetching(true);
     setLoading(true);
@@ -93,42 +90,47 @@ export function useInstructorStudents(): UseInstructorStudentsResult {
     try {
       const institutionId = UserStateService.getInstance().getInstitutionId();
       const institution = institutionId ? decodeInstitutionId(institutionId) : undefined;
-      const result = await AnalyticsService.getInstance().listStudents({
-        limit: FETCH_BATCH_SIZE,
-        cursor,
-        institution,
-      });
 
-      const mappedStudents = result.data
-        .map(toInstructorStudentRow)
-        .filter((student): student is InstructorStudentRow => student !== null);
+      const allRows: InstructorStudentRow[] = [];
+      let cursor: string | undefined = undefined;
 
-      setStudents((prev) => (append ? [...prev, ...mappedStudents] : mappedStudents));
-      setNextCursor(result.meta.next_cursor ?? null);
+      while (true) {
+        const result = await AnalyticsService.getInstance().listStudents({
+          limit: FETCH_BATCH_SIZE,
+          cursor,
+          institution,
+        });
+
+        const mappedStudents = result.data
+          .map(toInstructorStudentRow)
+          .filter((student): student is InstructorStudentRow => student !== null);
+
+        allRows.push(...mappedStudents);
+
+        if (!result.meta.next_cursor) break;
+        cursor = result.meta.next_cursor;
+      }
+
+      setStudents(allRows);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)));
+      setStudents([]);
     } finally {
       setIsFetching(false);
       setLoading(false);
     }
   }, []);
 
-  const loadMoreRows = useCallback(async () => {
-    const cursor = nextCursorRef.current;
-    if (!cursor || isFetchingRef.current) return;
-    await fetchBatch(cursor, true);
-  }, [fetchBatch]);
-
   useEffect(() => {
-    void fetchBatch(undefined, false);
-  }, [fetchBatch]);
+    void fetchAllRows();
+  }, [fetchAllRows]);
 
   return {
     students,
     loading,
     error,
-    hasMoreRows: Boolean(nextCursor),
-    loadMoreRows,
+    hasMoreRows: false,
+    loadMoreRows: async () => {},
   };
 }

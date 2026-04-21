@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
-import { Box, Button, Chip, Grid, useTheme } from "@mui/material";
+import { Box, Button, Chip, Grid, TextField, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import JobPostingDetailsDialog from "src/components/JobPostings/JobPostingDetailsDialog";
 import StatCard from "src/components/StatCard/StatCard";
@@ -10,6 +10,7 @@ import type { JobPostingRow } from "src/types";
 import { useJobPostings } from "src/hooks/useJobPostings";
 
 const MAX_VISIBLE_SKILLS = 2;
+const MISSING_VALUE_LABEL = "—";
 
 const capitalize = (s: string) =>
   s
@@ -18,42 +19,41 @@ const capitalize = (s: string) =>
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 
-const uniqueOptions = (rows: JobPostingRow[], key: keyof JobPostingRow) => {
-  const values = Array.from(new Set(rows.map((r) => String(r[key] ?? "")).filter(Boolean))).sort();
-  return [{ value: "all", label: "All" }, ...values.map((v) => ({ value: v, label: capitalize(v) }))];
+const renderCapitalizedText = (value: JobPostingRow[keyof JobPostingRow], bold = false) => {
+  const text = typeof value === "string" ? value.trim() : "";
+  if (!text) return <span style={{ fontWeight: bold ? 700 : 400 }}>{MISSING_VALUE_LABEL}</span>;
+  return <span style={{ fontWeight: bold ? 700 : 400 }}>{capitalize(text)}</span>;
 };
 
 const JobPostings: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const [search, setSearch] = useState("");
+  const [sectorSearch, setSectorSearch] = useState("");
+  const [locationSearch, setLocationSearch] = useState("");
+  const [platformSearch, setPlatformSearch] = useState("");
   const {
     rows: jobPostings,
     stats: jobPostingStats,
     loading,
     error,
+    sortKey,
+    sortDir,
     hasNextPage,
     hasPrevPage,
     page,
     goToNextPage,
     goToPrevPage,
-  } = useJobPostings();
-
-  const [search, setSearch] = useState("");
-  const [sectorFilter, setSectorFilter] = useState("all");
-  const [locationFilter, setLocationFilter] = useState("all");
-  const [platformFilter, setPlatformFilter] = useState("all");
+    onSortChange,
+    onSortClear,
+  } = useJobPostings({ searchQuery: search, sectorQuery: sectorSearch, locationQuery: locationSearch });
   const [selectedJob, setSelectedJob] = useState<JobPostingRow | null>(null);
 
   const filteredRows = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return jobPostings.filter((row) => {
-      const matchesSearch = !q || row.jobTitle.toLowerCase().includes(q);
-      const matchesSector = sectorFilter === "all" || row.sector === sectorFilter;
-      const matchesLocation = locationFilter === "all" || row.location === locationFilter;
-      const matchesPlatform = platformFilter === "all" || row.platform === platformFilter;
-      return matchesSearch && matchesSector && matchesLocation && matchesPlatform;
-    });
-  }, [jobPostings, search, sectorFilter, locationFilter, platformFilter]);
+    const normalizedPlatform = platformSearch.trim().toLowerCase();
+    if (!normalizedPlatform) return jobPostings;
+    return jobPostings.filter((row) => (row.platform ?? "").toLowerCase().includes(normalizedPlatform));
+  }, [jobPostings, platformSearch]);
 
   const columns: ColumnDef<JobPostingRow>[] = useMemo(
     () => [
@@ -62,43 +62,36 @@ const JobPostings: React.FC = () => {
         label: t("dashboard.jobPostings.table.jobTitle"),
         align: "left",
         minWidth: 180,
-        render: (val) => <span style={{ fontWeight: 700 }}>{capitalize(val as string)}</span>,
+        sortable: true,
+        sortType: "text",
+        render: (val) => renderCapitalizedText(val, true),
       },
       {
         key: "sector",
         label: t("dashboard.jobPostings.table.sector"),
         align: "left",
         minWidth: 130,
-        filter: {
-          options: uniqueOptions(jobPostings, "sector"),
-          value: sectorFilter,
-          onChange: setSectorFilter,
-        },
-        render: (val) => capitalize(val as string),
+        sortable: true,
+        sortType: "text",
+        render: (val) => renderCapitalizedText(val),
       },
       {
         key: "location",
         label: t("dashboard.jobPostings.table.location"),
         align: "left",
         minWidth: 110,
-        filter: {
-          options: uniqueOptions(jobPostings, "location"),
-          value: locationFilter,
-          onChange: setLocationFilter,
-        },
-        render: (val) => capitalize(val as string),
+        sortable: true,
+        sortType: "text",
+        render: (val) => renderCapitalizedText(val),
       },
       {
         key: "platform",
         label: t("dashboard.jobPostings.table.platform"),
         align: "left",
         minWidth: 110,
-        filter: {
-          options: uniqueOptions(jobPostings, "platform"),
-          value: platformFilter,
-          onChange: setPlatformFilter,
-        },
-        render: (val) => capitalize(val as string),
+        sortable: true,
+        sortType: "text",
+        render: (val) => renderCapitalizedText(val),
       },
       {
         key: "skills",
@@ -161,14 +154,14 @@ const JobPostings: React.FC = () => {
               variant="text"
               size="small"
               sx={{ minWidth: 0, p: 0.5 }}
-              aria-label={t("dashboard.jobPostings.aria.openJob", { title: row.jobTitle })}
+              aria-label={t("dashboard.jobPostings.aria.openJob", { title: row.jobTitle ?? MISSING_VALUE_LABEL })}
             >
               <OpenInNewOutlinedIcon fontSize="small" />
             </Button>
           ) : null,
       },
     ],
-    [jobPostings, sectorFilter, locationFilter, platformFilter, theme, t]
+    [theme, t]
   );
 
   return (
@@ -195,20 +188,58 @@ const JobPostings: React.FC = () => {
 
       {error && <Box sx={{ color: "error.main", mb: 1, fontSize: "0.85rem" }}>{error.message}</Box>}
 
+      <Grid container spacing={theme.fixedSpacing(theme.tabiyaSpacing.sm)} sx={{ marginBottom: 1.5 }}>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <TextField
+            size="small"
+            fullWidth
+            placeholder={t("dashboard.jobPostings.searchPlaceholder")}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <TextField
+            size="small"
+            fullWidth
+            placeholder={`${t("dashboard.jobPostings.table.sector")}...`}
+            value={sectorSearch}
+            onChange={(e) => setSectorSearch(e.target.value)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <TextField
+            size="small"
+            fullWidth
+            placeholder={`${t("dashboard.jobPostings.table.location")}...`}
+            value={locationSearch}
+            onChange={(e) => setLocationSearch(e.target.value)}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 3 }}>
+          <TextField
+            size="small"
+            fullWidth
+            placeholder={`${t("dashboard.jobPostings.table.platform")}...`}
+            value={platformSearch}
+            onChange={(e) => setPlatformSearch(e.target.value)}
+          />
+        </Grid>
+      </Grid>
+
       <DataTable<JobPostingRow>
         rows={filteredRows}
         columns={columns}
         loading={loading}
         skeletonRows={8}
+        externalSortKey={sortKey}
+        externalSortDir={sortDir}
+        onSortChange={onSortChange}
+        onSortClear={onSortClear}
+        sortClearLabel={t("dashboard.dataTable.clearSorting")}
         ariaLabel={t("dashboard.jobPostings.aria.table")}
         emptyMessage={t("dashboard.jobPostings.jobsCount", { count: 0, total: 0 })}
         tableMinWidth={750}
-        search={{
-          placeholder: t("dashboard.jobPostings.searchPlaceholder"),
-          ariaLabel: t("dashboard.jobPostings.aria.search"),
-          value: search,
-          onChange: setSearch,
-        }}
         page={page}
         hasNextPage={hasNextPage}
         hasPrevPage={hasPrevPage}

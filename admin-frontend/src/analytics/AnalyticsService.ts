@@ -71,9 +71,18 @@ export default class AnalyticsService {
     }
   }
 
-  async listInstitutions(limit = 100, cursor?: string): Promise<PaginatedResponse<InstitutionApiItem>> {
+  async listInstitutions(
+    limit = 100,
+    cursor?: string,
+    sortBy?: string,
+    sortDir?: "asc" | "desc"
+  ): Promise<PaginatedResponse<InstitutionApiItem>> {
     const params = new URLSearchParams({ limit: String(limit) });
     if (cursor) params.set("cursor", cursor);
+    if (sortBy) {
+      params.set("sort_by", sortBy);
+      if (sortDir) params.set("sort_dir", sortDir);
+    }
     const url = `${this.baseUrl}/analytics/institutions?${params}`;
     const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "listInstitutions", "GET", url);
     const response = await customFetch(url, {
@@ -301,18 +310,24 @@ export default class AnalyticsService {
 
   async listJobs(
     params: {
+      search?: string;
       category?: string;
       employment_type?: string;
       location?: string;
       cursor?: string;
       limit?: number;
+      sort_by?: "title" | "category" | "location" | "source_platform" | "posted_date";
+      sort_dir?: "asc" | "desc";
     } = {}
   ): Promise<PaginatedResponse<JobApiItem>> {
     const query = new URLSearchParams();
+    if (params.search) query.set("search", params.search);
     if (params.category) query.set("category", params.category);
     if (params.employment_type) query.set("employment_type", params.employment_type);
     if (params.location) query.set("location", params.location);
     if (params.cursor) query.set("cursor", params.cursor);
+    if (params.sort_by) query.set("sort_by", params.sort_by);
+    if (params.sort_dir) query.set("sort_dir", params.sort_dir);
     query.set("limit", String(params.limit ?? 20));
     const url = `${this.baseUrl}/jobs?${query}`;
     const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "listJobs", "GET", url);

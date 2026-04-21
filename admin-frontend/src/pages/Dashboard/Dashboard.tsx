@@ -50,10 +50,14 @@ const Dashboard: React.FC = () => {
     institutions,
     loading: institutionsLoading,
     page: institutionsPage,
+    sortKey: institutionsSortKey,
+    sortDir: institutionsSortDir,
     hasNextPage,
     hasPrevPage,
     goToNextPage,
     goToPrevPage,
+    onSortChange: onInstitutionsSortChange,
+    onSortClear: onInstitutionsSortClear,
     error: institutionsError,
   } = useInstitutions();
   const { stats, loading: statsLoading, error: statsError } = useDashboardStats();
@@ -199,10 +203,14 @@ const Dashboard: React.FC = () => {
                     rows={institutions}
                     loading={institutionsLoading}
                     page={institutionsPage}
+                    sortKey={institutionsSortKey}
+                    sortDir={institutionsSortDir}
                     hasNextPage={hasNextPage}
                     hasPrevPage={hasPrevPage}
                     onNextPage={goToNextPage}
                     onPrevPage={goToPrevPage}
+                    onSortChange={onInstitutionsSortChange}
+                    onSortClear={onInstitutionsSortClear}
                   />
                 </>
               )}

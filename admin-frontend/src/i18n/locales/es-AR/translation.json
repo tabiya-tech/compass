@@ -137,6 +137,9 @@
       "skillsAnalytics": "Skills Analytics",
       "jobPostings": "Job Postings"
     },
+    "dataTable": {
+      "clearSorting": "Quitar ordenación"
+    },
     "dailyAdoptionTrend": {
       "title": "Daily Adoption Trend",
       "noData": "No hay datos disponibles",

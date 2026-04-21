@@ -2,6 +2,7 @@ import asyncio
 import base64
 import hashlib
 import logging
+from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -17,6 +18,16 @@ from common_libs.time_utilities import datetime_to_mongo_date
 logger = logging.getLogger(__name__)
 
 PLAIN_DATA_SCHOOL_KEY = "institution_name"
+SORTABLE_FIELDS = {
+    "name",
+    "students",
+    "active_7_days",
+    "skills_discovery_started_pct",
+    "skills_discovery_completed_pct",
+    "career_readiness_started_pct",
+    "career_readiness_completed_pct",
+    "career_explorer_started_pct",
+}
 
 
 def _anonymize(user_id: str) -> str:
@@ -40,6 +51,33 @@ class InstitutionsRepository:
             career_explorer_db.get_collection(Collections.CAREER_EXPLORER_CONVERSATIONS)
             if career_explorer_db is not None else None
         )
+
+    @staticmethod
+    def _sort_institutions(items: list[Institution], sort_by: str, sort_dir: str) -> list[Institution]:
+        safe_sort_by = sort_by if sort_by in SORTABLE_FIELDS else "name"
+        reverse = sort_dir == "desc"
+
+        if safe_sort_by == "name":
+            return sorted(items, key=lambda inst: inst.name.lower(), reverse=reverse)
+
+        def _numeric_key(selector: Callable[[Institution], Optional[float]]) -> Callable[[Institution], float]:
+            if reverse:
+                return lambda inst: float("-inf") if selector(inst) is None else float(selector(inst))
+            return lambda inst: float("inf") if selector(inst) is None else float(selector(inst))
+
+        selector_map: dict[str, Callable[[Institution], Optional[float]]] = {
+            "students": lambda inst: float(inst.students) if inst.students is not None else None,
+            "active_7_days": lambda inst: float(inst.active_7_days) if inst.active_7_days is not None else None,
+            "skills_discovery_started_pct": lambda inst: inst.skills_discovery_started_pct,
+            "skills_discovery_completed_pct": lambda inst: inst.skills_discovery_completed_pct,
+            "career_readiness_started_pct": lambda inst: inst.career_readiness_started_pct,
+            "career_readiness_completed_pct": lambda inst: inst.career_readiness_completed_pct,
+            "career_explorer_started_pct": lambda inst: inst.career_explorer_started_pct,
+        }
+
+        # Ensure deterministic ordering for ties by canonical institution name.
+        sorted_items = sorted(items, key=lambda inst: inst.name.lower())
+        return sorted(sorted_items, key=_numeric_key(selector_map[safe_sort_by]), reverse=reverse)
 
     async def _get_institution_names(self) -> list[str]:
         """Fetch the canonical sorted list of institution names from the institutions collection."""
@@ -87,6 +125,8 @@ class InstitutionsRepository:
         province: Optional[str] = None,
         cursor: Optional[str] = None,
         limit: int = 20,
+        sort_by: Optional[str] = None,
+        sort_dir: str = "asc",
     ) -> tuple[list[Institution], Optional[str], bool]:
         institution_names = await self._get_institution_names()
 
@@ -107,23 +147,12 @@ class InstitutionsRepository:
             except (ValueError, UnicodeDecodeError) as e:
                 logger.warning("Invalid pagination cursor, ignoring: %s", e)
 
-        # Slice the list for pagination
-        page = institution_names[start_index:start_index + limit + 1]
-        has_more = len(page) > limit
-        if has_more:
-            page = page[:limit]
-
-        next_cursor: Optional[str] = None
-        if has_more:
-            next_idx = start_index + limit
-            next_cursor = base64.urlsafe_b64encode(str(next_idx).encode()).decode().rstrip("=")
-
         # Fetch MongoDB counts in parallel
         counts_by_inst, active_anon_ids, cr_started_ids, cr_completed_ids, sd_started_ids, sd_completed_ids, ce_started_ids = \
             await self._fetch_activity_data()
 
-        items = []
-        for name in page:
+        all_items = []
+        for name in institution_names:
             inst_id = base64.urlsafe_b64encode(name.encode()).decode().rstrip("=")
             student_count, user_ids = counts_by_inst.get(name, (0, set()))
             anon_ids = {_anonymize(uid) for uid in user_ids}
@@ -140,7 +169,7 @@ class InstitutionsRepository:
             sd_completed_count = len(user_ids & sd_completed_ids)
             ce_started_count = len(user_ids & ce_started_ids)
 
-            items.append(Institution(
+            all_items.append(Institution(
                 id=inst_id,
                 name=name,
                 active=True,
@@ -153,7 +182,23 @@ class InstitutionsRepository:
                 career_explorer_started_pct=_pct(ce_started_count),
             ))
 
-        return items, next_cursor, has_more
+        if sort_by is None:
+            sorted_items = all_items
+        else:
+            sorted_items = self._sort_institutions(all_items, sort_by=sort_by, sort_dir=sort_dir)
+
+        # Slice the globally sorted list for pagination
+        page = sorted_items[start_index:start_index + limit + 1]
+        has_more = len(page) > limit
+        if has_more:
+            page = page[:limit]
+
+        next_cursor: Optional[str] = None
+        if has_more:
+            next_idx = start_index + limit
+            next_cursor = base64.urlsafe_b64encode(str(next_idx).encode()).decode().rstrip("=")
+
+        return page, next_cursor, has_more
 
     async def _get_ce_started_user_ids(self) -> set[str]:
         """Return user_ids that have at least one career explorer conversation."""

@@ -1,5 +1,6 @@
 import logging
 from http import HTTPStatus
+from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends, Query
 
@@ -24,6 +25,19 @@ def add_institutions_routes(router: APIRouter, auth: Authentication):
         province: str | None = Query(default=None, description="Filter by province"),
         cursor: str | None = Query(default=None, description="Pagination cursor from previous response"),
         limit: int = Query(default=20, ge=1, le=100, description="Max items per page"),
+        sort_by: Optional[
+            Literal[
+                "name",
+                "students",
+                "active_7_days",
+                "skills_discovery_started_pct",
+                "skills_discovery_completed_pct",
+                "career_readiness_started_pct",
+                "career_readiness_completed_pct",
+                "career_explorer_started_pct",
+            ]
+        ] = Query(default=None, description="Sort field; omit for canonical institution order"),
+        sort_dir: Literal["asc", "desc"] = Query(default="asc", description="Sort direction (used when sort_by is set)"),
         include: str | None = Query(default=None, description="Comma-separated: 'count' to include total"),
         repository: InstitutionRepository = Depends(get_institution_repository),
     ):
@@ -34,6 +48,8 @@ def add_institutions_routes(router: APIRouter, auth: Authentication):
             province=province,
             cursor=cursor,
             limit=limit,
+            sort_by=sort_by,
+            sort_dir=sort_dir,
         )
         total = await repository.count_institutions(
             active=active,

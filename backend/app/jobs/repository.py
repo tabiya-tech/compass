@@ -4,6 +4,9 @@ from typing import Any, Dict, List
 
 from motor.motor_asyncio import AsyncIOMotorCollection
 
+SORTABLE_FIELDS = {"title", "category", "location", "source_platform", "posted_date"}
+
+
 class IJobRepository(ABC):
     """
     Interface for the Job Repository.
@@ -16,6 +19,8 @@ class IJobRepository(ABC):
         filter_query: Dict[str, Any],
         offset: int,
         limit: int,
+        sort_by: str | None = None,
+        sort_dir: str = "asc",
     ) -> List[Dict[str, Any]]:
         pass
 
@@ -37,13 +42,46 @@ class JobRepository(IJobRepository):
         self._collection = collection
         self._logger = logging.getLogger(self.__class__.__name__)
 
+    @staticmethod
+    def _build_sorted_pipeline(
+        filter_query: Dict[str, Any],
+        offset: int,
+        limit: int,
+        sort_by: str,
+        sort_dir: str,
+    ) -> List[Dict[str, Any]]:
+        direction = 1 if sort_dir == "asc" else -1
+        sort_text_expr: Dict[str, Any] = {
+            "$trim": {"input": {"$toString": {"$ifNull": [f"${sort_by}", ""]}}}
+        }
+        return [
+            {"$match": filter_query},
+            {
+                "$addFields": {
+                    "__sort_missing": {"$cond": [{"$eq": [sort_text_expr, ""]}, 1, 0]},
+                    "__sort_value": {"$toLower": sort_text_expr},
+                }
+            },
+            {"$sort": {"__sort_missing": 1, "__sort_value": direction, "_id": 1}},
+            {"$project": {"_id": 0, "__sort_missing": 0, "__sort_value": 0}},
+            {"$skip": offset},
+            {"$limit": limit + 1},
+        ]
+
     async def list_jobs(
         self,
         filter_query: Dict[str, Any],
         offset: int,
         limit: int,
+        sort_by: str | None = None,
+        sort_dir: str = "asc",
     ) -> List[Dict[str, Any]]:
-        query = self._collection.find(filter_query, projection={"_id": 0}).skip(offset).limit(limit + 1)
+        if sort_by in SORTABLE_FIELDS:
+            pipeline = self._build_sorted_pipeline(filter_query, offset, limit, sort_by, sort_dir)
+            query = self._collection.aggregate(pipeline)
+        else:
+            query = self._collection.find(filter_query, projection={"_id": 0}).skip(offset).limit(limit + 1)
+
         docs: List[Dict[str, Any]] = []
         async for doc in query:
             docs.append(doc)

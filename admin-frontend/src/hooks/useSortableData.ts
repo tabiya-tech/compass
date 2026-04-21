@@ -6,8 +6,12 @@ export function useSortableData<T>(data: T[], initialKey?: keyof T, initialDir: 
   const [sortKey, setSortKey] = useState<keyof T | undefined>(initialKey);
   const [sortDir, setSortDir] = useState<SortDir>(initialDir);
 
-  const handleSort = (key: keyof T) => {
+  const handleSort = (key: keyof T, requestedDir?: SortDir) => {
     setSortKey((prev) => {
+      if (requestedDir) {
+        setSortDir(requestedDir);
+        return key;
+      }
       if (prev === key) {
         setSortDir((d) => (d === "asc" ? "desc" : "asc"));
       } else {

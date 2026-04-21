@@ -33,6 +33,7 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
     sortKey,
     sortDir,
     handleSort,
+    clearSort,
     nameSearch,
     setNameSearch,
     programme,
@@ -68,7 +69,8 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
     {
       key: "studentName",
       label: t("instructorDashboard.studentsTable.headers.studentName").toUpperCase(),
-      sortable: false,
+      sortable: true,
+      sortType: "text",
       align: "center",
       render: (val) => (
         <Typography
@@ -84,7 +86,8 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
     {
       key: "programme",
       label: t("instructorDashboard.studentsTable.headers.programme").toUpperCase(),
-      sortable: false,
+      sortable: true,
+      sortType: "text",
       align: "center",
       filter: {
         options: programmes.map((p) => ({ value: p, label: p === "all" ? allLabel : p })),
@@ -100,7 +103,8 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
     {
       key: "year",
       label: t("instructorDashboard.studentsTable.headers.year").toUpperCase(),
-      sortable: false,
+      sortable: true,
+      sortType: "number",
       align: "center",
       filter: {
         options: years.map((y) => ({ value: y, label: y === "all" ? allLabel : y })),
@@ -112,7 +116,8 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
     {
       key: "gender",
       label: t("instructorDashboard.studentsTable.headers.gender").toUpperCase(),
-      sortable: false,
+      sortable: true,
+      sortType: "text",
       align: "center",
       filter: {
         options: genders.map((g) => ({ value: g, label: g === "all" ? allLabel : g })),
@@ -124,7 +129,8 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
     {
       key: "lastLogin",
       label: t("instructorDashboard.studentsTable.headers.lastLogin").toUpperCase(),
-      sortable: false,
+      sortable: true,
+      sortType: "number",
       align: "center",
       filter: {
         options: [
@@ -145,7 +151,8 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
     {
       key: "lastActiveModuleId",
       label: t("instructorDashboard.studentsTable.headers.lastActiveModule").toUpperCase(),
-      sortable: false,
+      sortable: true,
+      sortType: "text",
       align: "center",
       filter: {
         options: modules.map((m) => ({
@@ -168,6 +175,7 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
       key: "modulesExplored",
       label: t("instructorDashboard.studentsTable.headers.modulesExplored"),
       sortable: true,
+      sortType: "number",
       align: "center",
       minWidth: 130,
     },
@@ -175,6 +183,7 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
       key: "careerReady",
       label: t("instructorDashboard.studentsTable.headers.careerReady"),
       sortable: true,
+      sortType: "text",
       align: "center",
       minWidth: 130,
       render: (val) => (fracComplete(val as string) ? <CheckCircleIcon sx={checkIconSx} /> : (val as string)),
@@ -183,6 +192,7 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
       key: "skillsInterestsExplored",
       label: t("instructorDashboard.studentsTable.headers.skillsInterestsExplored"),
       sortable: true,
+      sortType: "number",
       align: "center",
       minWidth: 130,
     },
@@ -204,7 +214,9 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
       ariaLabel={t("instructorDashboard.studentsTable.ariaLabel")}
       externalSortKey={sortKey as keyof InstructorStudentRow | null}
       externalSortDir={sortDir}
-      onSortChange={(key) => handleSort(key as StudentsSortKey)}
+      onSortChange={(key, dir) => handleSort(key as StudentsSortKey, dir)}
+      onSortClear={clearSort}
+      sortClearLabel={t("dashboard.dataTable.clearSorting")}
       page={safePageIndex + 1}
       hasPrevPage={hasPrevPage}
       hasNextPage={hasNextPage}

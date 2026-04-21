@@ -17,12 +17,15 @@ class _MockJobService(IJobService):
 
     async def list_jobs(
         self,
+        search: Optional[str],
         category: Optional[str],
         employment_type: Optional[str],
         location: Optional[str],
         days: Optional[int],
         cursor: Optional[str],
         limit: int,
+        sort_by: Optional[str],
+        sort_dir: str,
         include: Optional[str],
     ) -> PaginatedListResponse[JobDocument]:
         return PaginatedListResponse(

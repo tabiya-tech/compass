@@ -44,6 +44,27 @@ class TestJobRepository:
         collection.find.assert_called_once_with({"category": "Engineering"}, projection={"_id": 0})
 
     @pytest.mark.asyncio
+    async def test_list_jobs_with_sort_uses_aggregate_pipeline_with_missing_values_last(self):
+        # GIVEN a collection that returns an async cursor for aggregate
+        collection = MagicMock()
+        docs = [{"title": "Analyst"}, {"title": None}]
+        collection.aggregate.return_value = _AsyncCursor(docs)
+        repo = JobRepository(collection=collection)
+
+        # WHEN listing jobs with sorting
+        result = await repo.list_jobs(filter_query={"category": "Engineering"}, offset=5, limit=20, sort_by="title", sort_dir="desc")
+
+        # THEN repository uses an aggregation pipeline with null/empty-last sort semantics
+        assert result == docs
+        collection.aggregate.assert_called_once()
+        pipeline = collection.aggregate.call_args.args[0]
+        assert pipeline[0] == {"$match": {"category": "Engineering"}}
+        assert pipeline[2] == {"$sort": {"__sort_missing": 1, "__sort_value": -1, "_id": 1}}
+        assert pipeline[4] == {"$skip": 5}
+        assert pipeline[5] == {"$limit": 21}
+        collection.find.assert_not_called()
+
+    @pytest.mark.asyncio
     async def test_count_jobs_delegates_to_collection(self):
         # GIVEN a collection with count_documents
         collection = MagicMock()

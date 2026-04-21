@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import re
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
@@ -30,12 +31,15 @@ class IJobService(ABC):
     @abstractmethod
     async def list_jobs(
         self,
+        search: Optional[str],
         category: Optional[str],
         employment_type: Optional[str],
         location: Optional[str],
         days: Optional[int],
         cursor: Optional[str],
         limit: int,
+        sort_by: Optional[str],
+        sort_dir: str,
         include: Optional[str],
     ) -> PaginatedListResponse["JobDocument"]:
         pass
@@ -66,19 +70,28 @@ class JobService(IJobService):
         self._logger = logging.getLogger(self.__class__.__name__)
 
     @staticmethod
+    def _case_insensitive_space_tolerant_match(value: str) -> Dict[str, str]:
+        normalized_tokens = [re.escape(token) for token in value.strip().split() if token]
+        pattern = ".*".join(normalized_tokens) if normalized_tokens else re.escape(value)
+        return {"$regex": pattern, "$options": "i"}
+
+    @staticmethod
     def _build_jobs_mongo_filter(
+        search: Optional[str],
         category: Optional[str],
         employment_type: Optional[str],
         location: Optional[str],
         days: Optional[int],
     ) -> Dict[str, Any]:
         fquery: Dict[str, Any] = {}
+        if search:
+            fquery["title"] = {"$regex": re.escape(search), "$options": "i"}
         if category:
-            fquery["category"] = category
+            fquery["category"] = JobService._case_insensitive_space_tolerant_match(category)
         if employment_type:
             fquery["employment_type"] = employment_type
         if location:
-            fquery["location"] = location
+            fquery["location"] = JobService._case_insensitive_space_tolerant_match(location)
         if days is not None:
             cutoff_date = (datetime.now(timezone.utc) - timedelta(days=days)).date().isoformat()
             fquery["posted_date"] = {"$gte": cutoff_date}
@@ -126,19 +139,28 @@ class JobService(IJobService):
 
     async def list_jobs(
         self,
+        search: Optional[str],
         category: Optional[str],
         employment_type: Optional[str],
         location: Optional[str],
         days: Optional[int],
         cursor: Optional[str],
         limit: int,
+        sort_by: Optional[str],
+        sort_dir: str,
         include: Optional[str],
     ) -> PaginatedListResponse[JobDocument]:
-        filter_query = self._build_jobs_mongo_filter(category, employment_type, location, days)
+        filter_query = self._build_jobs_mongo_filter(search, category, employment_type, location, days)
         include_count = self._include_total(include)
         offset = self._parse_cursor_offset(cursor)
 
-        docs = await self._repository.list_jobs(filter_query=filter_query, offset=offset, limit=limit)
+        docs = await self._repository.list_jobs(
+            filter_query=filter_query,
+            offset=offset,
+            limit=limit,
+            sort_by=sort_by,
+            sort_dir=sort_dir,
+        )
 
         has_more = len(docs) > limit
         page_docs = docs[:limit]
