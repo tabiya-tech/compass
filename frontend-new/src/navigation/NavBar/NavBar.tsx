@@ -413,6 +413,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                     cursor: "not-allowed",
                     pointerEvents: "none",
                     "&:hover": { opacity: 0.45 },
+                    display: "none",
                   }}
                   data-testid={DATA_TEST_ID.NAVBAR_LINK_SEARCH}
                 >
