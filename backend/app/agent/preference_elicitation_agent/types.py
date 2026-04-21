@@ -420,6 +420,9 @@ class Vignette(BaseModel):
     difficulty_level: Literal["easy", "medium", "hard"] = "medium"
     """Difficulty of trade-off (easy = clear winner, hard = balanced options)"""
 
+    comparison_summary: Optional[str] = None
+    """Short LLM-generated sentence highlighting the core trade-off between the two options."""
+
     class Config:
         extra = "forbid"
 

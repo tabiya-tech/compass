@@ -41,7 +41,7 @@ class GeneratedVignetteContent(BaseModel):
     )
 
     option_a_description: str = Field(
-        description="Detailed description of option A (3-5 sentences)"
+        description="Key details of option A as 3-5 bullet points, each on its own line starting with '• '. Cover salary, schedule/flexibility, job security, growth, and any relevant trade-off."
     )
 
     option_b_title: str = Field(
@@ -49,7 +49,19 @@ class GeneratedVignetteContent(BaseModel):
     )
 
     option_b_description: str = Field(
-        description="Detailed description of option B (3-5 sentences)"
+        description="Key details of option B as 3-5 bullet points, each on its own line starting with '• '. Cover salary, schedule/flexibility, job security, growth, and any relevant trade-off."
+    )
+
+    comparison_summary: str = Field(
+        default="",
+        description=(
+            "One short, punchy sentence that names the single core tension between the two options. "
+            "Do NOT repeat the bullet points — strip it to the raw dilemma. "
+            "Examples: "
+            "'Security and benefits vs. higher pay and freedom — which matters more to you right now?' "
+            "'Steady income with a long commute, or more money with the flexibility to work from anywhere?' "
+            "'A safe career path with slower growth, or rapid advancement with high risk?'"
+        )
     )
 
     reasoning: str = Field(
@@ -138,8 +150,18 @@ Salary Balance Rules:
 
 {country_context}
 
+CRITICAL: Avoid Anchoring on the User's Current Employer
+=========================================================
+Do NOT make one of the options "stay at [user's current company]" unless this is the very first vignette.
+The user has already been told scenarios involving their current job. Repeating it makes all vignettes feel identical.
+Instead, use two HYPOTHETICAL roles the user might consider — neither needs to be their current job.
+It is fine to use the same occupational field (e.g. software development) but vary the employer type,
+sector, or role level. Across the full set of vignettes, vary: tech vs non-tech, field vs office,
+employed vs self-employed, large org vs small org.
+
 Examples of good personalization:
-- Software Developer → "Backend Engineer at [local tech company]" vs "Tech Lead at 2-person startup"
+- Software Developer → "Backend Engineer at a bank (Zanaco)" vs "Tech Lead at 2-person fintech startup"
+- Software Developer → "IT Support at a hospital" vs "Data analyst at an NGO"
 - Teacher → "Public school teacher (secure, lower pay)" vs "Private tutoring (variable, higher ceiling)"
 - Sales → "Corporate sales rep (stable, structured)" vs "Commission-only broker (risky, unlimited upside)"
 
@@ -156,9 +178,10 @@ Example Output:
 {{
   "scenario_intro": "You're weighing two paths in software development with very different risk profiles.",
   "option_a_title": "Senior Developer at [local tech company]",
-  "option_a_description": "You'd work as a Senior Backend Developer. The salary is [local currency] 18,000 per month with full benefits. The role offers excellent job security and predictable career progression. However, the work is often routine and innovation is slow.",
+  "option_a_description": "• Salary: [local currency] 18,000/month with full benefits\n• Fixed hours, office-based\n• Permanent contract — strong job security\n• Steady career progression within a structured team\n• Routine work; limited room for innovation",
   "option_b_title": "Tech Lead at Early-Stage Fintech Startup",
-  "option_b_description": "You'd be the founding engineer at a 5-person fintech startup. Base salary is [local currency] 11,000 per month but includes performance bonuses. The role offers rapid learning and autonomy. However, the startup might fail and there are no guaranteed benefits.",
+  "option_b_description": "• Salary: [local currency] 11,000/month base + performance bonuses\n• Flexible hours, remote-friendly\n• Contract-based — startup may fail\n• Rapid learning curve; you own the technical direction\n• No guaranteed benefits (NSSF/NHIF not covered)",
+  "comparison_summary": "Guaranteed stability vs. higher pay and growth potential — which risk are you willing to take?",
   "reasoning": "Personalized for senior developer background. Creates real dilemma: guaranteed stability vs growth upside."
 }}
 """
@@ -377,10 +400,11 @@ Example Output:
 
 **CRITICAL REQUIREMENTS:**
 1. The job scenarios you generate MUST be SUBSTANTIALLY DIFFERENT from all previous scenarios
-2. If previous scenarios used freelance/permanent contrast, use a DIFFERENT contrast (startup vs corporate, field work vs office, client-facing vs backend)
-3. If previous scenarios used a specific industry/company, use a COMPLETELY DIFFERENT industry/company
-4. Vary the job settings: if previous were tech/office jobs, try field work, retail, healthcare, education, etc.
-5. The trade-off dimensions from the template are what matter - not the specific job types
+2. Do NOT use the user's current employer as one of the options — use two hypothetical roles
+3. If previous scenarios used freelance/permanent contrast, use a DIFFERENT contrast (startup vs corporate, field work vs office, client-facing vs backend)
+4. If previous scenarios used a specific industry/company, use a COMPLETELY DIFFERENT industry/company
+5. Vary the job settings: if previous were tech/office jobs, try field work, retail, healthcare, education, etc.
+6. The trade-off dimensions from the template are what matter - not the specific job types
 
 Generate a personalized vignette that:
 - Tests the TEMPLATE'S trade-off dimensions
@@ -540,7 +564,13 @@ Generate personalized job titles and descriptions that:
 4. Maintain the EXACT trade-off shown in the attributes above
 5. Make both options attractive in different ways (create real dilemma)
 
-**CRITICAL:**
+**CRITICAL — Do NOT anchor on the user's current employer:**
+- Do NOT use the user's current company (e.g. Tabiya) as either option's employer
+- Both options must be HYPOTHETICAL roles the user could consider moving to
+- Use varied employers: banks, NGOs, telecoms, startups, government, field roles, etc.
+- Naming the current employer makes every vignette feel identical — avoid it entirely
+
+**CRITICAL — Attribute fidelity:**
 - DO NOT invent different attribute values
 - The descriptions must MATCH the attributes exactly
 - Only personalize job titles, company names, and descriptive language
@@ -557,6 +587,14 @@ Attributes: wage=8000, flexibility=1, remote_work=1
 **Example of Bad Personalization (inventing different values):**
 ❌ Description: "Earn 15,000/month..." (wage was 8000!)
 ❌ Description: "Fixed 9-5 schedule" (flexibility was 1!)
+
+**Also required — comparison_summary:**
+Write ONE short, punchy sentence naming the single core tension between the two options.
+Do NOT repeat the bullet points. Strip it to the raw dilemma.
+Examples:
+- "Steady pay and security vs. higher earnings with real risk — what matters most to you right now?"
+- "A long commute with more money, or a short commute with flexibility?"
+- "Structured growth in a big org, or fast-track responsibility at a small one?"
 
 Generate personalized content now:
 """
@@ -612,7 +650,8 @@ Generate personalized content now:
             options=personalized_options,
             follow_up_questions=vignette.follow_up_questions,
             targeted_dimensions=vignette.targeted_dimensions,
-            difficulty_level=vignette.difficulty_level
+            difficulty_level=vignette.difficulty_level,
+            comparison_summary=response.comparison_summary or None,
         )
 
         # Validate attributes were preserved

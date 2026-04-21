@@ -46,7 +46,8 @@ def save_vignettes_to_json(
     profile_generator: ProfileGenerator,
     converter: VignetteConverter,
     id_prefix: str = "offline",
-    metadata: dict = None
+    metadata: dict = None,
+    category_rotation: list[str] | None = None,
 ):
     """
     Save vignettes to JSON file in online Vignette schema format.
@@ -58,9 +59,12 @@ def save_vignettes_to_json(
         converter: VignetteConverter for format conversion
         id_prefix: Prefix for vignette IDs (e.g., "static_begin", "adaptive")
         metadata: Optional metadata to include
+        category_rotation: Optional list of categories to assign in order (for static vignettes)
     """
     # Convert to online format
-    converted_vignettes = converter.convert_vignette_list(vignettes, id_prefix=id_prefix)
+    converted_vignettes = converter.convert_vignette_list(
+        vignettes, id_prefix=id_prefix, category_rotation=category_rotation
+    )
 
     output = {
         "metadata": metadata or {},
@@ -247,7 +251,19 @@ def main():
             logger.info(f"  {key}: {value}")
     logger.info("")
 
-    # Save static vignettes (now in online format with category inference)
+    # Categories that must be covered across the full static set.
+    # Matches categories_to_explore in PreferenceElicitationAgentState.
+    # D-efficiency vignettes vary all attributes simultaneously so inference
+    # is unreliable — assign categories in a deliberate rotation instead.
+    STATIC_CATEGORY_ROTATION = [
+        "financial",
+        "work_environment",
+        "job_security",
+        "career_advancement",
+        "work_life_balance",
+        "task_preferences",
+    ]
+
     beginning_path = output_dir / "static_vignettes_beginning.json"
     save_vignettes_to_json(
         beginning_vignettes,
@@ -255,13 +271,14 @@ def main():
         profile_generator,
         converter,
         id_prefix="static_begin",
+        category_rotation=STATIC_CATEGORY_ROTATION,
         metadata={
             "timestamp": datetime.now().isoformat(),
             "type": "static_beginning",
             "count": len(beginning_vignettes),
             "optimization_stats": opt_stats,
             "format": "online_vignette_schema",
-            "note": "Vignettes converted to online format with inferred categories"
+            "note": "Categories assigned via rotation to ensure full coverage"
         }
     )
     logger.info(f"Saved beginning vignettes to: {beginning_path}")
@@ -273,12 +290,13 @@ def main():
         profile_generator,
         converter,
         id_prefix="static_end",
+        category_rotation=STATIC_CATEGORY_ROTATION,
         metadata={
             "timestamp": datetime.now().isoformat(),
             "type": "static_end",
             "count": len(end_vignettes),
             "format": "online_vignette_schema",
-            "note": "Vignettes converted to online format with inferred categories"
+            "note": "Categories assigned via rotation to ensure full coverage"
         }
     )
     logger.info(f"Saved end vignettes to: {end_path}")

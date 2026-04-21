@@ -78,20 +78,37 @@ class VignetteConverter:
             "company_values": "values_culture"
         }
 
-        # Find attribute with largest difference
-        max_diff_attr = max(differences, key=differences.get)
-        max_diff_value = differences[max_diff_attr]
-
-        # If no meaningful difference, return "mixed"
-        if max_diff_value < 0.1:
+        # If no attribute has a meaningful difference, return "mixed"
+        if max(differences.values()) < 0.1:
             return "mixed"
 
-        # Map to category
-        category = category_mapping.get(max_diff_attr, "mixed")
+        # Number of attributes per category — used for normalization so categories
+        # with more attributes (e.g. work_environment has 3) don't systematically win.
+        category_attr_counts = {
+            "financial": 1,
+            "work_environment": 3,   # physical_demand + commute_time + remote_work
+            "work_life_balance": 1,
+            "job_security": 1,
+            "career_advancement": 1,
+            "task_preferences": 2,   # task_variety + social_interaction
+            "values_culture": 1,
+        }
+
+        # Average normalised difference per category (intensity, not total mass)
+        category_sums: dict[str, float] = {}
+        for attr, diff in differences.items():
+            cat = category_mapping.get(attr, "mixed")
+            category_sums[cat] = category_sums.get(cat, 0.0) + diff
+
+        category_scores = {
+            cat: total / category_attr_counts.get(cat, 1)
+            for cat, total in category_sums.items()
+        }
+
+        category = max(category_scores, key=category_scores.get)
 
         self.logger.debug(
-            f"Inferred category '{category}' from dominant attribute '{max_diff_attr}' "
-            f"(diff={max_diff_value:.2f})"
+            f"Inferred category '{category}' from scores: {category_scores}"
         )
 
         return category
@@ -218,7 +235,8 @@ class VignetteConverter:
     def convert_vignette_list(
         self,
         vignette_pairs: list[Tuple[Dict[str, Any], Dict[str, Any]]],
-        id_prefix: str = "offline"
+        id_prefix: str = "offline",
+        category_rotation: list[str] | None = None,
     ) -> list[Dict[str, Any]]:
         """
         Convert list of offline vignettes to online format.
@@ -226,6 +244,10 @@ class VignetteConverter:
         Args:
             vignette_pairs: List of (profile_a, profile_b) tuples
             id_prefix: Prefix for generated IDs (e.g., "static_begin", "adaptive")
+            category_rotation: Optional list of categories to assign in order (cycling).
+                D-efficiency selects vignettes that vary all attributes simultaneously,
+                making single-category inference unreliable. Pass a rotation for static
+                vignettes so each gets a distinct category label for coverage tracking.
 
         Returns:
             List of Vignette dictionaries
@@ -235,6 +257,17 @@ class VignetteConverter:
         for idx, pair in enumerate(vignette_pairs, 1):
             vignette_id = f"{id_prefix}_{idx:03d}"
             vignette = self.convert_to_online_format(pair, vignette_id)
+
+            if category_rotation:
+                assigned = category_rotation[(idx - 1) % len(category_rotation)]
+                vignette["category"] = assigned
+                vignette["targeted_dimensions"] = [assigned]
+                vignette["scenario_text"] = self.generate_scenario_text(
+                    assigned,
+                    pair[0],
+                    pair[1]
+                )
+
             converted.append(vignette)
 
         self.logger.info(
