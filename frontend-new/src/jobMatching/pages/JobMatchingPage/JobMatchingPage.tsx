@@ -1,11 +1,12 @@
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Box, Tabs, Tab, Typography, useTheme, Chip, Alert } from "@mui/material";
 import Footer from "src/home/components/Footer/Footer";
 import DataTable from "src/jobMatching/components/DataTable/DataTable";
 import type { ColumnDef } from "src/jobMatching/components/DataTable/DataTable";
 import JobDetailModal from "src/jobMatching/components/JobDetailModal/JobDetailModal";
 import { useJobs } from "src/jobMatching/hooks/useJobs";
-import type { JobFilters, JobRow } from "src/jobMatching/types";
+import JobService from "src/jobMatching/services/JobService";
+import type { JobFilters, JobRow, JobSortKey } from "src/jobMatching/types";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -16,12 +17,28 @@ const capitalize = (s: string) =>
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 
-const uniqueFilterOptions = (jobs: JobRow[], key: keyof JobRow) => {
-  const values = Array.from(new Set(jobs.map((j) => String(j[key] ?? "")).filter(Boolean))).sort();
-  return [{ value: "all", label: "All" }, ...values.map((v) => ({ value: v, label: capitalize(v) }))];
+const toFilterOptions = (values: string[], selectedValue: string) => {
+  const mergedValues = selectedValue === "all" ? values : Array.from(new Set([...values, selectedValue]));
+  const sortedValues = [...mergedValues].sort((a, b) => a.localeCompare(b));
+  return [{ value: "all", label: "All" }, ...sortedValues.map((value) => ({ value, label: capitalize(value) }))];
 };
 
 const EMPTY_FILTERS: JobFilters = { search: "", category: "all", employmentType: "all", location: "all" };
+const SEARCH_DEBOUNCE_MS = 300;
+
+function useDebouncedValue<T>(value: T, delayMs: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedValue(value);
+    }, delayMs);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [delayMs, value]);
+
+  return debouncedValue;
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -39,15 +56,92 @@ const JobMatchingPage: React.FC = () => {
   const [browseFilters, setBrowseFilters] = useState<JobFilters>(EMPTY_FILTERS);
   const [selectedJob, setSelectedJob] = useState<JobRow | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [datasetFilterValues, setDatasetFilterValues] = useState<{
+    category: string[];
+    employmentType: string[];
+    location: string[];
+  }>({
+    category: [],
+    employmentType: [],
+    location: [],
+  });
 
-  const { jobs, loading, error, hasNextPage, hasPrevPage, page, goToNextPage, goToPrevPage } = useJobs(browseFilters);
+  const debouncedSearch = useDebouncedValue(browseFilters.search, SEARCH_DEBOUNCE_MS);
+  const queryFilters = useMemo(() => ({ ...browseFilters, search: debouncedSearch }), [browseFilters, debouncedSearch]);
 
-  // Client-side search filter (applied on top of server-side category/type/location filters)
-  const displayedJobs = useMemo(() => {
-    const q = browseFilters.search.trim().toLowerCase();
-    if (!q) return jobs;
-    return jobs.filter((job) => job.jobTitle.toLowerCase().includes(q) || job.company.toLowerCase().includes(q));
-  }, [jobs, browseFilters.search]);
+  const {
+    jobs,
+    loading,
+    error,
+    hasNextPage,
+    hasPrevPage,
+    page,
+    sortKey,
+    sortDir,
+    onSortChange,
+    onSortClear,
+    goToNextPage,
+    goToPrevPage,
+  } = useJobs(queryFilters);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadFilterValues = async () => {
+      try {
+        const categorySet = new Set<string>();
+        const employmentTypeSet = new Set<string>();
+        const locationSet = new Set<string>();
+        let cursor: string | undefined;
+
+        while (true) {
+          const result = await JobService.getInstance().listJobs({ cursor, limit: 100 });
+          result.data.forEach((doc) => {
+            const category = doc.category?.trim();
+            const employmentType = doc.employment_type?.trim();
+            const location = doc.location?.trim();
+
+            if (category) categorySet.add(category);
+            if (employmentType) employmentTypeSet.add(employmentType);
+            if (location) locationSet.add(location);
+          });
+
+          if (!result.meta.next_cursor) break;
+          cursor = result.meta.next_cursor;
+        }
+
+        if (!cancelled) {
+          setDatasetFilterValues({
+            category: Array.from(categorySet),
+            employmentType: Array.from(employmentTypeSet),
+            location: Array.from(locationSet),
+          });
+        }
+      } catch {
+        if (!cancelled) {
+          setDatasetFilterValues({ category: [], employmentType: [], location: [] });
+        }
+      }
+    };
+
+    void loadFilterValues();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const categoryOptions = useMemo(
+    () => toFilterOptions(datasetFilterValues.category, browseFilters.category),
+    [datasetFilterValues.category, browseFilters.category]
+  );
+  const employmentTypeOptions = useMemo(
+    () => toFilterOptions(datasetFilterValues.employmentType, browseFilters.employmentType),
+    [datasetFilterValues.employmentType, browseFilters.employmentType]
+  );
+  const locationOptions = useMemo(
+    () => toFilterOptions(datasetFilterValues.location, browseFilters.location),
+    [datasetFilterValues.location, browseFilters.location]
+  );
 
   const handleRowClick = (job: JobRow) => {
     setSelectedJob(job);
@@ -59,6 +153,7 @@ const JobMatchingPage: React.FC = () => {
       {
         key: "jobTitle",
         label: "Job Title",
+        sortable: true,
         align: "left",
         minWidth: 180,
         cellSx: {
@@ -73,6 +168,7 @@ const JobMatchingPage: React.FC = () => {
       {
         key: "company",
         label: "Company",
+        sortable: false,
         align: "left",
         minWidth: 140,
         render: (val) => (
@@ -84,10 +180,11 @@ const JobMatchingPage: React.FC = () => {
       {
         key: "category",
         label: "Category",
+        sortable: true,
         align: "left",
         minWidth: 140,
         filter: {
-          options: uniqueFilterOptions(jobs, "category"),
+          options: categoryOptions,
           value: browseFilters.category,
           onChange: (v) => setBrowseFilters((f) => ({ ...f, category: v })),
         },
@@ -100,10 +197,11 @@ const JobMatchingPage: React.FC = () => {
       {
         key: "employmentType",
         label: "Type",
+        sortable: false,
         align: "left",
         minWidth: 100,
         filter: {
-          options: uniqueFilterOptions(jobs, "employmentType"),
+          options: employmentTypeOptions,
           value: browseFilters.employmentType,
           onChange: (v) => setBrowseFilters((f) => ({ ...f, employmentType: v })),
         },
@@ -132,10 +230,11 @@ const JobMatchingPage: React.FC = () => {
       {
         key: "location",
         label: "Location",
+        sortable: true,
         align: "left",
         minWidth: 110,
         filter: {
-          options: uniqueFilterOptions(jobs, "location"),
+          options: locationOptions,
           value: browseFilters.location,
           onChange: (v) => setBrowseFilters((f) => ({ ...f, location: v })),
         },
@@ -148,6 +247,7 @@ const JobMatchingPage: React.FC = () => {
       {
         key: "posted",
         label: "Posted",
+        sortable: true,
         align: "left",
         minWidth: 100,
         render: (val) => (
@@ -157,7 +257,7 @@ const JobMatchingPage: React.FC = () => {
         ),
       },
     ],
-    [jobs, browseFilters, theme]
+    [browseFilters, categoryOptions, employmentTypeOptions, locationOptions, theme]
   );
 
   const matchedColumns: ColumnDef<JobRow>[] = useMemo(
@@ -241,11 +341,14 @@ const JobMatchingPage: React.FC = () => {
               </Alert>
             )}
             <DataTable<JobRow>
-              rows={displayedJobs}
+              rows={jobs}
               columns={columns}
               loading={loading}
-              initialSortKey="posted"
-              initialSortDir="desc"
+              externalSortKey={sortKey}
+              externalSortDir={sortDir}
+              onSortChange={(key, dir) => onSortChange(key as JobSortKey, dir)}
+              onSortClear={onSortClear}
+              sortClearLabel="Clear sorting"
               tableMinWidth={750}
               ariaLabel="browse jobs table"
               emptyMessage="No jobs found."

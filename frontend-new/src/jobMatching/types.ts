@@ -51,3 +51,6 @@ export interface JobFilters {
   employmentType: string;
   location: string;
 }
+
+export type JobSortKey = "jobTitle" | "category" | "location" | "posted";
+export type JobSortDir = "asc" | "desc";

@@ -19,11 +19,14 @@ function parseJson<T>(responseBody: string, errorFactory: RestAPIErrorFactory): 
 }
 
 export interface ListJobsParams {
+  search?: string;
   category?: string;
   employment_type?: string;
   location?: string;
   cursor?: string;
   limit?: number;
+  sort_by?: "title" | "category" | "location" | "posted_date";
+  sort_dir?: "asc" | "desc";
 }
 
 export default class JobService {
@@ -43,10 +46,13 @@ export default class JobService {
 
   async listJobs(params: ListJobsParams = {}): Promise<JobsApiResponse> {
     const query = new URLSearchParams();
+    if (params.search) query.set("search", params.search);
     if (params.category) query.set("category", params.category);
     if (params.employment_type) query.set("employment_type", params.employment_type);
     if (params.location) query.set("location", params.location);
     if (params.cursor) query.set("cursor", params.cursor);
+    if (params.sort_by) query.set("sort_by", params.sort_by);
+    if (params.sort_dir) query.set("sort_dir", params.sort_dir);
     query.set("limit", String(params.limit ?? 20));
 
     const url = `${this.baseUrl}?${query.toString()}`;

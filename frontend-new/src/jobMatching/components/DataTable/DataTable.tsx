@@ -6,7 +6,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TableSortLabel,
   Typography,
   useTheme,
   Box,
@@ -80,7 +79,9 @@ export interface DataTableProps<T extends { id: string }> {
   // Sort (controlled mode)
   externalSortKey?: keyof T | null;
   externalSortDir?: "asc" | "desc";
-  onSortChange?: (key: keyof T) => void;
+  onSortChange?: (key: keyof T, dir?: "asc" | "desc") => void;
+  onSortClear?: () => void;
+  sortClearLabel?: string;
   // Initial sort (uncontrolled mode)
   initialSortKey?: keyof T;
   initialSortDir?: "asc" | "desc";
@@ -96,12 +97,23 @@ interface FilterIconButtonProps<T> {
   col: ColumnDef<T>;
   isActiveSortKey: boolean;
   activeSortDir: "asc" | "desc";
-  onSort: (key: keyof T) => void;
+  onSort: (key: keyof T, dir?: "asc" | "desc") => void;
+  showSortClear?: boolean;
+  onSortClear?: () => void;
+  sortClearLabel?: string;
 }
 
 const SEARCHABLE_FILTER_THRESHOLD = 5;
 
-function FilterIconButton<T>({ col, isActiveSortKey, activeSortDir, onSort }: FilterIconButtonProps<T>) {
+function FilterIconButton<T>({
+  col,
+  isActiveSortKey,
+  activeSortDir,
+  onSort,
+  showSortClear,
+  onSortClear,
+  sortClearLabel,
+}: FilterIconButtonProps<T>) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [filterSearch, setFilterSearch] = useState("");
   const open = Boolean(anchorEl);
@@ -123,8 +135,8 @@ function FilterIconButton<T>({ col, isActiveSortKey, activeSortDir, onSort }: Fi
           p: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
           ml: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
           color: isActive ? "primary.main" : "text.disabled",
-          opacity: isActive ? 1 : 0.45,
-          "&:hover": { opacity: 1, color: "text.primary" },
+          opacity: 1,
+          "&:hover": { color: "text.primary" },
           flexShrink: 0,
         }}
         aria-label={`filter ${String(col.key)}`}
@@ -192,7 +204,7 @@ function FilterIconButton<T>({ col, isActiveSortKey, activeSortDir, onSort }: Fi
                 dense
                 selected={isActiveSortKey && activeSortDir === "asc"}
                 onClick={() => {
-                  onSort(col.key);
+                  onSort(col.key, "asc");
                   setAnchorEl(null);
                 }}
                 sx={{ gap: theme.fixedSpacing(theme.tabiyaSpacing.sm), fontSize: "0.78rem", color: "text.primary" }}
@@ -204,7 +216,7 @@ function FilterIconButton<T>({ col, isActiveSortKey, activeSortDir, onSort }: Fi
                 dense
                 selected={isActiveSortKey && activeSortDir === "desc"}
                 onClick={() => {
-                  onSort(col.key);
+                  onSort(col.key, "desc");
                   setAnchorEl(null);
                 }}
                 sx={{ gap: theme.fixedSpacing(theme.tabiyaSpacing.sm), fontSize: "0.78rem", color: "text.primary" }}
@@ -212,6 +224,21 @@ function FilterIconButton<T>({ col, isActiveSortKey, activeSortDir, onSort }: Fi
                 <ArrowDownwardIcon sx={{ fontSize: "0.85rem", flexShrink: 0 }} />
                 Sort descending
               </MenuItem>
+              {showSortClear && onSortClear && sortClearLabel && (
+                <>
+                  <Divider sx={{ my: theme.fixedSpacing(theme.tabiyaSpacing.xxs) }} />
+                  <MenuItem
+                    dense
+                    onClick={() => {
+                      onSortClear();
+                      setAnchorEl(null);
+                    }}
+                    sx={{ fontSize: "0.78rem", color: "text.primary" }}
+                  >
+                    {sortClearLabel}
+                  </MenuItem>
+                </>
+              )}
               {hasFilter && <Divider sx={{ my: theme.fixedSpacing(theme.tabiyaSpacing.xxs) }} />}
             </>
           )}
@@ -274,6 +301,8 @@ function DataTable<T extends { id: string }>({
   externalSortKey,
   externalSortDir,
   onSortChange,
+  onSortClear,
+  sortClearLabel,
   initialSortKey,
   initialSortDir = "asc",
   ariaLabel,
@@ -293,10 +322,11 @@ function DataTable<T extends { id: string }>({
 
   const activeSortKey = controlled ? externalSortKey : internalSortKey;
   const activeSortDir = controlled ? externalSortDir ?? "asc" : internalSortDir;
+  const showSortClear = Boolean(onSortClear && controlled && activeSortKey !== null && activeSortKey !== undefined);
 
-  const handleSortClick = (key: keyof T) => {
-    if (controlled) onSortChange?.(key);
-    else internalHandleSort(key);
+  const handleSortClick = (key: keyof T, dir?: "asc" | "desc") => {
+    if (controlled) onSortChange?.(key, dir);
+    else internalHandleSort(key, dir);
   };
 
   const displayRows = controlled ? rows : internalSorted;
@@ -320,33 +350,21 @@ function DataTable<T extends { id: string }>({
     const isActive = activeSortKey === col.key;
     const isSortable = col.sortable !== false;
 
-    if (isSortable && !col.filter) {
+    if (!isSortable && !col.filter) {
       return (
-        <TableSortLabel
-          active={isActive}
-          direction={isActive ? activeSortDir : "asc"}
-          onClick={() => handleSortClick(col.key)}
+        <Typography
+          variant="caption"
           sx={{
-            width: "100%",
-            justifyContent: headerJustifyContent(col.align),
-            "& .MuiTableSortLabel-icon": { fontSize: "0.72rem" },
-            color: "text.secondary",
+            fontWeight: 700,
+            fontSize: "0.68rem",
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            whiteSpace: "normal",
+            lineHeight: 1.2,
           }}
         >
-          <Typography
-            variant="caption"
-            sx={{
-              fontWeight: 700,
-              fontSize: "0.68rem",
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-              whiteSpace: "normal",
-              lineHeight: 1.2,
-            }}
-          >
-            {col.label}
-          </Typography>
-        </TableSortLabel>
+          {col.label}
+        </Typography>
       );
     }
 
@@ -378,12 +396,17 @@ function DataTable<T extends { id: string }>({
           ) : (
             <ArrowDownwardIcon sx={{ fontSize: "0.72rem", color: "primary.main", flexShrink: 0 }} />
           ))}
-        <FilterIconButton<T>
-          col={col}
-          isActiveSortKey={isActive}
-          activeSortDir={activeSortDir}
-          onSort={handleSortClick}
-        />
+        {(isSortable || col.filter) && (
+          <FilterIconButton<T>
+            col={col}
+            isActiveSortKey={isActive}
+            activeSortDir={activeSortDir}
+            onSort={handleSortClick}
+            showSortClear={showSortClear}
+            onSortClear={onSortClear}
+            sortClearLabel={sortClearLabel}
+          />
+        )}
       </Box>
     );
   };
