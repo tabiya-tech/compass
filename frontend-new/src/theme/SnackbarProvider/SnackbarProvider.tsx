@@ -20,7 +20,7 @@ declare module "notistack" {
   }
 }
 
-const SnackbarCloseButton = (key: SnackbarKey) => {
+export const SnackbarCloseButton = (key: SnackbarKey) => {
   const { closeSnackbar } = useSnackbar();
   // Currently due to a bug in the notistack library, we cannot ref to the correct ARIA ids (see https://github.com/iamhosseindhv/notistack/issues/579)
   // Suing  the title attribute for accessibility, is not ideal. When multiple snackbars are open,

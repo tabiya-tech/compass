@@ -19,6 +19,30 @@ jest.mock("src/feedback/bugReport/bugReportButton/BugReportButton", () => {
   };
 });
 describe("ErrorPage", () => {
+  test("ErrorPage renders the support reference block when a supportPayload is provided", async () => {
+    // GIVEN an error message and a support payload
+    const givenErrorMessage = "Something went wrong";
+    const givenSupportPayload = "Error: X\nReference: abc-123\nTime: now";
+
+    // WHEN the ErrorPage is rendered with the support payload
+    render(<ErrorPage errorMessage={givenErrorMessage} supportPayload={givenSupportPayload} />);
+
+    // THEN the support heading, payload and copy button are shown
+    expect(screen.getByTestId(DATA_TEST_ID.ERROR_SUPPORT_HEADING)).toBeInTheDocument();
+    const actualPayload = screen.getByTestId(DATA_TEST_ID.ERROR_SUPPORT_PAYLOAD);
+    expect(actualPayload).toHaveTextContent("Reference: abc-123");
+    expect(screen.getByTestId(DATA_TEST_ID.ERROR_SUPPORT_COPY_BUTTON)).toBeInTheDocument();
+  });
+
+  test("ErrorPage does not render the support reference block when no payload is provided", () => {
+    // GIVEN an error page without a support payload
+    render(<ErrorPage errorMessage="oops" />);
+
+    // THEN the support reference elements are absent
+    expect(screen.queryByTestId(DATA_TEST_ID.ERROR_SUPPORT_HEADING)).not.toBeInTheDocument();
+    expect(screen.queryByTestId(DATA_TEST_ID.ERROR_SUPPORT_COPY_BUTTON)).not.toBeInTheDocument();
+  });
+
   test("ErrorPage renders correctly", () => {
     // GIVEN an error message
     const errorMessage = "404 Error - Page Not Found";

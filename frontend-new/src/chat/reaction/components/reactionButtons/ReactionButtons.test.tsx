@@ -261,7 +261,7 @@ describe("ReactionButtons", () => {
           );
         });
         // AND expect an error snackbar to be shown
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit the feedback. Please try again.", {
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Your reaction didn't send. Tap again to retry.", {
           variant: "error",
         });
       });
@@ -319,7 +319,7 @@ describe("ReactionButtons", () => {
           expect(screen.getByTestId(DATA_TEST_ID.ICON_LIKE_ACTIVE)).toBeInTheDocument();
         });
         // AND expect the snackbar to show an error message
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit the feedback. Please try again.", {
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Your reaction didn't send. Tap again to retry.", {
           variant: "error",
         });
       });
@@ -520,7 +520,7 @@ describe("ReactionButtons", () => {
         expect(sendSpy).toHaveBeenCalledWith(givenSessionId, givenMessageId, new LikeReaction());
 
         // AND expect an error snackbar to be displayed
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit the feedback. Please try again.", {
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Your reaction didn't send. Tap again to retry.", {
           variant: "error",
         });
         // AND expect an error to be logged
@@ -574,7 +574,7 @@ describe("ReactionButtons", () => {
           expect(screen.getByTestId(DATA_TEST_ID.ICON_DISLIKE_ACTIVE)).toBeInTheDocument();
         });
         // AND expect the snackbar to show an error message
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to submit the feedback. Please try again.", {
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Your reaction didn't send. Tap again to retry.", {
           variant: "error",
         });
       });
@@ -643,9 +643,12 @@ describe("ReactionButtons", () => {
 
       // THEN expect an error snackbar to be displayed
       await waitFor(() => {
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to remove the feedback. Please try again.", {
-          variant: "error",
-        });
+        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+          "We couldn't remove your reaction. Tap again to retry.",
+          {
+            variant: "error",
+          }
+        );
       });
     });
   });

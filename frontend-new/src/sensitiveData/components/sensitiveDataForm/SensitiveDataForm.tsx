@@ -170,8 +170,19 @@ const SensitiveDataForm: React.FC = () => {
     schoolYear: false,
   });
 
+  // Only surface per-field error UI after a failed submit; while typing we stay quiet.
+  const [showFieldErrors, setShowFieldErrors] = useState(false);
+
+  const firstNameRef = useRef<HTMLDivElement | null>(null);
+  const lastNameRef = useRef<HTMLDivElement | null>(null);
+  const institutionRef = useRef<HTMLDivElement | null>(null);
+  const programmeRef = useRef<HTMLDivElement | null>(null);
+  const schoolYearRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    setIsSubmitButtonEnabled(isFormValid(validationErrors));
+    const valid = isFormValid(validationErrors);
+    setIsSubmitButtonEnabled(valid);
+    if (valid) setShowFieldErrors(false);
   }, [validationErrors]);
 
   const setFieldValid = useCallback((name: string, isValid: boolean) => {
@@ -239,12 +250,12 @@ const SensitiveDataForm: React.FC = () => {
         setProgrammes(result.programmes ?? []);
       } catch (e) {
         console.error("Failed to load programmes", e);
-        enqueueSnackbar("Failed to load programmes for this institution", { variant: "warning" });
+        enqueueSnackbar(t("sensitiveData.components.sensitiveDataForm.failedToLoadProgrammes"), { variant: "warning" });
       } finally {
         setProgrammesLoading(false);
       }
     },
-    [setFieldValid, enqueueSnackbar]
+    [setFieldValid, enqueueSnackbar, t]
   );
 
   // Build the sensitiveData payload from current field state
@@ -262,7 +273,17 @@ const SensitiveDataForm: React.FC = () => {
 
   const handleSaveSensitivePersonalData = useCallback(async () => {
     if (!isFormValid(validationErrors)) {
+      setShowFieldErrors(true);
       enqueueSnackbar(t("sensitiveData.components.sensitiveDataForm.invalidForm"), { variant: "error" });
+      const orderedRefs: Array<[string, React.RefObject<HTMLDivElement | null>]> = [
+        ["firstName", firstNameRef],
+        ["lastName", lastNameRef],
+        ["institution", institutionRef],
+        ["programme", programmeRef],
+        ["schoolYear", schoolYearRef],
+      ];
+      const firstInvalid = orderedRefs.find(([name]) => !validationErrors[name]);
+      firstInvalid?.[1].current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
@@ -395,6 +416,13 @@ const SensitiveDataForm: React.FC = () => {
                     setFirstName(val);
                     setFieldValid("firstName", val.trim().length > 0);
                   }}
+                  inputRef={firstNameRef}
+                  error={showFieldErrors && !validationErrors.firstName}
+                  helperText={
+                    showFieldErrors && !validationErrors.firstName
+                      ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
+                      : ""
+                  }
                 />
 
                 {/* Last Name */}
@@ -409,6 +437,13 @@ const SensitiveDataForm: React.FC = () => {
                     setLastName(val);
                     setFieldValid("lastName", val.trim().length > 0);
                   }}
+                  inputRef={lastNameRef}
+                  error={showFieldErrors && !validationErrors.lastName}
+                  helperText={
+                    showFieldErrors && !validationErrors.lastName
+                      ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
+                      : ""
+                  }
                 />
 
                 {/* Institution — type-to-search autocomplete, shows province on the right */}
@@ -447,6 +482,13 @@ const SensitiveDataForm: React.FC = () => {
                       required
                       label="Institution"
                       placeholder="Start typing to search..."
+                      inputRef={institutionRef}
+                      error={showFieldErrors && !validationErrors.institution}
+                      helperText={
+                        showFieldErrors && !validationErrors.institution
+                          ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
+                          : ""
+                      }
                       slotProps={{
                         input: {
                           ...params.InputProps,
@@ -487,6 +529,13 @@ const SensitiveDataForm: React.FC = () => {
                       required
                       label="Programme"
                       placeholder={selectedInstitution ? "Select programme" : "Select an institution first"}
+                      inputRef={programmeRef}
+                      error={showFieldErrors && !validationErrors.programme}
+                      helperText={
+                        showFieldErrors && !validationErrors.programme
+                          ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
+                          : ""
+                      }
                       slotProps={{
                         input: {
                           ...params.InputProps,
@@ -503,12 +552,13 @@ const SensitiveDataForm: React.FC = () => {
                 />
 
                 {/* School Year */}
-                <FormControl fullWidth required>
+                <FormControl fullWidth required error={showFieldErrors && !validationErrors.schoolYear}>
                   <InputLabel id="school-year-label">School Year</InputLabel>
                   <Select
                     value={schoolYear}
                     label="School Year"
                     labelId="school-year-label"
+                    inputRef={schoolYearRef}
                     SelectDisplayProps={
                       {
                         "data-testid": DATA_TEST_ID.SENSITIVE_DATA_SCHOOL_YEAR_SELECT,
@@ -525,6 +575,11 @@ const SensitiveDataForm: React.FC = () => {
                       </MenuItem>
                     ))}
                   </Select>
+                  {showFieldErrors && !validationErrors.schoolYear && (
+                    <Typography variant="caption" color="error" sx={{ marginLeft: 1.75, marginTop: 0.5 }}>
+                      {t("sensitiveData.components.sensitiveDataForm.fieldRequired")}
+                    </Typography>
+                  )}
                 </FormControl>
               </Box>
 

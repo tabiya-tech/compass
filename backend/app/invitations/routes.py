@@ -59,7 +59,7 @@ def add_user_invitations_routes(app: FastAPI):
             )
         except Exception as e:
             logger.exception(e)
-            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Opps! Something went wrong.")
+            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")
 
     ######################
     # Add the user invitations router to the app

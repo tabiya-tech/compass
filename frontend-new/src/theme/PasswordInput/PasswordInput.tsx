@@ -9,6 +9,9 @@ type PasswordInputProps = Omit<TextFieldProps, "type" | "helperText"> & {
   showPassword?: boolean;
   onValidityChange?: (isValid: boolean) => void;
   shouldValidatePassword?: boolean;
+  // External helperText is honoured only when shouldValidatePassword is false,
+  // otherwise the internal PasswordRequirements helper is used.
+  helperText?: React.ReactNode;
 };
 
 const uniqueId = "b7499b01-8082-4209-8667-c7d559a70cag";
@@ -26,6 +29,8 @@ const PasswordInput: React.FC<Readonly<PasswordInputProps>> = ({
   onChange,
   shouldValidatePassword = true,
   value,
+  helperText: externalHelperText,
+  error: externalError,
   ...props
 }) => {
   const { t } = useTranslation();
@@ -63,6 +68,11 @@ const PasswordInput: React.FC<Readonly<PasswordInputProps>> = ({
 
   const shouldShowHelperText = value !== "" && shouldValidatePassword && !isPasswordValid;
 
+  const effectiveError = shouldValidatePassword ? value !== "" && !isPasswordValid : !!externalError;
+  const effectiveHelperText = shouldValidatePassword
+    ? shouldShowHelperText && <PasswordRequirements validationResults={passwordValidation} />
+    : externalHelperText;
+
   return (
     <TextField
       {...props}
@@ -70,8 +80,8 @@ const PasswordInput: React.FC<Readonly<PasswordInputProps>> = ({
       onChange={handleChange}
       data-testid={DATA_TEST_ID.TEXT_FIELD}
       value={value}
-      error={value !== "" && shouldValidatePassword && !isPasswordValid}
-      helperText={shouldShowHelperText && <PasswordRequirements validationResults={passwordValidation} />}
+      error={effectiveError}
+      helperText={effectiveHelperText}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">

@@ -4,6 +4,9 @@ import { Button } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import { faker } from "@faker-js/faker";
 import { useEffect } from "react";
+import { enqueueErrorSnackbarWithReference } from "src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
+import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 
 const meta: Meta<typeof SnackbarProvider> = {
   title: "Components/SnackBar",
@@ -104,6 +107,60 @@ export const ShownMixed: Story = {
     ];
     return <ShowNotifications notifications={notifications} />;
   },
+};
+
+// Persistent error snackbar with a "Copy for support" action. Demonstrates the
+// enqueueErrorSnackbarWithReference helper used for generic fallback errors.
+const simulatedBackendError = () =>
+  new RestAPIError(
+    "ChatService",
+    "sendMessage",
+    "POST",
+    "/conversations/abc/messages",
+    500,
+    ErrorConstants.ErrorCodes.API_ERROR,
+    "server exploded",
+    JSON.stringify({
+      detail: "Oops! Something went wrong.",
+      correlation_id: "550e8400-e29b-41d4-a716-446655440000",
+      sentry_event_id: "9a8b7c6d5e4f3a2b",
+    })
+  );
+
+const PersistentErrorShortTrigger = () => (
+  <Button
+    onClick={() =>
+      enqueueErrorSnackbarWithReference("Failed to start new conversation", {
+        where: "Chat conversation (start)",
+        error: simulatedBackendError(),
+      })
+    }
+  >
+    Show persistent error (short)
+  </Button>
+);
+
+const PersistentErrorLongTrigger = () => (
+  <Button
+    onClick={() =>
+      enqueueErrorSnackbarWithReference(
+        "Failed to start new conversation — the server returned a 500 while provisioning your workspace. Retrying in a few seconds.",
+        { where: "Chat conversation (start)", error: simulatedBackendError() }
+      )
+    }
+  >
+    Show persistent error (long, truncated)
+  </Button>
+);
+
+export const PersistentErrorShort: Story = {
+  parameters: { docs: { disable: false }, a11y: { disable: true } },
+  render: () => <PersistentErrorShortTrigger />,
+};
+
+export const PersistentErrorLong: Story = {
+  parameters: { docs: { disable: false }, a11y: { disable: true } },
+  render: () => <PersistentErrorLongTrigger />,
 };
 
 function getRandomNotificationProps(count: number, variant: VariantType): { message: string; variant: VariantType }[] {

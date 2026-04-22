@@ -270,7 +270,7 @@ class TestHandleSensitivePersonalData:
         # THEN the response is INTERNAL_SERVER_ERROR
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
         # AND the response contains the error message
-        assert response.json() == {"detail": "Opps! Something went wrong."}
+        assert response.json() == {"detail": "Oops! Something went wrong."}
 
     @pytest.mark.asyncio
     async def test_invalid_payload(self, client_with_mocks: TestClientWithMocks):

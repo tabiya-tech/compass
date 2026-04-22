@@ -31,6 +31,8 @@
     },
     "validation": {
       "validEmailRequired": "Tafadhali ingiza anwani sahihi ya barua pepe",
+      "emailRequired": "Tafadhali ingiza barua pepe yako",
+      "passwordRequired": "Tafadhali ingiza nenosiri lako",
       "emailsDoNotMatch": "Barua pepe hazifanani",
       "passwordMinLength": "Nenosiri lazima liwe na angalau herufi 8.",
       "passwordNeedLowercase": "Nenosiri lazima liwe na angalau herufi moja ndogo.",
@@ -47,14 +49,14 @@
     "upload": {
       "errors": {
         "maxFileSize": "Faili iliyochaguliwa ni kubwa sana. Ukubwa wa juu ni MB 3.",
-        "tooDense": "Maudhui ya faili iliyopakiwa ni ndefu sana kuchakatwa. Tafadhali punguza urefu wake na ujaribu tena.",
+        "tooDense": "CV yako ina maandishi zaidi ya yale tunayoweza kushughulikia. Tafadhali fupisha maudhui au pakia faili yenye kurasa chache na ujaribu tena.",
         "emptyParse": "Hatukuweza kutambua uzoefu katika CV yako. Tafadhali angalia faili na ujaribu tena.",
         "generic": "Imeshindikana kuchakata CV yako. Tafadhali jaribu tena au tumia faili nyingine.",
         "rateLimit": "Upakiaji mwingi sana kwa wakati mmoja. Tafadhali subiri dakika moja na ujaribu tena.",
         "maxUploadsReached": "Umefika kikomo cha upakiaji wa CV kwa mazungumzo haya. Upakiaji zaidi hauruhusiwi.",
         "duplicate": "CV hii tayari imepakiwa. Ichague kutoka CV zako zilizopakiwa awali.",
         "unsupportedFileType": "Aina ya faili haikusaiidiwi. Inaruhusiwa: PDF, DOCX, TXT.",
-        "timeout": "Upakiaji umeisha muda. Tafadhali jaribu tena.",
+        "timeout": "Upakiaji umechukua muda mrefu sana. Mara nyingi hii humaanisha muunganisho wa polepole — tafadhali hakiki mtandao wako na ujaribu tena.",
         "unauthorized": "Huna ruhusa. Tafadhali ingia tena.",
         "uploadNotFound": "Upakiaji haujapatikana. Huenda haukuanza.",
         "cvMarkdownTooLong": "Maudhui ya CV yako ni ndefu sana. Tafadhali fupisha CV yako na ujaribu tena."
@@ -78,7 +80,7 @@
       "api": {
         "requestTooLong": "Data iliyotumwa kwa huduma inaonekana kuwa kubwa sana. Tafadhali jaribu tena na data ndogo zaidi.",
         "tooManyRequests": "Inaonekana unafanya maombi mengi sana. Tafadhali punguza kasi na ujaribu tena baadaye.",
-        "unexpectedError": "Kosa lisilotarajiwa limetokea. Tafadhali jaribu tena baadaye.",
+        "unexpectedError": "Kitu kimekwenda vibaya kwa upande wetu. Tafadhali jaribu tena baada ya muda mfupi, na kama tatizo litaendelea, nakili kumbukumbu iliyo chini na uishiriki na timu ya msaada.",
         "serverConnectionError": "Haiwezi kuunganisha na huduma. Tafadhali angalia muunganisho wako wa mtandao au jaribu tena baadaye.",
         "resourceNotFound": "Rasilimali iliyoombwa haijapatikana. Tafadhali futa kashe ya kivinjari chako na upakie upya ukurasa.",
         "authenticationFailure": "Inaonekana haujaingia. Tafadhali ingia ili kuendelea.",
@@ -139,9 +141,9 @@
       "extractingExperiences": "Inatoa uzoefu",
       "savingCv": "Inahifadhi CV",
       "failed": "Upakiaji wa CV umeshindikana",
-      "failedToStart": "Imeshindikana kuanza upakiaji.",
-      "networkErrorStatus": "Kosa la mtandao wakati wa kuangalia hali ya upakiaji.",
-      "failedToCancel": "Imeshindikana kughairi upakiaji",
+      "failedToStart": "Hatukuweza kuanzisha upakiaji wako. Tafadhali jaribu tena.",
+      "networkErrorStatus": "Tumepoteza muunganisho tukikagua upakiaji wako. Upakiaji unaweza kuendelea na kufanikiwa — tutaendelea kujaribu.",
+      "failedToCancel": "Hatukuweza kughairi upakiaji. Unaweza kuendelea nyuma ya pazia.",
       "uploadingFileNamed": "Inapakia {{filename}}...",
       "thinkingMessage": "Inachakata CV yako, hii inaweza kuchukua muda..."
     },
@@ -266,10 +268,10 @@
           "likeLabel": "penda",
           "dislikeLabel": "sipendi",
           "errors": {
-            "submitLike": "Imeshindikana kuwasilisha maoni. Tafadhali jaribu tena.",
-            "removeLike": "Imeshindikana kuondoa maoni. Tafadhali jaribu tena.",
-            "submitDislike": "Imeshindikana kuwasilisha maoni. Tafadhali jaribu tena.",
-            "removeDislike": "Imeshindikana kuondoa maoni. Tafadhali jaribu tena."
+            "submitLike": "Maoni yako hayakutumwa. Gonga tena ili kurejesha.",
+            "removeLike": "Hatukuweza kuondoa maoni yako. Gonga tena ili kurejesha.",
+            "submitDislike": "Maoni yako hayakutumwa. Gonga tena ili kurejesha.",
+            "removeDislike": "Hatukuweza kuondoa maoni yako. Gonga tena ili kurejesha."
           }
         }
       }
@@ -360,7 +362,7 @@
         "forgotPassword": "Umesahau nenosiri?",
         "pleaseEnterEmail": "Tafadhali ingiza anwani yako ya barua pepe",
         "passwordResetEmailSent": "Barua pepe ya kuweka upya nenosiri imetumwa!",
-        "failedToSendResetEmail": "Imeshindikana kutuma barua pepe ya kuweka upya",
+        "failedToSendResetEmail": "Hatukuweza kutuma barua pepe ya kuweka upya nenosiri kwa sasa. Tafadhali jaribu tena.",
         "passwordResetLinkSent": "Kiungo cha kuweka upya nenosiri kimetumwa kwenye anwani yako ya barua pepe.",
         "resetPassword": "Weka upya Nenosiri",
         "closePasswordResetForm": "Funga fomu ya kuweka upya nenosiri"
@@ -393,14 +395,13 @@
         "orContinueWith": "Au",
         "loginWithGoogle": "Ingia na Google",
         "googleLoginIsNotAvailableWhenOffline": "Kuingia na Google hakupatikani ukiwa nje ya mtandao.",
-        "socialFailedLoginWithMessage": "Imeshindikana kuingia: {{message}}",
         "accountNotRegistered": "Akaunti hii haijasajiliwa. Tafadhali wasiliana na mtoa kiungo hiki."
       }
     },
     "loggingYouOutNotice": "Tunakutoa nje...",
     "errors": {
-      "loginFailedWithMessage": "Imeshindikana kuingia: {{message}}",
-      "registerFailedWithMessage": "Usajili Umeshindikana: {{message}}",
+      "loginFailedGeneric": "Hatukuweza kukuingiza kwa sasa. Tafadhali jaribu tena.",
+      "registerFailedGeneric": "Hatukuweza kukamilisha usajili wako kwa sasa. Tafadhali jaribu tena.",
       "preferencesFetchFailedWithMessage": "Kosa limetokea wakati wa kujaribu kupata mapendeleo yako: {{message}}",
       "firebase": {
         "emailAlreadyInUse": "Akaunti yenye barua pepe hii tayari ipo. Ikiwa ulijiandikisha kwa Google, tafadhali tumia kitufe cha 'Ingia na Google' kuingia.",
@@ -433,12 +434,12 @@
           "components": {
             "summaryEditField": {
               "summaryPlaceholder": "Muhtasari wa uzoefu",
-              "restoreFailed": "Imeshindikana kurejesha muhtasari. Tafadhali jaribu tena baadaye.",
+              "restoreFailed": "Hatukuweza kurejesha muhtasari huo. Muhtasari wako wa awali bado umehifadhiwa — tafadhali jaribu tena.",
               "restored": "Muhtasari umejeshwa."
             }
           },
           "updateSuccess": "Uzoefu umesasishwa kwa mafanikio!",
-          "updateFailed": "Imeshindikana kusasisha uzoefu. Tafadhali jaribu tena baadaye.",
+          "updateFailed": "Mabadiliko yako hayajahifadhiwa. Tafadhali jaribu tena baada ya muda mfupi.",
           "skillsAddedSuccess": "Ujuzi umeongezwa kwa mafanikio!",
           "editTitle": "Hariri Uzoefu",
           "infoLabel": "Taarifa za uzoefu",
@@ -477,7 +478,7 @@
         },
         "restoreExperiencesDrawer": {
           "title": "Rejesha Uzoefu",
-          "fetchFailed": "Imeshindikana kupata uzoefu uliofutwa. Tafadhali jaribu tena baadaye.",
+          "fetchFailed": "Hatukuweza kupakia uzoefu wako uliofutwa kwa sasa. Bado uko salama — tafadhali jaribu tena.",
           "empty": "Hakuna uzoefu uliofutwa uliopatikana."
         },
         "downloadReportButton": {
@@ -490,7 +491,7 @@
           "preparingPdf": "Inaandaa pdf yako",
           "shareTitle": "Ripoti ya Uzoefu",
           "shareText": "Angalia ripoti yangu ya uzoefu",
-          "shareFailed": "Imeshindikana kushiriki ripoti. Tafadhali jaribu tena.",
+          "shareFailed": "Hatukuweza kushiriki ripoti yako. Unaweza kuipakua na kushiriki faili moja kwa moja.",
           "shareCanceled": "Kushiriki kumeghairiwa kwa ombi la mtumiaji"
         }
       },
@@ -663,7 +664,9 @@
         "skippableSubtitle": "Unaweza kuruka hatua hii.",
         "helpTipText": "Taarifa zako zimesimbwa kwa njia ya kisasa na zimehifadhiwa kwa usalama.",
         "failedToLoadConfig": "Imeshindikana kupakia usanidi wa fomu",
-        "invalidForm": "Tafadhali sahihisha makosa katika fomu kabla ya kuwasilisha.",
+        "failedToLoadProgrammes": "Hatukuweza kupakia programu za taasisi hii kwa sasa. Tafadhali jaribu kuichagua tena.",
+        "fieldRequired": "Sehemu hii inahitajika.",
+        "invalidForm": "Tafadhali sahihisha sehemu zilizowekwa alama kabla ya kuwasilisha.",
         "savedSuccess": "Data ya kibinafsi imehifadhiwa kwa mafanikio na kwa usalama.",
         "errorDefault": "Data ya kibinafsi haikuweza kuhifadhiwa. Tafadhali jaribu tena.",
         "errorEncryptedDataTooLarge": "Data ya kibinafsi inaonekana kuwa kubwa sana kuhifadhiwa. Tafadhali jaribu tena kwa maadili madogo zaidi.",
@@ -693,7 +696,7 @@
             "ratingLabelLow": "Sijaridhika",
             "ratingLabelHigh": "Nimeridhika",
             "submitSuccess": "Maoni ya ukadiriaji yamewasilishwa kwa mafanikio!",
-            "submitError": "Imeshindikana kuwasilisha maoni. Tafadhali jaribu tena baadaye."
+            "submitError": "Tathmini yako haikutumwa. Tafadhali jaribu tena baada ya muda mfupi."
           },
           "feedbackFormContent": {
             "previous": "Iliyotangulia",
@@ -701,7 +704,7 @@
           }
         },
         "submitSuccess": "Maoni yamewasilishwa kwa mafanikio!",
-        "submitError": "Imeshindikana kuwasilisha maoni. Tafadhali jaribu tena baadaye.",
+        "submitError": "Maoni yako hayakutumwa. Tafadhali jaribu tena baada ya muda mfupi. Kama hili litaendelea, tumia kumbukumbu inayoonyeshwa wakati mambo yanakosea na ujulishe timu ya msaada.",
         "helpUsImprove": "Tusaidie kuboresha!",
         "closeForm": "funga fomu ya maoni",
         "submittingFeedback": "Inawasilisha maoni..."
@@ -714,13 +717,22 @@
   "error": {
     "errorPage": {
       "illustrationAlt": "picha ya kosa",
-      "defaultMessage": "Kuna kitu kimekwenda vibaya na {{appName}}. Jaribu kupaisha upya ukurasa...",
+      "defaultMessage": "Kuna kitu kimekwenda vibaya na {{appName}}. Jaribu kuonyesha upya ukurasa, na kama tatizo litaendelea, nakili kumbukumbu iliyo chini na uishiriki na timu ya msaada.",
       "notFound": "Kosa la 404 - Ukurasa Haujapatikana",
       "refreshButton": "Onyesha upya ukurasa"
     },
     "restAPIError": {
       "storyChooseMessageLabel": "Chagua ujumbe wa kosa wa kuonyesha:",
       "storySelectPlaceholder": "Chagua ujumbe wa kosa"
+    },
+    "supportReference": {
+      "copyButton": "Nakili kwa ajili ya msaada",
+      "copied": "Imenakiliwa",
+      "copyFailed": "Haikuwezekana kunakili kwenye clipboard",
+      "heading": "Kama hii inaendelea kutokea, nakili maelezo yaliyo chini na yashiriki na timu ya msaada:",
+      "expand": "Onyesha ujumbe wote",
+      "collapse": "Onyesha kidogo",
+      "close": "Funga"
     }
   },
   "app": {

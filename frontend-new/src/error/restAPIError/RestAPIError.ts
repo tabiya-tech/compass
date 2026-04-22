@@ -16,6 +16,8 @@ export class RestAPIError extends ServiceError {
   path: string;
   statusCode: number;
   errorCode: ErrorConstants.ErrorCodes | string;
+  correlationId?: string;
+  sentryEventId?: string;
 
   constructor(
     serviceName: string,
@@ -32,6 +34,17 @@ export class RestAPIError extends ServiceError {
     this.path = path;
     this.statusCode = statusCode;
     this.errorCode = errorCode;
+
+    const parsed = this.cause;
+    if (parsed && typeof parsed === "object") {
+      const candidate = parsed as { correlation_id?: unknown; sentry_event_id?: unknown };
+      if (typeof candidate.correlation_id === "string") {
+        this.correlationId = candidate.correlation_id;
+      }
+      if (typeof candidate.sentry_event_id === "string") {
+        this.sentryEventId = candidate.sentry_event_id;
+      }
+    }
   }
 }
 

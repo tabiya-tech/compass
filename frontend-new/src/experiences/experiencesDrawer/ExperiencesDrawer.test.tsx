@@ -650,7 +650,7 @@ describe("ExperiencesDrawer", () => {
 
       // THEN expect error snackbar to be displayed
       expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-        "An unexpected error occurred. Please try again later.",
+        "Something went wrong on our end. Please try again in a moment, and if it keeps happening copy the reference below and share it with support.",
         { variant: "error" }
       );
     });

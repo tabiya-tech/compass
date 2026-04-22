@@ -57,6 +57,75 @@ describe("Test the RestAPIError class", () => {
   });
 });
 
+describe("Test the RestAPIError parses correlation_id and sentry_event_id from the cause", () => {
+  test("should expose correlationId and sentryEventId when the backend returns them as JSON", () => {
+    // GIVEN a backend error response body with correlation_id and sentry_event_id
+    const givenCauseJson = JSON.stringify({
+      detail: "boom",
+      correlation_id: "corr-123",
+      sentry_event_id: "ev-abc",
+    });
+
+    // WHEN a RestAPIError is constructed from that body
+    const actualError = new RestAPIError(
+      "service",
+      "function",
+      "method",
+      "path",
+      500,
+      ErrorConstants.ErrorCodes.API_ERROR,
+      "failure",
+      givenCauseJson
+    );
+
+    // THEN the reference fields are exposed on the error
+    expect(actualError.correlationId).toBe("corr-123");
+    expect(actualError.sentryEventId).toBe("ev-abc");
+  });
+
+  test("should leave correlationId and sentryEventId undefined when the cause has neither field", () => {
+    // GIVEN a cause without reference fields
+    const givenCause = { detail: "only detail" };
+
+    // WHEN a RestAPIError is constructed from it
+    const actualError = new RestAPIError(
+      "service",
+      "function",
+      "method",
+      "path",
+      500,
+      ErrorConstants.ErrorCodes.API_ERROR,
+      "failure",
+      givenCause
+    );
+
+    // THEN both fields remain undefined
+    expect(actualError.correlationId).toBeUndefined();
+    expect(actualError.sentryEventId).toBeUndefined();
+  });
+
+  test("should leave correlationId and sentryEventId undefined when the cause is a non-JSON string", () => {
+    // GIVEN a plain-text cause that is not JSON
+    const givenCause = "plain text error body";
+
+    // WHEN a RestAPIError is constructed from it
+    const actualError = new RestAPIError(
+      "service",
+      "function",
+      "method",
+      "path",
+      500,
+      ErrorConstants.ErrorCodes.API_ERROR,
+      "failure",
+      givenCause
+    );
+
+    // THEN both fields remain undefined
+    expect(actualError.correlationId).toBeUndefined();
+    expect(actualError.sentryEventId).toBeUndefined();
+  });
+});
+
 describe("Test the getRestAPIErrorFactory function", () => {
   it("should return a RestAPIErrorFactory", () => {
     // GIVEN a service name, function, method and path

@@ -69,6 +69,11 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
+// Mock the persistent error snackbar helper so tests can assert generic-fallback calls.
+jest.mock("src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference", () => ({
+  enqueueErrorSnackbarWithReference: jest.fn(),
+}));
+
 // mock the ChatList component
 jest.mock("src/chat/chatList/ChatList", () => {
   const actual = jest.requireActual("src/chat/chatList/ChatList");
@@ -648,13 +653,14 @@ describe("Chat", () => {
         await waitFor(() => {
           assertTypingMessageWasShown();
         });
-        // AND expect a snackbar notification was shown once
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledTimes(1);
-        // AND expect a snackbar notification to be an error
+        // AND expect a persistent error snackbar with a support reference
+        const { enqueueErrorSnackbarWithReference } = await import(
+          "src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference"
+        );
         await waitFor(() => {
-          expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+          expect(enqueueErrorSnackbarWithReference).toHaveBeenCalledWith(
             i18n.t(NOTIFICATION_MESSAGES_TEXT.FAILED_TO_START_CONVERSATION),
-            { variant: "error" }
+            expect.objectContaining({ where: "Chat conversation (start)" })
           );
         });
         // AND expect the chat to show a message that something went wrong
@@ -835,10 +841,14 @@ describe("Chat", () => {
         assertTypingMessageWasShown();
         // AND expect the getUserPreferences method to be called
         expect(UserPreferencesService.getInstance().getUserPreferences).toHaveBeenCalled();
-        // AND expect a snackbar notification to be shown
-        expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to start new conversation", {
-          variant: "error",
-        });
+        // AND expect a persistent error snackbar with a support reference
+        const { enqueueErrorSnackbarWithReference: enqueueErrorSnackbarWithReferenceMock } = await import(
+          "src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference"
+        );
+        expect(enqueueErrorSnackbarWithReferenceMock).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({ where: "Chat conversation (start)" })
+        );
         // AND expect the chat to show a message that something went wrong
         assertMessagesAreShown(
           [

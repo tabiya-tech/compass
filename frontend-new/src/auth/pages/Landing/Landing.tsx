@@ -14,6 +14,7 @@ import UserPreferencesStateService from "src/userPreferences/UserPreferencesStat
 import { AuthenticationError } from "src/error/commonErrors";
 import { RestAPIError, getUserFriendlyErrorMessage } from "src/error/restAPIError/RestAPIError";
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
+import { enqueueErrorSnackbarWithReference } from "src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference";
 import { useAuthPageContext } from "src/auth/components/AuthLayout/AuthPageContext";
 
 const uniqueId = "e9c346bb-bcc6-4aaa-aaa9-d24d09274925";
@@ -47,18 +48,16 @@ const Landing: React.FC = () => {
 
   const handleError = useCallback(
     async (error: Error) => {
-      let errorMessage;
       if (error instanceof RestAPIError) {
-        errorMessage = getUserFriendlyErrorMessage(error);
         console.error(error);
+        enqueueSnackbar(getUserFriendlyErrorMessage(error), { variant: "error" });
       } else if (error instanceof FirebaseError) {
-        errorMessage = getUserFriendlyFirebaseErrorMessage(error);
         console.warn(error);
+        enqueueSnackbar(getUserFriendlyFirebaseErrorMessage(error), { variant: "error" });
       } else {
-        errorMessage = error.message;
         console.error(error);
+        enqueueErrorSnackbarWithReference(t("auth.errors.loginFailedGeneric"), { where: "Landing", error });
       }
-      enqueueSnackbar(t("auth.errors.loginFailedWithMessage", { message: errorMessage }), { variant: "error" });
     },
     [enqueueSnackbar, t]
   );

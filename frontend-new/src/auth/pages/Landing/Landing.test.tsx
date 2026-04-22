@@ -48,6 +48,11 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
+// mock the support-reference snackbar helper
+jest.mock("src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference", () => ({
+  enqueueErrorSnackbarWithReference: jest.fn(),
+}));
+
 describe("Landing Page", () => {
   beforeEach(() => {
     (console.error as jest.Mock).mockClear();
@@ -274,10 +279,14 @@ describe("Landing Page", () => {
       // THEN expect error to be logged
       expect(console.error).toHaveBeenCalledWith(error);
 
-      // AND the error message to be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(`Failed to login: ${DATA_VALIDATION_ERROR}`, {
+      // AND the user-friendly error message is shown directly (no "Failed to login:" prefix)
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(DATA_VALIDATION_ERROR, {
         variant: "error",
       });
+      expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalledWith(
+        expect.stringContaining("Failed to login:"),
+        expect.anything()
+      );
     });
 
     test("should handle FirebaseError when continuing as guest", async () => {
@@ -307,10 +316,14 @@ describe("Landing Page", () => {
       // THEN expect error to be logged
       expect(console.warn).toHaveBeenCalledWith(error);
 
-      // AND the error message to be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(`Failed to login: An internal error has occurred.`, {
+      // AND the mapped Firebase message is shown directly (no "Failed to login:" prefix)
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("An internal error has occurred.", {
         variant: "error",
       });
+      expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalledWith(
+        expect.stringContaining("Failed to login:"),
+        expect.anything()
+      );
     });
 
     test("should handle error when getting user preferences", async () => {

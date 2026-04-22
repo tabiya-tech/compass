@@ -572,9 +572,12 @@ describe("ExperienceEditForm", () => {
     // AND notifyOnSave should NOT be called
     expect(notifyOnSave).not.toHaveBeenCalled();
     // AND an error snackbar should be shown
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith("Failed to update experience. Please try again later.", {
-      variant: "error",
-    });
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
+      "Your changes weren't saved. Please try again in a moment.",
+      {
+        variant: "error",
+      }
+    );
     // AND the error should be logged to console
     expect(console.error).toHaveBeenCalledWith(new ExperienceError("Failed to update experience:", givenError));
   });

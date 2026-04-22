@@ -107,6 +107,6 @@ def add_user_sensitive_personal_data_routes(users_router: APIRouter, auth: Authe
             raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=warning_msg)
         except Exception as e:
             logger.exception(e)
-            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Opps! Something went wrong.")
+            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")
 
     users_router.include_router(router)

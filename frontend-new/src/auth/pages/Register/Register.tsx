@@ -18,6 +18,7 @@ import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.consta
 import { INVITATIONS_PARAM_NAME } from "src/auth/auth.types";
 import { getApplicationRegistrationCode, getSocialAuthDisabled, getRegistrationCodeDisabled } from "src/envService";
 import { outlinedNoBorderSx } from "src/auth/pages/authInputStyles";
+import { enqueueErrorSnackbarWithReference } from "src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d0";
 
@@ -79,22 +80,20 @@ const Register: React.FC = () => {
 
   const handleError = useCallback(
     async (error: Error) => {
-      let errorMessage;
       if (error instanceof RestAPIError) {
         console.error(error);
-        errorMessage = getUserFriendlyErrorMessage(error);
+        enqueueSnackbar(getUserFriendlyErrorMessage(error), { variant: "error" });
       } else if (error instanceof FirebaseError) {
-        errorMessage = getUserFriendlyFirebaseErrorMessage(error);
         if (error.errorCode === FirebaseErrorCodes.INVALID_REGISTRATION_CODE) {
           console.error(error);
         } else {
           console.warn(error);
         }
+        enqueueSnackbar(getUserFriendlyFirebaseErrorMessage(error), { variant: "error" });
       } else {
         console.error(error);
-        errorMessage = error.message;
+        enqueueErrorSnackbarWithReference(t("auth.errors.registerFailedGeneric"), { where: "Register", error });
       }
-      enqueueSnackbar(t("auth.errors.registerFailedWithMessage", { message: errorMessage }), { variant: "error" });
     },
     [enqueueSnackbar, t]
   );

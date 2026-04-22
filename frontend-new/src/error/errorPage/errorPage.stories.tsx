@@ -43,3 +43,13 @@ export const WithRefreshButton: Story = {
     showRefreshButton: true,
   },
 };
+
+export const WithSupportReference: Story = {
+  args: {
+    errorMessage:
+      "Something went wrong with Compass. Try reloading the page, and if it keeps happening copy the reference below and share it with support.",
+    supportPayload:
+      "Error: ChunkLoadError: Loading chunk 17 failed\nWhere: Application\nReference: 550e8400-e29b-41d4-a716-446655440000\nSentry: 9a8b7c6d5e4f3a2b1c0d\nTime: 2026-04-21T10:32:15.421Z\nSession: 42",
+    showRefreshButton: true,
+  },
+};

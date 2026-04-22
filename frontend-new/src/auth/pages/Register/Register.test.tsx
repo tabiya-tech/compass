@@ -97,6 +97,11 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
+// Mock the persistent error snackbar helper so tests can assert generic-fallback calls.
+jest.mock("src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference", () => ({
+  enqueueErrorSnackbarWithReference: jest.fn(),
+}));
+
 // mock the router
 jest.mock("react-router-dom", () => {
   const actual = jest.requireActual("react-router-dom");
@@ -362,10 +367,13 @@ describe("Testing Register component", () => {
       expect(registerMock).toHaveBeenCalledWith(givenEmail, givenPassword, givenEmail, givenInvitationCode);
     });
 
-    // AND the error message should be displayed
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-      "Registration Failed: An unexpected error occurred. Please try again later.",
-      { variant: "error" }
+    // AND the persistent error snackbar with a support reference should be displayed
+    const { enqueueErrorSnackbarWithReference } = await import(
+      "src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference"
+    );
+    expect(enqueueErrorSnackbarWithReference).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ where: "Register" })
     );
     // AND the error should be logged
     expect(console.error).toHaveBeenCalled();
@@ -422,10 +430,14 @@ describe("Testing Register component", () => {
     // AND the RestAPIError should be logged with console.error
     expect(console.error).toHaveBeenCalledWith(givenRestAPIError);
 
-    // AND the user-friendly error message should be displayed
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.stringContaining("Registration Failed:"), {
+    // AND the user-friendly error message should be displayed (no template prefix)
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.any(String), {
       variant: "error",
     });
+    expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalledWith(
+      expect.stringContaining("Registration Failed:"),
+      expect.anything()
+    );
 
     // AND no warning should have occurred
     expect(console.warn).not.toHaveBeenCalled();
@@ -477,10 +489,14 @@ describe("Testing Register component", () => {
     // AND the FirebaseError with INVALID_REGISTRATION_CODE should be logged with console.error
     expect(console.error).toHaveBeenCalledWith(givenFirebaseError);
 
-    // AND the user-friendly error message should be displayed
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.stringContaining("Registration Failed:"), {
+    // AND the mapped Firebase user-friendly message should be displayed directly (no template prefix)
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.any(String), {
       variant: "error",
     });
+    expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalledWith(
+      expect.stringContaining("Registration Failed:"),
+      expect.anything()
+    );
 
     // AND no warning should have occurred
     expect(console.warn).not.toHaveBeenCalled();
@@ -532,10 +548,14 @@ describe("Testing Register component", () => {
     // AND the FirebaseError should be logged with console.warn (not console.error)
     expect(console.warn).toHaveBeenCalledWith(givenFirebaseError);
 
-    // AND the user-friendly error message should be displayed
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.stringContaining("Registration Failed:"), {
+    // AND the mapped Firebase user-friendly message should be displayed directly
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.any(String), {
       variant: "error",
     });
+    expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalledWith(
+      expect.stringContaining("Registration Failed:"),
+      expect.anything()
+    );
 
     // AND console.error should not have been called
     expect(console.error).not.toHaveBeenCalled();
@@ -572,10 +592,14 @@ describe("Testing Register component", () => {
       expect(mockLogout).toHaveBeenCalled();
     });
 
-    // AND the error should be handled and displayed to the user
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.stringContaining("Registration Failed:"), {
-      variant: "error",
-    });
+    // AND the generic persistent error snackbar with a support reference should be displayed
+    const { enqueueErrorSnackbarWithReference } = await import(
+      "src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference"
+    );
+    expect(enqueueErrorSnackbarWithReference).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ where: "Register" })
+    );
 
     // AND the error should be logged
     expect(console.error).toHaveBeenCalledWith(givenError);

@@ -31,6 +31,7 @@ import {
   getSocialAuthDisabled,
 } from "src/envService";
 import PasswordReset from "src/auth/components/passwordReset/PasswordReset";
+import { enqueueErrorSnackbarWithReference } from "src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference";
 
 const uniqueId = "7ce9ba1f-bde0-48e2-88df-e4f697945cc4";
 
@@ -64,6 +65,8 @@ const Login: React.FC = () => {
   const [inviteCode, setInviteCode] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const [activeLoginForm, setActiveLoginForm] = useState(ActiveForm.NONE);
 
@@ -79,32 +82,23 @@ const Login: React.FC = () => {
 
   const handleError = useCallback(
     async (error: Error) => {
-      let errorMessage;
       if (error instanceof RestAPIError) {
-        errorMessage = getUserFriendlyErrorMessage(error);
         console.error(error);
         setShowResendVerification(false);
+        enqueueSnackbar(getUserFriendlyErrorMessage(error), { variant: "error" });
       } else if (error instanceof FirebaseError) {
-        errorMessage = getUserFriendlyFirebaseErrorMessage(error);
         if (error.errorCode === FirebaseErrorCodes.INVALID_INVITATION_CODE) {
-          // we want to log errors about invalid invitation codes as errors
-          // so that we can track which invitation codes are failing and why
           console.error(error);
         } else {
           console.warn(error);
         }
-        // Show resend verification option if the error is due to unverified email
-        if (error.errorCode === FirebaseErrorCodes.EMAIL_NOT_VERIFIED) {
-          setShowResendVerification(true);
-        } else {
-          setShowResendVerification(false);
-        }
+        setShowResendVerification(error.errorCode === FirebaseErrorCodes.EMAIL_NOT_VERIFIED);
+        enqueueSnackbar(getUserFriendlyFirebaseErrorMessage(error), { variant: "error" });
       } else {
-        errorMessage = error.message;
         console.error(error);
         setShowResendVerification(false);
+        enqueueErrorSnackbarWithReference(t("auth.errors.loginFailedGeneric"), { where: "Login", error });
       }
-      enqueueSnackbar(t("auth.errors.loginFailedWithMessage", { message: errorMessage }), { variant: "error" });
 
       // if something goes wrong, log the user out
       const firebaseEmailAuthServiceInstance = FirebaseEmailAuthService.getInstance();
@@ -120,10 +114,12 @@ const Login: React.FC = () => {
   const handleEmailChanged = (email: string) => {
     setActiveLoginForm(ActiveForm.EMAIL);
     setEmail(email);
+    if (emailError) setEmailError(null);
   };
   const handlePasswordChanged = (password: string) => {
     setActiveLoginForm(ActiveForm.EMAIL);
     setPassword(password);
+    if (passwordError) setPasswordError(null);
   };
   const handleInviteCodeChanged = (code: string) => {
     setActiveLoginForm(ActiveForm.INVITE_CODE);
@@ -295,6 +291,8 @@ const Login: React.FC = () => {
       } else if (activeLoginForm === ActiveForm.EMAIL && email && password) {
         await handleLoginWithEmail(email, password);
       } else {
+        setEmailError(!email ? t("common.validation.emailRequired") : null);
+        setPasswordError(!password ? t("common.validation.passwordRequired") : null);
         enqueueSnackbar(t("auth.pages.login.fillInEmailAndPassword"), { variant: "error" });
       }
     },
@@ -474,6 +472,8 @@ const Login: React.FC = () => {
             notifyOnEmailChanged={handleEmailChanged}
             notifyOnPasswordChanged={handlePasswordChanged}
             isDisabled={isLoading}
+            emailError={emailError}
+            passwordError={passwordError}
           />
           {showResendVerification && (
             <ResendVerificationEmail email={lastAttemptedEmail} password={lastAttemptedPassword} />

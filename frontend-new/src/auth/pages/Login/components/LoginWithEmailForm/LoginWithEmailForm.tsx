@@ -18,6 +18,8 @@ export interface LoginFormProps {
   notifyOnEmailChanged: (email: string) => void;
   notifyOnPasswordChanged: (password: string) => void;
   isDisabled: boolean;
+  emailError?: string | null;
+  passwordError?: string | null;
 }
 const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
   email,
@@ -25,6 +27,8 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
   notifyOnEmailChanged,
   notifyOnPasswordChanged,
   isDisabled,
+  emailError,
+  passwordError,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -56,6 +60,9 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
         value={email}
         onChange={(e) => handleEmailChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_LOGIN_FORM_EMAIL_INPUT }}
+        error={!!emailError}
+        helperText={emailError || ""}
+        autoFocus={!!emailError}
       />
       <PasswordInput
         fullWidth
@@ -66,7 +73,9 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
         onChange={(e) => handlePasswordChange(e)}
         inputProps={{ "data-testid": DATA_TEST_ID.EMAIL_LOGIN_FORM_PASSWORD_INPUT }}
         sx={outlinedNoBorderSx}
-        shouldValidatePassword={false} // no password validation necessary on login
+        shouldValidatePassword={false}
+        error={!!passwordError}
+        helperText={passwordError || ""}
       />
     </Box>
   );

@@ -9,6 +9,7 @@ import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
+import { enqueueErrorSnackbarWithReference } from "src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference";
 
 const COOLDOWN_SECONDS = 60;
 
@@ -77,10 +78,15 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = ({ ini
       enqueueSnackbar(t("auth.components.passwordReset.passwordResetEmailSent"), { variant: "success" });
       setCooldownSeconds(COOLDOWN_SECONDS);
     } catch (error) {
-      const message =
-        error instanceof FirebaseError ? getUserFriendlyFirebaseErrorMessage(error) : (error as Error).message;
-      console.error("Password reset request failed:", message, error);
-      enqueueSnackbar(`${t("auth.components.passwordReset.failedToSendResetEmail")}: ${message}`, { variant: "error" });
+      console.error("Password reset request failed:", error);
+      if (error instanceof FirebaseError) {
+        enqueueSnackbar(getUserFriendlyFirebaseErrorMessage(error), { variant: "error" });
+      } else {
+        enqueueErrorSnackbarWithReference(t("auth.components.passwordReset.failedToSendResetEmail"), {
+          where: "Password reset",
+          error,
+        });
+      }
     } finally {
       setIsLoading(false);
       setDialogOpen(false);

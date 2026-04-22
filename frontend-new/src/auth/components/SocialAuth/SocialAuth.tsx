@@ -7,6 +7,7 @@ import FirebaseSocialAuthenticationService from "src/auth/services/FirebaseAuthe
 import { FirebaseError, getUserFriendlyFirebaseErrorMessage } from "src/error/FirebaseError/firebaseError";
 import { GoogleIcon } from "src/theme/Icons/GoogleIcon";
 import { getUserFriendlyErrorMessage, RestAPIError } from "src/error/restAPIError/RestAPIError";
+import { enqueueErrorSnackbarWithReference } from "src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import RegistrationCodeFormModal, {
@@ -71,19 +72,16 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
 
       // clear the registration code from the state
       setRegistrationCode(registrationCode);
-      let errorMessage;
       if (error instanceof RestAPIError) {
-        errorMessage = getUserFriendlyErrorMessage(error);
+        console.error(error);
+        enqueueSnackbar(getUserFriendlyErrorMessage(error), { variant: "error" });
       } else if (error instanceof FirebaseError) {
-        errorMessage = getUserFriendlyFirebaseErrorMessage(error);
+        console.warn(error);
+        enqueueSnackbar(getUserFriendlyFirebaseErrorMessage(error), { variant: "error" });
       } else {
-        errorMessage = error.message;
+        console.error(error);
+        enqueueErrorSnackbarWithReference(t("auth.errors.loginFailedGeneric"), { where: "Social login", error });
       }
-
-      console.error(error);
-      enqueueSnackbar(t("auth.components.socialAuth.socialFailedLoginWithMessage", { message: errorMessage }), {
-        variant: "error",
-      });
     },
     [enqueueSnackbar, registrationCode, t]
   );

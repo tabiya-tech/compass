@@ -32,6 +32,11 @@ jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   };
 });
 
+// Mock the support-reference snackbar helper
+jest.mock("src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference", () => ({
+  enqueueErrorSnackbarWithReference: jest.fn(),
+}));
+
 // Mock the router
 jest.mock("react-router-dom", () => {
   const actual = jest.requireActual("react-router-dom");
@@ -344,10 +349,14 @@ describe("SocialAuth tests", () => {
       // AND the error should be logged (covers lines 74-75, 82)
       expect(console.error).toHaveBeenCalledWith(givenRestAPIError);
 
-      // AND a user-friendly error message should be shown (covers line 83)
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.stringContaining("Failed to login:"), {
+      // AND the user-friendly error message is shown directly (no "Failed to login:" prefix)
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.any(String), {
         variant: "error",
       });
+      expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalledWith(
+        expect.stringContaining("Failed to login:"),
+        expect.anything()
+      );
     });
 
     test("should handle FirebaseError in handleError method", async () => {
@@ -389,13 +398,17 @@ describe("SocialAuth tests", () => {
         expect(logoutSpy).toHaveBeenCalled();
       });
 
-      // AND the error should be logged (covers lines 76-77, 82)
-      expect(console.error).toHaveBeenCalledWith(givenFirebaseError);
+      // AND the error should be logged as a warning (mapped Firebase error path)
+      expect(console.warn).toHaveBeenCalledWith(givenFirebaseError);
 
-      // AND a user-friendly error message should be shown
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.stringContaining("Failed to login:"), {
+      // AND the mapped Firebase message is shown directly (no "Failed to login:" prefix)
+      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.any(String), {
         variant: "error",
       });
+      expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalledWith(
+        expect.stringContaining("Failed to login:"),
+        expect.anything()
+      );
     });
 
     test("should handle generic Error with error.message in handleError method", async () => {
@@ -428,13 +441,17 @@ describe("SocialAuth tests", () => {
         expect(logoutSpy).toHaveBeenCalled();
       });
 
-      // AND the error should be logged (covers line 82)
+      // AND the error should be logged
       expect(console.error).toHaveBeenCalledWith(givenError);
 
-      // AND the error message should be shown (covers line 79)
-      expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(expect.stringContaining("Something went wrong"), {
-        variant: "error",
-      });
+      // AND a persistent support-reference snackbar should be shown for generic errors
+      const { enqueueErrorSnackbarWithReference } = await import(
+        "src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference"
+      );
+      expect(enqueueErrorSnackbarWithReference).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ where: "Social login" })
+      );
     });
   });
 

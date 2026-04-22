@@ -32,6 +32,7 @@ from app.vector_search.validate_taxonomy_model import validate_taxonomy_model
 from app.version.version_routes import add_version_routes
 from app.i18n.language_config import get_language_config
 from app.middleware.correlation_id_middleware import CorrelationIdMiddleware
+from app.errors.handlers import register_exception_handlers
 
 from contextlib import asynccontextmanager
 
@@ -360,6 +361,9 @@ app.add_middleware(BrotliRequestMiddleware)
 
 # --- Add CorrelationIdMiddleware for request tracing ---
 app.add_middleware(CorrelationIdMiddleware)
+
+# --- Register global exception handlers that enrich responses with correlation_id and sentry_event_id ---
+register_exception_handlers(app)
 
 ############################################
 # Setup the CORS policy

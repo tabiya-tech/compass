@@ -48,6 +48,7 @@ import { useExperiencesDrawer } from "src/experiences/ExperiencesDrawerProvider"
 import ModuleHandoffBanner from "src/home/components/ModuleHandoffBanner/ModuleHandoffBanner";
 import { useNextModule } from "src/home/useNextModule";
 import ChatPage from "src/chat/ChatPage/ChatPage";
+import { enqueueErrorSnackbarWithReference } from "src/theme/SnackbarProvider/enqueueErrorSnackbarWithReference";
 import SkillsDiscoverySidebar from "src/home/components/Sidebar/SkillsDiscoverySidebar";
 
 export const INACTIVITY_TIMEOUT = 3 * 60 * 1000; // in milliseconds
@@ -408,9 +409,15 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
           if (statusCode === 429) {
             enqueueSnackbar(getUploadErrorMessage(429, detail), { variant: "warning" });
           } else if (statusCode) {
-            enqueueSnackbar(getUploadErrorMessage(statusCode, detail), { variant: "error" });
+            enqueueErrorSnackbarWithReference(getUploadErrorMessage(statusCode, detail), {
+              where: "CV upload (polling)",
+              error,
+            });
           } else {
-            enqueueSnackbar(t("chat.cvUploadPolling.networkErrorStatus"), { variant: "error" });
+            enqueueErrorSnackbarWithReference(t("chat.cvUploadPolling.networkErrorStatus"), {
+              where: "CV upload (polling)",
+              error,
+            });
           }
           console.error("Error polling upload status:", error);
         },
@@ -494,7 +501,10 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         enqueueSnackbar(t("chat.cvUploadPolling.cancelled"), { variant: "info" });
       } catch (error) {
         console.error("Error cancelling upload:", error);
-        enqueueSnackbar(t("chat.cvUploadPolling.failedToCancel"), { variant: "error" });
+        enqueueErrorSnackbarWithReference(t("chat.cvUploadPolling.failedToCancel"), {
+          where: "CV upload (cancel)",
+          error,
+        });
       }
     },
     [activeUploads, enqueueSnackbar, stopPollingForUpload, t]
@@ -571,7 +581,10 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
           // No upload id – treat as immediate failure
           removeMessageFromChat(uploadingMessageId);
           console.log("Failed to start upload. Backend did not return uploadId ", response);
-          enqueueSnackbar(t("chat.cvUploadPolling.failedToStart"), { variant: "error" });
+          enqueueErrorSnackbarWithReference(t("chat.cvUploadPolling.failedToStart"), {
+            where: "CV upload (start)",
+            error: new Error("Backend did not return an uploadId"),
+          });
           return [] as string[];
         }
 
@@ -733,11 +746,16 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         if (chatText) {
           setFailedSendDraft(chatText);
         }
+        enqueueErrorSnackbarWithReference(t("common.errors.api.unexpectedError"), {
+          where: "Chat conversation (send)",
+          error: error as Error,
+        });
       } finally {
         setAiIsTyping(false);
       }
     },
     [
+      t,
       theme,
       addMessageToChat,
       removeMessageFromChat,
@@ -936,12 +954,12 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     initializingRef.current = true;
     initializeChat(currentUserId, activeSessionId).then((successful: boolean) => {
       if (!successful) {
-        // Add a message to the chat saying that something went wrong
         setMessages([generateSomethingWentWrongMessage()]);
-        // Set the conversation as completed to prevent the user from sending any messages
         setConversationCompleted(true);
-        // Notify the user that the chat failed to start
-        enqueueSnackbar(t("chat.chat.notifications.startConversationFailed"), { variant: "error" });
+        enqueueErrorSnackbarWithReference(t("chat.chat.notifications.startConversationFailed"), {
+          where: "Chat conversation (start)",
+          error: new Error("initializeChat returned false"),
+        });
       }
       setInitialized(true);
     });

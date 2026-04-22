@@ -32,6 +32,8 @@
     "validation": {
       "validEmailRequired": "Please enter a valid email address",
       "emailsDoNotMatch": "Emails do not match",
+      "emailRequired": "Please enter your email",
+      "passwordRequired": "Please enter your password",
       "passwordMinLength": "Password must be at least 8 characters long.",
       "passwordNeedLowercase": "Password must include at least one lowercase letter.",
       "passwordNeedUppercase": "Password must include at least one uppercase letter.",
@@ -47,14 +49,14 @@
     "upload": {
       "errors": {
         "maxFileSize": "Selected file is too large. Maximum size is 3 MB.",
-        "tooDense": "The uploaded file content is too long to process. Please reduce its length and try again.",
+        "tooDense": "Your CV has more text than we can process. Please shorten it or upload a file with fewer pages and try again.",
         "emptyParse": "We couldn't detect experiences in your CV. Please check the file and try again.",
         "generic": "Failed to parse your CV. Please try again or use a different file.",
         "rateLimit": "Too many uploads at once. Please wait one minute and try again.",
         "maxUploadsReached": "You've reached the maximum number of CV uploads for this conversation. Further uploads aren't allowed.",
         "duplicate": "This CV has already been uploaded. Select it from your previously uploaded CVs.",
         "unsupportedFileType": "Unsupported file type. Allowed: PDF, DOCX, TXT.",
-        "timeout": "The upload timed out. Please try again.",
+        "timeout": "The upload took too long. This usually means a slow connection — please check your network and try again.",
         "unauthorized": "You are not authorized. Please sign in again.",
         "uploadNotFound": "Upload not found. It may have failed to start.",
         "cvMarkdownTooLong": "Your CV content is too long. Please shorten your CV and try again."
@@ -78,7 +80,7 @@
       "api": {
         "requestTooLong": "The data sent to the service seems to be too large. Please try again with a smaller payload. If the problem persists, clear your browser's cache and refresh the page.",
         "tooManyRequests": "It looks like you are making too many requests. Please slow down and try again later.",
-        "unexpectedError": "An unexpected error occurred. Please try again later.",
+        "unexpectedError": "Something went wrong on our end. Please try again in a moment, and if it keeps happening copy the reference below and share it with support.",
         "serverConnectionError": "Cannot connect to the service. Please check your internet connection or try again later.",
         "resourceNotFound": "The requested resource was not found. Please clear your browser's cache and refresh the page.",
         "authenticationFailure": "It looks like you not logged in. Please log in to continue.",
@@ -139,9 +141,9 @@
       "extractingExperiences": "Extracting experiences",
       "savingCv": "Saving CV",
       "failed": "CV upload failed",
-      "failedToStart": "Failed to start upload.",
-      "networkErrorStatus": "Network error while checking upload status.",
-      "failedToCancel": "Failed to cancel upload",
+      "failedToStart": "We couldn't start your upload. Please try again.",
+      "networkErrorStatus": "We lost connection while checking your upload. The upload may still succeed — we'll keep retrying.",
+      "failedToCancel": "We couldn't cancel the upload. It may continue in the background.",
       "uploadingFileNamed": "Uploading {{filename}}...",
       "thinkingMessage": "Processing your CV, this might take a while..."
     },
@@ -266,10 +268,10 @@
           "likeLabel": "like",
           "dislikeLabel": "dislike",
           "errors": {
-            "submitLike": "Failed to submit the feedback. Please try again.",
-            "removeLike": "Failed to remove the feedback. Please try again.",
-            "submitDislike": "Failed to submit the feedback. Please try again.",
-            "removeDislike": "Failed to remove the feedback. Please try again."
+            "submitLike": "Your reaction didn't send. Tap again to retry.",
+            "removeLike": "We couldn't remove your reaction. Tap again to retry.",
+            "submitDislike": "Your reaction didn't send. Tap again to retry.",
+            "removeDislike": "We couldn't remove your reaction. Tap again to retry."
           }
         }
       }
@@ -360,7 +362,7 @@
         "forgotPassword": "Forgot password?",
         "pleaseEnterEmail": "Please enter your email address",
         "passwordResetEmailSent": "Password reset email sent!",
-        "failedToSendResetEmail": "Failed to send reset email",
+        "failedToSendResetEmail": "We couldn't send the password reset email right now. Please try again.",
         "passwordResetLinkSent": "A password reset link has been sent to your email address.",
         "resetPassword": "Reset Password",
         "closePasswordResetForm": "Close password reset form"
@@ -393,14 +395,13 @@
         "orContinueWith": "Or",
         "loginWithGoogle": "Login with Google",
         "googleLoginIsNotAvailableWhenOffline": "Google login is not available when offline.",
-        "socialFailedLoginWithMessage": "Failed to login: {{message}}",
         "accountNotRegistered": "This account isn’t registered. Please contact the provider of this link."
       }
     },
     "loggingYouOutNotice": "We are logging you out...",
     "errors": {
-      "loginFailedWithMessage": "Failed to login: {{message}}",
-      "registerFailedWithMessage": "Registration Failed: {{message}}",
+      "loginFailedGeneric": "We couldn't sign you in right now. Please try again.",
+      "registerFailedGeneric": "We couldn't complete your registration right now. Please try again.",
       "preferencesFetchFailedWithMessage": "An error occurred while trying to get your preferences: {{message}}",
       "firebase": {
         "emailAlreadyInUse": "An account with this email already exists. If you signed up with Google, please use the 'Sign in with Google' button to log in.",
@@ -451,12 +452,12 @@
           "components": {
             "summaryEditField": {
               "summaryPlaceholder": "Summary of experience",
-              "restoreFailed": "Failed to restore summary. Please try again later.",
+              "restoreFailed": "We couldn't restore that summary. Your previous summary is still saved — please try again.",
               "restored": "Summary restored."
             }
           },
           "updateSuccess": "Experience updated successfully!",
-          "updateFailed": "Failed to update experience. Please try again later.",
+          "updateFailed": "Your changes weren't saved. Please try again in a moment.",
           "skillsAddedSuccess": "Skills added successfully!",
           "editTitle": "Edit Experience",
           "infoLabel": "Experience info",
@@ -495,7 +496,7 @@
         },
         "restoreExperiencesDrawer": {
           "title": "Restore Experiences",
-          "fetchFailed": "Failed to fetch deleted experiences. Please try again later.",
+          "fetchFailed": "We couldn't load your deleted experiences right now. They're still safe — please try again.",
           "empty": "No deleted experiences found."
         },
         "downloadReportButton": {
@@ -508,7 +509,7 @@
           "preparingPdf": "Preparing your pdf",
           "shareTitle": "Experience Report",
           "shareText": "Check out my Experience Report",
-          "shareFailed": "Failed to share report. Please try again.",
+          "shareFailed": "We couldn't share your report. You can still download it and share the file directly.",
           "shareCanceled": "Sharing canceled because of user's request"
         }
       },
@@ -681,7 +682,9 @@
         "skippableSubtitle": "You can skip this step.",
         "helpTipText": "Your information is encrypted using state-of-the-art, end-to-end encryption and stored securely.",
         "failedToLoadConfig": "Failed to load form configuration",
-        "invalidForm": "Please correct the errors in the form before submitting.",
+        "failedToLoadProgrammes": "We couldn't load the programmes for this institution right now. Please try selecting it again.",
+        "fieldRequired": "This field is required.",
+        "invalidForm": "Please correct the highlighted fields before submitting.",
         "savedSuccess": "Personal data saved successfully and securely.",
         "errorDefault": "The personal data could not be saved. Please try again and if the problem persists, clear your browser's cache and refresh the page.",
         "errorEncryptedDataTooLarge": "The personal data seems to be too large to be saved. Please try again by entering smaller values for the fields. If the problem persists, clear your browser's cache and refresh the page.",
@@ -711,7 +714,7 @@
             "ratingLabelLow": "Unsatisfied",
             "ratingLabelHigh": "Satisfied",
             "submitSuccess": "Rating Feedback submitted successfully!",
-            "submitError": "Failed to submit feedback. Please try again later."
+            "submitError": "Your feedback wasn't sent. Please try again in a moment."
           },
           "feedbackFormContent": {
             "previous": "Previous",
@@ -719,7 +722,7 @@
           }
         },
         "submitSuccess": "Feedback submitted successfully!",
-        "submitError": "Failed to submit feedback. Please try again later.",
+        "submitError": "Your feedback wasn't sent. Please try again in a moment. If this keeps happening let support know using the reference shown when things fail.",
         "helpUsImprove": "Help us improve!",
         "closeForm": "close feedback form",
         "submittingFeedback": "Submitting feedback..."
@@ -732,13 +735,22 @@
   "error": {
     "errorPage": {
       "illustrationAlt": "error illustration",
-      "defaultMessage": "Something went wrong with {{appName}}. Try reloading the page...",
+      "defaultMessage": "Something went wrong with {{appName}}. Try reloading the page, and if it keeps happening copy the reference below and share it with support.",
       "notFound": "404 Error - Page Not Found",
       "refreshButton": "Refresh page"
     },
     "restAPIError": {
       "storyChooseMessageLabel": "Choose an error message to display in a notification:",
       "storySelectPlaceholder": "Select an error message"
+    },
+    "supportReference": {
+      "copyButton": "Copy for support",
+      "copied": "Copied",
+      "copyFailed": "Couldn't copy to clipboard",
+      "heading": "If this keeps happening, copy the details below and share them with support:",
+      "expand": "Show full message",
+      "collapse": "Show less",
+      "close": "Dismiss"
     }
   },
   "app": {

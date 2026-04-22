@@ -85,7 +85,7 @@ def add_user_plain_personal_data_routes(users_router: APIRouter, auth: Authentic
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=warning_msg)
         except Exception as e:
             logger.exception(e)
-            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Opps! Something went wrong.")
+            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")
 
     @router.get(
         path="",
@@ -119,6 +119,6 @@ def add_user_plain_personal_data_routes(users_router: APIRouter, auth: Authentic
             raise
         except Exception as e:
             logger.exception(e)
-            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Opps! Something went wrong.")
+            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Oops! Something went wrong.")
 
     users_router.include_router(router)

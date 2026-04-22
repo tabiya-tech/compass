@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from pydantic import BaseModel
 from fastapi import HTTPException
@@ -6,9 +7,19 @@ from fastapi import HTTPException
 
 class HTTPErrorResponse(BaseModel):
     """
-    HTTPErrorResponse class is a Pydantic model class that represents the response body of an HTTP error response.
+    Standard error response body. `detail` is always present; the remaining fields
+    are optional so existing clients that only read `detail` remain compatible.
     """
     detail: str
+    error_code: Optional[str] = None
+    correlation_id: Optional[str] = None
+    sentry_event_id: Optional[str] = None
+
+    class Config:
+        """
+        Pydantic configuration.
+        """
+        extra = "forbid"
 
 
 class ErrorService:
@@ -35,4 +46,4 @@ class ErrorService:
             raise e
 
         # Raise HTTPException with status code 500 if the exception is not an instance of HTTPException
-        raise HTTPException(status_code=500, detail="Opps! Something went wrong.")
+        raise HTTPException(status_code=500, detail="Oops! Something went wrong.")
