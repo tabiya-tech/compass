@@ -10,6 +10,7 @@ const base = (overrides: Partial<ModuleSummary>): ModuleSummary => ({
   status: "COMPLETED",
   sort_order: 1,
   input_placeholder: "",
+  active_conversation_id: null,
   ...overrides,
 });
 

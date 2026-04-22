@@ -82,6 +82,9 @@ class ModuleSummary(BaseModel):
     input_placeholder: str
     """Placeholder text shown in the chat input for this module"""
 
+    active_conversation_id: str | None = None
+    """The ID of the active conversation for this module, if one exists"""
+
     class Config:
         extra = "forbid"
 

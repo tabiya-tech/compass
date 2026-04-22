@@ -61,6 +61,7 @@ const makeModule = (id: string, status: ModuleSummary["status"]): ModuleSummary 
   status,
   sort_order: 0,
   input_placeholder: "",
+  active_conversation_id: null,
 });
 
 // Helper function to create default props

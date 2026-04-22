@@ -27,6 +27,7 @@ export interface ModuleSummary {
   status: ModuleStatus;
   sort_order: number;
   input_placeholder: string;
+  active_conversation_id: string | null;
 }
 
 export interface ModuleDetail extends ModuleSummary {

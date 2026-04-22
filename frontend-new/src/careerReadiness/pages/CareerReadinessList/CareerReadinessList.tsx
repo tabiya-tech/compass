@@ -1,15 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import type { Theme } from "@mui/material/styles";
-import type { ModuleSummary } from "src/careerReadiness/types";
 import Footer from "src/home/components/Footer/Footer";
 import HomeSidebar from "src/home/components/Sidebar/HomeSidebar";
-import CareerReadinessService from "src/careerReadiness/services/CareerReadinessService";
-import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import HeroSection from "src/careerReadiness/components/HeroSection/HeroSection";
 import ModuleRow from "src/careerReadiness/components/ModuleRow/ModuleRow";
 import ModuleRowSkeleton from "src/careerReadiness/components/ModuleRowSkeleton/ModuleRowSkeleton";
+import { useUserProfileContext } from "src/profile/UserProfileContext";
 
 const uniqueId = "d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a";
 
@@ -23,27 +21,12 @@ export const DATA_TEST_ID = {
 const CareerReadinessList: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
-  const [modules, setModules] = useState<ModuleSummary[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const loadModules = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await CareerReadinessService.getInstance().listModules();
-      const sorted = [...res.modules].sort((a, b) => a.sort_order - b.sort_order);
-      setModules(sorted);
-    } catch (e: any) {
-      enqueueSnackbar(e?.message ?? t("careerReadiness.listError"), { variant: "error" });
-    } finally {
-      setLoading(false);
-    }
-  }, [t, enqueueSnackbar]);
-
-  useEffect(() => {
-    loadModules();
-  }, [loadModules]);
+  // Read modules from shared context — already fetched by UserProfileProvider on layout mount
+  const { profileData, isLoadingModules } = useUserProfileContext();
+  const modules = [...profileData.modules].sort((a, b) => a.sort_order - b.sort_order);
+  const loading = isLoadingModules;
 
   const upNextModule =
     modules.find((m) => m.status === "IN_PROGRESS") ??

@@ -9,6 +9,8 @@ from app.users.cv.routes import add_user_cv_routes
 from app.users.auth import Authentication
 from app.users.preferences import add_user_preference_routes
 from app.programme_skills.routes import add_programme_skills_routes
+from app.users.me.profile_routes import add_user_me_profile_routes
+from app.users.me.progress_routes import add_user_me_progress_routes
 
 """
 This module is responsible for managing all the routes related to the users.
@@ -28,6 +30,12 @@ def add_users_routes(app: FastAPI, authentication: Authentication):
     """
 
     users_router = APIRouter(prefix="/users")
+
+    ############################################
+    # Add the consolidated /users/me/* routes
+    ############################################
+    add_user_me_profile_routes(users_router, authentication)
+    add_user_me_progress_routes(users_router, authentication)
 
     ############################################
     # Add the user preference routes

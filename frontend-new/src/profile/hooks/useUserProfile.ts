@@ -1,15 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchSkills } from "./utils/fetchSkills";
-import { fetchPersonalData } from "./utils/fetchPersonalData";
 import { Skill } from "src/experiences/experienceService/experiences.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
-import CareerReadinessService from "src/careerReadiness/services/CareerReadinessService";
-import CareerExplorerService from "src/careerExplorer/services/CareerExplorerService";
+import UserMeService from "src/userMe/UserMeService";
 import type { UserSectorEngagementItem } from "src/careerExplorer/services/CareerExplorerService";
-import ChatService from "src/chat/ChatService/ChatService";
 import type { ModuleSummary } from "src/careerReadiness/types";
-import SidebarService from "src/home/components/Sidebar/SidebarService";
 
 export interface UserProfileData {
   name: string | null;
@@ -48,18 +44,27 @@ export interface UseUserProfileResult {
 }
 
 /**
- * Hook to fetch and manage user profile data
- * Combines user authentication data with user preferences, personal data, and skills
- * Each component has its own independent state, loading, and error handling
+ * Hook to fetch and manage user profile data.
+ *
+ * Uses two consolidated backend endpoints to replace the previous 5 separate calls:
+ *   - GET /users/me/profile  → personal data + programme skills
+ *   - GET /users/me/progress → chat progress % + career readiness modules + sector engagement
+ *
+ * Skills from experiences (fetchSkills) remain separate since they aggregate
+ * across multiple sessions client-side.
  */
 export const useUserProfile = (): UseUserProfileResult => {
-  // Individual loading states for each component
+  // Individual loading states
   const [isLoadingSecurity, setIsLoadingSecurity] = useState(true);
   const [isLoadingPreferences, setIsLoadingPreferences] = useState(true);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [isLoadingSkills, setIsLoadingSkills] = useState(true);
+  // isLoadingModules and isLoadingCareerExplorer are now part of the progress fetch
+  // but kept as separate flags for backwards-compatible granularity
+  const [isLoadingModules, setIsLoadingModules] = useState(true);
+  const [isLoadingCareerExplorer, setIsLoadingCareerExplorer] = useState(true);
 
-  // Individual data states for each component
+  // Individual data states
   const [securityData, setSecurityData] = useState<{ email: string | null }>({ email: null });
   const [preferencesData, setPreferencesData] = useState<{ termsAcceptedDate: Date | null; language: string | null }>({
     termsAcceptedDate: null,
@@ -78,8 +83,6 @@ export const useUserProfile = (): UseUserProfileResult => {
     program: null,
     year: null,
   });
-  const [isLoadingModules, setIsLoadingModules] = useState(true);
-  const [isLoadingCareerExplorer, setIsLoadingCareerExplorer] = useState(true);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [educationSkills, setEducationSkills] = useState<Skill[]>([]);
   const [programmeSkills, setProgrammeSkills] = useState<string[]>([]);
@@ -89,7 +92,7 @@ export const useUserProfile = (): UseUserProfileResult => {
 
   const activeSessionId = useMemo(() => UserPreferencesStateService.getInstance().getActiveSessionId(), []);
 
-  // Individual error states for each component
+  // Individual error states
   const [errors, setErrors] = useState<{
     security: Error | null;
     preferences: Error | null;
@@ -106,191 +109,164 @@ export const useUserProfile = (): UseUserProfileResult => {
     careerExplorer: null,
   });
 
-  // Effect 1: Fetch security data (email from authenticated user)
+  // Effect 1: Read security data (email) from auth state — no API call
   useEffect(() => {
-    const fetchSecurityData = async () => {
-      try {
-        setIsLoadingSecurity(true);
-        setErrors((prev) => ({ ...prev, security: null }));
+    try {
+      setIsLoadingSecurity(true);
+      setErrors((prev) => ({ ...prev, security: null }));
 
-        const authenticatedUser = authenticationStateService.getInstance().getUser();
-        if (!authenticatedUser) {
-          console.warn("useUserProfile: no authenticated user, skipping security data fetch");
-          return;
-        }
-
-        setSecurityData({ email: authenticatedUser.email });
-      } catch (error) {
-        console.error("Error fetching security data:", error);
-        setErrors((prev) => ({ ...prev, security: error as Error }));
-      } finally {
-        setIsLoadingSecurity(false);
+      const authenticatedUser = authenticationStateService.getInstance().getUser();
+      if (!authenticatedUser) {
+        console.warn("useUserProfile: no authenticated user, skipping security data fetch");
+        return;
       }
-    };
-
-    fetchSecurityData();
+      setSecurityData({ email: authenticatedUser.email });
+    } catch (error) {
+      console.error("Error reading security data:", error);
+      setErrors((prev) => ({ ...prev, security: error as Error }));
+    } finally {
+      setIsLoadingSecurity(false);
+    }
   }, []);
 
-  // Effect 2: Fetch user preferences (terms accepted date, language)
+  // Effect 2: Read user preferences (terms date, language) from client-side cache — no API call
   useEffect(() => {
-    const fetchPreferencesData = async () => {
-      try {
-        setIsLoadingPreferences(true);
-        setErrors((prev) => ({ ...prev, preferences: null }));
+    try {
+      setIsLoadingPreferences(true);
+      setErrors((prev) => ({ ...prev, preferences: null }));
 
-        const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
-        if (!userPreferences) {
-          console.warn("useUserProfile: no user preferences found, skipping preferences fetch");
-          return;
-        }
-
-        setPreferencesData({
-          termsAcceptedDate: userPreferences.accepted_tc || null,
-          language: userPreferences.language || null,
-        });
-      } catch (error) {
-        console.error("Error fetching preferences data:", error);
-        setErrors((prev) => ({ ...prev, preferences: error as Error }));
-      } finally {
-        setIsLoadingPreferences(false);
+      const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
+      if (!userPreferences) {
+        console.warn("useUserProfile: no user preferences found, skipping preferences fetch");
+        return;
       }
-    };
-
-    fetchPreferencesData();
+      setPreferencesData({
+        termsAcceptedDate: userPreferences.accepted_tc || null,
+        language: userPreferences.language || null,
+      });
+    } catch (error) {
+      console.error("Error reading preferences data:", error);
+      setErrors((prev) => ({ ...prev, preferences: error as Error }));
+    } finally {
+      setIsLoadingPreferences(false);
+    }
   }, []);
 
-  // Effect 3: Fetch personal profile data (name, location, school, program, year)
+  // Effect 3+4 combined: fetch profile (personal data + programme skills) AND experiences in parallel.
+  // Merging them avoids a double-fetch: previously Effect 4 had [programmeSkills] as a dep,
+  // causing it to run once on mount (programmeSkills=[]) then again after Effect 3 set them.
   useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        setIsLoadingProfile(true);
-        setErrors((prev) => ({ ...prev, profile: null }));
-
-        const user = authenticationStateService.getInstance().getUser();
-        const userId = user?.id;
-
-        if (!userId) {
-          console.warn("useUserProfile: no authenticated user ID, skipping profile data fetch");
-          return;
-        }
-
-        const data = await fetchPersonalData(userId);
-        setPersonalData(data);
-      } catch (error: any) {
-        // Handle 404 gracefully - user may not have personal data yet
-        if (error?.statusCode === 404) {
-          console.log("Personal data not found (404) - user may not have set up profile yet");
-          setErrors((prev) => ({ ...prev, profile: null }));
-        } else {
-          console.error("Error fetching profile data:", error);
-          setErrors((prev) => ({ ...prev, profile: error as Error }));
-        }
-      } finally {
+    const fetchProfileAndSkills = async () => {
+      const user = authenticationStateService.getInstance().getUser();
+      if (!user?.id) {
+        console.warn("useUserProfile: no authenticated user, skipping profile + skills fetch");
         setIsLoadingProfile(false);
+        setIsLoadingSkills(false);
+        return;
       }
-    };
 
-    fetchProfileData();
-  }, []);
+      setIsLoadingProfile(true);
+      setIsLoadingSkills(true);
+      setErrors((prev) => ({ ...prev, profile: null, skills: null }));
 
-  // Effect 4: Fetch skills from experiences and programme skills
-  useEffect(() => {
-    const fetchSkillsData = async () => {
-      try {
-        setIsLoadingSkills(true);
-        setErrors((prev) => ({ ...prev, skills: null }));
+      // Fetch both in parallel — neither depends on the other
+      const [profileResult, skillsResult] = await Promise.allSettled([
+        UserMeService.getInstance().getProfile(),
+        fetchSkills(),
+      ]);
 
-        const [skillsData, programmeSkillLabels] = await Promise.all([
-          fetchSkills(),
-          SidebarService.getInstance().getProgrammeSkills(),
-        ]);
+      // Handle profile result
+      if (profileResult.status === "fulfilled") {
+        const profileResponse = profileResult.value;
+        const data = profileResponse.personal_data;
+        const firstName = data?.first_name;
+        const lastName = data?.last_name;
+        const name = firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || null;
 
-        setSkills(skillsData.workSkills);
-        setProgrammeSkills(programmeSkillLabels);
+        setPersonalData({
+          name,
+          location: data?.province ?? null,
+          school: data?.institution_name ?? null,
+          program: data?.programme_name ?? null,
+          year: data?.school_year ?? null,
+        });
+        setProgrammeSkills(profileResponse.programme_skills);
 
-        // Programme skills are education skills — merge them with experience-based education skills
-        const programmeSkillObjects: Skill[] = programmeSkillLabels.map((label, i) => ({
+        // Also merge programme skills into education skills now that we have both
+        const resolvedProgrammeSkills = profileResponse.programme_skills;
+        const programmeSkillObjects: Skill[] = resolvedProgrammeSkills.map((label, i) => ({
           UUID: `programme-skill-${i}`,
           preferredLabel: label,
           altLabels: [],
           description: "",
           orderIndex: i,
         }));
-        setEducationSkills([...skillsData.educationSkills, ...programmeSkillObjects]);
-      } catch (error) {
-        console.error("Error fetching skills:", error);
-        setErrors((prev) => ({ ...prev, skills: error as Error }));
-      } finally {
-        setIsLoadingSkills(false);
+
+        if (skillsResult.status === "fulfilled") {
+          setSkills(skillsResult.value.workSkills);
+          setEducationSkills([...skillsResult.value.educationSkills, ...programmeSkillObjects]);
+        }
+      } else {
+        const error = profileResult.reason as any;
+        // 404 = user hasn't set up their profile yet — not worth surfacing
+        if (error?.statusCode === 404) {
+          console.log("Personal data not found (404) — user may not have set up their profile yet");
+        } else {
+          console.error("Error fetching user profile:", error);
+          setErrors((prev) => ({ ...prev, profile: error as Error }));
+        }
+
+        // Skills still usable without programme skills
+        if (skillsResult.status === "fulfilled") {
+          setSkills(skillsResult.value.workSkills);
+          setEducationSkills(skillsResult.value.educationSkills);
+        }
       }
+
+      // Handle skills error separately if profile succeeded but skills failed
+      if (profileResult.status === "fulfilled" && skillsResult.status === "rejected") {
+        console.error("Error fetching skills:", skillsResult.reason);
+        setErrors((prev) => ({ ...prev, skills: skillsResult.reason as Error }));
+      }
+
+      setIsLoadingProfile(false);
+      setIsLoadingSkills(false);
     };
 
-    fetchSkillsData();
+    fetchProfileAndSkills();
   }, []);
 
-  // Effect 5: Fetch skills & interests progress from chat history
+  // Effect 5: GET /users/me/progress — chat progress % + modules + sector engagement (3 old calls → 1)
   useEffect(() => {
-    if (!activeSessionId) return;
-
-    ChatService.getInstance()
-      .getChatHistory(activeSessionId)
-      .then((history) => {
-        setSkillsInterestsProgress(history.current_phase?.percentage ?? 0);
-      })
-      .catch(() => {
-        setSkillsInterestsProgress(0);
-      });
-  }, [activeSessionId]);
-
-  // Effect 6: Fetch career readiness module statuses from API
-  useEffect(() => {
-    const fetchModules = async () => {
+    const fetchProgress = async () => {
       if (!authenticationStateService.getInstance().getUser()) {
-        console.warn("useUserProfile: no authenticated user, skipping career readiness modules fetch");
+        console.warn("useUserProfile: no authenticated user, skipping progress fetch");
         setIsLoadingModules(false);
+        setIsLoadingCareerExplorer(false);
         return;
       }
+
       try {
         setIsLoadingModules(true);
-        setErrors((prev) => ({ ...prev, modules: null }));
+        setIsLoadingCareerExplorer(true);
+        setErrors((prev) => ({ ...prev, modules: null, careerExplorer: null }));
 
-        const response = await CareerReadinessService.getInstance().listModules();
-        setModules(response.modules);
+        const progressResponse = await UserMeService.getInstance().getProgress(activeSessionId);
+
+        setSkillsInterestsProgress(progressResponse.skills_interests_progress);
+        setModules(progressResponse.career_readiness_modules);
+        setCareerExplorerSectors(progressResponse.sector_engagement);
       } catch (error) {
-        console.error("Error fetching career readiness modules:", error);
-        setErrors((prev) => ({ ...prev, modules: error as Error }));
+        console.error("Error fetching user progress:", error);
+        setErrors((prev) => ({ ...prev, modules: error as Error, careerExplorer: error as Error }));
       } finally {
         setIsLoadingModules(false);
-      }
-    };
-
-    fetchModules();
-  }, []);
-
-  // Effect 7: Fetch career explorer sector engagement for the user
-  useEffect(() => {
-    const fetchCareerExplorerData = async () => {
-      if (!authenticationStateService.getInstance().getUser()) {
-        console.warn("useUserProfile: no authenticated user, skipping career explorer fetch");
-        setIsLoadingCareerExplorer(false);
-        return;
-      }
-      try {
-        setIsLoadingCareerExplorer(true);
-        setErrors((prev) => ({ ...prev, careerExplorer: null }));
-
-        const response = await CareerExplorerService.getInstance().getSectorEngagementForUser();
-        setCareerExplorerSectors(response.data);
-      } catch (error) {
-        console.error("Error fetching career explorer engagement:", error);
-        setErrors((prev) => ({ ...prev, careerExplorer: error as Error }));
-      } finally {
         setIsLoadingCareerExplorer(false);
       }
     };
 
-    fetchCareerExplorerData();
-  }, []);
+    fetchProgress();
+  }, [activeSessionId]);
 
   // Combine all data into a single profile object
   const profileData: UserProfileData = {

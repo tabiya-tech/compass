@@ -21,6 +21,7 @@ const baseModules: ModuleSummary[] = [
     status: "COMPLETED",
     sort_order: 1,
     input_placeholder: "",
+    active_conversation_id: null,
   },
   {
     id: "2",
@@ -30,6 +31,7 @@ const baseModules: ModuleSummary[] = [
     status: "COMPLETED",
     sort_order: 2,
     input_placeholder: "",
+    active_conversation_id: null,
   },
   {
     id: "3",
@@ -39,6 +41,7 @@ const baseModules: ModuleSummary[] = [
     status: "NOT_STARTED",
     sort_order: 3,
     input_placeholder: "",
+    active_conversation_id: null,
   },
   {
     id: "4",
@@ -48,6 +51,7 @@ const baseModules: ModuleSummary[] = [
     status: "NOT_STARTED",
     sort_order: 4,
     input_placeholder: "",
+    active_conversation_id: null,
   },
   {
     id: "5",
@@ -57,6 +61,7 @@ const baseModules: ModuleSummary[] = [
     status: "NOT_STARTED",
     sort_order: 5,
     input_placeholder: "",
+    active_conversation_id: null,
   },
 ];
 

@@ -66,7 +66,7 @@ const getSectorEmoji = (sectorName: string): string => {
   return "🏢";
 };
 
-const moduleStatusToObjectiveStatus = (status: ModuleStatus): ObjectiveStatus => {
+export const moduleStatusToObjectiveStatus = (status: ModuleStatus): ObjectiveStatus => {
   switch (status) {
     case "COMPLETED":
       return "done";

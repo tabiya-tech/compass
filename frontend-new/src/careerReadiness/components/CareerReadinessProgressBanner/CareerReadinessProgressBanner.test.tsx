@@ -34,6 +34,7 @@ const makeModule = (id: string, status: ModuleSummary["status"], sortOrder: numb
   status,
   sort_order: sortOrder,
   input_placeholder: "",
+  active_conversation_id: null,
 });
 
 describe("CareerReadinessProgressBanner", () => {

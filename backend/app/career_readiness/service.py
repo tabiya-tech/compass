@@ -349,6 +349,9 @@ class CareerReadinessService(ICareerReadinessService):
         user_conversations = await self._repository.find_all_by_user(user_id)
         statuses = _derive_module_statuses(all_modules, user_conversations)
 
+        # Build a lookup of active conversation IDs by module
+        conversation_by_module = {c.module_id: c.conversation_id for c in user_conversations}
+
         summaries = []
         for module in all_modules:
             summaries.append(ModuleSummary(
@@ -359,6 +362,7 @@ class CareerReadinessService(ICareerReadinessService):
                 status=statuses.get(module.id, ModuleStatus.NOT_STARTED),
                 sort_order=module.sort_order,
                 input_placeholder=module.input_placeholder,
+                active_conversation_id=conversation_by_module.get(module.id),
             ))
 
         return ModuleListResponse(modules=summaries)

@@ -35,6 +35,7 @@ const mockModule: ModuleSummary = {
   status: "NOT_STARTED",
   sort_order: 1,
   input_placeholder: "Ask about CVs...",
+  active_conversation_id: null,
 };
 
 export const NotStarted: Story = {

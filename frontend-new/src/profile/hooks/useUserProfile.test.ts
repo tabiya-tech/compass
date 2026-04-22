@@ -3,11 +3,11 @@ import "src/_test_utilities/envServiceMock";
 
 import { renderHook, waitFor } from "src/_test_utilities/test-utils";
 import { useUserProfile } from "./useUserProfile";
-import CareerReadinessService from "src/careerReadiness/services/CareerReadinessService";
+import UserMeService from "src/userMe/UserMeService";
 import type { ModuleSummary } from "src/careerReadiness/types";
 
 // Mock all external dependencies
-jest.mock("src/careerReadiness/services/CareerReadinessService");
+jest.mock("src/userMe/UserMeService");
 jest.mock("src/auth/services/AuthenticationState.service", () => ({
   __esModule: true,
   default: { getInstance: jest.fn(() => ({ getUser: jest.fn(() => ({ id: "user-1", email: "test@test.com" })) })) },
@@ -21,17 +21,21 @@ jest.mock("src/userPreferences/UserPreferencesStateService", () => ({
     })),
   },
 }));
-jest.mock("./utils/fetchPersonalData", () => ({
-  fetchPersonalData: jest.fn(() =>
-    Promise.resolve({ name: null, location: null, school: null, program: null, year: null })
-  ),
-}));
 jest.mock("./utils/fetchSkills", () => ({
-  fetchSkills: jest.fn(() => Promise.resolve([])),
+  fetchSkills: jest.fn(() => Promise.resolve({ workSkills: [], educationSkills: [] })),
 }));
 
 const mockModules: ModuleSummary[] = [
-  { id: "m1", title: "Module 1", description: "", icon: "", status: "COMPLETED", sort_order: 1, input_placeholder: "" },
+  {
+    id: "m1",
+    title: "Module 1",
+    description: "",
+    icon: "",
+    status: "COMPLETED",
+    sort_order: 1,
+    input_placeholder: "",
+    active_conversation_id: null,
+  },
   {
     id: "m2",
     title: "Module 2",
@@ -40,18 +44,31 @@ const mockModules: ModuleSummary[] = [
     status: "IN_PROGRESS",
     sort_order: 2,
     input_placeholder: "",
+    active_conversation_id: "conv-123",
   },
 ];
+
+const mockProfileResponse = {
+  personal_data: null,
+  programme_skills: [],
+};
+
+const mockProgressResponse = {
+  skills_interests_progress: 0,
+  career_readiness_modules: mockModules,
+  sector_engagement: [],
+};
 
 describe("useUserProfile", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (CareerReadinessService.getInstance as jest.Mock).mockReturnValue({
-      listModules: jest.fn(() => Promise.resolve({ modules: mockModules })),
+    (UserMeService.getInstance as jest.Mock).mockReturnValue({
+      getProfile: jest.fn(() => Promise.resolve(mockProfileResponse)),
+      getProgress: jest.fn(() => Promise.resolve(mockProgressResponse)),
     });
   });
 
-  test("should fetch and return module statuses from CareerReadinessService", async () => {
+  test("should fetch and return module statuses from UserMeService.getProgress", async () => {
     // WHEN the hook is rendered
     const { result } = renderHook(() => useUserProfile());
 
@@ -63,10 +80,11 @@ describe("useUserProfile", () => {
     expect(result.current.profileData.modules).toEqual(mockModules);
   });
 
-  test("should set modules error when API call fails", async () => {
+  test("should set modules error when progress API call fails", async () => {
     // GIVEN the service throws
-    (CareerReadinessService.getInstance as jest.Mock).mockReturnValue({
-      listModules: jest.fn(() => Promise.reject(new Error("Network error"))),
+    (UserMeService.getInstance as jest.Mock).mockReturnValue({
+      getProfile: jest.fn(() => Promise.resolve(mockProfileResponse)),
+      getProgress: jest.fn(() => Promise.reject(new Error("Network error"))),
     });
 
     // WHEN the hook is rendered
@@ -79,5 +97,36 @@ describe("useUserProfile", () => {
 
     expect(result.current.errors.modules).toBeInstanceOf(Error);
     expect(result.current.profileData.modules).toEqual([]);
+  });
+
+  test("should populate personal data from UserMeService.getProfile", async () => {
+    // GIVEN the profile endpoint returns data
+    (UserMeService.getInstance as jest.Mock).mockReturnValue({
+      getProfile: jest.fn(() =>
+        Promise.resolve({
+          personal_data: {
+            first_name: "Bupe",
+            last_name: "Phiri",
+            province: "Lusaka",
+            institution_name: "UNZA",
+            programme_name: "ICT",
+            school_year: "Year 2",
+          },
+          programme_skills: ["JavaScript", "Python"],
+        })
+      ),
+      getProgress: jest.fn(() => Promise.resolve(mockProgressResponse)),
+    });
+
+    const { result } = renderHook(() => useUserProfile());
+
+    await waitFor(() => {
+      expect(result.current.isLoadingProfile).toBe(false);
+    });
+
+    expect(result.current.profileData.name).toBe("Bupe Phiri");
+    expect(result.current.profileData.location).toBe("Lusaka");
+    expect(result.current.profileData.school).toBe("UNZA");
+    expect(result.current.profileData.programmeSkills).toEqual(["JavaScript", "Python"]);
   });
 });
