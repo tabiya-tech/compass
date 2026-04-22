@@ -18,11 +18,11 @@ export const DATA_TEST_ID = {
 };
 
 const ICON_BY_SECTOR: Record<string, string> = {
-  energy: "⚡️",
-  mining: "⛏️",
-  hospitality: "🗻",
-  agriculture: "🌾",
-  water: "💧",
+  energy: `${process.env.PUBLIC_URL}/energy.svg`,
+  mining: `${process.env.PUBLIC_URL}/mining.svg`,
+  hospitality: `${process.env.PUBLIC_URL}/hospitality.svg`,
+  agriculture: `${process.env.PUBLIC_URL}/agriculture.svg`,
+  water: `${process.env.PUBLIC_URL}/water.svg`,
 };
 
 const SECTOR_TRANSLATION_KEYS = {
@@ -51,9 +51,9 @@ const isSectorTranslationKey = (value: string): value is SectorTranslationKey =>
 
 const getSectorKey = (document: DocumentMetadata) => (document.sector ?? document.title).toLowerCase();
 
-const getSectorIcon = (document: DocumentMetadata): string => {
+const getSectorIconSrc = (document: DocumentMetadata): string => {
   const key = getSectorKey(document);
-  return ICON_BY_SECTOR[key] ?? "•";
+  return ICON_BY_SECTOR[key];
 };
 
 const KnowledgeHubList: React.FC = () => {
@@ -83,7 +83,7 @@ const KnowledgeHubList: React.FC = () => {
       xs: "minmax(40px, 52px) minmax(0, 1fr)",
       sm: "minmax(48px, 56px) minmax(0, 1fr)",
     },
-    columnGap: { xs: 2, sm: 2.5 },
+    columnGap: { xs: 3, sm: 4 },
     alignItems: "flex-start",
     width: "100%",
   } as const;
@@ -228,6 +228,7 @@ const KnowledgeHubList: React.FC = () => {
             >
               {documents.map((doc) => {
                 const sectorKey = getSectorKey(doc);
+                const iconSrc = getSectorIconSrc(doc);
                 const sectorTranslation = isSectorTranslationKey(sectorKey)
                   ? SECTOR_TRANSLATION_KEYS[sectorKey]
                   : undefined;
@@ -240,9 +241,7 @@ const KnowledgeHubList: React.FC = () => {
                     sx={textAlignGrid}
                     data-testid={`${DATA_TEST_ID.KNOWLEDGE_HUB_SECTOR_ITEM}-${doc.id}`}
                   >
-                    <Typography variant="h1" aria-hidden>
-                      {getSectorIcon(doc)}
-                    </Typography>
+                    <Box component="img" src={iconSrc} alt="" aria-hidden />
                     <Box sx={{ minWidth: 0 }}>
                       <Typography variant="h3" sx={{ color: theme.palette.text.primary }}>
                         {displayName}
