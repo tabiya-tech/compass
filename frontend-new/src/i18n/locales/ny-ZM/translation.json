@@ -190,7 +190,12 @@
         "feedbackInProgressLinkText": "Kwaniritsani Nkhani yanu",
         "feedbackInProgressSuffix": "kuti tithandize kukonza chitukuko chanu!"
       },
-      "sent": "yatumizidwa "
+      "sent": "yatumizidwa ",
+      "suggestedActions": {
+        "quickReplyButtons": {
+          "chooseOne": "Sankhani chimodzi:"
+        }
+      }
     },
     "chat": {
       "notifications": {

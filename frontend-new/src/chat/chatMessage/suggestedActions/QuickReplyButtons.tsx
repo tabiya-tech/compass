@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import { QuickReplyOption } from "src/chat/ChatService/ChatService.types";
 
@@ -17,8 +18,11 @@ export interface QuickReplyButtonsProps {
 
 const QuickReplyButtons: React.FC<QuickReplyButtonsProps> = ({ options, onSelect }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   if (!options.length) return null;
+
+  const showChooseOneCaption = options.length >= 2;
 
   return (
     <Box
@@ -28,16 +32,18 @@ const QuickReplyButtons: React.FC<QuickReplyButtonsProps> = ({ options, onSelect
         gap: theme.tabiyaSpacing.sm,
       }}
     >
-      <Typography
-        data-testid={DATA_TEST_ID.QUICK_REPLY_HEADER}
-        sx={{
-          fontWeight: theme.typography.fontWeightBold,
-          fontSize: theme.typography.caption.fontSize,
-          textTransform: "uppercase",
-        }}
-      >
-        Quick replies:
-      </Typography>
+      {showChooseOneCaption && (
+        <Typography
+          data-testid={DATA_TEST_ID.QUICK_REPLY_HEADER}
+          sx={{
+            fontWeight: theme.typography.fontWeightBold,
+            fontSize: theme.typography.caption.fontSize,
+            textTransform: "uppercase",
+          }}
+        >
+          {t("chat.chatMessage.suggestedActions.quickReplyButtons.chooseOne")}
+        </Typography>
+      )}
       <Box
         data-testid={DATA_TEST_ID.QUICK_REPLY_CONTAINER}
         sx={{

@@ -19,6 +19,13 @@ QUICK_REPLY_PROMPT = """\
     set quick_reply_options to [{"label": "Option A"}, {"label": "Option B"}, {"label": "Option C"}].
     Never list options in the message text without also including them in quick_reply_options.
 
+    Quick-reply options are SINGLE-CHOICE: the user can click exactly one.
+    If the user might reasonably want more than one of the options (e.g. "crops or livestock"),
+    either:
+    - add a combined option such as {"label": "Both"} or {"label": "More than one"} to the array, OR
+    - phrase the question so a primary pick is expected (e.g. "Which interests you most?").
+    Do not offer multiple options as if they were each independently checkable.
+
     Do NOT include quick_reply_options when:
     - The question requires a detailed, personal, or free-text answer (e.g. "What was your job title?", "Where did you work?")
     - The options would be long paragraphs

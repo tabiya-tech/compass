@@ -148,7 +148,12 @@
         "feedbackInProgressLinkText": "Completa tus comentarios",
         "feedbackInProgressSuffix": "para ayudarnos a mejorar tu experiencia!"
       },
-      "sent": "enviado "
+      "sent": "enviado ",
+      "suggestedActions": {
+        "quickReplyButtons": {
+          "chooseOne": "Elige una:"
+        }
+      }
     },
     "chat": {
       "notifications": {

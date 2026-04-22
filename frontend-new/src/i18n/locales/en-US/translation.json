@@ -190,7 +190,12 @@
         "feedbackInProgressLinkText": "Complete your Feedback",
         "feedbackInProgressSuffix": "to help us improve your experience!"
       },
-      "sent": "sent "
+      "sent": "sent ",
+      "suggestedActions": {
+        "quickReplyButtons": {
+          "chooseOne": "Choose one:"
+        }
+      }
     },
     "chat": {
       "notifications": {

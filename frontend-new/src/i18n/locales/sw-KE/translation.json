@@ -190,7 +190,12 @@
         "feedbackInProgressLinkText": "Kamilisha Maoni yako",
         "feedbackInProgressSuffix": "ili kutusaidia kuboresha uzoefu wako!"
       },
-      "sent": "imetumwa "
+      "sent": "imetumwa ",
+      "suggestedActions": {
+        "quickReplyButtons": {
+          "chooseOne": "Chagua moja:"
+        }
+      }
     },
     "chat": {
       "notifications": {
