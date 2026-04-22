@@ -4,8 +4,8 @@ set -xe
 
 mkdir -p results
 
-#test_cases=(get-version check-invitation-code e2e-skills-elicitation-chat)
-test_cases=(e2e-skills-elicitation-chat)
+test_cases=(get-version check-invitation-code e2e-skills-elicitation-chat)
+#test_cases=(e2e-skills-elicitation-chat)
 
 for i in "${!test_cases[@]}"; do
   test_case="${test_cases[$i]}"
