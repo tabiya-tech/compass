@@ -8,12 +8,15 @@ jest.mock("react-markdown", () => {
   return {
     __esModule: true,
     default: ({ children }: { children: string }) => {
-      const parts = children.split(/(\*\*[^*]+\*\*)/g);
+      const parts = children.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
       return (
         <div>
           {parts.map((part: string, i: number) => {
             const boldMatch = part.match(/^\*\*([^*]+)\*\*$/);
-            return boldMatch ? <strong key={i}>{boldMatch[1]}</strong> : part;
+            const codeMatch = part.match(/^`([^`]+)`$/);
+            if (boldMatch) return <strong key={i}>{boldMatch[1]}</strong>;
+            if (codeMatch) return <code key={i}>{codeMatch[1]}</code>;
+            return part;
           })}
         </div>
       );
@@ -86,6 +89,21 @@ describe("render tests", () => {
     expect(screen.getByText("Farm producer").tagName).toBe("STRONG");
     // AND expect the raw asterisks not to appear in the document
     expect(screen.queryByText(/\*\*Farm producer\*\*/)).not.toBeInTheDocument();
+  });
+
+  test("should render inline code markdown as <code> in COMPASS messages", () => {
+    // GIVEN a message with inline code formatting (backticks)
+    const givenMessage: string = "Use `git status` to check your changes.";
+    // AND the sender is COMPASS (AI)
+    const givenSender: ConversationMessageSender = ConversationMessageSender.COMPASS;
+
+    // WHEN the chat bubble is rendered
+    render(<ChatBubble message={givenMessage} sender={givenSender} />);
+
+    // THEN expect the code text to be rendered as a <code> element, not raw backticks
+    expect(screen.getByText("git status").tagName).toBe("CODE");
+    // AND expect the raw backticks not to appear in the document
+    expect(screen.queryByText(/`git status`/)).not.toBeInTheDocument();
   });
 
   test("should NOT render markdown in USER messages", () => {

@@ -45,6 +45,16 @@ const MessageBubble = styled(Box, {
   "& em": { fontStyle: "italic" },
   "& ul, & ol": { paddingLeft: theme.fixedSpacing(theme.tabiyaSpacing.md), margin: 0 },
   "& li": { marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.xxs) },
+  // Override browser defaults for code blocks so that agent responses should never render as monospace
+  "& code": { fontFamily: "inherit", whiteSpace: "pre-wrap", wordBreak: "break-word" },
+  // fontFamily must be set on pre itself — code inside pre would otherwise inherit monospace from pre
+  "& pre": {
+    fontFamily: "inherit",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    margin: 0,
+  },
 }));
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({ message, sender, children, fillColor }) => {
