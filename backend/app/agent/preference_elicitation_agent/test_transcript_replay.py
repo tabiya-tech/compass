@@ -20,9 +20,22 @@ A full conversation transcript is written to transcript_replay_output.md in this
 directory after each run so you can read the complete agent responses.
 """
 
+import os
 import pytest
 from pathlib import Path
 from typing import Optional
+
+# Self-skip when GCP credentials are not configured (e.g. CI without secrets).
+# The llm_integration marker alone is not enough because CI uses -k, not -m.
+_HAS_GCP = bool(
+    os.environ.get("GOOGLE_CLOUD_PROJECT")
+    or os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    or os.environ.get("VERTEX_AI_PROJECT")
+)
+_skip_no_gcp = pytest.mark.skipif(
+    not _HAS_GCP,
+    reason="GCP credentials not configured — skipping LLM integration test"
+)
 
 from app.agent.preference_elicitation_agent.agent import PreferenceElicitationAgent
 from app.agent.preference_elicitation_agent.state import PreferenceElicitationAgentState
@@ -60,9 +73,7 @@ TRANSCRIPT_INPUTS = [
 ]
 
 
-# ── Victor's experience (from transcript) ────────────────────────────────────
-
-def victor_experiences() -> list[ExperienceEntity]:
+def user_experiences() -> list[ExperienceEntity]:
     return [
         ExperienceEntity(
             uuid="exp-victor-1",
@@ -88,7 +99,7 @@ def _make_agent() -> PreferenceElicitationAgent:
 def _make_state() -> PreferenceElicitationAgentState:
     return PreferenceElicitationAgentState(
         session_id=309,
-        initial_experiences_snapshot=victor_experiences(),
+        initial_experiences_snapshot=user_experiences(),
         use_db6_for_fresh_data=False,
         use_adaptive_selection=False,
     )
@@ -97,6 +108,7 @@ def _make_state() -> PreferenceElicitationAgentState:
 # ── Test ──────────────────────────────────────────────────────────────────────
 
 @pytest.mark.llm_integration
+@_skip_no_gcp
 @pytest.mark.asyncio
 async def test_vignette_phase_is_diverse_and_has_transitions():
     """
