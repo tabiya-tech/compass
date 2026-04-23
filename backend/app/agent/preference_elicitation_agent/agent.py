@@ -129,7 +129,8 @@ class PreferenceSummaryGenerator(BaseModel):
     )
 
     message: str = Field(
-        description="Summary of user's preferences as formatted bullet points (use • for bullets)"
+        description="Summary of user's preferences as formatted bullet points (use • for bullets). "
+                    "Plain text only — do not wrap in triple backticks or any markdown code blocks."
     )
 
     class Config:
@@ -1737,6 +1738,10 @@ Your task: Generate 3-5 natural, conversational bullet points summarizing what m
 - "Flexible hours and autonomy are important, though remote work isn't a must-have"
 
 Generate a summary that captures what's UNIQUE about this user's preferences.
+
+**Formatting rules:**
+- Use • for bullet points
+- Plain text only — do not wrap the message in triple backticks (```) or any markdown code blocks
 """
 
         # Create LLM caller
