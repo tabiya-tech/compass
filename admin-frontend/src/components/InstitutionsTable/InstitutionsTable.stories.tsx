@@ -42,3 +42,12 @@ export const Shown: Story = {
     rows: storyInstitutionsFixture,
   },
 };
+
+export const WithNumberedPagination: Story = {
+  args: {
+    rows: storyInstitutionsFixture,
+    page: 4,
+    totalPages: 12,
+    onPageChange: () => undefined,
+  },
+};

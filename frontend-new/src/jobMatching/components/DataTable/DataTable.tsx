@@ -12,19 +12,17 @@ import {
   Skeleton,
   alpha,
   IconButton,
-  Tooltip,
   TextField,
   MenuItem,
   MenuList,
   Paper,
   Popover,
   Divider,
+  Pagination,
 } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import SearchIcon from "@mui/icons-material/Search";
 import { useSortableData } from "src/jobMatching/hooks/useSortableData";
 
@@ -69,10 +67,8 @@ export interface DataTableProps<T extends { id: string }> {
   search?: SearchConfig;
   // Pagination
   page?: number;
-  hasNextPage?: boolean;
-  hasPrevPage?: boolean;
-  onNextPage?: () => void;
-  onPrevPage?: () => void;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
   prevPageLabel?: string;
   nextPageLabel?: string;
   pageLabel?: string;
@@ -291,10 +287,8 @@ function DataTable<T extends { id: string }>({
   emptyMessage = "No data",
   search,
   page,
-  hasNextPage,
-  hasPrevPage,
-  onNextPage,
-  onPrevPage,
+  totalPages,
+  onPageChange,
   prevPageLabel = "Previous page",
   nextPageLabel = "Next page",
   pageLabel,
@@ -535,31 +529,74 @@ function DataTable<T extends { id: string }>({
         </Table>
       </TableContainer>
 
-      {pageLabel !== undefined && (
+      {page !== undefined && totalPages !== undefined && onPageChange && (
         <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="flex-end"
-          gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
-          mt={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: { xs: "center", sm: "space-between" },
+            gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
+            mt: theme.fixedSpacing(theme.tabiyaSpacing.md),
+          }}
         >
-          <Tooltip title={prevPageLabel}>
-            <span>
-              <IconButton size="small" onClick={onPrevPage} disabled={!hasPrevPage || loading}>
-                <ChevronLeftIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
-          <Typography variant="caption" color="text.secondary">
-            {pageLabel}
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              display: { xs: "none", sm: "block" },
+              textAlign: "left",
+              minWidth: 0,
+              flexShrink: 1,
+            }}
+          >
+            {pageLabel ?? ""}
           </Typography>
-          <Tooltip title={nextPageLabel}>
-            <span>
-              <IconButton size="small" onClick={onNextPage} disabled={!hasNextPage || loading}>
-                <ChevronRightIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
+          <Box
+            sx={{
+              maxWidth: "100%",
+              overflowX: "auto",
+              WebkitOverflowScrolling: "touch",
+              flexShrink: 0,
+              pb: 0.25,
+            }}
+          >
+            <Pagination
+              page={page}
+              count={Math.max(1, totalPages)}
+              onChange={(_event, nextPage) => onPageChange(nextPage)}
+              color="primary"
+              size="small"
+              shape="rounded"
+              siblingCount={0}
+              boundaryCount={1}
+              disabled={loading}
+              showFirstButton={false}
+              showLastButton={false}
+              getItemAriaLabel={(type, p) => {
+                if (type === "previous") return prevPageLabel;
+                if (type === "next") return nextPageLabel;
+                if (type === "page") return `Page ${p}`;
+                return type;
+              }}
+              sx={{
+                "& .MuiPagination-ul": {
+                  flexWrap: "nowrap",
+                  gap: theme.fixedSpacing(theme.tabiyaSpacing.xs),
+                },
+                "& .MuiPaginationItem-root": {
+                  minWidth: { xs: 30, sm: 34 },
+                  height: { xs: 30, sm: 34 },
+                  fontSize: { xs: "0.875rem", sm: "1rem" },
+                  borderRadius: theme.rounding(theme.tabiyaRounding.xs),
+                  margin: 0,
+                },
+                "& .MuiPaginationItem-ellipsis": {
+                  minWidth: { xs: 20, sm: 24 },
+                },
+              }}
+            />
+          </Box>
         </Box>
       )}
     </>

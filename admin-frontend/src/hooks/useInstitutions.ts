@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { InstitutionRow } from "src/types";
 import AnalyticsService from "src/analytics/AnalyticsService";
 import type { InstitutionApiItem } from "src/analytics/AnalyticsService.types";
@@ -12,10 +12,9 @@ export interface UseInstitutionsResult {
   page: number;
   sortKey: keyof InstitutionRow | null;
   sortDir: "asc" | "desc";
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-  goToNextPage: () => void;
-  goToPrevPage: () => void;
+  totalItems: number;
+  totalPages: number;
+  goToPage: (page: number) => void;
   onSortChange: (key: keyof InstitutionRow, dir?: "asc" | "desc") => void;
   onSortClear: () => void;
 }
@@ -50,40 +49,29 @@ function mapSortKeyToApiField(key: keyof InstitutionRow): string {
 }
 
 export function useInstitutions(): UseInstitutionsResult {
-  // cursor stack: index 0 = page 1 (no cursor), index N = cursor for page N+1
-  const [cursorStack, setCursorStack] = useState<(string | undefined)[]>([undefined]);
-  const [pageIndex, setPageIndex] = useState(0);
+  const [page, setPage] = useState(1);
+  const [institutions, setInstitutions] = useState<InstitutionRow[]>([]);
   const [sortKey, setSortKey] = useState<keyof InstitutionRow | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
-  const [institutions, setInstitutions] = useState<InstitutionRow[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-
-  const cursorStackRef = React.useRef(cursorStack);
-  cursorStackRef.current = cursorStack;
 
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
-    const cursor = cursorStackRef.current[pageIndex];
     const apiSortBy = sortKey ? mapSortKeyToApiField(sortKey) : undefined;
     AnalyticsService.getInstance()
-      .listInstitutions(PAGE_SIZE, cursor, apiSortBy, sortKey ? sortDir : undefined)
+      .listInstitutions(PAGE_SIZE, undefined, apiSortBy, sortKey ? sortDir : undefined, { page, includeCount: true })
       .then((data) => {
         if (!isMounted) return;
         setInstitutions(data.data.map(mapApiItemToRow));
-        setNextCursor(data.meta.next_cursor);
-        setError(null);
-        // Push the next cursor onto the stack if we don't already have it
-        if (data.meta.next_cursor) {
-          setCursorStack((prev) => {
-            if (prev.length <= pageIndex + 1) {
-              return [...prev, data.meta.next_cursor!];
-            }
-            return prev;
-          });
+        if (typeof data.meta.total === "number") {
+          setTotalItems(data.meta.total);
+          setTotalPages(Math.max(1, Math.ceil(data.meta.total / PAGE_SIZE)));
         }
+        setError(null);
       })
       .catch((err) => {
         if (isMounted) setError(err instanceof Error ? err : new Error(String(err)));
@@ -94,15 +82,15 @@ export function useInstitutions(): UseInstitutionsResult {
     return () => {
       isMounted = false;
     };
-  }, [pageIndex, sortDir, sortKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [page, sortDir, sortKey]);
 
-  const goToNextPage = useCallback(() => {
-    if (nextCursor) setPageIndex((p) => p + 1);
-  }, [nextCursor]);
-
-  const goToPrevPage = useCallback(() => {
-    setPageIndex((p) => Math.max(0, p - 1));
-  }, []);
+  const goToPage = useCallback(
+    (nextPage: number) => {
+      if (!Number.isInteger(nextPage)) return;
+      setPage(Math.min(Math.max(1, nextPage), totalPages));
+    },
+    [totalPages]
+  );
 
   const onSortChange = useCallback((key: keyof InstitutionRow, dir?: "asc" | "desc") => {
     setSortKey((prevSortKey) => {
@@ -114,29 +102,25 @@ export function useInstitutions(): UseInstitutionsResult {
       }
       return key;
     });
-    setPageIndex(0);
-    setCursorStack([undefined]);
-    setNextCursor(null);
+    setPage(1);
   }, []);
 
   const onSortClear = useCallback(() => {
     setSortKey(null);
-    setPageIndex(0);
-    setCursorStack([undefined]);
-    setNextCursor(null);
+    setSortDir("asc");
+    setPage(1);
   }, []);
 
   return {
     institutions,
     loading,
     error,
-    page: pageIndex + 1,
+    page,
     sortKey,
     sortDir,
-    hasNextPage: Boolean(nextCursor),
-    hasPrevPage: pageIndex > 0,
-    goToNextPage,
-    goToPrevPage,
+    totalItems,
+    totalPages,
+    goToPage,
     onSortChange,
     onSortClear,
   };

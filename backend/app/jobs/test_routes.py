@@ -22,6 +22,7 @@ class _MockJobService(IJobService):
         employment_type: Optional[str],
         location: Optional[str],
         days: Optional[int],
+        page: Optional[int],
         cursor: Optional[str],
         limit: int,
         sort_by: Optional[str],
@@ -94,3 +95,44 @@ class TestJobsRoutes:
         # THEN HTTPException is propagated as-is
         assert response.status_code == HTTPStatus.BAD_REQUEST
         assert response.json()["detail"] == "Invalid cursor"
+
+    def test_get_jobs_accepts_page_query(self, client_with_mock_service: tuple[TestClient, _MockJobService], monkeypatch):
+        # GIVEN a service implementation that validates page forwarding
+        client, service = client_with_mock_service
+
+        async def _capture_page(*_args, **kwargs):
+            assert kwargs["page"] == 3
+            return PaginatedListResponse(
+                data=[{"title": "Engineer"}],
+                meta=PaginatedListMeta(limit=kwargs["limit"], next_cursor=None, has_more=False, total=100),
+            )
+
+        monkeypatch.setattr(service, "list_jobs", _capture_page)
+
+        # WHEN GET /jobs is called with page=3
+        response = client.get("/jobs?page=3")
+
+        # THEN request succeeds and page is passed through
+        assert response.status_code == HTTPStatus.OK
+        assert response.json()["meta"]["total"] == 100
+
+    def test_get_jobs_rejects_invalid_page(self, client_with_mock_service: tuple[TestClient, _MockJobService], monkeypatch):
+        # GIVEN service validation for invalid page input
+        client, service = client_with_mock_service
+
+        async def _validate_page(*_args, **kwargs):
+            if kwargs["page"] is not None and kwargs["page"] < 1:
+                raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Invalid page")
+            return PaginatedListResponse(
+                data=[{"title": "Engineer"}],
+                meta=PaginatedListMeta(limit=kwargs["limit"], next_cursor=None, has_more=False, total=None),
+            )
+
+        monkeypatch.setattr(service, "list_jobs", _validate_page)
+
+        # WHEN GET /jobs is called with page=0
+        response = client.get("/jobs?page=0")
+
+        # THEN request is rejected as a bad request
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.json()["detail"] == "Invalid page"

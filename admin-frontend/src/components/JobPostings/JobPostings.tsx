@@ -11,6 +11,7 @@ import { useJobPostings } from "src/hooks/useJobPostings";
 
 const MAX_VISIBLE_SKILLS = 2;
 const MISSING_VALUE_LABEL = "—";
+const PAGE_SIZE = 20;
 
 const capitalize = (s: string) =>
   s
@@ -39,11 +40,10 @@ const JobPostings: React.FC = () => {
     error,
     sortKey,
     sortDir,
-    hasNextPage,
-    hasPrevPage,
     page,
-    goToNextPage,
-    goToPrevPage,
+    totalItems,
+    totalPages,
+    goToPage,
     onSortChange,
     onSortClear,
   } = useJobPostings({ searchQuery: search, sectorQuery: sectorSearch, locationQuery: locationSearch });
@@ -190,6 +190,12 @@ const JobPostings: React.FC = () => {
     [theme, t]
   );
 
+  const pageRangeLabel = t("dashboard.pagination.range", {
+    start: totalItems === 0 ? 0 : (page - 1) * PAGE_SIZE + 1,
+    end: totalItems === 0 ? 0 : Math.min(page * PAGE_SIZE, totalItems),
+    total: totalItems,
+  });
+
   return (
     <Box sx={{ paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}>
       <Grid container spacing={theme.fixedSpacing(theme.tabiyaSpacing.md)} sx={{ marginBottom: 2 }}>
@@ -267,11 +273,9 @@ const JobPostings: React.FC = () => {
         emptyMessage={t("dashboard.jobPostings.jobsCount", { count: 0, total: 0 })}
         tableMinWidth={750}
         page={page}
-        hasNextPage={hasNextPage}
-        hasPrevPage={hasPrevPage}
-        onNextPage={goToNextPage}
-        onPrevPage={goToPrevPage}
-        pageLabel={`Page ${page}`}
+        totalPages={totalPages}
+        onPageChange={goToPage}
+        pageLabel={pageRangeLabel}
       />
 
       <JobPostingDetailsDialog job={selectedJob} isOpen={Boolean(selectedJob)} onClose={() => setSelectedJob(null)} />

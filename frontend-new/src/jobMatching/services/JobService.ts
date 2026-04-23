@@ -24,6 +24,8 @@ export interface ListJobsParams {
   employment_type?: string;
   location?: string;
   cursor?: string;
+  page?: number;
+  include?: string;
   limit?: number;
   sort_by?: "title" | "category" | "location" | "posted_date";
   sort_dir?: "asc" | "desc";
@@ -53,6 +55,8 @@ export default class JobService {
     if (params.cursor) query.set("cursor", params.cursor);
     if (params.sort_by) query.set("sort_by", params.sort_by);
     if (params.sort_dir) query.set("sort_dir", params.sort_dir);
+    if (params.page !== undefined) query.set("page", String(params.page));
+    if (params.include) query.set("include", params.include);
     query.set("limit", String(params.limit ?? 20));
 
     const url = `${this.baseUrl}?${query.toString()}`;

@@ -53,6 +53,7 @@ class TestJobService:
             employment_type="Full-time",
             location="Lusaka",
             days=7,
+            page=None,
             cursor="3",
             limit=2,
             sort_by=None,
@@ -90,6 +91,7 @@ class TestJobService:
             employment_type=None,
             location=None,
             days=None,
+            page=None,
             cursor=None,
             limit=20,
             sort_by=None,
@@ -116,6 +118,7 @@ class TestJobService:
             employment_type=None,
             location="ka fue",
             days=None,
+            page=None,
             cursor=None,
             limit=20,
             sort_by=None,
@@ -142,6 +145,7 @@ class TestJobService:
                 employment_type=None,
                 location=None,
                 days=None,
+                page=None,
                 cursor="not-a-number",
                 limit=20,
                 sort_by=None,
@@ -152,3 +156,56 @@ class TestJobService:
         # THEN HTTP 400 is raised
         assert exc_info.value.status_code == HTTPStatus.BAD_REQUEST
         assert exc_info.value.detail == "Invalid cursor"
+
+    @pytest.mark.asyncio
+    async def test_list_jobs_with_page_uses_offset_and_fetches_total(self):
+        # GIVEN page-based pagination
+        given_docs = [{"title": "A"}, {"title": "B"}]
+        repo = _FakeJobRepository(docs=given_docs, total=42)
+        service = JobService(repository=repo)
+
+        # WHEN list_jobs is called with page=3 and limit=10
+        result = await service.list_jobs(
+            search=None,
+            category=None,
+            employment_type=None,
+            location=None,
+            days=None,
+            page=3,
+            cursor=None,
+            limit=10,
+            sort_by=None,
+            sort_dir="asc",
+            include=None,
+        )
+
+        # THEN offset reflects page and total is included automatically
+        assert repo.last_offset == 20
+        assert repo.count_called is True
+        assert result.meta.total == 42
+
+    @pytest.mark.asyncio
+    async def test_list_jobs_with_invalid_page_raises_400(self):
+        # GIVEN a page index lower than 1
+        repo = _FakeJobRepository(docs=[], total=0)
+        service = JobService(repository=repo)
+
+        # WHEN list_jobs is called with page=0
+        with pytest.raises(HTTPException) as exc_info:
+            await service.list_jobs(
+                search=None,
+                category=None,
+                employment_type=None,
+                location=None,
+                days=None,
+                page=0,
+                cursor=None,
+                limit=20,
+                sort_by=None,
+                sort_dir="asc",
+                include=None,
+            )
+
+        # THEN HTTP 400 is raised
+        assert exc_info.value.status_code == HTTPStatus.BAD_REQUEST
+        assert exc_info.value.detail == "Invalid page"

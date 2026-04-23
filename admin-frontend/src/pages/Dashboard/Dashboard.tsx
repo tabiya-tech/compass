@@ -52,13 +52,12 @@ const Dashboard: React.FC = () => {
     page: institutionsPage,
     sortKey: institutionsSortKey,
     sortDir: institutionsSortDir,
-    hasNextPage,
-    hasPrevPage,
-    goToNextPage,
-    goToPrevPage,
+    totalItems: institutionsTotalItems,
+    totalPages: institutionsTotalPages,
+    goToPage,
+    error: institutionsError,
     onSortChange: onInstitutionsSortChange,
     onSortClear: onInstitutionsSortClear,
-    error: institutionsError,
   } = useInstitutions();
   const { stats, loading: statsLoading, error: statsError } = useDashboardStats();
   const { institutionNames } = useInstitutionFilterOptions();
@@ -223,10 +222,9 @@ const Dashboard: React.FC = () => {
                     page={institutionsPage}
                     sortKey={institutionsSortKey}
                     sortDir={institutionsSortDir}
-                    hasNextPage={hasNextPage}
-                    hasPrevPage={hasPrevPage}
-                    onNextPage={goToNextPage}
-                    onPrevPage={goToPrevPage}
+                    totalItems={institutionsTotalItems}
+                    totalPages={institutionsTotalPages}
+                    onPageChange={goToPage}
                     onSortChange={onInstitutionsSortChange}
                     onSortClear={onInstitutionsSortClear}
                   />

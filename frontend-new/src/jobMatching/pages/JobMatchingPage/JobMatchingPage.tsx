@@ -6,7 +6,7 @@ import Footer from "src/home/components/Footer/Footer";
 import DataTable from "src/jobMatching/components/DataTable/DataTable";
 import type { ColumnDef } from "src/jobMatching/components/DataTable/DataTable";
 import JobDetailModal from "src/jobMatching/components/JobDetailModal/JobDetailModal";
-import { useJobs } from "src/jobMatching/hooks/useJobs";
+import { useJobs, PAGE_SIZE } from "src/jobMatching/hooks/useJobs";
 import JobService from "src/jobMatching/services/JobService";
 import type { JobFilters, JobRow, JobSortKey } from "src/jobMatching/types";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -73,20 +73,8 @@ const JobMatchingPage: React.FC = () => {
   const debouncedSearch = useDebouncedValue(browseFilters.search, SEARCH_DEBOUNCE_MS);
   const queryFilters = useMemo(() => ({ ...browseFilters, search: debouncedSearch }), [browseFilters, debouncedSearch]);
 
-  const {
-    jobs,
-    loading,
-    error,
-    hasNextPage,
-    hasPrevPage,
-    page,
-    sortKey,
-    sortDir,
-    onSortChange,
-    onSortClear,
-    goToNextPage,
-    goToPrevPage,
-  } = useJobs(queryFilters);
+  const { jobs, loading, error, page, totalPages, totalItems, sortKey, sortDir, onSortChange, onSortClear, goToPage } =
+    useJobs(queryFilters);
 
   useEffect(() => {
     let cancelled = false;
@@ -152,6 +140,14 @@ const JobMatchingPage: React.FC = () => {
     setModalOpen(true);
   };
 
+  const browsePageLabel = useMemo(() => {
+    const enDash = "\u2013";
+    if (totalItems === 0) return `Page 0${enDash}0 of 0`;
+    const start = (page - 1) * PAGE_SIZE + 1;
+    const end = Math.min(page * PAGE_SIZE, totalItems);
+    return `Page ${start}${enDash}${end} of ${totalItems}`;
+  }, [page, totalItems]);
+
   const columns: ColumnDef<JobRow>[] = useMemo(
     () => [
       {
@@ -186,7 +182,7 @@ const JobMatchingPage: React.FC = () => {
         label: "Category",
         sortable: true,
         align: "left",
-        minWidth: 140,
+        minWidth: 120,
         filter: {
           options: categoryOptions,
           value: browseFilters.category,
@@ -253,7 +249,7 @@ const JobMatchingPage: React.FC = () => {
         label: "Posted",
         sortable: true,
         align: "left",
-        minWidth: 100,
+        minWidth: 120,
         render: (val) => (
           <Typography variant="body2" color="text.secondary">
             {val as string}
@@ -317,9 +313,10 @@ const JobMatchingPage: React.FC = () => {
       <Box
         sx={{
           flex: 1,
-          width: { xs: "100%", md: "60%" },
-          margin: { xs: "0", md: "0 auto" },
-          paddingX: "var(--layout-gutter-x)",
+          width: "100%",
+          maxWidth: "var(--layout-content-max-width)",
+          mx: "auto",
+          px: "var(--layout-gutter-x)",
           paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.md),
           paddingTop: theme.fixedSpacing(theme.tabiyaSpacing.sm),
         }}
@@ -386,11 +383,10 @@ const JobMatchingPage: React.FC = () => {
                 onChange: (v) => setBrowseFilters((f) => ({ ...f, search: v })),
               }}
               onRowClick={handleRowClick}
-              hasNextPage={hasNextPage}
-              hasPrevPage={hasPrevPage}
-              onNextPage={goToNextPage}
-              onPrevPage={goToPrevPage}
-              pageLabel={`Page ${page}`}
+              page={page}
+              totalPages={totalPages}
+              onPageChange={goToPage}
+              pageLabel={browsePageLabel}
             />
           </>
         )}

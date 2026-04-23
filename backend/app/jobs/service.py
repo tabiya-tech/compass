@@ -36,6 +36,7 @@ class IJobService(ABC):
         employment_type: Optional[str],
         location: Optional[str],
         days: Optional[int],
+        page: Optional[int],
         cursor: Optional[str],
         limit: int,
         sort_by: Optional[str],
@@ -144,6 +145,7 @@ class JobService(IJobService):
         employment_type: Optional[str],
         location: Optional[str],
         days: Optional[int],
+        page: Optional[int],
         cursor: Optional[str],
         limit: int,
         sort_by: Optional[str],
@@ -151,8 +153,13 @@ class JobService(IJobService):
         include: Optional[str],
     ) -> PaginatedListResponse[JobDocument]:
         filter_query = self._build_jobs_mongo_filter(search, category, employment_type, location, days)
-        include_count = self._include_total(include)
-        offset = self._parse_cursor_offset(cursor)
+        include_count = self._include_total(include) or page is not None
+        if page is not None:
+            if page < 1:
+                raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Invalid page")
+            offset = (page - 1) * limit
+        else:
+            offset = self._parse_cursor_offset(cursor)
 
         docs = await self._repository.list_jobs(
             filter_query=filter_query,

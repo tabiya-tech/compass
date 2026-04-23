@@ -10,10 +10,9 @@ export interface InstitutionsTableProps {
   page?: number;
   sortKey?: keyof InstitutionRow | null;
   sortDir?: "asc" | "desc";
-  hasNextPage?: boolean;
-  hasPrevPage?: boolean;
-  onNextPage?: () => void;
-  onPrevPage?: () => void;
+  totalItems?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
   onSortChange?: (key: keyof InstitutionRow, dir?: "asc" | "desc") => void;
   onSortClear?: () => void;
 }
@@ -24,16 +23,17 @@ const GROUP_COLORS = {
   careerExplorer: "#2ECC71",
 };
 
+const PAGE_SIZE = 20;
+
 const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
   rows,
   loading = false,
   page,
   sortKey,
   sortDir,
-  hasNextPage,
-  hasPrevPage,
-  onNextPage,
-  onPrevPage,
+  totalItems,
+  totalPages,
+  onPageChange,
   onSortChange,
   onSortClear,
 }) => {
@@ -179,6 +179,15 @@ const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
     },
   ];
 
+  const pageRangeLabel =
+    page !== undefined && totalItems !== undefined
+      ? t("dashboard.pagination.range", {
+          start: totalItems === 0 ? 0 : (page - 1) * PAGE_SIZE + 1,
+          end: totalItems === 0 ? 0 : Math.min(page * PAGE_SIZE, totalItems),
+          total: totalItems,
+        })
+      : undefined;
+
   return (
     <DataTable<InstitutionRow>
       rows={rows}
@@ -195,13 +204,11 @@ const InstitutionsTable: React.FC<InstitutionsTableProps> = ({
       ariaLabel="institutions table"
       tableMinWidth={960}
       page={page}
-      hasNextPage={hasNextPage}
-      hasPrevPage={hasPrevPage}
-      onNextPage={onNextPage}
-      onPrevPage={onPrevPage}
+      totalPages={totalPages}
+      onPageChange={onPageChange}
       prevPageLabel={t("dashboard.institutionsTable.prevPage")}
       nextPageLabel={t("dashboard.institutionsTable.nextPage")}
-      pageLabel={page !== undefined ? t("dashboard.institutionsTable.page", { page }) : undefined}
+      pageLabel={pageRangeLabel}
     />
   );
 };

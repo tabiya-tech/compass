@@ -52,11 +52,11 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
     modules,
     filteredRows,
     pagedRows,
+    pageSize,
+    totalItems,
+    totalPages,
     safePageIndex,
-    hasPrevPage,
-    hasNextPage,
-    goToNextPage,
-    goToPrevPage,
+    goToPage,
   } = useInstructorStudentsTableState(allRows, {
     hasMoreRows,
     loadingRows: loading,
@@ -64,6 +64,12 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
   });
 
   const allLabel = t("instructorDashboard.studentsTable.filters.all");
+  const currentPage = safePageIndex + 1;
+  const pageLabel = t("dashboard.pagination.range", {
+    start: totalItems === 0 ? 0 : safePageIndex * pageSize + 1,
+    end: totalItems === 0 ? 0 : Math.min((safePageIndex + 1) * pageSize, totalItems),
+    total: totalItems,
+  });
 
   const formatModuleLabel = (moduleId: string) => {
     const key = getModuleLabelKey(moduleId);
@@ -222,14 +228,12 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
       onSortChange={(key, dir) => handleSort(key as StudentsSortKey, dir)}
       onSortClear={clearSort}
       sortClearLabel={t("dashboard.dataTable.clearSorting")}
-      page={safePageIndex + 1}
-      hasPrevPage={hasPrevPage}
-      hasNextPage={hasNextPage}
-      onPrevPage={goToPrevPage}
-      onNextPage={goToNextPage}
+      page={currentPage}
+      totalPages={totalPages}
+      onPageChange={goToPage}
       prevPageLabel={t("dashboard.institutionsTable.prevPage")}
       nextPageLabel={t("dashboard.institutionsTable.nextPage")}
-      pageLabel={t("dashboard.institutionsTable.page", { page: safePageIndex + 1 })}
+      pageLabel={pageLabel}
     />
   );
 };

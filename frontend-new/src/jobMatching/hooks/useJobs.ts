@@ -3,7 +3,7 @@ import { ReconnectVersionContext } from "src/app/isOnlineProvider/IsOnlineProvid
 import JobService from "src/jobMatching/services/JobService";
 import type { JobApiDocument, JobFilters, JobRow, JobSortDir, JobSortKey } from "src/jobMatching/types";
 
-const PAGE_SIZE = 20;
+export const PAGE_SIZE = 20;
 
 let _rowCounter = 0;
 const nextId = () => String(++_rowCounter);
@@ -36,38 +36,34 @@ export interface UseJobsResult {
   jobs: JobRow[];
   loading: boolean;
   error: unknown;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
   page: number;
   sortKey: JobSortKey | null;
   sortDir: JobSortDir;
   onSortChange: (key: JobSortKey, dir?: JobSortDir) => void;
   onSortClear: () => void;
-  goToNextPage: () => void;
-  goToPrevPage: () => void;
+  totalPages: number;
+  totalItems: number;
+  goToPage: (page: number) => void;
   reload: () => void;
 }
 
 export function useJobs(filters: JobFilters): UseJobsResult {
   const reconnectVersion = useContext(ReconnectVersionContext);
-  const [cursorStack, setCursorStack] = useState<(string | undefined)[]>([undefined]);
-  const [pageIndex, setPageIndex] = useState(0);
+  const [page, setPage] = useState(1);
   const [jobs, setJobs] = useState<JobRow[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
   const [sortKey, setSortKey] = useState<JobSortKey | null>("posted");
   const [sortDir, setSortDir] = useState<JobSortDir>("desc");
 
-  // Reset to page 0 when filters or sort options change
+  // Reset to first page when query context changes.
   useEffect(() => {
-    setCursorStack([undefined]);
-    setPageIndex(0);
-    setNextCursor(null);
+    setPage(1);
   }, [filters.search, filters.category, filters.employmentType, filters.location, sortKey, sortDir]);
 
   useEffect(() => {
-    const cursor = cursorStack[pageIndex];
     let cancelled = false;
 
     const run = async () => {
@@ -77,22 +73,25 @@ export function useJobs(filters: JobFilters): UseJobsResult {
         const searchValue = filters.search.trim();
         const result = await JobService.getInstance().listJobs({
           search: searchValue.length > 0 ? searchValue : undefined,
-          category: filters.category === "all" ? undefined : filters.category,
-          employment_type: filters.employmentType === "all" ? undefined : filters.employmentType,
-          location: filters.location === "all" ? undefined : filters.location,
-          cursor,
+          category: filters.category !== "all" ? filters.category : undefined,
+          employment_type: filters.employmentType !== "all" ? filters.employmentType : undefined,
+          location: filters.location !== "all" ? filters.location : undefined,
+          page,
+          include: "count",
           limit: PAGE_SIZE,
           ...(sortKey ? { sort_by: mapSortKeyToApiField(sortKey), sort_dir: sortDir } : {}),
         });
         if (!cancelled) {
           setJobs(result.data.map(mapDocToRow));
-          setNextCursor(result.meta.next_cursor);
+          if (typeof result.meta.total === "number") {
+            setTotalItems(result.meta.total);
+            setTotalPages(Math.max(1, Math.ceil(result.meta.total / PAGE_SIZE)));
+          }
         }
       } catch (e: unknown) {
         if (!cancelled) {
           setError(e);
           setJobs([]);
-          setNextCursor(null);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -104,8 +103,7 @@ export function useJobs(filters: JobFilters): UseJobsResult {
       cancelled = true;
     };
   }, [
-    cursorStack,
-    pageIndex,
+    page,
     filters.search,
     filters.category,
     filters.employmentType,
@@ -134,38 +132,30 @@ export function useJobs(filters: JobFilters): UseJobsResult {
     setSortDir("asc");
   }, []);
 
-  const goToNextPage = useCallback(() => {
-    if (!nextCursor) return;
-    setCursorStack((prev) => {
-      const updated = [...prev];
-      updated[pageIndex + 1] = nextCursor;
-      return updated;
-    });
-    setPageIndex((p) => p + 1);
-  }, [nextCursor, pageIndex]);
-
-  const goToPrevPage = useCallback(() => {
-    setPageIndex((p) => Math.max(0, p - 1));
-  }, []);
+  const goToPage = useCallback(
+    (nextPage: number) => {
+      if (!Number.isInteger(nextPage)) return;
+      setPage(Math.min(Math.max(1, nextPage), totalPages));
+    },
+    [totalPages]
+  );
 
   const reload = useCallback(() => {
-    setCursorStack([undefined]);
-    setPageIndex(0);
+    setPage(1);
   }, []);
 
   return {
     jobs,
     loading,
     error,
-    hasNextPage: Boolean(nextCursor),
-    hasPrevPage: pageIndex > 0,
-    page: pageIndex + 1,
+    page,
     sortKey,
     sortDir,
     onSortChange,
     onSortClear,
-    goToNextPage,
-    goToPrevPage,
+    totalPages,
+    totalItems,
+    goToPage,
     reload,
   };
 }

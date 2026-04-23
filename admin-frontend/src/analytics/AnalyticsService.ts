@@ -72,10 +72,11 @@ export default class AnalyticsService {
   }
 
   async listInstitutions(
-    limit = 100,
+    limit = 20,
     cursor?: string,
     sortBy?: string,
-    sortDir?: "asc" | "desc"
+    sortDir?: "asc" | "desc",
+    options?: { page?: number; includeCount?: boolean }
   ): Promise<PaginatedResponse<InstitutionApiItem>> {
     const params = new URLSearchParams({ limit: String(limit) });
     if (cursor) params.set("cursor", cursor);
@@ -83,6 +84,8 @@ export default class AnalyticsService {
       params.set("sort_by", sortBy);
       if (sortDir) params.set("sort_dir", sortDir);
     }
+    if (options?.page !== undefined) params.set("page", String(options.page));
+    if (options?.includeCount) params.set("include", "count");
     const url = `${this.baseUrl}/analytics/institutions?${params}`;
     const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "listInstitutions", "GET", url);
     const response = await customFetch(url, {
@@ -318,6 +321,8 @@ export default class AnalyticsService {
       limit?: number;
       sort_by?: "title" | "category" | "location" | "source_platform" | "posted_date";
       sort_dir?: "asc" | "desc";
+      page?: number;
+      include?: string;
     } = {}
   ): Promise<PaginatedResponse<JobApiItem>> {
     const query = new URLSearchParams();
@@ -328,6 +333,8 @@ export default class AnalyticsService {
     if (params.cursor) query.set("cursor", params.cursor);
     if (params.sort_by) query.set("sort_by", params.sort_by);
     if (params.sort_dir) query.set("sort_dir", params.sort_dir);
+    if (params.page !== undefined) query.set("page", String(params.page));
+    if (params.include) query.set("include", params.include);
     query.set("limit", String(params.limit ?? 20));
     const url = `${this.baseUrl}/jobs?${query}`;
     const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "listJobs", "GET", url);

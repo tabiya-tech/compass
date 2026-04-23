@@ -2,7 +2,9 @@ import logging
 from http import HTTPStatus
 from typing import Literal, Optional
 
-from fastapi import APIRouter, Depends, Query
+import base64
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.analytics.institutions.repository import InstitutionRepository, get_institution_repository
 from app.analytics.types import Institution, PaginatedListMeta, PaginatedListResponse
@@ -23,6 +25,7 @@ def add_institutions_routes(router: APIRouter, auth: Authentication):
         user_info: UserInfo = Depends(auth.get_user_info()),
         active: bool | None = Query(default=None, description="Filter by active status"),
         province: str | None = Query(default=None, description="Filter by province"),
+        page: int | None = Query(default=None, description="1-based page number"),
         cursor: str | None = Query(default=None, description="Pagination cursor from previous response"),
         limit: int = Query(default=20, ge=1, le=100, description="Max items per page"),
         sort_by: Optional[
@@ -41,12 +44,20 @@ def add_institutions_routes(router: APIRouter, auth: Authentication):
         include: str | None = Query(default=None, description="Comma-separated: 'count' to include total"),
         repository: InstitutionRepository = Depends(get_institution_repository),
     ):
-        include_count = include and "count" in include.split(",")
+        include_count = bool(include and "count" in include.split(","))
+        effective_cursor = cursor
+
+        if page is not None:
+            if page < 1:
+                raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Invalid page")
+            offset = (page - 1) * limit
+            effective_cursor = base64.urlsafe_b64encode(str(offset).encode()).decode().rstrip("=")
+            include_count = True
 
         items, next_cursor_str, has_more = await repository.list_institutions(
             active=active,
             province=province,
-            cursor=cursor,
+            cursor=effective_cursor,
             limit=limit,
             sort_by=sort_by,
             sort_dir=sort_dir,

@@ -44,11 +44,10 @@ export interface UseJobPostingsResult {
   error: Error | null;
   sortKey: keyof JobPostingRow | null;
   sortDir: "asc" | "desc";
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
   page: number;
-  goToNextPage: () => void;
-  goToPrevPage: () => void;
+  totalItems: number;
+  totalPages: number;
+  goToPage: (page: number) => void;
   onSortChange: (key: keyof JobPostingRow, dir?: "asc" | "desc") => void;
   onSortClear: () => void;
 }
@@ -74,12 +73,12 @@ export function useJobPostings({
   sectorQuery = "",
   locationQuery = "",
 }: JobPostingQueryFilters): UseJobPostingsResult {
-  const [cursorStack, setCursorStack] = useState<(string | undefined)[]>([undefined]);
-  const [pageIndex, setPageIndex] = useState(0);
+  const [page, setPage] = useState(1);
   const [sortKey, setSortKey] = useState<keyof JobPostingRow | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [rows, setRows] = useState<JobPostingRow[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -90,9 +89,7 @@ export function useJobPostings({
   const normalizedLocationQuery = locationQuery.trim();
 
   useEffect(() => {
-    setCursorStack([undefined]);
-    setPageIndex(0);
-    setNextCursor(null);
+    setPage(1);
   }, [normalizedSearchQuery, normalizedSectorQuery, normalizedLocationQuery]);
 
   // Fetch stats once
@@ -118,7 +115,6 @@ export function useJobPostings({
 
   // Fetch current page
   useEffect(() => {
-    const cursor = cursorStack[pageIndex];
     let cancelled = false;
 
     const run = async () => {
@@ -130,20 +126,22 @@ export function useJobPostings({
           search: normalizedSearchQuery || undefined,
           category: normalizedSectorQuery || undefined,
           location: normalizedLocationQuery || undefined,
-          cursor,
+          page,
           limit: PAGE_SIZE,
+          include: "count",
           ...(apiSortBy ? { sort_by: apiSortBy, sort_dir: sortDir } : {}),
         });
         if (!cancelled) {
-          const mappedRows = result.data.map(mapToRow);
-          setRows(mappedRows);
-          setNextCursor(result.meta.next_cursor);
+          setRows(result.data.map(mapToRow));
+          if (typeof result.meta.total === "number") {
+            setTotalItems(result.meta.total);
+            setTotalPages(Math.max(1, Math.ceil(result.meta.total / PAGE_SIZE)));
+          }
         }
       } catch (e) {
         if (!cancelled) {
           setError(e instanceof Error ? e : new Error(String(e)));
           setRows([]);
-          setNextCursor(null);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -154,21 +152,15 @@ export function useJobPostings({
     return () => {
       cancelled = true;
     };
-  }, [cursorStack, pageIndex, sortDir, sortKey, normalizedSearchQuery, normalizedSectorQuery, normalizedLocationQuery]);
+  }, [page, sortDir, sortKey, normalizedSearchQuery, normalizedSectorQuery, normalizedLocationQuery]);
 
-  const goToNextPage = useCallback(() => {
-    if (!nextCursor) return;
-    setCursorStack((prev) => {
-      const updated = [...prev];
-      updated[pageIndex + 1] = nextCursor;
-      return updated;
-    });
-    setPageIndex((p) => p + 1);
-  }, [nextCursor, pageIndex]);
-
-  const goToPrevPage = useCallback(() => {
-    setPageIndex((p) => Math.max(0, p - 1));
-  }, []);
+  const goToPage = useCallback(
+    (nextPage: number) => {
+      if (!Number.isInteger(nextPage)) return;
+      setPage(Math.min(Math.max(1, nextPage), totalPages));
+    },
+    [totalPages]
+  );
 
   const onSortChange = useCallback((key: keyof JobPostingRow, dir?: "asc" | "desc") => {
     if (!mapSortKeyToApiField(key)) return;
@@ -181,16 +173,13 @@ export function useJobPostings({
       }
       return key;
     });
-    setCursorStack([undefined]);
-    setPageIndex(0);
-    setNextCursor(null);
+    setPage(1);
   }, []);
 
   const onSortClear = useCallback(() => {
     setSortKey(null);
-    setCursorStack([undefined]);
-    setPageIndex(0);
-    setNextCursor(null);
+    setSortDir("asc");
+    setPage(1);
   }, []);
 
   return {
@@ -201,11 +190,10 @@ export function useJobPostings({
     error,
     sortKey,
     sortDir,
-    hasNextPage: Boolean(nextCursor),
-    hasPrevPage: pageIndex > 0,
-    page: pageIndex + 1,
-    goToNextPage,
-    goToPrevPage,
+    page,
+    totalItems,
+    totalPages,
+    goToPage,
     onSortChange,
     onSortClear,
   };

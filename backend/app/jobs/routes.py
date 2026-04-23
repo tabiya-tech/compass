@@ -52,6 +52,7 @@ def add_jobs_routes(app: FastAPI):
         employment_type: Optional[str] = Query(default=None, description="Filter by employment type"),
         location: Optional[str] = Query(default=None, description="Filter by job location"),
         days: Optional[int] = Query(default=None, ge=1, le=3650, description="Only include jobs posted within the last N days"),
+        page: Optional[int] = Query(default=None, description="1-based page number"),
         cursor: Optional[str] = Query(default=None, description="Pagination cursor from previous response"),
         limit: Annotated[int, Query(ge=1, le=100, description="Max items per page")] = 20,
         sort_by: Literal["title", "category", "location", "source_platform", "posted_date"] | None = Query(
@@ -76,6 +77,7 @@ def add_jobs_routes(app: FastAPI):
                 employment_type=employment_type,
                 location=location,
                 days=days,
+                page=page,
                 cursor=cursor,
                 limit=limit,
                 sort_by=sort_by,

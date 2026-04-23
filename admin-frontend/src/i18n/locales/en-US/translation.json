@@ -221,6 +221,9 @@
         "allSectors": "All Sectors"
       }
     },
+    "pagination": {
+      "range": "Page {{start}}–{{end}} of {{total}}"
+    },
     "jobPostings": {
       "stats": {
         "jobsSourced": "Jobs Sourced",
@@ -230,6 +233,7 @@
       },
       "searchPlaceholder": "Search job titles...",
       "jobsCount": "{{count}} of {{total}} jobs",
+      "page": "Page {{page}} of {{totalPages}}",
       "moreSkills": "+{{count}} more",
       "filters": {
         "allSectors": "All Sectors",
@@ -282,7 +286,7 @@
       "empty": "No institutions found.",
       "prevPage": "Previous page",
       "nextPage": "Next page",
-      "page": "Page {{page}}"
+      "page": "Page {{page}} of {{totalPages}}"
     },
     "comingSoon": "No data so far."
   },

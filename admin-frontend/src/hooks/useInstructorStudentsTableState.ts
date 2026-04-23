@@ -170,10 +170,6 @@ export function useInstructorStudentsTableState(
   const safePageIndex = Math.min(pageIndex, totalPages - 1);
   const pageStart = safePageIndex * pageSize;
   const pagedRows = sortedRows.slice(pageStart, pageStart + pageSize);
-  const hasPrevPage = safePageIndex > 0;
-  const hasNextLoadedPage = safePageIndex < totalPages - 1;
-  const hasNextPage = hasNextLoadedPage || hasMoreRows;
-
   useEffect(() => {
     const isBeyondLoadedRows = pageStart >= sortedRows.length;
     if (isBeyondLoadedRows && hasMoreRows && !loadingRows && onLoadMoreRows) {
@@ -195,16 +191,10 @@ export function useInstructorStudentsTableState(
     setSortDir("asc");
   };
 
-  const goToNextPage = () => {
-    if (hasNextPage) {
-      setPageIndex((prev) => prev + 1);
-    }
-  };
-
-  const goToPrevPage = () => {
-    if (hasPrevPage) {
-      setPageIndex((prev) => prev - 1);
-    }
+  const goToPage = (pageNumber: number) => {
+    if (!Number.isInteger(pageNumber)) return;
+    const nextIndex = Math.max(0, Math.min(totalPages - 1, pageNumber - 1));
+    setPageIndex(nextIndex);
   };
 
   return {
@@ -230,10 +220,10 @@ export function useInstructorStudentsTableState(
     modules,
     filteredRows,
     pagedRows,
+    pageSize,
+    totalItems: sortedRows.length,
+    totalPages,
     safePageIndex,
-    hasPrevPage,
-    hasNextPage,
-    goToNextPage,
-    goToPrevPage,
+    goToPage,
   };
 }
