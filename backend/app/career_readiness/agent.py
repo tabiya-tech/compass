@@ -12,7 +12,7 @@ from enum import Enum
 from textwrap import dedent
 from typing import Type
 
-from pydantic import BaseModel, ConfigDict, Field, create_model, model_validator
+from pydantic import BaseModel, ConfigDict, create_model, model_validator
 
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMQuickReplyOption, LLMStats, AgentOutputWithReasoning
 from app.agent.llm_caller import LLMCaller
@@ -135,7 +135,9 @@ def _build_module_response_model(
     )
 
     class CareerReadinessModelResponseWithTopicEnum(CareerReadinessModelResponse):
-        topic_status: list[dynamic_record] = Field(default_factory=list)  # type: ignore[valid-type]
+        # Intentionally no default: keeps this in Pydantic's `required` list so
+        # Vertex AI structured output enforces it (default -> not required -> omittable).
+        topic_status: list[dynamic_record]  # type: ignore[valid-type]
 
         @model_validator(mode="after")
         def _enforce_one_record_per_topic(self):

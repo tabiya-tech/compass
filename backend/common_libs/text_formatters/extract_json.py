@@ -2,7 +2,7 @@ import json
 from typing import TypeVar, Type, Any
 import re
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 import fix_busted_json
 import json_repair
 import logging
@@ -38,7 +38,7 @@ def extract_json(text: str, model: Type[T]) -> T:
     :return: An instance of the Pydantic model if the JSON object is valid, otherwise raise an exception
     :raises NoJSONFound: If no JSON object is found in the text
     :raises InvalidJSON: If the extracted JSON is invalid
-    :raises ValidationError: If the extracted JSON does not conform to the model
+    :raises ExtractedDataValidationError: If the extracted JSON does not conform to the model
     """
     # Find JSON start by locating first '{' character (handles explanatory text before JSON)
     text_with_json_start = _find_json_start(text)
@@ -74,6 +74,11 @@ def extract_json(text: str, model: Type[T]) -> T:
 
     try:
         return model(**data)
+    except ValidationError as e:
+        field_errors = [f"{'.'.join(str(p) for p in err['loc'])}: {err['type']}" for err in e.errors()]
+        raise ExtractedDataValidationError(f"Failed to construct model: {model.__name__}"
+                                           f"\n  - field errors: {field_errors}"
+                                           f"\n  - with data: {data}") from e
     except Exception as e:  # pylint: disable=broad-except
         raise ExtractedDataValidationError(f"Failed to construct model: {model.__name__}"
                                            f"\n  - with data: {data}") from e

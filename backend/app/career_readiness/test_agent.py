@@ -534,3 +534,15 @@ class TestBuildModuleResponseModel:
         actual_topic_id_schema = actual_topic_status_items["properties"]["topic_id"]
         assert set(actual_topic_id_schema.get("enum", [])) == {"Alpha", "Beta"}
 
+    def test_vertex_schema_marks_topic_status_as_required(self):
+        # GIVEN a dynamic model built for a non-empty topic list
+        given_topics = ["Alpha", "Beta"]
+        actual_model = _build_module_response_model(given_topics)
+
+        # WHEN the Vertex-shaped schema is built
+        actual_schema = with_response_schema(actual_model)
+
+        # THEN topic_status is in the top-level `required` list
+        expected_required = actual_schema["response_schema"].get("required", [])
+        assert "topic_status" in expected_required
+
