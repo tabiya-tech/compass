@@ -141,17 +141,19 @@
       "clearSorting": "Clear sorting"
     },
     "dailyAdoptionTrend": {
-      "title": "Daily Adoption Trend",
+      "title": "Mwenendo wa matumizi ya kila siku",
       "noData": "Hakuna data inayopatikana",
-      "newRegistrations": "Usajili Mpya",
-      "dailyActiveUsers": "Watumiaji Wanaotumia Kila Siku"
+      "newRegistrations": "Usajili mpya",
+      "dailyActiveUsers": "Watumiaji hai wa kila siku"
     },
     "stats": {
-      "institutionsActive": "Institutions Active",
-      "institutionsActiveSubtitle": "of 15 pilot institutions",
-      "totalStudentsRegistered": "Total Students Registered",
-      "activeStudents7Days": "Active Students (7 days)",
-      "activeStudents7DaysSubtitle": "68% of registered"
+      "institutionsActive": "Taasisi zinazotumika",
+      "institutionsActiveSubtitle": "kati ya taasisi za majaribio {{total}}",
+      "institutionsActiveSubtitleNoTotal": "kati ya taasisi za majaribio",
+      "totalStudentsRegistered": "Jumla ya wanafunzi waliosajiliwa",
+      "activeStudents7Days": "Wanafunzi amilifu (siku 7)",
+      "activeStudents7DaysSubtitle": "{{pct}}% ya waliosajiliwa",
+      "activeStudents7DaysSubtitleNoPct": "ya waliosajiliwa"
     },
     "modules": {
       "titles": {
@@ -159,19 +161,18 @@
         "careerReadiness": "Kujiandaa kwa Kazi",
         "careerExplorer": "Njia za kazi"
       },
-      "registeredStudents": "{{count}} registered students",
-      "started": "Started",
-      "completed": "Completed",
-      "completedAll5": "Completed all 5",
-      "returned2Plus": "Returned 2+ times",
-      "prioritySectors": "Priority sector users",
-      "avgSubModulesCompleted": "Avg. sub-modules completed",
-      "engagementFunnel": "Engagement funnel",
-      "funnelCaption": "301 students in progress",
-      "subModuleBreakdown": "Sub-module breakdown",
-      "topSectorsExplored": "Top sectors explored",
-      "startedLegend": "Started",
-      "completedLegend": "Completed",
+      "registeredStudents": "{{count}} wanafunzi waliosajiliwa",
+      "started": "Walianza",
+      "completed": "Walikamilisha",
+      "completedAll5": "Walikamilisha zote",
+      "returned2Plus": "Wamerudi mara 2+",
+      "prioritySectors": "Watumiaji wa sekta za kipaumbele",
+      "avgSubModulesCompleted": "Wastani wa sehemu ndogo zilizokamilishwa",
+      "engagementFunnel": "Faneli ya ushiriki",
+      "subModuleBreakdown": "Uchanganuzi wa sehemu ndogo",
+      "topSectorsExplored": "Sekta zilizochunguzwa zaidi",
+      "startedLegend": "Walianza",
+      "completedLegend": "Walikamilisha",
       "sharingExperiences": "Kushiriki uzoefu",
       "identifyingSkills": "Kutambua ujuzi",
       "collectingPreferences": "Kukusanya mapendeleo",
@@ -226,11 +227,10 @@
     },
     "jobPostings": {
       "stats": {
-        "jobsSourced": "Jobs Sourced",
-        "sectorsCovered": "Sectors Covered",
-        "sourcePlatforms": "Source Platforms",
-        "lastUpdated": "Last updated 2 days ago",
-        "sourcePlatformsList": "GoZ Jobs, BrighterMonday, JobWeb, LinkedIn, Indeed"
+        "jobsSourced": "Ajira zilizokusanywa",
+        "sectorsCovered": "Sekta zilizofunikwa",
+        "sourcePlatforms": "Majukwaa ya chanzo",
+        "lastUpdatedOn": "Imesasishwa tarehe {{date}}"
       },
       "searchPlaceholder": "Search job titles...",
       "jobsCount": "{{count}} of {{total}} jobs",

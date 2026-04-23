@@ -3,6 +3,7 @@ export interface DashboardStatItem {
   titleKey: string;
   value: string | number;
   subtitleKey?: string;
+  subtitleValues?: Record<string, string | number>;
 }
 
 export interface InstitutionRow {
@@ -95,4 +96,5 @@ export interface JobPostingRow {
   skills: string[];
   candidatePool: number;
   jobUrl: string;
+  postedDate?: string;
 }

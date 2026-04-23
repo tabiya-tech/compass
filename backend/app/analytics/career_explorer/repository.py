@@ -42,10 +42,12 @@ class CareerExplorerAnalyticsRepository(ICareerExplorerAnalyticsRepository):
     def __init__(
         self,
         career_explorer_db: AsyncIOMotorDatabase,
+        application_db: AsyncIOMotorDatabase,
         metrics_db: AsyncIOMotorDatabase,
         userdata_db: AsyncIOMotorDatabase,
     ):
         self._ce_conversations = career_explorer_db.get_collection(Collections.CAREER_EXPLORER_CONVERSATIONS)
+        self._prefs = application_db.get_collection(Collections.USER_PREFERENCES)
         self._metrics = metrics_db.get_collection(Collections.COMPASS_METRICS)
         self._userdata = userdata_db.get_collection(Collections.PLAIN_PERSONAL_DATA)
 
@@ -78,10 +80,10 @@ class CareerExplorerAnalyticsRepository(ICareerExplorerAnalyticsRepository):
         return {d["user_id"] for d in docs if d.get("user_id")}
 
     async def _count_registered_students(self, user_ids: Optional[set[str]]) -> int:
-        """Count registered students in scope."""
+        """Count registered students in scope (from USER_PREFERENCES or filtered set)."""
         if user_ids is not None:
             return len(user_ids)
-        return await self._userdata.count_documents({})
+        return await self._prefs.count_documents({})
 
     async def _get_started_user_ids(self, user_ids: Optional[set[str]]) -> set[str]:
         """Return user_ids that have at least one career explorer conversation."""

@@ -141,17 +141,19 @@
       "clearSorting": "Clear sorting"
     },
     "dailyAdoptionTrend": {
-      "title": "Daily Adoption Trend",
+      "title": "Mayendedwe a kugwiritsa ntchito tsiku ndi tsiku",
       "noData": "Palibe deta ilipo",
-      "newRegistrations": "Zolemba Zatsopano",
-      "dailyActiveUsers": "Ogwiritsa Ntchito Tsiku Ndi Tsiku"
+      "newRegistrations": "Olemba atsopano",
+      "dailyActiveUsers": "Ogwiritsa ntchito a tsiku ndi tsiku"
     },
     "stats": {
-      "institutionsActive": "Institutions Active",
-      "institutionsActiveSubtitle": "of 15 pilot institutions",
-      "totalStudentsRegistered": "Total Students Registered",
-      "activeStudents7Days": "Active Students (7 days)",
-      "activeStudents7DaysSubtitle": "68% of registered"
+      "institutionsActive": "Mabungwe ogwira ntchito",
+      "institutionsActiveSubtitle": "mwa mabungwe oyesera {{total}}",
+      "institutionsActiveSubtitleNoTotal": "mwa mabungwe oyesera",
+      "totalStudentsRegistered": "Chiwerengero cha ophunzira olembetsedwa",
+      "activeStudents7Days": "Ophunzira ogwira ntchito (masiku 7)",
+      "activeStudents7DaysSubtitle": "{{pct}}% mwa olembetsedwa",
+      "activeStudents7DaysSubtitleNoPct": "mwa olembetsedwa"
     },
     "modules": {
       "titles": {
@@ -159,19 +161,18 @@
         "careerReadiness": "Kukonzekera Ntchito",
         "careerExplorer": "Njira za ntchito"
       },
-      "registeredStudents": "{{count}} registered students",
-      "started": "Started",
-      "completed": "Completed",
-      "completedAll5": "Completed all 5",
-      "returned2Plus": "Returned 2+ times",
-      "prioritySectors": "Priority sector users",
-      "avgSubModulesCompleted": "Avg. sub-modules completed",
-      "engagementFunnel": "Engagement funnel",
-      "funnelCaption": "301 students in progress",
-      "subModuleBreakdown": "Sub-module breakdown",
-      "topSectorsExplored": "Top sectors explored",
-      "startedLegend": "Started",
-      "completedLegend": "Completed",
+      "registeredStudents": "{{count}} ophunzira olembetsedwa",
+      "started": "Ayamba",
+      "completed": "Aamaliza",
+      "completedAll5": "Aamaliza zonse",
+      "returned2Plus": "Abwerera ka 2+",
+      "prioritySectors": "Ogwiritsa ntchito m'magawo ofunika",
+      "avgSubModulesCompleted": "Avereji ya ma sub-module amalizidwa",
+      "engagementFunnel": "Fanelo ya kutenga nawo mbali",
+      "subModuleBreakdown": "Kugawika kwa ma sub-module",
+      "topSectorsExplored": "Magawo ofufuzidwa kwambiri",
+      "startedLegend": "Ayamba",
+      "completedLegend": "Aamaliza",
       "sharingExperiences": "Kugawana zochitika",
       "identifyingSkills": "Kupeza maluso anu",
       "collectingPreferences": "Kusonkhetsa zomwe mumakonda",
@@ -226,11 +227,10 @@
     },
     "jobPostings": {
       "stats": {
-        "jobsSourced": "Jobs Sourced",
-        "sectorsCovered": "Sectors Covered",
-        "sourcePlatforms": "Source Platforms",
-        "lastUpdated": "Last updated 2 days ago",
-        "sourcePlatformsList": "GoZ Jobs, BrighterMonday, JobWeb, LinkedIn, Indeed"
+        "jobsSourced": "Ntchito zosonkhanitsidwa",
+        "sectorsCovered": "Magawo ophimbidwa",
+        "sourcePlatforms": "Mapulatifomu oyambira",
+        "lastUpdatedOn": "Yasinthidwa pa {{date}}"
       },
       "searchPlaceholder": "Search job titles...",
       "jobsCount": "{{count}} of {{total}} jobs",

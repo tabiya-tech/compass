@@ -101,6 +101,28 @@ const Dashboard: React.FC = () => {
   const [tab, setTab] = useState<DashboardTabValue>("institutions");
   const displayName = useMemo(() => UserStateService.getInstance().getUserName() ?? undefined, []);
 
+  const totalInstitutions = institutionNames.length;
+  const totalStudentsStat = stats.find((s) => s.id === "totalStudentsRegistered");
+  const hasRegisteredStudents = Number(totalStudentsStat?.value ?? 0) > 0;
+
+  const getStatSubtitle = (stat: (typeof stats)[number]) => {
+    if (!stat.subtitleKey) return undefined;
+
+    if (stat.id === "institutionsActive") {
+      return totalInstitutions > 0
+        ? t(stat.subtitleKey, { total: totalInstitutions })
+        : t("dashboard.stats.institutionsActiveSubtitleNoTotal");
+    }
+
+    if (stat.id === "activeStudents7Days") {
+      return hasRegisteredStudents && stat.subtitleValues
+        ? t(stat.subtitleKey, stat.subtitleValues)
+        : t("dashboard.stats.activeStudents7DaysSubtitleNoPct");
+    }
+
+    return t(stat.subtitleKey, stat.subtitleValues);
+  };
+
   const handleModuleFilterChange = (field: keyof typeof moduleFilters) => (event: SelectChangeEvent<string>) => {
     setModuleFilters((prev) => ({ ...prev, [field]: event.target.value }));
   };
@@ -167,11 +189,7 @@ const Dashboard: React.FC = () => {
                     size={{ xs: 12, md: 4 }}
                     data-testid={DATA_TEST_ID.DASHBOARD_STAT_CARD}
                   >
-                    <StatCard
-                      title={t(stat.titleKey)}
-                      value={stat.value}
-                      subtitle={stat.subtitleKey ? t(stat.subtitleKey) : undefined}
-                    />
+                    <StatCard title={t(stat.titleKey)} value={stat.value} subtitle={getStatSubtitle(stat)} />
                   </Grid>
                 ))}
           </Grid>

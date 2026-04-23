@@ -109,6 +109,7 @@ export function useModules(filters?: CareerReadinessFilters): UseModulesResult {
     const totalStudents = ceData.total_registered_students;
     const started = ceData.started.count;
     const returned = ceData.returned_2_plus.count;
+    const sectorUsersTotal = ceData.priority_sector_users + ceData.non_priority_sector_users;
 
     modules.push({
       id: "career-explorer",
@@ -132,7 +133,7 @@ export function useModules(filters?: CareerReadinessFilters): UseModulesResult {
         {
           labelKey: "dashboard.modules.prioritySectors",
           value: ceData.priority_sector_users,
-          total: 0,
+          total: sectorUsersTotal > 0 ? sectorUsersTotal : started,
           pct: 0,
           showBar: false,
         },

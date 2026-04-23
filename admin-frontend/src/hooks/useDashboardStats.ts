@@ -10,6 +10,11 @@ export interface UseDashboardStatsResult {
 }
 
 function mapResponseToStats(data: DashboardStats): DashboardStatItem[] {
+  const pctOfRegistered =
+    data.total_students > 0
+      ? Math.round((Number(data.active_students_7_days) / Number(data.total_students)) * 100)
+      : undefined;
+
   return [
     {
       id: "institutionsActive",
@@ -27,6 +32,7 @@ function mapResponseToStats(data: DashboardStats): DashboardStatItem[] {
       titleKey: "dashboard.stats.activeStudents7Days",
       value: data.active_students_7_days,
       subtitleKey: "dashboard.stats.activeStudents7DaysSubtitle",
+      subtitleValues: pctOfRegistered === undefined ? undefined : { pct: pctOfRegistered },
     },
   ];
 }

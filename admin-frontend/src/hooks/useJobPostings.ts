@@ -20,6 +20,7 @@ function mapToRow(doc: {
   application_url?: string;
   source_platform?: string;
   skills?: string[];
+  posted_date?: string;
 }): JobPostingRow {
   return {
     id: nextId(),
@@ -31,6 +32,7 @@ function mapToRow(doc: {
     skills: Array.isArray(doc.skills) ? doc.skills : [],
     candidatePool: 0,
     jobUrl: doc.application_url ?? "",
+    postedDate: doc.posted_date,
   };
 }
 

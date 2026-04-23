@@ -55,6 +55,32 @@ const JobPostings: React.FC = () => {
     return jobPostings.filter((row) => (row.platform ?? "").toLowerCase().includes(normalizedPlatform));
   }, [jobPostings, platformSearch]);
 
+  const sourcePlatformsList = useMemo(() => {
+    const uniquePlatforms = Array.from(
+      new Set(jobPostings.map((row) => (row.platform ?? "").trim()).filter(Boolean))
+    ).sort((a, b) => a.localeCompare(b));
+
+    if (uniquePlatforms.length === 0) {
+      return undefined;
+    }
+
+    return uniquePlatforms.map((platform) => capitalize(platform)).join(", ");
+  }, [jobPostings]);
+
+  const lastUpdatedSubtitle = useMemo(() => {
+    const latestTimestamp = Math.max(
+      ...jobPostings.map((row) => Date.parse(row.postedDate ?? "")).filter((timestamp) => Number.isFinite(timestamp)),
+      Number.NEGATIVE_INFINITY
+    );
+
+    if (!Number.isFinite(latestTimestamp)) {
+      return undefined;
+    }
+
+    const latestDate = new Date(latestTimestamp);
+    return t("dashboard.jobPostings.stats.lastUpdatedOn", { date: latestDate.toLocaleDateString() });
+  }, [jobPostings, t]);
+
   const columns: ColumnDef<JobPostingRow>[] = useMemo(
     () => [
       {
@@ -171,7 +197,7 @@ const JobPostings: React.FC = () => {
           <StatCard
             title={t("dashboard.jobPostings.stats.jobsSourced")}
             value={jobPostingStats.jobsSourced}
-            subtitle={t("dashboard.jobPostings.stats.lastUpdated")}
+            subtitle={lastUpdatedSubtitle}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
@@ -181,7 +207,7 @@ const JobPostings: React.FC = () => {
           <StatCard
             title={t("dashboard.jobPostings.stats.sourcePlatforms")}
             value={jobPostingStats.sourcePlatformsCount}
-            subtitle={t("dashboard.jobPostings.stats.sourcePlatformsList")}
+            subtitle={sourcePlatformsList}
           />
         </Grid>
       </Grid>

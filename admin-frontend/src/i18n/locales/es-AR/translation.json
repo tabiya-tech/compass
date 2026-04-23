@@ -141,17 +141,19 @@
       "clearSorting": "Quitar ordenación"
     },
     "dailyAdoptionTrend": {
-      "title": "Daily Adoption Trend",
+      "title": "Tendencia diaria de adopcion",
       "noData": "No hay datos disponibles",
-      "newRegistrations": "Nuevas Registraciones",
-      "dailyActiveUsers": "Usuarios Activos Diarios"
+      "newRegistrations": "Nuevos registros",
+      "dailyActiveUsers": "Usuarios activos diarios"
     },
     "stats": {
-      "institutionsActive": "Institutions Active",
-      "institutionsActiveSubtitle": "of 15 pilot institutions",
-      "totalStudentsRegistered": "Total Students Registered",
-      "activeStudents7Days": "Active Students (7 days)",
-      "activeStudents7DaysSubtitle": "68% of registered"
+      "institutionsActive": "Instituciones activas",
+      "institutionsActiveSubtitle": "de {{total}} instituciones piloto",
+      "institutionsActiveSubtitleNoTotal": "de instituciones piloto",
+      "totalStudentsRegistered": "Total de estudiantes registrados",
+      "activeStudents7Days": "Estudiantes activos (7 dias)",
+      "activeStudents7DaysSubtitle": "{{pct}}% de los registrados",
+      "activeStudents7DaysSubtitleNoPct": "de los registrados"
     },
     "modules": {
       "titles": {
@@ -159,19 +161,18 @@
         "careerReadiness": "Preparación profesional",
         "careerExplorer": "Rutas laborales"
       },
-      "registeredStudents": "{{count}} registered students",
-      "started": "Started",
-      "completed": "Completed",
-      "completedAll5": "Completed all 5",
-      "returned2Plus": "Returned 2+ times",
-      "prioritySectors": "Priority sector users",
-      "avgSubModulesCompleted": "Avg. sub-modules completed",
-      "engagementFunnel": "Engagement funnel",
-      "funnelCaption": "301 students in progress",
-      "subModuleBreakdown": "Sub-module breakdown",
-      "topSectorsExplored": "Top sectors explored",
-      "startedLegend": "Started",
-      "completedLegend": "Completed",
+      "registeredStudents": "{{count}} estudiantes registrados",
+      "started": "Iniciados",
+      "completed": "Completados",
+      "completedAll5": "Completaron todos los modulos",
+      "returned2Plus": "Regresaron 2+ veces",
+      "prioritySectors": "Usuarios de sectores prioritarios",
+      "avgSubModulesCompleted": "Prom. de submodulos completados",
+      "engagementFunnel": "Embudo de participacion",
+      "subModuleBreakdown": "Desglose por submodulo",
+      "topSectorsExplored": "Sectores mas explorados",
+      "startedLegend": "Iniciados",
+      "completedLegend": "Completados",
       "sharingExperiences": "Compartir experiencias",
       "identifyingSkills": "Identificación de habilidades",
       "collectingPreferences": "Recogida de preferencias",
@@ -226,11 +227,10 @@
     },
     "jobPostings": {
       "stats": {
-        "jobsSourced": "Empleos obtenidos",
+        "jobsSourced": "Empleos relevados",
         "sectorsCovered": "Sectores cubiertos",
         "sourcePlatforms": "Plataformas de origen",
-        "lastUpdated": "Actualizado hace 2 dias",
-        "sourcePlatformsList": "GoZ Jobs, BrighterMonday, JobWeb, LinkedIn, Indeed"
+        "lastUpdatedOn": "Actualizado el {{date}}"
       },
       "searchPlaceholder": "Buscar titulos de empleo...",
       "jobsCount": "{{count}} de {{total}} empleos",

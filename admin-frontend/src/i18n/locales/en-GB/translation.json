@@ -143,10 +143,12 @@
     },
     "stats": {
       "institutionsActive": "Institutions Active",
-      "institutionsActiveSubtitle": "of 15 pilot institutions",
+      "institutionsActiveSubtitle": "of {{total}} pilot institutions",
+      "institutionsActiveSubtitleNoTotal": "of pilot institutions",
       "totalStudentsRegistered": "Total Students Registered",
       "activeStudents7Days": "Active Students (7 days)",
-      "activeStudents7DaysSubtitle": "68% of registered"
+      "activeStudents7DaysSubtitle": "{{pct}}% of registered",
+      "activeStudents7DaysSubtitleNoPct": "of registered"
     },
     "modules": {
       "titles": {
@@ -157,12 +159,11 @@
       "registeredStudents": "{{count}} registered students",
       "started": "Started",
       "completed": "Completed",
-      "completedAll5": "Completed all 5",
+      "completedAll5": "Completed all modules",
       "returned2Plus": "Returned 2+ times",
       "prioritySectors": "Priority sector users",
       "avgSubModulesCompleted": "Avg. sub-modules completed",
       "engagementFunnel": "Engagement funnel",
-      "funnelCaption": "301 students in progress",
       "subModuleBreakdown": "Sub-module breakdown",
       "topSectorsExplored": "Top sectors explored",
       "startedLegend": "Started",
@@ -224,8 +225,7 @@
         "jobsSourced": "Jobs Sourced",
         "sectorsCovered": "Sectors Covered",
         "sourcePlatforms": "Source Platforms",
-        "lastUpdated": "Last updated 2 days ago",
-        "sourcePlatformsList": "GoZ Jobs, BrighterMonday, JobWeb, LinkedIn, Indeed"
+        "lastUpdatedOn": "Last updated {{date}}"
       },
       "searchPlaceholder": "Search job titles...",
       "jobsCount": "{{count}} of {{total}} jobs",

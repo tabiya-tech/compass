@@ -22,10 +22,11 @@ logger = logging.getLogger(__name__)
 
 async def _get_career_explorer_analytics_repository(
     career_explorer_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_career_explorer_db),
+    application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db),
     metrics_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_metrics_db),
     userdata_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_userdata_db),
 ) -> ICareerExplorerAnalyticsRepository:
-    return CareerExplorerAnalyticsRepository(career_explorer_db, metrics_db, userdata_db)
+    return CareerExplorerAnalyticsRepository(career_explorer_db, application_db, metrics_db, userdata_db)
 
 
 def add_career_explorer_analytics_routes(router: APIRouter, auth: Authentication) -> None:
