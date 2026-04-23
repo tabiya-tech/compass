@@ -3,6 +3,7 @@ import { useCareerReadinessStats } from "src/hooks/useCareerReadinessStats";
 import type { CareerReadinessFilters } from "src/hooks/useCareerReadinessStats";
 import { useSkillsDiscoveryStats } from "src/hooks/useSkillsDiscoveryStats";
 import { useCareerExplorerStats } from "src/hooks/useCareerExplorerStats";
+import { getModuleLabelKey } from "src/constants";
 
 export interface UseModulesResult {
   modules: ModuleData[];
@@ -96,7 +97,7 @@ export function useModules(filters?: CareerReadinessFilters): UseModulesResult {
       breakdownType: "subModules",
       breakdownTitleKey: "dashboard.modules.subModuleBreakdown",
       breakdownItems: crData.module_breakdown.map((m) => ({
-        labelKey: m.module_title,
+        labelKey: getModuleLabelKey(m.module_id) ?? m.module_title,
         value: m.completed_count,
         total: m.started_count,
       })),

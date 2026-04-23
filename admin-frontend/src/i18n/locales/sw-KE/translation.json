@@ -123,7 +123,7 @@
     "termsOfUse": "Terms of Use",
     "accessibility": "Accessibility",
     "contact": "Contact",
-    "collaboration": "{{appName}} is a collaboration between the World Bank Group and Tabiya."
+    "collaboration": "{{appName}} ni zana ya bure ya kuelekeza kazi iliyojengwa kwa ushirikiano kati ya Kundi la Benki ya Dunia na Tabiya."
   },
   "dashboard": {
     "sectionTitle": "Administrator dashboard — cross-institutional monitoring and analytics",
@@ -155,9 +155,9 @@
     },
     "modules": {
       "titles": {
-        "skillsDiscovery": "Skills Discovery",
-        "careerReadiness": "Career Readiness",
-        "careerExplorer": "Career Explorer"
+        "skillsDiscovery": "Jenga wasifu wako",
+        "careerReadiness": "Kujiandaa kwa Kazi",
+        "careerExplorer": "Njia za kazi"
       },
       "registeredStudents": "{{count}} registered students",
       "started": "Started",
@@ -172,14 +172,15 @@
       "topSectorsExplored": "Top sectors explored",
       "startedLegend": "Started",
       "completedLegend": "Completed",
-      "sharingExperiences": "Sharing Experiences",
-      "identifyingSkills": "Identifying Skills",
-      "collectingPreferences": "Collecting Preferences",
-      "professionalIdentity": "Professional Identity",
-      "cvDevelopment": "CV Development",
-      "coverLetterMotivation": "Cover Letter & Motivation",
-      "interviewPreparation": "Interview Preparation",
-      "workplaceReadiness": "Workplace Readiness",
+      "sharingExperiences": "Kushiriki uzoefu",
+      "identifyingSkills": "Kutambua ujuzi",
+      "collectingPreferences": "Kukusanya mapendeleo",
+      "professionalIdentity": "Wewe ni nani kama mtaalamu",
+      "cvDevelopment": "Kutengeneza CV yako",
+      "coverLetterMotivation": "Barua za maombi na kauli za motisha",
+      "interviewPreparation": "Maandalizi ya mahojiano",
+      "workplaceReadiness": "Utayari wa mahali pa kazi",
+      "entrepreneurship": "Ujasiriamali na biashara",
       "sectors": {
         "ict": "ICT",
         "mining": "Mining",
@@ -272,9 +273,9 @@
         "institution": "Institution",
         "students": "Students",
         "active7Days": "Active (7D)",
-        "skillsDiscovery": "Skills Discovery",
-        "careerReadiness": "Career Readiness",
-        "careerExplorer": "Career Explorer"
+        "skillsDiscovery": "Jenga wasifu wako",
+        "careerReadiness": "Kujiandaa kwa Kazi",
+        "careerExplorer": "Njia za kazi"
       },
       "subHeaders": {
         "started": "Started",
@@ -300,7 +301,7 @@
     "tabs": {
       "ariaLabel": "Instructor dashboard tabs",
       "students": "Students",
-      "modules": "Modules",
+      "modules": "Kituo Chako cha Kazi",
       "skillsAnalytics": "Skills Analytics"
     },
     "stats": {
@@ -320,8 +321,8 @@
         "gender": "Gender",
         "profileStrength": "Profile Strength",
         "modulesExplored": "Modules Explored",
-        "careerReady": "Career Readiness",
-        "skillsInterestsExplored": "Skills & Interests Explored",
+        "careerReady": "Kujiandaa kwa Kazi",
+        "skillsInterestsExplored": "Jenga wasifu wako",
         "prioritySectorsExplored": "Priority Sectors Explored",
         "lastLogin": "Last Login",
         "lastActiveModule": "Last Active Module"

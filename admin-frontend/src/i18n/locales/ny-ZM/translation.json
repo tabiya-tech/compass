@@ -123,7 +123,7 @@
     "termsOfUse": "Terms of Use",
     "accessibility": "Accessibility",
     "contact": "Contact",
-    "collaboration": "{{appName}} is a collaboration between the World Bank Group and Tabiya."
+    "collaboration": "{{appName}} ndi chida chaulere chothandiza ndi malangizo a ntchito chimene chinapangidwa m'magwirizano pakati pa World Bank Group ndi Tabiya."
   },
   "dashboard": {
     "sectionTitle": "Administrator dashboard — cross-institutional monitoring and analytics",
@@ -155,9 +155,9 @@
     },
     "modules": {
       "titles": {
-        "skillsDiscovery": "Skills Discovery",
-        "careerReadiness": "Career Readiness",
-        "careerExplorer": "Career Explorer"
+        "skillsDiscovery": "Pangani mbiri yanu",
+        "careerReadiness": "Kukonzekera Ntchito",
+        "careerExplorer": "Njira za ntchito"
       },
       "registeredStudents": "{{count}} registered students",
       "started": "Started",
@@ -172,14 +172,15 @@
       "topSectorsExplored": "Top sectors explored",
       "startedLegend": "Started",
       "completedLegend": "Completed",
-      "sharingExperiences": "Sharing Experiences",
-      "identifyingSkills": "Identifying Skills",
-      "collectingPreferences": "Collecting Preferences",
-      "professionalIdentity": "Professional Identity",
-      "cvDevelopment": "CV Development",
-      "coverLetterMotivation": "Cover Letter & Motivation",
-      "interviewPreparation": "Interview Preparation",
-      "workplaceReadiness": "Workplace Readiness",
+      "sharingExperiences": "Kugawana zochitika",
+      "identifyingSkills": "Kupeza maluso anu",
+      "collectingPreferences": "Kusonkhetsa zomwe mumakonda",
+      "professionalIdentity": "Inu muli ndani monga katswiri",
+      "cvDevelopment": "Kupanga CV yanu",
+      "coverLetterMotivation": "Makalata oyambira ndi mawu olimbikitsa",
+      "interviewPreparation": "Kukonzekera mafunso antchito",
+      "workplaceReadiness": "Kukonzekera malo a ntchito",
+      "entrepreneurship": "Kudzitangira ntchito ndi bizinesi",
       "sectors": {
         "ict": "ICT",
         "mining": "Mining",
@@ -272,7 +273,7 @@
         "institution": "Institution",
         "students": "Students",
         "active7Days": "Active (7D)",
-        "skillsDiscovery": "Skills Discovery",
+        "skillsDiscovery": "Pangani mbiri yanu",
         "careerReadiness": "Career Readiness",
         "careerExplorer": "Career Explorer"
       },
@@ -300,7 +301,7 @@
     "tabs": {
       "ariaLabel": "Instructor dashboard tabs",
       "students": "Students",
-      "modules": "Modules",
+      "modules": "Malo Anu a Ntchito",
       "skillsAnalytics": "Skills Analytics"
     },
     "stats": {
@@ -320,8 +321,8 @@
         "gender": "Gender",
         "profileStrength": "Profile Strength",
         "modulesExplored": "Modules Explored",
-        "careerReady": "Career Readiness",
-        "skillsInterestsExplored": "Skills & Interests Explored",
+        "careerReady": "Kukonzekera Ntchito",
+        "skillsInterestsExplored": "Pangani mbiri yanu",
         "prioritySectorsExplored": "Priority Sectors Explored",
         "lastLogin": "Last Login",
         "lastActiveModule": "Last Active Module"

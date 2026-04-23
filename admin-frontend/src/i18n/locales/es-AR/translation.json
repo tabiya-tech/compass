@@ -123,7 +123,7 @@
     "termsOfUse": "Terms of Use",
     "accessibility": "Accessibility",
     "contact": "Contact",
-    "collaboration": "{{appName}} is a collaboration between the World Bank Group and Tabiya."
+    "collaboration": "{{appName}} es una herramienta gratuita de orientación profesional desarrollada en colaboración entre el Grupo del Banco Mundial y Tabiya."
   },
   "dashboard": {
     "sectionTitle": "Administrator dashboard — cross-institutional monitoring and analytics",
@@ -155,9 +155,9 @@
     },
     "modules": {
       "titles": {
-        "skillsDiscovery": "Skills Discovery",
-        "careerReadiness": "Career Readiness",
-        "careerExplorer": "Career Explorer"
+        "skillsDiscovery": "Construí tu perfil",
+        "careerReadiness": "Preparación profesional",
+        "careerExplorer": "Rutas laborales"
       },
       "registeredStudents": "{{count}} registered students",
       "started": "Started",
@@ -172,14 +172,15 @@
       "topSectorsExplored": "Top sectors explored",
       "startedLegend": "Started",
       "completedLegend": "Completed",
-      "sharingExperiences": "Sharing Experiences",
-      "identifyingSkills": "Identifying Skills",
-      "collectingPreferences": "Collecting Preferences",
-      "professionalIdentity": "Professional Identity",
-      "cvDevelopment": "CV Development",
-      "coverLetterMotivation": "Cover Letter & Motivation",
-      "interviewPreparation": "Interview Preparation",
-      "workplaceReadiness": "Workplace Readiness",
+      "sharingExperiences": "Compartir experiencias",
+      "identifyingSkills": "Identificación de habilidades",
+      "collectingPreferences": "Recogida de preferencias",
+      "professionalIdentity": "Quién sos como profesional",
+      "cvDevelopment": "Armado de tu CV",
+      "coverLetterMotivation": "Cartas de presentación y cartas de motivación",
+      "interviewPreparation": "Preparación para entrevistas",
+      "workplaceReadiness": "Preparación para el mundo laboral",
+      "entrepreneurship": "Emprendedurismo y empresa",
       "sectors": {
         "ict": "ICT",
         "mining": "Mining",
@@ -272,9 +273,9 @@
         "institution": "Institution",
         "students": "Students",
         "active7Days": "Active (7D)",
-        "skillsDiscovery": "Skills Discovery",
-        "careerReadiness": "Career Readiness",
-        "careerExplorer": "Career Explorer"
+        "skillsDiscovery": "Construí tu perfil",
+        "careerReadiness": "Preparación profesional",
+        "careerExplorer": "Rutas laborales"
       },
       "subHeaders": {
         "started": "Started",
@@ -300,7 +301,7 @@
     "tabs": {
       "ariaLabel": "Instructor dashboard tabs",
       "students": "Students",
-      "modules": "Modules",
+      "modules": "Tu Centro de Carrera",
       "skillsAnalytics": "Skills Analytics"
     },
     "stats": {
@@ -320,8 +321,8 @@
         "gender": "Gender",
         "profileStrength": "Profile Strength",
         "modulesExplored": "Modules Explored",
-        "careerReady": "Career Readiness",
-        "skillsInterestsExplored": "Skills & Interests Explored",
+        "careerReady": "Preparación profesional",
+        "skillsInterestsExplored": "Construí tu perfil",
         "prioritySectorsExplored": "Priority Sectors Explored",
         "lastLogin": "Last Login",
         "lastActiveModule": "Last Active Module"

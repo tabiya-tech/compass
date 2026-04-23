@@ -2,7 +2,7 @@ import React from "react";
 import { Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useTranslation } from "react-i18next";
-import { getModuleLabel } from "src/constants";
+import { getModuleLabelKey, PLACEHOLDER_SYMBOL } from "src/constants";
 import { useInstructorStudentsTableState, type StudentsSortKey } from "src/hooks/useInstructorStudentsTableState";
 import type { InstructorStudentRow } from "src/types";
 import DataTable, { type ColumnDef } from "src/components/DataTable/DataTable";
@@ -64,6 +64,11 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
   });
 
   const allLabel = t("instructorDashboard.studentsTable.filters.all");
+
+  const formatModuleLabel = (moduleId: string) => {
+    const key = getModuleLabelKey(moduleId);
+    return key ? t(key) : PLACEHOLDER_SYMBOL;
+  };
 
   const columns: ColumnDef<InstructorStudentRow>[] = [
     {
@@ -157,13 +162,13 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
       filter: {
         options: modules.map((m) => ({
           value: m,
-          label: m === "all" ? allLabel : getModuleLabel(m),
+          label: m === "all" ? allLabel : formatModuleLabel(m),
         })),
         value: lastModuleFilter,
         onChange: setLastModuleFilter,
       },
       render: (val, row) => {
-        const label = getModuleLabel(row.lastActiveModuleId);
+        const label = formatModuleLabel(row.lastActiveModuleId);
         return (
           <Typography variant="body2" noWrap title={label} sx={{ textAlign: "center", width: "100%" }}>
             {label}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CAREER_MODULE_LABELS, PLACEHOLDER_SYMBOL } from "src/constants";
+import { MODULE_ID_TO_I18N_KEY, PLACEHOLDER_SYMBOL } from "src/constants";
 import { MODULE_FILTER_PROGRAMMES } from "src/data/moduleFilterOptions";
 import { lastLoginDisplayMatchesFilter } from "src/hooks/instructorStudentsLastLoginFilter";
 import type { InstructorStudentRow } from "src/types";
@@ -103,7 +103,7 @@ export function useInstructorStudentsTableState(
   }, [rows]);
 
   const modules = useMemo(() => {
-    const knownModuleIds = Object.keys(CAREER_MODULE_LABELS);
+    const knownModuleIds = Object.keys(MODULE_ID_TO_I18N_KEY);
     const dynamic = Array.from(
       new Set(rows.map((r) => r.lastActiveModuleId).filter((moduleId) => moduleId !== PLACEHOLDER_SYMBOL))
     );

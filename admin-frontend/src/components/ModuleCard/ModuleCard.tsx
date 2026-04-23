@@ -276,13 +276,20 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
           {module.breakdownType === "topSectors" && (
             <Box
               display="grid"
-              gridTemplateColumns="120px 1fr 40px"
+              gridTemplateColumns="minmax(120px, 1fr) minmax(0, 2fr) 40px"
               gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
               alignItems="center"
             >
               {module.breakdownItems.map((item) => (
                 <React.Fragment key={item.labelKey}>
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{
+                      whiteSpace: "normal",
+                      wordBreak: "break-word",
+                    }}
+                  >
                     {t(item.labelKey)}
                   </Typography>
                   <LinearProgress

@@ -119,7 +119,7 @@
     "termsOfUse": "Terms of Use",
     "accessibility": "Accessibility",
     "contact": "Contact",
-    "collaboration": "{{appName}} is a collaboration between the World Bank Group and Tabiya."
+    "collaboration": "{{appName}} is a free career guidance tool built in partnership between the World Bank Group and Tabiya."
   },
   "dashboard": {
     "sectionTitle": "Administrator dashboard — cross-institutional monitoring and analytics",
@@ -151,9 +151,9 @@
     },
     "modules": {
       "titles": {
-        "skillsDiscovery": "Skills Discovery",
-        "careerReadiness": "Career Readiness",
-        "careerExplorer": "Career Explorer"
+        "skillsDiscovery": "Build your profile",
+        "careerReadiness": "Get Job Ready",
+        "careerExplorer": "Career Paths"
       },
       "registeredStudents": "{{count}} registered students",
       "started": "Started",
@@ -171,11 +171,12 @@
       "sharingExperiences": "Sharing Experiences",
       "identifyingSkills": "Identifying Skills",
       "collectingPreferences": "Collecting Preferences",
-      "professionalIdentity": "Professional Identity",
-      "cvDevelopment": "CV Development",
-      "coverLetterMotivation": "Cover Letter & Motivation",
+      "professionalIdentity": "Who You Are as a Professional",
+      "cvDevelopment": "Building Your CV",
+      "coverLetterMotivation": "Cover Letters & Motivation Statements",
       "interviewPreparation": "Interview Preparation",
       "workplaceReadiness": "Workplace Readiness",
+      "entrepreneurship": "Entrepreneurship & Enterprise",
       "sectors": {
         "ict": "ICT",
         "mining": "Mining",
@@ -268,9 +269,9 @@
         "institution": "Institution",
         "students": "Students",
         "active7Days": "Active (7D)",
-        "skillsDiscovery": "Skills Discovery",
-        "careerReadiness": "Career Readiness",
-        "careerExplorer": "Career Explorer"
+        "skillsDiscovery": "Build your profile",
+        "careerReadiness": "Get Job Ready",
+        "careerExplorer": "Career Paths"
       },
       "subHeaders": {
         "started": "Started",
@@ -315,8 +316,8 @@
         "gender": "Gender",
         "profileStrength": "Profile Strength",
         "modulesExplored": "Modules Explored",
-        "careerReady": "Career Readiness",
-        "skillsInterestsExplored": "Skills & Interests Explored",
+        "careerReady": "Get Job Ready",
+        "skillsInterestsExplored": "Build your profile",
         "prioritySectorsExplored": "Priority Sectors Explored",
         "lastLogin": "Last Login",
         "lastActiveModule": "Last Active Module"

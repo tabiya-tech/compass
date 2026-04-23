@@ -1,17 +1,21 @@
 export const PLACEHOLDER_SYMBOL = "—";
 
-export const isPlaceholderValue = (value: string | number | null | undefined): boolean => value === PLACEHOLDER_SYMBOL;
-
-export const CAREER_MODULE_LABELS = {
-  "professional-identity": "Professional Identity",
-  "cv-development": "CV Development",
-  "interview-preparation": "Interview Preparation",
-  "workplace-readiness": "Workplace Readiness",
-  "skills-discovery": "Skills Discovery",
-  "career-explorer": "Career Explorer",
+/**
+ * Maps backend `module_id` / last-active module slugs to i18n keys.
+ */
+export const MODULE_ID_TO_I18N_KEY = {
+  "skills-discovery": "dashboard.modules.titles.skillsDiscovery",
+  "career-explorer": "dashboard.modules.titles.careerExplorer",
+  "professional-identity": "dashboard.modules.professionalIdentity",
+  "cv-development": "dashboard.modules.cvDevelopment",
+  "cover-letter": "dashboard.modules.coverLetterMotivation",
+  "interview-preparation": "dashboard.modules.interviewPreparation",
+  "workplace-readiness": "dashboard.modules.workplaceReadiness",
+  entrepreneurship: "dashboard.modules.entrepreneurship",
 } as const;
 
-export type CareerModuleId = keyof typeof CAREER_MODULE_LABELS;
-
-export const getModuleLabel = (moduleId: string | null | undefined): string =>
-  moduleId && moduleId in CAREER_MODULE_LABELS ? CAREER_MODULE_LABELS[moduleId as CareerModuleId] : PLACEHOLDER_SYMBOL;
+/** Translation key for `t()`, or `null` when unknown / empty / placeholder. */
+export const getModuleLabelKey = (moduleId: string | null | undefined): string | null => {
+  if (!moduleId || moduleId === PLACEHOLDER_SYMBOL) return null;
+  return (MODULE_ID_TO_I18N_KEY as Record<string, string>)[moduleId] ?? null;
+};
