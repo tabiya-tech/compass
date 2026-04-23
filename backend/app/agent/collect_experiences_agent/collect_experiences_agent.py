@@ -220,6 +220,59 @@ class CollectExperiencesAgent(Agent):
             if normalized_title:
                 elem.normalized_experience_title = normalized_title
 
+    def _prune_stale_orphan_experiences(
+        self,
+        *,
+        last_referenced_experience_index: int,
+        current_turn_count: int,
+    ) -> int:
+        """
+        Remove titleless experiences that were created in a previous turn.
+
+        Such entries are data-extraction artifacts (a fleeting mention that never got
+        named, or a phantom left behind because a later ADD created a sibling instead
+        of updating it). They cannot be meaningfully completed and would otherwise
+        block work-type transitions via _find_incomplete_required_for_work_type.
+
+        Fresh titleless entries (defined_at_turn_number >= current turn count) are
+        preserved so the conversation LLM can ask for a title in its response.
+
+        Returns the (possibly re-mapped) last_referenced_experience_index.
+        """
+        collected_data = self._state.collected_data
+
+        def _is_keepable(exp: CollectedData) -> bool:
+            if exp.experience_title and exp.experience_title.strip():
+                return True
+            if exp.defined_at_turn_number is not None and exp.defined_at_turn_number >= current_turn_count:
+                return True
+            return False
+
+        if all(_is_keepable(exp) for exp in collected_data):
+            return last_referenced_experience_index
+
+        last_ref_uuid = (
+            collected_data[last_referenced_experience_index].uuid
+            if 0 <= last_referenced_experience_index < len(collected_data)
+            else None
+        )
+        pruned_count = sum(1 for exp in collected_data if not _is_keepable(exp))
+        kept = [exp for exp in collected_data if _is_keepable(exp)]
+        for new_idx, exp in enumerate(kept):
+            exp.index = new_idx
+        self._state.collected_data = kept
+        self.logger.info(
+            "Pruned %d stale orphan experience(s) without titles (current turn count=%d).",
+            pruned_count, current_turn_count,
+        )
+
+        if last_ref_uuid is None:
+            return -1
+        for i, exp in enumerate(kept):
+            if exp.uuid == last_ref_uuid:
+                return i
+        return -1
+
     def set_state(self, state: CollectExperiencesAgentState):
         """
         Set the state of the agent.
@@ -247,6 +300,19 @@ class CollectExperiencesAgent(Agent):
             last_referenced_experience_index, data_extraction_llm_stats = await data_extraction_llm.execute(user_input=user_input,
                                                                                                             context=context,
                                                                                                             collected_experience_data_so_far=collected_data)
+        # Prune stale orphan experiences — titleless entries defined in a previous turn.
+        # Without this, a phantom (created when the user first mentions an experience but
+        # never gets a title assigned — e.g. because a later ADD created a sibling entry
+        # instead of updating it) traps TransitionDecisionTool in perpetual CONTINUE,
+        # because _find_incomplete_required_for_work_type treats missing titles as a
+        # blocker. Fresh titleless entries from this turn are kept — the conversation LLM
+        # is presumed to be asking for the title right now.
+        last_referenced_experience_index = self._prune_stale_orphan_experiences(
+            last_referenced_experience_index=last_referenced_experience_index,
+            current_turn_count=len(context.all_history.turns),
+        )
+        collected_data = self._state.collected_data
+
         await self._normalize_experience_titles(collected_data=collected_data)
         # TODO: Keep track of the last_referenced_experience_index and if it has changed it means that the user has
         #   provided a new experience, we need to handle this as
