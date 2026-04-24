@@ -156,6 +156,38 @@ const refreshToken = async (
   }
 };
 
+// Concurrent 401s share a single getIdToken(true) RPC via this slot; cleared when the refresh settles.
+let pendingRefreshPromise: Promise<string> | null = null;
+
+/*
+ * Test-only: reset the shared in-flight slot so one test's deduped refresh does not bleed into the next.
+ * */
+export const __resetPendingRefreshPromiseForTests = (): void => {
+  pendingRefreshPromise = null;
+};
+
+/*
+ * Deduplicated wrapper around refreshToken: parallel 401s await a single in-flight RPC
+ * instead of each triggering their own.
+ * */
+const sharedRefreshToken = (
+  attempt: number,
+  serviceName: string,
+  serviceFunction: string,
+  failureMessage: string,
+  errorFactory: RestAPIErrorFactory
+): Promise<string> => {
+  if (pendingRefreshPromise) {
+    return pendingRefreshPromise;
+  }
+  pendingRefreshPromise = refreshToken(attempt, serviceName, serviceFunction, failureMessage, errorFactory).finally(
+    () => {
+      pendingRefreshPromise = null;
+    }
+  );
+  return pendingRefreshPromise;
+};
+
 /*
  * Check if the token is valid before making the request.
  * If the token is otherwise valid, but expired or about to be expired, try to refresh it.
@@ -247,6 +279,10 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
   // Collect retry warnings instead of logging each one individually
   const attemptErrors: Error[] = [];
 
+  // Bounds the post-401 recovery path to exactly one refresh + one retry per fetch,
+  // so a persistent 401 (e.g. a true authorization failure) cannot loop.
+  let hasRefreshedThisFetch = false;
+
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     let token = authRequired ? AuthenticationStateService.getInstance().getToken() : null;
 
@@ -259,7 +295,8 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
       } catch (e) {
         if ((e as TokenError).message === TokenValidationFailureCause.TOKEN_EXPIRED) {
           // If the token is expired, try to refresh it.
-          token = await refreshToken(attempt, serviceName, serviceFunction, failureMessage, errorFactory);
+          token = await sharedRefreshToken(attempt, serviceName, serviceFunction, failureMessage, errorFactory);
+          hasRefreshedThisFetch = true;
           // After refreshing the token continue to the request
         } else {
           // if checking token fails for any other reason, do nothing and let the error be thrown.
@@ -404,22 +441,13 @@ export const customFetch = async (apiUrl: string, init: ExtendedRequestInit = de
       }
 
       return response;
-    } else if (authRequired && response.status === StatusCodes.UNAUTHORIZED) {
-      try {
-        await checkToken(token, attempt, serviceName, serviceFunction, errorFactory);
-        // If the token is valid, but the response is still 401 Unauthorized,
-        // it means that the 401 isnt about the token, but about the user not being authorized to access the resource.
-        // do nothing and let the error be thrown.
-      } catch (e) {
-        if ((e as TokenError).message === TokenValidationFailureCause.TOKEN_EXPIRED) {
-          // If the token is expired, try to refresh it.
-          await refreshToken(attempt, serviceName, serviceFunction, failureMessage, errorFactory);
-          // After refreshing the token, retry the request.
-          continue;
-        } else {
-          // if checking token fails for any other reason, do nothing and let the error be thrown.
-        }
-      }
+    } else if (authRequired && response.status === StatusCodes.UNAUTHORIZED && !hasRefreshedThisFetch) {
+      // Server is authoritative on token validity: refresh and retry on any 401 regardless
+      // of what the local-clock check would say. A second 401 after the retry falls through
+      // to the generic error path below — at that point it is authorization, not authentication.
+      hasRefreshedThisFetch = true;
+      await sharedRefreshToken(attempt, serviceName, serviceFunction, failureMessage, errorFactory);
+      continue;
     } else if (combinedRetriableStatusCodes.includes(response.status)) {
       // Instead of logging immediately, add to grouped attemptErrors
       const error = new CustomFetchError(

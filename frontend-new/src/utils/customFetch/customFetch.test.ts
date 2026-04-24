@@ -8,6 +8,7 @@ import {
   MAX_ATTEMPTS,
   MIN_TOKEN_VALIDITY_SECONDS,
   RETRY_STATUS_CODES,
+  __resetPendingRefreshPromiseForTests,
 } from "./customFetch";
 import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
@@ -63,6 +64,7 @@ describe("Api Service tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     resetAllMethodMocks(AuthenticationStateService.getInstance());
+    __resetPendingRefreshPromiseForTests();
   });
 
   test("fetchWithAuth should add Authorization header when authToken is present", async () => {
@@ -783,52 +785,70 @@ describe("Api Service tests", () => {
       expect(response.status).toBe(StatusCodes.OK);
     });
 
-    test("should not refresh token when receiving 401 with valid token", async () => {
-      // GIVEN an API URL and a valid token
+    test("should refresh token when receiving 401 even when local token looks valid", async () => {
+      // GIVEN an API URL and a token that looks locally valid (e.g. clock skew or exp-boundary race)
       const givenApiUrl = "givenAPIUrl";
-      const givenToken = "validToken";
+      const givenToken = "locallyValidButServerRejectedToken";
+      const givenNewToken = "newToken";
       const givenServiceName = "Some service";
       const givenServiceFunction = "Some function";
       const givenMethod = "GET";
       const givenFailureMessage = "fetchWithAuth failed";
 
-      // AND the auth token is set
-      jest.spyOn(AuthenticationStateService.getInstance(), "getToken").mockReturnValueOnce(givenToken);
+      // AND the auth token is initially set and then gets refreshed
+      jest
+        .spyOn(AuthenticationStateService.getInstance(), "getToken")
+        .mockReturnValueOnce(givenToken)
+        .mockReturnValueOnce(givenNewToken)
+        .mockReturnValueOnce(givenNewToken);
 
-      // AND the auth service factory is mocked to return a service that validates tokens
+      // AND the auth service always reports the local token as valid —
+      // simulating the clock-skew / exp-boundary race scenario where the server
+      // disagrees with the client's local expiry math.
       const mockAuthService = {
         isTokenValid: jest.fn().mockReturnValue({
-          decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // valid
+          isValid: true,
+          decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 }, // locally valid
           failureCause: null,
         }),
-        refreshToken: jest.fn(),
+        refreshToken: jest.fn().mockResolvedValue(undefined),
+        isProviderSessionValid: jest.fn().mockResolvedValue(true),
       };
       (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
 
-      // AND the server responds with 401
-      setupFetchSpy(StatusCodes.UNAUTHORIZED, "Unauthorized", "application/json;charset=UTF-8");
+      // AND the server first responds with 401, then with StatusCodes.OK after the refresh
+      const mockFetch = jest
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(new Response("Unauthorized", { status: StatusCodes.UNAUTHORIZED }))
+        .mockResolvedValueOnce(new Response("Success", { status: StatusCodes.OK }));
 
       // WHEN fetchWithAuth is called
-      let error: Error | undefined;
-      try {
-        await customFetch(givenApiUrl, {
-          expectedStatusCode: StatusCodes.OK,
-          serviceName: givenServiceName,
-          serviceFunction: givenServiceFunction,
-          method: givenMethod,
-          failureMessage: givenFailureMessage,
-          authRequired: true,
-        });
-      } catch (e) {
-        error = e as Error;
-      }
+      const response = await customFetch(givenApiUrl, {
+        expectedStatusCode: StatusCodes.OK,
+        serviceName: givenServiceName,
+        serviceFunction: givenServiceFunction,
+        method: givenMethod,
+        failureMessage: givenFailureMessage,
+        authRequired: true,
+      });
 
-      // THEN the token should not be refreshed
-      expect(mockAuthService.refreshToken).not.toHaveBeenCalled();
-      // AND an error should be thrown
-      expect(error).toBeDefined();
-      expect(error).toBeInstanceOf(RestAPIError);
-      expect(error?.message).toBe(`RestAPIError: ${givenFailureMessage}`);
+      // THEN the token should be refreshed (the server's 401 overrides the local-clock check)
+      expect(mockAuthService.refreshToken).toHaveBeenCalledTimes(1);
+      // AND the request should be retried with the new token
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        2,
+        givenApiUrl,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            map: expect.objectContaining({
+              authorization: `Bearer ${givenNewToken}`,
+            }),
+          }),
+        })
+      );
+      // AND the response should be successful
+      expect(response.status).toBe(StatusCodes.OK);
     });
 
     test("it should log the user out, if the token has expired and no provider session available", async () => {
@@ -896,6 +916,134 @@ describe("Api Service tests", () => {
 
       // AND the user should be redirected to the login page.
       expect(window.location.hash).toBe(`#${routerPaths.LOGIN}`);
+    });
+
+    test("should refresh at most once per customFetch call when 401 persists after refresh", async () => {
+      // GIVEN an API URL and a token that looks locally valid
+      const givenApiUrl = "givenAPIUrl";
+      const givenToken = "locallyValidToken";
+      const givenNewToken = "newToken";
+      const givenServiceName = "Some service";
+      const givenServiceFunction = "Some function";
+      const givenMethod = "GET";
+      const givenFailureMessage = "fetchWithAuth failed";
+
+      // AND the auth token is retrievable before and after refresh
+      jest
+        .spyOn(AuthenticationStateService.getInstance(), "getToken")
+        .mockReturnValueOnce(givenToken)
+        .mockReturnValueOnce(givenNewToken)
+        .mockReturnValueOnce(givenNewToken);
+
+      // AND the auth service reports the local token as valid on every check —
+      // so the local-clock guard would never trigger a refresh on its own.
+      const mockAuthService = {
+        isTokenValid: jest.fn().mockReturnValue({
+          isValid: true,
+          decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 },
+          failureCause: null,
+        }),
+        refreshToken: jest.fn().mockResolvedValue(undefined),
+        isProviderSessionValid: jest.fn().mockResolvedValue(true),
+      };
+      (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
+
+      // AND the server returns 401 on both the initial request and the retry
+      const mockFetch = jest
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(new Response("Unauthorized", { status: StatusCodes.UNAUTHORIZED }))
+        .mockResolvedValueOnce(new Response("Unauthorized", { status: StatusCodes.UNAUTHORIZED }));
+
+      // WHEN fetchWithAuth is called
+      let actualError: Error | undefined;
+      try {
+        await customFetch(givenApiUrl, {
+          expectedStatusCode: StatusCodes.OK,
+          serviceName: givenServiceName,
+          serviceFunction: givenServiceFunction,
+          method: givenMethod,
+          failureMessage: givenFailureMessage,
+          authRequired: true,
+        });
+      } catch (e) {
+        actualError = e as Error;
+      }
+
+      // THEN the token should be refreshed exactly once (not repeatedly on the second 401)
+      expect(mockAuthService.refreshToken).toHaveBeenCalledTimes(1);
+      // AND the request should have been attempted exactly twice (initial + one retry)
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      // AND the second 401 should fall through to the generic RestAPIError
+      expect(actualError).toBeInstanceOf(RestAPIError);
+      expect(actualError).toHaveProperty("statusCode", StatusCodes.UNAUTHORIZED);
+    });
+
+    test("should dedupe concurrent refresh calls across parallel fetches", async () => {
+      // GIVEN three API URLs that will all receive 401 on their first attempt
+      const givenApiUrls = ["givenAPIUrl1", "givenAPIUrl2", "givenAPIUrl3"];
+      const givenToken = "locallyValidToken";
+      const givenNewToken = "newToken";
+      const givenServiceName = "Some service";
+      const givenServiceFunction = "Some function";
+      const givenMethod = "GET";
+      const givenFailureMessage = "fetchWithAuth failed";
+
+      // AND getToken returns the old token for the initial attempt of each fetch,
+      // then the refreshed token for subsequent reads.
+      jest
+        .spyOn(AuthenticationStateService.getInstance(), "getToken")
+        .mockReturnValue(givenToken)
+        .mockReturnValueOnce(givenToken)
+        .mockReturnValueOnce(givenToken)
+        .mockReturnValueOnce(givenToken)
+        .mockReturnValue(givenNewToken);
+
+      // AND the auth service reports the local token as valid on every check —
+      // so the refresh is triggered purely by the server's 401 response.
+      const mockAuthService = {
+        isTokenValid: jest.fn().mockReturnValue({
+          isValid: true,
+          decodedToken: { exp: Math.floor(Date.now() / 1000) + 3600 },
+          failureCause: null,
+        }),
+        // Use a deferred resolve so all three fetches observe the in-flight promise
+        // before it settles, proving the dedupe path is being exercised.
+        refreshToken: jest.fn().mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 10))),
+        isProviderSessionValid: jest.fn().mockResolvedValue(true),
+      };
+      (AuthenticationServiceFactory.getCurrentAuthenticationService as jest.Mock).mockReturnValue(mockAuthService);
+
+      // AND the server returns 401 on the first attempt of each URL, then 200 on the retry
+      jest
+        .spyOn(global, "fetch")
+        .mockResolvedValueOnce(new Response("Unauthorized", { status: StatusCodes.UNAUTHORIZED }))
+        .mockResolvedValueOnce(new Response("Unauthorized", { status: StatusCodes.UNAUTHORIZED }))
+        .mockResolvedValueOnce(new Response("Unauthorized", { status: StatusCodes.UNAUTHORIZED }))
+        .mockResolvedValueOnce(new Response("Success", { status: StatusCodes.OK }))
+        .mockResolvedValueOnce(new Response("Success", { status: StatusCodes.OK }))
+        .mockResolvedValueOnce(new Response("Success", { status: StatusCodes.OK }));
+
+      // WHEN the three customFetch calls are fired in parallel
+      const actualResponses = await Promise.all(
+        givenApiUrls.map((url) =>
+          customFetch(url, {
+            expectedStatusCode: StatusCodes.OK,
+            serviceName: givenServiceName,
+            serviceFunction: givenServiceFunction,
+            method: givenMethod,
+            failureMessage: givenFailureMessage,
+            authRequired: true,
+          })
+        )
+      );
+
+      // THEN refreshToken should be called exactly once — not three times
+      expect(mockAuthService.refreshToken).toHaveBeenCalledTimes(1);
+      // AND all three requests should have succeeded on their retry
+      expect(actualResponses).toHaveLength(3);
+      actualResponses.forEach((response) => {
+        expect(response.status).toBe(StatusCodes.OK);
+      });
     });
   });
 
