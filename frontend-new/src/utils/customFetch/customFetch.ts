@@ -160,13 +160,6 @@ const refreshToken = async (
 let pendingRefreshPromise: Promise<string> | null = null;
 
 /*
- * Test-only: reset the shared in-flight slot so one test's deduped refresh does not bleed into the next.
- * */
-export const __resetPendingRefreshPromiseForTests = (): void => {
-  pendingRefreshPromise = null;
-};
-
-/*
  * Deduplicated wrapper around refreshToken: parallel 401s await a single in-flight RPC
  * instead of each triggering their own.
  * */

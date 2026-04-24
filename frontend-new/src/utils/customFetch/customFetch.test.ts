@@ -8,7 +8,6 @@ import {
   MAX_ATTEMPTS,
   MIN_TOKEN_VALIDITY_SECONDS,
   RETRY_STATUS_CODES,
-  __resetPendingRefreshPromiseForTests,
 } from "./customFetch";
 import { setupFetchSpy } from "src/_test_utilities/fetchSpy";
 import { RestAPIError } from "src/error/restAPIError/RestAPIError";
@@ -64,7 +63,6 @@ describe("Api Service tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     resetAllMethodMocks(AuthenticationStateService.getInstance());
-    __resetPendingRefreshPromiseForTests();
   });
 
   test("fetchWithAuth should add Authorization header when authToken is present", async () => {
