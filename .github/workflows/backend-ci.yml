@@ -63,7 +63,7 @@ jobs:
 
       - name: Run unit tests
         shell: bash
-        run: poetry run pytest -m 'not (evaluation_test or smoke_test)'
+        run: poetry run pytest -m 'not (evaluation_test or smoke_test or llm_integration)'
         working-directory: backend
 
       # generate offline vignettes for deployment
